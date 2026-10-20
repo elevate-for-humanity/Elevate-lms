@@ -1,0 +1,22 @@
+.root { min-width: 0; }
+.mobileTabs { display: none; }
+.desktop { display: contents; }
+.mobile { display: none; }
+@media (max-width: 767px) {
+  .mobileTabs { display: flex; flex-wrap: wrap; gap: .5rem; padding: .5rem; }
+  .desktop { display: none; }
+  .mobile { display: block; min-width: 0; }
+}
+@media (max-width: 767px) {
+  .operations, .outline { height: auto !important; min-height: 0 !important; }
+  .operations > div:first-child, .outline > div:first-child { display: none; }
+  .operations > div:nth-child(2), .outline > div:nth-child(2) { display: block; overflow: visible; }
+  .operations > div:nth-child(2) > [role=separator], .outline > div:nth-child(2) > [role=separator] { display: none; }
+  .root[data-mobile-pane=preview] .operations > div:nth-child(2) > section,
+  .root[data-mobile-pane=preview] .outline > div:nth-child(2) > section,
+  .root[data-mobile-pane=outline] .operations > div:nth-child(2) > section,
+  .root[data-mobile-pane=outline] .outline > div:nth-child(2) > div:first-child,
+  .root[data-mobile-pane=operations] .operations > div:nth-child(2) > div:first-child { display: none; }
+  .root[data-mobile-pane=outline] .outline > div:nth-child(2) > section,
+  .root[data-mobile-pane=operations] .operations > div:nth-child(2) > section { display: block; }
+}

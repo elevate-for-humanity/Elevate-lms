@@ -37,6 +37,9 @@ export class UltimateReleaseService {
     )
       throw new Error('ULTIMATE_ALL_COMPETENCIES_REQUIRED');
     for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile, lesson.competency_id);
+    // Current automated contract evidence authorizes publication. Historical
+    // owner-review policies and optional review records cannot strand a build.
+
     const p: any = b.profile,
       cm = new Map((p.competencies ?? []).map((c: any) => [String(c.id), c]));
     return {

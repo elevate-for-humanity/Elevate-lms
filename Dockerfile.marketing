@@ -40,6 +40,7 @@ RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --stric
 FROM base AS builder
 
 ARG APPLICATION_SERVICE=marketing
+ENV APPLICATION_SERVICE=$APPLICATION_SERVICE
 RUN case "$APPLICATION_SERVICE" in marketing|store) ;; *) exit 1 ;; esac
 
 ARG NF_GIT_SHA

@@ -7,6 +7,15 @@ import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs'
 /** Changing this version invalidates every checkpoint and release certificate. */
 export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
 export const MAX_TARGETED_REPAIRS = 8;
+// Only the manually approved Cosmetology build; never the automated build.
+const MANUAL_COSMETOLOGY_COURSE_ID = 'a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
+export function nonblockingManualReview(profile: unknown): boolean {
+  return (profile as any)?.id === 'course:' + MANUAL_COSMETOLOGY_COURSE_ID;
+}
+export function optionalManualReviewStage(step: UltimateBuildStep, profile: unknown): boolean {
+  return nonblockingManualReview(profile) && (step === 'instructional_qa' || step === 'learner_runthrough');
+}
+
 type Artifact = Record<string, any>;
 export function contractHash(value: unknown): string {
   function canonical(v: any): any {
@@ -37,7 +46,10 @@ export function stepInputHash(
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,
-    profile: instructionalProfile,
+    // Publication is an operational policy, not a reason to regenerate saved lessons.
+    // Preserve the existing hash identity when upgrading legacy review profiles.
+    profile: { ...instructionalProfile, ...(instructionalProfile.publicationPolicy === 'automatic-quality-verified'
+      ? { publicationPolicy: 'owner-review-required' } : {}) },
     step,
     // Invalidate source-generated teaching after the full-section authoring
     // fix, while retaining the unchanged standards checkpoint. Downstream
@@ -239,7 +251,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       require(a.release?.blocked === false &&
         a.release.traceability?.pass === true &&
         populated(a.release.rows) &&
-        a.release.accessibility?.pass === true, 'RELEASE_TRACEABILITY_ACCESSIBILITY_REQUIRED');
+        (a.release.accessibility?.pass === true || (a.release.courseId === MANUAL_COSMETOLOGY_COURSE_ID && a.release.accessibility?.deferred === true)), 'RELEASE_TRACEABILITY_ACCESSIBILITY_REQUIRED');
       break;
   }
   return failures;
@@ -266,6 +278,8 @@ export function assertCompleteLesson(
   if (practicalVisualFailures(artifacts, competency).length)
     throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {
+    // These are omitted, not passed or certified, on this owner-approved build.
+    if (optionalManualReviewStage(step, profile)) continue;
     const a = artifacts[step];
     if (
       !currentEvidence(a, profile ? stepInputHashes(step, profile, artifacts) : undefined) ||

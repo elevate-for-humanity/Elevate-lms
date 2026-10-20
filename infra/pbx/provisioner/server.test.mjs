@@ -39,6 +39,13 @@ test('contact existence and qualified reachability are distinct', () => {
   assert.deepEqual(parseContacts(`Aor: ${endpoint} 1\nContact: ${endpoint}/sip:x unknown Avail 1.0`, endpoint), { contactCount: 1, reachableContactCount: 1 });
   assert.throws(() => parseContacts('No such AOR', endpoint));
 });
+test('Asterisk 20 clipped AOR columns retain exact-query identity and full contact IDs', () => {
+  const output = `Aor: ${endpoint.slice(0, 41)} 1\nContact: ${endpoint}/sip:fixture hash Avail 1.0`;
+  assert.deepEqual(parseContacts(output, endpoint), { contactCount: 1, reachableContactCount: 1 });
+  assert.throws(() => parseContacts(`Aor: ${endpoint.slice(0, 40)} 1`, endpoint));
+  assert.throws(() => parseContacts(`Aor: pwa-${'f'.repeat(37)} 1`, endpoint));
+  assert.throws(() => parseContacts(`Aor: ${endpoint} 2`, endpoint));
+});
 
 async function fixture(t) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'elevate-pbx-test-'));

@@ -6,6 +6,13 @@ spec = importlib.util.spec_from_file_location('pbx_audit', Path(__file__).with_n
 pbx = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pbx)
 class RuntimeEvidence(unittest.TestCase):
+    def test_generated_operator_uses_contact_collection_before_dialing(self):
+        plan = "[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\n 2. Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(pwa-" + 'a'*40 + ")})\n 3. Dial(${PWA_CONTACTS},25)\n 4. Return()"
+        self.assertTrue(pbx.pwa_operator_configured(plan))
+        self.assertFalse(pbx.operator_configured(plan))
+        self.assertFalse(pbx.pwa_operator_configured("[ Context 'elevate-pwa-extensions' ]\n '_X.' => 1. Set(PWA_CONTACTS=)\nReturn()"))
+        self.assertFalse(pbx.pwa_operator_configured("[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\nReturn()"))
+        self.assertTrue(pbx.pwa_operator_configured("[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\nSet(DIALSTATUS=CHANUNAVAIL)\nReturn()"))
     def test_carrier_inventory_excludes_identity_and_credentials(self):
         report = pbx.carrier_inventory('Transport: transport-udp udp 0 0 0.0.0.0:5060\nTransport: secure tls 0 0 0.0.0.0:5061\npassword=private',
                                       ' Endpoint: twilio/123456 Not in use\n Endpoint: pwa-private Not in use\n Endpoint: telnyx Not in use')

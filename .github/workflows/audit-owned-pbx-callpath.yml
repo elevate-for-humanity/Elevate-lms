@@ -2,7 +2,7 @@ name: Audit independent Elevate PBX call path
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['.github/workflows/audit-owned-pbx-callpath.yml', 'scripts/gcp/*pbx*', 'scripts/gcp/pbx-one-command-readiness.sh']
+    paths: ['.github/workflows/audit-owned-pbx-callpath.yml', 'scripts/gcp/*pbx*', 'scripts/gcp/pbx-one-command-readiness.sh', 'infra/pbx/paris/**', 'infra/pbx/asterisk/**']
   push:
     branches: [main]
     paths:
@@ -10,6 +10,8 @@ on:
       - 'scripts/gcp/audit-pbx-runtime.py'
       - 'scripts/gcp/verify-pbx-transport.mjs'
       - 'scripts/gcp/pbx-one-command-readiness.sh'
+      - 'infra/pbx/paris/**'
+      - 'infra/pbx/asterisk/**'
 permissions:
   actions: write
   contents: read
@@ -30,6 +32,7 @@ jobs:
           persist-credentials: false
       - run: python3 scripts/gcp/test-audit-pbx-runtime.py
       - run: node --check scripts/gcp/verify-pbx-transport.mjs
+      - run: node --test infra/pbx/paris/*.test.mjs
   dispatch:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04

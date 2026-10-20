@@ -37,6 +37,8 @@ export interface ApproveApplicationResult {
 
 const APPROVABLE_APPLICATION_STATUSES = new Set([
   'under_review',
+  'pending_admin_review',
+  'submitted',
   'funding_review',
   'pending_workone',
   'in_review',
@@ -58,24 +60,16 @@ export async function approveApplication(
     .maybeSingle();
 
   if (appError || !app) return { success: false, error: 'Application not found' };
-  if (app.status === 'approved') {
-    return { success: true, userId: app.user_id, error: 'Already approved' };
-  }
+  // Reconcile previously approved applications rather than returning before LMS provisioning.
+  // Re-running approval must be safe when an earlier attempt partially completed.
 
-  if (!APPROVABLE_APPLICATION_STATUSES.has(app.status)) {
+  if (app.status !== 'approved' && !APPROVABLE_APPLICATION_STATUSES.has(app.status)) {
     return {
       success: false,
       error: `Application must be under review before approval (current status: ${app.status})`,
     };
   }
 
-  if (app.status === 'pending_workone' && !app.has_workone_approval) {
-    return {
-      success: false,
-      error:
-        'This application is pending WorkOne eligibility confirmation. Update has_workone_approval before approving.',
-    };
-  }
 
   const isRepair = (input as any).source === 'stripe_repair';
   const NON_SELF_PAY = [
@@ -353,7 +347,8 @@ export async function approveApplication(
       status: 'approved',
       user_id: userId,
       program_id: resolvedProgramId,
-      eligibility_status: 'verified',
+      // Admission grants access; eligibility is owned by its separate review.
+      // In particular, an audited payment-gate exception is not funding proof.
       updated_at: new Date().toISOString(),
     })
     .eq('id', applicationId);

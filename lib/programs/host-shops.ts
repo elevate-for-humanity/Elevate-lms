@@ -94,8 +94,13 @@ function parseMedia(value: unknown): HostShopMedia[] {
     .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
+/** Fail closed for synthetic records and retired partner identities on every public surface. */
 function isPubliclyListedHostShop(shop: HostShop): boolean {
-  return Boolean(shop.name.trim());
+  const identity = [shop.name, shop.email, shop.publicSlug, shop.address].filter(Boolean).join(' ').toLowerCase();
+  if (!shop.name.trim()) return false;
+  if (/\\[qa(?:\\s+e2e)?\\]|qa[ -]?e2e|qa test|100 qa test way|@qa\\.invalid|@example\\.(?:com|org|net)|@test\\.|\\.invalid\\b/.test(identity)) return false;
+  if (/razor[’'\\s-]*s?\\s+image|razorsimage/.test(identity)) return false;
+  return true;
 }
 
 function approvedAddress(shop: HostShop) {
@@ -297,7 +302,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       return { id: row.id, name: row.name, address: row.address ?? '', city: row.city ?? '', state: row.state === 'Indiana' ? 'IN' : row.state || 'IN', zip: row.zip_code ?? '', phone: row.phone ?? '', email: '', supervisor: '', programs, primaryProgram: programs[0], badge: 'partner', publicSlug: featured?.slug ?? slug, website: row.website || featured?.websiteUrl, description: row.description || featured?.marketingBlurb || `${row.name} participates in Elevate’s approved Host Shop network. Occupation and placement availability are confirmed by Elevate.`, mediaGallery: row.image_url ? [{url: row.image_url, alt: `${row.name} shop photo`}] : undefined };
     });
   const archivedNames = new Set((archivedPartnerResult.data ?? []).flatMap((row) => [row.name, row.shop_name, row.dba]).filter(Boolean).map(businessKey));
-  const all = [...existing, ...activeShopBacked].filter((shop) => !archivedNames.has(businessKey(shop.name)));
+  const all = [...existing, ...activeShopBacked].filter((shop) =>
+    isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)),
+  );
 
 
   if (program) {

@@ -5,8 +5,8 @@ import { dispatchQueuedCourseJob } from './dispatch-course-job.mjs';
 function setup(executions, queued, httpStatus=200) {
   const calls=[];
   const run=(_command,args)=>{calls.push(args); return JSON.stringify(args[2] === 'describe' ? {spec:{template:{spec:{parallelism:2,template:{spec:{containers:[{resources:{limits:{cpu:'8',memory:'32Gi'}}}]}}}}}} : executions);};
-  const request=async url=>({ok:httpStatus===200,status:httpStatus,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-test',heartbeat_at:'2026-10-06T10:00:01Z'}] : queued});
-  return {calls,options:{run,request,capacityCheck:async()=>({fits:true}),env:{SUPABASE_SERVICE_ROLE_KEY:'test-fixture'},now:new Date('2026-10-06T10:00:00Z')}};
+  const request=async url=>({ok:httpStatus===200,status:httpStatus,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-test',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}] : queued});
+  return {calls,options:{run,request,capacityCheck:async()=>({fits:true}),env:{SUPABASE_SERVICE_ROLE_KEY:'test-fixture'},now:new Date('2026-10-06T10:00:00Z'),clock:()=>Date.parse('2026-10-06T10:00:02Z')}};
 }
 test('active worker allows another execution when a worker slot remains',async()=>{
   const s=setup([{status:{}}],[{id:'queued'}]);
@@ -76,7 +76,7 @@ test('insufficient approved regional capacity leaves queued work untouched and d
 
 test('two eligible builds request two parallel Google Cloud Run worker tasks',async()=>{
  const s=setup([],[{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]);
- s.options.request=async url=>({ok:true,status:200,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-a',heartbeat_at:'2026-10-06T10:00:01Z'},{id:'queued-2',status:'running',lease_owner:'worker-b',heartbeat_at:'2026-10-06T10:00:01Z'}] : [{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]});
+ s.options.request=async url=>({ok:true,status:200,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-a',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'},{id:'queued-2',status:'running',lease_owner:'worker-b',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}] : [{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]});
  const result=await dispatchQueuedCourseJob(s.options);
  assert.equal(result.tasks,2);
  assert.ok(s.calls[2].includes('--tasks=2'));
@@ -117,4 +117,13 @@ test('unavailable execution allocation fails closed before launching a worker',a
  const s=setup([{spec:{taskCount:2,parallelism:2},status:{succeededCount:3}}],[{id:'queued'}]);
  await assert.rejects(dispatchQueuedCourseJob(s.options),/allocation is unavailable/);
  assert.equal(s.calls.some(args=>args.includes('execute')),false);
+});
+
+test('a fresh heartbeat with an expired lease is not a confirmed assignment',async()=>{
+ const s=setup([],[{id:'queued'}]);
+ s.options.assignmentAttempts=1;
+ s.options.request=async url=>({ok:true,json:async()=>url.searchParams.has('id')
+  ? [{id:'queued',status:'running',lease_owner:'old-worker',heartbeat_at:'2026-10-06T10:00:01Z',lease_expires_at:'2026-10-06T09:59:00Z'}]
+  : [{id:'queued'}]});
+ await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
 });

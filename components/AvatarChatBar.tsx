@@ -81,7 +81,7 @@ const getAvatarConfig = (pathname: string) => {
       video: '/videos/avatars/financial-guide.mp4',
       name: 'Funding Guide',
       message:
-        'Looking for free training? I can help you understand WIOA funding, grants, and financial aid options!',
+        'Looking for help with training costs? I can explain program-specific funding, grants, and payment options without promising eligibility.',
     };
   }
   if (pathname.includes('/onboarding') || pathname.includes('/orientation')) {

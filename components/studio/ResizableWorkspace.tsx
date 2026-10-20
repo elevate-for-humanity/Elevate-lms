@@ -1,7 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import styles from './ResizableWorkspace.module.css';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import styles from "./ResizableWorkspace.module.css";
 
 interface Props {
   children: ReactNode;
@@ -10,6 +17,9 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   className?: string;
+  panelPosition?: "start" | "end";
+  initialPanelSize?: number;
+  mobileExclusive?: boolean;
 }
 
 /** Keeps both workspaces mounted while resizing, hiding, or expanding a panel. */
@@ -19,12 +29,17 @@ export function ResizableWorkspace({
   title,
   open,
   onOpenChange,
-  className = '',
+  className = "",
+  panelPosition = "end",
+  initialPanelSize = 45,
+  mobileExclusive = false,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const body = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(45);
+  const [width, setWidth] = useState(
+    Math.max(25, Math.min(75, initialPanelSize)),
+  );
   const [height, setHeight] = useState(45);
   const [stacked, setStacked] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -34,11 +49,12 @@ export function ResizableWorkspace({
   useEffect(() => {
     const element = root.current;
     if (!element) return;
-    const observe = () => setStacked(element.getBoundingClientRect().width <= 760);
+    const observe = () =>
+      setStacked(element.getBoundingClientRect().width <= 760);
     observe();
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', observe);
-      return () => window.removeEventListener('resize', observe);
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", observe);
+      return () => window.removeEventListener("resize", observe);
     }
     const observer = new ResizeObserver(observe);
     observer.observe(element);
@@ -48,28 +64,53 @@ export function ResizableWorkspace({
   useEffect(() => {
     if (!expanded) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setExpanded(false);
+      if (event.key === "Escape") setExpanded(false);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [expanded]);
 
   const resize = (amount: number) => {
-    if (stacked) setHeight((value) => Math.max(25, Math.min(75, value + amount)));
+    if (stacked)
+      setHeight((value) => Math.max(25, Math.min(75, value + amount)));
     else setWidth((value) => Math.max(25, Math.min(75, value + amount)));
   };
   const close = () => {
     setExpanded(false);
     onOpenChange(false);
   };
-  const full = open && expanded;
+  const mobileFull = open && stacked && mobileExclusive;
+  const full = open && (expanded || mobileFull);
+  useEffect(() => {
+    const element = root.current;
+    if (!open || !expanded || mobileFull || !element || typeof element.showPopover !== "function") return;
+    try {
+      if (!element.matches(":popover-open")) element.showPopover();
+    } catch {
+      // Browsers without stable popover support retain the in-layout expanded panel.
+      return;
+    }
+    return () => {
+      try {
+        if (element.matches(":popover-open")) element.hidePopover();
+      } catch {
+        // The node may already have unmounted during navigation.
+      }
+    };
+  }, [open, expanded, mobileFull]);
 
   return (
-    <div ref={root} className={`${styles.root} ${className}`}>
+    <div
+      ref={root}
+      style={full ? { display: "flex" } : undefined}
+      popover={open && expanded && !mobileFull ? "manual" : undefined}
+      className={`${styles.root} ${mobileFull ? styles.mobileExclusive : ""} ${open && expanded ? styles.fullScreen : ""} ${className}`}
+    >
       <div className={styles.toolbar}>
         <span className={styles.title}>{title}</span>
         {open ? (
           <>
+            {!mobileFull && <>
             <button
               type="button"
               onClick={() => resize(-5)}
@@ -91,10 +132,16 @@ export function ResizableWorkspace({
               onClick={() => setExpanded((value) => !value)}
               aria-pressed={expanded}
             >
-              {expanded ? 'Restore split view' : 'Expand panel'}
+              {expanded ? "Restore split view" : "Expand panel"}
             </button>
-            <button type="button" onClick={close} aria-controls={panelId} aria-expanded>
-              Close {title}
+            </>}
+            <button
+              type="button"
+              onClick={close}
+              aria-controls={panelId}
+              aria-expanded
+            >
+              {mobileFull ? "Back to chat" : `Close ${title}`}
             </button>
           </>
         ) : (
@@ -110,8 +157,13 @@ export function ResizableWorkspace({
       </div>
       <div
         ref={body}
-        className={`${styles.body} ${open ? styles.open : ''} ${full ? styles.expanded : ''}`}
-        style={{ '--panel-width': `${width}%`, '--panel-height': `${height}%` } as CSSProperties}
+        className={`${styles.body} ${panelPosition === "start" ? styles.panelStart : ""} ${open ? styles.open : ""} ${full ? styles.expanded : ""}`}
+        style={
+          {
+            "--panel-width": `${width}%`,
+            "--panel-height": `${height}%`,
+          } as CSSProperties
+        }
       >
         <div className={styles.primary} hidden={full}>
           {children}
@@ -122,26 +174,28 @@ export function ResizableWorkspace({
             tabIndex={0}
             aria-label={`Resize ${title}`}
             aria-controls={panelId}
-            aria-orientation={stacked ? 'horizontal' : 'vertical'}
+            aria-orientation={stacked ? "horizontal" : "vertical"}
             aria-valuemin={25}
             aria-valuemax={75}
             aria-valuenow={stacked ? height : width}
-            aria-valuetext={stacked ? `${height} percent tall` : `${width} percent wide`}
+            aria-valuetext={
+              stacked ? `${height} percent tall` : `${width} percent wide`
+            }
             className={styles.separator}
             onKeyDown={(event) => {
-              const amount = ['ArrowLeft', 'ArrowUp'].includes(event.key)
+              const amount = ["ArrowLeft", "ArrowUp"].includes(event.key)
                 ? 5
-                : ['ArrowRight', 'ArrowDown'].includes(event.key)
+                : ["ArrowRight", "ArrowDown"].includes(event.key)
                   ? -5
                   : 0;
               if (amount) {
                 event.preventDefault();
-                resize(amount);
+                resize(panelPosition === "start" ? -amount : amount);
               }
-              if (event.key === 'Home' || event.key === 'End') {
+              if (event.key === "Home" || event.key === "End") {
                 event.preventDefault();
-                if (stacked) setHeight(event.key === 'Home' ? 25 : 75);
-                else setWidth(event.key === 'Home' ? 25 : 75);
+                if (stacked) setHeight(event.key === "Home" ? 25 : 75);
+                else setWidth(event.key === "Home" ? 25 : 75);
               }
             }}
             onPointerDown={(event) => {
@@ -156,8 +210,18 @@ export function ResizableWorkspace({
               const rect = body.current.getBoundingClientRect();
               const size = stacked ? rect.height : rect.width;
               if (!size) return;
-              const remaining = stacked ? rect.bottom - event.clientY : rect.right - event.clientX;
-              const percentage = Math.max(25, Math.min(75, Math.round((remaining / size) * 100)));
+              const remaining =
+                panelPosition === "start"
+                  ? stacked
+                    ? event.clientY - rect.top
+                    : event.clientX - rect.left
+                  : stacked
+                    ? rect.bottom - event.clientY
+                    : rect.right - event.clientX;
+              const percentage = Math.max(
+                25,
+                Math.min(75, Math.round((remaining / size) * 100)),
+              );
               if (stacked) setHeight(percentage);
               else setWidth(percentage);
             }}
@@ -179,7 +243,12 @@ export function ResizableWorkspace({
             <span aria-hidden>⋮</span>
           </div>
         )}
-        <section id={panelId} aria-label={title} className={styles.secondary} hidden={!open}>
+        <section
+          id={panelId}
+          aria-label={title}
+          className={styles.secondary}
+          hidden={!open}
+        >
           {panel}
         </section>
         {dragging && <div className={styles.dragShield} />}

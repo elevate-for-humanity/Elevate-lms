@@ -130,7 +130,7 @@ export function planAIToolFromCommand(
   if (lower.trim() === 'inspect course builder health checks') {
     return { name: 'courses.health', input: {} };
   }
-  if (/\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
+  if (!isEngineeringCommand(lower) && /\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
       /\b(status|health|monitor|failures?|errors?|working|helping)\b/.test(lower))
     return {name:'paris.supervision', input:{}};
 
@@ -165,6 +165,23 @@ export function planAIToolFromCommand(
   ) {
     return { name: 'workflows.inspect', input: {} };
   }
+  // A read-only Course Builder investigation must never enqueue production work,
+  // even when a quoted error or historical action contains repair verbs.
+  // Preserve the explicit tool override above for trusted internal callers.
+  if (
+    /\b(read[- ]?only|do not (?:start|resume|create|generate|publish|modify|change|repair)|without (?:starting|resuming|modifying))\b/.test(lower) &&
+    /\b(course|lesson|course builder|build|worker|checkpoint)\b/.test(lower) &&
+    /\b(audit|inspect|check|status|health|review|report|verify)\b/.test(lower)
+  ) {
+    return {
+      name: 'courses.status',
+      input: {
+        ...(typeof context.courseId === 'string' ? { courseId: context.courseId } : {}),
+        ...(typeof context.buildId === 'string' ? { buildId: context.buildId } : {}),
+      },
+    };
+  }
+
   // A compound repair request may require live-browser evidence, but the
   // browser runtime cannot edit, test, commit, or deploy repository changes.
   // Route explicit engineering execution to the coding runtime; that worker

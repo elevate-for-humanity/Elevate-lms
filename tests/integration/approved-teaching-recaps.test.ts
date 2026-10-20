@@ -1,3 +1,4 @@
+import {createCourseProgressWatch} from '../../lib/ultimate-course-builder/worker/progress-watch.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {addFreshTeachingRecaps} from '../../lib/ultimate-course-builder/instructional/teaching-recaps';
@@ -35,4 +36,17 @@ test('review failure is returned to author for a bounded source-grounded repair'
   return {pass:reviews>1,findings:reviews>1?[]:['Unsupported instruction'],hash:input.hash,blueprintHash:input.hash,competencyId:input.competencyId};
  });
  assert.equal(reviews,2);assert.equal(repairs,1);assert.equal(result.segments.length,2);
+});
+
+test('recap generation and evidence count as real progress during a long objectives stage',async()=>{
+ let tick=0,calls=0;const watch=createCourseProgressWatch({now:()=>tick,schedule:()=>0,cancel:()=>{}});
+ try {
+  await watch.run(()=>addFreshTeachingRecaps(blueprint,{},sources,async(_model,_system,input)=>{
+   tick+=540000;await watch.check();assert.equal(watch.signal.aborted,false);
+   return ++calls===1?{recaps}:{pass:true,findings:[],hash:input.hash,blueprintHash:input.hash,competencyId:input.competencyId};
+  }));
+  assert.equal(watch.signal.aborted,false);assert.equal(calls,2);
+  assert.equal(watch.snapshot().phase,'authoring:tools:recap-evidence');
+  tick+=600001;await watch.check();assert.equal(watch.signal.aborted,true);
+ } finally {watch.dispose();}
 });

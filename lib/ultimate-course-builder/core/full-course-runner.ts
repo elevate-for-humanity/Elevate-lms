@@ -57,6 +57,30 @@ export async function runUltimateCourse(
     console.info('[UltimateCourse] checkpoint loading', {lessonBuildId: lesson.id, competencyId: competency.id});
     const checkpoint = await persistence.loadLessonCheckpoint({ lessonBuildId: lesson.id });
     console.info('[UltimateCourse] checkpoint loaded', {lessonBuildId: lesson.id, passedSteps: checkpoint.passedSteps.length});
+    // A complete checkpoint is immutable during ordinary continuation.
+    // Revalidate it without invoking producers; only explicit repair reauthors it.
+    if (
+      !plan.repairFromStep &&
+      !plan.renderPreviewOnly &&
+      ULTIMATE_BUILD_STEPS.every((step) =>
+        checkpoint.passedSteps.includes(step),
+      )
+    ) {
+      assertCompleteLesson(
+        checkpoint.artifacts as any,
+        plan.profile,
+        competency.id,
+      );
+      lessons.push({
+        competencyId: competency.id,
+        lessonBuildId: lesson.id,
+        result: {
+          artifacts: checkpoint.artifacts as any,
+          findings: checkpoint.findings.filter((f) => f.severity !== "error"),
+        },
+      });
+      continue;
+    }
     const restoredPassed: UltimateBuildStep[] = [];
     for (const step of ULTIMATE_BUILD_STEPS) {
       if (step === plan.repairFromStep) break;
@@ -161,3 +185,4 @@ export async function runUltimateCourse(
   return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed, previewReady,
     nextIndex: startIndex + lessons.length, hasRemaining: startIndex + lessons.length < eligible.length };
 }
+

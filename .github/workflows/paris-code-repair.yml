@@ -17,6 +17,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  actions: write
 concurrency:
   group: paris-code-repair
   cancel-in-progress: false
@@ -43,17 +44,36 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
-      - run: |
+      - name: Tick PARIS and dispatch the claimed repair with workflow-owned identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
           python - <<'PYCODE'
           import os,json,urllib.request,urllib.error
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=json.dumps({'phase':'tick'}).encode(),headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
+          endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
+          headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}
+          preflight=urllib.request.Request(endpoint,data=json.dumps({'phase':'auth-diagnostic'}).encode(),headers=headers)
+          capability=json.load(urllib.request.urlopen(preflight,timeout=60))
+          if capability.get('workflowAuthorization')!='temporary-job-v1':
+            print('Repair monitor deferred until the compatible Admin runtime is deployed.')
+            raise SystemExit(0)
+          req=urllib.request.Request(endpoint,data=json.dumps({'phase':'tick'}).encode(),headers=headers)
           try:
-            print(urllib.request.urlopen(req,timeout=120).read().decode())
+            result=json.load(urllib.request.urlopen(req,timeout=120))
+            print(json.dumps(result))
+            if result.get('dispatchRequired'):
+              repair_id=result['repairId']
+              import subprocess
+              subprocess.run(['gh','api','--method','POST','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/workflows/paris-code-repair.yml/dispatches','-f','ref=main','-f','inputs[repair_id]='+repair_id],check=True)
           except urllib.error.HTTPError as error:
             print(error.read().decode()[:1000])
             raise
           PYCODE
   prepare:
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 8
@@ -81,6 +101,7 @@ jobs:
       - name: Stage the PARIS patch
         id: patch
         env:
+          GH_TOKEN: ${{ github.token }}
           ADMIN_URL: https://admin.elevateforhumanity.org
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
@@ -88,7 +109,7 @@ jobs:
           import json,os,re,urllib.request
           if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
           body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
+          req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
           result=json.load(urllib.request.urlopen(req,timeout=330))
           if not all(re.fullmatch(r'[a-f0-9]{40}',result.get(k,'')) for k in ['sha','baseSha']): raise SystemExit('Missing candidate evidence')
           with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('sha='+result['sha']+'\nbase='+result['baseSha']+'\n')
@@ -163,6 +184,10 @@ jobs:
           path: /tmp/paris-validation.json
           retention-days: 7
   publish:
+    permissions:
+      contents: write
+      actions: write
+      id-token: write
     needs: [prepare,validate]
     runs-on: ubuntu-24.04
     timeout-minutes: 3
@@ -186,12 +211,13 @@ jobs:
           NODE
       - name: Publish only the independently validated immutable patch
         env:
+          GH_TOKEN: ${{ github.token }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
           import os,json,urllib.request
           data=json.dumps({'phase':'publish','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
           result=json.load(urllib.request.urlopen(req,timeout=120))
           print(json.dumps({'status':result.get('status'),'sha':result.get('sha'),'verifiedLive':False}))
           PY

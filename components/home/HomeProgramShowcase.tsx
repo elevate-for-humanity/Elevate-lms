@@ -84,7 +84,7 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             id="program-showcase-heading"
             className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl"
           >
-            Train for an in-demand career. Funding may cover your cost.
+            Train for an in-demand career. Review the verified payment path for your program.
           </Heading>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
             Explore HVAC, CDL, business, bookkeeping, technology, healthcare, and more. Funding is
@@ -95,10 +95,9 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-blue-200 bg-white p-4">
               <BadgeDollarSign className="h-6 w-6 text-emerald-700" />
-              <p className="mt-2 font-black">Training may be no-cost if you qualify</p>
+              <p className="mt-2 font-black">Verified funding exists for selected programs</p>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Apply first, complete intake, and receive written approval before funded training
-                begins.
+                Open the exact program record first. Where workforce funding is verified, complete agency intake and receive written authorization before training begins.
               </p>
             </div>
             <div className="rounded-2xl border border-blue-200 bg-white p-4">

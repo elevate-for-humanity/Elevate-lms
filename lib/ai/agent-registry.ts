@@ -206,7 +206,8 @@ export class AgentRegistry {
     if (capableAgents.length === 0) {
       // Fall back to router if no specific agent can handle the intent
       const router = this.getAgent(AIAgent.ROUTER);
-      if (router) {
+      if (router?.status === AgentStatus.ACTIVE &&
+          this.getAgentLoad(router.type) < router.maxConcurrentTasks) {
         return router;
       }
       throw new Error(`No agent available for intent: ${intent}`);

@@ -30,6 +30,7 @@ import { isAffirmInvoiceAmount } from '@/lib/billing/invoice-checkout';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ENCHANTED_HEARTS } from '@/lib/partners/enchanted-hearts';
 import { resolveQuickBooksProgramPromotion } from '@/lib/payments/quickbooks-program-promotion';
+import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 
 type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
     const { data: program, error: programError } = await admin
       .from('programs')
       .select(
-        'id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free',
+        'id, title, slug, price, tuition, total_cost, status, is_free',
       )
       .eq('id', program_id)
       .eq('published', true)
@@ -144,22 +145,29 @@ export async function POST(request: NextRequest) {
       );
     }
     const agencyFundingRequested = funding_source !== 'self_pay';
-    if (
-      agencyFundingRequested &&
-      !program.funding_confirmed &&
-      !program.wioa_approved &&
-      !program.etpl_listed
-    ) {
+    const publicFundingRequested = ['workone', 'wioa', 'grant'].includes(funding_source);
+    const verifiedFunding = getVerifiedProgramFunding(program.slug);
+    const publicFundingAllowed =
+      funding_source === 'grant'
+        ? Boolean(verifiedFunding?.etplListedFor2Exclusive && verifiedFunding.wrgEligible)
+        : Boolean(
+            verifiedFunding?.etplListedFor2Exclusive &&
+            verifiedFunding.wioaEligible &&
+            ['workone', 'wioa'].includes(funding_source),
+          );
+
+    if (publicFundingRequested && !publicFundingAllowed) {
       return NextResponse.json(
         {
           error:
-            'This program does not have a verified agency-funded checkout path. Choose self-pay or contact admissions.',
+            'This program does not have a verified public-funding checkout path for the selected source. Choose self-pay, employer sponsorship when documented, or contact admissions.',
         },
         { status: 409 },
       );
     }
-    // A funding request is not a payment authorization. Keep the enrollment
-    // pending until staff records the agency's written authorization.
+    // A public-funding or employer-sponsorship request is not a payment
+    // authorization. Keep the enrollment pending until written authorization
+    // or sponsorship is recorded.
     const amountToCharge = agencyFundingRequested ? 0 : stickerPrice;
 
     const partnerProgram =

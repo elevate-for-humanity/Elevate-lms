@@ -77,12 +77,12 @@ export class OpenStudioAgent {
    */
   async initialize(): Promise<void> {
     // Add system message
-    this.messages.push({
+    this.messages = [{
       id: crypto.randomUUID(),
       role: 'system',
       content: this.config.systemPrompt || DEFAULT_SYSTEM_PROMPT,
       timestamp: Date.now(),
-    });
+    }];
 
     // Try to load existing session from localStorage
     const savedSession = typeof window === 'undefined' ? null : window.localStorage.getItem('openstudio_session');
@@ -90,7 +90,10 @@ export class OpenStudioAgent {
       try {
         const session = JSON.parse(savedSession) as ConversationSession;
         this.sessionId = session.id;
-        this.messages = session.messages;
+        if (Array.isArray(session.messages)) {
+          this.messages = [this.messages[0], ...session.messages.filter(message =>
+            message && ['user', 'assistant', 'tool'].includes(message.role) && typeof message.content === 'string')];
+        }
       } catch (e) {
         console.error('Failed to load session:', e);
       }

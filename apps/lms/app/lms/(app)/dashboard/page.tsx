@@ -13,7 +13,9 @@ import {
   Clock,
   CreditCard,
   ExternalLink,
+  FileText,
   GraduationCap,
+  Mail,
   MessageSquare,
   Play,
   Trophy,
@@ -29,7 +31,7 @@ import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { loadLearnerWorkspace } from '@/lib/learner/workspace';
-import { getActiveJobs } from '@/lib/data/jobs';
+import { getLearnerCareerMatches } from '@/lib/learner/career-matches';
 import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -84,9 +86,10 @@ function isBlockedExternalTraining(course: {
 
 export default async function StudentDashboard() {
   const { user, profile } = await requireRole(['student', 'learner', 'admin', 'super_admin']);
-  const supabase = await createClient();
+  const actorDb = await createClient();
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user.id);
+  const supabase = subject.previewing ? db : actorDb;
   const isAdminActor = ['admin', 'super_admin'].includes(String(profile?.role || ''));
   if (isAdminActor && !subject.previewing) return <NeutralStudentPortalPreview />;
 
@@ -97,7 +100,7 @@ export default async function StudentDashboard() {
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling ? await loadLearnerBillingRequirement(db, subjectId) : null;
-  const careerJobs = await getActiveJobs({ limit: 4 });
+  const careerMatches = await getLearnerCareerMatches(subjectId, 4);
   const { data: holderStudentRows } = await db
     .from('program_holder_students')
     .select('id')
@@ -187,12 +190,13 @@ export default async function StudentDashboard() {
   ]);
 
   const programEnrollments = workspace.enrollments
-    .filter((row) => row.program_id)
+    .filter((row) => row.program_id || row.program_slug)
     .map((row) => ({
       id: row.enrollment_id,
       status: row.status,
       enrolled_at: row.created_at,
       program_id: row.program_id,
+      program_slug: row.program_slug,
       programs: { id: row.program_id, title: row.program_title, slug: row.program_slug },
     }));
   const courseEnrollments = workspace.enrollments
@@ -373,6 +377,12 @@ export default async function StudentDashboard() {
       image: '/images/pages/comp-home-highlight-success.webp',
     },
     {
+      href: '/lms/certification/upload',
+      label: 'Upload Credentials',
+      text: 'Submit earned certifications and licenses for staff verification.',
+      image: '/images/pages/comp-home-highlight-success.webp',
+    },
+    {
       href: '/lms/resume-builder',
       label: 'Resume Builder',
       text: 'Create, update, and save your professional resume.',
@@ -383,6 +393,12 @@ export default async function StudentDashboard() {
       label: 'Schedule',
       text: 'Review classes, deadlines, and upcoming activity.',
       image: '/images/pages/career-counseling.jpg',
+    },
+    {
+      href: '/communications/email',
+      label: 'Interoffice Email',
+      text: 'Access your interoffice staff communications and program messages.',
+      image: '/images/pages/contact-hero.jpg',
     },
     {
       href: '/lms/messages',
@@ -418,14 +434,64 @@ export default async function StudentDashboard() {
       </div>
 
       <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6">
-        {!subject.previewing && programEnrollments.some((row) => row.programs.slug === 'hvac-technician') ? <>
-          <section className="rounded-xl border border-blue-200 bg-blue-50 p-5">
-            <h2 className="text-xl font-bold">Your HVAC start guide</h2>
-            <p className="my-3">Four weeks online, followed by two weeks at the facility. Review the dashboard orientation and confirm your calendar dates with staff.</p>
-            <Link className="font-bold underline" href="/lms/orientation">Program and dashboard orientation</Link>
-          </section>
-          <OnlineStudyClock />
-        </> : null}
+        {programEnrollments.some((row: any) => row.programs?.slug === 'hvac-technician' || row.program_slug === 'hvac-technician') ? (
+          <>
+            <section className="rounded-xl border border-blue-200 bg-blue-50 p-5">
+              <h2 className="text-xl font-bold text-slate-950">Your HVAC start guide</h2>
+              <p className="my-2 text-sm text-slate-700">
+                Four weeks online, followed by two weeks at the facility. Review the dashboard orientation and confirm your calendar dates with staff.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-4">
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue-800 underline" href="/lms/orientation">
+                  <BookOpen className="h-4 w-4" /> Program and dashboard orientation
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue-800 underline" href="/lms/documents">
+                  <FileText className="h-4 w-4" /> Submit required documents
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue-800 underline" href="/communications/email">
+                  <Mail className="h-4 w-4" /> Interoffice staff email
+                </Link>
+              </div>
+            </section>
+            <OnlineStudyClock />
+          </>
+        ) : null}
+        {programEnrollments.some((row: any) =>
+          ['bookkeeping', 'finance-bookkeeping-accounting'].includes(String(row.programs?.slug || row.program_slug || '').toLowerCase())
+        ) ? (
+          <>
+            <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <h2 className="text-xl font-bold text-slate-950">Your Bookkeeping &amp; Accounting Start Guide</h2>
+              <p className="my-2 text-sm text-slate-700">
+                8-week hybrid pathway preparing you for Intuit QuickBooks Certified User and Microsoft Office Specialist certification.
+              </p>
+              <div className="mt-4 rounded-lg border border-emerald-300 bg-white p-4">
+                <h3 className="font-bold text-slate-900">Assigned Learning Resource: BUS103 Introduction to Financial Accounting</h3>
+                <p className="mt-1 text-sm text-slate-700">
+                  <strong>BUS103 Instructions:</strong> Complete the accounting fundamentals, double-entry bookkeeping, general ledger reconciliations, and financial statement exercises in BUS103. Practice spreadsheet entries and QuickBooks Online workflows.
+                </p>
+                <p className="mt-2 text-xs font-semibold text-emerald-800">
+                  <strong>Training-Hour Guidance:</strong> Maintain 15–20 hours per week of active coursework, practical bookkeeping exercises, and software labs. Use the Online Study Clock below to log and verify each study session.
+                </p>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-4">
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/orientation">
+                  <BookOpen className="h-4 w-4" /> Program and dashboard orientation
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/documents">
+                  <FileText className="h-4 w-4" /> Submit required documents
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/communications/email">
+                  <Mail className="h-4 w-4" /> Interoffice staff email
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/courses/566e2ef7-6861-4736-9807-b4ff868fc908">
+                  <Play className="h-4 w-4" /> Open Bookkeeping courseware
+                </Link>
+              </div>
+            </section>
+            <OnlineStudyClock />
+          </>
+        ) : null}
         {subject.previewing ? (
           <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
             <span className="font-semibold">
@@ -466,7 +532,7 @@ export default async function StudentDashboard() {
           requirement={billingRequirement}
           readOnly={subject.previewing}
         /> : null}
-        {activeCourseEnrollment && activeCourseId ? (
+        {activeWorkspaceEnrollment ? (
           <section className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
             <Image
               src={studentHeroImage}
@@ -479,11 +545,11 @@ export default async function StudentDashboard() {
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/35" />
             <div className="p-6 sm:p-8 lg:max-w-[70%] lg:p-10">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-300">
-                {activeCourse?.title ?? 'Active Course'}
+                {activeCourse?.title ?? activeWorkspaceEnrollment.program_title ?? 'Active Program'}
               </p>
               <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">
                 {!activeCourseIsAvailable
-                  ? `Your course is being prepared, ${firstName}`
+                  ? `Welcome to your program, ${firstName}`
                   : isComplete
                     ? `Training complete, ${firstName}`
                     : isFirstVisit
@@ -492,16 +558,16 @@ export default async function StudentDashboard() {
               </h1>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-100">
                 {!activeCourseIsAvailable
-                  ? 'Your enrollment is recorded. Training will open here after the curriculum and media pass final review.'
+                  ? 'Your active program enrollment is confirmed. Complete your required orientation and documents below while course materials are being prepared.'
                   : isComplete
                     ? 'Every lesson in this course is recorded complete.'
                     : nextLesson
                       ? `${lessonsLeft} lesson${lessonsLeft === 1 ? '' : 's'} remaining. Next: ${nextLesson.title ?? 'lesson'}.`
                       : 'Your course is active and ready.'}
               </p>
-              {activeCourse?.description ? (
+              {activeCourse?.description || activeWorkspaceEnrollment.course_description ? (
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-200">
-                  {activeCourse.description}
+                  {activeCourse?.description ?? activeWorkspaceEnrollment.course_description}
                 </p>
               ) : null}
 
@@ -529,7 +595,7 @@ export default async function StudentDashboard() {
               )}
 
               <div className="mt-7 flex flex-wrap gap-3">
-                {resumeHref ? (
+                {activeCourseIsAvailable && resumeHref ? (
                   <Link
                     href={resumeHref}
                     className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-500"
@@ -542,7 +608,7 @@ export default async function StudentDashboard() {
                         : 'Continue Training'}
                   </Link>
                 ) : null}
-                {activeCourseIsAvailable && !isPartnerCourse ? (
+                {activeCourseIsAvailable && activeCourseId && !isPartnerCourse ? (
                   <Link
                     href={`/lms/courses/${activeCourseId}`}
                     className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
@@ -550,6 +616,24 @@ export default async function StudentDashboard() {
                     View Curriculum <ArrowRight className="h-4 w-4" />
                   </Link>
                 ) : null}
+                <Link
+                  href="/lms/orientation"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white/15 px-5 py-3 text-sm font-bold text-white hover:bg-white/25"
+                >
+                  <BookOpen className="h-4 w-4" /> Complete Orientation
+                </Link>
+                <Link
+                  href="/lms/documents"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                >
+                  <FileText className="h-4 w-4" /> Required Documents
+                </Link>
+                <Link
+                  href="/communications/email"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                >
+                  <Mail className="h-4 w-4" /> Interoffice Email
+                </Link>
               </div>
             </div>
           </section>
@@ -653,10 +737,10 @@ export default async function StudentDashboard() {
               Career Services
             </Link>
           </div>
-          {careerJobs.length > 0 ? (
+          {careerMatches.length > 0 ? (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {careerJobs.map((job) => (
-                <JobCard key={job.id} job={job} showApply href="/lms/placement" />
+              {careerMatches.map(({ job, eligibility, reasons, missingCredentials, applyUrl, source }) => (
+                <div key={job.id} className="min-w-0 space-y-2"><JobCard job={job} showApply href={applyUrl ?? "/lms/placement"} /><p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">{eligibility === 'credential_match' ? 'Verified credential match' : 'Explore this opportunity'}{reasons.length ? ` · ${reasons.join('; ')}` : ''}{missingCredentials.length ? ` · Credentials not verified: ${missingCredentials.join(', ')}` : ''}{source ? ` · Jobs sourced by ${source}` : ''}</p></div>
               ))}
             </div>
           ) : (

@@ -453,7 +453,7 @@ test.describe('Studio single-session access and composer', () => {
         if (attempt === 1) throw error;
       }
     }
-    const composer = page.getByRole('textbox', { name: 'Tell Admin AI what you need done...', exact: true });
+    const composer = page.getByRole('textbox', { name: 'Tell Paris what you need done...', exact: true });
     await expect(composer).toBeVisible();
     await expect.poll(() => composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
     await composer.fill('Readability test draft');
@@ -462,7 +462,11 @@ test.describe('Studio single-session access and composer', () => {
     await page.goto(`${ADMIN_BASE}/dashboard`);
     const access = page.getByRole('region', { name: 'Course and media access' });
     await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
-    await expect(page.getByRole('navigation', { name: 'Course tools' }).getByRole('link', { name: 'Course Builder', exact: true })).toBeVisible();
+    await access.getByRole('link', { name: 'Open Course Builder' }).click();
+    await expect(page).toHaveURL(`${ADMIN_BASE}/studio/courses`);
+    await expect(page.getByRole('heading', { name: 'Course Production Studio', exact: true })).toBeVisible();
+    await page.goto(`${ADMIN_BASE}/dashboard`);
+    await expect(access).toBeVisible();
     // Clean up the exact disposable browser session independently of UI state.
     const createdSessions: Promise<{id:string;token:string;publicUrl:string} | null>[] = [];
     const captureSession = (response: import('@playwright/test').Response) => {

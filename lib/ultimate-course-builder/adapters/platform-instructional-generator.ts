@@ -6,6 +6,7 @@ import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-c
 import { ULTIMATE_TEACHING_SEQUENCE } from '../instructional/teaching-sequence';
 import { produceTeachingVisual } from '../instructional/teaching-visual';
 import { addFreshTeachingRecaps } from '../instructional/teaching-recaps';
+import { repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { sourceTeaching, narrationChunks } from '../instructional/source-teaching';
 import { authorGoogleLesson, generateVertexLessonJson, validateGoogleAuthoringEvidence, GOOGLE_LESSON_AUTHOR_VERSION } from '../instructional/google-lesson-author';
 
@@ -56,7 +57,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
     const lessonSources = e.profile.instructionalSources?.filter(s =>
       [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
-      e.competency.authorityRequirementIds.includes(s.id)) ?? [];
+      e.competency.authorityRequirementIds.includes(s.id) || (e.profile.instructionalAuthoring?.provider === 'google' && s.id.startsWith('syllabus:'))) ?? [];
     const approved = e.profile.lessonBlueprints?.[e.competency.id];
     if (approved && !e.repairDirective) {
       validateLessonBlueprint(approved, e.competency);
@@ -90,7 +91,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       (s) =>
         [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(
           s.id,
-        ) || e.competency.authorityRequirementIds.includes(s.id),
+        ) || e.competency.authorityRequirementIds.includes(s.id) || (e.profile.instructionalAuthoring?.provider === 'google' && s.id.startsWith('syllabus:')),
     );
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
@@ -98,8 +99,24 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     if (e.profile.instructionalAuthoring?.provider === 'google') {
       const config = e.profile.instructionalAuthoring;
       if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
-      const authored = await authorGoogleLesson({ profile: e.profile, competency: e.competency, sources, repairDirective:e.repairDirective },
+      const author = (repairDirective: any) => authorGoogleLesson(
+        { profile: e.profile, competency: e.competency, sources, repairDirective },
         (system, input) => generateVertexLessonJson(config.model, system, input, config.location));
+      let authored = await author(e.repairDirective);
+      // Repair the authored source instead of clearing a duplicate-narration
+      // finding or regenerating narration from unchanged duplicate segments.
+      // Bound correction attempts and preserve the original source references.
+      for (let repair = 0; repair < 2 &&
+          repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')); repair++) {
+        authored = await author({
+          ...(e.repairDirective ?? {}),
+          reason: 'NARRATION_DUPLICATION',
+          instruction: 'Rewrite duplicated teaching segments with unique, source-grounded instructional content. Keep the required objectives, stages, standards and assessments; do not repeat sentences or invent facts.',
+          attempt: repair + 1,
+        });
+      }
+      if (repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')))
+        throw new Error('NARRATION_DUPLICATION');
       return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(authored,e.profile,sources) : authored;
     }
 

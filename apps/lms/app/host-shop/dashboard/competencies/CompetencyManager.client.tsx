@@ -44,6 +44,8 @@ type Apprentice = {
   programSlug: string;
   name: string;
   email: string;
+  practiceOnly?: boolean;
+  placementId?: string;
   standard: Standard;
   completedCompetencies: number;
   competencyRecords: RecordRow[];
@@ -85,7 +87,7 @@ export default function CompetencyManager() {
   }, [load]);
 
   const totalPending = useMemo(
-    () => apprentices.reduce((sum, apprentice) => sum + (apprentice.standard.competencyCount - apprentice.completedCompetencies), 0),
+    () => apprentices.reduce((sum, apprentice) => sum + (apprentice.practiceOnly ? 0 : apprentice.standard.competencyCount - apprentice.completedCompetencies), 0),
     [apprentices],
   );
 
@@ -148,7 +150,7 @@ export default function CompetencyManager() {
     const key=`${apprentice.enrollmentId}:${competency.id}`;
     setSavingKey(key);setError(null);
     try{
-      const response=await fetch('/api/host-shop/practical-services',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollmentId:apprentice.enrollmentId,competencyId:competency.id,serviceName:serviceName.trim(),subjectType,performedOn})});
+      const response=await fetch('/api/host-shop/practical-services',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollmentId:apprentice.enrollmentId,competencyId:competency.id || null,serviceName:serviceName.trim(),subjectType,performedOn})});
       const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not record service');
       setServiceCounts(current=>({...current,[key]:(current[key]||0)+1}));
     }catch(e){setError(e instanceof Error?e.message:'Unable to save practical service');}finally{setSavingKey(null);}
@@ -201,6 +203,20 @@ export default function CompetencyManager() {
         </div>
       </div>
 
+      {apprentices.length > 0 && <section className="rounded-2xl border border-blue-200 bg-white p-5">
+        <h2 className="text-xl font-black">Apprentice training progress chart</h2>
+        <p className="mt-1 text-sm text-slate-600">Shows verified competency progress where a registered standard is available. Practice-only placements remain visible without fabricated approvals.</p>
+        <div className="mt-4 space-y-5">{apprentices.map(apprentice => {
+          const total=apprentice.standard.competencyCount;
+          const completed=apprentice.completedCompetencies;
+          const percent=total>0?Math.round(completed/total*100):0;
+          return <div key={apprentice.enrollmentId}>
+            <div className="flex flex-wrap justify-between gap-2 text-sm"><span className="font-bold">{apprentice.name} · {apprentice.standard.occupationTitle}</span><span>{apprentice.practiceOnly?'Practical services: record below':completed+' of '+total+' competencies verified'}</span></div>
+            <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} aria-label={apprentice.name+' competency progress'} className="mt-2 h-3 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-blue-700" style={{width:percent+'%'}} /></div>
+            {apprentice.practiceOnly && <p className="mt-2 text-xs text-amber-800">Registered competency standard awaiting sponsor linkage. Logged practical services do not certify completion.</p>}
+          </div>;
+        })}</div>
+      </section>}
       {apprentices.length === 0 ? (
         <div className="rounded-2xl border bg-white px-6 py-12 text-center">
           <ShieldCheck className="mx-auto h-10 w-10 text-slate-300" />
@@ -212,7 +228,7 @@ export default function CompetencyManager() {
       {apprentices.map((apprentice) => {
         const recordById = new Map(apprentice.competencyRecords.map((row) => [row.competency_id, row]));
         const completed = apprentice.competencyRecords.filter((row) => row.completed).length;
-        const pct = Math.round((completed / apprentice.standard.competencyCount) * 100);
+        const pct = apprentice.standard.competencyCount ? Math.round((completed / apprentice.standard.competencyCount) * 100) : 0;
         const nextWage = apprentice.standard.wageMilestones.find((milestone) => milestone.completedCompetencies > completed);
 
         return (
@@ -239,6 +255,11 @@ export default function CompetencyManager() {
               </div>
             </div>
 
+            {apprentice.practiceOnly && <div className="border-t p-5">
+              <h3 className="font-black">Record supervised salon service</h3>
+              <p className="mt-1 text-sm">Choose a service, date, and person served. These are training observations, not formal competency sign-offs.</p>
+              <button type="button" disabled={Boolean(savingKey)} onClick={()=>void recordService(apprentice,{id:'',category:'Practical service',description:'Observed salon practice'})} className="mt-3 min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white">+ Record practical service</button>
+            </div>}
             <div className="divide-y">
               {apprentice.standard.competencies.map((competency, index) => {
                 const record = recordById.get(competency.id);

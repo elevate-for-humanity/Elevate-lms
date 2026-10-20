@@ -26,6 +26,7 @@ function show(jobStatus: string, buildStatus = 'running', expired = false) {
               {
                 id: 'persisted-job',
                 status: jobStatus,
+                lease_owner: 'assigned-worker',
                 created_at: '2026-10-03T00:00:00Z',
                 heartbeat_at: new Date(Date.now() - (expired ? 600_000 : 0)).toISOString(),
                 lease_expires_at: new Date(Date.now() + (expired ? -300_000 : 300_000)).toISOString(),

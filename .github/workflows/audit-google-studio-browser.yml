@@ -41,6 +41,23 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Record actual Admin and Studio Cloud Run serving revisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for service in elevate-admin-migration elevate-studio-browser; do
+            gcloud run services describe "$service" --project=elegant-racer-299721 --region=us-central1 --format=json |
+              node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{const x=JSON.parse(s);console.log(JSON.stringify({service:x.metadata?.name,url:x.status?.url,ready:x.status?.conditions?.find(c=>c.type==="Ready")?.status,latestReadyRevision:x.status?.latestReadyRevisionName,traffic:(x.status?.traffic||[]).map(t=>({revision:t.revisionName,percent:t.percent}))}))})'
+          done
+      - name: Verify Admin public sign-in response without credentials
+        run: |
+          node --input-type=module <<'NODE'
+          const url='https://admin.elevateforhumanity.org/';
+          const response=await fetch(url,{redirect:'manual',signal:AbortSignal.timeout(15000)});
+          const location=response.headers.get('location')||'';
+          console.log(JSON.stringify({url,status:response.status,loginRedirect:location.startsWith('/login')||location.startsWith('https://admin.elevateforhumanity.org/login')}));
+          if(![200,302,303,307,308].includes(response.status))process.exitCode=1;
+          NODE
       - name: Verify active Google browser endpoint and persistent state topology
         run: node scripts/gcp/audit-studio-browser.mjs
       - run: node --test scripts/gcp/audit-studio-backend-end-to-end.test.mjs

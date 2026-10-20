@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
 import '@/apps/admin/styles/studio-mobile-safety.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -409,6 +410,7 @@ export default function StudioCommandWorkspace({
         </div>
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
           <ResizableWorkspace
+            mobileExclusive
             className="h-full"
             title="Studio side panel"
             open={surface !== 'commands'}
@@ -514,6 +516,7 @@ export default function StudioCommandWorkspace({
                         : 'hidden'
                     }
                   >
+                    {activeCapability === 'health' && <details className="border-b border-slate-200 p-3"><summary className="cursor-pointer font-semibold">PARIS execution and recovery evidence</summary><ParisSupervisionPanel active={surface === 'capability'} /></details>}
                     {mountedWorkspaceUrl ? (
                       <RepositoryLivePreview
                         filePath={null}

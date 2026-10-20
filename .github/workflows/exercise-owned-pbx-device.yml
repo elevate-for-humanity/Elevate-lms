@@ -2,7 +2,7 @@ name: Repair and exercise approved operator device creation
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
+    paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/*pwa-config-includes*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
   push:
     branches: [main]
     paths: ['.github/workflows/exercise-owned-pbx-device.yml', 'infra/pbx/provisioner/server.mjs', 'scripts/gcp/repair-pbx-provisioner-reload.py']
@@ -24,6 +24,7 @@ jobs:
         with: {node-version: '22'}
       - run: node --test infra/pbx/provisioner/server.test.mjs
       - run: python3 scripts/gcp/test-provisioner-reload-repair.py
+      - run: python3 scripts/gcp/test-pwa-config-includes.py
       - run: python3 scripts/gcp/test-operator-provisioning.py
   dispatch:
     if: github.event_name == 'push'
@@ -37,6 +38,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     environment: production
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,7 +67,7 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
-          const keys={lms:['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'],admin:['PBX_PROVISIONING_TOKEN','PBX_PHONE_SYSTEM_ID']};
+          const keys={lms:['PBX_RUNTIME_CONFIG_PROVIDER','PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'],admin:['PBX_RUNTIME_CONFIG_PROVIDER','PBX_PROVISIONING_TOKEN','PBX_PHONE_SYSTEM_ID']};
           const read=args=>JSON.parse(google([...args,'--project',PROJECT,'--region','us-central1','--format=json']));
           for(const component of ['admin','lms']){
             const service=read(['run','services','describe','elevate-'+component+'-migration']);
@@ -72,7 +77,7 @@ jobs:
               const revision=read(['run','revisions','describe',name]);
               const env=new Map((revision.spec?.containers?.[0]?.env||[]).map(e=>[e.name,e]));
               const present=Object.fromEntries(keys[component].map(key=>[key,Boolean(env.get(key)?.value||env.get(key)?.valueFrom?.secretKeyRef)]));
-              console.log(JSON.stringify({servingPhoneBindings:{component,revision:name,googleProvider:env.get('ELEVATE_RUNTIME_CONFIG_PROVIDER')?.value==='google-secret-manager',present}}));
+              console.log(JSON.stringify({servingPhoneBindings:{component,revision:name,googleProvider:env.get('ELEVATE_RUNTIME_CONFIG_PROVIDER')?.value==='google-secret-manager',phoneGoogleProvider:env.get('PBX_RUNTIME_CONFIG_PROVIDER')?.value==='google-secret-manager',present}}));
             }
           }
           NODE
@@ -84,6 +89,12 @@ jobs:
           gcloud compute scp infra/pbx/provisioner/server.mjs "elevate-pbx:/tmp/elevate-provisioner-$GITHUB_SHA.mjs" --project=elegant-racer-299721 --zone=us-central1-a --quiet
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command="sudo python3 - /tmp/elevate-provisioner-$GITHUB_SHA.mjs $GITHUB_SHA" < scripts/gcp/repair-pbx-provisioner-reload.py
+      - name: Load the approved generated PWA files in the existing Asterisk configuration
+        run: |
+          set -euo pipefail
+          python3 scripts/gcp/test-pwa-config-includes.py
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo python3 - $GITHUB_SHA" < scripts/gcp/repair-pwa-config-includes.py
       - name: Verify authenticated provisioning recovered before creating a device
         run: |
           set -euo pipefail
@@ -95,3 +106,19 @@ jobs:
           python3 scripts/gcp/test-operator-provisioning.py
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command='sudo python3 - --exercise' < scripts/gcp/probe-operator-provisioning.py
+
+  handoff:
+    needs: exercise
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.exercise.result == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/phone-runtime-handoff.test.mjs
+      - name: Hand actual device acceptance to protected runtime binding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PHONE_EXERCISE_RUN_ID: ${{ github.run_id }}
+        run: node scripts/gcp/phone-runtime-handoff.mjs dispatch

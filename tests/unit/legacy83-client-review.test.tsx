@@ -20,6 +20,7 @@ it('preserves the project, backend and protected interactions while giving all n
   const heroes=config.pages.map(p=>p.sections.find(s=>s.type==='hero'));
   expect(new Set(heroes.map(s=>s.content.image)).size).toBe(9);
   expect(heroes.every(s=>s.content.imageAlt)).toBe(true);
+  expect(JSON.stringify(config.pages.flatMap(p=>p.sections.filter(s=>s.visible!==false)))).not.toMatch(/\/images\/pages\/|\/images\/business-/);
   for (const p of original.pages) for (const s of p.sections.filter(s=>['assessment','contact_form','events'].includes(s.type))) expect(config.pages.find(next=>next.slug===p.slug).sections.find(next=>next.id===s.id)).toEqual(s);
   expect(refineLegacy83ClientReview(config)).toEqual(config);
   expect(original).toEqual(restoreLegacy83ApprovedReference(saved));

@@ -57,6 +57,16 @@ export function refineLegacy83ClientReview(input) {
     if(existing) existing.content={title,text};
     else page(slug).sections.splice(1,0,{id,type:'rich_text',visible:true,content:{title,text},settings:{}});
   }
+  // Remove inherited Elevate stock from the customer's explanatory cards.
+  for(const p of config.pages) for(const s of p.sections.filter(Boolean)) {
+    if(!Array.isArray(s.content.items)) continue;
+    s.content.items=s.content.items.map(item=>{
+      if(!item || typeof item!=='object' || typeof item.image!=='string' || !/^\/images\/(pages\/|business-)/.test(item.image)) return item;
+      const next={...item}; delete next.image; delete next.imageAlt; delete next.imageSegment; return next;
+    });
+  }
+  const journalTopics=section('/journal','journal-topics');
+  if(journalTopics) journalTopics.visible=false;
   const contact=section('/contact','contact-info');
   if(contact) contact.content={...contact.content,...(config.contact?.email ? {email:config.contact.email} : {}),...(config.contact?.phone ? {phone:config.contact.phone} : {})};
   const bookingId='consultation-booking';

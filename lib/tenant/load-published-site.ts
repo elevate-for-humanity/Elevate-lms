@@ -30,6 +30,11 @@ async function userOwnedSiteCanServe(db: Awaited<ReturnType<typeof requireAdminC
   return access.allowed;
 }
 
+async function publicParisEnabled(db: Awaited<ReturnType<typeof requireAdminClient>>, websiteId: string) {
+  const { data, error } = await db.from('website_paris_workspaces').select('enabled').eq('website_id', websiteId).maybeSingle();
+  return !error && data?.enabled === true;
+}
+
 export async function loadPublishedSiteBySubdomain(
   subdomain: string,
 ): Promise<PublishedTenantSite | null> {
@@ -53,6 +58,7 @@ export async function loadPublishedSiteBySubdomain(
       siteName: row.site_name ?? slug,
       organizationId: row.organization_id,
       config: parseConfig(row.site_config, row.site_name ?? slug),
+      parisEnabled: await publicParisEnabled(db, row.id),
     };
   }
 
@@ -82,6 +88,7 @@ export async function loadPublishedSiteBySubdomain(
         siteName: row.site_name ?? org.name,
         organizationId: org.id,
         config: parseConfig(row.site_config, org.name),
+        parisEnabled: await publicParisEnabled(db, row.id),
       };
     }
   }

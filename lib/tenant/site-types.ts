@@ -131,4 +131,5 @@ export type PublishedTenantSite = {
   siteName: string;
   organizationId: string | null;
   config: TenantSiteConfig;
+  parisEnabled?: boolean;
 };

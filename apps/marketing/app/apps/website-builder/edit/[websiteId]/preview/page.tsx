@@ -1,3 +1,4 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -19,13 +20,15 @@ export default async function WebsiteResponsivePreviewPage({ params }: Props) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
 
-  const { data: site } = await supabase
+  // Server-owned roles and exact organization membership remain mandatory.
+  const admin = await requireAdminClient();
+  const { data: site } = await admin
     .from('user_websites')
-    .select('id, user_id, site_name, site_config')
+    .select('id, user_id, site_name, site_config, subdomain, is_published')
     .eq('id', websiteId)
     .maybeSingle();
 
-  if (!site || !(await canManageHostedWebsite(supabase, websiteId, user.id))) notFound();
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) notFound();
 
   const siteName = (site.site_name as string | null) ?? 'My Site';
   const base = buildDefaultSiteConfig({ organizationName: siteName });
@@ -33,5 +36,5 @@ export default async function WebsiteResponsivePreviewPage({ params }: Props) {
     ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>)
     : base;
 
-  return <ResponsivePreviewClient websiteId={site.id} siteName={siteName} config={config} />;
+  return <ResponsivePreviewClient websiteId={site.id} siteName={siteName} config={config} publicBasePath={site.is_published && site.subdomain ? `/sites/${site.subdomain}` : undefined} />;
 }

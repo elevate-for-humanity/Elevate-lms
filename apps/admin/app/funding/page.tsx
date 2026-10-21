@@ -80,6 +80,7 @@ export default async function FundingPage() {
   const totalSelfPay = selfPayStudents.reduce((s: number, e: any) => s + (e.amount_paid_cents ?? 0), 0);
 
   const QUICK_LINKS = [
+    { label: 'Credential Document Review', href: '/funding/credentials' },
     { label: 'Student Funding Reconciliation', href: '/funding/reconciliation' },
     { label: 'WIOA Participants', href: '/wioa' },
     { label: 'Grants', href: '/grants' },

@@ -18,7 +18,7 @@ export function VoucherRoster({ rows }: { rows: VoucherRosterRow[] }) {
       <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <div><dt className="font-bold">Funding</dt><dd>{r.source} · {r.fundingStatus}</dd><dd>{r.voucher ? `Voucher ${r.voucher}` : 'No voucher number documented'}</dd><dd>Authorization: {date(r.authorization)}</dd><dd>Recorded paid: {r.recordedPaid == null ? 'Unverified' : new Intl.NumberFormat('en-US', {style:'currency',currency:'USD'}).format(r.recordedPaid)}; settlement unverified</dd></div>
         <div><dt className="font-bold">Training dates</dt><dd>Start: {date(r.start)}</dd><dd>Expected: {date(r.expected)}</dd><dd>Actual: {date(r.actual)}</dd></div>
-        <div><dt className="font-bold">Program Holder</dt><dd>{r.holder}</dd><dt className="mt-2 font-bold">Certification</dt><dd>{r.credentialStatus}</dd></div>
+        <div><dt className="font-bold">Program Holder</dt><dd>{r.holder}</dd><dt className="mt-2 font-bold">Certification</dt><dd>{r.credentialStatus}</dd><Link className="font-bold text-blue-700 underline" href="/funding/credentials">Review credential uploads</Link></div>
         <div><dt className="font-bold">Career readiness</dt><dd>Resume: {r.resume ? 'Saved' : 'Missing'}</dd><dd>Career profile: {r.career ? 'Started' : 'Not started'}</dd><dd>Provider records: {r.providers.length ? r.providers.map(p => `${p.name}: ${p.status}`).join('; ') : 'None'}</dd></div>
       </dl>
       {r.alerts.length > 0 && <ul className="mt-3 list-inside list-disc rounded-lg bg-amber-50 p-3 text-sm text-amber-950">{r.alerts.map(a => <li key={a}>{a}</li>)}</ul>}

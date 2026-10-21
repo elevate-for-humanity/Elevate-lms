@@ -1,3 +1,4 @@
+import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
 import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -434,6 +435,7 @@ export default async function StudentDashboard() {
       </div>
 
       <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6">
+        <StudentCompletionTasks userId={subjectId} />
         {programEnrollments.some((row: any) => row.programs?.slug === 'hvac-technician' || row.program_slug === 'hvac-technician') ? (
           <>
             <section className="rounded-xl border border-blue-200 bg-blue-50 p-5">

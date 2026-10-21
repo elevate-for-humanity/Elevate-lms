@@ -11,7 +11,7 @@ const PORTAL_LINKS = [
   ['Applicants', '/program-holder/students/pending'],
   ['Programs', '/program-holder/programs'],
   ['Hours', '/program-holder/hours'],
-  ['Meetings', '/program-holder/meetings'],
+  ['Calendar & Meetings', '/program-holder/meetings'],
   ['Phone', '/program-holder/phone'],
   ['AirScript', '/program-holder/airscript'],
   ['Email', '/program-holder/email'],

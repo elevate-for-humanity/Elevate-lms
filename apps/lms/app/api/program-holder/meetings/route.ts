@@ -1,4 +1,5 @@
 // pre-auth-registry: exempt - requireProgramHolder and holder filters authorize every operation.
+import { studentContactHolderIds } from '@/lib/email/assigned-student-directory';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
@@ -50,24 +51,32 @@ export async function GET() {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }
   await hydrateProcessEnv();
-  const [{ data, error }, { data: applicants }] = await Promise.all([
-    ctx.db
-      .from('program_holder_meetings')
-      .select('*')
-      .eq('program_holder_id', ctx.holderId)
-      .order('starts_at'),
-    ctx.db
-      .from('program_holder_students')
-      .select('id,applicant_name,user_id')
-      .eq('program_holder_id', ctx.holderId)
-      .in('status', ['applied', 'pending', 'enrolled'])
-      .order('applicant_name'),
-  ]);
-  return error
+  const [{ data, error }, { data: applicants, error: applicantError }, contactHolderIds] =
+    await Promise.all([
+      ctx.db
+        .from('program_holder_meetings')
+        .select('*')
+        .eq('program_holder_id', ctx.holderId)
+        .order('starts_at'),
+      ctx.db
+        .from('program_holder_students')
+        .select('id,applicant_name,user_id,applicant_email,applicant_phone')
+        .eq('program_holder_id', ctx.holderId)
+        .in('status', ['applied', 'pending', 'enrolled'])
+        .order('applicant_name'),
+      studentContactHolderIds(ctx.db, ctx.user.id),
+    ]);
+  return error || applicantError
     ? NextResponse.json({ error: 'Unable to load meetings.' }, { status: 500 })
     : NextResponse.json({
+        userId: ctx.user.id,
         meetings: data ?? [],
-        applicants: applicants ?? [],
+        contactAccessGranted: contactHolderIds.includes(ctx.holderId),
+        applicants: (applicants ?? []).map((student: any) =>
+          contactHolderIds.includes(ctx.holderId)
+            ? student
+            : { id: student.id, applicant_name: student.applicant_name, user_id: student.user_id },
+        ),
         videoReady: liveKitReadiness().ready,
       });
 }
@@ -98,7 +107,7 @@ export async function POST(request: Request) {
   }
   const { data: student } = await ctx.db
     .from('program_holder_students')
-    .select('id,applicant_name,user_id')
+    .select('id,applicant_name,user_id,applicant_email,applicant_phone')
     .eq('id', studentId)
     .eq('program_holder_id', ctx.holderId)
     .maybeSingle();
@@ -251,7 +260,9 @@ export async function POST(request: Request) {
       agenda || '',
       method === 'in_person' ? String(body.location || '') : '',
       `Sign in with your student account: ${loginUrl}`,
-    ].filter(Boolean).join('\n\n');
+    ]
+      .filter(Boolean)
+      .join('\n\n');
     const escaped = text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     try {
       const delivery = await sendEmail({
@@ -269,7 +280,8 @@ export async function POST(request: Request) {
           .update({ invite_status: 'sent' })
           .eq('room_id', communicationRoomId)
           .eq('profile_id', student.user_id);
-        if (inviteUpdateError) logger.error('[holder-meetings] invitation status update failed', inviteUpdateError);
+        if (inviteUpdateError)
+          logger.error('[holder-meetings] invitation status update failed', inviteUpdateError);
       }
     } catch (cause) {
       invitationDelivery = 'failed';

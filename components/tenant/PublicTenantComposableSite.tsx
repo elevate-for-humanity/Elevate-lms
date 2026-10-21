@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import './legacy83-premium.css';
 import Link from 'next/link';
 import { TenantParis } from '@/components/tenant/TenantParis';
@@ -83,24 +83,29 @@ function ActionLink({
   );
 }
 
-function Section({ section, primary, secondary, basePath }: { section: TenantSiteSection; primary: string; secondary: string; basePath: string }) {
+function Section({ section, primary, secondary, basePath, isPageHeading = false }: { section: TenantSiteSection; primary: string; secondary: string; basePath: string; isPageHeading?: boolean }) {
   if (section.visible === false) return null;
   const c = section.content || {};
   const align = text(section.settings?.align) || 'left';
   const centered = align === 'center';
+  const variant = text(section.settings?.variant);
 
   if (section.type === 'hero') {
     const image = text(c.image);
+    const Heading = isPageHeading ? 'h1' : 'h2';
+    const title = text(c.title);
+    const highlight = text(c.titleHighlight);
+    const highlightAt = highlight ? title.indexOf(highlight) : -1;
     return (
-      <section className="border-b border-black/5">
+      <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)}>
         <div className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
           <div className={centered || !image ? 'text-center' : ''}>
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
-            <h1 className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{text(c.title)}</h1>
+            <Heading className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{highlightAt >= 0 ? <>{title.slice(0, highlightAt)}<span className="tenant-title-highlight">{highlight}</span>{title.slice(highlightAt + highlight.length)}</> : title}</Heading>
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
-            {text(c.buttonText) ? <div className={`mt-8 ${centered || !image ? 'flex justify-center' : ''}`}><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}
+            {text(c.buttonText) || text(c.secondaryButtonText) ? <div className={`tenant-hero-actions mt-8 flex flex-wrap gap-4 ${centered || !image ? 'justify-center' : ''}`}>{text(c.buttonText) ? <ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink> : null}{text(c.secondaryButtonText) ? <ActionLink href={text(c.secondaryButtonHref) || '/services'} primary={secondary} basePath={basePath}>{text(c.secondaryButtonText)}</ActionLink> : null}</div> : null}
           </div>
-          {image ? <div className="overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl ring-1 ring-black/5"><img src={image} alt={text(c.imageAlt) || text(c.title)} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div> : null}
+          {image ? <figure className="tenant-hero-media"><div className="tenant-hero-image-frame overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl ring-1 ring-black/5"><img src={image} alt={text(c.imageAlt) || text(c.title)} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div>{text(c.imageCaption) ? <figcaption className="mt-6 text-center text-sm">{text(c.imageCaption)}</figcaption> : null}</figure> : null}
         </div>
       </section>
     );
@@ -113,12 +118,16 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
   if (section.type === 'features' || section.type === 'services' || section.type === 'pricing' || section.type === 'team') {
     const items = list(c.items);
     return (
-      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">
+      <section className="tenant-cards mx-auto max-w-7xl px-5 py-14 sm:px-6" data-variant={variant}>
+        <div className="tenant-section-intro">
         {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
         {text(c.title) ? <h2 className="mt-2 text-3xl font-black">{text(c.title)}</h2> : null}
         {text(c.text) ? <p className="mt-3 max-w-3xl leading-7 text-slate-600">{text(c.text)}</p> : null}
-        <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((item, index) => <article key={`${text(item.title) || text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.title) || text(item.name)} className="aspect-[16/10] w-full object-cover" /> : null}<div className="p-6"><h3 className="text-xl font-black">{text(item.title) || text(item.name)}</h3>{text(item.role) ? <p className="mt-1 text-sm font-bold" style={{ color: primary }}>{text(item.role)}</p> : null}{text(item.price) ? <p className="mt-2 text-2xl font-black" style={{ color: primary }}>{text(item.price)}</p> : null}<p className="mt-3 leading-7 text-slate-600">{text(item.description) || text(item.text)}</p>{text(item.href) ? <div className="mt-5"><ActionLink href={text(item.href)} primary={primary} basePath={basePath}>{text(item.buttonText) || 'Learn more'}</ActionLink></div> : null}</div></article>)}
+        {text(c.buttonText) ? <div className="mt-8"><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}
+        </div>
+        {!items.length && text(c.emptyText) ? <p className="mt-8 rounded-lg border border-black/10 bg-white p-6 leading-8 text-slate-600">{text(c.emptyText)}</p> : null}
+        <div className="tenant-card-grid mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((item, index) => <article key={`${text(item.title) || text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.title) || text(item.name)} className="aspect-[16/10] w-full object-cover" /> : null}<div className="tenant-card-body p-6">{text(item.marker) || section.settings?.numbered === true ? <span className="tenant-card-marker" aria-hidden="true">{text(item.marker) || String(index + 1).padStart(2, '0')}</span> : null}<div className="tenant-card-copy"><h3 className="text-xl font-black">{text(item.title) || text(item.name)}</h3>{text(item.role) ? <p className="mt-1 text-sm font-bold" style={{ color: primary }}>{text(item.role)}</p> : null}{text(item.price) ? <p className="mt-2 text-2xl font-black" style={{ color: primary }}>{text(item.price)}</p> : null}<p className="mt-3 leading-7 text-slate-600">{text(item.description) || text(item.text)}</p>{text(item.href) ? <div className="mt-5"><ActionLink href={text(item.href)} primary={primary} basePath={basePath}>{text(item.buttonText) || 'Learn more'}</ActionLink></div> : null}</div></div></article>)}
         </div>
       </section>
     );
@@ -161,7 +170,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
   }
 
   if (section.type === 'cta') {
-    return <section className="mx-auto max-w-6xl px-5 py-14 sm:px-6"><div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: primary }}><h2 className="text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
+    return <section className="tenant-cta mx-auto max-w-6xl px-5 py-14 sm:px-6" data-variant={variant}><div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: primary }}>{text(c.eyebrow) ? <p className="tenant-cta-eyebrow text-xs font-bold uppercase tracking-[.3em]">{text(c.eyebrow)}</p> : null}<h2 className="mt-4 text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
   }
 
   if (section.type === 'booking') {
@@ -187,7 +196,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
   return null;
 }
 
-export function PublicTenantComposableSite({ site, pathname = '/', basePath = '' }: { site: PublishedTenantSite; pathname?: string; basePath?: string }) {
+export function PublicTenantComposableSite({ site, pathname = '/', basePath = '', onNavigate }: { site: PublishedTenantSite; pathname?: string; basePath?: string; onNavigate?: (pathname: string) => void }) {
   const config = ensureComposableSiteConfig(site.config);
   const path = normalizePageSlug(pathname);
   const page: TenantSitePage = config.pages?.find((candidate) => candidate.slug === path) || config.pages?.find((candidate) => candidate.slug === '/') || { id: 'missing', slug: '/', title: site.siteName, sections: [] };
@@ -196,10 +205,19 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const background = config.branding.backgroundColor || '#ffffff';
   const textColor = config.branding.textColor || '#0f172a';
   const navigation = (config.pages || []).filter((item) => item.showInNavigation !== false);
-  const isLegacy83 = site.siteName.toLowerCase().includes('legacy 83');
+  const isLegacy83 = config.template.id === 'legacy83-premium';
+  function navigateDraft(event: MouseEvent<HTMLDivElement>) {
+    if (!onNavigate || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const anchor = (event.target as Element).closest('a');
+    const href = anchor?.getAttribute('href');
+    const target = (config.pages || []).find((item) => hrefFor(item.slug, basePath) === href);
+    if (!target) return;
+    event.preventDefault();
+    onNavigate(target.slug);
+  }
 
   return (
-    <div className={`min-h-screen antialiased ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
+    <div onClickCapture={onNavigate ? navigateDraft : undefined} className={`min-h-screen antialiased ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
@@ -209,7 +227,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
         </div>
       </header>
       {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></details></div> : null}
-      <main>{page.sections.map((section) => <Section key={section.id} section={section} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
+      <main>{page.sections.map((section, index) => <Section key={section.id} section={section} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}</div></footer>
     </div>

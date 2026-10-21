@@ -31,6 +31,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Studio GitHub credential fallback regression tests
+        run: node --test scripts/test-devstudio-github-token.mjs
       - name: Automatic container build-memory policy
         run: |
           node scripts/check-build-memory-policy.mjs

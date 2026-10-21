@@ -11,8 +11,8 @@ function normalizeToken(value: string | undefined | null): string | null {
   let token = value.trim();
 
   // Accept values copied from shell snippets or authorization headers.
-  token = token.replace(/^(['"])(.*)\\1$/, '$2').trim();
-  token = token.replace(/^(?:token|bearer)\\s+/i, '').trim();
+  token = token.replace(/^(['"])(.*)\1$/, '$2').trim();
+  token = token.replace(/^(?:token|bearer)\s+/i, '').trim();
 
   if (token.length < 10) return null;
   if (/placeholder/i.test(token)) return null;

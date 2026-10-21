@@ -1430,14 +1430,16 @@ async function _POST(req: NextRequest) {
       : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
-      toolsAllowed ? getRAGContext(lastUserMessage) : Promise.resolve(''),
+      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: effectiveProvider === 'elevate' ? 'owned-only' : 'configured-provider' }) : Promise.resolve(''),
       toolsAllowed ? collectAutomaticEvidence(lastUserMessage) : Promise.resolve([]),
     ]);
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
       agent,
-      ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
+      contextProfile: effectiveProvider === 'elevate' ? 'owned-cpu' : 'full',
+      institutionalContext: getAiCharterContext(),
+      ragContext,
       fileContext,
       documentsContext,
       lastUserMessage,

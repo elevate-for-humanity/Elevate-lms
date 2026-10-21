@@ -477,7 +477,7 @@ export default async function StudentDashboard() {
                   <strong>BUS103 Instructions:</strong> Complete the accounting fundamentals, double-entry bookkeeping, general ledger reconciliations, and financial statement exercises in BUS103. Practice spreadsheet entries and QuickBooks Online workflows.
                 </p>
                 <p className="mt-2 text-xs font-semibold text-emerald-800">
-                  <strong>Training-Hour Guidance:</strong> Maintain 15–20 hours per week of active coursework, practical bookkeeping exercises, and software labs. Use the Online Study Clock below to log and verify each study session.
+                  <strong>Training-Hour Guidance:</strong> Maintain 15–20 hours per week of active coursework, practical bookkeeping exercises, and software labs. Follow your instructor’s study-time reporting instructions.
                 </p>
               </div>
               <div className="mt-4 flex flex-wrap gap-4">
@@ -495,7 +495,6 @@ export default async function StudentDashboard() {
                 </a>
               </div>
             </section>
-            <OnlineStudyClock />
           </>
         ) : null}
         {subject.previewing ? (

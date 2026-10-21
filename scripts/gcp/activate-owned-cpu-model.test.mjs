@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareAdminCpuConfiguration,activatePrivateCpuModel} from './activate-owned-cpu-model.mjs';
+import {prepareAdminCpuConfiguration,activatePrivateCpuModel,REQUIRED_ADMIN_CPU_COMMIT} from './activate-owned-cpu-model.mjs';
 const config={version:1,component:'admin',runtimeEnvironment:{ELEVATE_LLM_URL:'https://retired.code.run',ELEVATE_LLM_SECRET:'a'.repeat(32),UNRELATED:'keep'},volumes:[],runtimeFiles:{}};
 const base='https://elevate-owned-cpu-llm-123.run.app';
 test('updates both endpoint aliases and paired credentials without mutating the source or unrelated settings',()=>{
  const next=prepareAdminCpuConfiguration(config,base,'a'.repeat(32));
  assert.equal(next.runtimeEnvironment.ELEVATE_LLM_URL,base);assert.equal(next.runtimeEnvironment.ELEVATE_LLM_CPU_URL,base);
  assert.equal(next.runtimeEnvironment.ELEVATE_LLM_GOOGLE_IAM,'true');assert.equal(next.runtimeEnvironment.AI_PROVIDER,'elevate');
+ assert.equal(next.runtimeEnvironment.ELEVATE_LLM_CONTEXT_TOKENS,'8192');
  assert.equal(next.runtimeEnvironment.PARIS_GPU_ENABLED,'false');assert.equal(next.runtimeEnvironment.UNRELATED,'keep');
  assert.equal(config.runtimeEnvironment.ELEVATE_LLM_URL,'https://retired.code.run');
  assert.throws(()=>prepareAdminCpuConfiguration(config,'https://retired.code.run','a'.repeat(32)),/ENDPOINT_UNVERIFIED/);
@@ -30,7 +31,7 @@ function fixture() {
  };
  return {run,writes,current:()=>saved};
 }
-const request=async()=>Response.json({healthy:true,service:'admin',commit:'4e79ac553bf2c698167655bcbc9c287b38d82cb4'});
+const request=async()=>Response.json({healthy:true,service:'admin',commit:REQUIRED_ADMIN_CPU_COMMIT});
 test('failed real-model acceptance leaves both runtime configuration and serving revision untouched',async()=>{
  const f=fixture();await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,probeAdmin:async()=>({verified:true}),accept:async()=>({passed:false})}),/REAL_MODEL_ACCEPTANCE_REQUIRED/);
  assert.equal(f.writes.length,0);assert.deepEqual(f.current(),config);
@@ -38,10 +39,18 @@ test('failed real-model acceptance leaves both runtime configuration and serving
 test('only accepted inference can update aliases and activate the existing verified Admin image',async()=>{
  const f=fixture();let verifiedCommit;
  const result=await activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,probeAdmin:async()=>({verified:true}),accept:async()=>({passed:true}),activate:async input=>{verifiedCommit=input.commit;return {traffic:100};}});
- assert.equal(result.productionTrafficChanged,true);assert.equal(verifiedCommit,'4e79ac553bf2c698167655bcbc9c287b38d82cb4');
+ assert.equal(result.productionTrafficChanged,true);assert.equal(verifiedCommit,REQUIRED_ADMIN_CPU_COMMIT);
  assert.equal(f.current().runtimeEnvironment.ELEVATE_LLM_CPU_URL,base);
  assert.ok(f.writes.find(x=>x.args.includes('update')).args.includes('--no-traffic'));
+ assert.match(f.writes.find(x=>x.args.includes('update')).args.find(x=>x.startsWith('--update-env-vars=')),/ELEVATE_LLM_CONTEXT_TOKENS=8192/);
  assert.ok(f.writes.every(x=>!JSON.stringify(x.args).includes('a'.repeat(32))));
+});
+
+test('rejects a serving Admin image that predates the compact private prompt and owned-only retrieval',async()=>{
+ const f=fixture();
+ const oldRequest=async url=>String(url).includes('api.github.com')?Response.json({status:'behind'}):Response.json({healthy:true,service:'admin',commit:'4e79ac553bf2c698167655bcbc9c287b38d82cb4'});
+ await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request:oldRequest,accept:async()=>({passed:true}),probeAdmin:async()=>({verified:true})}),/PRIVATE_TRANSPORT_ADAPTER_NOT_LIVE/);
+ assert.equal(f.writes.length,0);
 });
 test('candidate validation failure restores the previous configuration instead of leaving a partial endpoint cutover',async()=>{
  const f=fixture();await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,probeAdmin:async()=>({verified:true}),accept:async()=>({passed:true}),activate:async()=>{throw Error('candidate health failed');}}),/candidate health failed/);

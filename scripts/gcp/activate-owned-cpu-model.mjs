@@ -7,7 +7,7 @@ import {probeServingAdminModel} from './probe-owned-cpu-admin.mjs';
 import {CPU_SERVICE,CPU_REGION,reviewPrivateModelPolicy} from './deploy-owned-cpu-model.mjs';
 
 const SECRET='elevate-admin-runtime-config';
-const ADAPTER_COMMIT='4e79ac553bf2c698167655bcbc9c287b38d82cb4';
+export const REQUIRED_ADMIN_CPU_COMMIT='56f8e7f693d94048c550b32efca71dcf8be2eacc';
 const fail=code=>{throw Error('PRIVATE_CPU_ACTIVATION_'+code);};
 
 export function prepareAdminCpuConfiguration(config,base,token) {
@@ -16,7 +16,7 @@ export function prepareAdminCpuConfiguration(config,base,token) {
  return validateConfig({...config,runtimeEnvironment:{...config.runtimeEnvironment,
   ELEVATE_LLM_URL:base,ELEVATE_LLM_CPU_URL:base,ELEVATE_LLM_SECRET:token,ELEVATE_LLM_CPU_SECRET:token,
   ELEVATE_LLM_GOOGLE_IAM:'true',PARIS_INFERENCE_TIER:'cpu',PARIS_GPU_ENABLED:'false',
-  AI_PROVIDER:'elevate',AI_PROVIDER_ORDER:'elevate',ELEVATE_LLM_TIMEOUT_MS:'300000',
+  AI_PROVIDER:'elevate',AI_PROVIDER_ORDER:'elevate',ELEVATE_LLM_TIMEOUT_MS:'300000',ELEVATE_LLM_CONTEXT_TOKENS:'8192',
  }},'admin');
 }
 
@@ -33,8 +33,8 @@ export async function activatePrivateCpuModel({base,invokerToken,run=google,requ
  const health=await request(new URL('/api/health',before.status?.url),{redirect:'error',signal:AbortSignal.timeout(15000)});
  const body=await health.json();
  if(!health.ok||!body.healthy||body.service!=='admin'||!/^[a-f0-9]{40}$/.test(body.commit??''))fail('LIVE_ADMIN_UNVERIFIED');
- if(body.commit!==ADAPTER_COMMIT) {
-  const compare=await request(`https://api.github.com/repos/elevate-for-humanity/Elevate-lms/compare/${ADAPTER_COMMIT}...${body.commit}`,{headers:{Accept:'application/vnd.github+json'},redirect:'error',signal:AbortSignal.timeout(15000)});
+ if(body.commit!==REQUIRED_ADMIN_CPU_COMMIT) {
+  const compare=await request(`https://api.github.com/repos/elevate-for-humanity/Elevate-lms/compare/${REQUIRED_ADMIN_CPU_COMMIT}...${body.commit}`,{headers:{Accept:'application/vnd.github+json'},redirect:'error',signal:AbortSignal.timeout(15000)});
   if(!compare.ok||!['ahead','identical'].includes((await compare.json()).status))fail('PRIVATE_TRANSPORT_ADAPTER_NOT_LIVE');
  }
  const acceptance=await accept({base,token,invokerToken});
@@ -55,7 +55,7 @@ export async function activatePrivateCpuModel({base,invokerToken,run=google,requ
   // Keep the serving image, identity, resource limits and traffic unchanged
   // until the new binding revision passes the standard activation checks.
   run(['run','services','update','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--no-traffic',
-   '--update-env-vars='+Object.entries(next.runtimeEnvironment).filter(([key])=>['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL','ELEVATE_LLM_GOOGLE_IAM','PARIS_INFERENCE_TIER','PARIS_GPU_ENABLED','AI_PROVIDER','AI_PROVIDER_ORDER','ELEVATE_LLM_TIMEOUT_MS'].includes(key)).map(([key,value])=>key+'='+value).join(','),
+   '--update-env-vars='+Object.entries(next.runtimeEnvironment).filter(([key])=>['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL','ELEVATE_LLM_GOOGLE_IAM','PARIS_INFERENCE_TIER','PARIS_GPU_ENABLED','AI_PROVIDER','AI_PROVIDER_ORDER','ELEVATE_LLM_TIMEOUT_MS','ELEVATE_LLM_CONTEXT_TOKENS'].includes(key)).map(([key,value])=>key+'='+value).join(','),
    '--remove-env-vars=ELEVATE_LLM_SECRET,ELEVATE_LLM_CPU_SECRET',
    '--update-secrets=ELEVATE_LLM_SECRET=elevate-owned-llm-token:latest,ELEVATE_LLM_CPU_SECRET=elevate-owned-llm-token:latest','--quiet']);
   const after=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));

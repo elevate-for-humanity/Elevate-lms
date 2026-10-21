@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const {data: workspace, error} = await db.from('website_paris_workspaces')
       .select('enabled').eq('website_id', tenant.websiteId).maybeSingle();
     if (error || !workspace?.enabled) return NextResponse.json({error:'PARIS is currently unavailable. Please contact the business directly.'}, {status:503});
-    const site = await loadPublishedSiteBySubdomain(tenant.subdomain);
+    const site = tenant.previewSite || await loadPublishedSiteBySubdomain(tenant.subdomain);
     if (!site || site.id !== tenant.websiteId) return NextResponse.json({error:'Published website not found'}, {status:404});
     // Whitelist only copy already visible on this tenant's published website.
     // Never provide configuration metadata, credentials, client records, other

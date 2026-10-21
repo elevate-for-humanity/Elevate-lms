@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { createBrowserSpeechRecognition, type BrowserSpeechRecognition } from '@/lib/browser/speech-recognition';
 import { tenantSiteHref } from '@/lib/tenant/site-links';
+import { useTenantRequestHeaders } from './TenantPreviewContext';
 
 export function TenantParis({business,accent,basePath=''}:{business:string;accent:string;basePath?:string}) {
+  const previewHeaders = useTenantRequestHeaders();
   const [open,setOpen]=useState(false);
   const [input,setInput]=useState('');
   const [busy,setBusy]=useState(false);
@@ -32,7 +34,7 @@ export function TenantParis({business,accent,basePath=''}:{business:string;accen
     event.preventDefault();const question=input.trim();if(!question||busy)return;
     setBusy(true);setError('');setInput('');setMessages(previous=>[...previous,{role:'You',text:question}]);
     try{
-      const response=await fetch('/api/tenant-sites/paris',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:question}),signal:AbortSignal.timeout(55000)});
+      const response=await fetch('/api/tenant-sites/paris',{method:'POST',headers:{'Content-Type':'application/json',...previewHeaders},body:JSON.stringify({message:question}),signal:AbortSignal.timeout(55000)});
       const data=await response.json();
       if(!response.ok||typeof data.message!=='string')throw new Error('unavailable');
       setMessages(previous=>[...previous,{role:'PARIS',text:data.message}]);

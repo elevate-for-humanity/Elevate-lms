@@ -3,7 +3,8 @@
 
 import type { MouseEvent, ReactNode } from 'react';
 import './legacy83-premium.css';
-import { ChartNoAxesCombined, UsersRound, Sprout } from 'lucide-react';
+import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
+import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantParis } from '@/components/tenant/TenantParis';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
 import type { PublishedTenantSite, TenantSiteSection } from '@/lib/tenant/site-types';
@@ -107,6 +108,8 @@ function Section({ section, primary, secondary, basePath, isPageHeading = false 
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
             <Heading className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{titleLines.length ? titleLines.map((line, index) => <span className="tenant-title-line" key={index}>{index > 0 ? ' ' : ''}{highlight && line.includes(highlight) ? <>{line.slice(0, line.indexOf(highlight))}<em>{highlight}</em>{line.slice(line.indexOf(highlight) + highlight.length)}</> : line}</span>) : highlightAt >= 0 ? <><span className="tenant-title-prefix">{title.slice(0, highlightAt)}</span><span className="tenant-title-highlight">{highlight}</span>{title.slice(highlightAt + highlight.length)}</> : title}</Heading>
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
+            {text(c.veteranAcknowledgement) ? <p className="tenant-veteran-note"><Flag aria-hidden="true" /><span>{text(c.veteranAcknowledgement)}</span></p> : null}
+            {text(c.narration) ? <TenantIntroduction narration={text(c.narration)} musicUrl={text(c.musicUrl)} /> : null}
             {text(c.buttonText) || text(c.secondaryButtonText) ? <div className={`tenant-hero-actions mt-8 flex flex-wrap gap-4 ${centered || !image ? 'justify-center' : ''}`}>{text(c.buttonText) ? <ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink> : null}{text(c.secondaryButtonText) ? <ActionLink href={text(c.secondaryButtonHref) || '/services'} primary={secondary} basePath={basePath}>{text(c.secondaryButtonText)}</ActionLink> : null}</div> : null}
             {highlights.length ? <div className="tenant-hero-highlights">{highlights.slice(0, 3).map((item, index) => { const Icon = highlightIcons[index] || Sprout; return <div key={index}><Icon aria-hidden="true" /><strong>{text(item.title)}</strong><span>{text(item.text)}</span></div>; })}</div> : null}
           </div>
@@ -175,7 +178,7 @@ function Section({ section, primary, secondary, basePath, isPageHeading = false 
   }
 
   if (section.type === 'cta') {
-    return <section className="tenant-cta mx-auto max-w-6xl px-5 py-14 sm:px-6" data-variant={variant}><div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: primary }}>{text(c.eyebrow) ? <p className="tenant-cta-eyebrow text-xs font-bold uppercase tracking-[.3em]">{text(c.eyebrow)}</p> : null}<h2 className="mt-4 text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
+    return <section className="tenant-cta mx-auto max-w-6xl px-5 py-14 sm:px-6" data-variant={variant} data-has-background={Boolean(text(c.image))}>{text(c.image) ? <img className="tenant-cta-background" src={text(c.image)} alt={text(c.imageAlt)} /> : null}<div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: primary }}>{text(c.eyebrow) ? <p className="tenant-cta-eyebrow text-xs font-bold uppercase tracking-[.3em]">{text(c.eyebrow)}</p> : null}<h2 className="mt-4 text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
   }
 
   if (section.type === 'booking') {

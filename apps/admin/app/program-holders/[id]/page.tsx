@@ -48,7 +48,7 @@ export default async function ProgramHolderDetailPage({
   const { data: roster, error: rosterError } = await db
     .from('program_enrollments')
     .select(
-      'id,user_id,full_name,email,status,enrollment_state,program_id,enrolled_at,progress_percent,at_risk,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at',
+      'id,user_id,full_name,email,status,enrollment_state,program_id,enrolled_at,progress_percent,at_risk,training_start_date,training_end_date,expected_end_date,completion_date,completed_at,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at',
     )
     .eq('program_holder_id', id)
     .order('enrolled_at', { ascending: false });
@@ -334,12 +334,13 @@ export default async function ProgramHolderDetailPage({
                             Start: {learner.training_start_date || 'Missing'}
                           </span>
                           <span className="block">
-                            End: {learner.training_end_date || 'Missing'}
+                            Expected: {learner.expected_end_date || learner.training_end_date || 'Missing'}
                           </span>
+                          <span className="block">Actual completion: {(learner.completion_date || learner.completed_at)?.slice(0, 10) || 'Not documented'}</span>
                         </td>
                         <td className="px-5 py-4 text-xs text-slate-700">
                           {learner.training_start_date &&
-                          learner.training_end_date &&
+                          (learner.completion_date || learner.completed_at) &&
                           Number(learner.total_hours_completed || 0) > 0 &&
                           learner.lms_completed &&
                           learner.practical_skills_verified &&

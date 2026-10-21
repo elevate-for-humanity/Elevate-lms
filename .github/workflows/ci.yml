@@ -31,6 +31,18 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Student funding and permission regression tests
+        run: >-
+          pnpm exec vitest run
+          tests/unit/student-document-validation.test.ts
+          tests/unit/student-training-privacy.test.ts
+          tests/unit/credential-document-preview.test.ts
+          tests/unit/career-onboarding-route.test.ts
+          tests/unit/program-holder-workspace-contract.test.ts
+          tests/unit/voucher-remittance-evidence.test.ts
+          tests/unit/student-enrollment-identity.test.ts
+          tests/unit/epa-testing-readiness-route.test.ts
+          --environment node
       - name: Studio GitHub credential fallback regression tests
         run: node --test scripts/test-devstudio-github-token.mjs
       - name: Automatic container build-memory policy

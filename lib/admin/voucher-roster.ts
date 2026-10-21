@@ -1,3 +1,4 @@
+import { getInitiatedRemittances } from './remittance-evidence';
 import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
@@ -17,8 +18,8 @@ export async function getVoucherRoster() {
     }
   }
   const [vouchers, funding] = await Promise.all([
-    all('ita_vouchers', 'id,voucher_id,participant_name,user_id,enrollment_id,program_id,voucher_date,service_start_date,service_end_date,fund_stream,status,payments_to_date,comments'),
-    all('enrollment_funding_records', 'id,enrollment_id,learner_id,program_id,funding_source,status,notes'),
+    all('ita_vouchers', 'id,voucher_id,participant_name,user_id,enrollment_id,program_id,voucher_date,service_start_date,service_end_date,fund_stream,status,payments_to_date,comments,remittance_evidence'),
+    all('enrollment_funding_records', 'id,enrollment_id,learner_id,program_id,funding_source,status,notes,authorization_date'),
   ]);
   const enrollmentIds = [...new Set([...vouchers, ...funding].map(r => r.enrollment_id).filter(Boolean))];
   async function linked(table: string, fields: string, column: string, ids: string[]) {
@@ -46,7 +47,7 @@ export async function getVoucherRoster() {
   ]);
   const records = [
     ...vouchers.map(v => ({ ...v, source: v.fund_stream || 'ITA', evidence: v.comments, authorization: v.voucher_date, recordedPaid: Number(v.payments_to_date || 0) })),
-    ...funding.filter(f => !vouchers.some(v => v.enrollment_id === f.enrollment_id)).map(f => ({ ...f, user_id: f.learner_id, voucher_id: null, source: f.funding_source, evidence: f.notes, recordedPaid: null, authorization: null })),
+    ...funding.filter(f => !vouchers.some(v => v.enrollment_id === f.enrollment_id)).map(f => ({ ...f, user_id: f.learner_id, voucher_id: null, source: f.funding_source, evidence: f.notes, recordedPaid: null, authorization: f.authorization_date })),
   ];
   return records.map(record => {
     const candidates = enrollments.filter(e => record.enrollment_id ? e.id === record.enrollment_id : e.user_id === record.user_id && (!record.program_id || e.program_id === record.program_id));
@@ -63,7 +64,7 @@ export async function getVoucherRoster() {
       authorization: record.authorization, program: e?.program_slug || 'Program needs review', enrollmentStatus: e?.status || 'Unlinked',
       holder: holder?.organization_name || holder?.name || 'Unassigned', start: e?.training_start_date || record.service_start_date,
       expected: e?.expected_end_date || record.service_end_date || e?.training_end_date, actual: e?.completion_date || e?.completed_at,
-      credentialStatus, resume, career, providers: providers.filter(p => p.student_id === uid).map(p => ({ name: p.partner_lms_providers?.provider_name || 'Provider', status: p.status })), alerts, evidence: record.evidence || 'Source documentation needs review' };
+      credentialStatus, resume, career, remittances: getInitiatedRemittances(record.remittance_evidence), providers: providers.filter(p => p.student_id === uid).map(p => ({ name: p.partner_lms_providers?.provider_name || 'Provider', status: p.status })), alerts, evidence: record.evidence || 'Source documentation needs review' };
   });
 }
 export type VoucherRosterRow = Awaited<ReturnType<typeof getVoucherRoster>>[number];

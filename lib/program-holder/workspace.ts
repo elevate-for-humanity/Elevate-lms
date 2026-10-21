@@ -1,4 +1,4 @@
-import { holderTrainingRecord } from './student-training';
+import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
@@ -339,6 +339,15 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     throw new Error(
       `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
     );
+  const { data: credentialUploads, error: credentialError } = rosterUserIds.length && programIds.length
+    ? await db.from('student_credential_uploads')
+        .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
+        .in('user_id', rosterUserIds).in('program_id', programIds)
+    : { data: [], error: null };
+  if (credentialError) throw new Error('Program Holder certification status could not load.');
+  const trainingRecord = (row: any) => holderTrainingRecord({
+    ...row, ...holderCredentialStatus(row, credentialUploads ?? []),
+  });
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])
       .filter(
@@ -515,10 +524,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     holder: holderRes.data ?? null,
     profile,
     programs: programsRes.data ?? [],
-    enrollments: enrolledRoster.map(holderTrainingRecord),
-    upcomingEnrollments: upcomingRoster.map(holderTrainingRecord),
+    enrollments: enrolledRoster.map(trainingRecord),
+    upcomingEnrollments: upcomingRoster.map(trainingRecord),
     applicants: deduplicatedApplicants,
-    convertedStudents: deduplicatedConvertedStudents.map((row: any) => holderTrainingRecord({
+    convertedStudents: deduplicatedConvertedStudents.map((row: any) => trainingRecord({
       ...row,
       roster_source: 'holder_student',
       full_name: row.applicant_name || 'Student',

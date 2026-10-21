@@ -7,6 +7,7 @@ const TRAINING_FIELDS = [
   'start_date', 'completion_date', 'completed_at', 'total_hours_completed', 'lms_completed',
   'practical_skills_verified', 'roster_source', 'enrollment_id', 'work_start_date',
   'work_progress', 'hours_taught', 'hours_required', 'work_site', 'updated_at',
+  'certification_status', 'credential_earned_date', 'certificate_verified_at',
 ] as const;
 
 export function holderTrainingRecord(row: Record<string, unknown>): Record<string, any> {
@@ -29,4 +30,15 @@ export function completionAlert(row: Record<string, any>, today = new Intl.DateT
   if (days <= 14) return 'Completion due within 14 days';
   if (days <= 30) return 'Completion due within 30 days';
   return null;
+}
+
+/** A submitted file is evidence awaiting review, never automatic certification. */
+export function holderCredentialStatus(row: Record<string, any>, uploads: Record<string, any>[]) {
+  const matching = uploads.filter(c => row.user_id && c.user_id === row.user_id && c.program_id === row.program_id);
+  const approved = matching.filter(c => c.verification_status === 'approved').sort((a, b) => String(b.verified_at || '').localeCompare(String(a.verified_at || '')))[0];
+  return {
+    certification_status: approved ? 'Approved evidence' : matching.some(c => c.verification_status === 'pending') ? 'Submitted for review' : matching.some(c => c.verification_status === 'rejected') ? 'Rejected — resubmit' : 'Upload missing',
+    credential_earned_date: approved?.credential_earned_date || null,
+    certificate_verified_at: approved?.verified_at || null,
+  };
 }

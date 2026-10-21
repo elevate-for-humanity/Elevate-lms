@@ -1,3 +1,4 @@
+import CourseSyllabus, { type CourseSyllabusRecord } from '@/components/learner/CourseSyllabus';
 import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
 import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
 import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
@@ -131,6 +132,15 @@ export default async function StudentDashboard() {
           .limit(1)
           .maybeSingle()
       : { data: null };
+  const [{ data: courseAccessNotice }, { data: syllabusHolder }] = await Promise.all([
+    supabase.from('notifications').select('title,message,created_at')
+      .eq('user_id', subjectId).eq('metadata->>kind', 'course_access_notice')
+      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    bookkeeping && linkedToWilkes
+      ? db.from('program_holders').select('features').eq('id', wilkesHolderId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  const courseSyllabus = syllabusHolder?.features?.course_syllabus as CourseSyllabusRecord | undefined;
   const holderStudentIds = (holderStudentRows ?? []).map((row) => row.id);
   const { data: meetingRows } = holderStudentIds.length
     ? await db
@@ -597,6 +607,17 @@ export default async function StudentDashboard() {
           </div>
         </section>
 
+        {courseAccessNotice ? (
+          <section role="status" className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+            <h2 className="text-xl font-black text-blue-950">{courseAccessNotice.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-blue-950">{courseAccessNotice.message}</p>
+            <div className="mt-4 flex flex-wrap gap-4">
+              <Link href="/lms/documents" className="font-bold underline">Review documents & agreements</Link>
+              <Link href="/lms/messages" className="font-bold underline">Contact your instructor</Link>
+            </div>
+          </section>
+        ) : null}
+        <CourseSyllabus syllabus={workspace.enrollments.some((row) => row.program_id === courseSyllabus?.program_id) ? courseSyllabus : null} />
         <DashboardOrientationPanel
           bookkeeping={bookkeeping}
           instructorEmail={instructorMailbox?.address}

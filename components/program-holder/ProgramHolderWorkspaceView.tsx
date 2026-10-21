@@ -1,3 +1,4 @@
+import CourseSyllabus from '@/components/learner/CourseSyllabus';
 import { completionAlert } from '@/lib/program-holder/student-training';
 import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
@@ -477,6 +478,7 @@ export async function ProgramHolderWorkspaceView({
           ))}
         </div>
       </section>
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       {texasLaunchKit}
       <ProgramHolderOperationsGuide
         holderName={data.holder?.organization_name || data.holder?.name || data.profile?.full_name}
@@ -1893,6 +1895,7 @@ function Programs({ data }: { data: any }) {
         title={label}
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>
   );

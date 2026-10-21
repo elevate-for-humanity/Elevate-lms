@@ -1,25 +1,16 @@
 name: Release private CPU model candidate
 # Owner requested the Paris endpoint repair on 2026-10-21. New invocation
-# grants require explicit review; this workflow never grants access or reroutes Admin.
+# grants require explicit review. This workflow never grants access; Admin
+# cutover requires the live private transport adapter and real model acceptance.
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/release-owned-cpu-model.yml']
   workflow_dispatch:
 permissions:
   contents: read
-  actions: write
   id-token: write
 concurrency:
   group: google-private-cpu-model-release
   cancel-in-progress: false
 jobs:
-  dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    steps:
-      - env: {GH_TOKEN: '${{ github.token }}'}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/release-owned-cpu-model.yml/dispatches" -f ref=main
   release:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

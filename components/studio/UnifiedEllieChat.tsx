@@ -95,7 +95,7 @@ type StudioProvider =
   | 'groq';
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
-  auto: 'Paris · Best available',
+  auto: 'Paris · Private model',
   elevate: 'Elevate AI',
   cloudflare: 'Cloudflare AI',
   xai: 'Grok / xAI',
@@ -848,8 +848,8 @@ export default function UnifiedEllieChat({
 
   useEffect(() => {
     const saved = window.localStorage.getItem('elevate:studio:provider') as StudioProvider | null;
-    // The self-hosted Elevate GPU is intentionally archived. Migrate stale
-    // selections back to auto, which currently resolves to the low-cost OpenAI lane.
+    // Auto selects the owned CPU model. Keep legacy owned selections on that
+    // same path; external inference always requires an explicit selection.
     if (saved === 'elevate' || !saved) {
       setSelectedProvider('auto');
       return;
@@ -1208,16 +1208,16 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      {aiOk === false && (
+      {aiOk === false && (selectedProvider === 'auto' || selectedProvider === 'elevate') && (
         <div className="flex shrink-0 items-start gap-2 border-b border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
-            No AI provider is currently healthy. Review the{' '}
+            Paris private inference is unavailable. Review{' '}
             <Link
-              href={getAdminUrl('/integrations/env-manager')}
+              href={getAdminUrl('/studio/health')}
               className="font-semibold underline underline-offset-2"
             >
-              Environment Manager
+              System Health
             </Link>{' '}
             and deployment configuration.
           </p>

@@ -192,7 +192,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
 export function PublicTenantComposableSite({ site, pathname = '/', basePath = '' }: { site: PublishedTenantSite; pathname?: string; basePath?: string }) {
   const config = ensureComposableSiteConfig(site.config);
   const path = normalizePageSlug(pathname);
-  const page: TenantSitePage = config.pages?.find((candidate) => candidate.slug === path) || config.pages?.find((candidate) => candidate.slug === '/') || { id: 'missing', slug: '/', title: site.siteName, sections: [] };
+  const page: TenantSitePage | undefined = config.pages?.find((candidate) => candidate.slug === path);
   const primary = config.branding.primaryColor || '#7c3f58';
   const secondary = config.branding.secondaryColor || '#475569';
   const background = config.branding.backgroundColor || '#ffffff';
@@ -206,12 +206,12 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
           <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
-          <nav className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.slice(0, 8).map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
+          <nav className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === path ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === path ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
           {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>Contact</Link> : null}
         </div>
       </header>
       {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></details></div> : null}
-      <main>{page.sections.map((section) => <Section key={section.id} section={section} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
+      <main>{page ? page.sections.map((section) => <Section key={section.id} section={section} primary={primary} secondary={secondary} basePath={basePath} />) : <section className="mx-auto max-w-4xl px-6 py-24 text-center"><h1 className="text-4xl font-bold">This page is not ready yet</h1><p className="mt-5 text-lg">The requested page has not been created for this website. Return to the homepage or contact the business.</p><Link className="mt-8 inline-block rounded-lg px-6 py-3 font-bold text-white" style={{backgroundColor:primary}} href={hrefFor('/',basePath)}>Back to homepage</Link></section>}</main>
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}</div></footer>
     </div>
   );

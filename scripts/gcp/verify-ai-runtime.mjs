@@ -10,10 +10,26 @@ export async function verifyOwnedModel(env, options={}) {
   return probeOwnedModel({env, ...options});
 }
 
+/** Read-only permission check for this exact private model service. */
+export async function inspectModelServicePermissions(accessToken,{request=fetch}={}) {
+  try {
+    const response=await request(`https://run.googleapis.com/v2/projects/${PROJECT}/locations/us-east1/services/elevate-owned-cpu-llm:testIamPermissions`,{
+      method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({permissions:['run.services.setIamPolicy','run.routes.invoke']}),signal:AbortSignal.timeout(15000),
+    });
+    const body=await response.json().catch(()=>({}));
+    return {verified:response.ok,canManageInvocation:response.ok&&body.permissions?.includes('run.services.setIamPolicy')===true,
+      canInvoke:response.ok&&body.permissions?.includes('run.routes.invoke')===true,httpStatus:response.status};
+  } catch {return {verified:false,status:'permission_check_unavailable'};}
+}
+
 export function classifyRuntimeErrors(entries) {
   return entries.map(entry => {
     const text=JSON.stringify(entry.textPayload??entry.jsonPayload??'');
-    const category=/diagnostic-only/.test(text)?'diagnostic_narration_config':
+    const category=/MODEL_BOUNDED_EIGHT_GIB_MEMORY_REQUIRED/.test(text)?'model_memory_boundary':
+      /MODEL_CHECKSUM_FAILED/.test(text)?'model_checksum':
+      /MODEL_AUTHENTICATION_CONFIGURATION_REQUIRED/.test(text)?'model_authentication_configuration':
+      /diagnostic-only/.test(text)?'diagnostic_narration_config':
       /Cannot find module|Module not found|Could not resolve/.test(text)?'missing_runtime_dependency':
       /Kokoro|kokoro|onnx|ONNX/.test(text)?'owned_narration_runtime':
       /Remotion|remotion|render/.test(text)?'media_render':
@@ -66,7 +82,31 @@ async function main() {
   } catch(error) { report.cpuReleasePrerequisites.secretReaderStatus = error.code || 'unavailable'; }
   try {
     const cpuServices = JSON.parse(google(['run','services','list','--project',PROJECT,'--region','us-east1','--format=json']));
-    report.cpuReleasePrerequisites.existingCpuService = cpuServices.some(service => service.metadata?.name==='elevate-owned-cpu-llm');
+    const cpuService = cpuServices.find(service => service.metadata?.name==='elevate-owned-cpu-llm');
+    report.cpuReleasePrerequisites.existingCpuService = Boolean(cpuService);
+    if (cpuService) {
+      const container=cpuService.spec?.template?.spec?.containers?.[0];
+      report.cpuReleasePrerequisites.service={
+        revision:cpuService.status?.latestCreatedRevisionName,
+        readyRevision:cpuService.status?.latestReadyRevisionName,
+        conditions:cpuService.status?.conditions?.map(condition=>({type:condition.type,status:condition.status,reason:condition.reason})),
+        cpu:container?.resources?.limits?.cpu,memory:container?.resources?.limits?.memory,
+        imageDigest:container?.image?.match(/sha256:[a-f0-9]{64}/)?.[0],
+      };
+      const policy=JSON.parse(google(['run','services','get-iam-policy','elevate-owned-cpu-llm','--project',PROJECT,'--region','us-east1','--format=json']));
+      const invokers=(policy.bindings??[]).filter(binding=>binding.role==='roles/run.invoker'&&!binding.condition).flatMap(binding=>binding.members??[]);
+      const adminIdentity=services.find(service=>service.metadata?.name==='elevate-admin-migration')?.spec?.template?.spec?.serviceAccountName;
+      const required=[`elevate-github-deploy@${PROJECT}.iam.gserviceaccount.com`,adminIdentity].filter(Boolean);
+      report.cpuReleasePrerequisites.deploymentPermissions=await inspectModelServicePermissions(google(['auth','print-access-token']));
+      report.cpuReleasePrerequisites.invocation={
+        private:!(policy.bindings??[]).some(binding=>binding.members?.some(member=>['allUsers','allAuthenticatedUsers'].includes(member))),
+        requiredInvokers:required,missingInvokers:required.filter(identity=>!invokers.includes('serviceAccount:'+identity)),
+      };
+      try {
+        const entries=JSON.parse(google(['logging','read','resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-owned-cpu-llm"','--project',PROJECT,'--freshness=20m','--limit=10','--format=json']));
+        report.cpuReleasePrerequisites.runtimeErrors=classifyRuntimeErrors(entries);
+      } catch(error) { report.cpuReleasePrerequisites.modelLogsStatus=error.code||'unavailable'; }
+    }
     report.cpuReleasePrerequisites.capacity = await inspectRegionalCapacity({region:'us-east1',task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]}});
   } catch(error) { report.cpuReleasePrerequisites.capacityStatus = error.code || 'unavailable'; }
   try {

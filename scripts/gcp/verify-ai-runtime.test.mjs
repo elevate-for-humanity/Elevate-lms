@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyOwnedModel, classifyRuntimeErrors, isReadyStudioCloudRun } from './verify-ai-runtime.mjs';
+import { verifyOwnedModel, classifyRuntimeErrors, isReadyStudioCloudRun, inspectModelServicePermissions } from './verify-ai-runtime.mjs';
 const env={ELEVATE_LLM_URL:'https://elevate-model-123.us-central1.run.app',ELEVATE_LLM_SECRET:'private-fixture'};
 const studio={metadata:{name:'elevate-studio-browser'},status:{url:'https://elevate-studio-browser-aabnh2y32a-uc.a.run.app',conditions:[{type:'Ready',status:'True'}]}};
 test('recognizes the ready canonical Cloud Run Studio without requiring a VM',()=>{
@@ -48,4 +48,21 @@ test('uses the private Google invocation adapter for model health', async () => 
   });
   assert.equal(result.verified,true); assert.equal(calls,1);
   assert.ok(!JSON.stringify(result).includes('private-identity'));
+});
+
+test('model startup diagnostics retain categories without printing model keys or arbitrary logs',()=>{
+ const entries=['MODEL_BOUNDED_EIGHT_GIB_MEMORY_REQUIRED','MODEL_CHECKSUM_FAILED','MODEL_AUTHENTICATION_CONFIGURATION_REQUIRED'].map(code=>({textPayload:code+' private-value'}));
+ const result=classifyRuntimeErrors(entries);
+ assert.deepEqual(result.map(x=>x.category),['model_memory_boundary','model_checksum','model_authentication_configuration']);
+ assert.ok(!JSON.stringify(result).includes('private-value'));
+});
+
+test('checks only service-scoped permissions and never includes the access credential in diagnostics',async()=>{
+ const result=await inspectModelServicePermissions('fixture-access',{request:async(url,options)=>{
+   assert.equal(url,'https://run.googleapis.com/v2/projects/elegant-racer-299721/locations/us-east1/services/elevate-owned-cpu-llm:testIamPermissions');
+   assert.deepEqual(JSON.parse(options.body),{permissions:['run.services.setIamPolicy','run.routes.invoke']});
+   return Response.json({permissions:[]});
+ }});
+ assert.deepEqual(result,{verified:true,canManageInvocation:false,canInvoke:false,httpStatus:200});
+ assert.ok(!JSON.stringify(result).includes('fixture-access'));
 });

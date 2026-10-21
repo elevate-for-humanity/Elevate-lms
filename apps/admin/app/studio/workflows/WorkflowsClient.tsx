@@ -375,7 +375,7 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
                   <kpi.icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className={`text-xl font-bold ${embedded ? 'text-white' : 'text-slate-900'}`}>{kpi.value}</p>
+                  <p className={`text-xl font-bold ${embedded ? 'text-white' : 'text-slate-900'}`}>{loading ? '…' : kpi.value}</p>
                   <p className={`text-xs ${embedded ? 'text-slate-500' : 'text-slate-500'}`}>{kpi.label}</p>
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
         </div>
 
         <p className={`text-sm mb-4 ${embedded ? 'text-slate-500' : 'text-slate-500'}`}>
-          {filtered.length} of {workflows.length} workflows
+          {loading ? 'Loading workflow records…' : `${filtered.length} of ${workflows.length} workflows`}
         </p>
 
         {/* Unified list */}
@@ -486,7 +486,8 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
                     {w.type === 'general' && (
                       <button
                         onClick={() => handleToggleStatus(w)}
-                        title={w.status === 'active' ? 'Pause' : 'Activate'}
+                        disabled={w.status !== 'active' && ((w.trigger_count ?? 0) < 1 || (w.step_count ?? 0) < 1)}
+                        title={w.status === 'active' ? 'Pause' : (w.trigger_count ?? 0) < 1 || (w.step_count ?? 0) < 1 ? 'Add an enabled trigger and step before activation' : 'Activate'}
                         className={`p-1.5 rounded-lg border transition-colors ${
                           w.status === 'active'
                             ? 'border-green-200 text-green-600 hover:bg-green-50'
@@ -531,7 +532,8 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
               </div>
             ))}
 
-            {filtered.length === 0 && (
+            {loading && <p role="status" className="p-5 text-sm text-slate-500">Loading workflow records…</p>}
+            {!loading && filtered.length === 0 && (
               <div className={`px-5 py-12 text-center ${embedded ? 'text-slate-500' : 'text-slate-500'}`}>
                 <Workflow className="mx-auto h-10 w-10 text-slate-300" />
                 <p className="mt-2 text-sm font-medium">No workflows{typeFilter !== 'all' ? ` in "${typeFilter}"` : ''}</p>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ResumeUploads } from '@/components/career/ResumeUploads';
 import { ResumeBuilder } from '@/components/career/ResumeBuilder';
 import { createClient } from '@/lib/supabase/client';
 
@@ -9,6 +10,7 @@ export function ResumeBuilderPage() {
   return <div className="space-y-4">
     <div><p className="text-xs font-black uppercase tracking-widest text-blue-700">Career services</p><h1 className="mt-2 text-3xl font-black text-slate-950">Build your professional resume</h1><p className="mt-2 text-slate-700">Your resume is saved to your authenticated learner account.</p></div>
     {message ? <p role="status" className="rounded-xl bg-emerald-50 p-3 font-bold text-emerald-900">{message}</p> : null}
+    <ResumeUploads />
     <ResumeBuilder onSave={async (resumeData) => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();

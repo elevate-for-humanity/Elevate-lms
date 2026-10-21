@@ -150,6 +150,7 @@ export class UltimateReleaseService {
           competencyId: l.competencyId,
           learning: l.content,
           experience: {
+            ...(l.content.flashcards?.length ? {flashcards: l.content.flashcards} : {}),
             knowledgeChecks: l.assessment.questions.map((q: any) => ({
               ...q,
               question: q.prompt,
@@ -286,13 +287,14 @@ export class UltimateReleaseService {
   }
   async publish(buildId: string, actorId: string) {
     const p: any = await this.derive(buildId),
-      now = await this.applyPackage(p, actorId),
-      version = await this.nextVersion(p.courseId);
-    await this.db
+      version = await this.nextVersion(p.courseId),
+      now = await this.applyPackage(p, actorId);
+    const superseded = await this.db
       .from('ultimate_release_versions')
       .update({ status: 'superseded' })
       .eq('course_id', p.courseId)
       .eq('status', 'released');
+    if (superseded.error) throw superseded.error;
     const q = await this.db
       .from('ultimate_release_versions')
       .insert({
@@ -333,13 +335,14 @@ export class UltimateReleaseService {
       .single();
     if (q.error || !q.data) throw q.error ?? new Error('ULTIMATE_RELEASE_NOT_FOUND');
     const p = { ...(q.data.package as any), buildId: q.data.build_id, courseId };
-    const now = await this.applyPackage(p, actorId),
-      next = await this.nextVersion(courseId);
-    await this.db
+    const next = await this.nextVersion(courseId),
+      now = await this.applyPackage(p, actorId);
+    const superseded = await this.db
       .from('ultimate_release_versions')
       .update({ status: 'superseded' })
       .eq('course_id', courseId)
       .eq('status', 'released');
+    if (superseded.error) throw superseded.error;
     const n = await this.db
       .from('ultimate_release_versions')
       .insert({
@@ -402,13 +405,14 @@ export class UltimateReleaseService {
     return recorded.id;
   }
   private async nextVersion(courseId: string) {
-    const { data } = await this.db
+    const { data, error } = await this.db
       .from('ultimate_release_versions')
       .select('version')
       .eq('course_id', courseId)
       .order('version', { ascending: false })
       .limit(1)
       .maybeSingle();
+    if (error) throw error;
     return (data?.version ?? 0) + 1;
   }
 }

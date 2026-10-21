@@ -30,9 +30,11 @@ function assertNoConflict(env,plan){
     throw Error('existing_phone_credential_requires_review');
 }
 export async function pinnedControlVersion(run=google){
-  const code=`from pathlib import Path\nimport re\ns=Path('/etc/elevate-pbx/provisioner.conf').read_text()\nm=re.search(r'^PBX_PROVISIONING_TOKEN_SECRET=[\\"\\\']?(projects/(?:elegant-racer-299721|484736877039)/secrets/elevate-pbx-provisioning-token/versions/([1-9][0-9]*|latest))[\\"\\\']?$',s,re.M)\nif not m: raise SystemExit(1)\nprint(m[2])\n`;
+  const code=`from pathlib import Path\nimport re\np=Path('/etc/elevate-pbx/provisioner.conf')\nif not p.is_file():\n print('PBX_REF_FILE_MISSING')\n raise SystemExit(0)\ns=p.read_text()\nm=re.search(r'^PBX_PROVISIONING_TOKEN_SECRET=[\\"\\\']?(projects/(?:elegant-racer-299721|484736877039)/secrets/elevate-pbx-provisioning-token/versions/([1-9][0-9]*|latest))[\\"\\\']?$',s,re.M)\nif not m:\n print('PBX_REF_INVALID')\n raise SystemExit(0)\nprint(m[2])\n`;
   const quoted="'"+code.replace(/'/g,"'\\''")+"'";
   const pin=run(['compute','ssh','elevate-pbx','--project',PROJECT,'--zone','us-central1-a','--quiet','--command','sudo python3 -c '+quoted]).trim();
+  if(pin==='PBX_REF_FILE_MISSING')throw Error('pbx_control_reference_file_missing');
+  if(pin==='PBX_REF_INVALID')throw Error('pbx_control_reference_unverified');
   if(!/^(?:[1-9][0-9]*|latest)$/.test(pin))throw Error('pbx_control_reference_unverified');
   const meta=JSON.parse(run(['secrets','versions','describe',pin,'--secret',SECRET,'--project',PROJECT,'--format=json']));
   const match=meta.name?.match(/^projects\/(?:elegant-racer-299721|484736877039)\/secrets\/elevate-pbx-provisioning-token\/versions\/([1-9][0-9]*)$/);
@@ -89,7 +91,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
       console.log(JSON.stringify(await bindControl(component,version)));
     }
   }catch(error){
-    const known=new Set(['pbx_binding_scope_invalid','pbx_control_reference_unverified','pbx_control_version_unverified',
+    const known=new Set(['pbx_binding_scope_invalid','pbx_control_reference_file_missing','pbx_control_reference_unverified','pbx_control_version_unverified',
       'existing_phone_binding_requires_review','existing_phone_credential_requires_review','phone_application_identity_or_state_unverified',
       'phone_application_health_unverified','trusted_binding_workflow_required','phone_candidate_binding_unverified','serving_phone_binding_unverified']);
     const googleCodes=new Set(['permission_denied','quota_exceeded','not_found','api_disabled','authentication_failed','command_failed']);

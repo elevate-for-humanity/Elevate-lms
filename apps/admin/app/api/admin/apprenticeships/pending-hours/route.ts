@@ -18,9 +18,16 @@ export async function GET(req: NextRequest) {
     const { entries, ledger, programs } = await loadAdminHours(await requireAdminClient());
     return NextResponse.json(
       {
-        entries: entries.filter(
-          (e) => ['submitted', 'draft'].includes(e.status) && e.hours_worked > 0,
-        ).map((entry) => ({ ...entry, review_ledger: sameDayHoursLedger(entry, ledger, programs) })),
+        entries: entries
+          .filter((e) => ['submitted', 'draft'].includes(e.status) && e.hours_worked > 0)
+          .map((entry) => ({
+            ...entry,
+            review_ledger: sameDayHoursLedger(entry, ledger, programs),
+          })),
+        disputedCount: entries.filter((e) => e.status === 'disputed').length,
+        disputedHours: entries
+          .filter((e) => e.status === 'disputed')
+          .reduce((sum, e) => sum + e.hours_worked, 0),
         incompleteCount: entries.filter(
           (e) => ['submitted', 'draft'].includes(e.status) && e.hours_worked <= 0,
         ).length,

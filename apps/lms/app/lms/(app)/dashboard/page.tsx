@@ -1,3 +1,4 @@
+import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
 import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -374,7 +375,7 @@ export default async function StudentDashboard() {
       href: '/lms/certificates',
       label: 'Certificates',
       text: 'View earned and verified training credentials.',
-      image: '/images/pages/comp-home-highlight-success.webp',
+      image: '/images/pages/admin-courses-partners-hero.webp',
     },
     {
       href: '/lms/certification/upload',
@@ -398,7 +399,7 @@ export default async function StudentDashboard() {
       href: '/communications/email',
       label: 'Interoffice Email',
       text: 'Access your interoffice staff communications and program messages.',
-      image: '/images/pages/contact-hero.jpg',
+      image: '/images/pages/admin-live-chat-detail.webp',
     },
     {
       href: '/lms/messages',
@@ -434,6 +435,7 @@ export default async function StudentDashboard() {
       </div>
 
       <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6">
+        <StudentCompletionTasks userId={subjectId} />
         {programEnrollments.some((row: any) => row.programs?.slug === 'hvac-technician' || row.program_slug === 'hvac-technician') ? (
           <>
             <section className="rounded-xl border border-blue-200 bg-blue-50 p-5">
@@ -466,12 +468,16 @@ export default async function StudentDashboard() {
                 8-week hybrid pathway preparing you for Intuit QuickBooks Certified User and Microsoft Office Specialist certification.
               </p>
               <div className="mt-4 rounded-lg border border-emerald-300 bg-white p-4">
-                <h3 className="font-bold text-slate-900">Assigned Learning Resource: BUS103 Introduction to Financial Accounting</h3>
+                <h3 className="font-bold text-slate-900">Free external course: BUS103 Introduction to Financial Accounting (Saylor University)</h3>
+                <p className="mt-2 text-sm text-slate-700">Create or sign in to your free Saylor account, open BUS103, then select “Enroll Me in This Course.” Your Saylor login is separate from your Elevate account. This link does not enroll you automatically.</p>
+                <a href="https://learn.saylor.org/course/view.php?id=1261" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white hover:bg-emerald-800">
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" /> Open free BUS103 course at Saylor
+                </a>
                 <p className="mt-1 text-sm text-slate-700">
                   <strong>BUS103 Instructions:</strong> Complete the accounting fundamentals, double-entry bookkeeping, general ledger reconciliations, and financial statement exercises in BUS103. Practice spreadsheet entries and QuickBooks Online workflows.
                 </p>
                 <p className="mt-2 text-xs font-semibold text-emerald-800">
-                  <strong>Training-Hour Guidance:</strong> Maintain 15–20 hours per week of active coursework, practical bookkeeping exercises, and software labs. Use the Online Study Clock below to log and verify each study session.
+                  <strong>Training-Hour Guidance:</strong> Maintain 15–20 hours per week of active coursework, practical bookkeeping exercises, and software labs. Follow your instructor’s study-time reporting instructions.
                 </p>
               </div>
               <div className="mt-4 flex flex-wrap gap-4">
@@ -484,12 +490,11 @@ export default async function StudentDashboard() {
                 <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/communications/email">
                   <Mail className="h-4 w-4" /> Interoffice staff email
                 </Link>
-                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/courses/566e2ef7-6861-4736-9807-b4ff868fc908">
-                  <Play className="h-4 w-4" /> Open Bookkeeping courseware
-                </Link>
+                <a className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="https://learn.saylor.org/course/view.php?id=1261" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4" /> Free BUS103 enrollment and login
+                </a>
               </div>
             </section>
-            <OnlineStudyClock />
           </>
         ) : null}
         {subject.previewing ? (

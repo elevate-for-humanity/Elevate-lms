@@ -2,6 +2,7 @@ name: Course Builder isolation acceptance
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/course-builder-isolation-acceptance.yml'
 permissions:
@@ -9,6 +10,7 @@ permissions:
   id-token: write
 jobs:
   isolate:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 12

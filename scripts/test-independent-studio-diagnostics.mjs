@@ -4,7 +4,12 @@ import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 const engineering=stripTypeScriptTypes(readFileSync('lib/devstudio/engineering-runner/plan.ts','utf8'));
 const dependency='data:text/javascript;base64,'+Buffer.from(engineering).toString('base64');
-const source=readFileSync('lib/platform/planner.ts','utf8').replace("'@/lib/devstudio/engineering-runner/plan'",JSON.stringify(dependency));
+// Data-URL modules cannot resolve Next.js aliases. Load both real dependencies.
+const commandIntent=stripTypeScriptTypes(readFileSync('lib/ai/command-intent.ts','utf8'));
+const commandIntentDependency='data:text/javascript;base64,'+Buffer.from(commandIntent).toString('base64');
+const source=readFileSync('lib/platform/planner.ts','utf8')
+ .replace("'@/lib/devstudio/engineering-runner/plan'",JSON.stringify(dependency))
+ .replace("'@/lib/ai/command-intent'",JSON.stringify(commandIntentDependency));
 const {decomposePlan,canExecuteStep}=await import('data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes(source)).toString('base64'));
 test('browser outage does not prevent independent platform diagnosis',()=>{
  const p=decomposePlan('Get platform health. Read only; do not deploy or change records.');

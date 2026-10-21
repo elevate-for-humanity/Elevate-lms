@@ -9,6 +9,7 @@ it('renders the unsaved draft and its active controls inside the selected viewpo
   render(<TenantDraftViewport width={390} title="Customer mobile draft"><button onClick={action}>Draft control</button></TenantDraftViewport>);
   const frame = screen.getByTitle('Customer mobile draft') as HTMLIFrameElement;
   expect(frame.style.width).toBe('390px');
+  expect(frame.style.maxWidth).toBe('none');
   // Hydration may start after the iframe's load event has already happened.
   await waitFor(() => expect(within(frame.contentDocument!.body).getByRole('button', { name: 'Draft control' })).toBeTruthy());
   fireEvent.click(within(frame.contentDocument!.body).getByRole('button', { name: 'Draft control' }));

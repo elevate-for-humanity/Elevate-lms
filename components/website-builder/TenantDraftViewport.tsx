@@ -35,7 +35,7 @@ export function TenantDraftViewport({ children, width, title }: { children: Reac
     ref={frameRef}
     title={title}
     srcDoc={'<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0}</style></head><body></body></html>'}
-    style={{ width, height: 800 }}
+    style={{ width, maxWidth: 'none', height: 800 }}
     className="mx-auto block border-0 bg-white shadow-sm"
     allow="microphone 'none'; camera 'none'"
   >{frameDocument ? createPortal(children, frameDocument.body) : null}</iframe>;

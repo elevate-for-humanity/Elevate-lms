@@ -1,0 +1,117 @@
+name: Release private CPU model candidate
+# Owner requested the Paris endpoint repair on 2026-10-21. New invocation
+# grants require explicit review; this workflow never grants access or reroutes Admin.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-owned-cpu-model.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-private-cpu-model-release
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/release-owned-cpu-model.yml/dispatches" -f ref=main
+  release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment: production
+    outputs:
+      model_url: ${{ steps.deploy.outputs.model_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify private release and model acceptance contracts
+        run: |
+          node --test scripts/gcp/deploy-owned-cpu-model.test.mjs scripts/gcp/accept-owned-cpu-model.test.mjs lib/ai/providers/google-runtime-auth.test.mjs
+          node scripts/check-build-memory-policy.mjs --source-only
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify existing identity, scoped secret and fresh regional capacity
+        run: node scripts/gcp/deploy-owned-cpu-model.mjs
+      - name: Make room for the approved weights on the ephemeral runner
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Build checksum-verified CPU model
+        run: docker build -f services/llm-cpu-worker/Dockerfile.google -t elevate-owned-cpu-candidate .
+      - name: Accept real authentication, inference, tools and streaming within resource limits
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          export LLM_WORKER_SECRET="$(openssl rand -hex 32)"
+          echo "::add-mask::$LLM_WORKER_SECRET"
+          docker run --detach --name elevate-cpu-acceptance --cpus=4 --memory=8g --memory-swap=8g --env LLM_WORKER_SECRET --publish 127.0.0.1:8080:8080 elevate-owned-cpu-candidate
+          trap 'docker rm --force elevate-cpu-acceptance >/dev/null 2>&1 || true' EXIT
+          ready=false
+          for attempt in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:8080/health >/dev/null; then ready=true; break; fi
+            if test "$(docker inspect --format='{{.State.Running}}' elevate-cpu-acceptance)" != true; then break; fi
+            sleep 5
+          done
+          test "$ready" = true
+          CPU_MODEL_LOCAL_TEST=true CPU_MODEL_URL=http://127.0.0.1:8080 node scripts/gcp/accept-owned-cpu-model.mjs
+          test "$(docker inspect --format='{{.State.OOMKilled}}' elevate-cpu-acceptance)" = false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - name: Upload immutable image and deploy isolated IAM-private candidate
+        id: deploy
+        run: |
+          set -euo pipefail
+          IMAGE=us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag elevate-owned-cpu-candidate "$IMAGE:$GITHUB_SHA"
+          docker push "$IMAGE:$GITHUB_SHA"
+          export CPU_IMAGE_DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          CPU_RELEASE_MODE=deploy node scripts/gcp/deploy-owned-cpu-model.mjs
+
+  activate:
+    needs: release
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.release.result == 'success'
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/activate-owned-cpu-model.test.mjs
+      - uses: google-github-actions/auth@v3
+        id: invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: ${{ needs.release.outputs.model_url }}
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify the private service and activate every Admin endpoint alias
+        id: connect
+        env:
+          CPU_MODEL_URL: ${{ needs.release.outputs.model_url }}
+          MODEL_INVOKER_TOKEN: ${{ steps.invocation.outputs.id_token }}
+        run: node scripts/gcp/activate-owned-cpu-model.mjs

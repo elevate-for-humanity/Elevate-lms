@@ -40,7 +40,7 @@ export default async function MeetingsPage() {
   const { data: rooms } = workspace?.id
     ? await db
         .from('communication_rooms')
-        .select('id,title,room_type,status,scheduled_at,max_participants,allow_screen_share')
+        .select('id,title,room_key,description,room_type,status,scheduled_at,max_participants,allow_screen_share')
         .eq('workspace_id', workspace.id)
         .order('scheduled_at', { ascending: false })
         .limit(20)
@@ -127,13 +127,14 @@ export default async function MeetingsPage() {
                 </span>
                 {room.status !== 'cancelled' ? (
                   <Link
-                    href={`/phone/meetings/${room.id}`}
+                    href={room.room_key?.startsWith('google-calendar-') && /^https:\/\/meet\.google\.com\/[a-z-]+$/.test(room.description ?? '') ? room.description : `/phone/meetings/${room.id}`}
+                    target={room.room_key?.startsWith('google-calendar-') ? '_blank' : undefined}
                     className="rounded-lg bg-indigo-700 px-3 py-2 text-sm font-black text-white"
                   >
                     Join
                   </Link>
                 ) : null}
-                {room.status !== 'cancelled' && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} />}
+                {room.status !== 'cancelled' && !room.room_key?.startsWith('google-calendar-') && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} />}
               </div>
             ))}
           </div>

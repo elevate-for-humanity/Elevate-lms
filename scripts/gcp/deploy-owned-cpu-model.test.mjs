@@ -8,10 +8,10 @@ test('CPU release is immutable, bounded, scale-to-zero and never enables public 
  assert.ok(!args.some(arg=>/allow-unauthenticated|invoker-iam|--gpu|allUsers/.test(arg)));
  assert.throws(()=>privateCpuDeploymentArguments('latest'),/IMMUTABLE_IMAGE/);
 });
-test('requires explicit service-specific invoker bindings and rejects public policies',()=>{
+test('reports explicit service bindings without confusing them with effective IAM access',()=>{
  const required=reviewPrivateModelPolicy({bindings:[]},admin).requiredInvokers;
  assert.equal(required.length,2);
- assert.deepEqual(reviewPrivateModelPolicy({bindings:[{role:'roles/run.invoker',members:required.map(x=>'serviceAccount:'+x)}]},admin).missingInvokers,[]);
+ assert.deepEqual(reviewPrivateModelPolicy({bindings:[{role:'roles/run.invoker',members:required.map(x=>'serviceAccount:'+x)}]},admin).principalsWithoutServiceBinding,[]);
  for(const member of ['allUsers','allAuthenticatedUsers'])assert.throws(()=>reviewPrivateModelPolicy({bindings:[{role:'roles/run.invoker',members:[member]}]},admin),/PUBLIC_ACCESS/);
 });
 test('missing existing model identity blocks before compute, configuration or IAM mutations',async()=>{

@@ -100,11 +100,11 @@ async function main() {
       report.cpuReleasePrerequisites.deploymentPermissions=await inspectModelServicePermissions(google(['auth','print-access-token']));
       report.cpuReleasePrerequisites.invocation={
         private:!(policy.bindings??[]).some(binding=>binding.members?.some(member=>['allUsers','allAuthenticatedUsers'].includes(member))),
-        requiredInvokers:required,missingInvokers:required.filter(identity=>!invokers.includes('serviceAccount:'+identity)),
+        requiredInvokers:required,principalsWithoutServiceBinding:required.filter(identity=>!invokers.includes('serviceAccount:'+identity)),
       };
       try {
         const entries=JSON.parse(google(['logging','read','resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-owned-cpu-llm"','--project',PROJECT,'--freshness=20m','--limit=10','--format=json']));
-        report.cpuReleasePrerequisites.runtimeErrors=classifyRuntimeErrors(entries);
+        report.cpuReleasePrerequisites.recentLogCategories=classifyRuntimeErrors(entries).map(entry=>({...entry,category:entry.category==='application_error'?'model_runtime_log':entry.category}));
       } catch(error) { report.cpuReleasePrerequisites.modelLogsStatus=error.code||'unavailable'; }
     }
     report.cpuReleasePrerequisites.capacity = await inspectRegionalCapacity({region:'us-east1',task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]}});

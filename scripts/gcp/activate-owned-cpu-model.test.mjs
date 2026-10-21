@@ -11,18 +11,13 @@ test('updates both endpoint aliases and paired credentials without mutating the 
  assert.equal(config.runtimeEnvironment.ELEVATE_LLM_URL,'https://retired.code.run');
  assert.throws(()=>prepareAdminCpuConfiguration(config,'https://retired.code.run','a'.repeat(32)),/ENDPOINT_UNVERIFIED/);
 });
-test('missing approved private invocation prevents inference and every configuration write',async()=>{
- const calls=[];let accepted=false;
- const run=args=>{calls.push(args);if(args.includes('elevate-admin-runtime-config'))return JSON.stringify(config);if(args.includes('describe'))return JSON.stringify({spec:{template:{spec:{serviceAccountName:'elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com'}}}});if(args.includes('get-iam-policy'))return JSON.stringify({bindings:[]});throw Error('Unexpected mutation');};
- await assert.rejects(activatePrivateCpuModel({base,run,accept:async()=>{accepted=true;}}),/INVOCATION_REVIEW_REQUIRED/);
- assert.equal(accepted,false);assert.ok(calls.every(args=>!args.includes('add')&&!args.includes('update')));
-});
 
 function fixture() {
  let saved=structuredClone(config),staged=false;const writes=[];
  const adminIdentity='elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com';
  const deployIdentity='elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com';
  const run=(args,input)=>{
+  if(args.includes('describe')&&args.includes('elevate-owned-cpu-llm'))return JSON.stringify({status:{url:base}});
   if(args.includes('get-iam-policy'))return JSON.stringify({bindings:[{role:'roles/run.invoker',members:[adminIdentity,deployIdentity].map(x=>'serviceAccount:'+x)}]});
   if(args[0]==='secrets') {
    if(args.includes('add')){writes.push({args,input});saved=JSON.parse(input);return JSON.stringify({name:'projects/test/secrets/config/versions/12'});}
@@ -37,18 +32,30 @@ function fixture() {
 }
 const request=async()=>Response.json({healthy:true,service:'admin',commit:'4e79ac553bf2c698167655bcbc9c287b38d82cb4'});
 test('failed real-model acceptance leaves both runtime configuration and serving revision untouched',async()=>{
- const f=fixture();await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,accept:async()=>({passed:false})}),/REAL_MODEL_ACCEPTANCE_REQUIRED/);
+ const f=fixture();await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,probeAdmin:async()=>({verified:true}),accept:async()=>({passed:false})}),/REAL_MODEL_ACCEPTANCE_REQUIRED/);
  assert.equal(f.writes.length,0);assert.deepEqual(f.current(),config);
 });
 test('only accepted inference can update aliases and activate the existing verified Admin image',async()=>{
  const f=fixture();let verifiedCommit;
- const result=await activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,accept:async()=>({passed:true}),activate:async input=>{verifiedCommit=input.commit;return {traffic:100};}});
+ const result=await activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,probeAdmin:async()=>({verified:true}),accept:async()=>({passed:true}),activate:async input=>{verifiedCommit=input.commit;return {traffic:100};}});
  assert.equal(result.productionTrafficChanged,true);assert.equal(verifiedCommit,'4e79ac553bf2c698167655bcbc9c287b38d82cb4');
  assert.equal(f.current().runtimeEnvironment.ELEVATE_LLM_CPU_URL,base);
  assert.ok(f.writes.find(x=>x.args.includes('update')).args.includes('--no-traffic'));
  assert.ok(f.writes.every(x=>!JSON.stringify(x.args).includes('a'.repeat(32))));
 });
 test('candidate validation failure restores the previous configuration instead of leaving a partial endpoint cutover',async()=>{
- const f=fixture();await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,accept:async()=>({passed:true}),activate:async()=>{throw Error('candidate health failed');}}),/candidate health failed/);
+ const f=fixture();await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,probeAdmin:async()=>({verified:true}),accept:async()=>({passed:true}),activate:async()=>{throw Error('candidate health failed');}}),/candidate health failed/);
  assert.deepEqual(f.current(),config);assert.equal(f.writes.filter(x=>x.args.includes('add')).length,2);
+});
+
+test('actual Admin invocation failure prevents endpoint writes even when the deployment identity can invoke',async()=>{
+ const f=fixture();
+ await assert.rejects(activatePrivateCpuModel({base,invokerToken:'test-identity',run:f.run,request,accept:async()=>({passed:true}),probeAdmin:async()=>({verified:false,discovery:{httpStatus:403}})}),/ADMIN_INVOCATION_REQUIRED/);
+ assert.equal(f.writes.length,0);assert.deepEqual(f.current(),config);
+});
+test('effective inherited access can pass without adding redundant service-level grants',async()=>{
+ const f=fixture();const run=(args,input)=>args.includes('get-iam-policy')?JSON.stringify({bindings:[]}):f.run(args,input);
+ const result=await activatePrivateCpuModel({base,invokerToken:'test-identity',run,request,accept:async()=>({passed:true}),probeAdmin:async()=>({verified:true,execution:'probe-success'}),activate:async()=>({traffic:100})});
+ assert.equal(result.productionTrafficChanged,true);assert.equal(result.adminInvocation.verified,true);
+ assert.ok(f.writes.every(x=>!x.args.includes('add-iam-policy-binding')));
 });

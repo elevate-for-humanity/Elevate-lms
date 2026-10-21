@@ -26,7 +26,7 @@ export function reviewPrivateModelPolicy(policy,adminIdentity) {
   if(policy.bindings?.some(binding=>binding.members?.some(member=>['allUsers','allAuthenticatedUsers'].includes(member))))fail('PUBLIC_ACCESS_FORBIDDEN');
   const invokers=policy.bindings?.filter(binding=>binding.role==='roles/run.invoker'&&!binding.condition).flatMap(binding=>binding.members??[])??[];
   const required=[DEPLOY_IDENTITY,adminIdentity];
-  return {private:true,requiredInvokers:required,missingInvokers:required.filter(identity=>!invokers.includes('serviceAccount:'+identity))};
+  return {private:true,requiredInvokers:required,principalsWithoutServiceBinding:required.filter(identity=>!invokers.includes('serviceAccount:'+identity))};
 }
 
 export async function preflightPrivateCpuRelease({run=google,capacity=inspectRegionalCapacity}={}) {
@@ -68,9 +68,6 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
     console.log(JSON.stringify(report));
     if(report.url&&process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'model_url='+report.url+'\n');
     if(process.env.GITHUB_STEP_SUMMARY)appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\nPrivate CPU model release evidence:\n```json\n'+JSON.stringify(report,null,2)+'\n```\n');
-    if(report.missingInvokers?.length) {
-      console.error('PRIVATE_CPU_RELEASE_INVOCATION_REVIEW_REQUIRED: the private candidate is ready for service-specific invoker review; Admin remains unchanged.');
-      process.exitCode=1;
-    }
+
   }).catch(error=>{console.error(JSON.stringify({operation:'private_cpu_release',code:error.message?.startsWith('PRIVATE_CPU_RELEASE_')?error.message:error.code||'preflight_failed'}));process.exitCode=1;});
 }

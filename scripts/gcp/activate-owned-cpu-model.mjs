@@ -3,6 +3,7 @@ import {google,loadGoogleConfig,PROJECT,validateConfig} from './runtime-config.m
 import {modelCredential} from './deploy-owned-llm.mjs';
 import {acceptOwnedCpuModel} from './accept-owned-cpu-model.mjs';
 import {activateTestedRevision} from './activate-tested-public-revision.mjs';
+import {probeServingAdminModel} from './probe-owned-cpu-admin.mjs';
 import {CPU_SERVICE,CPU_REGION,reviewPrivateModelPolicy} from './deploy-owned-cpu-model.mjs';
 
 const SECRET='elevate-admin-runtime-config';
@@ -19,13 +20,15 @@ export function prepareAdminCpuConfiguration(config,base,token) {
  }},'admin');
 }
 
-export async function activatePrivateCpuModel({base,invokerToken,run=google,request=fetch,accept=acceptOwnedCpuModel,activate=activateTestedRevision}={}) {
+export async function activatePrivateCpuModel({base,invokerToken,run=google,request=fetch,accept=acceptOwnedCpuModel,activate=activateTestedRevision,probeAdmin=probeServingAdminModel}={}) {
  const original=loadGoogleConfig('admin',run);
  const token=modelCredential(original);
+ const modelService=JSON.parse(run(['run','services','describe',CPU_SERVICE,'--project',PROJECT,'--region',CPU_REGION,'--format=json']));
+ if(modelService.status?.url!==base)fail('ENDPOINT_NOT_OWNED');
  const before=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));
  const adminIdentity=before.spec?.template?.spec?.serviceAccountName;
  const policy=JSON.parse(run(['run','services','get-iam-policy',CPU_SERVICE,'--project',PROJECT,'--region',CPU_REGION,'--format=json']));
- if(reviewPrivateModelPolicy(policy,adminIdentity).missingInvokers.length)fail('INVOCATION_REVIEW_REQUIRED');
+ reviewPrivateModelPolicy(policy,adminIdentity); // Private policy is required; effective permissions may be inherited.
  if(!invokerToken)fail('GOOGLE_INVOCATION_IDENTITY_REQUIRED');
  const health=await request(new URL('/api/health',before.status?.url),{redirect:'error',signal:AbortSignal.timeout(15000)});
  const body=await health.json();
@@ -36,6 +39,8 @@ export async function activatePrivateCpuModel({base,invokerToken,run=google,requ
  }
  const acceptance=await accept({base,token,invokerToken});
  if(acceptance?.passed!==true)fail('REAL_MODEL_ACCEPTANCE_REQUIRED');
+ const adminInvocation=await probeAdmin({base,run});
+ if(adminInvocation?.verified!==true)fail('ADMIN_INVOCATION_REQUIRED');
  const next=prepareAdminCpuConfiguration(original,base,token);
  if(JSON.stringify(loadGoogleConfig('admin',run))!==JSON.stringify(original))fail('CONFIGURATION_CHANGED_CONCURRENTLY');
  const previousVersion=run(['secrets','versions','list',SECRET,'--project',PROJECT,'--limit=1','--format=value(name)']);
@@ -58,7 +63,7 @@ export async function activatePrivateCpuModel({base,invokerToken,run=google,requ
   stagedRevision=revision;
   if(!/^elevate-admin-migration-[a-z0-9-]+$/.test(revision??''))fail('ADMIN_CANDIDATE_UNVERIFIED');
   const activation=await activate({service:'elevate-admin-migration',revision,commit:body.commit,read:args=>JSON.parse(run([...args,'--project',PROJECT,'--format=json'])),fetcher:request});
-  return {accepted:true,...acceptance,modelUrl:base,adminCandidate:revision,configurationVersion:version,previousConfigurationVersion:previousVersion,previousAdminTraffic:before.status?.traffic,endpointAliasesUpdated:['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL'],productionTrafficChanged:true,activation};
+  return {accepted:true,...acceptance,adminInvocation,modelUrl:base,adminCandidate:revision,configurationVersion:version,previousConfigurationVersion:previousVersion,previousAdminTraffic:before.status?.traffic,endpointAliasesUpdated:['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL'],productionTrafficChanged:true,activation};
  } catch(error) {
   // Do not overwrite another writer's later configuration while rolling back.
   const current=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));

@@ -59,7 +59,7 @@ export function AutonomousWebsiteBuilder({
 
   const pages = config.pages || [];
   const page = pages.find((item) => item.slug === selectedPage) || pages[0];
-  const publicUrl = subdomain && published ? `https://${subdomain}.app.elevateforhumanity.org` : '';
+  const publicUrl = subdomain && published ? `/sites/${subdomain}` : '';
   const site = useMemo(() => ({ id: websiteId, subdomain: subdomain || '', siteName, organizationId: null, config }), [websiteId, subdomain, siteName, config]);
 
   async function persist(publish?: boolean) {

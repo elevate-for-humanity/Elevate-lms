@@ -120,7 +120,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save website' }, { status: 500 });
 
   validation = validateSiteConfig(saved.site_config as TenantSiteConfig);
-  const publicUrl = saved.subdomain && saved.is_published ? `https://${saved.subdomain}.app.elevateforhumanity.org` : null;
+  const publicUrl = saved.subdomain && saved.is_published ? `/sites/${saved.subdomain}` : null;
   return NextResponse.json({ website: saved, publicUrl, validation });
 }
 

@@ -33,6 +33,38 @@ export function runtimeSpec(spec){
   return ordered(copy);
 }
 
+/**
+ * Return names of changed fields only; never log embedded environment values.
+ * This is diagnostic evidence, not permission to ignore a runtime change.
+ */
+export function changedRuntimePaths(expected,actual,limit=16){
+ const paths=[];
+ const walk=(a,b,path)=>{
+  if(paths.length>=limit)return;
+  if(Object.is(a,b))return;
+  if(Array.isArray(a)||Array.isArray(b)){
+   if(!Array.isArray(a)||!Array.isArray(b)){paths.push(path||'(root)');return;}
+   if(a.length!==b.length)paths.push((path||'(root)')+'.length');
+   for(let i=0;i<Math.min(a.length,b.length);i++)walk(a[i],b[i],path+'['+i+']');
+   return;
+  }
+  if(a&&b&&typeof a==='object'&&typeof b==='object'){
+   for(const key of new Set([...Object.keys(a),...Object.keys(b)])){
+    // Only expose structural field names, never free-form keys from env or annotations.
+    if(/^(env|annotations|labels)$/i.test(key)){
+     if(JSON.stringify(a[key])!==JSON.stringify(b[key]))paths.push((path?path+'.':'')+key+'[redacted]');
+    }else if(/^[a-zA-Z][a-zA-Z0-9_]*$/.test(key)){
+     walk(a[key],b[key],(path?path+'.':'')+key);
+    }else paths.push((path||'(root)')+'[redacted]');
+    if(paths.length>=limit)return;
+   }
+   return;
+  }
+  paths.push(path||'(root)');
+ };
+ walk(expected,actual,'');
+ return paths.slice(0,limit);
+}
 export function runtimeDifferencePaths(before,after,path='spec'){
   if(JSON.stringify(before)===JSON.stringify(after))return [];
   if(before&&after&&typeof before==='object'&&typeof after==='object')
@@ -115,6 +147,11 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
   if(task.containers[0].image!==image)run(['run','jobs','update',name,...scope,'--image='+image,'--quiet']);
   const deployed=read(['run','jobs','describe',name]);
   const expected=structuredClone(before.spec);expected.template.spec.template.spec.containers[0].image=image;
+  if(JSON.stringify(runtimeSpec(deployed.spec))!==JSON.stringify(runtimeSpec(expected))){
+    const differences=changedRuntimePaths(runtimeSpec(expected),runtimeSpec(deployed.spec));
+    console.error(JSON.stringify({code:'OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED',changedPaths:differences}));
+    throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');
+  }
   const changedPaths=runtimeDifferencePaths(runtimeSpec(expected),runtimeSpec(deployed.spec));
   if(changedPaths.length){console.error(JSON.stringify({ownerPreviewReadbackChangedPaths:changedPaths.slice(0,50)}));throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');}
   // No reset of attempts, generation, checkpoints, ordinary pause, or other jobs.

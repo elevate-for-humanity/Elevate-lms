@@ -13,7 +13,7 @@ function badgeLabel(source,state,accessGranted){let code=source.slice(source.ind
 async function submitCase(source,mode,kind){let states=[],resets=0,calls=0;
 let react={useState:(v)=>[v,n=>states.push(n)],useCallback:f=>f,useEffect:()=>{}};
 let response={ok:kind!=='http',status:kind==='http'?403:200,headers:{get:()=>kind==='html'?'text/html':'application/json'},json:async()=>kind==='http'?{error:'Forbidden'}:{}};
-let scope={exports:{},require:n=>n==='react'?react:n==='react/jsx-runtime'?jsx:{},FormData:class{get(){return ''}},fetch:async()=>{calls++;if(kind==='network')throw Error('Network unavailable');return response;}};
+let scope={exports:{},require:n=>n==='react'?react:n==='react/jsx-runtime'?jsx:{},FormData:class{get(key){return key==='startsAt'?'2026-11-01T16:00':''}},fetch:async()=>{calls++;if(kind==='network')throw Error('Network unavailable');return response;}};
 vm.runInNewContext(compile(source,'office.tsx'),scope);
 let tree=scope.exports.ProgramHolderOfficeTools({mode});
 function find(node){if(!node||typeof node!=='object')return; if(node.type==='form')return node;let children=node.props?.children;for(let child of Array.isArray(children)?children:[children]){let found=find(child);if(found)return found;}}

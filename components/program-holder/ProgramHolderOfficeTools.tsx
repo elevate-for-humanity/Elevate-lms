@@ -50,12 +50,21 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
     event.preventDefault();
     setStatus('Saving…');
     const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    try {
     const body =
       mode === 'meetings'
         ? {
             programHolderStudentId: form.get('student'),
             title: form.get('title'),
-            startsAt: new Date(String(form.get('startsAt'))).toISOString(),
+            startsAt: (() => {
+              const value = String(form.get('startsAt') || '');
+              const date = new Date(value);
+              if (!value || Number.isNaN(date.getTime())) {
+                throw new Error('Enter a valid meeting date and time.');
+              }
+              return date.toISOString();
+            })(),
             meetingMethod: form.get('method'),
             durationMinutes: Number(form.get('duration') || 30),
             location: form.get('location'),
@@ -66,9 +75,6 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
             subject: form.get('subject'),
             message: form.get('message'),
           };
-    // React clears currentTarget after dispatch; retain the form before awaiting.
-    const formElement = event.currentTarget;
-    try {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },

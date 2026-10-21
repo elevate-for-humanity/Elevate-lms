@@ -10,7 +10,7 @@
  */
 
 import { buildUnifiedEngineeringStages } from '@/lib/devstudio/engineering-runner/plan';
-import { isReadOnlyRequest } from '@/lib/ai/command-intent';
+import { affirmativeActionText, isReadOnlyRequest, prohibitsToolUse } from '@/lib/ai/command-intent';
 
 export type StepStatus =
   | 'pending'
@@ -404,7 +404,8 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 };
 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
-  const g = goal.toLowerCase();
+  if (prohibitsToolUse(goal)) throw new Error('Tool execution is disabled by this request. Use conversational chat.');
+  const g = affirmativeActionText(goal).toLowerCase();
   const explicitReadOnly = isReadOnlyRequest(goal);
   const explicitReadOnlyStudioDiagnostic =
     explicitReadOnly &&

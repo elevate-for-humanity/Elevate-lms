@@ -20,6 +20,7 @@ interface Props {
   panelPosition?: "start" | "end";
   initialPanelSize?: number;
   mobileExclusive?: boolean;
+  hideClosedToolbar?: boolean;
 }
 
 /** Keeps both workspaces mounted while resizing, hiding, or expanding a panel. */
@@ -33,6 +34,7 @@ export function ResizableWorkspace({
   panelPosition = "end",
   initialPanelSize = 45,
   mobileExclusive = false,
+  hideClosedToolbar = false,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
@@ -106,7 +108,7 @@ export function ResizableWorkspace({
       popover={open && expanded && !mobileFull ? "manual" : undefined}
       className={`${styles.root} ${mobileFull ? styles.mobileExclusive : ""} ${open && expanded ? styles.fullScreen : ""} ${className}`}
     >
-      <div className={styles.toolbar}>
+      <div className={styles.toolbar} hidden={!open && hideClosedToolbar}>
         <span className={styles.title}>{title}</span>
         {open ? (
           <>

@@ -16,6 +16,7 @@
   background: #f8fafc;
   color: #0f172a;
 }
+.toolbar[hidden] { display: none; }
 .title {
   flex: 1 1 8rem;
   font-weight: 700;

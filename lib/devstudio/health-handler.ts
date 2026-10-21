@@ -54,7 +54,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
   // Configuration alone does not establish successful browser or workflow execution.
   const executionPrerequisitesReady = githubTokenValid && isGoogleRuntimeReady() &&
     Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
-    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && aiConfigured;
+    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && hasElevate;
   let nextVersion = 'unknown';
   try {
     nextVersion = require('next/package.json').version;
@@ -69,6 +69,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
     hasOpenAI,
     hasAnthropic,
     hasElevate,
+    ownedModel: 'ownedModel' in ai ? ai.ownedModel : { configured: false, verified: false, status: 'unavailable' },
     hasCloudflare,
     cloudflare: cloudflareProbe,
     activeProvider,

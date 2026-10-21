@@ -15,7 +15,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
-import { ElevateProvider } from '@/lib/ai/providers/elevate';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -40,8 +39,6 @@ export async function GET(request: NextRequest) {
   const keys = [
     'OPENHANDS_API_KEY',
     'GITHUB_TOKEN',
-    'ELEVATE_LLM_URL',
-    'ELEVATE_LLM_SECRET',
     'STUDIO_BROWSER_URL',
     'STUDIO_BROWSER_PUBLIC_URL',
     'STUDIO_BROWSER_SECRET',
@@ -66,11 +63,7 @@ export async function GET(request: NextRequest) {
   const hasCloudflare = cloudflareProbe.reachable;
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
-  const elevateLlmUrl = selectedSecrets.ELEVATE_LLM_URL || process.env.ELEVATE_LLM_URL || '';
-  const elevateLlmSecret =
-    selectedSecrets.ELEVATE_LLM_SECRET || process.env.ELEVATE_LLM_SECRET || '';
-  const hasElevateOwnedAI =
-    Boolean(elevateLlmUrl && elevateLlmSecret) && new ElevateProvider().isAvailable();
+  const hasElevateOwnedAI = ai.elevate;
   const studioBrowserUrl = (
     selectedSecrets.STUDIO_BROWSER_URL ||
     process.env.STUDIO_BROWSER_URL ||
@@ -147,8 +140,8 @@ export async function GET(request: NextRequest) {
     name: 'Elevate Owned AI',
     status: hasElevateOwnedAI ? 'ok' : 'fail',
     detail: hasElevateOwnedAI
-      ? 'Supported Elevate-owned inference endpoint configured; each command must verify its response'
-      : 'Elevate-owned inference configuration is missing or points to a retired provider; configured external inference remains separate',
+      ? 'Selected Elevate-owned model responded to authenticated discovery; command results require independent verification'
+      : 'Selected Elevate-owned model is unavailable or failed authenticated discovery; configured external inference remains separate',
   });
 
   checks.push({

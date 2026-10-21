@@ -78,6 +78,7 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [workflows, setWorkflows] = useState<UnifiedWorkflow[]>([]);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<'all' | 'ai_task' | 'general'>('all');
@@ -97,6 +98,8 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setWorkflows(json.workflows ?? []);
+      setWarnings(Array.isArray(json.warnings) ? json.warnings : []);
+      if (json.status === 'unavailable') throw new Error(json.warnings?.[0] ?? 'Workflow storage is unavailable.');
       setError(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load workflows');
@@ -114,13 +117,19 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
       return;
     }
     const next = w.status === 'active' ? 'inactive' : 'active';
-    await fetch(`/api/admin/workflows/${w.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: next }),
-    });
-    startTransition(() => router.refresh());
-    fetchWorkflows();
+    try {
+      const res = await fetch(`/api/admin/workflows/${w.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Could not update workflow status.');
+      startTransition(() => router.refresh());
+      await fetchWorkflows();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Could not update workflow status.');
+    }
   }
 
   async function handleRun(w: UnifiedWorkflow) {
@@ -188,7 +197,7 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
     : workflows.filter(w => w.type === typeFilter);
 
   const activeCount = workflows.filter(w => w.type === 'general' && w.status === 'active').length;
-  const totalRuns = workflows.reduce((s, w) => s + (w.run_count ?? 0), 0);
+  const totalRuns = workflows.filter(w => w.type === 'general').reduce((s, w) => s + (w.run_count ?? 0), 0);
   const failedCount = workflows.filter(w => w.last_run_status === 'failed').length;
 
   const header = !embedded ? (
@@ -355,10 +364,10 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
         {/* KPI Strip */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Total Workflows', value: workflows.length, icon: Workflow, color: 'text-indigo-600 bg-indigo-50' },
+            { label: 'Workflow & AI records', value: workflows.length, icon: Workflow, color: 'text-indigo-600 bg-indigo-50' },
             { label: 'Active', value: activeCount, icon: Activity, color: 'text-green-600 bg-green-50' },
-            { label: 'Total Runs', value: totalRuns.toLocaleString(), icon: Play, color: 'text-blue-600 bg-blue-50' },
-            { label: 'Failures', value: failedCount, icon: AlertTriangle, color: failedCount > 0 ? 'text-red-600 bg-red-50' : `${embedded ? 'text-slate-500 bg-slate-800' : 'text-slate-400 bg-slate-50'}` },
+            { label: 'Workflow Runs', value: totalRuns.toLocaleString(), icon: Play, color: 'text-blue-600 bg-blue-50' },
+            { label: 'Latest Failures', value: failedCount, icon: AlertTriangle, color: failedCount > 0 ? 'text-red-600 bg-red-50' : `${embedded ? 'text-slate-500 bg-slate-800' : 'text-slate-400 bg-slate-50'}` },
           ].map(kpi => (
             <div key={kpi.label} className={`rounded-xl border p-4 shadow-sm ${embedded ? 'border-[#333] bg-[#1e1e1e]' : 'bg-white border-slate-200'}`}>
               <div className="flex items-center gap-3">
@@ -375,7 +384,12 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
         </div>
 
         {/* Error */}
-        {error && (
+        {warnings.length > 0 && (
+        <div role="status" className="mx-4 my-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+          {warnings.map((warning) => <p key={warning}>{warning}</p>)}
+        </div>
+      )}
+      {error && (
           <div className={`rounded-xl border px-5 py-4 text-sm mb-6 ${embedded ? 'border-red-900 bg-red-900/20 text-red-400' : 'border-red-200 bg-red-50 text-red-700'}`}>
             {error}
           </div>

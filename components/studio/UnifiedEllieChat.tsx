@@ -1284,7 +1284,7 @@ export default function UnifiedEllieChat({
         </div>
       ) : null}
       {showActivity ? (
-        <div className="max-h-[42vh] shrink-0 overflow-y-auto border-b border-slate-200">
+        <div className="max-h-[24dvh] shrink-0 overflow-y-auto border-b border-slate-200">
           <CanonicalRunActivity runId={canonicalRunId} />
           <CourseBuildRuns />
           <ConversationActivity conversationId={conversationId} />
@@ -1450,7 +1450,7 @@ export default function UnifiedEllieChat({
       </div>
 
       <div
-        className={`min-w-0 shrink-0 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4 ${inputAreaClass}`}
+        className={`min-w-0 shrink-0 border-t p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:p-3 ${inputAreaClass}`}
       >
         <div className="mx-auto w-full min-w-0 max-w-4xl">
           {attachment ? (
@@ -1536,9 +1536,9 @@ export default function UnifiedEllieChat({
                   void send();
                 }
               }}
-              rows={3}
+              rows={1}
               placeholder="Tell Paris what you need done..."
-              className={`order-first min-h-[100px] max-h-[35dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
+              className={`order-first min-h-[60px] max-h-[20dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
             />
             <button
               type="button"

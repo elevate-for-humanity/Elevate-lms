@@ -32,3 +32,20 @@ test('runtime diagnostics contain categories instead of secret-bearing applicati
   const result=classifyRuntimeErrors([{textPayload:'Kokoro request failed with password=private-fixture',timestamp:'2026-10-08T18:00:00Z'}]);
   assert.equal(result[0].category,'owned_narration_runtime');assert.ok(!JSON.stringify(result).includes('private-fixture'));
 });
+
+test('prefers the authoritative CPU endpoint over a stale legacy endpoint', async () => {
+  const result = await verifyOwnedModel({...env,ELEVATE_LLM_URL:'https://retired.code.run',ELEVATE_LLM_CPU_URL:'https://elevate-owned-cpu-llm-123.run.app'}, {
+    request: async (url) => { assert.equal(url, 'https://elevate-owned-cpu-llm-123.run.app/v1/models'); return Response.json({data:[{id:'elevate-local'}]}); }
+  });
+  assert.equal(result.verified, true);
+});
+test('uses the private Google invocation adapter for model health', async () => {
+  const {probeOwnedModel} = await import('../../lib/ai/providers/owned-model-health.mjs');
+  let calls = 0;
+  const result = await probeOwnedModel({env:{...env,ELEVATE_LLM_GOOGLE_IAM:'true'},
+    headersFor: async (_base, token, {env: config}) => { assert.equal(config.ELEVATE_LLM_GOOGLE_IAM,'true'); return {Authorization:'Bearer '+token,'X-Serverless-Authorization':'Bearer private-identity'}; },
+    request: async (_url, options) => { calls++; assert.equal(options.headers['X-Serverless-Authorization'],'Bearer private-identity'); return Response.json({data:[{id:'elevate-local'}]}); }
+  });
+  assert.equal(result.verified,true); assert.equal(calls,1);
+  assert.ok(!JSON.stringify(result).includes('private-identity'));
+});

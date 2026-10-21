@@ -1,24 +1,13 @@
 import { pathToFileURL } from 'node:url';
-import { google, loadGoogleConfig, PROJECT } from './runtime-config.mjs';
+import { google, loadGoogleConfig, PROJECT, COMPONENTS } from './runtime-config.mjs';
+import { inspectRegionalCapacity } from './regional-capacity.mjs';
+import { resolveOwnedModelConnection } from '../../lib/ai/providers/owned-model-config.mjs';
 import { diagnoseAccess } from './diagnose-access.mjs';
 
-export async function verifyOwnedModel(env, { request = fetch } = {}) {
-  const base = env.ELEVATE_LLM_URL?.trim().replace(/\/+$/, '');
-  const secret = env.ELEVATE_LLM_SECRET?.trim();
-  if (!base || !secret) return { configured:false, verified:false, status:'not_configured' };
-  let url;
-  try { url = new URL(base); } catch { return { configured:true, verified:false, status:'invalid_endpoint' }; }
-  if (url.protocol !== 'https:' || !url.hostname.endsWith('.run.app') || url.username || url.password || url.search || url.hash) {
-    return { configured:true, verified:false, status:'google_endpoint_required' };
-  }
-  try {
-    const response = await request(base+'/v1/models', {
-      redirect:'manual', headers:{Authorization:`Bearer ${secret}`}, signal:AbortSignal.timeout(15000),
-    });
-    const body = await response.json().catch(()=>({}));
-    const verified = response.ok && Array.isArray(body.data) && body.data.some(model=>model?.id==='elevate-local');
-    return { configured:true, verified, status:verified?'reachable':response.status===401||response.status===403?'authentication_failed':'model_unavailable', httpStatus:response.status };
-  } catch { return { configured:true, verified:false, status:'request_failed' }; }
+import { probeOwnedModel } from '../../lib/ai/providers/owned-model-health.mjs';
+
+export async function verifyOwnedModel(env, options={}) {
+  return probeOwnedModel({env, ...options});
 }
 
 export function classifyRuntimeErrors(entries) {
@@ -55,6 +44,31 @@ async function main() {
     studio:{ configured:Boolean(admin.runtimeEnvironment.STUDIO_BROWSER_URL), persistentVolumes:browser.volumes.length, stateTransferVerified:false },
     runtimeErrors:[], failures:[],
   };
+  // Read-only release evidence. Never create identities, grant permissions,
+  // start compute, or expose model credentials from diagnostics.
+  report.modelConsumers = COMPONENTS.map(component => {
+    try {
+      const env = loadGoogleConfig(component).runtimeEnvironment;
+      const connection = resolveOwnedModelConnection(env);
+      return {component, configured:connection.configured, endpointAccepted:Boolean(connection.base), tier:connection.tier,
+        cpuEndpointPresent:Boolean(env.ELEVATE_LLM_CPU_URL), privateGoogleInvocation:env.ELEVATE_LLM_GOOGLE_IAM==='true', provider:env.AI_PROVIDER || 'unset'};
+    } catch(error) { return {component, status:error.code || 'configuration_unavailable'}; }
+  });
+  const modelIdentity = `elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`;
+  report.cpuReleasePrerequisites = {};
+  try {
+    google(['iam','service-accounts','describe',modelIdentity,'--project',PROJECT,'--format=value(email)']);
+    report.cpuReleasePrerequisites.identityPresent = true;
+  } catch(error) { report.cpuReleasePrerequisites.identityStatus = error.code || 'unavailable'; }
+  try {
+    const policy = JSON.parse(google(['secrets','get-iam-policy','elevate-owned-llm-token','--project',PROJECT,'--format=json']));
+    report.cpuReleasePrerequisites.scopedModelSecretReader = Boolean(policy.bindings?.some(binding => binding.role==='roles/secretmanager.secretAccessor' && binding.members?.includes('serviceAccount:'+modelIdentity)));
+  } catch(error) { report.cpuReleasePrerequisites.secretReaderStatus = error.code || 'unavailable'; }
+  try {
+    const cpuServices = JSON.parse(google(['run','services','list','--project',PROJECT,'--region','us-east1','--format=json']));
+    report.cpuReleasePrerequisites.existingCpuService = cpuServices.some(service => service.metadata?.name==='elevate-owned-cpu-llm');
+    report.cpuReleasePrerequisites.capacity = await inspectRegionalCapacity({region:'us-east1',task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]}});
+  } catch(error) { report.cpuReleasePrerequisites.capacityStatus = error.code || 'unavailable'; }
   try {
     const instances=JSON.parse(google(['compute','instances','list','--project',PROJECT,'--filter=name=elevate-studio-browser','--format=json']));
     report.studio.googleInstancePresent=instances.some(instance=>instance.name==='elevate-studio-browser' && instance.status==='RUNNING');

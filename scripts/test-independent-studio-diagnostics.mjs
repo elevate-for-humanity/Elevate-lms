@@ -2,11 +2,13 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-const engineering=stripTypeScriptTypes(readFileSync('lib/devstudio/engineering-runner/plan.ts','utf8'));
-const dependency='data:text/javascript;base64,'+Buffer.from(engineering).toString('base64');
-// Data-URL modules cannot resolve Next.js aliases. Load both real dependencies.
+// Data-URL modules cannot resolve Next.js aliases. Load the shared intent
+// helper in both real consumers so this check exercises production planning.
 const commandIntent=stripTypeScriptTypes(readFileSync('lib/ai/command-intent.ts','utf8'));
 const commandIntentDependency='data:text/javascript;base64,'+Buffer.from(commandIntent).toString('base64');
+const engineering=stripTypeScriptTypes(readFileSync('lib/devstudio/engineering-runner/plan.ts','utf8')
+ .replace("'@/lib/ai/command-intent'",JSON.stringify(commandIntentDependency)));
+const dependency='data:text/javascript;base64,'+Buffer.from(engineering).toString('base64');
 const source=readFileSync('lib/platform/planner.ts','utf8')
  .replace("'@/lib/devstudio/engineering-runner/plan'",JSON.stringify(dependency))
  .replace("'@/lib/ai/command-intent'",JSON.stringify(commandIntentDependency));

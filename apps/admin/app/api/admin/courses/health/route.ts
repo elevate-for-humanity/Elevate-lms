@@ -1,3 +1,4 @@
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 /** Course Builder Health Endpoint */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -126,19 +127,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   if (aiAvailable) {
     try {
       if (provider === 'elevate') {
-        const base = process.env.ELEVATE_LLM_URL?.trim().replace(/\/+$/, '');
-        const token = process.env.ELEVATE_LLM_SECRET?.trim();
-        if (!base || !token) throw new Error('Owned model configuration is incomplete');
-        const response = await fetch(`${base}/v1/models`, {
-          headers: { Authorization: `Bearer ${token}` },
-          redirect: 'error',
-          signal: AbortSignal.timeout(10_000),
-        });
-        if (!response.ok) throw new Error(`Owned model catalog returned ${response.status}`);
-        const catalog = await response.json() as { data?: Array<{ id?: string }> };
-        if (!catalog.data?.some((model) => model.id === 'elevate-local')) {
-          throw new Error('Owned model catalog does not include elevate-local');
-        }
+        const owned = await probeOwnedModel();
+        if (!owned.verified) throw new Error('Owned model discovery failed: ' + owned.status);
       } else if (provider === 'xai') {
         const token = getXAIAPIKey();
         if (!token) throw new Error('xAI configuration is incomplete');

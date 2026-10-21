@@ -1,3 +1,4 @@
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
 /**
  * POST /api/admin/dev-studio/plan
  *
@@ -185,6 +186,10 @@ export async function POST(req: NextRequest) {
 
   if (!goal && !resumePlanId) {
     return new Response('data: [DONE]\n\n', { headers: { 'Content-Type': 'text/event-stream' } });
+  }
+
+  if (prohibitsToolUse(goal)) {
+    return Response.json({ error: 'Tool execution is disabled by this request. Use conversational chat.' }, { status: 422 });
   }
 
   const db = await requireAdminClient();

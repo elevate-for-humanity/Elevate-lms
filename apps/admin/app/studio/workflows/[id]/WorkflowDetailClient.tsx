@@ -117,6 +117,8 @@ export default function WorkflowDetailClient({
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const canRun = steps.some((step) => step.enabled);
+  const canActivate = canRun && triggers.some((trigger) => trigger.enabled);
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [status, setStatus] = useState(workflow.status);
@@ -136,6 +138,7 @@ export default function WorkflowDetailClient({
   const [addingTrigger, setAddingTrigger] = useState(false);
 
   async function handleRun() {
+    if (!canRun) { setRunResult({ok: false, msg: 'Add and enable a step before running this workflow.'}); return; }
     setRunning(true);
     setRunResult(null);
     try {
@@ -147,7 +150,7 @@ export default function WorkflowDetailClient({
       const data = await res.json();
       setRunResult({
         ok: res.ok && data.status !== 'failed',
-        msg: data.status === 'failed' ? (data.error ?? 'Run failed') : `Run ${data.runId?.slice(0,8)} — ${data.stepsRun} step(s) executed`,
+        msg: !res.ok || data.status === 'failed' ? (data.error ?? 'Run failed') : `Run ${data.runId?.slice(0,8)} — ${data.stepsRun} step(s) executed`,
       });
     } catch (err: any) {
       setRunResult({ ok: false, msg: err.message });
@@ -158,15 +161,23 @@ export default function WorkflowDetailClient({
   }
 
   async function handleStatusChange(next: string) {
+    if (next === 'active' && !canActivate) {
+      setRunResult({ok: false, msg: 'Add an enabled trigger and step before activation.'});
+      return;
+    }
     setSavingStatus(true);
-    await fetch(`/api/admin/workflows/${workflow.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: next }),
-    });
-    setStatus(next);
-    setSavingStatus(false);
-    startTransition(() => router.refresh());
+    try {
+      const res = await fetch(`/api/admin/workflows/${workflow.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Could not update workflow status.');
+      setStatus(next);
+      startTransition(() => router.refresh());
+    } catch (error) {
+      setRunResult({ok: false, msg: error instanceof Error ? error.message : 'Could not update workflow status.'});
+    } finally { setSavingStatus(false); }
   }
 
   async function handleAddStep(e: React.FormEvent) {
@@ -236,7 +247,7 @@ export default function WorkflowDetailClient({
                 {workflow.name}
               </h1>
               <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${STATUS_BADGE[status] ?? 'bg-slate-400/50 text-white'}`}>
-                {status}
+                {canActivate ? status : 'incomplete'}
               </span>
             </div>
             <p className="text-indigo-100 text-sm mt-1">
@@ -254,7 +265,7 @@ export default function WorkflowDetailClient({
               const next = status === 'active' ? 'inactive' : 'active';
               handleStatusChange(next);
             }}
-            disabled={savingStatus}
+            disabled={savingStatus || (status !== 'active' && !canActivate)}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all disabled:opacity-50 ${
               status === 'active'
                 ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-200'
@@ -265,7 +276,7 @@ export default function WorkflowDetailClient({
           </button>
           <button
             onClick={handleRun}
-            disabled={running}
+            disabled={running || !canRun}
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-semibold transition-all disabled:opacity-50 shadow-sm"
           >
             {running ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
@@ -282,34 +293,10 @@ export default function WorkflowDetailClient({
         )}
       </div>
 
-      {/* Body */}
-      <div className="max-w-6xl mx-auto px-6 pb-8 space-y-6">
-        <div className="flex items-center gap-2">
-          <select
-            value={status}
-            onChange={e => handleStatusChange(e.target.value)}
-            disabled={savingStatus}
-            className="border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-          >
-            {['active','inactive','paused'].map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <button
-            onClick={handleRun}
-            disabled={running}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-          >
-            {running ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-            {running ? 'Running…' : 'Run Now'}
-          </button>
-        </div>
-      </div>
-
-      {runResult && (
-        <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-sm ${runResult.ok ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
-          {runResult.ok ? <CheckCircle className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
-          {runResult.msg}
-          <button onClick={() => setRunResult(null)} className="ml-auto text-xs opacity-60 hover:opacity-100">✕</button>
-        </div>
+      {!canActivate && (
+        <p role="status" className="mx-6 my-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+          Incomplete workflow: add and enable at least one trigger and one step before activation. Manual runs require an enabled step.
+        </p>
       )}
 
       <div className="grid lg:grid-cols-3 gap-6">

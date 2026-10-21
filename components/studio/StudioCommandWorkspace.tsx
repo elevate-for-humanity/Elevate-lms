@@ -126,6 +126,7 @@ export default function StudioCommandWorkspace({
   const viewportStyle = useStudioViewport();
   const [focusMode, setFocusMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Array<{ id: string; title: string }>>([]);
   const [historyError, setHistoryError] = useState('');
@@ -332,27 +333,37 @@ export default function StudioCommandWorkspace({
           <button
             type="button"
             onClick={() => {
-              setActiveCapability(null);
-              setSurface('browser');
+              setSurface(lastSurface);
             }}
             aria-pressed={surface !== 'commands'}
             className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface !== 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Work
           </button>
+          <button
+            type="button"
+            aria-expanded={toolsOpen}
+            aria-controls="studio-tool-navigation"
+            onClick={() => setToolsOpen((open) => !open)}
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-100"
+          >
+            <Menu className="h-4 w-4" aria-hidden="true" /> Tools
+          </button>
           <span className="ml-2 hidden text-[11px] font-semibold text-slate-500 sm:inline">
             One workspace · governed workflow · verified evidence
           </span>
         </nav>
         <nav
+          hidden={!toolsOpen}
+          id="studio-tool-navigation"
           aria-label="Studio tools"
-          className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-blue-100 bg-blue-50 px-2 py-1 [scrollbar-width:thin]"
+          className={`${toolsOpen ? 'flex' : 'hidden'} min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-blue-100 bg-blue-50 px-2 py-1 [scrollbar-width:thin]`}
         >
           {workspaces.map((workspace) => (
             <button
               type="button"
               key={workspace.id}
-              onClick={() => openCapability(workspace.id)}
+              onClick={() => { openCapability(workspace.id); setToolsOpen(false); }}
               aria-pressed={
                 currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course')
               }
@@ -411,6 +422,8 @@ export default function StudioCommandWorkspace({
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
           <ResizableWorkspace
             mobileExclusive
+            hideClosedToolbar
+            initialPanelSize={65}
             className="h-full"
             title="Studio side panel"
             open={surface !== 'commands'}

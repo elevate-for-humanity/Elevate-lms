@@ -696,6 +696,14 @@ export async function POST(request: NextRequest) {
   // Never hydrate the complete encrypted platform_secrets table into env.
   const providerKeys = [
     'ELEVATE_LLM_SECRET',
+    'ELEVATE_LLM_URL',
+    'ELEVATE_LLM_CPU_SECRET',
+    'ELEVATE_LLM_CPU_URL',
+    'ELEVATE_LLM_GPU_SECRET',
+    'ELEVATE_LLM_GPU_URL',
+    'ELEVATE_LLM_GOOGLE_IAM',
+    'PARIS_GPU_ENABLED',
+    'PARIS_INFERENCE_TIER',
     'GROQ_API_KEY',
     'GEMINI_API_KEY',
     'GOOGLE_CLOUD_API_KEY',

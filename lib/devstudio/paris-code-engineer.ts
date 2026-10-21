@@ -1,3 +1,4 @@
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import {requireAdminClient} from '@/lib/supabase/admin';
@@ -228,8 +229,8 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const db=await requireAdminClient();
   const provider=(process.env.AI_PROVIDER??'openai').trim().toLowerCase();
   if(provider==='elevate'){
-    let endpoint:URL;try{endpoint=new URL(process.env.ELEVATE_LLM_URL??'');}catch{return NextResponse.json({error:'Owned model connection is unavailable.'},{status:503});}
-    if(endpoint.protocol!=='https:'||!endpoint.hostname.endsWith('.run.app'))return NextResponse.json({error:'Configure the owned Google model endpoint before using it.'},{status:503});
+    const owned = await probeOwnedModel();
+    if (!owned.verified) return NextResponse.json({error:'Owned model connection is unavailable. Verify the selected private CPU endpoint before retrying.'},{status:503});
   }
   const taskId = repairId ?? crypto.randomUUID();
   const { branch, baseSha } = await createTaskBranch(taskId);

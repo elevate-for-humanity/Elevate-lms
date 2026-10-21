@@ -8,6 +8,9 @@ import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { ResponsivePreviewClient } from './ResponsivePreviewClient';
 
 export const dynamic = 'force-dynamic';
+export const metadata = {
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ websiteId: string }> };
 

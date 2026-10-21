@@ -586,6 +586,17 @@ export default async function StudentDashboard() {
           </section>
         )}
 
+        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Documents and agreements">
+          <h2 className="text-xl font-black">Your documents & agreements</h2>
+          <p className="mt-2 text-sm text-slate-700">Read your handbook, MOU, and enrollment documents anytime, including after signing.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/lms/documents" className="rounded-xl bg-slate-950 px-4 py-3 font-bold text-white">Documents & uploads</Link>
+            <Link href="/lms/handbook" className="rounded-xl border px-4 py-3 font-bold">Student handbook</Link>
+            <Link href="/lms/legal/student-mou" className="rounded-xl border px-4 py-3 font-bold">Participation MOU</Link>
+            <Link href="/lms/agreements" className="rounded-xl border px-4 py-3 font-bold">All agreements & signatures</Link>
+          </div>
+        </section>
+
         <DashboardOrientationPanel
           bookkeeping={bookkeeping}
           instructorEmail={instructorMailbox?.address}

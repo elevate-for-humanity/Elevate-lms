@@ -167,7 +167,12 @@
 .legacy83-premium[data-page="/academy"] [data-section-id=academy-programs]{gap:35px}
 .legacy83-premium[data-page="/journal"] [data-section-id=journal-topics] .tenant-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.legacy83-premium .tenant-cards[data-variant=process-steps] article{overflow:visible;border:0;border-top:1px solid #cbb58c;border-radius:0;background:transparent;box-shadow:none}
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-body{padding:24px 0}
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-marker{display:flex;width:36px;height:36px;align-items:center;justify-content:center;margin-top:-43px;margin-bottom:18px;border-radius:50%;background:#173b2b;color:#e7ce98;font-size:16px}
 @media(max-width:767px){
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-grid{grid-template-columns:1fr;gap:32px}
 .legacy83-premium .tenant-hero[data-variant=editorial]>div{padding:36px 24px;gap:30px;flex-direction:column}
 .legacy83-premium .tenant-hero[data-variant=editorial] .tenant-hero-media{max-width:none;padding:0}
 .legacy83-premium .tenant-hero[data-variant=reference]>div{display:flex;flex-direction:column;padding:0 24px;gap:0}

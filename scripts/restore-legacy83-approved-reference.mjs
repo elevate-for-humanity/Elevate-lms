@@ -43,6 +43,24 @@ export function restoreLegacy83ApprovedReference(input) {
   }
   const framework = page('/').sections.find(item => item.id === 'framework');
   if (framework) framework.settings = { ...framework.settings, variant: 'reference-framework' };
+  const process = page('/').sections.find(item => item.id === 'process');
+  if (process) {
+    process.settings = { ...process.settings, variant: 'process-steps', numbered: true };
+    process.content.items = (process.content.items || []).map(item => ({ ...item, title: typeof item.title === 'string' ? item.title.replace(/^\d+\s*[—-]\s*/, '') : item.title }));
+  }
+  const academyFeature = page('/').sections.find(item => item.id === 'academy');
+  if (academyFeature) {
+    academyFeature.type = 'hero';
+    academyFeature.settings = { ...academyFeature.settings, variant: 'editorial' };
+    academyFeature.content = { ...academyFeature.content, image: sheet, imageSegment: 3, imageAlt: 'Illustrative notebook and business learning materials' };
+  }
+  for (const slug of ['/academy', '/resources']) {
+    const cards = page(slug).sections.find(item => item.id === (slug === '/academy' ? 'academy-programs' : 'resources-tools'));
+    if (cards) {
+      cards.settings = { ...cards.settings, variant: 'photographic', numbered: false };
+      cards.content.items = (cards.content.items || []).map((item, index) => ({ ...item, image: sheet, imageSegment: images[index % 4], imageAlt: `Illustrative business imagery for ${item.title || 'learning and development'}`, href: item.href || '/contact', buttonText: item.buttonText || 'Ask about this learning area' }));
+    }
+  }
   const aboutHero = page('/about').sections.find(item => item.type === 'hero');
   aboutHero.settings = { ...aboutHero.settings, variant: 'reference' };
   aboutHero.content = { ...aboutHero.content, image: portrait, imageMask: mask, imageAlt: homeHero.content.imageAlt, imageCaption: homeHero.content.imageCaption };
@@ -50,6 +68,7 @@ export function restoreLegacy83ApprovedReference(input) {
     ['/services', 0, imageAlts[0]], ['/resources', 2, imageAlts[3]],
     ['/academy', 3, 'Notebook representing business learning'], ['/growth-iq', 0, imageAlts[0]],
     ['/journal', 3, 'Notebook representing business insights'], ['/events', 1, 'Illustrative business conversation; no event is depicted'],
+    ['/contact', 1, 'Illustrative business consultation'],
   ]) {
     const hero = page(slug).sections.find(item => item.type === 'hero');
     hero.settings = { ...hero.settings, variant: 'editorial' };

@@ -1,3 +1,4 @@
+import { holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
@@ -189,7 +190,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ? db
           .from('program_enrollments')
           .select(
-            `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,funding_verified,voucher_issued_date,voucher_paid_date,payment_status,amount_paid_cents,completed_at,completion_date${enrollmentContactColumns}`,
+            `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,expected_end_date,completed_at,completion_date${enrollmentContactColumns}`,
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
@@ -222,7 +223,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ? db
           .from('program_holder_students')
           .select(
-            `id,user_id,applicant_name,status,application_status,program_id,label${applicantNotesColumns},call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
+            `id,user_id,applicant_name,status,application_status,program_id,label${applicantNotesColumns},call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,updated_at${applicantContactColumns}`,
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
@@ -268,13 +269,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       )
       .eq('user_id', profile.id)
       .maybeSingle(),
-    db
-      .from('payout_schedules')
-      .select(
-        'id,enrollment_id,program_id,total_payout_cents,increment_1_cents,increment_2_cents,increment_1_status,increment_2_status,increment_1_release_date,increment_2_release_date,increment_1_paid_at,increment_2_paid_at',
-      )
-      .eq('program_holder_id', holderId)
-      .order('created_at', { ascending: false }),
+    // Student funding and reimbursement records are administrator-only.
+    Promise.resolve({ data: [] }),
     db
       .from('notification_preferences')
       .select(
@@ -347,7 +343,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     (rosterProfiles ?? [])
       .filter(
         (row: any) =>
-          ['student', 'learner', 'apprentice'].includes(String(row.role || '').toLowerCase()) &&
           !String(row.email || '')
             .toLowerCase()
             .endsWith('@qa.invalid'),
@@ -390,7 +385,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .map((row: any) => [row.id, row.full_name.trim()]),
   );
   const enrolledRoster = (enrollmentsRes.data ?? [])
-    .filter((row: any) => eligibleRosterUserIds.has(row.user_id))
+    .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
     .map((row: any) => ({
       ...row,
       full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
@@ -401,10 +396,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       training_start_date: row.training_start_date || firstClockDateByUser.get(row.user_id) || null,
     }));
   const upcomingRoster = (upcomingRes.data ?? []).filter((row: any) =>
-    eligibleRosterUserIds.has(row.user_id),
+    !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );
   const convertedRoster = (convertedStudentsRes.data ?? []).filter((row: any) =>
-    eligibleRosterUserIds.has(row.user_id),
+    !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );
 
   let phoneLine = phoneLineRes.data ?? null;
@@ -520,17 +515,17 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     holder: holderRes.data ?? null,
     profile,
     programs: programsRes.data ?? [],
-    enrollments: enrolledRoster,
-    upcomingEnrollments: upcomingRoster,
+    enrollments: enrolledRoster.map(holderTrainingRecord),
+    upcomingEnrollments: upcomingRoster.map(holderTrainingRecord),
     applicants: deduplicatedApplicants,
-    convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
+    convertedStudents: deduplicatedConvertedStudents.map((row: any) => holderTrainingRecord({
       ...row,
       roster_source: 'holder_student',
       full_name: row.applicant_name || 'Student',
       enrollment_state: row.status,
       program_slug: null,
       training_start_date: row.work_start_date,
-      training_end_date: row.completion_date,
+      training_end_date: null,
       total_hours_completed: Number(row.hours_taught || 0),
       progress_percent:
         Number(row.hours_required || 0) > 0
@@ -543,11 +538,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         row.work_progress && row.work_progress !== 'Not started'
           ? row.work_progress
           : 'Record training progress',
-      funding_verified: false,
-      voucher_issued_date: null,
-      voucher_paid_date: null,
-      payment_status: null,
-      amount_paid_cents: 0,
     })),
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],

@@ -63,22 +63,30 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
             subject: form.get('subject'),
             message: form.get('message'),
           };
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const result = await response.json();
-    setStatus(
-      response.ok
-        ? mode === 'meetings'
-          ? 'Meeting scheduled.'
-          : 'Office message sent.'
-        : result.error || 'Unable to save.',
-    );
-    if (response.ok) {
-      event.currentTarget.reset();
+    // React clears currentTarget after dispatch; retain the form before awaiting.
+    const formElement = event.currentTarget;
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!response.headers.get('content-type')?.includes('application/json')) {
+        throw new Error('Your session could not be verified. Sign in again before retrying.');
+      }
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to save.');
+      formElement.reset();
       await load();
+      setStatus(mode !== 'meetings'
+        ? 'Office message sent.'
+        : result.invitationDelivery === 'accepted'
+          ? 'Meeting scheduled. Student invitation accepted for email delivery.'
+          : result.invitationDelivery === 'missing_email'
+            ? 'Meeting scheduled, but no student account email is available for the invitation.'
+            : 'Meeting scheduled, but the invitation email was not sent. Contact the student before the meeting.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to save. Please retry.');
     }
   }
 

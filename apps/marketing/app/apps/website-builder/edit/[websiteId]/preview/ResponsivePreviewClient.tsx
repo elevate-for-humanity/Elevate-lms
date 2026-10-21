@@ -6,15 +6,21 @@ import { ArrowLeft, Monitor, Smartphone, Tablet } from 'lucide-react';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComposableSite';
+import { TenantDraftViewport } from '@/components/website-builder/TenantDraftViewport';
+import { useRouter } from 'next/navigation';
+import { TenantPreviewProvider } from '@/components/tenant/TenantPreviewContext';
 
 type Device = 'desktop' | 'tablet' | 'mobile';
 const widths: Record<Device, number> = { desktop: 1280, tablet: 768, mobile: 390 };
 
-export function ResponsivePreviewClient({ websiteId, siteName, config: initialConfig, publicBasePath }: { websiteId: string; siteName: string; config: TenantSiteConfig; publicBasePath?: string }) {
+export function ResponsivePreviewClient({ websiteId, siteName, config: initialConfig, pageSlug = '/', parisEnabled = false }: { websiteId: string; siteName: string; config: TenantSiteConfig; pageSlug?: string; parisEnabled?: boolean }) {
+  const router = useRouter();
   const [device, setDevice] = useState<Device>('desktop');
   const config = useMemo(() => ensureComposableSiteConfig(initialConfig), [initialConfig]);
-  const [pageSlug, setPageSlug] = useState(config.pages?.[0]?.slug || '/');
-  const site = useMemo(() => ({ id: websiteId, subdomain: '', siteName, organizationId: null, config }), [websiteId, siteName, config]);
+  const site = useMemo(() => ({ id: websiteId, subdomain: '', siteName, organizationId: null, config, parisEnabled }), [websiteId, siteName, config, parisEnabled]);
+  function navigate(slug: string) {
+    router.push(`/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(slug)}`, { scroll: false });
+  }
 
   return (
     <main className="min-h-screen bg-slate-100">
@@ -31,17 +37,17 @@ export function ResponsivePreviewClient({ websiteId, siteName, config: initialCo
           </div>
         </div>
         <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-4">
-          {(config.pages || []).map((page) => <button key={page.id} type="button" onClick={() => setPageSlug(page.slug)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${pageSlug === page.slug ? 'bg-brand-red-600 text-white' : 'border border-slate-300 bg-white text-slate-700'}`}>{page.title}</button>)}
+          {(config.pages || []).map((page) => <Link key={page.id} href={`/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(page.slug)}`} scroll={false} aria-current={pageSlug === page.slug ? 'page' : undefined} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${pageSlug === page.slug ? 'bg-brand-red-600 text-white' : 'border border-slate-300 bg-white text-slate-700'}`}>{page.title}</Link>)}
         </div>
       </header>
 
       <section className="overflow-auto px-4 py-8">
-        <div className="mx-auto transition-[width] duration-200" style={{ width: `min(100%, ${widths[device]}px)` }}>
+        <div className="mx-auto transition-[width] duration-200" style={{ width: widths[device] }}>
           <div className="overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-xl">
             <div className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-center text-xs font-bold text-slate-500">{device.toUpperCase()} · {widths[device]}px · {pageSlug}</div>
-            {publicBasePath ? <iframe key={`${device}:${pageSlug}`} src={pageSlug === '/' ? publicBasePath : `${publicBasePath}${pageSlug}`} title={`${siteName} ${device} preview`} className="block h-[900px] w-full border-0" allow="microphone 'none'; camera 'none'" /> : <PublicTenantComposableSite site={site} pathname={pageSlug} />}
+            <TenantPreviewProvider websiteId={websiteId}><TenantDraftViewport key={pageSlug} width={widths[device]} title={`${siteName} ${device} preview`}><PublicTenantComposableSite site={site} pathname={pageSlug} basePath={`/apps/website-builder/edit/${websiteId}/preview?page=`} onNavigate={navigate} /></TenantDraftViewport></TenantPreviewProvider>
           </div>
-          <p className="mt-4 text-center text-xs text-slate-500">{publicBasePath ? 'Live published website in a separate viewport, so mobile and tablet media queries match the selected width.' : 'Draft preview uses the published page-and-section renderer. Publish to verify device viewport behavior.'}</p>
+          <p role="status" className="mt-4 text-center text-xs text-slate-500">Private review · Sign-in and project access required. Desktop, tablet, and mobile previews use the selected screen width. Contact forms send to the business.</p>
         </div>
       </section>
     </main>

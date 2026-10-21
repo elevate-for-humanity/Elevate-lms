@@ -68,6 +68,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   let generated: Record<string, any>;
   try {
     const result = await aiChat({
+      providerPolicy: 'owned-only',
       messages: [
         {
           role: 'system',

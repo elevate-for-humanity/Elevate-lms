@@ -40,7 +40,8 @@ export function MarketingChromeBoundary({
 }) {
   const pathname = usePathname() || '/';
   const operational = matchesPrefix(pathname, OPERATIONAL_PREFIXES);
-  const standaloneBrand = matchesPrefix(pathname, STANDALONE_BRAND_PREFIXES);
+  const standaloneBrand = matchesPrefix(pathname, STANDALONE_BRAND_PREFIXES)
+    || /^\/apps\/website-builder\/edit\/[^/]+\/preview(?:\/|$)/.test(pathname);
 
   if (operational || standaloneBrand) {
     return (

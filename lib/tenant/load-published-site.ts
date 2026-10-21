@@ -3,6 +3,7 @@ import type { PublishedTenantSite, TenantSiteConfig } from '@/lib/tenant/site-ty
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { loadPublishedOfferings } from '@/lib/tenant/published-offerings';
 
 type WebsiteRow = {
   id: string;
@@ -57,7 +58,7 @@ export async function loadPublishedSiteBySubdomain(
       subdomain: row.subdomain ?? slug,
       siteName: row.site_name ?? slug,
       organizationId: row.organization_id,
-      config: parseConfig(row.site_config, row.site_name ?? slug),
+      config: await loadPublishedOfferings(parseConfig(row.site_config, row.site_name ?? slug)),
       parisEnabled: await publicParisEnabled(db, row.id),
     };
   }
@@ -87,7 +88,7 @@ export async function loadPublishedSiteBySubdomain(
         subdomain: row.subdomain ?? slug,
         siteName: row.site_name ?? org.name,
         organizationId: org.id,
-        config: parseConfig(row.site_config, org.name),
+        config: await loadPublishedOfferings(parseConfig(row.site_config, org.name)),
         parisEnabled: await publicParisEnabled(db, row.id),
       };
     }

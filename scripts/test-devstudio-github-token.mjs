@@ -8,13 +8,22 @@ async function resolver({deployed, canonical, statuses = [], storeError}) {
   const calls = [];
   let storeReads = 0;
   const injected = source
+    .replace("import { currentWorkflowGitHubToken } from './workflow-github-context';", '')
     .replace("import { getDecryptedPlatformSecret } from '@/lib/secrets';", '')
     .replaceAll('process.env.GITHUB_TOKEN', 'environment.GITHUB_TOKEN');
-  const factory = new Function('getDecryptedPlatformSecret', 'fetch', 'environment',
-    stripTypeScriptTypes(injected).replaceAll('export ', '') + '\nreturn {getGitHubToken, getGitHubHeaders};');
-  const api = factory(async () => { storeReads++; if (storeError) throw storeError; return canonical; },
+  const factory = new Function(
+    'currentWorkflowGitHubToken',
+    'getDecryptedPlatformSecret',
+    'fetch',
+    'environment',
+    stripTypeScriptTypes(injected).replaceAll('export ', '') + '\nreturn {getGitHubToken, getGitHubHeaders};',
+  );
+  const api = factory(
+    () => null,
+    async () => { storeReads++; if (storeError) throw storeError; return canonical; },
     async (url, init) => { calls.push({url, init}); return new Response(null, {status: statuses.shift() ?? 200}); },
-    {GITHUB_TOKEN: deployed});
+    {GITHUB_TOKEN: deployed},
+  );
   return {...api, calls, storeReads: () => storeReads};
 }
 

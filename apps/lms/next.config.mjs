@@ -17,6 +17,9 @@ const nextConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
+  // Multipart overhead must fit above the validated 10 MB photo/document limit.
+  experimental: { serverActions: { bodySizeLimit: '12mb' } },
+
   images: { unoptimized: true },
   eslint: { ignoreDuringBuilds: true },
   // Keep observability instrumentation in Node's runtime boundary. Bundling

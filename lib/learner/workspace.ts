@@ -1,3 +1,4 @@
+import { selectOnboardingEnrollment } from '@/lib/learner/onboarding-enrollment';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
@@ -49,9 +50,7 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
   const enrollmentResult = await getUserEnrollments(userId);
   if (enrollmentResult.error) warnings.push('Enrollment records could not be loaded.');
 
-  const primaryEnrollment = enrollmentResult.enrollments.find((row) =>
-    ['active', 'enrolled', 'in_progress', 'pending'].includes(row.status.toLowerCase()),
-  ) ?? enrollmentResult.enrollments[0] ?? null;
+  const primaryEnrollment = selectOnboardingEnrollment(enrollmentResult.enrollments);
   const trainingEnrollment = enrollmentResult.enrollments.find((row) =>
     row.source_table === 'partner_lms_enrollments' && ['active', 'enrolled', 'in_progress'].includes(row.status.toLowerCase()),
   ) ?? primaryEnrollment;

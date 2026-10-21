@@ -49,7 +49,7 @@ export default async function LearnerWorkspaceLayout({
       }}
       role="student"
     >
-      {showLearnerNotices && !photoProfile?.avatar_url ? (
+      {showLearnerNotices && !isAdmin && !photoProfile?.avatar_url ? (
         <div className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6">
           <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 sm:p-5">
             <p className="text-xs font-black uppercase tracking-[0.14em] text-amber-800">

@@ -3,7 +3,6 @@
 
 import type { MouseEvent, ReactNode } from 'react';
 import './legacy83-premium.css';
-import Link from 'next/link';
 import { ChartNoAxesCombined, UsersRound, Sprout } from 'lucide-react';
 import { TenantParis } from '@/components/tenant/TenantParis';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
@@ -206,7 +205,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const config = ensureComposableSiteConfig(site.config);
   const path = normalizePageSlug(pathname);
   const page = config.pages?.find((candidate) => candidate.slug === path);
-  if (!page) return <section role="status" className="p-8"><h1>Page not found</h1><p>This page is not available.</p><Link href={hrefFor('/', basePath)}>Return to Home</Link></section>;
+  if (!page) return <section role="status" className="p-8"><h1>Page not found</h1><p>This page is not available.</p><a href={hrefFor('/', basePath)}>Return to Home</a></section>;
   const primary = config.branding.primaryColor || '#7c3f58';
   const secondary = config.branding.secondaryColor || '#475569';
   const background = config.branding.backgroundColor || '#ffffff';
@@ -226,17 +225,18 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   return (
     <div data-page={page.slug} onClickCapture={onNavigate ? navigateDraft : undefined} className={`min-h-screen antialiased ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
+      {/* Real document links remain usable when client routing cannot complete. */}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
-          <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
-          <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.filter((item) => item.slug !== '/contact').map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
-          {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</Link> : null}
+          <a href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></a>
+          <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.filter((item) => item.slug !== '/contact').map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</a>)}</nav>
+          {navigation.some((item) => item.slug === '/contact') ? <a href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</a> : null}
         </div>
       </header>
-      {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></details></div> : null}
+      {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
       <main>{page.sections.map((section, index) => <Section key={section.id} section={section} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
-      <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></div></footer>
+      <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
     </div>
   );
 }

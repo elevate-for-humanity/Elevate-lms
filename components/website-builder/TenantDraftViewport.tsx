@@ -1,11 +1,22 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 /** Keep editable draft previews in a real viewport without saving or publishing. */
 export function TenantDraftViewport({ children, width, title }: { children: ReactNode; width: number; title: string }) {
   const [frameDocument, setFrameDocument] = useState<Document | null>(null);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    const initialize = () => setFrameDocument(frame.contentDocument);
+    frame.addEventListener('load', initialize);
+    // Server-rendered iframes can finish loading before React hydrates them.
+    initialize();
+    return () => frame.removeEventListener('load', initialize);
+  }, []);
 
   useEffect(() => {
     if (!frameDocument) return;
@@ -18,9 +29,9 @@ export function TenantDraftViewport({ children, width, title }: { children: Reac
   }, [frameDocument]);
 
   return <iframe
+    ref={frameRef}
     title={title}
     srcDoc={'<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0}</style></head><body></body></html>'}
-    onLoad={(event) => setFrameDocument(event.currentTarget.contentDocument)}
     style={{ width, height: 800 }}
     className="mx-auto block border-0 bg-white shadow-sm"
     allow="microphone 'none'; camera 'none'"

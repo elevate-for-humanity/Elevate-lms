@@ -17,6 +17,7 @@
 .legacy83-premium .tenant-hero>div{position:relative;max-width:1280px;padding:88px 24px;gap:64px}
 .legacy83-premium .tenant-hero h1{font-size:clamp(3rem,5.1vw,4.7rem);line-height:1.07;letter-spacing:-.035em;max-width:640px}
 .legacy83-premium .tenant-hero .tenant-title-highlight{color:var(--legacy-gold)}
+.legacy83-premium .tenant-hero .tenant-title-prefix{display:block}
 .legacy83-premium .tenant-hero p{color:#eee8dc!important;font-size:18px}
 .legacy83-premium .tenant-hero p:first-child{color:var(--legacy-gold)!important;font-size:12px;letter-spacing:.27em;line-height:1.7}
 .legacy83-premium .tenant-hero .tenant-hero-actions a{border-radius:4px;background:var(--legacy-gold)!important;color:var(--legacy-forest)!important;font-size:14px;letter-spacing:0;padding:16px 26px;box-shadow:none;border:1px solid var(--legacy-gold)}

@@ -45,6 +45,7 @@ describe('Legacy 83 repository design restoration', () => {
     expect(screen.getAllByAltText('Icy Williams')).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(container.querySelector('h1 .tenant-title-highlight')?.textContent).toBe('Leave a Legacy');
+    expect(container.querySelector('h1 .tenant-title-prefix')?.textContent?.trim()).toBe('Build Today.');
     expect(screen.getByRole('link', { name: 'Schedule a Conversation →' })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
     expect(screen.getByRole('link', { name: 'Explore Our Services' })).toHaveAttribute('href', '/sites/legacy83-preview/services');
     expect(container.querySelectorAll('[data-variant="pathways"] article')).toHaveLength(4);

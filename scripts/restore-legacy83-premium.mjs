@@ -69,6 +69,8 @@ export function restoreLegacy83Premium(input) {
   // Preserve any additional customer sections instead of discarding newer work.
   const retained = new Set([...home.sections.map(item => item.id), 'founder']);
   for (const item of original.values()) if (!retained.has(item.id)) home.sections.splice(-1, 0, item);
+  const process = home.sections.find(item => item.id === 'process');
+  if (process) process.settings = { ...process.settings, variant: 'pathways' };
   config.branding = { ...config.branding, primaryColor: '#123327', accentColor: '#d7b46a', secondaryColor: '#9a743d', backgroundColor: '#faf7f0', textColor: '#19372b' };
   config.homepage = { ...config.homepage, heroTitle: home.sections[0].content.title, heroSubtitle: home.sections[0].content.text, heroCtaText: 'Schedule a Conversation →', heroCtaHref: '/contact', heroImage: hero.content.image };
   config.meta = { ...config.meta, premiumDesignSource: designSource };
@@ -76,6 +78,7 @@ export function restoreLegacy83Premium(input) {
     if (page.slug === '/') continue;
     for (const item of page.sections) {
       if (item.type === 'features' || item.type === 'services') item.settings = { ...item.settings, numbered: true };
+      if (item.id === 'about-pillars') item.settings = { ...item.settings, variant: 'pathways' };
     }
     const lastCta = page.sections.findLast(item => item.type === 'cta');
     if (lastCta) lastCta.settings = { ...lastCta.settings, variant: 'final' };

@@ -61,6 +61,24 @@ test('reads only the VM reference and metadata, never a secret payload',async()=
   assert.equal(version,'1');
   assert.equal(calls.some(args=>args.includes('access')),false);
 });
+test('missing VM reference fails closed before querying Secret Manager',async()=>{
+  let calls=0;
+  await assert.rejects(pinnedControlVersion(args=>{
+    if(args[0]==='compute')return 'PBX_REF_FILE_MISSING';
+    calls++;
+    throw Error('unexpected Secret Manager access');
+  }),error=>error.message==='pbx_control_reference_file_missing');
+  assert.equal(calls,0);
+});
+test('invalid VM reference fails closed before querying Secret Manager',async()=>{
+  let calls=0;
+  await assert.rejects(pinnedControlVersion(args=>{
+    if(args[0]==='compute')return 'PBX_REF_INVALID';
+    calls++;
+    throw Error('unexpected Secret Manager access');
+  }),error=>error.message==='pbx_control_reference_unverified');
+  assert.equal(calls,0);
+});
 test('updates only phone bindings and verifies the actual revision after promotion',async()=>{
   const f=fixture(); const result=await bindControl('lms','1',f.dependencies);
   assert.equal(result.phoneBindingsVerified,true);

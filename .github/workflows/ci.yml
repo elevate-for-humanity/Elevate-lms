@@ -7,7 +7,7 @@ on:
     branches: [main, work]
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -36,11 +36,13 @@ jobs:
           node scripts/check-build-memory-policy.mjs
           node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
       - name: Ultimate course builder repair regression tests
-        run: node --test tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs
+        run: node --test tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/release-database-failures.test.mjs
       - name: Traffic scope and unavailable-data regression tests
         run: node --test tests/unit/traffic-report.test.mjs
       - name: Public narration lifecycle regression tests
         run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts tests/unit/cookie-consent-navigation.test.tsx tests/unit/first-party-traffic-storage.test.tsx tests/unit/studio-chat-readiness.test.tsx tests/unit/header-mobile-focus.test.tsx
+      - name: Google Studio runtime topology regression tests
+        run: node --test scripts/gcp/verify-ai-runtime.test.mjs
       - name: Google runtime settings regression tests
         run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
       - name: Resizable Studio and Course Builder panels
@@ -60,6 +62,8 @@ jobs:
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Shared dashboard and Program Holder communication regressions
+        run: node --test tests/shared-holder-dashboard-repairs.node.test.mjs
       - name: Canonical student lifecycle contract
         run: |
           node --test tests/admission-eligibility.node.test.mjs

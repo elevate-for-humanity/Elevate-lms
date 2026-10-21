@@ -144,6 +144,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
   }, [application]);
 
-  // Shared, user-controlled update prompt; no automatic reload of unsaved work.
-  return <PwaUpdateNotice />;
+  // Operational portals need the shared loaded-build check and an explicit,
+  // user-controlled update. Keep public marketing pages free of update banners.
+  return application === 'marketing' ? null : <PwaUpdateNotice />;
 }

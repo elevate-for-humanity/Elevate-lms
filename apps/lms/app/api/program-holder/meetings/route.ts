@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -192,7 +194,7 @@ export async function POST(request: Request) {
           email: studentProfile?.email || null,
           display_name: studentProfile?.full_name || student.applicant_name || 'Student',
           role: 'participant',
-          invite_status: 'sent',
+          invite_status: 'pending',
         },
       ]);
     if (participantError) {
@@ -230,5 +232,49 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ error: 'Unable to schedule meeting.' }, { status: 500 });
   }
-  return NextResponse.json({ meeting: data }, { status: 201 });
+  // A saved meeting is not a delivered invitation. Use the student's portal
+  // route, never the host-only Program Holder URL.
+  let invitationDelivery: 'accepted' | 'failed' | 'missing_email' = 'missing_email';
+  const { data: recipient } = student.user_id
+    ? await ctx.db.from('profiles').select('email').eq('id', student.user_id).maybeSingle()
+    : { data: null };
+  if (recipient?.email) {
+    const joinUrl = communicationRoomId
+      ? `https://app.elevateforhumanity.org/lms/meetings/${communicationRoomId}`
+      : 'https://app.elevateforhumanity.org/learner/dashboard';
+    const loginUrl = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(new URL(joinUrl).pathname)}`;
+    const text = [
+      title,
+      `Starts: ${new Date(startsAt).toISOString()} (UTC)`,
+      `Duration: ${duration} minutes`,
+      `Method: ${method.replaceAll('_', ' ')}`,
+      agenda || '',
+      method === 'in_person' ? String(body.location || '') : '',
+      `Sign in with your student account: ${loginUrl}`,
+    ].filter(Boolean).join('\n\n');
+    const escaped = text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    try {
+      const delivery = await sendEmail({
+        to: recipient.email,
+        replyTo: ctx.profile.email || undefined,
+        subject: `Meeting invitation: ${title}`,
+        text,
+        html: `<div style="white-space:pre-wrap">${escaped}</div>`,
+        singleAttempt: true,
+      });
+      invitationDelivery = delivery.success ? 'accepted' : 'failed';
+      if (delivery.success && communicationRoomId) {
+        const { error: inviteUpdateError } = await ctx.db
+          .from('communication_room_participants')
+          .update({ invite_status: 'sent' })
+          .eq('room_id', communicationRoomId)
+          .eq('profile_id', student.user_id);
+        if (inviteUpdateError) logger.error('[holder-meetings] invitation status update failed', inviteUpdateError);
+      }
+    } catch (cause) {
+      invitationDelivery = 'failed';
+      logger.error('[holder-meetings] invitation failed', cause);
+    }
+  }
+  return NextResponse.json({ meeting: data, invitationDelivery }, { status: 201 });
 }

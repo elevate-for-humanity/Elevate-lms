@@ -34,6 +34,15 @@ export function classifyRuntimeErrors(entries) {
   });
 }
 
+export function isReadyStudioCloudRun(service) {
+  if (service?.metadata?.name !== 'elevate-studio-browser' ||
+      !service.status?.conditions?.some(condition => condition.type === 'Ready' && condition.status === 'True')) return false;
+  try {
+    const url = new URL(service.status.url);
+    return url.protocol === 'https:' && url.hostname.endsWith('.run.app') && !url.username && !url.password;
+  } catch { return false; }
+}
+
 async function main() {
   const region='us-central1';
   const services=JSON.parse(google(['run','services','list','--project',PROJECT,'--region',region,'--format=json']));
@@ -48,8 +57,10 @@ async function main() {
   };
   try {
     const instances=JSON.parse(google(['compute','instances','list','--project',PROJECT,'--filter=name=elevate-studio-browser','--format=json']));
-    report.studio.googleInstancePresent=instances.length===1;
+    report.studio.googleInstancePresent=instances.some(instance=>instance.name==='elevate-studio-browser' && instance.status==='RUNNING');
   } catch { report.failures.push('studio_instance_inventory_unavailable'); }
+  report.studio.googleCloudRunReady=services.some(isReadyStudioCloudRun);
+  report.studio.googleRuntimeReady=report.studio.googleCloudRunReady || report.studio.googleInstancePresent===true;
   try {
     const resource=JSON.parse(google(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region',region,'--format=json']));
     const container=resource.spec?.template?.spec?.containers?.[0];
@@ -78,7 +89,7 @@ async function main() {
   } catch(error) { report.identityInventoryStatus=error.code??'read_failed'; }
   report.access=await diagnoseAccess(google(['auth','print-access-token']));
   console.log(JSON.stringify(report,null,2));
-  if(!ownedModel.verified || !report.studio.googleInstancePresent || report.failures.length) process.exitCode=1;
+  if(!ownedModel.verified || !report.studio.googleRuntimeReady || report.failures.length) process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)
   main().catch(error=>{console.error('Google AI runtime verification failed: '+(error.code??'read_failed'));process.exitCode=1;});

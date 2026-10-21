@@ -11,8 +11,8 @@ function normalizeToken(value: string | undefined | null): string | null {
   let token = value.trim();
 
   // Accept values copied from shell snippets or authorization headers.
-  token = token.replace(/^(['"])(.*)\1$/, '$2').trim();
-  token = token.replace(/^(?:token|bearer)\s+/i, '').trim();
+  token = token.replace(/^(['"])(.*)\\1$/, '$2').trim();
+  token = token.replace(/^(?:token|bearer)\\s+/i, '').trim();
 
   if (token.length < 10) return null;
   if (/placeholder/i.test(token)) return null;
@@ -48,25 +48,18 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
 }
 
 export async function getGitHubToken(): Promise<string | null> {
-  const workflowToken=currentWorkflowGitHubToken();
-  if(workflowToken)return workflowToken;
-  // Capture the deployment value before hydration. hydrateProcessEnv may load
-  // a canonical fallback into process.env, but must not replace a valid token
-  // supplied directly by the production service.
-  // Check the canonical rotating credential first. Never pin it in process.env.
-  const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
-  if (storedToken) return storedToken;
+  const workflowToken = currentWorkflowGitHubToken();
+  if (workflowToken) return workflowToken;
+
   const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
   if (deployedToken && await acceptedByGitHub(deployedToken)) return deployedToken;
 
-  const fromCanonicalStore = normalizeToken(
-    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
-  );
-  if (fromCanonicalStore && fromCanonicalStore !== deployedToken && await acceptedByGitHub(fromCanonicalStore)) {
-    return fromCanonicalStore;
+  const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  if (storedToken && storedToken !== deployedToken && await acceptedByGitHub(storedToken)) {
+    return storedToken;
   }
 
-  if (deployedToken || fromCanonicalStore) {
+  if (deployedToken || storedToken) {
     throw new Error('GITHUB_TOKEN_REJECTED: Configured credentials were rejected for Elevate-lms. Reconnect an authorized credential in Dev Studio Secrets.');
   }
   return null;
@@ -104,4 +97,3 @@ export async function getGitHubTokenCandidates(): Promise<string[]> {
   const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
   return [...new Set([stored, deployed].filter((value): value is string => Boolean(value)))];
 }
-

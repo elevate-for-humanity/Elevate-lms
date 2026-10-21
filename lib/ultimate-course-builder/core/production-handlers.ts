@@ -249,6 +249,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     active_teaching: async (ctx) => ({
       artifacts: {
         activities: (ctx.artifacts.instructor_script as any)?.script?.activities,
+        flashcards: (ctx.artifacts.instructor_script as any)?.script?.flashcards ?? [],
         objectives: ctx.artifacts.learning_objectives,
       },
     }),

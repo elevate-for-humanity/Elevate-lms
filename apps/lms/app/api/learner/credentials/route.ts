@@ -1,3 +1,4 @@
+import { validateDocument } from '@/lib/uploads/document-validation';
 import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -47,7 +48,9 @@ export async function POST(request: NextRequest) {
       .select('id').eq('id', credentialId).maybeSingle();
     if (credentialError || !credential) return NextResponse.json({error:'Credential is not in the approved catalog.'},{status:400});
   }
-  const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+  const validated = await validateDocument(file, 'credential');
+  if (validated.error || !validated.extension) return NextResponse.json({ error: validated.error }, { status: 400 });
+  const extension = validated.extension;
   const path = `${user.id}/${enrollment.program_id}/${uploadType}/${randomUUID()}.${extension}`;
   const { error: storageError } = await db.storage.from('credential-uploads').upload(path, file, { contentType: file.type, upsert: false });
   if (storageError) return NextResponse.json({ error: 'The protected credential file could not be uploaded.' }, { status: 500 });

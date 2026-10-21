@@ -1,3 +1,4 @@
+import { completionAlert } from '@/lib/program-holder/student-training';
 import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
 import { StudentProgressReportForm } from './StudentProgressReportForm';
@@ -369,7 +370,7 @@ export async function ProgramHolderWorkspaceView({
       </div>
     );
   if (section === 'payouts')
-    return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;
+    return <section className="space-y-4 p-4"><h1 className="text-2xl font-black">Financial records</h1><p>Student funding, reimbursements, and payment records are managed by authorized Elevate administrators.</p>{payoutPanel}</section>;
   if (section === 'settings')
     return (
       <Settings
@@ -1522,32 +1523,6 @@ function Metric({
   );
 }
 
-function voucherStatus(row: any) {
-  const paid =
-    Boolean(row.voucher_paid_date) ||
-    Number(row.amount_paid_cents || 0) > 0 ||
-    ['paid', 'completed', 'succeeded'].includes(String(row.payment_status || '').toLowerCase());
-  if (paid) return 'Paid';
-
-  const verified = Boolean(row.voucher_issued_date) || row.funding_verified === true;
-  return verified ? 'Voucher verified' : 'Voucher pending';
-}
-
-function expectedPaymentStatus(row: any) {
-  const cents = Number(row.expected_payout_cents || 0);
-  if (cents <= 0) return 'Not projected';
-
-  const amount = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(cents / 100);
-  const status =
-    row.expected_payout_status === 'pending_voucher_payment'
-      ? 'pending voucher/payment'
-      : String(row.expected_payout_status || 'projected').replaceAll('_', ' ');
-  return `${amount} — ${status}`;
-}
-
 function completionStatus(row: any) {
   const state = String(row.enrollment_state || row.status || '').toLowerCase();
   if (
@@ -1601,14 +1576,12 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   label="Program"
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
-                <Row label="Voucher" value={voucherStatus(row)} />
-                <Row label="Expected payment" value={expectedPaymentStatus(row)} />
                 <Row label="Completion" value={completionStatus(row)} />
                 <Row
                   label="Training"
-                  value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`}
+                  value={`${row.training_start_date || 'Start missing'} — ${row.expected_end_date || row.training_end_date || 'End missing'}`}
                 />
-                <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+                <Row label="Next action" value={completionAlert(row) || row.next_required_action || 'Continue training'} />
                 <Row
                   label="WorkOne hours"
                   value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
@@ -1647,8 +1620,6 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <tr>
               <th className="px-3 py-3">Student</th>
               <th className="px-3 py-3">Program</th>
-              <th className="px-3 py-3">Voucher</th>
-              <th className="px-3 py-3">Expected payment</th>
               <th className="px-3 py-3">Completion</th>
               <th className="px-3 py-3">Progress</th>
               <th className="px-3 py-3">WorkOne hours</th>
@@ -1668,8 +1639,6 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4 font-bold">{voucherStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{expectedPaymentStatus(row)}</td>
                   <td className="px-3 py-4 font-bold">{completionStatus(row)}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
@@ -1677,9 +1646,9 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   </td>
                   <td className="px-3 py-4 text-xs">
                     <span className="block">Start: {row.training_start_date || 'Missing'}</span>
-                    <span className="block">End: {row.training_end_date || 'Missing'}</span>
+                    <span className="block">End: {row.expected_end_date || row.training_end_date || 'Missing'}</span>
                   </td>
-                  <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
+                  <td className="px-3 py-4">{completionAlert(row) || row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
                       <StudentCommunicationActions
@@ -1701,7 +1670,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
                   No confirmed student enrollments are linked.
                 </td>
               </tr>

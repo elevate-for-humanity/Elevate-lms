@@ -109,7 +109,7 @@ export async function POST(
   }
 
   const publicUrl = restored.subdomain && restored.is_published
-    ? `https://${restored.subdomain}.app.elevateforhumanity.org`
+    ? `/sites/${restored.subdomain}`
     : null;
   return NextResponse.json({ website: restored, publicUrl });
 }

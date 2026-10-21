@@ -18,6 +18,10 @@ function upsertSection(target: TenantSitePage | undefined, next: TenantSiteSecti
 
 export function bridgeLegacyPatchIntoComposition(config: TenantSiteConfig, patch: Partial<TenantSiteConfig>): TenantSiteConfig {
   const next = ensureComposableSiteConfig(config);
+  // The page editor submits the complete canonical page model along with
+  // retained legacy summaries. Those summaries must never overwrite the
+  // approved pages during an ordinary save or publish.
+  if (Array.isArray(patch.pages)) return next;
   const pages = structuredClone(next.pages || []);
   const working: TenantSiteConfig = { ...next, pages };
 

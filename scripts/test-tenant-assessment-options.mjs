@@ -2,6 +2,30 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { sanitizeSection, ensureComposableSiteConfig } from '../lib/tenant/site-composition.ts';
 import { tenantSiteHref } from '../lib/tenant/site-links.ts';
+import fs from 'node:fs/promises';
+import { stripTypeScriptTypes } from 'node:module';
+
+const bridgeSource = await fs.readFile(new URL('../lib/tenant/legacy-composition-bridge.ts', import.meta.url), 'utf8');
+const bridgeModule = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(bridgeSource.replace("'@/lib/tenant/site-composition'", JSON.stringify(new URL('../lib/tenant/site-composition.ts', import.meta.url).href)))).toString('base64'));
+
+function canonicalFixture() {
+  return {homepage:{heroTitle:'Old summary',features:[{title:'Old features'}]},programs:[],pages:[
+    {id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Approved premium headline'}},{id:'framework',type:'features',content:{items:[{title:'Goals'},{title:'Revenue'},{title:'Operations'},{title:'Workforce'},{title:'Succession'}]}}]},
+    {id:'services',slug:'/services',title:'Services',sections:[{id:'services',type:'services',content:{items:[{title:'Strategic Planning'}]}}]},
+  ]};
+}
+test('saving a full page model cannot overwrite premium copy from stale legacy summaries',()=>{
+  const config=canonicalFixture();
+  const saved=bridgeModule.bridgeLegacyPatchIntoComposition(config,structuredClone(config));
+  assert.equal(saved.pages[0].sections[0].content.title,'Approved premium headline');
+  assert.equal(saved.pages[0].sections[1].content.items.length,5);
+  assert.equal(saved.pages[1].sections[0].content.items[0].title,'Strategic Planning');
+});
+test('legacy-only edits still update the existing page model',()=>{
+  const saved=bridgeModule.bridgeLegacyPatchIntoComposition(canonicalFixture(),{homepage:{heroTitle:'Explicit legacy edit'}});
+  assert.equal(saved.pages[0].sections[0].content.title,'Explicit legacy edit');
+  assert.equal(saved.pages[0].sections[1].content.items.length,5);
+});
 
 test('assessment, journal and event actions stay in the tenant preview', () => {
   const base = '/sites/legacy83-preview';

@@ -30,6 +30,12 @@ export function refineLegacy83ClientReview(input) {
     delete card.content.imageSegment;
     card.settings = { ...card.settings, variant: 'final' };
   }
+  for (const [slug,id] of [['/','services'],['/services','services-grid'],['/academy','academy-programs'],['/resources','resources-tools']]) {
+    const cards=section(slug,id);
+    if(cards) cards.settings={...cards.settings,variant:'photographic-background'};
+  }
+  const academyCards=section('/academy','academy-programs');
+  if(academyCards?.content.items?.[4]) academyCards.content.items[4]={...academyCards.content.items[4],image:asset('continuity'),imageAlt:'Stone bridge representing business continuity',imageSegment:null};
   const copy = [
     ['/about','about-copy','A Legacy Is More Than a Business You Own','A legacy is the enduring value your business creates for people, families, customers, and the community. It lives in the leaders you develop, the standards you establish, and the opportunities your work makes possible. Building that legacy starts with intentional decisions today.'],
     ['/about','about-story','Build Beyond Your Own Involvement','A strong business needs more than an owner who works harder. It needs clear direction, capable people, and systems that others can carry forward. Legacy 83 brings those priorities into one practical conversation about growth, leadership, and continuity.'],

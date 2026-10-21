@@ -35,6 +35,7 @@ it('restores the full founder photograph, honors veterans, and puts photographs 
   expect(founder).not.toHaveStyle({maskImage:'url("/images/legacy83/founder-mask.webp")'});
   expect(screen.getByText('Honoring veterans and the legacies they build.')).toBeVisible();
   expect(container.querySelectorAll('.tenant-cta-background')).toHaveLength(2);
+  expect(container.querySelector('[data-section-id=services]')).toHaveAttribute('data-variant','photographic-background');
   expect(play).not.toHaveBeenCalled();
   expect(container.querySelector('audio')).toBeNull();
 });

@@ -1,3 +1,4 @@
+import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 import CourseSyllabus from '@/components/learner/CourseSyllabus';
 import { completionAlert } from '@/lib/program-holder/student-training';
 import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
@@ -1606,11 +1607,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   hasEmail={Boolean(row.email)}
                   hasPhone={Boolean(row.phone)}
                 />
-                <StudentReadyForTestingButton
+                {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
                   studentId={row.id}
                   studentName={row.full_name || 'Student'}
                   source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
-                />
+                /> : null}
               </div>
             </article>
           ))
@@ -1663,13 +1664,13 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                         hasEmail={Boolean(row.email)}
                         hasPhone={Boolean(row.phone)}
                       />
-                      <StudentReadyForTestingButton
+                      {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
                         studentId={row.id}
                         studentName={row.full_name || 'Student'}
                         source={
                           row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
                         }
-                      />
+                      /> : null}
                     </div>
                   </td>
                 </tr>

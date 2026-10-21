@@ -11,7 +11,10 @@ export function TenantDraftViewport({ children, width, title }: { children: Reac
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
-    const initialize = () => setFrameDocument(frame.contentDocument);
+    const initialize = () => {
+      const current = frame.contentDocument;
+      if (current?.body && current.readyState === 'complete') setFrameDocument(current);
+    };
     frame.addEventListener('load', initialize);
     // Server-rendered iframes can finish loading before React hydrates them.
     initialize();

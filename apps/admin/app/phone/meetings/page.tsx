@@ -134,7 +134,7 @@ export default async function MeetingsPage() {
                     Join
                   </Link>
                 ) : null}
-                {room.status !== 'cancelled' && !room.room_key?.startsWith('google-calendar-') && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} />}
+                {room.status !== 'cancelled' && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} externalUrl={room.room_key?.startsWith('google-calendar-') && /^https:\/\/meet\.google\.com\/[a-z-]+$/.test(room.description ?? '') ? room.description : undefined} />}
               </div>
             ))}
           </div>

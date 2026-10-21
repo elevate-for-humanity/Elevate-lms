@@ -107,7 +107,7 @@ export default async function MeetingsPage() {
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-black">Meeting rooms</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-black">Meeting rooms</h2><Link href="/phone/meetings/legacy83-presentation" className="rounded-lg bg-indigo-700 px-4 py-3 font-bold text-white">Present Legacy 83</Link></div>
         {rooms?.length ? (
           <div className="mt-4 divide-y divide-slate-100">
             {rooms.map((room: any) => (

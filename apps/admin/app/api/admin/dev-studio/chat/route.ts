@@ -1,3 +1,4 @@
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
 import { recordParisObservation } from '@/lib/ai/runtime/supervision';
 import { executeStudioCommand } from '@/lib/studio/runtime-command';
 import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
@@ -1423,24 +1424,27 @@ async function _POST(req: NextRequest) {
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
-    const masterExecution = lastUserMessage.trim()
+    const toolsAllowed = !prohibitsToolUse(lastUserMessage);
+    const masterExecution = toolsAllowed && lastUserMessage.trim()
       ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage)
       : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
-      getRAGContext(lastUserMessage),
-      collectAutomaticEvidence(lastUserMessage),
+      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: effectiveProvider === 'elevate' ? 'owned-only' : 'configured-provider' }) : Promise.resolve(''),
+      toolsAllowed ? collectAutomaticEvidence(lastUserMessage) : Promise.resolve([]),
     ]);
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
       agent,
-      ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
+      contextProfile: effectiveProvider === 'elevate' ? 'owned-cpu' : 'full',
+      institutionalContext: getAiCharterContext(),
+      ragContext,
       fileContext,
       documentsContext,
       lastUserMessage,
       automaticEvidence: formatAutomaticEvidence(automaticEvidence),
-      toolInventory: TOOLS.map((tool) => tool.function.name),
+      toolInventory: toolsAllowed ? TOOLS.map((tool) => tool.function.name) : [],
     });
 
     let assistantMessage: string | null = null;
@@ -1469,8 +1473,8 @@ async function _POST(req: NextRequest) {
             const first = await openai.chat.completions.create({
               model: selectedModel,
               messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-              tools: TOOLS,
-              tool_choice: 'auto',
+              tools: toolsAllowed ? TOOLS : undefined,
+              tool_choice: toolsAllowed ? 'auto' : undefined,
               temperature: 0.4,
               max_tokens: 4096,
               stream: true,
@@ -1492,7 +1496,7 @@ async function _POST(req: NextRequest) {
             }
 
             const calls = Object.values(streamedToolCalls).filter((call) => call.name);
-            if (calls.length) {
+            if (toolsAllowed && calls.length) {
               const toolResults = [];
               const assistantToolCalls = [];
               for (const call of calls) {
@@ -1615,8 +1619,8 @@ async function _POST(req: NextRequest) {
           const initial = await groq.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...messages],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1627,7 +1631,7 @@ async function _POST(req: NextRequest) {
             (toolCall) => toolCall.type === 'function',
           );
 
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
@@ -1677,8 +1681,8 @@ async function _POST(req: NextRequest) {
           const initial = await openai.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1687,7 +1691,7 @@ async function _POST(req: NextRequest) {
           const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
             (toolCall) => toolCall.type === 'function',
           );
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
@@ -1736,10 +1740,10 @@ async function _POST(req: NextRequest) {
             max_tokens: 4096,
             system: systemPrompt,
             messages: toChatMessages(messages),
-            tools: anthropicTools,
+            tools: toolsAllowed ? anthropicTools : undefined,
           });
           const toolUseBlocks = initial.content.filter((b) => b.type === 'tool_use');
-          if (toolUseBlocks.length > 0) {
+          if (toolsAllowed && toolUseBlocks.length > 0) {
             const toolResults = await Promise.all(
               toolUseBlocks.map(async (b) => {
                 if (b.type !== 'tool_use') return null;

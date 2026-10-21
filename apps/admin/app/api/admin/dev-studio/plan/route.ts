@@ -1,3 +1,4 @@
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
 /**
  * POST /api/admin/dev-studio/plan
  *
@@ -187,6 +188,10 @@ export async function POST(req: NextRequest) {
     return new Response('data: [DONE]\n\n', { headers: { 'Content-Type': 'text/event-stream' } });
   }
 
+  if (prohibitsToolUse(goal)) {
+    return Response.json({ error: 'Tool execution is disabled by this request. Use conversational chat.' }, { status: 422 });
+  }
+
   const db = await requireAdminClient();
   let durableDocumentContext = '';
   if (documentIds.length) {
@@ -233,6 +238,11 @@ export async function POST(req: NextRequest) {
       let canonicalRun: Awaited<ReturnType<typeof ensureCanonicalStudioRun>> | null = null;
       try {
         plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
+        if (plan && prohibitsToolUse(plan.goal)) {
+          write('This saved plan cannot run because its request prohibits tool execution. Start a conversational reply or a new explicitly authorized task.');
+          write('', { checkpoint: { planId: plan.id, taskId: '', status: 'failed' } });
+          return;
+        }
         if (!plan) {
           plan = prepareMasterStudioPlan(effectiveGoal, params);
           const shared = await loadSharedContext({

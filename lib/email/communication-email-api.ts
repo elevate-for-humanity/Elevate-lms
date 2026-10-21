@@ -1,3 +1,4 @@
+import { assignedStudentDirectory, assignedInstructorDirectory } from './assigned-student-directory';
 import { processInterofficeOutbox } from './interoffice-outbox';
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
@@ -296,6 +297,8 @@ export async function handleCommunicationEmailGet(
             display_name: m.displayName,
             mailbox_kind: m.mailboxKind,
           }))
+          .concat(await assignedStudentDirectory(context.db, context.user.id))
+          .concat(await assignedInstructorDirectory(context.db, context.user.id))
           .concat([
             {
               id: 'admin',

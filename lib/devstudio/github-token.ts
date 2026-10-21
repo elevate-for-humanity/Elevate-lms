@@ -3,6 +3,7 @@
  * Verify deployment credentials before falling back to canonical platform secrets.
  */
 
+import { currentWorkflowGitHubToken } from './workflow-github-context';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 
 function normalizeToken(value: string | undefined | null): string | null {
@@ -47,9 +48,14 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
 }
 
 export async function getGitHubToken(): Promise<string | null> {
-  // Resolve lazily: an accepted deployment credential does not depend on the
-  // canonical store being available. Never copy a fallback into process.env;
-  // doing so shadows later secret rotations with a stale deployment value.
+  const workflowToken=currentWorkflowGitHubToken();
+  if(workflowToken)return workflowToken;
+  // Capture the deployment value before hydration. hydrateProcessEnv may load
+  // a canonical fallback into process.env, but must not replace a valid token
+  // supplied directly by the production service.
+  // Check the canonical rotating credential first. Never pin it in process.env.
+  const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  if (storedToken) return storedToken;
   const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
   if (deployedToken && await acceptedByGitHub(deployedToken)) return deployedToken;
 
@@ -91,3 +97,11 @@ export function githubApiErrorMessage(status: number): string {
   }
   return `GitHub API error (${status}) — check GITHUB_TOKEN in Dev Studio > Secrets`;
 }
+
+/** Existing credentials for the same repository; never log or persist their values. */
+export async function getGitHubTokenCandidates(): Promise<string[]> {
+  const deployed = normalizeToken(process.env.GITHUB_TOKEN);
+  const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  return [...new Set([stored, deployed].filter((value): value is string => Boolean(value)))];
+}
+

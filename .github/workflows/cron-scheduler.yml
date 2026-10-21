@@ -187,25 +187,31 @@ jobs:
           done
 
       - name: Dispatch platform events to workflow engine
+        id: workflow_events
+        continue-on-error: true
         run: |
           curl -sf -X POST "$ADMIN_URL/api/internal/workflow-event-processor" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
-            --max-time 55 || echo "::warning::workflow-event-processor failed"
+            --max-time 55 || { echo "::error::workflow-event-processor HTTP request failed"; exit 1; }
 
       - name: Fire scheduled workflow triggers
+        id: workflow_schedules
+        continue-on-error: true
         run: |
           curl -sf -X POST "$ADMIN_URL/api/internal/workflow-schedule-processor" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
-            --max-time 55 || echo "::warning::workflow-schedule-processor failed"
+            --max-time 55 || { echo "::error::workflow-schedule-processor HTTP request failed"; exit 1; }
 
       - name: AI operator triage
+        id: ai_operator
+        continue-on-error: true
         run: |
           curl -sf -X POST "$ADMIN_URL/api/internal/ai-operator" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
-            --max-time 55 || echo "::warning::ai-operator failed"
+            --max-time 55 || { echo "::error::ai-operator HTTP request failed"; exit 1; }
 
       - name: Continue canonical lesson video renders
         run: |
@@ -213,6 +219,21 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 1800 || echo "::warning::video-render-queue failed"
+
+      - name: Require critical queue processors to succeed
+        if: always()
+        env:
+          EVENT_RESULT: ${{ steps.workflow_events.outcome }}
+          SCHEDULE_RESULT: ${{ steps.workflow_schedules.outcome }}
+          AI_RESULT: ${{ steps.ai_operator.outcome }}
+        run: |
+          set -euo pipefail
+          for outcome in "$EVENT_RESULT" "$SCHEDULE_RESULT" "$AI_RESULT"; do
+            if [ "$outcome" != success ]; then
+              echo "::error::Critical queue processor failed; see individual step results"
+              exit 1
+            fi
+          done
 
   # ── Daily 8 AM: follow-ups, reminders, compliance ─────────────────────────
   daily-morning:

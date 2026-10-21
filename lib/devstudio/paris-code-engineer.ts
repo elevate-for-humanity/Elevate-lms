@@ -1,3 +1,4 @@
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import {requireAdminClient} from '@/lib/supabase/admin';
@@ -48,7 +49,7 @@ function blockedPath(path: string): boolean {
     path.includes('..') ||
     /^\.env(?:\.|$)/.test(path) ||
     path.startsWith('.git/') ||
-    /code-repair|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
+    /code-repair|course-repair-policy|workflow-github-context|github-token|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
     path.includes('/node_modules/') ||
     path.includes('/.next/') ||
     !/^(lib|components|apps|remotion-src|workers|tests)\//.test(path) ||
@@ -158,7 +159,17 @@ async function searchCode(query: string) {
   );
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(`GitHub code search failed: ${String(payload?.message ?? response.status)}`);
+    // Search has an independent GitHub rate limit. Let the repair planner
+    // continue with known-file reads instead of consuming another inference
+    // turn retrying an unavailable search endpoint.
+    if (response.status === 403 || response.status === 429) {
+      const remaining = response.headers.get('x-ratelimit-remaining');
+      const message = String(payload?.message ?? '').toLowerCase();
+      if (response.status === 429 || remaining === '0' || message.includes('rate limit') || message.includes('try again')) {
+        return [];
+      }
+    }
+    throw new Error(`GitHub code search failed: ${response.status}`);
   }
   return (Array.isArray(payload.items) ? payload.items : []).map((item: any) => ({
     path: item.path,
@@ -218,8 +229,8 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const db=await requireAdminClient();
   const provider=(process.env.AI_PROVIDER??'openai').trim().toLowerCase();
   if(provider==='elevate'){
-    let endpoint:URL;try{endpoint=new URL(process.env.ELEVATE_LLM_URL??'');}catch{return NextResponse.json({error:'Owned model connection is unavailable.'},{status:503});}
-    if(endpoint.protocol!=='https:'||!endpoint.hostname.endsWith('.run.app'))return NextResponse.json({error:'Configure the owned Google model endpoint before using it.'},{status:503});
+    const owned = await probeOwnedModel();
+    if (!owned.verified) return NextResponse.json({error:'Owned model connection is unavailable. Verify the selected private CPU endpoint before retrying.'},{status:503});
   }
   const taskId = repairId ?? crypto.randomUUID();
   const { branch, baseSha } = await createTaskBranch(taskId);

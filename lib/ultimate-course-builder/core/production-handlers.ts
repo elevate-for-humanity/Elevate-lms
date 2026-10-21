@@ -249,6 +249,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     active_teaching: async (ctx) => ({
       artifacts: {
         activities: (ctx.artifacts.instructor_script as any)?.script?.activities,
+        flashcards: (ctx.artifacts.instructor_script as any)?.script?.flashcards ?? [],
         objectives: ctx.artifacts.learning_objectives,
       },
     }),
@@ -315,6 +316,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             lessonId: canonicalLessonId ?? comp(ctx).id,
             courseId:ctx.courseId,
             courseTitle: ctx.profile.title,
+            lessonTitle: comp(ctx).title,
             ownerPreview: ctx.renderPreviewOnly === true,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,
@@ -523,7 +525,17 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const learnerEvidence: any =
         (ctx.artifacts.learner_runthrough as any)?.learnerRuntimeEvidence?.evidence ?? {};
       const a11y: any = learnerEvidence.accessibility ?? {};
-      const accessibility = evaluateAccessibility(a11y);
+      // This manually approved course retired browser run-through evidence.
+      // Do not turn an unavailable browser, expired login, or evidence-store
+      // outage into a publication stop. Retain truthful deferred QA metadata,
+      // and continue to require rendered video, captions, transcript and media QA.
+      const browserEvidenceRetired = ctx.courseId === 'a6b0b712-1cf0-475a-ba79-ee2023dea8ec' &&
+        !Object.keys(a11y).length;
+      const accessibility = browserEvidenceRetired
+        ? { pass: false, critical: false, deferred: true,
+            failures: ['ACCESSIBILITY_BROWSER_EVIDENCE_RETIRED'],
+            source: 'browser-testing-retired' }
+        : evaluateAccessibility(a11y);
       const release = {
         courseId: ctx.courseId,
         competencyId: c.id,

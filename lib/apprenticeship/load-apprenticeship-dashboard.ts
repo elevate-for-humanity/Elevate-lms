@@ -46,7 +46,10 @@ export async function loadApprenticeshipDashboard(
     return { ...base, extras, complianceLinks, rti: null };
   }
 
-  const courseId = await resolveCourseIdFromDb(supabase, programSlug);
+  const courseId =
+    (await resolveCourseIdFromDb(supabase, programSlug)) ||
+    (base.enrollment as any)?.course_id ||
+    null;
   if (!courseId) {
     return { ...base, extras, complianceLinks, rti: null };
   }
@@ -63,7 +66,7 @@ export async function loadApprenticeshipDashboard(
 
   const [{ data: course }, { data: lmsProgress }, lessonCountRes, completedRes, entryLinks] =
     await Promise.all([
-    supabase.from('courses').select('id, title').eq('id', courseId).maybeSingle(),
+    supabase.from('lms_courses').select('id, title').eq('id', courseId).maybeSingle(),
     supabase
       .from('lms_progress')
       .select('progress_percent, status, last_activity_at')

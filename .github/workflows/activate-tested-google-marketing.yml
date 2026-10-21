@@ -14,6 +14,7 @@ jobs:
     timeout-minutes: 10
     concurrency:
       group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     env:
       IMAGE_SHA: 97a6397dbed488354f7f3f8aa8e63353281f57c5

@@ -143,3 +143,20 @@ describe('selectStudioAgent', () => {
     expect(selectStudioAgent(message)).toBe(agent);
   });
 });
+
+
+describe('explicit execution constraints', () => {
+  const prompt = 'Audit test: reply with PARIS_AUDIT_READY. Do not call tools, change data, run workflows, deploy, purchase credits, or send messages.';
+  it('keeps an explicit no-tools reply out of durable orchestration', () => {
+    expect(shouldOrchestrateMessage(prompt)).toBe(false);
+    expect(() => decomposePlan(prompt)).toThrow('Tool execution is disabled');
+  });
+  it('does not turn prohibited action lists into requested actions', () => {
+    expect(shouldOrchestrateMessage('Say hello. Do not change data, run workflows, deploy, or send messages.')).toBe(false);
+    const plan = decomposePlan('Fix the repository code, add regression tests. Do not send messages, publish, or deploy.');
+    expect(plan.steps.some(step => step.title === 'Deploy the verified build')).toBe(false);
+  });
+  it('retains an affirmative repair after a prohibition', () => {
+    expect(shouldOrchestrateMessage('Do not deploy, but fix the routing code.')).toBe(true);
+  });
+});

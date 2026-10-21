@@ -1083,11 +1083,36 @@ export async function renderStoryboardVideo(
       const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
       await writeFile(manifestPath, 'ffconcat version 1.0\n' +
         chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
-      await execFileAsync('ffmpeg', [
+      // Never dispatch a concat without both verified inputs and a destination.
+      // Past worker logs showed ffmpeg invoked with only the input arguments.
+      if (!chunkPaths.length) throw new Error('REMOTION_CONCAT_SEGMENTS_MISSING');
+      // Resolve the final destination independently of the segment manifest. A
+      // render must never be marked successful without a concrete MP4 target.
+      const concatOutputPath = path.resolve(paths.videoPath || '');
+      if (!paths.videoPath || concatOutputPath === path.resolve(manifestPath) ||
+          path.extname(concatOutputPath).toLowerCase() !== '.mp4') {
+        throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      }
+      await mkdir(path.dirname(concatOutputPath), {recursive: true});
+      const concatArgs = [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
-        '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
-      ], {timeout: 600_000, maxBuffer: 2_000_000});
-      const output = await stat(paths.videoPath);
+        // Frame-range chunks have independent timebases. Normalize timestamps
+        // and re-encode to prevent replay at segment boundaries.
+        '-fflags', '+genpts',
+        '-c:v', 'libx264', '-preset', 'fast', '-crf', '20',
+        '-r', String(composition.fps), '-fps_mode', 'cfr',
+        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',
+        '-movflags', '+faststart',
+        concatOutputPath,
+      ];
+      if (concatArgs.at(-1) !== concatOutputPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      try {
+        await execFileAsync('ffmpeg', concatArgs, {timeout: 600_000, maxBuffer: 2_000_000});
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error('REMOTION_FFMPEG_ASSEMBLY_FAILED:' + detail, {cause: error});
+      }
+      const output = await stat(concatOutputPath);
       if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
       logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});
     };

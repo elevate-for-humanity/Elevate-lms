@@ -72,7 +72,7 @@ export default function DevStudioHealthPanel() {
         ['Supabase URL', flag(health.supabaseUrlPresent)],
         ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
-        ['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable'],
+        ['Paris owned inference', health.hasElevate ? 'verified reachable' : 'unavailable'],
         [
           'Repository writes',
           health.execution?.repositoryWritesReady

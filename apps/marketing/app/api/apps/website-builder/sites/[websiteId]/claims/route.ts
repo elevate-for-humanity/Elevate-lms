@@ -22,8 +22,8 @@ async function ownedSite(websiteId: string) {
   const db = await createClient();
   const { data: { user } } = await db.auth.getUser();
   if (!user?.id) return { db, user: null, site: null };
-  if (!(await canManageHostedWebsite(db, websiteId, user.id))) return { db, user, site: null };
   const admin = await requireAdminClient();
+  if (!(await canManageHostedWebsite(admin, websiteId, user.id))) return { db, user, site: null };
   const { data: site } = await admin.from('user_websites').select('id,user_id').eq('id', websiteId).maybeSingle();
   return { db: admin, user, site };
 }

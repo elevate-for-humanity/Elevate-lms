@@ -9,6 +9,8 @@ import {
   practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
+  nonblockingManualReview,
+  optionalManualReviewStage,
 } from './lesson-contract';
 import { isDurableExternalBlocker, routeSelectiveRepairs } from './repair-router';
 import {
@@ -80,6 +82,9 @@ export class UltimateBuildRunner {
         }
       }
       const step = ULTIMATE_BUILD_STEPS[index];
+      // Review/browser acceptance is advisory for this specific manual course.
+      // Do not fabricate QA artifacts, certificates or browser evidence.
+      if (optionalManualReviewStage(step, ctx.profile)) { index++; continue; }
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
       if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], stepInputHashes(step, ctx.profile, ctx.artifacts)) &&
@@ -116,7 +121,12 @@ export class UltimateBuildRunner {
             },
           };
         const findings = result.findings ?? [];
-        failures = findings.filter((f) => f.severity === 'error');
+        failures = findings.filter((f) => f.severity === 'error' &&
+          !(nonblockingManualReview(ctx.profile) && f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED'));
+        // Retain the review finding as a warning, without blocking authoring.
+        if (nonblockingManualReview(ctx.profile)) for (const f of findings) {
+          if (f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED') f.severity = 'warning';
+        }
         const contractFailures = failures.length ? [] : validateStepOutput(step, artifacts);
         if (step === 'visual_assignment') contractFailures.push(...practicalVisualFailures({...ctx.artifacts, visual_assignment: artifacts}, competency));
         for (const code of contractFailures)
@@ -126,7 +136,8 @@ export class UltimateBuildRunner {
             code,
             message: `${step} is missing required contract evidence: ${code}`,
           });
-        if (result.passed === false && !failures.length)
+        if (result.passed === false && !failures.length &&
+          !(nonblockingManualReview(ctx.profile) && findings.some(f => f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED')))
           failures.push({
             step,
             severity: 'error',
@@ -150,6 +161,16 @@ export class UltimateBuildRunner {
         // A failed repair candidate must not replace a known-good artifact or
         // create a new accepted artifact version. Keep the previous checkpoint
         // available for recovery and record the failed state separately.
+        // Do not spend another render on a producer that returned the same
+        // defective evidence. Preserve the prior certified artifact, and surface
+        // a genuine repair blocker for PARIS rather than marking it corrected.
+        // Media QA itself is an inspector, not a producer.
+        if (producerRepair && failures.length === 0 &&
+            ['synchronization', 'visual_assignment', 'scene_construction', 'natural_narration'].includes(step) &&
+            contractHash(Object.fromEntries(Object.entries(artifacts).filter(([key]) => key !== 'contractEvidence'))) ===
+            contractHash(Object.fromEntries(Object.entries(previous).filter(([key]) => key !== 'contractEvidence')))) {
+          throw new Error('REPAIR_PRODUCER_UNCHANGED:' + step);
+        }
         if (producerRepair && failures.length) {
           artifacts = previous;
           ctx.artifacts[step] = previous;

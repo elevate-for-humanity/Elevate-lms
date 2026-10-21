@@ -221,8 +221,7 @@ export default function ProgramCategoryPage({
             Ready to Start Your {categoryName} Career?
           </h2>
           <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-            Most students qualify for free training through WIOA funding. Apply today and start your
-            new career path.
+            Funding varies by program and participant. Review the exact program record and rely on agency funding only after written authorization.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

@@ -10,6 +10,7 @@ export function PwaUpdateNotice() {
   const [error, setError] = useState('');
   const registration = useRef<ServiceWorkerRegistration | null>(null);
   const reloadRequested = useRef(false);
+  const dismissed = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useBuildVersion();
@@ -17,11 +18,11 @@ export function PwaUpdateNotice() {
   useEffect(() => {
     const onReady = (event: Event) => {
       registration.current = (event as CustomEvent<ServiceWorkerRegistration>).detail ?? null;
-      setAvailable(true);
+      if (!dismissed.current) setAvailable(true);
     };
-    const onBuildUpdate = () => setAvailable(true);
+    const onBuildUpdate = () => { if (!dismissed.current) setAvailable(true); };
     const onControllerChange = () => {
-      setAvailable(true);
+      if (!dismissed.current) setAvailable(true);
       if (reloadRequested.current) window.location.reload();
     };
     window.addEventListener('elevate-pwa-update-ready', onReady);
@@ -67,10 +68,7 @@ export function PwaUpdateNotice() {
     <section
       data-pwa-update-notice
       aria-label="Application update"
-      className="fixed left-4 right-4 z-[80] mx-auto max-w-xl rounded-2xl border border-blue-200 bg-white p-4 shadow-xl"
-      style={{
-        bottom: 'calc(var(--elevate-pwa-bottom-offset, 1rem) + env(safe-area-inset-bottom, 0px))',
-      }}
+      className="fixed right-4 top-4 z-[80] ml-4 max-w-sm rounded-2xl border border-blue-200 bg-white p-4 shadow-xl"
     >
       <div role="status">
         <p className="font-bold text-slate-950">A new Elevate version is available.</p>
@@ -86,6 +84,14 @@ export function PwaUpdateNotice() {
         className="mt-3 min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white disabled:opacity-70"
       >
         {updating ? 'Updating…' : 'Update now'}
+      </button>
+      <button
+        type="button"
+        disabled={updating}
+        onClick={() => { dismissed.current = true; setAvailable(false); }}
+        className="ml-2 mt-3 min-h-11 rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-700 disabled:opacity-70"
+      >
+        Later
       </button>
     </section>
   );

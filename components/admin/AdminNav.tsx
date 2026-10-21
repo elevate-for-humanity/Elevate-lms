@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, Bell, LogOut, Search, Settings } from 'lucide-react';
+import { ArrowLeft, Bell, ClipboardCheck, LogOut, Search, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import LogoImage from '@/components/site/LogoImage';
 import { DEFAULT_NAV, type NavSection } from '@/lib/admin/nav-config';
+import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
 
 export interface AdminNavNotif {
   id: string;
@@ -124,6 +125,18 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 Admin AI
               </Link>
             </div>
+
+            <a
+              href={APPLICATION_CHECKER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Application Checker (opens private tool in a new tab)"
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-bold text-blue-700 hover:bg-blue-50 sm:px-3 sm:text-sm"
+            >
+              <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="md:hidden">App Checker</span>
+              <span className="hidden md:inline">Application Checker</span>
+            </a>
 
             {/* Search */}
             <form

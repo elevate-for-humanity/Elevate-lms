@@ -10,6 +10,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import {
   resolveDeliveryMode,
   getContinueLearningUrl,
@@ -65,11 +66,20 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const supabase = await createClient();
   if (!supabase) return { enrollments: [], error: 'Database not configured' };
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.id !== userId) return { enrollments: [], error: 'Unauthorized' };
+  if (!user) return { enrollments: [], error: 'Unauthorized' };
+  const isPreview = user.id !== userId;
+  if (isPreview) {
+    const adminDb = await requireAdminClient();
+    const { data: actor } = await adminDb.from('profiles').select('role').eq('id', user.id).maybeSingle();
+    const selected = await resolvePortalPreviewSubject(adminDb, user.id);
+    if (!['admin', 'super_admin'].includes(String(actor?.role || '')) || !selected.previewing || selected.userId !== userId)
+      return { enrollments: [], error: 'Unauthorized' };
+  }
+  const reader = isPreview ? await requireAdminClient() : supabase;
 
   const results: NormalizedEnrollment[] = [];
 
-  const { data: programEnrollments, error: programEnrollmentError } = await supabase
+  const { data: programEnrollments, error: programEnrollmentError } = await reader
     .from('program_enrollments')
     .select(
       'id,user_id,student_id,course_id,program_id,program_holder_id,program_slug,title,description,status,progress_percent,created_at,updated_at',
@@ -90,13 +100,13 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
 
   const [programResult, courseResult, holderResult] = await Promise.all([
     programIds.length
-      ? supabase
+      ? reader
           .from('programs')
           .select('id,slug,name,title,delivery_mode')
           .in('id', programIds)
       : Promise.resolve({ data: [] as ProgramRow[], error: null }),
     courseIds.length
-      ? supabase
+      ? reader
           .from('courses')
           .select('id,title,course_name,description,short_description,duration_hours')
           .in('id', courseIds)
@@ -155,7 +165,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     results.push(enrollment);
   }
 
-  const { data: courseEnrollments, error: courseEnrollmentError } = await supabase
+  const { data: courseEnrollments, error: courseEnrollmentError } = await reader
     .from('course_enrollments')
     .select('id,student_id,course_id,status,progress,created_at,updated_at')
     .eq('student_id', userId);
@@ -165,7 +175,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const directCourseIds = [...new Set((courseEnrollments ?? []).map((row) => row.course_id).filter(Boolean))] as string[];
   const missingCourseIds = directCourseIds.filter((id) => !coursesById.has(id));
   if (missingCourseIds.length) {
-    const { data: directCourses, error: directCoursesError } = await supabase
+    const { data: directCourses, error: directCoursesError } = await reader
       .from('courses')
       .select('id,title,course_name,description,short_description,duration_hours')
       .in('id', missingCourseIds);
@@ -190,7 +200,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     representedCourseIds.add(row.course_id);
   }
 
-  const { data: partnerEnrollments, error: partnerError } = await supabase
+  const { data: partnerEnrollments, error: partnerError } = await reader
     .from('partner_lms_enrollments')
     .select(
       'id,student_id,course_id,provider_id,status,progress_percentage,enrolled_at,created_at,updated_at,metadata',
@@ -220,7 +230,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
 
   const internalFallbackCourseIds = partnerCourseIds.filter((id) => !partnerCoursesById.has(id) && !coursesById.has(id));
   if (internalFallbackCourseIds.length) {
-    const { data: partnerCourseFallbacks } = await supabase
+    const { data: partnerCourseFallbacks } = await reader
       .from('courses')
       .select('id,title,course_name,description,short_description,duration_hours')
       .in('id', internalFallbackCourseIds);

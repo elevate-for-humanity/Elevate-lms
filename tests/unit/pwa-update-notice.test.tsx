@@ -68,6 +68,17 @@ describe('safe dashboard and website updates', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Please try again');
   });
 
+  it('lets the user defer an update and keep editing without repeated notices', async () => {
+    render(<><input aria-label="Draft" defaultValue="Unsaved Paris request" /><PwaUpdateNotice /></>);
+    await waitFor(() => expect(fetch).toHaveBeenCalled());
+    act(() => window.dispatchEvent(new CustomEvent('elevate-build-update-ready')));
+    fireEvent.click(screen.getByRole('button', {name:'Later'}));
+    expect(screen.queryByRole('region', {name:'Application update'})).toBeNull();
+    act(() => window.dispatchEvent(new CustomEvent('elevate-build-update-ready')));
+    expect(screen.queryByRole('button', {name:'Update now'})).toBeNull();
+    expect(screen.getByRole('textbox', {name:'Draft'})).toHaveValue('Unsaved Paris request');
+  });
+
   it('keeps polling after React remounts effects', async () => {
     const { unmount } = render(<PwaUpdateNotice />);
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));

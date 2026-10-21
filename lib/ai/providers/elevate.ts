@@ -1,6 +1,8 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 import { normalizeStructuredOutput } from './structured-output';
 import { requestsJson } from './structured-output';
+import { resolveOwnedModelConnection } from './owned-model-config.mjs';
+import { ownedModelHeaders } from './google-runtime-auth.mjs';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_CONTEXT_TOKENS = 8192;
@@ -60,29 +62,11 @@ type OpenAIChatResponse = {
 };
 
 function endpoint(): string | null {
-  // CPU is the authoritative everyday PARIS endpoint. A separately configured
-  // GPU endpoint is used only when explicitly enabled for this runtime.
-  const gpuAllowed = process.env.PARIS_GPU_ENABLED === 'true' &&
-    process.env.PARIS_INFERENCE_TIER === 'gpu';
-  const raw = (gpuAllowed
-    ? process.env.ELEVATE_LLM_GPU_URL
-    : process.env.ELEVATE_LLM_CPU_URL || process.env.ELEVATE_LLM_URL)?.trim();
-  if (!raw) return null;
-  const base = raw.replace(/\/+$/, '');
-  try {
-    const url = new URL(base);
-    if (/(^|\.)(?:code\.run|northflank\.app|northflank\.com)$/i.test(url.hostname)) return null;
-    return base;
-  } catch { return null; }
+  return resolveOwnedModelConnection().base;
 }
 
 function secret(): string | null {
-  const gpuAllowed = process.env.PARIS_GPU_ENABLED === 'true' &&
-    process.env.PARIS_INFERENCE_TIER === 'gpu';
-  const value = (gpuAllowed
-    ? process.env.ELEVATE_LLM_GPU_SECRET
-    : process.env.ELEVATE_LLM_CPU_SECRET || process.env.ELEVATE_LLM_SECRET)?.trim();
-  return value || null;
+  return resolveOwnedModelConnection().token;
 }
 
 /**
@@ -93,7 +77,7 @@ function secret(): string | null {
  * self-controlled inference path: no commercial provider is involved.
  *
  * Configuration comes from the canonical secret stores:
- *   ELEVATE_LLM_URL    — public URL of the GPU worker
+ *   ELEVATE_LLM_URL    — legacy endpoint alias; ELEVATE_LLM_CPU_URL is authoritative
  *   ELEVATE_LLM_SECRET — shared bearer token minted at provisioning time
  */
 export class ElevateProvider implements AIProvider {
@@ -109,7 +93,7 @@ export class ElevateProvider implements AIProvider {
     if (!base || !token) throw new Error('Elevate LLM worker not configured (ELEVATE_LLM_URL / ELEVATE_LLM_SECRET)');
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
         messages: options.messages,
@@ -172,10 +156,7 @@ export class ElevateProvider implements AIProvider {
 
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
         messages: options.messages,

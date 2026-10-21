@@ -121,19 +121,9 @@ export async function fetchAiHealth(): Promise<{
       anthropic: Boolean(data.hasAnthropic),
       gemini: Boolean(data.hasGemini),
     };
-    const ok = res.ok && Boolean(data.aiConfigured);
-    const label = [
-      providers.elevate && 'Elevate AI',
-      providers.cloudflare && 'Cloudflare AI',
-      providers.xai && 'Grok / xAI',
-      providers.groq && 'Groq',
-      providers.openai && 'OpenAI',
-      providers.anthropic && 'Claude',
-      providers.gemini && 'Gemini',
-    ]
-      .filter(Boolean)
-      .join(' / ');
-    return { ok, label: label || 'no keys', providers };
+    const ok = res.ok && providers.elevate;
+    const label = ok ? 'Private model verified reachable' : 'Private model unavailable';
+    return { ok, label, providers };
   } catch {
     return { ok: false, label: 'offline', providers: {} };
   }

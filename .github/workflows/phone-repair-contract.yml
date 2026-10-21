@@ -2,10 +2,11 @@ name: Phone repair contract
 on:
   push:
     branches: [main]
-    paths: ['lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', 'apps/admin/app/phone/**', 'components/communications/**', 'components/program-holder/ProgramHolderPhone.tsx', 'lib/communications/meeting-calendar*', '.github/workflows/phone-repair-contract.yml']
+    paths: ['lib/secrets.ts', 'lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', 'apps/admin/app/phone/**', 'components/communications/**', 'components/program-holder/ProgramHolderPhone.tsx', 'lib/communications/meeting-calendar*', '.github/workflows/phone-repair-contract.yml']
   pull_request:
     paths:
       - 'lib/phone/**'
+      - 'lib/secrets.ts'
       - 'tests/unit/phone-*.test.ts'
       - 'tests/unit/phone-*.test.tsx'
       - 'tests/unit/asterisk-*.test.ts'
@@ -41,6 +42,7 @@ jobs:
           version: 10.28.2
       - run: pnpm install --frozen-lockfile
       - run: node --test lib/communications/meeting-calendar.test.mjs
+      - run: pnpm exec vitest run tests/unit/google-runtime-secret-scope.test.ts tests/unit/asterisk-device.test.ts
       - run: node --test infra/pbx/provisioner/server.test.mjs
       - run: node --test infra/pbx/paris/*.test.mjs infra/pbx/runtime-secrets.test.mjs
       - run: python3 scripts/gcp/test-audit-pbx-runtime.py

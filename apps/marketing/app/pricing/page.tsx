@@ -18,7 +18,7 @@ async function getPricingData() {
     const [programsRes, licenseTiersRes, storeProductsRes] = await Promise.all([
       supabase
         .from('programs')
-        .select('id, name, title, slug, price, tuition, total_cost, duration_weeks, estimated_weeks, program_type, status, funding_eligible, funding_confirmed, is_free')
+        .select('id, name, title, slug, price, tuition, total_cost, duration_weeks, estimated_weeks, program_type, status, funding_eligible, is_free')
         .eq('status', 'active')
         .order('name'),
       supabase

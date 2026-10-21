@@ -30,12 +30,22 @@ export class UltimateJobQueue {
     if (readError) throw readError;
     if (existing) return existing;
     const { data: previous, error: previousError } = await this.db.from('ultimate_build_jobs')
-      .select('monitor').eq('build_id', buildId).eq('job_type', 'course_build')
+      .select('monitor,status,payload,pending_dependency_resume').eq('build_id', buildId).eq('job_type', 'course_build')
       .order('created_at', {ascending: false}).limit(1).maybeSingle();
     if (previousError) throw previousError;
+    // A failed dependency/paused attempt retains the exact lesson cursor and
+    // repair intent. A completed preview must not constrain a full-course run.
+    let checkpointPayload: Record<string, unknown> = previous?.payload &&
+      typeof previous.payload === 'object' && !Array.isArray(previous.payload) ? {...previous.payload} : {};
+    const pending = previous?.pending_dependency_resume;
+    if (pending && typeof pending === 'object' && !Array.isArray(pending))
+      checkpointPayload = {...checkpointPayload,...pending};
+    delete checkpointPayload.progress;
+    const nextPayload = previous?.status === 'failed' && payload &&
+      typeof payload === 'object' && !Array.isArray(payload) ? {...checkpointPayload,...payload} : payload;
     const { data, error } = await this.db
       .from('ultimate_build_jobs')
-      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload,
+      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload: nextPayload,
         ...(previous?.monitor ? {monitor: previous.monitor} : {}) })
       .select('*')
       .single();

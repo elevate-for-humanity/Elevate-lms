@@ -146,8 +146,10 @@ describe('Admin UI route consolidation', () => {
     expect(canonical).toContain('/api/admin/ultimate-course-builder/autopilot');
     expect(canonical).not.toContain('runCourseFactoryPipeline');
     expect(canonical).toContain('<UltimateStageInspector');
-    expect(canonical).toContain('data-course-workspace-layout');
-    expect(canonical).toContain('2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]');
+    expect(canonical).toContain('operations={operations}');
+    const layout = readFileSync(path.join(root,'components/admin/course-builder/ProductionPanelLayout.tsx'),'utf8');
+    expect(layout).toContain('Production operations');
+    expect(layout).toContain('Course outline');
   });
 
   it('does not expose retired /admin UI links or redirects from executable source', () => {

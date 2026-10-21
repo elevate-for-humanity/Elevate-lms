@@ -2,7 +2,7 @@ import { google } from './runtime-config.mjs';
 import { inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 
-export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60} = {}) {
+export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60, clock = () => Date.now()} = {}) {
   const scope = ['--project=elegant-racer-299721', '--region=us-central1'];
   // An active Cloud Run execution must not block unrelated queued builds.
   // Atomic database leases prevent two tasks from claiming the same job.
@@ -65,7 +65,7 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // Launch is not assignment. Require fresh durable claims for every task.
   const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));
   const assignmentUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  assignmentUrl.searchParams.set('select', 'id,status,lease_owner,heartbeat_at,last_error');
+  assignmentUrl.searchParams.set('select', 'id,status,lease_owner,lease_expires_at,heartbeat_at,last_error');
   assignmentUrl.searchParams.set('id', 'in.(' + [...pending.keys()].join(',') + ')');
   for (let attempt = 0; attempt < assignmentAttempts; attempt++) {
     const check = await request(assignmentUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
@@ -74,7 +74,8 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
     for (const job of rows ?? []) {
       if (!pending.has(job.id)) continue;
       if (job.status === 'failed') throw new Error('COURSE_WORKER_FAILED_AFTER_ASSIGNMENT:' + job.id);
-      if (job.lease_owner && job.heartbeat_at && job.heartbeat_at > pending.get(job.id) && job.heartbeat_at >= now.toISOString()) pending.delete(job.id);
+      if (job.status === 'running' && job.lease_owner && Date.parse(job.lease_expires_at ?? '') > clock() &&
+          job.heartbeat_at && job.heartbeat_at > pending.get(job.id) && job.heartbeat_at >= now.toISOString()) pending.delete(job.id);
     }
     if (!pending.size) return {status:'assigned',tasks,jobIds:queued.slice(0,tasks).map(item=>item.id)};
     if (attempt + 1 < assignmentAttempts) await delay(5000);

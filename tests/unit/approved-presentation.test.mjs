@@ -37,3 +37,22 @@ test('instructions follow spoken cue timing rather than equal divisions of the s
   assert.equal(measuredTeachingStep(steps,cues,8),1);
   assert.throws(()=>measuredTeachingStep([{narrationQuote:'Cut without a guard'}],cues,2),/NOT_ALIGNED/);
 });
+
+test('the premium scene and picture timeline use the same measured speech alignment', async () => {
+  const {quoteStartSeconds}=await import('../../lib/ultimate-course-builder/instructional/picture-timeline.mjs');
+  const steps=[{narrationQuote:'Prepare the station safely'},{narrationQuote:'Current platform limits are 40 OJL hours and 50 combined OJL/RTI hours weekly'}];
+  const cues=[{text:'Prepare the station safely',startSeconds:0,endSeconds:5},{text:'Current platform limits are 40 OJL hours and 50 combined OJL slash RTI hours weekly',startSeconds:5,endSeconds:14}];
+  assert.equal(quoteStartSeconds(steps[1].narrationQuote,cues),5);
+  assert.equal(measuredTeachingStep(steps,cues,4.9),0);
+  assert.equal(measuredTeachingStep(steps,cues,5),1);
+});
+
+test('frame playback reuses alignment while retaining accurate transitions and safeguards',()=>{
+  const steps=[{narrationQuote:'Inspect the blade'},{narrationQuote:'Attach the guard'}];
+  const cues=[{text:'Inspect the blade',startSeconds:0},{text:'Attach the guard',startSeconds:8}];
+  for(let frame=0;frame<1800;frame++) {
+    const seconds=frame/30;
+    assert.equal(measuredTeachingStep(steps,cues,seconds),seconds>=8?1:0);
+  }
+  assert.throws(()=>measuredTeachingStep([{narrationQuote:'Unspoken instruction'}],cues,1),/NOT_ALIGNED/);
+});

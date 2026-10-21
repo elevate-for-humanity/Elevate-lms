@@ -449,6 +449,12 @@ export async function executeWorkflow(
     return { runId: '', status: 'failed', stepsRun: 0, error: stepsErr.message };
   }
 
+  // A zero-step run cannot verify an outcome. Reject it before creating a
+  // misleading successful history entry or emitting execution events.
+  if (!steps?.length) {
+    return { runId: '', status: 'failed', stepsRun: 0, error: 'Workflow has no enabled steps. Add and enable a step before running it.' };
+  }
+
   const { data: run, error: runErr } = await db
     .from('workflow_runs')
     .insert({

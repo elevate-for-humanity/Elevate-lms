@@ -1,38 +1,26 @@
-/**
- * Bind the existing Admin Cloud Run runtime identity to the existing
- * Course Builder job. This is a one-time, narrowly scoped IAM repair;
- * it does not redeploy, change, or execute either workload.
- * Run only with an administrator-approved Google Cloud identity.
- */
 import {execFileSync} from 'node:child_process';
-
-const project='elegant-racer-299721';
-const region='us-central1';
-const admin='elevate-admin-migration';
-const job='elevate-course-builder';
-function gcloud(args) {
-  return execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:30000}).trim();
+import {pathToFileURL} from 'node:url';
+const PROJECT='elegant-racer-299721';
+const TARGETS=[{job:'elevate-course-builder',region:'us-central1'},{job:'elevate-course-builder-parallel',region:'us-east1'}];
+export function authorizeAdminCourseWorker(run=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:30000}).trim()) {
+ const admin=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project='+PROJECT,'--region=us-central1','--format=json']));
+ const identity=admin.spec?.template?.spec?.serviceAccountName??admin.template?.serviceAccount;
+ if(!identity||!/^[a-z0-9-]+@elegant-racer-299721\.iam\.gserviceaccount\.com$/.test(identity))throw Error('ADMIN_RUNTIME_SERVICE_ACCOUNT_NOT_RESOLVED');
+ const member='serviceAccount:'+identity;
+ const roles=['roles/run.jobsExecutor','roles/run.viewer'];
+ for(const target of TARGETS) {
+  const scope=['--project='+PROJECT,'--region='+target.region];
+  const job=JSON.parse(run(['run','jobs','describe',target.job,...scope,'--format=json']));
+  if(!String(job.metadata?.name??job.name??'').endsWith(target.job))throw Error('COURSE_BUILDER_JOB_NOT_FOUND');
+  let policy=JSON.parse(run(['run','jobs','get-iam-policy',target.job,...scope,'--format=json']));
+  for(const role of roles) {
+   if(!(policy.bindings??[]).some(b=>b.role===role&&!b.condition&&(b.members??[]).includes(member)))
+    run(['run','jobs','add-iam-policy-binding',target.job,...scope,'--member='+member,'--role='+role,'--quiet']);
+  }
+  policy=JSON.parse(run(['run','jobs','get-iam-policy',target.job,...scope,'--format=json']));
+  if(!roles.every(role=>(policy.bindings??[]).some(b=>b.role===role&&!b.condition&&(b.members??[]).includes(member))))throw Error('COURSE_WORKER_ACCESS_NOT_VERIFIED');
+  console.log(JSON.stringify({identity,job:target.job,region:target.region,roles,verified:true}));
+ }
 }
-const adminData=JSON.parse(gcloud(['run','services','describe',admin,
-  '--project='+project,'--region='+region,'--format=json']));
-const serviceAccount=adminData?.spec?.template?.spec?.serviceAccountName ??
-  adminData?.template?.serviceAccount;
-if (!serviceAccount || !/^[a-z0-9-]+@[a-z0-9-]+\.iam\.gserviceaccount\.com$/.test(serviceAccount))
-  throw new Error('ADMIN_RUNTIME_SERVICE_ACCOUNT_NOT_RESOLVED');
-const jobData=JSON.parse(gcloud(['run','jobs','describe',job,
-  '--project='+project,'--region='+region,'--format=json']));
-if (!String(jobData.metadata?.name ?? jobData.name ?? '').endsWith(job))
-  throw new Error('COURSE_BUILDER_JOB_NOT_FOUND');
-const member='serviceAccount:'+serviceAccount;
-console.log('Admin runtime identity:',serviceAccount);
-console.log('Course Builder target:',job,'role: roles/run.jobsExecutor');
-gcloud(['run','jobs','add-iam-policy-binding',job,
-  '--project='+project,'--region='+region,
-  '--member='+member,'--role=roles/run.jobsExecutor',
-  '--condition=None','--quiet']);
-const policy=JSON.parse(gcloud(['run','jobs','get-iam-policy',job,
-  '--project='+project,'--region='+region,'--format=json']));
-const hasRole=(policy.bindings??[]).some(b=>b.role==='roles/run.jobsExecutor' &&
-  (b.members??[]).includes(member));
-if (!hasRole) throw new Error('COURSE_WORKER_EXECUTION_ROLE_NOT_VERIFIED');
-console.log('Verified scoped Cloud Run job execute permission for Admin runtime.');
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)authorizeAdminCourseWorker();
+

@@ -1,4 +1,8 @@
+import CourseSyllabus from '@/components/learner/CourseSyllabus';
+import { completionAlert } from '@/lib/program-holder/student-training';
+import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
+import { StudentProgressReportForm } from './StudentProgressReportForm';
 import Image from 'next/image';
 import {
   AlertTriangle,
@@ -355,16 +359,19 @@ export async function ProgramHolderWorkspaceView({
     );
   if (section === 'reports')
     return (
-      <Reports
-        rows={data.reports}
-        enrolled={data.enrollments.length}
-        active={active.length}
-        completed={completed.length}
-        programLabel={primaryProgramLabel}
-      />
+      <div className="space-y-6">
+        <Reports
+          rows={data.reports}
+          enrolled={data.enrollments.length}
+          active={active.length}
+          completed={completed.length}
+          programLabel={primaryProgramLabel}
+        />
+        <StudentProgressReportForm students={data.enrollments.map(row => ({id:row.id, full_name:row.full_name}))} />
+      </div>
     );
   if (section === 'payouts')
-    return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;
+    return <section className="space-y-4 p-4"><h1 className="text-2xl font-black">Financial records</h1><p>Student funding, reimbursements, and payment records are managed by authorized Elevate administrators.</p>{payoutPanel}</section>;
   if (section === 'settings')
     return (
       <Settings
@@ -376,7 +383,7 @@ export async function ProgramHolderWorkspaceView({
     );
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="w-full min-w-0 space-y-6 px-3 pb-28 sm:space-y-8 sm:px-6 lg:pb-8 [&_h1]:[overflow-wrap:normal] [&_h2]:[overflow-wrap:normal] [&_h3]:[overflow-wrap:normal] [&_h1]:[word-break:normal] [&_h2]:[word-break:normal] [&_h3]:[word-break:normal] [&_section]:min-w-0 [&_article]:min-w-0">
       <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -471,6 +478,7 @@ export async function ProgramHolderWorkspaceView({
           ))}
         </div>
       </section>
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       {texasLaunchKit}
       <ProgramHolderOperationsGuide
         holderName={data.holder?.organization_name || data.holder?.name || data.profile?.full_name}
@@ -1517,36 +1525,10 @@ function Metric({
   );
 }
 
-function voucherStatus(row: any) {
-  const paid =
-    Boolean(row.voucher_paid_date) ||
-    Number(row.amount_paid_cents || 0) > 0 ||
-    ['paid', 'completed', 'succeeded'].includes(String(row.payment_status || '').toLowerCase());
-  if (paid) return 'Paid';
-
-  const verified = Boolean(row.voucher_issued_date) || row.funding_verified === true;
-  return verified ? 'Voucher verified' : 'Voucher pending';
-}
-
-function expectedPaymentStatus(row: any) {
-  const cents = Number(row.expected_payout_cents || 0);
-  if (cents <= 0) return 'Not projected';
-
-  const amount = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(cents / 100);
-  const status =
-    row.expected_payout_status === 'pending_voucher_payment'
-      ? 'pending voucher/payment'
-      : String(row.expected_payout_status || 'projected').replaceAll('_', ' ');
-  return `${amount} — ${status}`;
-}
-
 function completionStatus(row: any) {
   const state = String(row.enrollment_state || row.status || '').toLowerCase();
   if (
-    Boolean(row.completed_at) ||
+    Boolean(row.completed_at || row.completion_date) ||
     ['completed', 'graduated'].includes(state) ||
     String(row.work_progress || '').toLowerCase() === 'completed'
   ) {
@@ -1596,14 +1578,16 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   label="Program"
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
-                <Row label="Voucher" value={voucherStatus(row)} />
-                <Row label="Expected payment" value={expectedPaymentStatus(row)} />
                 <Row label="Completion" value={completionStatus(row)} />
+                <Row label="Actual completion" value={(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'} />
+                <Row label="Certification evidence" value={row.certification_status || 'Upload missing'} />
+                {row.credential_earned_date && <Row label="Credential earned" value={row.credential_earned_date} />}
+                {row.certificate_verified_at && <Row label="Credential verified" value={row.certificate_verified_at.slice(0, 10)} />}
                 <Row
                   label="Training"
-                  value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`}
+                  value={`${row.training_start_date || 'Start missing'} — ${row.expected_end_date || row.training_end_date || 'End missing'}`}
                 />
-                <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+                <Row label="Next action" value={completionAlert(row) || row.next_required_action || 'Continue training'} />
                 <Row
                   label="WorkOne hours"
                   value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
@@ -1642,8 +1626,6 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <tr>
               <th className="px-3 py-3">Student</th>
               <th className="px-3 py-3">Program</th>
-              <th className="px-3 py-3">Voucher</th>
-              <th className="px-3 py-3">Expected payment</th>
               <th className="px-3 py-3">Completion</th>
               <th className="px-3 py-3">Progress</th>
               <th className="px-3 py-3">WorkOne hours</th>
@@ -1663,18 +1645,16 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4 font-bold">{voucherStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{expectedPaymentStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{completionStatus(row)}</td>
+                  <td className="px-3 py-4"><p className="font-bold">{completionStatus(row)}</p><p className="text-xs">{row.certification_status || 'Upload missing'}</p>{row.credential_earned_date && <p className="text-xs">Earned: {row.credential_earned_date}</p>}{row.certificate_verified_at && <p className="text-xs">Verified: {row.certificate_verified_at.slice(0, 10)}</p>}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
                     {Math.min(48, Number(row.total_hours_completed || 0))} / 48
                   </td>
                   <td className="px-3 py-4 text-xs">
                     <span className="block">Start: {row.training_start_date || 'Missing'}</span>
-                    <span className="block">End: {row.training_end_date || 'Missing'}</span>
+                    <span className="block">End: {row.expected_end_date || row.training_end_date || 'Missing'}</span><span className="block">Actual completion: {(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'}</span>
                   </td>
-                  <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
+                  <td className="px-3 py-4">{completionAlert(row) || row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
                       <StudentCommunicationActions
@@ -1696,7 +1676,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
                   No confirmed student enrollments are linked.
                 </td>
               </tr>
@@ -1915,6 +1895,7 @@ function Programs({ data }: { data: any }) {
         title={label}
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>
   );
@@ -2102,6 +2083,7 @@ function Hours({
         title="Training Hours"
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
+      <HolderHourSubmissionForm enrollments={enrollments} />
       <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>
@@ -2165,6 +2147,19 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
+  const actionFor = (label: string): string | null => {
+    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
+    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
+    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
+    if (label === 'Signed image release') return '/program-holder/documents';
+    if (label === 'Program-holder approval') return '/program-holder/onboarding';
+    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+    return null;
+  };
   return (
     <div className="space-y-6">
       <Hero
@@ -2194,11 +2189,18 @@ function Compliance({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
-                {item.complete ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {actionFor(item.label) ? (
+                    <Link href={actionFor(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                      {item.complete ? 'View form' : 'Open form'}
+                    </Link>
+                  ) : null}
+                  {item.complete ? (
+                    <CheckCircle2 aria-label="Completed" className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle aria-label="Action required" className="h-5 w-5 text-amber-600" />
+                  )}
+                </div>
               </div>
             ))}
           </div>

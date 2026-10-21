@@ -118,15 +118,32 @@ export function EmailWorkspace({
   apiPath = '/api/communications/email',
   initialMailboxId,
   roleLabel = 'Program Holder',
+  initialRecipient,
+  initialSubject = '',
 }: {
   apiPath?: string;
   initialMailboxId?: string;
   roleLabel?: string;
+  initialRecipient?: string;
+  initialSubject?: string;
 }) {
   const [data, setData] = useState<WorkspaceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [compose, setCompose] = useState<ComposeState | null>(null);
+  const initialComposeOpened = useRef(false);
+  useEffect(() => {
+    if (
+      !data ||
+      data.readOnly ||
+      !data.selectedMailboxId ||
+      !initialRecipient ||
+      initialComposeOpened.current
+    )
+      return;
+    initialComposeOpened.current = true;
+    setCompose({ to: initialRecipient, subject: initialSubject, body: '' });
+  }, [data, initialRecipient, initialSubject]);
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
   const [filterEditor, setFilterEditor] = useState(false);

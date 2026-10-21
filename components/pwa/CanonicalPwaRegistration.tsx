@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
 import { PwaUpdateNotice } from './PwaUpdateNotice';
+import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
 import {
   capturePwaInstallPrompt,
   clearPwaInstallPrompt,
@@ -144,5 +144,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
   }, [application]);
 
-  return <PwaUpdateNotice />;
+  // Operational portals need the shared loaded-build check and an explicit,
+  // user-controlled update. Keep public marketing pages free of update banners.
+  return application === 'marketing' ? null : <PwaUpdateNotice />;
 }

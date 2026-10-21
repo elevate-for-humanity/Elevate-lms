@@ -7,6 +7,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/gcp/production-acceptance.*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
@@ -137,7 +138,7 @@ jobs:
           node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
           pnpm run typecheck:marketing
           node --test scripts/gcp/marketing-health-routing.test.cjs
-          node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs
+          node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs scripts/test-tenant-assessment-options.mjs scripts/test-tenant-paris.mjs
           node --test scripts/test-public-revision-activation.mjs scripts/gcp/wait-ready-public-revision.test.mjs
           node scripts/audit-geo-claims.mjs
           node scripts/check-public-claims.mjs
@@ -437,3 +438,22 @@ jobs:
             echo "Deployment is NOT confirmed. Inspect the failed job; do not mark this release successful."
             echo "The previously serving revision may remain active; verify Cloud Run traffic separately."
           } >> "$GITHUB_STEP_SUMMARY"
+  acceptance:
+    needs: deploy
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Explicitly hand the verified Marketing release to production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: marketing
+          ACCEPTANCE_SHA: ${{ github.sha }}
+          ACCEPTANCE_RUN_ID: ${{ github.run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs dispatch

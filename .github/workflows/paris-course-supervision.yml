@@ -1,0 +1,37 @@
+name: PARIS independent course supervision
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gcp/supervise-course-queue.mjs'
+      - 'scripts/gcp/supervise-course-queue.test.mjs'
+      - 'scripts/gcp/paris-course-monitor.mjs'
+      - 'lib/ultimate-course-builder/worker/paris-monitor.mjs'
+      - '.github/workflows/paris-course-supervision.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '2-59/5 * * * *'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: paris-course-supervision
+  cancel-in-progress: false
+jobs:
+  supervise:
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/gcp/supervise-course-queue.test.mjs scripts/gcp/paris-course-monitor.test.mjs
+      - name: Verify worker state and request canonical recovery when dispatch stopped
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/gcp/supervise-course-queue.mjs

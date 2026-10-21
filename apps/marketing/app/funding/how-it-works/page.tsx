@@ -90,8 +90,7 @@ export default function FundingHowItWorksPage() {
               How Funding Works
             </h1>
             <p className="text-lg text-black max-w-3xl mx-auto">
-              Many of our training programs may be available at no cost to eligible participants
-              through federal and state funding.
+              Selected programs have documented workforce-funding pathways. The responsible agency determines participant eligibility, approved costs, available funds, and written authorization.
             </p>
           </div>
         </div>

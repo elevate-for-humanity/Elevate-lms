@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('host shop search discovery', () => {
-  it('includes curated Host Shop profiles in the public sitemap', () => {
+  it('only exposes currently approved Host Shop profiles in the public sitemap', () => {
     const sitemap = readFileSync('apps/marketing/app/sitemap.ts', 'utf8');
-    expect(sitemap).toContain('FEATURED_BEAUTY_HOST_PARTNERS.map');
+    expect(sitemap).toContain('await getApprovedShops()');
+    expect(sitemap).not.toContain('...featuredHostShopRoutes');
     expect(sitemap).toContain('/host-shops/${shop.slug}');
   });
 

@@ -26,3 +26,19 @@ test('phone-size unreadable text routes to the scene producer', () => {
     [{ step: 'scene_construction', codes: ['MEDIA_TEXT_UNREADABLE'], rebuildOnlyThisStage: true }],
   );
 });
+
+
+test('picture mismatch from render routes to upstream synchronization', () => {
+ const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'}];
+ assert.deepEqual(routeSelectiveRepairs(findings),[{step:'synchronization',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+});
+
+test('repeated encoded timeline and insufficient shots repair upstream visual assignment', () => {
+ const findings=[{code:'Media quality gate failed',message:'insufficient visual changes: detected 6, expected at least 12; rendered video repeats 8 earlier moving sequences'}];
+ assert.equal(routeSelectiveRepairs(findings)[0].step,'visual_assignment');
+});
+
+test('ffmpeg assembly failures stay at render stage', () => {
+ const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'FFmpeg output missing'}];
+ assert.equal(routeSelectiveRepairs(findings)[0].step,'lesson_film_render');
+});

@@ -21,6 +21,18 @@ def operator_configured(output):
     return bool(output and re.search(r"^\s*'0'\s*=>\s*1\.\s*(?:Goto|Gosub|Dial)\(", output, re.M))
 
 
+def pwa_operator_configured(output):
+    if not output or not re.search(r"^\s*'0'\s*=>\s*1\.\s*Set\(PWA_CONTACTS=\)", output, re.M):
+        return False
+    if 'elevate-pwa-extensions' not in output or 'Return(' not in output:
+        return False
+    # An intentionally unavailable extension is a valid configured fallback.
+    if 'Set(DIALSTATUS=CHANUNAVAIL)' in output and 'Dial(' not in output:
+        return True
+    return bool(re.search(r'PJSIP_DIAL_CONTACTS\(pwa-[a-f0-9]{40}\)', output) and
+                re.search(r'Dial\(\$\{PWA_CONTACTS\},\d+\)', output))
+
+
 def mailbox_count(output):
     # Asterisk 20 emits this sentence instead of a numeric summary when empty.
     if re.search(r'^There are no voicemail users currently defined\.?$', output or '', re.M):
@@ -120,7 +132,7 @@ def audit():
     plan = cli('dialplan show 0@internal')
     record('OPERATOR_CONFIGURATION', operator_configured(plan), 'explicit_extension_0_required; call acceptance separate')
     generated = cli('dialplan show 0@elevate-pwa-extensions')
-    record('PWA_OPERATOR_CONFIGURATION', operator_configured(generated), 'generated_operator_route_observed; fallback acceptance separate')
+    record('PWA_OPERATOR_CONFIGURATION', pwa_operator_configured(generated), 'generated_operator_route_observed; fallback acceptance separate')
     count = mailbox_count(cli('voicemail show users'))
     checks['VOICEMAIL_CONFIGURATION'] = {
         'result': 'BLOCKED' if count is None else ('PASS' if count > 0 else 'FAIL'),

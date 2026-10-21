@@ -81,3 +81,18 @@ describe('workflow AI result verification', () => {
     expect(writes).toEqual([]);
   });
 });
+
+
+describe('empty workflow guard', () => {
+  it.each([[], null])('rejects an empty enabled-step result before recording a run', async steps => {
+    const from = vi.fn((table: string) => {
+      if (table !== 'workflow_steps') throw new Error('Unexpected write: ' + table);
+      return { select: () => ({ eq: () => ({ eq: () => ({ order: async () => ({data: steps, error: null}) }) }) }) };
+    });
+    state.db.mockResolvedValue({from});
+    const result = await executeWorkflow('empty-workflow', 'manual');
+    expect(result).toMatchObject({runId: '', status: 'failed', stepsRun: 0});
+    expect(result.error).toContain('no enabled steps');
+    expect(from).toHaveBeenCalledTimes(1);
+  });
+});

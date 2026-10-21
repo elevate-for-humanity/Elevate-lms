@@ -72,10 +72,11 @@ test('type checking is deferred only for the canonical sequential build child', 
 });
 
 test('all Google image profiles have explicit workload families and unknown images are rejected', () => {
-  assert.equal(Object.keys(containerBuildPolicy).length, 9);
+  assert.equal(Object.keys(containerBuildPolicy).length, 10);
   assert.equal(containerBuild('store').app, 'marketing');
   assert.equal(containerBuild('ultimate-worker').family, 'native-course-worker');
   assert.equal(containerBuild('media-gpu-worker').family, 'gpu-media');
+  assert.equal(containerBuild('owned-cpu-llm').family, 'cpu-llm');
   assert.throws(() => containerBuild('unreviewed'), /Register a reviewed/);
   assert.throws(() => containerBuild('__proto__'), /Register a reviewed/);
 });

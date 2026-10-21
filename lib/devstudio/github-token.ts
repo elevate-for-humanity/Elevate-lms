@@ -1,6 +1,6 @@
 /**
  * Resolve GITHUB_TOKEN for Dev Studio GitHub API routes.
- * Canonical platform_secrets values are hydrated before process.env fallback.
+ * Verify deployment credentials before falling back to canonical platform secrets.
  */
 
 import { currentWorkflowGitHubToken } from './workflow-github-context';
@@ -27,11 +27,26 @@ export async function ensureDevStudioSecrets(): Promise<void> {
   await getGitHubToken();
 }
 
-/**
- * Do not keep a second token cache here. lib/secrets already owns the runtime
- * cache and refreshSecrets() invalidates it after Studio rotations. A duplicate
- * cache made a newly-rotated GitHub token remain stale for up to five minutes.
- */
+/** A present token can be expired or lack access to the requested repository. */
+async function acceptedByGitHub(token: string): Promise<boolean> {
+  const response = await fetch(
+    'https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      redirect: 'error',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
+    },
+  );
+  if (response.ok) return true;
+  if ([401, 403, 404].includes(response.status)) return false;
+  throw new Error(`GITHUB_CREDENTIAL_CHECK_UNAVAILABLE_HTTP_${response.status}`);
+}
+
 export async function getGitHubToken(): Promise<string | null> {
   const workflowToken=currentWorkflowGitHubToken();
   if(workflowToken)return workflowToken;
@@ -42,8 +57,18 @@ export async function getGitHubToken(): Promise<string | null> {
   const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
   if (storedToken) return storedToken;
   const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
-  if (deployedToken) return deployedToken;
+  if (deployedToken && await acceptedByGitHub(deployedToken)) return deployedToken;
 
+  const fromCanonicalStore = normalizeToken(
+    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
+  );
+  if (fromCanonicalStore && fromCanonicalStore !== deployedToken && await acceptedByGitHub(fromCanonicalStore)) {
+    return fromCanonicalStore;
+  }
+
+  if (deployedToken || fromCanonicalStore) {
+    throw new Error('GITHUB_TOKEN_REJECTED: Configured credentials were rejected for Elevate-lms. Reconnect an authorized credential in Dev Studio Secrets.');
+  }
   return null;
 }
 

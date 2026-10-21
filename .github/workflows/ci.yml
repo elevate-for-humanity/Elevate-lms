@@ -43,6 +43,8 @@ jobs:
           tests/unit/student-enrollment-identity.test.ts
           tests/unit/epa-testing-readiness-route.test.ts
           --environment node
+      - name: Studio GitHub credential fallback regression tests
+        run: node --test scripts/test-devstudio-github-token.mjs
       - name: Automatic container build-memory policy
         run: |
           node scripts/check-build-memory-policy.mjs

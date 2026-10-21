@@ -33,8 +33,8 @@ export function ParisFloatingButton({
       : 'PARIS Career Assistant';
 
   useEffect(() => {
-    if (autoOpenOnDashboard && pathname.endsWith('/dashboard')) setIsOpen(true);
-  }, [autoOpenOnDashboard, pathname]);
+    if (!learnerSurface && autoOpenOnDashboard && pathname.endsWith('/dashboard')) setIsOpen(true);
+  }, [autoOpenOnDashboard, pathname, learnerSurface]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,7 +52,7 @@ export function ParisFloatingButton({
       const issue = (event as CustomEvent<PortalSupportIssue>).detail;
       if (!issue?.workflow || !issue.message) return;
       setPortalIssue(issue);
-      setIsOpen(true);
+      if (!learnerSurface) setIsOpen(true);
       void fetch('/api/paris/workflow-incident', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,9 +62,11 @@ export function ParisFloatingButton({
     };
     window.addEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
     return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
-  }, []);
+  }, [learnerSurface]);
 
-  useEffect(() => { setShowWelcome(false); }, [pathname, surface]);
+  useEffect(() => {
+    setShowWelcome(false);
+  }, [pathname, surface]);
 
   const dismissWelcome = useCallback(() => {
     setShowWelcome(false);
@@ -83,10 +85,7 @@ export function ParisFloatingButton({
 
   // Keep information-dense and embedded-PARIS surfaces unobstructed. PARIS
   // remains available throughout authenticated portals and other public pages.
-  if (
-    surface === 'public' &&
-    (pathname === '/programs/bookkeeping' || hasEmbeddedParisWorkspace)
-  ) {
+  if (surface === 'public' && (pathname === '/programs/bookkeeping' || hasEmbeddedParisWorkspace)) {
     return null;
   }
 
@@ -142,18 +141,24 @@ export function ParisFloatingButton({
             </div>
 
             <div className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden">
-              <Suspense fallback={<p role="status" className="p-6 text-sm text-slate-600">Opening PARIS…</p>}>
-              <ParisChat
-                showHeader={false}
-                surface={surface}
-                courseTitle={courseTitle}
-                nextLessonTitle={nextLessonTitle}
-                courseProgress={courseProgress}
-                portalRole={portalRole}
-                personName={personName}
-                portalIssue={portalIssue}
-                voiceEnabled
-              />
+              <Suspense
+                fallback={
+                  <p role="status" className="p-6 text-sm text-slate-600">
+                    Opening PARIS…
+                  </p>
+                }
+              >
+                <ParisChat
+                  showHeader={false}
+                  surface={surface}
+                  courseTitle={courseTitle}
+                  nextLessonTitle={nextLessonTitle}
+                  courseProgress={courseProgress}
+                  portalRole={portalRole}
+                  personName={personName}
+                  portalIssue={portalIssue}
+                  voiceEnabled
+                />
               </Suspense>
             </div>
           </div>
@@ -204,9 +209,10 @@ export function ParisFloatingButton({
             dismissWelcome();
             open();
           }}
+          aria-expanded={isOpen}
           aria-label={
             learnerSurface
-              ? 'Open PARIS Learning Assistant for course help'
+              ? 'Need help? Open PARIS'
               : portalSurface
                 ? 'Open PARIS Portal Assistant'
                 : 'Open PARIS Career Assistant'
@@ -215,9 +221,9 @@ export function ParisFloatingButton({
         >
           <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
           <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className="hidden sm:inline">
+          <span className={learnerSurface ? '' : 'hidden sm:inline'}>
             {learnerSurface
-              ? 'Ask PARIS · Course help'
+              ? 'Need help?'
               : portalSurface
                 ? 'Ask PARIS · Portal help'
                 : 'Ask PARIS'}

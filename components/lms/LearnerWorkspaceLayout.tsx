@@ -35,7 +35,9 @@ export default async function LearnerWorkspaceLayout({
   const subjectRole = subject.previewing
     ? (await db.from('profiles').select('role').eq('id', subject.userId).maybeSingle()).data?.role
     : profile?.role;
-  const showBilling = (!isAdmin || subject.previewing) && await learnerCanSeeBilling(db, subject.userId, subjectRole);
+  const showBilling =
+    (!isAdmin || subject.previewing) &&
+    (await learnerCanSeeBilling(db, subject.userId, subjectRole));
 
   return (
     <PlatformShell
@@ -48,10 +50,14 @@ export default async function LearnerWorkspaceLayout({
         avatar_url: photoProfile?.avatar_url || undefined,
       }}
       role="student"
+      paris={{ autoOpenOnDashboard: false }}
     >
       {showLearnerNotices && !isAdmin && !photoProfile?.avatar_url ? (
         <div className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6">
-          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 sm:p-5">
+          <details className="rounded-xl border border-slate-200 bg-white p-3">
+            <summary className="cursor-pointer text-sm font-bold text-slate-700">
+              Profile reminder: add your photo
+            </summary>
             <p className="text-xs font-black uppercase tracking-[0.14em] text-amber-800">
               Required profile to-do
             </p>
@@ -72,16 +78,29 @@ export default async function LearnerWorkspaceLayout({
                 Upload profile photo
               </Link>
             </div>
-          </div>
+          </details>
         </div>
       ) : null}
       {showLearnerNotices && showBilling ? (
-        <section className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6" aria-label="Your payment plan">
-          <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-5">
+        <section
+          className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6"
+          aria-label="Your payment plan"
+        >
+          <details className="rounded-xl border border-slate-200 bg-white p-3">
+            <summary className="cursor-pointer text-sm font-bold text-slate-700">
+              Billing and payment plan
+            </summary>
             <h2 className="font-bold text-slate-950">Your payment plan</h2>
-            <p className="mt-1 text-sm text-slate-700">Review your invoices, balance, and approved payment plan.</p>
-            <Link href="/lms/payments" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 font-bold text-white">View billing</Link>
-          </div>
+            <p className="mt-1 text-sm text-slate-700">
+              Review your invoices, balance, and approved payment plan.
+            </p>
+            <Link
+              href="/lms/payments"
+              className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 font-bold text-white"
+            >
+              View billing
+            </Link>
+          </details>
         </section>
       ) : null}
       {children}

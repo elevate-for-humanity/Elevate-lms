@@ -16,12 +16,31 @@ function upsertSection(target: TenantSitePage | undefined, next: TenantSiteSecti
   else target.sections.push(next);
 }
 
-export function bridgeLegacyPatchIntoComposition(config: TenantSiteConfig, patch: Partial<TenantSiteConfig>): TenantSiteConfig {
+function changedLegacyFields(patch: Partial<TenantSiteConfig>, previous: TenantSiteConfig): Partial<TenantSiteConfig> {
+  const changed: Record<string, unknown> = { ...patch };
+  for (const key of ['homepage', 'contact'] as const) {
+    const incoming = patch[key];
+    if (!incoming) continue;
+    const before = previous[key] as unknown as Record<string, unknown> | undefined;
+    const fields = Object.fromEntries(Object.entries(incoming).filter(([field, value]) => JSON.stringify(value) !== JSON.stringify(before?.[field])));
+    if (Object.keys(fields).length) changed[key] = fields;
+    else delete changed[key];
+  }
+  for (const key of ['programs', 'products', 'testimonial'] as const) {
+    if (JSON.stringify(patch[key]) === JSON.stringify(previous[key])) delete changed[key];
+  }
+  return changed as Partial<TenantSiteConfig>;
+}
+
+export function bridgeLegacyPatchIntoComposition(config: TenantSiteConfig, patch: Partial<TenantSiteConfig>, previous?: TenantSiteConfig): TenantSiteConfig {
   const next = ensureComposableSiteConfig(config);
   // The page editor submits the complete canonical page model along with
   // retained legacy summaries. Those summaries must never overwrite the
   // approved pages during an ordinary save or publish.
   if (Array.isArray(patch.pages)) return next;
+  // Legacy settings forms may resend unchanged summaries. Only an actual
+  // field edit is authority to change a canonical page section.
+  if (previous) patch = changedLegacyFields(patch, previous);
   const pages = structuredClone(next.pages || []);
   const working: TenantSiteConfig = { ...next, pages };
 

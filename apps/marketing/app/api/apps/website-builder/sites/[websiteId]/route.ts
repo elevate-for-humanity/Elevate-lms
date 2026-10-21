@@ -71,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const base = buildDefaultSiteConfig({ organizationName: siteName });
   const existing = site.site_config && typeof site.site_config === 'object' ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>) : base;
   const configPatch = body.siteConfig && typeof body.siteConfig === 'object' ? body.siteConfig as Partial<TenantSiteConfig> : {};
-  const merged = bridgeLegacyPatchIntoComposition(mergeSiteConfig(existing, configPatch), configPatch);
+  const merged = bridgeLegacyPatchIntoComposition(mergeSiteConfig(existing, configPatch), configPatch, existing);
 
   // Verification state is server authority. Never trust claims embedded in a
   // browser-supplied site_config, even when the rest of the draft is editable.

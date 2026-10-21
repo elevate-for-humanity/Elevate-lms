@@ -26,6 +26,18 @@ test('legacy-only edits still update the existing page model',()=>{
   assert.equal(saved.pages[0].sections[0].content.title,'Explicit legacy edit');
   assert.equal(saved.pages[0].sections[1].content.items.length,5);
 });
+test('image settings do not resend unchanged legacy copy into canonical sections',()=>{
+  const previous=canonicalFixture();
+  previous.contact={email:'info@example.com',address:'Original address'};
+  previous.pages.push({id:'contact',slug:'/contact',title:'Contact',sections:[{id:'details',type:'rich_text',content:{text:'Approved contact copy'}}]});
+  const patch={homepage:{...previous.homepage,heroImage:'/authentic-founder.jpg'},contact:{...previous.contact},programs:[]};
+  const saved=bridgeModule.bridgeLegacyPatchIntoComposition({...previous,homepage:{...previous.homepage,...patch.homepage}},patch,previous);
+  assert.equal(saved.pages[0].sections[0].content.title,'Approved premium headline');
+  assert.equal(saved.pages[0].sections[0].content.image,'/authentic-founder.jpg');
+  assert.equal(saved.pages[0].sections[1].content.items.length,5);
+  assert.equal(saved.pages[1].sections[0].content.items.length,1);
+  assert.equal(saved.pages[2].sections[0].content.text,'Approved contact copy');
+});
 
 test('assessment, journal and event actions stay in the tenant preview', () => {
   const base = '/sites/legacy83-preview';

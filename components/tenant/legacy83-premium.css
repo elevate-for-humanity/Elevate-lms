@@ -1,5 +1,5 @@
 /* Legacy 83's repository-approved editorial direction, applied to editable sections. */
-.legacy83-premium .tenant-veteran-note{display:flex;align-items:center;gap:10px;font-size:13px!important;color:#e3bf72!important;letter-spacing:.02em}
+.legacy83-premium .tenant-hero .tenant-veteran-note{display:flex;align-items:center;gap:10px;font-size:13px!important;color:#e3bf72!important;letter-spacing:.02em}
 .tenant-veteran-note svg{flex:none;width:24px;height:24px;stroke:currentColor;fill:none}
 .legacy83-premium .tenant-introduction{margin-top:20px;max-width:480px;font-size:13px}
 .legacy83-premium .tenant-introduction button{padding:8px 0;border-bottom:1px solid #d7b46a;color:#e3bf72}
@@ -247,5 +247,5 @@
 .legacy83-premium .tenant-cards[data-variant=photographic-background] article>.tenant-card-image-strip,.legacy83-premium .tenant-cards[data-variant=photographic-background] article>img{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:cover;z-index:-2}
 .legacy83-premium .tenant-cards[data-variant=photographic-background] article:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#08251b12,#08251beb 70%);z-index:-1}
 .legacy83-premium .tenant-cards[data-variant=photographic-background] .tenant-card-body{position:relative;display:flex;align-items:flex-end;min-height:360px;height:100%;padding:30px}
-.legacy83-premium .tenant-cards[data-variant=photographic-background] h3,.legacy83-premium .tenant-cards[data-variant=photographic-background] p{color:white!important}
+.legacy83-premium .tenant-cards[data-variant=photographic-background] article h3,.legacy83-premium .tenant-cards[data-variant=photographic-background] article p{color:white!important}
 .legacy83-premium .tenant-cards[data-variant=photographic-background] .tenant-card-body a{background:#d7b46a!important;color:#123327!important}

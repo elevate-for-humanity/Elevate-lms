@@ -18,7 +18,7 @@ export async function getVoucherRoster() {
   }
   const [vouchers, funding] = await Promise.all([
     all('ita_vouchers', 'id,voucher_id,participant_name,user_id,enrollment_id,program_id,voucher_date,service_start_date,service_end_date,fund_stream,status,payments_to_date,comments'),
-    all('enrollment_funding_records', 'id,enrollment_id,learner_id,program_id,funding_source,status,notes'),
+    all('enrollment_funding_records', 'id,enrollment_id,learner_id,program_id,funding_source,status,notes,authorization_date'),
   ]);
   const enrollmentIds = [...new Set([...vouchers, ...funding].map(r => r.enrollment_id).filter(Boolean))];
   async function linked(table: string, fields: string, column: string, ids: string[]) {
@@ -46,7 +46,7 @@ export async function getVoucherRoster() {
   ]);
   const records = [
     ...vouchers.map(v => ({ ...v, source: v.fund_stream || 'ITA', evidence: v.comments, authorization: v.voucher_date, recordedPaid: Number(v.payments_to_date || 0) })),
-    ...funding.filter(f => !vouchers.some(v => v.enrollment_id === f.enrollment_id)).map(f => ({ ...f, user_id: f.learner_id, voucher_id: null, source: f.funding_source, evidence: f.notes, recordedPaid: null, authorization: null })),
+    ...funding.filter(f => !vouchers.some(v => v.enrollment_id === f.enrollment_id)).map(f => ({ ...f, user_id: f.learner_id, voucher_id: null, source: f.funding_source, evidence: f.notes, recordedPaid: null, authorization: f.authorization_date })),
   ];
   return records.map(record => {
     const candidates = enrollments.filter(e => record.enrollment_id ? e.id === record.enrollment_id : e.user_id === record.user_id && (!record.program_id || e.program_id === record.program_id));

@@ -164,8 +164,14 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     ].map((type) => ({
       id: `${e.competency.id}:activity:${type}`,
       type,
-      prompt: `Complete ${type.replace(/_/g, ' ')} for ${e.competency.title} using the lesson procedure and evidence.`,
-      feedback: `Compare the response with the authorized lesson content, correct any mismatch, and repeat until the objective is demonstrated.`,
+      prompt: ['knowledge_check', 'reassessment'].includes(type)
+        ? teaching.questions[type === 'reassessment' ? 1 : 0]?.question ||
+          stageText[type === 'reassessment' ? 'assessment' : type]
+        : stageText[type],
+      feedback: ['guided_practice', 'independent_practice'].includes(type) && teaching.practiceFeedback
+        ? teaching.practiceFeedback
+        : teaching.questions[type === 'reassessment' ? 1 : 0]?.explanation ||
+          `Compare the response with the authorized lesson content, correct any mismatch, and repeat until the objective is demonstrated.`,
       objectiveIds: [objectiveId],
     }));
     const question = (suffix: string, alternate = false) => {
@@ -199,6 +205,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     };
     const blueprint: LessonBlueprint = {
       competencyId: e.competency.id,
+      flashcards: teaching.flashcards,
       objectives: [{ id: objectiveId, text: competencyText, sourceRequirementIds: requirementIds }],
       prerequisites: {
         checks: [],
@@ -253,6 +260,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       script: segments.map((s) => s.text).join('\n\n'),
       segments,
       activities: b.activities,
+      flashcards: b.flashcards ?? [],
       mistakes: b.mistakes,
       assessment: b.assessment,
       blueprintHash: contractHash(b),

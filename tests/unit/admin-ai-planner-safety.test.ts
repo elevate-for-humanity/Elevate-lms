@@ -64,4 +64,24 @@ describe('Admin AI operational planner safety', () => {
     expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
     expect(plan.steps.some((step) => step.title === 'Execute approved deployment')).toBe(false);
   });
+
+  it.each([
+    'Fix Paris and Course Builder source code and add regression tests. Begin with a read-only baseline of provider health. Preserve completed lessons.',
+    'Fix Course Builder source code and workflow, inspect jobs and provider health, and add regression tests. Begin with a read-only baseline.',
+  ])('preserves a repair goal that begins with a read-only diagnostic phase: %s', (goal) => {
+    const plan = decomposePlan(goal);
+    expect(plan.steps[0]).toMatchObject({ title: 'Implement repository outcome', command: goal });
+    expect(planAIToolFromCommand(goal)?.name).toBe('studio.engineering.execute');
+  });
+
+  it('keeps incidental provider health words from replacing repository repair', () => {
+    const goal = 'Fix Course Builder source code, verify provider health, and add regression tests.';
+    expect(planAIToolFromCommand(goal)?.name).toBe('studio.engineering.execute');
+  });
+
+  it('preserves a global read-only constraint even with a diagnostic first phase', () => {
+    const goal = 'Read-only diagnostic: inspect provider health and source code. Begin with read-only checks. Do not modify or deploy.';
+    expect(decomposePlan(goal).steps[0]?.title).toBe('Studio provider health');
+    expect(planAIToolFromCommand(goal)?.name).toBe('devstudio.health');
+  });
 });

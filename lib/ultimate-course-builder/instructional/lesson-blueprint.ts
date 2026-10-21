@@ -4,6 +4,7 @@ import { contractHash } from '../core/lesson-contract';
 import { validateTeachingVisual, type TeachingVisual } from './teaching-visual';
 export interface LessonBlueprint {
   competencyId: string;
+  flashcards?: Array<{front: string; back: string}>;
   objectives: Array<{ id: string; text: string; sourceRequirementIds: string[] }>;
   prerequisites: {
     checks: Array<{ prompt: string; expectedAnswer: string }>;

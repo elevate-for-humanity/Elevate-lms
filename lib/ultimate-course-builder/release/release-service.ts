@@ -150,6 +150,7 @@ export class UltimateReleaseService {
           competencyId: l.competencyId,
           learning: l.content,
           experience: {
+            ...(l.content.flashcards?.length ? {flashcards: l.content.flashcards} : {}),
             knowledgeChecks: l.assessment.questions.map((q: any) => ({
               ...q,
               question: q.prompt,

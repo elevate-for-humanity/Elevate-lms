@@ -10,6 +10,7 @@
  */
 
 import { buildUnifiedEngineeringStages } from '@/lib/devstudio/engineering-runner/plan';
+import { isReadOnlyRequest } from '@/lib/ai/command-intent';
 
 export type StepStatus =
   | 'pending'
@@ -404,7 +405,7 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
   const g = goal.toLowerCase();
-  const explicitReadOnly = /\bread[- ]?only\b/.test(g);
+  const explicitReadOnly = isReadOnlyRequest(goal);
   const explicitReadOnlyStudioDiagnostic =
     explicitReadOnly &&
     /\b(studio|provider|router|tool(?:-response)?|platform|system|health|diagnostic)\b/.test(g);

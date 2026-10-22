@@ -298,6 +298,15 @@ export default async function ApprenticePortalPage() {
     totalLessons = lessonCountRes.count ?? 0;
     completedLessons = progressCountRes.count ?? 0;
   }
+  // Display recorded OJL progress without inventing a theory-unlock threshold.
+  // Access remains controlled by the existing server-side enrollment policy.
+  const { data: apprenticeHours } = await db
+    .from('apprentices')
+    .select('ojl_hours,hours_completed')
+    .eq('user_id', subject.userId)
+    .maybeSingle();
+  const recordedOjlHours = Math.max(0, Number(apprenticeHours?.ojl_hours ?? apprenticeHours?.hours_completed ?? 0) || 0);
+
   const digitalCoursePercent = totalLessons
     ? Math.min(100, Math.round((completedLessons / totalLessons) * 100))
     : 0;
@@ -589,6 +598,7 @@ export default async function ApprenticePortalPage() {
           syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'}
           completedLessons={completedLessons}
           totalLessons={totalLessons}
+          recordedOjlHours={recordedOjlHours}
         />
         {priorLearning ? (
           <PriorLearningPanel priorLearning={priorLearning} nativePercent={digitalCoursePercent} />
@@ -857,6 +867,7 @@ export default async function ApprenticePortalPage() {
         syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'}
         completedLessons={completedLessons}
         totalLessons={totalLessons}
+        recordedOjlHours={recordedOjlHours}
       />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -1078,12 +1089,14 @@ function TheorySchedulePanel({
   syllabusHref,
   completedLessons,
   totalLessons,
+  recordedOjlHours,
 }: {
   schedule: any;
   courseHref: string;
   syllabusHref: string;
   completedLessons: number;
   totalLessons: number;
+  recordedOjlHours: number;
 }) {
   if (!schedule)
     return (
@@ -1132,6 +1145,12 @@ function TheorySchedulePanel({
             <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You
             will receive automatic alerts when each scheduled block starts and stops.
           </p>
+          <div className="mt-4 rounded-xl border border-fuchsia-200 bg-white p-4 text-sm text-slate-800">
+            <p className="font-black">Theory schedule and eligibility</p>
+            <p className="mt-1">Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours.</p>
+            <p className="mt-1">Scheduled theory: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')} hours weekly, up to {(schedule.weekly_max_minutes / 60).toLocaleString('en-US')} hours weekly.</p>
+            <p className="mt-1">Any minimum work-hour requirement for unlocking theory must be confirmed by your program administrator. This dashboard does not impose an unverified hour threshold.</p>
+          </div>
           <p className="mt-2 text-sm font-semibold text-slate-700">
             Course progress: {completedLessons} of {totalLessons} published lessons complete.
           </p>

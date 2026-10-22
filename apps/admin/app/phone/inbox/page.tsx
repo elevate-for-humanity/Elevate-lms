@@ -13,6 +13,12 @@ function date(value?: string) {
     ? new Date(value).toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })
     : 'Not recorded';
 }
+function carrierLabel(item: any) {
+  const provider = String(item.provider || '').toLowerCase();
+  if (provider === 'telnyx') return 'Historical call · Telnyx (retired carrier)';
+  if (provider === 'twilio') return 'Twilio call';
+  return 'Carrier not identified';
+}
 function owner(item: any) {
   return item.extension
     ? `${item.extension.display_name || 'Assigned holder'} · extension ${item.extension.extension}`
@@ -96,6 +102,7 @@ export default async function PhoneInboxPage({
                   {date(item.started_at || item.created_at)} ET · {item.direction} ·{' '}
                   {holderCallOutcome(item)}
                 </p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{carrierLabel(item)}</p>
                 <p className="mt-1 font-semibold">Assigned: {owner(item)}</p>
                 <p className="text-slate-600">Call reference: {item.id}</p>
                 <p>Voicemail: {item.voicemails?.length ? 'Message saved' : 'No voicemail saved'}</p>

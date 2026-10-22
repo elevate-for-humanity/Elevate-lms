@@ -41,7 +41,7 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
     // the frozen-frame/assembly defect and causes expensive unchanged retries.
     if (f.code === 'Media quality gate failed') {
       const visual = /insufficient visual changes|repeats .* earlier moving sequence|backward timeline jump/i.test(f.message);
-      const assembly = /frozen interval|blank\\/black interval/i.test(f.message);
+      const assembly = /frozen interval|blank\/black interval/i.test(f.message);
       if (visual) targets.set('visual_assignment', [...(targets.get('visual_assignment') ?? []), f.code]);
       if (assembly) targets.set('lesson_film_render', [...(targets.get('lesson_film_render') ?? []), f.code]);
       if (!visual && !assembly) targets.set('finished_media_qa', [...(targets.get('finished_media_qa') ?? []), f.code]);

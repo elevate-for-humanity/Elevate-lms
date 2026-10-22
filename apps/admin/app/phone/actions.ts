@@ -180,6 +180,13 @@ export async function savePhoneSettings(
     if (aiEnabled && aiInstructions.length < 20) {
       return { ok: false, message: 'Give the AI receptionist clear operating instructions.' };
     }
+    // Asterisk currently records unanswered-call voicemail regardless of this
+    // database setting. The ingest API rejects recordings when disabled, which
+    // would discard callers' messages. Do not permit that unsafe mismatch until
+    // Admin settings are applied and acknowledged by the PBX itself.
+    if (!checked(formData, 'voicemailEnabled')) {
+      return { ok: false, message: 'Voicemail cannot be disabled from Admin until the live PBX confirms the change. No settings were saved.' };
+    }
     const recordingEnabled = checked(formData, 'callRecordingEnabled');
     const recordingDisclosure = String(formData.get('recordingDisclosure') ?? '').trim();
     if (recordingEnabled && !recordingDisclosure) {

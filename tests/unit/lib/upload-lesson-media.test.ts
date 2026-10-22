@@ -87,11 +87,11 @@ describe('upload-lesson-media routing', () => {
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
 
-  it('does not silently fall back to Supabase when B2 is explicitly required but delivery is missing', () => {
+  it('permits explicitly selected private B2 while keeping Supabase fallback disabled', () => {
     configureB2(false);
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'elevate-media';
-    expect(() => shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
-      .toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
+    expect(shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
+      .toBe(true);
   });
 
   it('routes private Backblaze B2 video without a public delivery URL', () => {

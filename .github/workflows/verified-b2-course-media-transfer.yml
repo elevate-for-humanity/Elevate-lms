@@ -25,8 +25,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-      - run: npm ci --ignore-scripts
+      - name: Enable pnpm from packageManager
+        run: corepack enable
+      - name: Install workspace dependencies using pnpm lockfile
+        run: corepack pnpm install --frozen-lockfile --ignore-scripts
       - name: Validate migration inputs and credentials
         env:
           INPUT_LIMIT: ${{ inputs.limit }}

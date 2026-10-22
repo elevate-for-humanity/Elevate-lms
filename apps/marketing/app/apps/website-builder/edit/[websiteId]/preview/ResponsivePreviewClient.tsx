@@ -11,13 +11,12 @@ import { TenantPreviewProvider } from '@/components/tenant/TenantPreviewContext'
 type Device = 'desktop' | 'tablet' | 'mobile';
 const widths: Record<Device, number> = { desktop: 1280, tablet: 768, mobile: 390 };
 
-export function ResponsivePreviewClient({ websiteId, siteName, config: initialConfig, pageSlug = '/', parisEnabled = false }: { websiteId: string; siteName: string; config: TenantSiteConfig; pageSlug?: string; parisEnabled?: boolean }) {
-  const [device, setDevice] = useState<Device>('desktop');
+export function ResponsivePreviewClient({ websiteId, siteName, config: initialConfig, pageSlug = '/', parisEnabled = false, initialDevice = 'desktop' }: { websiteId: string; siteName: string; config: TenantSiteConfig; pageSlug?: string; parisEnabled?: boolean; initialDevice?: Device }) {
+  const [device, setDevice] = useState<Device>(initialDevice);
   const config = useMemo(() => ensureComposableSiteConfig(initialConfig), [initialConfig]);
   const site = useMemo(() => ({ id: websiteId, subdomain: '', siteName, organizationId: null, config, parisEnabled }), [websiteId, siteName, config, parisEnabled]);
-  function navigate(slug: string) {
-    window.location.assign(`/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(slug)}`);
-  }
+  const reviewHref = (slug: string) => `/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(slug)}${device === 'desktop' ? '' : `&device=${device}`}`;
+  function navigate(slug: string) { window.location.assign(reviewHref(slug)); }
 
   return (
     <main className="min-h-screen bg-slate-100">
@@ -34,7 +33,7 @@ export function ResponsivePreviewClient({ websiteId, siteName, config: initialCo
           </div>
         </div>
         <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-4">
-          {(config.pages || []).map((page) => <a key={page.id} href={`/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(page.slug)}`} aria-current={pageSlug === page.slug ? 'page' : undefined} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${pageSlug === page.slug ? 'bg-brand-red-600 text-white' : 'border border-slate-300 bg-white text-slate-700'}`}>{page.title}</a>)}
+          {(config.pages || []).map((page) => <a key={page.id} href={reviewHref(page.slug)} aria-current={pageSlug === page.slug ? 'page' : undefined} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${pageSlug === page.slug ? 'bg-brand-red-600 text-white' : 'border border-slate-300 bg-white text-slate-700'}`}>{page.title}</a>)}
         </div>
       </header>
 

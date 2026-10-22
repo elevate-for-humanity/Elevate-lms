@@ -1,6 +1,6 @@
 /**
  * Resolve GITHUB_TOKEN for Dev Studio GitHub API routes.
- * Verify deployment credentials before falling back to canonical platform secrets.
+ * Prefer the rotating canonical credential and validate repository access.
  */
 
 import { currentWorkflowGitHubToken } from './workflow-github-context';
@@ -50,25 +50,23 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
 export async function getGitHubToken(): Promise<string | null> {
   const workflowToken=currentWorkflowGitHubToken();
   if(workflowToken)return workflowToken;
-  // Capture the deployment value before hydration. hydrateProcessEnv may load
-  // a canonical fallback into process.env, but must not replace a valid token
-  // supplied directly by the production service.
-  // Check the canonical rotating credential first. Never pin it in process.env.
-  const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
-  if (storedToken) return storedToken;
-  const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
-  if (deployedToken && await acceptedByGitHub(deployedToken)) return deployedToken;
-
-  const fromCanonicalStore = normalizeToken(
-    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
-  );
-  if (fromCanonicalStore && fromCanonicalStore !== deployedToken && await acceptedByGitHub(fromCanonicalStore)) {
-    return fromCanonicalStore;
+  // Read the rotating value on each request; never pin it in process.env.
+  let storedToken: string | null = null;
+  let storeUnavailable = false;
+  try {
+    storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  } catch {
+    storeUnavailable = true;
   }
-
-  if (deployedToken || fromCanonicalStore) {
+  const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
+  const candidates = [...new Set([storedToken, deployedToken].filter((token): token is string => Boolean(token)))];
+  for (const token of candidates) {
+    if (await acceptedByGitHub(token)) return token;
+  }
+  if (candidates.length) {
     throw new Error('GITHUB_TOKEN_REJECTED: Configured credentials were rejected for Elevate-lms. Reconnect an authorized credential in Dev Studio Secrets.');
   }
+  if (storeUnavailable) throw new Error('GITHUB_SECRET_STORE_UNAVAILABLE: Credential storage is temporarily unavailable.');
   return null;
 }
 

@@ -101,7 +101,7 @@ export function shouldUploadCourseMediaToElevateMedia(
     // configuration error, never permission to consume Supabase storage.
     const b2Selected =
       process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2' ||
-      /backblazeb2\\.com/i.test(process.env.ELEVATE_MEDIA_ENDPOINT ?? '');
+      /backblazeb2\.com/i.test(process.env.ELEVATE_MEDIA_ENDPOINT ?? '');
     if (backend === 'elevate-media' || (b2Selected && contentType.startsWith('video/')))
       throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
     return false;

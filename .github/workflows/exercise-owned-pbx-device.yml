@@ -16,6 +16,8 @@ on:
       - 'scripts/gcp/probe-operator-provisioning.py'
       - 'scripts/gcp/test-operator-provisioning.py'
       - 'scripts/gcp/audit-pbx-runtime.py'
+      - 'scripts/gcp/bind-pbx-control-runtime.mjs'
+      - 'scripts/gcp/bind-pbx-control-runtime.test.mjs'
 permissions:
   actions: write
   contents: read

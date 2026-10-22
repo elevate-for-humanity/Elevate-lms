@@ -58,6 +58,15 @@ function hasCronBearer(req: NextRequest): boolean {
   return Boolean(cronSecret && req.headers.get('authorization') === `Bearer ${cronSecret}`);
 }
 
+// These exact processors use scheduler credentials in their own handlers.
+// A valid scheduler request must reach them without an administrator cookie.
+const INTERNAL_WORKFLOW_CRON_PATHS = new Set([
+  '/api/internal/ai-operator',
+  '/api/internal/workflow-event-processor',
+  '/api/internal/workflow-schedule-processor',
+  '/api/internal/orchestration/process',
+]);
+
 function requiredRoles(pathname: string): readonly UserRole[] {
   const isStudio =
     pathname === '/studio' ||
@@ -167,6 +176,10 @@ export async function middleware(req: NextRequest) {
   // Scheduled social publishing has no browser session. Admit only the exact
   // route with the scheduler secret; the route handler verifies it again.
   if (pathname === '/api/internal/social-media/process' && hasCronBearer(req)) {
+    return NextResponse.next();
+  }
+
+  if (req.method === 'POST' && INTERNAL_WORKFLOW_CRON_PATHS.has(pathname) && hasCronBearer(req)) {
     return NextResponse.next();
   }
 

@@ -430,6 +430,7 @@ export async function executeWorkflow(
   traceId?: string,
   tenantId?: string,
   studioContext?: { runId?: string; stepId?: string },
+  executionContext?: { platformEventId?: string },
 ): Promise<{ runId: string; status: RunStatus; stepsRun: number; error?: string }> {
   const runStart = Date.now();
   const db = await requireAdminClient();
@@ -467,6 +468,7 @@ export async function executeWorkflow(
       steps_done: 0,
       retry_count: 0,
       started_at: new Date().toISOString(),
+      ...(executionContext?.platformEventId ? { platform_event_id: executionContext.platformEventId } : {}),
       ...(tenantId ? { tenant_id: tenantId } : {}),
     })
     .select('id')

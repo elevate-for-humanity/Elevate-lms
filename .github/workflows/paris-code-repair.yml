@@ -54,9 +54,11 @@ jobs:
           headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}
           preflight=urllib.request.Request(endpoint,data=json.dumps({'phase':'auth-diagnostic'}).encode(),headers=headers)
           capability=json.load(urllib.request.urlopen(preflight,timeout=60))
-          if capability.get('workflowAuthorization')!='temporary-job-v1':
+          if capability.get('workflowAuthorization')!='temporary-job-v1' or capability.get('diagnosticVersion')!=2:
             print('Repair monitor deferred until the compatible Admin runtime is deployed.')
             raise SystemExit(0)
+          if not all(capability.get(key,{}).get('ok') is True for key in ['repository','contents','workflow']):
+            raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
           req=urllib.request.Request(endpoint,data=json.dumps({'phase':'tick'}).encode(),headers=headers)
           try:
             result=json.load(urllib.request.urlopen(req,timeout=120))
@@ -146,7 +148,7 @@ jobs:
           for line in changes:
             status,path=line.split('\t',1)
             if status not in ['A','M'] or not re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path): raise SystemExit('Repair outside application scope')
-            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|paris-code-engineer|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
+            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|paris-code-engineer|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
             if path.startswith('tests/'):
               if status!='A': raise SystemExit('Existing tests must remain unchanged')
               if re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)

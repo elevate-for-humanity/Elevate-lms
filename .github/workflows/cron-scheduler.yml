@@ -186,6 +186,15 @@ jobs:
             if echo "$body" | grep -q '"processed":0'; then break; fi
           done
 
+      - name: Queue scheduled workflow triggers
+        id: workflow_schedules
+        continue-on-error: true
+        run: |
+          curl -sf -X POST "$ADMIN_URL/api/internal/workflow-schedule-processor" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 55 || { echo "::error::workflow-schedule-processor HTTP request failed"; exit 1; }
+
       - name: Dispatch platform events to workflow engine
         id: workflow_events
         continue-on-error: true
@@ -194,15 +203,6 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 55 || { echo "::error::workflow-event-processor HTTP request failed"; exit 1; }
-
-      - name: Fire scheduled workflow triggers
-        id: workflow_schedules
-        continue-on-error: true
-        run: |
-          curl -sf -X POST "$ADMIN_URL/api/internal/workflow-schedule-processor" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 55 || { echo "::error::workflow-schedule-processor HTTP request failed"; exit 1; }
 
       - name: AI operator triage
         id: ai_operator

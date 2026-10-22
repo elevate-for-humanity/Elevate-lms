@@ -19,7 +19,7 @@ jobs:
   transfer:
     runs-on: ubuntu-latest
     timeout-minutes: 50
-    environment: production-media-migration
+    environment: production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,13 +33,13 @@ jobs:
         env:
           INPUT_LIMIT: ${{ inputs.limit }}
           INPUT_SKIP: ${{ inputs.skip }}
-          SUPABASE_URL: ${{ secrets.MIGRATION_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
-          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.MIGRATION_B2_ENDPOINT }}
-          ELEVATE_MEDIA_REGION: ${{ secrets.MIGRATION_B2_REGION }}
-          ELEVATE_MEDIA_BUCKET: ${{ secrets.MIGRATION_B2_BUCKET }}
-          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.MIGRATION_B2_KEY_ID }}
-          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.MIGRATION_B2_APP_KEY }}
+          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
+          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
+          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
+          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
+          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
+          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
         run: |
           node --input-type=module -e '
             const n=Number(process.env.INPUT_LIMIT),s=Number(process.env.INPUT_SKIP);
@@ -52,11 +52,11 @@ jobs:
         env:
           MIGRATION_LIMIT: ${{ inputs.limit }}
           MIGRATION_SKIP: ${{ inputs.skip }}
-          SUPABASE_URL: ${{ secrets.MIGRATION_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
-          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.MIGRATION_B2_ENDPOINT }}
-          ELEVATE_MEDIA_REGION: ${{ secrets.MIGRATION_B2_REGION }}
-          ELEVATE_MEDIA_BUCKET: ${{ secrets.MIGRATION_B2_BUCKET }}
-          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.MIGRATION_B2_KEY_ID }}
-          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.MIGRATION_B2_APP_KEY }}
+          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
+          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
+          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
+          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
+          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
+          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
         run: node scripts/gcp/migrate-course-media-to-b2.mjs

@@ -47,11 +47,11 @@ def delegated_operator_configured(operator_output, target_output):
     """
     if not operator_output or not target_output:
         return False
-    match = re.search(r"^\\s*'0'\\s*=>\\s*1\\.\\s*Gosub\\(elevate-pwa-extensions,([1-9][0-9]{2}),1\\)", operator_output, re.M)
+    match = re.search(r"^\s*'0'\s*=>\s*1\.\s*Gosub\(elevate-pwa-extensions,([1-9][0-9]{2}),1\)", operator_output, re.M)
     if not match or 'Return(' not in operator_output:
         return False
     extension = match.group(1)
-    expected = r"^\\s*'" + extension + r"'\\s*=>\\s*1\\.\\s*Set\\(PWA_CONTACTS=\\)"
+    expected = r"^\s*'" + extension + r"'\s*=>\s*1\.\s*Set\(PWA_CONTACTS=\)"
     if not re.search(expected, target_output, re.M):
         return False
     normalized = re.sub(expected, "'0' => 1. Set(PWA_CONTACTS=)", target_output, count=1, flags=re.M)

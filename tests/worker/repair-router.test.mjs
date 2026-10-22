@@ -56,3 +56,10 @@ test('freeze-only routes to render while replay-only routes to visual assignment
  assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'frozen interval 5.4s'}]).map(x=>x.step),['lesson_film_render']);
  assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'repeats 6 earlier moving sequence(s)'}]).map(x=>x.step),['visual_assignment']);
 });
+
+test('storage capacity failures are operational blockers and never trigger unchanged rerenders', () => {
+ const finding={code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:Cannot upload files, storage cap exceeded. See the Caps & Alerts page to increase your cap.'};
+ assert.equal(isDurableExternalBlocker(finding),true);
+ assert.deepEqual(routeSelectiveRepairs([finding]),[]);
+ assert.equal(isDurableExternalBlocker({code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}),false);
+});

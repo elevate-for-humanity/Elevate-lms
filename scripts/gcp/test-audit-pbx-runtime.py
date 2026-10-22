@@ -13,6 +13,18 @@ class RuntimeEvidence(unittest.TestCase):
         self.assertFalse(pbx.pwa_operator_configured("[ Context 'elevate-pwa-extensions' ]\n '_X.' => 1. Set(PWA_CONTACTS=)\nReturn()"))
         self.assertFalse(pbx.pwa_operator_configured("[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\nReturn()"))
         self.assertTrue(pbx.pwa_operator_configured("[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\nSet(DIALSTATUS=CHANUNAVAIL)\nReturn()"))
+    def test_operator_generated_live_contact_resolution(self):
+        endpoint = 'pwa-' + 'a' * 40
+        plan = (
+            "[ Context 'elevate-pwa-extensions' ]\\n"
+            " '0' => 1. Set(PWA_CONTACTS=)\\n"
+            " 2. ExecIf($[1]?Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(" + endpoint + ")}))\\n"
+            " 3. Dial(${PWA_CONTACTS},20)\\n"
+            " 4. Return()"
+        )
+        self.assertTrue(pbx.pwa_operator_configured(plan))
+        self.assertFalse(pbx.pwa_operator_configured(plan.replace('Dial(${PWA_CONTACTS},20)', 'NoOp(no ring)')))
+
     def test_carrier_inventory_excludes_identity_and_credentials(self):
         report = pbx.carrier_inventory('Transport: transport-udp udp 0 0 0.0.0.0:5060\nTransport: secure tls 0 0 0.0.0.0:5061\npassword=private',
                                       ' Endpoint: twilio/123456 Not in use\n Endpoint: pwa-private Not in use\n Endpoint: telnyx Not in use')

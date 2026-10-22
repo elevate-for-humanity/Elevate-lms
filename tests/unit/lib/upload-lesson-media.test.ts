@@ -94,6 +94,12 @@ describe('upload-lesson-media routing', () => {
       .toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
   });
 
+  it('fails closed when Backblaze is selected but delivery is missing', () => {
+    configureB2(false);
+    expect(() => shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
+      .toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
+  });
+
   it('auto sends large mp4 to Backblaze B2 when configured for public delivery', () => {
     configureB2(true);
     const buf = Buffer.alloc(6 * 1024 * 1024);

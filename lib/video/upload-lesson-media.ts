@@ -97,7 +97,13 @@ export function shouldUploadCourseMediaToElevateMedia(
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
   if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
-    if (backend === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
+    // When an operator selected Backblaze, missing credentials or delivery is a
+    // configuration error, never permission to consume Supabase storage.
+    const b2Selected =
+      process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2' ||
+      /backblazeb2\.com/i.test(process.env.ELEVATE_MEDIA_ENDPOINT ?? '');
+    if (backend === 'elevate-media' || (b2Selected && contentType.startsWith('video/')))
+      throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
     return false;
   }
 
@@ -237,7 +243,9 @@ export async function uploadCourseVideosObject(
       // The ordinary request ceiling does not apply to the TUS route below.
       // Keep the completed bytes and let Storage enforce its actual object
       // limit instead of rejecting a valid film before a chunked upload.
-      if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED', { cause: err });
+      if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
+          process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
+        throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED', { cause: err });
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }
@@ -288,7 +296,9 @@ export async function uploadLessonFileFromDisk(
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
     const result = await ownerPreviewMediaDelivery(await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
     if (result.success && result.url) url = result.url;
-    else if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
+    else if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
+             process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
+      throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');
   }
   if (!url && ext === 'mp4' && size > SUPABASE_TUS_CHUNK_BYTES) {

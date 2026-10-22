@@ -1106,13 +1106,13 @@ function TheorySchedulePanel({
     );
   };
   return (
-    <section className="rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm sm:p-8">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+    <section className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-4 shadow-sm sm:p-8">
+      <div className="flex min-w-0 flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">
             Your weekly theory plan
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-950">{days}</h2>
+          <h2 className="mt-2 break-words text-2xl font-black text-slate-950">{days}</h2>
           <p className="mt-2 font-bold text-slate-800">
             {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>

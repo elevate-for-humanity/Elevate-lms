@@ -41,3 +41,9 @@ it('uses real authenticated page URLs in the private review page selector', () =
     expectDocumentNavigation(link);
   }
 });
+
+it('retains the selected mobile viewport across document page navigation', () => {
+  render(<ResponsivePreviewClient websiteId="existing" siteName="Legacy 83 Business" config={config} initialDevice="mobile" />);
+  expect(screen.getByTitle('Legacy 83 Business mobile preview')).toHaveStyle({ width: '390px' });
+  expect(screen.getByRole('link', { name: 'Services', exact: true })).toHaveAttribute('href', '/apps/website-builder/edit/existing/preview?page=%2Fservices&device=mobile');
+});

@@ -64,7 +64,7 @@ describe('nine saved Legacy 83 pages', () => {
     }
     fireEvent.click(screen.getByRole('button', { name: 'Mobile' }));
     expect(frame.style.width).toBe('390px');
-    expect(screen.getByRole('link', { name: 'About', current: 'page' })).toHaveAttribute('href', '/apps/website-builder/edit/existing/preview?page=%2Fabout');
+    expect(screen.getByRole('link', { name: 'About', current: 'page' })).toHaveAttribute('href', '/apps/website-builder/edit/existing/preview?page=%2Fabout&device=mobile');
   });
   it('preserves private destinations for copied links, anchors and query strings', () => {
     const base = '/apps/website-builder/edit/existing/preview?page=';

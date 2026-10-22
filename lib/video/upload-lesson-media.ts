@@ -77,7 +77,9 @@ export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   if (raw === 'supabase' || raw === 'auto') return raw;
   // Legacy "r2" and provider-oriented values map to the Elevate Media backend.
   if (raw === 'elevate-media' || raw === 'object' || raw === 's3' || raw === 'b2' || raw === 'r2') return 'elevate-media';
-  return 'auto';
+  // Invalid explicit modes must never silently reroute production media to
+  // Supabase: a typo can exhaust its storage cap while appearing successful.
+  throw new Error('COURSE_VIDEO_STORAGE_BACKEND_INVALID');
 }
 
 export function isAnyElevateMediaStorageConfigured(): boolean {
@@ -286,7 +288,7 @@ export async function uploadLessonFileFromDisk(
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
     const result = await ownerPreviewMediaDelivery(await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
     if (result.success && result.url) url = result.url;
-    else if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED');
+    else if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');
   }
   if (!url && ext === 'mp4' && size > SUPABASE_TUS_CHUNK_BYTES) {

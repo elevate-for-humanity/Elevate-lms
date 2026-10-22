@@ -199,10 +199,21 @@ jobs:
         id: workflow_events
         continue-on-error: true
         run: |
-          curl -sf -X POST "$ADMIN_URL/api/internal/workflow-event-processor" \
+          # Capture only the HTTP status, never response bodies or credentials.
+          # curl -f alone hides the status behind a generic failure message.
+          http_status="$(curl --silent --show-error --max-time 55 \
+            --output /dev/null --write-out '%{http_code}' \
+            -X POST "$ADMIN_URL/api/internal/workflow-event-processor" \
             -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 55 || { echo "::error::workflow-event-processor HTTP request failed"; exit 1; }
+            -H "Content-Type: application/json")" || {
+            echo "::error::workflow-event-processor transport failure (HTTP ${http_status:-000})"
+            exit 1
+          }
+          echo "workflow-event-processor HTTP $http_status"
+          if [ "$http_status" != 200 ]; then
+            echo "::error::workflow-event-processor returned HTTP $http_status"
+            exit 1
+          fi
 
       - name: AI operator triage
         id: ai_operator

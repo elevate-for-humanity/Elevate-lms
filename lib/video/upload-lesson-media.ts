@@ -96,7 +96,10 @@ export function shouldUploadCourseMediaToElevateMedia(
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
-  if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
+  // Private B2 does not require public bucket access. Owner previews use
+  // signed reads; uploads only require the S3 endpoint, bucket and credentials.
+  const privateB2 = process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2';
+  if (!isElevateMediaStorageConfigured() || (!privateB2 && !isElevateMediaPublicDeliveryConfigured())) {
     // When an operator selected Backblaze, missing credentials or delivery is a
     // configuration error, never permission to consume Supabase storage.
     const b2Selected =
@@ -219,6 +222,8 @@ async function uploadCourseVideosToElevateMedia(
 ): Promise<string> {
   const key = elevateMediaKeyForStoragePath(storagePath);
   const result = await ownerPreviewMediaDelivery(await uploadToElevateMedia(buffer, key, contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
+  // A signed URL is suitable only for a temporary owner preview. Persistent
+  // publication must store the B2 object key and mint URLs on authorized reads.
   if (!result.success || !result.url) {
     throw new Error(result.error ?? `Elevate Media Storage upload failed for ${key}`);
   }

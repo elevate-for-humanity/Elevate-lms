@@ -59,6 +59,7 @@ export interface MediaQualityEvidence {
   repeatedVisualMaximum: number;
   backwardTimelineJumpDetected: boolean;
   repeatedTemporalSequenceCount: number;
+  temporalReplayMatches?: Array<{priorStartSeconds:number;replayStartSeconds:number;durationSeconds:number}>;
   requiredProcedurePhases: string[];
   deliveredProcedurePhases: string[];
   sourceEvidenceCoverage: number;
@@ -185,7 +186,7 @@ function frameDifference(a: Buffer, b: Buffer): number {
 async function detectBackwardTimelineReplay(
   videoPath: string,
   workDir: string,
-): Promise<{ backwardTimelineJumpDetected: boolean; repeatedTemporalSequenceCount: number }> {
+): Promise<{ backwardTimelineJumpDetected: boolean; repeatedTemporalSequenceCount: number; temporalReplayMatches: Array<{priorStartSeconds:number;replayStartSeconds:number;durationSeconds:number}> }> {
   const width = 32;
   const height = 18;
   const frameSize = width * height;
@@ -214,7 +215,7 @@ async function detectBackwardTimelineReplay(
     frames.push(raw.subarray(offset, offset + frameSize));
   }
   if (frames.length < 12) {
-    return { backwardTimelineJumpDetected: false, repeatedTemporalSequenceCount: 0 };
+    return { backwardTimelineJumpDetected: false, repeatedTemporalSequenceCount: 0, temporalReplayMatches: [] };
   }
 
   const sequenceLength = 4;
@@ -222,6 +223,7 @@ async function detectBackwardTimelineReplay(
   const similarityThreshold = 3.5;
   const minimumMotion = 4;
   let repeatedTemporalSequenceCount = 0;
+  const temporalReplayMatches: Array<{priorStartSeconds:number;replayStartSeconds:number;durationSeconds:number}> = [];
 
   for (let current = minimumGap; current <= frames.length - sequenceLength; current += 1) {
     for (let prior = 0; prior <= current - minimumGap; prior += 1) {
@@ -241,6 +243,10 @@ async function detectBackwardTimelineReplay(
       if (motion < minimumMotion) continue;
 
       repeatedTemporalSequenceCount += 1;
+      // Keep exact one-frame-per-second locations for source-timeline comparison.
+      // These matches indicate visual similarity; they do not by themselves
+      // establish the root cause of a backwards timebase jump.
+      temporalReplayMatches.push({priorStartSeconds:prior,replayStartSeconds:current,durationSeconds:sequenceLength});
       current += sequenceLength - 1;
       break;
     }
@@ -249,6 +255,7 @@ async function detectBackwardTimelineReplay(
   return {
     backwardTimelineJumpDetected: repeatedTemporalSequenceCount > 0,
     repeatedTemporalSequenceCount,
+    temporalReplayMatches,
   };
 }
 
@@ -678,6 +685,7 @@ export async function enforceMediaQuality(input: {
       repeatedVisualMaximum: Math.max(0, ...counts.values()),
       backwardTimelineJumpDetected: temporalReplay.backwardTimelineJumpDetected,
       repeatedTemporalSequenceCount: temporalReplay.repeatedTemporalSequenceCount,
+      temporalReplayMatches: temporalReplay.temporalReplayMatches,
       requiredProcedurePhases,
       deliveredProcedurePhases,
       sourceEvidenceCoverage: input.sceneData.scenes.length

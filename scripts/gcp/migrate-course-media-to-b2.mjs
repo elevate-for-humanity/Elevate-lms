@@ -14,7 +14,6 @@ import {pipeline} from 'node:stream/promises';
 import {S3Client,PutObjectCommand,GetObjectCommand,HeadObjectCommand} from '@aws-sdk/client-s3';
 
 const BUCKETS=['course-videos','course_videos'];
-const required=(name)=>{const value=process.env[name]?.trim();if(!value)throw Error('Missing '+name);return value;};
 const safePath=(name)=>name.split('/').every(part=>part&&part!=='.'&&part!=='..')&&!name.includes('\\');
 async function digestStream(stream){
  const hash=createHash('sha256');let size=0;
@@ -32,7 +31,9 @@ export async function migrate({request=fetch,env=process.env,client,limit=Number
  });
  if(!Number.isSafeInteger(limit)||limit<1||limit>1000)throw Error('MIGRATION_LIMIT must be 1..1000');
  const auth={apikey:token,Authorization:'Bearer '+token};
- let examined=0,copied=0,verified=0;
+ const skip=Number(env.MIGRATION_SKIP||'0');
+ if(!Number.isSafeInteger(skip)||skip<0)throw Error('MIGRATION_SKIP must be >=0');
+ let visited=0,examined=0,copied=0,verified=0;
  for(const bucket of BUCKETS){
   // The Storage list API returns virtual folders. Descend only after the
   // parent is fully paged; offsets are local to each directory.
@@ -52,7 +53,9 @@ export async function migrate({request=fetch,env=process.env,client,limit=Number
      const name=prefix+item.name;
      if(!safePath(name))throw Error('UNSAFE_STORAGE_KEY');
      if(!item.id){stack.push(name+'/');continue;}
-     if(examined++>=limit)break;
+     if(visited++<skip)continue;
+     if(examined>=limit)break;
+     examined++;
      const key=bucket+'/'+name;
      const resource=source+'/storage/v1/object/authenticated/'+encodeURIComponent(bucket)+'/'+name.split('/').map(encodeURIComponent).join('/');
      const temp=await mkdtemp(join(tmpdir(),'course-media-migrate-'));const file=join(temp,'object');
@@ -85,7 +88,7 @@ export async function migrate({request=fetch,env=process.env,client,limit=Number
    }
   }
  }
- return {examined,copied,verified,complete:false,deleted:0};
+ return {skip,examined,copied,verified,nextSkip:skip+examined,complete:false,deleted:0};
 }
 function requiredFrom(env,key){const v=env[key]?.trim();if(!v)throw Error('MISSING_'+key);return v;}
 if(import.meta.url==='file://'+process.argv[1]){

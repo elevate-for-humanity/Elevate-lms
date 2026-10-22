@@ -26,10 +26,10 @@ class RuntimeEvidence(unittest.TestCase):
         self.assertFalse(pbx.pwa_operator_configured(plan.replace('Dial(${PWA_CONTACTS},20)', 'NoOp(no ring)')))
 
     def test_delegated_operator_requires_verified_destination(self):
-        alias = "[ Context 'elevate-pwa-extensions' ]\\n '0' => 1. Gosub(elevate-pwa-extensions,104,1)\\n 2. Return()"
-        target = ("[ Context 'elevate-pwa-extensions' ]\\n '104' => 1. Set(PWA_CONTACTS=)\\n"
-                  " 2. ExecIf($[1]?Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(pwa-" + 'a'*40 + ")}))\\n"
-                  " 3. Dial(${PWA_CONTACTS},25)\\n 4. Return()")
+        alias = "[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Gosub(elevate-pwa-extensions,104,1)\n 2. Return()"
+        target = ("[ Context 'elevate-pwa-extensions' ]\n '104' => 1. Set(PWA_CONTACTS=)\n"
+                  " 2. ExecIf($[1]?Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(pwa-" + 'a'*40 + ")}))\n"
+                  " 3. Dial(${PWA_CONTACTS},25)\n 4. Return()")
         self.assertTrue(pbx.delegated_operator_configured(alias, target))
         self.assertFalse(pbx.delegated_operator_configured(alias, None))
         self.assertFalse(pbx.delegated_operator_configured(alias, target.replace("'104'", "'105'")))

@@ -14,11 +14,13 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-type Props = { params: Promise<{ websiteId: string }>; searchParams: Promise<{ page?: string }> };
+type Props = { params: Promise<{ websiteId: string }>; searchParams: Promise<{ page?: string; device?: string }> };
 
 export default async function WebsiteResponsivePreviewPage({ params, searchParams }: Props) {
   const { websiteId } = await params;
-  const pageSlug = normalizePageSlug((await searchParams).page || '/');
+  const query = await searchParams;
+  const pageSlug = normalizePageSlug(query.page || '/');
+  const initialDevice = query.device === 'mobile' || query.device === 'tablet' ? query.device : 'desktop';
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=${encodeURIComponent(`/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(pageSlug)}`)}`);
@@ -45,5 +47,5 @@ export default async function WebsiteResponsivePreviewPage({ params, searchParam
   const composed = ensureComposableSiteConfig(config);
   if (!composed.pages?.some((page) => page.slug === pageSlug)) notFound();
   const { data: workspace } = await admin.from('website_paris_workspaces').select('enabled').eq('website_id', site.id).maybeSingle();
-  return <ResponsivePreviewClient websiteId={site.id} siteName={siteName} config={await loadPublishedOfferings(composed)} pageSlug={pageSlug} parisEnabled={workspace?.enabled === true} />;
+  return <ResponsivePreviewClient websiteId={site.id} siteName={siteName} config={await loadPublishedOfferings(composed)} pageSlug={pageSlug} parisEnabled={workspace?.enabled === true} initialDevice={initialDevice} />;
 }

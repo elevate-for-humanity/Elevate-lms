@@ -111,9 +111,10 @@ export async function enqueueDueWorkflowSchedules(db: any, now = new Date(), sec
       const matches = parseWorkflowCron(trigger.cron_expr);
       const version = definitionVersion(trigger, workflow);
       const cursorKey = `workflow:schedule:cursor:${trigger.id}`;
-      let { data: cursor, error: cursorError } = await db.from('platform_events')
+      const { data: savedCursor, error: cursorError } = await db.from('platform_events')
         .select('id,payload').eq('idempotency_key', cursorKey).maybeSingle();
       if (cursorError) throw cursorError;
+      let cursor = savedCursor;
       let previous = nowMinute - MINUTE;
       if (!cursor) {
         // Persist the start of the first observation window, not its end.

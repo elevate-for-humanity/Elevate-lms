@@ -132,9 +132,19 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       .single();
     if (error) throw error;
     const findings = Array.isArray(data?.findings) ? data.findings : [];
+    // Repeated repairs must not append the same unresolved finding on each pass.
+    // Keep distinct errors and their evidence; never mark a failed QA gate as passed.
+    const key = (finding: any) => JSON.stringify([
+      finding?.step ?? null,
+      finding?.code ?? null,
+      finding?.message ?? null,
+      finding?.severity ?? null,
+    ]);
+    const unique = [...new Map([...findings, input.finding].map((finding: any) => [key(finding), finding])).values()];
+    if (unique.length === findings.length && findings.some((finding: any) => key(finding) === key(input.finding))) return;
     const { error: e } = await this.db
       .from('ultimate_course_builds')
-      .update({ findings: [...findings, input.finding], updated_at: new Date().toISOString() })
+      .update({ findings: unique, updated_at: new Date().toISOString() })
       .eq('id', input.buildId);
     if (e) throw e;
   }

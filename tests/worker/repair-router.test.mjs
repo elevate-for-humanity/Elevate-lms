@@ -42,3 +42,17 @@ test('ffmpeg assembly failures stay at render stage', () => {
  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'FFmpeg output missing'}];
  assert.equal(routeSelectiveRepairs(findings)[0].step,'lesson_film_render');
 });
+
+
+test('combined freeze and backward replay repair both media assembly and visuals', () => {
+ const findings=[{code:'Media quality gate failed',message:'Media quality gate failed: frozen interval 5.40s exceeds 4s; rendered video repeats 6 earlier moving sequence(s), indicating a backward timeline jump or replay'}];
+ assert.deepEqual(routeSelectiveRepairs(findings),[
+  {step:'visual_assignment',codes:['Media quality gate failed'],rebuildOnlyThisStage:true},
+  {step:'lesson_film_render',codes:['Media quality gate failed'],rebuildOnlyThisStage:true},
+ ]);
+});
+
+test('freeze-only routes to render while replay-only routes to visual assignment', () => {
+ assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'frozen interval 5.4s'}]).map(x=>x.step),['lesson_film_render']);
+ assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'repeats 6 earlier moving sequence(s)'}]).map(x=>x.step),['visual_assignment']);
+});

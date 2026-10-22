@@ -36,9 +36,18 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
   for (const f of findings) {
     if (isDurableExternalBlocker(f)) continue;
     const renderInputFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/.test(f.message);
-    const target = renderInputFailure ? 'synchronization' : f.code === 'Media quality gate failed'
-      ? (/insufficient visual changes|repeats .* earlier moving sequence|backward timeline jump/i.test(f.message) ? 'visual_assignment' : /frozen interval|blank\/black interval/i.test(f.message) ? 'lesson_film_render' : 'finished_media_qa')
-      : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    // The finished-film gate can report two *independent* defects in one
+    // finding. Route both; choosing visual_assignment alone for a replay masks
+    // the frozen-frame/assembly defect and causes expensive unchanged retries.
+    if (f.code === 'Media quality gate failed') {
+      const visual = /insufficient visual changes|repeats .* earlier moving sequence|backward timeline jump/i.test(f.message);
+      const assembly = /frozen interval|blank\/black interval/i.test(f.message);
+      if (visual) targets.set('visual_assignment', [...(targets.get('visual_assignment') ?? []), f.code]);
+      if (assembly) targets.set('lesson_film_render', [...(targets.get('lesson_film_render') ?? []), f.code]);
+      if (!visual && !assembly) targets.set('finished_media_qa', [...(targets.get('finished_media_qa') ?? []), f.code]);
+      continue;
+    }
+    const target = renderInputFailure ? 'synchronization' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

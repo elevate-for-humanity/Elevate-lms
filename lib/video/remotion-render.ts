@@ -16,6 +16,7 @@ import 'server-only';
 
 import path from 'path';
 import {createHash} from 'node:crypto';
+import { videoEncoderArgs } from './ffmpeg-runtime';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
@@ -1099,7 +1100,7 @@ export async function renderStoryboardVideo(
         // Frame-range chunks have independent timebases. Normalize timestamps
         // and re-encode to prevent replay at segment boundaries.
         '-fflags', '+genpts',
-        '-c:v', 'libx264', '-preset', 'fast', '-crf', '20',
+        ...videoEncoderArgs(20),
         '-r', String(composition.fps), '-fps_mode', 'cfr',
         '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',
         '-movflags', '+faststart',

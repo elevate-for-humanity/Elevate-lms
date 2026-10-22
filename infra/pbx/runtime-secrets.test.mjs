@@ -23,3 +23,13 @@ test('foreign secret project and unknown role fail before any network request',a
 test('denied secret access never returns credential values or raw provider errors',async()=>{
   await assert.rejects(loadRoleSecrets('gateway',{environment,request:async url=>({ok:url.includes('computeMetadata'),json:async()=>({access_token:'test-token',error:{message:'private provider detail'}})})}),/^Error: PBX_SECRET_ACCESS_DENIED$/);
 });
+test('owned phone inference loads its dedicated model secret only for the turn role',async()=>{
+ const configured={...environment,PARIS_PHONE_INFERENCE_PROVIDER:'owned',PARIS_PHONE_LLM_SECRET_REF:root+'elevate-paris-phone-model/versions/1'};
+ const seen=[];
+ const request=async url=>{seen.push(url);return {ok:true,json:async()=>url.includes('computeMetadata')?{access_token:'test-token'}:{payload:{data:Buffer.from('test-model-secret'.repeat(3)).toString('base64')}}};};
+ const turn=await loadRoleSecrets('turn',{environment:configured,request});
+ assert.equal(typeof turn.PARIS_PHONE_LLM_SECRET,'string');assert.equal(seen.length,3);
+ seen.length=0;const gateway=await loadRoleSecrets('gateway',{environment:configured,request});
+ assert.equal(gateway.PARIS_PHONE_LLM_SECRET,undefined);assert.equal(seen.some(url=>url.includes('phone-model')),false);
+ await assert.rejects(loadRoleSecrets('turn',{environment:{...environment,PARIS_PHONE_INFERENCE_PROVIDER:'owned'},request:async()=>assert.fail('must validate before fetching')}),/REFERENCE_INVALID/);
+});

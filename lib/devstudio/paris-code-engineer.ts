@@ -183,12 +183,11 @@ async function searchCode(query: string) {
     // Search has an independent GitHub rate limit. Let the repair planner
     // continue with known-file reads instead of consuming another inference
     // turn retrying an unavailable search endpoint.
+    // Code search is optional discovery. Private repository installations may
+    // authorize Contents while denying Search (403). In that case use the
+    // already supported list/read path instead of failing the repair.
     if (response.status === 403 || response.status === 429) {
-      const remaining = response.headers.get('x-ratelimit-remaining');
-      const message = String(payload?.message ?? '').toLowerCase();
-      if (response.status === 429 || remaining === '0' || message.includes('rate limit') || message.includes('try again')) {
-        return [];
-      }
+      return [];
     }
     throw new Error(`GitHub code search failed: ${response.status}`);
   }

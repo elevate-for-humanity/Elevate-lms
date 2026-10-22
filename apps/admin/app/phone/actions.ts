@@ -221,7 +221,7 @@ export async function savePhoneSettings(
       .eq('id', id);
     if (error) return { ok: false, message: error.message };
     revalidatePath('/phone');
-    return { ok: true, message: 'Phone settings saved in Admin. Live PBX routing, voicemail delivery, and caller ID must be verified separately.' };
+    return { ok: true, message: 'Phone preferences saved to the database only; live PBX greetings, hours, routing and voicemail have NOT been applied or verified. Existing live phone configuration remains unchanged.' };
   } catch (error) {
     return failure(error, 'Unable to save phone settings.');
   }

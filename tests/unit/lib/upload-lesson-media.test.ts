@@ -94,8 +94,15 @@ describe('upload-lesson-media routing', () => {
       .toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
   });
 
-  it('fails closed when Backblaze is selected but delivery is missing', () => {
+  it('routes private Backblaze B2 video without a public delivery URL', () => {
     configureB2(false);
+    expect(shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
+      .toBe(true);
+  });
+
+  it('fails closed if selected Backblaze credentials are missing', () => {
+    configureB2(false);
+    delete process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY;
     expect(() => shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
       .toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
   });

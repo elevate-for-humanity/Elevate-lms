@@ -62,6 +62,11 @@ describe('upload-lesson-media routing', () => {
     expect(resolveCourseVideoStorageBackend()).toBe('auto');
   });
 
+  it('rejects misspelled explicit storage backend instead of silently routing to Supabase', () => {
+    process.env.COURSE_VIDEO_STORAGE_BACKEND = 'elevate-medai';
+    expect(() => resolveCourseVideoStorageBackend()).toThrow('COURSE_VIDEO_STORAGE_BACKEND_INVALID');
+  });
+
   it('maps legacy r2 backend selection to the Elevate Media backend', () => {
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'r2';
     expect(resolveCourseVideoStorageBackend()).toBe('elevate-media');

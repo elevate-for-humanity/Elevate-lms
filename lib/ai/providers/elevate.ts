@@ -93,6 +93,7 @@ export class ElevateProvider implements AIProvider {
     if (!base || !token) throw new Error('Elevate LLM worker not configured (ELEVATE_LLM_URL / ELEVATE_LLM_SECRET)');
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
+      redirect: 'error',
       headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
@@ -156,6 +157,7 @@ export class ElevateProvider implements AIProvider {
 
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
+      redirect: 'error',
       headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,

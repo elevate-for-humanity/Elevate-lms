@@ -16,10 +16,10 @@ class RuntimeEvidence(unittest.TestCase):
     def test_operator_generated_live_contact_resolution(self):
         endpoint = 'pwa-' + 'a' * 40
         plan = (
-            "[ Context 'elevate-pwa-extensions' ]\\n"
-            " '0' => 1. Set(PWA_CONTACTS=)\\n"
-            " 2. ExecIf($[1]?Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(" + endpoint + ")}))\\n"
-            " 3. Dial(${PWA_CONTACTS},20)\\n"
+            "[ Context 'elevate-pwa-extensions' ]\n"
+            " '0' => 1. Set(PWA_CONTACTS=)\n"
+            " 2. ExecIf($[1]?Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(" + endpoint + ")}))\n"
+            " 3. Dial(${PWA_CONTACTS},20)\n"
             " 4. Return()"
         )
         self.assertTrue(pbx.pwa_operator_configured(plan))

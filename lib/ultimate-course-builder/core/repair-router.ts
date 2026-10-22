@@ -28,6 +28,11 @@ const PREFIX_ROUTES: Array<[RegExp, UltimateBuildStep]> = [
 const DURABLE_EXTERNAL_BLOCKERS = /^(TEACHING_PHOTO_REPLACEMENT_REQUIRED|TEACHING_PHOTO_REPAIR_UNCHANGED|LICENSE_APPROVAL_REQUIRED|MEDIA_LICENSE_REQUIRED|MEDIA_SOURCE_APPROVAL_REQUIRED|PAID_INFERENCE_AUTHORIZATION_REQUIRED|BROWSER_AUTHORIZATION_REQUIRED|ULTIMATE_INSTRUCTIONAL_SOURCES_REQUIRED|ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|ULTIMATE_AUTHORING_SOURCE_GAP|ULTIMATE_GOOGLE_MODEL_REQUIRED|ULTIMATE_GOOGLE_PROJECT_REQUIRED|ULTIMATE_GOOGLE_SERVICE_IDENTITY_UNAVAILABLE|ULTIMATE_GOOGLE_AUTHORING_HTTP_(?:401|403|404))$/;
 
 export function isDurableExternalBlocker(finding: UltimateInstructionalFinding) {
+  // Storage account limits are operational restrictions, not render defects.
+  // Rebuilding the same approved video cannot raise the account's quota.
+  // Preserve checkpoints and require a configured, writable delivery backend.
+  if (finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+      /storage cap exceeded|quota exceeded|storage quota exceeded|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED|COURSE_OBJECT_STORAGE_UPLOAD_FAILED/i.test(finding.message)) return true;
   return DURABLE_EXTERNAL_BLOCKERS.test(finding.code);
 }
 

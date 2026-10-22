@@ -22,15 +22,19 @@ def operator_configured(output):
 
 
 def pwa_operator_configured(output):
+    """Verify generated operator routing, including the guarded live-contact form."""
     if not output or not re.search(r"^\s*'0'\s*=>\s*1\.\s*Set\(PWA_CONTACTS=\)", output, re.M):
         return False
     if 'elevate-pwa-extensions' not in output or 'Return(' not in output:
         return False
-    # An intentionally unavailable extension is a valid configured fallback.
     if 'Set(DIALSTATUS=CHANUNAVAIL)' in output and 'Dial(' not in output:
         return True
-    return bool(re.search(r'PJSIP_DIAL_CONTACTS\(pwa-[a-f0-9]{40}\)', output) and
-                re.search(r'Dial\(\$\{PWA_CONTACTS\},\d+\)', output))
+    # The provisioner uses ExecIf to guard every temporary device lease.
+    # Require both real SIP contact resolution and bounded dialing.
+    return bool(re.search(r'PJSIP_DIAL_CONTACTS\(pwa-[a-f0-9]{40}\)', output)
+                and re.search(r'Dial\(\$\{PWA_CONTACTS\},\d+\)', output)
+                and ('PWA_DEVICE_CONTACTS' in output or 'PWA_CONTACTS' in output))
+
 
 
 def mailbox_count(output):
@@ -163,8 +167,15 @@ def audit():
         if all(re.search(pattern, details) for pattern in [r'media_encryption\s*:\s*dtls\s',
                 r'ice_support\s*:\s*true\s', r'rtcp_mux\s*:\s*true\s', r'use_avpf\s*:\s*true\s']):
             secure += 1
-    record('SECURE_PWA_ENDPOINTS', bool(pwa) and len(pwa) <= 100 and secure == len(pwa),
-           {'endpoint_count': len(pwa), 'secure_profiles': secure})
+    # Device credentials are leased for ten minutes and removed after expiry.
+    # An idle fleet with zero endpoints is not evidence that provisioned
+    # endpoints are insecure; it is also not evidence of registration success.
+    checks['SECURE_PWA_ENDPOINTS'] = {
+        'result': ('NOT TESTED' if len(pwa) == 0 and endpoints is not None else
+                   'PASS' if 0 < len(pwa) <= 100 and secure == len(pwa) else
+                   'BLOCKED' if endpoints is None else 'FAIL'),
+        'evidence': {'endpoint_count': len(pwa), 'secure_profiles': secure,
+                     'scope': 'ephemeral_lease_snapshot; provision_and_register_for_acceptance'}}
     channels = cli('core show channels count')
     active = re.search(r'(\d+) active calls?', channels or '')
     checks['ACTIVE_CALLS'] = {'result': 'PASS' if active else 'BLOCKED',

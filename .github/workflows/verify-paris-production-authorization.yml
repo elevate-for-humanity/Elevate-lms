@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
   id-token: write
 concurrency:
   group: paris-production-readonly-verification
@@ -81,13 +82,15 @@ jobs:
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
       - name: Verify PARIS GitHub credential via protected read-only diagnostic
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
           import os,json,urllib.request,urllib.error,sys
           secret=os.environ.get('PARIS_ID_TOKEN','')
           if not secret: raise SystemExit('PARIS_WORKFLOW_IDENTITY_UNAVAILABLE')
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
-          req=urllib.request.Request(endpoint,data=b'{"phase":"auth-diagnostic"}',headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
+          req=urllib.request.Request(endpoint,data=b'{"phase":"auth-diagnostic"}',headers={'Authorization':'Bearer '+secret,'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
           try:
             with urllib.request.urlopen(req,timeout=30) as response:
               body=json.load(response)
@@ -96,10 +99,11 @@ jobs:
             # Never print upstream error response text or request credentials.
             print(json.dumps({'type':'paris_diagnostic','httpStatus':e.code,'ok':False}))
             raise SystemExit('PARIS_DIAGNOSTIC_HTTP_FAILURE')
-          identity=body.get('identity',{})
           repo=body.get('repository',{})
-          safe={'type':'paris_diagnostic','identity_status':identity.get('status'),'identity_ok':identity.get('ok') is True,'repo_status':repo.get('status'),'repo_ok':repo.get('ok') is True,'contents_write':repo.get('permissions',{}).get('contentsWrite') is True}
+          contents=body.get('contents',{})
+          workflow=body.get('workflow',{})
+          safe={'type':'paris_diagnostic','diagnostic_version':body.get('diagnosticVersion'),'repo_status':repo.get('status'),'repo_ok':repo.get('ok') is True,'contents_ok':contents.get('ok') is True,'workflow_ok':workflow.get('ok') is True,'write_authority':'not_exercised'}
           print(json.dumps(safe))
-          if not safe['identity_ok'] or not safe['repo_ok'] or not safe['contents_write']:
-            raise SystemExit('PARIS_GITHUB_CREDENTIAL_NOT_ACCEPTED_OR_INSUFFICIENT_CONTENTS_ACCESS')
+          if safe['diagnostic_version']!=2 or not safe['repo_ok'] or not safe['contents_ok'] or not safe['workflow_ok']:
+            raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
           PY

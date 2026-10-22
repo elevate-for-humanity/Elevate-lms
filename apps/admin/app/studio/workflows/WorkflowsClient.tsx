@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import WorkflowRepairReview from '@/components/paris/WorkflowRepairReview';
 import {
   Workflow, RefreshCw, Plus, Play, Pause, Activity, CheckCircle, XCircle,
   Clock, RotateCcw, AlertTriangle, Zap, Bot, ChevronRight,
@@ -247,6 +248,8 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
       {header}
 
       <div className={`flex-1 overflow-y-auto ${embedded ? 'px-4 py-6' : 'max-w-6xl mx-auto px-6 py-8 w-full'}`}>
+
+        <WorkflowRepairReview embedded={embedded} />
 
         {/* Create form */}
         {showCreateForm && (

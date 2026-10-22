@@ -1,10 +1,10 @@
 'use client';
 
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { X, MessageCircle, Mic } from 'lucide-react';
 import type { ParisLearnerContext } from './ParisFloatingWrapper';
-import { PARIS_PORTAL_ISSUE_EVENT, type PortalSupportIssue } from '@/lib/paris/portal-support';
+import { PARIS_PORTAL_ISSUE_EVENT, reportPortalWorkflowIssue, type PortalIssueReceipt, type PortalSupportIssue } from '@/lib/paris/portal-support';
 
 const ParisChat = lazy(() => import('./ParisChat'));
 
@@ -20,10 +20,18 @@ export function ParisFloatingButton({
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [portalIssue, setPortalIssue] = useState<PortalSupportIssue | null>(null);
+  const [issueReceipt, setIssueReceipt] = useState<PortalIssueReceipt | null>(null);
+  const reportingSequence = useRef(0);
   const pathname = usePathname();
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
+  const reportIssue = useCallback(async (issue: PortalSupportIssue) => {
+    const sequence = ++reportingSequence.current;
+    setIssueReceipt({status: 'reporting'});
+    const receipt = await reportPortalWorkflowIssue(issue);
+    if (reportingSequence.current === sequence) setIssueReceipt(receipt);
+  }, []);
   const learnerSurface = surface === 'learner';
   const portalSurface = surface === 'portal';
   const assistantLabel = learnerSurface
@@ -53,16 +61,11 @@ export function ParisFloatingButton({
       if (!issue?.workflow || !issue.message) return;
       setPortalIssue(issue);
       if (!learnerSurface) setIsOpen(true);
-      void fetch('/api/paris/workflow-incident', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(issue),
-      }).catch(() => undefined);
+      void reportIssue(issue);
     };
     window.addEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
     return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
-  }, [learnerSurface]);
+  }, [learnerSurface, reportIssue]);
 
   useEffect(() => {
     setShowWelcome(false);
@@ -139,6 +142,23 @@ export function ParisFloatingButton({
                 <span className="hidden min-[380px]:inline">Close</span>
               </button>
             </div>
+
+            {portalIssue && issueReceipt && (
+              <div role="status" aria-live="polite" className="shrink-0 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
+                {issueReceipt.status === 'reporting' && <p>Reporting the workflow issue…</p>}
+                {issueReceipt.status === 'reported' && (
+                  <p>Issue reported for diagnostic review. Reference: {issueReceipt.incidentId}. A repair has not been verified yet.</p>
+                )}
+                {issueReceipt.status === 'failed' && (
+                  <>
+                    <p>{issueReceipt.httpStatus === 401 ? 'Sign in again to report this issue.' : 'This issue could not be reported.'} Your message is still here.</p>
+                    <button type="button" onClick={() => void reportIssue(portalIssue)} className="mt-2 rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold">
+                      Retry report
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             <div className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden">
               <Suspense

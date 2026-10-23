@@ -1096,6 +1096,7 @@ export default function UnifiedEllieChat({
             [...messages.map(({ role, content }) => ({ role, content })), userMsg],
             {
               agent: 'ADMIN_AI',
+              conversationId: canonicalConversationId,
               fileContext,
               documentsContext: attachment?.context,
               provider: selectedProvider === 'auto' ? undefined : selectedProvider,

@@ -175,6 +175,32 @@ function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'
   );
 }
 
+/** Parse FFmpeg event stream sequentially; EOF freezes remain evidence. */
+export function parseFreezeIntervals(output: string, durationSeconds: number): Array<{start:number;end:number}> {
+  const events = [...output.matchAll(/freeze_(start|end):\s*([0-9]+(?:\.[0-9]+)?)/g)];
+  const intervals: Array<{start:number;end:number}> = [];
+  let start: number | null = null;
+  for (const match of events) {
+    const time = Number(match[2]);
+    if (!Number.isFinite(time) || time < 0 || time > durationSeconds + 0.25)
+      throw new Error('MEDIA_FREEZE_TIMESTAMP_INVALID');
+    if (match[1] === 'start') {
+      if (start !== null) throw new Error('MEDIA_FREEZE_OVERLAPPING_STARTS');
+      start = time;
+    } else {
+      if (start === null || time < start) throw new Error('MEDIA_FREEZE_END_WITHOUT_START');
+      intervals.push({start,end:time});
+      start = null;
+    }
+  }
+  if (start !== null) {
+    if (!Number.isFinite(durationSeconds) || durationSeconds < start)
+      throw new Error('MEDIA_FREEZE_UNCLOSED_INVALID_DURATION');
+    intervals.push({start,end:durationSeconds});
+  }
+  return intervals;
+}
+
 function frameDifference(a: Buffer, b: Buffer): number {
   const length = Math.min(a.length, b.length);
   if (!length) return Number.POSITIVE_INFINITY;
@@ -566,8 +592,7 @@ export async function enforceMediaQuality(input: {
       slideStarts.push({start:slideCursor,end:slideCursor+duration,staticSlide});
       slideCursor += duration;
     }
-    const freezeIntervals = [...String(freezeOutput).matchAll(/freeze_start:\s*([0-9.]+)[\s\S]*?freeze_end:\s*([0-9.]+)/g)]
-      .map(m => ({start:Number(m[1]),end:Number(m[2])}));
+    const freezeIntervals = parseFreezeIntervals(String(freezeOutput), actualDurationSeconds);
     const unexplainedFreezes = freezeIntervals.filter(interval =>
       !slideStarts.some(scene => scene.staticSlide &&
         interval.start >= scene.start + 0.1 && interval.end <= scene.end - 0.1));

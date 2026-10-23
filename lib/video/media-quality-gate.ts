@@ -566,7 +566,7 @@ export async function enforceMediaQuality(input: {
       slideStarts.push({start:slideCursor,end:slideCursor+duration,staticSlide});
       slideCursor += duration;
     }
-    const freezeIntervals = [...String(freezeOutput).matchAll(/freeze_start:\\s*([0-9.]+)[\\s\\S]*?freeze_end:\\s*([0-9.]+)/g)]
+    const freezeIntervals = [...String(freezeOutput).matchAll(/freeze_start:\s*([0-9.]+)[\s\S]*?freeze_end:\s*([0-9.]+)/g)]
       .map(m => ({start:Number(m[1]),end:Number(m[2])}));
     const unexplainedFreezes = freezeIntervals.filter(interval =>
       !slideStarts.some(scene => scene.staticSlide &&

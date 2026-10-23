@@ -1136,11 +1136,13 @@ export async function renderStoryboardVideo(
       Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
+      {forceSupabase: checkpointFallbackUsed},
     );
     const transcriptUrl = await uploadCourseVideosObject(
       Buffer.from(scenes.map((scene) => scene.narration).join('\n\n'), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.txt`,
       'text/plain',
+      {forceSupabase: checkpointFallbackUsed},
     );
     resolvedStoryboard.captionUrl = captionUrl;
     (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;

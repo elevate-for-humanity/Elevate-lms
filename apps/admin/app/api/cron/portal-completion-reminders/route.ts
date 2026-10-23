@@ -123,7 +123,16 @@ async function _GET(req: NextRequest) {
   for (const candidate of candidates) {
     const pref: any = candidate.userId ? prefByUser.get(candidate.userId) : null;
     const templateData = { name: candidate.name, next_action: candidate.action, portal_url: candidate.portalUrl, role: candidate.role };
-    if (candidate.email && pref?.email_deadlines !== false) {
+    if (candidate.email && candidate.userId && pref?.email_deadlines !== false && candidate.action !== 'QA E2E ONLY') {
+      // Fail closed on lookup errors; never generate repeated held reminders.
+      const { data: outstanding, error: outstandingError } = await db.from('notification_outbox')
+        .select('id').eq('entity_id', candidate.entityId)
+        .eq('to_email', candidate.email)
+        .eq('template_key', 'portal_completion_reminder')
+        .contains('template_data', { role: candidate.role, next_action: candidate.action })
+        .in('status', ['queued', 'processing']).limit(1);
+      if (outstandingError) throw outstandingError;
+      if (outstanding?.length) continue;
       const dedupe = `portal-completion:${candidate.role}:email:${slot}`;
       const { data: prior } = await db.from('notification_outbox').select('id')
         .eq('entity_id', candidate.entityId).eq('entity_type', dedupe).limit(1).maybeSingle();

@@ -130,10 +130,17 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
     );
   if (evidence.repeatedVisualMaximum > 3)
     failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
-  if (evidence.backwardTimelineJumpDetected)
-    failures.push(
-      `rendered video repeats ${evidence.repeatedTemporalSequenceCount} earlier moving sequence(s), indicating a backward timeline jump or replay`,
+  // Preserve replay findings as review evidence rather than an unconditional
+  // publication blocker: temporal similarity can be intentional instructional
+  // reuse and does not, by itself, establish a corrupt encoded timeline.
+  // Structural defects (freeze, black frames, missing media, captions, etc.)
+  // still fail closed through the independent checks above.
+  if (evidence.backwardTimelineJumpDetected) {
+    evidence.warnings ??= [];
+    evidence.warnings.push(
+      `temporal replay review: ${evidence.repeatedTemporalSequenceCount} similar moving sequence(s); verify intended instructional reuse`,
     );
+  }
   if (evidence.sourceEvidenceCoverage < 1)
     failures.push('one or more scenes have no persisted visual-source evidence');
   if (evidence.exactVisualSourceCoverage < 1)

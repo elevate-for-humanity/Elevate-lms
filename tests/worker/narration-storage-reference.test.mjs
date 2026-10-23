@@ -62,6 +62,8 @@ test('foreign buckets, lookalike hosts, unsafe paths and credentials never sign 
     virtual.replace('course-videos/', 'private/'),
     virtual.replace('lesson-test.mp4', '%2e%2e%2fprivate.mp4'),
     virtual.replace('lesson-test.mp4', 'bad%5cfile.mp4'),
+    virtual.replace('lesson-test.mp4', 'bad%00file.mp4'),
+    virtual.replace('lesson-test.mp4', 'bad%7ffile.mp4'),
     virtual.replace('https://', 'http://'),
     virtual.replace('https://', 'https://user:password@'),
   ]) await assert.rejects(analyze(value), /NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL/);

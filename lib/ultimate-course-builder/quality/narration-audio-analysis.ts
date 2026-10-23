@@ -128,7 +128,7 @@ function assertTrustedNarrationUrl(audioUrl: string): { url: URL; mediaKey?: str
   catch { throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL'); }
   if (!mediaKey.startsWith('course-videos/') || !mediaKey.slice('course-videos/'.length) ||
       mediaKey.split('/').some(part => part === '.' || part === '..' || !part) ||
-      /[\u0000-\u001f\u007f\\]/.test(mediaKey)) {
+      [...mediaKey].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127 || character === '\\')) {
     throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
   }
   return { url, mediaKey };

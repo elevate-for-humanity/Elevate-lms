@@ -125,7 +125,7 @@ async function _GET(req: NextRequest) {
     const pref: any = candidate.userId ? prefByUser.get(candidate.userId) : null;
     const templateData = { name: candidate.name, next_action: candidate.action, portal_url: candidate.portalUrl, role: candidate.role };
     if (candidate.action === 'QA E2E ONLY') continue;
-    if (candidate.email && candidate.userId && pref?.email_deadlines !== false && ) {
+    if (candidate.email && candidate.userId && pref?.email_deadlines !== false) {
       // Fail closed on lookup errors; never generate repeated held reminders.
       const { data: outstanding, error: outstandingError } = await db.from('notification_outbox')
         .select('id').eq('entity_id', candidate.entityId)

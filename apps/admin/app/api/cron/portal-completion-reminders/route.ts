@@ -132,7 +132,7 @@ async function _GET(req: NextRequest) {
         .contains('template_data', { role: candidate.role, next_action: candidate.action })
         .in('status', ['queued', 'processing']).limit(1);
       if (outstandingError) throw outstandingError;
-      if (outstanding?.length) continue;
+      if (!outstanding?.length) {
       const dedupe = `portal-completion:${candidate.role}:email:${slot}`;
       const { data: prior } = await db.from('notification_outbox').select('id')
         .eq('entity_id', candidate.entityId).eq('entity_type', dedupe).limit(1).maybeSingle();
@@ -144,6 +144,7 @@ async function _GET(req: NextRequest) {
           entity_type: dedupe, entity_id: candidate.entityId,
         });
         if (!error) emailQueued++;
+      }
       }
     }
     const smsPhone = pref?.sms_phone || candidate.phone;

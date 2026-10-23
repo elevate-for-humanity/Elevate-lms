@@ -7,8 +7,8 @@ const source = stripTypeScriptTypes(
   readFileSync(new URL('../../lib/ultimate-course-builder/core/repair-router.ts', import.meta.url), 'utf8'),
   { mode: 'transform' },
 ).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm, '').replaceAll('export ', '');
-const { isDurableExternalBlocker, routeSelectiveRepairs } =
-  new Function(source + '\nreturn { isDurableExternalBlocker, routeSelectiveRepairs };')();
+const { isDurableExternalBlocker, routeSelectiveRepairs, requiresIndependentMediaDelivery, COURSE_RECOVERY_CONTRACT_VERSION } =
+  new Function(source + '\nreturn { isDurableExternalBlocker, routeSelectiveRepairs, requiresIndependentMediaDelivery, COURSE_RECOVERY_CONTRACT_VERSION };')();
 
 test('unchanged producer output is an internal repair failure, not an external blocker', () => {
   assert.equal(isDurableExternalBlocker({ code: 'REPAIR_PRODUCER_UNCHANGED' }), false);
@@ -62,4 +62,13 @@ test('storage capacity failures are operational blockers and never trigger uncha
  assert.equal(isDurableExternalBlocker(finding),true);
  assert.deepEqual(routeSelectiveRepairs([finding]),[]);
  assert.equal(isDurableExternalBlocker({code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}),false);
+});
+
+test('recovery v2 classifies VTT storage failure as delivery-only, never rerender', () => {
+  assert.equal(COURSE_RECOVERY_CONTRACT_VERSION, 'course-recovery-v2');
+  const failedVtt = {code:'ULTIMATE_VIDEO_RENDER_FAILED', message:'ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:lesson-3.vtt'};
+  assert.equal(requiresIndependentMediaDelivery(failedVtt), true);
+  assert.equal(isDurableExternalBlocker(failedVtt), true);
+  assert.deepEqual(routeSelectiveRepairs([failedVtt]), []);
+  assert.equal(requiresIndependentMediaDelivery({code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}), false);
 });

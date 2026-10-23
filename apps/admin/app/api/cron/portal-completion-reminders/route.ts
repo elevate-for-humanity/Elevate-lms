@@ -35,6 +35,9 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
     const userId = enrollment.user_id || enrollment.student_id;
     const profile: any = learnerById.get(userId);
     if (!profile) continue;
+    // A privileged account can have an enrollment for testing or administration.
+    // Never address learner-completion reminders to staff/admin accounts.
+    if (!['student', 'learner', 'apprentice'].includes(String(profile.role || '').toLowerCase())) continue;
     const incomplete = !profile.onboarding_completed || !enrollment.orientation_completed_at ||
       !enrollment.documents_completed_at || enrollment.agreement_signed !== true || Boolean(enrollment.next_required_action);
     if (!incomplete) continue;

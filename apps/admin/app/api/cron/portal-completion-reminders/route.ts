@@ -72,9 +72,15 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
       userId: membership?.user_id || null,
       role: 'host_shop',
       name: partner.shop_name || partner.name || profile?.full_name || 'Host Shop',
-      // The approved partner contact is the authoritative organizational destination.\n      // A member profile may belong to a different individual or former shop contact.\n      email: partner.contact_email || null,
+      // The approved partner contact is the authoritative organizational destination.
+      // A member profile may belong to a different individual or former shop contact.
+      email: partner.contact_email || null,
       phone: profile?.phone || partner.contact_phone || partner.phone || null,
-      action: [\n        ...(partner.mou_signed !== true ? ['sign the host shop agreement'] : []),\n        ...(partner.documents_verified !== true ? ['submit documents for verification'] : []),\n        ...(partner.onboarding_completed !== true ? [String(partner.onboarding_step || 'complete host shop onboarding').replaceAll('_', ' ')] : []),\n      ].join('; '),
+      action: [
+        ...(partner.mou_signed !== true ? ['sign the host shop agreement'] : []),
+        ...(partner.documents_verified !== true ? ['submit documents for verification'] : []),
+        ...(partner.onboarding_completed !== true ? [String(partner.onboarding_step || 'complete host shop onboarding').replaceAll('_', ' ')] : []),
+      ].join('; '),
       portalUrl: `${APP_URL}/host-shop/dashboard`,
     });
   }

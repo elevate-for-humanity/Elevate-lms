@@ -112,7 +112,7 @@ async function policyFixture(run) {
       await mkdir(dirname(path), { recursive: true });
       await writeFile(path, 'FROM node:22 AS builder\nRUN install util-linux\n');
       if (dockerfile === 'Dockerfile.ultimate-worker') {
-        await writeFile(path, 'FROM node:22 AS builder\nRUN install util-linux\nCOPY tests/worker/narration-storage-reference.test.mjs ./tests/worker/\n'.replace(/\\n/g, '\\n'));
+        await writeFile(path, 'FROM node:22 AS builder\nRUN install util-linux\nCOPY tests/worker/narration-storage-reference.test.mjs ./tests/worker/\n');
       }
     }
     for (const profile of Object.values(containerBuildPolicy)) {
@@ -181,8 +181,8 @@ test('alternate future container builders cannot silently bypass admission', asy
 
 test('worker regression must remain included by the Docker context', async () => {
   await policyFixture(async root => {
-    await writeFile(join(root, '.dockerignore'), 'tests\\n');
-    await assert.rejects(checkBuildMemoryPolicy(root), /Worker image fixture excluded by \\.dockerignore/);
+    await writeFile(join(root, '.dockerignore'), 'tests\n');
+    await assert.rejects(checkBuildMemoryPolicy(root), /Worker image fixture excluded by \.dockerignore/);
   });
 });
 

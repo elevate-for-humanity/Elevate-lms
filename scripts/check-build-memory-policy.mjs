@@ -6,6 +6,22 @@ import { containerBuildPolicy, validateContainerProfiles } from './container-bui
 
 export async function checkBuildMemoryPolicy(root, { sourceOnly = false } = {}) {
   validateContainerProfiles(containerBuildPolicy, path => existsSync(join(root, path)));
+
+  // Worker image tests are excluded by default to keep the production Docker
+  // context minimal. Reject COPY of a test that .dockerignore still filters
+  // out; this must fail at preflight instead of during a protected GCP build.
+  const workerDocker = readFileSync(join(root, 'Dockerfile.ultimate-worker'), 'utf8');
+  const dockerIgnore = readFileSync(join(root, '.dockerignore'), 'utf8')
+    .split(/\r?\n/).map(line => line.trim());
+  for (const match of workerDocker.matchAll(/^COPY\s+(tests\/worker\/[^\s]+)\s+\.\/tests\/worker\/\s*$/gm)) {
+    const fixture = match[1];
+    if (!existsSync(join(root, fixture))) throw new Error(`Worker image regression fixture missing: ${fixture}`);
+    if (dockerIgnore.lastIndexOf('!tests') <= dockerIgnore.lastIndexOf('tests') ||
+        dockerIgnore.lastIndexOf('!tests/worker') <= dockerIgnore.lastIndexOf('tests/*') ||
+        dockerIgnore.lastIndexOf(`!${fixture}`) <= dockerIgnore.lastIndexOf('tests/worker/*')) {
+      throw new Error(`Worker image fixture excluded by .dockerignore: ${fixture}`);
+    }
+  }
   const configs = [join(root, 'next.config.mjs')];
   const apps = [];
   const workflows = join(root, '.github/workflows');

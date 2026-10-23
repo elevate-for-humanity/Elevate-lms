@@ -86,12 +86,29 @@ function requiredNumber(output: string, pattern: RegExp, label: string): number 
 
 function assertTrustedNarrationUrl(audioUrl: string): URL {
   const url = new URL(audioUrl);
-  const configuredBase = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  if (!configuredBase) throw new Error('NARRATION_ANALYSIS_SUPABASE_URL_REQUIRED');
-  const storageOrigin = new URL(configuredBase).origin;
-  if (url.origin !== storageOrigin || !url.pathname.startsWith('/storage/v1/object/')) {
+  if (url.protocol !== 'https:' || url.username || url.password || url.port) {
     throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
   }
+  const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const mediaEndpoint = (process.env.ELEVATE_MEDIA_ENDPOINT || process.env.S3_ENDPOINT || '').trim();
+  const mediaPublic = (process.env.ELEVATE_MEDIA_PUBLIC_URL || process.env.NEXT_PUBLIC_ELEVATE_MEDIA_URL || process.env.S3_PUBLIC_URL || '').trim();
+  const candidates = [supabase, mediaEndpoint, mediaPublic].filter(Boolean) as string[];
+  const authorized = candidates.some((base) => {
+    let trusted: URL;
+    try { trusted = new URL(base); } catch { return false; }
+    if (trusted.protocol !== 'https:' || trusted.username || trusted.password || trusted.port) return false;
+    if (url.origin !== trusted.origin) return false;
+    if (base === supabase) return url.pathname.startsWith('/storage/v1/object/');
+    // Only the configured media bucket, not the whole storage endpoint.
+    const bucket = (process.env.ELEVATE_MEDIA_BUCKET || process.env.S3_BUCKET || '').trim();
+    if (!bucket) return false;
+    const prefix = '/' + bucket + '/';
+    return url.pathname.startsWith(prefix) || (
+      trusted.hostname.startsWith(bucket + '.') &&
+      url.pathname.startsWith('/course-videos/')
+    );
+  });
+  if (!authorized) throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
   return url;
 }
 

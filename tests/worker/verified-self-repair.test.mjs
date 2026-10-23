@@ -21,7 +21,9 @@ test('unchanged repaired output is independently rejected without a redundant pr
  await new R({learning_objectives:async()=>{authorCalls++;return {artifacts:{blueprint:{title:'same'}}};},lesson_film_render:async()=>({passed:false,findings:[{code:'INSTRUCTIONAL_QUALITY_FAILED',severity:'error',message:'missing recap'}]})}).run(ctx);
  assert.equal(authorCalls,2); // initial attempt and one validated repair; repeated identical QA failure must not retrigger the producer
  assert.equal(ctx.findings.at(-1).code,'INSTRUCTIONAL_QUALITY_FAILED');
- assert.equal(journal.filter(event=>event.step==='learning_objectives').length,2);\n assert.equal(ctx.artifacts.selective_repair.repair.unresolved,1);\n assert.equal(ctx.artifacts.selective_repair.repair.blockedAt,'lesson_film_render');
+ assert.equal(journal.filter(event=>event.step==='learning_objectives').length,2);
+ assert.equal(ctx.artifacts.selective_repair.repair.unresolved,1);
+ assert.equal(ctx.artifacts.selective_repair.repair.blockedAt,'lesson_film_render');
  assert.equal(ctx.artifacts.learning_objectives.blueprint.title,'same');
  assert.equal(ctx.artifacts.learning_objectives.contractEvidence.passed,true);
 });

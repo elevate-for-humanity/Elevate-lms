@@ -1136,18 +1136,32 @@ export async function renderStoryboardVideo(
     logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});
     logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
+    // Bounded delivery retries reuse the completed movie. Never restart narration
+    // or frame encoding for a transient ancillary object-storage error.
+    const uploadAncillary = async (buffer: Buffer, key: string, mime: string): Promise<string> => {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          return await uploadCourseVideosObject(buffer, key, mime, {forceSupabase: checkpointFallbackUsed});
+        } catch (error) {
+          const reason = error instanceof Error ? error.message : String(error);
+          // Authorization, quota, and configuration faults cannot be healed by retries.
+          if (attempt === 3 || /(?:401|403|unauthoriz|forbidden|quota|cap exceeded|not configured|invalid credentials|accessdenied)/i.test(reason))
+            throw error;
+          await new Promise(resolve => setTimeout(resolve, 350 * attempt));
+        }
+      }
+      throw new Error('COURSE_ANCILLARY_DELIVERY_FAILED');
+    };
     logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
-    const captionUrl = await uploadCourseVideosObject(
+    const captionUrl = await uploadAncillary(
       Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
-      {forceSupabase: checkpointFallbackUsed},
     );
-    const transcriptUrl = await uploadCourseVideosObject(
+    const transcriptUrl = await uploadAncillary(
       Buffer.from(scenes.map((scene) => scene.narration).join('\n\n'), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.txt`,
       'text/plain',
-      {forceSupabase: checkpointFallbackUsed},
     );
     resolvedStoryboard.captionUrl = captionUrl;
     (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;

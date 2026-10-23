@@ -101,6 +101,30 @@ function assertTrustedNarrationUrl(audioUrl: string): { url: URL; mediaKey?: str
       /^\/storage\/v1\/object\/(public|sign)\/course[-_]videos\//.test(url.pathname)) {
     return { url };
   }
+  // Google-generated narration may be delivered from a dedicated Google Cloud
+  // Storage bucket. Trust only an explicitly configured bucket and the course
+  // media keyspace, never the entire googleapis.com domain. Private GCS objects
+  // require a separately provisioned, valid signed HTTPS download URL.
+  const googleBucket = (process.env.GOOGLE_NARRATION_AUDIO_BUCKET ?? process.env.GCS_NARRATION_BUCKET ?? '').trim();
+  if (googleBucket && /^[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]$/.test(googleBucket)) {
+    const googlePathStyle = url.hostname === 'storage.googleapis.com' &&
+      url.pathname.startsWith('/' + googleBucket + '/');
+    const googleVirtualHost = url.hostname === googleBucket + '.storage.googleapis.com';
+    const encodedGcsKey = googlePathStyle
+      ? url.pathname.slice(googleBucket.length + 2)
+      : googleVirtualHost ? url.pathname.slice(1) : undefined;
+    if (encodedGcsKey !== undefined) {
+      let key: string;
+      try { key = decodeURIComponent(encodedGcsKey); }
+      catch { throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL'); }
+      if (key.startsWith('course-videos/') && key.length > 'course-videos/'.length &&
+          !key.split('/').some(part => !part || part === '.' || part === '..') &&
+          ![...key].some(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\\\')) {
+        return { url };
+      }
+    }
+    throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
+  }
   // Use the uploader's configuration, including its supported legacy aliases.
   // S3 signs either endpoint/bucket/key or bucket.endpoint/key. Both identify
   // the same configured bucket; no provider-wide hostname suffix is trusted.

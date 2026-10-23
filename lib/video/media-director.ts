@@ -71,6 +71,8 @@ export interface MediaScene {
   transition: Transition;
   referenceImageUrl?: string;
   sourceVideoUrl?: string;
+  /** Optional render-resolved clip: a footage scene must never be accepted as a static slide. */
+  clipUrl?: string | null;
   characterIds: string[];
   negativePrompt?: string;
   seed?: number;

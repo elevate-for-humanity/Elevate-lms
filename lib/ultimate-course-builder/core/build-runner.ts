@@ -229,8 +229,8 @@ export class UltimateBuildRunner {
       const repeatedValidatedFailure = proposedTarget &&
         validatedRepair?.status === 'producer-validated' &&
         validatedRepair?.directive?.target === proposedTarget &&
-        Array.isArray(validatedRepair?.directive?.findings) &&
-        failures.every(f => validatedRepair.directive.findings.some(
+        Array.isArray(validatedRepair?.directive?.requirements) &&
+        failures.every(f => validatedRepair.directive.requirements.some(
           (previous: any) => previous.code === f.code && previous.message === f.message,
         ));
       const target = repeatedValidatedFailure ? undefined : proposedTarget;

@@ -551,6 +551,40 @@ export async function enforceMediaQuality(input: {
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
     const temporalReplay = await detectBackwardTimelineReplay(videoPath, workDir);
+    // These are narrated instructional slides, not continuous-action films.
+    // A deliberate hold is acceptable only when its *entire* measured freeze
+    // lies inside one authored, non-footage slide. Never waive freezes across
+    // scene boundaries or on sourced motion/demonstrations.
+    const slideStarts: Array<{ start: number; end: number; staticSlide: boolean }> = [];
+    let slideCursor = Number((input.sceneData as any).preRollDurationSeconds ?? 0) +
+      (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3);
+    for (const scene of input.sceneData.scenes) {
+      const duration = Number(scene.durationSeconds);
+      const staticSlide = Number.isFinite(duration) && duration > 0 &&
+        !scene.sourceVideoUrl && !scene.clipUrl &&
+        Boolean(scene.teachingVisual || scene.referenceImageUrl || scene.subject);
+      slideStarts.push({start:slideCursor,end:slideCursor+duration,staticSlide});
+      slideCursor += duration;
+    }
+    const freezeIntervals = [...String(freezeOutput).matchAll(/freeze_start:\\s*([0-9.]+)[\\s\\S]*?freeze_end:\\s*([0-9.]+)/g)]
+      .map(m => ({start:Number(m[1]),end:Number(m[2])}));
+    const unexplainedFreezes = freezeIntervals.filter(interval =>
+      !slideStarts.some(scene => scene.staticSlide &&
+        interval.start >= scene.start + 0.1 && interval.end <= scene.end - 0.1));
+    // Frame-similarity is not itself proof of a backwards timebase jump.
+    // Keep a hard failure for repeating footage/within-scene motion, while
+    // recording matched slide-to-slide instructional reuse as advisory.
+    const explainedSlideRepeats = temporalReplay.temporalReplayMatches.filter(match => {
+      const prior = slideStarts.find(scene => scene.staticSlide &&
+        match.priorStartSeconds >= scene.start &&
+        match.priorStartSeconds + match.durationSeconds <= scene.end);
+      const later = slideStarts.find(scene => scene.staticSlide &&
+        match.replayStartSeconds >= scene.start &&
+        match.replayStartSeconds + match.durationSeconds <= scene.end);
+      return Boolean(prior && later && prior !== later);
+    });
+    const unexplainedReplayMatches = temporalReplay.temporalReplayMatches.filter(
+      match => !explainedSlideRepeats.includes(match));
 
     // OCR the encoded title at desktop and a phone-sized delivery width.
     // Metadata about font sizes cannot establish that the final picture is readable.

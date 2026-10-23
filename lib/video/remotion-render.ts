@@ -1131,6 +1131,11 @@ export async function renderStoryboardVideo(
       // corrected, source-locked job is retried.
       throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
     }
+    // Deliver the already encoded MP4 before ancillary text assets. A VTT upload
+    // failure must not prevent the completed video from reaching durable storage.
+    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});
+    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
     logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
@@ -1148,9 +1153,6 @@ export async function renderStoryboardVideo(
     (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;
     (resolvedStoryboard as any).scenes.forEach((scene: any, index: number) => { scene.captionCues = scenes[index].captionCues; });
     resolvedStoryboard.transcriptUrl = transcriptUrl;
-    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
-    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});
-    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
     await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
     return {
       success: true,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -123,28 +124,32 @@ async function _GET(req: NextRequest) {
   for (const candidate of candidates) {
     const pref: any = candidate.userId ? prefByUser.get(candidate.userId) : null;
     const templateData = { name: candidate.name, next_action: candidate.action, portal_url: candidate.portalUrl, role: candidate.role };
-    if (candidate.email && candidate.userId && pref?.email_deadlines !== false && candidate.action !== 'QA E2E ONLY') {
+    if (candidate.action === 'QA E2E ONLY') continue;
+    if (candidate.email && candidate.userId && pref?.email_deadlines !== false && ) {
       // Fail closed on lookup errors; never generate repeated held reminders.
       const { data: outstanding, error: outstandingError } = await db.from('notification_outbox')
         .select('id').eq('entity_id', candidate.entityId)
-        .eq('to_email', candidate.email)
+        .ilike('to_email', candidate.email)
         .eq('template_key', 'portal_completion_reminder')
         .contains('template_data', { role: candidate.role, next_action: candidate.action })
         .in('status', ['queued', 'processing']).limit(1);
       if (outstandingError) throw outstandingError;
       if (!outstanding?.length) {
-      const dedupe = `portal-completion:${candidate.role}:email:${slot}`;
-      const { data: prior } = await db.from('notification_outbox').select('id')
-        .eq('entity_id', candidate.entityId).eq('entity_type', dedupe).limit(1).maybeSingle();
-      if (!prior) {
-        const { error } = await db.from('notification_outbox').insert({
-          channel: 'email', to_email: candidate.email,
-          template_key: 'portal_completion_reminder', template_data: templateData,
-          status: 'queued', scheduled_for: new Date().toISOString(),
-          entity_type: dedupe, entity_id: candidate.entityId,
-        });
-        if (!error) emailQueued++;
-      }
+        // Stable across cron runs. The database unique index resolves racing workers.
+        const key = 'portal-completion:' + createHash('sha256')
+          .update(JSON.stringify([candidate.entityId, candidate.role, 'email', candidate.email.trim().toLowerCase(), candidate.action.trim().toLowerCase()]))
+          .digest('hex');
+        const { data: inserted, error: insertError } = await db.from('notification_outbox')
+          .upsert({
+            channel: 'email', to_email: candidate.email,
+            template_key: 'portal_completion_reminder', template_data: templateData,
+            notification_key: key,
+            status: 'queued', scheduled_for: new Date().toISOString(),
+            entity_type: `portal-completion:${candidate.role}:email:${slot}`, entity_id: candidate.entityId,
+          }, { onConflict: 'notification_key', ignoreDuplicates: true })
+          .select('id');
+        if (insertError) throw insertError;
+        if (inserted?.length) emailQueued++;
       }
     }
     const smsPhone = pref?.sms_phone || candidate.phone;

@@ -418,6 +418,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         audioUrl: renderMediaUrl(render),
         transcript: inspection.actualTranscript,
         deliveredMp4: true,
+        expectedMediaSha256: inspection.mediaSha256,
       });
       const narrationQA = {
         ...evaluateNarration(metrics),

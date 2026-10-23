@@ -1,9 +1,11 @@
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import type { Metric, NarrationMetrics } from './narration-quality';
+import { getElevateMediaStorageConfig, getSignedElevateMediaUrl } from '../../storage/elevate-media-storage';
 
 const execFileAsync = promisify(execFile);
 const MAX_NARRATION_BYTES = 512 * 1024 * 1024;
@@ -84,42 +86,73 @@ function requiredNumber(output: string, pattern: RegExp, label: string): number 
   return value;
 }
 
-function assertTrustedNarrationUrl(audioUrl: string): URL {
-  const url = new URL(audioUrl);
-  if (url.protocol !== 'https:' || url.username || url.password || url.port) {
+function trustedHttpsUrl(value?: string): URL | null {
+  try {
+    const url = new URL(value ?? '');
+    return url.protocol === 'https:' && !url.username && !url.password && !url.port && !url.hash ? url : null;
+  } catch { return null; }
+}
+
+function assertTrustedNarrationUrl(audioUrl: string): { url: URL; mediaKey?: string } {
+  const url = trustedHttpsUrl(audioUrl);
+  if (!url) throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
+  const supabase = trustedHttpsUrl(process.env.NEXT_PUBLIC_SUPABASE_URL?.trim());
+  if (supabase && url.origin === supabase.origin &&
+      /^\/storage\/v1\/object\/(public|sign)\/course[-_]videos\//.test(url.pathname)) {
+    return { url };
+  }
+  // Use the uploader's configuration, including its supported legacy aliases.
+  // S3 signs either endpoint/bucket/key or bucket.endpoint/key. Both identify
+  // the same configured bucket; no provider-wide hostname suffix is trusted.
+  const config = getElevateMediaStorageConfig();
+  const endpoint = trustedHttpsUrl(config.endpoint);
+  const publicBase = trustedHttpsUrl(config.publicUrl);
+  let encodedKey: string | undefined;
+  if (endpoint && config.bucket) {
+    const prefix = endpoint.pathname.replace(/\/$/, '') + '/' + encodeURIComponent(config.bucket) + '/';
+    const virtual = new URL(endpoint);
+    virtual.hostname = `${config.bucket}.${endpoint.hostname}`;
+    const virtualPrefix = endpoint.pathname.replace(/\/$/, '') + '/';
+    if (url.origin === endpoint.origin && url.pathname.startsWith(prefix)) {
+      encodedKey = url.pathname.slice(prefix.length);
+    } else if (url.origin === virtual.origin && url.pathname.startsWith(virtualPrefix)) {
+      encodedKey = url.pathname.slice(virtualPrefix.length);
+    }
+  }
+  if (encodedKey === undefined && publicBase && config.bucket && url.origin === publicBase.origin) {
+    const prefix = publicBase.pathname.replace(/\/$/, '') + '/';
+    if (url.pathname.startsWith(prefix)) encodedKey = url.pathname.slice(prefix.length);
+  }
+  let mediaKey: string;
+  try { mediaKey = decodeURIComponent(encodedKey ?? ''); }
+  catch { throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL'); }
+  if (!mediaKey.startsWith('course-videos/') || !mediaKey.slice('course-videos/'.length) ||
+      mediaKey.split('/').some(part => part === '.' || part === '..' || !part) ||
+      /[\u0000-\u001f\u007f\\]/.test(mediaKey)) {
     throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
   }
-  const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const mediaEndpoint = (process.env.ELEVATE_MEDIA_ENDPOINT || process.env.S3_ENDPOINT || '').trim();
-  const mediaPublic = (process.env.ELEVATE_MEDIA_PUBLIC_URL || process.env.NEXT_PUBLIC_ELEVATE_MEDIA_URL || process.env.S3_PUBLIC_URL || '').trim();
-  const candidates = [supabase, mediaEndpoint, mediaPublic].filter(Boolean) as string[];
-  const authorized = candidates.some((base) => {
-    let trusted: URL;
-    try { trusted = new URL(base); } catch { return false; }
-    if (trusted.protocol !== 'https:' || trusted.username || trusted.password || trusted.port) return false;
-    if (url.origin !== trusted.origin) return false;
-    if (base === supabase) return url.pathname.startsWith('/storage/v1/object/');
-    // Only the configured media bucket, not the whole storage endpoint.
-    const bucket = (process.env.ELEVATE_MEDIA_BUCKET || process.env.S3_BUCKET || '').trim();
-    if (!bucket) return false;
-    const prefix = '/' + bucket + '/';
-    return url.pathname.startsWith(prefix) || (
-      trusted.hostname.startsWith(bucket + '.') &&
-      url.pathname.startsWith('/course-videos/')
-    );
-  });
-  if (!authorized) throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
-  return url;
+  return { url, mediaKey };
 }
 
 export async function analyzeNarrationAudio(input: {
   audioUrl: string;
   transcript: string;
   deliveredMp4?: boolean;
+  expectedMediaSha256?: string;
 }): Promise<NarrationMetrics> {
-  const url = assertTrustedNarrationUrl(input.audioUrl);
+  const reference = assertTrustedNarrationUrl(input.audioUrl);
+  let url = reference.url;
+  if (reference.mediaKey) {
+    // Checkpoints outlive signed URLs. Renew access, not narration or rendering.
+    const renewed = await getSignedElevateMediaUrl(reference.mediaKey, 3600);
+    if (!renewed) throw new Error('NARRATION_ANALYSIS_MEDIA_SIGNING_FAILED');
+    const checked = assertTrustedNarrationUrl(renewed);
+    if (checked.mediaKey !== reference.mediaKey) throw new Error('NARRATION_ANALYSIS_MEDIA_REFERENCE_MISMATCH');
+    url = checked.url;
+  }
   const response = await fetch(url, {
     cache: 'no-store',
+    redirect: 'error',
     signal: AbortSignal.timeout(120_000),
   });
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
@@ -131,6 +164,10 @@ export async function analyzeNarrationAudio(input: {
   const audio = Buffer.from(await response.arrayBuffer());
   if (!audio.length || audio.length > MAX_NARRATION_BYTES) {
     throw new Error(`NARRATION_ANALYSIS_AUDIO_SIZE_INVALID:${audio.length}`);
+  }
+  if (input.expectedMediaSha256 &&
+      createHash('sha256').update(audio).digest('hex') !== input.expectedMediaSha256) {
+    throw new Error('NARRATION_ANALYSIS_MEDIA_CHECKSUM_MISMATCH');
   }
 
   const directory = await mkdtemp(path.join(tmpdir(), 'ultimate-narration-'));

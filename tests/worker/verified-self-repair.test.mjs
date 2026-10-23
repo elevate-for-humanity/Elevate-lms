@@ -14,14 +14,16 @@ test('repair carries exact failed requirement, changes producer and validates be
  await r.run(ctx);assert.equal(authors,2);assert.equal(renders,1);assert.equal(ctx.artifacts.__repairState.status,'producer-validated');
  assert.equal(journal.find(x=>x.artifacts?.repair?.directive)?.artifacts.repair.directive.requirements[0].message,'narration must teach apprenticeship');
 });
-test('unchanged repair output is evaluated by independent QA instead of a duplicate-producer gate',async()=>{
+test('unchanged validated repair output is independently QA-checked once without restarting the same producer indefinitely',async()=>{
  let authorCalls=0;const journal=[];
  const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set(),persistArtifact:async event=>journal.push(event)};
  const R=runner();
  await new R({learning_objectives:async()=>{authorCalls++;return {artifacts:{blueprint:{title:'same'}}};},lesson_film_render:async()=>({passed:false,findings:[{code:'INSTRUCTIONAL_QUALITY_FAILED',severity:'error',message:'missing recap'}]})}).run(ctx);
- assert.equal(authorCalls,3); // initial attempt plus two bounded selective repairs
+ assert.equal(authorCalls,2); // initial attempt and one validated repair; identical downstream failure must stop
  assert.equal(ctx.findings.at(-1).code,'INSTRUCTIONAL_QUALITY_FAILED');
- assert.equal(journal.filter(event=>event.step==='learning_objectives').length,3);
+ assert.equal(journal.filter(event=>event.step==='learning_objectives').length,2);
+ assert.equal(ctx.artifacts.selective_repair.repair.attempts.length,1);
+ assert.equal(ctx.artifacts.selective_repair.repair.blockedAt,'lesson_film_render');
  assert.equal(ctx.artifacts.learning_objectives.blueprint.title,'same');
  assert.equal(ctx.artifacts.learning_objectives.contractEvidence.passed,true);
 });

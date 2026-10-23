@@ -120,8 +120,8 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
   return [...selected];
 }
 
-async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string) {
-  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command });
+async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
+  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
   return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
 }
 
@@ -1424,9 +1424,25 @@ async function _POST(req: NextRequest) {
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
+    const conversationId = typeof body.conversationId === 'string'
+      ? body.conversationId.trim() : undefined;
+    if (conversationId) {
+      const { data: conversation, error: conversationError } = await masterDb
+        .from('studio_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', auth.userId)
+        .maybeSingle();
+      if (conversationError) {
+        return NextResponse.json({ error: 'Conversation lookup failed' }, { status: 503 });
+      }
+      if (!conversation) {
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      }
+    }
     const toolsAllowed = !prohibitsToolUse(lastUserMessage);
     const masterExecution = toolsAllowed && lastUserMessage.trim()
-      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage)
+      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage, conversationId)
       : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([

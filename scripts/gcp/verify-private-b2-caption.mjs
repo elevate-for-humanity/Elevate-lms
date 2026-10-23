@@ -9,7 +9,19 @@
 import { randomUUID, createHash } from 'node:crypto';
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
-const env = process.env;
+let runtime = {};
+if (process.env.COURSE_B2_CONFIG_STDIN === 'true') {
+  let input = '';
+  for await (const chunk of process.stdin) {
+    input += chunk;
+    if (input.length > 100_000) throw Error('B2_PROBE_CONFIG_INPUT_TOO_LARGE');
+  }
+  const parsed = JSON.parse(input);
+  const names = ['ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_REGION','ELEVATE_MEDIA_BUCKET',
+    'ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY'];
+  runtime = Object.fromEntries(names.map(name => [name, parsed[name]]));
+}
+const env = {...process.env, ...runtime};
 const required = ['ELEVATE_MEDIA_ENDPOINT', 'ELEVATE_MEDIA_REGION', 'ELEVATE_MEDIA_BUCKET',
   'ELEVATE_MEDIA_ACCESS_KEY_ID', 'ELEVATE_MEDIA_SECRET_ACCESS_KEY'];
 const missing = required.filter(key => !env[key]?.trim());

@@ -242,6 +242,17 @@ export async function uploadToElevateMedia(
         CacheControl: 'public, max-age=31536000, immutable',
       }),
     );
+    // Caption/transcript uploads must be verified with a real authenticated
+    // read, not inferred from a signed URL or a successful PUT alone.
+    if (body.length <= 1024 * 1024 && /^(text\/|application\/x-subrip)/.test(contentType)) {
+      const stored = await client.send(new GetObjectCommand({ Bucket: config.bucket, Key: key }));
+      if (!stored.Body) throw new Error('COURSE_OBJECT_STORAGE_READBACK_EMPTY');
+      const bytes = Buffer.from(await stored.Body.transformToByteArray());
+      const expected = Buffer.from(body);
+      if (!bytes.equals(expected)) throw new Error('COURSE_OBJECT_STORAGE_READBACK_MISMATCH');
+      if (stored.ContentType?.split(';')[0].trim().toLowerCase() !== contentType.toLowerCase())
+        throw new Error('COURSE_OBJECT_STORAGE_MIME_MISMATCH');
+    }
 
     return {
       success: true,

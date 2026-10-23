@@ -52,9 +52,9 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
   }
 
   const { data: partners } = await db.from('partners')
-    .select('id,shop_name,name,contact_email,contact_phone,phone,onboarding_completed,onboarding_step')
+    .select('id,shop_name,name,contact_email,contact_phone,phone,onboarding_completed,onboarding_step,documents_verified,mou_signed')
     .eq('status', 'active').eq('approval_status', 'approved').eq('is_active', true)
-    .or('onboarding_completed.is.null,onboarding_completed.eq.false');
+    .or('onboarding_completed.is.null,onboarding_completed.eq.false,documents_verified.is.null,documents_verified.eq.false,mou_signed.is.null,mou_signed.eq.false');
   const partnerIds = (partners || []).map((row: any) => row.id);
   const { data: memberships } = partnerIds.length
     ? await db.from('partner_users').select('partner_id,user_id,status').in('partner_id', partnerIds).in('status', ['active', 'approved'])
@@ -72,9 +72,9 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
       userId: membership?.user_id || null,
       role: 'host_shop',
       name: partner.shop_name || partner.name || profile?.full_name || 'Host Shop',
-      email: profile?.email || partner.contact_email || null,
+      // The approved partner contact is the authoritative organizational destination.\n      // A member profile may belong to a different individual or former shop contact.\n      email: partner.contact_email || null,
       phone: profile?.phone || partner.contact_phone || partner.phone || null,
-      action: String(partner.onboarding_step || 'complete host shop onboarding').replaceAll('_', ' '),
+      action: [\n        ...(partner.mou_signed !== true ? ['sign the host shop agreement'] : []),\n        ...(partner.documents_verified !== true ? ['submit documents for verification'] : []),\n        ...(partner.onboarding_completed !== true ? [String(partner.onboarding_step || 'complete host shop onboarding').replaceAll('_', ' ')] : []),\n      ].join('; '),
       portalUrl: `${APP_URL}/host-shop/dashboard`,
     });
   }
@@ -125,7 +125,7 @@ async function _GET(req: NextRequest) {
     const pref: any = candidate.userId ? prefByUser.get(candidate.userId) : null;
     const templateData = { name: candidate.name, next_action: candidate.action, portal_url: candidate.portalUrl, role: candidate.role };
     if (candidate.action === 'QA E2E ONLY') continue;
-    if (candidate.email && candidate.userId && pref?.email_deadlines !== false) {
+    if (candidate.email && (!candidate.userId || pref?.email_deadlines !== false)) {
       // Fail closed on lookup errors; never generate repeated held reminders.
       const { data: outstanding, error: outstandingError } = await db.from('notification_outbox')
         .select('id').eq('entity_id', candidate.entityId)

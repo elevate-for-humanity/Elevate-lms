@@ -250,7 +250,7 @@ export async function uploadCourseVideosObject(
       // limit instead of rejecting a valid film before a chunked upload.
       if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
           process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
-        throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED', { cause: err });
+        throw new Error(`COURSE_OBJECT_STORAGE_UPLOAD_FAILED:${err instanceof Error ? err.message.replace(/https?:\\/\\/[^\\s]+/g, '[url redacted]').slice(0, 240) : 'unknown storage failure'}`, { cause: err });
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }

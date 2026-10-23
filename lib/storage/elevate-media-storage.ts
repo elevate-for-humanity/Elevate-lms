@@ -233,19 +233,34 @@ export async function uploadToElevateMedia(
   try {
     const config = getElevateMediaStorageConfig();
     const client = getElevateMediaStorageClient();
-    await client.send(
-      new PutObjectCommand({
-        Bucket: config.bucket,
-        Key: key,
-        Body: body,
-        ContentType: contentType,
-        CacheControl: 'public, max-age=31536000, immutable',
-      }),
-    );
+    try {
+      await client.send(
+        new PutObjectCommand({
+          Bucket: config.bucket,
+          Key: key,
+          Body: body,
+          ContentType: contentType,
+          CacheControl: config.provider === 'backblaze-b2' ? 'private, max-age=0' : 'public, max-age=31536000, immutable',
+        }),
+      );
+    } catch (error) {
+      const status = typeof error === 'object' && error !== null && '$metadata' in error
+        ? (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode
+        : undefined;
+      // Do not leak signed URLs or provider request details. Distinguish S3
+      // write authorization/capacity failures from a caption readback mismatch.
+      throw new Error(`COURSE_OBJECT_STORAGE_PUT_FAILED_HTTP_${status ?? 'UNKNOWN'}`, {cause: error});
+    }
     // Caption/transcript uploads must be verified with a real authenticated
     // read, not inferred from a signed URL or a successful PUT alone.
     if (body.length <= 1024 * 1024 && /^(text\/|application\/x-subrip)/.test(contentType)) {
-      const stored = await client.send(new GetObjectCommand({ Bucket: config.bucket, Key: key }));
+      const stored = await client.send(new GetObjectCommand({ Bucket: config.bucket, Key: key }))
+        .catch((error: unknown) => {
+          const status = typeof error === 'object' && error !== null && '$metadata' in error
+            ? (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode
+            : undefined;
+          throw new Error(`COURSE_OBJECT_STORAGE_READBACK_HTTP_${status ?? 'UNKNOWN'}`, {cause: error});
+        });
       if (!stored.Body) throw new Error('COURSE_OBJECT_STORAGE_READBACK_EMPTY');
       const bytes = Buffer.from(await stored.Body.transformToByteArray());
       const expected = Buffer.from(body);

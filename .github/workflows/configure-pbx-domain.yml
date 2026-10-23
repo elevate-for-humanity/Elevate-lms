@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/configure-pbx-domain.yml'
+      - 'scripts/gcp/verify-pbx-transport.mjs'
+      - 'scripts/gcp/verify-production-dns.mjs'
   schedule:
     - cron: '23 * * * *'
 permissions:
@@ -16,32 +18,23 @@ jobs:
     environment: production
     timeout-minutes: 5
     steps:
-      - name: Verify externally managed DNS and HTTPS
-        shell: bash
-        run: |
-          set -euo pipefail
-          host=phone.elevateforhumanity.org
-          expected=107.178.216.162
-          resolved="$(dig +short A "$host" | grep -E '^[0-9]+(\.[0-9]+){3}$' || true)"
-          echo "A records: $resolved"
-          if ! printf '%s\n' "$resolved" | grep -Fxq "$expected"; then
-            echo "::error::Durable DNS A record for $host must point to $expected"
-            exit 1
-          fi
-          echo "DNS verified. Checking TLS and HTTPS without modifying phone service."
-          curl --silent --show-error --fail --max-time 15 --output /dev/null "https://$host/healthz"
-
       - uses: actions/checkout@v4
-        with: {persist-credentials: false}
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - name: Verify strict SIP WebSocket acceptance without placing a call
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import { verifySipUpgrade } from './scripts/gcp/verify-pbx-transport.mjs';
-          const result = await verifySipUpgrade();
-          console.log(JSON.stringify(result));
-          if (result.result !== 'PASS') process.exit(1);
-          NODE
+        with:
+          node-version: '22'
+      # The previous grep check succeeded whenever the expected A record was
+      # present, even alongside an unexpected A/AAAA record. Use the existing
+      # fail-closed verifier to compare all authoritative answers and check
+      # trusted hostname TLS, /healthz and strict SIP WebSocket negotiation.
+      # This is transport-only verification; never report actual calls as PASS.
+      - name: Verify authoritative DNS, TLS, HTTPS and SIP WebSocket transport
+        run: node scripts/gcp/verify-pbx-transport.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pbx-transport-evidence
+          path: pbx-transport-evidence.json
+          if-no-files-found: warn
+          retention-days: 14

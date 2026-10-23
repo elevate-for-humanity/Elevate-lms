@@ -221,18 +221,24 @@ async function uploadCourseVideosToElevateMedia(
   contentType: string,
 ): Promise<string> {
   const key = elevateMediaKeyForStoragePath(storagePath);
-  const result = await ownerPreviewMediaDelivery(await uploadToElevateMedia(buffer, key, contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
-  // A signed URL is suitable only for a temporary owner preview. Persistent
-  // publication must store the B2 object key and mint URLs on authorized reads.
-  if (!result.success || !result.url) {
-    throw new Error(result.error ?? `Elevate Media Storage upload failed for ${key}`);
+  const uploaded = await uploadToElevateMedia(buffer, key, contentType);
+  if (!uploaded.success) {
+    throw new Error(uploaded.error ?? `Elevate Media Storage upload failed for ${key}`);
   }
+  const result = await ownerPreviewMediaDelivery(uploaded, {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
+  // Private B2 intentionally has no public URL. An absent public URL after
+  // successful PutObject is NOT an upload failure. Mint a short-lived signed
+  // read for immediate rendering/QA, without granting public bucket access.
+  // The durable object identity remains result.key; release consumers must
+  // resolve a fresh authorized URL rather than permanently publish this token.
+  const deliveryUrl = result.url ?? await getSignedElevateMediaUrl(key, 21600, {contentType});
+  if (!deliveryUrl) throw new Error(`COURSE_OBJECT_STORAGE_READBACK_SIGNING_FAILED:${key}`);
   logger.info('[upload-lesson-media] uploaded to Elevate Media Storage', {
     key,
     bytes: buffer.length,
     // Signed read URLs are bearer credentials; never log them.
   });
-  return result.url;
+  return deliveryUrl;
 }
 
 export async function uploadCourseVideosObject(
@@ -300,8 +306,13 @@ export async function uploadLessonFileFromDisk(
   // Selection only needs the byte count; large source files remain on disk.
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
     const result = await ownerPreviewMediaDelivery(await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
-    if (result.success && result.url) url = result.url;
-    else if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
+    if (result.success) {
+      // Private B2 provides durable keys, not public URLs. Mint a temporary
+      // authorized read for the current render; never interpret missing
+      // public access as a failed MP4 upload.
+      url = result.url ?? await getSignedElevateMediaUrl(elevateMediaKeyForStoragePath(storagePath), 21600, { contentType }) ?? undefined;
+      if (!url) throw new Error('COURSE_OBJECT_STORAGE_READBACK_SIGNING_FAILED');
+    } else if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
              process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
       throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');

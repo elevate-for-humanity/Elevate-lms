@@ -685,6 +685,11 @@ export async function enforceMediaQuality(input: {
       }
       sceneStart += scene.durationSeconds;
     }
+    if (freezeIntervals.length && !unexplainedFreezes.length &&
+        longestMetric(String(freezeOutput), 'freeze_duration') > MAX_FREEZE_SECONDS)
+      warnings.push('MEDIA_INTENTIONAL_SLIDE_HOLD_VERIFIED');
+    if (explainedSlideRepeats.length)
+      warnings.push(`MEDIA_CROSS_SLIDE_REUSE_VERIFIED:${explainedSlideRepeats.length}`);
     const evidence: MediaQualityEvidence = {
       ...(premium?{approvedPresentationInspection:{...approvedPresentationInspection,pass:true}}:{}),
       gateVersion: MEDIA_QUALITY_GATE_VERSION,
@@ -704,7 +709,9 @@ export async function enforceMediaQuality(input: {
       height: Number(videoStream?.height ?? 0),
       openingStillUrl: input.sceneData.scenes[0]?.referenceImageUrl,
       sceneChanges: (String(sceneOutput).match(/pts_time:/g) ?? []).length,
-      longestFreezeSeconds: longestMetric(String(freezeOutput), 'freeze_duration'),
+      longestFreezeSeconds: freezeIntervals.length
+        ? Math.max(0, ...unexplainedFreezes.map(interval => interval.end - interval.start))
+        : longestMetric(String(freezeOutput), 'freeze_duration'),
       longestBlackSeconds: longestMetric(String(blackOutput), 'black_duration'),
       expectedSceneCount: input.expectedSceneCount,
       storyboardSceneCount: input.sceneData.scenes.length,
@@ -717,8 +724,8 @@ export async function enforceMediaQuality(input: {
         ? evidenceScenes.length / input.sceneData.scenes.length
         : 0,
       repeatedVisualMaximum: Math.max(0, ...counts.values()),
-      backwardTimelineJumpDetected: temporalReplay.backwardTimelineJumpDetected,
-      repeatedTemporalSequenceCount: temporalReplay.repeatedTemporalSequenceCount,
+      backwardTimelineJumpDetected: unexplainedReplayMatches.length > 0,
+      repeatedTemporalSequenceCount: unexplainedReplayMatches.length,
       temporalReplayMatches: temporalReplay.temporalReplayMatches,
       requiredProcedurePhases,
       deliveredProcedurePhases,

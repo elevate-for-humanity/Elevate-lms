@@ -177,7 +177,7 @@ function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'
 
 /** Parse FFmpeg event stream sequentially; EOF freezes remain evidence. */
 export function parseFreezeIntervals(output: string, durationSeconds: number): Array<{start:number;end:number}> {
-  const events = [...output.matchAll(/freeze_(start|end):\\s*([0-9]+(?:\\.[0-9]+)?)/g)];
+  const events = [...output.matchAll(/freeze_(start|end):\s*([0-9]+(?:\.[0-9]+)?)/g)];
   const intervals: Array<{start:number;end:number}> = [];
   let start: number | null = null;
   for (const match of events) {

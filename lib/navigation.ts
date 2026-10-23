@@ -122,6 +122,27 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
+    id: 'tax-services',
+    name: 'Get Your Taxes Prepared',
+    href: '/tax',
+    subItems: [
+      { name: 'Supersonic Fast Cash', href: '/tax', isSectionLink: true },
+      { name: 'Prepare My Taxes', href: '/tax-software/self-file', isSectionLink: true },
+      { name: 'Get Professional Tax Help', href: '/tax-software/contact', isSectionLink: true },
+    ],
+  },
+  {
+    id: 'community',
+    name: 'Community',
+    href: '/community',
+    subItems: [
+      { name: 'Explore the Community', href: '/community', isSectionLink: true },
+      { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
+      { name: 'Barber & Beauty Network', href: '/barber-beauty-network', isSectionLink: true },
+      { name: 'Employer Directory', href: '/employers/directory', isSectionLink: true },
+    ],
+  },
+  {
     id: 'funding',
     name: 'Funding',
     href: ROUTES.funding,
@@ -151,6 +172,9 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Employers',
     href: ROUTES.employers,
     subItems: [
+      { name: 'Partner With Us', href: '/apply/employer', isSectionLink: true },
+      { name: 'Employer Directory', href: '/employers/directory', isSectionLink: true },
+      { name: 'Browse Jobs', href: '/jobs', isSectionLink: true },
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },

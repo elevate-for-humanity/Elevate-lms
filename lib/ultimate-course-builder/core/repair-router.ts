@@ -1,6 +1,18 @@
 import type { UltimateBuildStep } from './types';
 import type { UltimateInstructionalFinding } from './execution-policy';
 
+/**
+ * Recovery contract v2: delivery faults never invalidate approved teaching or
+ * trigger a new render. These failures require a separate storage/delivery
+ * retry of the existing durable artifact, not a producer rebuild.
+ * QA defects remain blocking and must be repaired and reinspected.
+ */
+export const COURSE_RECOVERY_CONTRACT_VERSION = 'course-recovery-v2';
+export function requiresIndependentMediaDelivery(finding: Pick<UltimateInstructionalFinding, 'code' | 'message'>): boolean {
+  return /COURSE_OBJECT_STORAGE_(?:UPLOAD_FAILED|DELIVERY_NOT_CONFIGURED|READBACK_SIGNING_FAILED)|storage cap exceeded|storage quota exceeded|quota exceeded/i
+    .test(String(finding.message ?? '') + ' ' + String(finding.code ?? ''));
+}
+
 const PREFIX_ROUTES: Array<[RegExp, UltimateBuildStep]> = [
   [/^(ENCODED_MP4_INSPECTION_REQUIRED|MEDIA_INSPECTION_|TRANSCRIPTION_)/, 'finished_media_qa'],
   [/^(MEDIA_FREEZE_DETECTED|MEDIA_BLACK_FRAMES|MEDIA_VISUAL_CHANGES_REQUIRED)/, 'lesson_film_render'],
@@ -31,8 +43,7 @@ export function isDurableExternalBlocker(finding: UltimateInstructionalFinding) 
   // Storage account limits are operational restrictions, not render defects.
   // Rebuilding the same approved video cannot raise the account's quota.
   // Preserve checkpoints and require a configured, writable delivery backend.
-  if (finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
-      /storage cap exceeded|quota exceeded|storage quota exceeded|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED|COURSE_OBJECT_STORAGE_UPLOAD_FAILED/i.test(finding.message)) return true;
+  if (requiresIndependentMediaDelivery(finding)) return true;
   return DURABLE_EXTERNAL_BLOCKERS.test(finding.code);
 }
 

@@ -220,7 +220,20 @@ export class UltimateBuildRunner {
         /HTTP (429|5\d\d)|timeout|timed out|ECONNRESET|fetch failed/i.test(f.message),
       );
       const durableBlocker = failures.some((f) => isDurableExternalBlocker(f));
-      const target = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
+      const proposedTarget = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
+      // A previously validated producer checkpoint must not be invalidated
+      // indefinitely for the same downstream finding. A genuine new source
+      // revision or explicit checkpoint repair can authorize a fresh attempt;
+      // until then, retain the evidence and expose the unresolved QA failure.
+      const validatedRepair = (ctx.artifacts as any).__repairState;
+      const repeatedValidatedFailure = proposedTarget &&
+        validatedRepair?.status === 'producer-validated' &&
+        validatedRepair?.directive?.target === proposedTarget &&
+        Array.isArray(validatedRepair?.directive?.requirements) &&
+        failures.every(f => validatedRepair.directive.requirements.some(
+          (previous: any) => previous.code === f.code && previous.message === f.message,
+        ));
+      const target = repeatedValidatedFailure ? undefined : proposedTarget;
       if (target && attempts.length < MAX_TARGETED_REPAIRS) {
         const previous=ctx.artifacts[target];
         const directive=repairDirective(failures,step,target,previous,attempts.length+1);

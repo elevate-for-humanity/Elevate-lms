@@ -122,8 +122,8 @@ function assertTrustedNarrationUrl(audioUrl: string): { url: URL; mediaKey?: str
           ![...key].some(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\')) {
         return { url };
       }
+      throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
     }
-    throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
   }
   // Use the uploader's configuration, including its supported legacy aliases.
   // S3 signs either endpoint/bucket/key or bucket.endpoint/key. Both identify

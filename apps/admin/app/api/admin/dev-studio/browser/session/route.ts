@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+  await hydrateProcessEnv();
   const config = configuration();
   if (!config.configured) {
     return NextResponse.json(

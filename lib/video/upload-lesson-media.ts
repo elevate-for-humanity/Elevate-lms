@@ -306,8 +306,13 @@ export async function uploadLessonFileFromDisk(
   // Selection only needs the byte count; large source files remain on disk.
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
     const result = await ownerPreviewMediaDelivery(await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
-    if (result.success && result.url) url = result.url;
-    else if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
+    if (result.success) {
+      // Private B2 provides durable keys, not public URLs. Mint a temporary
+      // authorized read for the current render; never interpret missing
+      // public access as a failed MP4 upload.
+      url = result.url ?? await getSignedElevateMediaUrl(elevateMediaKeyForStoragePath(storagePath), 21600, { contentType }) ?? undefined;
+      if (!url) throw new Error('COURSE_OBJECT_STORAGE_READBACK_SIGNING_FAILED');
+    } else if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
              process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
       throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');

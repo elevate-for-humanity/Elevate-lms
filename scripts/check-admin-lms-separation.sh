@@ -17,7 +17,7 @@ cd "$ROOT"
 
 # 1) The separate Google container images must serve their own applications.
 LMS_DOCKERFILE="Dockerfile.northflank-lms"
-ADMIN_DOCKERFILE="Dockerfile.northflank-admin"
+ADMIN_DOCKERFILE="Dockerfile.admin"
 for file in "$LMS_DOCKERFILE" "$ADMIN_DOCKERFILE"; do
   [[ -f "$file" ]] || fail "$file missing"
   grep -q '/api/ping' "$file" || fail "$file must healthcheck /api/ping"
@@ -35,7 +35,7 @@ for file in "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; do
   [[ -f "$file" ]] || fail "$file missing"
 done
 grep -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
-grep -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
+grep -q 'Dockerfile.admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
 grep -Fq 'lms) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
 grep -Fq 'loadGoogleConfig(component)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
 grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"

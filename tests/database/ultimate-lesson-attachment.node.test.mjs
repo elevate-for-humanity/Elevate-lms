@@ -79,7 +79,7 @@ test('completed lesson attachment against isolated PostgreSQL',async t=>{
   });
   await t.test('retains earlier questions and unrelated lesson experience on retry',async()=>{
    const row=await snapshot();
-   await db.query('update course_lessons set quiz_questions=$1,content_json=$2 where id=$3',[[{id:'existing',question:'Keep this'}],{...row.content_json,experience:{readingGuide:{summary:'Keep reading'}}},canonical]);
+   await db.query('update course_lessons set quiz_questions=$1,content_json=$2 where id=$3',[JSON.stringify([{id:'existing',question:'Keep this'}]),{...row.content_json,experience:{readingGuide:{summary:'Keep reading'}}},canonical]);
    await call();const after=await snapshot();
    assert.equal(after.quiz_questions.length,2);assert.equal(after.quiz_questions[0].id,'existing');
    assert.deepEqual(after.content_json.experience.readingGuide,{summary:'Keep reading'});

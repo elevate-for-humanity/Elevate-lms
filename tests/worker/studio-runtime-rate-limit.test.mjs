@@ -9,12 +9,12 @@ process.env.REDIS_URL='';process.env.UPSTASH_REDIS_REST_URL='';process.env.UPSTA
 const rateNames=['contactRateLimit','strictRateLimit','apiRateLimit','authRateLimit','paymentRateLimit','publicRateLimit','pageLoadRateLimit','createRateLimitHeaders','checkInMemoryRateLimit','getIdentifier','getRetryAfterSeconds'];
 const rates=new Function('logger',strip('lib/rate-limit.ts')+';return {'+rateNames.join(',')+'};')(logger);
 const {applyRateLimit}=new Function('NextResponse','logger',...rateNames,strip('lib/api/withRateLimit.ts')+';return {applyRateLimit};')(Response,logger,...rateNames.map(n=>rates[n]));
-let operator='operator-a',deny=false,backendCalls=0;
+let operator='operator-a',deny=false,backendCalls=0,backendStatus=200;
 const {GET,POST}=new Function('NextResponse','apiRequireDevStudio','applyRateLimit','getSecrets','requireAdminClient','recordMasterStudioArtifact','fetch',strip('apps/admin/app/api/admin/dev-studio/runtime/route.ts')+';return {GET,POST};')(
  Response,async()=>deny?{error:Response.json({error:'AUTH_REQUIRED'},{status:401})}:{id:operator},
  applyRateLimit,async()=>({STUDIO_BROWSER_URL:'https://runtime.example',STUDIO_BROWSER_SECRET:'test-secret'}),
  ()=>{throw Error('No run lookup is part of these requests');},()=>{throw Error('No artifact writes are part of these requests');},
- async(_url,options)=>{backendCalls++;if(options.headers['x-studio-operator-id'])assert.equal(options.headers['x-studio-operator-id'],operator);return Response.json({id:'test-terminal',output:[],state:'running'});}
+ async(_url,options)=>{backendCalls++;if(options.headers['x-studio-operator-id'])assert.equal(options.headers['x-studio-operator-id'],operator);return Response.json(backendStatus===200?{id:'test-terminal',output:[],state:'running'}:{error:'private-runtime-detail'},{status:backendStatus});}
 );
 function request(operation,method='POST',ip='198.51.100.10'){
  const url='https://admin.example/api/admin/dev-studio/runtime'+(method==='GET'?'?operation='+operation+'&sessionId=test-terminal':'');
@@ -59,3 +59,18 @@ test('unauthorized operators and unsupported commands never reach the runtime',a
  assert.equal((await GET(request('terminal-output','GET'))).status,401);assert.equal(backendCalls,before);
  deny=false;operator='invalid-operation';assert.equal((await POST(request('unsupported'))).status,400);assert.equal(backendCalls,before);
 });
+
+for(const status of [401,403])for(const method of ['GET','POST'])test(`private runtime HTTP ${status} on ${method} never masquerades as an expired Admin session`,async()=>{
+ operator='upstream-auth-'+status+'-'+method;backendStatus=status;
+ try{
+  const before=backendCalls;
+  const response=await (method==='GET'?GET:POST)(request(method==='GET'?'terminal-output':'terminal-input',method));
+  assert.equal(response.status,503);
+  const payload=await response.json();
+  assert.equal(payload.error,'STUDIO_RUNTIME_AUTH_REJECTED');
+  assert.ok(!JSON.stringify(payload).includes('private-runtime-detail'));
+  assert.equal(response.headers.get('Cache-Control'),'private, no-store');
+  assert.equal(backendCalls,before+1);
+ }finally{backendStatus=200;}
+});
+

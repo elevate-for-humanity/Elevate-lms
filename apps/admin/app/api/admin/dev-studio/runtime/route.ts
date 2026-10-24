@@ -9,6 +9,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
+function runtimeAuthenticationFailure() {
+  // The operator passed Admin authorization. A rejection by the private
+  // runtime belongs to the server connection, not the browser login session.
+  return NextResponse.json(
+    { error: 'STUDIO_RUNTIME_AUTH_REJECTED', message: 'The Studio server connection could not authenticate. Your Admin session does not need another sign-in.' },
+    { status: 503, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } },
+  );
+}
+
 async function runtimeConfig() {
   const config=await getSecrets(['STUDIO_BROWSER_URL','STUDIO_BROWSER_SECRET']);
   const url = String(config.STUDIO_BROWSER_URL || process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
@@ -34,6 +43,7 @@ export async function GET(request: NextRequest) {
     cache: 'no-store',
     signal: AbortSignal.timeout(20_000),
   });
+  if (response.status === 401 || response.status === 403) return runtimeAuthenticationFailure();
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
   return NextResponse.json(payload, { status: response.status });
 }
@@ -93,6 +103,7 @@ export async function POST(request: NextRequest) {
             }),
     signal: AbortSignal.timeout(120_000),
   });
+  if (response.status === 401 || response.status === 403) return runtimeAuthenticationFailure();
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
   if (response.ok && runId) {
     const db = await requireAdminClient();
@@ -113,3 +124,4 @@ export async function POST(request: NextRequest) {
   }
   return NextResponse.json(payload, { status: response.status });
 }
+

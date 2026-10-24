@@ -21,6 +21,9 @@ interface Props {
   initialPanelSize?: number;
   mobileExclusive?: boolean;
   hideClosedToolbar?: boolean;
+  stackedTabs?: boolean;
+  primaryLabel?: string;
+  panelLabel?: string;
 }
 
 /** Keeps both workspaces mounted while resizing, hiding, or expanding a panel. */
@@ -35,6 +38,9 @@ export function ResizableWorkspace({
   initialPanelSize = 45,
   mobileExclusive = false,
   hideClosedToolbar = false,
+  stackedTabs = false,
+  primaryLabel = "Editor",
+  panelLabel = "Preview",
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
@@ -46,6 +52,7 @@ export function ResizableWorkspace({
   const [stacked, setStacked] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [stackedPane, setStackedPane] = useState<"primary" | "panel">("primary");
   const drag = useRef(false);
 
   useEffect(() => {
@@ -83,6 +90,7 @@ export function ResizableWorkspace({
   };
   const mobileFull = open && stacked && mobileExclusive;
   const full = open && (expanded || mobileFull);
+  const tabbed = open && stacked && stackedTabs && !full;
   useEffect(() => {
     const element = root.current;
     if (!open || !expanded || mobileFull || !element || typeof element.showPopover !== "function") return;
@@ -109,10 +117,13 @@ export function ResizableWorkspace({
       className={`${styles.root} ${mobileFull ? styles.mobileExclusive : ""} ${open && expanded ? styles.fullScreen : ""} ${className}`}
     >
       <div className={styles.toolbar} hidden={!open && hideClosedToolbar}>
-        <span className={styles.title}>{title}</span>
+        <span className={`${styles.title} ${tabbed ? styles.tabbedTitle : ""}`}>{title}</span>
         {open ? (
           <>
-            {!mobileFull && <>
+            {tabbed ? <div role="group" aria-label={`${title} view`} className={styles.viewTabs}>
+              <button type="button" aria-pressed={stackedPane === "primary"} aria-controls={`${panelId}-primary`} onClick={() => setStackedPane("primary")}>{primaryLabel}</button>
+              <button type="button" aria-pressed={stackedPane === "panel"} aria-controls={panelId} onClick={() => setStackedPane("panel")}>{panelLabel}</button>
+            </div> : !mobileFull && <>
             <button
               type="button"
               onClick={() => resize(-5)}
@@ -137,14 +148,14 @@ export function ResizableWorkspace({
               {expanded ? "Restore split view" : "Expand panel"}
             </button>
             </>}
-            <button
+            {!tabbed && <button
               type="button"
               onClick={close}
               aria-controls={panelId}
               aria-expanded
             >
               {mobileFull ? "Back to chat" : `Close ${title}`}
-            </button>
+            </button>}
           </>
         ) : (
           <button
@@ -159,7 +170,7 @@ export function ResizableWorkspace({
       </div>
       <div
         ref={body}
-        className={`${styles.body} ${panelPosition === "start" ? styles.panelStart : ""} ${open ? styles.open : ""} ${full ? styles.expanded : ""}`}
+        className={`${styles.body} ${panelPosition === "start" ? styles.panelStart : ""} ${open ? styles.open : ""} ${full ? styles.expanded : ""} ${tabbed ? styles.tabbed : ""}`}
         style={
           {
             "--panel-width": `${width}%`,
@@ -167,10 +178,10 @@ export function ResizableWorkspace({
           } as CSSProperties
         }
       >
-        <div className={styles.primary} hidden={full}>
+        <div id={`${panelId}-primary`} className={styles.primary} hidden={full || (tabbed && stackedPane === "panel")}>
           {children}
         </div>
-        {open && !full && (
+        {open && !full && !tabbed && (
           <div
             role="separator"
             tabIndex={0}
@@ -249,7 +260,7 @@ export function ResizableWorkspace({
           id={panelId}
           aria-label={title}
           className={styles.secondary}
-          hidden={!open}
+          hidden={!open || (tabbed && stackedPane === "primary")}
         >
           {panel}
         </section>
@@ -258,3 +269,4 @@ export function ResizableWorkspace({
     </div>
   );
 }
+

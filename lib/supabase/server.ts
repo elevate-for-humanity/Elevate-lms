@@ -2,7 +2,8 @@ import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Check if Supabase is configured
@@ -71,6 +72,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
 
   try {
     const cookieStore = await cookies();
+    const hostname = (await headers()).get('host') ?? '';
 
     return createServerClient(supabaseUrl, supabaseAnonKey, {
       global: { fetch: timedFetch },
@@ -86,7 +88,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
               // Only apply to Supabase auth tokens — leave other cookies alone.
               const isAuthCookie = name.startsWith('sb-') && name.includes('-auth-token');
               const cookieOptions = isAuthCookie
-                ? { ...options, domain: '.elevateforhumanity.org' }
+                ? sessionCookieOptions(options, hostname)
                 : options;
               cookieStore.set(name, value, cookieOptions);
             });

@@ -41,3 +41,10 @@ test('blocked generation uses an existing selected asset once and retains the pr
  const result=await recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});},persistFailure:async finding=>findings.push(finding),selectedReplacement:async()=>({bytes:Buffer.from('licensed selected image'),selectedSourceAssetId:'existing-source'})});
  assert.equal(calls,1);assert.equal(result.repair.sourceAssetId,'existing-source');assert.equal(findings[0].provider.blocked,true);
 });
+test('photo recovery retry window fits within ten-minute output deadline',async()=>{
+ await recoverTeachingPhoto({...request,generate:async(_prompt,options)=>{
+  assert.equal(options.maxAttempts,3);assert.equal(options.timeoutMs,120000);
+  const worstCase=10000+options.maxAttempts*options.timeoutMs+15000+30000+30000;
+  assert.ok(worstCase<600000);return {bytes:Buffer.from('saved')};
+ }});
+});

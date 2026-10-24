@@ -44,7 +44,7 @@ jobs:
           tests/unit/epa-testing-readiness-route.test.ts
           --environment node
       - name: Required CI completion policy
-        run: node --test scripts/test-ci-required-gate.mjs
+        run: node --test scripts/test-ci-required-gate.mjs lib/phone/microphone.test.mjs
       - name: Studio GitHub credential fallback regression tests
         run: node --test scripts/test-devstudio-github-token.mjs
       - name: Automatic container build-memory policy

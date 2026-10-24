@@ -100,6 +100,16 @@ function guardedIdentity(
   };
 }
 
+function authProviderUnavailable(): NextResponse {
+  return NextResponse.json(
+    {
+      error: 'AUTH_PROVIDER_UNAVAILABLE',
+      message: 'Authentication verification is temporarily unavailable. Retry shortly.',
+    },
+    { status: 503, headers: { 'Retry-After': '30' } },
+  );
+}
+
 /** Resolve the authenticated API caller using both the primary profile role and active secondary roles. */
 export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
   try {
@@ -110,7 +120,7 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
     } = await supabase.auth.getUser();
 
     if (authError && isAuthRetryableFetchError(authError)) {
-      return guardedIdentity('', null, null, [], NextResponse.json({error:'AUTH_PROVIDER_UNAVAILABLE',message:'Authentication verification is temporarily unavailable. Retry shortly.'},{status:503,headers:{'Retry-After':'30'}}));
+      return guardedIdentity('', null, null, [], authProviderUnavailable());
     }
 
     if (authError || !user) {
@@ -140,7 +150,7 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
 
     return guardedIdentity(user.id, user.email ?? null, role, effectiveRoles);
   } catch (error) {
-    if (isAuthRetryableFetchError(error)) return guardedIdentity('', null, null, [], NextResponse.json({error:'AUTH_PROVIDER_UNAVAILABLE',message:'Authentication verification is temporarily unavailable. Retry shortly.'},{status:503,headers:{'Retry-After':'30'}}));
+    if (isAuthRetryableFetchError(error)) return guardedIdentity('', null, null, [], authProviderUnavailable());
     return guardedIdentity('', null, null, [], unauthorized());
   }
 }

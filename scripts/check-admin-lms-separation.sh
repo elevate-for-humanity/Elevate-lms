@@ -36,7 +36,9 @@ for file in "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; do
 done
 grep -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
 grep -q 'Dockerfile.admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
-grep -Fq 'lms) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
+grep -Fq 'node scripts/container-build-policy.mjs "$COMPONENT"' "$IMAGE_WF" || fail "Google image builds must use the reviewed workload registry"
+[[ "$(node scripts/container-build-policy.mjs lms)" == "$LMS_DOCKERFILE" ]] || fail "Google LMS build must select its reviewed LMS recipe"
+[[ "$(node scripts/container-build-policy.mjs admin)" == "$ADMIN_DOCKERFILE" ]] || fail "Google Admin build must select its reviewed Admin recipe"
 grep -Fq 'loadGoogleConfig(component)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
 grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
 grep -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"

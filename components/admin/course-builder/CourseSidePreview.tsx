@@ -166,7 +166,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
               <ProgressiveLessonVideo buildId={buildId} lessonId={lesson.lessonId} title={lesson.title} />
             ) : <p>This lesson has no saved video yet.</p>}
           </div>
-          <p role={buildRunning ? "status" : undefined} className="shrink-0 text-xs text-slate-300">
+          <p role="status" className="shrink-0 text-xs text-slate-300">
             {buildRunning ? "Course build in progress. Saved videos stay available." : "Latest saved lesson video."}
           </p>
         </>

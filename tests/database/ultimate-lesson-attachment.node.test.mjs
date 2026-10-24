@@ -35,7 +35,7 @@ test('completed lesson attachment against isolated PostgreSQL',async t=>{
    set request.jwt.claim.role='service_role';
   `);
   await exec(await readFile(new URL('../../supabase/migrations/20261024202258_attach_completed_ultimate_lesson_media.sql',import.meta.url),'utf8'));
-  await exec(await readFile(new URL('../../supabase/migrations/20261024214548_attach_lesson_learning_with_media.sql',import.meta.url),'utf8'));
+  await exec(await readFile(new URL('../../supabase/migrations/20261024214710_attach_lesson_learning_with_media.sql',import.meta.url),'utf8'));
   const build=randomUUID(),course=randomUUID(),lesson=randomUUID(),canonical=randomUUID(),job=randomUUID();
   const question={id:'q1',prompt:'Which action prevents contamination?',choices:['Separate clean tools','Mix used and clean tools'],answerIndex:0,explanation:'Keep cleaned tools separate.',remediation:'Review clean tool storage.',objectiveIds:['objective']};
   const artifacts={assessment_alignment:{assessment:{questions:[question],reassessment:[{...question,id:'retry'}],passingScore:80}},lesson_film_render:{render:{success:true,videoUrl:'https://media.example/saved.mp4',captionsUrl:'https://media.example/saved.vtt',transcriptUrl:'https://media.example/saved.txt',duration:372.2,sceneData:{scenes:[]}}},natural_narration:{narration:{segments:[{audioUrl:'https://media.example/voice.wav'}]}},finished_media_qa:{mediaQA:{pass:true}},narration_qa:{narrationQA:{pass:true}},instructor_script:{script:{script:'Preserved narration'}}};

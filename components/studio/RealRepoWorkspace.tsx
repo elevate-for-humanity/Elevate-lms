@@ -57,6 +57,7 @@ export default function RealRepoWorkspace({
   const [saving, setSaving] = useState(false);
   const [confirmation,setConfirmation]=useState('');
   const [runtimeReady, setRuntimeReady] = useState(false);
+  const [repositoryConnected, setRepositoryConnected] = useState(false);
   const [terminalInterrupted,setTerminalInterrupted]=useState(false);
   const [reconnect,setReconnect]=useState(0);
   const [running, setRunning] = useState(false);
@@ -96,11 +97,12 @@ export default function RealRepoWorkspace({
   // Sync and terminal recovery own initialization. Listing files before the
   // runtime is ready races the initial durable repository checkpoint.
   useEffect(() => {
-    if (runtimeReady) void refreshTree();
-  }, [runtimeReady, refreshTree]);
+    if (repositoryConnected) void refreshTree();
+  }, [repositoryConnected, refreshTree]);
 
   useEffect(() => {
     let cancelled=false,polling=false,disconnected=false;
+    setRepositoryConnected(false);
     const request=async(body:Record<string,unknown>)=>{
       const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
       const result=await response.json();if(!response.ok)throw new Error(result.error||`HTTP ${response.status}`);return result;
@@ -127,8 +129,9 @@ export default function RealRepoWorkspace({
     void(async()=>{
       const saved=savedTerminalId();
       try{
-        if(saved){terminalSessionRef.current=saved;await read(saved);return;}
+        if(saved){terminalSessionRef.current=saved;await read(saved);if(!cancelled)setRepositoryConnected(true);return;}
         await request({operation:'repository-sync',repoUrl:'https://github.com/elevate-for-humanity/Elevate-lms.git',branch:'main'});
+        if(!cancelled)setRepositoryConnected(true);
         const session=await request({operation:'terminal-create'});
         if(!session.id)throw new Error('Studio terminal session missing');
         if(cancelled){await request({operation:'terminal-stop',sessionId:session.id});return;}

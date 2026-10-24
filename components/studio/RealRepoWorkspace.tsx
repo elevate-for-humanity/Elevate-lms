@@ -93,9 +93,11 @@ export default function RealRepoWorkspace({
     }
   }, [onFileChange, output]);
 
+  // Sync and terminal recovery own initialization. Listing files before the
+  // runtime is ready races the initial durable repository checkpoint.
   useEffect(() => {
-    void refreshTree();
-  }, [refreshTree]);
+    if (runtimeReady) void refreshTree();
+  }, [runtimeReady, refreshTree]);
 
   useEffect(() => {
     let cancelled=false,polling=false,disconnected=false;

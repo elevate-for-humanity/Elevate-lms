@@ -15,6 +15,9 @@ test('production storyboard renderer retains checkpoint recovery and requires ex
   assert.ok(transformed.includes('await renderMedia('));
   assert.ok(transformed.includes('getElevateMediaStorageClient()'));
   assert.ok(transformed.includes('checkpoints.write('));
+  assert.ok(transformed.includes("uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {})"));
+  assert.ok(transformed.includes('privateCheckpointStorage()'));
+  assert.doesNotMatch(transformed, /forceSupabase/);
 
   // The legacy private checkpoint store supports reads only. A storage-cap
   // fallback must never silently create a new uncertified video in Supabase.

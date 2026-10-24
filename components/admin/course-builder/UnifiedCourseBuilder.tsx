@@ -362,6 +362,9 @@ export default function UnifiedCourseBuilder({
     <ResizableWorkspace
       className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
       title="Course side panel"
+      stackedTabs
+      primaryLabel="Build course"
+      panelLabel="Lesson preview"
       open={browserOpen}
       onOpenChange={(open) => {
         setBrowserOpen(open);
@@ -371,7 +374,7 @@ export default function UnifiedCourseBuilder({
         <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
           <nav
             aria-label="Course side panel views"
-            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-3"
+            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-1.5"
           >
             <button
               type="button"
@@ -395,7 +398,7 @@ export default function UnifiedCourseBuilder({
           </nav>
           <div
             hidden={sidePanel !== "lesson"}
-            className="min-h-0 flex-1 overflow-auto"
+            className="min-h-0 flex-1 overflow-hidden"
           >
             <CourseSidePreview courseId={courseId} />
           </div>
@@ -1628,3 +1631,4 @@ export function UltimateBuildPanel({
     </section>
   );
 }
+

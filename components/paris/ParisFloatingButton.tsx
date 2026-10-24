@@ -243,7 +243,7 @@ export function ParisFloatingButton({
           <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span className={learnerSurface ? '' : 'hidden sm:inline'}>
             {learnerSurface
-              ? 'Need help?'
+              ? 'Ask PARIS · Course help'
               : portalSurface
                 ? 'Ask PARIS · Portal help'
                 : 'Ask PARIS'}

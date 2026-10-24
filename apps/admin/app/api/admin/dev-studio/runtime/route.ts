@@ -9,6 +9,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
+function runtimeAuthenticationFailure() {
+  // The operator passed Admin authorization. A rejection by the private
+  // runtime belongs to the server connection, not the browser login session.
+  return NextResponse.json(
+    { error: 'STUDIO_RUNTIME_AUTH_REJECTED', message: 'The Studio server connection could not authenticate. Your Admin session does not need another sign-in.' },
+    { status: 503, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } },
+  );
+}
+
 async function runtimeConfig() {
   const config=await getSecrets(['STUDIO_BROWSER_URL','STUDIO_BROWSER_SECRET']);
   const url = String(config.STUDIO_BROWSER_URL || process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
@@ -18,10 +27,10 @@ async function runtimeConfig() {
 }
 
 export async function GET(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
+  const rateLimited = await applyRateLimit(request, 'api', { key: `studio-runtime-read:${auth.id}` });
+  if (rateLimited) return rateLimited;
   const operation = request.nextUrl.searchParams.get('operation') || 'health';
   const { url, secret } = await runtimeConfig();
   const target = operation === 'files'
@@ -34,19 +43,26 @@ export async function GET(request: NextRequest) {
     cache: 'no-store',
     signal: AbortSignal.timeout(20_000),
   });
+  if (response.status === 401 || response.status === 403) return runtimeAuthenticationFailure();
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
   return NextResponse.json(payload, { status: response.status });
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'strict');
-  if (rateLimited) return rateLimited;
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
   const body = await request.json().catch(() => ({}));
   const operation = String(body.operation || 'exec');
   if (!['exec','repository-sync','terminal-create','terminal-input','terminal-stop','terminal-resume','file-write'].includes(operation))
     return NextResponse.json({error:'Unsupported Studio runtime operation'},{status:400});
+  // Polling, ordinary terminal input and repository synchronization have
+  // different workloads. Do not spend a shared public strict bucket on every
+  // keystroke or let one operator's reads exhaust another operator's controls.
+  const synchronizing = operation === 'repository-sync';
+  const rateLimited = await applyRateLimit(request, synchronizing ? 'strict' : 'api', {
+    key: `studio-runtime-${synchronizing ? 'sync' : 'command'}:${auth.id}`,
+  });
+  if (rateLimited) return rateLimited;
   const command = String(body.command || '').trim();
   if (operation === 'exec' && !command) return NextResponse.json({ error: 'command is required' }, { status: 400 });
   const runId = typeof body.studioRunId === 'string' ? body.studioRunId : '';
@@ -87,6 +103,7 @@ export async function POST(request: NextRequest) {
             }),
     signal: AbortSignal.timeout(120_000),
   });
+  if (response.status === 401 || response.status === 403) return runtimeAuthenticationFailure();
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
   if (response.ok && runId) {
     const db = await requireAdminClient();
@@ -107,3 +124,4 @@ export async function POST(request: NextRequest) {
   }
   return NextResponse.json(payload, { status: response.status });
 }
+

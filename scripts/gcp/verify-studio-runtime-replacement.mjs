@@ -7,12 +7,12 @@ const fail=code=>{throw Error(code);};
 /** Exact zero-traffic candidate only. Restarts its process, never a serving revision.
  * Synthetic file/browser state only; no login, payment, user-file deletion or replay.
  */
-export async function verifyStudioRuntimeReplacement({url,revision,sha,secret,readTraffic,request=fetch,sleep=ms=>new Promise(r=>setTimeout(r,ms)),attempts=60}={}){
+export async function verifyStudioRuntimeReplacement({url,revision,sha,candidateTag,secret,readTraffic,request=fetch,sleep=ms=>new Promise(r=>setTimeout(r,ms)),attempts=60}={}){
  let base;try{base=new URL(url);}catch{fail('STUDIO_RECOVERY_CANDIDATE_INVALID');}
- if(base.protocol!=='https:'||!base.hostname.startsWith('studio-verify---elevate-studio-browser-')||!base.hostname.endsWith('.run.app')||base.pathname!=='/'||base.search||base.hash||base.username||base.password||!/^elevate-studio-browser-[a-z0-9-]+$/.test(revision||'')||!/^[a-f0-9]{40}$/.test(sha||'')||typeof secret!=='string'||secret.length<16||typeof readTraffic!=='function')fail('STUDIO_RECOVERY_CANDIDATE_INVALID');
+ if(!/^sc-[a-f0-9]{8}-[a-f0-9]{8}$/.test(candidateTag||'')||!/^[a-f0-9]{40}$/.test(sha||'')||!candidateTag.startsWith('sc-'+sha.slice(0,8)+'-')||base.protocol!=='https:'||!base.hostname.startsWith(candidateTag+'---elevate-studio-browser-')||!base.hostname.endsWith('.run.app')||base.pathname!=='/'||base.search||base.hash||base.username||base.password||!/^elevate-studio-browser-[a-z0-9-]+$/.test(revision||'')||typeof secret!=='string'||secret.length<16||typeof readTraffic!=='function')fail('STUDIO_RECOVERY_CANDIDATE_INVALID');
  const assertCandidate=async()=>{
   const traffic=await readTraffic();
-  if(!Array.isArray(traffic)||!traffic.some(t=>t.revisionName===revision&&t.tag==='studio-verify'&&t.url===url)||traffic.some(t=>(t.percent>0||t.latestRevision===true)&&t.revisionName===revision))fail('STUDIO_RECOVERY_SERVING_REVISION_REFUSED');
+  if(!Array.isArray(traffic)||!traffic.some(t=>t.revisionName===revision&&t.tag===candidateTag&&t.url===url)||traffic.some(t=>(t.percent>0||t.latestRevision===true)&&t.revisionName===revision))fail('STUDIO_RECOVERY_SERVING_REVISION_REFUSED');
  };
  const serviceHeaders={'x-studio-browser-secret':secret,'content-type':'application/json'};
  const call=async(path,{method='GET',body,token,anonymous=false,timeoutMs=40000}={})=>{

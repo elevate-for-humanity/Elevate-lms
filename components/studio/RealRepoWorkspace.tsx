@@ -58,6 +58,7 @@ export default function RealRepoWorkspace({
   const [confirmation,setConfirmation]=useState('');
   const [runtimeReady, setRuntimeReady] = useState(false);
   const [repositoryConnected, setRepositoryConnected] = useState(false);
+  const [signInRequired, setSignInRequired] = useState(false);
   const [terminalInterrupted,setTerminalInterrupted]=useState(false);
   const [reconnect,setReconnect]=useState(0);
   const [running, setRunning] = useState(false);
@@ -71,6 +72,19 @@ export default function RealRepoWorkspace({
 
   const dirty = content !== savedContent;
 
+  // Never replay a write after a rejected session. Keep the editor and saved
+  // terminal mounted while the operator signs in in a separate tab.
+  const studioFetch = useCallback(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const response = await fetch(input, { ...init, credentials: 'same-origin' });
+    if (response.status === 401) {
+      setSignInRequired(true);
+      setRuntimeReady(false);
+      setRepositoryConnected(false);
+      setStatus('Sign in to reconnect');
+    }
+    return response;
+  }, []);
+
   const output = useCallback((line: string) => {
     setTerminalOutput((previous) => [...previous, line]);
     onOutput?.(line);
@@ -78,7 +92,7 @@ export default function RealRepoWorkspace({
 
   const refreshTree = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/dev-studio/files?source=container', { cache: 'no-store',signal:AbortSignal.timeout(30000) });
+      const response = await studioFetch('/api/admin/dev-studio/files?source=container', { cache: 'no-store',signal:AbortSignal.timeout(30000) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
       const nextTree = Array.isArray(data.tree) ? data.tree : [];
@@ -92,7 +106,7 @@ export default function RealRepoWorkspace({
       setStatus(message);
       output(`Repository error: ${message}`);
     }
-  }, [onFileChange, output]);
+  }, [onFileChange, output, studioFetch]);
 
   // Sync and terminal recovery own initialization. Listing files before the
   // runtime is ready races the initial durable repository checkpoint.
@@ -104,11 +118,11 @@ export default function RealRepoWorkspace({
     let cancelled=false,polling=false,disconnected=false,authRejected=false;
     setRepositoryConnected(false);
     const request=async(body:Record<string,unknown>)=>{
-      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
       const result=await response.json();if(!response.ok)throw new Error(result.error||`HTTP ${response.status}`);return result;
     };
     const read=async(sessionId:string)=>{
-      const response=await fetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+      const response=await studioFetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store',signal:AbortSignal.timeout(20000)});
       const result=await response.json();
       if(!response.ok){
         if(response.status===404){rememberTerminal('');terminalSessionRef.current='';}
@@ -145,7 +159,7 @@ export default function RealRepoWorkspace({
       try{await read(id);}catch(error){if(!cancelled){setRuntimeReady(false);if(!disconnected)output(`Terminal disconnected; reconnecting to the same session: ${error instanceof Error?error.message:'Unknown error'}`);disconnected=true;}}finally{polling=false;}
     },1500);
     return()=>{cancelled=true;window.clearInterval(timer);terminalSessionRef.current='';};
-  },[output,reconnect]);
+  },[output,reconnect,studioFetch]);
 
   useEffect(() => {
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -155,7 +169,7 @@ export default function RealRepoWorkspace({
     setConfirmation('');
     setStatus(`Opening ${path}…`);
     try {
-      const response = await fetch(`/api/admin/dev-studio/files?source=container&path=${encodeURIComponent(path)}`, {
+      const response = await studioFetch(`/api/admin/dev-studio/files?source=container&path=${encodeURIComponent(path)}`, {
         cache: 'no-store',
       });
       const data = await response.json();
@@ -179,7 +193,7 @@ export default function RealRepoWorkspace({
     setStatus(`Committing ${activePath}…`);
     try {
       const updating = Boolean(sha);
-      const response = await fetch('/api/admin/dev-studio/files', {
+      const response = await studioFetch('/api/admin/dev-studio/files', {
         method: updating ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -233,7 +247,7 @@ export default function RealRepoWorkspace({
 
   async function stageActiveFileInRuntime() {
     if(!runtimeReady || !activePath)throw new Error('Connect the runtime and select a file first');
-    const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
+    const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',
       headers:{'content-type':'application/json'},body:JSON.stringify({operation:'file-write',path:activePath,content})});
     const result=await response.json();
     if(!response.ok || !result.ok)throw new Error(result.error || 'Runtime file staging failed');
@@ -246,7 +260,7 @@ export default function RealRepoWorkspace({
     if(!sessionId || !trimmed || running)return;
     setRunning(true);output(`$ ${trimmed}`);
     try {
-      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',
         headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-input',sessionId,data:trimmed+'\n'})});
       const result=await response.json();
       if(!response.ok || !result.ok)throw new Error(result.error || 'Command delivery failed');
@@ -273,7 +287,7 @@ export default function RealRepoWorkspace({
   async function resumeTerminal(){
     const sessionId=terminalSessionRef.current||savedTerminalId();if(!sessionId)return;
     try{
-      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-resume',sessionId})});
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-resume',sessionId})});
       const result=await response.json();if(!response.ok)throw new Error(result.error||'Terminal recovery failed');
       terminalSessionRef.current=sessionId;rememberTerminal(sessionId);terminalStateRef.current='running';setTerminalInterrupted(false);setRuntimeReady(true);
       output('New shell started from the saved directory. Previous commands were not repeated.');
@@ -284,7 +298,7 @@ export default function RealRepoWorkspace({
     const sessionId=terminalSessionRef.current;
     if(!sessionId)return;
     try {
-      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',
         headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-stop',sessionId})});
       if(!response.ok)throw new Error('Terminal stop failed');
       terminalSessionRef.current='';rememberTerminal('');setTerminalInterrupted(false);setRuntimeReady(false);setRunning(false);output('Studio terminal stopped.');
@@ -364,6 +378,11 @@ export default function RealRepoWorkspace({
         </button>
       </div>
 
+      {signInRequired && <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-amber-700 bg-amber-950 px-3 py-3 text-sm text-amber-100">
+        <span>Your Admin session needs sign-in. Your editor and saved terminal are kept here.</span>
+        <a href="/login?redirect=%2Fstudio%2Frepository" target="_blank" rel="noopener noreferrer" className="underline">Sign in to Admin</a>
+        <button type="button" onClick={() => { setSignInRequired(false); setReconnect(value => value + 1); }} className="rounded border border-amber-300 px-3 py-1">Reconnect after sign-in</button>
+      </div>}
       {dirty&&branch==='main'&&<label className="flex items-center gap-2 bg-slate-900 px-3 py-2 text-xs text-white">To commit to main, type CONFIRM PUSH<input aria-label="Main commit confirmation" value={confirmation} onChange={e=>setConfirmation(e.target.value)} className="rounded border border-slate-500 bg-slate-950 p-2 text-white" /></label>}
       <div className="flex min-h-0 flex-1">
         <aside className="w-64 shrink-0 overflow-y-auto border-r border-[#3c3c3c] bg-[#252526] py-1">
@@ -427,3 +446,4 @@ export default function RealRepoWorkspace({
     </div>
   );
 }
+

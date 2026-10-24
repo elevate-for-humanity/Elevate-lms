@@ -6,7 +6,8 @@ describe('host shop search discovery', () => {
     const sitemap = readFileSync('apps/marketing/app/sitemap.ts', 'utf8');
     expect(sitemap).toContain('await getApprovedShops()');
     expect(sitemap).not.toContain('...featuredHostShopRoutes');
-    expect(sitemap).toContain('/host-shops/${shop.slug}');
+    expect(sitemap).toContain('.filter((shop) => Boolean(shop.publicSlug))');
+    expect(sitemap).toContain('/host-shops/${shop.publicSlug}');
   });
 
   it('publishes business identity and local discovery structured data', () => {

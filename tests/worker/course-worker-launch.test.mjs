@@ -29,8 +29,10 @@ test('neither launch path accepted never claims running or consumes saved course
   assert.equal(result.executionVerified,false);assert.match(result.message,/Scheduled recovery may retry/);
  }
 });
-test('regional queue includes existing approved builds and administrator requests',()=>{
- const url=scopedCourseQueueUrl('https://database.example/rest/v1/ultimate_build_jobs?or=(status.eq.queued,status.eq.running)');
+test('regional queue preserves dispatcher eligibility without a hard-coded build allowlist',()=>{
+ const input='https://database.example/rest/v1/ultimate_build_jobs?or=(status.eq.queued,status.eq.running)&available_at=lte.2026-10-24T12:00:00Z&lease_expires_at=is.null';
+ const url=scopedCourseQueueUrl(input);
+ assert.equal(url.href,new URL(input).href);
  assert.equal(url.searchParams.get('or'),'(status.eq.queued,status.eq.running)');
- assert.match(url.searchParams.get('and'),/build_id.in./);assert.match(url.searchParams.get('and'),/payload->>requestedBy.not.is.null/);
+ assert.equal(url.searchParams.has('and'),false);
 });

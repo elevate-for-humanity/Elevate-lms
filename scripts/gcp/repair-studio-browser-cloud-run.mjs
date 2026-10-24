@@ -49,7 +49,9 @@ const staleVolumes=(existingBrowser?.volumes||[]).filter(v=>!mounted.has(v.name)
 const mountArguments=authMount?[]:['--add-volume=name=elevate-studio-browser-auth,mount-path=/var/lib/studio-browser-auth,type=cloud-storage,bucket='+bucket+',mount-options=uid=1001;gid=1001;file-mode=600;dir-mode=700'];
 if(staleVolumes.length)mountArguments.push('--remove-volume='+staleVolumes.join(','));
 // A verification run must never claim a tag used by an active Admin connection.
-const candidateTag='studio-candidate-'+sha.slice(0,12)+'-'+randomUUID().slice(0,8);
+// Cloud Run limits service name plus traffic tag to 46 characters.
+const candidateTag='sc-'+sha.slice(0,8)+'-'+randomUUID().slice(0,8);
+if(candidateTag.length+name.length>46)throw Error('STUDIO_CANDIDATE_TAG_TOO_LONG');
 if((existingService.status?.traffic||[]).some(t=>t.tag===candidateTag))throw Error('STUDIO_CANDIDATE_TAG_COLLISION');
 let url,state,candidateRevision,trafficActivated=false;
 try {
@@ -101,7 +103,7 @@ if(!foundationResponse.ok)throw Error('Live candidate browser foundation failed;
 const foundation=await foundationResponse.json();
 if(foundation.passed!==true||foundation.commit!==sha||!Array.isArray(foundation.checks)||!foundation.checks.length||foundation.checks.some(check=>check.passed!==true))throw Error('Live candidate browser foundation evidence invalid; serving traffic retained');
 console.log(JSON.stringify({candidateRevision,commit:sha,browserFoundationPassed:true,checks:foundation.checks.map(check=>({name:check.name,passed:check.passed}))}));
-const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
+const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,candidateTag,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
 if(replacement?.passed!==true||replacement.runtimeReplaced!==true||replacement.isolatedWorkspaceFileRestored!==true)throw Error('STUDIO_RUNTIME_REPLACEMENT_UNVERIFIED');
 console.log(JSON.stringify(replacement));
 if(process.env.STUDIO_CANDIDATE_ONLY==='true'){

@@ -15,7 +15,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
-function mock(saved = true) {
+function mock(saved = true, activeJob = false) {
   const fetcher = vi.fn(async (url: string, options?: RequestInit) => ({
     ok: true,
     json: async () =>
@@ -52,6 +52,7 @@ function mock(saved = true) {
                 id: "build",
                 status: "running",
                 current_step: "lesson_film_render",
+                ...(activeJob ? { ultimate_build_jobs: [{ status: 'running', payload: { progress: { phase: 'render-frames:1800' } } }] } : {}),
               },
             ],
           },
@@ -65,7 +66,8 @@ it("shows selected course video without a general browser or writes", async () =
   const video = await screen.findByLabelText("First lesson side preview");
   expect(video).toHaveAttribute("src", "https://media.example/one.mp4");
   expect(screen.queryByText("Live render portions")).toBeNull();
-  expect(screen.getByRole("status")).toHaveTextContent("lesson film render");
+  expect(screen.getByRole("status")).toHaveTextContent("Latest saved lesson video.");
+  expect(screen.queryByText(/lesson film render/)).toBeNull();
   fireEvent.change(screen.getByLabelText("Lesson to watch"), {
     target: { value: "two" },
   });
@@ -76,6 +78,15 @@ it("shows selected course video without a general browser or writes", async () =
   expect(
     f.mock.calls.every(([, options]) => !options || !("method" in options)),
   ).toBe(true);
+});
+it("keeps plain-language build status after the player instead of exposing render internals", async () => {
+  mock(true, true);
+  render(<CourseSidePreview courseId="course" />);
+  const video = await screen.findByLabelText("First lesson side preview");
+  const status = screen.getByRole('status');
+  expect(status).toHaveTextContent('Course build in progress. Saved videos stay available.');
+  expect(screen.queryByText(/render-frames/)).toBeNull();
+  expect(video.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 it("shows completed render portions while a lesson has no saved final video", async () => {
   mock(false);
@@ -141,3 +152,4 @@ it("follows the queued course cursor rather than a stale running lesson", async 
   expect(screen.getByLabelText("Lesson to watch")).toHaveValue("three");
   expect(screen.queryByLabelText("Old lesson side preview")).toBeNull();
 });
+

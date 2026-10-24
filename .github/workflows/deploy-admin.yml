@@ -160,14 +160,13 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
-          STUDIO_BROWSER_ENV="$(node scripts/gcp/production-browser-binding.mjs)"
           # Reserve rollout headroom before creating a replacement revision.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            --update-env-vars="AI_NARRATION_PROVIDER=kokoro,$STUDIO_BROWSER_ENV" --quiet
+            --update-env-vars="AI_NARRATION_PROVIDER=kokoro" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         run: |

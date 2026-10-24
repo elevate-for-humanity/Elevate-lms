@@ -23,3 +23,12 @@ for (const [file,buildLabel,uploadLabel] of [
  assert.ok(build>=0 && build<auth,'Google identity must not gate image building');
  assert.ok(auth<billing && billing<upload,'Google upload must retain billing admission');
 });
+
+test('ordinary Admin releases retain the current browser workspace binding until a verified cutover',()=>{
+ const s=workflow();
+ assert.ok(!s.includes('STUDIO_BROWSER_ENV='));
+ const update=s.slice(s.indexOf('gcloud run services update elevate-admin-migration'),s.indexOf('      - name: Health-check and activate'));
+ assert.ok(update.includes('--update-env-vars="AI_NARRATION_PROVIDER=kokoro"'));
+ assert.ok(!update.includes('STUDIO_BROWSER_URL='));
+ assert.ok(!update.includes('STUDIO_BROWSER_PUBLIC_URL='));
+});

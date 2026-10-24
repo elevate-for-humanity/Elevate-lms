@@ -1,3 +1,4 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
@@ -221,6 +222,19 @@ export async function middleware(req: NextRequest) {
     data: { user },
     error,
   } = await supabase.auth.getUser();
+
+  if (error && isAuthRetryableFetchError(error)) {
+    const response = pathname.startsWith('/api/')
+      ? NextResponse.json(
+          { error: 'AUTH_PROVIDER_UNAVAILABLE', message: 'Authentication verification is temporarily unavailable. Retry shortly.' },
+          { status: 503 },
+        )
+      : new NextResponse('Authentication verification is temporarily unavailable. Refresh this page shortly to try again.', {
+          status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
+    response.headers.set('Retry-After', '30');
+    return withCookies(response);
+  }
 
   if (error || !user) {
     return withCookies(unauthenticatedRedirect(req, pathname, search));

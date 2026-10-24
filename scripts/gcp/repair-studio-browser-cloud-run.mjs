@@ -49,7 +49,9 @@ const staleVolumes=(existingBrowser?.volumes||[]).filter(v=>!mounted.has(v.name)
 const mountArguments=authMount?[]:['--add-volume=name=elevate-studio-browser-auth,mount-path=/var/lib/studio-browser-auth,type=cloud-storage,bucket='+bucket+',mount-options=uid=1001;gid=1001;file-mode=600;dir-mode=700'];
 if(staleVolumes.length)mountArguments.push('--remove-volume='+staleVolumes.join(','));
 // A verification run must never claim a tag used by an active Admin connection.
-const candidateTag='studio-candidate-'+sha.slice(0,12)+'-'+randomUUID().slice(0,8);
+// Cloud Run limits service name plus traffic tag to 46 characters.
+const candidateTag='sc-'+sha.slice(0,8)+'-'+randomUUID().slice(0,8);
+if(candidateTag.length+name.length>46)throw Error('STUDIO_CANDIDATE_TAG_TOO_LONG');
 if((existingService.status?.traffic||[]).some(t=>t.tag===candidateTag))throw Error('STUDIO_CANDIDATE_TAG_COLLISION');
 let url,state,candidateRevision,trafficActivated=false;
 try {
@@ -138,3 +140,5 @@ command(['run','services','update','elevate-admin-migration','--project='+projec
 console.log(JSON.stringify({service:name,url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,authorizedWorkspace:true,anonymousWorkspaceDenied:true,adminSwitched:true,oldProviderRemoved:false,existingProviderLoginRecovery:'not verified'}));
 
 }
+
+

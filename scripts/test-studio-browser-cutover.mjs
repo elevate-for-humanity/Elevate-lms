@@ -43,6 +43,12 @@ async function execute(overrides={}){
  return f;
 }
 function switched(f){return f.commands.some(a=>a[0]==='run'&&a[1]==='services'&&a[2]==='update'&&a[3]==='elevate-admin-migration');}
+test('candidate hostname fits the Cloud Run service and traffic tag limit',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ const tag=deploy.find(a=>a.startsWith('--tag=')).slice(6);
+ assert.ok(tag.length+deploy[2].length<=46,'Cloud Run rejects combined service and tag names above 46 characters');
+});
 test('Admin cutover requires exact revision, durable storage and both authorization proofs',async()=>{
  const f=await execute();assert.equal(f.error,undefined);assert.equal(switched(f),true);
  const grants=f.commands.filter(a=>a[0]==='secrets'&&a[1]==='add-iam-policy-binding');
@@ -91,7 +97,7 @@ test('browser releases preserve mounted storage and restored runtime settings',a
 test('pinned old traffic is preserved until the exact candidate passes all proofs',async()=>{
  const f=await execute();assert.equal(f.error,undefined);
  const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
- assert.ok(deploy.includes('--no-traffic'));assert.match(deploy.find(a=>a.startsWith('--tag=')),/^--tag=studio-candidate-[a-f0-9]{12}-[a-f0-9]{8}$/);
+ assert.ok(deploy.includes('--no-traffic'));assert.match(deploy.find(a=>a.startsWith('--tag=')),/^--tag=sc-[a-f0-9]{8}-[a-f0-9]{8}$/);
  const activation=f.events.findIndex(e=>e.command?.includes('--to-revisions=browser-candidate=100'));
  assert.ok(activation>0);
  const before=f.events.slice(0,activation).filter(e=>e.request).map(e=>e.request);
@@ -174,3 +180,5 @@ test('repeated verification of the same image uses a fresh tag and never reuses 
  assert.notEqual(tag(first),'--tag=studio-verify');
  assert.notEqual(tag(second),'--tag=studio-verify');
 });
+
+

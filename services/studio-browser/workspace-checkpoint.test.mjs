@@ -64,3 +64,21 @@ test('a same-size edit with restored modification time is still checkpointed',as
  await fsp.rm(f.root,{recursive:true});await fsp.mkdir(f.root);await new WorkspaceCheckpoint(f.config).initialize();
  assert.equal(await fsp.readFile(file,'utf8'),'new lesson');
 });
+
+test('unfinished Git transfers cannot exceed snapshot limits or replace accepted objects',async t=>{
+ const f=await fixture(t),store=new WorkspaceCheckpoint({...f.config,maxBytes:1024});
+ await store.initialize();
+ const pack=path.join(f.root,'.git','objects','pack');await fsp.mkdir(pack,{recursive:true});
+ await fsp.writeFile(path.join(pack,'pack-accepted.pack'),'accepted Git objects');
+ await fsp.writeFile(path.join(pack,'tmp_pack_incomplete'),Buffer.alloc(4096));
+ await fsp.writeFile(path.join(pack,'tmp_idx_incomplete'),Buffer.alloc(4096));
+ await fsp.writeFile(path.join(f.root,'draft.txt'),'user draft');
+ const saved=await store.checkpoint();assert.equal(saved.changed,true);
+ assert.ok(saved.bytes<1024);
+ assert.equal((await fsp.stat(path.join(pack,'tmp_pack_incomplete'))).size,4096);
+ await fsp.rm(f.root,{recursive:true});await fsp.mkdir(f.root);
+ await new WorkspaceCheckpoint({...f.config,maxBytes:1024}).initialize();
+ assert.equal(await fsp.readFile(path.join(pack,'pack-accepted.pack'),'utf8'),'accepted Git objects');
+ assert.equal(await fsp.readFile(path.join(f.root,'draft.txt'),'utf8'),'user draft');
+ await assert.rejects(fsp.stat(path.join(pack,'tmp_pack_incomplete')),/ENOENT/);
+});

@@ -21,6 +21,10 @@ export class WorkspaceCheckpoint {
   const walk=async directory=>{
    for(const item of (await fsp.readdir(path.join(this.root,directory),{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){
     if(excluded.has(item.name))continue;
+    // Git transfer temporaries are not accepted objects or recoverable work.
+    // A timed-out fetch can leave gigabytes here; preserve them locally without
+    // letting an incomplete transfer invalidate every durable checkpoint.
+    if(directory==='.git/objects/pack' && /^tmp_(?:pack|idx)_/.test(item.name))continue;
     const name=safeRelative(directory?directory+'/'+item.name:item.name),full=path.join(this.root,name),stat=await fsp.lstat(full);
     const entry={name,mode:stat.mode&0o777,mtimeMs:stat.mtimeMs,ctimeMs:stat.ctimeMs,size:stat.size};
     if(stat.isSymbolicLink()){

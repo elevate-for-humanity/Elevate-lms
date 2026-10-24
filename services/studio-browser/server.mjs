@@ -13,6 +13,7 @@ import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import {WorkspaceCheckpoint} from './workspace-checkpoint.mjs';
+import {syncWorkspaceRepository} from './repository-sync.mjs';
 import {BrowserFileStore} from './browser-file-store.mjs';
 import {GcsWorkspaceObjects} from './gcs-workspace-objects.mjs';
 import {BrowserWorkspaceStore} from './browser-workspace-store.mjs';
@@ -139,20 +140,9 @@ async function ensureRepository(body = {}) {
   const repoUrl = String(body.repoUrl || process.env.STUDIO_REPOSITORY_URL || '');
   const branch = String(body.branch || process.env.STUDIO_REPOSITORY_BRANCH || 'main');
   if (!repoUrl) throw new BrowserServiceError('repository_not_configured', 503);
-  await fs.promises.mkdir(workspaceRoot, { recursive: true });
-  const gitDir = path.join(workspaceRoot, '.git');
-  if (!fs.existsSync(gitDir)) {
-    const entries = await fs.promises.readdir(workspaceRoot);
-    if (entries.length) throw new BrowserServiceError('workspace_not_empty', 409);
-    await execFileAsync('git', ['clone', '--depth', '1', '--branch', branch, repoUrl, workspaceRoot], { timeout: 120_000, maxBuffer: 10 * 1024 * 1024 });
-  } else {
-    await execFileAsync('git', ['fetch', 'origin', branch, '--prune'], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
-    await execFileAsync('git', ['checkout', branch], { cwd: workspaceRoot, timeout: 30_000, maxBuffer: 10 * 1024 * 1024 });
-    await execFileAsync('git', ['pull', '--ff-only', 'origin', branch], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
-  }
-  const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], { cwd: workspaceRoot });
+  const result = await syncWorkspaceRepository({ root: workspaceRoot, repoUrl, branch });
   await checkpointWorkspace();
-  return { ok: true, branch, sha: stdout.trim() };
+  return result;
 }
 
 async function executeWorkspaceCommand(body) {

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { PRIVILEGED_MFA_ROLES, privilegedMfaEnforcementEnabled } from '@/lib/auth/privileged-mfa';
@@ -95,15 +96,13 @@ function requiredRoles(pathname: string): readonly UserRole[] {
   return ADMIN_ROLES;
 }
 
-function platformCookieOptions(options: Record<string, unknown> | undefined) {
-  return {
+function platformCookieOptions(options: Record<string, unknown> | undefined, hostname: string) {
+  return sessionCookieOptions({
     ...(options || {}),
     path: '/',
     sameSite: 'lax' as const,
-    ...(process.env.NODE_ENV === 'production'
-      ? { domain: '.elevateforhumanity.org', secure: true }
-      : {}),
-  };
+    ...(process.env.NODE_ENV === 'production' ? { secure: true } : {}),
+  }, hostname);
 }
 
 function unauthenticatedRedirect(req: NextRequest, pathname: string, search: string) {
@@ -206,7 +205,7 @@ export async function middleware(req: NextRequest) {
     response.headers.set('Cache-Control', 'private, no-store, max-age=0');
     response.headers.set('Vary', 'Cookie');
     for (const cookie of pendingCookies) {
-      response.cookies.set(cookie.name, cookie.value, platformCookieOptions(cookie.options) as any);
+      response.cookies.set(cookie.name, cookie.value, platformCookieOptions(cookie.options, req.nextUrl.hostname) as any);
     }
     response.cookies.set('__efh_pathname', `${pathname}${search}`, {
       httpOnly: false,

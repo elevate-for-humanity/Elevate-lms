@@ -43,7 +43,7 @@ RUN node scripts/verify-portal-production-contracts.mjs
 
 # Admin document navigations must remain browser-owned. Intercepting them in
 # the service worker can resolve without a Response and surface as ERR_FAILED.
-RUN ! grep -Fq "event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' })" /app/public/sw-admin.js
+RUN node scripts/verify-admin-service-worker-navigation.mjs
 
 # Failed or completed Course Builder tasks must expose a supported retry path.
 RUN grep -Fq "Start new run" /app/components/studio/AgenticCourseRunPanel.tsx

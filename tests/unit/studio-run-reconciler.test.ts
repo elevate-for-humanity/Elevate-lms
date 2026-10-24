@@ -31,14 +31,25 @@ describe('canonical Studio run reconciliation', () => {
     ).toEqual({ status: 'blocked', failure: null });
   });
 
-  it('requires every required step to be verified or intentionally skipped', () => {
+  it('blocks completion when a required step is skipped', () => {
     expect(
       deriveStudioRunState([
         { status: 'verified', required: true },
         { status: 'skipped', required: true },
         { status: 'failed', required: false },
       ]),
-    ).toEqual({ status: 'completed', failure: null });
+    ).toEqual({ status: 'blocked', failure: { message: 'A required Studio step was skipped without verification' } });
+  });
+
+  it('completes verified required work while allowing optional steps to be skipped', () => {
+    expect(deriveStudioRunState([
+      { status: 'verified', required: true },
+      { status: 'skipped', required: false },
+    ])).toEqual({ status: 'completed', failure: null });
+  });
+
+  it('does not complete an empty run', () => {
+    expect(deriveStudioRunState([])).toEqual({ status: 'executing', failure: null });
   });
 
   it('makes a required failure authoritative', () => {

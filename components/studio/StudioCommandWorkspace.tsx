@@ -534,7 +534,7 @@ export default function StudioCommandWorkspace({
                       <RepositoryLivePreview
                         filePath={null}
                         content=""
-                        initialUrl={`https://admin.elevateforhumanity.org${mountedWorkspaceUrl}`}
+                        initialUrl={mountedWorkspaceUrl}
                         trustedInteractive
                         allowManualTarget={false}
                         allowExternalOpen={false}

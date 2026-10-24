@@ -36,7 +36,6 @@ import {
   type BrowserSpeechRecognition,
 } from '@/lib/browser/speech-recognition';
 import {
-  ELLIE_ROUTE_LABEL,
   fetchAiHealth,
   routeEllieMessage,
   selectStudioAgent,
@@ -677,7 +676,6 @@ export default function UnifiedEllieChat({
   const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
   const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
   const [showActivity, setShowActivity] = useState(false);
-  const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const messagesViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
@@ -1043,7 +1041,6 @@ export default function UnifiedEllieChat({
     setLoading(true);
     const route = attachment ? 'platform' : routeEllieMessage(text);
     const agent = selectStudioAgent(text);
-    setLastRoute(route);
     const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
     const assistantIdx = messages.length + 1;
@@ -1096,6 +1093,7 @@ export default function UnifiedEllieChat({
             [...messages.map(({ role, content }) => ({ role, content })), userMsg],
             {
               agent: 'ADMIN_AI',
+              conversationId: canonicalConversationId,
               fileContext,
               documentsContext: attachment?.context,
               provider: selectedProvider === 'auto' ? undefined : selectedProvider,
@@ -1180,7 +1178,6 @@ export default function UnifiedEllieChat({
             <p className="truncate text-sm font-semibold">PARIS</p>
             <p className={`truncate text-[11px] ${mutedTextClass}`}>
               Platform tools · {health}
-              {lastRoute ? ` · last: ${ELLIE_ROUTE_LABEL[lastRoute]}` : ''}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -1387,17 +1384,12 @@ export default function UnifiedEllieChat({
                     {message.role === 'assistant' && (
                       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-600">
                         PARIS
-                        {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}
                     <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                       {message.content}
                     </p>
-                    {message.role === 'assistant' && message.capabilitiesUsed?.length ? (
-                      <p className="mt-2 text-xs text-gray-600">
-                        Capabilities used: {message.capabilitiesUsed.join(', ')}
-                      </p>
-                    ) : null}
+
                     {message.role === 'assistant' && message.toolCalls?.length ? (
                       <ToolActivity toolCalls={message.toolCalls} />
                     ) : null}

@@ -19,6 +19,7 @@ COPY services/studio-browser/command-arguments.mjs ./command-arguments.mjs
 COPY services/studio-browser/server.mjs ./server.mjs
 COPY services/studio-browser/cdp-*.mjs ./
 COPY services/studio-browser/workspace-checkpoint.mjs ./workspace-checkpoint.mjs
+COPY services/studio-browser/repository-sync.mjs ./repository-sync.mjs
 COPY services/studio-browser/gcs-workspace-objects.mjs ./gcs-workspace-objects.mjs
 COPY services/studio-browser/browser-file-store.mjs ./browser-file-store.mjs
 COPY services/studio-browser/browser-workspace-store.mjs ./browser-workspace-store.mjs

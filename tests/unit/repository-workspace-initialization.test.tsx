@@ -68,6 +68,34 @@ describe('Repository workspace initialization', () => {
     expect(screen.getByText(/Runtime unavailable: AUTH_REQUIRED/)).toBeInTheDocument();
   });
 
+  it('keeps unsaved editor text through session loss and reconnection without replaying writes', async () => {
+    window.sessionStorage.setItem(terminalKey, 'saved-editor-terminal');
+    let signedIn = true;
+    const fetcher = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      if (!signedIn) return Promise.resolve(response({ error: 'AUTH_REQUIRED' }, 401));
+      const url = String(input);
+      if (url === filesUrl) return Promise.resolve(response(tree));
+      if (url.startsWith(filesUrl + '&path=')) return Promise.resolve(response({ path: 'app.ts', content: 'saved source', sha: 'fixture-sha' }));
+      if (url.includes('terminal-output')) return Promise.resolve(response({ state: 'running', output: [], cursor: 0 }));
+      throw new Error(`Unexpected mutation: ${String(init?.body)}`);
+    });
+    vi.stubGlobal('fetch', fetcher);
+    render(<RealRepoWorkspace />);
+    fireEvent.click(await screen.findByRole('button', { name: 'app.ts', exact: true }));
+    const editor = await screen.findByDisplayValue('saved source');
+    fireEvent.change(editor, { target: { value: 'my unsaved source' } });
+    signedIn = false;
+    fireEvent.click(screen.getByTitle('Refresh'));
+    await screen.findByRole('link', { name: 'Sign in to Admin' });
+    expect(editor).toHaveValue('my unsaved source');
+    signedIn = true;
+    fireEvent.click(screen.getByRole('button', { name: 'Reconnect after sign-in' }));
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'Sign in to Admin' })).not.toBeInTheDocument());
+    expect(editor).toHaveValue('my unsaved source');
+    expect(window.sessionStorage.getItem(terminalKey)).toBe('saved-editor-terminal');
+    expect(fetcher.mock.calls.every(([, init]) => !init?.method || init.method === 'GET')).toBe(true);
+  });
+
   it('reconnects the preserved terminal after sign-in without replaying commands or repository synchronization', async () => {
     window.sessionStorage.setItem(terminalKey, 'saved-auth-terminal');
     let signedIn = false;

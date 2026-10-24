@@ -13,6 +13,8 @@ import {Readable} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
 import {S3Client,PutObjectCommand,GetObjectCommand,HeadObjectCommand} from '@aws-sdk/client-s3';
 
+import {retryCourseMediaTransfer} from './course-media-transfer-retry.mjs';
+
 const BUCKETS=['course-videos','course_videos'];
 const safePath=(name)=>name.split('/').every(part=>part&&part!=='.'&&part!=='..')&&!name.includes('\\');
 async function digestStream(stream){
@@ -27,6 +29,8 @@ export async function migrate({request=fetch,env=process.env,client,limit=Number
  const s3=client??new S3Client({
   endpoint:requiredFrom(env,'ELEVATE_MEDIA_ENDPOINT'),
   region:requiredFrom(env,'ELEVATE_MEDIA_REGION'),
+  maxAttempts:3,
+  requestHandler:{connectionTimeout:10000,socketTimeout:120000,requestTimeout:300000},
   credentials:{accessKeyId:requiredFrom(env,'ELEVATE_MEDIA_ACCESS_KEY_ID'),secretAccessKey:requiredFrom(env,'ELEVATE_MEDIA_SECRET_ACCESS_KEY')}
  });
  if(!Number.isSafeInteger(limit)||limit<1||limit>1000)throw Error('MIGRATION_LIMIT must be 1..1000');
@@ -71,14 +75,20 @@ export async function migrate({request=fetch,env=process.env,client,limit=Number
        if(e?.$metadata?.httpStatusCode===404||e?.name==='NotFound')return null;throw e;
       });
       if(!(head?.Metadata?.sha256===local.sha256&&Number(head.ContentLength)===local.size)){
-       await s3.send(new PutObjectCommand({Bucket:targetBucket,Key:key,Body:createReadStream(file),
+       await retryCourseMediaTransfer(async()=>{
+        const body=createReadStream(file);
+        try{await s3.send(new PutObjectCommand({Bucket:targetBucket,Key:key,Body:body,
          ContentLength:local.size,Metadata:{sha256:local.sha256},
-         ContentType:item.metadata?.mimetype||'application/octet-stream'}));
+         ContentType:item.metadata?.mimetype||'application/octet-stream'}));}
+        finally{body.destroy();}
+       },{onRetry:retry=>onResult(JSON.stringify({retry:true,phase:'upload',key,...retry}))});
        copied++;
       }
-      const remote=await s3.send(new GetObjectCommand({Bucket:targetBucket,Key:key}));
-      if(!remote.Body)throw Error('DESTINATION_READ_EMPTY');
-      const compared=await digestStream(remote.Body);
+      const compared=await retryCourseMediaTransfer(async()=>{
+       const remote=await s3.send(new GetObjectCommand({Bucket:targetBucket,Key:key}));
+       if(!remote.Body)throw Error('DESTINATION_READ_EMPTY');
+       try{return await digestStream(remote.Body);}finally{remote.Body.destroy?.();}
+      },{onRetry:retry=>onResult(JSON.stringify({retry:true,phase:'readback',key,...retry}))});
       if(compared.sha256!==local.sha256||compared.size!==local.size)throw Error('DESTINATION_CHECKSUM_MISMATCH');
       verified++;onResult(JSON.stringify({sourceBucket:bucket,key,bytes:local.size,sha256:local.sha256,verified:true}));
      }finally{await rm(temp,{recursive:true,force:true});}

@@ -44,7 +44,8 @@ test('blocked generation uses an existing selected asset once and retains the pr
 test('photo recovery retry window fits within ten-minute output deadline',async()=>{
  await recoverTeachingPhoto({...request,generate:async(_prompt,options)=>{
   assert.equal(options.maxAttempts,3);assert.equal(options.timeoutMs,120000);
-  const worstCase=10000+options.maxAttempts*options.timeoutMs+15000+30000+30000;
+  // Retry-After may raise each of the two backoffs to sixty seconds.
+  const worstCase=10000+options.maxAttempts*options.timeoutMs+2*60000+30000;
   assert.ok(worstCase<600000);return {bytes:Buffer.from('saved')};
  }});
 });

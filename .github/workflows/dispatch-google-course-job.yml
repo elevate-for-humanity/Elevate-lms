@@ -48,6 +48,8 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
+      - name: Read redacted course worker stop evidence
+        run: node scripts/gcp/course-worker-stop-diagnostics.mjs
       - name: Dispatch queued or expired work without overlapping executions
         env:
           COURSE_WORKER_PARALLELISM: '1'

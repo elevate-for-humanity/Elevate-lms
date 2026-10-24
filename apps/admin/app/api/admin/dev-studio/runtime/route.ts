@@ -18,10 +18,10 @@ async function runtimeConfig() {
 }
 
 export async function GET(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
+  const rateLimited = await applyRateLimit(request, 'api', { key: `studio-runtime-read:${auth.id}` });
+  if (rateLimited) return rateLimited;
   const operation = request.nextUrl.searchParams.get('operation') || 'health';
   const { url, secret } = await runtimeConfig();
   const target = operation === 'files'
@@ -39,14 +39,20 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'strict');
-  if (rateLimited) return rateLimited;
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
   const body = await request.json().catch(() => ({}));
   const operation = String(body.operation || 'exec');
   if (!['exec','repository-sync','terminal-create','terminal-input','terminal-stop','terminal-resume','file-write'].includes(operation))
     return NextResponse.json({error:'Unsupported Studio runtime operation'},{status:400});
+  // Polling, ordinary terminal input and repository synchronization have
+  // different workloads. Do not spend a shared public strict bucket on every
+  // keystroke or let one operator's reads exhaust another operator's controls.
+  const synchronizing = operation === 'repository-sync';
+  const rateLimited = await applyRateLimit(request, synchronizing ? 'strict' : 'api', {
+    key: `studio-runtime-${synchronizing ? 'sync' : 'command'}:${auth.id}`,
+  });
+  if (rateLimited) return rateLimited;
   const command = String(body.command || '').trim();
   if (operation === 'exec' && !command) return NextResponse.json({ error: 'command is required' }, { status: 400 });
   const runId = typeof body.studioRunId === 'string' ? body.studioRunId : '';

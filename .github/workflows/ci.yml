@@ -50,7 +50,7 @@ jobs:
           node scripts/check-build-memory-policy.mjs
           node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
       - name: Ultimate course builder repair regression tests
-        run: node --test tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/objective-practice.test.mjs tests/worker/authored-practice.test.mjs
+        run: node --test tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/objective-practice.test.mjs tests/worker/authored-practice.test.mjs tests/worker/studio-runtime-rate-limit.test.mjs
       - name: Authored cosmetology sample production adapter regression
         run: pnpm exec vitest run tests/unit/ultimate-authored-sample.test.ts
       - name: Traffic scope and unavailable-data regression tests

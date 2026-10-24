@@ -101,7 +101,7 @@ export default function RealRepoWorkspace({
   }, [repositoryConnected, refreshTree]);
 
   useEffect(() => {
-    let cancelled=false,polling=false,disconnected=false;
+    let cancelled=false,polling=false,disconnected=false,authRejected=false;
     setRepositoryConnected(false);
     const request=async(body:Record<string,unknown>)=>{
       const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
@@ -112,6 +112,7 @@ export default function RealRepoWorkspace({
       const result=await response.json();
       if(!response.ok){
         if(response.status===404){rememberTerminal('');terminalSessionRef.current='';}
+        if(response.status===401||response.status===403){authRejected=true;setRepositoryConnected(false);}
         throw new Error(result.error||`HTTP ${response.status}`);
       }
       if(cancelled)return;
@@ -140,7 +141,7 @@ export default function RealRepoWorkspace({
       }catch(error){if(!cancelled){setRuntimeReady(false);disconnected=true;output(`Runtime unavailable: ${error instanceof Error?error.message:'Connection failed'}`);}}
     })();
     const timer=window.setInterval(async()=>{
-      const id=terminalSessionRef.current;if(cancelled||polling||!id)return;polling=true;
+      const id=terminalSessionRef.current;if(cancelled||polling||authRejected||!id)return;polling=true;
       try{await read(id);}catch(error){if(!cancelled){setRuntimeReady(false);if(!disconnected)output(`Terminal disconnected; reconnecting to the same session: ${error instanceof Error?error.message:'Unknown error'}`);disconnected=true;}}finally{polling=false;}
     },1500);
     return()=>{cancelled=true;window.clearInterval(timer);terminalSessionRef.current='';};

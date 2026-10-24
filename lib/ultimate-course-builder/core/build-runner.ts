@@ -58,6 +58,13 @@ export class UltimateBuildRunner {
   constructor(private handlers: Partial<Record<UltimateBuildStep, StepHandler>>) {}
 
   async run(ctx: UltimateRunContext) {
+    // Keep recovery payloads until a replacement passes validation and is saved.
+    // Invalidating a certificate must not destroy the previously saved lesson.
+    const retainedCheckpoints = new Map<UltimateBuildStep, Record<string, unknown>>();
+    for (const step of ULTIMATE_BUILD_STEPS) {
+      const checkpoint = ctx.artifacts[step];
+      if (checkpoint) retainedCheckpoints.set(step, structuredClone(checkpoint));
+    }
     const attempts: Array<{
       failedStep: UltimateBuildStep;
       target: UltimateBuildStep;
@@ -176,7 +183,10 @@ export class UltimateBuildRunner {
           ctx.artifacts[step] = previous;
         } else {
           ctx.artifacts[step] = artifacts;
-          await ctx.persistArtifact?.({ step, artifacts });
+          if (!failures.length) {
+            await ctx.persistArtifact?.({ step, artifacts });
+            retainedCheckpoints.set(step, structuredClone(artifacts));
+          }
         }
         if (!failures.length) {
           if(isRepairTarget){
@@ -210,6 +220,14 @@ export class UltimateBuildRunner {
             : message.split(':')[0];
         failures = [{ step, severity: 'error', code, message }];
       }
+      // A thrown handler, rejected candidate, or failed save leaves the last
+      // durable payload available. Cleared passedSteps stay cleared: recovered
+      // media is history, not permission to publish against changed inputs.
+      for (const [savedStep, checkpoint] of retainedCheckpoints) {
+        if (savedStep === step || ctx.artifacts[savedStep] === undefined)
+          ctx.artifacts[savedStep] = structuredClone(checkpoint);
+      }
+      artifacts = ctx.artifacts[step] ?? artifacts;
       ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'failed', artifacts, findings: failures });
       for (const finding of failures) await ctx.persistFinding?.(finding);

@@ -76,7 +76,7 @@ const learnerTests = new Map();
 const foundationFixtures = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
 // Cloud Run requires durable object storage; local browser fixtures have no cloud credentials.
-const workspaceObjects=(process.env.K_SERVICE||process.env.STUDIO_WORKSPACE_STORAGE==='gcs')?new GcsWorkspaceObjects():null;
+const workspaceObjects=(process.env.K_SERVICE||process.env.STUDIO_WORKSPACE_STORAGE==='gcs')?new GcsWorkspaceObjects({prefix:process.env.STUDIO_WORKSPACE_OBJECT_PREFIX||'workspaces/admin-repository-v1'}):null;
 const workspaceCheckpoint=workspaceObjects?new WorkspaceCheckpoint({root:workspaceRoot,secret:sharedSecret,objects:workspaceObjects}):null;
 let workspaceRecovery={ready:!workspaceCheckpoint,persistent:Boolean(workspaceCheckpoint),state:workspaceCheckpoint?'restoring':'volatile'};
 async function ensureWorkspaceReady({mutation=false}={}){

@@ -21,17 +21,16 @@ export async function POST(req: NextRequest) {
   if (!ownedEnrollment) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   const admin = await requireAdminClient();
   if (!admin) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
-  // OCR is a preflight readability check, not an identity or eligibility decision.
-  // Unreadable evidence must not be recorded as submitted for verification.
+  // OCR assists reviewers; a failed extraction must not block scanned PDFs or IDs.
+  // Do not treat readable text as proof of identity or eligibility.
   const extracted = await autoExtract(Buffer.from(await file.arrayBuffer()), file.type);
-  if (!extracted.text.trim()) {
-    return NextResponse.json({ error: 'Document text could not be read. Upload a clearer image or text-based PDF.' }, { status: 422 });
-  }
   const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
   const path = `${user.id}/${requirementId}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await admin.storage.from('documents').upload(path, file, { contentType: file.type, upsert: false });
   if (uploadError) return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   const { error: updateError } = await admin.from('enrollment_requirements').update({ evidence_url: path, status: 'completed', updated_at: new Date().toISOString() }).eq('id', requirementId).eq('enrollment_id', requirement.enrollment_id);
   if (updateError) { await admin.storage.from('documents').remove([path]); return NextResponse.json({ error: 'Document record could not be saved' }, { status: 500 }); }
-  return NextResponse.json({ success: true });
+  // The existing enrollment workspace treats 'completed' as submitted/pending
+  // verification and only 'verified' as approved. Keep that distinction intact.
+  return NextResponse.json({ success: true, verification_status: 'pending_review', ocr_readable: Boolean(extracted.text.trim()) });
 }

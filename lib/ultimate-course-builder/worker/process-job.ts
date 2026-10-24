@@ -1,3 +1,4 @@
+import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
 import { preservedCourseCursor } from './preserve-completed.mjs';
 import { recordProductionAlert } from './production-alert';
 import {ULTIMATE_BUILD_STEPS} from '../core/types';
@@ -194,6 +195,8 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       await queue.complete(job.id,workerId,generation);
       return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
     }
+    await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
+      validate:assertCompleteLesson,assertActive});
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {

@@ -26,12 +26,13 @@ function scenario(payload, completed = true, options = {}) {
     async claim() { return { id: 'job', build_id: 'build', execution_generation: 1, payload }; }
     async heartbeat() { return true; }
     async complete() { events.push('complete'); }
+    async yieldProgress() { events.push('advance'); }
     async fail() { events.push('fail'); }
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [preservedCourseCursor,async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const names = ['attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
@@ -41,7 +42,7 @@ test('a successful targeted lesson clears course running state before releasing 
     const s = scenario(payload);
     const result = await s.run();
     assert.equal(result.completed, true);
-    assert.deepEqual(s.events, [{ buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
+    assert.deepEqual(s.events, ['attach', { buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
   }
 });
 
@@ -76,5 +77,17 @@ test('a completed legacy owner-review course publishes without waiting for a man
  const s=scenario({});s.build.profile.publicationPolicy='owner-review-required';
  const result=await s.run();assert.equal(result.completed,true);
  assert.equal(s.profileWrites[0]?.publicationPolicy,'automatic-quality-verified');
- assert.deepEqual(s.events,[{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
+ assert.deepEqual(s.events,['attach',{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
+});
+
+
+test('failed media attachment cannot advance or complete the job',async()=>{
+ const s=scenario({},true,{attach:async()=>{throw Error('ULTIMATE_ATTACHMENT_READBACK_FAILED');},nextWork:()=>({continue:true,payload:{nextCompetencyIndex:3}})});
+ const result=await s.run();
+ assert.equal(result.completed,false);assert.deepEqual(s.events,['fail']);
+});
+test('attachment completes before the course cursor advances',async()=>{
+ const s=scenario({},true,{nextWork:()=>({continue:true,payload:{nextCompetencyIndex:3}})});
+ const result=await s.run();assert.equal(result.continuing,true);
+ assert.deepEqual(s.events,['attach','advance']);
 });

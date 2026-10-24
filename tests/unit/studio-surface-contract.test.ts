@@ -232,7 +232,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain("import('@/components/admin/course-builder/UnifiedCourseBuilder')");
     expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
     expect(courseBuilder).toContain('embedded?: boolean');
-    expect(courseBuilder).toContain('if (embedded) return;');
+    expect(courseBuilder).toContain('syncLocationWithUrl = !embedded');
+    expect(courseBuilder).toContain('if (!syncLocationWithUrl) return;');
   });
 
   it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {

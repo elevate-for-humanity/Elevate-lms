@@ -2,7 +2,7 @@
 
 Verdict: **partial; not a certification that all 171 paths or every production button works.**
 
-Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, commit `6b7c3251de00a3b305ed00f8132ea05266f3e169`. Code is awaiting required checks and deployment at report preparation.
+Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, commit `6b7c3251de00a3b305ed00f8132ea05266f3e169`. PR #2117 merged as `cb038e3920232b5f673b6e7d802eab5b4f6f6e39`. Follow-up PR #2120 (`faa837d8`) adds navigation, OJT export, Operations, and Compliance repairs and is awaiting CI. Production activation is not yet verified.
 
 ## Scope and counts
 
@@ -12,7 +12,8 @@ Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, commit 
 | API route patterns | 53 | Includes interpolated route IDs; every pattern resolves to an Admin route module. 85 exported/re-exported method handlers. All 75 directly traced fetch methods match their route exports. |
 | Static navigation destinations | 58 | Four entry files; each resolves to an Admin page module after repairs. |
 | Extracted server queries | 311 | 138 route/service modules, including immediate service imports and the Ultimate release service. Literal table, select/filter/order columns, and resolved object writes; dynamic expressions, joins, deeper calls, and row-level semantics need additional checks. |
-| Supabase tables inspected | 81 | All requested table names exist in active project cuxzzpsyufcewtmicszk. Includes the now-removed rollback snapshot query. No customer rows or secret values exported. |
+| Supabase tables inspected | 141 | All requested table names exist in active project cuxzzpsyufcewtmicszk. Includes the now-removed rollback snapshot query. No customer rows or secret values exported. |
+| Additional page/helper queries | 153 | 61 modules; 73 table references. All literal columns inspected against the combined live metadata; dynamic filters also manually checked where repaired. |
 
 The earlier 171 count has no supplied path manifest. It cannot be reconciled honestly by treating button declarations as unique website routes. The JSON companion contains the exact file/line inventory.
 
@@ -27,6 +28,15 @@ The earlier 171 count has no supplied path manifest. It cannot be reconciled hon
 | saveCourseModule expected missing course_modules.metadata | Module authoring settings could not save | Additive migration 20261024183332_course_module_authoring_settings applied and verified. Existing module_completion_rules remain the progression authority. No business records changed. |
 | Task rollback queried nonexistent snapshot fields and never restored files | Could falsely mark a task rolled_back | Removed false state mutation. Authenticated endpoint returns 501 TASK_ROLLBACK_UNAVAILABLE. Actual automatic restoration remains unavailable and is not counted as working. |
 
+## Follow-up findings in PR #2120
+
+- **Hours Export** (`/hours-export`) redirected to the dashboard. Replaced with a real date/status form and `/api/admin/apprenticeships/hours/export` GET, backed by `loadAdminHours`: progress_entries, apprentices, programs, profiles, and hour_entries review reconciliation. Existing Student Hours and dashboard return links are explicit. Protected by the same admin/super_admin/staff boundary, rate limiting, filter validation, private/no-store headers, CSV formula/quote escaping, and export audit events. No live data export was triggered.
+- **Document Tools** (`/docs`) counted profiles as documents. Removed misleading queries and added direct links to existing document review, WIOA documents, program-holder documents, and Compliance, with a dashboard return.
+- **Operations** used nonexistent workflows.is_active and workflow_dead_letters.last_error. Mapped to status=active and error, matching the live schema and workflow scheduler.
+- **Compliance** selected nonexistent age_group, auto_generated, submission_method, action_required, and deadline columns and unsupported embedded relations. Uses is_youth and exact participant counts, existing report/alert columns, preserved session RLS, and explicit unavailable states. Placement and credential rates remain unavailable pending reconciled outcome definitions; enrollment completion is not treated as credential attainment. Audit links now open /compliance-audit.
+- Post-merge CI exposed a test reaching a hidden Operations pane in compact Course Builder mode. The regression now opens the pane and retains running-worker and publication assertions. Follow-up suite: four files, 18 tests pass.
+- The legacy /api/admin/export/weekly-hours endpoint is not used by the new form. Inspection identified ignored shop filtering and zero-hour fallback defects in that older endpoint; these remain outside the repaired export contract and require follow-up before reuse.
+
 ## Database ownership and publication
 
 The Ultimate publish route delegates to UltimateReleaseService, which persists canonical course_modules and course_lessons, records ultimate_release_versions, and updates courses. LMS course content reads these canonical course tables. Live catalog inspection confirmed foreign keys from lessons to courses/modules, modules to courses, courses to programs, build records to courses, lesson-build records to builds, and release records to courses/builds. Aggregate live-data checks found zero mismatched course IDs in lesson/module, release/build, and video-job/lesson joins. The LMS lesson page filters both lesson ID and course ID, and its previous/next/return links remain under that course. No production course was published during this audit.
@@ -39,11 +49,11 @@ Security advisories were inspected before and after the migration. No course_mod
 
 - 24 focused test files, 108 tests passed, including the new layout, job-feed, lesson-storage, and rollback-boundary cases plus portal/PWA/release regression suites.
 - Changed TypeScript source files passed ESLint; existing Pages-directory configuration warning remains.
-- Admin production compilation, static generation, and generated-route typecheck passed before the final lesson-storage/rollback edits. Final Admin typecheck passed. Final integrated Admin build is queued behind the shared validation lock; CI build checks are required before merge.
+- Final PR #2117 Admin production build and typecheck passed; its exact-head Admin and LMS CI builds passed before merge. The merged-main suite subsequently failed one compact-pane test, repaired in PR #2120. Follow-up initial typecheck passed; expanded final build and exact-head CI remain pending.
 - Studio and PWA architecture guards passed earlier in this repair; no new shell or service-worker cache path was introduced.
 - Side-by-side diff review performed. The change-review companion records exact differing lines and deliberate-change classifications.
 - Anonymous HTTP sweep: 110 requests, including 58 page destinations, 49 static API URL probes, and three PWA manifests. Page requests reached the login boundary; that is not authenticated-page success. All 49 static API probes reached 401 after one recheck resolved two initial timeouts, which remain recorded in JSON. No credentials or mutation payloads were sent.
-- Browser checks used the existing Admin session. Subsequent broad authenticated navigation encountered repeated browser timeouts and a browser runtime reset; uncompleted destinations remain unverified.
+- Browser checks used the existing Admin session. After recovering from a browser runtime reset, all 58 navigation destinations were visited. The JSON and table below distinguish rendered pages, placeholder defects, and degraded data. Visits alone do not certify button mutations or other roles.
 
 PWA manifests returned 200 with Admin start_url /dashboard, Learner /lms/dashboard, and Apprentice /apprentice on their correct hosts. Actual install, offline recovery, and device resize behavior remain unverified.
 
@@ -66,7 +76,7 @@ PWA manifests returned 200 with Admin start_url /dashboard, Learner /lms/dashboa
 | Workforce Board | https://www.elevateforhumanity.org/workforce-board/dashboard | Rendered Regional workforce dashboard |
 | Case Manager | https://www.elevateforhumanity.org/case-manager/dashboard | Rendered Case Manager Dashboard |
 | Provider | https://www.elevateforhumanity.org/provider/dashboard | Rendered Training provider operations |
-| Host Shop | https://app.elevateforhumanity.org/host-shop/dashboard | Registry/source mapping inspected; a specific shop was not selected; destination not live-verified |
+| Host Shop | https://app.elevateforhumanity.org/host-shop/dashboard | Rendered Host Shop PWA admin preview; Select Host Shop and Manage partners link to admin /partners; no shop selected |
 | Course Builder | https://admin.elevateforhumanity.org/studio/courses | Rendered; Courses, Credential Registry and Media Library tabs checked; no production generation/publish action triggered |
 
 ## API inventory
@@ -196,13 +206,78 @@ All 58 page modules exist. These anonymous requests reached authentication; only
 
 ## Latest runtime identity
 
-Health checks at 18:50–18:51 UTC returned HTTP 200 and healthy/ready for marketing (b59a5571), Admin (8dc7baaa), and LMS (e047b01e). None serves repair commit 6b7c3251 yet. Runtime revisions are retained in the JSON companion.
+Health checks at 19:23 UTC returned HTTP 200 and healthy/ready for marketing (b59a5571), Admin (8dc7baaa), and LMS (e047b01e). None serves merged repair cb038e39 or follow-up faa837d8 yet. Google deployment runs are still in progress/queued. Runtime revisions are retained in the JSON companion.
 
 ## Remaining acceptance gaps
 
-- Reconcile the requested 171-path manifest against this scoped inventory; complete authenticated rendering and action checks for every included destination.
-- Complete CI and final build/type validation, merge normally, then verify the actual Google Cloud revision/image and live SHA for the deployed repairs. Initial live checks showed Admin/marketing on b59a5571 and LMS on e047b01e, while main was 8212d2b9; those earlier SHAs are not current deployment proof.
+- Reconcile the requested 171-path manifest against this scoped inventory. All 58 inventoried navigation URLs were visited; production-safe mutation acceptance remains incomplete.
+- Recheck the Workflow Designer warning: AI task data was unavailable while general workflows rendered. Metadata exists, but a working live query is not established.
+- Reconcile WIOA outcome records before enabling placement/credential rates; remediate the older unused weekly-hours export before reconnecting it.
+- Complete PR #2120 CI and final build validation, merge normally, then verify the actual Google Cloud revision/image and live SHA for the deployed repairs. Initial live checks showed Admin/marketing on b59a5571 and LMS on e047b01e, while main was 8212d2b9; those earlier SHAs are not current deployment proof.
 - Perform production-safe end-to-end write-flow tests with identified disposable fixtures; imports, generated builds, course publication, payment, deletion, and real user changes were not triggered for testing.
 - Implement a verified task restoration mechanism before enabling automatic rollback.
 - Finish the separately documented Course Builder state unification: shared course/build/lesson/artifact selection and consistent draft-versus-approved preview policy. This patch does not claim that architecture is complete.
 - Verify selected-shop access, Creator entitlement flow, installed-PWA behavior, and every role's row/tenant boundaries with appropriate test accounts.
+
+## Authenticated page observations
+
+| Requested path | Observed destination | Result |
+|---|---|---|
+| `/data-import` | `/data-import` | Data Import; rendered |
+| `/applications` | `/applications` | Applications; rendered |
+| `/students` | `/students` | Students; rendered |
+| `/programs` | `/programs` | Programs Management; rendered |
+| `/funding` | `/funding` | Funding; rendered |
+| `/documents/review` | `/documents/review` | Document Review; rendered |
+| `/program-holders` | `/program-holders` | Program Holders; rendered |
+| `/phone` | `/phone` | Elevate Communications Hub; rendered |
+| `/phone/email` | `/phone/email` | Elevate Email; rendered |
+| `/partners` | `/partners` | Approved Host Shop readiness; rendered |
+| `/portals` | `/portals` | All portals; rendered |
+| `/analytics/traffic` | `/analytics/traffic` | Website Traffic; rendered |
+| `/reports` | `/reports` | Reports; rendered |
+| `/compliance` | `/compliance` | Compliance Dashboard; rendered |
+| `/website-editor` | `/website-editor` | Website Editor; rendered |
+| `/system-health` | `/system-health` | System Health; rendered |
+| `/operations/infrastructure-costs` | `/operations/infrastructure-costs` | Google Cloud & GPU Cost Control; rendered |
+| `/wioa/documents` | `/wioa/documents` | WIOA Documents; rendered |
+| `/submissions` | `/submissions` | External Submissions OS; rendered |
+| `/program-holder-documents` | `/program-holder-documents` | Program Holder Documents; rendered |
+| `/course-import` | `/course-import` | Course Import; rendered |
+| `/migrations` | `/migrations` | Data Migrations; rendered |
+| `/monitoring` | `/monitoring` | Monitoring; rendered |
+| `/monitoring/setup` | `/monitoring/setup` | Monitoring Setup; rendered |
+| `/activity` | `/activity` | Activity Feed; rendered |
+| `/audit-logs` | `/audit-logs` | Audit Logs; rendered |
+| `/compliance-audit` | `/compliance-audit` | Compliance Audit; rendered |
+| `/enrollment-jobs` | `/enrollment-jobs` | Enrollment Jobs Monitor; rendered |
+| `/payout-queue` | `/payout-queue` | Partner Payout Queue; rendered |
+| `/review-queue` | `/review-queue` | Review Queue; rendered |
+| `/workone-queue` | `/workone-queue` | WorkOne / Funding Queue; rendered |
+| `/referrals` | `/referrals` | Agency Referrals; rendered |
+| `/shops` | `/shops` | Shop Management; rendered |
+| `/system/jobs` | `/system/jobs` | Background Jobs; rendered |
+| `/system/webhooks` | `/system/webhooks` | Webhook Health; rendered |
+| `/phone/meetings` | `/phone/meetings` | Team Meetings; rendered |
+| `/provider-applications` | `/provider-applications` | Provider Applications; rendered |
+| `/store` | `/store` | Store Management; rendered |
+| `/licenses` | `/licenses` | Platform Licenses; rendered |
+| `/license-requests` | `/license-requests` | License Requests; rendered |
+| `/promo-codes` | `/promo-codes` | Promo Codes; rendered |
+| `/api-keys` | `/api-keys` | API Keys; rendered |
+| `/integrations` | `/integrations` | Communication; Scheduling; Payments; Data & CRM; Learning; rendered |
+| `/operations` | `/operations` | Operations Hub; rendered |
+| `/integrations/gemini` | `/integrations/gemini` | Google Gemini AI; rendered |
+| `/governance` | `/governance` | Governance; rendered |
+| `/governance/security` | `/governance/security` | Security & Data Protection Statement; rendered |
+| `/ferpa` | `/ferpa` | FERPA Compliance; rendered |
+| `/settings` | `/settings` | Settings; rendered |
+| `/tenants` | `/tenants` | Tenant Management; rendered |
+| `/studio/courses` | `/studio/courses` | Course Production Studio; rendered |
+| `/hours-export` | `/dashboard` | wrong destination; placeholder redirect confirmed in source |
+| `/docs` | `/docs` | source defect: profiles presented as documents; repair prepared |
+| `/` | `/dashboard` | expected Admin landing; rendered dashboard |
+| `/dashboard` | `/dashboard` | rendered earlier; latest h1 check empty |
+| `/studio/browser` | `/studio/browser` | rendered; browser idle; Admin, Course Builder and Studio return controls present |
+| `/studio/workflows` | `/studio?workspace=workflows` | rendered Workflow Designer selected; general workflows loaded; AI task records degraded |
+| `/studio` | `/studio` | rendered conversation workspace; What are we building today? |

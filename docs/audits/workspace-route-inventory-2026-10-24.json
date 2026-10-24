@@ -9805,6 +9805,6773 @@
       "missing": []
     }
   ],
+  "pageDatabaseQueries": [
+    {
+      "file": "apps/admin/app/activity/page.tsx",
+      "line": 70,
+      "table": "audit_logs",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "action",
+        "actor_id",
+        "actor_email",
+        "actor_role",
+        "resource_type",
+        "resource_id",
+        "event_type",
+        "ip_address",
+        "created_at",
+        "metadata",
+        "details"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/activity/page.tsx",
+      "line": 75,
+      "table": "audit_logs",
+      "ops": [
+        "select"
+      ],
+      "columns": [
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/activity/page.tsx",
+      "line": 76,
+      "table": "enrollments",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/activity/page.tsx",
+      "line": 77,
+      "table": "applications",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/activity/page.tsx",
+      "line": 88,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/analytics/traffic/page.tsx",
+      "line": 25,
+      "table": "page_views",
+      "ops": [
+        "select",
+        "gte",
+        "lte",
+        "or"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/analytics/traffic/page.tsx",
+      "line": 33,
+      "table": "page_views",
+      "ops": [
+        "select",
+        "gte",
+        "lte",
+        "or"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/api-keys/page.tsx",
+      "line": 18,
+      "table": "api_keys",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "name",
+        "is_active",
+        "status",
+        "created_at",
+        "last_used_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/api-keys/page.tsx",
+      "line": 23,
+      "table": "api_keys",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/api-keys/page.tsx",
+      "line": 27,
+      "table": "api_keys",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "is_active"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/applications/page.tsx",
+      "line": 79,
+      "table": "programs",
+      "ops": [
+        "select",
+        "neq",
+        "not",
+        "not",
+        "order"
+      ],
+      "columns": [
+        "slug",
+        "title",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/applications/page.tsx",
+      "line": 98,
+      "table": "applications",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/applications/page.tsx",
+      "line": 109,
+      "table": "applications",
+      "ops": [
+        "select"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/applications/page.tsx",
+      "line": 111,
+      "table": "applications",
+      "ops": [
+        "select",
+        "is",
+        "is",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "onboarding_sent_at",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance/page.tsx",
+      "line": 42,
+      "table": "compliance_items",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance/page.tsx",
+      "line": 43,
+      "table": "compliance_items",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance/page.tsx",
+      "line": 44,
+      "table": "compliance_items",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance-audit/page.tsx",
+      "line": 22,
+      "table": "compliance_audits",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance-audit/page.tsx",
+      "line": 23,
+      "table": "compliance_audits",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance-audit/page.tsx",
+      "line": 24,
+      "table": "compliance_audits",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "action",
+        "details",
+        "ip_address",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/compliance-audit/page.tsx",
+      "line": 29,
+      "table": "compliance_events",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "action",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/documents/review/page.tsx",
+      "line": 34,
+      "table": "documents",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/documents/review/page.tsx",
+      "line": 43,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email",
+        "role"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/enrollment-jobs/page.tsx",
+      "line": 21,
+      "table": "enrollment_jobs",
+      "ops": [
+        "select",
+        "in",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/ferpa/page.tsx",
+      "line": 28,
+      "table": "documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "document_type"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/ferpa/page.tsx",
+      "line": 32,
+      "table": "documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/ferpa/page.tsx",
+      "line": 33,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "role"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/ferpa/page.tsx",
+      "line": 34,
+      "table": "compliance_alerts",
+      "ops": [
+        "select",
+        "eq",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "alert_type",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/ferpa/page.tsx",
+      "line": 39,
+      "table": "audit_logs",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "action",
+        "target_type",
+        "resource_type",
+        "created_at",
+        "actor_role",
+        "actor_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/funding/page.tsx",
+      "line": 46,
+      "table": "ita_vouchers",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "voucher_id",
+        "participant_name",
+        "wioa_type",
+        "fund_stream",
+        "service_name",
+        "voucher_date",
+        "voucher_expire_date",
+        "total_voucher_amount",
+        "payments_to_date",
+        "status",
+        "is_final",
+        "remittance_email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/funding/page.tsx",
+      "line": 50,
+      "table": "ita_vouchers",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/funding/page.tsx",
+      "line": 51,
+      "table": "ita_vouchers",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/funding/page.tsx",
+      "line": 52,
+      "table": "ita_vouchers",
+      "ops": [
+        "select",
+        "eq",
+        "lte"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "voucher_expire_date"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/funding/page.tsx",
+      "line": 53,
+      "table": "program_enrollments",
+      "ops": [
+        "select",
+        "in",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "full_name",
+        "email",
+        "program_slug",
+        "payment_status",
+        "amount_paid_cents",
+        "funding_source",
+        "payout_status",
+        "payout_amount",
+        "payout_due_date",
+        "access_granted_at",
+        "enrolled_at",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/funding/page.tsx",
+      "line": 75,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/license-requests/page.tsx",
+      "line": 21,
+      "table": "license_requests",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/license-requests/page.tsx",
+      "line": 22,
+      "table": "license_requests",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/license-requests/page.tsx",
+      "line": 23,
+      "table": "license_requests",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/license-requests/page.tsx",
+      "line": 24,
+      "table": "license_requests",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "license_type",
+        "status",
+        "requested_at",
+        "approved_at",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/licenses/page.tsx",
+      "line": 20,
+      "table": "licenses",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "company_name",
+        "admin_email",
+        "tier",
+        "plan_type",
+        "status",
+        "max_users",
+        "max_programs",
+        "expires_at",
+        "valid_until",
+        "stripe_subscription_id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/monitoring/page.tsx",
+      "line": 21,
+      "table": "monitoring_alerts",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/monitoring/page.tsx",
+      "line": 22,
+      "table": "monitoring_alerts",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/monitoring/page.tsx",
+      "line": 23,
+      "table": "monitoring_alerts",
+      "ops": [
+        "select",
+        "eq",
+        "neq"
+      ],
+      "columns": [
+        "action_required",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/monitoring/page.tsx",
+      "line": 24,
+      "table": "monitoring_alerts",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "source",
+        "alert_title",
+        "alert_description",
+        "severity",
+        "status",
+        "action_required",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 40,
+      "table": "cron_job_runs",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "started_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 41,
+      "table": "cron_job_runs",
+      "ops": [
+        "select",
+        "eq",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "started_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 42,
+      "table": "cron_job_runs",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "started_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 43,
+      "table": "workflow_runs",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 44,
+      "table": "workflow_runs",
+      "ops": [
+        "select",
+        "eq",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 45,
+      "table": "workflow_dead_letters",
+      "ops": [
+        "select"
+      ],
+      "columns": [
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 46,
+      "table": "workflow_dead_letters",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 47,
+      "table": "workflow_step_logs",
+      "ops": [
+        "select",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 48,
+      "table": "workflows",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 49,
+      "table": "admin_alerts",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "resolved"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 50,
+      "table": "admin_alerts",
+      "ops": [
+        "select",
+        "eq",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "resolved",
+        "severity"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 51,
+      "table": "cron_job_runs",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "job_name",
+        "status",
+        "started_at",
+        "duration_ms",
+        "error"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 52,
+      "table": "workflow_dead_letters",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "workflow_id",
+        "action_type",
+        "error",
+        "attempts",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/operations/page.tsx",
+      "line": 53,
+      "table": "admin_alerts",
+      "ops": [
+        "select",
+        "eq",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "alert_type",
+        "severity",
+        "message",
+        "created_at",
+        "resolved"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/partners/page.tsx",
+      "line": 34,
+      "table": "partners",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/partners/page.tsx",
+      "line": 35,
+      "table": "partner_applications",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/partners/page.tsx",
+      "line": 44,
+      "table": "partner_documents",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "partner_id",
+        "document_type",
+        "status",
+        "uploaded_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/partners/page.tsx",
+      "line": 45,
+      "table": "partner_users",
+      "ops": [
+        "select",
+        "in",
+        "eq"
+      ],
+      "columns": [
+        "partner_id",
+        "user_id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/partners/page.tsx",
+      "line": 46,
+      "table": "shops",
+      "ops": [
+        "select",
+        "in",
+        "neq"
+      ],
+      "columns": [
+        "id",
+        "partner_id",
+        "name",
+        "active"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/partners/page.tsx",
+      "line": 47,
+      "table": "partner_document_requirements",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/payout-queue/page.tsx",
+      "line": 71,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "role",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/payout-queue/page.tsx",
+      "line": 84,
+      "table": "app_settings",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "key",
+        "value"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/payout-queue/page.tsx",
+      "line": 95,
+      "table": "program_enrollments",
+      "ops": [
+        "select",
+        "neq",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "program_slug",
+        "program_holder_id",
+        "student_start_date",
+        "voucher_issued_date",
+        "voucher_paid_date",
+        "payout_due_date",
+        "payout_status",
+        "payout_amount",
+        "payout_paid_date",
+        "payout_notes",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/payout-queue/page.tsx",
+      "line": 117,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/payout-queue/page.tsx",
+      "line": 126,
+      "table": "program_holders",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "name",
+        "contact_name",
+        "contact_email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 46,
+      "table": "phone_systems",
+      "ops": [
+        "select",
+        "limit"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 53,
+      "table": "phone_systems",
+      "ops": [
+        "select",
+        "is",
+        "limit",
+        "maybeSingle"
+      ],
+      "columns": [
+        "tenant_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 70,
+      "table": "phone_numbers",
+      "ops": [
+        "select",
+        "eq",
+        "order"
+      ],
+      "columns": [
+        "phone_system_id",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 71,
+      "table": "phone_destinations",
+      "ops": [
+        "select",
+        "eq",
+        "order",
+        "order"
+      ],
+      "columns": [
+        "phone_system_id",
+        "priority",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 77,
+      "table": "phone_menu_options",
+      "ops": [
+        "select",
+        "eq",
+        "order"
+      ],
+      "columns": [
+        "phone_system_id",
+        "position"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 82,
+      "table": "phone_calls",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "phone_system_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 86,
+      "table": "voicemails",
+      "ops": [
+        "select",
+        "eq",
+        "eq"
+      ],
+      "columns": [
+        "phone_system_id",
+        "is_read"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 91,
+      "table": "communication_workspaces",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "phone_system_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 96,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email",
+        "role",
+        "program_holder_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 101,
+      "table": "communication_extensions",
+      "ops": [
+        "select",
+        "eq",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "profile_id",
+        "extension",
+        "display_name",
+        "department",
+        "enabled",
+        "workspace.phone_system_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 108,
+      "table": "phone_webrtc_devices",
+      "ops": [
+        "select",
+        "eq",
+        "gte"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "last_seen_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/page.tsx",
+      "line": 199,
+      "table": "communication_onboarding_progress",
+      "ops": [
+        "select",
+        "eq",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "announcement_seen_at",
+        "workspace_id",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/meetings/page.tsx",
+      "line": 22,
+      "table": "communication_workspaces",
+      "ops": [
+        "select",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "name",
+        "meeting_provider"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/meetings/page.tsx",
+      "line": 32,
+      "table": "communication_workspaces",
+      "ops": [
+        "select",
+        "is",
+        "limit",
+        "maybeSingle"
+      ],
+      "columns": [
+        "id",
+        "status",
+        "name",
+        "meeting_provider",
+        "tenant_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/phone/meetings/page.tsx",
+      "line": 41,
+      "table": "communication_rooms",
+      "ops": [
+        "select",
+        "eq",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "title",
+        "room_key",
+        "description",
+        "room_type",
+        "status",
+        "scheduled_at",
+        "max_participants",
+        "allow_screen_share",
+        "workspace_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holder-documents/page.tsx",
+      "line": 34,
+      "table": "program_holder_documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holder-documents/page.tsx",
+      "line": 35,
+      "table": "program_holder_documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holder-documents/page.tsx",
+      "line": 36,
+      "table": "program_holder_documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holder-documents/page.tsx",
+      "line": 37,
+      "table": "program_holder_documents",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "document_type",
+        "file_name",
+        "file_url",
+        "file_size",
+        "mime_type",
+        "status",
+        "approved",
+        "reviewed_at",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holder-documents/page.tsx",
+      "line": 48,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holders/page.tsx",
+      "line": 30,
+      "table": "program_holders",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "organization_name",
+        "name",
+        "contact_name",
+        "contact_email",
+        "contact_phone",
+        "status",
+        "mou_signed",
+        "created_at",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holders/page.tsx",
+      "line": 36,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email",
+        "role",
+        "program_holder_id",
+        "is_active"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/program-holders/page.tsx",
+      "line": 46,
+      "table": "program_holder_programs",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "program_holder_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/programs/page.tsx",
+      "line": 27,
+      "table": "programs",
+      "ops": [
+        "select",
+        "eq",
+        "order"
+      ],
+      "columns": [
+        "is_active",
+        "title"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/programs/page.tsx",
+      "line": 28,
+      "table": "programs",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/programs/page.tsx",
+      "line": 29,
+      "table": "programs",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "is_active"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/programs/page.tsx",
+      "line": 30,
+      "table": "programs",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "featured"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/programs/page.tsx",
+      "line": 31,
+      "table": "courses",
+      "ops": [
+        "select",
+        "not"
+      ],
+      "columns": [
+        "id",
+        "program_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/provider-applications/page.tsx",
+      "line": 27,
+      "table": "provider_applications",
+      "ops": [
+        "select"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/provider-applications/page.tsx",
+      "line": 35,
+      "table": "provider_applications",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/referrals/page.tsx",
+      "line": 58,
+      "table": "workforce_referrals",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status",
+        "archived"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/referrals/page.tsx",
+      "line": 71,
+      "table": "referral_pipeline_summary",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "referral_date"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/reports/page.tsx",
+      "line": 75,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "role"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/reports/page.tsx",
+      "line": 77,
+      "table": "program_enrollments",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/reports/page.tsx",
+      "line": 78,
+      "table": "program_completion_certificates",
+      "ops": [
+        "select"
+      ],
+      "columns": [],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/review-queue/page.tsx",
+      "line": 53,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "role",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/review-queue/page.tsx",
+      "line": 64,
+      "table": "applications",
+      "ops": [
+        "select",
+        "in",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "program_interest",
+        "status",
+        "reference_number",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/review-queue/page.tsx",
+      "line": 74,
+      "table": "review_queue",
+      "ops": [
+        "select",
+        "order",
+        "order"
+      ],
+      "columns": [
+        "priority",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/review-queue/page.tsx",
+      "line": 93,
+      "table": "review_queue",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "queue_type",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/settings/page.tsx",
+      "line": 23,
+      "table": "platform_settings",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "key",
+        "value",
+        "updated_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/settings/page.tsx",
+      "line": 24,
+      "table": "social_media_settings",
+      "ops": [
+        "select"
+      ],
+      "columns": [
+        "platform",
+        "access_token",
+        "expires_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/shops/page.tsx",
+      "line": 25,
+      "table": "shops",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/shops/page.tsx",
+      "line": 38,
+      "table": "shop_applications",
+      "ops": [
+        "select",
+        "eq",
+        "order"
+      ],
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/shops/page.tsx",
+      "line": 47,
+      "table": "shop_required_docs_status",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "required",
+        "approved",
+        "shop_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/store/page.tsx",
+      "line": 35,
+      "table": "store_products",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "name",
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/store/page.tsx",
+      "line": 40,
+      "table": "purchases",
+      "ops": [
+        "select",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "amount_cents",
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/store/page.tsx",
+      "line": 44,
+      "table": "license_purchases",
+      "ops": [
+        "select",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "amount_cents",
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/store/page.tsx",
+      "line": 48,
+      "table": "purchases",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "amount_cents",
+        "status",
+        "created_at",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/store/page.tsx",
+      "line": 53,
+      "table": "license_purchases",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "amount_cents",
+        "status",
+        "created_at",
+        "contact_name",
+        "contact_email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/students/page.tsx",
+      "line": 76,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "like",
+        "not",
+        "not",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "first_name",
+        "last_name",
+        "email",
+        "phone",
+        "created_at",
+        "role"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/students/page.tsx",
+      "line": 104,
+      "table": "program_enrollments",
+      "ops": [
+        "select",
+        "in",
+        "order"
+      ],
+      "columns": [
+        "user_id",
+        "enrollment_state",
+        "access_granted_at",
+        "program_slug",
+        "enrolled_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/students/page.tsx",
+      "line": 118,
+      "table": "program_enrollments",
+      "ops": [
+        "select",
+        "in",
+        "in"
+      ],
+      "columns": [
+        "enrollment_state",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/students/page.tsx",
+      "line": 129,
+      "table": "program_enrollments",
+      "ops": [
+        "select",
+        "in",
+        "in"
+      ],
+      "columns": [
+        "enrollment_state",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/students/page.tsx",
+      "line": 140,
+      "table": "program_enrollments",
+      "ops": [
+        "select",
+        "eq",
+        "in"
+      ],
+      "columns": [
+        "enrollment_state",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/students/page.tsx",
+      "line": 153,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "like",
+        "not",
+        "not",
+        "gte"
+      ],
+      "columns": [
+        "role",
+        "email",
+        "full_name",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 127,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "role",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 145,
+      "table": "sos_organization_facts",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 149,
+      "table": "sos_attachment_library",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 153,
+      "table": "sos_content_blocks",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 157,
+      "table": "sos_review_tasks",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 158,
+      "table": "sos_opportunities",
+      "ops": [
+        "select",
+        "not"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 165,
+      "table": "grant_opportunities",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/submissions/page.tsx",
+      "line": 170,
+      "table": "grant_applications",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/system/jobs/page.tsx",
+      "line": 51,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "role",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/system/jobs/page.tsx",
+      "line": 61,
+      "table": "job_queue",
+      "ops": [
+        "select",
+        "in",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/system/jobs/page.tsx",
+      "line": 68,
+      "table": "job_queue",
+      "ops": [
+        "select",
+        "eq",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/system/jobs/page.tsx",
+      "line": 75,
+      "table": "job_queue",
+      "ops": [
+        "select",
+        "eq",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "status",
+        "processed_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/system/webhooks/page.tsx",
+      "line": 30,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "role",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/tenants/page.tsx",
+      "line": 19,
+      "table": "tenants",
+      "ops": [
+        "select",
+        "order"
+      ],
+      "columns": [
+        "created_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/wioa/documents/page.tsx",
+      "line": 32,
+      "table": "wioa_documents",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "document_type",
+        "file_name",
+        "status",
+        "created_at",
+        "updated_at",
+        "user_id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/wioa/documents/page.tsx",
+      "line": 39,
+      "table": "wioa_documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/wioa/documents/page.tsx",
+      "line": 40,
+      "table": "wioa_documents",
+      "ops": [
+        "select",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/wioa/documents/page.tsx",
+      "line": 51,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/workone-queue/page.tsx",
+      "line": 29,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "role",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/workone-queue/page.tsx",
+      "line": 40,
+      "table": "applications",
+      "ops": [
+        "select",
+        "in",
+        "order"
+      ],
+      "columns": [
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "phone",
+        "program_interest",
+        "status",
+        "created_at",
+        "requested_funding_source",
+        "recommended_funding_source",
+        "household_size",
+        "annual_income_usd",
+        "has_workone_approval",
+        "workone_approval_ref",
+        "eligibility_status",
+        "eligibility_data"
+      ],
+      "missing": []
+    },
+    {
+      "file": "apps/admin/app/workone-queue/page.tsx",
+      "line": 61,
+      "table": "workforce_referrals",
+      "ops": [
+        "select",
+        "in",
+        "eq"
+      ],
+      "columns": [
+        "id",
+        "application_id",
+        "agency_name",
+        "status",
+        "partner_acknowledged",
+        "archived"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/apprenticeship/admin-hours.ts",
+      "line": 32,
+      "table": "progress_entries",
+      "ops": [
+        "select",
+        "order",
+        "order",
+        "range"
+      ],
+      "columns": [
+        "id",
+        "apprentice_id",
+        "partner_id",
+        "program_id",
+        "status",
+        "work_date",
+        "week_ending",
+        "hours_worked",
+        "max_hours_per_week",
+        "notes",
+        "tasks_completed",
+        "clock_in_at",
+        "clock_out_at",
+        "verified_by",
+        "verified_at"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/apprenticeship/admin-hours.ts",
+      "line": 42,
+      "table": "apprentices",
+      "ops": [
+        "select",
+        "order",
+        "range"
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "program_id",
+        "total_hours_required",
+        "status",
+        "start_date",
+        "enrollment_date"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/apprenticeship/admin-hours.ts",
+      "line": 49,
+      "table": "programs",
+      "ops": [
+        "select",
+        "order",
+        "range"
+      ],
+      "columns": [
+        "id",
+        "slug",
+        "name",
+        "title",
+        "required_hours",
+        "total_hours"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/apprenticeship/admin-hours.ts",
+      "line": 56,
+      "table": "hour_entries",
+      "ops": [
+        "select",
+        "order",
+        "range"
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "program_slug",
+        "progress_entry_id",
+        "legacy_source",
+        "legacy_id",
+        "status",
+        "work_date",
+        "hours_claimed",
+        "accepted_hours",
+        "source_type"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/apprenticeship/admin-hours.ts",
+      "line": 72,
+      "table": "profiles",
+      "ops": [
+        "select",
+        "in"
+      ],
+      "columns": [
+        "id",
+        "full_name",
+        "email"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/compliance/wioa-dashboard.ts",
+      "line": 7,
+      "table": "wioa_participants",
+      "ops": [
+        "select"
+      ],
+      "columns": [
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/compliance/wioa-dashboard.ts",
+      "line": 13,
+      "table": "wioa_compliance_reports",
+      "ops": [
+        "select",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "report_type",
+        "due_date",
+        "status"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/compliance/wioa-dashboard.ts",
+      "line": 14,
+      "table": "compliance_alerts",
+      "ops": [
+        "select",
+        "eq",
+        "order",
+        "limit"
+      ],
+      "columns": [
+        "id",
+        "alert_type",
+        "severity",
+        "message",
+        "description",
+        "resolved",
+        "created_at"
+      ],
+      "missing": []
+    }
+  ],
+  "authenticatedPages": [
+    {
+      "path": "/data-import",
+      "landed": "/data-import",
+      "heading": "Data Import",
+      "status": "rendered"
+    },
+    {
+      "path": "/applications",
+      "landed": "/applications",
+      "heading": "Applications",
+      "status": "rendered"
+    },
+    {
+      "path": "/students",
+      "landed": "/students",
+      "heading": "Students",
+      "status": "rendered"
+    },
+    {
+      "path": "/programs",
+      "landed": "/programs",
+      "heading": "Programs Management",
+      "status": "rendered"
+    },
+    {
+      "path": "/funding",
+      "landed": "/funding",
+      "heading": "Funding",
+      "status": "rendered"
+    },
+    {
+      "path": "/documents/review",
+      "landed": "/documents/review",
+      "heading": "Document Review",
+      "status": "rendered"
+    },
+    {
+      "path": "/program-holders",
+      "landed": "/program-holders",
+      "heading": "Program Holders",
+      "status": "rendered"
+    },
+    {
+      "path": "/phone",
+      "landed": "/phone",
+      "heading": "Elevate Communications Hub",
+      "status": "rendered"
+    },
+    {
+      "path": "/phone/email",
+      "landed": "/phone/email",
+      "heading": "Elevate Email",
+      "status": "rendered"
+    },
+    {
+      "path": "/partners",
+      "landed": "/partners",
+      "heading": "Approved Host Shop readiness",
+      "status": "rendered"
+    },
+    {
+      "path": "/portals",
+      "landed": "/portals",
+      "heading": "All portals",
+      "status": "rendered"
+    },
+    {
+      "path": "/analytics/traffic",
+      "landed": "/analytics/traffic",
+      "heading": "Website Traffic",
+      "status": "rendered"
+    },
+    {
+      "path": "/reports",
+      "landed": "/reports",
+      "heading": "Reports",
+      "status": "rendered"
+    },
+    {
+      "path": "/compliance",
+      "landed": "/compliance",
+      "heading": "Compliance Dashboard",
+      "status": "rendered"
+    },
+    {
+      "path": "/website-editor",
+      "landed": "/website-editor",
+      "heading": "Website Editor",
+      "status": "rendered"
+    },
+    {
+      "path": "/system-health",
+      "landed": "/system-health",
+      "heading": "System Health",
+      "status": "rendered"
+    },
+    {
+      "path": "/operations/infrastructure-costs",
+      "landed": "/operations/infrastructure-costs",
+      "heading": "Google Cloud & GPU Cost Control",
+      "status": "rendered"
+    },
+    {
+      "path": "/wioa/documents",
+      "landed": "/wioa/documents",
+      "heading": "WIOA Documents",
+      "status": "rendered"
+    },
+    {
+      "path": "/submissions",
+      "landed": "/submissions",
+      "heading": "External Submissions OS",
+      "status": "rendered"
+    },
+    {
+      "path": "/program-holder-documents",
+      "landed": "/program-holder-documents",
+      "heading": "Program Holder Documents",
+      "status": "rendered"
+    },
+    {
+      "path": "/course-import",
+      "landed": "/course-import",
+      "heading": "Course Import",
+      "status": "rendered"
+    },
+    {
+      "path": "/migrations",
+      "landed": "/migrations",
+      "heading": "Data Migrations",
+      "status": "rendered"
+    },
+    {
+      "path": "/monitoring",
+      "landed": "/monitoring",
+      "heading": "Monitoring",
+      "status": "rendered"
+    },
+    {
+      "path": "/monitoring/setup",
+      "landed": "/monitoring/setup",
+      "heading": "Monitoring Setup",
+      "status": "rendered"
+    },
+    {
+      "path": "/activity",
+      "landed": "/activity",
+      "heading": "Activity Feed",
+      "status": "rendered"
+    },
+    {
+      "path": "/audit-logs",
+      "landed": "/audit-logs",
+      "heading": "Audit Logs",
+      "status": "rendered"
+    },
+    {
+      "path": "/compliance-audit",
+      "landed": "/compliance-audit",
+      "heading": "Compliance Audit",
+      "status": "rendered"
+    },
+    {
+      "path": "/enrollment-jobs",
+      "landed": "/enrollment-jobs",
+      "heading": "Enrollment Jobs Monitor",
+      "status": "rendered"
+    },
+    {
+      "path": "/payout-queue",
+      "landed": "/payout-queue",
+      "heading": "Partner Payout Queue",
+      "status": "rendered"
+    },
+    {
+      "path": "/review-queue",
+      "landed": "/review-queue",
+      "heading": "Review Queue",
+      "status": "rendered"
+    },
+    {
+      "path": "/workone-queue",
+      "landed": "/workone-queue",
+      "heading": "WorkOne / Funding Queue",
+      "status": "rendered"
+    },
+    {
+      "path": "/referrals",
+      "landed": "/referrals",
+      "heading": "Agency Referrals",
+      "status": "rendered"
+    },
+    {
+      "path": "/shops",
+      "landed": "/shops",
+      "heading": "Shop Management",
+      "status": "rendered"
+    },
+    {
+      "path": "/system/jobs",
+      "landed": "/system/jobs",
+      "heading": "Background Jobs",
+      "status": "rendered"
+    },
+    {
+      "path": "/system/webhooks",
+      "landed": "/system/webhooks",
+      "heading": "Webhook Health",
+      "status": "rendered"
+    },
+    {
+      "path": "/phone/meetings",
+      "landed": "/phone/meetings",
+      "heading": "Team Meetings",
+      "status": "rendered"
+    },
+    {
+      "path": "/provider-applications",
+      "landed": "/provider-applications",
+      "heading": "Provider Applications",
+      "status": "rendered"
+    },
+    {
+      "path": "/store",
+      "landed": "/store",
+      "heading": "Store Management",
+      "status": "rendered"
+    },
+    {
+      "path": "/licenses",
+      "landed": "/licenses",
+      "heading": "Platform Licenses",
+      "status": "rendered"
+    },
+    {
+      "path": "/license-requests",
+      "landed": "/license-requests",
+      "heading": "License Requests",
+      "status": "rendered"
+    },
+    {
+      "path": "/promo-codes",
+      "landed": "/promo-codes",
+      "heading": "Promo Codes",
+      "status": "rendered"
+    },
+    {
+      "path": "/api-keys",
+      "landed": "/api-keys",
+      "heading": "API Keys",
+      "status": "rendered"
+    },
+    {
+      "path": "/integrations",
+      "landed": "/integrations",
+      "heading": "Communication; Scheduling; Payments; Data & CRM; Learning",
+      "status": "rendered"
+    },
+    {
+      "path": "/operations",
+      "landed": "/operations",
+      "heading": "Operations Hub",
+      "status": "rendered"
+    },
+    {
+      "path": "/integrations/gemini",
+      "landed": "/integrations/gemini",
+      "heading": "Google Gemini AI",
+      "status": "rendered"
+    },
+    {
+      "path": "/governance",
+      "landed": "/governance",
+      "heading": "Governance",
+      "status": "rendered"
+    },
+    {
+      "path": "/governance/security",
+      "landed": "/governance/security",
+      "heading": "Security & Data Protection Statement",
+      "status": "rendered"
+    },
+    {
+      "path": "/ferpa",
+      "landed": "/ferpa",
+      "heading": "FERPA Compliance",
+      "status": "rendered"
+    },
+    {
+      "path": "/settings",
+      "landed": "/settings",
+      "heading": "Settings",
+      "status": "rendered"
+    },
+    {
+      "path": "/tenants",
+      "landed": "/tenants",
+      "heading": "Tenant Management",
+      "status": "rendered"
+    },
+    {
+      "path": "/studio/courses",
+      "landed": "/studio/courses",
+      "heading": "Course Production Studio",
+      "status": "rendered"
+    },
+    {
+      "path": "/hours-export",
+      "landed": "/dashboard",
+      "status": "wrong destination; placeholder redirect confirmed in source"
+    },
+    {
+      "path": "/docs",
+      "landed": "/docs",
+      "status": "source defect: profiles presented as documents; repair prepared"
+    },
+    {
+      "path": "/",
+      "landed": "/dashboard",
+      "status": "expected Admin landing; rendered dashboard"
+    },
+    {
+      "path": "/dashboard",
+      "landed": "/dashboard",
+      "status": "rendered earlier; latest h1 check empty"
+    },
+    {
+      "path": "/studio/browser",
+      "landed": "/studio/browser",
+      "status": "rendered; browser idle; Admin, Course Builder and Studio return controls present"
+    },
+    {
+      "path": "/studio/workflows",
+      "landed": "/studio?workspace=workflows",
+      "status": "rendered Workflow Designer selected; general workflows loaded; AI task records degraded"
+    },
+    {
+      "path": "/studio",
+      "landed": "/studio",
+      "status": "rendered conversation workspace; What are we building today?"
+    }
+  ],
+  "schemaMetadata": [
+    {
+      "table_name": "admin_alerts",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "alert_type",
+        "severity",
+        "partner_id",
+        "apprentice_id",
+        "progress_entry_id",
+        "site_id",
+        "message",
+        "metadata",
+        "created_at",
+        "resolved_at",
+        "resolved_by",
+        "details",
+        "escalation_level",
+        "escalated_at",
+        "acknowledged_at",
+        "acknowledged_by",
+        "resolved"
+      ]
+    },
+    {
+      "table_name": "admin_audit_events",
+      "relkind": "v",
+      "rls_enabled": false,
+      "columns": [
+        "id",
+        "action",
+        "actor_user_id",
+        "actor_id",
+        "actor_role",
+        "target_type",
+        "target_id",
+        "metadata",
+        "ip_address",
+        "created_at",
+        "entity_type",
+        "entity_id",
+        "old_data",
+        "new_data"
+      ]
+    },
+    {
+      "table_name": "agentic_build_projects",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "user_id",
+        "target_type",
+        "target_id",
+        "title",
+        "original_prompt",
+        "status",
+        "locale",
+        "resume_token_hash",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "lifecycle_status",
+        "source_type",
+        "artifact_manifest",
+        "design_system",
+        "approved_plan",
+        "subscription_requirements",
+        "template_version_id",
+        "current_checkpoint_id",
+        "current_release_id"
+      ]
+    },
+    {
+      "table_name": "agentic_build_runs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "project_id",
+        "prompt",
+        "plan",
+        "status",
+        "credits_used",
+        "error",
+        "started_at",
+        "completed_at",
+        "failed_at",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "ai_agents",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "name",
+        "role",
+        "status",
+        "capabilities",
+        "config",
+        "created_at",
+        "updated_at",
+        "slug",
+        "description",
+        "model_hint",
+        "metadata",
+        "avatar",
+        "voice_enabled",
+        "voice_type",
+        "permissions",
+        "tools",
+        "metrics",
+        "owner_id",
+        "is_clone",
+        "clone_of"
+      ]
+    },
+    {
+      "table_name": "ai_approvals",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "task_id",
+        "requested_by",
+        "approved_by",
+        "status",
+        "reason",
+        "decided_at",
+        "created_at",
+        "tenant_id",
+        "risk_tags",
+        "reviewed_by",
+        "reviewed_at"
+      ]
+    },
+    {
+      "table_name": "ai_file_snapshots",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "file_path",
+        "content",
+        "version",
+        "task_id",
+        "created_at",
+        "tenant_id"
+      ]
+    },
+    {
+      "table_name": "ai_memory",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "agent_id",
+        "category",
+        "key",
+        "value",
+        "created_at",
+        "updated_at",
+        "scope",
+        "task_id",
+        "content",
+        "embedding_ref",
+        "metadata",
+        "tenant_id",
+        "user_id"
+      ]
+    },
+    {
+      "table_name": "ai_task_logs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "task_id",
+        "agent_id",
+        "level",
+        "message",
+        "metadata",
+        "created_at",
+        "tenant_id",
+        "user_id"
+      ]
+    },
+    {
+      "table_name": "ai_task_steps",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "task_id",
+        "step_order",
+        "action",
+        "status",
+        "output",
+        "started_at",
+        "completed_at",
+        "created_at",
+        "tenant_id",
+        "user_id",
+        "name",
+        "action_type",
+        "input_json",
+        "output_json",
+        "error_message"
+      ]
+    },
+    {
+      "table_name": "ai_tasks",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "agent_id",
+        "title",
+        "description",
+        "status",
+        "priority",
+        "requires_approval",
+        "approval_reason",
+        "plan",
+        "result",
+        "created_by",
+        "created_at",
+        "updated_at",
+        "requested_by",
+        "trace_id",
+        "plan_json",
+        "risk_tags",
+        "result_json",
+        "error_message",
+        "started_at",
+        "completed_at",
+        "user_id",
+        "tenant_id",
+        "agent_type",
+        "intent",
+        "payload",
+        "attempts",
+        "max_attempts",
+        "timeout_ms",
+        "correlation_id",
+        "metadata",
+        "task_id",
+        "command",
+        "tool_name",
+        "tool_input",
+        "tool_output",
+        "approval_status",
+        "quality_score",
+        "config",
+        "conversation_id",
+        "studio_run_id",
+        "studio_run_step_id"
+      ]
+    },
+    {
+      "table_name": "app_secrets",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "key",
+        "value",
+        "scope",
+        "note",
+        "updated_at",
+        "description"
+      ]
+    },
+    {
+      "table_name": "apprenticeship_standard_competencies",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "standard_key",
+        "competency_key",
+        "source_label",
+        "category",
+        "description",
+        "display_order",
+        "is_required"
+      ]
+    },
+    {
+      "table_name": "apprenticeship_standard_versions",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "standard_key",
+        "program_slug",
+        "occupation_title",
+        "onet_soc_code",
+        "rapids_code",
+        "sponsor_name",
+        "registration_number",
+        "registration_date",
+        "revision_date",
+        "approach",
+        "competency_count",
+        "related_instruction_hours",
+        "apprentice_to_mentor_ratio",
+        "probationary_hours",
+        "source_authority",
+        "is_active",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "audit_failures",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "created_at",
+        "context",
+        "error_message",
+        "original_event",
+        "resolved",
+        "resolved_at",
+        "resolved_by"
+      ]
+    },
+    {
+      "table_name": "audit_logs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "action",
+        "actor_id",
+        "target_type",
+        "target_id",
+        "metadata",
+        "ip_address",
+        "user_agent",
+        "created_at",
+        "actor_role",
+        "entity",
+        "resource_type",
+        "resource_id",
+        "user_id",
+        "details",
+        "event_type",
+        "before_state",
+        "after_state",
+        "actor_email",
+        "program_id",
+        "student_id",
+        "entity_id",
+        "entity_type",
+        "changes",
+        "actor_user_id",
+        "meta",
+        "subject",
+        "who",
+        "notes",
+        "status",
+        "reason",
+        "creator_email",
+        "email_sent",
+        "timestamp",
+        "count",
+        "steps_generated",
+        "title",
+        "type",
+        "agreements_signed",
+        "total_courses",
+        "successful",
+        "failed",
+        "forced",
+        "program_title",
+        "eligible",
+        "funding_types",
+        "state",
+        "stage",
+        "career_interest",
+        "source",
+        "week_ending",
+        "hours_worked",
+        "hours",
+        "credential_type",
+        "viewer_role",
+        "ip",
+        "email",
+        "results_count",
+        "share_link_id",
+        "tenant_id",
+        "role",
+        "success",
+        "action_type",
+        "description",
+        "old_data",
+        "new_data",
+        "actor_type"
+      ]
+    },
+    {
+      "table_name": "badge_definitions",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "icon_url",
+        "badge_type",
+        "criteria",
+        "points_reward",
+        "rarity",
+        "is_active",
+        "created_at",
+        "key"
+      ]
+    },
+    {
+      "table_name": "completion_rules",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "entity_type",
+        "entity_id",
+        "rule_type",
+        "config",
+        "is_active",
+        "created_at",
+        "threshold_value",
+        "is_required",
+        "notes"
+      ]
+    },
+    {
+      "table_name": "course_lessons",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "course_id",
+        "module_id",
+        "legacy_lesson_id",
+        "slug",
+        "title",
+        "content",
+        "lesson_type",
+        "order_index",
+        "passing_score",
+        "quiz_questions",
+        "is_required",
+        "created_at",
+        "updated_at",
+        "video_url",
+        "activity_type",
+        "scenario_prompt",
+        "key_terms",
+        "status",
+        "is_published",
+        "partner_exam_code",
+        "legacy_curriculum_id",
+        "duration_minutes",
+        "video_config",
+        "activities",
+        "rendered_html",
+        "generation_status",
+        "locked",
+        "ai_generated",
+        "approved",
+        "generator_prompt",
+        "last_generated_at",
+        "domain_key",
+        "required_skill_id",
+        "required_reps",
+        "requires_verification",
+        "learning_objectives",
+        "competency_checks",
+        "instructor_notes",
+        "practical_required",
+        "unlock_rule",
+        "required_artifacts",
+        "rubric_id",
+        "script_text",
+        "resources",
+        "version",
+        "published_at",
+        "published_by",
+        "previous_version_id",
+        "org_id",
+        "media_asset_id",
+        "script",
+        "bullet_points",
+        "duration_seconds",
+        "scene_data",
+        "video_status",
+        "video_job_id",
+        "video_error",
+        "video_generated_at",
+        "hour_category",
+        "evidence_type",
+        "delivery_method",
+        "requires_instructor_signoff",
+        "instructor_requirement",
+        "minimum_seat_time_minutes",
+        "fieldwork_eligible",
+        "compliance_profile_key",
+        "content_json",
+        "media_origin",
+        "media_quality_status",
+        "media_quality_evidence",
+        "media_verified_at"
+      ]
+    },
+    {
+      "table_name": "course_modules",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "course_id",
+        "title",
+        "description",
+        "order_index",
+        "duration_minutes",
+        "content",
+        "video_url",
+        "created_at",
+        "updated_at",
+        "duration",
+        "is_required",
+        "order",
+        "type",
+        "is_published",
+        "available_from",
+        "is_draft",
+        "org_id",
+        "domain_key",
+        "target_hours",
+        "slug",
+        "created_by",
+        "metadata"
+      ]
+    },
+    {
+      "table_name": "course_videos",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "lesson_id",
+        "course_id",
+        "title",
+        "video_url",
+        "storage_path",
+        "duration_seconds",
+        "thumbnail_url",
+        "transcript",
+        "generated_by",
+        "status",
+        "created_by",
+        "created_at",
+        "updated_at",
+        "asset_role",
+        "sequence_index",
+        "media_asset_id",
+        "entitlement_id"
+      ]
+    },
+    {
+      "table_name": "courses",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "program_id",
+        "legacy_course_id",
+        "slug",
+        "title",
+        "short_description",
+        "description",
+        "status",
+        "is_active",
+        "published_at",
+        "created_at",
+        "updated_at",
+        "course_name",
+        "generation_status",
+        "generation_progress",
+        "generation_paused",
+        "generator_prompt",
+        "last_generated_at",
+        "thumbnail_url",
+        "total_lessons",
+        "duration_hours",
+        "review_status",
+        "submitted_for_review_at",
+        "submitted_by",
+        "reviewed_at",
+        "reviewed_by",
+        "review_notes",
+        "org_id",
+        "version",
+        "published_by",
+        "compliance_profile_key",
+        "governing_body",
+        "governing_region",
+        "governing_standard_version",
+        "retention_policy_days",
+        "audit_notes",
+        "course_code",
+        "category",
+        "passing_score",
+        "module_id",
+        "course_slug",
+        "created_by",
+        "metadata",
+        "duration_weeks",
+        "tuition_cost",
+        "max_students",
+        "prerequisites",
+        "learning_outcomes"
+      ]
+    },
+    {
+      "table_name": "credential_registry",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "name",
+        "abbreviation",
+        "description",
+        "issuer_type",
+        "issuing_authority",
+        "proctor_authority",
+        "delivery",
+        "requires_exam",
+        "exam_type",
+        "exam_location",
+        "passing_score",
+        "verification_source",
+        "verification_url",
+        "renewal_period_months",
+        "national_registry_id",
+        "cip_code",
+        "soc_code",
+        "wioa_eligible",
+        "dol_registered",
+        "credential_stack",
+        "stack_level",
+        "is_active",
+        "is_published",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "created_by",
+        "competency_area",
+        "provider_id"
+      ]
+    },
+    {
+      "table_name": "cron_job_runs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "job_name",
+        "status",
+        "started_at",
+        "finished_at",
+        "duration_ms",
+        "result",
+        "error",
+        "created_at",
+        "tenant_id"
+      ]
+    },
+    {
+      "table_name": "dev_audit_logs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "action",
+        "resource_type",
+        "resource_id",
+        "metadata",
+        "ip_address",
+        "created_at",
+        "actor_id",
+        "trace_id",
+        "risk_level",
+        "tenant_id"
+      ]
+    },
+    {
+      "table_name": "devstudio_documents",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "name",
+        "original_name",
+        "s3_key",
+        "bucket",
+        "size_bytes",
+        "content_type",
+        "ext",
+        "signed_url",
+        "signed_url_expires_at",
+        "created_at",
+        "extracted_text",
+        "extraction_status"
+      ]
+    },
+    {
+      "table_name": "devstudio_jobs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "command",
+        "status",
+        "log_lines",
+        "tool_name",
+        "tool_args",
+        "started_at",
+        "finished_at",
+        "created_at",
+        "updated_at",
+        "stage",
+        "progress",
+        "result",
+        "error",
+        "attempts",
+        "max_attempts",
+        "run_at",
+        "locked_at",
+        "locked_by",
+        "idempotency_key"
+      ]
+    },
+    {
+      "table_name": "ellie_pending_actions",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "action_type",
+        "label",
+        "params",
+        "target_ids",
+        "requested_by",
+        "session_id",
+        "status",
+        "result",
+        "created_at",
+        "resolved_at"
+      ]
+    },
+    {
+      "table_name": "government_job_feed",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "source",
+        "external_id",
+        "title",
+        "organization",
+        "location",
+        "salary_range",
+        "job_type",
+        "remote_type",
+        "description",
+        "application_url",
+        "posted_at",
+        "closes_at",
+        "raw_payload",
+        "imported_at",
+        "promoted_to_job_postings"
+      ]
+    },
+    {
+      "table_name": "licensed_media_entitlements",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "org_id",
+        "provider",
+        "provider_item_id",
+        "purchase_code",
+        "title",
+        "item_url",
+        "thumbnail_url",
+        "category",
+        "license_type",
+        "purchased_at",
+        "license_document_url",
+        "certificate_storage_path",
+        "metadata",
+        "created_by",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "managed_licenses",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "organization_id",
+        "status",
+        "tier",
+        "plan_id",
+        "trial_started_at",
+        "trial_ends_at",
+        "expires_at",
+        "stripe_customer_id",
+        "stripe_subscription_id",
+        "current_period_start",
+        "current_period_end",
+        "last_payment_status",
+        "last_invoice_url",
+        "created_at",
+        "updated_at",
+        "canceled_at",
+        "suspended_at",
+        "provider_customer_id",
+        "provider_subscription_id"
+      ]
+    },
+    {
+      "table_name": "media_assets",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "asset_type",
+        "title",
+        "description",
+        "storage_bucket",
+        "storage_path",
+        "public_url",
+        "mime_type",
+        "file_size_bytes",
+        "width",
+        "height",
+        "duration_seconds",
+        "metadata",
+        "tags",
+        "source_job_id",
+        "course_id",
+        "lesson_id",
+        "created_by",
+        "created_at",
+        "updated_at",
+        "org_id",
+        "type",
+        "status",
+        "deleted_at",
+        "transcript"
+      ]
+    },
+    {
+      "table_name": "module_completion_rules",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "course_id",
+        "module_id",
+        "required_previous_module_id",
+        "required_checkpoint_lesson_id",
+        "minimum_score",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "notification_outbox",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "to_email",
+        "to_phone",
+        "channel",
+        "template_key",
+        "template_data",
+        "status",
+        "attempts",
+        "max_attempts",
+        "last_error",
+        "created_at",
+        "scheduled_for",
+        "sent_at",
+        "entity_type",
+        "entity_id",
+        "dead_letter",
+        "processed_at",
+        "type",
+        "recipient_id",
+        "recipient_email",
+        "recipient_phone",
+        "subject",
+        "content",
+        "delivered_at",
+        "error_message",
+        "metadata",
+        "review_required",
+        "review_reason",
+        "claim_token",
+        "delivery_started_at",
+        "provider_message_id",
+        "notification_key"
+      ]
+    },
+    {
+      "table_name": "notifications",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "type",
+        "title",
+        "message",
+        "action_url",
+        "action_label",
+        "metadata",
+        "idempotency_key",
+        "read",
+        "created_at",
+        "tenant_id",
+        "link",
+        "read_at",
+        "course_id",
+        "data",
+        "notification_type",
+        "priority",
+        "recipient_type",
+        "status"
+      ]
+    },
+    {
+      "table_name": "organization_users",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "organization_id",
+        "user_id",
+        "role",
+        "created_at",
+        "updated_at",
+        "status",
+        "org_id"
+      ]
+    },
+    {
+      "table_name": "organizations",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "slug",
+        "name",
+        "type",
+        "status",
+        "created_at",
+        "updated_at",
+        "contact_email",
+        "onboarding_started_at",
+        "org_type",
+        "website",
+        "is_active",
+        "tenant_id",
+        "logo_url",
+        "tagline",
+        "support_email",
+        "service_area_counties",
+        "suspension_reason",
+        "suspended_at",
+        "offboarded_at",
+        "contact_name",
+        "domain",
+        "trial_ends_at",
+        "is_trial"
+      ]
+    },
+    {
+      "table_name": "paid_inference_artifacts",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "artifact_fingerprint",
+        "asset_type",
+        "storage_location",
+        "validation_status",
+        "source_request_id",
+        "metadata",
+        "created_at",
+        "validated_at",
+        "scope_key"
+      ]
+    },
+    {
+      "table_name": "paid_inference_requests",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "actor_id",
+        "course_id",
+        "lesson_id",
+        "run_id",
+        "job_id",
+        "artifact_fingerprint",
+        "idempotency_key",
+        "provider",
+        "model",
+        "operation",
+        "status",
+        "projected_cost_micros",
+        "reserved_cost_micros",
+        "actual_cost_micros",
+        "provider_request_id",
+        "approval_id",
+        "dispatch_attempts",
+        "error_category",
+        "error_message",
+        "result_location",
+        "acknowledged_at",
+        "dispatched_at",
+        "completed_at",
+        "created_at",
+        "updated_at",
+        "scope_key",
+        "approved_by",
+        "approved_at"
+      ]
+    },
+    {
+      "table_name": "paris_autopilot_policy",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "actor_id",
+        "enabled",
+        "max_daily_repairs",
+        "authorized_at"
+      ]
+    },
+    {
+      "table_name": "paris_code_repairs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "actor_id",
+        "fingerprint",
+        "goal",
+        "status",
+        "candidate",
+        "source_job_id",
+        "workflow_run_id",
+        "release_sha",
+        "verification",
+        "error_code",
+        "dispatched_at",
+        "created_at",
+        "updated_at",
+        "attempt_count",
+        "attempt_history"
+      ]
+    },
+    {
+      "table_name": "paris_runtime_events",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "identity",
+        "kind",
+        "operation",
+        "status",
+        "actor_id",
+        "correlation_id",
+        "provider",
+        "duration_ms",
+        "failure_category",
+        "recovery",
+        "next_action",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "platform_job_events",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "job_id",
+        "event_type",
+        "message",
+        "metadata",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "platform_jobs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "organization_id",
+        "job_type",
+        "status",
+        "priority",
+        "payload",
+        "result",
+        "error_message",
+        "scheduled_at",
+        "started_at",
+        "completed_at",
+        "created_by",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "platform_secrets",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "key",
+        "value_enc",
+        "description",
+        "category",
+        "is_sensitive",
+        "last_tested",
+        "test_status",
+        "updated_by",
+        "created_at",
+        "updated_at",
+        "scope",
+        "vault_secret_id"
+      ]
+    },
+    {
+      "table_name": "platform_settings",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "key",
+        "value",
+        "updated_at",
+        "updated_by",
+        "is_secret",
+        "is_active"
+      ]
+    },
+    {
+      "table_name": "profiles",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "email",
+        "full_name",
+        "role",
+        "enrollment_status",
+        "phone",
+        "address",
+        "city",
+        "state",
+        "zip",
+        "avatar_url",
+        "created_at",
+        "updated_at",
+        "organization_id",
+        "tenant_id",
+        "is_active",
+        "zip_code",
+        "onboarding_completed",
+        "onboarding_completed_at",
+        "first_name",
+        "last_name",
+        "funding_confirmed",
+        "orientation_completed",
+        "schedule_selected",
+        "account_balance",
+        "agreement_signed_at",
+        "bio",
+        "company",
+        "current_period_end",
+        "funding_source",
+        "graduation_year",
+        "headline",
+        "interests",
+        "job_title",
+        "last_sign_in_at",
+        "learning_style",
+        "location",
+        "notification_preferences",
+        "points",
+        "program",
+        "program_holder_id",
+        "roles",
+        "skill_level",
+        "status",
+        "stripe_customer_id",
+        "subscription_plan",
+        "subscription_status",
+        "trial_ends_at",
+        "verified",
+        "onboarding_started",
+        "onboarding_started_at",
+        "selected_cohort",
+        "orientation_completed_at",
+        "external_id",
+        "date_of_birth",
+        "last_login_at",
+        "last_login_provider",
+        "last_login_provider_account_id",
+        "student_number",
+        "emergency_contact_name",
+        "emergency_contact_phone",
+        "emergency_contact_relationship",
+        "website",
+        "linkedin_url",
+        "lti_subject",
+        "agreements_signed_at",
+        "documents_submitted_at",
+        "handbook_acknowledged_at",
+        "cohort_start_date",
+        "schedule_preference",
+        "portal_type",
+        "company_name",
+        "company_logo",
+        "community_visible",
+        "community_allow_messages",
+        "community_allow_follow",
+        "community_show_role",
+        "suspended",
+        "provider_customer_id",
+        "billing_customer_id"
+      ]
+    },
+    {
+      "table_name": "program_enrollments",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "student_id",
+        "program_id",
+        "program_slug",
+        "email",
+        "full_name",
+        "phone",
+        "amount_paid_cents",
+        "funding_source",
+        "stripe_payment_intent_id",
+        "stripe_checkout_session_id",
+        "status",
+        "enrollment_state",
+        "enrollment_confirmed_at",
+        "orientation_completed_at",
+        "documents_completed_at",
+        "next_required_action",
+        "enrolled_at",
+        "started_at",
+        "completed_at",
+        "created_at",
+        "updated_at",
+        "documents_submitted_at",
+        "agreement_signed",
+        "completed_lessons",
+        "completion_date",
+        "course_id",
+        "delegate_id",
+        "description",
+        "docs_verified",
+        "funding_pathway",
+        "funding_program_id",
+        "intake_completed",
+        "organization_id",
+        "payment_status",
+        "program_holder_id",
+        "progress_percent",
+        "sector",
+        "start_date",
+        "title",
+        "zip_code",
+        "enrollment_type",
+        "paid_at",
+        "partner_owed_cents",
+        "source",
+        "your_revenue_cents",
+        "cohort",
+        "cohort_id",
+        "funding_status",
+        "funding_status_changed_at",
+        "funding_status_reason",
+        "stripe_customer_id",
+        "confirmed_at",
+        "barber_sub_id",
+        "stripe_subscription_id",
+        "course_version_id",
+        "access_granted_at",
+        "funding_verification_due_at",
+        "funding_verification_notes",
+        "funding_verified",
+        "revoked_at",
+        "revoked_by",
+        "student_start_date",
+        "voucher_issued_date",
+        "voucher_paid_date",
+        "payout_status",
+        "payout_due_date",
+        "payout_paid_date",
+        "payout_paid_by",
+        "payout_notes",
+        "payout_sent_date",
+        "payout_amount",
+        "at_risk",
+        "draft_data",
+        "wizard_step",
+        "tenant_id",
+        "assigned_staff_id",
+        "student_number",
+        "training_start_date",
+        "training_end_date",
+        "provider_notified_at",
+        "provider_notified_by",
+        "stripe_subscription_status",
+        "host_shop_id",
+        "owner_id",
+        "transfer_hours",
+        "rapids_status",
+        "rapids_id",
+        "lms_enrolled",
+        "milady_enrolled_at",
+        "supervisor_id",
+        "hours_needed",
+        "total_program_fee",
+        "down_payment",
+        "amount_paid",
+        "balance_remaining",
+        "payment_plan_months",
+        "monthly_payment_amount",
+        "next_payment_date",
+        "vendor_paid",
+        "vendor_paid_at",
+        "vendor_payment_amount",
+        "certificate_issued_at",
+        "case_id",
+        "region_id",
+        "payment_option",
+        "required_hours",
+        "has_host_shop",
+        "host_shop_name",
+        "progress",
+        "employer_id",
+        "employer_of_record",
+        "employer_name",
+        "employer_contact_email",
+        "employer_contact_phone",
+        "employer_pays_wage",
+        "expected_end_date",
+        "wage_rate_hour",
+        "stipend_total_amount",
+        "tuition_covered_amount",
+        "external_case_id",
+        "lms_completed",
+        "practical_skills_verified",
+        "transfer_hours_verified",
+        "transfer_hours_verified_at",
+        "transfer_hours_source",
+        "access_status",
+        "approved_at",
+        "approved_by",
+        "at_risk_flagged_at",
+        "at_risk_reason",
+        "cancelled_at",
+        "enrollment_method",
+        "funding_verified_at",
+        "funding_verified_by",
+        "last_accessed",
+        "last_progress_update",
+        "pause_reason",
+        "paused_at",
+        "payment_amount_cents",
+        "payment_method",
+        "payment_provider",
+        "payment_reference",
+        "practical_hours_completed",
+        "progress_percentage",
+        "rapids_registered",
+        "refunded_at",
+        "revocation_reason",
+        "suspended_at",
+        "suspension_reason",
+        "theory_hours_completed",
+        "total_hours_completed",
+        "eligibility_status",
+        "risk_level",
+        "interview_score",
+        "interview_session_id",
+        "billing_provider",
+        "provider_subscription_id",
+        "provider_payment_intent_id",
+        "provider_checkout_session_id",
+        "provider_customer_id",
+        "provider_subscription_status"
+      ]
+    },
+    {
+      "table_name": "program_integrity",
+      "relkind": "v",
+      "rls_enabled": false,
+      "columns": [
+        "id",
+        "slug",
+        "title",
+        "status",
+        "category",
+        "published",
+        "is_active",
+        "total_lessons",
+        "total_modules",
+        "active_enrollments",
+        "certificates_issued",
+        "has_course_row",
+        "has_completion_rule",
+        "integrity_score",
+        "failing_checks"
+      ]
+    },
+    {
+      "table_name": "program_review_log",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "program_id",
+        "course_id",
+        "action",
+        "from_status",
+        "to_status",
+        "actor_id",
+        "notes",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "programs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "slug",
+        "title",
+        "category",
+        "description",
+        "estimated_weeks",
+        "estimated_hours",
+        "funding_tags",
+        "is_active",
+        "created_at",
+        "full_description",
+        "what_you_learn",
+        "day_in_life",
+        "salary_min",
+        "salary_max",
+        "credential_type",
+        "credential_name",
+        "employers",
+        "funding_pathways",
+        "delivery_method",
+        "training_hours",
+        "prerequisites",
+        "career_outcomes",
+        "industry_demand",
+        "image_url",
+        "hero_image_url",
+        "icon_url",
+        "featured",
+        "wioa_approved",
+        "dol_registered",
+        "placement_rate",
+        "completion_rate",
+        "total_cost",
+        "toolkit_cost",
+        "credentialing_cost",
+        "name",
+        "duration_weeks",
+        "updated_at",
+        "cip_code",
+        "soc_code",
+        "funding_eligibility",
+        "state_code",
+        "organization_id",
+        "category_norm",
+        "cover_image_url",
+        "cover_image_alt",
+        "excerpt",
+        "tenant_id",
+        "partner_name",
+        "partner_id",
+        "published",
+        "lms_model",
+        "requires_license",
+        "license_type",
+        "lms_config",
+        "is_store_template",
+        "store_config",
+        "store_id",
+        "funding_eligible",
+        "is_free",
+        "status",
+        "canonical_program_id",
+        "code",
+        "total_hours",
+        "tuition",
+        "requirements",
+        "eligibility_rules",
+        "credential",
+        "required_hours",
+        "hero_image",
+        "hero_image_alt",
+        "availability_status",
+        "next_start_date",
+        "enrollment_deadline",
+        "seats_available",
+        "total_seats",
+        "funding_cycle",
+        "funding_confirmed",
+        "is_apprenticeship",
+        "requires_employer_match",
+        "accreditation_body",
+        "accreditation_expires",
+        "accreditation_status",
+        "blurb",
+        "cover_url",
+        "delivery_mode",
+        "duration",
+        "enrolled_count",
+        "hours",
+        "occupation_code",
+        "price",
+        "rapids_required",
+        "required_skills",
+        "schedule",
+        "start_date",
+        "track",
+        "type",
+        "issuance_policy",
+        "min_rti_hours",
+        "min_ojl_hours",
+        "requires_instructor_attestation",
+        "min_engagement_hours",
+        "completion_criteria",
+        "non_exam_program",
+        "short_description",
+        "display_order",
+        "delivery_model",
+        "enrollment_type",
+        "external_enrollment_url",
+        "has_lms_course",
+        "hero_headline",
+        "hero_subheadline",
+        "length_weeks",
+        "certificate_title",
+        "funding",
+        "outcomes",
+        "slug_aliases",
+        "review_status",
+        "submitted_for_review_at",
+        "submitted_by",
+        "reviewed_at",
+        "reviewed_by",
+        "review_notes",
+        "version",
+        "published_at",
+        "published_by",
+        "intrainingid",
+        "credentials_list",
+        "etpl_listed",
+        "learning_objectives",
+        "certification_awarded",
+        "enrollment_state",
+        "next_cohort_date",
+        "waitlist_enabled",
+        "internal_provider_ref",
+        "program_type",
+        "etpl_requires_initial_eligibility",
+        "intraining_program_id",
+        "archived_at",
+        "duration_hours",
+        "org_id"
+      ]
+    },
+    {
+      "table_name": "scorm_packages",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "title",
+        "description",
+        "version",
+        "package_url",
+        "manifest_url",
+        "launch_url",
+        "duration_minutes",
+        "passing_score",
+        "max_attempts",
+        "active",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "scorm_version",
+        "course_id",
+        "status"
+      ]
+    },
+    {
+      "table_name": "shops",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "name",
+        "ein",
+        "address1",
+        "address2",
+        "city",
+        "state",
+        "zip",
+        "phone",
+        "email",
+        "active",
+        "created_at",
+        "updated_at",
+        "tenant_id",
+        "latitude",
+        "longitude",
+        "geocoded_at",
+        "geocode_source",
+        "geocode_failed_at",
+        "geocode_error",
+        "owner_id",
+        "partner_id",
+        "address_review_status",
+        "address_review_note",
+        "address_reviewed_at",
+        "address_reviewed_by"
+      ]
+    },
+    {
+      "table_name": "student_risk_status",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "code",
+        "days_since_activity",
+        "dropped",
+        "email",
+        "enrollments",
+        "first_name",
+        "last_activity_date",
+        "last_name",
+        "overdue_count",
+        "phone",
+        "profiles",
+        "program_id",
+        "programs",
+        "progress_percentage",
+        "status",
+        "student_funding_assignments",
+        "created_at",
+        "updated_at",
+        "risk_score",
+        "risk_factors",
+        "placement_probability",
+        "completion_probability",
+        "probabilities_updated_at"
+      ]
+    },
+    {
+      "table_name": "studio_conversations",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "user_id",
+        "title",
+        "messages",
+        "config",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "studio_run_artifacts",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "run_id",
+        "step_id",
+        "artifact_type",
+        "name",
+        "uri",
+        "content_hash",
+        "status",
+        "metadata",
+        "evidence",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "studio_run_events",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "run_id",
+        "step_id",
+        "event_type",
+        "level",
+        "message",
+        "payload",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "studio_run_step_dependencies",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "step_id",
+        "depends_on_step_id",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "studio_run_steps",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "run_id",
+        "ordinal",
+        "name",
+        "specialist",
+        "tool_name",
+        "status",
+        "required",
+        "input",
+        "output",
+        "evidence",
+        "error",
+        "attempts",
+        "max_attempts",
+        "started_at",
+        "completed_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "studio_runs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "conversation_id",
+        "user_id",
+        "organization_id",
+        "course_id",
+        "command",
+        "goal",
+        "status",
+        "active_step_id",
+        "preview_url",
+        "context",
+        "result",
+        "failure",
+        "cost",
+        "idempotency_key",
+        "started_at",
+        "completed_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "system_settings",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "key",
+        "value",
+        "updated_by",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "tenant_course_builder_credit_wallets",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "app_slug",
+        "balance",
+        "lifetime_granted",
+        "lifetime_used",
+        "current_period_start",
+        "current_period_end",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "tenant_members",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "user_id",
+        "tenant_role",
+        "permissions",
+        "status",
+        "invited_by",
+        "invited_at",
+        "joined_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "tenant_memberships",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "tenant_id",
+        "user_id",
+        "role",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "testimonials",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "name",
+        "role",
+        "company",
+        "quote",
+        "image_url",
+        "program_slug",
+        "service_type",
+        "rating",
+        "featured",
+        "approved",
+        "display_order",
+        "created_at",
+        "updated_at",
+        "content",
+        "is_featured",
+        "outcome",
+        "program",
+        "salary",
+        "title",
+        "show_on_home",
+        "show_on_program",
+        "is_active",
+        "published"
+      ]
+    },
+    {
+      "table_name": "ultimate_artifact_versions",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "artifact_id",
+        "version",
+        "parent_version_id",
+        "content",
+        "storage_ref",
+        "provenance",
+        "qa_state",
+        "approval_status",
+        "locked",
+        "locked_by",
+        "locked_at",
+        "approved_by",
+        "approved_at",
+        "change_reason",
+        "generated_by",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "ultimate_artifacts",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "build_id",
+        "lesson_build_id",
+        "stage",
+        "artifact_type",
+        "logical_key",
+        "current_version",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "ultimate_build_jobs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "build_id",
+        "job_type",
+        "status",
+        "priority",
+        "attempts",
+        "max_attempts",
+        "lease_owner",
+        "lease_expires_at",
+        "heartbeat_at",
+        "available_at",
+        "last_error",
+        "payload",
+        "created_at",
+        "updated_at",
+        "pending_dependency_resume",
+        "execution_generation",
+        "monitor"
+      ]
+    },
+    {
+      "table_name": "ultimate_course_builds",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "course_id",
+        "profile",
+        "status",
+        "current_step",
+        "findings",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "ultimate_lesson_builds",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "build_id",
+        "lesson_key",
+        "competency_id",
+        "status",
+        "artifacts",
+        "findings",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "ultimate_lesson_steps",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "lesson_build_id",
+        "step",
+        "state",
+        "artifacts",
+        "findings",
+        "started_at",
+        "completed_at"
+      ]
+    },
+    {
+      "table_name": "ultimate_release_versions",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "build_id",
+        "course_id",
+        "version",
+        "package",
+        "status",
+        "released_by",
+        "released_at",
+        "rolled_back_from"
+      ]
+    },
+    {
+      "table_name": "ultimate_review_decisions",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "artifact_version_id",
+        "action",
+        "reviewer_id",
+        "comment",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "video_jobs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "lesson_id",
+        "course_id",
+        "status",
+        "video_url",
+        "audio_url",
+        "error_message",
+        "scene_count",
+        "duration_seconds",
+        "lesson_title",
+        "script",
+        "bullet_points",
+        "scene_data",
+        "queued_at",
+        "started_at",
+        "completed_at",
+        "created_at",
+        "updated_at",
+        "provider",
+        "provider_job_id",
+        "thumbnail_url",
+        "asset_kind",
+        "asset_key",
+        "retry_count",
+        "last_provider",
+        "last_provider_model",
+        "last_failure_at",
+        "review_status",
+        "previous_video_url",
+        "reviewed_by",
+        "reviewed_at",
+        "review_notes",
+        "quality_evidence",
+        "procedure_schema",
+        "lease_token",
+        "lease_expires_at",
+        "heartbeat_at",
+        "failure_class",
+        "next_retry_at",
+        "dead_lettered_at"
+      ]
+    },
+    {
+      "table_name": "videos",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "title",
+        "description",
+        "url",
+        "thumbnail_url",
+        "duration_seconds",
+        "published",
+        "category",
+        "created_at",
+        "updated_at",
+        "video_url"
+      ]
+    },
+    {
+      "table_name": "workflow_dead_letters",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "workflow_id",
+        "run_id",
+        "step_id",
+        "action_type",
+        "action_config",
+        "attempts",
+        "error",
+        "trigger_payload",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "workflow_runs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "workflow_id",
+        "trigger_id",
+        "status",
+        "triggered_by",
+        "trigger_payload",
+        "steps_total",
+        "steps_done",
+        "error_message",
+        "started_at",
+        "completed_at",
+        "created_at",
+        "tenant_id",
+        "duration_ms",
+        "retry_count",
+        "platform_event_id"
+      ]
+    },
+    {
+      "table_name": "workflow_step_logs",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "run_id",
+        "step_id",
+        "step_order",
+        "action_type",
+        "status",
+        "output",
+        "error_message",
+        "duration_ms",
+        "created_at",
+        "attempts"
+      ]
+    },
+    {
+      "table_name": "workflow_steps",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "workflow_id",
+        "step_order",
+        "action_type",
+        "action_config",
+        "is_condition",
+        "condition_expr",
+        "enabled",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "workflow_triggers",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "workflow_id",
+        "trigger_type",
+        "event_filter",
+        "cron_expr",
+        "webhook_secret",
+        "enabled",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "workflows",
+      "relkind": "r",
+      "rls_enabled": true,
+      "columns": [
+        "id",
+        "name",
+        "workflow_key",
+        "category",
+        "status",
+        "last_run_at",
+        "last_run_status",
+        "run_count",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "webhook_key",
+        "tenant_id",
+        "description"
+      ]
+    },
+    {
+      "table_name": "api_keys",
+      "columns": [
+        "id",
+        "tenant_id",
+        "name",
+        "key_hash",
+        "permissions",
+        "last_used_at",
+        "expires_at",
+        "is_active",
+        "created_by",
+        "created_at",
+        "user_id",
+        "status",
+        "api_key",
+        "api_secret",
+        "key_name",
+        "request_count"
+      ]
+    },
+    {
+      "table_name": "app_settings",
+      "columns": [
+        "key",
+        "value",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "applications",
+      "columns": [
+        "id",
+        "first_name",
+        "last_name",
+        "phone",
+        "email",
+        "city",
+        "zip",
+        "program_interest",
+        "has_case_manager",
+        "case_manager_agency",
+        "support_notes",
+        "contact_preference",
+        "advisor_email",
+        "status",
+        "created_at",
+        "employer_sponsor_id",
+        "submit_token",
+        "program_id",
+        "user_id",
+        "pathway_slug",
+        "source",
+        "full_name",
+        "eligibility_data",
+        "reviewer_id",
+        "review_notes",
+        "reviewed_at",
+        "submitted_at",
+        "updated_at",
+        "intake_id",
+        "program_slug",
+        "payment_received_at",
+        "eligibility_status",
+        "eligibility_verified_at",
+        "eligibility_verified_by",
+        "advisor_assigned",
+        "advisor_notes",
+        "next_step",
+        "next_step_due_date",
+        "sezzle_session_uuid",
+        "sezzle_order_uuid",
+        "sezzle_reference_id",
+        "sezzle_card_token",
+        "payment_provider",
+        "payment_status",
+        "payment_amount_cents",
+        "payment_completed_at",
+        "payment_reference",
+        "internal_order_id",
+        "affirm_order_id",
+        "customer_email",
+        "reference_number",
+        "name",
+        "notes",
+        "date_of_birth",
+        "address",
+        "state",
+        "zip_code",
+        "lead_id",
+        "has_indiana_career_connect",
+        "has_workone_appointment",
+        "intake_stage",
+        "public_status_token",
+        "funding_type",
+        "funding_verified",
+        "funding_verified_at",
+        "funding_verified_by",
+        "has_workone_approval",
+        "workone_approval_ref",
+        "revoked_at",
+        "revoked_by",
+        "payment_intent_id",
+        "enrollment_id",
+        "milady_status",
+        "onboarding_sent_at",
+        "affirm_charge_id",
+        "payment_amount",
+        "refund_amount",
+        "refunded_at",
+        "transfer_hours_claimed",
+        "transfer_hours_verified",
+        "transfer_hours_verified_by",
+        "transfer_hours_verified_at",
+        "funding_status",
+        "readiness_status",
+        "support_needs_transport",
+        "support_needs_vehicle",
+        "support_needs_other",
+        "case_manager_name",
+        "case_manager_email",
+        "referral_source",
+        "normalized_email",
+        "normalized_phone",
+        "requested_funding_source",
+        "household_size",
+        "annual_income_usd",
+        "justice_involved",
+        "has_employer_sponsor",
+        "eligibility_evaluated_at",
+        "recommended_funding_source",
+        "funding_eligibility_status",
+        "county_of_residence",
+        "household_income",
+        "family_size",
+        "modality_preference",
+        "session_id",
+        "orientation_date",
+        "employer_assigned_at",
+        "employer_assigned_id",
+        "placed_at",
+        "placement_employer",
+        "placement_job_title",
+        "placement_hourly_wage",
+        "retained_at",
+        "funding_source",
+        "application_type",
+        "metadata",
+        "stripe_session_id",
+        "stripe_payment_intent_id",
+        "scheduled_at",
+        "referral_agency",
+        "type",
+        "follow_up_6mo_at",
+        "follow_up_12mo_at",
+        "follow_up_6mo_employed",
+        "follow_up_12mo_employed",
+        "follow_up_6mo_wage",
+        "follow_up_12mo_wage",
+        "follow_up_notes",
+        "request_fingerprint",
+        "submission_ip",
+        "submission_user_agent",
+        "assigned_at",
+        "assigned_shop_id",
+        "claimed_at",
+        "rejection_reason",
+        "interview_started_at",
+        "interview_completed",
+        "interview_completed_at",
+        "interview_current_question",
+        "interview_responses",
+        "interview_score",
+        "risk_level",
+        "funding_tier",
+        "funding_percentage",
+        "program_name",
+        "host_shop_contacted",
+        "host_shop_contacted_at",
+        "host_shop_inquiry_requested",
+        "provider_session_id",
+        "provider_payment_intent_id",
+        "outreach_interest",
+        "duplicate_of_application_id"
+      ]
+    },
+    {
+      "table_name": "apprentices",
+      "columns": [
+        "id",
+        "referral_id",
+        "employer_id",
+        "rapids_id",
+        "start_date",
+        "status",
+        "created_at",
+        "user_id",
+        "barber_subscription_id",
+        "mou_signed_at",
+        "dashboard_invite_sent_at",
+        "program_id",
+        "shop_id",
+        "updated_at",
+        "application_id",
+        "competencies_completed",
+        "competencies_required",
+        "enrollment_date",
+        "enrollment_id",
+        "host_shop_id",
+        "hours_completed",
+        "ojl_hours",
+        "ojl_hours_required",
+        "program_name",
+        "rti_hours",
+        "rti_hours_required",
+        "total_hours_required",
+        "transfer_hours_credited"
+      ]
+    },
+    {
+      "table_name": "communication_extensions",
+      "columns": [
+        "id",
+        "workspace_id",
+        "profile_id",
+        "destination_id",
+        "extension",
+        "display_name",
+        "department",
+        "presence_status",
+        "can_host_meetings",
+        "enabled",
+        "created_at",
+        "updated_at",
+        "ring_mode",
+        "availability_source",
+        "availability_schedule",
+        "ring_seconds",
+        "voicemail_greeting",
+        "paris_overflow_enabled",
+        "last_presence_at",
+        "admin_external_fallback",
+        "external_fallback_number",
+        "webrtc_provider"
+      ]
+    },
+    {
+      "table_name": "communication_onboarding_progress",
+      "columns": [
+        "id",
+        "workspace_id",
+        "user_id",
+        "announcement_seen_at",
+        "tour_started_at",
+        "tour_completed_at",
+        "completed_steps",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "communication_rooms",
+      "columns": [
+        "id",
+        "workspace_id",
+        "room_key",
+        "title",
+        "description",
+        "room_type",
+        "host_profile_id",
+        "status",
+        "scheduled_at",
+        "started_at",
+        "ended_at",
+        "max_participants",
+        "allow_screen_share",
+        "allow_chat",
+        "allow_phone_dial_in",
+        "recording_enabled",
+        "recording_url",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "communication_workspaces",
+      "columns": [
+        "id",
+        "tenant_id",
+        "phone_system_id",
+        "name",
+        "meeting_provider",
+        "meeting_region",
+        "recording_enabled",
+        "waiting_room_enabled",
+        "guests_allowed",
+        "status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "compliance_alerts",
+      "columns": [
+        "id",
+        "alert_type",
+        "severity",
+        "title",
+        "description",
+        "entity_type",
+        "entity_id",
+        "tenant_id",
+        "status",
+        "resolved_at",
+        "resolved_by",
+        "resolution_notes",
+        "created_at",
+        "message",
+        "metadata",
+        "resolved"
+      ]
+    },
+    {
+      "table_name": "compliance_audits",
+      "columns": [
+        "id",
+        "user_id",
+        "action",
+        "details",
+        "ip_address",
+        "created_at",
+        "updated_at",
+        "admissions_lead_signed",
+        "program_director_signed"
+      ]
+    },
+    {
+      "table_name": "compliance_events",
+      "columns": [
+        "id",
+        "user_id",
+        "action",
+        "details",
+        "ip_address",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "compliance_items",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "status",
+        "created_at",
+        "updated_at",
+        "title",
+        "category",
+        "last_reviewed_at",
+        "assigned_to",
+        "due_date"
+      ]
+    },
+    {
+      "table_name": "documents",
+      "columns": [
+        "id",
+        "user_id",
+        "document_type",
+        "file_name",
+        "file_size",
+        "file_url",
+        "mime_type",
+        "status",
+        "uploaded_by",
+        "reviewed_by",
+        "reviewed_at",
+        "rejection_reason",
+        "expiration_date",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "enrollment_id",
+        "application_id",
+        "verification_status",
+        "verified_by",
+        "verified_at",
+        "requirement_id",
+        "owner_type",
+        "owner_id",
+        "file_path",
+        "file_size_bytes",
+        "verified",
+        "verification_notes",
+        "title",
+        "url",
+        "ocr_text",
+        "ocr_confidence",
+        "extracted_data",
+        "processed_at",
+        "processed_by",
+        "extraction_status",
+        "applied_at",
+        "applied_to_application",
+        "storage_path",
+        "validation_checks"
+      ]
+    },
+    {
+      "table_name": "enrollment_jobs",
+      "columns": [
+        "id",
+        "attempt_count",
+        "email",
+        "enrollment_id",
+        "first_name",
+        "job_type",
+        "last_error",
+        "last_name",
+        "max_attempts",
+        "program_enrollments",
+        "scheduled_for",
+        "status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "enrollments",
+      "columns": [
+        "id",
+        "user_id",
+        "student_id",
+        "program_id",
+        "program_slug",
+        "status",
+        "enrollment_state",
+        "enrolled_at",
+        "completed_at",
+        "progress_percent",
+        "funding_source",
+        "cohort_id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "grant_applications",
+      "columns": [
+        "id",
+        "grant_id",
+        "submitted_by",
+        "status",
+        "amount_requested",
+        "amount_awarded",
+        "proposal_summary",
+        "documents",
+        "submitted_at",
+        "reviewed_at",
+        "reviewer_notes",
+        "created_at",
+        "updated_at",
+        "entity_id",
+        "opportunity_id",
+        "opportunity_title",
+        "opportunity_number",
+        "agency_name",
+        "cfda_number",
+        "deadline",
+        "award_ceiling",
+        "award_floor",
+        "opportunity_url",
+        "org_id",
+        "legal_name",
+        "ein",
+        "uei",
+        "sam_status",
+        "org_address",
+        "contact_name",
+        "contact_email",
+        "contact_phone",
+        "project_title",
+        "executive_summary",
+        "problem_statement",
+        "project_description",
+        "target_population",
+        "geographic_area",
+        "goals_and_objectives",
+        "evaluation_plan",
+        "sustainability_plan",
+        "budget_narrative",
+        "budget_total",
+        "partner_agencies",
+        "attached_document_ids",
+        "notes",
+        "created_by"
+      ]
+    },
+    {
+      "table_name": "grant_opportunities",
+      "columns": [
+        "id",
+        "source_id",
+        "external_id",
+        "title",
+        "agency",
+        "summary",
+        "eligibility",
+        "naics_tags",
+        "categories",
+        "location_limit",
+        "due_date",
+        "url",
+        "raw_json",
+        "created_at",
+        "updated_at",
+        "description",
+        "funder",
+        "amount_min",
+        "amount_max",
+        "deadline",
+        "eligibility_criteria",
+        "focus_areas",
+        "application_url",
+        "status",
+        "award_ceiling",
+        "opportunity_number",
+        "agency_code",
+        "cfda_number",
+        "assistance_listing",
+        "posted_date",
+        "close_date",
+        "archive_date",
+        "award_floor",
+        "estimated_funding",
+        "eligibility_text",
+        "applicant_types",
+        "funding_categories",
+        "imported_at",
+        "source",
+        "agency_name",
+        "opportunity_url"
+      ]
+    },
+    {
+      "table_name": "hour_entries",
+      "columns": [
+        "id",
+        "apprentice_application_id",
+        "host_shop_application_id",
+        "source_type",
+        "source_entity_name",
+        "source_state",
+        "source_document_url",
+        "work_date",
+        "hours_claimed",
+        "accepted_hours",
+        "category",
+        "notes",
+        "evaluation_required",
+        "evaluation_decision",
+        "rule_set_id",
+        "rule_hash",
+        "evaluated_at",
+        "evaluated_by",
+        "evaluation_notes",
+        "entered_by_email",
+        "entered_at",
+        "status",
+        "approved_by",
+        "approved_at",
+        "rejection_reason",
+        "created_at",
+        "hours",
+        "user_id",
+        "program_slug",
+        "legacy_source",
+        "legacy_id",
+        "approved_by_role",
+        "submitted_by_partner",
+        "program_holder_id",
+        "approval_status",
+        "approval_notes",
+        "funding_phase",
+        "progress_entry_id",
+        "host_shop_id",
+        "approved_by_user_id"
+      ]
+    },
+    {
+      "table_name": "ita_vouchers",
+      "columns": [
+        "id",
+        "participant_name",
+        "ssn_last4",
+        "state_id",
+        "student_id",
+        "voucher_id",
+        "app_id",
+        "voucher_date",
+        "voucher_expire_date",
+        "lwdb_region",
+        "fund_stream",
+        "program_title",
+        "wioa_type",
+        "service_code",
+        "service_name",
+        "provider_name",
+        "provider_fein",
+        "vendor_id",
+        "provider_address",
+        "service_start_date",
+        "service_end_date",
+        "tuition_fee",
+        "books",
+        "tools",
+        "supplies",
+        "fees",
+        "test_fees",
+        "other_costs",
+        "admin_fees",
+        "total_training_costs",
+        "total_voucher_amount",
+        "payments_to_date",
+        "status",
+        "is_final",
+        "comments",
+        "remittance_email",
+        "created_at",
+        "updated_at",
+        "user_id",
+        "program_id",
+        "enrollment_id",
+        "remittance_evidence"
+      ]
+    },
+    {
+      "table_name": "job_queue",
+      "columns": [
+        "id",
+        "type",
+        "payload",
+        "status",
+        "attempts",
+        "max_attempts",
+        "error",
+        "created_at",
+        "processed_at",
+        "updated_at",
+        "completed_at",
+        "last_error",
+        "run_after"
+      ]
+    },
+    {
+      "table_name": "license_purchases",
+      "columns": [
+        "id",
+        "organization_name",
+        "contact_name",
+        "contact_email",
+        "license_type",
+        "product_slug",
+        "stripe_payment_intent_id",
+        "stripe_checkout_session_id",
+        "tenant_id",
+        "status",
+        "amount_cents",
+        "currency",
+        "created_at",
+        "updated_at",
+        "license_id",
+        "provider_payment_intent_id",
+        "provider_checkout_session_id"
+      ]
+    },
+    {
+      "table_name": "license_requests",
+      "columns": [
+        "id",
+        "user_id",
+        "license_type",
+        "status",
+        "requested_at",
+        "approved_at",
+        "approved_by",
+        "created_at",
+        "updated_at",
+        "internal_notes"
+      ]
+    },
+    {
+      "table_name": "licenses",
+      "columns": [
+        "id",
+        "license_key",
+        "domain",
+        "customer_email",
+        "tenant_id",
+        "tier",
+        "status",
+        "max_users",
+        "max_deployments",
+        "features",
+        "expires_at",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "stripe_customer_id",
+        "stripe_subscription_id",
+        "current_period_end",
+        "suspended_at",
+        "canceled_at",
+        "paid_through",
+        "suspended_reason",
+        "plan_type",
+        "admin_email",
+        "company_name",
+        "ends_at",
+        "max_programs",
+        "organization_id",
+        "valid_until",
+        "expiry_warning_sent",
+        "max_students",
+        "valid_from",
+        "billing_provider",
+        "provider_subscription_id",
+        "provider_customer_id"
+      ]
+    },
+    {
+      "table_name": "monitoring_alerts",
+      "columns": [
+        "id",
+        "source",
+        "alert_title",
+        "alert_description",
+        "alert_url",
+        "severity",
+        "status",
+        "investigated_by",
+        "investigated_at",
+        "investigation_notes",
+        "action_required",
+        "action_taken",
+        "related_unauthorized_log_id",
+        "related_dmca_id",
+        "related_legal_action_id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "page_views",
+      "columns": [
+        "id",
+        "path",
+        "user_id",
+        "session_id",
+        "referrer",
+        "user_agent",
+        "ip_address",
+        "created_at",
+        "page",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "landing_path"
+      ]
+    },
+    {
+      "table_name": "partner_applications",
+      "columns": [
+        "id",
+        "shop_name",
+        "dba",
+        "owner_name",
+        "contact_email",
+        "phone",
+        "address_line1",
+        "city",
+        "state",
+        "zip",
+        "programs_requested",
+        "agreed_to_terms",
+        "status",
+        "created_at",
+        "updated_at",
+        "intake",
+        "state_updated_at",
+        "email",
+        "approval_status",
+        "approved_at",
+        "approved_by",
+        "denial_reason",
+        "denied_at",
+        "denied_by",
+        "notes"
+      ]
+    },
+    {
+      "table_name": "partner_document_requirements",
+      "columns": [
+        "id",
+        "state",
+        "program_id",
+        "document_type",
+        "document_name",
+        "description",
+        "is_required",
+        "allowed_file_types",
+        "max_file_size_mb",
+        "requires_expiration",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "partner_documents",
+      "columns": [
+        "id",
+        "display_name",
+        "file_url",
+        "status",
+        "uploaded_at",
+        "partner_id",
+        "document_type",
+        "program_id",
+        "state",
+        "file_name",
+        "reviewed_at",
+        "reviewed_by",
+        "rejection_reason",
+        "expiration_date",
+        "file_type",
+        "file_size",
+        "storage_bucket",
+        "notes"
+      ]
+    },
+    {
+      "table_name": "partner_users",
+      "columns": [
+        "id",
+        "user_id",
+        "partner_id",
+        "role",
+        "status",
+        "created_at",
+        "organization_id"
+      ]
+    },
+    {
+      "table_name": "partners",
+      "columns": [
+        "id",
+        "name",
+        "dba",
+        "ein",
+        "owner_name",
+        "contact_email",
+        "phone",
+        "address_line1",
+        "address_line2",
+        "city",
+        "state",
+        "zip",
+        "website",
+        "apprentice_capacity",
+        "license_number",
+        "license_state",
+        "license_expiry",
+        "status",
+        "created_at",
+        "updated_at",
+        "account_status",
+        "partner_type",
+        "description",
+        "logo_url",
+        "website_url",
+        "contact_name",
+        "featured",
+        "is_active",
+        "display_order",
+        "approval_status",
+        "approved_at",
+        "approved_by",
+        "rejection_reason",
+        "mou_signed",
+        "mou_signed_at",
+        "documents_verified",
+        "address",
+        "onboarding_completed",
+        "onboarding_step",
+        "programs",
+        "shop_name",
+        "type",
+        "legal_name",
+        "contact_phone",
+        "program_type",
+        "supervisor_name",
+        "supervisor_license_number",
+        "supervisor_years_licensed",
+        "compensation_model",
+        "number_of_employees",
+        "workers_comp_status",
+        "has_general_liability",
+        "can_supervise_and_verify",
+        "mou_acknowledged",
+        "notes",
+        "applied_at",
+        "mou_version",
+        "mou_pdf_url",
+        "mou_sent_at",
+        "partner_type_detail",
+        "public_slug",
+        "flyer_url",
+        "public_profile_published_at",
+        "verification_status",
+        "verification_details",
+        "rapids_employer_number",
+        "rapids_registration_status",
+        "rapids_registered_at",
+        "rapids_sponsor_registration_number",
+        "media_gallery",
+        "video_url",
+        "source_url",
+        "google_maps_url",
+        "media_verified_at",
+        "auto_approved",
+        "enrollment_id",
+        "geocoded_at",
+        "lat",
+        "lng",
+        "partner_application_id"
+      ]
+    },
+    {
+      "table_name": "phone_calls",
+      "columns": [
+        "id",
+        "phone_system_id",
+        "phone_number_id",
+        "provider",
+        "provider_call_id",
+        "direction",
+        "from_number",
+        "to_number",
+        "status",
+        "destination_id",
+        "started_at",
+        "answered_at",
+        "ended_at",
+        "duration_seconds",
+        "recording_url",
+        "created_at",
+        "updated_at",
+        "assigned_extension_id",
+        "assigned_profile_id"
+      ]
+    },
+    {
+      "table_name": "phone_destinations",
+      "columns": [
+        "id",
+        "phone_system_id",
+        "name",
+        "destination_type",
+        "destination",
+        "ring_seconds",
+        "enabled",
+        "created_at",
+        "updated_at",
+        "department",
+        "priority",
+        "simultaneous_group",
+        "fallback_to_voicemail",
+        "extension_id"
+      ]
+    },
+    {
+      "table_name": "phone_menu_options",
+      "columns": [
+        "id",
+        "phone_system_id",
+        "digit",
+        "label",
+        "destination_id",
+        "position",
+        "enabled",
+        "created_at",
+        "updated_at",
+        "spoken_keywords"
+      ]
+    },
+    {
+      "table_name": "phone_numbers",
+      "columns": [
+        "id",
+        "phone_system_id",
+        "e164",
+        "label",
+        "source",
+        "provider",
+        "provider_number_id",
+        "capabilities",
+        "status",
+        "is_primary",
+        "created_at",
+        "updated_at",
+        "assigned_profile_id",
+        "extension"
+      ]
+    },
+    {
+      "table_name": "phone_systems",
+      "columns": [
+        "id",
+        "organization_id",
+        "name",
+        "timezone",
+        "status",
+        "business_hours",
+        "greeting",
+        "after_hours_message",
+        "created_at",
+        "updated_at",
+        "tenant_id",
+        "routing_mode",
+        "default_destination_id",
+        "voicemail_enabled",
+        "voicemail_transcription_enabled",
+        "call_recording_enabled",
+        "recording_disclosure",
+        "max_queue_seconds",
+        "ai_enabled",
+        "ai_name",
+        "ai_voice",
+        "ai_instructions",
+        "ai_language",
+        "ai_allow_interruptions",
+        "ai_human_handoff_enabled",
+        "webrtc_connection_id",
+        "webrtc_connection_status",
+        "admin_extension",
+        "admin_menu_digit",
+        "paris_intake_enabled"
+      ]
+    },
+    {
+      "table_name": "phone_webrtc_devices",
+      "columns": [
+        "id",
+        "extension_id",
+        "profile_id",
+        "device_id",
+        "provider_credential_id",
+        "sip_username",
+        "status",
+        "last_seen_at",
+        "created_at",
+        "updated_at",
+        "provider",
+        "registration_state",
+        "connection_state",
+        "registration_verified_at"
+      ]
+    },
+    {
+      "table_name": "program_completion_certificates",
+      "columns": [
+        "id",
+        "user_id",
+        "program_id",
+        "course_id",
+        "enrollment_id",
+        "certificate_number",
+        "completion_date",
+        "verification_url",
+        "checkpoints_passed",
+        "total_checkpoints",
+        "issued_at",
+        "created_at",
+        "funding_status",
+        "funding_status_changed_at",
+        "funding_status_reason",
+        "hours_completed",
+        "competencies_achieved",
+        "instructor_verified",
+        "verification_summary",
+        "exam_ready",
+        "avg_checkpoint_score",
+        "competency_domains",
+        "certificate_title",
+        "certificate_subtitle",
+        "issued_by"
+      ]
+    },
+    {
+      "table_name": "program_holder_documents",
+      "columns": [
+        "id",
+        "user_id",
+        "organization_id",
+        "document_type",
+        "file_name",
+        "file_url",
+        "file_size",
+        "mime_type",
+        "description",
+        "uploaded_by",
+        "approved",
+        "approved_by",
+        "approved_at",
+        "approval_notes",
+        "created_at",
+        "updated_at",
+        "uploaded_at",
+        "status",
+        "reviewed_by",
+        "reviewed_at",
+        "rejection_reason",
+        "ocr_text",
+        "storage_bucket"
+      ]
+    },
+    {
+      "table_name": "program_holder_programs",
+      "columns": [
+        "id",
+        "status",
+        "created_at",
+        "program_holder_id",
+        "program_id",
+        "role_in_program",
+        "is_primary",
+        "program_slug"
+      ]
+    },
+    {
+      "table_name": "program_holders",
+      "columns": [
+        "id",
+        "organization_name",
+        "status",
+        "created_at",
+        "user_id",
+        "contact_name",
+        "contact_email",
+        "contact_phone",
+        "mou_signed",
+        "mou_signed_at",
+        "payout_status",
+        "is_using_internal_lms",
+        "approved_at",
+        "mou_final_pdf_url",
+        "mou_status",
+        "name",
+        "payout_share",
+        "approved_by",
+        "primary_program_id",
+        "teaches_multiple",
+        "mou_holder_name",
+        "mou_holder_signed_at",
+        "mou_holder_sig_url",
+        "mou_type",
+        "hvac_license_url",
+        "hvac_license_uploaded_at",
+        "welcome_email_sent",
+        "features",
+        "enrollments_restricted",
+        "mou_admin_name",
+        "mou_admin_sig_url",
+        "mou_admin_signed_at",
+        "mou_terminated",
+        "probation_reason",
+        "probation_started_at",
+        "restricted_at",
+        "restriction_reason",
+        "suspended_at",
+        "suspension_reason",
+        "terminated_at",
+        "termination_reason",
+        "updated_at",
+        "verification_status",
+        "rejection_reason",
+        "reviewed_at"
+      ]
+    },
+    {
+      "table_name": "progress_entries",
+      "columns": [
+        "id",
+        "apprentice_id",
+        "partner_id",
+        "program_id",
+        "week_ending",
+        "hours_worked",
+        "notes",
+        "submitted_by",
+        "status",
+        "created_at",
+        "tasks_completed",
+        "submitted_at",
+        "verified_by",
+        "verified_at",
+        "updated_at",
+        "max_hours_per_week",
+        "work_date",
+        "site_id",
+        "clock_in_at",
+        "clock_out_at",
+        "lunch_start_at",
+        "lunch_end_at",
+        "break_minutes",
+        "clock_in_lat",
+        "clock_in_lng",
+        "clock_in_accuracy_m",
+        "clock_out_lat",
+        "clock_out_lng",
+        "clock_out_accuracy_m",
+        "last_seen_at",
+        "last_seen_lat",
+        "last_seen_lng",
+        "last_seen_accuracy_m",
+        "last_seen_within_geofence",
+        "auto_clocked_out",
+        "auto_clock_out_reason",
+        "outside_geofence_since",
+        "last_geofence_check_at",
+        "last_known_lat",
+        "last_known_lng",
+        "last_location_at",
+        "hour_entry_id"
+      ]
+    },
+    {
+      "table_name": "provider_applications",
+      "columns": [
+        "id",
+        "org_name",
+        "org_type",
+        "ein",
+        "website",
+        "contact_name",
+        "contact_title",
+        "contact_email",
+        "contact_phone",
+        "address_line1",
+        "address_line2",
+        "city",
+        "state",
+        "zip",
+        "program_types",
+        "service_area",
+        "annual_enrollment",
+        "credential_authorities",
+        "wioa_eligible",
+        "etpl_listed",
+        "etpl_state",
+        "accreditation",
+        "mission_statement",
+        "outcomes_description",
+        "partnership_goals",
+        "agreed_to_terms",
+        "agreed_at",
+        "status",
+        "status_reason",
+        "reviewed_by",
+        "reviewed_at",
+        "review_notes",
+        "tenant_id",
+        "created_at",
+        "updated_at",
+        "w9_file_url",
+        "ein_doc_file_url",
+        "certification_file_url",
+        "resume_file_url",
+        "bank_name",
+        "bank_routing_number",
+        "bank_account_number",
+        "bank_account_type",
+        "quickbooks_connected",
+        "quickbooks_company_id",
+        "payroll_provider"
+      ]
+    },
+    {
+      "table_name": "purchases",
+      "columns": [
+        "id",
+        "email",
+        "product_id",
+        "repo",
+        "created_at",
+        "user_id",
+        "amount_cents",
+        "currency",
+        "purchased_at",
+        "refunded_at",
+        "status",
+        "stripe_session_id",
+        "provider_session_id"
+      ]
+    },
+    {
+      "table_name": "referral_pipeline_summary",
+      "columns": [
+        "id",
+        "user_id",
+        "application_id",
+        "enrollment_id",
+        "agency_name",
+        "agency_type",
+        "case_manager_name",
+        "case_manager_email",
+        "case_manager_phone",
+        "participant_name",
+        "participant_email",
+        "funding_type",
+        "voucher_number",
+        "funding_amount",
+        "funding_approved",
+        "funding_approved_at",
+        "status",
+        "referral_date",
+        "archived",
+        "notes",
+        "created_at",
+        "updated_at",
+        "program_id",
+        "program_slug",
+        "program_title"
+      ]
+    },
+    {
+      "table_name": "review_queue",
+      "columns": [
+        "id",
+        "queue_type",
+        "subject_type",
+        "subject_id",
+        "priority",
+        "reasons",
+        "status",
+        "assigned_to",
+        "resolved_by",
+        "resolved_at",
+        "resolution",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "entity_type",
+        "entity_id",
+        "review_type",
+        "ai_recommendation",
+        "ai_confidence",
+        "human_decision",
+        "human_notes",
+        "decided_by",
+        "decided_at",
+        "assignedat",
+        "assignedto",
+        "confidence_score",
+        "context",
+        "decidedat",
+        "decisionnote",
+        "extracted_data",
+        "failed_rules",
+        "system_recommendation"
+      ]
+    },
+    {
+      "table_name": "shop_applications",
+      "columns": [
+        "id",
+        "shop_name",
+        "owner_name",
+        "email",
+        "phone",
+        "address",
+        "city",
+        "state",
+        "zip",
+        "ein",
+        "years_in_business",
+        "licensed_barbers",
+        "agree_supervision",
+        "agree_reporting",
+        "agree_wages",
+        "status",
+        "reviewed_by",
+        "reviewed_at",
+        "review_notes",
+        "created_at"
+      ]
+    },
+    {
+      "table_name": "shop_required_docs_status",
+      "columns": [
+        "id",
+        "shop_name",
+        "status",
+        "created_at",
+        "required",
+        "approved",
+        "agree_supervision",
+        "agree_reporting",
+        "agree_wages",
+        "shop_id"
+      ]
+    },
+    {
+      "table_name": "social_media_settings",
+      "columns": [
+        "id",
+        "platform",
+        "handle",
+        "url",
+        "is_active",
+        "tenant_id",
+        "created_at",
+        "access_token",
+        "refresh_token",
+        "expires_at",
+        "organization_id",
+        "organizations",
+        "enabled",
+        "profile_data",
+        "updated_by",
+        "updated_at",
+        "granted_scopes",
+        "connection_status",
+        "last_verified_at",
+        "refresh_status",
+        "dry_run",
+        "access_token_secret_id",
+        "refresh_token_secret_id"
+      ]
+    },
+    {
+      "table_name": "sos_attachment_library",
+      "columns": [
+        "id",
+        "organization_id",
+        "document_type",
+        "title",
+        "file_url",
+        "file_path",
+        "effective_date",
+        "expiration_date",
+        "status",
+        "approved_by",
+        "approved_at",
+        "notes",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "sos_content_blocks",
+      "columns": [
+        "id",
+        "organization_id",
+        "block_type",
+        "title",
+        "content",
+        "tags",
+        "word_count",
+        "approved_by",
+        "approved_at",
+        "status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "sos_opportunities",
+      "columns": [
+        "id",
+        "organization_id",
+        "source_link_id",
+        "opportunity_type",
+        "issuer_name",
+        "title",
+        "reference_number",
+        "status",
+        "submission_method",
+        "portal_url",
+        "issue_date",
+        "due_date",
+        "questions_deadline",
+        "estimated_value",
+        "eligibility_text",
+        "scope_summary",
+        "profiled_by",
+        "profiled_at",
+        "notes",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "sos_organization_facts",
+      "columns": [
+        "id",
+        "organization_id",
+        "fact_key",
+        "fact_value_json",
+        "source_type",
+        "source_reference",
+        "approved_by",
+        "approved_at",
+        "expires_at",
+        "status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "sos_review_tasks",
+      "columns": [
+        "id",
+        "organization_id",
+        "opportunity_id",
+        "submission_packet_id",
+        "task_type",
+        "title",
+        "description",
+        "related_record_type",
+        "related_record_id",
+        "priority",
+        "status",
+        "assigned_to",
+        "resolved_by",
+        "resolved_at",
+        "resolution_notes",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "store_products",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "status",
+        "created_at",
+        "updated_at",
+        "course_id",
+        "grants_course_access",
+        "product_id",
+        "stripe_product_id",
+        "image_url",
+        "image_urls",
+        "provider_product_id"
+      ]
+    },
+    {
+      "table_name": "tenants",
+      "columns": [
+        "id",
+        "name",
+        "slug",
+        "created_at",
+        "updated_at",
+        "status",
+        "active",
+        "compliance_ferpa",
+        "compliance_hipaa",
+        "compliance_wioa",
+        "license_expires_at",
+        "license_status",
+        "type",
+        "is_platform_owner",
+        "parent_tenant_id",
+        "settings",
+        "stripe_customer_id",
+        "stripe_subscription_id",
+        "provider_customer_id",
+        "provider_subscription_id"
+      ]
+    },
+    {
+      "table_name": "voicemails",
+      "columns": [
+        "id",
+        "user_id",
+        "phone_number",
+        "recording_url",
+        "duration_seconds",
+        "transcription",
+        "is_read",
+        "created_at",
+        "phone_system_id",
+        "call_id",
+        "status",
+        "extension_id",
+        "assigned_profile_id",
+        "summary"
+      ]
+    },
+    {
+      "table_name": "wioa_compliance_reports",
+      "columns": [
+        "id",
+        "report_type",
+        "quarter",
+        "fiscal_year",
+        "status",
+        "data",
+        "submitted_at",
+        "submitted_by",
+        "created_at",
+        "updated_at",
+        "due_date"
+      ]
+    },
+    {
+      "table_name": "wioa_documents",
+      "columns": [
+        "id",
+        "user_id",
+        "application_id",
+        "document_type",
+        "file_url",
+        "file_name",
+        "status",
+        "reviewed_by",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table_name": "wioa_participants",
+      "columns": [
+        "id",
+        "user_id",
+        "date_of_birth",
+        "gender",
+        "ethnicity",
+        "race",
+        "us_citizen",
+        "work_authorized",
+        "work_authorization_type",
+        "work_authorization_expiry",
+        "selective_service_registered",
+        "selective_service_exempt",
+        "selective_service_exempt_reason",
+        "is_veteran",
+        "veteran_type",
+        "veteran_dd214_url",
+        "is_military_spouse",
+        "is_low_income",
+        "household_size",
+        "annual_income",
+        "income_verification_url",
+        "income_verification_date",
+        "income_verification_method",
+        "receives_tanf",
+        "receives_snap",
+        "receives_ssi",
+        "receives_ssdi",
+        "receives_general_assistance",
+        "is_dislocated_worker",
+        "layoff_date",
+        "layoff_reason",
+        "warn_notice_received",
+        "ui_exhausted",
+        "self_employed_now_unemployed",
+        "displaced_homemaker",
+        "military_spouse_displaced",
+        "is_youth",
+        "youth_in_school",
+        "youth_out_of_school",
+        "is_displaced_homemaker",
+        "is_homeless",
+        "homeless_type",
+        "is_runaway_youth",
+        "is_foster_care_youth",
+        "foster_care_age_out",
+        "is_pregnant_parenting",
+        "number_of_children",
+        "is_ex_offender",
+        "offender_type",
+        "has_disability",
+        "disability_types",
+        "disability_documentation_url",
+        "requires_accommodation",
+        "accommodation_needs",
+        "highest_education_level",
+        "school_status",
+        "employment_status_at_entry",
+        "employed_at_entry",
+        "is_basic_skills_deficient",
+        "basic_skills_assessment_date",
+        "basic_skills_assessment_type",
+        "basic_skills_reading_level",
+        "basic_skills_math_level",
+        "is_english_language_learner",
+        "primary_language",
+        "is_long_term_unemployed",
+        "unemployment_duration_weeks",
+        "is_migrant_farmworker",
+        "is_seasonal_farmworker",
+        "is_single_parent",
+        "has_cultural_barriers",
+        "cultural_barrier_description",
+        "eligibility_status",
+        "eligibility_determined_by",
+        "eligibility_determined_date",
+        "eligibility_notes",
+        "wioa_program",
+        "funding_source",
+        "created_at",
+        "updated_at",
+        "email",
+        "first_name",
+        "last_name",
+        "status",
+        "program_id",
+        "case_manager_id",
+        "authorization_date",
+        "case_manager",
+        "created_by",
+        "eligibility_verified_at",
+        "eligibility_verified_by",
+        "expiration_date",
+        "funding_amount",
+        "notes",
+        "participant_email",
+        "participant_name",
+        "participant_phone",
+        "program",
+        "workone_center"
+      ]
+    },
+    {
+      "table_name": "workforce_referrals",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "status",
+        "created_at",
+        "updated_at",
+        "user_id",
+        "application_id",
+        "enrollment_id",
+        "agency_name",
+        "agency_type",
+        "case_manager_name",
+        "case_manager_email",
+        "case_manager_phone",
+        "participant_name",
+        "participant_email",
+        "funding_type",
+        "voucher_number",
+        "funding_amount",
+        "funding_approved",
+        "funding_approved_at",
+        "funding_approved_by",
+        "referral_date",
+        "contact_sent",
+        "contact_sent_at",
+        "partner_acknowledged",
+        "partner_acknowledged_at",
+        "status_update_email_enabled",
+        "last_status_update_sent_at",
+        "case_notes",
+        "archived",
+        "applicant_email",
+        "applicant_name",
+        "applicant_phone",
+        "agency",
+        "program_interest",
+        "notes",
+        "referral_agency"
+      ]
+    }
+  ],
+  "mergedRepair": "cb038e3920232b5f673b6e7d802eab5b4f6f6e39",
+  "followupPR": 2120,
+  "followupHead": "faa837d8a549e7863731087c324988d8ab7e3fd7",
   "fetchMethodContracts": [
     {
       "file": "components/admin/dashboard/OpenHostShopPortalButton.tsx",
@@ -10627,7 +17394,7 @@
       "ready": true,
       "commit": "b59a5571f273f1281e7959b00456b4cb94a27a3e",
       "revision": "elevate-marketing-migration-rb59a5571-40112188199-1",
-      "timestamp": "2026-10-24T18:50:57.493Z"
+      "timestamp": "2026-10-24T19:23:20.599Z"
     },
     {
       "url": "https://admin.elevateforhumanity.org/api/health",
@@ -10636,7 +17403,7 @@
       "ready": true,
       "commit": "8dc7baaa6d7b201285920b7cbaa13b7855adff25",
       "revision": "elevate-admin-migration-00277-gtt",
-      "timestamp": "2026-10-24T18:50:58.161Z"
+      "timestamp": "2026-10-24T19:23:24.295Z"
     },
     {
       "url": "https://app.elevateforhumanity.org/api/health",
@@ -10645,7 +17412,7 @@
       "ready": true,
       "commit": "e047b01e4ba4beb38f23f21222e10ae44efba8e6",
       "revision": "elevate-lms-migration-00221-gv7",
-      "timestamp": "2026-10-24T18:50:57.625Z"
+      "timestamp": "2026-10-24T19:23:21.250Z"
     }
   ],
   "courseOwnershipChecks": [
@@ -11497,7 +18264,7 @@
     {
       "name": "Host Shop",
       "url": "https://app.elevateforhumanity.org/host-shop/dashboard",
-      "result": "Registry/source mapping inspected; a specific shop was not selected; destination not live-verified"
+      "result": "Rendered Host Shop PWA admin preview; Select Host Shop and Manage partners link to admin /partners; no shop selected"
     },
     {
       "name": "Course Builder",

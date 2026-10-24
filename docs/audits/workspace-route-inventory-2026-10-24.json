@@ -1,7 +1,7 @@
 {
   "date": "2026-10-24",
   "baseline": "8212d2b97e11bae0b19abefd0bd3c85496098f93",
-  "repairCommit": "93883da8cc3b79db20e6b2be1923d21cbe90704a",
+  "repairCommit": "6b7c3251de00a3b305ed00f8132ea05266f3e169",
   "scope": "DashboardShell, UnifiedCourseBuilder, StudioCommandWorkspace and their transitive UI imports; Advanced Tools static links; canonical role portals",
   "controls": {
     "roots": [
@@ -2986,7 +2986,10 @@
       "callers": [
         "components/studio/MediaStudioPanel.tsx:121"
       ],
-      "methods": [],
+      "methods": [
+        "POST",
+        "GET"
+      ],
       "tables": [],
       "rpc": [],
       "imports": [
@@ -3043,7 +3046,10 @@
       "callers": [
         "components/studio/MediaStudioPanel.tsx:539"
       ],
-      "methods": [],
+      "methods": [
+        "DELETE",
+        "PATCH"
+      ],
       "tables": [],
       "rpc": [],
       "imports": [
@@ -8373,6 +8379,7 @@
       "table": "course_modules",
       "ops": [
         "update",
+        "eq",
         "eq"
       ],
       "columns": [
@@ -8407,10 +8414,26 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 174,
+      "line": 143,
+      "table": "course_modules",
+      "ops": [
+        "select",
+        "eq",
+        "maybeSingle"
+      ],
+      "columns": [
+        "course_id",
+        "id"
+      ],
+      "missing": []
+    },
+    {
+      "file": "lib/course-builder/edit-service.ts",
+      "line": 183,
       "table": "course_lessons",
       "ops": [
         "update",
+        "eq",
         "eq"
       ],
       "columns": [
@@ -8448,7 +8471,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 175,
+      "line": 184,
       "table": "course_lessons",
       "ops": [
         "insert"
@@ -8487,7 +8510,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 192,
+      "line": 201,
       "table": "course_lessons",
       "ops": [
         "update",
@@ -8503,7 +8526,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 206,
+      "line": 215,
       "table": "course_lessons",
       "ops": [
         "delete",
@@ -8516,7 +8539,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 218,
+      "line": 227,
       "table": "course_lessons",
       "ops": [
         "update",
@@ -8533,7 +8556,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 222,
+      "line": 231,
       "table": "course_lessons",
       "ops": [
         "update",
@@ -8550,7 +8573,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 235,
+      "line": 244,
       "table": "scorm_packages",
       "ops": [
         "update",
@@ -8570,7 +8593,7 @@
     },
     {
       "file": "lib/course-builder/edit-service.ts",
-      "line": 244,
+      "line": 253,
       "table": "audit_logs",
       "ops": [
         "insert"
@@ -9780,6 +9803,863 @@
         "course_id"
       ],
       "missing": []
+    }
+  ],
+  "fetchMethodContracts": [
+    {
+      "file": "components/admin/dashboard/OpenHostShopPortalButton.tsx",
+      "line": 14,
+      "route": "/api/admin/select-host-shop",
+      "method": "POST",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/PublishWebsitePanel.tsx",
+      "line": 70,
+      "route": "/api/admin/publish-website",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/PublishWebsitePanel.tsx",
+      "line": 95,
+      "route": "/api/admin/publish-website",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/ProgramIntegrityPanel.tsx",
+      "line": 64,
+      "route": "/api/admin/program-integrity",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/JobBoardPanel.tsx",
+      "line": 26,
+      "route": "/api/jobs/government-feed",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/JobBoardPanel.tsx",
+      "line": 49,
+      "route": "/api/jobs/government-feed",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/SiteHealthStrip.tsx",
+      "line": 13,
+      "route": "/api/admin/site-health",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/LivePreviewIframe.tsx",
+      "line": 15,
+      "route": "/api/admin/dev-studio/embed-check",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/LizzyContainer.tsx",
+      "line": 54,
+      "route": "/api/admin/dev-studio/config",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/LizzyWorkspace.tsx",
+      "line": 56,
+      "route": "/api/admin/dev-studio/config",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/LizzyWorkspace.tsx",
+      "line": 59,
+      "route": "/api/admin/dev-studio/health",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 179,
+      "route": "/api/admin/dev-studio/tasks",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 197,
+      "route": "/api/admin/dev-studio/tasks/[dynamic]/approve",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 283,
+      "route": "/api/admin/dev-studio/jobs",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 383,
+      "route": "/api/admin/dev-studio/runs/[dynamic]",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 718,
+      "route": "/api/admin/dev-studio/conversations",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 764,
+      "route": "/api/admin/dev-studio/conversations",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 787,
+      "route": "/api/admin/dev-studio/conversations",
+      "method": "PUT",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 806,
+      "route": "/api/admin/dev-studio/upload",
+      "method": "POST",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 873,
+      "route": "/api/admin/ai-assistant/approve",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/UnifiedEllieChat.tsx",
+      "line": 992,
+      "route": "/api/admin/dev-studio/tasks/[dynamic]/approve",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/DeployPanel.tsx",
+      "line": 70,
+      "route": "/api/admin/dev-studio/shell",
+      "method": "POST",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/DeployPanel.tsx",
+      "line": 91,
+      "route": "/api/admin/dev-studio/shell",
+      "method": "GET",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/DeployPanel.tsx",
+      "line": 108,
+      "route": "/api/admin/dev-studio/git",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/DeployPanel.tsx",
+      "line": 138,
+      "route": "/api/admin/dev-studio/shell",
+      "method": "POST",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/PublishWebsiteDevPanel.tsx",
+      "line": 29,
+      "route": "/api/admin/publish-website",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/ServicesPanel.tsx",
+      "line": 116,
+      "route": "/api/admin/dev-studio/services",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/ServicesPanel.tsx",
+      "line": 135,
+      "route": "/api/admin/dev-studio/services",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/SecretsPanel.tsx",
+      "line": 231,
+      "route": "/api/admin/platform-secrets",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/SecretsPanel.tsx",
+      "line": 245,
+      "route": "/api/admin/platform-secrets",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/SecretsPanel.tsx",
+      "line": 255,
+      "route": "/api/admin/platform-secrets",
+      "method": "DELETE",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/SecretsPanel.tsx",
+      "line": 260,
+      "route": "/api/admin/platform-secrets",
+      "method": "PATCH",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/SecretsPanel.tsx",
+      "line": 270,
+      "route": "/api/admin/platform-secrets",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/LizzyUploadPanel.tsx",
+      "line": 22,
+      "route": "/api/admin/dev-studio/upload",
+      "method": "POST",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/LizzyErrorsPanel.tsx",
+      "line": 30,
+      "route": "/api/admin/monitoring/errors",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/WorkflowsOpsPanel.tsx",
+      "line": 25,
+      "route": "/api/admin/workflows",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/dashboard/WorkflowsOpsPanel.tsx",
+      "line": 44,
+      "route": "/api/admin/workflows/run",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 105,
+      "route": "/api/admin/ultimate-course-builder",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 200,
+      "route": "/api/admin/courses",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 225,
+      "route": "/api/admin/dev-studio/programs",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 437,
+      "route": "/api/admin/courses/health",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 636,
+      "route": "/api/admin/courses/generate/parse",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 655,
+      "route": "/api/admin/courses/generate",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 710,
+      "route": "/api/admin/courses",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 954,
+      "route": "/api/admin/ultimate-course-builder",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 1001,
+      "route": "/api/admin/ultimate-course-builder/autopilot",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 1026,
+      "route": "/api/admin/courses/generate/parse",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 1048,
+      "route": "/api/admin/ultimate-course-builder",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 1083,
+      "route": "/api/admin/ultimate-course-builder/run",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 1123,
+      "route": "/api/admin/ultimate-course-builder/pause",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UnifiedCourseBuilder.tsx",
+      "line": 1169,
+      "route": "/api/admin/ultimate-course-builder/publish",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/CourseSidePreview.tsx",
+      "line": 49,
+      "route": "/api/admin/ultimate-course-builder",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/CourseSidePreview.tsx",
+      "line": 68,
+      "route": "/api/admin/ultimate-course-builder",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/UltimateStageInspector.tsx",
+      "line": 245,
+      "route": "/api/admin/courses/health",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/LessonVideoReview.tsx",
+      "line": 30,
+      "route": "/api/admin/ultimate-course-builder/review",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/CredentialRegistryPanel.tsx",
+      "line": 65,
+      "route": "/api/admin/course-builder/registry",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/admin/course-builder/LicensedMediaLibrary.tsx",
+      "line": 31,
+      "route": "/api/admin/course-builder",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/MediaStudioPanel.tsx",
+      "line": 121,
+      "route": "/api/admin/media-assets",
+      "method": "GET",
+      "serverMethods": [
+        "POST",
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/MediaStudioPanel.tsx",
+      "line": 299,
+      "route": "/api/admin/media-studio/image",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/MediaStudioPanel.tsx",
+      "line": 375,
+      "route": "/api/admin/media-studio/commercial",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/MediaStudioPanel.tsx",
+      "line": 539,
+      "route": "/api/admin/media-assets/[dynamic]",
+      "method": "PATCH",
+      "serverMethods": [
+        "DELETE",
+        "PATCH"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 196,
+      "route": "/api/admin/dev-studio/config",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 221,
+      "route": "/api/admin/dev-studio/browser/session",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 275,
+      "route": "/api/admin/dev-studio/browser/session",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 299,
+      "route": "/api/admin/dev-studio/browser/session",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 422,
+      "route": "/api/admin/dev-studio/browser/action",
+      "method": "POST",
+      "serverMethods": [
+        "GET",
+        "DELETE",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 480,
+      "route": "/api/admin/videos/upload",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 508,
+      "route": "/api/admin/videos/upload",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 535,
+      "route": "/api/admin/dev-studio/tasks/[dynamic]/cancel",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 569,
+      "route": "/api/admin/dev-studio/browser/agent",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/CloudBrowserWorkspace.tsx",
+      "line": 702,
+      "route": "/api/admin/dev-studio/tasks/[dynamic]/approve",
+      "method": "POST",
+      "serverMethods": [
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/StudioCommandWorkspace.tsx",
+      "line": 136,
+      "route": "/api/admin/dev-studio/conversations",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/StudioCommandWorkspace.tsx",
+      "line": 168,
+      "route": "/api/admin/dev-studio/tasks",
+      "method": "GET",
+      "serverMethods": [
+        "GET",
+        "POST"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/StudioCapabilityRail.tsx",
+      "line": 79,
+      "route": "/api/admin/dev-studio/plugins/health",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    },
+    {
+      "file": "components/studio/StudioIntelligencePanel.tsx",
+      "line": 31,
+      "route": "/api/admin/dev-studio/intelligence",
+      "method": "GET",
+      "serverMethods": [
+        "GET"
+      ],
+      "status": "method matches"
+    }
+  ],
+  "latestLiveHealth": [
+    {
+      "url": "https://www.elevateforhumanity.org/api/health",
+      "status": 200,
+      "healthy": true,
+      "ready": true,
+      "commit": "b59a5571f273f1281e7959b00456b4cb94a27a3e",
+      "revision": "elevate-marketing-migration-rb59a5571-40112188199-1",
+      "timestamp": "2026-10-24T18:50:57.493Z"
+    },
+    {
+      "url": "https://admin.elevateforhumanity.org/api/health",
+      "status": 200,
+      "healthy": true,
+      "ready": true,
+      "commit": "8dc7baaa6d7b201285920b7cbaa13b7855adff25",
+      "revision": "elevate-admin-migration-00277-gtt",
+      "timestamp": "2026-10-24T18:50:58.161Z"
+    },
+    {
+      "url": "https://app.elevateforhumanity.org/api/health",
+      "status": 200,
+      "healthy": true,
+      "ready": true,
+      "commit": "e047b01e4ba4beb38f23f21222e10ae44efba8e6",
+      "revision": "elevate-lms-migration-00221-gv7",
+      "timestamp": "2026-10-24T18:50:57.625Z"
+    }
+  ],
+  "courseOwnershipChecks": [
+    {
+      "check_name": "lesson_module_course_mismatch",
+      "mismatches": 0
+    },
+    {
+      "check_name": "release_build_course_mismatch",
+      "mismatches": 0
+    },
+    {
+      "check_name": "video_job_lesson_course_mismatch",
+      "mismatches": 0
     }
   ],
   "anonymousHttpChecks": {

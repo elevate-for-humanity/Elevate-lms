@@ -2,16 +2,16 @@
 
 Verdict: **partial; not a certification that all 171 paths or every production button works.**
 
-Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, initial commit `93883da8cc3b79db20e6b2be1923d21cbe90704a`. Code is awaiting required checks and deployment at report preparation.
+Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, commit `6b7c3251de00a3b305ed00f8132ea05266f3e169`. Code is awaiting required checks and deployment at report preparation.
 
 ## Scope and counts
 
 | Inventory | Count | Evidence limit |
 |---|---:|---|
 | Native button declarations | 170 | Across 61 transitive UI modules rooted at DashboardShell, UnifiedCourseBuilder, and StudioCommandWorkspace. Declarations include local layout controls, not just API actions; dynamic repetitions and custom Button components are not a runtime button count. |
-| API route patterns | 53 | Includes interpolated route IDs; every pattern resolves to an Admin route module. 81 exported method handlers. |
+| API route patterns | 53 | Includes interpolated route IDs; every pattern resolves to an Admin route module. 85 exported/re-exported method handlers. All 75 directly traced fetch methods match their route exports. |
 | Static navigation destinations | 58 | Four entry files; each resolves to an Admin page module after repairs. |
-| Extracted server queries | 310 | 138 route/service modules, including immediate service imports and the Ultimate release service. Literal table, select/filter/order columns, and resolved object writes; dynamic expressions, joins, deeper calls, and row-level semantics need additional checks. |
+| Extracted server queries | 311 | 138 route/service modules, including immediate service imports and the Ultimate release service. Literal table, select/filter/order columns, and resolved object writes; dynamic expressions, joins, deeper calls, and row-level semantics need additional checks. |
 | Supabase tables inspected | 81 | All requested table names exist in active project cuxzzpsyufcewtmicszk. Includes the now-removed rollback snapshot query. No customer rows or secret values exported. |
 
 The earlier 171 count has no supplied path manifest. It cannot be reconciled honestly by treating button declarations as unique website routes. The JSON companion contains the exact file/line inventory.
@@ -23,13 +23,13 @@ The earlier 171 count has no supplied path manifest. It cannot be reconciled hon
 | Nested editor used viewport breakpoints despite a narrow desktop pane | Tiny stacked panels; compact controls hidden | Container measurement drives compact selection through shared ResizableWorkspace, preserving mounted editor/player state. Regression tests pass; new layout not yet live-verified. |
 | Job feed UI expected different count/provider/result fields | Incorrect status and false success on failed import | UI follows GET count/sources/configured and POST ok/imported.total/errors; HTTP failures and partial errors visible. Mock boundary tests; no live import triggered. |
 | /api/sentry-test, /import, /automation linked without handlers | Dead utility/navigation actions | Monitoring links replace Sentry test. Redundant dead import and automation entries removed; existing Data Import and Workflows entries retained. Meetings & Calendar points to /phone/meetings. |
-| saveCourseLesson wrote a nonexistent metadata column | Manual save failed; LMS compliance settings went to the wrong shape | Nine values map to existing course_lessons columns: required_artifacts, domain_key, hour_category, evidence_type, delivery_method, requires_instructor_signoff, instructor_requirement, minimum_seat_time_minutes, fieldwork_eligible. Create/update tests reproduce prior failure and pass after fix. |
+| saveCourseLesson wrote a nonexistent metadata column | Manual save failed; LMS compliance settings went to the wrong shape | Nine values map to existing course_lessons columns: required_artifacts, domain_key, hour_category, evidence_type, delivery_method, requires_instructor_signoff, instructor_requirement, minimum_seat_time_minutes, fieldwork_eligible. Create/update tests reproduce the prior storage failure and pass after the fix. Missing or cross-course modules are rejected before writes; module and lesson edits are scoped to the selected course. |
 | saveCourseModule expected missing course_modules.metadata | Module authoring settings could not save | Additive migration 20261024183332_course_module_authoring_settings applied and verified. Existing module_completion_rules remain the progression authority. No business records changed. |
 | Task rollback queried nonexistent snapshot fields and never restored files | Could falsely mark a task rolled_back | Removed false state mutation. Authenticated endpoint returns 501 TASK_ROLLBACK_UNAVAILABLE. Actual automatic restoration remains unavailable and is not counted as working. |
 
 ## Database ownership and publication
 
-The Ultimate publish route delegates to UltimateReleaseService, which persists canonical course_modules and course_lessons, records ultimate_release_versions, and updates courses. LMS course content reads these canonical course tables. Live catalog inspection confirmed foreign keys from lessons to courses/modules, modules to courses, courses to programs, build records to courses, lesson-build records to builds, and release records to courses/builds. This verifies schema relationships and source intent; no production course was published during this audit.
+The Ultimate publish route delegates to UltimateReleaseService, which persists canonical course_modules and course_lessons, records ultimate_release_versions, and updates courses. LMS course content reads these canonical course tables. Live catalog inspection confirmed foreign keys from lessons to courses/modules, modules to courses, courses to programs, build records to courses, lesson-build records to builds, and release records to courses/builds. Aggregate live-data checks found zero mismatched course IDs in lesson/module, release/build, and video-job/lesson joins. The LMS lesson page filters both lesson ID and course ID, and its previous/next/return links remain under that course. No production course was published during this audit.
 
 The direct devstudio_append_log RPC exists with arguments p_job_id uuid and p_lines text[]. No extracted literal column mismatch remained after the repairs and additive migration. This static result does not certify arbitrary runtime payloads, join expressions, authorization, or tenant ownership for every possible request.
 
@@ -37,12 +37,12 @@ Security advisories were inspected before and after the migration. No course_mod
 
 ## Verification
 
-- 24 focused test files, 105 tests passed, including the new layout, job-feed, lesson-storage, and rollback-boundary cases plus portal/PWA/release regression suites.
+- 24 focused test files, 108 tests passed, including the new layout, job-feed, lesson-storage, and rollback-boundary cases plus portal/PWA/release regression suites.
 - Changed TypeScript source files passed ESLint; existing Pages-directory configuration warning remains.
-- Admin production compilation, static generation, and generated-route typecheck passed before the final lesson-storage/rollback edits. Fresh final Admin typecheck is queued behind the repository's shared validation lock at report preparation. CI build/type checks are required before merge.
+- Admin production compilation, static generation, and generated-route typecheck passed before the final lesson-storage/rollback edits. Final Admin typecheck passed. Final integrated Admin build is queued behind the shared validation lock; CI build checks are required before merge.
 - Studio and PWA architecture guards passed earlier in this repair; no new shell or service-worker cache path was introduced.
 - Side-by-side diff review performed. The change-review companion records exact differing lines and deliberate-change classifications.
-- Anonymous HTTP sweep: 110 requests, including 58 page destinations, 49 static API URL probes, and three PWA manifests. Page requests reached the login boundary; that is not authenticated-page success. API probes reached 401 except initial timeouts recorded below and in JSON. No credentials or mutation payloads were sent.
+- Anonymous HTTP sweep: 110 requests, including 58 page destinations, 49 static API URL probes, and three PWA manifests. Page requests reached the login boundary; that is not authenticated-page success. All 49 static API probes reached 401 after one recheck resolved two initial timeouts, which remain recorded in JSON. No credentials or mutation payloads were sent.
 - Browser checks used the existing Admin session. Subsequent broad authenticated navigation encountered repeated browser timeouts and a browser runtime reset; uncompleted destinations remain unverified.
 
 PWA manifests returned 200 with Admin start_url /dashboard, Learner /lms/dashboard, and Apprentice /apprentice on their correct hosts. Actual install, offline recovery, and device resize behavior remain unverified.
@@ -109,10 +109,10 @@ PWA manifests returned 200 with Admin start_url /dashboard, Learner /lms/dashboa
 | `/api/admin/ultimate-course-builder/checkpoint` | GET, POST | ultimate_artifact_versions, ultimate_artifacts, ultimate_build_jobs, ultimate_course_builds, ultimate_lesson_builds, ultimate_lesson_steps | 401 boundary |
 | `/api/admin/course-builder/registry` | GET, POST | courses, programs | 401 boundary |
 | `/api/admin/course-builder` | GET, POST | ai_tasks, course_lessons, course_modules, course_videos, courses, credential_registry, paid_inference_artifacts, programs | 401 boundary |
-| `/api/admin/media-assets` |  | Delegated service / external operation | 401 boundary |
+| `/api/admin/media-assets` | POST, GET | Delegated service / external operation | 401 boundary |
 | `/api/admin/media-studio/image` | POST | Delegated service / external operation | 401 boundary |
 | `/api/admin/media-studio/commercial` | POST | Delegated service / external operation | 401 boundary |
-| `/api/admin/media-assets/[dynamic]` |  | Delegated service / external operation | Dynamic path; source only |
+| `/api/admin/media-assets/[dynamic]` | DELETE, PATCH | Delegated service / external operation | Dynamic path; source only |
 | `/api/admin/dev-studio/browser/session` | GET, POST | Delegated service / external operation | 401 boundary |
 | `/api/admin/dev-studio/browser/action` | GET, DELETE, POST | Delegated service / external operation | 401 boundary |
 | `/api/admin/videos/upload` | POST | course_lessons, course_videos, licensed_media_entitlements, videos | 401 boundary |
@@ -193,6 +193,10 @@ All 58 page modules exist. These anonymous requests reached authentication; only
 | `/website-editor` | `apps/admin/app/website-editor/page.tsx` | 200; login boundary |
 | `/wioa/documents` | `apps/admin/app/wioa/documents/page.tsx` | 200; login boundary |
 | `/workone-queue` | `apps/admin/app/workone-queue/page.tsx` | 200; login boundary |
+
+## Latest runtime identity
+
+Health checks at 18:50–18:51 UTC returned HTTP 200 and healthy/ready for marketing (b59a5571), Admin (8dc7baaa), and LMS (e047b01e). None serves repair commit 6b7c3251 yet. Runtime revisions are retained in the JSON companion.
 
 ## Remaining acceptance gaps
 

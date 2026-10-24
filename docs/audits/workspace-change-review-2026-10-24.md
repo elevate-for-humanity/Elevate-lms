@@ -191,17 +191,28 @@ Baseline: 8212d2b9. Every source/test/migration difference below is EXPECTED for
 
 | Before line | Before content | After line | After content | Verdict |
 |---:|---|---:|---|---|
-| 163 |     metadata: { | 163 |     required_artifacts: body.requiredArtifacts ?? [], | EXPECTED |
-| 164 |       requiredArtifacts: body.requiredArtifacts ?? [], | 164 |     domain_key: body.domainKey ?? null, | EXPECTED |
-| 165 |       domainKey: body.domainKey ?? null, | 165 |     hour_category: body.hourCategory ?? null, | EXPECTED |
-| 166 |       hourCategory: body.hourCategory ?? null, | 166 |     evidence_type: body.evidenceType ?? null, | EXPECTED |
-| 167 |       evidenceType: body.evidenceType ?? null, | 167 |     delivery_method: body.deliveryMethod ?? null, | EXPECTED |
-| 168 |       deliveryMethod: body.deliveryMethod ?? null, | 168 |     requires_instructor_signoff: body.requiresInstructorSignoff ?? false, | EXPECTED |
-| 169 |       requiresInstructorSignoff: body.requiresInstructorSignoff ?? false, | 169 |     instructor_requirement: body.instructorRequirement ?? null, | EXPECTED |
-| 170 |       instructorRequirement: body.instructorRequirement ?? null, | 170 |     minimum_seat_time_minutes: body.minimumSeatTimeMinutes ?? null, | EXPECTED |
-| 171 |       minimumSeatTimeMinutes: body.minimumSeatTimeMinutes ?? null, | 171 |     fieldwork_eligible: body.fieldworkEligible ?? false, | EXPECTED |
+| 133 |     ? db.from('course_modules').update(payload).eq('id', body.id) | 133 |     ? db.from('course_modules').update(payload).eq('id', body.id).eq('course_id', body.courseId) | EXPECTED |
+| — |  | 143 |   const { data: module, error: moduleError } = await db | EXPECTED |
+| — |  | 144 |     .from('course_modules') | EXPECTED |
+| — |  | 145 |     .select('course_id') | EXPECTED |
+| — |  | 146 |     .eq('id', body.moduleId) | EXPECTED |
+| — |  | 147 |     .maybeSingle(); | EXPECTED |
+| — |  | 148 |   if (moduleError) throw moduleError; | EXPECTED |
+| — |  | 149 |   if (!module &#124;&#124; module.course_id !== body.courseId) { | EXPECTED |
+| — |  | 150 |     throw new Error('The selected module does not belong to this course.'); | EXPECTED |
+| — |  | 151 |   } | EXPECTED |
+| 163 |     metadata: { | 172 |     required_artifacts: body.requiredArtifacts ?? [], | EXPECTED |
+| 164 |       requiredArtifacts: body.requiredArtifacts ?? [], | 173 |     domain_key: body.domainKey ?? null, | EXPECTED |
+| 165 |       domainKey: body.domainKey ?? null, | 174 |     hour_category: body.hourCategory ?? null, | EXPECTED |
+| 166 |       hourCategory: body.hourCategory ?? null, | 175 |     evidence_type: body.evidenceType ?? null, | EXPECTED |
+| 167 |       evidenceType: body.evidenceType ?? null, | 176 |     delivery_method: body.deliveryMethod ?? null, | EXPECTED |
+| 168 |       deliveryMethod: body.deliveryMethod ?? null, | 177 |     requires_instructor_signoff: body.requiresInstructorSignoff ?? false, | EXPECTED |
+| 169 |       requiresInstructorSignoff: body.requiresInstructorSignoff ?? false, | 178 |     instructor_requirement: body.instructorRequirement ?? null, | EXPECTED |
+| 170 |       instructorRequirement: body.instructorRequirement ?? null, | 179 |     minimum_seat_time_minutes: body.minimumSeatTimeMinutes ?? null, | EXPECTED |
+| 171 |       minimumSeatTimeMinutes: body.minimumSeatTimeMinutes ?? null, | 180 |     fieldwork_eligible: body.fieldworkEligible ?? false, | EXPECTED |
 | 172 |       fieldworkEligible: body.fieldworkEligible ?? false, | — |  | EXPECTED |
 | 173 |     }, | — |  | EXPECTED |
+| 176 |     ? db.from('course_lessons').update(payload).eq('id', body.id) | 183 |     ? db.from('course_lessons').update(payload).eq('id', body.id).eq('course_id', body.courseId) | EXPECTED |
 
 ## lib/devstudio/os/task-runner.ts
 
@@ -370,56 +381,77 @@ Baseline: 8212d2b9. Every source/test/migration difference below is EXPECTED for
 |---:|---|---:|---|---|
 | — |  | 1 | import { beforeEach, describe, expect, it, vi } from 'vitest'; | EXPECTED |
 | — |  | 2 |  | EXPECTED |
-| — |  | 3 | const state = vi.hoisted(() =&gt; ({ writes: [] as Array&lt;{ table: string; payload: Record&lt;string, unknown&gt; }&gt;, error: null as null &#124; { message: string } })); | EXPECTED |
-| — |  | 4 | const db = vi.hoisted(() =&gt; ({ | EXPECTED |
-| — |  | 5 |   from: (table: string) =&gt; { | EXPECTED |
-| — |  | 6 |     const query: any = { | EXPECTED |
-| — |  | 7 |       insert: (payload: Record&lt;string, unknown&gt;) =&gt; { state.writes.push({ table, payload }); return query; }, | EXPECTED |
-| — |  | 8 |       update: (payload: Record&lt;string, unknown&gt;) =&gt; { state.writes.push({ table, payload }); return query; }, | EXPECTED |
-| — |  | 9 |       eq: () =&gt; query, | EXPECTED |
-| — |  | 10 |       select: () =&gt; query, | EXPECTED |
-| — |  | 11 |       single: async () =&gt; ({ data: { id: 'saved-lesson' }, error: state.error }), | EXPECTED |
-| — |  | 12 |     }; | EXPECTED |
-| — |  | 13 |     return query; | EXPECTED |
-| — |  | 14 |   }, | EXPECTED |
-| — |  | 15 | })); | EXPECTED |
-| — |  | 16 | vi.mock('@/lib/course-builder/db', () =&gt; ({ getServiceDb: async () =&gt; db })); | EXPECTED |
-| — |  | 17 | vi.mock('@/lib/supabase/admin', () =&gt; ({ requireAdminClient: async () =&gt; db })); | EXPECTED |
-| — |  | 18 |  | EXPECTED |
-| — |  | 19 | import { saveCourseLesson } from '@/lib/course-builder/edit-service'; | EXPECTED |
-| — |  | 20 |  | EXPECTED |
-| — |  | 21 | const input = { | EXPECTED |
-| — |  | 22 |   courseId: '11111111-1111-4111-8111-111111111111', | EXPECTED |
-| — |  | 23 |   moduleId: '22222222-2222-4222-8222-222222222222', | EXPECTED |
-| — |  | 24 |   slug: 'safety', title: 'Safety', orderIndex: 0, lessonType: 'practical', durationMinutes: 30, | EXPECTED |
-| — |  | 25 |   learningObjectives: ['Demonstrate safe operation'], content: { text: 'Safety procedure' }, | EXPECTED |
-| — |  | 26 |   requiredArtifacts: ['video'], domainKey: 'safety', hourCategory: 'practical', evidenceType: 'video', | EXPECTED |
-| — |  | 27 |   deliveryMethod: 'in_person', requiresInstructorSignoff: true, | EXPECTED |
-| — |  | 28 |   instructorRequirement: { required: true, supervisionMethod: 'observation' }, | EXPECTED |
-| — |  | 29 |   minimumSeatTimeMinutes: 25, fieldworkEligible: true, | EXPECTED |
-| — |  | 30 | }; | EXPECTED |
-| — |  | 31 |  | EXPECTED |
-| — |  | 32 | beforeEach(() =&gt; { state.writes = []; state.error = null; }); | EXPECTED |
-| — |  | 33 |  | EXPECTED |
-| — |  | 34 | describe('manual lesson persistence uses the LMS schema', () =&gt; { | EXPECTED |
-| — |  | 35 |   it.each([undefined, '33333333-3333-4333-8333-333333333333'])('persists compliance fields on create/update (%s)', async (id) =&gt; { | EXPECTED |
-| — |  | 36 |     await saveCourseLesson({ ...input, id }); | EXPECTED |
-| — |  | 37 |     expect(state.writes).toHaveLength(1); | EXPECTED |
-| — |  | 38 |     expect(state.writes[0].table).toBe('course_lessons'); | EXPECTED |
-| — |  | 39 |     expect(state.writes[0].payload).toMatchObject({ | EXPECTED |
-| — |  | 40 |       course_id: input.courseId, module_id: input.moduleId, | EXPECTED |
-| — |  | 41 |       required_artifacts: ['video'], domain_key: 'safety', hour_category: 'practical', evidence_type: 'video', | EXPECTED |
-| — |  | 42 |       delivery_method: 'in_person', requires_instructor_signoff: true, | EXPECTED |
-| — |  | 43 |       instructor_requirement: input.instructorRequirement, minimum_seat_time_minutes: 25, fieldwork_eligible: true, | EXPECTED |
-| — |  | 44 |     }); | EXPECTED |
-| — |  | 45 |     expect(state.writes[0].payload).not.toHaveProperty('metadata'); | EXPECTED |
-| — |  | 46 |   }); | EXPECTED |
-| — |  | 47 |  | EXPECTED |
-| — |  | 48 |   it('does not report a successful save after a database failure', async () =&gt; { | EXPECTED |
-| — |  | 49 |     state.error = { message: 'database unavailable' }; | EXPECTED |
-| — |  | 50 |     await expect(saveCourseLesson(input)).rejects.toEqual(state.error); | EXPECTED |
-| — |  | 51 |   }); | EXPECTED |
-| — |  | 52 | }); | EXPECTED |
+| — |  | 3 | const state = vi.hoisted(() =&gt; ({ | EXPECTED |
+| — |  | 4 |   writes: [] as Array&lt;{ table: string; payload: Record&lt;string, unknown&gt; }&gt;, | EXPECTED |
+| — |  | 5 |   filters: [] as Array&lt;{ table: string; column: string; value: unknown }&gt;, | EXPECTED |
+| — |  | 6 |   error: null as null &#124; { message: string }, | EXPECTED |
+| — |  | 7 |   moduleCourseId: '11111111-1111-4111-8111-111111111111' as string &#124; null, | EXPECTED |
+| — |  | 8 | })); | EXPECTED |
+| — |  | 9 | const db = vi.hoisted(() =&gt; ({ | EXPECTED |
+| — |  | 10 |   from: (table: string) =&gt; { | EXPECTED |
+| — |  | 11 |     const query: any = { | EXPECTED |
+| — |  | 12 |       insert: (payload: Record&lt;string, unknown&gt;) =&gt; { state.writes.push({ table, payload }); return query; }, | EXPECTED |
+| — |  | 13 |       update: (payload: Record&lt;string, unknown&gt;) =&gt; { state.writes.push({ table, payload }); return query; }, | EXPECTED |
+| — |  | 14 |       eq: (column: string, value: unknown) =&gt; { state.filters.push({ table, column, value }); return query; }, | EXPECTED |
+| — |  | 15 |       select: () =&gt; query, | EXPECTED |
+| — |  | 16 |       maybeSingle: async () =&gt; ({ data: state.moduleCourseId ? { course_id: state.moduleCourseId } : null, error: state.error }), | EXPECTED |
+| — |  | 17 |       single: async () =&gt; ({ data: { id: 'saved-lesson' }, error: state.error }), | EXPECTED |
+| — |  | 18 |     }; | EXPECTED |
+| — |  | 19 |     return query; | EXPECTED |
+| — |  | 20 |   }, | EXPECTED |
+| — |  | 21 | })); | EXPECTED |
+| — |  | 22 | vi.mock('@/lib/course-builder/db', () =&gt; ({ getServiceDb: async () =&gt; db })); | EXPECTED |
+| — |  | 23 | vi.mock('@/lib/supabase/admin', () =&gt; ({ requireAdminClient: async () =&gt; db })); | EXPECTED |
+| — |  | 24 |  | EXPECTED |
+| — |  | 25 | import { saveCourseLesson, saveCourseModule } from '@/lib/course-builder/edit-service'; | EXPECTED |
+| — |  | 26 |  | EXPECTED |
+| — |  | 27 | const input = { | EXPECTED |
+| — |  | 28 |   courseId: '11111111-1111-4111-8111-111111111111', | EXPECTED |
+| — |  | 29 |   moduleId: '22222222-2222-4222-8222-222222222222', | EXPECTED |
+| — |  | 30 |   slug: 'safety', title: 'Safety', orderIndex: 0, lessonType: 'practical', durationMinutes: 30, | EXPECTED |
+| — |  | 31 |   learningObjectives: ['Demonstrate safe operation'], content: { text: 'Safety procedure' }, | EXPECTED |
+| — |  | 32 |   requiredArtifacts: ['video'], domainKey: 'safety', hourCategory: 'practical', evidenceType: 'video', | EXPECTED |
+| — |  | 33 |   deliveryMethod: 'in_person', requiresInstructorSignoff: true, | EXPECTED |
+| — |  | 34 |   instructorRequirement: { required: true, supervisionMethod: 'observation' }, | EXPECTED |
+| — |  | 35 |   minimumSeatTimeMinutes: 25, fieldworkEligible: true, | EXPECTED |
+| — |  | 36 | }; | EXPECTED |
+| — |  | 37 |  | EXPECTED |
+| — |  | 38 | beforeEach(() =&gt; { state.writes = []; state.filters = []; state.error = null; state.moduleCourseId = input.courseId; }); | EXPECTED |
+| — |  | 39 |  | EXPECTED |
+| — |  | 40 | describe('manual lesson persistence uses the LMS schema', () =&gt; { | EXPECTED |
+| — |  | 41 |   it.each([undefined, '33333333-3333-4333-8333-333333333333'])('persists compliance fields on create/update (%s)', async (id) =&gt; { | EXPECTED |
+| — |  | 42 |     await saveCourseLesson({ ...input, id }); | EXPECTED |
+| — |  | 43 |     expect(state.writes).toHaveLength(1); | EXPECTED |
+| — |  | 44 |     expect(state.writes[0].table).toBe('course_lessons'); | EXPECTED |
+| — |  | 45 |     expect(state.writes[0].payload).toMatchObject({ | EXPECTED |
+| — |  | 46 |       course_id: input.courseId, module_id: input.moduleId, | EXPECTED |
+| — |  | 47 |       required_artifacts: ['video'], domain_key: 'safety', hour_category: 'practical', evidence_type: 'video', | EXPECTED |
+| — |  | 48 |       delivery_method: 'in_person', requires_instructor_signoff: true, | EXPECTED |
+| — |  | 49 |       instructor_requirement: input.instructorRequirement, minimum_seat_time_minutes: 25, fieldwork_eligible: true, | EXPECTED |
+| — |  | 50 |     }); | EXPECTED |
+| — |  | 51 |     expect(state.writes[0].payload).not.toHaveProperty('metadata'); | EXPECTED |
+| — |  | 52 |     if (id) expect(state.filters).toContainEqual({ table: 'course_lessons', column: 'course_id', value: input.courseId }); | EXPECTED |
+| — |  | 53 |   }); | EXPECTED |
+| — |  | 54 |  | EXPECTED |
+| — |  | 55 |   it.each([null, '44444444-4444-4444-8444-444444444444'])('rejects a missing or mismatched parent module (%s)', async (moduleCourseId) =&gt; { | EXPECTED |
+| — |  | 56 |     state.moduleCourseId = moduleCourseId; | EXPECTED |
+| — |  | 57 |     await expect(saveCourseLesson(input)).rejects.toThrow('does not belong to this course'); | EXPECTED |
+| — |  | 58 |     expect(state.writes).toHaveLength(0); | EXPECTED |
+| — |  | 59 |   }); | EXPECTED |
+| — |  | 60 |  | EXPECTED |
+| — |  | 61 |   it('does not report a successful save after a database failure', async () =&gt; { | EXPECTED |
+| — |  | 62 |     state.error = { message: 'database unavailable' }; | EXPECTED |
+| — |  | 63 |     await expect(saveCourseLesson(input)).rejects.toEqual(state.error); | EXPECTED |
+| — |  | 64 |   }); | EXPECTED |
+| — |  | 65 |  | EXPECTED |
+| — |  | 66 |   it('scopes module edits to the selected course', async () =&gt; { | EXPECTED |
+| — |  | 67 |     await saveCourseModule({ | EXPECTED |
+| — |  | 68 |       id: input.moduleId, courseId: input.courseId, title: 'Safety', slug: 'safety', | EXPECTED |
+| — |  | 69 |       orderIndex: 0, domainKey: 'safety', targetHours: 1, quizRequired: true, practicalRequired: true, | EXPECTED |
+| — |  | 70 |     }); | EXPECTED |
+| — |  | 71 |     expect(state.filters).toContainEqual({ table: 'course_modules', column: 'course_id', value: input.courseId }); | EXPECTED |
+| — |  | 72 |   }); | EXPECTED |
+| — |  | 73 | }); | EXPECTED |
 
 ## tests/unit/studio-task-rollback-boundary.test.ts
 

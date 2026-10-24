@@ -98,6 +98,9 @@ const noOpClient = {
 } as unknown as SupabaseClient<any>;
 
 let warnedOnce = false;
+// @supabase/ssr returns a cached browser client. Install listeners and wrappers
+// once per client, rather than stacking another auth layer on every render.
+const initializedBrowserClients = new WeakSet<SupabaseClient<any>>();
 
 export function createBrowserClient(): SupabaseClient<any> {
   // process.env.NEXT_PUBLIC_* is inlined by Next.js at build time.
@@ -138,6 +141,8 @@ export function createBrowserClient(): SupabaseClient<any> {
         : { path: '/', sameSite: 'lax' },
     });
 
+    if (initializedBrowserClients.has(client)) return client;
+
     // Silently clear stale sessions when the refresh token is invalid or expired.
     // Without this, Supabase logs "Invalid Refresh Token: Refresh Token Not Found"
     // as an unhandled error every time a user with an old session cookie visits
@@ -167,6 +172,7 @@ export function createBrowserClient(): SupabaseClient<any> {
       return result;
     };
 
+    initializedBrowserClients.add(client);
     return client;
   } catch {
     return noOpClient;

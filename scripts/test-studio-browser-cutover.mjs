@@ -49,6 +49,16 @@ test('Admin cutover requires exact revision, durable storage and both authorizat
  assert.equal(grants.length,0);
  assert.ok(grants.every(a=>a.includes('studio-browser-shared-secret')));
 });
+
+test('new image deployments replace a stale runtime commit override with the exact immutable image SHA',async()=>{
+ const f=await execute({browserSpec:{containers:[{env:[{name:'GIT_SHA',value:'old-release'}]}]}});
+ assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ const env=deploy.find(a=>a.startsWith('--update-env-vars='));
+ assert.ok(env.split(',').includes('GIT_SHA='+sha));
+ assert.ok(!deploy.some(a=>a.startsWith('--set-env-vars=')));
+});
+
 test('unready persistent storage preserves Admin and collects exact revision diagnostics',async()=>{
  const f=await execute({state:{commit:sha,ready:true,providerAuthStorage:{persistent:false}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);

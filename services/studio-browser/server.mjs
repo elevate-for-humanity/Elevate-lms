@@ -48,7 +48,7 @@ const frameQuality = Math.min(
   Math.max(35, Number(process.env.STUDIO_BROWSER_FRAME_QUALITY || 60)),
 );
 const allowedDomains = (
-  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com'
+  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com,accounts.google.com,console.cloud.google.com,shell.cloud.google.com'
 )
   .split(',')
   .map((value) => value.trim().toLowerCase())

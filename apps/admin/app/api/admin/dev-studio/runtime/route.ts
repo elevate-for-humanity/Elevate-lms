@@ -26,7 +26,7 @@ async function runtimeConfig() {
   return { url, secret };
 }
 
-export async function GET(request: NextRequest) {
+async function readRuntime(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
   const rateLimited = await applyRateLimit(request, 'api', { key: `studio-runtime-read:${auth.id}` });
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(payload, { status: response.status });
 }
 
-export async function POST(request: NextRequest) {
+async function writeRuntime(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
   const body = await request.json().catch(() => ({}));
@@ -125,3 +125,30 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(payload, { status: response.status });
 }
 
+function runtimeUnavailable() {
+  return NextResponse.json(
+    {
+      error: 'STUDIO_RUNTIME_UNAVAILABLE',
+      message: 'The Studio runtime connection is unavailable. Retry shortly. Your Admin session does not need another sign-in.',
+    },
+    { status: 503, headers: { 'Cache-Control': 'private, no-store', 'Retry-After': '30', Vary: 'Cookie' } },
+  );
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    return await readRuntime(request);
+  } catch {
+    // Never expose the private runtime URL, shared secret, or upstream exception.
+    return runtimeUnavailable();
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    return await writeRuntime(request);
+  } catch {
+    // Commands are not replayed: a lost response can follow a completed write.
+    return runtimeUnavailable();
+  }
+}

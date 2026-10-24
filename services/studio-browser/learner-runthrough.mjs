@@ -201,7 +201,7 @@ export async function runLearnerTest(
           return !!r.active;
         });
         await page.reload();
-        await page.getByTestId('staged-lesson').waitFor();
+        await page.getByTestId('staged-lesson').filter({ visible: true }).first().waitFor();
         const sw = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL ?? '');
         assert(
           new URL(sw).pathname === '/sw-lms.js',
@@ -214,11 +214,11 @@ export async function runLearnerTest(
       'captions',
       'Load real caption track, enable it, and inspect parsed cues',
       async () => {
-        const video = page.locator('video').first();
+        const video = page.locator('video:visible').first();
         await video.waitFor();
         // Exercise the learner control, rather than forcing a track mode that
         // React can legitimately restore after a re-render.
-        const toggle = page.getByRole('button', { name: 'Show lesson captions', exact: true });
+        const toggle = page.getByRole('button', { name: 'Show lesson captions', exact: true }).filter({ visible: true }).first();
         await toggle.waitFor();
         await toggle.click();
         const c = await page.evaluate(async () => {
@@ -252,7 +252,7 @@ export async function runLearnerTest(
       'film_playback',
       'Play the entire delivered film without seeking and observe progress and completion',
       async () => {
-        const v = page.locator('video');
+        const v = page.locator('video:visible').first();
         await v.evaluate(async (video) => {
           video.muted = true;
           video.playbackRate = 1;
@@ -277,7 +277,7 @@ export async function runLearnerTest(
           async () => {
             const p = await state();
             await page.reload();
-            await page.getByTestId('staged-lesson').waitFor();
+            await page.getByTestId('staged-lesson').filter({ visible: true }).first().waitFor();
             await page.waitForFunction(
               (saved) => {
                 const v = document.querySelector('video');
@@ -289,11 +289,11 @@ export async function runLearnerTest(
             return `Resumed at ${p.position} seconds`;
           },
         );
-        await page.locator('video').evaluate(async (video) => {
+        await page.locator('video:visible').first().evaluate(async (video) => {
           video.muted = true;
           await video.play();
         });
-        const duration = await page.locator('video').evaluate((v) => v.duration);
+        const duration = await page.locator('video:visible').first().evaluate((v) => v.duration);
         assert(
           Number.isFinite(duration) && duration > 0 && duration < 3300,
           'Film duration outside runner budget',
@@ -317,7 +317,9 @@ export async function runLearnerTest(
           for (const activity of activities) {
             const section = page
               .getByTestId(type)
-              .filter({ has: page.getByText(activity.prompt, { exact: true }) });
+              .filter({ visible: true })
+              .filter({ has: page.getByText(activity.prompt, { exact: true }) })
+              .first();
             await section.locator('textarea').fill(`QA practice response: ${activity.feedback}`);
             await section.getByRole('button', { name: 'Submit practice' }).click();
             await section.getByRole('status').waitFor();
@@ -341,7 +343,7 @@ export async function runLearnerTest(
           await page.getByText(stage.instruction, { exact: true }).isVisible(),
           'Corrected scenario not visible',
         );
-        const section = page.getByTestId('scenario');
+        const section = page.getByTestId('scenario').filter({ visible: true }).first();
         await section.getByRole('button', { name: 'Continue with the mistake' }).click();
         await section.getByRole('status').filter({ hasText: 'Review this decision' }).waitFor();
         assert((await state()).scenario?.passed === false, 'Wrong scenario choice passed');

@@ -27,7 +27,7 @@ on:
       - 'components/studio/**'
       - 'components/analytics/**'
       - 'instrumentation.ts'
-      - 'Dockerfile.northflank-admin'
+      - 'Dockerfile.admin'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - '.github/workflows/build-google-migration-images.yml'
@@ -140,7 +140,7 @@ jobs:
           node --test scripts/test-independent-studio-diagnostics.mjs
           node scripts/verify-admin-instrumentation-boundary.mjs
           node scripts/verify-portal-production-contracts.mjs
-          docker build -f Dockerfile.northflank-admin -t "elevate-admin:$GITHUB_SHA" \
+          docker build -f Dockerfile.admin -t "elevate-admin:$GITHUB_SHA" \
             --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL \

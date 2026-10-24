@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Monitor, RefreshCw, Smartphone, Tablet } from 'lucide-react';
+import { resolveStudioPreviewUrl } from '@/lib/devstudio/preview-target-url';
 
 type Viewport = 'desktop' | 'tablet' | 'mobile';
 
@@ -104,7 +105,7 @@ export default function RepositoryLivePreview({
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    setManualUrl(target?.url ?? target?.origin ?? initialUrl);
+    setManualUrl(resolveStudioPreviewUrl(target?.url ?? target?.origin ?? initialUrl, window.location.origin));
   }, [target?.url, target?.origin, initialUrl]);
 
   const previewUrl = manualUrl.trim();

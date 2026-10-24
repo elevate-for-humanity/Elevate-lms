@@ -1,7 +1,8 @@
 /**
  * Upload generated lesson audio/video to durable storage.
  * - Small assets (MP3, slide JPEG) → Supabase `course-videos`
- * - Large MP4 → configured Elevate Media Storage when available
+ * - Every video, including small clips → configured external Elevate Media Storage
+ * Video uploads never fall back to Supabase, including on quota/provider errors.
  *
  * Production Elevate Media Storage can be Backblaze B2, Wasabi, AWS S3, Supabase S3,
  * Cloudflare R2, or another S3-compatible endpoint. Container disk remains
@@ -15,6 +16,7 @@ import os from 'os';
 import path from 'path';
 import {
   uploadToElevateMedia,
+  getElevateMediaStorageConfig,
   getSignedElevateMediaUrl,
   uploadFileToElevateMedia,
   isElevateMediaStorageConfigured,
@@ -95,6 +97,15 @@ export function shouldUploadCourseMediaToElevateMedia(
   contentType: string,
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
+  if (contentType.toLowerCase().startsWith('video/')) {
+    if (backend === 'supabase') throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
+    const config = getElevateMediaStorageConfig();
+    if (config.provider === 'supabase-s3' || /(?:^|\.)supabase\.(?:co|com)(?:[/:]|$)/i.test((config.endpoint || '').replace(/^https?:\/\//, '')))
+      throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
+    if (!isElevateMediaStorageConfigured())
+      throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
+    return true;
+  }
   if (backend === 'supabase') return false;
   // Private B2 does not require public bucket access. Owner previews use
   // signed reads; uploads only require the S3 endpoint, bucket and credentials.
@@ -247,6 +258,8 @@ export async function uploadCourseVideosObject(
   contentType: string,
   options?: { forceSupabase?: boolean },
 ): Promise<string> {
+  if (contentType.toLowerCase().startsWith('video/') && options?.forceSupabase)
+    throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia(buffer, contentType)) {
     try {
       return await uploadCourseVideosToElevateMedia(buffer, storagePath, contentType);
@@ -254,7 +267,7 @@ export async function uploadCourseVideosObject(
       // The ordinary request ceiling does not apply to the TUS route below.
       // Keep the completed bytes and let Storage enforce its actual object
       // limit instead of rejecting a valid film before a chunked upload.
-      if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
+      if (contentType.toLowerCase().startsWith('video/') || resolveCourseVideoStorageBackend() === 'elevate-media' ||
           process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
         throw new Error(`COURSE_OBJECT_STORAGE_UPLOAD_FAILED:${err instanceof Error ? err.message.replace(/https?:\/\/\S+/g, '[url redacted]').slice(0, 240) : 'unknown storage failure'}`, { cause: err });
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
@@ -299,6 +312,8 @@ export async function uploadLessonFileFromDisk(
   // Large MP4s use the resumable route in uploadCourseVideosObject. The
   // single-request ceiling is not an object-size limit and must not trigger
   // an unnecessary lossy transcode or reject a valid completed lesson.
+  if (ext === 'mp4' && options?.forceSupabase)
+    throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
   const {size} = await stat(filePath);
   const storagePath = lessonMediaStoragePath(lessonId, ext);
   const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
@@ -312,7 +327,7 @@ export async function uploadLessonFileFromDisk(
       // public access as a failed MP4 upload.
       url = result.url ?? await getSignedElevateMediaUrl(elevateMediaKeyForStoragePath(storagePath), 21600, { contentType }) ?? undefined;
       if (!url) throw new Error('COURSE_OBJECT_STORAGE_READBACK_SIGNING_FAILED');
-    } else if (resolveCourseVideoStorageBackend() === 'elevate-media' ||
+    } else if (ext === 'mp4' || resolveCourseVideoStorageBackend() === 'elevate-media' ||
              process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
       throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');

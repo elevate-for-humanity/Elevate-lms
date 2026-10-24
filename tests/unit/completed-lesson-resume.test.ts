@@ -26,7 +26,12 @@ it("reuses a complete saved lesson without invoking generation or rendering", as
     persistence,
   );
   expect(make).not.toHaveBeenCalled();
-  expect(persistence.finishLesson).not.toHaveBeenCalled();
+  expect(persistence.finishLesson).toHaveBeenCalledExactlyOnceWith({
+    lessonBuildId: "lesson",
+    status: "built",
+    artifacts: { lesson_film_render: { render: { videoUrl: "saved.mp4" } } },
+    findings: [],
+  });
   expect(result.completed).toBe(true);
   expect(
     result.lessons[0].result.artifacts.lesson_film_render.render.videoUrl,

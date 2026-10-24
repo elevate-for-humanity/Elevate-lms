@@ -32,3 +32,9 @@ test('RTI requirements retain all subjects and shop-based performance verificati
  assert.match(RTI_TEACHING_REQUIREMENTS,/verified by the shop supervisor/);
  assert.match(RTI_TEACHING_REQUIREMENTS,/not practical signoff/);
 });
+
+test('final exam uses all subject modules rather than checkpoint instructions',()=>{
+ const items=[['a','Hair Care'],['b','Hair — Checkpoint'],['c','Skin Care'],['d','Cosmetology Final Examination']].map(([id,title])=>({id,title,authorityRequirementIds:[]}));
+ const sources=items.map(c=>({id:'course-lesson:'+c.id,text:c.title}));
+ assert.deepEqual(lessonInstructionalSources({...rti,competencies:items,instructionalSources:sources},items[3]),[sources[0],sources[2]]);
+});

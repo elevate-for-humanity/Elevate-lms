@@ -4,14 +4,14 @@ import {assertRtiSubjectTeaching,lessonInstructionalSources,RTI_TEACHING_REQUIRE
 const rti={id:'course:a6b0b712-1cf0-475a-ba79-ee2023dea8ec'};
 const blueprint=text=>({segments:[{text}],assessment:{questions:[{prompt:'Which disinfectant is suitable for this tool?'}],reassessment:[]}});
 test('rejects navigation lectures and checkpoint-purpose questions before media generation',()=>{
- for(const text of ['Click the next button.','Here is how to answer multiple-choice questions.','Use this assessment to verify your understanding before continuing.','Read the checkpoint prompt carefully.'])
+ for(const text of ['Click the next button.','Press the play button to start this lesson.','Here is how to answer multiple-choice questions.','Use this assessment to verify your understanding before continuing.','Read the checkpoint prompt carefully.'])
   assert.throws(()=>assertRtiSubjectTeaching(blueprint(text),rti),/RTI_NAVIGATION_FILLER/);
  const b=blueprint('Keep clean and used tools separate.');
  b.assessment.questions=[{prompt:'What is the purpose of this checkpoint?'}];
  assert.throws(()=>assertRtiSubjectTeaching(b,rti),/RTI_NAVIGATION_FILLER/);
 });
 test('retains subject instruction, actual questions, and a brief pause cue unchanged',()=>{
- const b=blueprint('Pause and answer: which disinfectant is appropriate? Select the product for the tool material, then follow the manufacturer instructions. Review the scalp before choosing a service.');
+ const b=blueprint('Pause and answer: which disinfectant is appropriate? Select the product for the tool material, then follow the manufacturer instructions. Review the scalp before choosing a service. Press the start button on the device according to its instructions.');
  const before=structuredClone(b);assertRtiSubjectTeaching(b,rti);assert.deepEqual(b,before);
 });
 test('keeps other programs and approved stored material outside the new-authoring policy',()=>{

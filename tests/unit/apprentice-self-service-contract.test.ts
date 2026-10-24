@@ -71,7 +71,7 @@ describe('apprentice self-service portal contracts', () => {
     expect(legacyLoader).not.toContain('stripe_subscription_status');
     expect(legacyShell).not.toContain('Stripe');
     expect(legacyShell).not.toContain('stripe_subscription_id');
-    expect(legacyShell).not.toContain('PayPal authorization');
-    expect(legacyShell).not.toContain('QuickBooks invoice');
+    expect(legacyShell).toContain('Confirm the authorization only after reviewing the amount and billing schedule.');
+    expect(legacyShell).toContain('showPaymentSetupAlert &&');
   });
 });

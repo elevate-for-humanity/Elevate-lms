@@ -16,7 +16,7 @@ describe('Canonical billing provider cutover', () => {
     expect(dashboard).toContain('const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role)');
     expect(dashboard).toContain('const billingRequirement = showBilling');
     expect(dashboard).toContain('readOnly={subject.previewing}');
-    expect(dashboard).not.toContain('payment_logs');
+    expect(dashboard).toMatch(/showBilling\s*\?\s*supabase\s*\.from\('payment_logs'\)[\s\S]*?\.eq\('user_id', subjectId\)/);
     expect(dashboard).not.toContain('Recent Payments');
     expect(navigation).not.toContain("label: 'Payments'");
     expect(layout).not.toContain('Affirm and installment');

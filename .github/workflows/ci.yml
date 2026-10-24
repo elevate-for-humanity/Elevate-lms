@@ -43,6 +43,8 @@ jobs:
           tests/unit/student-enrollment-identity.test.ts
           tests/unit/epa-testing-readiness-route.test.ts
           --environment node
+      - name: Required CI completion policy
+        run: node --test scripts/test-ci-required-gate.mjs
       - name: Studio GitHub credential fallback regression tests
         run: node --test scripts/test-devstudio-github-token.mjs
       - name: Automatic container build-memory policy
@@ -177,7 +179,7 @@ jobs:
         run: pnpm lint
 
   diagnostics:
-    name: Advisory Tests & Repo Hygiene
+    name: Functional Tests & Repo Hygiene
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -192,9 +194,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Run Vitest suite (advisory baseline)
-        continue-on-error: true
-        run: pnpm test
+      - name: Run required Vitest suite
+        run: pnpm exec vitest run
       - name: Audit repository hygiene (non-destructive)
         if: always()
         run: node scripts/audit-repo-hygiene.mjs
@@ -235,7 +236,7 @@ jobs:
   ci-gate:
     name: CI Required Gate
     runs-on: ubuntu-latest
-    needs: [preflight, typecheck, lint, enrollment-database]
+    needs: [preflight, typecheck, lint, enrollment-database, diagnostics]
     if: always()
     steps:
       - name: Require every CI diagnostic to pass
@@ -248,3 +249,4 @@ jobs:
           test "${{ needs.typecheck.result }}" = "success"
           test "${{ needs.lint.result }}" = "success"
           test "${{ needs.enrollment-database.result }}" = "success"
+          test "${{ needs.diagnostics.result }}" = "success"

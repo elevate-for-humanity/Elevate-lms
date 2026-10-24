@@ -7,7 +7,7 @@ const filesUrl = '/api/admin/dev-studio/files?source=container';
 const tree = { tree: [{ name: 'app.ts', path: 'app.ts', type: 'file' }], repo: 'fixture', branch: 'main' };
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 beforeEach(() => window.sessionStorage.clear());
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe('Repository workspace initialization', () => {
   it('waits for repository synchronization before requesting the file tree', async () => {
@@ -51,5 +51,18 @@ describe('Repository workspace initialization', () => {
     expect(await screen.findByText(/Runtime unavailable: AUTH_REQUIRED/)).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('button', { name: 'app.ts', exact: true })).not.toBeInTheDocument();
+  });
+
+  it.each([401, 403])('suspends saved-terminal polling on HTTP %s and preserves its recovery ID', async (status) => {
+    vi.useFakeTimers();
+    window.sessionStorage.setItem(terminalKey, 'saved-auth-terminal');
+    const fetcher = vi.fn(() => Promise.resolve(response({ error: 'AUTH_REQUIRED' }, status)));
+    vi.stubGlobal('fetch', fetcher);
+    render(<RealRepoWorkspace />);
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(15_000); });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(window.sessionStorage.getItem(terminalKey)).toBe('saved-auth-terminal');
+    expect(screen.getByText(/Runtime unavailable: AUTH_REQUIRED/)).toBeInTheDocument();
   });
 });

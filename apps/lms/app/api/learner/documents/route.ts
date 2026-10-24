@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
   const path = `${user.id}/${requirementId}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await admin.storage.from('documents').upload(path, file, { contentType: file.type, upsert: false });
   if (uploadError) return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
-  const { error: updateError } = await admin.from('enrollment_requirements').update({ evidence_url: path, status: 'completed', updated_at: new Date().toISOString() }).eq('id', requirementId).eq('enrollment_id', requirement.enrollment_id);
-  if (updateError) { await admin.storage.from('documents').remove([path]); return NextResponse.json({ error: 'Document record could not be saved' }, { status: 500 }); }
+  const { data: savedRequirement, error: updateError } = await admin.from('enrollment_requirements').update({ evidence_url: path, status: 'completed', verified_by: null, verified_at: null, updated_at: new Date().toISOString() }).eq('id', requirementId).eq('enrollment_id', requirement.enrollment_id).neq('status', 'verified').select('id').maybeSingle();
+  if (updateError || !savedRequirement) { await admin.storage.from('documents').remove([path]); return NextResponse.json({ error: 'Document record could not be saved or has already been verified' }, { status: updateError ? 500 : 409 }); }
   // The existing enrollment workspace treats 'completed' as submitted/pending
   // verification and only 'verified' as approved. Keep that distinction intact.
   // Record review evidence in the existing audit trail; never auto-verify IDs,

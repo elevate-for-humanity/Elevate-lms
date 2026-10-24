@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { syncWorkspaceRepository } from './repository-sync.mjs';
+import { WorkspaceCheckpoint } from './workspace-checkpoint.mjs';
 const git=(cwd,...args)=>execFileSync('git',args,{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 test('sync avoids historical media blobs and preserves tracked and untracked working files',async t=>{
  const base=await fs.mkdtemp(path.join(os.tmpdir(),'studio-sync-'));
@@ -25,6 +26,12 @@ test('sync avoids historical media blobs and preserves tracked and untracked wor
  const packs=await fs.readdir(path.join(root,'.git','objects','pack'));
  let bytes=0;for(const file of packs)bytes+=(await fs.stat(path.join(root,'.git','objects','pack',file))).size;
  assert.ok(bytes<1024*1024,`historical blob downloaded: ${bytes}`);
+ const checkpoint = new WorkspaceCheckpoint({root});
+ const before = await checkpoint.scan();
+ const repeated = await syncWorkspaceRepository({root,repoUrl});
+ assert.equal(repeated.changed,false);
+ assert.equal((await checkpoint.scan()).fingerprint,before.fingerprint,'unchanged reconnect must not force another full durable archive');
+ assert.equal(await fs.readFile(path.join(root,'notes.txt'),'utf8'),'user draft');
  await fs.writeFile(path.join(origin,'notes.txt'),'remote change');git(origin,'add','.');git(origin,'commit','-m','conflicting change');
  await assert.rejects(syncWorkspaceRepository({root,repoUrl}));
  assert.equal(await fs.readFile(path.join(root,'notes.txt'),'utf8'),'user draft');assert.equal(await fs.readFile(path.join(root,'untracked.txt'),'utf8'),'keep me');

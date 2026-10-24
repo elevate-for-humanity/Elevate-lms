@@ -1,3 +1,4 @@
+import { createBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
@@ -75,7 +76,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
     const hostname = (await headers()).get('host') ?? '';
 
     return createServerClient(supabaseUrl, supabaseAnonKey, {
-      global: { fetch: timedFetch },
+      global: { fetch: createBrowserAuthFetch(supabaseUrl, { fetchImpl: timedFetch }) },
       cookies: {
         getAll() {
           return cookieStore.getAll();

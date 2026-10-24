@@ -82,3 +82,20 @@ test('unfinished Git transfers cannot exceed snapshot limits or replace accepted
  assert.equal(await fsp.readFile(path.join(f.root,'draft.txt'),'utf8'),'user draft');
  await assert.rejects(fsp.stat(path.join(pack,'tmp_pack_incomplete')),/ENOENT/);
 });
+
+test('a file edit during snapshot serialization retries the snapshot without replaying commands',async t=>{
+ const f=await fixture(t),store=new WorkspaceCheckpoint(f.config);await store.initialize();
+ const file=path.join(f.root,'draft');await fsp.writeFile(file,'before');
+ const write=f.objects.createArchiveWriteStream.bind(f.objects);let attempts=0;
+ f.objects.createArchiveWriteStream=name=>{if(++attempts===1)fs.writeFileSync(file,'latest correction');return write(name);};
+ const result=await store.checkpoint();assert.equal(result.changed,true);assert.equal(attempts,2);assert.equal(f.objects.writes,1);
+ await fsp.rm(f.root,{recursive:true});await fsp.mkdir(f.root);await new WorkspaceCheckpoint(f.config).initialize();
+ assert.equal(await fsp.readFile(file,'utf8'),'latest correction');
+});
+test('continuous edits stop after three snapshot attempts and never publish inconsistent bytes',async t=>{
+ const f=await fixture(t),store=new WorkspaceCheckpoint(f.config);await store.initialize();
+ const file=path.join(f.root,'draft');await fsp.writeFile(file,'initial');
+ const write=f.objects.createArchiveWriteStream.bind(f.objects);let attempts=0;
+ f.objects.createArchiveWriteStream=name=>{fs.writeFileSync(file,'changed-'+(++attempts));return write(name);};
+ await assert.rejects(store.checkpoint(),/WORKSPACE_CHANGED_DURING_CHECKPOINT/);assert.equal(attempts,3);assert.equal(f.objects.writes,0);
+});

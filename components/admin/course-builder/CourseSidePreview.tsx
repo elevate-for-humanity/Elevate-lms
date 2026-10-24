@@ -13,9 +13,9 @@ type SavedLesson = {
 
 function followedLesson(rows: SavedLesson[]) {
   const active = rows.find((row) => row.running);
-  // A queued cursor can precede creation of the lesson and its progressive frames.
-  // Keep watchable media on screen until that lesson actually has a preview.
-  if (active && (active.videoUrl || active.lessonId)) return active.id;
+  // Keep saved media visible through both queued and partially rendered lessons.
+  // The unfinished lesson remains selectable for watching its progressive frames.
+  if (active?.videoUrl) return active.id;
   return rows.filter((row) => row.videoUrl).at(-1)?.id || active?.id || rows[0]?.id || "";
 }
 
@@ -144,7 +144,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
   }, [courseId]);
   const lesson = lessons.find((row) => row.id === selected);
   const active = lessons.find((row) => row.running);
-  const waitingFor = following && active && !active.videoUrl && !active.lessonId && active.id !== selected ? active : null;
+  const waitingFor = following && active && !active.videoUrl && active.id !== selected ? active : null;
   return (
     <section aria-label="Saved course video preview" className="flex h-full min-h-0 flex-col gap-3 bg-slate-950 p-3 text-white">
       <h3 className="sr-only">Live course preview</h3>
@@ -170,7 +170,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
       {lesson && (
         <>
           <h4 className="sr-only">{lesson.title}</h4>
-          {waitingFor && <p className="shrink-0 text-xs text-slate-300">{waitingFor.title} has no saved preview yet. Showing {lesson.title} while waiting.</p>}
+          {waitingFor && <p className="shrink-0 text-xs text-slate-300">{waitingFor.title} has no saved video yet. Showing {lesson.title} while waiting.</p>}
           <div className="min-h-0 flex-1 overflow-auto">
             {lesson.videoUrl ? (
               <video controls playsInline preload="metadata" src={lesson.videoUrl} aria-label={`${lesson.title} side preview`}

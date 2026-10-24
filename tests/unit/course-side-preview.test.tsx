@@ -15,7 +15,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
-function mock(saved = true, activeJob = false) {
+function mock(saved = true, activeJob = false, secondSaved = true) {
   const fetcher = vi.fn(async (url: string, options?: RequestInit) => ({
     ok: true,
     json: async () =>
@@ -41,7 +41,7 @@ function mock(saved = true, activeJob = false) {
                   id: "l2",
                   competency_id: "two",
                   status: "built",
-                  preview: { videoUrl: "https://media.example/two.mp4" },
+                  preview: { videoUrl: secondSaved ? "https://media.example/two.mp4" : "" },
                 },
               ],
             },
@@ -89,9 +89,18 @@ it("keeps plain-language build status after the player instead of exposing rende
   expect(video.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 it("shows completed render portions while a lesson has no saved final video", async () => {
-  mock(false);
+  mock(false, false, false);
   render(<CourseSidePreview courseId="course" />);
   expect(await screen.findByText("Live render portions")).toBeInTheDocument();
+});
+it("keeps a saved video visible even after the unfinished lesson row exists", async () => {
+  mock(false);
+  render(<CourseSidePreview courseId="course" />);
+  expect(await screen.findByLabelText('Second lesson side preview')).toHaveAttribute('src', 'https://media.example/two.mp4');
+  expect(screen.getByText(/First lesson has no saved video yet/)).toBeVisible();
+  fireEvent.change(screen.getByLabelText('Lesson to watch'), { target: { value: 'one' } });
+  expect(screen.getByText('Live render portions')).toBeVisible();
+  expect(screen.queryByText(/Showing Second lesson while waiting/)).toBeNull();
 });
 it("removes the old course video when switching courses", async () => {
   mock();
@@ -155,7 +164,7 @@ it("keeps a saved video visible while the queued lesson has no preview, without 
   const video = await screen.findByLabelText("Lesson two side preview");
   expect(video).toHaveAttribute('src', 'latest.mp4');
   expect(screen.getByLabelText("Lesson to watch")).toHaveValue("two");
-  expect(screen.getByText(/Current third lesson has no saved preview yet/)).toBeVisible();
+  expect(screen.getByText(/Current third lesson has no saved video yet/)).toBeVisible();
   fireEvent.change(screen.getByLabelText('Lesson to watch'), { target: { value: 'three' } });
   expect(screen.getByText('This lesson has no saved video yet.')).toBeVisible();
   expect(screen.queryByText(/Showing Lesson two while waiting/)).toBeNull();

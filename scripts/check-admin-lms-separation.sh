@@ -39,7 +39,7 @@ grep -q 'Dockerfile.admin' "$ADMIN_WF" || fail "Admin deployment must build its 
 grep -Fq 'node scripts/container-build-policy.mjs "$COMPONENT"' "$IMAGE_WF" || fail "Google image builds must use the reviewed workload registry"
 [[ "$(node scripts/container-build-policy.mjs lms)" == "$LMS_DOCKERFILE" ]] || fail "Google LMS build must select its reviewed LMS recipe"
 [[ "$(node scripts/container-build-policy.mjs admin)" == "$ADMIN_DOCKERFILE" ]] || fail "Google Admin build must select its reviewed Admin recipe"
-grep -Fq 'loadGoogleConfig(component)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
+node --test scripts/gcp/stage-web.test.mjs || fail "Staging configuration ownership and credential isolation tests failed"
 grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
 grep -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
 if grep -Eq 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then

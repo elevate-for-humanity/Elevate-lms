@@ -1842,7 +1842,8 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage && effectiveProvider !== 'openai' && effectiveProvider !== 'elevate') {
+    // The owned Elevate stream returns above; only external providers reach this fallback.
+    if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();

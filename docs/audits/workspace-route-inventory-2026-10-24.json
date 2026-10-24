@@ -12520,7 +12520,7 @@
       "path": "/studio/courses",
       "landed": "/studio/courses",
       "heading": "Course Production Studio",
-      "status": "rendered"
+      "status": "rendered; live cb038e39 resize 45\u219240\u219245, close/open, 640px compact detection and Operations/Preview tabs verified; no build triggered"
     },
     {
       "path": "/hours-export",
@@ -12550,7 +12550,7 @@
     {
       "path": "/studio/workflows",
       "landed": "/studio?workspace=workflows",
-      "status": "rendered Workflow Designer selected; general workflows loaded; AI task records degraded"
+      "status": "rendered Workflow Designer selected; initial AI task warning resolved on post-deploy API read; total 105, only warning is 100-per-type display limit"
     },
     {
       "path": "/studio",
@@ -17394,16 +17394,16 @@
       "ready": true,
       "commit": "b59a5571f273f1281e7959b00456b4cb94a27a3e",
       "revision": "elevate-marketing-migration-rb59a5571-40112188199-1",
-      "timestamp": "2026-10-24T19:23:20.599Z"
+      "timestamp": "2026-10-24T19:29:32.902Z"
     },
     {
       "url": "https://admin.elevateforhumanity.org/api/health",
       "status": 200,
       "healthy": true,
       "ready": true,
-      "commit": "8dc7baaa6d7b201285920b7cbaa13b7855adff25",
-      "revision": "elevate-admin-migration-00277-gtt",
-      "timestamp": "2026-10-24T19:23:24.295Z"
+      "commit": "cb038e3920232b5f673b6e7d802eab5b4f6f6e39",
+      "revision": "elevate-admin-migration-00278-vfn",
+      "timestamp": "2026-10-24T19:29:33.022Z"
     },
     {
       "url": "https://app.elevateforhumanity.org/api/health",
@@ -17412,7 +17412,7 @@
       "ready": true,
       "commit": "e047b01e4ba4beb38f23f21222e10ae44efba8e6",
       "revision": "elevate-lms-migration-00221-gv7",
-      "timestamp": "2026-10-24T19:23:21.250Z"
+      "timestamp": "2026-10-24T19:29:33.045Z"
     }
   ],
   "courseOwnershipChecks": [

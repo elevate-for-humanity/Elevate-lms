@@ -2,7 +2,7 @@
 
 Verdict: **partial; not a certification that all 171 paths or every production button works.**
 
-Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, commit `6b7c3251de00a3b305ed00f8132ea05266f3e169`. PR #2117 merged as `cb038e3920232b5f673b6e7d802eab5b4f6f6e39`. Follow-up PR #2120 (`faa837d8`) adds navigation, OJT export, Operations, and Compliance repairs and is awaiting CI. Production activation is not yet verified.
+Baseline: `8212d2b97e11bae0b19abefd0bd3c85496098f93`. Repairs: PR #2117, commit `6b7c3251de00a3b305ed00f8132ea05266f3e169`. PR #2117 merged as `cb038e3920232b5f673b6e7d802eab5b4f6f6e39`. Follow-up PR #2120 (`faa837d8`) adds navigation, OJT export, Operations, and Compliance repairs and is awaiting CI. PR #2117 is live on Admin as cb038e39 (revision 00278-vfn, 100% traffic). PR #2120 activation remains pending.
 
 ## Scope and counts
 
@@ -21,7 +21,7 @@ The earlier 171 count has no supplied path manifest. It cannot be reconciled hon
 
 | Finding | Consequence | Repair / current state |
 |---|---|---|
-| Nested editor used viewport breakpoints despite a narrow desktop pane | Tiny stacked panels; compact controls hidden | Container measurement drives compact selection through shared ResizableWorkspace, preserving mounted editor/player state. Regression tests pass; new layout not yet live-verified. |
+| Nested editor used viewport breakpoints despite a narrow desktop pane | Tiny stacked panels; compact controls hidden | Container measurement drives compact selection through shared ResizableWorkspace, preserving mounted editor/player state. Regression tests pass. Live resize 45→40→45, close/open, 640px compact detection and Operations/Preview switching verified on cb038e39; no build action triggered. |
 | Job feed UI expected different count/provider/result fields | Incorrect status and false success on failed import | UI follows GET count/sources/configured and POST ok/imported.total/errors; HTTP failures and partial errors visible. Mock boundary tests; no live import triggered. |
 | /api/sentry-test, /import, /automation linked without handlers | Dead utility/navigation actions | Monitoring links replace Sentry test. Redundant dead import and automation entries removed; existing Data Import and Workflows entries retained. Meetings & Calendar points to /phone/meetings. |
 | saveCourseLesson wrote a nonexistent metadata column | Manual save failed; LMS compliance settings went to the wrong shape | Nine values map to existing course_lessons columns: required_artifacts, domain_key, hour_category, evidence_type, delivery_method, requires_instructor_signoff, instructor_requirement, minimum_seat_time_minutes, fieldwork_eligible. Create/update tests reproduce the prior storage failure and pass after the fix. Missing or cross-course modules are rejected before writes; module and lesson edits are scoped to the selected course. |
@@ -206,12 +206,12 @@ All 58 page modules exist. These anonymous requests reached authentication; only
 
 ## Latest runtime identity
 
-Health checks at 19:23 UTC returned HTTP 200 and healthy/ready for marketing (b59a5571), Admin (8dc7baaa), and LMS (e047b01e). None serves merged repair cb038e39 or follow-up faa837d8 yet. Google deployment runs are still in progress/queued. Runtime revisions are retained in the JSON companion.
+Health checks at 19:29 UTC returned HTTP 200 and healthy/ready: Admin serves merged repair cb038e39 on revision elevate-admin-migration-00278-vfn. Google deployment logs confirm candidate health and 100% traffic. Marketing still serves b59a5571 and LMS e047b01e. Their cb038 releases were superseded by newer main requests; replacements are queued. Follow-up faa837d8 is not deployed yet. Runtime revisions are retained in the JSON companion.
 
 ## Remaining acceptance gaps
 
 - Reconcile the requested 171-path manifest against this scoped inventory. All 58 inventoried navigation URLs were visited; production-safe mutation acceptance remains incomplete.
-- Recheck the Workflow Designer warning: AI task data was unavailable while general workflows rendered. Metadata exists, but a working live query is not established.
+- Workflow Designer recheck resolved the initial AI-task warning: the live API returned 105 records (five general plus the displayed AI tasks) with only its documented latest-100-per-type limit. This is a bounded list, not full-history acceptance.
 - Reconcile WIOA outcome records before enabling placement/credential rates; remediate the older unused weekly-hours export before reconnecting it.
 - Complete PR #2120 CI and final build validation, merge normally, then verify the actual Google Cloud revision/image and live SHA for the deployed repairs. Initial live checks showed Admin/marketing on b59a5571 and LMS on e047b01e, while main was 8212d2b9; those earlier SHAs are not current deployment proof.
 - Perform production-safe end-to-end write-flow tests with identified disposable fixtures; imports, generated builds, course publication, payment, deletion, and real user changes were not triggered for testing.
@@ -273,11 +273,11 @@ Health checks at 19:23 UTC returned HTTP 200 and healthy/ready for marketing (b5
 | `/ferpa` | `/ferpa` | FERPA Compliance; rendered |
 | `/settings` | `/settings` | Settings; rendered |
 | `/tenants` | `/tenants` | Tenant Management; rendered |
-| `/studio/courses` | `/studio/courses` | Course Production Studio; rendered |
+| `/studio/courses` | `/studio/courses` | Course Production Studio; rendered; live cb038e39 resize 45→40→45, close/open, 640px compact detection and Operations/Preview tabs verified; no build triggered |
 | `/hours-export` | `/dashboard` | wrong destination; placeholder redirect confirmed in source |
 | `/docs` | `/docs` | source defect: profiles presented as documents; repair prepared |
 | `/` | `/dashboard` | expected Admin landing; rendered dashboard |
 | `/dashboard` | `/dashboard` | rendered earlier; latest h1 check empty |
 | `/studio/browser` | `/studio/browser` | rendered; browser idle; Admin, Course Builder and Studio return controls present |
-| `/studio/workflows` | `/studio?workspace=workflows` | rendered Workflow Designer selected; general workflows loaded; AI task records degraded |
+| `/studio/workflows` | `/studio?workspace=workflows` | rendered Workflow Designer selected; initial AI task warning resolved on post-deploy API read; total 105, only warning is 100-per-type display limit |
 | `/studio` | `/studio` | rendered conversation workspace; What are we building today? |

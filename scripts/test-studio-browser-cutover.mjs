@@ -14,7 +14,7 @@ async function execute(overrides={}){
   if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return f.storedKey||key;
   if(args[0]==='storage'&&args[1]==='buckets'&&args[2]==='describe')return JSON.stringify({name:f.missingBucket?'unapproved':'elegant-racer-299721-studio-browser-auth'});
   if(args[0]==='artifacts')return 'sha256:'+sha+sha.slice(0,24);
-  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.run.app',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:'studio-verify',url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
+  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.run.app',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:f.commands.find(a=>a[0]==='run'&&a[1]==='deploy')?.find(a=>a.startsWith('--tag='))?.slice(6),url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
   return '';
  };
  globalThis.__studioCutoverFixture={
@@ -81,7 +81,7 @@ test('browser releases preserve mounted storage and restored runtime settings',a
 test('pinned old traffic is preserved until the exact candidate passes all proofs',async()=>{
  const f=await execute();assert.equal(f.error,undefined);
  const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
- assert.ok(deploy.includes('--no-traffic'));assert.ok(deploy.includes('--tag=studio-verify'));
+ assert.ok(deploy.includes('--no-traffic'));assert.match(deploy.find(a=>a.startsWith('--tag=')),/^--tag=studio-candidate-[a-f0-9]{12}-[a-f0-9]{8}$/);
  const activation=f.events.findIndex(e=>e.command?.includes('--to-revisions=browser-candidate=100'));
  assert.ok(activation>0);
  const before=f.events.slice(0,activation).filter(e=>e.request).map(e=>e.request);
@@ -127,7 +127,9 @@ test('candidate acceptance leaves serving traffic and Admin untouched',async()=>
  const f=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
  assert.equal(f.error,undefined);assert.equal(switched(f),false);
  assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);
- assert.ok(f.commands.some(a=>a.includes('--remove-tags=studio-verify')));
+ const tag=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag=')).slice(6);
+ assert.ok(f.commands.some(a=>a.includes('--remove-tags='+tag)));
+ assert.ok(!f.commands.some(a=>a.includes('--remove-tags=studio-verify')));
  assert.equal(f.commands.some(a=>a.includes('delete')),false);
  assert.ok(f.requests.includes('https://candidate.example.test/health'));
  assert.equal(f.requests.filter(u=>u==='https://candidate.example.test/workspace/files').length,2);
@@ -152,4 +154,13 @@ test('HTTP health and browser foundation cannot replace full runtime recovery ac
 });
 test('a passing replacement proof never discards existing serving workspace files',async()=>{
  const f=await execute({live:{activeBrowserSessions:0,workspace:{files:1,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true}});assert.match(f.error.message,/STUDIO_LIVE_STATE_REQUIRES_PRESERVATION/);assert.equal(switched(f),false);assert.ok(!f.commands.some(a=>a.includes('--to-revisions=browser-candidate=100')));
+});
+
+test('repeated verification of the same image uses a fresh tag and never reuses the active browser alias',async()=>{
+ const first=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}}),second=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
+ for(const f of [first,second])assert.equal(f.error,undefined);
+ const tag=f=>f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag='));
+ assert.notEqual(tag(first),tag(second));
+ assert.notEqual(tag(first),'--tag=studio-verify');
+ assert.notEqual(tag(second),'--tag=studio-verify');
 });

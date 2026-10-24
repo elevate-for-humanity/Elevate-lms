@@ -1,129 +1,249 @@
-# Course Builder executor wake contract: queued runs must be claimed on API activity (2026-08-25).
-FROM node:22-alpine AS base
+# syntax=docker/dockerfile:1.7
+# Google Cloud Admin production image. Selected by container-build-policy.mjs.
+# Serves admin.elevateforhumanity.org
+#
+# Production contract:
+# 1. Native module dependencies are installed and verified.
+# 2. Next.js standalone output is the authoritative production server.
+# 3. Google supplies the source commit through the legacy-compatible NF_GIT_SHA build argument.
+# 4. The final packaged runtime must boot and serve /api/ping before the image is accepted.
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN corepack enable
-RUN corepack prepare pnpm@10.28.2 --activate
-
-WORKDIR /app
-RUN apk add --no-cache util-linux
-
-FROM base AS dependencies
-
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/admin/package.json ./apps/admin/package.json
-
-COPY packages/bounded-braces ./packages/bounded-braces
-RUN pnpm install --frozen-lockfile
-
-FROM base AS builder
-
-ARG GITHUB_SHA=unknown
-ARG GIT_SHA=unknown
-ARG NEXT_PUBLIC_GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
 
+FROM node:22-bookworm-slim AS base
+
+ARG PNPM_VERSION=10.28.2
+
+ENV CI=true \
+    NEXT_TELEMETRY_DISABLED=1
+
+RUN corepack disable || true \
+    && npm install -g "pnpm@${PNPM_VERSION}" \
+    && test "$(pnpm --version)" = "${PNPM_VERSION}"
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        util-linux \
+        fontconfig \
+        libfontconfig1 \
+        libfreetype6 \
+        libjpeg62-turbo \
+        libpng16-16 \
+        libwebp7 \
+        python3 \
+        make \
+        g++ \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+RUN echo "nf-cache-invalidate-admin-2026-08-22-remotion-runtime-source"
+
+FROM base AS dependencies
+RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json ./apps/admin/package.json
+COPY packages ./packages
+COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
+# Runtime ships Debian FFmpeg. Fail closed unless the workspace blocks the
+# redundant ffmpeg-static GitHub download during dependency installation.
+RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
+RUN set -eux; \
+    PNPM_BIN="$(command -v pnpm)"; \
+    test -n "${PNPM_BIN}"; \
+    echo "pnpm=${PNPM_BIN} version=$(pnpm --version)"; \
+    test "$(pnpm --version)" = "10.28.2"; \
+    pnpm install --help | grep -E -- 'frozen-lockfile|lockfile'; \
+    node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+FROM base AS builder
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_ADMIN_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NF_GIT_SHA
+ARG BUILD_TIMESTAMP
+RUN set -eux; \
+    test -n "${NF_GIT_SHA}"; \
+    echo "${NF_GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
+    echo "NF_GIT_SHA validated: ${NF_GIT_SHA}"
 ENV NODE_ENV=production
+ENV CI=true
 ENV NEXT_STANDALONE_OUTPUT=1
-ENV GITHUB_SHA=$GITHUB_SHA
-ENV GIT_SHA=$GIT_SHA
-ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
-ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
-
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=dependencies /app/apps/admin/node_modules ./apps/admin/node_modules
+ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://www.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL:-https://admin.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-https://app.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+ENV GIT_SHA="${NF_GIT_SHA}"
+ENV GITHUB_SHA="${NF_GIT_SHA}"
+ENV NEXT_PUBLIC_GIT_SHA="${NF_GIT_SHA}"
+ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
+ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
+COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
-
-# Fail before compilation if authenticated Admin regresses to public widgets,
-# stale proof/demo IDs, or Website Builder starts seeding invented business data.
+RUN set -eux; \
+    test -n "$NEXT_PUBLIC_SUPABASE_URL"; \
+    test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"; \
+    test -n "$NF_GIT_SHA"; \
+    test -f /workspace/remotion-src/index.ts; \
+    echo "Admin build arguments verified"
+# Preserve the authenticated portal, retry, and browser-owned navigation contracts.
 RUN node scripts/verify-portal-production-contracts.mjs
-
-# Admin document navigations must remain browser-owned. Intercepting them in
-# the service worker can resolve without a Response and surface as ERR_FAILED.
 RUN node scripts/verify-admin-service-worker-navigation.mjs
-
-# Failed or completed Course Builder tasks must expose a supported retry path.
-RUN grep -Fq "Start new run" /app/components/studio/AgenticCourseRunPanel.tsx
-
-# Capture a real build timestamp even when the platform does not inject one.
-RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('Admin build timestamp:', ts)"
-
-# Stamp the admin service worker with the current deployment SHA before build.
+RUN grep -Fq "Start new run" /workspace/components/studio/AgenticCourseRunPanel.tsx
 RUN node scripts/stamp-sw.mjs
-RUN ! grep -q '__CACHE_VERSION__' /app/public/sw-admin.js || \
+RUN ! grep -q '__CACHE_VERSION__' /workspace/public/sw-admin.js || \
     (echo "ERROR: __CACHE_VERSION__ still present in sw-admin.js" && exit 1)
 
 RUN pnpm --filter @elevate/admin build
-RUN test -d /app/apps/admin/.next
-RUN test -f /app/apps/admin/.next/BUILD_ID
-RUN test -f /app/public/sw-admin.js
+RUN node scripts/verify-admin-critical-routes.mjs
+RUN set -eux; \
+    ADMIN_NEXT_DIR="/workspace/apps/admin/.next"; \
+    BUILD_ID_FILE="${ADMIN_NEXT_DIR}/BUILD_ID"; \
+    GENERATED_SERVER_FILE="${ADMIN_NEXT_DIR}/standalone/apps/admin/server.js"; \
+    test -d "${ADMIN_NEXT_DIR}/standalone"; \
+    test -d "${ADMIN_NEXT_DIR}/static"; \
+    test -f "${BUILD_ID_FILE}"; \
+    test -f "${GENERATED_SERVER_FILE}"; \
+    test -n "${GIT_SHA}"; \
+    test "${GIT_SHA}" != "unknown"; \
+    echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
+    ACTUAL_BUILD_ID="$(tr -d '\r\n' < "${BUILD_ID_FILE}")"; \
+    ACTUAL_SHA="${ACTUAL_BUILD_ID#admin-}"; \
+    EXPECTED_PREFIX="$(printf '%s' "${GIT_SHA}" | cut -c1-"${#ACTUAL_SHA}")"; \
+    echo "${ACTUAL_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
+    test "${ACTUAL_SHA}" = "${EXPECTED_PREFIX}"
+RUN pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
-FROM node:22-alpine AS runner
-
-WORKDIR /app
-
-ARG GITHUB_SHA=unknown
-ARG GIT_SHA=unknown
-ARG NEXT_PUBLIC_GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-
+FROM node:22-bookworm-slim AS runner
+ARG NF_GIT_SHA
+ARG BUILD_TIMESTAMP
+LABEL org.opencontainers.image.title="Elevate Admin"
+LABEL org.opencontainers.image.revision="${NF_GIT_SHA}"
+LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV ELEVATE_SERVICE=admin
-ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
-ENV GITHUB_SHA=$GITHUB_SHA
-ENV GIT_SHA=$GIT_SHA
-ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
-ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
-ENV REMOTION_BROWSER_EXECUTABLE=/usr/bin/chromium-browser
+ENV PORT=3000
+ENV SERVICE_NAME=elevate-admin
+ENV ELEVATE_SERVICE=admin
+ENV GIT_SHA="${NF_GIT_SHA}"
+ENV GITHUB_SHA="${NF_GIT_SHA}"
+ENV NEXT_PUBLIC_GIT_SHA="${NF_GIT_SHA}"
+ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
+ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
+ENV REMOTION_BROWSER_EXECUTABLE=/usr/bin/chromium
+WORKDIR /app
+# Do not launch a Chromium renderer during image construction. Managed builders
+# intentionally deny renderer OOM-score and DBus operations; executable,
+# linkage, and version checks prove packaging without depending on runtime IPC.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates chromium curl espeak-ng ffmpeg tesseract-ocr fontconfig fonts-dejavu-core fonts-liberation \
+    libasound2 libatk-bridge2.0-0 libatk1.0-0 libcairo2 libcups2 libdbus-1-3 libdrm2 \
+    libfontconfig1 libfreetype6 libgbm1 libjpeg62-turbo libnspr4 libnss3 libpango-1.0-0 \
+    libpng16-16 libwebp7 libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 && \
+    test -x /usr/bin/chromium && \
+    ! ldd /usr/lib/chromium/chromium 2>&1 | grep -q 'not found' && \
+    chromium --version >/dev/null && \
+    rm -rf /var/lib/apt/lists/*
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --create-home nextjs
 
-# FFmpeg/ffprobe are required by the canonical Media Studio commercial renderer.
-RUN apk add --no-cache curl ffmpeg \
-    && addgroup -g 1001 nodejs \
-    && adduser -S -u 1001 -G nodejs nextjs
+# Keep Next.js's generated standalone launcher. Do not overwrite it with the
+# repository's custom development/server harness.
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
+COPY --from=builder --chown=nextjs:nodejs /workspace/workers/admin-speech-cache.mjs /app/apps/admin/workers/admin-speech-cache.mjs
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
+COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
+# Remotion is bundled dynamically at render time. The standalone server changes
+# cwd to /app/apps/admin, so package the canonical repo-root composition there.
+COPY --from=builder --chown=nextjs:nodejs /workspace/remotion-src/ /app/apps/admin/remotion-src/
+# The dynamic composition imports these authored teaching helpers relative to
+# remotion-src. Next standalone tracing does not include runtime Webpack inputs.
+COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/teaching-presentation.ts /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-presentation.ts
+COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/approved-presentation.mjs /app/apps/admin/lib/ultimate-course-builder/instructional/approved-presentation.mjs
+COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/picture-timeline.mjs /app/apps/admin/lib/ultimate-course-builder/instructional/picture-timeline.mjs
+COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/teaching-visual.ts /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-visual.ts
+COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts /app/apps/admin/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts
+COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
+# Measure the two largest dependency copies before any pruning. The standalone
+# output and root modules both have runtime consumers (Remotion and native libs).
+# Keep this diagnostic read-only until a dependency trace proves safe removal.
+RUN set -eux; \
+    du -sh /app/node_modules /app/apps/admin/node_modules /app/apps/admin/.next /app/apps/admin/remotion-src 2>/dev/null || true; \
+    find /app -type f \( -name '*.log' -o -name '*.tsbuildinfo' \) -print | head -30
+RUN set -eux; \
+    test -f /app/apps/admin/server.js; \
+    test -d /app/apps/admin/.next/static; \
+    test -f /app/apps/admin/.next/required-server-files.json; \
+    test -d /app/apps/admin/public; \
+    test -d /app/apps/admin/public/images; \
+    test -f /app/apps/admin/remotion-src/index.ts; \
+    test -f /app/apps/admin/remotion-src/Root.tsx; \
+    test -f /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-presentation.ts; \
+    test -f /app/apps/admin/lib/ultimate-course-builder/instructional/approved-presentation.mjs; \
+    test -f /app/apps/admin/lib/ultimate-course-builder/instructional/picture-timeline.mjs; \
+    test -f /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-visual.ts; \
+    test -f /app/apps/admin/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts; \
+    test -d /app/node_modules/sharp; \
+    test -d /app/node_modules/@napi-rs/canvas; \
+    test -d /app/node_modules/fontkit; \
+    test -d /app/node_modules/pdfkit; \
+    command -v ffmpeg; \
+    command -v ffprobe; \
+    fc-match 'DejaVu Sans'
 
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
+# Exercise the actual runtime bundle, including transitive composition imports.
+RUN node --input-type=module -e "import {bundle} from '@remotion/bundler'; await bundle({entryPoint:'/app/apps/admin/remotion-src/index.ts',outDir:'/tmp/admin-remotion-smoke'});" \
+    && rm -rf /tmp/admin-remotion-smoke
 
-# Public assets are available at both standalone root and app-relative paths.
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/public ./apps/admin/public
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
-
-# The Admin-owned video worker bundles Remotion compositions at runtime.
-# Standalone output tracing cannot discover a source directory opened by path,
-# so ship the canonical root Remotion project at the exact Admin cwd path used
-# by lib/video/remotion-render.ts. This remains one composition tree, not a fork.
-COPY --from=builder --chown=nextjs:nodejs /app/remotion-src ./apps/admin/remotion-src
-RUN test -f /app/apps/admin/remotion-src/index.ts
-
-RUN test -f /app/public/sw-admin.js \
-    && test -f /app/apps/admin/public/sw-admin.js
-
-# Next's monorepo standalone output keeps the admin launcher and its bundled
-# node_modules under /app/apps/admin. Preserve that location so CommonJS module
-# resolution can find next and the traced runtime dependencies. Rename only the
-# extension because the package is type=module while the generated launcher is CJS.
-RUN if [ -f /app/apps/admin/server.js ]; then \
-      cp /app/apps/admin/server.js /app/apps/admin/server.cjs; \
-    elif [ -f /app/server.js ]; then \
-      cp /app/server.js /app/server.cjs; \
-    else \
-      echo "ERROR: No runnable server.js in runtime image"; \
-      find /app -maxdepth 5 -name "server.js" -print; \
-      exit 1; \
-    fi
-
+# Verify startup as the same unprivileged user used in production.
 USER nextjs
+RUN set -eux; \
+    LOG=/tmp/admin-runtime-smoke.log; \
+    SMOKE_PORT=3100; \
+    PORT="${SMOKE_PORT}" node --max-http-header-size=32768 apps/admin/server.js >"${LOG}" 2>&1 & \
+    PID=$!; \
+    trap 'cat "${LOG}" || true; kill "${PID}" 2>/dev/null || true' EXIT; \
+    READY=0; \
+    for attempt in $(seq 1 30); do \
+      if curl --fail --silent --show-error "http://127.0.0.1:${SMOKE_PORT}/api/ping" >/tmp/admin-ping.json 2>/tmp/admin-ping.err; then \
+        READY=1; \
+        break; \
+      fi; \
+      if ! kill -0 "${PID}" 2>/dev/null; then \
+        echo 'Admin standalone process exited during packaged-runtime smoke test.'; \
+        cat "${LOG}"; \
+        exit 1; \
+      fi; \
+      sleep 2; \
+    done; \
+    if [ "${READY}" -ne 1 ]; then \
+      echo 'Admin packaged standalone runtime did not become healthy.'; \
+      cat /tmp/admin-ping.err || true; \
+      cat "${LOG}"; \
+      exit 1; \
+    fi; \
+    cat /tmp/admin-ping.json; \
+    kill "${PID}"; \
+    wait "${PID}" || true; \
+    trap - EXIT
 
+# Populate the narrator cache under the same identity and package paths used by the live server.
+RUN node /app/apps/admin/workers/admin-speech-cache.mjs
+# A second process must narrate with networking disabled; a runtime model download cannot pass.
+RUN --network=none node /app/apps/admin/workers/admin-speech-cache.mjs
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/version" || exit 1
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=10s \
+    --start-period=90s \
+    --retries=5 \
+    CMD curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/dev/null || exit 1
 
-CMD ["sh", "-c", "if [ -f /app/apps/admin/server.cjs ]; then exec node --max-old-space-size=4096 /app/apps/admin/server.cjs; else exec node --max-old-space-size=4096 /app/server.cjs; fi"]
+CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

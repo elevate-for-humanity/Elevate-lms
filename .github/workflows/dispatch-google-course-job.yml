@@ -48,8 +48,6 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Read redacted course worker stop evidence
-        run: node scripts/gcp/course-worker-stop-diagnostics.mjs
       - name: Dispatch queued or expired work without overlapping executions
         env:
           COURSE_WORKER_PARALLELISM: '1'
@@ -59,3 +57,21 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/gcp/continue-approved-regional-courses.mjs
+
+  diagnose:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - run: node scripts/gcp/course-worker-stop-diagnostics.mjs

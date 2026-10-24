@@ -1,3 +1,4 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 /**
  * Admin Route Guards
  * Controls access to dev/test tools and sensitive admin features.
@@ -108,6 +109,10 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
       error: authError,
     } = await supabase.auth.getUser();
 
+    if (authError && isAuthRetryableFetchError(authError)) {
+      return guardedIdentity('', null, null, [], NextResponse.json({error:'AUTH_PROVIDER_UNAVAILABLE',message:'Authentication verification is temporarily unavailable. Retry shortly.'},{status:503,headers:{'Retry-After':'30'}}));
+    }
+
     if (authError || !user) {
       return guardedIdentity('', null, null, [], unauthorized());
     }
@@ -134,7 +139,8 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
     const effectiveRoles = normalizeRoles([role, ...secondaryRoles]);
 
     return guardedIdentity(user.id, user.email ?? null, role, effectiveRoles);
-  } catch {
+  } catch (error) {
+    if (isAuthRetryableFetchError(error)) return guardedIdentity('', null, null, [], NextResponse.json({error:'AUTH_PROVIDER_UNAVAILABLE',message:'Authentication verification is temporarily unavailable. Retry shortly.'},{status:503,headers:{'Retry-After':'30'}}));
     return guardedIdentity('', null, null, [], unauthorized());
   }
 }

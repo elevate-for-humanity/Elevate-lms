@@ -49,5 +49,21 @@ export async function POST(req: NextRequest) {
     created_at: new Date().toISOString(),
   });
   if (auditError) console.error('[learner/documents] audit log failed', auditError.message);
+  // Create a reviewer work item for every submission. OCR cannot establish
+  // authenticity or eligibility, so activation must wait for verified status.
+  const { error: reviewError } = await admin.from('review_queue').insert({
+    entity_type: 'enrollment_requirement',
+    entity_id: requirementId,
+    review_type: 'document_verification',
+    priority: 5,
+    status: 'pending',
+    extracted_data: { text: extracted.text.slice(0, 12000), source: extracted.source },
+    confidence_score: Math.max(0, Math.min(1, extracted.confidence / 100)),
+    failed_rules: extracted.text.trim() ? ['authenticity_requires_verification'] : ['ocr_unreadable_requires_review'],
+    system_recommendation: 'manual_review_required',
+    context: { enrollment_id: requirement.enrollment_id, requirement_id: requirementId, storage_path: path },
+    created_at: new Date().toISOString(),
+  });
+  if (reviewError) console.error('[learner/documents] review queue insert failed', reviewError.message);
   return NextResponse.json({ success: true, verification_status: 'pending_review', ocr_readable: Boolean(extracted.text.trim()) });
 }

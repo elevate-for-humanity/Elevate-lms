@@ -45,8 +45,11 @@ describe('anonymous portal request boundary', () => {
   });
   it('does not let dotted admin API paths bypass authentication', async () => {
     const response = await admin(new NextRequest('https://admin.elevateforhumanity.org/api/admin/export.json'));
-    expect(response.status).toBe(307);
-    expect(response.headers.get('location')).toContain('/login');
+    expect(response.status).toBe(401);
+    expect(response.headers.get('content-type')).toContain('application/json');
+    expect(response.headers.get('cache-control')).toContain('no-store');
+    expect(response.headers.get('location')).toBeNull();
+    expect(auth.getUser).not.toHaveBeenCalled();
   });
   it.each(['/provider/export.json', '/case-manager/export.json', '/workforce-board/export.json'])('does not let marketing %s bypass authentication', async (path) => {
     const response = await marketing(new NextRequest(`https://www.elevateforhumanity.org${path}`));
@@ -80,3 +83,4 @@ describe('anonymous portal request boundary', () => {
     expect(response.status).toBe(200);
   });
 });
+

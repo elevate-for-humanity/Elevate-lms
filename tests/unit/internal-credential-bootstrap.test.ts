@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import { planTokenBootstrap, bootstrap } from '../../scripts/gcp/bootstrap-internal-token.mjs';
 
@@ -16,3 +17,4 @@ describe('internal credential bootstrap', () => {
     expect(() => planTokenBootstrap({component:'unknown',key:'CRON_SECRET'})).toThrow();
   });
 });
+

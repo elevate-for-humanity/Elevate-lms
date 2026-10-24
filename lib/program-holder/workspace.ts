@@ -1,6 +1,7 @@
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
+import { isLearnerRosterProfile } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -353,12 +354,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   });
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])
-      .filter(
-        (row: any) =>
-          !String(row.email || '')
-            .toLowerCase()
-            .endsWith('@qa.invalid'),
-      )
+      .filter(isLearnerRosterProfile)
       .map((row: any) => row.id),
   );
   const verifiedHoursByUser = new Map<string, number>();
@@ -477,7 +473,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         program_id: row.program_id,
         program_slug: row.program_slug || row.program_interest,
         created_at: row.created_at,
-        label: `Gary regional applicant · ${row.distanceMiles.toFixed(1)} mi`,
+        label: `Gary regional applicant � ${row.distanceMiles.toFixed(1)} mi`,
         call_notes: null,
         call_date: null,
         call_outcome: null,
@@ -568,3 +564,4 @@ export function programTitle(programs: any[], programId?: string | null, slug?: 
   const program = programs.find((item) => item.id === programId || (slug && item.slug === slug));
   return program?.title || program?.name || slug || 'Assigned program';
 }
+

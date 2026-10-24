@@ -11,7 +11,7 @@ describe('Course Builder operator preview contract', () => {
     const courseLayout = read('apps/lms/app/lms/courses/layout.tsx');
 
     expect(learnerLayout).toContain('showLearnerNotices = true');
-    expect(learnerLayout).toContain('showLearnerNotices && !photoProfile?.avatar_url');
+    expect(learnerLayout).toContain('showLearnerNotices && !isAdmin && !photoProfile?.avatar_url');
     expect(learnerLayout).not.toContain('/apprentice/billing');
     expect(courseLayout).toContain('isAdminCoursePreview = isAdmin && coursePreview.active');
     expect(courseLayout).toContain('showLearnerNotices={!isAdminCoursePreview}');
@@ -36,3 +36,4 @@ describe('Course Builder operator preview contract', () => {
     expect(profile).toContain('UltimateAppendixAStandardsSource');
   });
 });
+

@@ -15,8 +15,9 @@ describe('PARIS-owned inference default across Admin and learner surfaces', () =
     expect(source).not.toContain("providerPreference === 'auto' ? 'openai'");
     expect(source).toContain("providerPreference === 'auto' ? 'elevate'");
     expect(source).toContain("providerPolicy: 'owned-only'");
-    expect(source).toContain("effectiveProvider !== 'elevate'");
-    expect(source).toContain("PARIS private AI is not ready");
+    expect(source).toContain("if (effectiveProvider === 'elevate')");
+    expect(source).toContain('return studioTextStreamResponse({');
+    expect(source).toContain('Paris could not complete this response. No outside AI provider was used.');
   });
 
   it('keeps learner chat on owned-only inference', () => {
@@ -32,3 +33,4 @@ describe('PARIS-owned inference default across Admin and learner surfaces', () =
     expect(config).toContain('vllm');
   });
 });
+

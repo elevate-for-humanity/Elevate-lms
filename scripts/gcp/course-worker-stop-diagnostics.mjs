@@ -2,7 +2,7 @@ import {execFileSync} from 'node:child_process';
 const read=args=>JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
 for(const [job,region] of [['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1']]){
  const runs=read(['run','jobs','executions','list','--job='+job,'--region='+region,'--project=elegant-racer-299721','--limit=6','--format=json']);
- console.log(JSON.stringify({job,region,executions:runs.map(r=>({name:r.metadata?.name,start:r.status?.startTime,end:r.status?.completionTime,running:r.status?.runningCount,failed:r.status?.failedCount,conditions:r.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason,message:String(c.message??'').replace(/https?:\\/\\/\\S+/g,'[url]').slice(0,220)}))}))}));
+ console.log(JSON.stringify({job,region,executions:runs.map(r=>({name:r.metadata?.name,start:r.status?.startTime,end:r.status?.completionTime,running:r.status?.runningCount,failed:r.status?.failedCount,conditions:r.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason}))}))}));
 }
 const logs=read(['logging','read','resource.type="cloud_run_job" AND (resource.labels.job_name="elevate-course-builder" OR resource.labels.job_name="elevate-course-builder-parallel")','--project=elegant-racer-299721','--freshness=2h','--limit=300','--format=json']);
 const patterns=[[/memory|OOM|SIGKILL/i,'memory_or_kill'],[/timeout|timed out/i,'timeout'],[/heartbeat.*failed|fetch failed|ECONNRESET|ETIMEDOUT|TLS/i,'connection_failure'],[/lease.*lost|LEASE_LOST/i,'lease_lost'],[/terminated|exit|killed|signal/i,'process_exit'],[/GOOGLE_TEACHING_PHOTO|RESOURCE_EXHAUSTED|429/i,'photo_provider_failure'],[/progress stalled|PROGRESS_STALLED/i,'progress_stall']];

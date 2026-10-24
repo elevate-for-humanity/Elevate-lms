@@ -34,7 +34,7 @@ test('completed lesson attachment against isolated PostgreSQL',async t=>{
     content_json jsonb,updated_at timestamptz);
    set request.jwt.claim.role='service_role';
   `);
-  await exec(await readFile(new URL('../../supabase/migrations/20261024201741_attach_completed_ultimate_lesson_media.sql',import.meta.url),'utf8'));
+  await exec(await readFile(new URL('../../supabase/migrations/20261024202258_attach_completed_ultimate_lesson_media.sql',import.meta.url),'utf8'));
   const build=randomUUID(),course=randomUUID(),lesson=randomUUID(),canonical=randomUUID(),job=randomUUID();
   const artifacts={lesson_film_render:{render:{success:true,videoUrl:'https://media.example/saved.mp4',captionsUrl:'https://media.example/saved.vtt',transcriptUrl:'https://media.example/saved.txt',duration:372.2,sceneData:{scenes:[]}}},natural_narration:{narration:{segments:[{audioUrl:'https://media.example/voice.wav'}]}},finished_media_qa:{mediaQA:{pass:true}},narration_qa:{narrationQA:{pass:true}},instructor_script:{script:{script:'Preserved narration'}}};
   const profile={ownerPaused:false,canonicalLessonIds:{competency:canonical}};

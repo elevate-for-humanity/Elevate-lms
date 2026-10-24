@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import RealRepoWorkspace from '@/components/studio/RealRepoWorkspace';
 
 const terminalKey = 'elevate.studio.terminal.v1';
@@ -51,6 +51,8 @@ describe('Repository workspace initialization', () => {
     expect(await screen.findByText(/Runtime unavailable: AUTH_REQUIRED/)).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('button', { name: 'app.ts', exact: true })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Sign in to Admin' })).toHaveAttribute('href', '/login?redirect=%2Fstudio%2Frepository');
+    expect(screen.getByRole('link', { name: 'Sign in to Admin' })).toHaveAttribute('target', '_blank');
   });
 
   it.each([401, 403])('suspends saved-terminal polling on HTTP %s and preserves its recovery ID', async (status) => {
@@ -65,4 +67,26 @@ describe('Repository workspace initialization', () => {
     expect(window.sessionStorage.getItem(terminalKey)).toBe('saved-auth-terminal');
     expect(screen.getByText(/Runtime unavailable: AUTH_REQUIRED/)).toBeInTheDocument();
   });
+
+  it('reconnects the preserved terminal after sign-in without replaying commands or repository synchronization', async () => {
+    window.sessionStorage.setItem(terminalKey, 'saved-auth-terminal');
+    let signedIn = false;
+    const fetcher = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      if (!signedIn) return Promise.resolve(response({ error: 'AUTH_REQUIRED' }, 401));
+      if (String(input) === filesUrl) return Promise.resolve(response(tree));
+      if (String(input).includes('terminal-output')) return Promise.resolve(response({ state: 'running', output: [], cursor: 0 }));
+      throw new Error(`Unexpected mutation during reauthentication: ${String(init?.body)}`);
+    });
+    vi.stubGlobal('fetch', fetcher);
+    render(<RealRepoWorkspace />);
+    await screen.findByRole('link', { name: 'Sign in to Admin' });
+    expect(window.sessionStorage.getItem(terminalKey)).toBe('saved-auth-terminal');
+    signedIn = true;
+    fireEvent.click(screen.getByRole('button', { name: 'Reconnect after sign-in' }));
+    expect(await screen.findByRole('button', { name: 'app.ts', exact: true })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Sign in to Admin' })).not.toBeInTheDocument();
+    expect(fetcher.mock.calls.every(([, init]) => !init?.method || init.method === 'GET')).toBe(true);
+    expect(window.sessionStorage.getItem(terminalKey)).toBe('saved-auth-terminal');
+  });
 });
+

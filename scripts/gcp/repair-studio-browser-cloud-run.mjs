@@ -103,7 +103,7 @@ if(!foundationResponse.ok)throw Error('Live candidate browser foundation failed;
 const foundation=await foundationResponse.json();
 if(foundation.passed!==true||foundation.commit!==sha||!Array.isArray(foundation.checks)||!foundation.checks.length||foundation.checks.some(check=>check.passed!==true))throw Error('Live candidate browser foundation evidence invalid; serving traffic retained');
 console.log(JSON.stringify({candidateRevision,commit:sha,browserFoundationPassed:true,checks:foundation.checks.map(check=>({name:check.name,passed:check.passed}))}));
-const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
+const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,candidateTag,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
 if(replacement?.passed!==true||replacement.runtimeReplaced!==true||replacement.isolatedWorkspaceFileRestored!==true)throw Error('STUDIO_RUNTIME_REPLACEMENT_UNVERIFIED');
 console.log(JSON.stringify(replacement));
 if(process.env.STUDIO_CANDIDATE_ONLY==='true'){
@@ -140,5 +140,3 @@ command(['run','services','update','elevate-admin-migration','--project='+projec
 console.log(JSON.stringify({service:name,url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,authorizedWorkspace:true,anonymousWorkspaceDenied:true,adminSwitched:true,oldProviderRemoved:false,existingProviderLoginRecovery:'not verified'}));
 
 }
-
-

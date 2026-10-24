@@ -18,7 +18,7 @@ async function execute(overrides={}){
   return '';
  };
  globalThis.__studioCutoverFixture={
-  async verifyStudioRuntimeReplacement(){f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
+  async verifyStudioRuntimeReplacement(options){f.replacementOptions=options;f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
   async inventoryStudioLiveState(){return f.live||{activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true};},
   execFileSync(_program,args){return output(args);},
   execFile(_program,args,_options,callback){f.diagnostics.push(args);callback(null,{stdout:args.includes('--format=value(status.latestCreatedRevisionName)')?'browser-failed-revision':args[0]==='run'?JSON.stringify({metadata:{name:'failed'},spec:{containers:[{env:[{name:'PRIVATE_TOKEN',value:'private-runtime-value'}]}]}}):JSON.stringify([{textPayload:'private-log-value',severity:'ERROR',timestamp:'2026-10-17T00:00:00Z'}])});},
@@ -43,6 +43,15 @@ async function execute(overrides={}){
  return f;
 }
 function switched(f){return f.commands.some(a=>a[0]==='run'&&a[1]==='services'&&a[2]==='update'&&a[3]==='elevate-admin-migration');}
+
+test('recovery verification receives the exact isolated deployment tag and release',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const tag=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag=')).slice(6);
+ assert.equal(f.replacementOptions.candidateTag,tag);
+ assert.equal(f.replacementOptions.sha,sha);
+ assert.equal(f.replacementOptions.revision,'browser-candidate');
+ assert.equal(f.replacementOptions.url,'https://candidate.example.test');
+});
 test('candidate hostname fits the Cloud Run service and traffic tag limit',async()=>{
  const f=await execute();assert.equal(f.error,undefined);
  const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
@@ -180,5 +189,3 @@ test('repeated verification of the same image uses a fresh tag and never reuses 
  assert.notEqual(tag(first),'--tag=studio-verify');
  assert.notEqual(tag(second),'--tag=studio-verify');
 });
-
-

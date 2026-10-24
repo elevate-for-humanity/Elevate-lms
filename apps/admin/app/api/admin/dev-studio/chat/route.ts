@@ -1636,6 +1636,13 @@ async function _POST(req: NextRequest) {
             provider: 'elevate',
             model: 'elevate-local',
             providerPreference,
+            availableProviders: {
+              xai: isXAIConfigured(),
+              groq: isGroqConfigured(),
+              openai: isOpenAIConfigured(),
+              anthropic: isAnthropicConfigured(),
+              gemini: isGeminiConfigured(),
+            },
             toolCalls,
             capabilitiesUsed,
             studioRun: masterExecution,

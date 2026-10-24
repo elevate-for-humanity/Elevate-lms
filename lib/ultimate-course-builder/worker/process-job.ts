@@ -63,9 +63,12 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       if(!data?.length)throw Error('ULTIMATE_JOB_LEASE_LOST:'+job.id);
     },
     onStall:async(progress:any)=>{
+      // Cancellation can reject the active provider immediately. Only this
+      // callback owns the fenced failure transition, even if its write hangs.
+      leaseLost=true;
       console.error('[UltimateWorker] progress stalled', {jobId:job.id,...progress});
       await queue.fail(job.id,workerId,'ULTIMATE_PROGRESS_STALLED:'+JSON.stringify(progress),generation,true);
-      leaseLost=true;deadline.lose();
+      deadline.lose();
     },
   });
   const work = async () => {

@@ -27,12 +27,12 @@ function scenario(payload, completed = true, options = {}) {
     async heartbeat() { return true; }
     async complete() { events.push('complete'); }
     async yieldProgress() { events.push('advance'); }
-    async fail() { events.push('fail'); }
+    async fail() { events.push('fail');await options.fail?.(); }
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
   const names = ['attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const values = [options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
@@ -90,4 +90,22 @@ test('attachment completes before the course cursor advances',async()=>{
  const s=scenario({},true,{nextWork:()=>({continue:true,payload:{nextCompetencyIndex:3}})});
  const result=await s.run();assert.equal(result.continuing,true);
  assert.deepEqual(s.events,['attach','advance']);
+});
+
+test('stall cancellation has one failure-state writer while provider unwinds',async()=>{
+ let watch,clock=0,finishFailure;
+ const pendingFailure=new Promise(resolve=>{finishFailure=resolve;});
+ const s=scenario({acceptance:true},false,{
+  progressFactory:options=>(watch=createCourseProgressWatch({...options,idleMs:100,now:()=>clock,schedule:()=>0,cancel:()=>{}})),
+  fail:()=>pendingFailure,
+  runCourse:async()=>{
+   clock=101;void watch.check();
+   await Promise.resolve();
+   throw watch.signal.reason;
+  },
+ });
+ const result=await s.run();
+ await new Promise(setImmediate);
+ assert.equal(result.stalled,true);assert.deepEqual(s.events,['fail']);
+ finishFailure();
 });

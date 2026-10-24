@@ -11,7 +11,7 @@ const web = app => ({ family: 'next-web', app,
 export const containerBuildPolicy = Object.freeze({
   marketing: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
   store: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
-  admin: { dockerfile: 'Dockerfile.northflank-admin', ...web('admin') },
+  admin: { dockerfile: 'Dockerfile.admin', ...web('admin') },
   lms: { dockerfile: 'Dockerfile.northflank-lms', ...web('lms') },
   'ultimate-worker': { dockerfile: 'Dockerfile.ultimate-worker', family: 'native-course-worker',
     memoryControl: 'scripts/gcp/regional-capacity.mjs',

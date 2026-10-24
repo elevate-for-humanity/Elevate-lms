@@ -1842,6 +1842,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
+    // The owned Elevate stream returns above; only external providers reach this fallback.
     if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();

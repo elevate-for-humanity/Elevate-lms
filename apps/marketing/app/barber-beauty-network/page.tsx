@@ -44,7 +44,8 @@ export default async function BarberBeautyNetworkPage() {
           <h1 className="mt-4 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">Barber & Beauty Network</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-100">A professional community for barbers, cosmetologists, estheticians, nail technicians, students, host shops and hiring businesses. Build connections, find opportunities and showcase the beauty industry.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/partners/host-shop/apply" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600">Join Free as a Host Shop <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="https://app.elevateforhumanity.org/signup" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600">Join the Barber &amp; Beauty Network <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/partners/host-shop/apply" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10">Apply as a Host Shop <ArrowRight className="h-4 w-4" /></Link>
             <Link href="#shop-directory" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10">Find a Shop <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </div>
@@ -68,7 +69,8 @@ export default async function BarberBeautyNetworkPage() {
           ]} />
           <div><p className="text-sm font-black uppercase text-red-700">Free network membership</p><h2 className="mt-2 text-3xl font-black">Your talent deserves to be seen.</h2><p className="mt-4 leading-7">The Barber &amp; Beauty Network brings professionals, customers, students, and apprenticeship host shops together. Explore real portfolios, follow business links, share your work in the community, and find your next step.</p>
           <div className="mt-5 grid gap-3">
-            <Link href="/partners/host-shop/apply" className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white">Join Free as a Host Shop</Link>
+            <Link href="https://app.elevateforhumanity.org/signup" className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white">Join the Barber &amp; Beauty Network — Create Account</Link>
+            <Link href="/partners/host-shop/apply" className="rounded-xl border border-red-700 bg-white px-5 py-3 text-center font-black">Businesses: Apply as a Host Shop</Link>
             <Link href="https://app.elevateforhumanity.org/community" className="rounded-xl border border-red-700 bg-white px-5 py-3 text-center font-black">Professionals &amp; Students: Join the Community</Link>
             <Link href="/programs/barber-apprenticeship" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-center font-black">Start Barber Training — Explore Payment Plans</Link>
           </div><p className="mt-4 text-sm leading-6">Host shops apply at no cost and submit their business and supervisor documents for review. Approved shops receive portal access to add their portfolio and business links. Community access requires sign-in. Apprentice placement depends on approval and availability.</p></div>

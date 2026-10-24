@@ -60,4 +60,3 @@ describe('program-holder dashboard hero', () => {
     expect(closeout).not.toContain('Practical HVAC skills verified');
   });
 });
-

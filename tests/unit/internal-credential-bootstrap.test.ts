@@ -17,4 +17,3 @@ describe('internal credential bootstrap', () => {
     expect(() => planTokenBootstrap({component:'unknown',key:'CRON_SECRET'})).toThrow();
   });
 });
-

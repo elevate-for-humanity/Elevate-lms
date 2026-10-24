@@ -36,4 +36,3 @@ describe('Course Builder operator preview contract', () => {
     expect(profile).toContain('UltimateAppendixAStandardsSource');
   });
 });
-

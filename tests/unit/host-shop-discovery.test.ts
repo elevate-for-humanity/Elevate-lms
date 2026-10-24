@@ -18,4 +18,3 @@ describe('host shop search discovery', () => {
     expect(profile).toContain('potentialAction: shop.bookingUrl');
   });
 });
-

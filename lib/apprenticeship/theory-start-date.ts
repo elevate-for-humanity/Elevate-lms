@@ -9,4 +9,3 @@ export function formatTheoryStartDate(value: unknown): string | null {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC',
   });
 }
-

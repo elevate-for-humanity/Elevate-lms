@@ -401,7 +401,7 @@ export default async function ApprenticePortalPage() {
               <p
                 className={`mt-3 text-xs font-black uppercase ${timeclockPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
               >
-                {timeclockPolicyAccepted ? '� Signed' : 'Signature required'}
+                {timeclockPolicyAccepted ? '✓ Signed' : 'Signature required'}
               </p>
             </Link>
             <Link
@@ -416,7 +416,7 @@ export default async function ApprenticePortalPage() {
               <p
                 className={`mt-3 text-xs font-black uppercase ${paymentPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
               >
-                {paymentPolicyAccepted ? '� Signed' : 'Signature required'}
+                {paymentPolicyAccepted ? '✓ Signed' : 'Signature required'}
               </p>
             </Link>
           </div>
@@ -529,7 +529,7 @@ export default async function ApprenticePortalPage() {
             <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700" />
             <div className="w-full">
               <h2 className="text-xl font-black text-red-950">
-                Required to-do - {incompleteCount} incomplete
+                Required to-do — {incompleteCount} incomplete
               </h2>
               <p className="mt-1 text-sm font-semibold text-red-900">
                 PARIS will walk you through these items in order. Items marked Open still need attention,
@@ -546,7 +546,7 @@ export default async function ApprenticePortalPage() {
                       <span
                         className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-black ${done ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}
                       >
-                        {done ? '�' : index + 1}
+                        {done ? '✓' : index + 1}
                       </span>
                       <Icon className="h-5 w-5 shrink-0" />
                       <span className="font-black">{label}</span>
@@ -638,7 +638,7 @@ export default async function ApprenticePortalPage() {
     },
     {
       title: 'Open RTI course',
-      text: `${courseTitle} � ${digitalCoursePercent}% digital lesson completion`,
+      text: `${courseTitle} · ${digitalCoursePercent}% digital lesson completion`,
       href: courseHref,
       image: '/images/pages/training-classroom.webp',
     },
@@ -687,7 +687,7 @@ export default async function ApprenticePortalPage() {
                     Supervisor: {supervisorName}
                   </span>
                   <span className="rounded-full bg-cyan-100 px-3 py-1.5 text-cyan-900">
-                    RAPIDS {runtime.contract.standard.rapidsCode} � competency-based
+                    RAPIDS {runtime.contract.standard.rapidsCode} · competency-based
                   </span>
                 </div>
               </div>
@@ -727,8 +727,8 @@ export default async function ApprenticePortalPage() {
               is not used as a fabricated fixed completion denominator.
             </p>
             <p className="mt-2 text-xs font-bold uppercase tracking-wide">
-              {runtime.contract.standard.apprenticeToMentorRatio} mentor ratio �{' '}
-              {runtime.contract.standard.probationaryHours}-hour probation � standard{' '}
+              {runtime.contract.standard.apprenticeToMentorRatio} mentor ratio ·{' '}
+              {runtime.contract.standard.probationaryHours}-hour probation · standard{' '}
               {runtime.contract.standardVersionKey}
             </p>
             {!placementReady ? (
@@ -803,13 +803,13 @@ export default async function ApprenticePortalPage() {
         <Metric
           label="Verified RTI hours"
           value={`${progress.rti.verifiedHours.toFixed(2)} / ${progress.rti.requiredHours}`}
-          detail={`${progress.rti.percent}% verified RTI � ${progress.rti.pendingEntries} pending entries`}
+          detail={`${progress.rti.percent}% verified RTI · ${progress.rti.pendingEntries} pending entries`}
           icon={BookOpen}
         />
         <Metric
           label="Approved weekly OJL"
           value={progress.ojl.approvedHours.toLocaleString()}
-          detail={`${progress.ojl.pendingEntries} pending work entries � approved supervised hours only`}
+          detail={`${progress.ojl.pendingEntries} pending work entries · approved supervised hours only`}
           icon={Clock3}
         />
         <Metric
@@ -884,7 +884,7 @@ export default async function ApprenticePortalPage() {
           </span>
           {nextWageMilestone ? (
             <span className="rounded-full bg-amber-100 px-3 py-2 text-amber-950">
-              Next baseline milestone: {nextWageMilestone.completedCompetencies} competencies  $
+              Next baseline milestone: {nextWageMilestone.completedCompetencies} competencies → $
               {nextWageMilestone.hourlyRate.toFixed(2)}/hr
             </span>
           ) : (
@@ -1025,7 +1025,7 @@ function PriorLearningPanel({
         </div>
       ) : null}
       <p className="mt-5 text-xs font-bold text-slate-600">
-        Elevate-native lesson completion: {nativePercent}% � imported history is stored separately
+        Elevate-native lesson completion: {nativePercent}% · imported history is stored separately
         for auditability.
       </p>
     </section>
@@ -1066,7 +1066,7 @@ function LearningCenter({
             </div>
             <h3 className="mt-4 font-black text-slate-950">{title}</h3>
             <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{text}</p>
-            <span className="mt-4 inline-flex text-sm font-black text-brand-red-700">Open </span>
+            <span className="mt-4 inline-flex text-sm font-black text-brand-red-700">Open →</span>
           </Link>
         ))}
       </div>
@@ -1128,7 +1128,7 @@ function TheorySchedulePanel({
           </p>
           <h2 className="mt-2 break-words text-2xl font-black text-slate-950">{days}</h2>
           <p className="mt-2 font-bold text-slate-800">
-            {time(schedule.start_time)}-{time(schedule.end_time)} � {schedule.timezone}
+            {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>
           {formatTheoryStartDate(schedule.starts_on) ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
@@ -1173,4 +1173,3 @@ function TheorySchedulePanel({
     </section>
   );
 }
-

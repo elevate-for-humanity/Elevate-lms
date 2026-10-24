@@ -16,4 +16,3 @@ describe('shared apprentice and Host Shop theory start date', () => {
     expect(formatTheoryStartDate(value)).toBeNull();
   });
 });
-

@@ -36,7 +36,7 @@ describe('Canonical billing provider cutover', () => {
     expect(diagnostic).not.toContain('@/lib/stripe');
     expect(navigation).toContain("label: 'Billing Schedules'");
     expect(navigation).toContain("label: 'Payment Settings'");
-    expect(navigation).not.toContain('Integrations - Stripe');
+    expect(navigation).not.toContain('Integrations — Stripe');
   });
 
   it('does not call Stripe from active license enforcement or system health', () => {
@@ -58,4 +58,3 @@ describe('Canonical billing provider cutover', () => {
     );
   });
 });
-

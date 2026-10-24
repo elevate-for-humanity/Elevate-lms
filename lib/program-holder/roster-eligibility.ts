@@ -7,4 +7,3 @@ export function isLearnerRosterProfile(profile: {
     ['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(String(profile.role || '').toLowerCase()) &&
     !String(profile.email || '').toLowerCase().endsWith('@qa.invalid');
 }
-

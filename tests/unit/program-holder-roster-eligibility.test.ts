@@ -17,4 +17,3 @@ describe('Program Holder learner roster boundary', () => {
     expect(isLearnerRosterProfile({ id: 'learner-id', role: 'learner' })).toBe(true);
   });
 });
-

@@ -47,7 +47,7 @@ describe('Legacy 83 repository design restoration', () => {
     expect(container.querySelector('h1 em')?.textContent).toBe('Legacy');
     expect(Array.from(container.querySelectorAll('h1 .tenant-title-line'), element => element.textContent?.trim())).toEqual(['Build Today.', 'Leave a Legacy', 'Tomorrow.']);
     const hero = within(container.querySelector('[data-variant="reference"]') as HTMLElement);
-    expect(hero.getByRole('link', { name: 'Book a Consultation ' })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
+    expect(hero.getByRole('link', { name: 'Book a Consultation →' })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
     expect(hero.getByRole('link', { name: 'Explore Our Services' })).toHaveAttribute('href', '/sites/legacy83-preview/services');
     expect(container.querySelectorAll('[data-variant="photographic"] article')).toHaveLength(4);
     expect(container.querySelectorAll('[data-variant="photographic"] article img')).toHaveLength(4);
@@ -59,9 +59,8 @@ describe('Legacy 83 repository design restoration', () => {
     const navigate = vi.fn();
     const { container } = render(<PublicTenantComposableSite site={{ id: 'existing', subdomain: 'legacy83-preview', siteName: 'Legacy 83 Business', organizationId: null, config }} onNavigate={navigate} />);
     const hero = within(container.querySelector('[data-variant="reference"]') as HTMLElement);
-    fireEvent.click(hero.getByRole('link', { name: 'Book a Consultation ' }));
+    fireEvent.click(hero.getByRole('link', { name: 'Book a Consultation →' }));
     expect(navigate).toHaveBeenCalledWith('/contact');
     expect(navigate).toHaveBeenCalledTimes(1);
   });
 });
-

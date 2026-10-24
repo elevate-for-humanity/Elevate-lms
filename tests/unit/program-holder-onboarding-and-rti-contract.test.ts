@@ -24,4 +24,3 @@ describe('program-holder onboarding and RTI portal contract', () => {
     expect(uploader).toContain("['company_logo', 'Program Holder company logo']");
   });
 });
-

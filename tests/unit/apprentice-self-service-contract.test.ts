@@ -75,4 +75,3 @@ describe('apprentice self-service portal contracts', () => {
     expect(legacyShell).not.toContain('QuickBooks invoice');
   });
 });
-

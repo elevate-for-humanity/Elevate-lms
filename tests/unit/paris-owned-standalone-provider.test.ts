@@ -33,4 +33,3 @@ describe('PARIS-owned inference default across Admin and learner surfaces', () =
     expect(config).toContain('vllm');
   });
 });
-

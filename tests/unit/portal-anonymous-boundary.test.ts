@@ -83,4 +83,3 @@ describe('anonymous portal request boundary', () => {
     expect(response.status).toBe(200);
   });
 });
-

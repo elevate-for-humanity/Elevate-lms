@@ -473,7 +473,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         program_id: row.program_id,
         program_slug: row.program_slug || row.program_interest,
         created_at: row.created_at,
-        label: `Gary regional applicant � ${row.distanceMiles.toFixed(1)} mi`,
+        label: `Gary regional applicant · ${row.distanceMiles.toFixed(1)} mi`,
         call_notes: null,
         call_date: null,
         call_outcome: null,
@@ -564,4 +564,3 @@ export function programTitle(programs: any[], programId?: string | null, slug?: 
   const program = programs.find((item) => item.id === programId || (slug && item.slug === slug));
   return program?.title || program?.name || slug || 'Assigned program';
 }
-

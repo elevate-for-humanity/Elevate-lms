@@ -117,4 +117,3 @@ describe('homepage hero slideshow rendering', () => {
     expect(renderer).not.toContain('scale-[1.015]');
   });
 });
-

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { autoExtract } from '@/lib/ocr/tesseract-ocr';
 
 const ALLOWED = new Set(['application/pdf','image/jpeg','image/png','image/webp']);
 export async function POST(req: NextRequest) {
@@ -20,6 +21,12 @@ export async function POST(req: NextRequest) {
   if (!ownedEnrollment) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   const admin = await requireAdminClient();
   if (!admin) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
+  // OCR is a preflight readability check, not an identity or eligibility decision.
+  // Unreadable evidence must not be recorded as submitted for verification.
+  const extracted = await autoExtract(Buffer.from(await file.arrayBuffer()), file.type);
+  if (!extracted.text.trim()) {
+    return NextResponse.json({ error: 'Document text could not be read. Upload a clearer image or text-based PDF.' }, { status: 422 });
+  }
   const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
   const path = `${user.id}/${requirementId}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await admin.storage.from('documents').upload(path, file, { contentType: file.type, upsert: false });

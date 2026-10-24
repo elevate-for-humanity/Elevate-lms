@@ -1842,7 +1842,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage && effectiveProvider !== 'openai' && effectiveProvider !== 'elevate') {
+    if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();

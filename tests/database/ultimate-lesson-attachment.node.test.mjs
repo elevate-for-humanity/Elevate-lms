@@ -31,12 +31,14 @@ test('completed lesson attachment against isolated PostgreSQL',async t=>{
    create table ultimate_lesson_builds(id uuid primary key,build_id uuid,competency_id text,status text,artifacts jsonb);
    create table course_lessons(id uuid primary key,course_id uuid,status text,is_published boolean,approved boolean,
     video_url text,video_status text,video_error text,duration_seconds integer,script_text text,scene_data jsonb,
-    content_json jsonb,updated_at timestamptz);
+    content_json jsonb,quiz_questions jsonb,passing_score integer,updated_at timestamptz);
    set request.jwt.claim.role='service_role';
   `);
   await exec(await readFile(new URL('../../supabase/migrations/20261024202258_attach_completed_ultimate_lesson_media.sql',import.meta.url),'utf8'));
+  await exec(await readFile(new URL('../../supabase/migrations/20261024214548_attach_lesson_learning_with_media.sql',import.meta.url),'utf8'));
   const build=randomUUID(),course=randomUUID(),lesson=randomUUID(),canonical=randomUUID(),job=randomUUID();
-  const artifacts={lesson_film_render:{render:{success:true,videoUrl:'https://media.example/saved.mp4',captionsUrl:'https://media.example/saved.vtt',transcriptUrl:'https://media.example/saved.txt',duration:372.2,sceneData:{scenes:[]}}},natural_narration:{narration:{segments:[{audioUrl:'https://media.example/voice.wav'}]}},finished_media_qa:{mediaQA:{pass:true}},narration_qa:{narrationQA:{pass:true}},instructor_script:{script:{script:'Preserved narration'}}};
+  const question={id:'q1',prompt:'Which action prevents contamination?',choices:['Separate clean tools','Mix used and clean tools'],answerIndex:0,explanation:'Keep cleaned tools separate.',remediation:'Review clean tool storage.',objectiveIds:['objective']};
+  const artifacts={assessment_alignment:{assessment:{questions:[question],reassessment:[{...question,id:'retry'}],passingScore:80}},lesson_film_render:{render:{success:true,videoUrl:'https://media.example/saved.mp4',captionsUrl:'https://media.example/saved.vtt',transcriptUrl:'https://media.example/saved.txt',duration:372.2,sceneData:{scenes:[]}}},natural_narration:{narration:{segments:[{audioUrl:'https://media.example/voice.wav'}]}},finished_media_qa:{mediaQA:{pass:true}},narration_qa:{narrationQA:{pass:true}},instructor_script:{script:{script:'Preserved narration'}}};
   const profile={ownerPaused:false,canonicalLessonIds:{competency:canonical}};
   await db.query('insert into ultimate_course_builds values($1,$2,$3)',[build,course,profile]);
   await db.query("insert into ultimate_lesson_builds values($1,$2,'competency','built',$3)",[lesson,build,artifacts]);
@@ -53,11 +55,19 @@ test('completed lesson attachment against isolated PostgreSQL',async t=>{
    assert.deepEqual(row.content_json.film,{videoUrl:artifacts.lesson_film_render.render.videoUrl,playbackUrl:row.video_url,captionsUrl:'https://media.example/saved.vtt',transcriptUrl:'https://media.example/saved.txt'});
    assert.deepEqual(row.content_json.savedNarration,artifacts.natural_narration.narration);
    assert.deepEqual(row.content_json.existingAssessment,{id:'keep'});
+   assert.equal(row.quiz_questions.length,1);
+   assert.equal(row.quiz_questions[0].id,'ultimate:'+lesson+':q1');
+   assert.equal(row.quiz_questions[0].question,question.prompt);
+   assert.deepEqual(row.quiz_questions[0].options,question.choices);
+   assert.equal(row.quiz_questions[0].correctAnswer,0);
+   assert.equal(row.quiz_questions[0].explanation,question.explanation);
+   assert.equal(row.passing_score,80);
+   assert.deepEqual(row.content_json.assessment,artifacts.assessment_alignment.assessment);
    assert.equal(row.status,'draft');assert.equal(row.is_published,false);assert.equal(row.approved,false);
   });
   await t.test('retry attaches the same object without changing lesson identity',async()=>{
    const before=await snapshot();await call();const after=await snapshot();
-   assert.equal(after.id,before.id);assert.equal(after.video_url,before.video_url);
+   assert.equal(after.id,before.id);assert.equal(after.video_url,before.video_url);assert.deepEqual(after.quiz_questions,before.quiz_questions);
   });
   await t.test('readback detects trigger interference and rolls the attachment back',async()=>{
    const before=await snapshot();
@@ -66,6 +76,23 @@ test('completed lesson attachment against isolated PostgreSQL',async t=>{
    await assert.rejects(call(),/READBACK_FAILED/);
    assert.equal((await snapshot()).video_url,before.video_url);
    await exec('drop trigger break_attachment on course_lessons; drop function break_attachment();');
+  });
+  await t.test('retains earlier questions and unrelated lesson experience on retry',async()=>{
+   const row=await snapshot();
+   await db.query('update course_lessons set quiz_questions=$1,content_json=$2 where id=$3',[[{id:'existing',question:'Keep this'}],{...row.content_json,experience:{readingGuide:{summary:'Keep reading'}}},canonical]);
+   await call();const after=await snapshot();
+   assert.equal(after.quiz_questions.length,2);assert.equal(after.quiz_questions[0].id,'existing');
+   assert.deepEqual(after.content_json.experience.readingGuide,{summary:'Keep reading'});
+  });
+  await t.test('missing or invalid scoring blocks media attachment atomically',async()=>{
+   const before=await snapshot();
+   for(const questions of [[],[{...question,answerIndex:9}],[{...question,answerIndex:-1}],[{...question,choices:null}]]){
+    const bad={...artifacts,assessment_alignment:{assessment:{...artifacts.assessment_alignment.assessment,questions}}};
+    await db.query('update ultimate_lesson_builds set artifacts=$1 where id=$2',[bad,lesson]);
+    await assert.rejects(call({1:bad}),/ASSESSMENT_REQUIRED/);
+    assert.deepEqual((await snapshot()).quiz_questions,before.quiz_questions);
+   }
+   await db.query('update ultimate_lesson_builds set artifacts=$1 where id=$2',[artifacts,lesson]);
   });
   await t.test('stale generation, wrong worker, changed artifacts and expired lease fail closed',async()=>{
    for(const args of [{4:2},{3:'other'},{1:{...artifacts,changed:true}}])await assert.rejects(call(args));

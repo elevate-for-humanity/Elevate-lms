@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { isLearnerRosterProfile } from '../../lib/program-holder/roster-eligibility';
 
 describe('Program Holder learner roster boundary', () => {
-  it.each(['student', 'learner', 'apprentice', 'STUDENT'])('accepts a learner role: %s', role => {
+  it.each(['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice', 'STUDENT'])('accepts a learner role: %s', role => {
     expect(isLearnerRosterProfile({ id: 'learner-id', role, email: 'learner@example.test' })).toBe(true);
   });
   it.each(['admin', 'super_admin', 'instructor', 'program_holder', 'employer', 'staff', 'pending', '', null, undefined])('rejects a non-learner role: %s', role => {

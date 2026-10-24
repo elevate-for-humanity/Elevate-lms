@@ -145,7 +145,7 @@ export function ParisFloatingButton({
 
             {portalIssue && issueReceipt && (
               <div role="status" aria-live="polite" className="shrink-0 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
-                {issueReceipt.status === 'reporting' && <p>Reporting the workflow issue…</p>}
+                {issueReceipt.status === 'reporting' && <p>Reporting the workflow issue.</p>}
                 {issueReceipt.status === 'reported' && (
                   <p>Issue reported for diagnostic review. Reference: {issueReceipt.incidentId}. A repair has not been verified yet.</p>
                 )}
@@ -164,7 +164,7 @@ export function ParisFloatingButton({
               <Suspense
                 fallback={
                   <p role="status" className="p-6 text-sm text-slate-600">
-                    Opening PARIS…
+                    Opening PARIS.
                   </p>
                 }
               >
@@ -191,7 +191,7 @@ export function ParisFloatingButton({
           className="fixed bottom-[calc(9.25rem+env(safe-area-inset-bottom))] right-3 z-50 w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl md:bottom-24 md:right-6"
         >
           <div className="flex items-center justify-between gap-3">
-            <p className="font-black text-slate-950">Hi, I’m PARIS.</p>
+            <p className="font-black text-slate-950">Hi, I'm PARIS.</p>
             <button
               type="button"
               onClick={dismissWelcome}
@@ -203,7 +203,7 @@ export function ParisFloatingButton({
             </button>
           </div>
           <p className="mt-1 text-sm font-medium leading-6 text-slate-700">
-            I’m here if you need guidance with programs, funding, applications, documents, employer
+            I'm here if you need guidance with programs, funding, applications, documents, employer
             opportunities, or your next step.
           </p>
           <p className="mt-3 text-xs font-bold text-brand-red-700">
@@ -243,9 +243,9 @@ export function ParisFloatingButton({
           <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span className={learnerSurface ? '' : 'hidden sm:inline'}>
             {learnerSurface
-              ? 'Need help?'
+              ? 'Ask PARIS � Course help'
               : portalSurface
-                ? 'Ask PARIS · Portal help'
+                ? 'Ask PARIS � Portal help'
                 : 'Ask PARIS'}
           </span>
         </button>
@@ -255,3 +255,4 @@ export function ParisFloatingButton({
 }
 
 export default ParisFloatingButton;
+

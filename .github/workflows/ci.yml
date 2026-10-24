@@ -64,7 +64,7 @@ jobs:
       - name: Public narration lifecycle regression tests
         run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts tests/unit/cookie-consent-navigation.test.tsx tests/unit/first-party-traffic-storage.test.tsx tests/unit/studio-chat-readiness.test.tsx tests/unit/header-mobile-focus.test.tsx
       - name: Completed lesson media handoff regression tests
-        run: node --test tests/worker/attach-lesson-media.test.mjs workers/process-job-state.test.mjs
+        run: node --test tests/worker/attach-lesson-media.test.mjs workers/process-job-state.test.mjs tests/worker/complete-lesson-before-advance.test.mjs
       - name: Course dispatch eligibility regression tests
         run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/probe-course-dispatch-queue.test.mjs
       - name: Course dispatch PostgREST projection (read-only)

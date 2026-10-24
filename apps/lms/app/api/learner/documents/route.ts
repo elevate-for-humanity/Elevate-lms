@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { autoExtract } from '@/lib/ocr/tesseract-ocr';
+import { setAuditContext } from '@/lib/audit-context';
 
 const ALLOWED = new Set(['application/pdf','image/jpeg','image/png','image/webp']);
 export async function POST(req: NextRequest) {
@@ -15,12 +16,15 @@ export async function POST(req: NextRequest) {
   const file = form.get('file');
   if (!requirementId || !(file instanceof File)) return NextResponse.json({ error: 'Requirement and file are required' }, { status: 400 });
   if (!ALLOWED.has(file.type) || file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'Use a PDF, JPG, PNG, or WebP file up to 10 MB' }, { status: 400 });
-  const { data: requirement } = await supabase.from('enrollment_requirements').select('id,enrollment_id').eq('id', requirementId).maybeSingle();
+  const { data: requirement } = await supabase.from('enrollment_requirements').select('id,enrollment_id,status,requirement_type,title').eq('id', requirementId).maybeSingle();
   if (!requirement) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   const { data: ownedEnrollment } = await supabase.from('program_enrollments').select('id').eq('id', requirement.enrollment_id).or(`user_id.eq.${user.id},student_id.eq.${user.id}`).maybeSingle();
   if (!ownedEnrollment) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
+  if (requirement.status === 'verified') return NextResponse.json({ error: 'This requirement is already verified. Contact staff to replace it.' }, { status: 409 });
+  if (requirement.requirement_type !== 'document') return NextResponse.json({ error: 'This requirement does not accept document uploads' }, { status: 400 });
   const admin = await requireAdminClient();
   if (!admin) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
+  await setAuditContext(admin, { systemActor: 'learner_document_upload' });
   // OCR assists reviewers; a failed extraction must not block scanned PDFs or IDs.
   // Do not treat readable text as proof of identity or eligibility.
   const extracted = await autoExtract(Buffer.from(await file.arrayBuffer()), file.type);
@@ -32,5 +36,18 @@ export async function POST(req: NextRequest) {
   if (updateError) { await admin.storage.from('documents').remove([path]); return NextResponse.json({ error: 'Document record could not be saved' }, { status: 500 }); }
   // The existing enrollment workspace treats 'completed' as submitted/pending
   // verification and only 'verified' as approved. Keep that distinction intact.
+  // Record review evidence in the existing audit trail; never auto-verify IDs,
+  // eligibility, or funding documents from OCR readability alone.
+  const { error: auditError } = await admin.from('audit_logs').insert({
+    action: 'learner_document_submitted_for_verification',
+    target_type: 'enrollment_requirement',
+    target_id: requirementId,
+    actor_id: user.id,
+    metadata: { enrollment_id: requirement.enrollment_id, requirement_title: requirement.title,
+      storage_path: path, ocr_source: extracted.source,
+      ocr_confidence: extracted.confidence, ocr_readable: Boolean(extracted.text.trim()) },
+    created_at: new Date().toISOString(),
+  });
+  if (auditError) console.error('[learner/documents] audit log failed', auditError.message);
   return NextResponse.json({ success: true, verification_status: 'pending_review', ocr_readable: Boolean(extracted.text.trim()) });
 }

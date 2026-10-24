@@ -3,6 +3,11 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 const state=vi.hoisted(()=>({results:{} as Record<string,{data:unknown;error:unknown;count?:number}>,revalidate:vi.fn(),role:vi.fn()}));
 vi.mock('@/lib/auth/require-role',()=>({requireRole:state.role}));
+// Keep the baseline page's identity lookup valid for the regression control.
+vi.mock('@/lib/supabase/server',()=>({createClient:async()=>({
+ auth:{getUser:async()=>({data:{user:{id:'fixture-operator'}},error:null})},
+ from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:{role:'admin'},error:null})})})})
+})}));
 vi.mock('next/cache',()=>({revalidatePath:state.revalidate}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:string)=>{
  let operation='read';const chain:Record<string,unknown>={};

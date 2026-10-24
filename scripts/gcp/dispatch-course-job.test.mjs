@@ -127,3 +127,25 @@ test('a fresh heartbeat with an expired lease is not a confirmed assignment',asy
   : [{id:'queued'}]});
  await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
 });
+
+
+test('owner-paused course builds never launch a paid worker execution',async()=>{
+ const s=setup([],[{id:'paused',attempts:1,max_attempts:7,build:{owner_paused:'true'}}]);
+ const base=s.options.request;
+ s.options.request=async url=>{
+  assert.match(url.searchParams.get('select'),/build:ultimate_course_builds!inner/);
+  return base(url);
+ };
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.equal(result.status,'empty');
+ assert.equal(s.calls.length,1);
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
+});
+
+test('unpaused builds still dispatch while owner-paused builds are excluded',async()=>{
+ const s=setup([],[{id:'paused',attempts:0,max_attempts:7,build:{owner_paused:true}},{id:'queued',attempts:0,max_attempts:7,build:{owner_paused:'false'}}]);
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.equal(result.status,'assigned');
+ assert.deepEqual(result.jobIds,['queued']);
+ assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
+});

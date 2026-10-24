@@ -20,6 +20,9 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // A stopped execution leaves an expired running lease. Claim RPC performs
   // recovery, but it cannot run unless the dispatcher launches a worker.
   url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + now.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
+  // Filter the joined build before the queue limit so paused rows cannot
+  // hide eligible work. Missing pause flags retain their existing eligibility.
+  url.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
   url.searchParams.set('limit','50');
   const response = await request(url, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
   if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);

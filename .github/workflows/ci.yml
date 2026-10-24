@@ -63,6 +63,11 @@ jobs:
         run: node --test tests/unit/traffic-report.test.mjs
       - name: Public narration lifecycle regression tests
         run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts tests/unit/cookie-consent-navigation.test.tsx tests/unit/first-party-traffic-storage.test.tsx tests/unit/studio-chat-readiness.test.tsx tests/unit/header-mobile-focus.test.tsx
+      - name: Course dispatch eligibility regression tests
+        run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/probe-course-dispatch-queue.test.mjs
+      - name: Course dispatch PostgREST projection (read-only)
+        if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request'
+        run: node scripts/gcp/probe-course-dispatch-queue.mjs
       - name: Google Studio runtime topology regression tests
         run: node --test scripts/gcp/verify-ai-runtime.test.mjs
       - name: Google runtime settings regression tests

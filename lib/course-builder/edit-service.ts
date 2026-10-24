@@ -160,17 +160,15 @@ export async function saveCourseLesson(input: unknown) {
     practical_required: body.practicalRequired ?? false,
     activities: body.activities ?? [],
     is_required: body.isRequired ?? true,
-    metadata: {
-      requiredArtifacts: body.requiredArtifacts ?? [],
-      domainKey: body.domainKey ?? null,
-      hourCategory: body.hourCategory ?? null,
-      evidenceType: body.evidenceType ?? null,
-      deliveryMethod: body.deliveryMethod ?? null,
-      requiresInstructorSignoff: body.requiresInstructorSignoff ?? false,
-      instructorRequirement: body.instructorRequirement ?? null,
-      minimumSeatTimeMinutes: body.minimumSeatTimeMinutes ?? null,
-      fieldworkEligible: body.fieldworkEligible ?? false,
-    },
+    required_artifacts: body.requiredArtifacts ?? [],
+    domain_key: body.domainKey ?? null,
+    hour_category: body.hourCategory ?? null,
+    evidence_type: body.evidenceType ?? null,
+    delivery_method: body.deliveryMethod ?? null,
+    requires_instructor_signoff: body.requiresInstructorSignoff ?? false,
+    instructor_requirement: body.instructorRequirement ?? null,
+    minimum_seat_time_minutes: body.minimumSeatTimeMinutes ?? null,
+    fieldwork_eligible: body.fieldworkEligible ?? false,
   };
   const query = body.id
     ? db.from('course_lessons').update(payload).eq('id', body.id)

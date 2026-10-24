@@ -1,6 +1,7 @@
 'use client';
 
 import ProgressiveLessonVideo from './ProgressiveLessonVideo';
+import LessonVideoReview from './LessonVideoReview';
 import ProductionPanelLayout from './ProductionPanelLayout';
 import type { ReactNode } from 'react';
 import AssessmentPreview from './AssessmentPreview';
@@ -150,8 +151,6 @@ export default function UltimateStageInspector({
   const [healthError, setHealthError] = useState('');
   const requestToken = useRef(0);
   const [preferApproved, setPreferApproved] = useState(true);
-  const [reviewBusy, setReviewBusy] = useState(false);
-  const [reviewMessage, setReviewMessage] = useState('');
   const [actionBusy, setActionBusy] = useState('');
   const [actionResults, setActionResults] = useState<
     Record<string, { error?: string; message?: string; diagnostic?: any }>
@@ -296,33 +295,6 @@ export default function UltimateStageInspector({
     }
   }
 
-  async function reviewVideo(lesson: Lesson, action: 'approve' | 'request_change') {
-    const version = lesson.preview?.review?.artifactVersionId;
-    if (!version) return;
-    setReviewBusy(true);
-    setReviewMessage('');
-    try {
-      const response = await fetch('/api/admin/ultimate-course-builder/review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          buildId,
-          lessonBuildId: lesson.id,
-          artifactVersionId: version,
-          action,
-        }),
-        signal: AbortSignal.timeout(25000),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Video review failed');
-      setReviewMessage(result.message);
-      setRetry((v) => v + 1);
-    } catch (error) {
-      setReviewMessage(error instanceof Error ? error.message : 'Video review failed');
-    } finally {
-      setReviewBusy(false);
-    }
-  }
   const outline = (
     <nav aria-label="Course lesson outline" className="space-y-2 p-3 text-white">
       <h3 className="font-bold">Course outline</h3>
@@ -344,7 +316,6 @@ export default function UltimateStageInspector({
               onClick={() => {
                 setFollowActive(false);
                 setSelectedLesson(lesson.lesson_key);
-                setReviewMessage('');
               }}
             >
               <strong>
@@ -442,36 +413,14 @@ export default function UltimateStageInspector({
                   />
                   {lesson.preview?.review &&
                     (!lesson.preview?.approvedVideoUrl || !preferApproved) && (
-                      <div className="rounded-lg border border-cyan-700 p-3">
-                        <p>
-                          Video version {lesson.preview.review.version} · Review:{' '}
-                          {lesson.preview.review.decision.replaceAll('_', ' ')}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-300">
-                          Review applies only to this saved video. Publishing still requires the
-                          course quality checks.
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            disabled={reviewBusy || lesson.preview.review.decision === 'approve'}
-                            onClick={() => void reviewVideo(lesson, 'approve')}
-                            className="min-h-11 rounded-lg bg-emerald-500 px-3 font-bold text-slate-950 disabled:opacity-50"
-                          >
-                            {lesson.preview.review.decision === 'approve' ? 'Video version approved' : reviewBusy ? 'Saving review…' : 'Approve this video version'}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={reviewBusy}
-                            onClick={() => void reviewVideo(lesson, 'request_change')}
-                            className="min-h-11 rounded-lg border border-amber-500 px-3"
-                          >
-                            Request changes
-                          </button>
-                        </div>
-                      </div>
+                      <LessonVideoReview
+                        key={lesson.preview.review.artifactVersionId}
+                        buildId={buildId}
+                        lessonBuildId={lesson.id}
+                        review={lesson.preview.review}
+                        onSaved={() => setRetry((value) => value + 1)}
+                      />
                     )}
-                  {reviewMessage && <p role="status">{reviewMessage}</p>}
                   {!lesson.saved && (
                     <p>This lesson has not been built. No saved video is available yet.</p>
                   )}
@@ -695,4 +644,5 @@ export default function UltimateStageInspector({
     </ProductionPanelLayout>
   );
 }
+
 

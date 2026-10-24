@@ -11,9 +11,18 @@ type SavedLesson = {
   running: boolean;
 };
 
+function followedLesson(rows: SavedLesson[]) {
+  const active = rows.find((row) => row.running);
+  // A queued cursor can precede creation of the lesson and its progressive frames.
+  // Keep watchable media on screen until that lesson actually has a preview.
+  if (active && (active.videoUrl || active.lessonId)) return active.id;
+  return rows.filter((row) => row.videoUrl).at(-1)?.id || active?.id || rows[0]?.id || "";
+}
+
 /** Read-only saved media preview; opening it never queues or repairs a build. */
 export default function CourseSidePreview({ courseId }: { courseId: string }) {
   const followActive = useRef(true);
+  const [following, setFollowing] = useState(true);
   const [lessons, setLessons] = useState<SavedLesson[]>([]);
   const [selected, setSelected] = useState("");
   const [buildId, setBuildId] = useState("");
@@ -25,6 +34,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
     let pending = false;
     const controller = new AbortController();
     followActive.current = true;
+    setFollowing(true);
     setLessons([]);
     setSelected("");
     setBuildId("");
@@ -106,7 +116,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
         setLessons(rows);
         setSelected(
           (previous) =>
-            (followActive.current && rows.find((row) => row.running)?.id) ||
+            (followActive.current && followedLesson(rows)) ||
             (rows.some((row) => row.id === previous)
               ? previous
               : rows[0]?.id || ""),
@@ -133,6 +143,8 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
     };
   }, [courseId]);
   const lesson = lessons.find((row) => row.id === selected);
+  const active = lessons.find((row) => row.running);
+  const waitingFor = following && active && !active.videoUrl && !active.lessonId && active.id !== selected ? active : null;
   return (
     <section aria-label="Saved course video preview" className="flex h-full min-h-0 flex-col gap-3 bg-slate-950 p-3 text-white">
       <h3 className="sr-only">Live course preview</h3>
@@ -144,13 +156,13 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
         <div className="flex shrink-0 items-end gap-2">
           <label className="block min-w-0 flex-1 text-xs">
             Lesson to watch
-            <select value={selected} onChange={(event) => { followActive.current = false; setSelected(event.target.value); }}
+            <select value={selected} onChange={(event) => { followActive.current = false; setFollowing(false); setSelected(event.target.value); }}
               className="mt-1 min-h-11 w-full rounded-lg border border-slate-600 bg-slate-900 px-2 text-sm text-white">
               {lessons.map((row) => <option key={row.id} value={row.id}>{row.title}</option>)}
             </select>
           </label>
           <button type="button" aria-label="Follow current build" className="min-h-11 shrink-0 rounded-lg border border-slate-600 px-2 text-xs"
-            onClick={() => { followActive.current = true; setSelected(lessons.find((row) => row.running)?.id || selected); }}>
+            onClick={() => { followActive.current = true; setFollowing(true); setSelected(followedLesson(lessons) || selected); }}>
             Follow build
           </button>
         </div>
@@ -158,6 +170,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
       {lesson && (
         <>
           <h4 className="sr-only">{lesson.title}</h4>
+          {waitingFor && <p className="shrink-0 text-xs text-slate-300">{waitingFor.title} has no saved preview yet. Showing {lesson.title} while waiting.</p>}
           <div className="min-h-0 flex-1 overflow-auto">
             {lesson.videoUrl ? (
               <video controls playsInline preload="metadata" src={lesson.videoUrl} aria-label={`${lesson.title} side preview`}

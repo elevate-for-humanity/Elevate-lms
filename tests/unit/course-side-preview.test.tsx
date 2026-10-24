@@ -106,7 +106,7 @@ it("removes the old course video when switching courses", async () => {
   ).toBeInTheDocument();
 });
 
-it("follows the queued course cursor rather than a stale running lesson", async () => {
+it("keeps a saved video visible while the queued lesson has no preview, without hiding manual selection", async () => {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => ({
@@ -129,6 +129,12 @@ it("follows the queued course cursor rather than a stale running lesson", async 
                     status: "running",
                     preview: { videoUrl: "old.mp4" },
                   },
+                  {
+                    id: "latest",
+                    competency_id: "two",
+                    status: "built",
+                    preview: { videoUrl: "latest.mp4" },
+                  },
                 ],
               },
             }
@@ -146,10 +152,14 @@ it("follows the queued course cursor rather than a stale running lesson", async 
     })),
   );
   render(<CourseSidePreview courseId="course" />);
-  expect(
-    await screen.findByRole("heading", { name: "Current third lesson" }),
-  ).toBeVisible();
-  expect(screen.getByLabelText("Lesson to watch")).toHaveValue("three");
-  expect(screen.queryByLabelText("Old lesson side preview")).toBeNull();
+  const video = await screen.findByLabelText("Lesson two side preview");
+  expect(video).toHaveAttribute('src', 'latest.mp4');
+  expect(screen.getByLabelText("Lesson to watch")).toHaveValue("two");
+  expect(screen.getByText(/Current third lesson has no saved preview yet/)).toBeVisible();
+  fireEvent.change(screen.getByLabelText('Lesson to watch'), { target: { value: 'three' } });
+  expect(screen.getByText('This lesson has no saved video yet.')).toBeVisible();
+  expect(screen.queryByText(/Showing Lesson two while waiting/)).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Follow current build' }));
+  expect(screen.getByLabelText('Lesson two side preview')).toHaveAttribute('src', 'latest.mp4');
 });
 

@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
+import { getBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 
 // Chainable stub that returns empty data for every query method.
 // Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
@@ -131,6 +132,7 @@ export function createBrowserClient(): SupabaseClient<any> {
     const sharedPortalSession =
       hostname === 'elevateforhumanity.org' || hostname.endsWith('.elevateforhumanity.org');
     const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey, {
+      global: { fetch: getBrowserAuthFetch(supabaseUrl) },
       cookieOptions: sharedPortalSession
         ? {
             domain: '.elevateforhumanity.org',
@@ -184,6 +186,6 @@ export const createClient = createBrowserClient;
 
 // No-op cache reset for dynamic config updates (called from public-config.ts)
 export function resetSupabaseBrowserClientCache(): void {
-  // Client is recreated on each call, no cache to reset
+  // The SSR SDK owns the browser singleton; retain it and its refresh backoff.
   // This function exists for API compatibility
 }

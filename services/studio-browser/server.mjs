@@ -91,7 +91,16 @@ async function checkpointWorkspace(){
   await ensureWorkspaceReady();
   if(!workspaceCheckpoint)return {persistent:false,changed:false};
   try{const result=await workspaceCheckpoint.checkpoint();workspaceRecovery={...workspaceRecovery,lastSavedAt:new Date().toISOString(),lastSaveError:null};return {...result,persistent:true};}
-  catch{workspaceRecovery={...workspaceRecovery,lastSaveError:'workspace_checkpoint_unavailable'};throw new BrowserServiceError('workspace_checkpoint_unavailable',503);}
+  catch(error){
+    // Keep credentials, paths and provider response bodies out of logs. Preserve
+    // a bounded failure category so storage faults and concurrent edits can be
+    // diagnosed without treating every failure as an unavailable worker.
+    const code=/^WORKSPACE_[A-Z_]+$/.test(String(error?.message||''))?error.message:
+      Number.isInteger(error?.code)?'WORKSPACE_STORAGE_'+error.code:'WORKSPACE_CHECKPOINT_FAILURE';
+    console.error(JSON.stringify({event:'workspace_checkpoint_failed',code}));
+    workspaceRecovery={...workspaceRecovery,lastSaveError:'workspace_checkpoint_unavailable',lastSaveCode:code};
+    throw new BrowserServiceError('workspace_checkpoint_unavailable',503);
+  }
 }
 
 const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);

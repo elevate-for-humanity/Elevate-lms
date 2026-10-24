@@ -1,3 +1,4 @@
+import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
 import { preservedCourseCursor } from './preserve-completed.mjs';
 import { recordProductionAlert } from './production-alert';
 import {ULTIMATE_BUILD_STEPS} from '../core/types';
@@ -104,12 +105,12 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           db
             .from("course_lessons")
             .select(
-              "id,status,is_published,approved,video_status,media_quality_status,video_url,video_job_id",
+              "id,status,is_published,approved,video_status,media_quality_status,video_url,video_job_id,media_attachment:content_json->mediaAttachment,film:content_json->film",
             )
             .eq("course_id", build.course_id),
           db
             .from("ultimate_lesson_builds")
-            .select("competency_id,status")
+            .select("id,competency_id,status,render_source:artifacts->lesson_film_render->render->>videoUrl,captions_source:artifacts->lesson_film_render->render->>captionsUrl,transcript_source:artifacts->lesson_film_render->render->>transcriptUrl")
             .eq("build_id", build.id),
         ]);
         if (canonical.error) throw canonical.error;
@@ -194,6 +195,8 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       await queue.complete(job.id,workerId,generation);
       return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
     }
+    await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
+      validate:assertCompleteLesson,assertActive});
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {

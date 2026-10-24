@@ -81,3 +81,11 @@ test('preview cannot become an untargeted full-course execution',async()=>{
  await assert.rejects(()=>run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'}]},renderPreviewOnly:true},
   ()=>({run:async ctx=>ctx}),persistence([])),/OWNER_PREVIEW_REQUIRES_EXACT_SINGLE_LESSON/);
 });
+
+
+test('a complete saved checkpoint restores built status before retrying attachment without rerendering',async()=>{
+ const events=[],run=makeCourseRunner(()=>{}),p=persistence(events);
+ p.loadLessonCheckpoint=async()=>({passedSteps:['standards_lock','lesson_film_render','finished_media_qa','credential_release'],artifacts:{lesson_film_render:{render:{videoUrl:'saved.mp4'}}},findings:[]});
+ const out=await run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'}]}},()=>{throw Error('saved media must not rerender');},p);
+ assert.equal(out.completed,true);assert.deepEqual(events,['create:first','finish:built']);
+});

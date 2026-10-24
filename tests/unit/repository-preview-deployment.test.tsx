@@ -1,3 +1,4 @@
+/** @vitest-environment-options {"url":"https://paris-acceptance.example.test/studio/repository"} */
 import { afterEach, expect, it } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/react';
 import RepositoryLivePreview from '@/components/studio/RepositoryLivePreview';

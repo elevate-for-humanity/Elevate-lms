@@ -31,7 +31,7 @@ export async function renderReview(
   if (!version) return null;
   const decisions = await db
     .from('ultimate_review_decisions')
-    .select('action,reviewer_id,created_at')
+    .select('action,reviewer_id,created_at,comment')
     .eq('artifact_version_id', version.id)
     .in('action', ['approve', 'reject', 'request_change'])
     .order('created_at', { ascending: false })
@@ -42,5 +42,7 @@ export async function renderReview(
     artifactVersionId: version.id,
     version: version.version,
     decision: decisions.data?.action ?? 'unreviewed',
+    comment: decisions.data?.comment ?? null,
   };
 }
+

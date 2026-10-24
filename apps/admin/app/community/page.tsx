@@ -40,8 +40,8 @@ async function deleteCommunityItem(formData: FormData) {
             : null;
   if (!table) throw new Error('COMMUNITY_ITEM_INPUT_INVALID');
   const admin = await requireAdminClient();
-  const { error } = await admin.from(table).delete().eq('id', id);
-  if (error) throw new Error('COMMUNITY_DELETE_FAILED');
+  const { data: deleted, error } = await admin.from(table).delete().eq('id', id).select('id').maybeSingle();
+  if (error || !deleted) throw new Error('COMMUNITY_DELETE_FAILED');
   revalidatePath('/community');
 }
 
@@ -52,12 +52,12 @@ async function updateReport(formData: FormData) {
   const status = String(formData.get('status') || '');
   if (!id || !['reviewing', 'resolved', 'dismissed'].includes(status)) throw new Error('COMMUNITY_REPORT_INPUT_INVALID');
   const admin = await requireAdminClient();
-  const { error } = await admin.from('community_reports').update({
+  const { data: updated, error } = await admin.from('community_reports').update({
     status,
     reviewed_by: user.id,
     reviewed_at: new Date().toISOString(),
-  }).eq('id', id);
-  if (error) throw new Error('COMMUNITY_REPORT_UPDATE_FAILED');
+  }).eq('id', id).select('id').maybeSingle();
+  if (error || !updated) throw new Error('COMMUNITY_REPORT_UPDATE_FAILED');
   revalidatePath('/community');
 }
 

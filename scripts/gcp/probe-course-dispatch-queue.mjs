@@ -4,13 +4,26 @@ import {dispatchQueuedCourseJob} from './dispatch-course-job.mjs';
 
 // Exercise the dispatcher's actual REST query, but never give this probe a
 // Google runner or return jobs to the launch path. Reads only; no claims/writes.
-export async function probeCourseDispatchQueue({env=process.env,request=fetch}={}) {
+export async function probeCourseDispatchQueue({env=process.env,request=fetch,
+ wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}) {
  let sampled=0,eligible=0;
  const read=async url=>{
-  const response=await request(url,{headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-   Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY},signal:AbortSignal.timeout(15000)});
-  if(!response.ok)throw Error('COURSE_QUEUE_PROJECTION_HTTP_'+response.status);
-  const rows=await response.json();
+  // The projection is read-only. Retry bounded network timeouts without ever
+  // turning a missing/invalid response or HTTP error into a passing CI gate.
+  let rows;
+  for(let attempt=0;attempt<3;attempt++){
+   try{
+    const response=await request(url,{headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+     Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY},signal:AbortSignal.timeout(15000)});
+    if(!response.ok)throw Error('COURSE_QUEUE_PROJECTION_HTTP_'+response.status);
+    rows=await response.json();
+    break;
+   }catch(error){
+    if(error?.name!=='TimeoutError')throw error;
+    if(attempt===2)throw Error('COURSE_QUEUE_PROJECTION_TIMEOUT');
+    await wait(500*(attempt+1));
+   }
+  }
   assert.ok(Array.isArray(rows),'COURSE_QUEUE_PROJECTION_INVALID');
   for(const row of rows)assert.ok(row.build && !Array.isArray(row.build) &&
    Object.hasOwn(row.build,'owner_paused'),'COURSE_QUEUE_PARENT_PROJECTION_INVALID');

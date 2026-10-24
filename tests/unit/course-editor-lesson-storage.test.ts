@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const state = vi.hoisted(() => ({ writes: [] as Array<{ table: string; payload: Record<string, unknown> }>, error: null as null | { message: string } }));
+const state = vi.hoisted(() => ({
+  writes: [] as Array<{ table: string; payload: Record<string, unknown> }>,
+  filters: [] as Array<{ table: string; column: string; value: unknown }>,
+  error: null as null | { message: string },
+  moduleCourseId: '11111111-1111-4111-8111-111111111111' as string | null,
+}));
 const db = vi.hoisted(() => ({
   from: (table: string) => {
     const query: any = {
       insert: (payload: Record<string, unknown>) => { state.writes.push({ table, payload }); return query; },
       update: (payload: Record<string, unknown>) => { state.writes.push({ table, payload }); return query; },
-      eq: () => query,
+      eq: (column: string, value: unknown) => { state.filters.push({ table, column, value }); return query; },
       select: () => query,
+      maybeSingle: async () => ({ data: state.moduleCourseId ? { course_id: state.moduleCourseId } : null, error: state.error }),
       single: async () => ({ data: { id: 'saved-lesson' }, error: state.error }),
     };
     return query;
@@ -16,7 +22,7 @@ const db = vi.hoisted(() => ({
 vi.mock('@/lib/course-builder/db', () => ({ getServiceDb: async () => db }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => db }));
 
-import { saveCourseLesson } from '@/lib/course-builder/edit-service';
+import { saveCourseLesson, saveCourseModule } from '@/lib/course-builder/edit-service';
 
 const input = {
   courseId: '11111111-1111-4111-8111-111111111111',
@@ -29,7 +35,7 @@ const input = {
   minimumSeatTimeMinutes: 25, fieldworkEligible: true,
 };
 
-beforeEach(() => { state.writes = []; state.error = null; });
+beforeEach(() => { state.writes = []; state.filters = []; state.error = null; state.moduleCourseId = input.courseId; });
 
 describe('manual lesson persistence uses the LMS schema', () => {
   it.each([undefined, '33333333-3333-4333-8333-333333333333'])('persists compliance fields on create/update (%s)', async (id) => {
@@ -43,10 +49,25 @@ describe('manual lesson persistence uses the LMS schema', () => {
       instructor_requirement: input.instructorRequirement, minimum_seat_time_minutes: 25, fieldwork_eligible: true,
     });
     expect(state.writes[0].payload).not.toHaveProperty('metadata');
+    if (id) expect(state.filters).toContainEqual({ table: 'course_lessons', column: 'course_id', value: input.courseId });
+  });
+
+  it.each([null, '44444444-4444-4444-8444-444444444444'])('rejects a missing or mismatched parent module (%s)', async (moduleCourseId) => {
+    state.moduleCourseId = moduleCourseId;
+    await expect(saveCourseLesson(input)).rejects.toThrow('does not belong to this course');
+    expect(state.writes).toHaveLength(0);
   });
 
   it('does not report a successful save after a database failure', async () => {
     state.error = { message: 'database unavailable' };
     await expect(saveCourseLesson(input)).rejects.toEqual(state.error);
+  });
+
+  it('scopes module edits to the selected course', async () => {
+    await saveCourseModule({
+      id: input.moduleId, courseId: input.courseId, title: 'Safety', slug: 'safety',
+      orderIndex: 0, domainKey: 'safety', targetHours: 1, quizRequired: true, practicalRequired: true,
+    });
+    expect(state.filters).toContainEqual({ table: 'course_modules', column: 'course_id', value: input.courseId });
   });
 });

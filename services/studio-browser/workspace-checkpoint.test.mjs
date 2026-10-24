@@ -96,6 +96,6 @@ test('continuous edits stop after three snapshot attempts and never publish inco
  const f=await fixture(t),store=new WorkspaceCheckpoint(f.config);await store.initialize();
  const file=path.join(f.root,'draft');await fsp.writeFile(file,'initial');
  const write=f.objects.createArchiveWriteStream.bind(f.objects);let attempts=0;
- f.objects.createArchiveWriteStream=name=>{fs.writeFileSync(file,'changed-'+(++attempts));return write(name);};
+ f.objects.createArchiveWriteStream=name=>{fs.writeFileSync(file,'changed-'.repeat(++attempts+1));return write(name);};
  await assert.rejects(store.checkpoint(),/WORKSPACE_CHANGED_DURING_CHECKPOINT/);assert.equal(attempts,3);assert.equal(f.objects.writes,0);
 });

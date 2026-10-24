@@ -19,6 +19,7 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:s
 import CommunityAdminPage from '@/apps/admin/app/community/page';
 type Action=(data:FormData)=>Promise<void>;
 function nodes(root:ReactNode):Array<React.ReactElement<{children?:ReactNode;name?:string;value?:string;action?:Action}>>{
+ if(Array.isArray(root))return root.flatMap(nodes);
  if(!isValidElement<{children?:ReactNode;name?:string;value?:string;action?:Action}>(root))return[];
  return[root,...Children.toArray(root.props.children).flatMap(nodes)];
 }

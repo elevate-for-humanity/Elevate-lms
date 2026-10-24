@@ -199,3 +199,36 @@ This inventory excludes this checkpoint document itself.
 | `tests/unit/supabase-server-refresh-retention.test.ts` | added | +44 / -0 |
 | `tests/unit/supabase-ssr-refresh-retention.test.ts` | added | +42 / -0 |
 | `tests/worker/checkpoint-fallback.test.mjs` | modified | +8 / -5 |
+
+
+## Independent cloud preparation and deployment blocker repair
+
+Recorded: 2026-10-24T08:14:54.283092-04:00 (America/Indianapolis). This is an implementation checkpoint, not acceptance of pending source in production.
+
+### Production capacity recovery
+
+LMS run 40084361023 and Store run 40084387868 built images, then failed rollout capacity admission. Store subsequently queried a revision never created. Existing allocations totaled 17 vCPU / 36 GiB against 20 vCPU / 40 GiB granted, excluding a replacement.
+
+Inspected user tabs and recent request logs, then removed only Admin's unused zero-percent paris-acceptance traffic tag for elevate-admin-migration-00889-zaw. Its revision/image and the active studio-verify browser endpoint remain available. Routing rollback metadata is preserved at gs://elegant-racer-299721-studio-browser-auth/release-evidence/20261024/admin-acceptance-tag-rollback.json. Readback confirmed Admin still routes 100 percent to elevate-admin-migration-00272-dd4.
+
+Fresh regional checker including a 4 vCPU / 8 GiB candidate: required 19000 millicpu / 42949672960 bytes; granted 20000 millicpu / 42949672960 bytes; fits=true. Recheck before each serialized rollout. The safety gate remains intact. Cloud Shell quota inspection required an explicit quota-project request header; no quota increase was requested.
+
+### Pending source and fresh verification
+
+- Store declares its candidate revision only after successful admission and skips phantom-revision diagnostics on admission failure. An executable shell regression failed before the fix and passes afterward. Six existing admission tests pass.
+- Admin, shared migration-image and Store Docker builds now precede Google authentication/billing admission. Google upload/deployment retains those checks. Four build-boundary tests and existing publisher concurrency tests pass. Store uses its Dockerfile's official Node image default rather than Google's public image mirror.
+- Canonical production browser resolver rejects preview aliases; four focused tests pass. This source repair is not live. Preserve the workspace currently used through studio-verify before any browser cutover.
+- Snapshot mutation regression fixture now changes size deterministically; Node 22 recovery/binding tests pass. Community moderation fixture traverses child arrays; no application assertions were removed.
+- Fresh audit reproduced 11 vulnerabilities: 6 high and 5 moderate. Targeted changes: Zod 4.6.6 in root/worker, Multer 2.5, Nodemailer 10.1.4, Happy DOM 21.0.4, Undici 7.30.1, body-parser 2.4 and fast-uri 3.1.9. Regenerated the existing pnpm lockfile without exclusions.
+- Remediated pnpm audit: zero findings at all severities, exit 0. Frozen dependency image rebuilt successfully. All 15 affected functional suites / 99 tests pass with the new dependency graph.
+- Fresh pnpm typecheck and pnpm lint returned exit 0. Final integrated lint also passed. The combined runner then failed its real-Git test because the web dependency image omits Git. Re-executing every runtime/boundary regression in Node 22 Bookworm with Git passed all 25 tests; no test assertions were removed.
+
+### Independent-runtime boundary
+
+The existing infra/modal implementation, lib/compute adapter, operator CLI and preserved DigitalOcean recovery branch are reusable source, not proof of a running backup. Admin has no external-compute enable flag, broker endpoint or proxy bindings. The relevant Modal, Runpod and DigitalOcean connection keys were absent from the two inspected Supabase secret stores; values were not read.
+
+Production readback confirms external_compute_policies and external_course_executions are absent, as is prepare_external_course_execution. No migration was applied, paid provider activated, or credentials transmitted to another provider.
+
+External contract verification first returned 27 passing checks and a SIGKILL failure in a 2 GiB test container. The 4 GiB serial rerun passed all 28 tests. This proves the existing isolated database/adapter contracts, not live provider operation.
+
+Remaining: independent account/capacity, protected release images/configuration, private browser persistence, coordinated job ownership, traffic takeover, complete failover exercise and final-source image acceptance. No new source release was activated by this checkpoint. PBX calling, PARIS/operator transfers and actual voicemail delivery remain uncertified.

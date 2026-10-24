@@ -1,3 +1,4 @@
+import { isCosmetologyRti, RTI_TEACHING_REQUIREMENTS, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
 import {reportCourseProgress, courseProgressSignal} from '../worker/progress-watch.mjs';
 import { assertGeneratedLessonAssessment } from './generated-lesson-assessment.mjs';
 import { parseVertexLessonResponse } from './vertex-response.mjs';
@@ -67,14 +68,17 @@ Output only a complete JSON object with double-quoted property names and strings
   const presentationRequirements = input.profile.lessonPresentation === 'approved-premium-v1'
     ? 'Use focused PowerPoint-style teaching moments. Explain the required tools and exact numbered guard lengths when supported by the source. Within each teaching moment include a fresh brief recap or practice question, never repeat its spoken passage. Change the visual for the next technique. Whole pictures stay visible beside concise demonstration instructions, with word-aligned bottom captions. Use unique task-relevant images; do not reuse a photo or loop as filler. Do not invent technical measurements or substitute illustrative photos for an actual required physical demonstration.'
     : undefined;
-  const authorRequest = { ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
-  let result = bindBlueprintRequirements(await generate(system, authorRequest), input.competency);
+  const rtiRequirements = isCosmetologyRti(input.profile) ? RTI_TEACHING_REQUIREMENTS : undefined;
+  const authorSystem = rtiRequirements ? system + '\n' + rtiRequirements : system;
+  const authorRequest = { ...(rtiRequirements ? {rtiRequirements} : {}), ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
+  let result = bindBlueprintRequirements(await generate(authorSystem, authorRequest), input.competency);
   reportCourseProgress('authoring:' + input.competency.id + ':draft', 1);
   for (let attempt = 0; attempt < 3; attempt++) {
     if (result?.blocked) break;
     try {
       assertGeneratedLessonAssessment(result?.blueprint?.assessment);
       validateLessonBlueprint(result?.blueprint, input.competency);
+      assertRtiSubjectTeaching(result?.blueprint, input.profile);
       break;
     }
     catch (error) {
@@ -83,8 +87,9 @@ Output only a complete JSON object with double-quoted property names and strings
         try { if (segment.teachingVisual) validateTeachingVisual(segment.teachingVisual, segment.text); return []; }
         catch { return [{segmentId: segment.id, narration: segment.text, teachingVisual: segment.teachingVisual}]; }
       });
-      result = bindBlueprintRequirements(await generate(system, {...authorRequest, repair: {
+      result = bindBlueprintRequirements(await generate(authorSystem, {...authorRequest, repair: {
         code: error.message, previousResult: result, invalidVisuals,
+        ...(rtiRequirements ? {rtiRequirements, contentRepair: 'Replace navigation and test-taking filler with the substantive supplied module content. Preserve actual subject questions, safety facts and all teaching stages.'} : {}),
         instructions: 'Repair the reported blueprint validation failure using blueprintSchema. Return all required 13-16 segments with nonempty text and visualRequirement, unique segment IDs, objectiveIds that match actual blueprint objectives and omit sourceRequirementIds because the builder supplies them. Preserve all thirteen stages in order and all required activity and assessment fields. Repair invalid teaching visuals. Return the full {blueprint}. Preserve spoken narration, objectives and valid assessment items. Supply at least two recap questions and at least two distinct reassessment questions. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.',
       }}), input.competency);
       reportCourseProgress('authoring:' + input.competency.id + ':repair', attempt + 1);

@@ -1,3 +1,4 @@
+import { lessonInstructionalSources } from '../instructional/rti-teaching-policy.mjs';
 import {sceneRole} from '../core/repair-policy.mjs';
 import type { UltimateInstructionalGenerator } from '../instructional/generation-contract';
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
@@ -55,9 +56,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     const e = value as Evidence;
     if (!e?.competency?.id || !e.profile?.authority)
       throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
-    const lessonSources = e.profile.instructionalSources?.filter(s =>
-      [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
-      e.competency.authorityRequirementIds.includes(s.id) || (e.profile.instructionalAuthoring?.provider === 'google' && s.id.startsWith('syllabus:'))) ?? [];
+    const lessonSources: Array<{id:string;text:string}> = lessonInstructionalSources(e.profile, e.competency);
     const approved = e.profile.lessonBlueprints?.[e.competency.id];
     if (approved && !e.repairDirective) {
       validateLessonBlueprint(approved, e.competency);
@@ -87,12 +86,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
   private async generate(e: Evidence): Promise<LessonBlueprint> {
     // Course-wide source arrays contain many different lessons. Never narrate
     // the first lesson's source for every competency in a course.
-    const sources = e.profile.instructionalSources?.filter(
-      (s) =>
-        [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(
-          s.id,
-        ) || e.competency.authorityRequirementIds.includes(s.id) || (e.profile.instructionalAuthoring?.provider === 'google' && s.id.startsWith('syllabus:')),
-    );
+    const sources: Array<{id:string;text:string}> = lessonInstructionalSources(e.profile, e.competency);
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
 

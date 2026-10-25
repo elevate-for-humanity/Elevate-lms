@@ -48,8 +48,9 @@ jobs:
           import {execFileSync} from 'node:child_process';
           import {randomUUID} from 'node:crypto';
           import {servingPhoneCredential} from './scripts/gcp/serving-phone-credential.mjs';
+          import {readVoicemailAdminHealth} from './scripts/gcp/voicemail-live-health.mjs';
           const base='https://admin.elevateforhumanity.org';
-          const health=await (await fetch(base+'/api/health',{signal:AbortSignal.timeout(10000)})).json();
+          const health=await readVoicemailAdminHealth(base);
           if(!/^[a-f0-9]{40}$/.test(health.commit||''))throw Error('Live Admin version is not verified');
           const source=JSON.parse(execFileSync('gh',['api','repos/'+process.env.GITHUB_REPOSITORY+'/contents/apps/admin/app/api/internal/phone/voicemail/route.ts?ref='+health.commit],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
           if(!Buffer.from(source.content,'base64').toString('utf8').includes('body.validateOnly===true'))throw Error('Non-delivering voice acceptance mode is not deployed yet');

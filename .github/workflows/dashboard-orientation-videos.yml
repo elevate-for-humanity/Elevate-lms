@@ -9,13 +9,22 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
   group: dashboard-orientation-media
   cancel-in-progress: false
 jobs:
+  request-publication:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Request the existing Google-trusted main dispatch event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dashboard-orientation-videos.yml/dispatches" -f ref=main
   publish:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:

@@ -1,4 +1,4 @@
-import {readFile,writeFile,mkdtemp,rm} from 'node:fs/promises';
+import {readFile,writeFile,mkdtemp,rm,stat} from 'node:fs/promises';
 import {existsSync,createReadStream} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
@@ -13,13 +13,13 @@ const guides=JSON.parse(await readFile('/source/lib/orientation/dashboard-orient
 const root=await mkdtemp(join(tmpdir(),'dashboard-orientation-'));
 const endpoint=process.env.ELEVATE_MEDIA_ENDPOINT, bucket=process.env.ELEVATE_MEDIA_BUCKET;
 if(!/^https:\/\/s3\.[a-z0-9-]+\.backblazeb2\.com\/?$/.test(endpoint??'')||!bucket)throw Error('ORIENTATION_B2_CONFIGURATION_REQUIRED');
-const client=new S3Client({endpoint,region:process.env.ELEVATE_MEDIA_REGION,forcePathStyle:false,
+const client=new S3Client({endpoint,region:process.env.ELEVATE_MEDIA_REGION,forcePathStyle:false,requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED',
  credentials:{accessKeyId:process.env.ELEVATE_MEDIA_ACCESS_KEY_ID,secretAccessKey:process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY}});
 let narrator;
 const time=value=>{const ms=Math.max(0,Math.round(value*1000));return `${String(Math.floor(ms/3600000)).padStart(2,'0')}:${String(Math.floor(ms/60000)%60).padStart(2,'0')}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}.${String(ms%1000).padStart(3,'0')}`;};
 const wrap=(text,width)=>{let line='',lines=[];for(const word of text.split(/\s+/)){if((line+' '+word).trim().length>width&&line){lines.push(line);line='';}line+=(line?' ':'')+word;}if(line)lines.push(line);return lines.join('\n');};
 async function present(key){try{await client.send(new HeadObjectCommand({Bucket:bucket,Key:key}));return true;}catch(e){if(e.$metadata?.httpStatusCode===404||e.name==='NotFound')return false;throw Error('ORIENTATION_STORAGE_CHECK_FAILED');}}
-async function upload(key,file,type){await client.send(new PutObjectCommand({Bucket:bucket,Key:key,Body:createReadStream(file),ContentType:type,CacheControl:'private,max-age=3600'}));if(!await present(key))throw Error('ORIENTATION_UPLOAD_READBACK_FAILED');}
+async function upload(key,file,type){await client.send(new PutObjectCommand({Bucket:bucket,Key:key,Body:createReadStream(file),ContentLength:(await stat(file)).size,ContentType:type,CacheControl:'private,max-age=3600'}));if(!await present(key))throw Error('ORIENTATION_UPLOAD_READBACK_FAILED');}
 try {
  for(const [audience,guide] of Object.entries(guides)) {
   const videoKey=orientationKeyForGuide(audience,'mp4',guide),captionKey=orientationKeyForGuide(audience,'vtt',guide);

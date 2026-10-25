@@ -49,8 +49,8 @@ function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
   const programSlug = row.program_slug ?? program?.slug ?? null;
   const programTitle = program?.title ?? program?.name ?? (programSlug ? formatSlugTitle(programSlug) : null);
 
-  let rawStatus = row.status ?? 'pending';
-  let rawState = row.enrollment_state ?? null;
+  const rawStatus = row.status ?? 'pending';
+  const rawState = row.enrollment_state ?? null;
 
   // Pending approval is not authorization to access courses.
 

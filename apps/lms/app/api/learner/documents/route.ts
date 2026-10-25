@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const { data: ownedEnrollment } = await supabase.from('program_enrollments').select('id').eq('id', requirement.enrollment_id).or(`user_id.eq.${user.id},student_id.eq.${user.id}`).maybeSingle();
   if (!ownedEnrollment) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   if (requirement.status === 'verified') return NextResponse.json({ error: 'This requirement is already verified. Contact staff to replace it.' }, { status: 409 });
-  if (requirement.requirement_type !== 'document') return NextResponse.json({ error: 'This requirement does not accept document uploads' }, { status: 400 });
+  if (!new Set(['government_id','high_school_diploma','identity','proof_of_address','proof_of_age','social_security_card','eligibility','funding','program']).has(requirement.requirement_type)) return NextResponse.json({ error: 'This requirement does not accept document uploads' }, { status: 400 });
   const admin = await requireAdminClient();
   if (!admin) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
   await setAuditContext(admin, { systemActor: 'learner_document_upload' });
@@ -56,10 +56,10 @@ export async function POST(req: NextRequest) {
     entity_id: requirementId,
     review_type: 'document_verification',
     priority: 5,
-    status: 'pending',
+    status: 'open',
     extracted_data: { text: extracted.text.slice(0, 12000), source: extracted.source },
     confidence_score: Math.max(0, Math.min(1, extracted.confidence / 100)),
-    failed_rules: extracted.text.trim() ? ['authenticity_requires_verification'] : ['ocr_unreadable_requires_review'],
+    failed_rules: extracted.text.trim() ? 'authenticity_requires_verification' : 'ocr_unreadable_requires_review',
     system_recommendation: 'manual_review_required',
     context: { enrollment_id: requirement.enrollment_id, requirement_id: requirementId, storage_path: path },
     created_at: new Date().toISOString(),

@@ -78,7 +78,7 @@ jobs:
         run: pnpm exec vitest run tests/unit/resizable-workspace.test.tsx tests/unit/course-browser-panels.test.tsx tests/unit/studio-conversation-workspace.test.tsx tests/unit/studio-browser-navigation.test.tsx tests/unit/studio-browser-secure-input.test.tsx tests/unit/studio-viewport.test.tsx
       - name: Google activation and dependency health regression tests
         run: |
-          node --test scripts/gcp/serving-phone-credential.test.mjs tests/phone-runtime-authority.node.test.mjs
+          node --test scripts/gcp/serving-phone-credential.test.mjs tests/phone-runtime-authority.node.test.mjs scripts/gcp/voicemail-live-health.test.mjs
           node --test scripts/gcp/phone-runtime-handoff.test.mjs
           node --test scripts/test-public-revision-activation.mjs
           node --test scripts/test-studio-workflow-inspection.mjs

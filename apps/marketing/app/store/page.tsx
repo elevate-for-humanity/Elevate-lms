@@ -13,7 +13,7 @@ import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercia
 import { StandaloneBuildPackages } from '@/components/store/StandaloneBuildPackages';
 import Image from 'next/image';
 import StoreDemoPreview from '@/components/store/StoreDemoPreview';
-import StoreDemoVideo from './StoreDemoVideo';
+import StorePlatformDemos from '@/components/store/StorePlatformDemos';
 
 export const metadata: Metadata = {
   title: 'Store | AI Business, Workforce & Education Platform',
@@ -70,10 +70,10 @@ export default function StorePage() {
                 Start Free Trial
               </Link>
               <Link
-                href="#role-demos"
+                href="#platform-demos"
                 className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 text-center font-black text-slate-950 hover:border-brand-red-600 sm:w-auto"
               >
-                See Role Demos
+                Watch Product Demos
               </Link>
               <Link
                 href="/store/proof"
@@ -105,38 +105,7 @@ export default function StorePage() {
 
       <UnifiedSalesMarketplace />
 
-      <section className="border-b border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">
-              Real course demonstration
-            </p>
-            <h2 className="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">
-              See what learners receive—not just a list of features.
-            </h2>
-            <p className="mt-4 text-base font-semibold leading-7 text-slate-700">
-              Watch a working lesson from the HVAC Technician course. Organizations can evaluate the
-              lesson experience, instructional structure, and media delivery before choosing a
-              licensing or platform package.
-            </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/store/demos"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800"
-              >
-                Browse platform demos
-              </Link>
-              <Link
-                href="/store/courses"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-950 hover:border-brand-red-600"
-              >
-                View licensable courses
-              </Link>
-            </div>
-          </div>
-          <StoreDemoVideo />
-        </div>
-      </section>
+      <StorePlatformDemos />
 
       <section className="border-b border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-6xl px-5">

@@ -52,6 +52,10 @@ export async function POST(req: NextRequest) {
   // Create a reviewer work item for every submission. OCR cannot establish
   // authenticity or eligibility, so activation must wait for verified status.
   const { error: reviewError } = await admin.from('review_queue').insert({
+    queue_type: 'document_review',
+    subject_type: 'document',
+    subject_id: requirementId,
+    reasons: [extracted.text.trim() ? 'authenticity_requires_verification' : 'ocr_unreadable_requires_review'],
     entity_type: 'enrollment_requirement',
     entity_id: requirementId,
     review_type: 'document_verification',

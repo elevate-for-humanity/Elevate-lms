@@ -509,22 +509,67 @@ jobs:
       ))
     steps:
       - name: Guardrail evaluation
+        id: guardrails
+        continue-on-error: true
         run: |
-          curl -sf -X POST "$ADMIN_URL/api/cron/guardrail-evaluation" \
-            -H "Authorization: Bearer $CRON_SECRET" --max-time 120 \
-            || echo "::warning::guardrail-evaluation failed"
+          set -euo pipefail
+          test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET missing"; exit 1; }
+          status="$(curl --silent --show-error --max-time 120 \
+            --output /dev/null --write-out '%{http_code}' \
+            -X GET "$ADMIN_URL/api/cron/guardrail-evaluation" \
+            -H "Authorization: Bearer $CRON_SECRET")" || {
+            echo "::error::guardrail-evaluation transport failed"
+            exit 1
+          }
+          echo "guardrail-evaluation HTTP $status"
+          if [ "$status" != 200 ]; then echo "::error::guardrail-evaluation HTTP $status"; exit 1; fi
 
       - name: AI memory cleanup (expired TTL rows)
+        id: memory_cleanup
+        continue-on-error: true
         run: |
-          curl -sf -X POST "$ADMIN_URL/api/cron/memory-cleanup" \
-            -H "Authorization: Bearer $CRON_SECRET" --max-time 30 \
-            || echo "::warning::memory-cleanup failed"
+          set -euo pipefail
+          test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET missing"; exit 1; }
+          status="$(curl --silent --show-error --max-time 30 \
+            --output /dev/null --write-out '%{http_code}' \
+            -X POST "$ADMIN_URL/api/cron/memory-cleanup" \
+            -H "Authorization: Bearer $CRON_SECRET")" || {
+            echo "::error::memory-cleanup transport failed"
+            exit 1
+          }
+          echo "memory-cleanup HTTP $status"
+          if [ "$status" != 200 ]; then echo "::error::memory-cleanup HTTP $status"; exit 1; fi
 
       - name: Testing no-show enforcement
+        id: testing_no_show
+        continue-on-error: true
         run: |
-          curl -sf -X GET "$ADMIN_URL/api/cron/testing-no-show" \
-            -H "Authorization: Bearer $CRON_SECRET" --max-time 60 \
-            || echo "::warning::testing-no-show failed"
+          set -euo pipefail
+          test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET missing"; exit 1; }
+          status="$(curl --silent --show-error --max-time 60 \
+            --output /dev/null --write-out '%{http_code}' \
+            -X GET "$ADMIN_URL/api/cron/testing-no-show" \
+            -H "x-cron-secret: $CRON_SECRET")" || {
+            echo "::error::testing-no-show transport failed"
+            exit 1
+          }
+          echo "testing-no-show HTTP $status"
+          if [ "$status" != 200 ]; then echo "::error::testing-no-show HTTP $status"; exit 1; fi
+
+      - name: Require daily maintenance routes to succeed
+        if: always()
+        env:
+          GUARDRAIL_OUTCOME: ${{ steps.guardrails.outcome }}
+          MEMORY_OUTCOME: ${{ steps.memory_cleanup.outcome }}
+          NO_SHOW_OUTCOME: ${{ steps.testing_no_show.outcome }}
+        run: |
+          set -euo pipefail
+          for outcome in "$GUARDRAIL_OUTCOME" "$MEMORY_OUTCOME" "$NO_SHOW_OUTCOME"; do
+            if [ "$outcome" != success ]; then
+              echo "::error::Daily maintenance request failed; inspect redacted step diagnostics"
+              exit 1
+            fi
+          done
 
   # ── Weekly Monday 9 AM: weekly reports ────────────────────────────────────
   weekly:

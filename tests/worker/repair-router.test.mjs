@@ -75,3 +75,9 @@ test('recovery v2 classifies VTT storage failure as delivery-only, never rerende
 test('per-scene ASR mismatch reinspects existing encoded audio without restarting a deterministic timeline',()=>{
  assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_SCENE_NARRATION_MISMATCH',message:'MEDIA_SCENE_NARRATION_MISMATCH:scene:0.734'}]),[{step:'finished_media_qa',codes:['MEDIA_SCENE_NARRATION_MISMATCH'],rebuildOnlyThisStage:true}]);
 });
+
+
+test('picture-to-speech render cue mismatch routes to visual media rather than unchanged synchronization', () => {
+  const repairs = routeSelectiveRepairs([{step:'lesson_film_render',code:'ULTIMATE_VIDEO_RENDER_FAILED',severity:'error',message:'ULTIMATE_VIDEO_RENDER_FAILED:PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'}]);
+  assert.deepEqual(repairs.map(x => x.step), ['visual_assignment']);
+});

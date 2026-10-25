@@ -524,8 +524,8 @@ const sentryWebpackPluginOptions = {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   webpack: {
     autoInstrumentMiddleware: false,
+    treeshake: { removeDebugLogging: true },
   },
-  treeshake: { removeDebugLogging: true },
   widenClientFileUpload: false,
 };
 

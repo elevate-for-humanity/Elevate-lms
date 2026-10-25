@@ -1,3 +1,4 @@
+import { checkpointContinuousLesson, continuousCourseLease } from './continuous-course-lease.mjs';
 import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
 import { preservedCourseCursor } from './preserve-completed.mjs';
 import { recordProductionAlert } from './production-alert';
@@ -24,6 +25,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
+  const executionStarted = Date.now();
   const generation = Number(job.execution_generation);
   if (!Number.isSafeInteger(generation) || generation < 1)
     throw new Error('ULTIMATE_EXECUTION_GENERATION_REQUIRED');
@@ -73,6 +75,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   });
   const work = async () => {
   try {
+    while (true) {
     const { data: build, error } = await db
       .from('ultimate_course_builds')
       .select('id,course_id,profile,status')
@@ -204,6 +207,24 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
         if (result.completed) delete continuation.payload.checkpointRepair;
+        if (continuousCourseLease(build.course_id, payload, Date.now() - executionStarted)) {
+          // Drain writes from the previous lesson before committing its cursor.
+          // Subsequent progress must use the new payload under the same fence.
+          await progressWatch.flush();
+          assertActive();
+          await ensureNotPaused();
+          if (await checkpointContinuousLesson({db, jobId:job.id, workerId, generation,
+            payload:continuation.payload})) {
+            job.payload = continuation.payload;
+            reportCourseProgress('continuing:lesson:' + continuation.payload.nextCompetencyIndex);
+            console.info('[UltimateWorker] continuing under same lease', {
+              jobId:job.id,workerId,generation,nextIndex:continuation.payload.nextCompetencyIndex,
+            });
+            continue;
+          }
+        }
+        // Pending media/repair requests and the bounded execution budget use
+        // the existing atomic wakeup transition rather than losing requests.
         await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
@@ -288,6 +309,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     assertActive();
     await queue.complete(job.id, workerId, generation);
     return { claimed: true, completed: true, jobId: job.id, result };
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (leaseLost || message.startsWith('ULTIMATE_JOB_LEASE_LOST')) {

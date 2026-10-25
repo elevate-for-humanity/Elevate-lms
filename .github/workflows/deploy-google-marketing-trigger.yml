@@ -27,6 +27,7 @@ on:
       - 'scripts/verify-portal-production-contracts.mjs'
       - 'apps/marketing/**'
       - 'components/**'
+      - 'styles/**'
       - 'lib/marketing/**'
       - 'lib/health/**'
       - 'lib/ai/google-natural-voice.ts'

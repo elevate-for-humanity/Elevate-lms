@@ -22,6 +22,7 @@ on:
       - 'apps/lms/**'
       - 'lib/**'
       - 'components/**'
+      - 'styles/**'
       - 'packages/**'
       - 'Dockerfile.northflank-lms'
       - 'scripts/gcp/preflight-billing.mjs'

@@ -23,7 +23,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   responsive-marketing:
-    runs-on: ubuntu-latest
+    # Playwright 1.57.0 cannot install Chromium dependencies on Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}

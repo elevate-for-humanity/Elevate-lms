@@ -343,7 +343,7 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string, expec
   if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
     const { transcribeLocalAudio } = await import('./local-transcription.mjs');
     const decoded=await independentSpeechWindows({
-      read:async(textProfile:string)=>{
+      read:async(textProfile:'default'|'wide'|'nonoverlap')=>{
         const recognized=await transcribeLocalAudio(videoPath,{wordTimings:false,textProfile});
         reportCourseProgress('media-qa:transcription:'+basename(workDir)+':'+textProfile,1,1);
         return recognized.text;

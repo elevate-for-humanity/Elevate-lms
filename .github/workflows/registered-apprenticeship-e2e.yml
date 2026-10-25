@@ -58,7 +58,7 @@ jobs:
     # Dispatch-only success proves the deployment ran, not just that it was queued.
     if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
     name: Full portal authenticated persistence and responsive design
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 70
     env:

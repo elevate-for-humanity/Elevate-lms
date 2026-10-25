@@ -109,7 +109,7 @@ export function ProgramIntegrityPanel() {
             aria-label="Refresh program integrity"
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-50"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-lg text-xs text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           </button>

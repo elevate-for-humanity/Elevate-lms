@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import '@/apps/admin/styles/studio-mobile-safety.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -391,6 +392,7 @@ export default function StudioCommandWorkspace({
             onOpenWorkspace={openCapability}
           >
             <nav aria-label="Saved Studio conversations" className="mb-4 space-y-1">
+              <CommunicationTodos inboxPath="/phone/email" />
               <p className="px-2 py-2 text-xs font-semibold text-slate-700">Your conversations</p>
               {historyError ? (
                 <p role="alert" className="px-2 text-xs text-amber-300">

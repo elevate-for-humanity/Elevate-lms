@@ -752,7 +752,7 @@ export default function ProgramDetailPage({
                 </div>
               ))}
             </div>
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-6 grid grid-cols-1 min-[390px]:grid-cols-2 gap-3 sm:grid-cols-4">
               <DecisionFact label="Length" value={durationLabel} />
               <DecisionFact label="Schedule" value={weeklyHoursLabel} />
               <DecisionFact
@@ -849,7 +849,7 @@ export default function ProgramDetailPage({
       {/* CREDIBILITY STRIP */}
       <section className="py-8 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-1 min-[390px]:grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
                 {p.laborMarket?.salaryRange ?? '—'}

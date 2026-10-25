@@ -126,6 +126,13 @@ body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
   .admin-portal :where(main) {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
+
+  /* Studio's composer owns its safe area. Document padding on each nested
+   * main would repeatedly reduce its viewport and clip the bottom controls. */
+  .admin-portal main.admin-studio-viewport,
+  .admin-portal .admin-studio-viewport main {
+    padding-bottom: 0;
+  }
 }
 
 /* Grid utilities own their breakpoints. Substring matching also captures

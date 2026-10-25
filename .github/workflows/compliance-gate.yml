@@ -53,7 +53,8 @@ jobs:
 
   e2e-enrollment:
     name: E2E Enrollment Flow
-    runs-on: ubuntu-latest
+    # Match the operating systems supported by the pinned Playwright release.
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +129,8 @@ jobs:
 
   accessibility:
     name: Accessibility Tests
-    runs-on: ubuntu-latest
+    # Match the operating systems supported by the pinned Playwright release.
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4

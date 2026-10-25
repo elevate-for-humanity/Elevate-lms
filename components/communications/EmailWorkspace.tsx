@@ -8,6 +8,8 @@ import {
   Search,
   Folder,
   MailOpen,
+  Mic,
+  MicOff,
   ArrowLeft,
   FileText,
   Inbox,
@@ -20,6 +22,8 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
+
+import { createBrowserSpeechRecognition, type BrowserSpeechRecognition } from '@/lib/browser/speech-recognition';
 
 type Mailbox = {
   id: string;
@@ -146,6 +150,34 @@ export function EmailWorkspace({
   }, [data, initialRecipient, initialSubject]);
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [speechError, setSpeechError] = useState('');
+  const speechRef = useRef<BrowserSpeechRecognition | null>(null);
+  useEffect(() => () => speechRef.current?.stop(), []);
+  function toggleDictation() {
+    if (listening) { speechRef.current?.stop(); setListening(false); return; }
+    const recognition = createBrowserSpeechRecognition();
+    if (!recognition) { setSpeechError('Voice dictation is unavailable in this browser.'); return; }
+    setSpeechError('');
+    recognition.lang = 'en-US';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.onresult = (event) => {
+      const phrases: string[] = [];
+      for (let i = event.resultIndex ?? 0; i < event.results.length; i++) {
+        if (event.results[i].isFinal) phrases.push(event.results[i][0].transcript);
+      }
+      const words = phrases.join(' ').trim();
+      if (words) setCompose(previous => previous ? { ...previous, body: [previous.body.trimEnd(), words].filter(Boolean).join(' ') } : previous);
+    };
+    recognition.onerror = (event) => {
+      setSpeechError(event.error === 'not-allowed' ? 'Microphone permission denied.' : 'Dictation stopped. Try again.');
+      setListening(false);
+    };
+    recognition.onend = () => setListening(false);
+    try { recognition.start(); speechRef.current = recognition; setListening(true); }
+    catch { setSpeechError('Unable to start microphone.'); }
+  }
   const [filterEditor, setFilterEditor] = useState(false);
   const [filter, setFilter] = useState({
     field: 'subject',
@@ -234,6 +266,8 @@ export function EmailWorkspace({
       );
       return;
     }
+    speechRef.current?.stop();
+    setListening(false);
     setSending(true);
     setError('');
     const form = new FormData();
@@ -1231,6 +1265,15 @@ export function EmailWorkspace({
                   className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 px-4 font-medium"
                 />
               </label>
+              <button type="button" onClick={toggleDictation}
+                aria-label={listening ? 'Stop voice dictation' : 'Dictate email message'}
+                aria-pressed={listening}
+                className="mb-2 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold">
+                {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {listening ? 'Stop dictation' : 'Dictate message'}
+              </button>
+              {speechError && <p role="alert" className="text-sm text-red-700">{speechError}</p>}
+              <p className="text-xs text-slate-600">Review your message and recipients before sending.</p>
               <label className="block text-sm font-black text-slate-800">
                 Message
                 <textarea

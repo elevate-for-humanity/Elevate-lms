@@ -8,6 +8,35 @@ type Snapshot = {
   courses:Array<{id:string;status:string;heartbeat_at:string|null;lease_owner:string|null;lease_expires_at:string|null;monitor:{state?:string}}>;
 };
 
+/**
+ * A 200 response can still contain an unrelated API payload. Reject incomplete
+ * supervision snapshots rather than crashing the entire course-building panel
+ * or misreporting missing observations as healthy.
+ */
+function parseSnapshot(value: unknown): Snapshot {
+  const invalid = () => new Error('Invalid PARIS supervision response.');
+  if (!value || typeof value !== 'object') throw invalid();
+  const data = value as Partial<Snapshot>;
+  if (
+    typeof data.observedAt !== 'string' ||
+    !Number.isFinite(Date.parse(data.observedAt)) ||
+    !Array.isArray(data.events) ||
+    !data.events.every(event =>
+      event && typeof event.id === 'string' &&
+      typeof event.operation === 'string' &&
+      typeof event.status === 'string' &&
+      typeof event.created_at === 'string'
+    ) ||
+    !Array.isArray(data.courses) ||
+    !data.courses.every(job => job && typeof job.id === 'string' && typeof job.status === 'string') ||
+    (data.codeRepair !== undefined &&
+      (!data.codeRepair ||
+        !Array.isArray(data.codeRepair.repairs) ||
+        !data.codeRepair.repairs.every(repair => repair && typeof repair.id === 'string' && typeof repair.status === 'string')))
+  ) throw invalid();
+  return data as Snapshot;
+}
+
 export default function ParisSupervisionPanel({buildId,active=true}:{buildId?:string;active?:boolean}) {
   const requestVersion=useRef(0);
   const panel=useRef<HTMLElement>(null);
@@ -20,7 +49,7 @@ export default function ParisSupervisionPanel({buildId,active=true}:{buildId?:st
     try {
       const response=await fetch('/api/paris/supervision'+(buildId?'?buildId='+encodeURIComponent(buildId):''),{cache:'no-store'});
       if(!response.ok) throw new Error(`Supervision records unavailable (HTTP ${response.status}).`);
-      const data=await response.json();
+      const data=parseSnapshot(await response.json());
       if(version===requestVersion.current){setSnapshot(data);setError('');}
     } catch(e) {if(version===requestVersion.current)setError(e instanceof Error?e.message:'Supervision records unavailable.');}
     finally {if(version===requestVersion.current)setLoading(false);}

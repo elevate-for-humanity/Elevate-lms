@@ -1,4 +1,6 @@
 import 'server-only';
+import {independentSpeechWindows} from './independent-speech-windows.mjs';
+import {reportCourseProgress} from '../ultimate-course-builder/worker/progress-watch.mjs';
 import { narrationCoverageSeverity, generatedTeachingPhoto } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
 import { captionSampleGroups, captionWordCoverage, charcoalPixelsMatch } from '../ultimate-course-builder/instructional/approved-frame-checks.mjs';
 import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
@@ -8,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 import { promisify } from 'node:util';
 
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -337,10 +339,19 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
   return { accountId, token };
 }
 
-async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
+async function transcribeRenderedAudio(videoPath: string, workDir: string, expectedScript: string, minimumCoverage: number): Promise<string> {
   if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
     const { transcribeLocalAudio } = await import('./local-transcription.mjs');
-    return (await transcribeLocalAudio(videoPath,{wordTimings:false})).text;
+    const decoded=await independentSpeechWindows({
+      read:async(textProfile:'default'|'wide'|'nonoverlap')=>{
+        const recognized=await transcribeLocalAudio(videoPath,{wordTimings:false,textProfile});
+        reportCourseProgress('media-qa:transcription:'+basename(workDir)+':'+textProfile,1,1);
+        return recognized.text;
+      },
+      coverage:(text:string)=>narrationCoverage(expectedScript,text),minimumCoverage,
+    });
+    console.info('[MediaQA] independent speech windows',{profile:decoded.profile,coverage:decoded.coverage,attempts:decoded.attempts});
+    return decoded.transcript;
   }
   const model = resolveCloudflareTranscriptionModel();
 
@@ -455,8 +466,8 @@ export async function enforceMediaQuality(input: {
     };
     const streams = probe.streams ?? [];
     const videoStream = streams.find((stream) => stream.codec_type === 'video');
-    const actualTranscript = await transcribeRenderedAudio(videoPath, workDir);
     const narrationCoverageAdvisory = input.lessonPresentation === 'approved-premium-v1';
+    const actualTranscript = await transcribeRenderedAudio(videoPath, workDir, input.expectedScript, narrationCoverageAdvisory ? 0.75 : 0.9);
     const warnings: string[] = [];
     const totalCoverage = narrationCoverage(input.expectedScript, actualTranscript);
     if (narrationCoverageSeverity(totalCoverage, narrationCoverageAdvisory) === 'warning')
@@ -707,7 +718,7 @@ export async function enforceMediaQuality(input: {
         const directory=await mkdtemp(join(workDir,`scene-${index}-`));
         const audio=join(directory,'rendered-scene.mp3');
         await execFileAsync('ffmpeg',['-y','-ss',String(sceneStart),'-i',videoPath,'-t',String(scene.durationSeconds),'-vn','-ac','1','-ar','16000',audio],{timeout:60000,maxBuffer:1000000});
-        const transcript=await transcribeRenderedAudio(audio,directory);
+        const transcript=await transcribeRenderedAudio(audio,directory,scene.dialogue ?? scene.action,narrationCoverageAdvisory ? 0.75 : 0.9);
         const coverage=narrationCoverage(scene.dialogue ?? scene.action,transcript);
         sceneNarrationEvidence.push({sceneId:scene.id,startSeconds:sceneStart,endSeconds:sceneStart+scene.durationSeconds,actualTranscript:transcript,coverage});
         const severity = narrationCoverageSeverity(coverage, narrationCoverageAdvisory);

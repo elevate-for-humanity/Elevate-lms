@@ -6,9 +6,10 @@ test('durable MP4 upload precedes captions and transcript so failed VTT cannot p
   const source = readFileSync(new URL('../../lib/video/remotion-render.ts', import.meta.url), 'utf8');
   const renderStart = source.indexOf('export async function renderStoryboardVideo(');
   const uploadMp4 = source.indexOf("const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4'", renderStart);
-  const uploadVtt = source.indexOf('const captionUrl = await uploadCourseVideosObject(', renderStart);
-  const uploadTranscript = source.indexOf('const transcriptUrl = await uploadCourseVideosObject(', renderStart);
+  const uploadVtt = source.indexOf('const captionUrl = await uploadAncillary(', renderStart);
+  const uploadTranscript = source.indexOf('const transcriptUrl = await uploadAncillary(', renderStart);
   assert.ok(renderStart >= 0 && uploadMp4 > renderStart, 'storyboard must upload MP4');
+  assert.match(source.slice(uploadMp4,uploadVtt),/return await uploadCourseVideosObject\(buffer, key, mime, \{\}\)/);
   assert.ok(uploadMp4 < uploadVtt && uploadVtt < uploadTranscript,
     'completed movie must reach durable storage before ancillary delivery');
 });

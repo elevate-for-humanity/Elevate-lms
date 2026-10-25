@@ -15,6 +15,7 @@ import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/inst
 import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
 import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
+import { checkpointPreviewArtifacts } from '@/lib/ultimate-course-builder/core/checkpoint-preview.mjs';
 import {
   renderMediaUrl,
   renderPlaybackUrl,
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
       ? await db
           .from('ultimate_course_builds')
           .select(
-            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))',
+            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,preview_objectives:artifacts->learning_objectives->objectives,preview_assessment:artifacts->assessment_alignment->assessment,preview_script:artifacts->instructor_script->script,preview_scenes:artifacts->storyboard->storyboard->scenes,preview_media_url:artifacts->lesson_film_render->render->mediaUrl,preview_video_url:artifacts->lesson_film_render->render->videoUrl,preview_playback_url:artifacts->lesson_film_render->render->playbackUrl,preview_media_approved:artifacts->finished_media_qa->mediaQA->pass,ultimate_lesson_steps(step,state,findings,completed_at))',
           )
           .eq('id', buildId)
           .single()
@@ -70,7 +71,9 @@ export async function GET(req: NextRequest) {
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
       const lessons = await Promise.all(
         (data.ultimate_lesson_builds ?? []).map(async (lesson: any) => {
-          const { artifacts, ...saved } = lesson;
+          const {preview_objectives,preview_assessment,preview_script,preview_scenes,
+            preview_media_url,preview_video_url,preview_playback_url,preview_media_approved,...saved} = lesson;
+          const artifacts = checkpointPreviewArtifacts(lesson);
           const preview = {
             ...lessonPreview(artifacts),
             historicalVersion: null as number | null,

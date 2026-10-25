@@ -15,11 +15,14 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  url.searchParams.set('select','id,heartbeat_at,attempts,max_attempts,last_error');
+  url.searchParams.set('select','id,heartbeat_at,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
   // A stopped execution leaves an expired running lease. Claim RPC performs
   // recovery, but it cannot run unless the dispatcher launches a worker.
   url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + now.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
+  // Filter the joined build before the queue limit so paused rows cannot
+  // hide eligible work. Missing pause flags retain their existing eligibility.
+  url.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
   url.searchParams.set('limit','50');
   const response = await request(url, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
   if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);
@@ -28,7 +31,10 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // Storage capacity failures require a successful capacity/upload preflight.
   // Never dispatch another expensive render merely because its lease expired.
   const blockedByStorage = job => /storage cap exceeded|COURSE_OBJECT_STORAGE_UPLOAD_FAILED|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED/i.test(job.last_error ?? '');
-  const queued = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job));
+  // Respect explicit owner pauses before launching paid Cloud Run work.
+  // The worker independently enforces this pause if it changes after dispatch.
+  const ownerPaused = job => job.build?.owner_paused === true || job.build?.owner_paused === 'true';
+  const queued = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job) && !ownerPaused(job));
   // Never claim an empty queue merely because an earlier failed job exists.
   // Emit durable, actionable diagnostics without exposing Supabase credentials.
   console.info(JSON.stringify({event:'course_dispatch_queue_scan',candidateCount:candidates.length,

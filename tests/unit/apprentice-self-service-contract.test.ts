@@ -50,16 +50,19 @@ describe('apprentice self-service portal contracts', () => {
     expect(webhook).toContain("event.event_type === 'PAYMENT.SALE.COMPLETED'");
   });
 
-  it('keeps administrative billing separate from apprentice learning dashboards', () => {
+  it('preserves authorized apprentice billing without restoring retired Stripe collection', () => {
     const billingPage = source('apps/lms/app/apprentice/billing/page.tsx');
     const billingCard = source('components/learner/BillingCard.tsx');
     const apprenticeDashboard = source('apps/lms/app/apprentice/page.tsx');
     expect(billingPage).toContain(".from('billing_schedules')");
     expect(billingPage).toContain('provider_subscription_id');
     expect(billingCard).toContain('Complete PayPal Authorization');
-    expect(apprenticeDashboard).not.toContain('automaticBillingActive');
-    expect(apprenticeDashboard).not.toContain('MandatoryBillingSetup');
-    expect(apprenticeDashboard).not.toContain('href="/apprentice/billing"');
+    expect(apprenticeDashboard).toContain('billingAuthorization?.billing_schedule_id');
+    expect(apprenticeDashboard).toContain("automaticBillingSchedule?.status === 'active'");
+    expect(apprenticeDashboard).toContain("automaticBillingSchedule?.provider_status === 'active'");
+    expect(apprenticeDashboard).toContain('automaticBillingSchedule?.provider_subscription_id');
+    expect(apprenticeDashboard).toContain('loadLearnerBillingRequirement(db, subject.userId)');
+    expect(apprenticeDashboard).toContain('href="/apprentice/billing"');
     expect(billingCard).not.toContain('Stripe');
     expect(apprenticeDashboard).not.toContain('stripe_subscription_id');
     const legacyLoader = source('lib/portal/load-apprentice-portal.ts');
@@ -68,7 +71,7 @@ describe('apprentice self-service portal contracts', () => {
     expect(legacyLoader).not.toContain('stripe_subscription_status');
     expect(legacyShell).not.toContain('Stripe');
     expect(legacyShell).not.toContain('stripe_subscription_id');
-    expect(legacyShell).not.toContain('PayPal authorization');
-    expect(legacyShell).not.toContain('QuickBooks invoice');
+    expect(legacyShell).toContain('Confirm the authorization only after reviewing the amount and billing schedule.');
+    expect(legacyShell).toContain('showPaymentSetupAlert &&');
   });
 });

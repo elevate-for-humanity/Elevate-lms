@@ -13,6 +13,8 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  * values. Enable that authority only after the service inventory is complete.
  * PBX_RUNTIME_CONFIG_PROVIDER applies the same authority only to PBX keys,
  * allowing the phone integration to migrate independently of other settings.
+ * OWNED_MODEL_RUNTIME_CONFIG_PROVIDER scopes the same authority to owned-model
+ * connection, provider selection, and CPU/GPU routing settings.
  *
  * Build-only and unused Studio values must never be copied into process.env.
  */
@@ -33,6 +35,9 @@ const SECRETS_READ_ATTEMPTS = Math.max(
 function usesGoogleRuntimeBindings(key?: string): boolean {
   return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager' ||
     key === 'PBX_RUNTIME_CONFIG_PROVIDER' ||
+    key === 'OWNED_MODEL_RUNTIME_CONFIG_PROVIDER' ||
+    Boolean(typeof key === 'string' && process.env.OWNED_MODEL_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager' &&
+      (key.startsWith('ELEVATE_LLM_') || ['AI_PROVIDER', 'AI_PROVIDER_ORDER', 'PARIS_INFERENCE_TIER', 'PARIS_GPU_ENABLED'].includes(key))) ||
     Boolean(typeof key === 'string' && key.startsWith('PBX_') && process.env.PBX_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager');
 }
 

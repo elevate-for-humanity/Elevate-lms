@@ -26,17 +26,26 @@ test('explicit provider safety block is retained',async()=>{
  await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
 });
 
-test('conceptual knowledge-check can recover without exact photograph',async()=>{
+test('conceptual cards cannot pass as replacement photographs',async()=>{
  const {conceptualTeachingCard}=await import('../../lib/ultimate-course-builder/adapters/conceptual-teaching-card.mjs');
  const scene={id:'licensing-check',stage:'knowledge_check',title:'Licensing'};
  const card=await conceptualTeachingCard({scene,step:{narrationQuote:'Complete the required licensing steps.'},courseTitle:'Cosmetology',index:0});
  assert.equal(card.mimeType,'image/png');assert.ok(card.bytes.length>100);
- const recovered=await recoverTeachingPhoto({...request,scene,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},selectedReplacement:async()=>card});
- assert.equal(recovered.repair.method,'lesson-conceptual-card-v1');
+ for(const replacement of [card,{...card,selectedSourceAssetId:'generated-training-diagram:scene:0'}]){
+  await assert.rejects(recoverTeachingPhoto({...request,scene,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},selectedReplacement:async()=>replacement}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
+ }
 });
 
 test('blocked generation uses an existing selected asset once and retains the provider finding',async()=>{
  let calls=0;const findings=[];
  const result=await recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});},persistFailure:async finding=>findings.push(finding),selectedReplacement:async()=>({bytes:Buffer.from('licensed selected image'),selectedSourceAssetId:'existing-source'})});
  assert.equal(calls,1);assert.equal(result.repair.sourceAssetId,'existing-source');assert.equal(findings[0].provider.blocked,true);
+});
+test('photo recovery retry window fits within ten-minute output deadline',async()=>{
+ await recoverTeachingPhoto({...request,generate:async(_prompt,options)=>{
+  assert.equal(options.maxAttempts,3);assert.equal(options.timeoutMs,120000);
+  // Retry-After may raise each of the two backoffs to sixty seconds.
+  const worstCase=10000+options.maxAttempts*options.timeoutMs+2*60000+30000;
+  assert.ok(worstCase<600000);return {bytes:Buffer.from('saved')};
+ }});
 });

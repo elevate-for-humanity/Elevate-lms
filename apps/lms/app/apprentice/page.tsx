@@ -1,4 +1,5 @@
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
+import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -1129,13 +1130,10 @@ function TheorySchedulePanel({
           <p className="mt-2 font-bold text-slate-800">
             {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>
-          {schedule.starts_on ? (
+          {formatTheoryStartDate(schedule.starts_on) ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
               Theory/RTI begins{' '}
-              {new Date(`${String(schedule.starts_on).slice(0, 10)}T12:00:00Z`).toLocaleDateString(
-                'en-US',
-                { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' },
-              )}
+              {formatTheoryStartDate(schedule.starts_on)}
               .
             </p>
           ) : null}

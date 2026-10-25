@@ -14,6 +14,57 @@ test('repair carries exact failed requirement, changes producer and validates be
  await r.run(ctx);assert.equal(authors,2);assert.equal(renders,1);assert.equal(ctx.artifacts.__repairState.status,'producer-validated');
  assert.equal(journal.find(x=>x.artifacts?.repair?.directive)?.artifacts.repair.directive.requirements[0].message,'narration must teach apprenticeship');
 });
+
+test('checkpoint save failure preserves the prior payload and cannot advance to rendering',async()=>{
+ const source={blueprint:{title:'saved source'}},film={video:'saved external movie'};
+ let saves=0;
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:source,lesson_film_render:film,__repairState:{status:'diagnosed',directive:{target:'learning_objectives',previous:source}}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render']),persistArtifact:async e=>{if(e.step==='learning_objectives'){saves++;throw Error('CHECKPOINT_SAVE_UNAVAILABLE: database rejected the write');}}};
+ const R=runner({},()=>[],{currentEvidence:()=>true});
+ await new R({learning_objectives:async()=>({artifacts:{blueprint:{title:'new validated source'}}}),lesson_film_render:()=>assert.fail('must not render after failed checkpoint save')}).run(ctx);
+ assert.equal(saves,1);
+ assert.deepEqual(ctx.artifacts.learning_objectives,source);
+ assert.deepEqual(ctx.artifacts.lesson_film_render,film);
+ assert.equal(ctx.passedSteps.has('learning_objectives'),false);
+ assert.equal(ctx.findings.at(-1).code,'CHECKPOINT_SAVE_UNAVAILABLE');
+});
+test('a later failed render retains the newly saved source and the old movie as uncertified recovery data',async()=>{
+ const source={blueprint:{title:'saved source'}},film={video:'saved external movie'};
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:source,lesson_film_render:film,__repairState:{status:'diagnosed',directive:{target:'learning_objectives',previous:source}}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render'])};
+ const R=runner({},()=>[],{currentEvidence:()=>true});
+ await new R({learning_objectives:async()=>({artifacts:{blueprint:{title:'new validated source'}}}),lesson_film_render:async()=>{throw Error('MEDIA_LICENSE_REQUIRED: render blocked before encoding');}}).run(ctx);
+ assert.equal(ctx.artifacts.learning_objectives.blueprint.title,'new validated source');
+ assert.equal(ctx.passedSteps.has('learning_objectives'),true);
+ assert.deepEqual(ctx.artifacts.lesson_film_render,film);
+ assert.equal(ctx.passedSteps.has('lesson_film_render'),false);
+ assert.equal(ctx.artifacts.selective_repair.repair.blockedAt,'lesson_film_render');
+});
+
+
+test('a thrown repair failure retains source and movie checkpoints without recertifying them',async()=>{
+ const source={blueprint:{title:'saved source'}},film={video:'saved external movie'};
+ const steps=[];
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:source,lesson_film_render:film,__repairState:{status:'diagnosed',directive:{target:'learning_objectives',previous:source}}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render']),persistStep:async e=>steps.push(e)};
+ const R=runner({},()=>[],{currentEvidence:()=>true});
+ await new R({learning_objectives:async()=>{throw Error('MEDIA_LICENSE_REQUIRED: actual entitlement unavailable');},lesson_film_render:()=>assert.fail('must not render after failed repair')}).run(ctx);
+ assert.deepEqual(ctx.artifacts.learning_objectives,source);
+ assert.deepEqual(ctx.artifacts.lesson_film_render,film);
+ assert.equal(ctx.passedSteps.has('learning_objectives'),false);
+ assert.equal(ctx.passedSteps.has('lesson_film_render'),false);
+ assert.deepEqual(steps.find(e=>e.step==='learning_objectives'&&e.state==='failed').artifacts,source);
+ assert.equal(ctx.artifacts.selective_repair.repair.unresolved,1);
+});
+test('a failed repair output cannot replace the previous checkpoint with a new artifact version',async()=>{
+ const source={blueprint:{title:'saved source'}},film={video:'saved external movie'};
+ const saved=[];
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:source,lesson_film_render:film,__repairState:{status:'diagnosed',directive:{target:'learning_objectives',previous:source}}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render']),persistArtifact:async e=>saved.push(e)};
+ const R=runner({},()=>[],{currentEvidence:()=>true});
+ await new R({learning_objectives:async()=>({passed:false,artifacts:{blueprint:{title:'invalid replacement'}},findings:[{code:'MEDIA_LICENSE_REQUIRED',severity:'error',message:'Actual entitlement unavailable'}]})}).run(ctx);
+ assert.deepEqual(ctx.artifacts.learning_objectives,source);
+ assert.deepEqual(ctx.artifacts.lesson_film_render,film);
+ assert.equal(saved.some(e=>e.step==='learning_objectives'),false);
+ assert.equal(ctx.passedSteps.has('lesson_film_render'),false);
+});
+
 test('unchanged repaired output is independently rejected without a redundant producer rerun',async()=>{
  let authorCalls=0;const journal=[];
  const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set(),persistArtifact:async event=>journal.push(event)};

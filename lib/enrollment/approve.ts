@@ -291,12 +291,15 @@ export async function approveApplication(
       (course: { status?: string | null; is_active?: boolean | null }) =>
         course.status === 'published' && course.is_active === true,
     );
+    // Program admission and course-content release are separate workflows.
+    // An unpublished curriculum must not block an otherwise authorized
+    // program enrollment. The database trigger grants only published courses;
+    // additional course access is provisioned when content is released.
     if (mappedCourses.length > 0 && availableCourses.length === 0) {
-      logger.error('[approve] program has mapped courses but none are published and active', undefined, {
+      logger.info('[approve] program enrollment created; curriculum not yet published', {
         resolvedProgramId,
         mappedCourseIds: mappedCourses.map((course: { id: string }) => course.id),
       });
-      return { success: false, error: 'Program curriculum is not published and active' };
     }
 
     const courseIds = availableCourses.map((course: { id: string }) => course.id);

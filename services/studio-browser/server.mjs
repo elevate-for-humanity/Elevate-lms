@@ -13,6 +13,7 @@ import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import {WorkspaceCheckpoint} from './workspace-checkpoint.mjs';
+import {syncWorkspaceRepository} from './repository-sync.mjs';
 import {BrowserFileStore} from './browser-file-store.mjs';
 import {GcsWorkspaceObjects} from './gcs-workspace-objects.mjs';
 import {BrowserWorkspaceStore} from './browser-workspace-store.mjs';
@@ -47,7 +48,7 @@ const frameQuality = Math.min(
   Math.max(35, Number(process.env.STUDIO_BROWSER_FRAME_QUALITY || 60)),
 );
 const allowedDomains = (
-  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com'
+  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com,accounts.google.com,console.cloud.google.com,shell.cloud.google.com'
 )
   .split(',')
   .map((value) => value.trim().toLowerCase())
@@ -75,7 +76,7 @@ const learnerTests = new Map();
 const foundationFixtures = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
 // Cloud Run requires durable object storage; local browser fixtures have no cloud credentials.
-const workspaceObjects=(process.env.K_SERVICE||process.env.STUDIO_WORKSPACE_STORAGE==='gcs')?new GcsWorkspaceObjects():null;
+const workspaceObjects=(process.env.K_SERVICE||process.env.STUDIO_WORKSPACE_STORAGE==='gcs')?new GcsWorkspaceObjects({prefix:process.env.STUDIO_WORKSPACE_OBJECT_PREFIX||'workspaces/admin-repository-v1'}):null;
 const workspaceCheckpoint=workspaceObjects?new WorkspaceCheckpoint({root:workspaceRoot,secret:sharedSecret,objects:workspaceObjects}):null;
 let workspaceRecovery={ready:!workspaceCheckpoint,persistent:Boolean(workspaceCheckpoint),state:workspaceCheckpoint?'restoring':'volatile'};
 async function ensureWorkspaceReady({mutation=false}={}){
@@ -90,7 +91,16 @@ async function checkpointWorkspace(){
   await ensureWorkspaceReady();
   if(!workspaceCheckpoint)return {persistent:false,changed:false};
   try{const result=await workspaceCheckpoint.checkpoint();workspaceRecovery={...workspaceRecovery,lastSavedAt:new Date().toISOString(),lastSaveError:null};return {...result,persistent:true};}
-  catch{workspaceRecovery={...workspaceRecovery,lastSaveError:'workspace_checkpoint_unavailable'};throw new BrowserServiceError('workspace_checkpoint_unavailable',503);}
+  catch(error){
+    // Keep credentials, paths and provider response bodies out of logs. Preserve
+    // a bounded failure category so storage faults and concurrent edits can be
+    // diagnosed without treating every failure as an unavailable worker.
+    const code=/^WORKSPACE_[A-Z_]+$/.test(String(error?.message||''))?error.message:
+      Number.isInteger(error?.code)?'WORKSPACE_STORAGE_'+error.code:'WORKSPACE_CHECKPOINT_FAILURE';
+    console.error(JSON.stringify({event:'workspace_checkpoint_failed',code}));
+    workspaceRecovery={...workspaceRecovery,lastSaveError:'workspace_checkpoint_unavailable',lastSaveCode:code};
+    throw new BrowserServiceError('workspace_checkpoint_unavailable',503);
+  }
 }
 
 const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);
@@ -139,20 +149,9 @@ async function ensureRepository(body = {}) {
   const repoUrl = String(body.repoUrl || process.env.STUDIO_REPOSITORY_URL || '');
   const branch = String(body.branch || process.env.STUDIO_REPOSITORY_BRANCH || 'main');
   if (!repoUrl) throw new BrowserServiceError('repository_not_configured', 503);
-  await fs.promises.mkdir(workspaceRoot, { recursive: true });
-  const gitDir = path.join(workspaceRoot, '.git');
-  if (!fs.existsSync(gitDir)) {
-    const entries = await fs.promises.readdir(workspaceRoot);
-    if (entries.length) throw new BrowserServiceError('workspace_not_empty', 409);
-    await execFileAsync('git', ['clone', '--depth', '1', '--branch', branch, repoUrl, workspaceRoot], { timeout: 120_000, maxBuffer: 10 * 1024 * 1024 });
-  } else {
-    await execFileAsync('git', ['fetch', 'origin', branch, '--prune'], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
-    await execFileAsync('git', ['checkout', branch], { cwd: workspaceRoot, timeout: 30_000, maxBuffer: 10 * 1024 * 1024 });
-    await execFileAsync('git', ['pull', '--ff-only', 'origin', branch], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
-  }
-  const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], { cwd: workspaceRoot });
+  const result = await syncWorkspaceRepository({ root: workspaceRoot, repoUrl, branch });
   await checkpointWorkspace();
-  return { ok: true, branch, sha: stdout.trim() };
+  return result;
 }
 
 async function executeWorkspaceCommand(body) {

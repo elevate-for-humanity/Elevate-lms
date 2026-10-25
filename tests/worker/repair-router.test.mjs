@@ -72,3 +72,6 @@ test('recovery v2 classifies VTT storage failure as delivery-only, never rerende
   assert.deepEqual(routeSelectiveRepairs([failedVtt]), []);
   assert.equal(requiresIndependentMediaDelivery({code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}), false);
 });
+test('per-scene ASR mismatch reinspects existing encoded audio without restarting a deterministic timeline',()=>{
+ assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_SCENE_NARRATION_MISMATCH',message:'MEDIA_SCENE_NARRATION_MISMATCH:scene:0.734'}]),[{step:'finished_media_qa',codes:['MEDIA_SCENE_NARRATION_MISMATCH'],rebuildOnlyThisStage:true}]);
+});

@@ -1,3 +1,5 @@
+import { checkpointContinuousLesson, continuousCourseLease } from './continuous-course-lease.mjs';
+import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
 import { preservedCourseCursor } from './preserve-completed.mjs';
 import { recordProductionAlert } from './production-alert';
 import {ULTIMATE_BUILD_STEPS} from '../core/types';
@@ -23,6 +25,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
+  const executionStarted = Date.now();
   const generation = Number(job.execution_generation);
   if (!Number.isSafeInteger(generation) || generation < 1)
     throw new Error('ULTIMATE_EXECUTION_GENERATION_REQUIRED');
@@ -62,13 +65,17 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       if(!data?.length)throw Error('ULTIMATE_JOB_LEASE_LOST:'+job.id);
     },
     onStall:async(progress:any)=>{
+      // Cancellation can reject the active provider immediately. Only this
+      // callback owns the fenced failure transition, even if its write hangs.
+      leaseLost=true;
       console.error('[UltimateWorker] progress stalled', {jobId:job.id,...progress});
       await queue.fail(job.id,workerId,'ULTIMATE_PROGRESS_STALLED:'+JSON.stringify(progress),generation,true);
-      leaseLost=true;deadline.lose();
+      deadline.lose();
     },
   });
   const work = async () => {
   try {
+    while (true) {
     const { data: build, error } = await db
       .from('ultimate_course_builds')
       .select('id,course_id,profile,status')
@@ -104,12 +111,12 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           db
             .from("course_lessons")
             .select(
-              "id,status,is_published,approved,video_status,media_quality_status,video_url,video_job_id",
+              "id,status,is_published,approved,video_status,media_quality_status,video_url,video_job_id,media_attachment:content_json->mediaAttachment,film:content_json->film",
             )
             .eq("course_id", build.course_id),
           db
             .from("ultimate_lesson_builds")
-            .select("competency_id,status")
+            .select("id,competency_id,status,render_source:artifacts->lesson_film_render->render->>videoUrl,captions_source:artifacts->lesson_film_render->render->>captionsUrl,transcript_source:artifacts->lesson_film_render->render->>transcriptUrl")
             .eq("build_id", build.id),
         ]);
         if (canonical.error) throw canonical.error;
@@ -194,10 +201,30 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       await queue.complete(job.id,workerId,generation);
       return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
     }
+    await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
+      validate:assertCompleteLesson,assertActive});
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
         if (result.completed) delete continuation.payload.checkpointRepair;
+        if (continuousCourseLease(build.course_id, payload, Date.now() - executionStarted)) {
+          // Drain writes from the previous lesson before committing its cursor.
+          // Subsequent progress must use the new payload under the same fence.
+          await progressWatch.flush();
+          assertActive();
+          await ensureNotPaused();
+          if (await checkpointContinuousLesson({db, jobId:job.id, workerId, generation,
+            payload:continuation.payload})) {
+            job.payload = continuation.payload;
+            reportCourseProgress('continuing:lesson:' + continuation.payload.nextCompetencyIndex);
+            console.info('[UltimateWorker] continuing under same lease', {
+              jobId:job.id,workerId,generation,nextIndex:continuation.payload.nextCompetencyIndex,
+            });
+            continue;
+          }
+        }
+        // Pending media/repair requests and the bounded execution budget use
+        // the existing atomic wakeup transition rather than losing requests.
         await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
@@ -282,6 +309,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     assertActive();
     await queue.complete(job.id, workerId, generation);
     return { claimed: true, completed: true, jobId: job.id, result };
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (leaseLost || message.startsWith('ULTIMATE_JOB_LEASE_LOST')) {
@@ -310,7 +338,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   try {
     return await progressWatch.race(deadline.race(progressWatch.run(work)));
   } catch (error) {
-    if (progressWatch.signal.aborted) return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
+    // Disposal also aborts this signal. Only the watchdog's own reason is a stall.
+    if (String(progressWatch.signal.reason?.message ?? '').startsWith('ULTIMATE_PROGRESS_STALLED:'))
+      return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
     if (leaseLost) return {claimed:true,completed:false,jobId:job.id,error:'ULTIMATE_JOB_LEASE_LOST:' + job.id};
     throw error;
   } finally {

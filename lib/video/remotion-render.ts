@@ -999,7 +999,6 @@ export async function renderStoryboardVideo(
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition, makeCancelSignal } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
-    let checkpointFallbackUsed=false;
     const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
       logger.info('[RemotionRender] selecting storyboard composition', {lessonId: input.lessonId, totalFrames});
       const selected = await selectComposition({
@@ -1039,7 +1038,7 @@ export async function renderStoryboardVideo(
           },
           readFallback:(key:string)=>privateStorage.read(key),
           writeFallback:(key:string,bytes:Buffer)=>privateStorage.write(key,bytes),
-          onFallback:()=>logger.warn('[RemotionRender] storage cap: switched to private Supabase checkpoints'),
+          onFallback:()=>logger.warn('[RemotionRender] external storage unavailable; legacy checkpoint reads remain available, new video writes require external storage'),
         });
         let existing = await stat(chunkPath).catch(() => null);
         if(!existing?.size){
@@ -1075,7 +1074,6 @@ export async function renderStoryboardVideo(
           await checkpoints.write(segmentKey,await readFile(chunkPath));
           logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
         }
-        checkpointFallbackUsed ||= checkpoints.usingFallback();
         reportCourseProgress('render-checkpoint',end,totalFrames);
         chunkPaths.push(chunkPath);
       }
@@ -1134,14 +1132,14 @@ export async function renderStoryboardVideo(
     // Deliver the already encoded MP4 before ancillary text assets. A VTT upload
     // failure must not prevent the completed video from reaching durable storage.
     logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
-    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {});
     logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
     // Bounded delivery retries reuse the completed movie. Never restart narration
     // or frame encoding for a transient ancillary object-storage error.
     const uploadAncillary = async (buffer: Buffer, key: string, mime: string): Promise<string> => {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          return await uploadCourseVideosObject(buffer, key, mime, {forceSupabase: checkpointFallbackUsed});
+          return await uploadCourseVideosObject(buffer, key, mime, {});
         } catch (error) {
           const reason = error instanceof Error ? error.message : String(error);
           // Authorization, quota, and configuration faults cannot be healed by retries.

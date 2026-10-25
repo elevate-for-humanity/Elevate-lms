@@ -79,7 +79,6 @@ jobs:
             tsconfig.json \
             proxy.ts \
             Dockerfile.admin \
-            Dockerfile.northflank-admin \
             pnpm-lock.yaml \
             package.json \
             pnpm-workspace.yaml \

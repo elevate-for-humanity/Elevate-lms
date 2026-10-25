@@ -2,7 +2,7 @@ name: Dispatch and recover Google course work
 on:
   push:
     branches: [main]
-    paths: ['scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', 'scripts/gcp/paris-course-monitor.mjs', 'lib/ultimate-course-builder/worker/paris-monitor.mjs', '.github/workflows/dispatch-google-course-job.yml']
+    paths: ['scripts/gcp/course-worker-stop-diagnostics.mjs', 'scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', 'scripts/gcp/paris-course-monitor.mjs', 'lib/ultimate-course-builder/worker/paris-monitor.mjs', '.github/workflows/dispatch-google-course-job.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
@@ -57,3 +57,21 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/gcp/continue-approved-regional-courses.mjs
+
+  diagnose:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - run: node scripts/gcp/course-worker-stop-diagnostics.mjs

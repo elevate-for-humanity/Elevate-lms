@@ -6,15 +6,17 @@ const root = process.cwd();
 const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
 
 describe('Canonical billing provider cutover', () => {
-  it('keeps payment systems out of learner dashboards and navigation', () => {
+  it('scopes learner billing to owned plans without exposing administrative payment systems', () => {
     const layout = read('components/lms/LearnerWorkspaceLayout.tsx');
     const dashboard = read('apps/lms/app/lms/(app)/dashboard/page.tsx');
     const navigation =
       read('components/lms/LMSNavigation.tsx') + read('components/lms/LMSSidebar.tsx');
     expect(layout).not.toContain('/apprentice/billing');
     expect(layout).not.toContain('PayPal');
-    expect(dashboard).not.toContain('MandatoryBillingSetup');
-    expect(dashboard).not.toContain('payment_logs');
+    expect(dashboard).toContain('const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role)');
+    expect(dashboard).toContain('const billingRequirement = showBilling');
+    expect(dashboard).toContain('readOnly={subject.previewing}');
+    expect(dashboard).toMatch(/showBilling\s*\?\s*supabase\s*\.from\('payment_logs'\)[\s\S]*?\.eq\('user_id', subjectId\)/);
     expect(dashboard).not.toContain('Recent Payments');
     expect(navigation).not.toContain("label: 'Payments'");
     expect(layout).not.toContain('Affirm and installment');

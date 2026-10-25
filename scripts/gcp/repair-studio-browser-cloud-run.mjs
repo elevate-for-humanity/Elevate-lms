@@ -1,3 +1,4 @@
+import {randomUUID} from 'node:crypto';
 import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';
 import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';
 import {execFileSync, execFile} from 'node:child_process';
@@ -47,10 +48,14 @@ const mounted=new Set((existingBrowser?.containers||[]).flatMap(c=>(c.volumeMoun
 const staleVolumes=(existingBrowser?.volumes||[]).filter(v=>!mounted.has(v.name)&&v.csi?.driver==='gcsfuse.run.googleapis.com'&&v.csi?.volumeAttributes?.bucketName===bucket).map(v=>v.name);
 const mountArguments=authMount?[]:['--add-volume=name=elevate-studio-browser-auth,mount-path=/var/lib/studio-browser-auth,type=cloud-storage,bucket='+bucket+',mount-options=uid=1001;gid=1001;file-mode=600;dir-mode=700'];
 if(staleVolumes.length)mountArguments.push('--remove-volume='+staleVolumes.join(','));
-const candidateTag='studio-verify';
+// A verification run must never claim a tag used by an active Admin connection.
+// Cloud Run limits service name plus traffic tag to 46 characters.
+const candidateTag='sc-'+sha.slice(0,8)+'-'+randomUUID().slice(0,8);
+if(candidateTag.length+name.length>46)throw Error('STUDIO_CANDIDATE_TAG_TOO_LONG');
+if((existingService.status?.traffic||[]).some(t=>t.tag===candidateTag))throw Error('STUDIO_CANDIDATE_TAG_COLLISION');
 let url,state,candidateRevision,trafficActivated=false;
 try {
-command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--no-traffic','--tag='+candidateTag,'--update-env-vars=STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org','--update-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest',...mountArguments,'--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--liveness-probe=httpGet.path=/live,httpGet.port=3100,periodSeconds=30,timeoutSeconds=5,failureThreshold=3','--quiet']);
+command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--no-traffic','--tag='+candidateTag,'--update-env-vars=STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org,GIT_SHA='+sha,'--update-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest',...mountArguments,'--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--liveness-probe=httpGet.path=/live,httpGet.port=3100,periodSeconds=30,timeoutSeconds=5,failureThreshold=3','--quiet']);
 const service=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
 url=service.status.url;
 candidateRevision=service.status.latestCreatedRevisionName;
@@ -98,7 +103,7 @@ if(!foundationResponse.ok)throw Error('Live candidate browser foundation failed;
 const foundation=await foundationResponse.json();
 if(foundation.passed!==true||foundation.commit!==sha||!Array.isArray(foundation.checks)||!foundation.checks.length||foundation.checks.some(check=>check.passed!==true))throw Error('Live candidate browser foundation evidence invalid; serving traffic retained');
 console.log(JSON.stringify({candidateRevision,commit:sha,browserFoundationPassed:true,checks:foundation.checks.map(check=>({name:check.name,passed:check.passed}))}));
-const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
+const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,candidateTag,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
 if(replacement?.passed!==true||replacement.runtimeReplaced!==true||replacement.isolatedWorkspaceFileRestored!==true)throw Error('STUDIO_RUNTIME_REPLACEMENT_UNVERIFIED');
 console.log(JSON.stringify(replacement));
 if(process.env.STUDIO_CANDIDATE_ONLY==='true'){

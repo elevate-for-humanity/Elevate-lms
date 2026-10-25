@@ -1,3 +1,4 @@
+import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
 import { prohibitsToolUse } from '@/lib/ai/command-intent';
 import { recordParisObservation } from '@/lib/ai/runtime/supervision';
 import { executeStudioCommand } from '@/lib/studio/runtime-command';
@@ -26,7 +27,7 @@ import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
+import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
 import { isXAIConfigured } from '@/lib/ai/xai-config';
 import {
   executePaidInference,
@@ -120,8 +121,8 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
   return [...selected];
 }
 
-async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string) {
-  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command });
+async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
+  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
   return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
 }
 
@@ -1424,9 +1425,25 @@ async function _POST(req: NextRequest) {
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
+    const conversationId = typeof body.conversationId === 'string'
+      ? body.conversationId.trim() : undefined;
+    if (conversationId) {
+      const { data: conversation, error: conversationError } = await masterDb
+        .from('studio_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', auth.userId)
+        .maybeSingle();
+      if (conversationError) {
+        return NextResponse.json({ error: 'Conversation lookup failed' }, { status: 503 });
+      }
+      if (!conversation) {
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      }
+    }
     const toolsAllowed = !prohibitsToolUse(lastUserMessage);
     const masterExecution = toolsAllowed && lastUserMessage.trim()
-      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage)
+      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage, conversationId)
       : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
@@ -1437,7 +1454,9 @@ async function _POST(req: NextRequest) {
 
     const systemPrompt = buildAdminAiSystemPrompt({
       agent,
-      contextProfile: effectiveProvider === 'elevate' ? 'owned-cpu' : 'full',
+      contextProfile: effectiveProvider === 'elevate'
+        ? (!toolsAllowed && !fileContext && !documentsContext && !isOperationalDiagnosticRequest(lastUserMessage) ? 'conversation' : 'owned-cpu')
+        : 'full',
       institutionalContext: getAiCharterContext(),
       ragContext,
       fileContext,
@@ -1588,23 +1607,50 @@ async function _POST(req: NextRequest) {
     }
 
     if (effectiveProvider === 'elevate') {
-      try {
-        const result = await aiChat({
+      return studioTextStreamResponse({
+        signal: req.signal,
+        tokens: (signal) => aiChatStream({
           providerPolicy: 'owned-only',
           messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
           temperature: 0.4,
           maxTokens: 2048,
-        });
-        assistantMessage = result.content || null;
-        provider = 'elevate';
-        model = 'elevate-local';
-      } catch (error) {
-        logger.warn('[devstudio/chat] Owned PARIS inference unavailable', normalizeError(error));
-        return NextResponse.json({
-          error: 'PARIS private AI is not ready. The owned model must be deployed and verified before activation; no outside AI credits were used.',
-          provider: 'elevate',
-        }, { status: 503 });
-      }
+          signal,
+        }),
+        complete: async (content) => {
+          const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+          try {
+            const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
+              user_id: auth.userId,
+              user_message: lastUserMessage,
+              assistant_response: content,
+              file_context: fileContext || null,
+              provider: 'elevate',
+              model: 'elevate-local',
+            });
+            if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
+            await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
+          } catch (error) {
+            logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
+          }
+          return {
+            provider: 'elevate',
+            model: 'elevate-local',
+            providerPreference,
+            availableProviders: {
+              xai: isXAIConfigured(),
+              groq: isGroqConfigured(),
+              openai: isOpenAIConfigured(),
+              anthropic: isAnthropicConfigured(),
+              gemini: isGeminiConfigured(),
+            },
+            toolCalls,
+            capabilitiesUsed,
+            studioRun: masterExecution,
+          };
+        },
+        onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
+        errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
+      });
     }
 
     const providerOrder = [effectiveProvider];
@@ -1796,7 +1842,8 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage && effectiveProvider !== 'openai' && effectiveProvider !== 'elevate') {
+    // The owned Elevate stream returns above; only external providers reach this fallback.
+    if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();

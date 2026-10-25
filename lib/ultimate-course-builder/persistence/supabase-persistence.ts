@@ -49,6 +49,22 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const passed = (steps ?? []).filter((x: any) => x.state === 'passed' && currentEvidence(x.artifacts));
     const artifacts = { ...((lesson?.artifacts ?? {}) as Record<string, unknown>) };
     for (const step of passed) artifacts[String(step.step)] = step.artifacts ?? {};
+    // A legacy ASR finding was routed to a deterministic timeline producer.
+    // Recover its exact certified timeline and already encoded film; the new
+    // independent decoded-audio QA still has to pass before acceptance.
+    const narrationDirective = (artifacts.__repairState as any)?.directive;
+    const narrationInspectorRetry = narrationDirective?.failedStep === 'finished_media_qa' &&
+      narrationDirective?.target === 'synchronization' &&
+      Array.isArray(narrationDirective.requirements) && narrationDirective.requirements.length > 0 &&
+      narrationDirective.requirements.every((finding: any) => finding.code === 'MEDIA_SCENE_NARRATION_MISMATCH') &&
+      currentEvidence(narrationDirective.previous) && currentEvidence(artifacts.lesson_film_render as any);
+    if (narrationInspectorRetry) {
+      artifacts.synchronization = narrationDirective.previous;
+      if (!passed.some((step: any) => step.step === 'synchronization'))
+        passed.push({step:'synchronization',state:'passed',artifacts:narrationDirective.previous});
+      artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
+        directive:{...narrationDirective,target:'finished_media_qa'}};
+    }
     // The old full-frame premium OCR can reject a readable heading, then strand
     // its unchanged scene producer. Retry that inspection using the previously
     // certified producer and saved film. The runner still verifies every input
@@ -94,7 +110,8 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     return {
       artifacts,
       passedSteps: reusable.map((x: any) => String(x.step)),
-      recoveredSteps: legacyTitleRetry && reusable.some((step: any) => step.step === 'scene_construction')
+      recoveredSteps: narrationInspectorRetry && reusable.some((step: any) => step.step === 'synchronization')
+        ? ['synchronization' as const] : legacyTitleRetry && reusable.some((step: any) => step.step === 'scene_construction')
         ? ['scene_construction' as const] : [],
       findings: Array.isArray(lesson?.findings) ? lesson.findings : [],
     };

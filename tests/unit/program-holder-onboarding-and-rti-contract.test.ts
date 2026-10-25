@@ -8,9 +8,11 @@ const apprenticePortal = readFileSync('apps/lms/app/apprentice/page.tsx', 'utf8'
 const hostPortal = readFileSync('apps/lms/app/host-shop/dashboard/schedule/page.tsx', 'utf8');
 
 describe('program-holder onboarding and RTI portal contract', () => {
-  it('shows the September 21 RTI start in both portals', () => {
-    expect(apprenticePortal).toContain('Theory/RTI begins Monday, September 21, 2026.');
-    expect(hostPortal).toContain('Theory/RTI begins Monday, September 21, 2026.');
+  it('shows the assigned theory start consistently in both portals', () => {
+    for (const portal of [apprenticePortal, hostPortal]) {
+      expect(portal).toContain('formatTheoryStartDate(schedule.starts_on)');
+      expect(portal).not.toContain('Theory/RTI begins Monday, September 21, 2026.');
+    }
   });
 
   it('requires image release, logo, QuickBooks, and PayPal completion', () => {

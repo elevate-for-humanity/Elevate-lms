@@ -31,9 +31,15 @@ export function deriveStudioRunState(steps: StudioStepState[]): {
   if (required.some((step) => step.status === 'blocked')) {
     return { status: 'blocked', failure: null };
   }
+  if (required.some((step) => step.status === 'skipped')) {
+    return {
+      status: 'blocked',
+      failure: { message: 'A required Studio step was skipped without verification' },
+    };
+  }
   if (
     required.length > 0 &&
-    required.every((step) => ['verified', 'skipped'].includes(step.status))
+    required.every((step) => step.status === 'verified')
   ) {
     return { status: 'completed', failure: null };
   }

@@ -98,6 +98,11 @@ async function policyFixture(run) {
     await mkdir(join(root, 'scripts'), { recursive: true });
     await writeFile(join(root, 'scripts/build-memory-policy.mjs'), await readFile(new URL('./build-memory-policy.mjs', import.meta.url)));
     await writeFile(join(root, 'next.config.mjs'), "import {withBuildMemoryDefaults} from './scripts/build-memory-policy.mjs'; export default withBuildMemoryDefaults({});");
+    // Test against the reviewed worker COPY allowlist used in real image builds.
+    await writeFile(join(root, '.dockerignore'), await readFile(new URL('../.dockerignore', import.meta.url)));
+    const workerTest = join(root, 'tests/worker/narration-storage-reference.test.mjs');
+    await mkdir(dirname(workerTest), { recursive: true });
+    await writeFile(workerTest, '// fixture for policy validation');
     const app = join(root, 'apps', 'future-app');
     await mkdir(app, { recursive: true });
     await writeFile(join(app, 'package.json'), await readFile(new URL('../templates/next-web-container/package.json', import.meta.url)));
@@ -106,6 +111,9 @@ async function policyFixture(run) {
       const path = join(root, dockerfile);
       await mkdir(dirname(path), { recursive: true });
       await writeFile(path, 'FROM node:22 AS builder\nRUN install util-linux\n');
+      if (dockerfile === 'Dockerfile.ultimate-worker') {
+        await writeFile(path, 'FROM node:22 AS builder\nRUN install util-linux\nCOPY tests/worker/narration-storage-reference.test.mjs ./tests/worker/\n');
+      }
     }
     for (const profile of Object.values(containerBuildPolicy)) {
       for (const field of ['memoryControl', 'savingControl', 'recoveryControl']) {
@@ -168,5 +176,19 @@ test('alternate future container builders cannot silently bypass admission', asy
       await writeFile(join(directory, 'future.yml'), `steps:\n  - ${builder}\n`);
       await assert.rejects(checkBuildMemoryPolicy(root), /integrate this container builder/);
     }
+  });
+});
+
+test('worker regression must remain included by the Docker context', async () => {
+  await policyFixture(async root => {
+    await writeFile(join(root, '.dockerignore'), 'tests\n');
+    await assert.rejects(checkBuildMemoryPolicy(root), /Worker image fixture excluded by \.dockerignore/);
+  });
+});
+
+test('missing worker regression fixture blocks release admission', async () => {
+  await policyFixture(async root => {
+    await rm(join(root, 'tests/worker/narration-storage-reference.test.mjs'));
+    await assert.rejects(checkBuildMemoryPolicy(root), /Worker image regression fixture missing/);
   });
 });

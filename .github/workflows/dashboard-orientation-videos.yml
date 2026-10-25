@@ -70,6 +70,6 @@ jobs:
             -v "$PWD:/source:ro" \
             -v "$PWD/lib/orientation:/app/lib/orientation:ro" \
             -v "$PWD/scripts/gcp/render-dashboard-orientations.mjs:/app/scripts/gcp/render-dashboard-orientations.mjs:ro" \
-            "$image" /app/scripts/gcp/render-dashboard-orientations.mjs
+            "$image" --import=tsx /app/scripts/gcp/render-dashboard-orientations.mjs
       - name: Record publication boundary
         run: echo 'All six captioned role orientation films uploaded and storage readback verified. This workflow does not claim any user completed orientation or training.' >> "$GITHUB_STEP_SUMMARY"

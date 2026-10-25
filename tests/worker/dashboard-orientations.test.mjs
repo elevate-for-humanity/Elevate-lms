@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
-import {orientationKeyForGuide} from '../../lib/orientation/media-contract.mjs';
+import {orientationKeyForGuide,orientationCaptionGroups} from '../../lib/orientation/media-contract.mjs';
 const guides=JSON.parse(readFileSync(new URL('../../lib/orientation/dashboard-orientations.json',import.meta.url),'utf8'));
 test('every dashboard audience has illustrated, actionable instruction and a detailed transcript',()=>{
  assert.deepEqual(Object.keys(guides).sort(),['apprentice','host-shop','hvac','learner','program-holder','site-coordinator']);
@@ -31,4 +31,12 @@ test('media keys reject arbitrary audiences, paths and formats, and change when 
  const first=orientationKeyForGuide('learner','mp4',guides.learner);
  assert.match(first,/^dashboard-orientations\/learner\/[a-f0-9]{16}\.mp4$/);
  assert.notEqual(first,orientationKeyForGuide('learner','mp4',{...guides.learner,title:'Revised'}));
+});
+
+test('long technical captions stay bounded without losing or retiming words',()=>{
+ const words='Your Site Coordinator dashboard connects regional intake Program Holders host sites active learners and reporting'.split(' ').map((word,i)=>({word,start:i,end:i+.8}));
+ const groups=orientationCaptionGroups(words);
+ assert.deepEqual(groups.flat(),words);
+ for(const group of groups){assert.ok(group.length<=8);assert.ok(group.map(w=>w.word).join(' ').length<=68);}
+ assert.throws(()=>orientationCaptionGroups([{word:'bad',start:1,end:0}]),/CAPTION_INVALID/);
 });

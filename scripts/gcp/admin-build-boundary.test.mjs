@@ -9,7 +9,7 @@ test('Admin Docker build precedes Google identity and billing admission',()=>{
  assert.ok(build<s.indexOf('      - name: Verify project billing'), 'Google billing must not gate the independent Docker build');
 });
 test('Google upload retains authenticated SDK and billing checks',()=>{
- const s=workflow(),auth=s.indexOf('uses: google-github-actions/auth@'),sdk=s.indexOf('      - name: Verify Google SDK'),billing=s.indexOf('      - name: Verify project billing'),upload=s.indexOf('      - name: Upload and deploy the exact Admin image');
+ const s=workflow(),auth=s.indexOf('uses: google-github-actions/auth@'),sdk=s.indexOf('      - name: Verify Google SDK'),billing=s.indexOf('      - name: Verify project billing'),upload=s.indexOf('      - name: Upload tested Admin image');
  assert.ok(auth>=0 && auth<sdk && sdk<billing && billing<upload);
 });
 
@@ -31,4 +31,19 @@ test('ordinary Admin releases retain the current browser workspace binding until
  assert.ok(update.includes('--update-env-vars="AI_NARRATION_PROVIDER=kokoro"'));
  assert.ok(!update.includes('STUDIO_BROWSER_URL='));
  assert.ok(!update.includes('STUDIO_BROWSER_PUBLIC_URL='));
+});
+
+test('Admin compilation does not hold the shared production runtime lock',()=>{
+ const s=workflow();const build=s.slice(s.indexOf('  build-admin:'),s.indexOf('  deploy-admin:'));
+ const deploy=s.slice(s.indexOf('  deploy-admin:'),s.indexOf('  acceptance:'));
+ assert.ok(build.includes('docker build -f Dockerfile.admin'));
+ assert.ok(!build.includes('google-runtime-us-central1'));
+ assert.ok(!build.includes('gcloud run services update'));
+ assert.ok(deploy.includes('needs: build-admin'));
+ assert.ok(deploy.includes('group: google-runtime-us-central1'));
+ assert.ok(deploy.includes('queue: max'));
+ assert.ok(deploy.includes('test "$DIGEST" = "$IMAGE_DIGEST"'));
+ assert.ok(deploy.includes('preflight-web-rollout.mjs'));
+ assert.ok(deploy.includes('activate-tested-public-revision.mjs'));
+ assert.ok(deploy.includes('verify-admin-revision.mjs'));
 });

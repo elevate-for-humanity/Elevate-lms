@@ -70,12 +70,13 @@ jobs:
           # current main containing them; the build retains exact-SHA checks.
           [[ "$latest" =~ ^[a-f0-9]{40}$ ]]
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
-  deploy-admin:
+  build-admin:
     concurrency:
-      group: google-runtime-us-central1
-      cancel-in-progress: false
-      queue: max
-    name: Build and deploy Admin on Google
+      group: google-admin-build-main
+      cancel-in-progress: true
+    name: Build and upload Admin image
+    outputs:
+      digest: ${{ steps.upload.outputs.digest }}
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
@@ -149,7 +150,8 @@ jobs:
         run: node scripts/gcp/verify-sdk.mjs
       - name: Verify project billing and empty upload admission before building
         run: node scripts/gcp/preflight-billing.mjs
-      - name: Upload and deploy the exact Admin image
+      - name: Upload tested Admin image
+        id: upload
         shell: bash
         run: |
           set -euo pipefail
@@ -159,6 +161,53 @@ jobs:
           docker push "$IMAGE:$GITHUB_SHA"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+  deploy-admin:
+    needs: build-admin
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
+    name: Deploy and verify Admin on Google
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 30
+    env:
+      IMAGE_DIGEST: ${{ needs.build-admin.outputs.digest }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Reject superseded deployment requests before rollout
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-admin.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
+      - name: Upload and deploy the exact Admin image
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin'
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          test "$DIGEST" = "$IMAGE_DIGEST"
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
           # Reserve rollout headroom before creating a replacement revision.

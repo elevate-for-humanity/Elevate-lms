@@ -87,7 +87,7 @@ export async function ProgramHolderWorkspaceView({
 }) {
   const data = await getProgramHolderWorkspace();
   const coordinatorRole =
-    data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
+    data.mode === 'holder' ? String(data.holder?.features?.approved_role || (data.profile?.role === 'site_coordinator' ? 'Site Coordinator' : '')) : '';
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
   const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;

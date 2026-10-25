@@ -1,4 +1,6 @@
 'use client';
-import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
+import VisualDashboardOrientation, {type OrientationAudience} from '@/components/orientation/VisualDashboardOrientation';
 
-export function ProgramHolderDashboardGuide() { return <VisualDashboardOrientation audience="program-holder" />; }
+export function ProgramHolderDashboardGuide({audience='program-holder'}:{audience?:OrientationAudience}) {
+  return <VisualDashboardOrientation audience={audience} compact />;
+}

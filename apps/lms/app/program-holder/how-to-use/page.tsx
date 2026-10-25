@@ -68,6 +68,7 @@ export default async function ProgramHolderStartHerePage() {
   const data = await getProgramHolderWorkspace();
   const holderName = data.holder?.organization_name || data.holder?.name || 'Your organization';
   const profileName = data.profile?.full_name || 'Program Holder';
+  const roleTitle = String(data.holder?.features?.approved_role || (data.profile?.role === 'site_coordinator' ? 'Site Coordinator' : 'Program Holder'));
 
   return (
     <div className="space-y-8">
@@ -78,19 +79,20 @@ export default async function ProgramHolderStartHerePage() {
           </div>
           <div className="p-6 sm:p-10">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-orange-300">Welcome {profileName}</p>
-            <h1 className="mt-3 text-3xl font-black sm:text-4xl">{holderName} Program Holder Orientation</h1>
+            <h1 className="mt-3 text-3xl font-black sm:text-4xl">{holderName} {roleTitle} Orientation</h1>
             <div className="mt-5 space-y-4 text-base leading-7 text-slate-200">
               <p>Your dashboard is the official workspace for routed applicants, enrolled learners, program delivery, communications, compliance, evidence, reporting, and payment readiness.</p>
-              <p>Every person in Applicants must be contacted. Confirm the selected program, explain whether verified funding exists or the program is self-pay, state the published amount, schedule the next step, and document the call.</p>
+              <details><summary className="min-h-11 cursor-pointer font-bold text-orange-200">Read the full welcome and responsibilities</summary><p>Every person in Applicants must be contacted. Confirm the selected program, explain whether verified funding exists or the program is self-pay, state the published amount, schedule the next step, and document the call.</p>
               <p>PARIS can explain the dashboard, open workspaces, identify missing actions, and prepare drafts. You remain responsible for reviewing facts, protecting student information, supervising training, and verifying every submitted record.</p>
-              <p>If you work in more than one Elevate role, verify the Program Holder name, official mailbox, and phone extension at the top of the workspace before contacting a student.</p>
+              <p>If you work in more than one Elevate role, verify the Program Holder name, official mailbox, and phone extension at the top of the workspace before contacting a student.</p></details>
             </div>
             <p className="mt-5 text-sm font-bold text-white">— Elizabeth Greene, Founder &amp; Chief Executive Officer</p>
           </div>
         </div>
       </section>
 
-      <ProgramHolderDashboardGuide />
+      <ProgramHolderDashboardGuide audience={roleTitle.toLowerCase().includes('coordinator') ? 'site-coordinator' : 'program-holder'} />
+      <details className="rounded-3xl border border-slate-200 bg-white p-5"><summary className="min-h-11 cursor-pointer text-lg font-bold">Full reference: programs, office tools, responsibilities, and payment readiness</summary><div className="mt-5 space-y-6">
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex items-start gap-3">
@@ -193,6 +195,7 @@ export default async function ProgramHolderStartHerePage() {
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">Return here whenever you need the complete workflow. The Reference Library contains additional portal documentation.</p>
         <Link href="/program-holder/documentation" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-700 px-4 text-sm font-black text-white">Open the Reference Library</Link>
       </section>
+      </div></details>
     </div>
   );
 }

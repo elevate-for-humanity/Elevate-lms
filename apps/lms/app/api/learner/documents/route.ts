@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
     context: { enrollment_id: requirement.enrollment_id, requirement_id: requirementId, storage_path: path },
     created_at: new Date().toISOString(),
   });
-  if (reviewError) console.error('[learner/documents] review queue insert failed', reviewError.message);
+  if (reviewError) {
+    console.error('[learner/documents] review queue insert failed', reviewError.message);
+    // Do not acknowledge a submission that reviewers cannot see. Keep the
+    // evidence in private storage for recovery; fail closed and surface error.
+    return NextResponse.json({ error: 'Document saved but verification queue unavailable. Contact staff; do not upload sensitive documents again.' }, { status: 503 });
+  }
   return NextResponse.json({ success: true, verification_status: 'pending_review', ocr_readable: Boolean(extracted.text.trim()) });
 }

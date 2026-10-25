@@ -38,9 +38,9 @@ export function AdminApplicationChrome({
           : 'min-h-dvh min-w-0 overflow-x-clip bg-slate-50'
       }
     >
-      <div className={studioOwnsViewport ? 'max-h-[25dvh] shrink-0 overflow-y-auto' : ''}>
-        <CommunicationTodos inboxPath="/phone/email" />
-      </div>
+      {/* Studio keeps these live notices inside its own navigation so they do
+          not subtract height from the full-viewport conversation workspace. */}
+      {!studioOwnsViewport ? <CommunicationTodos inboxPath="/phone/email" /> : null}
       {!studioOwnsViewport ? <AdminNavShell navSections={navSections} /> : null}
       <main
         data-elevate-dashboard-content

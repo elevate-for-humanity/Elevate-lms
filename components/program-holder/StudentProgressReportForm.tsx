@@ -12,7 +12,7 @@ export function StudentProgressReportForm({students}:{students:{id:string;full_n
   setMessage(response.ok?'Report submitted for review.':result.error||'Unable to save report.');
   if(response.ok)form.reset();
  }
- return <section className="rounded-xl border bg-white p-5">
+ return <section className="min-w-0 rounded-xl border bg-white p-4 sm:p-5">
   <h2 className="text-xl font-bold">Student progress report</h2>
   <p>Select the enrolled student by name. Only check activities actually completed. Reported hours require separate verification.</p>
   <form className="mt-4 grid gap-3" onSubmit={submit}>
@@ -21,7 +21,7 @@ export function StudentProgressReportForm({students}:{students:{id:string;full_n
    <label>End date<input name="end" required type="date" className="block w-full rounded border p-2"/></label>
    <label>Reported hours<input name="hours" required type="number" min="0" max="168" step="0.25" className="block w-full rounded border p-2"/></label>
    <label>Progress<select name="progress" required className="block w-full rounded border p-2"><option value="on_track">On track</option><option value="needs_support">Needs support</option><option value="at_risk">At risk</option><option value="milestone_met">Milestone met — review required</option></select></label>
-   <fieldset className="grid gap-2 rounded border p-3"><legend className="font-bold">Progress checklist</legend>{[['attendance','Attended training'],['instruction','Completed instruction'],['practice','Practiced skills'],['assessment','Completed assessment'],['safety','Reviewed safety'],['support','Support needs addressed']].map(([key,label])=><label key={key}><input type="checkbox" name={key}/> {label}</label>)}</fieldset>
+   <fieldset className="grid min-w-0 gap-2 rounded border p-3"><legend className="font-bold">Progress checklist</legend>{[['attendance','Attended training'],['instruction','Completed instruction'],['practice','Practiced skills'],['assessment','Completed assessment'],['safety','Reviewed safety'],['support','Support needs addressed']].map(([key,label])=><label key={key} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-2 focus-within:outline focus-within:outline-2 focus-within:outline-blue-600"><input type="checkbox" name={key} className="h-8 w-8 shrink-0 accent-blue-700"/> <span className="min-w-0">{label}</span></label>)}</fieldset>
    <label>Notes and next steps<textarea name="notes" required maxLength={4000} className="block w-full rounded border p-2"/></label>
    <button className="rounded bg-blue-700 p-3 font-bold text-white">Submit report for review</button>
    <p role="status">{message}</p>

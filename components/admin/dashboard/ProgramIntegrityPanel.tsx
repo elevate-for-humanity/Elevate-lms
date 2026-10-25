@@ -85,9 +85,9 @@ export function ProgramIntegrityPanel() {
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white mb-6">
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-slate-500" />
+      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <ShieldCheck className="w-4 h-4 shrink-0 text-slate-500" />
           <h2 className="font-bold text-slate-900">Program Integrity</h2>
           {!loading && data && (
             <div className="flex items-center gap-1.5 ml-1">
@@ -104,18 +104,18 @@ export function ProgramIntegrityPanel() {
             </div>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center justify-end gap-3">
           <button
             aria-label="Refresh program integrity"
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-50"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-lg text-xs text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Link
             href="/programs"
-            className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
+            className="min-h-11 text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
           >
             All programs <ArrowRight className="w-3 h-3" />
           </Link>
@@ -198,7 +198,7 @@ export function ProgramIntegrityPanel() {
             <div className="px-4 sm:px-6 py-3 border-t border-slate-100">
               <button
                 onClick={() => setShowAll((v) => !v)}
-                className="text-xs font-semibold text-brand-blue-600 hover:underline"
+                className="min-h-11 text-xs font-semibold text-brand-blue-600 hover:underline"
               >
                 {showAll ? 'Show less' : `Show all ${programs.length} programs needing attention`}
               </button>

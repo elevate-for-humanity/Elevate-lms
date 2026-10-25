@@ -32,3 +32,7 @@ Full `pnpm typecheck`, `pnpm lint`, Marketing build, Admin build and LMS build w
 The authenticated nine-role production suite was not rerun and production was not changed. Issue #791's missing Studio browser stream and zero-shell/transient Program Holder evidence remain separate; no claim is made that those are repaired. Native iOS/Android installation, hardware keyboards/software keyboards on real devices, and full authenticated course/email/onboarding flows remain release validation. PR #2127's refresh minimum-target change is incorporated here with additional wrapping fixes; it is not independently certified for production by this preview.
 
 Private preview project: `appgprj_6ade3173119c8191a813f3d43357631c`.
+
+## CI runner compatibility
+
+The initial PR Design Repair and Compliance browser jobs stopped at browser installation: `Playwright does not support chromium on ubuntu26.04-x64`. No responsive/accessibility/enrollment assertions ran in those failed jobs. Pin only responsive-marketing, e2e-enrollment and accessibility to ubuntu-24.04; preserve every assertion, test command, dependency version and permission. The updated jobs require a fresh run before release. Observed runs: 40213559735 and 40213559796.

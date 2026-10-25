@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -522,11 +522,10 @@ const sentryWebpackPluginOptions = {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
-  autoInstrumentMiddleware: false,
   webpack: {
     autoInstrumentMiddleware: false,
   },
-  disableLogger: true,
+  treeshake: { removeDebugLogging: true },
   widenClientFileUpload: false,
 };
 

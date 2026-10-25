@@ -65,6 +65,52 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
         directive:{...narrationDirective,target:'finished_media_qa'}};
     }
+    // Recover a legacy picture-cue repair that was incorrectly routed
+    // to the deterministic synchronization producer.
+    //
+    // Picture-to-speech mismatches belong to visual assignment.
+    // Preserve certified narration and timeline evidence, but do not
+    // certify rendering or downstream media QA.
+    const pictureCueDirective =
+      (artifacts.__repairState as any)?.directive;
+
+    const legacyPictureCueRetry =
+      pictureCueDirective?.target === 'synchronization' &&
+      pictureCueDirective?.failedStep === 'lesson_film_render' &&
+      Array.isArray(pictureCueDirective.requirements) &&
+      pictureCueDirective.requirements.length > 0 &&
+      pictureCueDirective.requirements.every((finding: any) =>
+        finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/
+          .test(String(finding.message ?? ''))
+      ) &&
+      currentEvidence(pictureCueDirective.previous);
+
+    if (legacyPictureCueRetry) {
+      artifacts.synchronization = pictureCueDirective.previous;
+
+      if (!passed.some((step: any) =>
+        step.step === 'synchronization')) {
+        passed.push({
+          step: 'synchronization',
+          state: 'passed',
+          artifacts: pictureCueDirective.previous,
+        });
+      }
+
+      // The next runner pass must reconsider the original visual
+      // assignment rather than replaying the obsolete sync repair.
+      artifacts.__repairState = {
+        ...(artifacts.__repairState as any),
+        status: 'diagnosed',
+        directive: {
+          ...pictureCueDirective,
+          target: 'visual_assignment',
+          previous: artifacts.visual_assignment,
+        },
+      };
+    }
+
     // The old full-frame premium OCR can reject a readable heading, then strand
     // its unchanged scene producer. Retry that inspection using the previously
     // certified producer and saved film. The runner still verifies every input

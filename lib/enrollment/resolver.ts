@@ -52,13 +52,7 @@ function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
   let rawStatus = row.status ?? 'pending';
   let rawState = row.enrollment_state ?? null;
 
-  // Resolve stale AWAIT_APPROVAL for admitted or confirmed student enrollments
-  if (['awaiting_approval', 'await_approval'].includes(String(rawStatus).toLowerCase())) {
-    rawStatus = 'active';
-  }
-  if (['awaiting_approval', 'await_approval'].includes(String(rawState).toLowerCase())) {
-    rawState = 'active';
-  }
+  // Pending approval is not authorization to access courses.
 
   const isBookkeeping = programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting';
   const courseId = row.course_id ?? (isBookkeeping ? '566e2ef7-6861-4736-9807-b4ff868fc908' : null);
@@ -167,9 +161,18 @@ export const ACCESS_STATES = new Set(['active', 'enrolled']);
 
 export function hasLmsAccess(enrollment: ResolvedEnrollment | null): boolean {
   if (!enrollment) return false;
-  // Primary gate: access_granted_at set by admin or submit-documents route.
-  if (enrollment.accessGrantedAt) return true;
-  // Fallback: enrollment_state/status covers canonical legacy rows.
-  return ACCESS_STATES.has(enrollment.enrollmentState ?? '') ||
-    ACCESS_STATES.has(enrollment.status ?? '');
+  // Access must be explicitly granted.
+  // A status label alone cannot authorize LMS access.
+  if (!enrollment.accessGrantedAt) return false;
+
+  const blocked = new Set([
+    'withdrawn',
+    'revoked',
+    'rejected',
+    'suspended',
+  ]);
+
+  return !blocked.has(
+    String(enrollment.enrollmentState ?? enrollment.status).toLowerCase()
+  );
 }

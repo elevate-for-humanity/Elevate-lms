@@ -109,3 +109,8 @@ test('stall cancellation has one failure-state writer while provider unwinds',as
  assert.equal(result.stalled,true);assert.deepEqual(s.events,['fail']);
  finishFailure();
 });
+test('a failed recovery write preserves its database error instead of reporting a progress stall',async()=>{
+ const failure=new Error('database failure-state write timed out');
+ const s=scenario({acceptance:true},false,{runCourse:async()=>{throw Error('ULTIMATE_FENCED_WRITE_FAILED:update_build:AbortError');},fail:async()=>{throw failure;}});
+ await assert.rejects(s.run(),error=>error===failure);assert.deepEqual(s.events,['fail']);
+});

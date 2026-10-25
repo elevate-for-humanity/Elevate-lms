@@ -316,7 +316,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   try {
     return await progressWatch.race(deadline.race(progressWatch.run(work)));
   } catch (error) {
-    if (progressWatch.signal.aborted) return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
+    // Disposal also aborts this signal. Only the watchdog's own reason is a stall.
+    if (String(progressWatch.signal.reason?.message ?? '').startsWith('ULTIMATE_PROGRESS_STALLED:'))
+      return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
     if (leaseLost) return {claimed:true,completed:false,jobId:job.id,error:'ULTIMATE_JOB_LEASE_LOST:' + job.id};
     throw error;
   } finally {

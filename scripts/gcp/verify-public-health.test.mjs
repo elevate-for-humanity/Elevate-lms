@@ -50,3 +50,83 @@ test('network and malformed JSON failures remain distinguishable',async()=>{
   assert.equal(result[0].error,name);assert.equal(JSON.stringify(result).includes('private-message'),false);
  }
 });
+
+test('one transient Admin ping timeout recovers without weakening service identity checks', async () => {
+  const attempts = new Map();
+  const request = async url => {
+    attempts.set(url, (attempts.get(url) ?? 0) + 1);
+    if (url.endsWith('/api/ping') && attempts.get(url) === 1) {
+      const error = new Error('private-upstream-message');
+      error.name = 'TimeoutError';
+      throw error;
+    }
+    return { status: 200, json: async () => ({
+      service: 'admin', ok: true, ready: true, healthy: true,
+      dependencies: { supabase: { ok: true } },
+    }) };
+  };
+  const results = await verifySite('admin', request);
+  assert.equal(results.every(row => row.passed), true);
+  assert.equal(attempts.get('https://admin.elevateforhumanity.org/api/ping'), 2);
+  assert.equal(attempts.get('https://admin.elevateforhumanity.org/api/health'), 1);
+  assert.equal(JSON.stringify(results).includes('private-upstream-message'), false);
+});
+
+test('persistent network timeouts fail after precisely one bounded retry', async () => {
+  let calls = 0;
+  const results = await verifySite('admin', async url => {
+    if (url.endsWith('/api/ping')) {
+      calls++;
+      const error = new Error('private-upstream-message');
+      error.name = 'TimeoutError';
+      throw error;
+    }
+    return { status: 200, json: async () => ({
+      service: 'admin', ok: true, ready: true, healthy: true,
+      dependencies: { supabase: { ok: true } },
+    }) };
+  });
+  assert.equal(calls, 2);
+  assert.deepEqual(
+    { passed: results[0].passed, error: results[0].error },
+    { passed: false, error: 'TimeoutError' },
+  );
+  assert.equal(JSON.stringify(results).includes('private-upstream-message'), false);
+});
+
+test('HTTP errors and incorrect service identities are never retried', async () => {
+  for (const badResponse of [
+    { status: 503, body: { service: 'admin', ok: true } },
+    { status: 200, body: { service: 'marketing', ok: true } },
+  ]) {
+    let pingAttempts = 0;
+    const results = await verifySite('admin', async url => {
+      if (url.endsWith('/api/ping')) {
+        pingAttempts++;
+        return { status: badResponse.status, json: async () => badResponse.body };
+      }
+      return { status: 200, json: async () => ({
+        service: 'admin', healthy: true, ready: true, dependencies: { supabase: { ok: true } },
+      }) };
+    });
+    assert.equal(results[0].passed, false);
+    assert.equal(pingAttempts, 1);
+  }
+});
+
+test('malformed health JSON is not retried and remains a failure', async () => {
+  let attempts = 0;
+  const results = await verifySite('admin', async url => {
+    if (url.endsWith('/api/ping')) {
+      attempts++;
+      return { status: 200, json: async () => { throw new SyntaxError('secret-invalid-body'); } };
+    }
+    return { status: 200, json: async () => ({
+      service: 'admin', healthy: true, ready: true, dependencies: { supabase: { ok: true } },
+    }) };
+  });
+  assert.equal(attempts, 1);
+  assert.equal(results[0].passed, false);
+  assert.equal(results[0].error, 'SyntaxError');
+  assert.equal(JSON.stringify(results).includes('secret-invalid-body'), false);
+});

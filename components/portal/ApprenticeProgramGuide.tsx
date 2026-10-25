@@ -1,10 +1,11 @@
+import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 import Link from 'next/link';
 import { APPRENTICE_TIMECLOCK_RULES, APPRENTICE_PAYMENT_RULES } from '@/lib/apprenticeship/apprentice-policy';
 import { APPRENTICE_BILLING_POLICY } from '@/lib/apprenticeship/billing-policy';
 
 export function ApprenticeProgramGuide() {
-  return <section className="rounded-3xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-white p-5 sm:p-7">
+  return <div className="space-y-5"><VisualDashboardOrientation audience="apprentice" /><details className="rounded-2xl border border-slate-200 bg-white p-4"><summary className="min-h-11 cursor-pointer font-bold">Open the full operating instructions</summary><section className="rounded-3xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-white p-5 sm:p-7">
     <p className="text-xs font-black uppercase tracking-widest text-cyan-800">Start here · Know your program</p>
     <h2 className="mt-2 text-2xl font-black">Your app, training hours, and next steps</h2>
     <p className="mt-3 text-sm leading-6">Install the apprentice app from <Link className="font-bold underline" href="/install/apprentice">Install app</Link>. Open the app icon and sign in each training day. Read the syllabus and current lesson, clock in at your approved site, and check your hours and supervisor feedback before the week ends.</p>
@@ -14,5 +15,5 @@ export function ApprenticeProgramGuide() {
       <details className="rounded-2xl bg-white p-4"><summary className="cursor-pointer font-black">Payments, due dates, and access</summary><ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6">{APPRENTICE_PAYMENT_RULES.map(rule => <li key={rule}>{rule}</li>)}</ul><p className="mt-3 text-sm leading-6">The billing status calculation uses a {APPRENTICE_BILLING_POLICY.defaultGraceDays}-day default grace period unless your plan specifies a different period. Your signed agreement and displayed invoice control the actual amount and due date. A missed payment does not itself delete approved hours or automatically terminate your enrollment; Administration must document any program pause or cancellation.</p><Link className="mt-3 inline-flex min-h-11 items-center font-bold underline" href="/apprentice/billing">Check invoices and your payment plan</Link></details>
       <details className="rounded-2xl bg-white p-4"><summary className="cursor-pointer font-black">Career Feed, résumé, and your community</summary><p className="mt-3 text-sm leading-6">Use Career Feed to review opportunities, check requirements, and follow the employer's application instructions. In Résumé Builder, add your experience, training, skills, and credentials, review the result, and download it for applications. Open Community to find your program group, ask training questions, and follow meetings and announcements.</p><div className="mt-3 flex flex-wrap gap-4"><Link className="font-bold underline" href="/lms/career">Open career tools</Link><Link className="font-bold underline" href="/lms/resume-builder">Build your résumé</Link><Link className="font-bold underline" href="/lms/community">Open community</Link></div></details>
     </div>
-  </section>;
+  </section></details></div>;
 }

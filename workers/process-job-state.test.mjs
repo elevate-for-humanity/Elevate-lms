@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {continuousCourseLease,checkpointContinuousLesson} from '../lib/ultimate-course-builder/worker/continuous-course-lease.mjs';
 import {preservedCourseCursor} from '../lib/ultimate-course-builder/worker/preserve-completed.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -31,8 +32,8 @@ function scenario(payload, completed = true, options = {}) {
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const names = ['continuousCourseLease','checkpointContinuousLesson','attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [continuousCourseLease,checkpointContinuousLesson,options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }

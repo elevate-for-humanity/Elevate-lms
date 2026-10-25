@@ -492,9 +492,21 @@ jobs:
     steps:
       - name: End-of-day summary
         run: |
-          curl -sf -X GET "$ADMIN_URL/api/cron/end-of-day-summary" \
-            -H "Authorization: Bearer $CRON_SECRET" --max-time 60 \
-            || echo "::warning::end-of-day-summary failed"
+          set -euo pipefail
+          if [[ -z "${CRON_SECRET:-}" ]]; then
+            echo "::error::end-of-day-summary CRON_SECRET is missing"
+            exit 1
+          fi
+          status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            --request GET "$ADMIN_URL/api/cron/end-of-day-summary" \
+            --header "Authorization: Bearer $CRON_SECRET" --max-time 60)" || {
+              echo "::error::end-of-day-summary transport failed"
+              exit 1
+            }
+          if [[ ! "$status" =~ ^2[0-9][0-9]$ ]]; then
+            echo "::error::end-of-day-summary returned HTTP $status"
+            exit 1
+          fi
 
   # ── Daily 2 AM: maintenance (guardrails + memory cleanup) ─────────────────
   daily-maintenance:

@@ -100,7 +100,9 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
   // Keep it out of learner onboarding so WIOA/ITA amounts and funding evidence
   // cannot be exposed or used as a learner-facing completion blocker.
   const requirements = ((requirementResult.data ?? []) as LearnerRequirement[]).filter(
-    (row) => !['funding', 'wioa_funding', 'ita_funding'].includes(String(row.requirement_type || '').toLowerCase()),
+    (row) => !['funding', 'wioa_funding', 'ita_funding'].includes(String(row.requirement_type || '').toLowerCase()) &&
+      // Retired universally by owner policy; keep database evidence/history.
+      !(row.requirement_type === 'program' && row.title?.trim().toLowerCase() === 'learner intake confirmation'),
   );
   const missingRequirements = requirements.filter((row) =>
     !['completed', 'verified', 'not_applicable'].includes(row.status),

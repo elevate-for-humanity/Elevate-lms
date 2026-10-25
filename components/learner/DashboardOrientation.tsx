@@ -262,7 +262,6 @@ export function DashboardOrientationPanel(props: {
   return (
     <details
       ref={panel}
-      open
       id="orientation"
       className="rounded-2xl border border-slate-200 bg-white p-4"
     >

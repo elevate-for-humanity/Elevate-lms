@@ -4,7 +4,7 @@ import Link from 'next/link';
 import CourseProductionWorkspace from '@/components/admin/course-builder/CourseProductionWorkspace';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { robots: { index: false, follow: false } };
+export const metadata: Metadata = { manifest: '/manifest-course-builder.json', robots: { index: false, follow: false } };
 
 type CourseBuilderTab = 'courses' | 'ultimate' | 'registry' | 'media';
 

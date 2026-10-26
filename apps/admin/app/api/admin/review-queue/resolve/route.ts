@@ -4,6 +4,7 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import type { Database } from '@/types/database.generated';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -171,8 +172,9 @@ export async function POST(req: Request) {
               .from('enrollment_requirements')
               .update({
                 status: 'verified',
-                verified_at: new Date().toISOString(),
-              })
+                verified_by: user.id,
+                updated_at: new Date().toISOString(),
+              } satisfies Database['public']['Tables']['enrollment_requirements']['Update'])
               .eq('id', requirement.id)
               .eq('status', 'completed')
               .select('id')

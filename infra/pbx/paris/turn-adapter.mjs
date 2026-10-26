@@ -84,10 +84,15 @@ export async function converse(history,request=googleJson,{env=process.env,reque
 }
 // Routing is driven by a caller's explicit request, not by generated model text.
 // No external dial string or arbitrary extension can be routed by this service.
-export function callerRouteIntent(transcript){
+export function callerRouteIntent(transcript,{allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || ''}={}){
   const text=String(transcript||'').toLowerCase().trim();
   const asked=/(?:\b(?:transfer|connect|speak|talk|reach|put me through)\b.{0,48}\b(?:operator|administrator|human|person|representative|front desk)\b|\b(?:operator|administrator)\b.{0,28}\bplease\b)/i;
-  return asked.test(text)?{type:'operator',extension:'0'}:null;
+  if(asked.test(text))return {type:'operator',extension:'0'};
+  // Explicit caller-provided extension, restricted to a reviewed, deployed allowlist.
+  // Never infer a destination from AI output or route a raw dial string.
+  const match=text.match(/\b(?:extension|ext)\s*(?:number\s*)?(\d{3})\b/);
+  const allowed=new Set(String(allowedExtensions).split(',').map(v=>v.trim()).filter(v=>/^[1-9]\d{2}$/.test(v)));
+  return match && allowed.has(match[1]) ? {type:'extension',extension:match[1]} : null;
 }
 
 export async function synthesize(text,request=googleJson){
@@ -140,7 +145,7 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
         if(!words)return fail('NO_SPEECH',422);
         const history=[...prior.history,{role:'user',text:words}].slice(-12);
         const route=callerRouteIntent(words);
-        const reply=route?'I will connect you to the operator now.':await llm(history);
+        const reply=route?(route.type==='operator'?'I will connect you to the operator now.':'I will connect you to extension '+route.extension+' now.'):await llm(history);
         const audioReply=await tts(reply);
         prior.history=[...history,{role:'model',text:reply}].slice(-12);
         prior.sequence=body.sequence;prior.updated=Date.now();

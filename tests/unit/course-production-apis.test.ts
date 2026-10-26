@@ -18,7 +18,7 @@ describe('authenticated production controls',()=>{
  });
  it('records pause actor without replacing checkpoints, job payload, lease or lifecycle',async()=>{
   const update=vi.fn();const filters:unknown[]=[];
-  const q={select:()=>q,eq:(...args:unknown[])=>{filters.push(args);return q;},single:async()=>({data:{id,status:'running',profile:{competencies:[{id:'saved'}]}},error:null}),update:(value:unknown)=>{update(value);return q;},then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
+  const q={select:()=>q,eq:(...args:unknown[])=>{filters.push(args);return q;},single:async()=>({data:{id,status:'running',updated_at:'2026-10-25T12:00:00.000Z',profile:{competencies:[{id:'saved'}]}},error:null}),update:(value:unknown)=>{update(value);return q;},then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
   const from=vi.fn(()=>q);mocks.db.mockResolvedValue({from});
   const response=await pause(request({buildId:id}));expect(response.status).toBe(200);
   expect(update.mock.calls[0][0]).toMatchObject({profile:{ownerPaused:true,competencies:[{id:'saved'}],pauseResumeAudit:{pausedBy:'admin',action:'explicit-admin-pause'}}});
@@ -44,7 +44,7 @@ describe('authenticated production controls',()=>{
 
 it('Resume clears an explicit pause while preserving a freshly leased worker instead of launching a duplicate',async()=>{
  const update=vi.fn();
- const q={select:()=>q,eq:()=>q,in:()=>q,update:(v:unknown)=>{update(v);return q;},single:async()=>({data:{id,status:'running',profile:{ownerPaused:true,competencies:[{id:'saved'}]}},error:null}),then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
+ const q={select:()=>q,eq:()=>q,in:()=>q,update:(v:unknown)=>{update(v);return q;},single:async()=>({data:{id,status:'running',updated_at:'2026-10-25T12:00:00.000Z',profile:{ownerPaused:true,competencies:[{id:'saved'}]}},error:null}),then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
  mocks.db.mockResolvedValue({from:()=>q});
  mocks.enqueue.mockResolvedValue({id,status:'running',lease_owner:'assigned-worker',lease_expires_at:new Date(Date.now()+300000).toISOString(),heartbeat_at:new Date().toISOString()});
  const response=await run(request({buildId:id}));expect(response.status).toBe(200);

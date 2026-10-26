@@ -127,9 +127,18 @@ jobs:
                 redirect:'manual', signal:AbortSignal.timeout(Math.min(20000,deadline-Date.now()))
               });
               body=await response.json();
-            } catch {
-              console.log(JSON.stringify({component,attempt,error:'health_probe_failed'}));
-              throw new Error('Health endpoint did not return a valid bounded response');
+            } catch (error) {
+              // Only retry bounded transport failures; malformed JSON and all
+              // actual HTTP responses still fail their existing release gates.
+              const transient = ['TimeoutError', 'AbortError', 'TypeError'].includes(error?.name);
+              console.log(JSON.stringify({component,attempt,error:transient
+                ? 'transient_health_transport' : 'health_probe_invalid_response'}));
+              if (!transient || Date.now() >= deadline) {
+                throw new Error('Health endpoint did not return a valid bounded response');
+              }
+              consecutive = 0;
+              await new Promise(resolve => setTimeout(resolve, 5000));
+              continue;
             }
             const dependency=body.dependencies?.supabase;
             const result={component,attempt,httpStatus:response.status,

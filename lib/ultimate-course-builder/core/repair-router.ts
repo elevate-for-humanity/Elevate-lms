@@ -63,10 +63,8 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
       if (!visual && !assembly) targets.set('finished_media_qa', [...(targets.get('finished_media_qa') ?? []), f.code]);
       continue;
     }
-    // A picture cue is a visual assignment failure, not a narration timeline defect.
-    // Re-running synchronization against unchanged narration produces the same
-    // timeline and exhausts worker retries without repairing the cue.
-    const target = renderInputFailure ? 'visual_assignment' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    // Cue quotations originate in the storyboard, not the deterministic timeline.
+    const target = renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
@@ -406,6 +407,7 @@ export default async function HostShopDashboardView() {
 
   return (
     <main className="w-full max-w-none px-4 py-8 sm:px-6">
+      <ProgramGuideResources />
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <div className="p-6 sm:p-8">

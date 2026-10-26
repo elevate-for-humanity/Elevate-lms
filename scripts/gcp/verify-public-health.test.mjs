@@ -61,7 +61,7 @@ test('one transient Admin ping timeout recovers without weakening service identi
       throw error;
     }
     return { status: 200, json: async () => ({
-      service: 'admin', ok: true, ready: true, healthy: true,
+      service: 'admin', ok: true, ready: true, healthy: true, agenticExecutorReady: true,
       dependencies: { supabase: { ok: true } },
     }) };
   };
@@ -82,7 +82,7 @@ test('persistent network timeouts fail after precisely one bounded retry', async
       throw error;
     }
     return { status: 200, json: async () => ({
-      service: 'admin', ok: true, ready: true, healthy: true,
+      service: 'admin', ok: true, ready: true, healthy: true, agenticExecutorReady: true,
       dependencies: { supabase: { ok: true } },
     }) };
   });
@@ -129,4 +129,12 @@ test('malformed health JSON is not retried and remains a failure', async () => {
   assert.equal(results[0].passed, false);
   assert.equal(results[0].error, 'SyntaxError');
   assert.equal(JSON.stringify(results).includes('secret-invalid-body'), false);
+});
+
+ test('a responsive Admin still fails readiness without its agentic executor', async () => {
+  const results = await verifySite('admin', async () => ({ status: 200, json: async () => ({
+    service: 'admin', ok: true, ready: true, healthy: true,
+    dependencies: { supabase: { ok: true } },
+  }) }));
+  assert.equal(results.find(row => row.path === '/api/ready').passed, false);
 });

@@ -82,7 +82,7 @@ jobs:
         run: |
           node --test scripts/gcp/serving-phone-credential.test.mjs tests/phone-runtime-authority.node.test.mjs scripts/gcp/voicemail-live-health.test.mjs
           node --test scripts/gcp/phone-runtime-handoff.test.mjs
-          node --test scripts/test-public-revision-activation.mjs
+          node --test scripts/test-public-revision-activation.mjs scripts/gcp/deploy-health-retry.node.test.mjs
           node --test scripts/test-studio-workflow-inspection.mjs
           node --test scripts/gcp/prune-web-release-requests.test.mjs
           node --test scripts/validation/tenant-isolation-proof.test.mjs

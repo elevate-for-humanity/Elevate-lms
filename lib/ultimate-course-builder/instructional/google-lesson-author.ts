@@ -1,7 +1,7 @@
 import { isCosmetologyRti, RTI_TEACHING_REQUIREMENTS, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
 import {reportCourseProgress, courseProgressSignal} from '../worker/progress-watch.mjs';
 import { assertGeneratedLessonAssessment } from './generated-lesson-assessment.mjs';
-import { parseVertexLessonResponse } from './vertex-response.mjs';
+import { parseVertexLessonResponse, vertexLessonGenerationConfig } from './vertex-response.mjs';
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
 import { contractHash } from '../core/lesson-contract';
 import { validateLessonBlueprint, type LessonBlueprint } from './lesson-blueprint';
@@ -137,10 +137,12 @@ export async function generateVertexLessonJson(model: string, system: string, in
   const token = await tokenResponse.json();
   if (!token.access_token) throw new Error('ULTIMATE_GOOGLE_SERVICE_IDENTITY_UNAVAILABLE');
   const host = region === 'global' ? 'aiplatform.googleapis.com' : ['us','eu'].includes(region) ? `aiplatform.${region}.rep.googleapis.com` : `${region}-aiplatform.googleapis.com`;
+  let maxOutputTokens=16384;
   for(let attempt=0;attempt<3;attempt++) {
+  reportCourseProgress('authoring:google-request',attempt+1,3);
   const response = await fetch(`https://${host}/v1/projects/${project}/locations/${region}/publishers/google/models/${model}:generateContent`, {
     method: 'POST', headers: { Authorization: `Bearer ${token.access_token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 16384, responseMimeType: 'application/json' } }),
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: vertexLessonGenerationConfig(model,maxOutputTokens) }),
     signal: courseProgressSignal() ? AbortSignal.any([courseProgressSignal(), AbortSignal.timeout(180000)]) : AbortSignal.timeout(180000),
   });
   if ([429,500,502,503,504].includes(response.status)&&attempt<2) {await new Promise(r=>setTimeout(r,15000*2**attempt));continue;}
@@ -148,7 +150,13 @@ export async function generateVertexLessonJson(model: string, system: string, in
   const output = await response.json();
   try {return parseVertexLessonResponse(output);}
   catch(error) {
-   if(attempt===2 || !['ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID','ULTIMATE_GOOGLE_AUTHORING_INCOMPLETE'].includes((error as Error).message)) throw error;
+   const failure=error as Error & {finishReason?:string};
+   const code=failure.message.split(':')[0];
+   if(failure.finishReason)reportCourseProgress('authoring:google-incomplete:'+failure.finishReason,attempt+1,3);
+   const retryable=code==='ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID'||
+     (code==='ULTIMATE_GOOGLE_AUTHORING_INCOMPLETE'&&failure.finishReason==='MAX_TOKENS');
+   if(attempt===2||!retryable)throw error;
+   if(failure.finishReason==='MAX_TOKENS')maxOutputTokens=32768;
   }
   }
   throw Error('ULTIMATE_GOOGLE_AUTHORING_RETRIES_EXHAUSTED');

@@ -158,13 +158,9 @@ function assertTrustedNarrationUrl(audioUrl: string): { url: URL; mediaKey?: str
   return { url, mediaKey };
 }
 
-export async function analyzeNarrationAudio(input: {
-  audioUrl: string;
-  transcript: string;
-  deliveredMp4?: boolean;
-  expectedMediaSha256?: string;
-}): Promise<NarrationMetrics> {
-  const reference = assertTrustedNarrationUrl(input.audioUrl);
+/** Renew access to the same configured object without regenerating saved speech. */
+export async function resolveStoredNarrationUrl(audioUrl: string): Promise<URL> {
+  const reference = assertTrustedNarrationUrl(audioUrl);
   let url = reference.url;
   if (reference.mediaKey) {
     // Checkpoints outlive signed URLs. Renew access, not narration or rendering.
@@ -174,6 +170,16 @@ export async function analyzeNarrationAudio(input: {
     if (checked.mediaKey !== reference.mediaKey) throw new Error('NARRATION_ANALYSIS_MEDIA_REFERENCE_MISMATCH');
     url = checked.url;
   }
+  return url;
+}
+
+export async function analyzeNarrationAudio(input: {
+  audioUrl: string;
+  transcript: string;
+  deliveredMp4?: boolean;
+  expectedMediaSha256?: string;
+}): Promise<NarrationMetrics> {
+  const url = await resolveStoredNarrationUrl(input.audioUrl);
   const response = await fetch(url, {
     cache: 'no-store',
     redirect: 'error',

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const db = await requireAdminClient();
     const { data: build, error } = await db
       .from('ultimate_course_builds')
-      .select('id,status,profile')
+      .select('id,status,profile,updated_at')
       .eq('id', body.buildId)
       .single();
     if (error || !build)
@@ -34,6 +34,8 @@ export async function POST(req: NextRequest) {
       );
     // An explicit authenticated Resume must clear a saved production pause.
     // Record the real authenticated actor; the legacy flag alone proves no actor.
+    if (typeof build.updated_at !== 'string')
+      return NextResponse.json({ error: 'The saved revision is unavailable. Refresh before changing the build.' }, { status: 409 });
     const profile = build.profile as Record<string, unknown>;
     if (profile?.ownerPaused === true) {
       const now = new Date().toISOString();
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest) {
           'failed',
           'built_with_findings',
         ])
-        .eq('profile', JSON.stringify(profile))
+        .eq('updated_at', build.updated_at)
         .select('id');
       if (resumed.error || resumed.data?.length !== 1)
         return NextResponse.json(

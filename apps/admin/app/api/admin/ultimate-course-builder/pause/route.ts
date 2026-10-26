@@ -16,12 +16,14 @@ export async function POST(req: NextRequest) {
     const db = await requireAdminClient();
     const { data: build, error } = await db
       .from('ultimate_course_builds')
-      .select('id,status,profile')
+      .select('id,status,profile,updated_at')
       .eq('id', input.buildId)
       .single();
     if (error) throw error;
     if (['published', 'archived', 'built'].includes(build.status))
       return NextResponse.json({ error: 'This revision has finished.' }, { status: 409 });
+    if (typeof build.updated_at !== 'string')
+      return NextResponse.json({ error: 'The saved revision is unavailable. Refresh before changing the build.' }, { status: 409 });
     const profile = build.profile as Record<string, unknown>;
     const now = new Date().toISOString();
     const saved = await db
@@ -35,7 +37,7 @@ export async function POST(req: NextRequest) {
         updated_at: now,
       })
       .eq('id', build.id)
-      .eq('profile', JSON.stringify(profile))
+      .eq('updated_at', build.updated_at)
       .eq('status', build.status)
       .select('id');
     if (saved.error) throw saved.error;

@@ -43,6 +43,8 @@ export function ProgramHolderPhoneReceiver() {
     let active = true;
     const controller = new AbortController();
     let heartbeat: ReturnType<typeof setInterval> | null = null;
+    let retry: ReturnType<typeof setTimeout> | null = null;
+    let starting = false;
     let client: PhoneClient | null = null;
     let ready = false;
     const id = currentDeviceId();
@@ -62,6 +64,9 @@ export function ProgramHolderPhoneReceiver() {
     }
 
     async function start() {
+      if (!active || starting || ready) return;
+      starting = true;
+      try {
       const settingsResponse = await fetch('/api/program-holder/phone', { cache: 'no-store', signal: controller.signal });
       if (!settingsResponse.ok || !active) return;
       const settings = await settingsResponse.json();
@@ -73,9 +78,10 @@ export function ProgramHolderPhoneReceiver() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deviceId: id }),
       });
-      if (!tokenResponse.ok || !active) return;
+      if (!active) return;
+      if (!tokenResponse.ok) throw new Error('phone_enrollment_unavailable');
       const token = await tokenResponse.json();
-      if (!audioRef.current) return;
+      if (!audioRef.current) throw new Error('phone_audio_unavailable');
       client = await createPhoneClient(token, audioRef.current);
       if (!active) { await client.disconnect(); return; }
       clientRef.current = client;
@@ -127,9 +133,10 @@ export function ProgramHolderPhoneReceiver() {
       await client.connect();
       if (!active) { await client.disconnect(); return; }
       heartbeat = setInterval(() => void ping(), 45_000);
+      } finally { starting = false; }
     }
 
-    void start().catch(async () => {
+    async function recover() {
       if (!active) return;
       setOnline(false);
       try {
@@ -143,11 +150,20 @@ export function ProgramHolderPhoneReceiver() {
         body: JSON.stringify({ action: 'disconnect', deviceId: id }),
         keepalive: true,
       }).catch(() => undefined);
-    });
+      client = null;
+      clientRef.current = null;
+      if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+      if (active && !retry) retry = setTimeout(() => {
+        retry = null;
+        void start().catch(recover);
+      }, 30_000);
+    }
+    void start().catch(recover);
     return () => {
       active = false;
       controller.abort();
       if (heartbeat) clearInterval(heartbeat);
+      if (retry) clearTimeout(retry);
       void client?.disconnect();
       clientRef.current = null;
       callRef.current = null;

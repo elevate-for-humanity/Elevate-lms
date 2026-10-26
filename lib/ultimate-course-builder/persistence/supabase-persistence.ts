@@ -65,6 +65,23 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
         directive:{...narrationDirective,target:'finished_media_qa'}};
     }
+    // A legacy render cue error was routed to the deterministic sync producer.
+    // Recover only its previously certified timeline. The compound-token fix
+    // is checked again by the renderer; no media or learner QA is approved here.
+    const pictureCueDirective = (artifacts.__repairState as any)?.directive;
+    const legacyPictureCueRetry = pictureCueDirective?.target === 'synchronization' &&
+      pictureCueDirective?.failedStep === 'lesson_film_render' &&
+      Array.isArray(pictureCueDirective.requirements) && pictureCueDirective.requirements.length > 0 &&
+      pictureCueDirective.requirements.every((finding: any) => finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/.test(String(finding.message ?? ''))) &&
+      currentEvidence(pictureCueDirective.previous);
+    if (legacyPictureCueRetry) {
+      artifacts.synchronization = pictureCueDirective.previous;
+      if (!passed.some((step: any) => step.step === 'synchronization'))
+        passed.push({step:'synchronization',state:'passed',artifacts:pictureCueDirective.previous});
+      artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
+        recovery:'certified-picture-cue-timeline',directive:{...pictureCueDirective,target:'lesson_film_render'}};
+    }
     // The old full-frame premium OCR can reject a readable heading, then strand
     // its unchanged scene producer. Retry that inspection using the previously
     // certified producer and saved film. The runner still verifies every input
@@ -110,7 +127,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     return {
       artifacts,
       passedSteps: reusable.map((x: any) => String(x.step)),
-      recoveredSteps: narrationInspectorRetry && reusable.some((step: any) => step.step === 'synchronization')
+      recoveredSteps: (narrationInspectorRetry || legacyPictureCueRetry) && reusable.some((step: any) => step.step === 'synchronization')
         ? ['synchronization' as const] : legacyTitleRetry && reusable.some((step: any) => step.step === 'scene_construction')
         ? ['scene_construction' as const] : [],
       findings: Array.isArray(lesson?.findings) ? lesson.findings : [],

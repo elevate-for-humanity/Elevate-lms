@@ -28,9 +28,9 @@ test('phone-size unreadable text routes to the scene producer', () => {
 });
 
 
-test('picture mismatch from render routes to upstream synchronization', () => {
+test('picture mismatch from render routes to its storyboard cue producer', () => {
  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'}];
- assert.deepEqual(routeSelectiveRepairs(findings),[{step:'synchronization',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+ assert.deepEqual(routeSelectiveRepairs(findings),[{step:'storyboard',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
 });
 
 test('repeated encoded timeline and insufficient shots repair upstream visual assignment', () => {

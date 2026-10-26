@@ -63,7 +63,8 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
       if (!visual && !assembly) targets.set('finished_media_qa', [...(targets.get('finished_media_qa') ?? []), f.code]);
       continue;
     }
-    const target = renderInputFailure ? 'synchronization' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    // Cue quotations originate in the storyboard, not the deterministic timeline.
+    const target = renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

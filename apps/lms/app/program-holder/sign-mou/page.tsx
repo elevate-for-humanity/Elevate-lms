@@ -42,9 +42,6 @@ export default async function SignMouPage() {
   ) {
     redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
   }
-  if (holder.mou_signed) {
-    redirect('/program-holder/dashboard');
-  }
 
   const { data: assignments } = await db
     .from('program_holder_programs')
@@ -64,8 +61,7 @@ export default async function SignMouPage() {
         </p>
         <h1 className="mt-3 text-3xl font-black sm:text-4xl">Sign the Program Holder MOU</h1>
         <p className="mt-4 text-base leading-7 text-slate-700">
-          Your application for <strong>{holder.organization_name}</strong> is approved. The MOU must
-          be signed before the Program Holder dashboard is unlocked.
+          Your application for <strong>{holder.organization_name}</strong> is approved. Review the complete terms below. Your existing signature remains on record if you have already signed.
         </p>
 
         <section className="mt-7 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
@@ -95,12 +91,21 @@ export default async function SignMouPage() {
           insurance, W-9, program-specific credentials, and training plan have all been approved.
         </section>
 
-        <DocumentSignatureBlock
-          agreementType="program_holder_mou"
-          agreementVersion={`3.0-${holder.id}`}
-          buttonLabel="Sign Program Holder MOU & Continue"
-          nextUrl="/program-holder/dashboard"
-        />
+        {holder.mou_signed ? (
+          <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm font-semibold text-emerald-950">
+            Your Program Holder MOU is already recorded as signed. You may review the terms above at any time.
+            <Link href="/program-holder/documents" className="mt-3 block font-bold underline">
+              View other required documents and acknowledgements
+            </Link>
+          </div>
+        ) : (
+          <DocumentSignatureBlock
+            agreementType="program_holder_mou"
+            agreementVersion={`3.0-${holder.id}`}
+            buttonLabel="Sign Program Holder MOU & Continue"
+            nextUrl="/program-holder/dashboard"
+          />
+        )}
       </div>
     </main>
   );

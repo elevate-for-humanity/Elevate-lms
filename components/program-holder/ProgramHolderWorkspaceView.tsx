@@ -1124,6 +1124,13 @@ export async function ProgramHolderWorkspaceView({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
+                {programHolderRequirementLink(item.label) ? (
+                  <Link href={programHolderRequirementLink(item.label)!} className="ml-auto inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">
+                    {item.complete ? 'View' : 'Open'}
+                  </Link>
+                ) : item.owner === 'Elevate' ? (
+                  <span className="ml-auto text-xs font-semibold text-slate-500">Elevate-managed</span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -2134,6 +2141,23 @@ function Hours({
     </div>
   );
 }
+function programHolderRequirementLink(label: string): string | null {
+    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
+    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
+    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
+    if (label === 'Signed image release') return '/program-holder/documents';
+    if (label === 'Program-holder approval') return '/program-holder/onboarding';
+    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+    if (label === 'QuickBooks payment-record connection') return '/program-holder/payouts';
+    if (label === 'Graduated-student back work and 48-hour sign-offs') return '/program-holder/students';
+    if (label === 'Course delivery assignment' || label === 'HVAC program assignment') return '/program-holder/programs';
+    return null;
+}
+
 function Compliance({
   score,
   items,
@@ -2148,19 +2172,7 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
-  const actionFor = (label: string): string | null => {
-    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
-    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
-    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
-    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
-    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
-    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
-    if (label === 'Signed image release') return '/program-holder/documents';
-    if (label === 'Program-holder approval') return '/program-holder/onboarding';
-    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
-    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
-    return null;
-  };
+
   return (
     <div className="space-y-6">
       <Hero
@@ -2191,8 +2203,8 @@ function Compliance({
                   </span>
                 </span>
                 <div className="flex shrink-0 items-center gap-3">
-                  {actionFor(item.label) ? (
-                    <Link href={actionFor(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                  {programHolderRequirementLink(item.label) ? (
+                    <Link href={programHolderRequirementLink(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
                       {item.complete ? 'View form' : 'Open form'}
                     </Link>
                   ) : null}

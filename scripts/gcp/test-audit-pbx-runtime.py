@@ -47,6 +47,20 @@ class RuntimeEvidence(unittest.TestCase):
         self.assertIsNone(pbx.operator_alias_extension(" '_X.' => 1. Gosub(elevate-pwa-extensions,104,1)\n 2. Return()"))
         self.assertIsNone(pbx.operator_alias_extension(" '0' => 1. Gosub(elevate-pwa-extensions,9,1)\n 2. Return()"))
 
+    def test_operator_route_reason_reports_only_fixed_labels(self):
+        direct = " '0' => 1. Set(PWA_CONTACTS=)\n Set(DIALSTATUS=CHANUNAVAIL)\n Return()"
+        alias = " '0' => 1. Gosub(elevate-pwa-extensions,104,1)\n 2. Return()"
+        target = (" '104' => 1. Set(PWA_CONTACTS=)\n"
+                  " 2. Set(DIALSTATUS=CHANUNAVAIL)\n 3. Return()")
+        self.assertEqual(pbx.operator_route_reason(None, None), 'operator_dialplan_unavailable')
+        self.assertEqual(pbx.operator_route_reason('There is no existence of 0@elevate-pwa-extensions', None), 'generated_route_absent')
+        self.assertEqual(pbx.operator_route_reason(" '0' => 1. NoOp(private)", None), 'generated_route_invalid')
+        self.assertEqual(pbx.operator_route_reason(alias, None), 'delegated_target_unverified')
+        self.assertEqual(pbx.operator_route_reason(alias, target), 'delegated_route_verified')
+        self.assertEqual(pbx.operator_route_reason(direct, None), 'direct_route_verified')
+        self.assertNotIn('104', pbx.operator_route_reason(alias, target))
+        self.assertNotIn('private', pbx.operator_route_reason(" '0' => 1. NoOp(private)", None))
+
     def test_carrier_inventory_excludes_identity_and_credentials(self):
         report = pbx.carrier_inventory('Transport: transport-udp udp 0 0 0.0.0.0:5060\nTransport: secure tls 0 0 0.0.0.0:5061\npassword=private',
                                       ' Endpoint: twilio/123456 Not in use\n Endpoint: pwa-private Not in use\n Endpoint: telnyx Not in use')

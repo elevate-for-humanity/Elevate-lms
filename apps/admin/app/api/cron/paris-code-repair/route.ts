@@ -1,4 +1,5 @@
 import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
+import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {authorizeParisWorkflow} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
 import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
@@ -9,6 +10,13 @@ export async function POST(request:NextRequest){
  if(!await authorizeParisWorkflow(request.headers.get('authorization')))return NextResponse.json({error:'Unauthorized'},{status:401});
  const body=await request.json().catch(()=>({}));
  try{
+  if(body.phase==='app-auth-diagnostic'){
+   // Deliberately ignore X-Paris-GitHub-Token: this phase proves the runtime App.
+   const token=await getGitHubAppToken();
+   if(!token)return NextResponse.json({errorCode:'GITHUB_APP_NOT_CONFIGURED'},{status:503});
+   const headers={Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+   return NextResponse.json({...await diagnoseParisGitHubCredential(headers),credentialSource:'github-app-installation',writeAuthority:'not_exercised'},{headers:{'Cache-Control':'no-store'}});
+  }
   if(body.phase==='auth-diagnostic'){
    const diagnostic=async()=>NextResponse.json({...await diagnoseParisGitHubCredential(),workflowAuthorization:'temporary-job-v1'},{headers:{'Cache-Control':'no-store'}});
    const token=request.headers.get('x-paris-github-token');

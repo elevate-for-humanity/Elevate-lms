@@ -1,6 +1,11 @@
 name: Verify PARIS Admin production authorization
 on:
   workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact deployed main SHA to verify
+        required: false
+        type: string
 permissions:
   contents: read
   actions: read
@@ -44,6 +49,8 @@ jobs:
           # Actual revision health/commit is verified separately through public health.
           PY
       - name: Verify public serving Admin commit contains PR 1927
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
         run: |
           python3 - <<'PY'
           import json,urllib.request,subprocess,os,re
@@ -57,6 +64,8 @@ jobs:
           sha=body.get('commit') or body.get('commitSha')
           if not isinstance(sha,str) or not re.fullmatch('[a-f0-9]{40}',sha):
             raise SystemExit('ADMIN_PRODUCTION_COMMIT_MISSING')
+          if sha!=os.environ['EXPECTED_SHA']:
+            raise SystemExit('ADMIN_PRODUCTION_COMMIT_DIFFERS_FROM_REQUESTED_RELEASE')
           subprocess.run(['git','fetch','--no-tags','--depth=150','origin','main'],check=True,stdout=subprocess.DEVNULL)
           merge='ccbdda8d8201fe551bcf4eaa5d6a213d13abf34c'
           subprocess.run(['git','cat-file','-e',sha+'^{commit}'],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
@@ -83,14 +92,15 @@ jobs:
           NODE
       - name: Verify PARIS GitHub credential via protected read-only diagnostic
         env:
-          GH_TOKEN: ${{ github.token }}
+          # The runtime must use its own App binding, not a workflow token.
+          VERIFICATION_SOURCE: github-app-installation
         run: |
           python3 - <<'PY'
           import os,json,urllib.request,urllib.error,sys
           secret=os.environ.get('PARIS_ID_TOKEN','')
           if not secret: raise SystemExit('PARIS_WORKFLOW_IDENTITY_UNAVAILABLE')
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
-          req=urllib.request.Request(endpoint,data=b'{"phase":"auth-diagnostic"}',headers={'Authorization':'Bearer '+secret,'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
+          req=urllib.request.Request(endpoint,data=b'{"phase":"app-auth-diagnostic"}',headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
           try:
             with urllib.request.urlopen(req,timeout=30) as response:
               body=json.load(response)
@@ -104,6 +114,6 @@ jobs:
           workflow=body.get('workflow',{})
           safe={'type':'paris_diagnostic','diagnostic_version':body.get('diagnosticVersion'),'repo_status':repo.get('status'),'repo_ok':repo.get('ok') is True,'contents_ok':contents.get('ok') is True,'workflow_ok':workflow.get('ok') is True,'write_authority':'not_exercised'}
           print(json.dumps(safe))
-          if safe['diagnostic_version']!=2 or not safe['repo_ok'] or not safe['contents_ok'] or not safe['workflow_ok']:
+          if body.get('credentialSource')!='github-app-installation' or safe['diagnostic_version']!=2 or not safe['repo_ok'] or not safe['contents_ok'] or not safe['workflow_ok']:
             raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
           PY

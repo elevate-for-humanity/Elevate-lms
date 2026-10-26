@@ -5,14 +5,27 @@ Verified request-scoped workflow credentials retain precedence. Otherwise a
 configured App takes precedence over legacy GITHUB_TOKEN credentials. An invalid
 or incomplete App configuration fails closed without falling back to a PAT.
 
-Bind these values in the existing Google Admin runtime, using its existing
-Google deployment and configuration workflow:
+The existing protected Admin deployment now validates the existing Google
+Secret Manager key, discovers the App installation for Elevate-lms, checks
+contents/actions/pull-request write permissions, and binds the following values
+to the zero-traffic candidate before the existing health/activation gates:
 
 | Variable | Value |
 | --- | --- |
 | GITHUB_APP_ID | 5477907 |
 | GITHUB_APP_INSTALLATION_ID | The installation of PARIS Engineer for Elevate on elevate-for-humanity, verified in GitHub App settings |
 | GITHUB_APP_PRIVATE_KEY_FILE | Absolute path to the PEM mounted from Google Secret Manager |
+
+The default key secret is `paris-engineer-github-private-key`. If the key is
+already stored elsewhere, set repository variable `PARIS_GITHUB_APP_SECRET` to
+that secret's name; do not copy or regenerate the key. The deployment pins an
+enabled numeric secret version at `/var/run/secrets/paris-github-app/key.pem`.
+It never prints the PEM or installation token. Missing keys, denied Google
+access, missing installation, or missing App permissions fail before rollout.
+The deployment identity needs access to this key; the existing Admin runtime
+identity must be allowed to read its mounted version. This change does not
+grant project-wide secret access or provision identities. Google IAM failures
+must be resolved by the account owner on the specific secret resource.
 
 Alternatively bind GITHUB_APP_PRIVATE_KEY directly from Google Secret Manager;
 set exactly one key source. Never set either as a NEXT_PUBLIC variable. Do not
@@ -35,14 +48,18 @@ issuance.
 
 ## Validation
 
-Run `node --test scripts/test-github-app-token.mjs scripts/test-devstudio-github-token.mjs`.
+Run `node --test scripts/test-github-app-token.mjs scripts/test-devstudio-github-token.mjs scripts/gcp/paris-github-app-binding.test.mjs scripts/test-paris-app-diagnostic.mjs`.
 Run Admin typecheck, lint and build before release. After the approved main
 deployment, validate a normal authenticated Studio/PARIS request using the App
 configuration (without a workflow token override), and verify repository access
 and an authorized protected workflow dispatch separately. Never log the token.
 
-The existing verify-paris-production-authorization workflow supplies its own
-GitHub Actions token; it does not prove this App's credentials work. Source tests
-do not establish that the secret is bound to the production runtime. Record the
-deployed SHA, ready revision and live App-authenticated result before calling
-the connection complete.
+After exact-revision activation, the deployment uses an App installation token
+to dispatch `verify-paris-production-authorization.yml`, passing the deployed
+SHA. This proves dispatch acceptance, not successful verification. That workflow
+requires the live SHA to match and calls `app-auth-diagnostic` through the
+existing GitHub OIDC authorization. This phase ignores workflow-token headers
+and uses only the runtime's App binding; no PAT fallback is allowed. It reports
+only source/status metadata and does not repair code, change business records,
+or dispatch additional workflows. Record the ready revision and successful
+live verification run before calling the connection complete.

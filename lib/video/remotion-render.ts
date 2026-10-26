@@ -1,3 +1,4 @@
+import { resolveStoredNarrationUrl } from '../ultimate-course-builder/quality/narration-audio-analysis';
 import { storyboardRenderFingerprint } from './render-checkpoint-contract.mjs';
 import {createCheckpointFallback,privateCheckpointStorage} from './checkpoint-fallback.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../ultimate-course-builder/worker/progress-watch.mjs';
@@ -611,7 +612,8 @@ export async function renderStoryboardVideo(
       let audioSrc: string;
       let measuredNarrationSeconds: number | null;
       if (approvedAudio) {
-        const response = await fetch(approvedAudio.audioUrl, {
+        const approvedAudioUrl = (await resolveStoredNarrationUrl(approvedAudio.audioUrl)).href;
+        const response = await fetch(approvedAudioUrl, {
           signal: AbortSignal.timeout(60000),
         });
         if (!response.ok) throw new Error(`Approved narration returned HTTP ${response.status}`);
@@ -628,7 +630,7 @@ export async function renderStoryboardVideo(
           Math.abs(measuredNarrationSeconds - approvedAudio.durationSeconds) > 0.1
         )
           throw new Error('ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED');
-        audioSrc = approvedAudio.audioUrl;
+        audioSrc = approvedAudioUrl;
       } else {
         const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
         const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);

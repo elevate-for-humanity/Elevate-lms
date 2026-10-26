@@ -37,3 +37,9 @@ test('opening requires configured greeting and rejects synthetic audio or unknow
  assert.equal((await send(handler,{...payload,audioBase64:'AAAA'})).code,400);
  assert.equal((await send(handler,{...payload,event:'external-transfer'})).code,400);
 });
+
+test('explicit extension routing requires the reviewed allowlist',()=>{
+ assert.deepEqual(callerRouteIntent('Please connect me to extension 123',{allowedExtensions:'123,456'}),{type:'extension',extension:'123'});
+ assert.equal(callerRouteIntent('Please connect me to extension 999',{allowedExtensions:'123,456'}),null);
+ assert.equal(callerRouteIntent('Please connect me to extension 123',{allowedExtensions:''}),null);
+});

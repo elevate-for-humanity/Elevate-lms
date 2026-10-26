@@ -131,3 +131,13 @@ test('asynchronous Asterisk apply and revocation settle before acceptance', asyn
   assert.equal(f.waits(), 4);
   assert.equal((await f.request('/status')).status, 200);
 });
+
+test('multiple devices owned by the same extension render independent endpoints and one ring group', () => {
+  const otherIdentity = { ...identity, deviceId: 'asterisk_second_device' };
+  const second = { ...record, ...otherIdentity, endpointId: endpointFor(otherIdentity) };
+  const config = renderConfiguration([record, second]);
+  assert.match(config.pjsip, new RegExp(endpoint));
+  assert.match(config.pjsip, new RegExp(second.endpointId));
+  assert.equal((config.dialplan.match(/exten => 101,1,Set\\(PWA_CONTACTS=\\)/g) || []).length, 1);
+  assert.match(config.dialplan, new RegExp('PJSIP_DIAL_CONTACTS\\\\(' + second.endpointId + '\\\\)'));
+});

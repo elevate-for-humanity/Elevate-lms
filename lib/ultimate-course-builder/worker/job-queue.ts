@@ -175,6 +175,9 @@ export class UltimateJobQueue {
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    // Each saved lesson checkpoint requests a successor immediately; the
+    // durable queue and scheduled coordinator remain the recovery fallback.
+    await notifyCourseDispatcher({});
   }
 
   async fail(jobId: string, workerId: string, errorMessage: string, generation: number, retry = true) {

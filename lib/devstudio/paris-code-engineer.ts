@@ -50,7 +50,7 @@ function blockedPath(path: string): boolean {
     path.includes('..') ||
     /^\.env(?:\.|$)/.test(path) ||
     path.startsWith('.git/') ||
-    /code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
+    /code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
     path.includes('/node_modules/') ||
     path.includes('/.next/') ||
     !/^(lib|components|apps|remotion-src|workers|tests)\//.test(path) ||
@@ -186,6 +186,16 @@ async function searchCode(query: string) {
     // Code search is optional discovery. Private repository installations may
     // authorize Contents while denying Search (403). In that case use the
     // already supported list/read path instead of failing the repair.
+    if (response.status === 401) {
+      // Search can reject job/App identities independently of Contents. A 401
+      // is optional discovery only when this exact credential still reads main.
+      const repository = await fetch(`${GH_API}/repos/${REPOSITORY}/git/ref/heads/main`, {
+        headers: await githubHeaders(), redirect: 'error', cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      });
+      if (repository.ok) return [];
+      throw new Error(`GitHub repository authorization failed: ${repository.status}`);
+    }
     if (response.status === 403 || response.status === 429) {
       return [];
     }

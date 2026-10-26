@@ -136,8 +136,8 @@ test('multiple devices owned by the same extension render independent endpoints 
   const otherIdentity = { ...identity, deviceId: 'asterisk_second_device' };
   const second = { ...record, ...otherIdentity, endpointId: endpointFor(otherIdentity) };
   const config = renderConfiguration([record, second]);
-  assert.match(config.pjsip, new RegExp(endpoint));
-  assert.match(config.pjsip, new RegExp(second.endpointId));
-  assert.equal((config.dialplan.match(/exten => 101,1,Set\\(PWA_CONTACTS=\\)/g) || []).length, 1);
-  assert.match(config.dialplan, new RegExp('PJSIP_DIAL_CONTACTS\\\\(' + second.endpointId + '\\\\)'));
+  assert.ok(config.pjsip.includes(endpoint));
+  assert.ok(config.pjsip.includes(second.endpointId));
+  assert.equal(config.dialplan.split('exten => 101,1,Set(PWA_CONTACTS=)').length - 1, 1);
+  assert.ok(config.dialplan.includes('PJSIP_DIAL_CONTACTS(' + second.endpointId + ')'));
 });

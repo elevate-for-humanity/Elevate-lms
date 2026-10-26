@@ -4,6 +4,7 @@
  */
 
 import { currentWorkflowGitHubToken } from './workflow-github-context';
+import { getGitHubAppToken } from './github-app-token';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 
 function normalizeToken(value: string | undefined | null): string | null {
@@ -50,6 +51,8 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
 export async function getGitHubToken(): Promise<string | null> {
   const workflowToken=currentWorkflowGitHubToken();
   if(workflowToken)return workflowToken;
+  const appToken = await getGitHubAppToken();
+  if (appToken) return appToken;
   // Capture the deployment value before hydration. hydrateProcessEnv may load
   // a canonical fallback into process.env, but must not replace a valid token
   // supplied directly by the production service.
@@ -75,7 +78,7 @@ export async function getGitHubToken(): Promise<string | null> {
 export async function getGitHubHeaders(): Promise<HeadersInit> {
   const token = await getGitHubToken();
   if (!token) {
-    throw new Error('GITHUB_TOKEN is not configured. Add it in Dev Studio > Secrets.');
+    throw new Error('GitHub authentication is not configured. Bind GitHub App credentials in the server runtime or add GITHUB_TOKEN in Dev Studio > Secrets.');
   }
   return {
     Authorization: `Bearer ${token}`,
@@ -87,10 +90,10 @@ export async function getGitHubHeaders(): Promise<HeadersInit> {
 
 export function githubApiErrorMessage(status: number): string {
   if (status === 401) {
-    return 'GitHub token rejected (401). Rotate GITHUB_TOKEN in Dev Studio > Secrets.';
+    return 'GitHub token rejected (401). Check the configured GitHub App installation or legacy GITHUB_TOKEN.';
   }
   if (status === 403) {
-    return 'GitHub API forbidden (403). Ensure GITHUB_TOKEN has contents read/write permission on elevate-for-humanity/Elevate-lms.';
+    return 'GitHub API forbidden (403). Check the App installation or legacy token permissions on elevate-for-humanity/Elevate-lms.';
   }
   if (status === 404) {
     return 'Requested GitHub resource was not found in elevate-for-humanity/Elevate-lms.';
@@ -100,6 +103,10 @@ export function githubApiErrorMessage(status: number): string {
 
 /** Existing credentials for the same repository; never log or persist their values. */
 export async function getGitHubTokenCandidates(): Promise<string[]> {
+  const workflow = currentWorkflowGitHubToken();
+  if (workflow) return [workflow];
+  const app = await getGitHubAppToken();
+  if (app) return [app];
   const deployed = normalizeToken(process.env.GITHUB_TOKEN);
   const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
   return [...new Set([stored, deployed].filter((value): value is string => Boolean(value)))];

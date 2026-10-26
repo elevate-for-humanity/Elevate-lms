@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import type { Metadata } from 'next';
@@ -484,6 +485,7 @@ export default async function ApprenticePortalPage() {
     return (
       <main className="space-y-7 pb-10">
         <TimeclockAttendanceNotice />
+        <ProgramGuideResources />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
           <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
@@ -659,6 +661,7 @@ export default async function ApprenticePortalPage() {
   return (
     <main className="space-y-7 pb-10">
       <TimeclockAttendanceNotice />
+        <ProgramGuideResources />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">

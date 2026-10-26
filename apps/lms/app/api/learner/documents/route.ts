@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   // authenticity or eligibility, so activation must wait for verified status.
   const { error: reviewError } = await admin.from('review_queue').insert({
     queue_type: 'document_review',
-    subject_type: 'document',
+    subject_type: 'enrollment_requirement',
     subject_id: requirementId,
     reasons: [extracted.text.trim() ? 'authenticity_requires_verification' : 'ocr_unreadable_requires_review'],
     entity_type: 'enrollment_requirement',

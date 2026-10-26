@@ -19,6 +19,22 @@ function dependencyEvidence(value) {
     error: allowed.includes(value.error) ? value.error : undefined };
 }
 
+// Retry only transport failures on idempotent public-health GETs. A real HTTP
+// response (including 503) or a malformed body must still fail its gate.
+// Each attempt gets its own abort signal; the total retry budget is bounded.
+async function getWithTransportRetry(request, url, options) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await request(url, {
+        ...options,
+        signal: AbortSignal.timeout(attempt === 0 ? 20_000 : 10_000),
+      });
+    } catch (error) {
+      if (attempt === 1 || !['TimeoutError', 'AbortError', 'TypeError'].includes(error?.name)) throw error;
+    }
+  }
+}
+
 export async function verifySite(component, request = fetch) {
   const base = sites[component];
   if (!base) throw new Error('Unknown public service');
@@ -26,7 +42,7 @@ export async function verifySite(component, request = fetch) {
   const results = [];
   for (const path of ['/api/ping', '/api/health', '/api/ready']) {
     try {
-      const r = await request(base + path, { redirect: 'manual', signal: AbortSignal.timeout(20000), headers: { 'Cache-Control': 'no-cache' } });
+      const r = await getWithTransportRetry(request, base + path, { redirect: 'manual', headers: { 'Cache-Control': 'no-cache' } });
       const body = await r.json();
       const passed = path === '/api/ping'
         ? r.status === 200 && body.ok === true && body.service === processService

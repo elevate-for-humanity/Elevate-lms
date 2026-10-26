@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -106,6 +107,7 @@ export default function StorePage() {
       <UnifiedSalesMarketplace />
 
       <StorePlatformDemos />
+      <div className="mx-auto max-w-6xl px-5"><ProgramGuideResources /></div>
 
       <section className="border-b border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-6xl px-5">

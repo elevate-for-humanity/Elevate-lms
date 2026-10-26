@@ -1,3 +1,4 @@
+import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
@@ -54,6 +55,9 @@ export default async function AdminDashboardPage() {
           <p className="mt-1 text-sm text-slate-600">Registered apprenticeships, OJL, RTI, and employer approvals only.</p>
         </Link>
       </nav>
+      <div className="px-3 sm:px-5 lg:px-6">
+        <PodcastProgramGuideReview authorized={canAccessDevStudio} />
+      </div>
       <AdminDashboardContent
         data={data}
         heroAssets={heroAssets}

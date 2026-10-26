@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -130,15 +131,79 @@ export async function POST(req: Request) {
 
       // Handle document review
       if (item.queue_type === 'document_review') {
-        await supabase
-          .from('documents')
-          .update({
-            status: 'approved',
-            reviewed_at: new Date().toISOString(),
-          })
-          .eq('id', item.subject_id);
+        const isEnrollmentRequirement =
+          item.entity_type === 'enrollment_requirement' ||
+          item.review_type === 'document_verification';
 
-        reasonCodes.push('DOCUMENT_APPROVED');
+        if (isEnrollmentRequirement) {
+          const { data: requirement, error: requirementError } =
+            await supabase
+              .from('enrollment_requirements')
+              .select('id,status,enrollment_id')
+              .eq('id', item.subject_id)
+              .maybeSingle();
+
+          if (requirementError || !requirement) {
+            return NextResponse.json(
+              { error: 'Enrollment requirement not found' },
+              { status: 404 },
+            );
+          }
+
+          if (requirement.status !== 'completed') {
+            return NextResponse.json(
+              { error: 'Document has not been submitted for review' },
+              { status: 409 },
+            );
+          }
+
+          const adminClient = await requireAdminClient();
+
+          if (!adminClient) {
+            return NextResponse.json(
+              { error: 'Document verification service unavailable' },
+              { status: 503 },
+            );
+          }
+
+          const { data: verified, error: verifyError } =
+            await adminClient
+              .from('enrollment_requirements')
+              .update({
+                status: 'verified',
+                verified_at: new Date().toISOString(),
+              })
+              .eq('id', requirement.id)
+              .eq('status', 'completed')
+              .select('id')
+              .maybeSingle();
+
+          if (verifyError || !verified) {
+            return NextResponse.json(
+              { error: 'Document verification failed' },
+              { status: 500 },
+            );
+          }
+
+          reasonCodes.push('ENROLLMENT_DOCUMENT_VERIFIED');
+        } else {
+          const { error: documentError } = await supabase
+            .from('documents')
+            .update({
+              status: 'approved',
+              reviewed_at: new Date().toISOString(),
+            })
+            .eq('id', item.subject_id);
+
+          if (documentError) {
+            return NextResponse.json(
+              { error: 'Document approval failed' },
+              { status: 500 },
+            );
+          }
+
+          reasonCodes.push('DOCUMENT_APPROVED');
+        }
       }
     } else if (action === 'reject') {
       if (!reject_reason) {

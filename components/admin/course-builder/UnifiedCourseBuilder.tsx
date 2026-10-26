@@ -1,4 +1,5 @@
 'use client';
+import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 
 import dynamic from 'next/dynamic';
 import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
@@ -290,6 +291,9 @@ export default function UnifiedCourseBuilder({
         </div>
       </div>
 
+      <div className="mx-auto w-full max-w-[1600px] px-3 sm:px-5">
+        <PodcastProgramGuideReview authorized />
+      </div>
       <div className="overflow-x-auto border-b border-slate-800 bg-slate-950 px-4 py-3">
         <div className="mx-auto flex max-w-[1600px] gap-2">
           {TABS.map(({ id, label, icon: Icon }) => (

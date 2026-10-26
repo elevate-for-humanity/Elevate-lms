@@ -28,6 +28,7 @@ concurrency:
 
 jobs:
   process:
+    if: github.ref == 'refs/heads/main'
     name: Process universal canonical course video queue
     runs-on: ubuntu-latest
     timeout-minutes: 360
@@ -39,6 +40,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Validate trusted Admin media release ancestry
+        run: node --test scripts/gcp/verify-admin-media-release.test.mjs
 
       - name: Resolve the approved Admin runtime revision
         shell: bash
@@ -93,7 +97,8 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 90); do
             live_sha=$((curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/api/version" || true) | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const p=JSON.parse(d);process.stdout.write(p.commitSha||'')}catch{}})")
-            if [ "$live_sha" = "$REQUIRED_ADMIN_SHA" ]; then
+            if bash scripts/gcp/verify-admin-media-release.sh "$REQUIRED_ADMIN_SHA" "$live_sha" "$GITHUB_SHA"; then
+              echo "Approved Admin media planner release is live (required=$REQUIRED_ADMIN_SHA, serving=$live_sha)"
               exit 0
             fi
             echo "Admin media planner not live yet (attempt $attempt/90, live=$live_sha)"

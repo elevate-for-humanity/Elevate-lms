@@ -8,6 +8,7 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { setAuditContext } from '@/lib/audit-context';
 
 const execAsync = promisify(exec);
 
@@ -494,6 +495,7 @@ export async function approveAction(
       .eq('id', approverId).maybeSingle();
     if (error || !profile) return {success: false, message: 'Administrator identity could not be verified.'};
     try {
+      await setAuditContext(db, { actorUserId: approverId, systemActor: 'control_plane_workflow_approval' });
       const {approveWorkflowRepair} = await import('./workflow-repairs');
       const repair = await approveWorkflowRepair(db, actionId, {
         actorId: approverId, actorRoles: [profile.role], tenantId: profile.tenant_id ?? null,

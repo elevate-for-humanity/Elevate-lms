@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import CourseSyllabus, { type CourseSyllabusRecord } from '@/components/learner/CourseSyllabus';
 import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
 import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
@@ -618,6 +619,7 @@ export default async function StudentDashboard() {
           </section>
         ) : null}
         <CourseSyllabus syllabus={workspace.enrollments.some((row) => row.program_id === courseSyllabus?.program_id) ? courseSyllabus : null} />
+        <ProgramGuideResources />
         <DashboardOrientationPanel
           hvac={workspace.enrollments.some(row => row.program_slug === 'hvac-technician' && ['active','enrolled','in_progress','onboarding','orientation','pending'].includes(String(row.status)))}
           bookkeeping={bookkeeping}

@@ -37,6 +37,12 @@ def pwa_operator_configured(output):
 
 
 
+def operator_alias_extension(output):
+    """Extract only a concrete three-digit delegated operator route."""
+    match = re.search(r"^\s*'0'\s*=>\s*1\.\s*Gosub\(elevate-pwa-extensions,([1-9][0-9]{2}),1\)", output or '', re.M)
+    return match.group(1) if match else None
+
+
 def delegated_operator_configured(operator_output, target_output):
     """Require an explicit operator alias AND a usable generated target route.
 
@@ -47,10 +53,9 @@ def delegated_operator_configured(operator_output, target_output):
     """
     if not operator_output or not target_output:
         return False
-    match = re.search(r"^\s*'0'\s*=>\s*1\.\s*Gosub\(elevate-pwa-extensions,([1-9][0-9]{2}),1\)", operator_output, re.M)
-    if not match or 'Return(' not in operator_output:
+    extension = operator_alias_extension(operator_output)
+    if not extension or 'Return(' not in operator_output:
         return False
-    extension = match.group(1)
     expected = r"^\s*'" + extension + r"'\s*=>\s*1\.\s*Set\(PWA_CONTACTS=\)"
     if not re.search(expected, target_output, re.M):
         return False
@@ -158,8 +163,8 @@ def audit():
     record('OPERATOR_CONFIGURATION', operator_configured(plan), 'explicit_extension_0_required; call acceptance separate')
     generated = cli('dialplan show 0@elevate-pwa-extensions')
     direct_operator = pwa_operator_configured(generated)
-    alias = re.search(r"^\\s*'0'\\s*=>\\s*1\\.\\s*Gosub\\(elevate-pwa-extensions,([1-9][0-9]{2}),1\\)", generated or '', re.M)
-    target = cli('dialplan show ' + alias.group(1) + '@elevate-pwa-extensions') if alias and not direct_operator else None
+    alias_extension = operator_alias_extension(generated) if not direct_operator else None
+    target = cli('dialplan show ' + alias_extension + '@elevate-pwa-extensions') if alias_extension else None
     configured = direct_operator or delegated_operator_configured(generated, target)
     record('PWA_OPERATOR_CONFIGURATION', configured, 'generated_operator_and_delegated_route_checked; live call acceptance separate')
     count = mailbox_count(cli('voicemail show users'))

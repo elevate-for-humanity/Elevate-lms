@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {claimExactOwnerPreview} from './owner-preview-claim.mjs';
+import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
 
 export class UltimateJobQueue {
   constructor(private db: SupabaseClient) {}
@@ -16,6 +17,7 @@ export class UltimateJobQueue {
         if (build?.status === 'published') return null;
         throw new Error('ULTIMATE_DEPENDENCY_WAKEUP_NOT_PERSISTED');
       }
+      await notifyCourseDispatcher({});
       return data[0];
     }
     const active = () =>
@@ -59,6 +61,7 @@ export class UltimateJobQueue {
       .update({ status: 'queued', updated_at: new Date().toISOString() })
       .eq('id', buildId);
     if (buildError) throw buildError;
+    await notifyCourseDispatcher({});
     return data;
   }
 

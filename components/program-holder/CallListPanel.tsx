@@ -169,6 +169,13 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-900 truncate">{applicant.applicant_name}</p>
                   <p className="text-xs text-slate-600 truncate">{applicant.applicant_email}</p>
+                  {applicant.applicant_phone ? (
+                    <a href={`tel:${applicant.applicant_phone.replace(/[^+0-9]/g, '')}`} className="mt-1 block w-fit text-sm font-bold text-blue-800 underline" aria-label={`Call ${applicant.applicant_name} at ${applicant.applicant_phone}`}>
+                      {applicant.applicant_phone}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-xs font-semibold text-amber-800">Phone number not on file — request contact update</p>
+                  )}
                   {notes && (
                     <p className="text-xs text-slate-500 italic truncate mt-0.5">"{notes}"</p>
                   )}

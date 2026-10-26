@@ -1559,6 +1559,13 @@ function applicantPipelineStatus(row: any) {
   return status === 'approved' ? 'Voucher pending' : status.replaceAll('_', ' ');
 }
 
+function isCompletionOverdue(row: any): boolean {
+  const status = String(row.status || row.enrollment_state || '').toLowerCase();
+  if (['completed', 'graduated', 'withdrawn', 'cancelled'].includes(status) || row.completed_at || row.completion_date) return false;
+  const end = String(row.expected_end_date || row.training_end_date || '').slice(0, 10);
+  return Boolean(end && end < new Date().toISOString().slice(0, 10));
+}
+
 function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
   return (
     <div className="mt-5 min-w-0">
@@ -1568,7 +1575,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <article
               key={row.id}
               data-testid="student-card"
-              className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"
+              className={isCompletionOverdue(row) ? "min-w-0 rounded-xl border-2 border-red-600 bg-red-50 p-4" : "min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"}
             >
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -1587,6 +1594,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
                 <Row label="Completion" value={completionStatus(row)} />
+                {isCompletionOverdue(row) && <p role="alert" className="rounded-lg bg-red-700 p-2 text-xs font-black text-white">Completion overdue — review testing and closeout</p>}
                 <Row label="Actual completion" value={(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'} />
                 <Row label="Certification evidence" value={row.certification_status || 'Upload missing'} />
                 {row.credential_earned_date && <Row label="Credential earned" value={row.credential_earned_date} />}
@@ -1628,7 +1636,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           </div>
         )}
       </div>
-      <div className="hidden overflow-x-auto md:block">
+      <div className="hidden max-w-full overflow-x-auto md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
             <tr>
@@ -1645,7 +1653,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           <tbody className="divide-y divide-slate-100">
             {rows.length ? (
               rows.map((row) => (
-                <tr key={row.id} data-testid="student-row">
+                <tr key={row.id} data-testid="student-row" className={isCompletionOverdue(row) ? "bg-red-50" : undefined}>
                   <td className="px-3 py-4">
                     <p className="font-bold">{row.full_name || 'Student'}</p>
                     <p className="text-xs text-slate-500">{row.email || ''}</p>
@@ -1653,7 +1661,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4"><p className="font-bold">{completionStatus(row)}</p><p className="text-xs">{row.certification_status || 'Upload missing'}</p>{row.credential_earned_date && <p className="text-xs">Earned: {row.credential_earned_date}</p>}{row.certificate_verified_at && <p className="text-xs">Verified: {row.certificate_verified_at.slice(0, 10)}</p>}</td>
+                  <td className="px-3 py-4"><p className={isCompletionOverdue(row) ? "font-black text-red-800" : "font-bold"}>{completionStatus(row)}</p>{isCompletionOverdue(row) && <p role="alert" className="text-xs font-black text-red-800">Completion overdue</p>}<p className="text-xs">{row.certification_status || 'Upload missing'}</p>{row.credential_earned_date && <p className="text-xs">Earned: {row.credential_earned_date}</p>}{row.certificate_verified_at && <p className="text-xs">Verified: {row.certificate_verified_at.slice(0, 10)}</p>}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
                     {Math.min(48, Number(row.total_hours_completed || 0))} / 48

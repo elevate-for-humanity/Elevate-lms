@@ -24,7 +24,8 @@ describe('authenticated production controls',()=>{
   expect(update.mock.calls[0][0]).toMatchObject({profile:{ownerPaused:true,competencies:[{id:'saved'}],pauseResumeAudit:{pausedBy:'admin',action:'explicit-admin-pause'}}});
   expect(update.mock.calls[0][0]).not.toHaveProperty('status');
   expect(from.mock.calls.every(([table])=>table==='ultimate_course_builds')).toBe(true);
-  expect(filters).toContainEqual(['profile',JSON.stringify({competencies:[{id:'saved'}]})]);
+  expect(filters).toContainEqual(['updated_at','2026-10-25T12:00:00.000Z']);
+  expect(filters).toContainEqual(['status','running']);
  });
  it('rejects malformed review identity before opening the database',async()=>{
   expect((await review(request({buildId:id,lessonBuildId:id,artifactVersionId:'wrong',action:'approve'}))).status).toBe(400);

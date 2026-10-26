@@ -168,7 +168,7 @@ export function ProgramHolderPhoneReceiver() {
       clientRef.current = null;
       if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
       reconnecting = false;
-      if (active) scheduleReconnect();
+      if (active) void start().catch(() => scheduleReconnect());
     }
     void start().catch(recover);
     return () => {

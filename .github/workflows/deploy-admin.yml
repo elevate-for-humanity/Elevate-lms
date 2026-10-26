@@ -29,6 +29,8 @@ on:
       - 'components/analytics/**'
       - 'instrumentation.ts'
       - 'Dockerfile.admin'
+      - 'scripts/gcp/paris-github-app-binding.mjs'
+      - 'scripts/gcp/paris-github-app-binding.test.mjs'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - '.github/workflows/build-google-migration-images.yml'

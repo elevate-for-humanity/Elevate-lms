@@ -13,10 +13,36 @@ export async function parisGitHubAppBinding({ run = google, request = fetch, dis
   secret = process.env.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' } = {}) {
   if (!/^[a-zA-Z0-9_-]{1,255}$/.test(secret)) throw Error('PARIS_APP_SECRET_NAME_INVALID');
   if (dispatchSha !== undefined && !/^[a-f0-9]{40}$/.test(dispatchSha)) throw Error('PARIS_APP_RELEASE_SHA_INVALID');
-  const versionName = run(['secrets', 'versions', 'describe', 'latest', '--secret', secret, '--project', PROJECT, '--format=value(name)']);
-  const version = versionName.match(/\/versions\/(\d+)$/)?.[1];
-  if (!version) throw Error('PARIS_APP_SECRET_VERSION_INVALID');
-  const pem = run(['secrets', 'versions', 'access', version, '--secret', secret, '--project', PROJECT]);
+  // AccessSecretVersion includes the resolved numeric version and payload.
+  // Avoid versions.describe: Secret Accessor permits access, not metadata reads.
+  let raw;
+  try {
+    raw = run(['secrets', 'versions', 'access', 'latest', '--secret', secret,
+      '--project', PROJECT, '--format=json(name,payload.data)']);
+  } catch (error) {
+    const codes = {
+      permission_denied: 'PARIS_APP_SECRET_ACCESS_DENIED',
+      not_found: 'PARIS_APP_SECRET_NOT_FOUND',
+      authentication_failed: 'PARIS_APP_GOOGLE_AUTHENTICATION_FAILED',
+      api_disabled: 'PARIS_APP_SECRET_API_DISABLED',
+      quota_exceeded: 'PARIS_APP_SECRET_QUOTA_EXCEEDED',
+    };
+    throw Error(codes[error?.code] || 'PARIS_APP_GOOGLE_SECRET_UNAVAILABLE');
+  }
+  let accessed;
+  try { accessed = JSON.parse(raw); }
+  catch { throw Error('PARIS_APP_SECRET_RESPONSE_INVALID'); }
+  const match = typeof accessed?.name === 'string'
+    ? accessed.name.match(/^projects\/[^/]+\/secrets\/([^/]+)\/versions\/([1-9]\d*)$/)
+    : null;
+  if (!match || match[1] !== secret) throw Error('PARIS_APP_SECRET_VERSION_INVALID');
+  const version = match[2];
+  const encoded = accessed?.payload?.data;
+  if (typeof encoded !== 'string' || !encoded ||
+    !/^[A-Za-z0-9+/_-]+={0,2}$/.test(encoded) || encoded.length > 90_000) {
+    throw Error('PARIS_APP_SECRET_RESPONSE_INVALID');
+  }
+  const pem = Buffer.from(encoded, 'base64').toString('utf8');
   let jwt;
   try {
     const key = createPrivateKey(pem.replace(/\\n/g, '\n'));

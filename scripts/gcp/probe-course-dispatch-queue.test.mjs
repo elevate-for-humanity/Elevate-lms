@@ -26,3 +26,22 @@ test('probe rejects a paused row leaking through the filtered queue',async()=>{
 test('probe reports an HTTP failure without exposing response bodies or credentials',async()=>{
  await assert.rejects(probeCourseDispatchQueue({env,request:async()=>({ok:false,status:400,json:async()=>{throw Error('must not read body');}})}),/COURSE_QUEUE_PROJECTION_HTTP_400/);
 });
+
+test('probe retries bounded transient timeouts and still validates both projections',async()=>{
+ let requests=0;const waits=[];
+ const result=await probeCourseDispatchQueue({env,wait:async ms=>{waits.push(ms);},request:async()=>{
+  requests++;
+  if(requests===1)throw Object.assign(new Error('network timeout'),{name:'TimeoutError'});
+  return {ok:true,json:async()=>[{build:{owner_paused:null}}]};
+ }});
+ assert.equal(requests,3);assert.deepEqual(waits,[500]);
+ assert.equal(result.projectionVerified,true);assert.equal(result.pausedFilterVerified,true);
+});
+test('probe never turns persistent timeouts into a passing gate',async()=>{
+ let requests=0;const waits=[];
+ await assert.rejects(probeCourseDispatchQueue({env,wait:async ms=>{waits.push(ms);},request:async()=>{
+  requests++;
+  throw Object.assign(new Error('network timeout'),{name:'TimeoutError'});
+ }}),/COURSE_QUEUE_PROJECTION_TIMEOUT/);
+ assert.equal(requests,3);assert.deepEqual(waits,[500,1000]);
+});

@@ -2255,12 +2255,18 @@ function Documents({
             rows.map((row) => (
               <div key={row.id} className="flex items-center gap-3 rounded-xl border p-4">
                 <FileText className="h-5 w-5 text-blue-700" />
-                <div>
-                  <p className="font-bold">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words font-bold">
                     {row.document_type || row.file_name || 'Program document'}
                   </p>
                   <p className="text-xs capitalize text-slate-500">{row.status || 'submitted'}</p>
+                  {row.file_name && row.document_type && <p className="break-all text-xs text-slate-600">{row.file_name}</p>}
                 </div>
+                {typeof row.file_url === 'string' && /^https:\/\//i.test(row.file_url) ? (
+                  <a href={row.file_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">View uploaded file</a>
+                ) : (
+                  <span className="text-xs font-semibold text-amber-800">File preview unavailable — contact Office Mail</span>
+                )}
               </div>
             ))
           ) : (

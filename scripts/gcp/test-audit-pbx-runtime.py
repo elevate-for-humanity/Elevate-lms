@@ -48,9 +48,9 @@ class RuntimeEvidence(unittest.TestCase):
         self.assertIsNone(pbx.operator_alias_extension(" '0' => 1. Gosub(elevate-pwa-extensions,9,1)\n 2. Return()"))
 
     def test_operator_route_reason_reports_only_fixed_labels(self):
-        direct = " '0' => 1. Set(PWA_CONTACTS=)\n Set(DIALSTATUS=CHANUNAVAIL)\n Return()"
+        direct = "[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\n Set(DIALSTATUS=CHANUNAVAIL)\n Return()"
         alias = " '0' => 1. Gosub(elevate-pwa-extensions,104,1)\n 2. Return()"
-        target = (" '104' => 1. Set(PWA_CONTACTS=)\n"
+        target = ("[ Context 'elevate-pwa-extensions' ]\n '104' => 1. Set(PWA_CONTACTS=)\n"
                   " 2. Set(DIALSTATUS=CHANUNAVAIL)\n 3. Return()")
         self.assertEqual(pbx.operator_route_reason(None, None), 'operator_dialplan_unavailable')
         self.assertEqual(pbx.operator_route_reason('There is no existence of 0@elevate-pwa-extensions', None), 'generated_route_absent')

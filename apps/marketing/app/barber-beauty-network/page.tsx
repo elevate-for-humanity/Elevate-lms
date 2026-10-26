@@ -10,6 +10,7 @@ import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { ArrowRight, BriefcaseBusiness, MessageCircle, Scissors, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
+  manifest: '/manifest-barber-beauty.json',
   title: 'Barber & Beauty Network | Elevate for Humanity',
   description: 'Find Indiana barbershops and salons, explore real portfolios, and contact or book directly. Licensed shops join free to showcase their business and develop apprentices. Earn while you learn through approved paid employment.',
   openGraph: { images: [{ url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Inside an Elevate barber apprenticeship host shop' }] },

@@ -71,7 +71,10 @@ export function ProgramHolderPhoneReceiver() {
       const settingsResponse = await fetch('/api/program-holder/phone', { cache: 'no-store', signal: controller.signal });
       if (!active) return;
       if (settingsResponse.status >= 500) throw new Error('phone_settings_unavailable');
-      if (!settingsResponse.ok) return;
+      if (!settingsResponse.ok) {
+        if (settingsResponse.status === 429) scheduleReconnect();
+        return;
+      }
       const settings = await settingsResponse.json();
       const ringMode = String(settings?.extension?.ringMode || 'offline');
       if (['offline', 'do_not_disturb'].includes(ringMode)) return;
@@ -131,6 +134,7 @@ export function ProgramHolderPhoneReceiver() {
           setNumber('');
           setMuted(false);
           navigator.vibrate?.(0);
+          if (!ready) scheduleReconnect();
         }
       });
       await client.connect();

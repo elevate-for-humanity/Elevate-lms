@@ -63,6 +63,20 @@ def delegated_operator_configured(operator_output, target_output):
     return pwa_operator_configured(normalized)
 
 
+def operator_route_reason(operator_output, target_output):
+    """Return only fixed diagnostic labels; never emit dialplan or device details."""
+    if operator_output is None:
+        return 'operator_dialplan_unavailable'
+    if pwa_operator_configured(operator_output):
+        return 'direct_route_verified'
+    if operator_alias_extension(operator_output):
+        return ('delegated_route_verified' if delegated_operator_configured(operator_output, target_output)
+                else 'delegated_target_unverified')
+    if re.search(r"^\s*'0'\s*=>\s*1\.", operator_output, re.M):
+        return 'generated_route_invalid'
+    return 'generated_route_absent'
+
+
 def mailbox_count(output):
     # Asterisk 20 emits this sentence instead of a numeric summary when empty.
     if re.search(r'^There are no voicemail users currently defined\.?$', output or '', re.M):
@@ -166,7 +180,8 @@ def audit():
     alias_extension = operator_alias_extension(generated) if not direct_operator else None
     target = cli('dialplan show ' + alias_extension + '@elevate-pwa-extensions') if alias_extension else None
     configured = direct_operator or delegated_operator_configured(generated, target)
-    record('PWA_OPERATOR_CONFIGURATION', configured, 'generated_operator_and_delegated_route_checked; live call acceptance separate')
+    record('PWA_OPERATOR_CONFIGURATION', configured, {'scope': 'configuration_only; live call acceptance separate',
+          'reason_code': operator_route_reason(generated, target)})
     count = mailbox_count(cli('voicemail show users'))
     checks['VOICEMAIL_CONFIGURATION'] = {
         'result': 'BLOCKED' if count is None else ('PASS' if count > 0 else 'FAIL'),

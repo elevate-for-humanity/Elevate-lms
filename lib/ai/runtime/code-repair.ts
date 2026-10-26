@@ -10,9 +10,9 @@ import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint
  * Read-only, cron-authenticated credential preflight. Returns only safe status
  * and permission booleans, never credential values or upstream response bodies.
  */
-export async function diagnoseParisGitHubCredential() {
+export async function diagnoseParisGitHubCredential(explicitHeaders?: HeadersInit) {
  const endpoint='https://api.github.com';
- const tokenHeaders=await getGitHubHeaders();
+ const tokenHeaders=explicitHeaders??await getGitHubHeaders();
  const probe=async(path:string,kind:'repository'|'contents'|'workflow')=>{
   try {
    const response=await fetch(endpoint+path,{headers:tokenHeaders,cache:'no-store',signal:AbortSignal.timeout(15000)});

@@ -201,6 +201,8 @@ jobs:
           RELEASE_WORKFLOW: deploy-admin.yml
         run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
       - name: Upload and deploy the exact Admin image
+        env:
+          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -210,13 +212,18 @@ jobs:
           test "$DIGEST" = "$IMAGE_DIGEST"
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
+          # Validate the stored key/App installation and pin its Secret Manager
+          # version before rollout. The flags file contains no secret payload.
+          node scripts/gcp/paris-github-app-binding.mjs > "$RUNNER_TEMP/paris-app-flags"
+          mapfile -t PARIS_APP_FLAGS < "$RUNNER_TEMP/paris-app-flags"
+          PARIS_APP_FLAGS[0]="${PARIS_APP_FLAGS[0]},AI_NARRATION_PROVIDER=kokoro"
           # Reserve rollout headroom before creating a replacement revision.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            --update-env-vars="AI_NARRATION_PROVIDER=kokoro" --quiet
+            "${PARIS_APP_FLAGS[@]}" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         run: |
@@ -230,6 +237,10 @@ jobs:
           set -euo pipefail
           export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
           node scripts/gcp/verify-admin-revision.mjs
+      - name: Dispatch read-only live PARIS verification using the App credential
+        env:
+          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}
+        run: node scripts/gcp/paris-github-app-binding.mjs --verify-live "$GITHUB_SHA"
 
   acceptance:
     needs: deploy-admin

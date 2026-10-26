@@ -83,9 +83,16 @@ async function rawRequest(config: QuickBooksConfig, token: string, path: string,
 
 export async function quickBooksRequest<T = any>(db: Database, config: QuickBooksConfig, path: string, init?: RequestInit): Promise<T> {
   assertQuickBooksProductionEnvironment();
-  if (!config.accessToken || !config.realmId) throw new QuickBooksError('oauth_configuration_missing', 'QuickBooks is not connected.');
-  let response = await rawRequest(config, config.accessToken, path, init);
-  if (response.status === 401) response = await rawRequest(config, await refreshQuickBooksToken(db, config), path, init);
+  if (!config.realmId || (!config.accessToken && !config.refreshToken)) {
+    throw new QuickBooksError('oauth_configuration_missing', 'QuickBooks is not connected.');
+  }
+  // An expired/missing access token is recoverable when a refresh token exists.
+  // Persist the refreshed token before retrying the original request.
+  const accessToken = config.accessToken || await refreshQuickBooksToken(db, config);
+  let response = await rawRequest(config, accessToken, path, init);
+  if (response.status === 401 && config.accessToken) {
+    response = await rawRequest(config, await refreshQuickBooksToken(db, config), path, init);
+  }
   if (!response.ok) throw new QuickBooksError(
     response.status === 401 ? 'oauth_reauthorization_required' : response.status === 403 ? 'provider_access_denied' : 'provider_request_failed',
     `QuickBooks request failed (${response.status}).`,

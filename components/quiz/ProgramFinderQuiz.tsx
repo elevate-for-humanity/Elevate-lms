@@ -108,9 +108,9 @@ const steps: QuizStep[] = [
     options: [
       {
         id: 'free',
-        label: 'Yes — I need free training',
+        label: 'Yes — I need help with training costs',
         icon: <DollarSign className="w-6 h-6" />,
-        description: 'WIOA, WRG, and JRI cover everything',
+        description: 'Funding varies by program and requires agency authorization',
       },
       {
         id: 'self',

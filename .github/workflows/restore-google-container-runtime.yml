@@ -1,8 +1,5 @@
 name: Restore Google container runtime parity
 on:
-  push:
-    branches: [main]
-    paths: ['scripts/gcp/restore-container-runtime.mjs', 'scripts/gcp/restore-container-runtime.test.mjs', '.github/workflows/restore-google-container-runtime.yml']
   workflow_dispatch:
     inputs:
       quota_contact_email:
@@ -14,19 +11,14 @@ permissions:
   actions: write
   id-token: write
 jobs:
-  dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    steps:
-      - env: {GH_TOKEN: '${{ github.token }}'}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/restore-google-container-runtime.yml/dispatches" -f ref=main
   restore:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 30
     concurrency:
-      group: google-container-runtime-restoration
+      group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

@@ -40,7 +40,7 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
             <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
               {subject.previewing
                 ? 'The learner dashboard preview is read-only. Course records and actions stay in secured Admin management so an administrator cannot accidentally act as the learner.'
-                : 'This Student Portal module is operational. No learner identity, enrollment, course, or progress record is attached to the administrator session.'}
+                : 'Select a learner in Admin to view their course records. No learner is selected in this session.'}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a

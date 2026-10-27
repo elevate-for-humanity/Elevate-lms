@@ -4,6 +4,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { assertQuickBooksProductionEnvironment } from '@/lib/integrations/quickbooks-client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -64,6 +65,8 @@ export async function GET(request: NextRequest) {
   const redirectUri =
     process.env.QB_REDIRECT_URI || stored.QB_REDIRECT_URI || `${base}/api/auth/quickbooks/callback`;
 
+  try { assertQuickBooksProductionEnvironment(); }
+  catch { return redirect('error=production_environment_unverified'); }
   if (!clientId || !clientSecret) return redirect('error=not_configured');
   if (!verifyQuickBooksOAuthState(state, clientSecret)) {
     return redirect('error=invalid_state');

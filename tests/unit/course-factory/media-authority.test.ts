@@ -42,6 +42,13 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain("job.status === 'complete' && !options.force");
   });
 
+  it('requires manual review for storage and quality errors before retrying media', () => {
+    const manager = read('lib/course-factory/media-manager.ts');
+    expect(manager).toContain("if (!message) return false;");
+    expect(manager).toContain("['transient', 'renderer'].includes(classifyVideoFailure(message))");
+    expect(manager).toContain('COURSE_MEDIA_MAX_RETRIES = 3');
+  });
+
   it('caps retries and applies retry backoff', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     expect(manager).toContain('COURSE_MEDIA_MAX_RETRIES = 3');

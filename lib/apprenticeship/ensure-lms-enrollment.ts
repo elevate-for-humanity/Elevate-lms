@@ -34,7 +34,7 @@ export async function ensureApprenticeshipLmsEnrollment(
   const { error: enrollmentError } = await db
     .from('program_enrollments')
     .update(enrollmentPatch)
-    .eq('user_id', input.userId)
+    .or(`user_id.eq.${input.userId},student_id.eq.${input.userId}`)
     .eq('program_slug', input.programSlug);
   if (enrollmentError) throw enrollmentError;
 

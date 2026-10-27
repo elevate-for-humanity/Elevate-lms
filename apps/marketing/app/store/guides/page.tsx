@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Practical guides for workforce development organizations — capital readiness, compliance, licensing, and funding navigation.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/guides',
+    canonical: 'https://store.elevateforhumanity.org/store/guides',
   },
 };
 

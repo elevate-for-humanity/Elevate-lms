@@ -15,11 +15,11 @@ export async function POST(request: NextRequest) {
   const task = String(body.task ?? body.goal ?? '').trim();
   if (!task) return NextResponse.json({ error: 'task is required' }, { status: 400 });
 
-  const {stageParisCodeRepair} = await import('@/lib/devstudio/paris-code-engineer');
   const {enqueueParisRepair} = await import('@/lib/ai/runtime/code-repair');
-  const staged = await stageParisCodeRepair(task,undefined,auth.id);
-  const payload = await staged.json();
-  if (!staged.ok) return NextResponse.json(payload,{status:staged.status});
-  const repair = await enqueueParisRepair({actorId:auth.id,goal:task,candidate:payload});
-  return NextResponse.json({...payload,repairId:repair.id,status:'running',summary:'PARIS staged the patch and queued independent validation before main publication.'},{status:202});
+  // Persist ownership first. The signed workflow stages the patch with its
+  // short-lived job token, so closing Studio cannot interrupt or lose the task.
+  const repair = await enqueueParisRepair({actorId:auth.id,goal:task});
+  if(!repair.id)return NextResponse.json({error:'Durable repair task could not be confirmed.'},{status:503});
+  return NextResponse.json({repairId:repair.id,status:'queued',executed:false,
+    summary:'PARIS saved the repair task. The repair workflow will stage the patch, run independent checks, publish to main, and verify production.'},{status:202});
 }

@@ -15,6 +15,9 @@
 
 import { logger } from '@/lib/logger';
 
+export type RagProviderPolicy = 'owned-only' | 'configured-provider';
+export interface RagOptions { providerPolicy?: RagProviderPolicy; }
+
 interface KnowledgeChunk {
   id: string;
   source_type: string;
@@ -65,7 +68,12 @@ export async function retrieveContext(
   query: string,
   topK = 5,
   threshold = 0.65,
+  options: RagOptions = {},
 ): Promise<string> {
+  // This index uses vendor embeddings. Owned-only conversations use their
+  // canonical reference catalog and registered evidence tools instead.
+  const policy = options.providerPolicy ?? (process.env.AI_PROVIDER?.trim().toLowerCase() === 'elevate' ? 'owned-only' : 'configured-provider');
+  if (policy === 'owned-only') return '';
   try {
     const embedding = await embedQuery(query);
     if (!embedding) return '';
@@ -113,7 +121,7 @@ export async function retrieveContext(
  * Retrieve context and format it for injection into a system prompt.
  * Returns empty string on any failure — never throws.
  */
-export async function getRAGContext(query: string): Promise<string> {
-  const ctx = await retrieveContext(query);
+export async function getRAGContext(query: string, options: RagOptions = {}): Promise<string> {
+  const ctx = await retrieveContext(query, 5, 0.65, options);
   return ctx;
 }

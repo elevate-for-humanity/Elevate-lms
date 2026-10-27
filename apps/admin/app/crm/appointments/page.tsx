@@ -123,7 +123,7 @@ export default async function AppointmentsPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Past Appointments</h2>
           {past.length === 0 ? (
-            <div className="bg-white rounded-xl border p-6 text-center text-slate-400 text-sm">
+            <div className="bg-white rounded-xl border p-6 text-center text-slate-600 text-sm">
               No past appointments.
             </div>
           ) : (

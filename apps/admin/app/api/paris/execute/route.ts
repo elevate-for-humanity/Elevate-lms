@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   const context = { ...requestedContext, tenantId };
   const db = await requireAdminClient();
 
-  const { data: durableTask } = await db
+  const { data: durableTask, error: durableTaskError } = await Promise.resolve(db
     .from('ai_tasks')
     .insert({
       task_id: correlationId,
@@ -104,7 +104,16 @@ export async function POST(req: NextRequest) {
       started_at: new Date().toISOString(),
     })
     .select('id')
-    .maybeSingle();
+    .maybeSingle()).catch(() => ({data: null, error: {message: 'TASK_STORAGE_UNAVAILABLE'}}));
+
+  // An operational command must have a durable receipt before any tool runs.
+  if (durableTaskError || !durableTask?.id) {
+    logger.warn('[paris/execute] durable task unavailable; command was not executed', {correlationId});
+    return respond({
+      success: false, executed: false, taskId: null,
+      message: 'PARIS could not save this task. The command was not executed. Please retry after task storage is available.',
+    }, 503);
+  }
 
   try {
     const result = await executeAICommand(command, {
@@ -127,7 +136,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (durableTask?.id) {
-      await db.from('ai_tasks').update({
+      const {error: taskUpdateError} = await Promise.resolve(db.from('ai_tasks').update({
         status: result.status === 'approval_required'
           ? 'awaiting_approval'
           : result.status === 'running' ? 'running' : result.ok ? 'completed' : 'failed',
@@ -156,7 +165,15 @@ export async function POST(req: NextRequest) {
         error_message: result.ok ? null : result.message,
         completed_at: result.status === 'approval_required' || result.status === 'running' ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }).eq('id', durableTask.id);
+      }).eq('id', durableTask.id)).catch(() => ({error: {message: 'TASK_STATUS_STORAGE_UNAVAILABLE'}}));
+      if (taskUpdateError) {
+        logger.warn('[paris/execute] command result could not be persisted', {correlationId, taskId: durableTask.id});
+        return respond({
+          success: false, executed: result.executed, status: result.status,
+          taskId: durableTask.id, data: result.payload ?? null,
+          message: 'The command was processed, but its task status could not be saved. Check this task before sending the command again.',
+        }, 503);
+      }
     }
 
     if (result.status === 'approval_required') {

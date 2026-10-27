@@ -459,7 +459,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
       { title: 'Software Development',                  cred: 'Certiport / CompTIA Developer Certificate',   dur: '16 wks',   cost: '$4,800',  fund: 'WIOA/WRG' },
       { title: 'Graphic Design',                        cred: 'Adobe Certified Professional',                dur: '8 wks',    cost: '$2,800',  fund: 'WIOA/WRG' },
       { title: 'CAD Drafting',                          cred: 'Autodesk AutoCAD Certification',              dur: '10 wks',   cost: '$3,500',  fund: 'WIOA/WRG' },
-      { title: 'Bookkeeping & QuickBooks',              cred: 'QuickBooks ProAdvisor / NACPB Certificate',   dur: '5 wks',    cost: '$1,500',  fund: 'WIOA/WRG/SNAP' },
+      { title: 'Bookkeeping & QuickBooks',              cred: 'QuickBooks Certified User / MOS Excel',       dur: '8 wks',    cost: '$1,500',  fund: 'Self-pay; verify any agency funding before enrollment' },
       { title: 'Tax Preparation',                       cred: 'IRS AFSP / VITA Certificate',                 dur: '6 wks',    cost: '$1,200',  fund: 'WIOA/SNAP' },
       { title: 'Office Administration',                 cred: 'Microsoft Office Specialist (MOS)',           dur: '6 wks',    cost: '$1,800',  fund: 'WIOA/WRG/SNAP' },
     ]},

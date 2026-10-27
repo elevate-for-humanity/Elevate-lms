@@ -179,6 +179,12 @@ export async function POST(request: Request) {
         subject: 'Finish Your Host Shop Application | Elevate for Humanity',
         html: `<p>Hello ${contactName},</p><p>Your Host Shop application for <strong>${businessName}</strong> is saved.</p><p><strong>Reference:</strong> ${applicationId}</p><p>Your conditional Host Shop portal is ready. Use the secure link below to continue onboarding and upload the remaining compliance items.</p><p><a href="${accessLink}">Open Host Shop Onboarding</a></p><p>Your shop is not approved and no apprentice can be assigned until Elevate verifies the required licenses, insurance, workers' compensation/exemption, supervisor credential, EIN/W-9 record, acknowledgements, and signature.</p>`,
       }),
+      // Drafts require an administrative inbox alert as well as dashboard visibility.
+      sendEmail({
+        to: 'elevate4humanityedu@gmail.com',
+        subject: `[HOST SHOP DRAFT] ${businessName} — follow-up required`,
+        html: `<p>A host shop application draft was saved but not submitted.</p><p><strong>${businessName}</strong> — ${contactName}</p><p>Application reference: ${applicationId}</p><p>Review in the Admin host shop application queue and follow up on missing documents.</p>`,
+      }),
       db.from('staff_notifications').insert({
         type: 'host_shop_draft_saved',
         title: `Host Shop draft saved: ${businessName}`,

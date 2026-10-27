@@ -11,16 +11,16 @@ const asset = {
   visual_requirements: ['A client consultation'],
 };
 describe('automatic licensed scene assignment', () => {
-  it('allows sourced graphics for theory but preserves physical demonstration gaps', () => {
+  it('requests photographs for theory but preserves physical demonstration gaps', () => {
     const scene = {id:'demo', stage:'demonstration', visualRequirement:'Demonstrate a safe shave',
       teachingVisual:{kind:'sequence',steps:[{label:'Prepare',value:'Check the tool'}]}};
     expect(buildSceneAssignments([scene], [], [], {requiresPracticalEvidence:true}).gaps).toHaveLength(1);
     const theory = buildSceneAssignments([scene], [], [], {requiresPracticalEvidence:false});
     expect(theory.gaps).toEqual([]);
-    expect(theory.assignments[0].generatedInstructionalVisual).toBe(true);
+    expect(theory.assignments[0].requestedTeachingPhotograph).toBe(true);
     const recordTeaching=buildSceneAssignments([scene],[],[],{requiresPracticalEvidence:true,competencyType:'knowledge'});
     expect(recordTeaching.gaps).toEqual([]);
-    expect(recordTeaching.assignments[0].generatedInstructionalVisual).toBe(true);
+    expect(recordTeaching.assignments[0].requestedTeachingPhotograph).toBe(true);
   });
   it('uses inspected visible actions instead of a misleading title for semantic assignment', () => {
     const inspected = {

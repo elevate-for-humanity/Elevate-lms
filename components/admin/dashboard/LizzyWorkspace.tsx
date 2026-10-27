@@ -37,6 +37,7 @@ const TOOLS: { id: ToolPanel; label: string; Icon: ElementType<{ className?: str
 
 export function LizzyWorkspace({
   isSuperAdmin = false,
+  onPreviewUrlDetected,
   pendingApplications = [],
   pendingApplicationsCount = 0,
   pendingProgramHolders = 0,
@@ -65,24 +66,24 @@ export function LizzyWorkspace({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#1e1e1e] text-[#cccccc]">
-      <div className="shrink-0 border-b border-[#3c3c3c] bg-[#1a2e1a] px-3 py-2 text-[10px] leading-snug text-[#9ca3af]"><strong className="text-[#4ec9b0]">Ellie</strong> — unified ops, deploy, code, workflows and platform health.</div>
-      <div className="shrink-0 max-h-[220px] overflow-hidden border-b border-[#3c3c3c]"><DashboardPanelErrorBoundary name="Deploy"><DeployPanel workflowButtons={config?.workflowButtons} /></DashboardPanelErrorBoundary></div>
-      <div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-[#3c3c3c] bg-[#252526] px-2 py-1.5">
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-700 bg-[#111827] font-sans text-slate-100 shadow-xl">
+      <div className="shrink-0 border-b border-slate-700 bg-slate-900 px-4 py-3 text-sm leading-relaxed text-slate-300"><strong className="text-cyan-300">Ellie</strong> — unified ops, deploy, code, workflows and platform health.</div>
+      <div className="max-h-[180px] shrink-0 overflow-y-auto border-b border-slate-700 bg-slate-900/70 sm:max-h-[220px]"><DashboardPanelErrorBoundary name="Deploy"><DeployPanel workflowButtons={config?.workflowButtons} /></DashboardPanelErrorBoundary></div>
+      <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-slate-700 bg-slate-900 px-3 py-3 [scrollbar-width:thin] sm:flex-wrap">
         {visibleTools.map(({ id, label, Icon }) => {
           const active = panel === id;
-          return <button key={id} type="button" onClick={() => openPanel(id)} className="inline-flex h-8 items-center gap-1.5 rounded border px-2.5 text-[11px] font-medium" style={{ borderColor: active ? '#0078d4' : '#3c3c3c', background: active ? '#094771' : 'transparent', color: active ? '#fff' : '#ccc' }}><Icon className="h-3.5 w-3.5" />{label}</button>;
+          return <button key={id} type="button" onClick={() => openPanel(id)} aria-pressed={active} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" style={{ borderColor: active ? '#0078d4' : '#3c3c3c', background: active ? '#094771' : 'transparent', color: active ? '#fff' : '#ccc' }}><Icon className="h-4 w-4" />{label}</button>;
         })}
-        <span className="ml-auto hidden items-center gap-2 text-[10px] text-[#858585] sm:flex"><Rocket className="h-3 w-3" />GitHub → Google Cloud Run <Server className="h-3 w-3" />{health ? 'Health loaded' : 'Health…'}</span>
+        <span className="ml-auto hidden items-center gap-2 text-xs text-slate-400 lg:flex"><Rocket className="h-3 w-3" />GitHub → Google Cloud Run <Server className="h-3 w-3" />{health ? 'Health loaded' : 'Health…'}</span>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
         <DashboardPanelErrorBoundary name={`Lizzy ${panel}`}>
-          {panel === 'command' && <UnifiedEllieChat embedded />}
+          {panel === 'command' && <UnifiedEllieChat embedded onPreviewTarget={onPreviewUrlDetected} />}
           {panel === 'upload' && <LizzyUploadPanel />}
           {panel === 'files' && <LizzyFilesPanel />}
           {panel === 'ops' && <LizzyOperationsPanel pendingApplications={pendingApplications} pendingCount={pendingApplicationsCount} pendingProgramHolders={pendingProgramHolders} />}
           {panel === 'workflows' && <WorkflowsOpsPanel />}
-          {panel === 'health' && <div className="flex h-full flex-col overflow-hidden"><div className="min-h-0 flex-1 overflow-auto"><EnvironmentHealthPanel /></div><div className="h-1/2 min-h-[200px] border-t border-[#3c3c3c]"><ServicesPanel /></div></div>}
+          {panel === 'health' && <div className="flex h-full flex-col overflow-hidden"><div className="min-h-0 flex-1 overflow-auto"><EnvironmentHealthPanel /></div><div className="h-1/2 min-h-[200px] border-t border-slate-700"><ServicesPanel /></div></div>}
           {panel === 'errors' && <LizzyErrorsPanel />}
           {panel === 'video' && <LizzyVideoPanel />}
           {panel === 'secrets' && (isSuperAdmin ? <SecretsPanel /> : <LizzyErrorsPanel />)}

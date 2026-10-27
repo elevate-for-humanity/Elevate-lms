@@ -256,7 +256,7 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     const studioGeometry = await page.evaluate(() => {
       const workspace = document.querySelector<HTMLElement>('#admin-ai-workspace');
       const composer = document.querySelector<HTMLTextAreaElement>(
-        'textarea[placeholder="Tell Admin AI what you need done..."]',
+        'textarea[aria-label="Tell Paris what you need done..."]',
       );
       const send = document.querySelector<HTMLElement>('[aria-label="Send request"]');
       const rect = (element: HTMLElement | null) => {
@@ -453,7 +453,7 @@ test.describe('Studio single-session access and composer', () => {
         if (attempt === 1) throw error;
       }
     }
-    const composer = page.getByRole('textbox', { name: 'Tell Admin AI what you need done...', exact: true });
+    const composer = page.getByRole('textbox', { name: 'Tell Paris what you need done...', exact: true });
     await expect(composer).toBeVisible();
     await expect.poll(() => composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
     await composer.fill('Readability test draft');
@@ -462,7 +462,11 @@ test.describe('Studio single-session access and composer', () => {
     await page.goto(`${ADMIN_BASE}/dashboard`);
     const access = page.getByRole('region', { name: 'Course and media access' });
     await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
-    await expect(page.getByRole('navigation', { name: 'Course tools' }).getByRole('link', { name: 'Course Builder', exact: true })).toBeVisible();
+    await access.getByRole('link', { name: 'Open Course Builder' }).click();
+    await expect(page).toHaveURL(`${ADMIN_BASE}/studio/courses`);
+    await expect(page.getByRole('heading', { name: 'Course Production Studio', exact: true })).toBeVisible();
+    await page.goto(`${ADMIN_BASE}/dashboard`);
+    await expect(access).toBeVisible();
     // Clean up the exact disposable browser session independently of UI state.
     const createdSessions: Promise<{id:string;token:string;publicUrl:string} | null>[] = [];
     const captureSession = (response: import('@playwright/test').Response) => {
@@ -475,6 +479,15 @@ test.describe('Studio single-session access and composer', () => {
     // Envato may require its own provider login, but Studio must reuse the Admin session.
     await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
     await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);
+    // Diagnose browser-session admission before reporting a responsive-design failure.
+    // Keep the real stream assertion: runtime failures must never be accepted as passes.
+    const runtimeResponse = await page.request.get(`${ADMIN_BASE}/api/admin/dev-studio/browser/session`, {
+      failOnStatusCode: false,
+    });
+    const runtime = await runtimeResponse.json().catch(() => ({}));
+    expect(runtimeResponse.status(), 'Studio browser runtime check must succeed').toBe(200);
+    expect(runtime.configured, 'Studio browser must be configured').toBe(true);
+    expect(runtime.ready, 'Studio browser runtime must be ready for live mobile acceptance').toBe(true);
     const stream = page.getByAltText('Live isolated Chromium browser');
     await expect(stream).toBeVisible({ timeout: 30_000 });
     await expect.poll(() => stream.evaluate(el => (el as HTMLImageElement).naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);

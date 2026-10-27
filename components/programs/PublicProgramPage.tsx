@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -223,14 +224,13 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
 
       {/* Hero Image — clean, no text overlay */}
       <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={config.heroImage.src}
           alt={config.heroImage.alt}
           fill
           sizes="100vw"
           className="object-contain"
-          priority placeholder="empty"
+          priority
         />
       </section>
 

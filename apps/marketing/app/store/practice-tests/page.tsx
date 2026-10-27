@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   description:
     'Shop certification practice tests and exam-prep materials for Microsoft Office, ACT WorkKeys, EPA 608, OSHA 10, CNA, and other workforce credentials.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/practice-tests',
+    canonical: 'https://store.elevateforhumanity.org/store/practice-tests',
   },
   robots: { index: true, follow: true },
   openGraph: {
     title: 'Certification Practice Tests & Exam Prep | Elevate Store',
     description: 'Practice tests and exam-prep products for workforce and industry credentials.',
-    url: 'https://www.elevateforhumanity.org/store/practice-tests',
+    url: 'https://store.elevateforhumanity.org/store/practice-tests',
     type: 'website',
   },
 };
@@ -63,7 +63,7 @@ export default async function PracticeTestsPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Elevate certification practice tests',
-    url: 'https://www.elevateforhumanity.org/store/practice-tests',
+    url: 'https://store.elevateforhumanity.org/store/practice-tests',
     itemListElement: products.map((product, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -78,7 +78,7 @@ export default async function PracticeTestsPage() {
           priceCurrency: 'USD',
           price: product.price,
           availability: 'https://schema.org/InStock',
-          url: 'https://www.elevateforhumanity.org/store/practice-tests',
+          url: 'https://store.elevateforhumanity.org/store/practice-tests',
         },
       },
     })),

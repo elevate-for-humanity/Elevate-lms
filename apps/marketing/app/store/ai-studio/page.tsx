@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     'Generate AI videos, voiceovers, images, and virtual instructors for your courses. Powered by OpenAI, Synthesia, D-ID, and more.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/ai-studio',
+    canonical: 'https://store.elevateforhumanity.org/store/ai-studio',
   },
 };
 

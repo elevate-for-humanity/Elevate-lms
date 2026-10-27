@@ -6,8 +6,8 @@ const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-cours
  .replace(/^import .*;\n/gm,'').replace('const execute = promisify(execFile);','').replace('const execute=promisify(execFile);','').replace('export class ','class ');
 function harness(fail=false){
  const progress=[];let cleaned=false;
- const Provider=new Function('alignRecordedNarration','measureNarrationCaptions','configuredNarrationProvider','generateEdgeTTS','uploadLessonMediaBuffer','execute','mkdtemp','writeFile','readFile','rm','tmpdir','join','reportCourseProgress',source+'\nreturn UltimatePlatformNarration;')(
-  async(_file,text)=>text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2})),()=>{},()=> 'configured',async()=>{if(fail)throw Error('TTS_FAILED');return Buffer.alloc(10);},async()=> 'https://media.example/audio.mp3',
+ const Provider=new Function('alignRecordedNarration','measureNarrationCaptions','configuredNarrationProvider','EDGE_TTS_VOICES','generateEdgeTTS','uploadLessonMediaBuffer','execute','mkdtemp','writeFile','readFile','rm','tmpdir','join','reportCourseProgress',source+'\nreturn UltimatePlatformNarration;')(
+  async(_file,text)=>text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2})),()=>{},()=> 'configured',{warm:'test-warm-voice'},async(_text,options)=>{assert.equal(options.voice,'test-warm-voice');if(fail)throw Error('TTS_FAILED');return Buffer.alloc(10);},async()=> 'https://media.example/audio.mp3',
   async()=>({stdout:'1'}),async()=>'/tmp/narration',async()=>{},async()=>Buffer.alloc(10),async()=>{cleaned=true;},()=>'/tmp',(...parts)=>parts.join('/'),
   (phase,completed,total)=>progress.push({phase,completed,total}));
  return{provider:new Provider(),progress,cleaned:()=>cleaned};

@@ -29,6 +29,7 @@ it('never claims runtime connection before a probe and keeps the composer usable
   render(<UnifiedEllieChat embedded restoreLatest={false} />);
   expect(screen.getByText('AI configuration: checking…')).toBeInTheDocument();
   expect(screen.queryByText(/runtime: connected/)).not.toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' })).toHaveClass('text-xl');
   fireEvent.change(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' }), {
     target: { value: 'Inspect current jobs' },
   });

@@ -15,7 +15,7 @@ function safeFileName(name: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { user, db, partner } = await requireCurrentHostShopPartner();
+    const { user, db, partner } = await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
     const board = await getHostShopBoard(user.id);
     const form = await request.formData();
     const documentType = String(form.get('documentType') || '').trim();
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: `File upload failed: ${uploadError.message}` }, { status: 500 });
     }
 
-    const { error: insertError } = await db.from('partner_documents').insert({
+    const { data: savedDocument, error: insertError } = await db.from('partner_documents').insert({
       partner_id: partner.id,
       document_type: documentType,
       program_id: board.programType,
@@ -69,15 +69,15 @@ export async function POST(request: NextRequest) {
       storage_bucket: 'partner-documents',
       status: 'pending',
       expiration_date: expirationDate || null,
-    });
+    }).select('id, partner_id, document_type, status').single();
 
-    if (insertError) {
+    if (insertError || !savedDocument || savedDocument.partner_id !== partner.id || savedDocument.document_type !== documentType || savedDocument.status !== 'pending') {
       await db.storage.from('partner-documents').remove([storagePath]);
       logger.error('[host-shop-documents] Document record failed', insertError, {
         partnerId: partner.id,
         documentType,
       });
-      return NextResponse.json({ ok: false, error: `Document record failed: ${insertError.message}` }, { status: 500 });
+      return NextResponse.json({ ok: false, error: `Document record failed: ${insertError?.message || 'Unable to verify saved document.'}` }, { status: 500 });
     }
 
     await db
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       .update({ onboarding_step: 'documents', updated_at: new Date().toISOString() })
       .eq('id', partner.id);
 
-    return NextResponse.json({ ok: true, documentType });
+    return NextResponse.json({ ok: true, documentType, documentId: savedDocument.id });
   } catch (error) {
     logger.error('[host-shop-documents] Unexpected upload failure', error);
     const code = error instanceof Error ? error.message : '';

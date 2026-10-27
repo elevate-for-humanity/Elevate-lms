@@ -41,6 +41,10 @@ export function requiredRegionalAllocation(services, task, revisions, executions
   for (const service of services) {
     if (service.metadata?.annotations?.['run.googleapis.com/scalingMode'] === 'manual')
       throw new Error('Manual service scaling requires explicit capacity review');
+    const serviceMaxValue = service.metadata?.annotations?.['run.googleapis.com/maxScale'];
+    const serviceMax = serviceMaxValue === undefined ? Infinity : Number(serviceMaxValue);
+    if (serviceMaxValue !== undefined && (!Number.isInteger(serviceMax) || serviceMax < 1))
+      throw new Error('Effective service maximum is unavailable');
     // Only revisions receiving traffic or retained by a live traffic tag can
     // scale to the configured maximum. Historical revisions can remain marked
     // Active after traffic has moved; counting all of them double-counts
@@ -53,8 +57,14 @@ export function requiredRegionalAllocation(services, task, revisions, executions
     for (const name of names) {
       const revision = revisions.find(r => r.metadata?.name === name);
       if (!revision) throw new Error('Service effective revision is unavailable');
-      const max = Number(revision.metadata?.annotations?.['autoscaling.knative.dev/maxScale']);
+      const revisionMaxValue = revision.metadata?.annotations?.['autoscaling.knative.dev/maxScale'];
+      const revisionMax = revisionMaxValue === undefined ? Infinity : Number(revisionMaxValue);
+      if (revisionMaxValue !== undefined && (!Number.isInteger(revisionMax) || revisionMax < 1))
+        throw new Error('Effective revision needs a bounded maximum');
+      const max = Math.min(revisionMax, serviceMax);
       if (!Number.isInteger(max) || max < 1) throw new Error('Effective revision needs a bounded maximum');
+      // Applying the service cap per revision remains conservative when multiple
+      // traffic tags exist: the actual cap is shared across those revisions.
       add(revision.spec?.containers, max);
     }
   }

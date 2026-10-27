@@ -11,6 +11,7 @@ const ServicesPanel = dynamic(
 );
 
 type HealthPayload = Record<string, unknown> & {
+  hasElevate?: boolean;
   hasGroq?: boolean;
   hasXAI?: boolean;
   hasGemini?: boolean;
@@ -73,6 +74,7 @@ export default function DevStudioHealthPanel() {
         ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
         ['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable'],
+        ['Paris owned inference', health.hasElevate ? 'verified reachable' : 'unavailable'],
         [
           'Repository writes',
           health.execution?.repositoryWritesReady

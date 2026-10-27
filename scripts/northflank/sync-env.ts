@@ -11,7 +11,13 @@
 import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { nfFetch, projectApiPath, resolveProjectId, resolveLmsServiceId, resolveAdminServiceId } from './lib';
+import {
+  nfFetch,
+  projectApiPath,
+  resolveProjectId,
+  resolveLmsServiceId,
+  resolveAdminServiceId,
+} from './lib';
 import { dedupeSecretVariables } from './canonical-env.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
@@ -33,8 +39,13 @@ const STATIC_ENV: Record<string, string> = {
   NEXT_PUBLIC_EMAIL_FROM_ADDRESS: 'noreply@elevateforhumanity.org',
   NEXT_PUBLIC_CERT_HOLDER: 'Elevate for Humanity',
   DEVSTUDIO_DEVCONTAINER_MODE: 'github-only',
+  // Learner-facing production narration must never inherit a stale local/edge
+  // diagnostic setting from the shared Northflank secret group. Cloudflare is
+  // the canonical managed TTS route; edge/espeak remain diagnostics only.
+  AI_NARRATION_PROVIDER: 'cloudflare',
   COURSE_VIDEO_STORAGE_BACKEND: 'auto',
-  COURSE_VIDEO_R2_MIN_BYTES: '5242880',
+  ELEVATE_MEDIA_PROVIDER: 'backblaze-b2',
+  ELEVATE_MEDIA_VIDEO_MIN_BYTES: '5242880',
   REMOTION_RELEASE_BUNDLE_AFTER_RENDER: 'true',
 };
 
@@ -93,13 +104,14 @@ async function findOrCreateSecretGroup(
     console.log(`Creating secret group: ${secretId}`);
   }
 
-  const restrictions = serviceIds.length > 0
-    ? {
-        restricted: true,
-        nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
-        tagMatchCondition: 'or' as const,
-      }
-    : { restricted: false };
+  const restrictions =
+    serviceIds.length > 0
+      ? {
+          restricted: true,
+          nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
+          tagMatchCondition: 'or' as const,
+        }
+      : { restricted: false };
 
   await nfFetch(projectApiPath(projectId, '/secrets'), {
     method: 'POST',
@@ -129,32 +141,13 @@ async function main() {
   variables = dedupeSecretVariables(variables);
   for (const key of INFRA_KEYS) delete variables[key];
 
-  const missingCritical = [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'NEXTAUTH_SECRET',
-    'STRIPE_SECRET_KEY',
-    'SENDGRID_API_KEY',
-  ].filter((k) => !variables[k]?.trim());
-
   console.log(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
   console.log(`Project: ${projectId}`);
-  console.log(`Variables to sync: ${Object.keys(variables).length}`);
+  console.log(`Variables supplied by this run: ${Object.keys(variables).length}`);
   console.log(`Infrastructure keys excluded: ${[...INFRA_KEYS].join(', ')}`);
 
-  if (missingCritical.length) {
-    console.warn(`Missing CRITICAL keys: ${missingCritical.join(', ')}`);
-  }
-
   if (dryRun) {
-    process.exit(missingCritical.length ? 1 : 0);
-  }
-
-  if (missingCritical.length) {
-    throw new Error(
-      `Refusing to update production secret group with missing critical keys: ${missingCritical.join(', ')}`,
-    );
+    return;
   }
 
   const lmsId = resolveLmsServiceId() || 'elevate-lms';
@@ -164,14 +157,35 @@ async function main() {
 
   // The standalone GPU service is intentionally excluded here because it lives
   // in NORTHFLANK_GPU_PROJECT_ID, not this main web project.
-  const serviceIds = [...new Set([
-    marketingId,
-    lmsId,
-    adminId,
-    ...(storeId ? [storeId] : []),
-  ])];
+  const serviceIds = [...new Set([marketingId, lmsId, adminId, ...(storeId ? [storeId] : [])])];
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);
+  const current = await nfFetch<{
+    secrets?: { variables?: Record<string, string> };
+    variables?: Record<string, string>;
+  }>(projectApiPath(projectId, `/secrets/${groupId}`));
+  const existingVariables = current.secrets?.variables || current.variables || {};
+
+  // A workflow only receives secrets that are explicitly mapped into its
+  // environment. Replacing the whole group with that partial set silently
+  // deletes provider credentials added by another workflow or in Northflank.
+  // Preserve the canonical group and overlay only non-empty values supplied by
+  // this run.
+  variables = dedupeSecretVariables({ ...existingVariables, ...variables });
+  for (const key of INFRA_KEYS) delete variables[key];
+
+  const missingCritical = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXTAUTH_SECRET',
+    'SENDGRID_API_KEY',
+  ].filter((k) => !variables[k]?.trim());
+  if (missingCritical.length) {
+    throw new Error(
+      `Refusing to update production secret group with missing critical keys: ${missingCritical.join(', ')}`,
+    );
+  }
   const restrictions = {
     restricted: true,
     nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
@@ -191,7 +205,10 @@ async function main() {
     }),
   });
 
-  console.log(`Updated secret group "${groupId}" with ${Object.keys(variables).length} variables.`);
+  console.log(
+    `Updated secret group "${groupId}" with ${Object.keys(variables).length} variables; ` +
+      `preserved ${Object.keys(existingVariables).length} existing variables.`,
+  );
   console.log(`Attached to services: ${serviceIds.join(', ')}`);
 }
 

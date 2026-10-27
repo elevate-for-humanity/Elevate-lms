@@ -750,7 +750,7 @@ add({
 add({
   lessonId: 'hvac-06-02',
   concept:
-    'Section 608 of the Clean Air Act makes it illegal to knowingly vent refrigerant. Fines up to $44,539 per day per violation. Technicians must be EPA 608 certified to purchase refrigerant. Recovery is required before any repair that opens the refrigerant circuit. Records must be kept for refrigerant purchases, usage, and disposal. The law applies to ALL refrigerants including HFCs.',
+    'Section 608 of the Clean Air Act prohibits knowingly venting regulated refrigerants. Civil penalty amounts are adjusted over time, so technicians should verify the current EPA enforcement figure rather than memorize a static dollar amount. Technicians must be EPA 608 certified to purchase or handle covered refrigerants for stationary equipment, and recovery is required before service or disposal when the refrigerant circuit is opened.',
   keyTerms: [
     {
       term: 'Section 608',
@@ -758,7 +758,7 @@ add({
     },
     {
       term: 'Venting Prohibition',
-      definition: 'Knowingly releasing refrigerant is illegal. Fines up to $44,539 per day.',
+      definition: 'Knowingly releasing regulated refrigerant is prohibited. Verify current EPA civil penalty amounts because they are adjusted over time.',
     },
   ],
   jobApplication:
@@ -796,7 +796,7 @@ add({
 add({
   lessonId: 'hvac-06-04',
   concept:
-    'Refrigerant classification: Group 1 (low toxicity, low flammability) includes R-410A, R-22, R-134a. Group 2 (low toxicity, mildly flammable) includes R-32. Group 3 (low toxicity, highly flammable) includes R-290 (propane). Safety group A means low toxicity, B means higher toxicity. Flammability class 1 means no flame propagation, 2L means mildly flammable, 3 means highly flammable. Cylinder colors identify refrigerants: R-410A is rose/pink, R-22 is green, R-134a is light blue.',
+    'ASHRAE Standard 34 uses a letter for toxicity and a number for flammability. A1 refrigerants include R-410A, R-22, and R-134a. R-32 is an HFC classified A2L, and R-454B is an HFC/HFO blend classified A2L. R-290 (propane) is A3. Do not identify a refrigerant solely by cylinder paint color; read the cylinder label and markings because the industry moved away from refrigerant-specific container colors.',
   keyTerms: [
     {
       term: 'ASHRAE 34',

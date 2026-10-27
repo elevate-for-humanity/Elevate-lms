@@ -1,34 +1,130 @@
 'use client';
 
 import Image from 'next/image';
+import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  MapPin,
+  Pause,
+  Phone,
+  Play,
+  Volume2,
+} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
+import type {
+  FeaturedHostPartner,
+  FeaturedHostPartnerMedia,
+} from '@/lib/apprenticeship-programs/host-partners';
 
-const ROTATION_MS = 4500;
+const ROTATION_MS = 6000;
+type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
+type ShowcaseSequenceItem = { shopSlug: string; media: ShowcaseMedia };
 
-const FEATURED_PHOTO_BY_SHOP: Record<string, { src: string; alt: string; kind: 'photo' }> = {
-  'kountry-kutz-barbershop': { src: '/images/partners/kountry-kutz-interior.webp', alt: 'Interior of Kountry Kutz apprenticeship host barbershop', kind: 'photo' },
-  'cals-kutz-studio': { src: '/images/partners/cals-kutz-official.webp', alt: 'Cals Kutz Studio apprenticeship host barbershop', kind: 'photo' },
-  'razors-image-barbershop': { src: '/images/partners/razors-image-video-poster.webp', alt: "Razor's Image host barbershop representative", kind: 'photo' },
-  'b-52s-barber-shop': { src: '/images/partners/b52s-official.webp', alt: "B-52's Barbershop in New Castle", kind: 'photo' },
+const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
+  'kountry-kutz-barbershop': {
+    src: '/images/partners/kountry-kutz-interior.webp',
+    alt: 'Interior of Kountry Kutz apprenticeship host barbershop',
+    kind: 'photo',
+  },
+  'cals-kutz-studio': {
+    src: '/images/partners/cals-kutz-official.webp',
+    alt: 'Cals Kutz Studio apprenticeship host barbershop',
+    kind: 'photo',
+  },
+  'b-52s-barber-shop': {
+    src: '/images/partners/b52s-official.webp',
+    alt: "B-52's Barbershop in New Castle",
+    kind: 'photo',
+  },
+  'salon-saloon': {
+    src: '/videos/partners/salon-saloon-tour.mp4',
+    alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon',
+    kind: 'video',
+    backdropSrc: '/images/partners/salon-saloon/team-sign.webp',
+    script:
+      'Welcome to Salon Saloon in South Bend, Indiana, a participating Cosmetology Apprenticeship Host Salon. This tour introduces the salon environment where approved apprentices may build supervised skills in client service, sanitation, hair care, styling, and professional workplace routines. Placement, employment, supervision, and enrollment approval are confirmed through Elevate before training begins.',
+  },
 };
 
-export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner[] }) {
+export default function HostShopShowcase({
+  shops,
+  videoTourShopSlug,
+  autoPlayVideoOnVisible = false,
+  autoPlayNarrationOnVisible = false,
+  enableNarration = true,
+  narration,
+  narrationSrc,
+  narrationSources,
+  mediaOverrides,
+  mediaSequence,
+  tourScripts,
+  asHero = false,
+}: {
+  shops: FeaturedHostPartner[];
+  /** Limit video playback to the designated tour while retaining other shops as still slides. */
+  videoTourShopSlug?: string;
+  /** Start the designated tour, muted, when its section enters the viewport. */
+  autoPlayVideoOnVisible?: boolean;
+  /** Start separate narration with the video. Off by default so page narration remains the only sound control. */
+  autoPlayNarrationOnVisible?: boolean;
+  /** Disable page narration when the featured media already carries its own spoken audio. */
+  enableNarration?: boolean;
+  /** Page-specific natural narration used while this section is dominant. */
+  narration?: string;
+  /** Pre-rendered narration removes runtime voice-generation delay. */
+  narrationSrc?: string;
+  /** Recorded scripts matched to the active shop media. */
+  narrationSources?: Record<string, string>;
+  /** Page-specific media without changing another surface such as the homepage. */
+  mediaOverrides?: Record<string, ShowcaseMedia>;
+  /** Explicit media order for a surface that needs more than one slide per shop. */
+  mediaSequence?: ShowcaseSequenceItem[];
+  /** Accessible scripts keyed by the tour video source path. */
+  tourScripts?: Record<string, string>;
+  /** Render the lead heading as the page's primary heading. */
+  asHero?: boolean;
+  /** Give vertical shop tours a full-height frame without cropping the video. */
+  portraitTour?: boolean;
+}) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
   // Keep the rotation representative and brisk: one real photo per shop,
   // instead of letting shops with large portfolios dominate the carousel.
-  const slides = useMemo(() => shops.flatMap((shop) => {
-    const media = FEATURED_PHOTO_BY_SHOP[shop.slug] ?? shop.media?.find((item) => item.kind !== 'video');
-    return media ? [{ shop, media }] : [];
-  }), [shops]);
+  const slides = useMemo(() => {
+    if (mediaSequence?.length) {
+      const shopsBySlug = new Map(shops.map((shop) => [shop.slug, shop]));
+      return mediaSequence.flatMap(({ shopSlug, media }) => {
+        const shop = shopsBySlug.get(shopSlug);
+        return shop ? [{ shop, media }] : [];
+      });
+    }
+
+    return shops.flatMap((shop) => {
+      const featured = mediaOverrides?.[shop.slug] ??
+        (videoTourShopSlug === shop.slug ? shop.media?.find((item) => item.kind === 'video') : undefined) ??
+        shop.media?.find((item) => item.kind !== 'video') ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
+      const media: ShowcaseMedia | undefined =
+        featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
+          ? (featured ?? shop.media?.find((item) => item.kind !== 'video'))
+          : shop.media?.find((item) => item.kind !== 'video');
+      return media ? [{ shop, media }] : [];
+    });
+  }, [mediaOverrides, mediaSequence, shops, videoTourShopSlug]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+  const [failedVideos, setFailedVideos] = useState<Set<string>>(() => new Set());
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
+  const userEnabledSoundRef = useRef(false);
+  const [narrationBlocked, setNarrationBlocked] = useState(false);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -39,28 +135,93 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
   }, []);
 
   useEffect(() => {
-    if (paused || interacting || reduceMotion || slides.length < 2) return;
-    const timer = window.setInterval(() => {
+    if (paused || interacting || reduceMotion || videoPlaying || slides.length < 2) return;
+    const timer = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
     }, ROTATION_MS);
-    return () => window.clearInterval(timer);
-  }, [interacting, paused, reduceMotion, slides.length]);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, interacting, paused, reduceMotion, videoPlaying, slides]);
+
+  useEffect(() => {
+    if (!autoPlayVideoOnVisible) return;
+    const section = sectionRef.current;
+    if (!section || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const video = section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]');
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
+          // Browser autoplay requires muted video playback. Once a visitor
+          // explicitly enables sound, never silently mute it again.
+          if (video) {
+            if (!userEnabledSoundRef.current) video.muted = true;
+            void video.play().catch(() => undefined);
+          }
+
+          // The Host Shop introduction is pre-rendered audio. Start it when
+          // the slideshow becomes visible, including when the active slide is
+          // a still image. Never overlap narration with a playing tour video.
+          const narrationAudio = autoPlayNarrationOnVisible ? narrationAudioRef.current : null;
+          if (narrationAudio && (!video || video.paused)) {
+            void narrationAudio
+              .play()
+              .then(() => setNarrationBlocked(false))
+              .catch(() => setNarrationBlocked(true));
+          }
+        } else {
+          video?.pause();
+          narrationAudioRef.current?.pause();
+        }
+      },
+      { threshold: [0, 0.35, 0.75] },
+    );
+
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+      section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]')?.pause();
+    };
+  }, [activeIndex, autoPlayNarrationOnVisible, autoPlayVideoOnVisible, narrationSrc]);
+
+  useEffect(() => {
+    userEnabledSoundRef.current = false;
+    setVideoPlaying(false);
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!slides.length) return;
-    const nextSlides = [1, 2].map((offset) => slides[(activeIndex + offset) % slides.length]);
-    nextSlides.forEach((slide) => {
-      if (!slide?.media?.src) return;
-      const preload = new window.Image();
-      preload.src = slide.media.src;
-    });
+    const nextSlide = slides[(activeIndex + 1) % slides.length];
+    if (!nextSlide?.media?.src || nextSlide.media.kind === 'video') return;
+
+    // Warm only the next still image. Treating MP4 tours as images caused the
+    // browser to download media users had not reached yet and competed with the
+    // visible page for bandwidth.
+    const preload = new window.Image();
+    preload.src = nextSlide.media.src;
   }, [activeIndex, slides]);
 
   if (!slides.length) return null;
 
   const { shop, media: image } = slides[activeIndex];
-  const externalUrl = shop.websiteUrl ?? shop.onlineListingUrl ?? shop.socialUrl;
-  const externalLabel = shop.websiteLabel ?? shop.onlineListingLabel ?? shop.socialLabel ?? 'Visit shop online';
+  const Heading = asHero ? 'h1' : 'h2';
+  const externalLinks = [
+    shop.websiteUrl
+      ? { href: shop.websiteUrl, label: shop.websiteLabel ?? `Visit ${shop.dba ?? shop.name}` }
+      : null,
+    shop.bookingUrl ? { href: shop.bookingUrl, label: 'Book an appointment' } : null,
+    shop.socialUrl
+      ? { href: shop.socialUrl, label: shop.socialLabel ?? `Follow ${shop.dba ?? shop.name}` }
+      : null,
+    shop.onlineListingUrl
+      ? {
+          href: shop.onlineListingUrl,
+          label: shop.onlineListingLabel ?? `View ${shop.dba ?? shop.name} online`,
+        }
+      : null,
+  ].filter(
+    (link, index, links): link is { href: string; label: string } =>
+      Boolean(link) && links.findIndex((candidate) => candidate?.href === link.href) === index,
+  );
 
   function go(delta: number) {
     setActiveIndex((current) => (current + delta + slides.length) % slides.length);
@@ -68,26 +229,73 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
 
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
-      className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
+      data-scroll-narration={enableNarration && image.kind !== 'video' ? true : undefined}
+      data-narration-src={enableNarration ? (narrationSources?.[image.src] ?? narrationSrc) : undefined}
+      data-narration={
+        enableNarration
+          ? (tourScripts?.[image.src] ??
+            image.script ??
+            narration ??
+            `Meet ${shop.dba ?? shop.name} in ${shop.city}, ${shop.state}. ${shop.marketingBlurb ?? shop.note}`)
+          : undefined
+      }
+      data-narration-rate="0.84"
+      data-narration-style="instructor"
+      className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-10 text-slate-950 sm:px-6 sm:py-12"
       onMouseEnter={() => setInteracting(true)}
       onMouseLeave={() => setInteracting(false)}
       onFocusCapture={() => setInteracting(true)}
       onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteracting(false);
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+          setInteracting(false);
       }}
     >
+      {autoPlayNarrationOnVisible && narrationSrc ? (
+        <audio
+          ref={narrationAudioRef}
+          src={narrationSrc}
+          preload="metadata"
+          onEnded={() => setNarrationBlocked(false)}
+          className="sr-only"
+          aria-hidden="true"
+        />
+      ) : null}
       <div className="mx-auto max-w-6xl">
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-red-700">Meet the host-shop network</p>
-            <h2 id="host-shop-showcase-heading" className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">
-              Train in real shops. Discover the businesses behind the apprenticeship.
-            </h2>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-red-700">
+              Indiana shops: we’re looking for you
+            </p>
+            <Heading
+              id="host-shop-showcase-heading"
+              className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
+            >
+              Become a Host Shop for free. Grow your team through apprenticeship.
+            </Heading>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
-              This rotating showcase introduces approved host shops, where they are located, and how to visit, book, or learn more.
+              Elevate has apprentices ready to train, and we need licensed barbershops, beauty
+              salons, nail studios, spas, and esthetics businesses across Indiana. Join the Barber &
+              Beauty Host Shop Network at no cost, develop future professionals, and gain a
+              permanent business profile that helps apprentices and customers discover your shop.
             </p>
           </div>
+          {narrationBlocked ? (
+            <button
+              type="button"
+              onClick={() => {
+                const audio = narrationAudioRef.current;
+                if (!audio) return;
+                audio.currentTime = 0;
+                void audio.play().then(() => setNarrationBlocked(false));
+              }}
+              className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-blue-800 sm:self-auto"
+            >
+              <Volume2 className="h-4 w-4" aria-hidden="true" />
+              Start Host Shop audio
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setPaused((value) => !value)}
@@ -101,85 +309,198 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[390px]">
-              {image?.kind === 'video' ? (
-                <video
-                  key={image.src}
-                  src={image.src}
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="h-full w-full bg-black object-contain"
-                  aria-label={image.alt}
-                />
+          <div className="grid lg:grid-cols-2">
+            <div className="relative aspect-[16/10] max-h-[320px] min-h-0 overflow-hidden bg-slate-950">
+              {image?.kind === 'video' && !failedVideos.has(image.src) ? (
+                <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  {image.backdropSrc ? (
+                    <Image
+                      src={image.backdropSrc}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 58vw"
+                      className="object-contain opacity-90"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  {tourScripts?.[image.src] || image.script ? (
+                    <div className="relative z-10 h-full w-full">
+                      <NarratedShopTour src={image.src} script={tourScripts?.[image.src] ?? image.script!}
+                        shopName={shop.dba ?? shop.name} showScript={false} onPlaybackChange={setVideoPlaying} />
+                    </div>
+                  ) : (
+                  <video
+                    key={image.src}
+                    src={image.src}
+                    controls
+                    playsInline
+                    muted={autoPlayVideoOnVisible}
+                    data-host-shop-tour
+                    poster={image.backdropSrc}
+                    onPause={() => setVideoPlaying(false)}
+                    onPlay={(event) => {
+                      setVideoPlaying(true);
+                      event.currentTarget.defaultPlaybackRate = 1;
+                      event.currentTarget.playbackRate = 1;
+                      if (!event.currentTarget.muted) {
+                        stopAllNaturalVoicePlayback();
+                        event.currentTarget.volume = 1;
+                      }
+                    }}
+                    onLoadedMetadata={(event) => {
+                      event.currentTarget.defaultPlaybackRate = 1;
+                      event.currentTarget.playbackRate = 1;
+                    }}
+                    onVolumeChange={(event) => {
+                      const video = event.currentTarget;
+                      userEnabledSoundRef.current = !video.muted && video.volume > 0;
+                      if (userEnabledSoundRef.current) stopAllNaturalVoicePlayback();
+                    }}
+                    onEnded={(event) => {
+                      // Resume photo rotation only after the full tour finishes.
+                      setVideoPlaying(false);
+                      event.currentTarget.pause();
+                    }}
+                    onError={() =>
+                      setFailedVideos((current) => {
+                        const next = new Set(current);
+                        next.add(image.src);
+                        return next;
+                      })
+                    }
+                    preload="metadata"
+                    className="relative z-10 aspect-[9/16] h-full max-h-[320px] w-auto max-w-full object-contain shadow-2xl"
+                    aria-label={image.alt}
+                  />
+                  )}
+                </div>
+              ) : image?.kind === 'video' && image.backdropSrc ? (
+                <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  <Image
+                    src={image.backdropSrc}
+                    alt={image.alt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    className="object-contain"
+                  />
+                </div>
               ) : image && !failedImages.has(image.src) ? (
-                <Image
-                  key={image.src}
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  priority={activeIndex === 0}
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                  className="object-contain bg-white"
-                  onError={() => setFailedImages((current) => {
-                    const next = new Set(current);
-                    next.add(image.src);
-                    return next;
-                  })}
-                />
+                <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  <Image
+                    key={image.src}
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    priority={activeIndex === 0}
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    className="host-showcase-media-enter object-contain"
+                    onError={() =>
+                      setFailedImages((current) => {
+                        const next = new Set(current);
+                        next.add(image.src);
+                        return next;
+                      })
+                    }
+                  />
+                </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col justify-end bg-[radial-gradient(circle_at_top_left,rgba(185,28,28,0.32),transparent_42%),linear-gradient(145deg,#1e293b,#020617)] px-8 py-10 sm:px-12 sm:py-12">
-                  <p className="max-w-xl text-4xl font-black tracking-tight sm:text-5xl">{shop.dba ?? shop.name}</p>
-                  <p className="mt-3 text-lg font-semibold text-slate-300">Local business • {shop.city}, {shop.state}</p>
+                  <p className="max-w-xl text-4xl font-black tracking-tight sm:text-5xl">
+                    {shop.dba ?? shop.name}
+                  </p>
+                  <p className="mt-3 text-lg font-semibold text-slate-300">
+                    Local business • {shop.city}, {shop.state}
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="flex flex-col justify-center p-7 text-slate-950 sm:p-9 lg:p-10" aria-live="polite">
+            <div
+              className="flex flex-col justify-center p-4 text-slate-950 sm:p-5 lg:p-6"
+              aria-live="polite"
+            >
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
-                Host Shop gallery image {activeIndex + 1} of {slides.length}
+                Indiana Host Shop Network • Example {activeIndex + 1} of {slides.length}
               </p>
-              <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{shop.dba ?? shop.name}</h3>
-              {shop.dba ? <p className="mt-1 text-sm text-slate-600">Legal name: {shop.name}</p> : null}
-              <p className="mt-5 text-base leading-7 text-slate-700">{shop.marketingBlurb ?? shop.note}</p>
+              <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
+                {shop.dba ?? shop.name}
+              </h3>
+              {shop.dba ? (
+                <p className="mt-1 text-sm text-slate-600">Legal name: {shop.name}</p>
+              ) : null}
+              <p className="mt-5 text-base leading-7 text-slate-700">
+                {shop.marketingBlurb ?? shop.note}
+              </p>
+              {image?.kind === 'video' && (image.script || tourScripts?.[image.src]) ? (
+                <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
+                    Read this tour script
+                  </summary>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
+                    {image.script ?? tourScripts?.[image.src]}
+                  </p>
+                </details>
+              ) : null}
               <p className="mt-5 flex items-start gap-2 text-sm font-semibold text-slate-800">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
-                <span>{shop.address}, {shop.city}, {shop.state} {shop.zip}</span>
+                <span>
+                  {shop.address}, {shop.city}, {shop.state} {shop.zip}
+                </span>
               </p>
+              {shop.phone ? (
+                <a
+                  href={`tel:${shop.phone.replace(/[^+\d]/g, '')}`}
+                  className="mt-3 flex items-center gap-2 text-sm font-bold text-brand-blue-800 hover:underline"
+                >
+                  <Phone className="h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
+                  {shop.phone}
+                </a>
+              ) : null}
 
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
+                  href="/partners/host-shop/apply"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-brand-red-700"
+                >
+                  Apply Free to Become a Host Shop
+                </Link>
+                <Link
                   href={`/host-shops/${shop.slug}`}
-                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-red-500"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-5 py-2.5 text-sm font-extrabold text-slate-900 hover:bg-slate-50"
                 >
                   Explore this host shop
                 </Link>
-                {externalUrl ? (
+                {externalLinks.map((link) => (
                   <a
-                    href={externalUrl}
+                    key={link.href}
+                    href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-brand-blue-700 bg-white px-5 py-2.5 text-sm font-black text-brand-blue-900 hover:bg-sky-50"
                   >
-                    {externalLabel} <ExternalLink className="h-4 w-4" />
+                    {link.label} <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   </a>
-                ) : null}
+                ))}
               </div>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-5 py-4 sm:px-7">
-            <div className="flex gap-2" aria-label="Choose a host shop slide">
+            <div className="flex min-w-0 max-w-full flex-wrap gap-1" aria-label="Choose a host shop slide">
               {slides.map(({ shop: item, media }, index) => (
                 <button
                   key={`${item.slug}-${media?.src ?? 'no-media'}`}
                   type="button"
                   onClick={() => setActiveIndex(index)}
-                  className={`h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-brand-red-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
                   aria-label={`Show ${item.dba ?? item.name}${media ? ` — ${media.alt}` : ''}`}
                   aria-current={index === activeIndex ? 'true' : undefined}
-                />
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-brand-red-600' : 'w-2.5 bg-slate-300'}`}
+                  />
+                </button>
               ))}
             </div>
             <div className="flex gap-2">
@@ -203,6 +524,27 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .host-showcase-media-enter {
+          animation: host-showcase-fade 650ms ease-out both;
+          transform-origin: center;
+        }
+        @keyframes host-showcase-fade {
+          from {
+            opacity: 0;
+            transform: scale(1.02);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .host-showcase-media-enter {
+            animation: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }

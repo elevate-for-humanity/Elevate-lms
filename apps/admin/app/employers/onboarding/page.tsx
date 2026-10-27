@@ -1,6 +1,5 @@
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Clock, XCircle, Eye, CheckCircle } from 'lucide-react';
@@ -13,15 +12,16 @@ export const metadata = {
 
 export default async function EmployerOnboardingReview() {
   await requireRole(['admin', 'staff']);
-  const auth = await createClient();
-
   const supabase = await requireAdminClient();
 
   let onboardings: any[] = [];
   let orientationProgress: any[] = [];
   if (supabase) {
     const [onboardingRes, orientationRes] = await Promise.all([
-      supabase.from('employer_onboarding').select('*').order('created_at', { ascending: false }),
+      supabase
+        .from('employers')
+        .select('id,business_name,company_name,name,contact_name,contact_email,email,contact_phone,phone,status,approved,created_at,employer_onboarding(id,status,activated_at,updated_at)')
+        .order('created_at', { ascending: false }),
       // employer_onboarding_progress — written by /onboarding/employer/orientation
       supabase
         .from('employer_onboarding_progress')
@@ -29,7 +29,20 @@ export default async function EmployerOnboardingReview() {
         .order('created_at', { ascending: false })
         .limit(100),
     ]);
-    onboardings = onboardingRes.data || [];
+    onboardings = (onboardingRes.data || []).map((employer: any) => {
+      const onboarding = Array.isArray(employer.employer_onboarding)
+        ? employer.employer_onboarding[0]
+        : employer.employer_onboarding;
+      return {
+        id: employer.id,
+        business_name: employer.company_name || employer.business_name || employer.name || 'Employer',
+        contact_name: employer.contact_name,
+        contact_email: employer.contact_email || employer.email,
+        contact_phone: employer.contact_phone || employer.phone,
+        status: employer.approved ? 'approved' : onboarding?.status || employer.status || 'pending',
+        created_at: employer.created_at,
+      };
+    });
     orientationProgress = orientationRes.data || [];
   }
 
@@ -101,7 +114,7 @@ export default async function EmployerOnboardingReview() {
                       </td>
                       <td className="px-6 py-4">
                         <Link
-                          href={`/employers/onboarding/${onboarding.id}`}
+                          href={`/employers/${onboarding.id}`}
                           className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                         >
                           Review →

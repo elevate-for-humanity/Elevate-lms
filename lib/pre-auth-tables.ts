@@ -129,6 +129,12 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
     reason: 'Payment lifecycle events. Written by cron/webhook.',
   },
   {
+    table: 'billing_schedules',
+    mode: 'anonymous',
+    reason:
+      'Public QuickBooks checkout may create an idempotent invoice schedule before account creation. Customer email and the canonical customer/product key provide reconciliation and duplicate prevention; the table has no user_id column.',
+  },
+  {
     table: 'partner_export_logs',
     mode: 'anonymous',
     reason: 'Export audit trail. Written server-side after partner auth.',
@@ -229,17 +235,20 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
   {
     table: 'tenant_orders',
     mode: 'anonymous',
-    reason: 'Public connected-account Checkout creates a pending order before buyer authentication. Stripe checkout_session_id and customer_email provide the reconciliation/audit key; the table has no user_id column.',
+    reason:
+      'Public connected-account Checkout creates a pending order before buyer authentication. Stripe checkout_session_id and customer_email provide the reconciliation/audit key; the table has no user_id column.',
   },
   {
     table: 'community_groups',
     mode: 'anonymous',
-    reason: 'Demo-to-trial conversion seeds tenant-owned starter groups after the workspace and tenant are created. These rows are workspace content, not user-owned records.',
+    reason:
+      'Demo-to-trial conversion seeds tenant-owned starter groups after the workspace and tenant are created. These rows are workspace content, not user-owned records.',
   },
   {
     table: 'community_posts',
     mode: 'anonymous',
-    reason: 'Demo-to-trial conversion can seed a tenant-owned welcome post before the new owner completes first login. Tenant ownership is the authority for this generated starter content.',
+    reason:
+      'Demo-to-trial conversion can seed a tenant-owned welcome post before the new owner completes first login. Tenant ownership is the authority for this generated starter content.',
   },
 ];
 

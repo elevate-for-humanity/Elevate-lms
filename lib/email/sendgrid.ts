@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { withResilience, breakers } from '@/lib/resilience';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { randomUUID } from 'node:crypto';
 
 export interface EmailAttachment {
   content: string;
@@ -20,12 +21,14 @@ export interface EmailOptions {
   replyTo?: string;
   bcc?: string | string[];
   attachments?: EmailAttachment[];
+  /** Durable outbox owns retry policy; ambiguous sends must never auto-retry. */
+  singleAttempt?: boolean;
 }
 
 type EmailSendResult = {
   success: boolean;
   error?: string;
-  data?: { provider: string };
+  data?: { provider: string; messageId?: string; trackingIds?: string[] };
   from?: string;
 };
 
@@ -34,6 +37,7 @@ async function auditTransportDelivery(
   result: EmailSendResult,
   resolvedFrom: string,
   provider: 'sendgrid' | 'unconfigured' = 'sendgrid',
+  trackingIds: string[] = [],
 ): Promise<void> {
   try {
     // Dynamic import avoids making the email transport part of the Supabase
@@ -48,20 +52,23 @@ async function auditTransportDelivery(
     const rows = recipients
       .map((recipient) => String(recipient || '').trim())
       .filter(Boolean)
-      .map((recipient) => ({
+      .map((recipient, index) => ({
+        id: trackingIds[index] || randomUUID(),
         action: 'email_transport_send',
         recipient_email: recipient,
         recipient,
         to: recipient,
         subject: options.subject,
         provider,
-        status: result.success ? 'sent' : 'failed',
+        status: result.success ? 'accepted' : 'failed',
         error_message: result.error ?? null,
         error: result.error ?? null,
         sent_at: result.success ? now : null,
+        message_id: result.data?.messageId ?? null,
         details: {
           transport: provider,
           from: resolvedFrom,
+          provider_status: result.success ? 'accepted' : 'failed',
           has_attachments: Boolean(options.attachments?.length),
           bcc_count: options.bcc ? (Array.isArray(options.bcc) ? options.bcc.length : 1) : 0,
         },
@@ -122,17 +129,20 @@ export async function sendEmail(options: EmailOptions): Promise<EmailSendResult>
     return result;
   }
 
+  const trackingIds = toArr.map(() => randomUUID());
   const result = await sendViaSendGrid(sendgridKey, {
+    singleAttempt: options.singleAttempt,
     from,
     replyTo,
     to: toArr,
+    trackingIds,
     subject: options.subject,
     html: options.html,
     ...(options.text ? { text: options.text } : {}),
     ...(options.attachments ? { attachments: options.attachments } : {}),
     ...(bccArr ? { bcc: bccArr } : {}),
   });
-  await auditTransportDelivery(options, result, from, 'sendgrid');
+  await auditTransportDelivery(options, result, from, 'sendgrid', trackingIds);
   return result;
 }
 
@@ -140,6 +150,7 @@ async function sendViaSendGrid(
   apiKey: string,
   opts: {
     to: string[];
+    trackingIds: string[];
     from: string;
     subject: string;
     html: string;
@@ -147,18 +158,18 @@ async function sendViaSendGrid(
     replyTo: string;
     bcc?: string[];
     attachments?: EmailAttachment[];
+    singleAttempt?: boolean;
   },
 ): Promise<EmailSendResult> {
   try {
-    const personalization: Record<string, unknown> = {
-      to: opts.to.map((email) => ({ email })),
-    };
-    if (opts.bcc?.length) {
-      personalization.bcc = opts.bcc.map((email) => ({ email }));
-    }
+    const personalizations = opts.to.map((email, index) => ({
+      to: [{ email }],
+      custom_args: { elevate_email_log_id: opts.trackingIds[index] },
+      ...(opts.bcc?.length ? { bcc: opts.bcc.map((bcc) => ({ email: bcc })) } : {}),
+    }));
 
     const body = JSON.stringify({
-      personalizations: [personalization],
+      personalizations,
       from: parseSendGridFrom(opts.from),
       reply_to: parseSendGridFrom(opts.replyTo),
       subject: opts.subject,
@@ -185,10 +196,11 @@ async function sendViaSendGrid(
           method: 'POST',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           body,
+          signal: AbortSignal.timeout(10_000),
         }),
       {
         circuitBreaker: breakers.sendgrid,
-        attempts: 3,
+        attempts: opts.singleAttempt ? 1 : 3,
         baseDelayMs: 1000,
         label: 'sendgrid',
         // Don't retry 4xx — those are permanent failures (bad key, invalid address, etc.)
@@ -200,18 +212,24 @@ async function sendViaSendGrid(
     );
 
     if (!resp.ok) {
-      const data = await resp.json().catch(() => ({}));
-      logger.error(`[Email] SendGrid ${resp.status}:`, data);
+      logger.error('[Email] SendGrid rejected request', { status: resp.status });
       return {
         success: false,
-        error: `SendGrid error ${resp.status}: ${JSON.stringify(data)}`,
+        error: `SendGrid rejected request (${resp.status})`,
         from: opts.from,
       };
     }
 
-    return { success: true, data: { provider: 'sendgrid' } };
+    return {
+      success: true,
+      data: {
+        provider: 'sendgrid',
+        messageId: resp.headers.get('x-message-id') || undefined,
+        trackingIds: opts.trackingIds,
+      },
+    };
   } catch (error) {
-    logger.error('[Email] SendGrid send error:', error);
+    logger.error('[Email] SendGrid send outcome unavailable');
     return { success: false, error: 'Operation failed' };
   }
 }

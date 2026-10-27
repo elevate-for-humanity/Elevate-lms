@@ -10,14 +10,13 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 
 export default function SpeechCanceller() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    stopAllNaturalVoicePlayback();
   }, [pathname]);
 
   return null;

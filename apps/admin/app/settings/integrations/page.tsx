@@ -11,6 +11,11 @@ export default async function IntegrationSettingsPage() {
 
   const integrations = [
     {
+      title: 'Intuit for Education / Edlink',
+      description: 'Review roster-sync readiness, privacy gates, credentials, and connection requirements',
+      href: '/integrations/edlink',
+    },
+    {
       title: 'Environment Manager',
       description: 'Review runtime/configuration status and manage non-secret platform settings',
       href: '/integrations/env-manager',
@@ -63,7 +68,7 @@ export default async function IntegrationSettingsPage() {
       <div className="max-w-xl rounded-xl border border-amber-200 bg-amber-50 p-5">
         <p className="mb-2 text-sm font-bold text-amber-950">Configuration rule</p>
         <div className="space-y-1 text-xs font-medium leading-5 text-amber-950">
-          <p><strong>Production secret keys</strong> — configure on the Northflank service that consumes them, then redeploy that service if a fresh runtime is required.</p>
+          <p><strong>Production secret keys</strong> — configure on the Google Cloud Run service that consumes them, then redeploy that service if a fresh runtime is required.</p>
           <p><strong>platform_settings</strong> — non-secret application configuration only; values are stored as plaintext database settings.</p>
           <p><strong>process.env</strong> — runtime environment injected into the dedicated Admin, LMS, or Marketing container.</p>
         </div>

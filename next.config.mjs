@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -6,6 +6,7 @@ import {
   sharedStandaloneTraceExcludes,
 } from './scripts/next-standalone-trace-excludes.mjs';
 import { resolveCommitSha } from './scripts/build-identity.mjs';
+import { withBuildMemoryDefaults } from './scripts/build-memory-policy.mjs';
 
 const useStandaloneOutput =
   process.env.GITHUB_ACTIONS !== 'true' || process.env.NEXT_STANDALONE_OUTPUT === '1';
@@ -122,6 +123,7 @@ const nextConfig = {
     contentDispositionType: 'inline',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
+      { protocol: 'https', hostname: 'cdn.durable.co' },
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: '*.elevateforhumanity.org' },
       { protocol: 'https', hostname: 'www.elevateforhumanity.org' },
@@ -158,6 +160,10 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-'],
     serverActions: {
+      // Host Shop compliance documents use a protected server action. Keep the
+      // transport ceiling above the enforced 10 MB document limit so multipart
+      // overhead never turns a valid upload into an opaque 413 response.
+      bodySizeLimit: '12mb',
       allowedOrigins: [
         'www.elevateforhumanity.org',
         'elevateforhumanity.org',
@@ -223,9 +229,6 @@ const nextConfig = {
     return config;
   },
 
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -284,8 +287,6 @@ const nextConfig = {
       },
     ];
   },
-
-
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const isPreview =
@@ -303,9 +304,10 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
       },
-      ...(isProduction
-        ? [{ key: 'X-Frame-Options', value: 'DENY' }]
-        : []),
+      // Clickjacking protection is enforced by the CSP frame-ancestors
+      // directive below. Do not also emit X-Frame-Options: DENY: it
+      // overrides the explicit first-party allowlist and breaks the
+      // authenticated Course Studio learner preview across subdomains.
       {
         key: 'X-Content-Type-Options',
         value: 'nosniff',
@@ -320,7 +322,7 @@ const nextConfig = {
       },
       {
         key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=()',
+        value: 'camera=(self), microphone=(self), geolocation=(self)',
       },
       {
         key: 'Content-Security-Policy',
@@ -330,7 +332,7 @@ const nextConfig = {
             ? "script-src 'self' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://www.googletagmanager.com https://widget.sezzle.com https://challenges.cloudflare.com"
             : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://www.googletagmanager.com https://widget.sezzle.com https://challenges.cloudflare.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://images.pexels.com https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io https://*.r2.dev https://cdn.elevatelms.com https://*.githubusercontent.com https://cdn1.affirm.com",
+          "img-src 'self' data: blob: https://cdn.durable.co https://*.supabase.co https://images.unsplash.com https://images.pexels.com https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io https://*.r2.dev https://cdn.elevatelms.com https://*.githubusercontent.com https://cdn1.affirm.com",
           "font-src 'self' data: https://fonts.gstatic.com",
           "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://us06web.zoom.us https://*.sentry.io https://www.google-analytics.com https://region1.google-analytics.com",
           "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://js.stripe.com https://us06web.zoom.us https://challenges.cloudflare.com https://*.cloudflarestream.com https://calendly.com",
@@ -360,11 +362,6 @@ const nextConfig = {
         key: 'X-Robots-Tag',
         value: 'noindex, nofollow, noarchive',
       });
-    } else {
-      securityHeaders.push({
-        key: 'X-Robots-Tag',
-        value: 'noai, noimageai',
-      });
     }
 
     return [
@@ -375,7 +372,14 @@ const nextConfig = {
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
           { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
         ],
       },
       {
@@ -385,15 +389,33 @@ const nextConfig = {
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
           { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
         ],
       },
       {
-        source: '/(|about|about/mission|about/team|about/partners|blog|careers|contact|credentials|dmca|donate|eligibility|faq|for-employers|for-students|how-it-works|jri|news|partners|press|resources|scholarships|services|site-map|training|transparency|tuition|verify|workkeys|mobile-app|install-app|career-training-indiana|certification-testing|check-eligibility|call-now|career-assessment|career-counseling|workforce-training-indianapolis|healthcare-training-indianapolis|skilled-trades-training-indiana|it-certification-training-indianapolis|employer-workforce-partnerships-indiana|agency-referral-workforce-training-indiana|wioa-eligibility)',
+        source:
+          '/(|about|about/mission|about/team|about/partners|blog|careers|contact|credentials|dmca|donate|eligibility|faq|for-employers|for-students|how-it-works|jri|news|partners|press|resources|scholarships|services|site-map|training|transparency|tuition|verify|workkeys|mobile-app|install-app|career-training-indiana|certification-testing|check-eligibility|call-now|career-assessment|career-counseling|workforce-training-indianapolis|healthcare-training-indianapolis|skilled-trades-training-indiana|it-certification-training-indianapolis|employer-workforce-partnerships-indiana|agency-referral-workforce-training-indiana|wioa-eligibility)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=60, stale-while-revalidate=300' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
+          {
+            key: 'X-Deployment-ID',
+            value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local',
+          },
           ...securityHeaders,
         ],
       },
@@ -401,20 +423,41 @@ const nextConfig = {
         source: '/programs/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=60, stale-while-revalidate=300' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
+          {
+            key: 'X-Deployment-ID',
+            value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local',
+          },
           ...securityHeaders,
         ],
       },
       {
-        source: '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio|programs).*)',
+        source:
+          '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio|programs).*)',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'Pragma', value: 'no-cache' },
           { key: 'Expires', value: '0' },
           { key: 'Surrogate-Control', value: 'no-store' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
+          {
+            key: 'X-Deployment-ID',
+            value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local',
+          },
           ...securityHeaders,
         ],
       },
@@ -479,16 +522,15 @@ const sentryWebpackPluginOptions = {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
-  autoInstrumentMiddleware: false,
   webpack: {
     autoInstrumentMiddleware: false,
+    treeshake: { removeDebugLogging: true },
   },
-  disableLogger: true,
   widenClientFileUpload: false,
 };
 
 const skipSentry = process.env.BUILD_SCOPE === '1';
 
 export default skipSentry
-  ? nextConfig
-  : withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+  ? withBuildMemoryDefaults(nextConfig)
+  : withSentryConfig(withBuildMemoryDefaults(nextConfig), sentryWebpackPluginOptions);

@@ -18,6 +18,11 @@ import { FollowUpBlastButton } from '@/components/admin/FollowUpBlastButton';
 import { BulkOnboardingButton } from '@/components/admin/BulkOnboardingButton';
 import ApplicationsTableClient from './ApplicationsTableClient';
 import type { ApplicationRow } from './ApplicationsTableClient';
+import {
+  APPLICATION_REVIEW_STATUSES,
+  applicationProgramFilter,
+  applicationSearchFilter,
+} from '@/lib/admin/application-filters';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -44,7 +49,7 @@ export default async function ApplicationsPage({
   // Resolve virtual filter aliases and comma-separated multi-status
   const resolvedStatuses: string[] =
     rawStatus === 'awaiting_review'
-      ? ['submitted', 'pending', 'in_review']
+      ? [...APPLICATION_REVIEW_STATUSES]
       : rawStatus && rawStatus !== 'all'
         ? rawStatus.split(',').filter(Boolean)
         : [];
@@ -65,9 +70,21 @@ export default async function ApplicationsPage({
           <code className="mx-1 px-1 bg-slate-100 rounded">SUPABASE_SERVICE_ROLE_KEY</code>
           is missing from the container environment.
         </p>
-        <Link href="/applications" className="text-sm text-blue-600 underline">Retry</Link>
+        <Link href="/applications" className="text-sm text-blue-600 underline">
+          Retry
+        </Link>
       </div>
     );
+
+  const { data: programRows, error: programsError } = await adminDb
+    .from('programs')
+    .select('slug,title')
+    .neq('status', 'archived')
+    .not('title', 'ilike', '[QA%')
+    .not('slug', 'ilike', 'qa-%')
+    .order('title');
+  const programs = (programRows ?? []).filter((p: any) => p.slug && p.title);
+  const selectedProgram = programs.find((p: any) => p.slug === programFilter);
 
   // Optimize: use getApplicationCounts RPC if available; fall back to two parallel queries
   // one for paginated results, one for counts only
@@ -84,18 +101,12 @@ export default async function ApplicationsPage({
         .order('created_at', { ascending: false });
       if (resolvedStatuses.length === 1) query = query.eq('status', resolvedStatuses[0]);
       else if (resolvedStatuses.length > 1) query = query.in('status', resolvedStatuses);
-      if (programFilter === 'cdl-training')
-        query = query.or('program_slug.eq.cdl-training,program_interest.ilike.%cdl%');
-      if (search)
-        query = query.or(
-          `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,full_name.ilike.%${search}%`,
-        );
+      if (selectedProgram) query = query.or(applicationProgramFilter(selectedProgram));
+      if (search) query = query.or(applicationSearchFilter(search));
       return query.range(offset, offset + pageSize - 1);
     })(),
     // Query 2: Status counts only (head=true to avoid transferring full rows)
-    adminDb
-      .from('applications')
-      .select('id, status', { head: false }),
+    adminDb.from('applications').select('id, status', { head: false }),
     // Query 3: Guest pending count (separate count query)
     adminDb
       .from('applications')
@@ -113,7 +124,9 @@ export default async function ApplicationsPage({
         <p className="text-slate-500 text-sm mb-1">
           Database error — check server logs for details.
         </p>
-        <Link href="/applications" className="text-sm text-blue-600 underline">Retry</Link>
+        <Link href="/applications" className="text-sm text-blue-600 underline">
+          Retry
+        </Link>
       </div>
     );
   }
@@ -125,7 +138,9 @@ export default async function ApplicationsPage({
         <p className="text-slate-500 text-sm mb-1">
           Database error — check server logs for details.
         </p>
-        <Link href="/applications" className="text-sm text-blue-600 underline">Retry</Link>
+        <Link href="/applications" className="text-sm text-blue-600 underline">
+          Retry
+        </Link>
       </div>
     );
   }
@@ -145,9 +160,16 @@ export default async function ApplicationsPage({
   });
 
   const totalPages = Math.ceil((totalCount || 0) / pageSize);
-  const pending = (statusCounts['pending'] || 0) + (statusCounts['submitted'] || 0);
+  const pending = APPLICATION_REVIEW_STATUSES.reduce(
+    (sum, status) => sum + (statusCounts[status] || 0),
+    0,
+  );
 
-  const baseHref = `/applications${rawStatus && rawStatus !== 'all' ? `?status=${rawStatus}` : ''}${search ? `${rawStatus && rawStatus !== 'all' ? '&' : '?'}search=${search}` : ''}`;
+  const paginationParams = new URLSearchParams();
+  if (rawStatus && rawStatus !== 'all') paginationParams.set('status', rawStatus);
+  if (search) paginationParams.set('search', search);
+  if (selectedProgram) paginationParams.set('program', selectedProgram.slug);
+  const baseHref = `/applications${paginationParams.size ? `?${paginationParams}` : ''}`;
 
   return (
     <AdminPageShell
@@ -190,6 +212,7 @@ export default async function ApplicationsPage({
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Status</label>
             <select
+              aria-label="Application status"
               name="status"
               defaultValue={rawStatus || 'all'}
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
@@ -198,6 +221,7 @@ export default async function ApplicationsPage({
               <option value="submitted">Submitted</option>
               <option value="in_review">In Review</option>
               <option value="under_review">Under Review</option>
+              <option value="pending_admin_review">Pending Admin Review</option>
               <option value="pending_workone">Pending WorkOne</option>
               <option value="waitlisted">Waitlisted</option>
               <option value="approved">Approved</option>
@@ -209,13 +233,23 @@ export default async function ApplicationsPage({
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Program</label>
             <select
+              aria-label="Application program"
               name="program"
               defaultValue={programFilter || 'all'}
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
             >
               <option value="all">All Programs</option>
-              <option value="cdl-training">CDL Training</option>
+              {programs.map((program: any) => (
+                <option key={program.slug} value={program.slug}>
+                  {program.title}
+                </option>
+              ))}
             </select>
+            {programsError && (
+              <p role="status" className="mt-1 text-xs text-red-600">
+                Program filters are unavailable. Refresh to retry.
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Search</label>

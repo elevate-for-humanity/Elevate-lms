@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
+import { aiChat } from '@/lib/ai/ai-service';
+import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,18 +16,6 @@ export const dynamic = 'force-dynamic';
 async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  if (!isOpenAIConfigured()) {
-    return NextResponse.json(
-      { error: 'AI features not configured. Please set OPENAI_API_KEY.' },
-      { status: 503 },
-    );
-  }
-
-  const client = getOpenAIClient();
-  if (!client) {
-    return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
-  }
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -102,13 +91,13 @@ ${JSON.stringify(features, null, 2)}
 `;
 
   try {
-    const completion = await client.chat.completions.create({
+    const completion = await aiChat({
       model: 'gpt-4.1',
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'system', content: PARIS_SYSTEM_IDENTITY }, { role: 'user', content: prompt }],
       temperature: 0.3,
     });
 
-    const text = completion.choices[0].message.content || '[]';
+    const text = completion.content || '[]';
     let parsed: any;
 
     try {

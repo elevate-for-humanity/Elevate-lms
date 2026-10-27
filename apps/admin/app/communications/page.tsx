@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { MessageSquare, Mail, Phone, Bell, Send, Users, FileText, Clock } from 'lucide-react';
 
@@ -11,26 +11,27 @@ export const metadata: Metadata = {
 
 export default async function CommunicationsPage() {
   await requireRole(['admin', 'super_admin']);
-  const db = await createClient();
+  const db = await requireAdminClient();
 
   // Fetch recent communications from database
   const { data: communications } = await db
     .from('communications')
-    .select('*')
+    .select('id,recipient_id,type,subject,body,status,sent_at,created_at,metadata')
     .order('created_at', { ascending: false })
     .limit(50);
 
   // Fetch email templates
   const { data: templates } = await db
     .from('email_templates')
-    .select('*')
+    .select('id,key,subject,created_at')
     .limit(20);
 
   // Fetch scheduled messages
   const { data: scheduled } = await db
-    .from('scheduled_messages')
-    .select('*')
-    .order('send_at', { ascending: true })
+    .from('email_queue')
+    .select('id,recipient:recipient_email,message:body,channel:related_type,scheduled_at:scheduled_for,status')
+    .not('scheduled_for', 'is', null)
+    .order('scheduled_for', { ascending: true })
     .limit(20);
 
   return (
@@ -59,14 +60,14 @@ export default async function CommunicationsPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="bg-white p-4 rounded-lg border">
           <div className="flex items-center gap-3">
             <div className="bg-blue-100 p-3 rounded-lg">
               <Mail className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{communications?.length || 0}</p>
+              <p className="text-2xl font-bold">{communications?.filter((c) => c.status === 'sent').length || 0}</p>
               <p className="text-sm text-gray-600">Total Sent</p>
             </div>
           </div>
@@ -110,9 +111,9 @@ export default async function CommunicationsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {/* Recent Communications */}
-        <div className="col-span-2 bg-white rounded-lg border">
+        <div className="bg-white rounded-lg border sm:col-span-2">
           <div className="p-4 border-b">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
@@ -132,8 +133,8 @@ export default async function CommunicationsPage() {
                       }`}>
                         {comm.type?.toUpperCase()}
                       </span>
-                      <p className="mt-2 font-medium">{comm.subject || comm.title}</p>
-                      <p className="text-sm text-gray-600">{comm.recipient}</p>
+                      <p className="mt-2 font-medium">{comm.subject || 'No subject'}</p>
+                      <p className="text-sm text-gray-600">{comm.status} · {String(comm.metadata?.recipient_email || comm.recipient_id || 'recipient recorded in delivery audit')}</p>
                     </div>
                     <span className="text-xs text-gray-500">
                       {new Date(comm.created_at).toLocaleDateString()}
@@ -169,7 +170,7 @@ export default async function CommunicationsPage() {
                     href={`/communications/templates/${tmpl.id}`}
                     className="block p-4 hover:bg-gray-50"
                   >
-                    <p className="font-medium">{tmpl.name}</p>
+                    <p className="font-medium">{tmpl.key}</p>
                     <p className="text-sm text-gray-600">{tmpl.subject}</p>
                   </Link>
                 ))
@@ -193,9 +194,9 @@ export default async function CommunicationsPage() {
               {scheduled?.length ? (
                 scheduled.slice(0, 5).map((msg: any) => (
                   <div key={msg.id} className="p-4">
-                    <p className="font-medium">{msg.title}</p>
+                    <p className="font-medium">{msg.channel.toUpperCase()} · {msg.recipient}</p>
                     <p className="text-sm text-gray-600">
-                      Scheduled: {new Date(msg.send_at).toLocaleString()}
+                      Scheduled: {new Date(msg.scheduled_at).toLocaleString()}
                     </p>
                   </div>
                 ))

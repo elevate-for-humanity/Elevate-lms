@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -15,39 +15,40 @@ async function _GET(request: NextRequest) {
   try {
     // Verify cron secret
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
     const today = new Date().toISOString().split('T')[0];
 
     // Get all active apprenticeships
     const { data: apprenticeships, error } = await supabase
-      .from('apprenticeship_enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,
         student_id,
         employer_id,
         program_id,
-        student:profiles!apprenticeship_enrollments_student_id_fkey(
+        student:profiles!program_enrollments_student_id_profiles_fkey(
           id,
           email,
           full_name
         ),
-        employer:profiles!apprenticeship_enrollments_employer_id_fkey(
+        employer:employers!program_enrollments_employer_id_fkey(
           id,
-          email,
-          full_name
+          contact_email,
+          contact_name
         ),
-        program:programs(
+        program:programs!fk_program_enrollments_program(
           id,
           name
         )
       `,
       )
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .eq('enrollment_type', 'apprentice');
 
     if (error) throw error;
 
@@ -72,39 +73,41 @@ async function _GET(request: NextRequest) {
       const employer = apprenticeship.employer as any;
       const program = apprenticeship.program as any;
 
-      if (!todayLog && employer?.email) {
+      if (!todayLog && employer?.contact_email) {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SITE_URL}/api/apprentice/email-alerts`,
+          `${process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org'}/api/apprentice/email-alerts`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', authorization: `Bearer ${process.env.CRON_SECRET}` },
+            signal: AbortSignal.timeout(10_000),
             body: JSON.stringify({
               type: 'missed_checkin',
               apprenticeshipId: apprenticeship.id,
               data: {
                 studentName: student?.full_name,
-                employerEmail: employer.email,
-                employerName: employer.full_name,
+                employerEmail: employer.contact_email,
+                employerName: employer.contact_name,
                 programName: program?.name,
                 date: today,
               },
             }),
           },
-        );
+        ).catch(() => null);
 
         results.push({
           student: student?.full_name,
-          employer: employer.full_name,
-          status: response.ok ? 'alert_sent' : 'failed',
+          employer: employer.contact_name,
+          status: response?.ok ? 'alert_sent' : 'failed',
         });
       }
     }
 
+    const success = results.every((result) => result.status === 'alert_sent');
     return NextResponse.json({
-      success: true,
-      alerts_sent: results.length,
+      success,
+      alerts_sent: results.filter((result) => result.status === 'alert_sent').length,
       results,
-    });
+    }, { status: success ? 200 : 503 });
   } catch (error) {
     logger.error('Missed check-ins cron error:', error);
     return NextResponse.json({ error: 'Failed to check missed check-ins' }, { status: 500 });

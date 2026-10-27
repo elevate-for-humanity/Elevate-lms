@@ -3,15 +3,15 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   buildProgramSchemaFromPartial,
-  buildProgramSchemaFromRegistry,
 } from '@/lib/programs/build-program-schema';
-import { resolveProgram, resolveSlug } from '@/lib/program-registry';
 
 describe('build-program-schema', () => {
-  it('builds a valid schema for registry-only programs (reentry-specialist)', () => {
-    const entry = resolveProgram('reentry-specialist');
-    expect(entry).toBeDefined();
-    const schema = buildProgramSchemaFromRegistry(entry!);
+  it('builds a valid schema from an authoritative program record', () => {
+    const schema = buildProgramSchemaFromPartial({
+      slug: 'reentry-specialist',
+      title: 'Reentry Specialist',
+      category: 'Human Services',
+    });
     expect(schema.slug).toBe('reentry-specialist');
     expect(schema.credentials.length).toBeGreaterThanOrEqual(3);
     expect(schema.outcomes.length).toBeGreaterThanOrEqual(5);
@@ -28,24 +28,27 @@ describe('build-program-schema', () => {
     expect(schema.programType).toBe('certification');
   });
 
-  it('canonicalizes duplicate phlebotomy aliases', () => {
-    expect(resolveSlug('phlebotomy-technician')).toBe('phlebotomy');
-    expect(resolveSlug('nha-phlebotomy')).toBe('phlebotomy');
+  it('does not silently rewrite authoritative database slugs', () => {
+    const schema = buildProgramSchemaFromPartial({
+      slug: 'phlebotomy-technician',
+      title: 'Phlebotomy Technician',
+      category: 'Healthcare',
+    });
+    expect(schema.slug).toBe('phlebotomy-technician');
   });
 });
 
 describe('single program page renderer', () => {
   it('[program]/page.tsx has no legacy ProgramPage or cf-programs fallback', () => {
-    const page = readFileSync(join(process.cwd(), 'app/programs/[program]/page.tsx'), 'utf8');
+    const page = readFileSync(join(process.cwd(), 'apps/marketing/app/programs/[program]/page.tsx'), 'utf8');
     expect(page).not.toContain('cf-programs');
     expect(page).not.toContain('function ProgramPage');
-    expect(page).not.toContain('ProgramPage');
     expect(page).toContain('loadProgramForPage');
-    expect(page).toContain('ProgramDetailPageComponent');
+    expect(page).toContain('ProgramDetailPage');
   });
 
   it('cf-programs.ts is removed', () => {
-    const exists = require('node:fs').existsSync(join(process.cwd(), 'content/cf-programs.ts'));
+    const exists = require('node:fs').existsSync(join(process.cwd(), 'lib/programs/cf-programs.ts'));
     expect(exists).toBe(false);
   });
 });

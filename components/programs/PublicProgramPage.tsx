@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -222,15 +223,14 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       </div>
 
       {/* Hero Image — clean, no text overlay */}
-      <section className="relative h-[clamp(420px,58vh,720px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+      <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={config.heroImage.src}
           alt={config.heroImage.alt}
           fill
           sizes="100vw"
-          className="object-cover"
-          priority placeholder="empty"
+          className="object-contain"
+          priority
         />
       </section>
 
@@ -312,7 +312,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             alt={config.sectionImages.overview.alt}
             fill
             sizes="100vw"
-            className="object-cover" placeholder="empty"
+            className="object-contain" placeholder="empty"
           />
         </section>
       )}
@@ -437,7 +437,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             alt={config.sectionImages.curriculum.alt}
             fill
             sizes="100vw"
-            className="object-cover" placeholder="empty"
+            className="object-contain" placeholder="empty"
           />
         </section>
       )}
@@ -485,7 +485,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             alt={config.sectionImages.career.alt}
             fill
             sizes="100vw"
-            className="object-cover" placeholder="empty"
+            className="object-contain" placeholder="empty"
           />
         </section>
       )}

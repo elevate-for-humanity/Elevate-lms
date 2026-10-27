@@ -35,7 +35,13 @@ export function url(path: string): string {
  * Admin site URL builder
  */
 export function adminUrl(path: string): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  // Admin is deployed at the root of admin.elevateforhumanity.org. Older
+  // callers sometimes pass a legacy `/admin/...` path; normalize it here so
+  // email and cross-service links cannot point at a route that does not exist.
+  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+  const cleanPath = withLeadingSlash === '/admin'
+    ? '/'
+    : withLeadingSlash.replace(/^\/admin\//, '/');
   return `${ADMIN_URL}${cleanPath}`;
 }
 
@@ -142,7 +148,7 @@ export const assets = {
 export const org = {
   name: process.env.NEXT_PUBLIC_ORG_NAME || 'Elevate for Humanity',
   legalName: process.env.NEXT_PUBLIC_ORG_LEGAl_NAME || 'Elevate for Humanity Technical and Career Institute',
-  phone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(317) 314-3757',
+  phone: '(463) 240-1404',
   email: INFO_EMAIL,
   support: SUPPORT_EMAIL,
   address: 'Indianapolis, Indiana',

@@ -1,6 +1,13 @@
 /** Canonical credential-blueprint types shared by generator, auditor, and seeded curricula. */
 
-export type EnrollmentType = 'standard' | 'apprentice' | 'employer-sponsored' | 'workforce-funded' | string;
+import type { LearningExperienceProfile } from '../learning-experience';
+
+export type EnrollmentType =
+  | 'standard'
+  | 'apprentice'
+  | 'employer-sponsored'
+  | 'workforce-funded'
+  | string;
 
 export type InteractionSpecs = {
   includeKnowledgeChecks?: boolean;
@@ -141,6 +148,18 @@ export type BlueprintGenerationRules = {
   requireFinalExam?: boolean;
   passingScore?: number;
   allowedLessonTypes?: string[];
+  /** Enforces the complete AI-generated learning sequence before publication. */
+  learningExperienceProfile?: LearningExperienceProfile;
+  /** Normal knowledge threshold; critical safety rules may override it. */
+  masteryThreshold?: number;
+  /** Required score for knowledge explicitly marked safety-critical. */
+  criticalMasteryThreshold?: number;
+  requireDiagnosticPreassessment?: boolean;
+  requirePrerequisiteGates?: boolean;
+  requireObjectiveLevelRemediation?: boolean;
+  requirePracticalEvidence?: boolean;
+  requireInstructorSignoffForCriticalSkills?: boolean;
+  preventAverageScoreCriticalBypass?: boolean;
   [key: string]: unknown;
 };
 
@@ -162,9 +181,10 @@ export type BlueprintCertificateRequirements = {
 };
 
 export type BlueprintVideoConfig = {
-  videoGenerator: 'runway' | 'canvas-slides' | 'manual';
-  template: 'elevate-slide' | 'talking-head' | 'screencast' | 'custom';
+  videoGenerator: 'runway' | 'remotion' | 'canvas-slides' | 'manual';
+  template: 'elevate-slide' | 'trade-demonstration' | 'talking-head' | 'screencast' | 'custom';
   instructorName: string;
+  instructorId?: string;
   instructorTitle: string;
   instructorImagePath: string;
   brandName?: string;
@@ -176,6 +196,22 @@ export type BlueprintVideoConfig = {
   logoPath?: string;
   backgroundMusic?: boolean;
   captions?: boolean;
+  /** Critical hand-skill scenes may never be satisfied by generic stock footage. */
+  criticalProcedureMedia?: Array<'original_capture' | 'licensed_demonstration'>;
+  stockFootageContextOnly?: boolean;
+  requireFullDemonstration?: boolean;
+  requireStepMicrovideos?: boolean;
+  requireHumanTechnicalReview?: boolean;
+  requireAutomatedTechnicalReview?: boolean;
+  humanReviewOnlyOnValidationFailure?: boolean;
+  requireValidatedStoryboardBeforeRender?: boolean;
+  requireSceneLevelObjectiveMapping?: boolean;
+  requireNarrationVisualAlignment?: boolean;
+  requireSafetySceneWhenApplicable?: boolean;
+  requireInstructionalEvidence?: boolean;
+  requireWorkedExample?: boolean;
+  requireCaptionsAndTranscript?: boolean;
+  allowSceneLevelRepair?: boolean;
   [key: string]: unknown;
 };
 

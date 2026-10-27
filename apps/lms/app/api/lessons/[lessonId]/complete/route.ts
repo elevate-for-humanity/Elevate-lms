@@ -64,7 +64,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
     const db = await requireAdminClient();
     const { data: lesson, error: lessonError } = await db
       .from('course_lessons')
-      .select('id,course_id,module_id,title,lesson_type,duration_minutes')
+      .select('id,course_id,module_id,title,lesson_type,duration_minutes,video_url,content_json')
       .eq('id', lessonId)
       .maybeSingle();
     if (lessonError || !lesson) {
@@ -114,7 +114,10 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
     const { canCompleteLesson } = await import('@/lib/ojt/canCompleteLesson');
     if (!(await canCompleteLesson(user.id, lessonId))) {
       return NextResponse.json(
-        { error: 'Complete required shop work before finishing this lesson', code: 'OJT_INCOMPLETE' },
+        {
+          error: 'Complete required shop work before finishing this lesson',
+          code: 'OJT_INCOMPLETE',
+        },
         { status: 403 },
       );
     }
@@ -151,13 +154,75 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       }
     }
 
-    const minimumSeconds = MINIMUM_SEAT_TIME[contentType] ?? 30;
-    if (timeSpentSeconds < minimumSeconds) {
+    const contentJson =
+      lesson.content_json && typeof lesson.content_json === 'object'
+        ? (lesson.content_json as Record<string, any>)
+        : {};
+    const experience =
+      contentJson.experience && typeof contentJson.experience === 'object'
+        ? (contentJson.experience as Record<string, any>)
+        : null;
+    const timeline = experience?.instructionalTimeline;
+    const interactiveVideo = experience?.interactiveVideo;
+    const requiredWatchPercent = Number(
+      timeline?.requiredWatchPercent ?? interactiveVideo?.requiredWatchPercent ?? 95,
+    );
+    const hasRequiredVideo = Boolean(lesson.video_url && (timeline || interactiveVideo));
+    if (hasRequiredVideo) {
+      const { data: videoProgress, error: videoProgressError } = await db
+        .from('learner_video_progress')
+        .select('progress_percent,completed')
+        .eq('user_id', user.id)
+        .eq('course_id', lesson.course_id)
+        .eq('lesson_id', lessonId)
+        .maybeSingle();
+      if (videoProgressError) throw videoProgressError;
+      if (
+        !videoProgress ||
+        Number(videoProgress.progress_percent ?? 0) < requiredWatchPercent ||
+        videoProgress.completed !== true
+      ) {
+        return NextResponse.json(
+          {
+            error: `Complete the interactive video and every required checkpoint before finishing this lesson.`,
+            code: 'INTERACTIVE_VIDEO_INCOMPLETE',
+            requiredWatchPercent,
+            actualWatchPercent: Number(videoProgress?.progress_percent ?? 0),
+          },
+          { status: 403 },
+        );
+      }
+    }
+
+    const configuredSeatTime = Number(
+      timeline?.minimumSeatTimeSeconds ?? interactiveVideo?.minimumSeatTimeSeconds ?? 0,
+    );
+    const minimumSeconds = Math.max(MINIMUM_SEAT_TIME[contentType] ?? 30, configuredSeatTime);
+    const { data: apprentice } = await db
+      .from('apprentices')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+    let effectiveTimeSpentSeconds = timeSpentSeconds;
+    if (apprentice) {
+      const { data: theorySessions, error: theorySessionError } = await db
+        .from('theory_activity_sessions')
+        .select('active_seconds')
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId);
+      if (theorySessionError) throw theorySessionError;
+      effectiveTimeSpentSeconds = (theorySessions || []).reduce(
+        (sum: number, session: any) => sum + Number(session.active_seconds || 0),
+        0,
+      );
+    }
+    if (effectiveTimeSpentSeconds < minimumSeconds) {
       return NextResponse.json(
         {
           error: 'Minimum time requirement not met',
           required: minimumSeconds,
-          actual: timeSpentSeconds,
+          actual: effectiveTimeSpentSeconds,
         },
         { status: 403 },
       );
@@ -175,9 +240,17 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       lessonId,
       lesson.course_id,
       enrollment.id,
-      timeSpentSeconds,
+      effectiveTimeSpentSeconds,
     );
     const completedAt = new Date().toISOString();
+    if (apprentice) {
+      await db
+        .from('theory_activity_sessions')
+        .update({ status: 'completed', ended_at: completedAt, updated_at: completedAt })
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId)
+        .in('status', ['active', 'paused']);
+    }
 
     try {
       const { data: linkedCompetencies } = await db
@@ -186,7 +259,11 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
         .eq('lesson_id', lessonId);
       for (const { competency_id } of linkedCompetencies ?? []) {
         const [{ data: competency }, { data: existing }] = await Promise.all([
-          db.from('competencies').select('minimum_touchpoints').eq('id', competency_id).maybeSingle(),
+          db
+            .from('competencies')
+            .select('minimum_touchpoints')
+            .eq('id', competency_id)
+            .maybeSingle(),
           db
             .from('student_competency_progress')
             .select('id,touchpoints,is_mastered')
@@ -253,7 +330,9 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       } catch (eligibilityError) {
         logger.error(
           '[credential-pipeline] Eligibility check failed (non-fatal):',
-          eligibilityError instanceof Error ? eligibilityError : new Error(String(eligibilityError)),
+          eligibilityError instanceof Error
+            ? eligibilityError
+            : new Error(String(eligibilityError)),
         );
       }
     }
@@ -333,7 +412,8 @@ async function _DELETE(
       .select('course_id')
       .eq('id', lessonId)
       .maybeSingle();
-    if (!lesson?.course_id) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    if (!lesson?.course_id)
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
     try {
       await assertLessonAccess(user.id, lessonId);

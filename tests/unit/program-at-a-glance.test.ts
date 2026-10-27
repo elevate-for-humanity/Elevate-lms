@@ -18,9 +18,9 @@ describe('buildProgramAtAGlance', () => {
     expect(rows[1].answer).toContain('6 weeks');
   });
 
-  it('CNA duration is 6 weeks in at-a-glance', () => {
+  it('CNA duration matches the four-week catalog contract', () => {
     const rows = buildProgramAtAGlance(CNA);
-    expect(rows[1].answer).toContain('6 weeks');
+    expect(rows[1].answer).toContain('4 weeks');
   });
 
   it('includes issuing organization in credential answer', () => {
@@ -34,11 +34,11 @@ describe('buildProgramAtAGlance', () => {
 describe('canonical program durations', () => {
   it('HVAC static catalog is 6 weeks', () => {
     expect(HVAC_TECHNICIAN.durationWeeks).toBe(6);
-    expect(HVAC_TECHNICIAN.subtitle).toMatch(/6 weeks/i);
+    expect(HVAC_TECHNICIAN.subtitle).toMatch(/6[- ]week/i);
   });
 
-  it('CNA static catalog is 6 weeks', () => {
-    expect(CNA.durationWeeks).toBe(6);
-    expect(CNA.subtitle).toMatch(/6 weeks/i);
+  it('CNA static catalog is 4 weeks', () => {
+    expect(CNA.durationWeeks).toBe(4);
+    expect(CNA.subtitle).toMatch(/4[- ]week/i);
   });
 });

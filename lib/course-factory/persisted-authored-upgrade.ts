@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@/lib/supabase';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getBlueprintBySlug } from './blueprint-loader';
 import { compileAuthoredLessonExperience } from './authored-content-compiler';
+import { createJob } from '@/lib/video/job-queue';
 
 function record(value: unknown): Record<string, any> {
   if (value && typeof value === 'object' && !Array.isArray(value))
@@ -77,7 +79,11 @@ function specificSource(
   };
 }
 
-export async function upgradePersistedAuthoredCourse(courseId: string, client?: SupabaseClient) {
+export async function upgradePersistedAuthoredCourse(
+  courseId: string,
+  client?: SupabaseClient,
+  options?: { lessonIds?: readonly string[] },
+) {
   const db = client ?? (await requireAdminClient());
   const { data: course, error: courseError } = await db
     .from('courses')
@@ -124,9 +130,23 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
   const curriculumBySlug = new Map((curriculumRows ?? []).map((item) => [item.lesson_slug, item]));
   const modulesById = new Map((modules ?? []).map((item) => [item.id, item]));
 
-  // Compile every lesson before the transaction. One invalid lesson blocks the
-  // entire course, so a repair can never leave a half-upgraded publication.
-  const payload = lessons.map((lesson) => {
+  const requestedLessonIds = options?.lessonIds?.length
+    ? new Set(options.lessonIds)
+    : null;
+  const lessonsToUpgrade = requestedLessonIds
+    ? lessons.filter((lesson) => requestedLessonIds.has(lesson.id))
+    : lessons;
+
+  if (requestedLessonIds && lessonsToUpgrade.length !== requestedLessonIds.size) {
+    const found = new Set(lessonsToUpgrade.map((lesson) => lesson.id));
+    const missing = [...requestedLessonIds].filter((lessonId) => !found.has(lessonId));
+    throw new Error(`Selective authored repair referenced missing lesson(s): ${missing.join(', ')}`);
+  }
+
+  // Compile only the requested failed lesson components before the transaction.
+  // A normal authored upgrade still compiles the complete course, while repair
+  // callers can preserve every passing lesson byte-for-byte.
+  const payload = lessonsToUpgrade.map((lesson) => {
     const module = modulesById.get(lesson.module_id);
     if (!module) throw new Error(`${lesson.title}: module is missing`);
     const source = specificSource(
@@ -149,8 +169,19 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
       existingExperience: currentJson.experience ?? currentContent.experience,
     });
     const quickClips = compiled.experience.quickClips;
+    const sourceFingerprint = createHash('sha256')
+      .update(
+        JSON.stringify({
+          narration: compiled.experience.narrationScript,
+          objective: compiled.objectives[0] ?? null,
+          learningPoints: compiled.learningPoints,
+          visualPrompt: compiled.experience.visualPrompt ?? null,
+        }),
+      )
+      .digest('hex');
     return {
       id: lesson.id,
+      title: lesson.title,
       content: {
         ...currentContent,
         html: source.html,
@@ -171,6 +202,10 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
       video_config: {
         ...record(lesson.video_config),
         enabled: true,
+        source_fingerprint: sourceFingerprint,
+        source_contract_version: 1,
+        narration_locked: true,
+        allow_paid_narration: true,
         ai_instructor: true,
         narration: compiled.experience.narrationScript,
         transcript: compiled.experience.narrationScript,
@@ -182,6 +217,14 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
       script: compiled.experience.narrationScript,
       bullet_points: compiled.learningPoints,
       scene_data: {
+        source_contract: {
+          version: 1,
+          fingerprint: sourceFingerprint,
+          narration_locked: true,
+        },
+        scenes: compiled.experience.instructionalTimeline?.scenes ?? [],
+        captions: compiled.experience.instructionalTimeline?.captions ?? [],
+        timeline_events: compiled.experience.instructionalTimeline?.events ?? [],
         visual_prompt: compiled.experience.visualPrompt,
         reading_guide: compiled.experience.readingGuide,
         scenario: compiled.experience.scenario,
@@ -190,7 +233,9 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
         glossary: compiled.experience.glossary,
         readiness: compiled.experience.readiness,
       },
-      generation_status: 'generated',
+      // Authored content is ready, but the lesson is not generated until its
+      // locked media package has rendered and passed the canonical quality gate.
+      generation_status: 'generating',
     };
   });
 
@@ -199,12 +244,26 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
     p_lessons: payload,
   });
   if (error) throw error;
+
+  for (const lesson of payload) {
+    await createJob({
+      lesson_id: lesson.id,
+      course_id: courseId,
+      lesson_title: lesson.title,
+      script: lesson.script,
+      bullet_points: lesson.learning_objectives,
+      scene_data: lesson.scene_data,
+      asset_kind: 'lesson',
+    });
+  }
+
   return {
     ok: true as const,
     courseId,
     courseSlug: course.slug,
     moduleCount: modules?.length ?? 0,
-    lessonCount: payload.length,
+    lessonCount: lessons?.length ?? 0,
+    repairedLessonCount: payload.length,
     result: data,
   };
 }

@@ -27,12 +27,15 @@ export interface FactoryInput {
   audience?: string;
   state?: string;
   credential?: string;
+  /** Versioned standards-registry identity. Drafting remains allowed when absent. */
+  credentialRegistryKey?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   hours?: number;
   deliveryFormat?: string;
   additionalRequirements?: string;
   moduleCount?: number;
   lessonsPerModule?: number;
+  buildScope?: 'lesson' | 'course';
   mode?: BuildMode;
   contentSource?: ContentSource;
   videoMode?: VideoMode;
@@ -57,6 +60,8 @@ export interface FactoryOutput {
   lessonVideosQueued?: number;
   /** Short concept-clip jobs queued by this build. */
   microclipsQueued?: number;
+  /** The course is not build-complete until required lesson media is attached and verified. */
+  completionState?: 'content_only' | 'media_pending' | 'ready_for_review';
   generationFailures?: Array<{ slug: string; reason: string }>;
   warnings?: string[];
   errors?: string[];
@@ -76,11 +81,20 @@ export type FactoryStage =
   | 'init'
   | 'resolve'
   | 'blueprint'
+  | 'instructional_plan'
+  | 'technical_review'
+  | 'storyboard'
   | 'enrich'
   | 'assess'
   | 'validate'
+  | 'contract'
+  | 'generating_assets'
+  | 'generating_narration'
   | 'publish'
   | 'media'
+  | 'rendering'
+  | 'quality_review'
+  | 'human_review'
   | 'complete'
   | 'error';
 

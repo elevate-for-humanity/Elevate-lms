@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Clock3, Download, GraduationCap, MonitorSmartphone } from 'lucide-react';
+import Image from 'next/image';
+import { getProgramCardImage, getProgramImageAlt } from '@/lib/images/programImages';
+import { BookOpen, Building2, Clock3, Download, GraduationCap, MonitorSmartphone, Store } from 'lucide-react';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 
 export const metadata: Metadata = {
@@ -8,6 +10,13 @@ export const metadata: Metadata = {
   description: 'Install the Elevate LMS dashboard for student, apprentice, and employer access.',
   robots: { index: false, follow: false },
 };
+
+const PROGRAM_COVERS = [
+  ['barber-apprenticeship', 'Barber'], ['cosmetology-apprenticeship', 'Cosmetology'],
+  ['nail-technician-apprenticeship', 'Nail Technician'], ['esthetician-apprenticeship', 'Esthetics'],
+  ['hvac-technician', 'HVAC'], ['cdl-training', 'CDL'],
+  ['bookkeeping', 'Bookkeeping'], ['business-administration', 'Business'],
+] as const;
 
 export default function LmsInstallPage() {
   return (
@@ -28,7 +37,7 @@ export default function LmsInstallPage() {
             className="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3 font-extrabold text-white hover:bg-blue-800"
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Link href="/lms/dashboard" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-300 hover:bg-blue-50">
               <GraduationCap className="h-5 w-5 text-blue-800" aria-hidden />
               <h2 className="mt-3 text-lg font-extrabold">Student Dashboard</h2>
@@ -44,8 +53,25 @@ export default function LmsInstallPage() {
               <h2 className="mt-3 text-lg font-extrabold">Employer Dashboard</h2>
               <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Candidates, apprenticeship operations, verification, and employer workflows.</p>
             </Link>
+            <Link href="/program-holder/dashboard" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-300 hover:bg-blue-50">
+              <Building2 className="h-5 w-5 text-blue-800" aria-hidden />
+              <h2 className="mt-3 text-lg font-extrabold">Program Holder</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Programs, students, agreements, compliance, documents, and reporting.</p>
+            </Link>
+            <Link href="/host-shop/dashboard" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-300 hover:bg-blue-50">
+              <Store className="h-5 w-5 text-blue-800" aria-hidden />
+              <h2 className="mt-3 text-lg font-extrabold">Host Shop</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Apprentices, attendance, OJL, competencies, documents, and shop reports.</p>
+            </Link>
           </div>
 
+          <section className="mt-10" aria-labelledby="program-install-covers">
+            <h2 id="program-install-covers" className="text-2xl font-black">Choose your program cover</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Open your program’s install page. Your account determines course access and enrollment.</p>
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {PROGRAM_COVERS.map(([slug, title]) => <Link key={slug} href={`/install/learner?program=${slug}`} className="overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-500"><div className="relative aspect-[4/3]"><Image src={getProgramCardImage(slug)} alt={getProgramImageAlt(slug, title)} fill sizes="(min-width: 640px) 220px, 50vw" className="object-cover" /></div><div className="p-3"><h3 className="font-bold">{title}</h3><span className="mt-2 inline-block text-sm font-bold text-blue-800">Open install page →</span></div></Link>)}
+            </div>
+          </section>
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <Download className="h-5 w-5 text-slate-800" aria-hidden />
             <h2 className="mt-3 text-lg font-extrabold">iPhone and iPad</h2>

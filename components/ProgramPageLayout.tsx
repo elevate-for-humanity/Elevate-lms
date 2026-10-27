@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -70,15 +71,14 @@ export default function ProgramPageLayout({
     <div className="min-h-screen bg-white">
       {/* Hero Banner — image only */}
       <section className="relative h-[350px] sm:h-[400px]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={heroImage}
           alt={heroImageAlt}
           fill
           className="object-cover"
           priority
           quality={90}
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 

@@ -13,6 +13,9 @@ export interface EmailTemplate {
 }
 
 export type TemplateKey =
+  | 'enrollment_welcome'
+  | 'theory_schedule_start'
+  | 'theory_schedule_stop'
   | 'inquiry_received'
   | 'apprentice_submission_received'
   | 'hostshop_submission_received'
@@ -31,7 +34,8 @@ export type TemplateKey =
   | 'provider_approved'
   | 'compliance_expiring'
   | 'program_approved'
-  | 'program_rejected';
+  | 'program_rejected'
+  | 'portal_completion_reminder';
 
 const BRAND_COLOR = '#7c3aed';
 const SUPPORT_EMAIL = PLATFORM_DEFAULTS.supportEmail;
@@ -67,6 +71,103 @@ function button(text: string, url: string): string {
 
 export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailTemplate {
   switch (key) {
+    case 'portal_completion_reminder': {
+      const portalUrl = data.portal_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;
+      const action = data.next_action || 'complete the remaining portal requirements';
+      return {
+        subject: `Action needed: ${action}`,
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Your portal checklist needs attention</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your next required step is to <strong>${action}</strong>.</p>
+          <p>These reminders stop automatically when the portal records the requirement as complete.</p>
+          ${button('Open Your Portal →', portalUrl)}
+        `),
+        text: `Your portal checklist needs attention\n\nHi ${data.name || 'there'},\n\nYour next required step is to ${action}. These reminders stop automatically when the portal records it as complete.\n\nOpen your portal: ${portalUrl}`,
+      };
+    }
+    case 'theory_schedule_start': {
+      const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice`;
+      return {
+        subject: 'It is time to start your scheduled theory session',
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Start your theory session</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your scheduled theory block is starting now. Open your assigned course and continue the next required lesson.</p>
+          <p><strong>Weekly target:</strong> ${data.weekly_target_hours} hours<br><strong>Weekly maximum:</strong> ${data.weekly_max_hours} hours</p>
+          ${button('Open Apprentice Dashboard →', dashboardUrl)}
+        `),
+        text: `It is time to start your scheduled theory session.\n\nWeekly target: ${data.weekly_target_hours} hours\nWeekly maximum: ${data.weekly_max_hours} hours\n\nOpen your dashboard: ${dashboardUrl}`,
+      };
+    }
+
+    case 'theory_schedule_stop': {
+      const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice`;
+      return {
+        subject: 'Your scheduled theory block is complete',
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Stop and save your theory work</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your scheduled theory block is complete. Save your work and return at your next scheduled session.</p>
+          <p>Keep working toward the <strong>${data.weekly_target_hours}-hour weekly target</strong> without exceeding the <strong>${data.weekly_max_hours}-hour weekly maximum</strong>.</p>
+          ${button('Review Apprentice Dashboard →', dashboardUrl)}
+        `),
+        text: `Your scheduled theory block is complete. Save your work and return at the next scheduled session.\n\nWeekly target: ${data.weekly_target_hours} hours\nWeekly maximum: ${data.weekly_max_hours} hours\n\nReview your dashboard: ${dashboardUrl}`,
+      };
+    }
+
+    case 'enrollment_welcome': {
+      const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/lms/dashboard`;
+      const loginUrl = data.login_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;
+      const passwordSetupUrl = data.password_setup_url || `${PLATFORM_DEFAULTS.siteUrl}/forgot-password`;
+      const securityUrl = data.security_url || `${PLATFORM_DEFAULTS.siteUrl}/account/settings/security`;
+      return {
+        subject: `Welcome to ${data.program_name || 'your Elevate program'} — start here`,
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Welcome to your program</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your enrollment in <strong>${data.program_name || 'your program'}</strong> is active.</p>
+          <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:16px;margin:18px 0;">
+            <p style="margin:0 0 8px;"><strong>Username:</strong> ${data.username || data.email || 'the email address that received this message'}</p>
+            <p style="margin:0;">For security, passwords are never sent by email. Use the one-time setup/reset page below to choose your password.</p>
+          </div>
+          <h3>Your first steps</h3>
+          <ol style="padding-left: 20px; line-height: 1.9;">
+            <li>Sign in to your learner account.</li>
+            <li>Open your dashboard and confirm your contact information.</li>
+            <li>Complete orientation and required acknowledgments.</li>
+            <li>Open My Courses and begin the first assigned lesson.</li>
+            <li>If you are an apprentice, confirm your Host Shop placement before clocking hours.</li>
+          </ol>
+          ${button('Set or Reset Your Password →', passwordSetupUrl)}
+          ${button('Sign In →', loginUrl)}
+          <p>After signing in, your dashboard is available at <a href="${dashboardUrl}">${dashboardUrl}</a>. You can change your password later under <a href="${securityUrl}">Account Security</a>.</p>
+          <p style="font-size: 13px; color: #666;">Do not create a second account. If sign-in does not recognize your email, reply to this message or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Welcome to ${data.program_name || 'your Elevate program'}
+
+Hi ${data.name || 'there'},
+
+Your enrollment is active.
+
+Username: ${data.username || data.email || 'the email address that received this message'}
+Password: For security, passwords are never sent by email.
+Set or reset your password: ${passwordSetupUrl}
+
+First steps:
+1. Sign in: ${loginUrl}
+2. Confirm your contact information.
+3. Complete orientation and required acknowledgments.
+4. Open My Courses and begin the first assigned lesson.
+5. Apprentices: confirm your Host Shop placement before clocking hours.
+
+Dashboard: ${dashboardUrl}
+Change your password later: ${securityUrl}
+
+Do not create a second account. If your email is not recognized, reply to this message or call ${SUPPORT_PHONE}.`,
+      };
+    }
+
     case 'inquiry_received':
       return {
         subject: 'We received your inquiry',

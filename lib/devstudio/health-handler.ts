@@ -2,23 +2,15 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
-import { isGeminiConfigured } from '@/lib/gemini-client';
-import { isGroqConfigured } from '@/lib/groq-client';
-import {
-  getNorthflankProjectId,
-  getNorthflankServices,
-  isNorthflankReady,
-} from '@/lib/northflank/runtime';
-import { hydrateProcessEnv } from '@/lib/secrets';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getGoogleServices, isGoogleRuntimeReady, googleProjectId } from '@/lib/google/runtime';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
  *
- * Dev Studio execution is admin-native. The legacy Studio Shell was removed and
+ * Master Studio execution uses the Admin control plane and the Google Studio runtime. The legacy Studio Shell was removed and
  * is explicitly forbidden by scripts/verify-no-studio-shell.mjs, so health must
  * never require STUDIO_SHELL_* variables or advertise a separate shell service.
  */
@@ -26,66 +18,50 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv().catch(() => undefined);
-
-  let dbGroq = false;
-  let dbGemini = false;
-  let dbOpenAI = false;
-  let dbAnthropic = false;
-  let dbGitHub = false;
-
-  try {
-    const db = await requireAdminClient();
-    const { data } = await db
-      .from('platform_secrets')
-      .select('key, value_enc')
-      .in('key', [
-        'GROQ_API_KEY',
-        'GEMINI_API_KEY',
-        'OPENAI_API_KEY',
-        'ANTHROPIC_API_KEY',
-        'GITHUB_TOKEN',
-      ]);
-
-    for (const row of data ?? []) {
-      const set = Boolean(row.value_enc && row.value_enc.length > 10);
-      if (row.key === 'GROQ_API_KEY') dbGroq = set;
-      if (row.key === 'GEMINI_API_KEY') dbGemini = set;
-      if (row.key === 'OPENAI_API_KEY') dbOpenAI = set;
-      if (row.key === 'ANTHROPIC_API_KEY') dbAnthropic = set;
-      if (row.key === 'GITHUB_TOKEN') dbGitHub = set;
+  const [ai, cloudflareProbe] = await Promise.all([
+    resolveAIRuntimeState().catch(() => ({
+    providers: { groq: false, xai: false, gemini: false, openai: false, anthropic: false, cloudflare: false },
+    activeProvider: 'none', elevate: false, anyConfigured: false,
+    })),
+    probeCloudflareWorkersAI().catch(() => ({
+      configured: false,
+      reachable: false,
+      status: 'unreachable' as const,
+      detail: 'Cloudflare Workers AI live probe failed.',
+      checkedAt: new Date().toISOString(),
+    })),
+  ]);
+  const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
+  const hasCloudflare = cloudflareProbe.reachable;
+  let githubAuthError: string | null = null;
+  const githubToken = await getGitHubToken().catch(() => {
+    githubAuthError = 'github_authentication_unavailable';
+    return null;
+  });
+  const hasGitHub = Boolean(githubToken);
+  let githubTokenValid = false;
+  if (githubToken) {
+    try {
+      // Installation credentials represent an App, not a user. Probe the
+      // repository PARIS actually needs rather than the user-only endpoint.
+      const response = await fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main', {
+        headers: { Authorization: `Bearer ${githubToken}`, Accept: 'application/vnd.github+json' },
+        redirect: 'error',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
+      });
+      githubTokenValid = response.ok;
+    } catch {
+      githubTokenValid = false;
     }
-  } catch {
-    dbGroq = false;
-    dbGemini = false;
-    dbOpenAI = false;
-    dbAnthropic = false;
-    dbGitHub = false;
   }
-
-  const hasGroq = isGroqConfigured() || dbGroq;
-  const hasGemini = isGeminiConfigured() || dbGemini;
-  const hasOpenAI = isOpenAIConfigured() || dbOpenAI;
-  const hasAnthropic = isAnthropicConfigured() || dbAnthropic;
-  const hasGitHub = Boolean(
-    process.env.GITHUB_TOKEN ||
-      process.env.GH_TOKEN ||
-      process.env.GITHUB_PAT ||
-      dbGitHub,
-  );
-  const aiConfigured = hasGroq || hasGemini || hasOpenAI || hasAnthropic;
-  const northflankServices = getNorthflankServices().map((service) => ({
-    key: service.key,
-    id: service.id,
-    configured: Boolean(service.id),
-  }));
-  const northflankTokenPresent = Boolean(
-    process.env.NORTHFLANK_API_TOKEN ||
-      process.env.NORTHFLANK_API_KEY ||
-      process.env.NF_API_TOKEN,
-  );
-  const northflankProjectIdPresent = Boolean(getNorthflankProjectId());
-
+  const activeProvider = ai.activeProvider;
+  const hasElevate = ai.elevate;
+  const aiConfigured = ai.anyConfigured;
+  // Configuration alone does not establish successful browser or workflow execution.
+  const executionPrerequisitesReady = githubTokenValid && isGoogleRuntimeReady() &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && hasElevate;
   let nextVersion = 'unknown';
   try {
     nextVersion = require('next/package.json').version;
@@ -95,41 +71,51 @@ export async function handleDevStudioHealth(req: NextRequest) {
 
   return NextResponse.json({
     hasGroq,
+    hasXAI,
     hasGemini,
     hasOpenAI,
     hasAnthropic,
+    hasElevate,
+    ownedModel: 'ownedModel' in ai ? ai.ownedModel : { configured: false, verified: false, status: 'unavailable' },
+    hasCloudflare,
+    cloudflare: cloudflareProbe,
+    activeProvider,
     hasGitHub,
+    githubTokenValid,
+    githubAuthError,
     aiConfigured,
-    supabaseUrlPresent: Boolean(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
-    ),
+    supabaseUrlPresent: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL),
     supabaseServiceKeyPresent: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
     nodeVersion: process.version,
     nextVersion,
     availableProviders: {
+      elevate: hasElevate,
+      cloudflare: hasCloudflare,
       groq: hasGroq,
+      xai: hasXAI,
       gemini: hasGemini,
       openai: hasOpenAI,
       anthropic: hasAnthropic,
     },
     git: {
       endpoint: '/api/admin/dev-studio/git',
-      remoteUrlPresent: Boolean(
-        process.env.GITHUB_REMOTE_URL || process.env.GITHUB_REPO,
-      ),
+      remoteUrlPresent: Boolean(process.env.GITHUB_REMOTE_URL || process.env.GITHUB_REPO),
       tokenPresent: hasGitHub,
+      tokenValid: githubTokenValid,
       pushScript: 'pnpm run git:push-main',
     },
     execution: {
-      mode: 'admin-native',
-      ready: hasGitHub,
+      mode: 'master-studio',
+      ready: executionPrerequisitesReady,
+      verifiedEndToEnd: false,
+      status: executionPrerequisitesReady ? 'prerequisites-configured-not-tested' : 'missing-prerequisites',
+      repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,
     },
-    northflank: {
-      ready: isNorthflankReady(),
-      tokenPresent: northflankTokenPresent,
-      projectIdPresent: northflankProjectIdPresent,
-      services: northflankServices,
+    google: {
+      provider: 'google-cloud', ready: isGoogleRuntimeReady(), project: googleProjectId(),
+      deploymentDispatchReady: githubTokenValid,
+      services: getGoogleServices().map(({ key, id }) => ({ key, id })),
     },
     runtime: 'nodejs',
     service: 'admin',

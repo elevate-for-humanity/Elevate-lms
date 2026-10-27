@@ -1,0 +1,190 @@
+/*
+ * Platform-wide responsive safety layer.
+ *
+ * Component styles remain responsible for their intended layout. These rules
+ * provide the invariants every surface needs so long labels, database values,
+ * tables, forms, and media cannot make a page wider than the device viewport.
+ */
+
+html {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+main,
+[data-public-layout-root],
+[data-marketing-main] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: clip;
+}
+
+/* Keep PWA controls above Admin's mobile dock and the device home indicator. */
+@media (max-width: 1023px) {
+  body.admin-portal:has([aria-label='Mobile admin navigation']) {
+    --elevate-pwa-bottom-offset: 5rem;
+  }
+}
+
+/* An update takes priority; two fixed banners must not cover each other. */
+body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
+  display: none;
+}
+
+:where(main, header, footer, nav, section, article, aside, form, fieldset, div) {
+  min-width: 0;
+}
+
+:where(img, video, canvas, svg, iframe) {
+  max-width: 100%;
+}
+
+:where(input, select, textarea, button) {
+  max-width: 100%;
+  font: inherit;
+}
+
+:where(p, li, dd, dt, label, legend, h1, h2, h3, h4, h5, h6, a, button, th, td) {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/* Preserve intrinsic column widths; arbitrary wrapping makes four-column
+ * directories appear to fit while turning every label into a vertical stack. */
+:where(th, td) {
+  overflow-wrap: normal;
+}
+
+:where(th) {
+  white-space: nowrap;
+}
+
+:where(pre, code) {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+:where([role='dialog'], [role='menu'], [role='listbox']) {
+  max-width: calc(100vw - 1rem);
+}
+
+@media (max-width: 767px) {
+  :where(main) {
+    width: 100%;
+  }
+
+  /* Heading sizes belong to each application and its design tokens.
+   * Global h1/h2/h3 sizes turn compact PWA cards and dashboard labels
+   * into oversized headings on phones. Marketing has its own scoped rhythm. */
+
+  :where(main) table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :where(main) th,
+  :where(main) td {
+    padding-inline: 0.75rem;
+  }
+
+  :where(main) input:not([type='checkbox']):not([type='radio']),
+  :where(main) select,
+  :where(main) textarea {
+    width: 100%;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  /* Do not rewrite Tailwind column utilities across the entire app:
+   * doing so collapses 12-column student rows into vertical character stacks.
+   * Responsive column counts belong to each component's sm:/md: variants. */
+  :where(.admin-portal, .lms-portal) main [data-mobile-stack='true'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* A deliberate horizontal table viewport must retain its intrinsic width. */
+  :where(.admin-portal, .lms-portal) main [data-horizontal-table] > * {
+    min-width: max-content;
+  }
+
+  :where(.admin-portal, .lms-portal) main [class*='w-['] {
+    max-width: 100%;
+  }
+
+  .admin-portal :where(main) {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* Studio's composer owns its safe area. Document padding on each nested
+   * main would repeatedly reduce its viewport and clip the bottom controls. */
+  .admin-portal main.admin-studio-viewport,
+  .admin-portal .admin-studio-viewport main {
+    padding-bottom: 0;
+  }
+}
+
+/* Grid utilities own their breakpoints. Substring matching also captures
+ * inactive xl:grid-cols-* utilities and destroys tablet layouts. */
+
+/* Public marketing mobile hardening.
+ * Preserve deliberate horizontal scrollers, but prevent desktop-first grids,
+ * fixed widths, media, and CTA rows from escaping a phone viewport. */
+@media (max-width: 767px) {
+  body {
+    width: 100%;
+    min-width: 0;
+  }
+
+  main :where(section, article, aside, form) {
+    max-width: 100%;
+  }
+
+  /* Do not force every max-width component to width: 100%.
+   * That expands intentionally compact cards, controls, image frames and
+   * dialogs in installed PWAs. Components already own responsive widths. */
+
+  main :where([class*='w-[']):not(table) {
+    max-width: 100%;
+  }
+
+  main :where(img, video, iframe, canvas):not([data-nimg='fill']):not(.absolute):not(.h-full) {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+  }
+
+  main :where(.flex) {
+    min-width: 0;
+  }
+
+  main :where(a, button) {
+    touch-action: manipulation;
+  }
+
+  main :where(a[class*='px-'], button[class*='px-']) {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 390px) {
+  main :where([class*='px-8'], [class*='px-10'], [class*='px-12']) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  main :where([class*='gap-8'], [class*='gap-10'], [class*='gap-12']) {
+    gap: 1.25rem;
+  }
+}

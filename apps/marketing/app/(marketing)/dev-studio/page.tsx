@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function LegacyDevStudioMarketingPage() {
-  redirect('/store/dev-studio');
+  redirect('/platform');
 }

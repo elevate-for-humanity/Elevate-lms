@@ -106,7 +106,7 @@ export function buildDevStudioPreviewTargets(options?: {
   targets.push(
     { label: 'Admin · Dashboard', url: `${adminSiteUrl}/dashboard` },
     { label: 'Admin · Dev Studio', url: `${adminSiteUrl}/studio` },
-    { label: 'Admin · Course builder', url: `${adminSiteUrl}/course-builder` },
+    { label: 'Admin · Course builder', url: `${adminSiteUrl}/studio/courses` },
     { label: 'Admin · Applications', url: `${adminSiteUrl}/applications` },
     { label: 'Public · Homepage', url: `${publicSiteUrl}/` },
     { label: 'Public · Programs', url: `${publicSiteUrl}/programs` },

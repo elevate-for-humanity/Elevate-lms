@@ -3,8 +3,8 @@ import { apprenticePortalPathForSlug } from '@/lib/portal/resolve-apprentice-pro
 
 describe('apprenticePortalPathForSlug', () => {
   it('maps known apprenticeship slugs to program portals', () => {
-    expect(apprenticePortalPathForSlug('barber-apprenticeship')).toBe('/portal/barber');
-    expect(apprenticePortalPathForSlug('cosmetology-apprenticeship')).toBe('/portal/cosmetology');
+    expect(apprenticePortalPathForSlug('barber-apprenticeship')).toBe('/apprentice?program=barber-apprenticeship');
+    expect(apprenticePortalPathForSlug('cosmetology-apprenticeship')).toBe('/apprentice?program=cosmetology-apprenticeship');
   });
 
   it('returns null for non-apprenticeship slugs (no barber default)', () => {

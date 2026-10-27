@@ -1,0 +1,402 @@
+{
+  "schemaVersion": 1,
+  "pr": 1293,
+  "architecture": "Author Input + Standards Sources -> CourseBlueprint -> UltimateCredentialProfile -> Durable Build -> 20-Stage Ultimate Runner -> Versioned Canonical Artifacts -> QA/Selective Repair -> Credential Release -> UltimateCoursePackage -> LMS/Exports",
+  "invariants": [
+    "one_builder",
+    "one_standards_registry",
+    "one_course_blueprint_model",
+    "one_credential_profile",
+    "one_durable_worker",
+    "one_20_stage_runner",
+    "one_artifact_authority",
+    "one_course_package"
+  ],
+  "capabilities": [
+    {
+      "id": "course_blueprint",
+      "extends": [
+        "standards-source",
+        "UltimateCredentialProfile"
+      ],
+      "stages": [
+        "standards_lock",
+        "learning_objectives",
+        "prerequisites",
+        "teaching_sequence"
+      ],
+      "persistence": [
+        "blueprint",
+        "versions"
+      ],
+      "admin": [
+        "blueprint editor",
+        "approval"
+      ],
+      "lms": [],
+      "worker": [
+        "blueprint job/checkpoint"
+      ],
+      "qa": [
+        "standards mappings",
+        "completeness"
+      ],
+      "tests": [
+        "versioning",
+        "feeds canonical build"
+      ],
+      "acceptance": [
+        "controlled lesson blueprint evidence"
+      ]
+    },
+    {
+      "id": "author_control",
+      "extends": [
+        "selective_repair",
+        "artifact governance"
+      ],
+      "stages": [
+        "all"
+      ],
+      "persistence": [
+        "locks",
+        "approvals",
+        "review decisions"
+      ],
+      "admin": [
+        "review workspace"
+      ],
+      "lms": [],
+      "worker": [
+        "approval waits",
+        "lock enforcement"
+      ],
+      "qa": [
+        "locked artifact immutability"
+      ],
+      "tests": [
+        "minimum-diff repair",
+        "lock enforcement"
+      ],
+      "acceptance": [
+        "author lock acceptance"
+      ]
+    },
+    {
+      "id": "artifact_versioning",
+      "extends": [
+        "persistence",
+        "checkpoint/resume"
+      ],
+      "stages": [
+        "all"
+      ],
+      "persistence": [
+        "artifact versions",
+        "dependency edges"
+      ],
+      "admin": [
+        "version history"
+      ],
+      "lms": [],
+      "worker": [
+        "resume by artifact version"
+      ],
+      "qa": [
+        "provenance"
+      ],
+      "tests": [
+        "history preserved",
+        "stale propagation"
+      ],
+      "acceptance": [
+        "restart/resume evidence"
+      ]
+    },
+    {
+      "id": "interactions",
+      "extends": [
+        "active_teaching"
+      ],
+      "stages": [
+        "active_teaching",
+        "instructional_qa",
+        "credential_release"
+      ],
+      "persistence": [
+        "interactions"
+      ],
+      "admin": [
+        "interaction review"
+      ],
+      "lms": [
+        "interactive runtime"
+      ],
+      "worker": [
+        "interaction generation"
+      ],
+      "qa": [
+        "objective mapping",
+        "accessibility fallback"
+      ],
+      "tests": [
+        "deterministic branching",
+        "objective mapping"
+      ],
+      "acceptance": [
+        "learner interaction evidence"
+      ]
+    },
+    {
+      "id": "assessment_coverage",
+      "extends": [
+        "assessment_alignment",
+        "instructional_qa",
+        "credential_release"
+      ],
+      "stages": [
+        "assessment_alignment",
+        "instructional_qa",
+        "credential_release"
+      ],
+      "persistence": [
+        "coverage matrix"
+      ],
+      "admin": [
+        "coverage matrix"
+      ],
+      "lms": [
+        "mastery"
+      ],
+      "worker": [],
+      "qa": [
+        "taught/practiced/assessed/mastered"
+      ],
+      "tests": [
+        "untaught content blocked"
+      ],
+      "acceptance": [
+        "coverage blocking acceptance"
+      ]
+    },
+    {
+      "id": "adaptive_instruction",
+      "extends": [
+        "mastery",
+        "remediation"
+      ],
+      "stages": [
+        "active_teaching",
+        "assessment_alignment"
+      ],
+      "persistence": [
+        "adaptive decisions"
+      ],
+      "admin": [
+        "decision audit"
+      ],
+      "lms": [
+        "adaptive path"
+      ],
+      "worker": [],
+      "qa": [
+        "traceability"
+      ],
+      "tests": [
+        "decision persistence"
+      ],
+      "acceptance": [
+        "targeted remediation"
+      ]
+    },
+    {
+      "id": "media_intelligence",
+      "extends": [
+        "storyboard",
+        "visual_assignment",
+        "scene_construction",
+        "finished_media_qa"
+      ],
+      "stages": [
+        "storyboard",
+        "visual_assignment",
+        "scene_construction",
+        "finished_media_qa"
+      ],
+      "persistence": [
+        "media scores",
+        "provenance"
+      ],
+      "admin": [
+        "media scoring"
+      ],
+      "lms": [
+        "film"
+      ],
+      "worker": [
+        "media acquisition"
+      ],
+      "qa": [
+        "semantic score",
+        "duplication"
+      ],
+      "tests": [
+        "low relevance rejected"
+      ],
+      "acceptance": [
+        "real media evidence"
+      ]
+    },
+    {
+      "id": "accessibility",
+      "extends": [
+        "learner artifacts",
+        "credential_release"
+      ],
+      "stages": [
+        "active_teaching",
+        "lesson_film_render",
+        "instructional_qa",
+        "credential_release"
+      ],
+      "persistence": [
+        "accessibility reports"
+      ],
+      "admin": [
+        "accessibility QA"
+      ],
+      "lms": [
+        "accessible alternatives"
+      ],
+      "worker": [],
+      "qa": [
+        "critical release blocker"
+      ],
+      "tests": [
+        "critical defect blocks release"
+      ],
+      "acceptance": [
+        "accessibility acceptance"
+      ]
+    },
+    {
+      "id": "source_traceability",
+      "extends": [
+        "standards_lock",
+        "credential_release"
+      ],
+      "stages": [
+        "standards_lock",
+        "credential_release"
+      ],
+      "persistence": [
+        "sources",
+        "claims",
+        "traceability"
+      ],
+      "admin": [
+        "source evidence"
+      ],
+      "lms": [],
+      "worker": [],
+      "qa": [
+        "source chain"
+      ],
+      "tests": [
+        "source-to-mastery chain"
+      ],
+      "acceptance": [
+        "traceability evidence"
+      ]
+    },
+    {
+      "id": "repair_mode",
+      "extends": [
+        "selective_repair"
+      ],
+      "stages": [
+        "selective_repair"
+      ],
+      "persistence": [
+        "repair plans",
+        "repair history"
+      ],
+      "admin": [
+        "repair plan"
+      ],
+      "lms": [],
+      "worker": [
+        "selective repair jobs"
+      ],
+      "qa": [
+        "minimum diff"
+      ],
+      "tests": [
+        "PASS artifacts unchanged"
+      ],
+      "acceptance": [
+        "minimum-diff acceptance"
+      ]
+    },
+    {
+      "id": "canonical_package_exports",
+      "extends": [
+        "LMS publication"
+      ],
+      "stages": [
+        "credential_release"
+      ],
+      "persistence": [
+        "export records"
+      ],
+      "admin": [
+        "exports"
+      ],
+      "lms": [
+        "canonical package consumer"
+      ],
+      "worker": [
+        "export jobs"
+      ],
+      "qa": [
+        "package validation"
+      ],
+      "tests": [
+        "same package all adapters"
+      ],
+      "acceptance": [
+        "SCORM/xAPI/cmi5 validation"
+      ]
+    },
+    {
+      "id": "quality_scorecard",
+      "extends": [
+        "QA evidence"
+      ],
+      "stages": [
+        "finished_media_qa",
+        "instructional_qa",
+        "narration_qa",
+        "credential_release"
+      ],
+      "persistence": [
+        "quality reports"
+      ],
+      "admin": [
+        "scorecard"
+      ],
+      "lms": [],
+      "worker": [],
+      "qa": [
+        "evidence-backed scores",
+        "blockers override"
+      ],
+      "tests": [
+        "critical blocker overrides score"
+      ],
+      "acceptance": [
+        "quality evidence"
+      ]
+    }
+  ]
+}

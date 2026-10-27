@@ -10,6 +10,17 @@ describe('SlideLesson audiovisual policy', () => {
     expect(source).toContain('rgba(15,23,42,0.50)');
     expect(source).toContain('rgba(15,23,42,0.08)');
     expect(source).not.toContain('rgba(15,23,42,0.82)');
+    expect(source).not.toContain('rgba(248,250,252,0.94)');
+    expect(source).toContain('rgba(248,250,252,0.06)');
+  });
+
+  it('shows a photographic poster before lesson motion and narration', () => {
+    expect(source).toContain('openingImageUrl');
+    expect(source).toContain('const INTRO_FRAMES = 90');
+    expect(renderer).toContain('createOpeningStillFromLicensedVideo');
+    expect(renderer).toContain('MEDIA_OPENING_STILL_EXTRACTION_FAILED');
+    expect(renderer).toContain("throw new Error('MEDIA_OPENING_STILL_MISSING')");
+    expect(renderer).toContain('openingImageUrl,');
   });
 
   it('renders narration above unity gain for audible delivery', () => {
@@ -17,7 +28,8 @@ describe('SlideLesson audiovisual policy', () => {
   });
 
   it('uses lip-synced instructor video only for the opening scene', () => {
-    expect(renderer).toContain("index === 0 && process.env.DID_API_KEY");
+    expect(renderer).toContain('enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR)');
+    expect(renderer).toContain('process.env.DID_API_KEY?.trim()');
     expect(renderer).toContain("resolvedProvider: 'd-id'");
     expect(renderer).toContain("resolvedModel: 'talks-lip-sync'");
   });

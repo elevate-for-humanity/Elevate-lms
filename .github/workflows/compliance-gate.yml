@@ -18,7 +18,7 @@ env:
 jobs:
   security:
     name: Security Audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +34,14 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Bounded brace parser security regression
+        run: node --test tests/security/bounded-braces.test.cjs
       - name: Dependency security audit
         run: pnpm audit --audit-level high
 
   registered-apprenticeship:
     name: Registered Apprenticeship Architecture
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +53,7 @@ jobs:
 
   e2e-enrollment:
     name: E2E Enrollment Flow
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -126,7 +128,7 @@ jobs:
 
   accessibility:
     name: Accessibility Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -185,7 +187,15 @@ jobs:
           echo '::error::Marketing server did not become ready within 120 seconds.'
           exit 1
       - name: Run accessibility tests
-        run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
+        run: |
+          # Run Axe coverage on Chromium device profiles. Axe's injected
+          # evaluator crashes the hosted WebKit process, so WebKit runs the
+          # browser-native keyboard, semantics, labeling, and motion checks.
+          for project in desktop-chrome laptop-chrome tablet-chrome android-chrome iphone-webkit; do
+            pnpm exec playwright test tests/e2e/accessibility.spec.ts \
+              --config playwright.config.ts \
+              --project="$project"
+          done
       - name: Homepage config leak smoke
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
       - name: Upload test results
@@ -198,7 +208,7 @@ jobs:
 
   compliance-files:
     name: Compliance Files Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Verify compliance components exist

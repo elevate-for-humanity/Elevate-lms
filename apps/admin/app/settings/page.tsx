@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import Link from 'next/link';
 import { Bell, Shield, CreditCard, Globe, Mail, Webhook, ArrowRight, Share2 } from 'lucide-react';
+import { RUNTIME_INTEGRATIONS, runtimeConfiguration } from '@/lib/integrations/runtime-status';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -11,15 +13,39 @@ export const metadata: Metadata = {
 
 export default async function AdminSettingsPage() {
   await requireRole(['admin']);
+  // The settings overview must report the effective Admin runtime, not stale
+  // display values from platform_settings. This also loads secrets from the
+  // canonical protected store when they are not injected into the container.
+  await hydrateProcessEnv();
   const db = await requireAdminClient();
 
-  const { data: settingsRows } = await db
-    .from('platform_settings')
-    .select('key, value, updated_at')
-    .order('key');
+  const [{ data: settingsRows }, { data: socialRows }] = await Promise.all([
+    db.from('platform_settings').select('key, value, updated_at').order('key'),
+    db.from('social_media_settings').select('platform, access_token, expires_at'),
+  ]);
   const settings: Record<string, string> = Object.fromEntries(
     (settingsRows ?? []).map((r: any) => [r.key, r.value]),
   );
+
+  const configuredIntegrations = RUNTIME_INTEGRATIONS.filter(
+    (item) => runtimeConfiguration(item.id).configured,
+  );
+  const webhookIntegrations = RUNTIME_INTEGRATIONS.filter((item) => item.webhook);
+  const configuredWebhooks = webhookIntegrations.filter(
+    (item) => runtimeConfiguration(item.id).configured,
+  ).length;
+  const connectedSocial = new Set(
+    (socialRows ?? [])
+      .filter((row: any) => {
+        const expired = row.expires_at ? new Date(row.expires_at).getTime() <= Date.now() : false;
+        return Boolean(row.access_token) && !expired;
+      })
+      .map((row: any) => row.platform),
+  );
+  const socialStatus = (platform: string) =>
+    connectedSocial.has(platform) ? 'Connected' : 'Not connected';
+  const isSensitiveSetting = (key: string) =>
+    /(?:secret|token|password|api[_-]?key|private[_-]?key|webhook)/i.test(key);
 
   const sections = [
     {
@@ -80,19 +106,19 @@ export default async function AdminSettingsPage() {
       fields: [
         {
           label: 'Facebook',
-          value: settings['social_facebook_connected'] === 'true' ? 'Connected' : 'Not connected',
+          value: socialStatus('facebook'),
         },
         {
           label: 'Instagram',
-          value: settings['social_instagram_connected'] === 'true' ? 'Connected' : 'Not connected',
+          value: socialStatus('instagram'),
         },
         {
           label: 'YouTube',
-          value: settings['social_youtube_connected'] === 'true' ? 'Connected' : 'Not connected',
+          value: socialStatus('youtube'),
         },
         {
-          label: 'Twitter / X',
-          value: settings['social_twitter_connected'] === 'true' ? 'Connected' : 'Not connected',
+          label: 'LinkedIn',
+          value: socialStatus('linkedin'),
         },
       ],
     },
@@ -101,8 +127,14 @@ export default async function AdminSettingsPage() {
       icon: Webhook,
       href: '/settings/integrations',
       fields: [
-        { label: 'Active Integrations', value: settings['active_integrations'] ?? '—' },
-        { label: 'Webhook Secret', value: settings['webhook_secret'] ? 'Configured' : 'Not set' },
+        {
+          label: 'Configured Integrations',
+          value: `${configuredIntegrations.length} of ${RUNTIME_INTEGRATIONS.length}`,
+        },
+        {
+          label: 'Webhook Endpoints',
+          value: `${configuredWebhooks} of ${webhookIntegrations.length} configured`,
+        },
       ],
     },
   ];
@@ -171,7 +203,7 @@ export default async function AdminSettingsPage() {
                   <tr key={r.key} className="hover:bg-slate-50">
                     <td className="py-3 px-5 font-mono text-xs text-slate-700">{r.key}</td>
                     <td className="py-3 px-5 text-slate-600 text-xs max-w-xs truncate">
-                      {r.value ?? '—'}
+                      {isSensitiveSetting(r.key) && r.value ? '••••••••' : (r.value ?? '—')}
                     </td>
                     <td className="py-3 px-5 text-slate-400 text-xs">
                       {r.updated_at ? new Date(r.updated_at).toLocaleDateString() : '—'}

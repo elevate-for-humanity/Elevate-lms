@@ -1,14 +1,16 @@
 import type { SupabaseClient } from '@/lib/supabase';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
+import { loadBillingProviderConfig } from '@/lib/billing/config';
 
 export interface SystemHealthAlert {
   code: string;
   severity: 'info' | 'warning' | 'critical';
   message: string;
 }
-
 export interface DashboardSystemHealth {
-  stripeWebhookOk: boolean;
-  stripeIssuingOk: boolean;
+  quickBooksWebhookOk: boolean;
+  quickBooksBillingOk: boolean;
   buildEnvOk: boolean;
   staleJobs: number;
   degraded: boolean;
@@ -18,130 +20,105 @@ export interface DashboardSystemHealth {
   alerts: SystemHealthAlert[];
 }
 
-const REQUIRED_ENV = [
-  'NEXT_PUBLIC_SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
-  'RESEND_API_KEY',
-];
-
-// In-process cache for the Stripe Issuing check — avoids a live outbound HTTP
-// call on every dashboard render. TTL: 5 minutes.
-let _stripeIssuingCache: { result: { enabled: boolean; reason: string | null }; expiresAt: number } | null = null;
-
-async function getCachedStripeIssuingStatus(): Promise<{ enabled: boolean; reason: string | null }> {
-  const now = Date.now();
-  if (_stripeIssuingCache && now < _stripeIssuingCache.expiresAt) {
-    return _stripeIssuingCache.result;
-  }
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    const result = { enabled: false, reason: 'no_key' };
-    _stripeIssuingCache = { result, expiresAt: now + 5 * 60 * 1000 };
-    return result;
-  }
-  try {
-    const res = await fetch('https://api.stripe.com/v1/issuing/cardholders?limit=1', {
-      headers: { Authorization: `Bearer ${key}` },
-    });
-    const result =
-      res.status === 200 ? { enabled: true, reason: null } :
-      res.status === 403 ? { enabled: false, reason: 'not_approved' } :
-      { enabled: false, reason: `stripe_${res.status}` };
-    _stripeIssuingCache = { result, expiresAt: now + 5 * 60 * 1000 };
-    return result;
-  } catch {
-    const result = { enabled: false, reason: 'fetch_error' };
-    // Cache failures for 1 minute only — retry sooner on transient errors
-    _stripeIssuingCache = { result, expiresAt: now + 60 * 1000 };
-    return result;
-  }
-}
+const REQUIRED_ENV = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SENDGRID_API_KEY'];
 
 export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSystemHealth> {
+  await hydrateProcessEnv();
   const alerts: SystemHealthAlert[] = [];
-
-  // Check required env vars
-  const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
+  const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
   const buildEnvOk = missingEnv.length === 0;
-  if (!buildEnvOk) {
+  if (!buildEnvOk)
     alerts.push({
       code: 'missing_env_vars',
       severity: 'critical',
       message: `Missing env vars: ${missingEnv.join(', ')}`,
     });
-  }
 
-  const [stripeWebhook, stripeIssuing, staleJobs, missingDocs, unresolvedFlags] = await Promise.all([
-    // Check Stripe webhook status via app_secrets or a known sentinel
-    db.from('app_secrets').select('value').eq('key', 'STRIPE_WEBHOOK_SECRET').maybeSingle(),
-
-    // Check Stripe Issuing — cached for 5 minutes to avoid blocking every dashboard load.
-    // A live outbound fetch on every render adds 200-800ms of latency.
-    getCachedStripeIssuingStatus(),
-
-    // Stale jobs stuck in processing > 30 min
+  const [
+    billingConfig,
+    staleJobs,
+    courseJobs,
+    missingDocs,
+    missingCertifications,
+    unresolvedFlags,
+  ] = await Promise.all([
+    Promise.all([loadQuickBooksConfig(db), loadBillingProviderConfig(db)])
+      .then(async ([config, provider]) => {
+        if (provider.primary !== 'quickbooks' || !config.clientId || !config.clientSecret ||
+            !config.accessToken || !config.refreshToken || !config.realmId) return false;
+        const company = await quickBooksRequest<{ CompanyInfo?: { CompanyName?: string } }>(
+          db, config, `companyinfo/${config.realmId}`, { signal: AbortSignal.timeout(4_000) },
+        );
+        return typeof company?.CompanyInfo?.CompanyName === 'string' && Boolean(company.CompanyInfo.CompanyName.trim());
+      })
+      .catch(() => false),
     db
       .from('job_queue')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'processing')
       .lt('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()),
-
-    // Enrollments missing required documents
+    db
+      .from('ultimate_build_jobs')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'running')
+      .or(
+        `lease_expires_at.is.null,lease_expires_at.lt.${new Date().toISOString()},heartbeat_at.is.null,heartbeat_at.lt.${new Date(Date.now() - 90_000).toISOString()}`,
+      ),
     db
       .from('program_enrollments')
       .select('id', { count: 'exact', head: true })
       .eq('enrollment_state', 'active')
-      .eq('docs_verified', false),
-
-    // Unresolved compliance flags (table may not exist — degrade gracefully)
-    db.from('compliance_flags').select('id', { count: 'exact', head: true }).eq('resolved', false)
-      .then(r => r.error ? { count: 0, error: null } : r),
+      .or('docs_verified.is.null,docs_verified.eq.false'),
+    db
+      .from('credential_verification')
+      .select('id', { count: 'exact', head: true })
+      .eq('verification_status', 'pending'),
+    db.from('compliance_flags').select('id', { count: 'exact', head: true }).eq('resolved', false),
   ]);
 
-  // Check env var first (ECS injects it via SSM), then fall back to app_secrets table
-  const stripeWebhookOk = !!process.env.STRIPE_WEBHOOK_SECRET || !!stripeWebhook.data?.value;
-  if (!stripeWebhookOk) {
+  const quickBooksBillingOk = billingConfig;
+  const quickBooksWebhookOk = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN);
+  if (!quickBooksBillingOk)
     alerts.push({
-      code: 'stripe_webhook_secret_missing',
+      code: 'quickbooks_billing_not_ready',
       severity: 'critical',
-      message: 'STRIPE_WEBHOOK_SECRET not set — webhook events will be dropped.',
+      message: 'QuickBooks company authorization could not be verified.',
     });
-  }
-
-  const stripeIssuingOk = stripeIssuing.enabled;
-  if (!stripeIssuingOk) {
-    const reasonMsg =
-      stripeIssuing.reason === 'not_approved'
-        ? 'Stripe Issuing not yet approved for this account. Apply at dashboard.stripe.com/issuing.'
-        : stripeIssuing.reason === 'no_key'
-        ? 'STRIPE_SECRET_KEY missing — Stripe Issuing status unknown.'
-        : `Stripe Issuing unavailable (${stripeIssuing.reason}).`;
+  if (!quickBooksWebhookOk)
     alerts.push({
-      code: 'stripe_issuing_not_enabled',
-      severity: stripeIssuing.reason === 'not_approved' ? 'warning' : 'info',
-      message: reasonMsg,
+      code: 'quickbooks_webhook_config_missing',
+      severity: 'critical',
+      message: 'QuickBooks webhook verifier is not configured.',
     });
+  for (const [name, result] of [
+    ['job_queue', staleJobs],
+    ['ultimate_build_jobs', courseJobs],
+    ['documents', missingDocs],
+    ['certifications', missingCertifications],
+    ['compliance_flags', unresolvedFlags],
+  ] as const) {
+    if (result.error)
+      alerts.push({
+        code: `${name}_health_unavailable`,
+        severity: 'critical',
+        message: `Unable to verify ${name} health.`,
+      });
   }
-
-  const staleJobCount = staleJobs.count ?? 0;
-  if (staleJobCount > 0) {
+  const staleJobCount = (staleJobs.count ?? 0) + (courseJobs.count ?? 0);
+  if (staleJobCount > 0)
     alerts.push({
       code: 'stale_jobs',
       severity: 'warning',
-      message: `${staleJobCount} job${staleJobCount > 1 ? 's' : ''} stuck in processing for >30 min.`,
+      message: `${staleJobCount} job${staleJobCount > 1 ? 's' : ''} with stale processing or missing/expired worker leases.`,
     });
-  }
-
   return {
-    stripeWebhookOk,
-    stripeIssuingOk,
+    quickBooksWebhookOk,
+    quickBooksBillingOk,
     buildEnvOk,
     staleJobs: staleJobCount,
     degraded: alerts.some((a) => a.severity === 'critical'),
     missingDocuments: missingDocs.count ?? 0,
-    missingCertifications: 0,
+    missingCertifications: missingCertifications.count ?? 0,
     unresolvedFlags: unresolvedFlags.count ?? 0,
     alerts,
   };

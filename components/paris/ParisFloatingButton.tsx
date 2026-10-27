@@ -1,21 +1,96 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { X, MessageCircle } from 'lucide-react';
-import ParisChat from './ParisChat';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { X, MessageCircle, Mic } from 'lucide-react';
 import type { ParisLearnerContext } from './ParisFloatingWrapper';
+import { PARIS_PORTAL_ISSUE_EVENT, reportPortalWorkflowIssue, type PortalIssueReceipt, type PortalSupportIssue } from '@/lib/paris/portal-support';
+
+const ParisChat = lazy(() => import('./ParisChat'));
 
 export function ParisFloatingButton({
   surface = 'public',
   courseTitle,
   nextLessonTitle,
   courseProgress,
+  portalRole,
+  personName,
+  autoOpenOnDashboard = false,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [portalIssue, setPortalIssue] = useState<PortalSupportIssue | null>(null);
+  const [issueReceipt, setIssueReceipt] = useState<PortalIssueReceipt | null>(null);
+  const reportingSequence = useRef(0);
+  const pathname = usePathname();
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
+  const reportIssue = useCallback(async (issue: PortalSupportIssue) => {
+    const sequence = ++reportingSequence.current;
+    setIssueReceipt({status: 'reporting'});
+    const receipt = await reportPortalWorkflowIssue(issue);
+    if (reportingSequence.current === sequence) setIssueReceipt(receipt);
+  }, []);
   const learnerSurface = surface === 'learner';
+  const portalSurface = surface === 'portal';
+  const assistantLabel = learnerSurface
+    ? 'PARIS Learning Assistant'
+    : portalSurface
+      ? 'PARIS Portal Assistant'
+      : 'PARIS Career Assistant';
+
+  useEffect(() => {
+    if (!learnerSurface && autoOpenOnDashboard && pathname.endsWith('/dashboard')) setIsOpen(true);
+  }, [autoOpenOnDashboard, pathname, learnerSurface]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [close, isOpen]);
+
+  useEffect(() => {
+    const handleIssue = (event: Event) => {
+      const issue = (event as CustomEvent<PortalSupportIssue>).detail;
+      if (!issue?.workflow || !issue.message) return;
+      setPortalIssue(issue);
+      if (!learnerSurface) setIsOpen(true);
+      void reportIssue(issue);
+    };
+    window.addEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
+    return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
+  }, [learnerSurface, reportIssue]);
+
+  useEffect(() => {
+    setShowWelcome(false);
+  }, [pathname, surface]);
+
+  const dismissWelcome = useCallback(() => {
+    setShowWelcome(false);
+    try {
+      window.sessionStorage.setItem('paris-home-welcome-seen', 'true');
+    } catch {
+      // The greeting can still be dismissed when browser storage is unavailable.
+    }
+  }, []);
+
+  // Do not render the global assistant on pages that already contain a
+  // full PARIS application workspace. A second fixed assistant obscures form
+  // controls on phones and duplicates the active experience.
+  const hasEmbeddedParisWorkspace =
+    pathname.startsWith('/apply/student') || pathname.startsWith('/apply/host-site');
+
+  // Keep information-dense and embedded-PARIS surfaces unobstructed. PARIS
+  // remains available throughout authenticated portals and other public pages.
+  if (surface === 'public' && (pathname === '/programs/bookkeeping' || hasEmbeddedParisWorkspace)) {
+    return null;
+  }
 
   return (
     <>
@@ -23,8 +98,8 @@ export function ParisFloatingButton({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
-          className="fixed inset-0 z-[9999] flex items-stretch sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
+          aria-label={assistantLabel}
+          className="fixed inset-0 z-[9999] flex h-[100dvh] w-screen max-w-[100vw] items-stretch overflow-x-hidden overscroll-contain sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
         >
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
@@ -32,51 +107,149 @@ export function ParisFloatingButton({
             aria-hidden="true"
           />
 
-          <div className="pointer-events-auto relative z-10 ml-auto flex h-full w-full flex-col bg-white shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100vh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200">
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
-              <div className="flex items-center gap-3">
+          <div className="pointer-events-auto relative z-10 ml-auto flex h-[100dvh] min-h-0 min-w-0 w-full max-w-[100vw] flex-col overflow-hidden bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100dvh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200 sm:pb-0">
+            <div className="flex min-w-0 max-w-full items-center justify-between overflow-hidden px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
+              <div className="min-w-0 flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
                   P
                 </div>
                 <div>
                   <span className="block font-bold text-slate-800 text-base sm:text-lg">
-                    {learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
+                    {learnerSurface
+                      ? 'PARIS Learning Assistant'
+                      : portalSurface
+                        ? 'PARIS Portal Assistant'
+                        : 'PARIS Career Assistant'}
                   </span>
                   <span className="block max-w-[300px] truncate text-xs text-slate-600">
-                    {learnerSurface ? courseTitle || 'Your Elevate coursework' : 'Admissions and career navigation'}
+                    {learnerSurface
+                      ? courseTitle || 'Your Elevate coursework'
+                      : portalSurface
+                        ? `${portalRole || 'Authenticated'} workspace help`
+                        : 'Admissions and career navigation'}
                   </span>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={close}
-                aria-label="Close chat"
-                className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
+                aria-label="Close PARIS"
+                title="Close PARIS"
+                style={{ width: 'auto', maxWidth: '45%' }}
+                className="ml-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm transition-colors hover:border-brand-red-300 hover:bg-brand-red-50 hover:text-brand-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
+                <span className="hidden min-[380px]:inline">Close</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-hidden min-h-0">
-              <ParisChat
-                showHeader={false}
-                surface={surface}
-                courseTitle={courseTitle}
-                nextLessonTitle={nextLessonTitle}
-                courseProgress={courseProgress}
-              />
+            {portalIssue && issueReceipt && (
+              <div role="status" aria-live="polite" className="shrink-0 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
+                {issueReceipt.status === 'reporting' && <p>Reporting the workflow issue…</p>}
+                {issueReceipt.status === 'reported' && (
+                  <p>Issue reported for diagnostic review. Reference: {issueReceipt.incidentId}. A repair has not been verified yet.</p>
+                )}
+                {issueReceipt.status === 'failed' && (
+                  <>
+                    <p>{issueReceipt.httpStatus === 401 ? 'Sign in again to report this issue.' : 'This issue could not be reported.'} Your message is still here.</p>
+                    <button type="button" onClick={() => void reportIssue(portalIssue)} className="mt-2 rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold">
+                      Retry report
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden">
+              <Suspense
+                fallback={
+                  <p role="status" className="p-6 text-sm text-slate-600">
+                    Opening PARIS…
+                  </p>
+                }
+              >
+                <ParisChat
+                  showHeader={false}
+                  surface={surface}
+                  courseTitle={courseTitle}
+                  nextLessonTitle={nextLessonTitle}
+                  courseProgress={courseProgress}
+                  portalRole={portalRole}
+                  personName={personName}
+                  portalIssue={portalIssue}
+                  voiceEnabled
+                />
+              </Suspense>
             </div>
           </div>
         </div>
       )}
 
-      <button
-        onClick={open}
-        aria-label={learnerSurface ? 'Open PARIS Learning Assistant for course help' : 'Open PARIS Career Assistant'}
-        className="fixed bottom-20 right-4 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-4 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 md:bottom-6 md:right-6"
-      >
-        <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-        <span>{learnerSurface ? 'Ask PARIS · Course help' : 'Ask PARIS'}</span>
-      </button>
+      {showWelcome && !isOpen ? (
+        <div
+          role="status"
+          className="fixed bottom-[calc(9.25rem+env(safe-area-inset-bottom))] right-3 z-50 w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl md:bottom-24 md:right-6"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-black text-slate-950">Hi, I’m PARIS.</p>
+            <button
+              type="button"
+              onClick={dismissWelcome}
+              aria-label="Close PARIS introduction"
+              className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+              Close
+            </button>
+          </div>
+          <p className="mt-1 text-sm font-medium leading-6 text-slate-700">
+            I’m here if you need guidance with programs, funding, applications, documents, employer
+            opportunities, or your next step.
+          </p>
+          <p className="mt-3 text-xs font-bold text-brand-red-700">
+            Ask a question by typing or using the microphone.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              dismissWelcome();
+              open();
+            }}
+            className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-4 py-3 font-black text-white shadow-md hover:bg-brand-red-700"
+          >
+            <MessageCircle className="h-5 w-5" aria-hidden="true" />
+            Open PARIS
+          </button>
+        </div>
+      ) : null}
+
+      {!showWelcome && !isOpen ? (
+        <button
+          onClick={() => {
+            dismissWelcome();
+            open();
+          }}
+          aria-expanded={isOpen}
+          aria-label={
+            learnerSurface
+              ? 'Need help? Open PARIS'
+              : portalSurface
+                ? 'Open PARIS Portal Assistant'
+                : 'Open PARIS Career Assistant'
+          }
+          className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:right-4 sm:px-4 md:bottom-6 md:right-6"
+        >
+          <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span className={learnerSurface ? '' : 'hidden sm:inline'}>
+            {learnerSurface
+              ? 'Ask PARIS · Course help'
+              : portalSurface
+                ? 'Ask PARIS · Portal help'
+                : 'Ask PARIS'}
+          </span>
+        </button>
+      ) : null}
     </>
   );
 }

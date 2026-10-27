@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export type OpenHandsLifecycleStatus =
   | 'queued'
   | 'running'
@@ -86,13 +88,22 @@ export function getOpenHandsConfig() {
   };
 }
 
+/**
+ * Resolve the live OpenHands configuration after loading canonical runtime
+ * secrets. Studio stores provider credentials in platform_secrets, so routes
+ * must not inspect process.env until hydration has completed.
+ */
+export async function getHydratedOpenHandsConfig() {
+  await hydrateProcessEnv();
+  return getOpenHandsConfig();
+}
+
 function headers(apiKey: string): HeadersInit {
   return {
-    // The Cloud guide documents Bearer auth while the generated V1 reference
-    // documents X-Access-Token. Supplying both keeps the client compatible
-    // with the documented Cloud gateway without exposing either to browsers.
+    // OpenHands Cloud API keys use Bearer authentication. Do not also send
+    // X-Access-Token: that legacy credential channel can take precedence at
+    // the gateway and reject an otherwise valid Cloud API key.
     Authorization: `Bearer ${apiKey}`,
-    'X-Access-Token': apiKey,
     'Content-Type': 'application/json',
     Accept: 'application/json',
   };
@@ -110,7 +121,7 @@ async function requestJson(
   path: string,
   init: RequestInit = {},
 ): Promise<unknown> {
-  const config = getOpenHandsConfig();
+  const config = await getHydratedOpenHandsConfig();
   if (!config.apiKey) throw new Error('OpenHands API key is not configured');
 
   const response = await fetch(`${config.origin}${path}`, {
@@ -165,9 +176,9 @@ function normalizeMessage(message: string): string {
   return trimmed;
 }
 
-function validateConversationId(conversationId: string): string {
+export function validateOpenHandsConversationId(conversationId: string): string {
   const id = conversationId.trim();
-  if (!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)) {
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(id)) {
     throw new Error('OpenHands conversation id is invalid');
   }
   return id;
@@ -176,6 +187,7 @@ function validateConversationId(conversationId: string): string {
 export async function startOpenHandsTask(
   input: StartOpenHandsTaskInput,
 ): Promise<OpenHandsStartTask> {
+  await hydrateProcessEnv();
   const message = normalizeMessage(input.message);
   const repository = validateRepository(input.repository);
   const { model } = getOpenHandsConfig();
@@ -208,7 +220,7 @@ export async function sendOpenHandsMessage(
   conversationId: string,
   message: string,
 ): Promise<OpenHandsSendMessageResult> {
-  const id = validateConversationId(conversationId);
+  const id = validateOpenHandsConversationId(conversationId);
   const text = normalizeMessage(message);
   const payload = await requestJson(
     `/api/v1/app-conversations/${encodeURIComponent(id)}/send-message`,
@@ -242,7 +254,7 @@ export async function getOpenHandsStartTask(startTaskId: string): Promise<OpenHa
 export async function getOpenHandsConversation(
   conversationId: string,
 ): Promise<OpenHandsConversation | null> {
-  const id = validateConversationId(conversationId);
+  const id = validateOpenHandsConversationId(conversationId);
   const payload = await requestJson(
     `/api/v1/app-conversations?ids=${encodeURIComponent(id)}`,
     { method: 'GET' },

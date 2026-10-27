@@ -75,6 +75,8 @@ async function _GET(request: NextRequest) {
       'documents',
       'enrollment-documents',
       'program-holder-documents',
+      'provider-documents',
+      'shop-onboarding',
       'apprentice-uploads',
       'tax-documents',
     ];

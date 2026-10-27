@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
 import { verifiedImageRewrites } from '../../lib/media/verified-image-aliases.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
+import { withBuildMemoryDefaults } from '../../scripts/build-memory-policy.mjs';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
@@ -16,7 +17,6 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../..'),
   poweredByHeader: false,
   reactStrictMode: true,
-
   generateBuildId: async () => {
     const sha = resolveCommitSha(process.env);
     return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
@@ -29,11 +29,25 @@ const nextConfig = {
   },
 
   images: { unoptimized: true },
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
   transpilePackages: ['buffer', 'process'],
+  // Keep native/server instrumentation in Node's runtime boundary. Bundling
+  // these packages makes webpack inspect require-in-the-middle's intentional
+  // dynamic require calls and emits noisy critical-dependency warnings.
+  serverExternalPackages: [
+    '@sentry/nextjs',
+    '@sentry/node',
+    '@sentry/node-core',
+    '@sentry/core',
+    '@opentelemetry/api',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/instrumentation',
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/resources',
+    '@opentelemetry/semantic-conventions',
+    'require-in-the-middle',
+  ],
 
   async rewrites() {
     return {
@@ -63,6 +77,13 @@ const nextConfig = {
       // can point directly at one canonical implementation. Next preserves
       // incoming query parameters for these redirects when the destination
       // does not replace them.
+      // Resolve old duplicated path segments before rendering a page. This
+      // produces an HTTP redirect rather than a streamed client redirect.
+      { source: '/about/mission/mission', destination: '/about', permanent: true },
+      { source: '/hire-graduates/hire-graduates', destination: '/employers', permanent: true },
+      { source: '/accreditation/accreditation', destination: '/approvals', permanent: true },
+      { source: '/for-students/for-students', destination: '/programs', permanent: true },
+      { source: '/merigoldround', destination: '/sites/meri-gold-round', permanent: true },
       { source: '/apply/status', destination: '/apply/track', permanent: true },
       { source: '/course-factory', destination: '/ai/course-factory', permanent: true },
       { source: '/compare', destination: '/store#marketplace', permanent: true },
@@ -71,7 +92,7 @@ const nextConfig = {
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa-funding', destination: '/wioa-eligibility', permanent: false },
-      { source: '/programs/construction', destination: '/programs/skilled-trades', permanent: false },
+      { source: '/programs/construction', destination: '/programs', permanent: false },
       { source: '/programs/drug-test', destination: '/programs/drug-collector', permanent: false },
       { source: '/programs/hvac-technician/apply', destination: '/apply/student?program=hvac-technician', permanent: true },
       { source: '/governance/security', destination: '/legal/disclosures', permanent: false },
@@ -84,24 +105,18 @@ const nextConfig = {
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
       { source: '/partners/barber-host-shop', destination: '/partners/host-shops', permanent: true },
       { source: '/partners/barber-host-shop/apply', destination: '/partners/host-shop/apply', permanent: true },
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/login', permanent: true },
-      { source: '/student/login', destination: 'https://app.elevateforhumanity.org/login', permanent: true },
       { source: '/videos/cna-hero', destination: '/programs/cna', permanent: true },
-      { source: '/student-portal', destination: '/platform/student-portal', permanent: true },
     ];
   },
 
-  experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', '@supabase/supabase-js'],
-    optimizeCss: false,
-    scrollRestoration: false,
-    workerThreads: false,
-    cpus: 1,
-  },
 
-  webpack: (config, { isServer }) => {
+
+  webpack: (config, { dev, isServer }) => {
     config.parallelism = 1;
-
+    // The production image is rebuilt from source in CI; disabling webpack's
+    // persistent pack cache avoids serializing large generated route strings
+    // and removes its big-string performance warning. Development keeps cache.
+    if (!dev) config.cache = false;
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),
@@ -117,23 +132,13 @@ const nextConfig = {
         }),
       );
 
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
-        },
-      };
+      // Preserve Next.js client chunking. Forcing every dependency into one
+      // vendors chunk groups React with unrelated client modules; the live
+      // layout currently fails while reading React's hook dispatcher.
     }
 
     return config;
   },
 };
 
-export default nextConfig;
+export default withBuildMemoryDefaults(nextConfig);

@@ -76,8 +76,8 @@ export function NotificationBell() {
   }
 
   return (
-    <div className="relative">
-      <button onClick={() => { setIsOpen((open) => !open); void fetchNotifications(); }} className="relative rounded-lg p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}>
+    <div className="relative shrink-0">
+      <button onClick={() => { setIsOpen((open) => !open); void fetchNotifications(); }} className="relative inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}>
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-orange-600 px-1 text-[10px] font-black text-white">{unreadCount > 99 ? '99+' : unreadCount}</span>}
       </button>

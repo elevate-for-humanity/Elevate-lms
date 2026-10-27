@@ -1,3 +1,5 @@
+import { PARIS_SYSTEM_IDENTITY } from '../paris-identity';
+import { recordParisObservation } from './supervision';
 import 'server-only';
 
 import { executeAiTask, type AITask } from '@/lib/ai/execute-ai-task';
@@ -5,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { executeRegisteredAITool, type AIToolExecutionContext } from '@/lib/ai/tools/executor';
 import { getAITool, getAIToolCatalogForPrompt, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
+import { communicationsKnowledgeFor } from '@/lib/paris/communications-knowledge';
 
 export type AICommandExecutionContext = Omit<AIToolExecutionContext, 'agent'> & {
   agent: AIAgentId;
@@ -40,7 +43,9 @@ function safeToolData(payload: unknown): string {
 
 function shouldSynthesize(command: string, toolName: string): boolean {
   if (toolName.startsWith('wioa.')) return true;
-  return /\b(draft|write|summari[sz]e|narrative|report|analy[sz]e|explain|email|reminder|recommend|what does|tell me)\b/i.test(command);
+  return /\b(draft|write|summari[sz]e|narrative|report|analy[sz]e|explain|email|reminder|recommend|what does|tell me)\b/i.test(
+    command,
+  );
 }
 
 async function synthesizeReadResult(
@@ -52,7 +57,7 @@ async function synthesizeReadResult(
   const result = await executeAiTask({
     task: context.advisoryTask ?? 'general_chat',
     prompt: [
-      `You are ${context.agentLabel ?? context.agent}, an Elevate workforce/admin AI.`,
+      PARIS_SYSTEM_IDENTITY,
       'The data below came from an authenticated live platform tool.',
       'Answer only from that data. Do not invent missing records, eligibility, funding decisions, compliance conclusions, or contact information.',
       'If asked to draft an email/reminder, draft it but do not claim it was sent.',
@@ -82,6 +87,21 @@ export async function executeAICommand(
   command: string,
   context: AICommandExecutionContext,
 ): Promise<AICommandExecutionResult> {
+  const started = Date.now();
+  try {
+    const result = await executeCombinedCommand(command, {...context, agent:'PARIS', agentLabel:'PARIS'});
+    await recordParisObservation({kind:'command',operation:result.tool ?? 'ai.advisory',status:result.status,
+      actorId:context.actorId,correlationId:context.correlationId,durationMs:Date.now()-started,
+      provider:result.provider,error:result.status === 'approval_required' ? 'approval required' : result.message});
+    return result;
+  } catch (error) {
+    await recordParisObservation({kind:'command',operation:'ai.command',status:'failed',actorId:context.actorId,
+      correlationId:context.correlationId,durationMs:Date.now()-started,error});
+    throw error;
+  }
+}
+
+async function executeCombinedCommand(command: string, context: AICommandExecutionContext): Promise<AICommandExecutionResult> {
   const plannedTool = planAIToolFromCommand(command, context.commandContext ?? {});
 
   if (plannedTool) {
@@ -90,10 +110,14 @@ export async function executeAICommand(
       ...context,
       confirmationText:
         context.approvalGranted && tool?.approvalRequired
-          ? tool.confirmationPhrase ?? `CONFIRM ${tool.name.toUpperCase()}`
+          ? (tool.confirmationPhrase ?? `CONFIRM ${tool.name.toUpperCase()}`)
           : context.confirmationText,
     };
-    const toolResult = await executeRegisteredAITool(plannedTool.name, plannedTool.input, executionContext);
+    const toolResult = await executeRegisteredAITool(
+      plannedTool.name,
+      plannedTool.input,
+      executionContext,
+    );
 
     if (toolResult.status === 'approval_required') {
       return {
@@ -109,7 +133,8 @@ export async function executeAICommand(
     }
 
     if (!toolResult.ok) {
-      const failedStatus: 'failed' | 'blocked' = toolResult.status === 'blocked' ? 'blocked' : 'failed';
+      const failedStatus: 'failed' | 'blocked' =
+        toolResult.status === 'blocked' ? 'blocked' : 'failed';
       return {
         ok: false,
         executed: false,
@@ -139,7 +164,12 @@ export async function executeAICommand(
     let provider: string | undefined;
     if (toolResult.classification === 'read' && shouldSynthesize(command, toolResult.tool)) {
       try {
-        const synthesis = await synthesizeReadResult(command, toolResult.tool, toolResult.payload, context);
+        const synthesis = await synthesizeReadResult(
+          command,
+          toolResult.tool,
+          toolResult.payload,
+          context,
+        );
         message = synthesis.message || message;
         provider = synthesis.provider;
       } catch (error) {
@@ -164,14 +194,18 @@ export async function executeAICommand(
   }
 
   const toolCatalog = getAIToolCatalogForPrompt(context.agent);
+  const operationalKnowledge =
+    context.agent === 'PARIS' ? communicationsKnowledgeFor(command) : null;
   const result = await executeAiTask({
     task: context.advisoryTask ?? 'general_chat',
     prompt: [
-      `You are ${context.agentLabel ?? context.agent}, operating as ${context.agentRole ?? 'an authorized Elevate platform assistant'}.`,
+      PARIS_SYSTEM_IDENTITY,
+      `Current capability: ${context.agentRole ?? 'authorized platform assistance'}.`,
       'You may explain, analyze, draft, or recommend.',
       'Do not claim a business action was executed unless a registered tool actually ran.',
       'Do not invent application status, funding approval, enrollment status, payment status, compliance outcomes, or current system state.',
       `Registered tools currently authorized for this agent:\n${toolCatalog || 'No tools assigned.'}`,
+      ...(operationalKnowledge ? [`Approved operational knowledge:\n${operationalKnowledge}`] : []),
       `User command:\n${command}`,
     ].join('\n\n'),
     context: {

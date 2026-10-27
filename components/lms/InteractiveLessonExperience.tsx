@@ -39,7 +39,15 @@ type Payload = {
   visualPrompt?: string | null;
   practicalTask?: any;
   interactiveVideo?: any;
+  instructionalTimeline?: any;
   experience?: Record<string, unknown> | null;
+  masteryPolicy?: {
+    threshold: number;
+    skills: Array<{ key: string; label: string; required: boolean }>;
+    remediationTargets: string[];
+    expertReviewRequired: boolean;
+    automatedEvidenceReview: boolean;
+  };
 };
 
 export default function InteractiveLessonExperience({
@@ -98,7 +106,9 @@ export default function InteractiveLessonExperience({
     !!payload?.narrationScript ||
     !!payload?.visualPrompt ||
     !!payload?.practicalTask ||
-    !!payload?.interactiveVideo;
+    !!payload?.interactiveVideo ||
+    !!payload?.instructionalTimeline;
+  const timeline = payload?.instructionalTimeline;
 
   if (loading)
     return (
@@ -120,6 +130,10 @@ export default function InteractiveLessonExperience({
           apply the skill in a realistic workplace context.
         </p>
       </div>
+
+      {payload?.masteryPolicy ? <MasteryPath policy={payload.masteryPolicy} /> : null}
+
+      {timeline ? <InstructionalTimelineOverview timeline={timeline} /> : null}
 
       {payload?.narrationScript ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -163,7 +177,14 @@ export default function InteractiveLessonExperience({
         if (interaction.type === 'drag-drop' || interaction.type === 'matching')
           return <MatchingActivity key={interaction.id} interaction={interaction} />;
         if (interaction.type === 'practical' || interaction.type === 'simulation')
-          return <PracticalActivity key={interaction.id} interaction={interaction} />;
+          return (
+            <PracticalActivity
+              key={interaction.id}
+              interaction={interaction}
+              courseId={courseId}
+              lessonId={lessonId}
+            />
+          );
         if (interaction.type === 'interactive-video')
           return <InteractiveVideo key={interaction.id} interaction={interaction} />;
         return null;
@@ -171,6 +192,8 @@ export default function InteractiveLessonExperience({
 
       {payload?.practicalTask && !interactions.some((i) => i.type === 'practical') ? (
         <PracticalActivity
+          courseId={courseId}
+          lessonId={lessonId}
           interaction={{
             id: `${lessonSlug}-practical`,
             type: 'practical',
@@ -183,6 +206,87 @@ export default function InteractiveLessonExperience({
         />
       ) : null}
     </section>
+  );
+}
+
+function MasteryPath({ policy }: { policy: NonNullable<Payload['masteryPolicy']> }) {
+  return (
+    <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-indigo-700">Skill path</p>
+          <h3 className="text-lg font-extrabold text-slate-950">Master the required skills</h3>
+        </div>
+        <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-900">
+          {policy.threshold}% required
+        </span>
+      </div>
+      {policy.skills.length ? (
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+          {policy.skills.map((skill) => (
+            <li
+              key={skill.key}
+              className="flex items-start gap-2 rounded-xl bg-slate-50 p-3 text-sm font-semibold text-slate-800"
+            >
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-indigo-700" />
+              {skill.label}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {policy.expertReviewRequired ? (
+        <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
+          Practical evidence must be reviewed by an authorized instructor or employer before this
+          skill is complete.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function InstructionalTimelineOverview({ timeline }: { timeline: any }) {
+  const scenes = Array.isArray(timeline?.scenes) ? timeline.scenes : [];
+  const events = Array.isArray(timeline?.events) ? timeline.events : [];
+  if (!scenes.length) return null;
+  return (
+    <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-indigo-700">
+            Interactive timeline
+          </p>
+          <h3 className="text-lg font-extrabold">Required lesson sequence</h3>
+        </div>
+        <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-900">
+          {Number(timeline.requiredWatchPercent ?? 95)}% watch ·{' '}
+          {events.filter((event: any) => event?.required !== false).length} required checkpoints
+        </span>
+      </div>
+      <ol className="mt-4 grid gap-3 md:grid-cols-2">
+        {scenes.map((scene: any, index: number) => (
+          <li
+            key={scene.id ?? index}
+            className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+          >
+            <p className="text-xs font-black uppercase tracking-wide text-indigo-700">
+              Scene {index + 1} · {String(scene.purpose ?? 'instruction')}
+            </p>
+            <p className="mt-1 font-bold text-slate-950">
+              {String(scene.visualType ?? 'instructional media').replaceAll('-', ' ')}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {Math.round(Number(scene.startTime ?? 0))}s–{Math.round(Number(scene.endTime ?? 0))}s
+            </p>
+          </li>
+        ))}
+      </ol>
+      {timeline.preventSeekPastRequiredEvents ? (
+        <p className="mt-4 text-sm font-semibold text-slate-700">
+          Required checkpoints must be completed in order; seeking cannot bypass them. Resume
+          position is saved.
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -621,7 +725,15 @@ function MatchingActivity({ interaction }: { interaction: Interaction }) {
   );
 }
 
-function PracticalActivity({ interaction }: { interaction: Interaction }) {
+function PracticalActivity({
+  interaction,
+  courseId,
+  lessonId,
+}: {
+  interaction: Interaction;
+  courseId: string;
+  lessonId: string;
+}) {
   const data = interaction.data ?? {};
   const steps = Array.isArray(data.instructions)
     ? data.instructions
@@ -629,6 +741,43 @@ function PracticalActivity({ interaction }: { interaction: Interaction }) {
       ? data.steps
       : [];
   const [done, setDone] = useState<Set<number>>(new Set());
+  const [evidence, setEvidence] = useState('');
+  const [attested, setAttested] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'saving' | 'submitted' | 'approved' | 'revision_required' | 'rejected' | 'error'>('idle');
+  const [reviewComments, setReviewComments] = useState('');
+  useEffect(() => {
+    let active = true;
+    void fetch(`/api/learner/practical-submissions?lessonId=${encodeURIComponent(lessonId)}&interactionId=${encodeURIComponent(interaction.id)}`)
+      .then(async response => { if (!response.ok) throw new Error('Practical status unavailable'); return response.json(); })
+      .then(({ submission }) => {
+        if (!active || !submission) return;
+        setStatus(submission.status === 'in_review' ? 'submitted' : submission.status);
+        const review = [...(submission.course_practical_reviews ?? [])].sort((a, b) => Date.parse(b.reviewed_at) - Date.parse(a.reviewed_at))[0];
+        setReviewComments(review?.comments || '');
+      }).catch(() => { if (active) setReviewComments('Current review status could not be loaded. Refresh before submitting again.'); });
+    return () => { active = false; };
+  }, [lessonId, interaction.id]);
+  const competencyKeys = Array.isArray(data.competencyKeys)
+    ? data.competencyKeys.map(String)
+    : [String(data.competencyKey ?? interaction.id)];
+  async function submitEvidence() {
+    setStatus('saving');
+    try {
+    const response = await fetch('/api/learner/practical-submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courseId,
+        lessonId,
+        interactionId: interaction.id,
+        competencyKeys,
+        evidence: [{ type: 'text', value: evidence }],
+        learnerAttestation: attested,
+      }),
+    });
+    setStatus(response.ok ? 'submitted' : 'error');
+    } catch { setStatus('error'); }
+  }
   return (
     <div className="rounded-2xl border border-teal-300 bg-teal-50 p-5">
       <div className="flex items-center gap-2 text-teal-950">
@@ -679,8 +828,57 @@ function PracticalActivity({ interaction }: { interaction: Interaction }) {
           <p className="mt-1 text-sm font-semibold text-slate-800">{data.evidence}</p>
         </div>
       ) : null}
+      <div className="mt-4 space-y-3 rounded-lg border border-teal-200 bg-white p-3">
+        <label
+          className="block text-xs font-bold uppercase text-teal-700"
+          htmlFor={`${interaction.id}-evidence`}
+        >
+          Submit verification evidence
+        </label>
+        <textarea
+          id={`${interaction.id}-evidence`}
+          value={evidence}
+          onChange={(event) => setEvidence(event.target.value)}
+          placeholder="Describe the work and paste an evidence link or file reference."
+          className="min-h-24 w-full rounded-lg border border-slate-300 p-3 text-sm"
+        />
+        <label className="flex items-start gap-2 text-sm font-semibold text-slate-800">
+          <input
+            type="checkbox"
+            checked={attested}
+            onChange={(event) => setAttested(event.target.checked)}
+            className="mt-1"
+          />
+          I attest this evidence is my work and may be reviewed by an authorized instructor or
+          supervisor.
+        </label>
+        <button
+          type="button"
+          onClick={submitEvidence}
+          disabled={
+            done.size < steps.length ||
+            !evidence.trim() ||
+            !attested ||
+            status === 'saving' ||
+            status === 'submitted' || status === 'approved'
+          }
+          className="rounded-lg bg-teal-800 px-4 py-2 font-bold text-white disabled:opacity-40"
+        >
+          {status === 'approved' ? 'Practical approved' : status === 'saving'
+            ? 'Submitting…'
+            : status === 'submitted'
+              ? 'Submitted for expert review'
+              : 'Submit evidence'}
+        </button>
+        {reviewComments ? <p role="status">{status.replaceAll('_', ' ')}: {reviewComments}</p> : null}
+        {status === 'error' ? (
+          <p className="text-sm font-semibold text-red-700">
+            Evidence could not be submitted. Check the required fields and retry.
+          </p>
+        ) : null}
+      </div>
       <p className="mt-3 text-xs font-semibold text-teal-900">
-        Instructor or supervisor verification may be required before competency is credited.
+        Competency is not credited until an authorized reviewer approves the submitted evidence.
       </p>
     </div>
   );

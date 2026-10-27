@@ -66,7 +66,8 @@ export class GeminiProvider implements AIProvider {
           lastError = error;
           // Retired/unavailable/capacity/rate-limit failures fall through to the
           // next supported Gemini model before the global provider circuit opens.
-          if ([404, 429, 503].includes(res.status)) continue;
+          if (res.status === 429) throw error;
+          if ([404, 503].includes(res.status)) continue;
           throw error;
         }
 
@@ -93,6 +94,7 @@ export class GeminiProvider implements AIProvider {
         };
       } catch (e) {
         lastError = e as Error;
+        if (lastError.message.includes(' returned 429')) throw lastError;
       }
     }
 

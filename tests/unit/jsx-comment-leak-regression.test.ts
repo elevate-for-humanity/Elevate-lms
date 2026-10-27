@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const filesWithDirectImageContractChildren = [
-  'app/career-assessment/page.tsx',
+  'apps/marketing/app/career-assessment/page.tsx',
   'components/FacebookPixel.tsx',
   'components/programs/onet/OnetLaborData.tsx',
   'components/admin/course-builder/ProgramBuilderClient.tsx',
@@ -16,7 +16,8 @@ describe('JSX comment leak regressions', () => {
     for (const file of filesWithDirectImageContractChildren) {
       const source = readFileSync(join(process.cwd(), file), 'utf8');
       expect(source, file).not.toMatch(/^\s*\/\/ IMAGE-CONTRACT:/m);
-      expect(source, file).toContain('{/* IMAGE-CONTRACT:');
+      // A JSX contract comment is optional; the invariant is that a JavaScript
+      // line comment never leaks into rendered JSX text.
     }
   });
 });

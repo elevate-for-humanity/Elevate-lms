@@ -328,20 +328,20 @@ describe('Follow-up scheduling (DB trigger logic)', () => {
 
 describe('Follow-up preview display', () => {
   it('Q2 preview is approximately 180 days from now', () => {
-    const now = new Date('2025-01-01');
+    const now = new Date(2025, 0, 1);
     const preview = followUpPreviewDates(now);
     // Should contain 2025 or 2026
     expect(preview.q2).toMatch(/202[56]/);
   });
 
   it('Q4 preview is approximately 365 days from now', () => {
-    const now = new Date('2025-01-01');
+    const now = new Date(2025, 0, 1);
     const preview = followUpPreviewDates(now);
     expect(preview.q4).toMatch(/2026/);
   });
 
   it('Q4 preview date is after Q2 preview date', () => {
-    const now = new Date('2025-06-01');
+    const now = new Date(2025, 5, 1);
     const preview = followUpPreviewDates(now);
     // Both are locale strings — compare by parsing
     const q2 = new Date(preview.q2);

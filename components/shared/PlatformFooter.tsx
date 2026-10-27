@@ -4,7 +4,7 @@ const footerLinks = {
   resources: [
     { label: 'Funding Options', href: '/funding' },
     { label: 'Testing Center', href: '/testing' },
-    { label: 'Apprenticeship', href: '/barber-and-beauty-apprenticeships' },
+    { label: 'Apprenticeship', href: '/apprenticeships' },
     { label: 'Career Services', href: '/career-services' },
   ],
   company: [

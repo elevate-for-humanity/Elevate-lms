@@ -2,26 +2,27 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { 
-  CheckCircle, 
-  Shield, 
-  Layers, 
-  Plug, 
-  BarChart3, 
-  Lock, 
-  Globe, 
+import {
+  CheckCircle,
+  Shield,
+  Layers,
+  Plug,
+  BarChart3,
+  Lock,
+  Globe,
   Zap,
   FileCheck,
   Building2,
   Users,
   BookOpen,
   ExternalLink,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'LMS Standards & Enterprise Capabilities | Elevate Platform',
-  description: 'Enterprise-grade LMS with SCORM 1.2/2004, xAPI (Tin Can), LTI 1.3 integration, SOC 2 compliance, and mature reporting. Built for workforce development at scale.',
+  description:
+    'Workforce LMS with SCORM delivery, xAPI learning events, governed course authoring, and partner-integration readiness.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/platform/standards',
   },
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
 const standards = [
   {
     name: 'SCORM 1.2 & 2004',
-    description: 'Full SCORM compliance for importing and tracking third-party courseware. Supports completion tracking, scoring, bookmarking, and sequencing.',
+    description:
+      'Full SCORM compliance for importing and tracking third-party courseware. Supports completion tracking, scoring, bookmarking, and sequencing.',
     status: 'Supported',
     icon: BookOpen,
     details: [
@@ -43,7 +45,8 @@ const standards = [
   },
   {
     name: 'xAPI (Tin Can)',
-    description: 'Experience API support for tracking learning activities across platforms, mobile apps, simulations, and real-world experiences.',
+    description:
+      'Experience API support for tracking learning activities across platforms, mobile apps, simulations, and real-world experiences.',
     status: 'Supported',
     icon: Zap,
     details: [
@@ -55,29 +58,29 @@ const standards = [
     ],
   },
   {
-    name: 'LTI 1.3 / Advantage',
-    description: 'Learning Tools Interoperability for seamless integration with external tools, content providers, and institutional systems.',
-    status: 'Supported',
+    name: 'LTI 1.3 / Advantage readiness',
+    description:
+      'Registration foundation for future certified connections with external learning platforms. Direct launches and grade services are not production-active.',
+    status: 'In development',
     icon: Plug,
     details: [
-      'LTI 1.3 Core',
-      'Deep Linking',
-      'Assignment and Grade Services',
-      'Names and Role Provisioning',
-      'Platform-to-tool launches',
+      'LTI platform registration foundation',
+      'Core OIDC launch required',
+      'Deep Linking required',
+      'Assignment and Grade Services required',
+      'Names and Roles Provisioning required',
     ],
   },
   {
     name: 'cmi5',
-    description: 'Next-generation e-learning standard combining xAPI flexibility with LMS launch and tracking capabilities.',
-    status: 'Supported',
+    description:
+      'Future interoperability target combining xAPI statements with standardized LMS launch and session rules.',
+    status: 'Roadmap',
     icon: Layers,
     details: [
-      'AU (Assignable Unit) management',
-      'Session tracking',
-      'Completion and success criteria',
-      'xAPI statement generation',
-      'Offline support',
+      'AU management not yet active',
+      'Session lifecycle not yet active',
+      'Conformance testing required',
     ],
   },
 ];
@@ -185,10 +188,12 @@ export default function PlatformStandardsPage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[
-            { label: 'Platform', href: '/platform' },
-            { label: 'Standards & Capabilities' }
-          ]} />
+          <Breadcrumbs
+            items={[
+              { label: 'Platform', href: '/platform' },
+              { label: 'Standards & Capabilities' },
+            ]}
+          />
         </div>
       </div>
 
@@ -204,9 +209,9 @@ export default function PlatformStandardsPage() {
               Industry Standards & Enterprise Capabilities
             </h1>
             <p className="text-xl text-slate-300 mb-8">
-              Built on universal e-learning standards with mature integrations, 
-              enterprise reporting, and third-party validated security. Ready for 
-              workforce development at any scale.
+              Built on universal e-learning standards with mature integrations, enterprise
+              reporting, and third-party validated security. Ready for workforce development at any
+              scale.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -234,8 +239,8 @@ export default function PlatformStandardsPage() {
               Universal E-Learning Standards
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Full compliance with industry-standard specifications for content 
-              interoperability, tracking, and tool integration.
+              Full compliance with industry-standard specifications for content interoperability,
+              tracking, and tool integration.
             </p>
           </div>
 
@@ -243,7 +248,10 @@ export default function PlatformStandardsPage() {
             {standards.map((standard) => {
               const Icon = standard.icon;
               return (
-                <div key={standard.name} className="bg-gray-50 rounded-xl p-6 border-2 border-gray-100">
+                <div
+                  key={standard.name}
+                  className="bg-gray-50 rounded-xl p-6 border-2 border-gray-100"
+                >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -282,8 +290,8 @@ export default function PlatformStandardsPage() {
               Security & Compliance Certifications
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Third-party validated security controls and regulatory compliance 
-              for enterprise and government deployments.
+              Third-party validated security controls and regulatory compliance for enterprise and
+              government deployments.
             </p>
           </div>
 
@@ -307,10 +315,7 @@ export default function PlatformStandardsPage() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link
-              href="/security"
-              className="text-blue-600 font-medium hover:underline"
-            >
+            <Link href="/security" className="text-blue-600 font-medium hover:underline">
               View Security Documentation →
             </Link>
           </div>
@@ -321,12 +326,10 @@ export default function PlatformStandardsPage() {
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Enterprise Feature Matrix
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Enterprise Feature Matrix</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Mature capabilities for reporting, content authoring, integrations, 
-              and multi-tenant deployments.
+              Mature capabilities for reporting, content authoring, integrations, and multi-tenant
+              deployments.
             </p>
           </div>
 
@@ -360,12 +363,10 @@ export default function PlatformStandardsPage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Integration Ecosystem
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Integration Ecosystem</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Connect with the tools your organization already uses through 
-              native integrations and open APIs.
+              Connect with the tools your organization already uses through native integrations and
+              open APIs.
             </p>
           </div>
 
@@ -394,12 +395,10 @@ export default function PlatformStandardsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Developer-First API
-              </h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Developer-First API</h2>
               <p className="text-lg text-gray-600 mb-6">
-                RESTful API with comprehensive documentation, SDKs, and webhook 
-                support for custom integrations and automation.
+                RESTful API with comprehensive documentation, SDKs, and webhook support for custom
+                integrations and automation.
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center gap-2 text-gray-700">
@@ -433,7 +432,9 @@ export default function PlatformStandardsPage() {
             <div className="bg-slate-900 rounded-xl p-6 font-mono text-sm">
               <div className="text-slate-400 mb-2"># Get learner progress</div>
               <div className="text-green-400">curl -X GET \</div>
-              <div className="text-white pl-4">https://api.elevate.edu/v1/learners/123/progress \</div>
+              <div className="text-white pl-4">
+                https://api.elevate.edu/v1/learners/123/progress \
+              </div>
               <div className="text-white pl-4">-H "Authorization: Bearer $TOKEN"</div>
               <div className="mt-4 text-slate-400"># Response</div>
               <div className="text-yellow-400">{'{'}</div>
@@ -450,12 +451,10 @@ export default function PlatformStandardsPage() {
       {/* CTA */}
       <section className="py-16 bg-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to See It in Action?
-          </h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to See It in Action?</h2>
           <p className="text-xl text-blue-100 mb-8">
-            Schedule a demo to see how our enterprise LMS can support your 
-            workforce development programs.
+            Schedule a demo to see how our enterprise LMS can support your workforce development
+            programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

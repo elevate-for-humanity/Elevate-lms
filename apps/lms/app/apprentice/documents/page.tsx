@@ -8,6 +8,8 @@ import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-pr
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import UploadDocuments from './UploadDocuments';
 import { getDocumentUploadGuidance } from './document-guidance';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { AgreementAcceptanceButton } from '@/components/lms/AgreementAcceptanceButton';
 
 export const metadata: Metadata = {
   title: 'Documents | Apprentice Portal',
@@ -20,13 +22,13 @@ const approvedStates = new Set(['approved', 'accepted', 'verified']);
 export default async function ApprenticeDocumentsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/documents');
-
   const admin = await requireAdminClient();
-  const programSlug = await resolveApprenticeProgramSlug(admin, user.id);
+  const subject = await resolvePortalPreviewSubject(admin, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/documents');
+  const programSlug = await resolveApprenticeProgramSlug(admin, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
-  const [{ data: requirements }, { data: documents }] = await Promise.all([
+  const [{ data: requirements }, { data: documents }, { data: agreement }] = await Promise.all([
     admin
       .from('apprentice_document_types')
       .select('id,name,description,document_type,is_required,accepted_formats,max_file_size_mb,display_order')
@@ -35,19 +37,34 @@ export default async function ApprenticeDocumentsPage() {
     admin
       .from('documents')
       .select('id,document_type,file_name,status,verification_status,created_at,metadata')
-      .eq('user_id', user.id)
+      .eq('user_id', subject.userId)
       .order('created_at', { ascending: false }),
+    admin
+      .from('license_agreement_acceptances')
+      .select('accepted_at')
+      .eq('user_id', subject.userId)
+      .eq('agreement_type', 'apprenticeship_agreement')
+      .eq('document_version', '1.0')
+      .maybeSingle(),
   ]);
 
   const docs = documents ?? [];
-  const required = (requirements ?? []).filter((item: any) => item.is_required);
-  const rows = (requirements ?? []).map((requirement: any) => {
+  // Never render a blank documents portal for a valid apprentice enrollment.
+  // Program-specific requirements should be provisioned in apprentice_document_types;
+  // this visible fallback keeps onboarding actionable while Admin repairs configuration.
+  const configuredRequirements = requirements ?? [];
+  const uploadRequirements = configuredRequirements.filter((item: any) =>
+    !['apprenticeship_agreement', 'employer_verification', 'offer_letter'].includes(String(item.document_type || '').toLowerCase()),
+  );
+  const required = uploadRequirements.filter((item: any) => item.is_required);
+  const rows = uploadRequirements.map((requirement: any) => {
     const document = docs.find((doc: any) => doc.document_type === requirement.document_type);
     const raw = String(document?.verification_status || document?.status || 'missing').toLowerCase();
     const status = approvedStates.has(raw) ? 'complete' : raw === 'pending' ? 'pending' : raw === 'rejected' ? 'rejected' : 'missing';
     return { requirement, document, status };
   });
-  const missingRequired = rows.filter(({ requirement, status }: any) => requirement.is_required && status !== 'complete').length;
+  const agreementSigned = Boolean(agreement?.accepted_at);
+  const missingRequired = rows.filter(({ requirement, status }: any) => requirement.is_required && status !== 'complete').length + (agreementSigned ? 0 : 1);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -58,19 +75,42 @@ export default async function ApprenticeDocumentsPage() {
           <p className="mt-2 text-slate-700">Required records stay visible until accepted. Missing or rejected items are shown in red.</p>
           <div className={`mt-5 rounded-xl border p-4 ${missingRequired ? 'border-red-300 bg-red-50 text-red-950' : 'border-green-300 bg-green-50 text-green-950'}`}>
             {missingRequired ? (
-              <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-black">Action required: {missingRequired} required document{missingRequired === 1 ? '' : 's'} incomplete.</p><p className="mt-1 text-sm font-semibold">Upload each missing item below. The signed apprenticeship agreement is required and remains red until accepted.</p></div></div>
+              <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-black">Action required: {missingRequired} required item{missingRequired === 1 ? '' : 's'} incomplete.</p><p className="mt-1 text-sm font-semibold">Upload supporting documents below. Read and electronically sign the apprenticeship agreement in the portal—do not upload it.</p></div></div>
             ) : (
-              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><p className="font-black">All {required.length} required apprenticeship documents are complete.</p></div>
+              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><p className="font-black">All {required.length} required uploads and the apprenticeship agreement are complete.</p></div>
             )}
           </div>
         </div>
 
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+        <section className={`mt-6 rounded-2xl border p-6 ${agreementSigned ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-xl font-black">Apprenticeship Agreement</h2>
+              <p className="mt-1 max-w-3xl text-sm leading-6">Read and electronically sign your student apprenticeship agreement here. Employer agreements and employer MOUs are completed by the employer in its own dashboard; students do not upload them.</p>
+              <Link href="/lms/legal/apprenticeship-agreement" target="_blank" className="mt-3 inline-flex font-black text-blue-800 underline">Read the apprenticeship agreement</Link>
+            </div>
+            {agreementSigned ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-1 text-xs font-black text-white"><CheckCircle2 className="h-4 w-4" /> Signed</span>
+            ) : subject.previewing ? (
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black">Learner signature required</span>
+            ) : (
+              <AgreementAcceptanceButton type="apprenticeship_agreement" version="1.0" />
+            )}
+          </div>
+        </section>
+
+        {!subject.previewing ? <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-xl font-black">Upload or replace a document</h2>
           <p className="mt-1 text-sm text-slate-600">Approved evidence is locked. Missing, pending, or rejected evidence can be uploaded through the secure document endpoint.</p>
           <div className="mt-5"><UploadDocuments programSlug={programSlug} /></div>
-        </section>
+        </section> : <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">Admin preview is read-only. This learner can upload these documents from their own account.</div>}
 
+        {configuredRequirements.length === 0 ? (
+          <section role="alert" className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-950">
+            <h2 className="font-black">Document checklist configuration needs attention</h2>
+            <p className="mt-2 text-sm font-semibold">Your enrollment is active, but this program's document checklist has not been configured yet. You can still complete orientation and the apprenticeship agreement. Elevate has been alerted to add the program-specific upload requirements.</p>
+          </section>
+        ) : null}
         <section className="mt-6 grid gap-4">
           {rows.map(({ requirement, document, status }: any) => {
             const complete = status === 'complete';
@@ -90,6 +130,14 @@ export default async function ApprenticeDocumentsPage() {
                       {getDocumentUploadGuidance(requirement) ? <p className="mt-1 max-w-3xl text-sm leading-6">{getDocumentUploadGuidance(requirement)}</p> : null}
                       <p className="mt-1 text-sm font-semibold">{requirement.is_required ? 'Required' : 'Optional'} · Accepted: {(requirement.accepted_formats ?? []).join(', ').toUpperCase()} · Max {requirement.max_file_size_mb || 10} MB</p>
                       {document?.file_name ? <p className="mt-2 text-xs font-semibold">Latest upload: {document.file_name}</p> : null}
+                      {!complete && !subject.previewing ? (
+                        <Link
+                          href={`/apprentice/documents?documentType=${encodeURIComponent(requirement.id)}#document-upload`}
+                          className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white hover:bg-slate-800"
+                        >
+                          {pending ? 'Upload a replacement' : status === 'rejected' ? 'Replace document' : `Upload ${requirement.name}`}
+                        </Link>
+                      ) : null}
                     </div>
                   </div>
                   {complete ? (

@@ -270,23 +270,23 @@ export async function advanceHvacWorkflow(userId: string): Promise<{
     lastName: profile.last_name || profile.full_name?.split(' ').slice(1).join(' ') || '',
   };
 
-  // Check certification submissions for this student + HVAC program
-  const { data: submissions } = await db
-    .from('certification_submissions')
-    .select('certification_name, status')
-    .eq('user_id', userId)
-    .eq('program_id', 'hvac-technician');
-
-  const approved = (name: string) =>
-    submissions?.some((s) => s.certification_name === name && s.status === 'approved') ?? false;
-
-  const oshaComplete = approved('OSHA 10-Hour Construction');
-  const cprComplete = approved('CPR/AED/First Aid');
-  const epa608Complete = approved('EPA 608 Universal');
-
   // Resolve HVAC IDs from DB (slug-based, not hardcoded UUID)
   const hvacCourseId = await resolveHvacCourseId();
   const hvacProgramId = await resolveHvacProgramId();
+
+  // Canonical protected learner uploads. Completion advances only after staff verification.
+  const { data: submissions } = await db
+    .from('student_credential_uploads')
+    .select('upload_type, verification_status')
+    .eq('user_id', userId)
+    .eq('program_id', hvacProgramId);
+
+  const approved = (uploadType: string) =>
+    submissions?.some((submission) => submission.upload_type === uploadType && submission.verification_status === 'verified') ?? false;
+
+  const oshaComplete = approved('osha-10');
+  const cprComplete = approved('cpr-aed');
+  const epa608Complete = approved('epa-608');
 
   // Check if all internal lessons are complete
   const { data: lessonProgress } = await db

@@ -17,8 +17,11 @@ export default function StoreDemoVideo() {
   const [ready, setReady] = useState(false);
 
   const start = () => {
+    const v = videoRef.current;
+    if (!v) return;
     setStarted(true);
-    // play() is called in the onCanPlay handler once the video element mounts
+    v.muted = false;
+    v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
   };
 
   const toggle = () => {
@@ -40,8 +43,8 @@ export default function StoreDemoVideo() {
     >
       {/* Poster — shown before play */}
       <Image
-        src="/images/pages/admin-activity-hero.webp"
-        alt="HVAC Technician course — Module 1 preview"
+        src="/images/hvac-training-vibrant-2026.webp"
+        alt="Illustrative HVAC training scene"
         fill
         className="object-cover"
         sizes="100vw"
@@ -51,30 +54,31 @@ export default function StoreDemoVideo() {
       {!started && (
         <>
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
-              <Play className="w-11 h-11 text-brand-red-600 ml-1" />
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
+              <Play className="w-8 h-8 sm:w-11 sm:h-11 text-brand-red-600 ml-1" />
             </div>
-            <p className="text-white font-bold text-lg drop-shadow-lg">Watch: HVAC Course — Module 1, Lesson 1</p>
+            <p className="text-white font-bold text-sm sm:text-lg drop-shadow-lg">Watch: HVAC Course — Module 1, Lesson 1</p>
             <p className="text-white/80 text-sm mt-1 drop-shadow">Sample lesson from the licensable HVAC Technician course</p>
           </div>
         </>
       )}
 
-      {/* Video — single file, no loop */}
-      {started && (
-        <>
-          <video
+      {/* Video stays mounted so Play remains inside the user's tap gesture. */}
+      <video
             ref={videoRef}
             className={`absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-300 ${ready ? 'opacity-100' : 'opacity-0'}`}
             playsInline
-            muted
+            muted={false}
             controls={false}
-            onCanPlay={() => { setReady(true); videoRef.current?.play().then(() => setPlaying(true)).catch(() => {}); }}
+            preload="metadata"
+            onCanPlay={() => setReady(true)}
             onError={() => { setReady(false); setPlaying(false); }}
             onEnded={() => setPlaying(false)}
           >
             <source src={getBrowserPublicStorageUrl('course-videos', 'hvac/hvac-module1-lesson1.mp4')} type="video/mp4" />
           </video>
+      {started && (
+        <>
           <div className="absolute bottom-0 inset-x-0 p-3 flex items-center justify-between bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={(e) => { e.stopPropagation(); toggle(); }} className="text-white hover:text-white/80">
               {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}

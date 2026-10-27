@@ -1,3 +1,4 @@
+import {PwaAlertSettings} from '@/components/notifications/PwaAlertSettings';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -58,6 +59,7 @@ export default async function NotificationSettingsPage() {
         <p className="text-slate-500">Configure email, SMS, and webhook notifications.</p>
       </div>
 
+      <PwaAlertSettings />
       <SettingsFormClient fields={FIELDS} initialValues={initialValues} />
 
       <p className="text-xs text-slate-400 max-w-xl">

@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
     const blueprint = loaded.blueprint;
 
     const { data: progressData } = await supabase
-      .from('competency_progress')
-      .select('*')
-      .eq('learner_id', user!.id)
-      .eq('course_id', enrollment.course_id);
+      .from('student_competency_progress')
+      .select('*, competencies(competency_key)')
+      .eq('user_id', user!.id)
+      .eq('program_id', enrollment.courses.program_id);
 
     const competencies = buildCompetencyTree(blueprint, progressData || []);
     const overallMastery = competencies.length
@@ -72,7 +72,10 @@ function buildCompetencyTree(
   progressData: Array<Record<string, unknown>>,
 ): CompetencyNode[] {
   const map = new Map<string, CompetencyNode>();
-  const progress = new Map(progressData.map((row) => [row.competency_key as string, row]));
+  const progress = new Map(progressData.map((row) => [
+    (row.competencies as { competency_key?: string } | null)?.competency_key ?? '',
+    row,
+  ]));
 
   for (const blueprintModule of blueprint.modules) {
     for (const competency of blueprintModule.competencies || []) {
@@ -83,8 +86,9 @@ function buildCompetencyTree(
         continue;
       }
 
-      const level = (stored?.current_level as number) || 0;
-      const verified = Boolean(stored?.verified);
+      const touchpoints = Array.isArray(stored?.touchpoints) ? stored.touchpoints.length : 0;
+      const level = stored?.is_mastered ? 100 : Math.min(99, touchpoints * 20);
+      const verified = Boolean(stored?.is_mastered);
       map.set(competency.competencyKey, {
         competencyKey: competency.competencyKey,
         competencyName: competency.competencyKey.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()),

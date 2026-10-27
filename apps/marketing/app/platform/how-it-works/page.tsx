@@ -23,7 +23,7 @@ const steps = [
     description:
       'Walk through guided tours of the admin dashboard, employer portal, and workforce program tools. No account needed. No data entered. Just see how it works.',
     icon: Play,
-    href: '/store/demo',
+    href: '/store/demos',
     cta: 'Start a tour',
   },
   {

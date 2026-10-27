@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { requireRole } from '@/lib/auth/require-role';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   robots: { index: false },
@@ -13,33 +14,17 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
-async function requireAdmin(supabase: any) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  return profile?.role === 'admin' || profile?.role === 'super_admin' ? user : null;
-}
-
 export default async function AdminInboxPage() {
-  const supabase = await createClient();
-  const adminUser = await requireAdmin(supabase);
-  if (!adminUser) redirect('/unauthorized');
+  await requireRole(['admin', 'super_admin']);
+  const adminDb = await requireAdminClient();
 
   const [{ data: partners }, { data: licenses }] = await Promise.all([
-    supabase
+    adminDb
       .from('partner_inquiries')
       .select('*')
       .order('submitted_at', { ascending: false })
       .limit(50),
-    supabase
+    adminDb
       .from('license_requests')
       .select('*')
       .order('created_at', { ascending: false })
@@ -53,11 +38,10 @@ export default async function AdminInboxPage() {
     const notes = String(formData.get('internal_notes') || '');
     if (!id || !status) return;
 
-    const supabase2 = await createClient();
-    const actor = await requireAdmin(supabase2);
-    if (!actor) redirect('/unauthorized');
+    const { user: actor } = await requireRole(['admin', 'super_admin']);
+    const db = await requireAdminClient();
 
-    const { error } = await supabase2
+    const { error } = await db
       .from('partner_inquiries')
       .update({ status, notes })
       .eq('id', id);
@@ -80,11 +64,10 @@ export default async function AdminInboxPage() {
     const notes = String(formData.get('internal_notes') || '');
     if (!id || !status) return;
 
-    const supabase2 = await createClient();
-    const actor = await requireAdmin(supabase2);
-    if (!actor) redirect('/unauthorized');
+    const { user: actor } = await requireRole(['admin', 'super_admin']);
+    const db = await requireAdminClient();
 
-    const { error } = await supabase2
+    const { error } = await db
       .from('license_requests')
       .update({ status, internal_notes: notes })
       .eq('id', id);

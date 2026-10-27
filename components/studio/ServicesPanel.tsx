@@ -1,22 +1,23 @@
 'use client';
 
 /**
- * Northflank services: LMS and Admin.
+ * Google Cloud Run services: Marketing, LMS and Admin.
  */
 
 import { useEffect, useState, useCallback } from 'react';
 import {
-  RefreshCw, CheckCircle, AlertCircle, Circle, Play, Square,
-  RotateCcw, ExternalLink, Loader2, Clock,
+  RefreshCw, CheckCircle, AlertCircle, Circle,
+  RotateCcw, ExternalLink, Loader2,
 } from 'lucide-react';
 
 interface ServiceHealth {
   ok: boolean;
   latencyMs: number;
   status: number | null;
+  commit?: string | null;
 }
 
-interface NorthflankDeploymentInfo {
+interface DeploymentInfo {
   runningCount: number;
   desiredCount: number;
   status: string;
@@ -38,13 +39,13 @@ interface Service {
   serviceId: string;
   url: string | null;
   color: string;
-  northflank: NorthflankDeploymentInfo | null;
+  deployment: DeploymentInfo | null;
   health: ServiceHealth | null;
   running: boolean | null;
   healthy: boolean | null;
   shellProbe?: ShellProbeInfo;
   shellSetupStatus?: string;
-  hasNorthflank?: boolean;
+  provider?: string;
 }
 
 interface ServicesData {
@@ -72,20 +73,20 @@ function StatusDot({ running, healthy }: { running: boolean | null; healthy: boo
 function StatusLabel({
   running,
   healthy,
-  northflank,
+  deployment,
   shellSetupStatus,
   shellProbe,
 }: {
   running: boolean | null;
   healthy: boolean | null;
-  northflank: NorthflankDeploymentInfo | null;
+  deployment: DeploymentInfo | null;
   shellSetupStatus?: string;
   shellProbe?: ShellProbeInfo;
 }) {
-  if (running === null && !northflank) return <span className="text-xs text-slate-400">Unknown</span>;
-  if (northflank?.status === 'NOT_FOUND') return <span className="text-xs text-slate-400">Not deployed</span>;
-  if (!running && northflank) {
-    return <span className="text-xs text-slate-500">Stopped ({northflank.desiredCount} desired)</span>;
+  if (running === null && !deployment) return <span className="text-xs text-slate-400">Unknown</span>;
+  if (deployment?.status === 'NOT_FOUND') return <span className="text-xs text-slate-400">Not deployed</span>;
+  if (!running && deployment) {
+    return <span className="text-xs text-slate-500">Stopped ({deployment.desiredCount} desired)</span>;
   }
   if (running && healthy === true) return <span className="text-xs text-brand-green-600">Running · ready</span>;
   if (running && healthy === false) {
@@ -104,6 +105,7 @@ export default function ServicesPanel() {
   const [data, setData] = useState<ServicesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [imageShas, setImageShas] = useState<Record<string, string>>({});
   const [actions, setActions] = useState<ActionState>({});
   const [actionMsg, setActionMsg] = useState<Record<string, string>>({});
 
@@ -124,18 +126,21 @@ export default function ServicesPanel() {
   useEffect(() => { load(); }, [load]);
 
   async function doAction(serviceKey: string, action: string) {
+    if (!window.confirm(action === 'build' ? `Build a Google image for ${serviceKey}? This does not deploy.` : `Deploy the specified image for ${serviceKey} on Google Cloud Run?`)) return;
+    const confirmation = window.prompt('Type CONFIRM DEPLOY to queue this operation.');
+    if (confirmation !== 'CONFIRM DEPLOY') return;
     setActions((prev) => ({ ...prev, [serviceKey + action]: 'loading' }));
     setActionMsg((prev) => ({ ...prev, [serviceKey]: '' }));
     try {
       const res = await fetch('/api/admin/dev-studio/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, service: serviceKey }),
+        body: JSON.stringify({ action, service: serviceKey, confirmation, image_sha: imageShas[serviceKey]?.trim() }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
       setActions((prev) => ({ ...prev, [serviceKey + action]: 'done' }));
-      setActionMsg((prev) => ({ ...prev, [serviceKey]: `${action} triggered — new image rolls out on deploy/restart` }));
+      setActionMsg((prev) => ({ ...prev, [serviceKey]: json.message || `${action} queued; verify completion in GitHub Actions` }));
       setTimeout(load, 5000);
     } catch (e) {
       setActions((prev) => ({ ...prev, [serviceKey + action]: 'error' }));
@@ -148,12 +153,12 @@ export default function ServicesPanel() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-white text-slate-900 overflow-hidden">
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-slate-50 font-sans text-slate-900">
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 shrink-0">
         <div>
           <p className="text-sm font-semibold text-slate-950">Services</p>
           {data && (
-            <p className="text-[10px] text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {data.cluster} · {new Date(data.fetchedAt).toLocaleTimeString()}
             </p>
           )}
@@ -163,7 +168,7 @@ export default function ServicesPanel() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {error && <p className="text-xs text-red-700">{error}</p>}
         {loading && !data && <p className="text-xs text-slate-500">Loading…</p>}
         {data?.services.map((svc) => (
@@ -178,7 +183,7 @@ export default function ServicesPanel() {
                 <StatusLabel
                   running={svc.running}
                   healthy={svc.healthy}
-                  northflank={svc.northflank}
+                  deployment={svc.deployment}
                   shellSetupStatus={svc.shellSetupStatus}
                   shellProbe={svc.shellProbe}
                 />
@@ -190,20 +195,22 @@ export default function ServicesPanel() {
               )}
             </div>
             {actionMsg[svc.key] && (
-              <p className="px-4 py-2 text-[10px] text-amber-400 border-b border-slate-100">{actionMsg[svc.key]}</p>
+              <p className="px-4 py-2 text-xs text-amber-400 border-b border-slate-100">{actionMsg[svc.key]}</p>
             )}
+            <div className="px-4 pt-3 text-xs text-slate-600">Google Cloud Run · {svc.serviceId}<br />Current revision: {svc.health?.commit || 'unknown'}</div>
+            <div className="px-4 pt-3"><label className="text-xs font-semibold">Uploaded image commit SHA<input aria-label={`${svc.label} uploaded image commit SHA`} value={imageShas[svc.key] || ''} onChange={e => setImageShas(prev => ({...prev, [svc.key]: e.target.value}))} placeholder="Full 40-character SHA from a successful image build" className="mt-1 w-full rounded border border-slate-300 p-2 text-xs" /></label></div>
             <div className="flex flex-wrap gap-2 px-4 py-3">
               <button
-                onClick={() => doAction(svc.key, 'restart')}
-                disabled={isLoading(svc.key, 'restart')}
+                onClick={() => doAction(svc.key, 'build')}
+                disabled={isLoading(svc.key, 'build')}
                 className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg bg-amber-50 text-amber-700 border border-amber-200 disabled:opacity-40"
               >
-                {isLoading(svc.key, 'restart') ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
-                Restart build
+                {isLoading(svc.key, 'build') ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                Build image
               </button>
               <button
                 onClick={() => doAction(svc.key, 'deploy')}
-                disabled={isLoading(svc.key, 'deploy')}
+                disabled={isLoading(svc.key, 'deploy') || !/^[a-f0-9]{40}$/.test((imageShas[svc.key] || '').trim())}
                 className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg bg-blue-50 text-blue-700 border border-blue-200 disabled:opacity-40"
               >
                 {isLoading(svc.key, 'deploy') ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}

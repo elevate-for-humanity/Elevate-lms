@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, ChevronDown, ChevronUp, Clock, XCircle, Calendar, MapPin, FileText } from 'lucide-react';
+import { Phone, MessageSquare, ChevronDown, ChevronUp, Clock, Calendar, MapPin, FileText } from 'lucide-react';
 
 interface Applicant {
   id: string;
   applicant_name: string;
+  regional_application_id?: string;
   applicant_email: string;
   applicant_phone: string;
   application_status: string;
@@ -15,6 +16,7 @@ interface Applicant {
   work_start_date: string | null;
   work_site: string | null;
   work_progress: string | null;
+  next_follow_up?: string | null;
 }
 
 const OUTCOMES = [
@@ -24,7 +26,7 @@ const OUTCOMES = [
   { value: 'scheduled',       label: 'Scheduled Start',   color: 'text-purple-600'},
   { value: 'enrolled',        label: 'Enrolled',          color: 'text-emerald-600'},
   { value: 'not_interested',  label: 'Not Interested',    color: 'text-red-600'   },
-  { value: 'wrong_number',    label: 'Wrong Number',      color: 'text-slate-400' },
+  { value: 'wrong_number',    label: 'Wrong Number',      color: 'text-slate-600' },
 ];
 
 function OutcomePill({ outcome }: { outcome: string | null }) {
@@ -43,6 +45,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const [forms, setForms] = useState<Record<string, {
     outcome: string; notes: string; next_follow_up: string;
     work_start_date: string; work_site: string;
@@ -61,12 +64,14 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
     const form = getForm(applicant.id);
     if (!form.outcome && !form.notes) return;
     setSaving(true);
+    setError('');
     try {
       const res = await fetch('/api/program-holder/call-log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           program_holder_student_id: applicant.id,
+          regional_application_id: applicant.regional_application_id,
           outcome: form.outcome,
           notes: form.notes,
           next_follow_up: form.next_follow_up || null,
@@ -84,7 +89,12 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
           call_date: new Date().toISOString(),
         }}));
         setTimeout(() => { setSaved(null); setExpanded(null); }, 1500);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Unable to save this call.');
       }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to save this call.');
     } finally {
       setSaving(false);
     }
@@ -114,7 +124,25 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
             {applicants.length}
           </span>
         </h2>
-        <p className="text-xs text-amber-600">HVAC applicants — tap phone to call, log notes below</p>
+        <p className="text-xs text-amber-700 font-semibold">Daily business: call every new applicant, help them complete setup, and document the outcome.</p>
+      </div>
+
+      <div className="border-b border-amber-100 bg-white px-6 py-4">
+        <p className="text-xs font-black uppercase tracking-wide text-slate-500">Today&apos;s required applicant work</p>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Applications are received by Elevate Admin first and copied to the primary Program Holder for the assigned program.
+          You are responsible for contacting each applicant, explaining the next steps, helping them complete required setup,
+          recording the call outcome and notes, and scheduling follow-up when needed. Do not leave new applicants sitting in the queue.
+        </p>
+        <ul className="mt-2 grid gap-2 text-sm text-slate-800 sm:grid-cols-2">
+          <li className="rounded-lg bg-red-50 px-3 py-2 font-bold">
+            {applicants.filter((item) => !item.call_outcome).length} new calls to complete
+          </li>
+          <li className="rounded-lg bg-amber-50 px-3 py-2 font-bold">
+            {applicants.filter((item) => item.next_follow_up && item.next_follow_up <= new Date().toISOString().slice(0, 10)).length} follow-ups due
+          </li>
+        </ul>
+        {error ? <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-800">{error}</p> : null}
       </div>
 
       {/* Rows */}
@@ -131,7 +159,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
           return (
             <div key={applicant.id}>
               {/* Summary row */}
-              <div className="px-6 py-3 flex items-center gap-3">
+              <div className="flex flex-wrap items-start gap-3 px-3 py-3 sm:px-6">
                 {/* Avatar */}
                 <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                   <span className="text-amber-700 text-sm font-bold">
@@ -142,10 +170,21 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                 {/* Name + email */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-900 truncate">{applicant.applicant_name}</p>
-                  <p className="text-xs text-slate-400 truncate">{applicant.applicant_email}</p>
-                  {notes && (
-                    <p className="text-xs text-slate-500 italic truncate mt-0.5">"{notes}"</p>
+                  <p className="text-xs text-slate-600 truncate">{applicant.applicant_email}</p>
+                  {applicant.applicant_phone ? (
+                    <a href={`tel:${applicant.applicant_phone.replace(/[^+0-9]/g, '')}`} className="mt-1 block w-fit text-sm font-bold text-blue-800 underline" aria-label={`Call ${applicant.applicant_name} at ${applicant.applicant_phone}`}>
+                      {applicant.applicant_phone}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-xs font-semibold text-amber-800">Phone number not on file — request contact update</p>
                   )}
+                  {notes && (
+                    <div className="mt-2 max-w-xl rounded-lg border border-blue-100 bg-blue-50 px-3 py-2">
+                      <p className="text-xs font-black text-blue-900">Student follow-up notes</p>
+                      <p className="mt-1 whitespace-pre-wrap break-words text-xs text-slate-800">{notes}</p>
+                    </div>
+                  )}
+                  {outcome && <p className="mt-1 text-xs font-semibold text-slate-700">Last call outcome: {OUTCOMES.find((item) => item.value === outcome)?.label || outcome}</p>}
                   {workStart && (
                     <p className="text-xs text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Start: {new Date(workStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -155,7 +194,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                 </div>
 
                 {/* Right side */}
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-2">
                   {/* App status */}
                   <span className={`text-xs font-semibold rounded-full px-2 py-0.5 ${
                     applicant.application_status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
@@ -170,19 +209,28 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
 
                   {/* Phone */}
                   {applicant.applicant_phone && (
-                    <a
-                      href={`tel:${applicant.applicant_phone}`}
-                      className="flex items-center gap-1 text-xs font-mono text-brand-blue-600 hover:text-brand-blue-800 bg-brand-blue-50 border border-brand-blue-200 rounded-lg px-2 py-1"
-                    >
-                      <Phone className="w-3 h-3" />
-                      {applicant.applicant_phone}
-                    </a>
+                    <>
+                      <a
+                        href={`tel:${applicant.applicant_phone}`}
+                        aria-label={`Call ${applicant.applicant_name}`}
+                        className="flex min-h-10 items-center gap-1 rounded-lg border border-brand-blue-200 bg-brand-blue-50 px-3 py-2 text-xs font-bold text-brand-blue-700"
+                      >
+                        <Phone className="w-4 h-4" /> Call
+                      </a>
+                      <a
+                        href={`sms:${applicant.applicant_phone}`}
+                        aria-label={`Text ${applicant.applicant_name}`}
+                        className="flex min-h-10 items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-800"
+                      >
+                        <MessageSquare className="w-4 h-4" /> Text
+                      </a>
+                    </>
                   )}
 
                   {/* Expand toggle */}
                   <button
                     onClick={() => setExpanded(isOpen ? null : applicant.id)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"
                   >
                     {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
@@ -193,6 +241,10 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
               {isOpen && (
                 <div className="px-6 pb-5 bg-slate-50 border-t border-slate-100">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-4 mb-3">Log This Call</p>
+                  <p className="mb-3 text-xs leading-5 text-slate-600">
+                    Commission applies only when you select Enrolled and document the participant setup.
+                    Routed applicants, unanswered calls, and interested leads do not earn commission.
+                  </p>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {/* Outcome */}
                     <div>
@@ -279,7 +331,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                     </button>
                     <button
                       onClick={() => setExpanded(null)}
-                      className="text-sm text-slate-400 hover:text-slate-600"
+                      className="text-sm text-slate-600 hover:text-slate-600"
                     >
                       Cancel
                     </button>

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -55,7 +56,7 @@ export interface WorkforceProgramData {
   slug: string;
   programId: string; // INTraining ID e.g. "#10004322"
   providerName: string; // "2Exclusive LLC-S" on INTraining
-  locationName: string; // "{PLATFORM_DEFAULTS.orgName} Training Center"
+  locationName: string; // Public training-site name shown to learners.
   category: string;
   categoryHref: string;
   heroImage: string;
@@ -183,15 +184,14 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </div>
 
       {/* Hero */}
-      <section className="relative h-[clamp(420px,58vh,720px)]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+      <section className="relative h-[clamp(260px,42svh,480px)]">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={program.heroImage}
           alt={`${program.title} training program`}
           fill
           sizes="100vw"
-          className="object-cover"
-          priority placeholder="empty"
+          className="object-contain"
+          priority
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
@@ -283,7 +283,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
                   alt={`${program.title} training`}
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover" placeholder="empty"
+                  className="object-contain" placeholder="empty"
                 />
               </div>
             )}

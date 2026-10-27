@@ -2,12 +2,6 @@ name: Repair Course Factory Contracts
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/trigger-course-factory-contract-repair.txt'
-  issues:
-    types: [opened, reopened]
 
 permissions:
   contents: write
@@ -15,7 +9,7 @@ permissions:
 
 jobs:
   repair:
-    if: github.event_name != 'issues' || github.event.issue.title == 'RUN COURSE FACTORY CONTRACT REPAIR'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

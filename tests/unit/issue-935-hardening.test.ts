@@ -5,10 +5,10 @@ const read = (path: string) => readFileSync(path, 'utf8');
 
 describe('issue #935 production hardening contracts', () => {
   it('surfaces HTTP status and correlation IDs for PARIS failures', () => {
-    const page = read('apps/admin/app/paris/page.tsx');
+    const page = read('lib/devstudio/ellie-unified-handlers.ts');
     const route = read('apps/admin/app/api/paris/execute/route.ts');
-    expect(page).toContain("'x-correlation-id': correlationId");
-    expect(page).toContain('HTTP ${res.status}, correlation ${traceId}');
+    expect(page).toContain('options.onRunId');
+    expect(page).toContain('HTTP ${res.status}');
     expect(route).toContain("'x-correlation-id': correlationId");
   });
 

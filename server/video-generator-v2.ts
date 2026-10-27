@@ -98,10 +98,10 @@ export async function generateVideo(
       // Generate TTS audio if voice-over is enabled
       let audioPath: string | undefined;
       if (request.settings.voiceOver && scene.voiceOver && scene.script) {
-        const voice = request.settings.voice || 'alloy';
-        const audioBuffer = await generateTextToSpeech(scene.script, voice, 1.0);
+        const audioBuffer = await generateTextToSpeech(scene.script, 'alloy', 1.0);
         audioPath = path.join(tempDir, `scene-${i + 1}-audio.mp3`);
         await fs.writeFile(audioPath, audioBuffer);
+        scene.duration = Math.max(scene.duration, estimateAudioDuration(scene.script, 1.0) + 0.5);
       }
 
       // Prepare render scene

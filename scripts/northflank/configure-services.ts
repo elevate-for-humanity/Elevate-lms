@@ -34,10 +34,9 @@ type ServiceConfig = {
 type RolloutMode = 'custom' | 'rollout-steady' | 'recreate';
 
 const RUNTIME_PORT = 3000;
-const DESIRED_INSTANCES = Number(
-  process.env.NORTHFLANK_DESIRED_INSTANCES ||
-    (process.env.NORTHFLANK_TARGET_SERVICE === 'admin' ? 2 : 1),
-);
+// Two steady-state replicas prevent a single container failure from taking the
+// public website, learner LMS, or Admin offline. Override only intentionally.
+const DESIRED_INSTANCES = Number(process.env.NORTHFLANK_DESIRED_INSTANCES || 2);
 const BUILDKIT_CACHE_MB = 32768;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [
@@ -97,16 +96,18 @@ function requirePublicBuildArgs(): Record<string, string> {
   return {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    NEXT_PUBLIC_SITE_URL:
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
     NEXT_PUBLIC_PUBLIC_SITE_URL:
       process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
-    NEXT_PUBLIC_APP_URL:
-      process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
     NEXT_PUBLIC_ADMIN_URL:
       process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
-    NEXT_PUBLIC_LMS_URL:
-      process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
+    NEXT_PUBLIC_LMS_URL: process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
+    // Client bundles cannot read the runtime secret group. Keep the public
+    // contact address in the Docker build contract so client hydration uses
+    // the same value as the server runtime.
+    NEXT_PUBLIC_SUPPORT_EMAIL:
+      process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@elevateforhumanity.org',
   };
 }
 
@@ -185,20 +186,46 @@ const billing = {
   buildPlan: process.env.NORTHFLANK_BUILD_PLAN || 'nf-compute-800-32',
 };
 
-function buildPatch(service: ServiceConfig, storageMb: number, rolloutMode: RolloutMode) {
+function buildPatch(
+  service: ServiceConfig,
+  storageMb: number,
+  rolloutMode: RolloutMode,
+  existingRuntimeEnvironment: Record<string, string>,
+  existingPorts: Array<Record<string, any>>,
+) {
   return {
     billing,
     disabledCI: true,
     deployment: deploymentFor(rolloutMode),
-    ports: [
-      {
-        name: 'site',
-        internalPort: RUNTIME_PORT,
-        protocol: 'HTTP',
-        public: true,
-      },
-    ],
-    runtimeEnvironment: runtimeEnvironmentFor(service),
+    // Port objects own custom-domain bindings in Northflank. Preserve every
+    // existing port id and domain assignment when applying infrastructure
+    // settings; replacing this array with a bare port definition removes live
+    // host routing and can turn a healthy apex redirect into a 502.
+    ports: existingPorts.length
+      ? existingPorts.map((port) => ({
+          id: port.id,
+          name: port.name,
+          internalPort: port.internalPort,
+          protocol: port.protocol || 'HTTP',
+          public: port.public,
+          domains: (port.domains ?? []).map((domain: { name?: string } | string) =>
+            typeof domain === 'string' ? domain : domain.name,
+          ).filter(Boolean),
+        }))
+      : [
+          {
+            name: 'site',
+            internalPort: RUNTIME_PORT,
+            protocol: 'HTTP',
+            public: true,
+          },
+        ],
+    // Infrastructure deploys must not erase feature-specific runtime settings
+    // (for example Studio Browser, OAuth, mail, or worker endpoints).
+    runtimeEnvironment: {
+      ...existingRuntimeEnvironment,
+      ...runtimeEnvironmentFor(service),
+    },
     buildArguments: requirePublicBuildArgs(),
     healthChecks,
     buildSettings: {
@@ -222,6 +249,14 @@ async function patchWithCapacitySafeStrategy(
   storageMb: number,
 ): Promise<{ response: Record<string, any>; rolloutMode: RolloutMode }> {
   const path = combinedServicePatchPath(projectId, service.id);
+  const current = await nfFetch<{ runtimeEnvironment?: Record<string, string> }>(
+    projectApiPath(projectId, `/services/${service.id}`),
+  );
+  const existingRuntimeEnvironment = current.runtimeEnvironment ?? {};
+  const portsResponse = await nfFetch<{ ports?: Array<Record<string, any>> }>(
+    projectApiPath(projectId, `/services/${service.id}/ports`),
+  );
+  const existingPorts = portsResponse.ports ?? [];
 
   // Production must remain available during deployments. Keep desired capacity
   // unchanged, allow one temporary surge instance, and never make an existing
@@ -231,7 +266,9 @@ async function patchWithCapacitySafeStrategy(
   const rolloutMode: RolloutMode = 'custom';
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',
-    body: JSON.stringify(buildPatch(service, storageMb, rolloutMode)),
+    body: JSON.stringify(
+      buildPatch(service, storageMb, rolloutMode, existingRuntimeEnvironment, existingPorts),
+    ),
   });
   return { response, rolloutMode };
 }
@@ -275,9 +312,7 @@ async function configureService(
   }
 
   const availabilitySummary =
-    appliedRolloutMode === 'custom'
-      ? 'maxUnavailable=0 maxSurge=1'
-      : appliedRolloutMode;
+    appliedRolloutMode === 'custom' ? 'maxUnavailable=0 maxSurge=1' : appliedRolloutMode;
 
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
@@ -324,7 +359,9 @@ async function main() {
     await configureService(projectId, service, requestedEphemeralMb);
   }
 
-  console.info('Northflank zero-downtime configuration applied to all requested production services.');
+  console.info(
+    'Northflank zero-downtime configuration applied to all requested production services.',
+  );
 }
 
 main().catch((error) => {

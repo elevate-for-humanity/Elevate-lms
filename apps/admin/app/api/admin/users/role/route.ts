@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
@@ -21,6 +22,9 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+    if (auth.error) return auth.error;
+
     const supabase = await createClient();
 
     // Check if current user is admin
@@ -37,8 +41,8 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!currentProfile || currentProfile.role !== 'admin') {
-      return NextResponse.json({ error: 'Only super admins can change roles' }, { status: 403 });
+    if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
+      return NextResponse.json({ error: 'Only administrators can change roles' }, { status: 403 });
     }
 
     // Get request body
@@ -103,6 +107,9 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+    if (auth.error) return auth.error;
+
     const supabase = await createClient();
 
     // Check if current user is admin
@@ -119,8 +126,8 @@ async function _GET(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!currentProfile || currentProfile.role !== 'admin') {
-      return NextResponse.json({ error: 'Only super admins can view roles' }, { status: 403 });
+    if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
+      return NextResponse.json({ error: 'Only administrators can view roles' }, { status: 403 });
     }
 
     // Get all admin/staff users

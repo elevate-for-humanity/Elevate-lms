@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -64,7 +65,7 @@ export default async function InstructorStudentsPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/instructor-page-14.webp"
           alt="Instructor portal"
           fill
@@ -101,7 +102,7 @@ export default async function InstructorStudentsPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
               <Users className="w-8 h-8 text-brand-blue-600" />

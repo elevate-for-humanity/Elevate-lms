@@ -7,6 +7,8 @@ import type {
   ImageGenerationOptions,
   GeneratedImage,
 } from '../types';
+import { normalizeStructuredOutput, requestsJson } from './structured-output';
+import { requirePaidInferenceContext } from '../paid-inference-context';
 
 /**
  * OpenAI provider — GPT models for chat, DALL-E for images.
@@ -18,6 +20,7 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
   private static readonly PLACEHOLDER_KEYS = ['placeholder-build-key', 'sk-placeholder-build-key'];
 
   private getClient(): OpenAI {
+    requirePaidInferenceContext('openai');
     if (this.client) return this.client;
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || OpenAIProvider.PLACEHOLDER_KEYS.includes(apiKey)) {
@@ -39,11 +42,12 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens || 2048,
+      ...(requestsJson(options) ? { response_format: { type: 'json_object' as const } } : {}),
     });
 
     const choice = res.choices[0];
     return {
-      content: choice.message.content || '',
+      content: normalizeStructuredOutput(choice.message.content || '', options),
       model: res.model,
       usage: res.usage
         ? {

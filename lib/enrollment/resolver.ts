@@ -1,4 +1,6 @@
-export type EnrollmentSource = 'program_enrollments' | 'training_enrollments';
+import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
+
+export type EnrollmentSource = 'program_enrollments';
 
 export interface ResolvedEnrollment {
   id: string;
@@ -16,10 +18,12 @@ export interface ResolvedEnrollment {
   createdAt: string | null;
 }
 
-interface ResolveEnrollmentOptions {
+export interface ResolveEnrollmentOptions {
   client: any;
   userId: string;
   prefer?: EnrollmentSource;
+  programSlug?: string;
+  enrollmentId?: string;
 }
 
 function toMillis(value: string | null): number {
@@ -28,17 +32,40 @@ function toMillis(value: string | null): number {
   return Number.isNaN(ms) ? 0 : ms;
 }
 
+async function requireEnrollmentOwner(client: any, userId: string) {
+  const { data } = await client.auth.getUser();
+  if (!data?.user || data.user.id !== userId) throw new Error('Unauthorized');
+}
+
+function formatSlugTitle(slug: string): string {
+  return slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
 function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
   const program = Array.isArray(row?.programs) ? (row.programs[0] ?? null) : row?.programs;
+  const programSlug = row.program_slug ?? program?.slug ?? null;
+  const programTitle = program?.title ?? program?.name ?? (programSlug ? formatSlugTitle(programSlug) : null);
+
+  const rawStatus = row.status ?? 'pending';
+  const rawState = row.enrollment_state ?? null;
+
+  // Pending approval is not authorization to access courses.
+
+  const isBookkeeping = programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting';
+  const courseId = row.course_id ?? (isBookkeeping ? '566e2ef7-6861-4736-9807-b4ff868fc908' : null);
+
   return {
     id: row.id,
     source: 'program_enrollments',
-    userId: row.user_id,
-    status: row.status ?? 'pending',
-    enrollmentState: row.enrollment_state ?? null,
-    programSlug: row.program_slug ?? program?.slug ?? null,
-    programTitle: program?.title ?? program?.name ?? null,
-    courseId: row.course_id ?? null,
+    userId: row.user_id ?? row.student_id,
+    status: rawStatus,
+    enrollmentState: rawState,
+    programSlug,
+    programTitle,
+    courseId,
     progress: Number(row.progress_percent ?? row.progress ?? 0),
     orientationCompletedAt: row.orientation_completed_at ?? null,
     documentsSubmittedAt: row.documents_submitted_at ?? null,
@@ -47,64 +74,65 @@ function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
   };
 }
 
-function normalizeTrainingEnrollment(row: any): ResolvedEnrollment {
-  const program = Array.isArray(row?.programs) ? (row.programs[0] ?? null) : row?.programs;
-  return {
-    id: row.id,
-    source: 'training_enrollments',
-    userId: row.user_id,
-    status: row.status ?? 'pending',
-    enrollmentState: null,
-    programSlug: program?.slug ?? null,
-    programTitle: program?.title ?? program?.name ?? null,
-    courseId: row.course_id ?? null,
-    progress: Number(row.progress_percent ?? 0),
-    orientationCompletedAt: row.orientation_completed_at ?? null,
-    documentsSubmittedAt: row.documents_submitted_at ?? null,
-    accessGrantedAt: row.approved_at ?? null,
-    createdAt: row.created_at ?? row.enrolled_at ?? null,
-  };
-}
-
 export async function resolveLatestEnrollment({
   client,
   userId,
-  prefer = 'program_enrollments',
+  programSlug,
+  enrollmentId,
 }: ResolveEnrollmentOptions): Promise<ResolvedEnrollment | null> {
-  const [programResp, trainingResp] = await Promise.all([
-    client
-      .from('program_enrollments')
-      .select(
-        'id, user_id, status, enrollment_state, program_slug, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
-      )
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    client
-      .from('program_enrollments')
-      .select(
-        'id, user_id, status, course_id, progress_percent, orientation_completed_at, documents_submitted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
-      )
-      .eq('user_id', userId)
-      .order('enrolled_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
+  await requireEnrollmentOwner(client, userId);
 
-  const normalizedProgram = programResp.data ? normalizeProgramEnrollment(programResp.data) : null;
-  const normalizedTraining = trainingResp.data ? normalizeTrainingEnrollment(trainingResp.data) : null;
+  let query = client
+    .from('program_enrollments')
+    .select(
+      'id, user_id, student_id, status, enrollment_state, program_slug, program_id, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
+    )
+    .or(`user_id.eq.${userId},student_id.eq.${userId}`);
 
-  if (!normalizedProgram && !normalizedTraining) return null;
-  if (normalizedProgram && !normalizedTraining) return normalizedProgram;
-  if (!normalizedProgram && normalizedTraining) return normalizedTraining;
+  if (enrollmentId) {
+    query = query.eq('id', enrollmentId);
+    const { data } = await query.limit(1).maybeSingle();
+    if (!data) return null;
+    const resolved = normalizeProgramEnrollment(data);
+    if (!resolved.courseId && resolved.programSlug) {
+      resolved.courseId = await resolveCourseIdFromDb(client, resolved.programSlug);
+    }
+    return resolved;
+  }
 
-  const programMillis = toMillis(normalizedProgram!.createdAt);
-  const trainingMillis = toMillis(normalizedTraining!.createdAt);
+  const { data } = await query
+    .order('created_at', { ascending: false })
+    .limit(20);
 
-  if (programMillis > trainingMillis) return normalizedProgram;
-  if (trainingMillis > programMillis) return normalizedTraining;
-  return prefer === 'program_enrollments' ? normalizedProgram : normalizedTraining;
+  if (!data || data.length === 0) return null;
+
+  const normalized = data.map(normalizeProgramEnrollment);
+
+  // If a specific program slug was requested, match against it
+  let candidate: ResolvedEnrollment | undefined;
+  if (programSlug) {
+    const target = programSlug.toLowerCase().trim();
+    candidate = normalized.find(
+      (e) => e.programSlug?.toLowerCase().trim() === target,
+    );
+  }
+
+  if (!candidate) {
+    // Prioritize active / enrolled states over pending or withdrawn
+    const activeStates = ['active', 'enrolled', 'in_progress', 'confirmed', 'orientation_complete', 'documents_complete'];
+    candidate = normalized.find((e) =>
+      activeStates.includes(String(e.enrollmentState || e.status).toLowerCase()),
+    );
+  }
+
+  const finalEnrollment = candidate ?? normalized[0];
+
+  // If courseId is missing but programSlug is present, attempt canonical course resolution
+  if (finalEnrollment && !finalEnrollment.courseId && finalEnrollment.programSlug) {
+    finalEnrollment.courseId = await resolveCourseIdFromDb(client, finalEnrollment.programSlug);
+  }
+
+  return finalEnrollment;
 }
 
 export async function listUnifiedEnrollments(
@@ -112,29 +140,17 @@ export async function listUnifiedEnrollments(
   userId: string,
   limit = 10,
 ): Promise<ResolvedEnrollment[]> {
-  const [programResp, trainingResp] = await Promise.all([
-    client
+  await requireEnrollmentOwner(client, userId);
+  const programResp = await client
       .from('program_enrollments')
       .select(
-        'id, user_id, status, enrollment_state, program_slug, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
+        'id, user_id, student_id, status, enrollment_state, program_slug, program_id, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
       )
-      .eq('user_id', userId)
+      .or(`user_id.eq.${userId},student_id.eq.${userId}`)
       .order('created_at', { ascending: false })
-      .limit(limit),
-    client
-      .from('program_enrollments')
-      .select(
-        'id, user_id, status, course_id, progress_percent, orientation_completed_at, documents_submitted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
-      )
-      .eq('user_id', userId)
-      .order('enrolled_at', { ascending: false })
-      .limit(limit),
-  ]);
+      .limit(limit);
 
-  const normalized = [
-    ...(programResp.data ?? []).map(normalizeProgramEnrollment),
-    ...(trainingResp.data ?? []).map(normalizeTrainingEnrollment),
-  ];
+  const normalized = (programResp.data ?? []).map(normalizeProgramEnrollment);
 
   return normalized.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
 }
@@ -145,10 +161,18 @@ export const ACCESS_STATES = new Set(['active', 'enrolled']);
 
 export function hasLmsAccess(enrollment: ResolvedEnrollment | null): boolean {
   if (!enrollment) return false;
-  // Primary gate: access_granted_at set by admin or submit-documents route.
-  if (enrollment.accessGrantedAt) return true;
-  // Fallback: enrollment_state in ACCESS_STATES covers pre-fix rows and
-  // training_enrollments where access_granted_at was never backfilled.
-  return ACCESS_STATES.has(enrollment.enrollmentState ?? '') ||
-    ACCESS_STATES.has(enrollment.status ?? '');
+  // Access must be explicitly granted.
+  // A status label alone cannot authorize LMS access.
+  if (!enrollment.accessGrantedAt) return false;
+
+  const blocked = new Set([
+    'withdrawn',
+    'revoked',
+    'rejected',
+    'suspended',
+  ]);
+
+  return !blocked.has(
+    String(enrollment.enrollmentState ?? enrollment.status).toLowerCase()
+  );
 }

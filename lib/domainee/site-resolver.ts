@@ -1,5 +1,8 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
 import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 
@@ -34,21 +37,26 @@ export async function resolveOwnedSite(websiteId: string) {
     return { error: NextResponse.json({ error: 'Authentication required' }, { status: 401 }) };
   }
 
-  const { data: site, error } = await supabase
+  const admin = await requireAdminClient();
+  const { data: site, error } = await admin
     .from('user_websites')
     .select('id, user_id, subdomain, site_name, is_published')
     .eq('id', websiteId)
     .maybeSingle();
   if (error) return { error: NextResponse.json({ error: error.message }, { status: 500 }) };
-  if (!site || site.user_id !== user.id) {
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) {
     return { error: NextResponse.json({ error: 'Website not found' }, { status: 404 }) };
   }
 
   const originUrl = site.subdomain
     ? tenantPublicSiteUrl(site.subdomain)
     : process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-  const entitlement = await resolveWebsiteBuilderEntitlement(supabase, user.id);
-  return { user, supabase, site, originUrl, entitlement };
+  const access = await getWebsiteBuilderAccess(user.id, supabase);
+  const entitlement = access.isAdmin
+    ? { allowed: true, plan: 'enterprise', status: 'active' }
+    : await resolveWebsiteBuilderEntitlement(supabase, user.id);
+  // Service access is returned only after exact-site management authorization.
+  return { user, supabase: admin, site, originUrl, entitlement, ownerUserId: site.user_id || user.id };
 }
 
 export function requireCustomDomainEntitlement(entitlement: WebsiteBuilderEntitlement) {

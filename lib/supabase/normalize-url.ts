@@ -11,11 +11,6 @@ export function normalizeSupabaseProjectUrl(
 
   let normalized = url.trim();
 
-  // Strip mistaken db. API hostname prefix
-  if (/^db\.[a-z0-9-]+\.supabase\.co\/?$/i.test(normalized)) {
-    normalized = normalized.replace(/^db\./i, '');
-  }
-
   if (!/^https?:\/\//i.test(normalized)) {
     normalized = `https://${normalized.replace(/^\/+/, '')}`;
   }
@@ -25,7 +20,15 @@ export function normalizeSupabaseProjectUrl(
     if (!parsed.hostname.endsWith('.supabase.co')) {
       return normalized;
     }
-    // Force https for Supabase REST
+
+    // Northflank database connection strings are commonly copied as
+    // https://db.<project-ref>.supabase.co. Supabase Auth/REST must use the
+    // project API host instead: https://<project-ref>.supabase.co.
+    if (/^db\.[a-z0-9-]+\.supabase\.co$/i.test(parsed.hostname)) {
+      parsed.hostname = parsed.hostname.replace(/^db\./i, '');
+    }
+
+    // Force https for Supabase Auth/REST.
     parsed.protocol = 'https:';
     parsed.pathname = '';
     parsed.search = '';

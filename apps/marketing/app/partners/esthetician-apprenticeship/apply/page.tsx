@@ -28,12 +28,12 @@ export default function Page() {
                 <p className="text-slate-600 mb-4">Our esthetician apprenticeship program prepares you for a career in skincare. You'll learn facials, chemical peels, microdermabrasion, and more while working in a licensed spa or salon.</p>
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div className="bg-slate-50 rounded-lg p-4">
-                    <div className="text-2xl font-bold text-brand-blue-600">12-18</div>
-                    <div className="text-slate-600 text-sm">Months</div>
+                    <div className="text-2xl font-bold text-brand-blue-600">20</div>
+                    <div className="text-slate-600 text-sm">Appendix A Competencies</div>
                   </div>
                   <div className="bg-slate-50 rounded-lg p-4">
-                    <div className="text-2xl font-bold text-brand-blue-600">750+</div>
-                    <div className="text-slate-600 text-sm">Training Hours</div>
+                    <div className="text-2xl font-bold text-brand-blue-600">300</div>
+                    <div className="text-slate-600 text-sm">Required RTI Hours</div>
                   </div>
                 </div>
               </div>

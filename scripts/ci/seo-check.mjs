@@ -2,12 +2,12 @@
 
 /**
  * SEO Governance Check - CI Script
- * 
+ *
  * Enforces SEO indexing rules at build time.
  * Designed for Next.js App Router with metadata.ts files.
- * 
+ *
  * Usage: node scripts/ci/seo-check.mjs
- * 
+ *
  * Exit codes:
  *   0 = All checks passed
  *   1 = Validation errors found (blocks deploy)
@@ -19,7 +19,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, '../..');
-const APP_DIR = path.join(ROOT_DIR, 'app');
+const APP_DIR = path.join(ROOT_DIR, 'apps', 'marketing', 'app');
 const WHITELIST_PATH = path.join(ROOT_DIR, 'config', 'seo-index-whitelist.json');
 const PRODUCTION_DOMAIN = 'https://www.elevateforhumanity.org';
 
@@ -50,6 +50,8 @@ const BLOCKED_PATTERNS = [
   '/lms/progress',
 ];
 
+const DYNAMIC_INDEX_PATTERNS = ['/sites/:param/:path*', '/tenant-site/:path*'];
+
 const errors = [];
 const warnings = [];
 const checked = { pages: 0, indexed: 0, noindex: 0 };
@@ -67,11 +69,14 @@ function loadWhitelist() {
 
 // Recursively find all page files
 function findPageFiles(dir, files = []) {
+  if (!fs.existsSync(dir)) {
+    throw new Error(`Marketing App Router directory not found: ${dir}`);
+  }
   const items = fs.readdirSync(dir, { withFileTypes: true });
-  
+
   for (const item of items) {
     const fullPath = path.join(dir, item.name);
-    
+
     if (item.isDirectory()) {
       // Skip node_modules and hidden directories
       if (item.name.startsWith('.') || item.name === 'node_modules') continue;
@@ -80,7 +85,7 @@ function findPageFiles(dir, files = []) {
       files.push(fullPath);
     }
   }
-  
+
   return files;
 }
 
@@ -90,16 +95,20 @@ function fileToRoute(filePath) {
     .replace(APP_DIR, '')
     .replace(/\/page\.tsx?$/, '')
     .replace(/\(.*?\)\//g, '') // Remove route groups
-    .replace(/\[.*?\]/g, ':param');
-  
+    .replace(/\[\[\.\.\.[^\]]+\]\]/g, ':path*')
+    .replace(/\[\.\.\.[^\]]+\]/g, ':path+')
+    .replace(/\[[^\]]+\]/g, ':param');
+
   return route || '/';
+}
+
+function isApprovedDynamicRoute(route) {
+  return DYNAMIC_INDEX_PATTERNS.includes(route);
 }
 
 // Check if route is blocked
 function isBlockedRoute(route) {
-  return BLOCKED_PATTERNS.some(pattern => 
-    route.startsWith(pattern) || route === pattern
-  );
+  return BLOCKED_PATTERNS.some((pattern) => route.startsWith(pattern) || route === pattern);
 }
 
 // Extract metadata from page file
@@ -113,7 +122,7 @@ function extractMetadata(filePath) {
   } else if (fs.existsSync(layoutPathTs)) {
     content += '\n' + fs.readFileSync(layoutPathTs, 'utf-8');
   }
-  
+
   const metadata = {
     file: filePath.replace(ROOT_DIR, ''),
     route,
@@ -125,7 +134,10 @@ function extractMetadata(filePath) {
   };
 
   // Check for metadata export
-  if (content.includes('export const metadata') || content.includes('export function generateMetadata')) {
+  if (
+    content.includes('export const metadata') ||
+    content.includes('export function generateMetadata')
+  ) {
     metadata.hasMetadata = true;
   }
 
@@ -171,10 +183,10 @@ function extractMetadata(filePath) {
 function runValidation() {
   console.log('\n🔍 SEO Governance Check\n');
   console.log('='.repeat(60));
-  
+
   const whitelist = loadWhitelist();
   console.log(`📋 Whitelist: ${whitelist.length} approved pages`);
-  
+
   const pageFiles = findPageFiles(APP_DIR);
   console.log(`📁 Found: ${pageFiles.length} page files\n`);
 
@@ -202,7 +214,7 @@ function runValidation() {
     // RULE 2: Index requires whitelist
     if (meta.index === true) {
       checked.indexed++;
-      if (!whitelist.includes(meta.route)) {
+      if (!whitelist.includes(meta.route) && !isApprovedDynamicRoute(meta.route)) {
         errors.push({
           rule: 'NOT_WHITELISTED',
           file: meta.file,
@@ -288,12 +300,12 @@ function runValidation() {
 
   if (warnings.length > 0) {
     console.log('\n⚠️  Warnings:');
-    warnings.forEach(w => console.log(`   - ${w}`));
+    warnings.forEach((w) => console.log(`   - ${w}`));
   }
 
   if (errors.length > 0) {
     console.log('\n❌ ERRORS:\n');
-    
+
     for (const err of errors) {
       console.log(`🚫 [${err.rule}]`);
       console.log(`   Route: ${err.route}`);

@@ -1,5 +1,7 @@
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { getProgramHolderPaymentReadiness } from './onboarding-readiness';
 
 /**
  * Checks whether all 4 program holder onboarding steps are complete and,
@@ -44,26 +46,8 @@ export async function checkAndSendOnboardingCompleteEmail(
 
   if (!holder) return { sent: false, reason: 'no_holder_row' };
   if (holder.welcome_email_sent) return { sent: false, reason: 'already_sent' };
-  if (!holder.mou_signed) return { sent: false, reason: 'mou_not_signed' };
-
-  // 2 & 3. Acknowledgements
-  const { data: acks } = await admin
-    .from('program_holder_acknowledgements')
-    .select('document_type')
-    .eq('user_id', userId);
-
-  const hasHandbook = acks?.some((a: any) => a.document_type === 'handbook');
-  const hasRights = acks?.some((a: any) => a.document_type === 'rights');
-  if (!hasHandbook) return { sent: false, reason: 'handbook_not_acknowledged' };
-  if (!hasRights) return { sent: false, reason: 'rights_not_acknowledged' };
-
-  // 4. At least one document
-  const { count: docCount } = await admin
-    .from('program_holder_documents')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId);
-
-  if (!docCount || docCount === 0) return { sent: false, reason: 'no_documents' };
+  const readiness = await getProgramHolderPaymentReadiness(admin, holderId);
+  if (!readiness.ready) return { sent: false, reason: readiness.missing.join('; ') };
 
   // Get profile for email
   const { data: profile } = await admin
@@ -77,14 +61,38 @@ export async function checkAndSendOnboardingCompleteEmail(
   const firstName = profile.full_name?.split(' ')[0] || 'Program Holder';
   const organizationName = holder.organization_name || 'your organization';
 
-  await sendWelcomeEmail({ email: profile.email, firstName, organizationName });
+  const delivery = await sendWelcomeEmail({ email: profile.email, firstName, organizationName });
+  if (!delivery.success) {
+    logger.error('[onboarding-complete] Welcome email was not accepted', new Error(delivery.error || 'Unknown email error'));
+    return { sent: false, reason: delivery.error || 'email_not_accepted' };
+  }
 
-  // Mark sent — welcome_email_sent column may not exist yet; ignore error
-  await admin
+  const { data: existingNotice } = await admin
+    .from('staff_notifications')
+    .select('id')
+    .eq('type', 'program_holder_onboarding_complete')
+    .contains('metadata', { program_holder_id: holderId })
+    .maybeSingle();
+  if (!existingNotice) {
+    await admin.from('staff_notifications').insert({
+      type: 'program_holder_onboarding_complete',
+      title: 'Program Holder onboarding complete',
+      message: `${organizationName} completed the MOU, acknowledgements, and all required documents.`,
+      severity: 'success',
+      metadata: {
+        program_holder_id: holderId,
+        user_id: userId,
+        action_url: `/program-holders/${holderId}`,
+      },
+    });
+  }
+
+  // Persist the delivery marker; never silently discard the write result.
+  const { error: markerError } = await admin
     .from('program_holders')
     .update({ welcome_email_sent: true })
-    .eq('id', holderId)
-    .catch(() => {});
+    .eq('id', holderId);
+  if (markerError) return { sent: true, reason: 'delivery_marker_failed' };
 
   logger.info('[onboarding-complete] Welcome email sent', { userId, email: profile.email });
   return { sent: true };
@@ -95,15 +103,9 @@ async function sendWelcomeEmail(opts: {
   firstName: string;
   organizationName: string;
 }) {
-  const sgKey = process.env.SENDGRID_API_KEY;
-  if (!sgKey) {
-    logger.warn('[onboarding-complete] SENDGRID_API_KEY not set — skipping welcome email');
-    return;
-  }
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
-  const dashboardUrl = `${siteUrl}/program-holder/dashboard`;
+  const dashboardUrl = 'https://app.elevateforhumanity.org/program-holder/dashboard';
 
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
@@ -159,20 +161,11 @@ async function sendWelcomeEmail(opts: {
   </table>
 </body></html>`;
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
-      reply_to: { email: 'elevate4humanityedu@gmail.com', name: PLATFORM_DEFAULTS.orgName },
-      personalizations: [{ to: [{ email: opts.email, name: opts.firstName }] }],
-      subject: 'Welcome — Your Program Holder Portal is Ready',
-      content: [{ type: 'text/html', value: html }],
-    }),
+  return sendEmail({
+    to: opts.email,
+    from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+    replyTo: 'elevate4humanityedu@gmail.com',
+    subject: 'Welcome — Your Program Holder Portal is Ready',
+    html,
   });
-
-  if (!res.ok) {
-    const body = await res.text();
-    logger.error('[onboarding-complete] Welcome email failed', new Error(body));
-  }
 }

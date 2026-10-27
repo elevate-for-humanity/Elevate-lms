@@ -1,12 +1,21 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
+import { getAnthropicAPIKey, isAnthropicConfigured } from '../anthropic-config';
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
 const API_VERSION = '2023-06-01';
 const DEFAULT_MODEL = 'claude-sonnet-4-20250514';
 
 type ClaudeTextBlock = { type: 'text'; text: string };
-type ClaudeToolUseBlock = { type: 'tool_use'; id: string; name: string; input: Record<string, unknown> };
-type ClaudeContentBlock = ClaudeTextBlock | ClaudeToolUseBlock | { type?: string; [key: string]: unknown };
+type ClaudeToolUseBlock = {
+  type: 'tool_use';
+  id: string;
+  name: string;
+  input: Record<string, unknown>;
+};
+type ClaudeContentBlock =
+  | ClaudeTextBlock
+  | ClaudeToolUseBlock
+  | { type?: string; [key: string]: unknown };
 
 type ClaudeResponse = {
   model?: string;
@@ -56,7 +65,7 @@ function splitMessages(options: ChatCompletionOptions) {
 }
 
 async function requestClaude(body: Record<string, unknown>): Promise<ClaudeResponse> {
-  const credential = process.env.ANTHROPIC_API_KEY?.trim();
+  const credential = getAnthropicAPIKey();
   if (!credential) throw new Error('ANTHROPIC_API_KEY not configured');
 
   const response = await fetch(API_URL, {
@@ -68,7 +77,9 @@ async function requestClaude(body: Record<string, unknown>): Promise<ClaudeRespo
 
   const payload = (await response.json().catch(() => ({}))) as ClaudeResponse;
   if (!response.ok) {
-    throw new Error(`Anthropic API ${response.status}: ${payload.error?.message || 'request failed'}`);
+    throw new Error(
+      `Anthropic API ${response.status}: ${payload.error?.message || 'request failed'}`,
+    );
   }
   return payload;
 }
@@ -77,7 +88,7 @@ export class AnthropicProvider implements AIProvider {
   readonly name = 'anthropic' as const;
 
   isAvailable(): boolean {
-    return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
+    return isAnthropicConfigured();
   }
 
   async chat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
@@ -96,7 +107,10 @@ export class AnthropicProvider implements AIProvider {
     });
 
     const content = (payload.content ?? [])
-      .filter((block): block is ClaudeTextBlock => block.type === 'text' && typeof (block as ClaudeTextBlock).text === 'string')
+      .filter(
+        (block): block is ClaudeTextBlock =>
+          block.type === 'text' && typeof (block as ClaudeTextBlock).text === 'string',
+      )
       .map((block) => block.text)
       .join('\n')
       .trim();

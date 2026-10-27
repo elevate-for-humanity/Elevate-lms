@@ -24,6 +24,7 @@ const portalsPage = read('apps/marketing/app/portals/page.tsx');
 const adminDashboard = read('apps/admin/app/dashboard/page.tsx');
 const marketingMiddleware = read('apps/marketing/middleware.ts');
 const marketingChrome = read('components/site/MarketingChromeBoundary.tsx');
+const lmsMiddleware = read('apps/lms/middleware.ts');
 
 const PORTALS = [
   { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner', 'user', 'delegate', 'grant_client'] },
@@ -103,6 +104,11 @@ for (const prefix of ['/case-manager', '/workforce-board', '/provider']) {
 if (!marketingMiddleware.includes("new URL('/login', LMS_HOST)")) fail('Marketing operational auth does not use canonical LMS authentication host');
 if (!marketingMiddleware.includes("`${MARKETING_HOST}${pathname}${search}`")) fail('Marketing operational login does not preserve the canonical public return URL');
 if (marketingMiddleware.includes("`${req.nextUrl.origin}${pathname}${search}`")) fail('Marketing operational login derives its return URL from an internal request origin');
+
+console.log('\n── LMS operational boundary ──');
+if (!lmsMiddleware.includes("'/host-shop',")) fail('/host-shop: complete operational family missing from LMS middleware protection');
+if (!lmsMiddleware.includes("pathname === '/host-shop/login'")) fail('/host-shop/login: public authentication entry is not explicitly exempted');
+if (lmsMiddleware.includes("'/host-shop/dashboard',")) fail('/host-shop: middleware protects only the dashboard subtree instead of the complete portal family');
 
 console.log('\n── Public discovery contract ──');
 if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: public portal directory missing');

@@ -18,10 +18,29 @@ async function _POST(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const body = await req.json().catch(() => ({}));
-  const { name, description, path_type, difficulty, estimated_weeks, is_featured } = body;
+  const { name, description, path_type, difficulty, estimated_weeks, is_featured, programs } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 });
+  }
+  if (!Array.isArray(programs) || programs.length === 0) {
+    return NextResponse.json({ error: 'At least one program is required' }, { status: 400 });
+  }
+
+  const allowedTypes = new Set(['credential', 'career', 'skill', 'general']);
+  const allowedDifficulties = new Set(['beginner', 'intermediate', 'advanced']);
+  if (!allowedTypes.has(path_type) || !allowedDifficulties.has(difficulty)) {
+    return NextResponse.json({ error: 'Invalid path type or difficulty' }, { status: 400 });
+  }
+
+  const normalizedPrograms = programs.map((program: Record<string, unknown>, index: number) => ({
+    program_id: String(program.program_id ?? ''),
+    name: String(program.name ?? ''),
+    order: index + 1,
+    duration_weeks: Number(program.duration_weeks ?? 0) || null,
+  }));
+  if (normalizedPrograms.some((program: { program_id: string }) => !program.program_id)) {
+    return NextResponse.json({ error: 'Every selected program requires an ID' }, { status: 400 });
   }
 
   const db = await requireAdminClient();
@@ -34,6 +53,8 @@ async function _POST(req: NextRequest) {
       difficulty: difficulty || 'beginner',
       estimated_weeks: estimated_weeks || null,
       is_featured: Boolean(is_featured),
+      is_active: true,
+      programs: normalizedPrograms,
     })
     .select('id')
     .single();

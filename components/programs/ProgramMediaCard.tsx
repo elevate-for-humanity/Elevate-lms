@@ -23,7 +23,7 @@ export function ProgramMediaCard({
 }: ProgramMediaCardProps) {
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
+      className={`flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
     >
       <div className={card.programImage}>
         <Image
@@ -43,7 +43,7 @@ export function ProgramMediaCard({
           </span>
         ) : null}
       </div>
-      <div className="p-3 sm:p-4">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
         <p className="text-sm font-bold leading-snug text-slate-900">{title}</p>
         {subtitle ? (
           <p className="mt-1 text-xs leading-snug text-slate-600">{subtitle}</p>

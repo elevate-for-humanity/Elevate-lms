@@ -360,7 +360,7 @@ export default function SchoolLicensePage() {
             </Link>
           </div>
           <p className="mt-8 text-orange-200">
-            Questions? Call {PLATFORM_DEFAULTS.supportPhone}
+            Questions? Call {PLATFORM_DEFAULTS.mainPhone}
           </p>
         </div>
       </section>

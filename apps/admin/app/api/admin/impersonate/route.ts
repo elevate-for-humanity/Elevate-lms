@@ -15,11 +15,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { apiAuthGuard } from '@/lib/admin/guards';
+import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent } from '@/lib/audit';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { cookies } from 'next/headers';
+import { createPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,12 +35,8 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard(req);
-
-  // Impersonation is admin only — admin and staff cannot impersonate users.
-  if (auth.role !== 'admin') {
-    return NextResponse.json({ error: 'Forbidden — admin required' }, { status: 403 });
-  }
+  const auth = await apiRequireRoles(req, ['admin', 'super_admin'], { adminOverride: false });
+  if (auth.error) return auth.error;
 
   const body = await req.json().catch(() => null);
   if (!body?.target_user_id) {
@@ -47,6 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { target_user_id, reason } = body;
+  const hostShopPartnerId = String(body.host_shop_partner_id || '').trim();
   const db = await requireAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
@@ -61,12 +59,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  if (['admin'].includes(target.role)) {
+  if (['admin', 'super_admin'].includes(target.role)) {
     return NextResponse.json({ error: 'Cannot impersonate admin users' }, { status: 403 });
   }
 
   if (target_user_id === auth.id) {
     return NextResponse.json({ error: 'Cannot impersonate yourself' }, { status: 400 });
+  }
+
+  if (hostShopPartnerId) {
+    const { data: membership, error: membershipError } = await db
+      .from('partner_users')
+      .select('partner_id,user_id,status')
+      .eq('partner_id', hostShopPartnerId)
+      .eq('user_id', target_user_id)
+      .eq('status', 'active')
+      .maybeSingle();
+    if (membershipError || !membership?.partner_id) {
+      return NextResponse.json(
+        { error: 'Active Host Shop account link not found' },
+        { status: 404 },
+      );
+    }
   }
 
   const session = {
@@ -88,6 +102,7 @@ export async function POST(req: NextRequest) {
     metadata: {
       actorRole: auth.role ?? 'admin',
       after: session,
+      preview_partner_id: hostShopPartnerId || null,
     },
   });
 
@@ -102,6 +117,17 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     success: true,
+    // Submit the signed handoff in a POST body. Keeping it out of the URL
+    // prevents it from being stored in browser history, access logs, and
+    // referrer headers, and avoids security filters that reject credential-like
+    // query parameters during the cross-subdomain transition.
+    preview_url: hostShopPartnerId
+      ? 'https://app.elevateforhumanity.org/api/admin/select-host-shop'
+      : 'https://app.elevateforhumanity.org/api/admin/preview',
+    preview_handoff: createPortalPreviewHandoff(
+      auth.id,
+      hostShopPartnerId || target_user_id,
+    ),
     impersonating: {
       user_id: target_user_id,
       name: target.full_name,
@@ -115,11 +141,8 @@ export async function DELETE(req: NextRequest) {
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
-  const auth = await apiAuthGuard(req);
-
-  if (auth.role !== 'admin') {
-    return NextResponse.json({ error: 'Forbidden — admin required' }, { status: 403 });
-  }
+  const auth = await apiRequireRoles(req, ['admin', 'super_admin'], { adminOverride: false });
+  if (auth.error) return auth.error;
 
   const cookieStore = await cookies();
   const raw = cookieStore.get(IMPERSONATION_COOKIE)?.value;

@@ -251,7 +251,7 @@ export default function ApprenticeshipHub() {
               return (
                 <div
                   key={program.id}
-                  className={`relative bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${
+                  className={`group relative bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${
                     isActive ? 'ring-2 ring-brand-red-500 shadow-xl' : 'hover:shadow-xl'
                   }`}
                   onMouseEnter={() => setActiveProgram(program.id)}
@@ -267,6 +267,17 @@ export default function ApprenticeshipHub() {
                   
                   {/* Program Header */}
                   <div className={`h-2 bg-gradient-to-r ${program.color}`} />
+
+                  <div className="relative aspect-[16/9] overflow-hidden bg-slate-200">
+                    <Image
+                      src={program.image}
+                      alt={`${program.name} hands-on training`}
+                      fill
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent" />
+                  </div>
                   
                   <div className="p-6 lg:p-8">
                     <div className="flex items-start gap-4 mb-6">

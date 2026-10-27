@@ -1,10 +1,12 @@
 export const revalidate = 3600;
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { organization } from '@/lib/config/organization';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/founder' },
@@ -22,7 +24,7 @@ export default function FounderPage() {
       </div>
       {/* Hero */}
       <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/admin-audit-logs-hero.webp"
           alt="Elevate for Humanity founder"
           fill
@@ -30,9 +32,9 @@ export default function FounderPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 flex items-center px-6">
+        <div className="absolute inset-0 bg-white/95 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
-            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">
+            <p className="text-brand-red-700 font-bold text-xs uppercase tracking-widest mb-2">
               Founder &amp; CEO
             </p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900">
@@ -50,8 +52,8 @@ export default function FounderPage() {
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             {/* Founder hero photo */}
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+                src={organization.founder.imagePath}
                 alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
                 fill
                 className="object-cover object-top"
@@ -62,9 +64,9 @@ export default function FounderPage() {
 
             {/* Bio */}
             <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">
                 Elizabeth Greene
-              </h1>
+              </h2>
               <p className="text-brand-red-600 font-bold text-lg mb-1">
                 Founder & Chief Executive Officer
               </p>
@@ -217,7 +219,6 @@ export default function FounderPage() {
                   'EmployIndy Partner',
                   'WorkOne Partner',
                   'Job Ready Indy Partner',
-                  'HSI (Health & Safety Institute) Affiliate',
                   'CareerSafe OSHA Training Provider',
                   'Elevate LMS Curriculum Partner',
                   'NRF Rise Up Provider',

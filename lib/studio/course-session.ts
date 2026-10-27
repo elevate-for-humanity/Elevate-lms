@@ -15,9 +15,12 @@
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { requireRole } from '@/lib/auth/require-role';
 import { logger } from '@/lib/logger';
+import {
+  coursePackageFromSession,
+  loadPersistedCoursePackageEvidence,
+} from '@/lib/course-package/from-course-session';
+import { evaluateCourseReadiness } from '@/lib/course-package/readiness';
 
 // ─── DTOs ─────────────────────────────────────────────────────────────────────
 
@@ -84,11 +87,15 @@ export interface StudioLesson {
   video_job_id: string | null;
   video_error: string | null;
   video_config: Record<string, unknown> | null;
+  scene_data: Record<string, unknown> | null;
+  media_quality_status: string | null;
+  media_quality_evidence: Record<string, unknown> | null;
   activities: Record<string, unknown> | null;
   quiz_questions: unknown[] | null;
   ai_generated: boolean;
   approved: boolean;
   generation_status: string | null;
+  domain_key: string | null;
   practical_required: boolean;
   required_artifacts: string[] | null;
   requires_instructor_signoff: boolean;
@@ -176,15 +183,21 @@ export interface CourseSession {
 
 // ─── Loader ───────────────────────────────────────────────────────────────────
 
-export async function loadCourseSession(courseId: string): Promise<CourseSession> {
+export async function loadCourseSession(
+  courseId: string,
+  options?: { system?: boolean },
+): Promise<CourseSession> {
   const warnings: string[] = [];
 
-  // Auth — admin, super_admin, or staff only
-  await requireRole(['admin', 'super_admin', 'staff']);
+  // Interactive Studio callers require role authorization. Internal Course
+  // Builder workers use the service client and must not depend on request auth.
+  if (!options?.system) {
+    const { requireRole } = await import('@/lib/auth/require-role');
+    await requireRole(['admin', 'super_admin', 'staff']);
+  }
 
-  const db = await createClient();
   const adminDb = await requireAdminClient();
-  const queryDb = adminDb ?? db;
+  const queryDb = adminDb;
 
   // ── Required: course ──────────────────────────────────────────────────────
   const { data: course, error: courseErr } = await queryDb
@@ -210,10 +223,6 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
   const [
     modulesRes,
     lessonsRes,
-    videosRes,
-    automationRes,
-    workflowsRes,
-    quizzesRes,
   ] = await Promise.all([
     queryDb
       .from('course_modules')
@@ -231,41 +240,15 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
         id, course_id, module_id, title, slug, lesson_type, order_index,
         status, is_published, is_required, passing_score, duration_minutes,
         content, rendered_html, content_json, video_url, media_asset_id,
-        video_status, video_job_id, video_error, video_config, activities,
-        quiz_questions, ai_generated, approved, generation_status,
+        video_status, video_job_id, video_error, video_config, scene_data,
+        media_quality_status, media_quality_evidence, activities,
+        quiz_questions, ai_generated, approved, generation_status, domain_key,
         practical_required, required_artifacts, requires_instructor_signoff,
         learning_objectives, competency_checks, created_at, updated_at
       `)
       .eq('course_id', courseId)
       .order('order_index', { ascending: true }),
 
-    // Videos — global pool, not course-scoped (linked via course_lessons.video_url)
-    queryDb
-      .from('videos')
-      .select('id, title, description, url, video_url, thumbnail_url, duration_seconds, published, category, created_at')
-      .eq('published', true)
-      .order('created_at', { ascending: false })
-      .limit(100),
-
-    // Automation rules — course-scoped where possible, else recent global
-    queryDb
-      .from('automation_rules')
-      .select('id, name, description, status, trigger_type, action_type, enabled, run_count, last_triggered_at, created_at')
-      .order('created_at', { ascending: false })
-      .limit(50),
-
-    queryDb
-      .from('workflows')
-      .select('id, name, workflow_key, category, status, last_run_at, last_run_status, run_count, created_at')
-      .order('created_at', { ascending: false })
-      .limit(50),
-
-    // Quizzes scoped to this course
-    queryDb
-      .from('quizzes')
-      .select('id, course_id, title, description, time_limit_minutes, passing_score, question_count, created_at, updated_at')
-      .eq('course_id', courseId)
-      .order('created_at', { ascending: false }),
   ]);
 
   // ── Resolve optional results with graceful degradation ───────────────────
@@ -277,51 +260,53 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
     warnings.push('lessons query failed');
     logger.warn('[studio] lessons query failed', { message: lessonsRes.error.message, courseId });
   }
-  if (videosRes.error) {
-    warnings.push('videos query failed');
-    logger.warn('[studio] videos query failed', { message: videosRes.error.message });
-  }
-  if (automationRes.error) {
-    warnings.push('automation rules query failed');
-    logger.warn('[studio] automation query failed', { message: automationRes.error.message });
-  }
-  if (workflowsRes.error) {
-    warnings.push('workflows query failed');
-    logger.warn('[studio] workflows query failed', { message: workflowsRes.error.message });
-  }
-  if (quizzesRes.error) {
-    warnings.push('quizzes query failed');
-    logger.warn('[studio] quizzes query failed', { message: quizzesRes.error.message, courseId });
-  }
-
   const modules = (modulesRes.data ?? []) as StudioModule[];
   const lessons = (lessonsRes.data ?? []) as StudioLesson[];
-  const videos = (videosRes.data ?? []) as StudioVideo[];
-  const automationRules = (automationRes.data ?? []) as StudioAutomationRule[];
-  const workflows = (workflowsRes.data ?? []) as StudioWorkflow[];
-  const quizzes = (quizzesRes.data ?? []) as StudioQuiz[];
+  const linkedVideos: StudioVideo[] = lessons
+    .filter((lesson) => Boolean(lesson.video_url))
+    .map((lesson) => ({
+      id: `lesson:${lesson.id}`,
+      title: lesson.title,
+      description: 'Attached course lesson video',
+      url: lesson.video_url,
+      video_url: lesson.video_url,
+      thumbnail_url: null,
+      duration_seconds: lesson.duration_minutes ? Number(lesson.duration_minutes) * 60 : null,
+      published: lesson.is_published,
+      category: 'course-lesson',
+      created_at: lesson.created_at,
+    }));
+  const videos = linkedVideos;
+  // Legacy automation_rules/workflows records are platform-global and have no
+  // course foreign key. Do not misrepresent them as course automation.
+  const automationRules: StudioAutomationRule[] = [];
+  const workflows: StudioWorkflow[] = [];
+  // Canonical assessments live on course_lessons.quiz_questions. The legacy
+  // integer-keyed quizzes table cannot represent UUID Course Builder courses.
+  const quizzes: StudioQuiz[] = lessons
+    .filter((lesson) => Array.isArray(lesson.quiz_questions) && lesson.quiz_questions.length > 0)
+    .map((lesson) => ({
+      id: lesson.id,
+      course_id: lesson.course_id,
+      title: lesson.title,
+      description: 'Canonical lesson assessment',
+      time_limit_minutes: null,
+      passing_score: lesson.passing_score,
+      question_count: lesson.quiz_questions?.length ?? 0,
+      created_at: lesson.created_at,
+      updated_at: lesson.updated_at,
+    }));
 
   // ── Derive publish state ──────────────────────────────────────────────────
   const publishedLessons = lessons.filter(l => l.is_published).length;
   const approvedLessons = lessons.filter(l => l.approved).length;
-  const readyToPublish =
-    lessons.length > 0 &&
-    approvedLessons === lessons.length &&
-    course.review_status !== 'rejected';
-
-  const publishState: StudioPublishState = {
-    isPublished: course.status === 'published',
-    publishedAt: course.published_at,
-    reviewStatus: course.review_status,
-    generationStatus: course.generation_status,
-    generationProgress: course.generation_progress,
-    totalLessons: lessons.length,
-    publishedLessons,
-    approvedLessons,
-    readyToPublish,
-  };
-
-  return {
+  const generatedLessons = lessons.filter((lesson) =>
+    ['generated', 'complete', 'completed', 'verification_ready', 'certificate_ready', 'published'].includes(
+      String(lesson.generation_status ?? ''),
+    ),
+  ).length;
+  const loadedAt = new Date().toISOString();
+  const baseSession: CourseSession = {
     course: course as StudioCourse,
     modules,
     lessons,
@@ -329,8 +314,41 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
     videos,
     automationRules,
     workflows,
-    publishState,
+    publishState: {
+      isPublished: course.status === 'published',
+      publishedAt: course.published_at,
+      reviewStatus: course.review_status,
+      generationStatus: course.generation_status,
+      generationProgress: course.generation_progress,
+      totalLessons: lessons.length,
+      publishedLessons,
+      approvedLessons,
+      readyToPublish: false,
+    },
     warnings,
-    loadedAt: new Date().toISOString(),
+    loadedAt,
+  };
+
+  let readyToPublish = false;
+  try {
+    const evidence = await loadPersistedCoursePackageEvidence(courseId);
+    readyToPublish = evaluateCourseReadiness(
+      coursePackageFromSession(baseSession, evidence),
+    ).pass;
+  } catch (readinessError) {
+    warnings.push('canonical readiness evaluation failed');
+    logger.warn('[studio] canonical readiness evaluation failed', {
+      courseId,
+      message:
+        readinessError instanceof Error ? readinessError.message : String(readinessError),
+    });
+  }
+
+  return {
+    ...baseSession,
+    publishState: {
+      ...baseSession.publishState,
+      readyToPublish,
+    },
   };
 }

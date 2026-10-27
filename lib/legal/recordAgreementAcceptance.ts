@@ -24,7 +24,8 @@ export type AgreementType =
   | 'disclosures'
   | 'license'
   | 'nda'
-  | 'mou';
+  | 'mou'
+  | 'apprenticeship_agreement';
 
 export type SignatureMethod = 'checkbox' | 'typed' | 'drawn';
 

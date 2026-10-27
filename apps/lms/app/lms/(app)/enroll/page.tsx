@@ -37,7 +37,7 @@ export default async function EnrollPage({ searchParams }: Props) {
     redirect(`/lms/courses/${params.course}/enroll`);
   }
 
-  // Get user's existing enrollments — training_enrollments is the canonical LMS table
+  // Get the user's canonical program enrollments.
   const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('course_id')

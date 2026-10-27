@@ -7,12 +7,24 @@ import { createCommercialPlan, type CommercialBrief } from '@/lib/media/commerci
 import { cleanupCommercialRender, renderCommercialVideo } from '@/lib/media/commercial-renderer';
 import { persistStudioAsset } from '@/lib/media/studio-assets';
 import { processCourseAgenticTask } from './course-executor';
+import { adaptiveBackoffMs } from '@/lib/resilience/adaptive-backoff';
+import { createAiTask } from '@/lib/devstudio/os/task-runner';
 
-const POLL_MS = 15_000;
+const DEFAULT_POLL_MS = 60_000;
+const MAX_OUTAGE_BACKOFF_MS = 15 * 60_000;
 const HOME_HERO_KIND = 'homepage-hero-commercial';
+const TASK_LEASE_SECONDS = 10 * 60;
 let started = false;
 let timer: NodeJS.Timeout | null = null;
 let polling = false;
+let consecutivePollFailures = 0;
+const executorId = `${process.env.HOSTNAME ?? 'admin'}:${process.pid}:${crypto.randomUUID()}`;
+
+function pollIntervalMs(): number {
+  const configured = Number.parseInt(process.env.AGENTIC_EXECUTOR_POLL_MS ?? '', 10);
+  if (!Number.isFinite(configured) || configured < 15_000) return DEFAULT_POLL_MS;
+  return Math.min(configured, 5 * 60_000);
+}
 
 function homeHeroBrief(prompt: string): CommercialBrief {
   return {
@@ -42,17 +54,49 @@ async function completeTask(taskId: string, output: Record<string, unknown>) {
       output,
       completed_at: new Date().toISOString(),
       error: null,
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
     })
-    .eq('id', taskId);
+    .eq('id', taskId)
+    .eq('lease_owner', executorId);
 }
 
-async function failTask(taskId: string, runId: string, projectId: string, error: unknown) {
+async function failTask(task: any, runId: string, projectId: string, error: unknown) {
   const db = await requireAdminClient();
   const message = error instanceof Error ? error.message : String(error);
+  const retryable = Number(task.attempt_count ?? 1) < Number(task.max_attempts ?? 3);
+  const retryAt = new Date(
+    Date.now() +
+      adaptiveBackoffMs(Number(task.attempt_count ?? 1), {
+        baseDelayMs: 15_000,
+        maxDelayMs: 5 * 60_000,
+      }),
+  ).toISOString();
   await db
     .from('agentic_build_tasks')
-    .update({ status: 'failed', error: message, completed_at: new Date().toISOString() })
-    .eq('id', taskId);
+    .update({
+      status: retryable ? 'queued' : 'failed',
+      error: message,
+      next_attempt_at: retryable ? retryAt : task.next_attempt_at,
+      completed_at: retryable ? null : new Date().toISOString(),
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+    })
+    .eq('id', task.id)
+    .eq('lease_owner', executorId);
+  if (retryable) {
+    await db.from('agentic_build_events').insert({
+      project_id: projectId,
+      run_id: runId,
+      task_id: task.id,
+      event_type: 'agentic.task.retry_scheduled',
+      summary: `Attempt ${task.attempt_count} failed; retry scheduled.`,
+      payload: { error: message, next_attempt_at: retryAt },
+    });
+    return;
+  }
   await db
     .from('agentic_build_runs')
     .update({ status: 'failed', error: message, failed_at: new Date().toISOString() })
@@ -61,7 +105,7 @@ async function failTask(taskId: string, runId: string, projectId: string, error:
   await db.from('agentic_build_events').insert({
     project_id: projectId,
     run_id: runId,
-    task_id: taskId,
+    task_id: task.id,
     event_type: 'agentic.task.failed',
     summary: message,
     payload: {},
@@ -79,22 +123,37 @@ async function dependencyOutputs(runId: string, dependencyIds: string[]) {
   return data ?? [];
 }
 
-async function dependenciesCompleted(runId: string, dependencyIds: string[]) {
-  if (!dependencyIds.length) return true;
-  const rows = await dependencyOutputs(runId, dependencyIds);
-  return rows.length === dependencyIds.length && rows.every((row) => row.status === 'completed');
+async function claimTask(runId?: string) {
+  const db = await requireAdminClient();
+  const { data, error } = await db.rpc('claim_agentic_build_task', {
+    p_worker_id: executorId,
+    p_run_id: runId ?? null,
+    p_lease_seconds: TASK_LEASE_SECONDS,
+  });
+  if (error) throw error;
+  return Array.isArray(data) ? (data[0] ?? null) : (data ?? null);
 }
 
-async function claimTask(taskId: string) {
-  const db = await requireAdminClient();
-  const { data } = await db
-    .from('agentic_build_tasks')
-    .update({ status: 'running', started_at: new Date().toISOString() })
-    .eq('id', taskId)
-    .eq('status', 'queued')
-    .select('id')
-    .maybeSingle();
-  return Boolean(data?.id);
+function startTaskHeartbeat(taskId: string): () => void {
+  const interval = setInterval(
+    async () => {
+      try {
+        const db = await requireAdminClient();
+        const { data, error } = await db.rpc('heartbeat_agentic_build_task', {
+          p_task_id: taskId,
+          p_worker_id: executorId,
+          p_lease_seconds: TASK_LEASE_SECONDS,
+        });
+        if (error || data !== true)
+          console.warn('[agentic-executor] task lease heartbeat rejected', { taskId });
+      } catch (error) {
+        console.warn('[agentic-executor] task lease heartbeat failed', { taskId, error });
+      }
+    },
+    Math.floor((TASK_LEASE_SECONDS * 1000) / 3),
+  );
+  interval.unref?.();
+  return () => clearInterval(interval);
 }
 
 async function resolveOrganizationId(tenantId: string | null) {
@@ -111,6 +170,127 @@ async function resolveOrganizationId(tenantId: string | null) {
   return data?.id ?? null;
 }
 
+async function processPlatformHardeningTask(task: any, run: any, project: any) {
+  const db = await requireAdminClient();
+  const input =
+    task.input && typeof task.input === 'object' ? (task.input as Record<string, any>) : {};
+  const delegatedTaskId =
+    task.output && typeof task.output === 'object'
+      ? String((task.output as Record<string, any>).delegated_task_id ?? '')
+      : '';
+
+  if (delegatedTaskId) {
+    const { data: delegated, error } = await db
+      .from('ai_tasks')
+      .select('id,status,result_json,tool_output,error_message,approval_status')
+      .eq('id', delegatedTaskId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!delegated) throw new Error('Delegated platform task no longer exists.');
+    if (delegated.status === 'completed') {
+      await completeTask(task.id, {
+        delegated_task_id: delegated.id,
+        summary: 'Platform hardening task completed through the canonical AI task runtime.',
+        result: delegated.result_json ?? delegated.tool_output ?? {},
+      });
+      return;
+    }
+    if (delegated.status === 'awaiting_approval') {
+      await db
+        .from('agentic_build_tasks')
+        .update({
+          status: 'queued',
+          requires_approval: true,
+          error: delegated.error_message ?? 'Delegated task is awaiting human approval.',
+          lease_owner: null,
+          lease_expires_at: null,
+          heartbeat_at: null,
+          output: { delegated_task_id: delegated.id, approval_status: delegated.approval_status },
+        })
+        .eq('id', task.id)
+        .eq('lease_owner', executorId);
+      return;
+    }
+    if (['failed', 'blocked', 'cancelled'].includes(String(delegated.status))) {
+      throw new Error(delegated.error_message ?? `Delegated task ended in ${delegated.status}`);
+    }
+
+    await db
+      .from('agentic_build_tasks')
+      .update({
+        status: 'queued',
+        next_attempt_at: new Date(Date.now() + 30_000).toISOString(),
+        lease_owner: null,
+        lease_expires_at: null,
+        heartbeat_at: null,
+        output: { delegated_task_id: delegated.id, delegated_status: delegated.status },
+      })
+      .eq('id', task.id)
+      .eq('lease_owner', executorId);
+    return;
+  }
+
+  const requestedBy = project.user_id;
+  if (!requestedBy) throw new Error('Platform hardening project requires an owning user.');
+  const delegated = await createAiTask(
+    db,
+    {
+      title: String(input.title ?? task.action ?? 'Platform hardening task'),
+      description: String(input.description ?? run.prompt ?? task.action ?? ''),
+      command: String(input.command ?? input.description ?? task.action ?? ''),
+      requestedBy,
+      agentSlug: typeof input.agentSlug === 'string' ? input.agentSlug : undefined,
+      toolName: typeof input.toolName === 'string' ? input.toolName : undefined,
+      toolInput:
+        input.toolInput && typeof input.toolInput === 'object'
+          ? input.toolInput
+          : undefined,
+      priority: Number(input.priority ?? 75),
+      executionMode: input.executionMode === 'interactive' ? 'interactive' : 'automatic',
+    },
+    {
+      actorRoles: ['super_admin'],
+      tenantId: project.tenant_id ?? null,
+      adminOrigin: process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org',
+      appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhumanity.org',
+    },
+  );
+
+  const { data: delegatedState } = await db
+    .from('ai_tasks')
+    .select('id,status,result_json,tool_output,error_message,approval_status')
+    .eq('id', delegated.id)
+    .single();
+
+  if (delegatedState.status === 'completed') {
+    await completeTask(task.id, {
+      delegated_task_id: delegatedState.id,
+      summary: 'Platform hardening task completed through the canonical AI task runtime.',
+      result: delegatedState.result_json ?? delegatedState.tool_output ?? {},
+    });
+    return;
+  }
+
+  await db
+    .from('agentic_build_tasks')
+    .update({
+      status: 'queued',
+      requires_approval: delegatedState.status === 'awaiting_approval',
+      error: delegatedState.error_message,
+      next_attempt_at: new Date(Date.now() + 30_000).toISOString(),
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+      output: {
+        delegated_task_id: delegatedState.id,
+        delegated_status: delegatedState.status,
+        approval_status: delegatedState.approval_status,
+      },
+    })
+    .eq('id', task.id)
+    .eq('lease_owner', executorId);
+}
+
 async function processMarketingTask(task: any, run: any, project: any) {
   const db = await requireAdminClient();
 
@@ -123,7 +303,13 @@ async function processMarketingTask(task: any, run: any, project: any) {
         overlay: 'none',
         motion: 'fast readable cuts with restrained animated typography',
         mobile_safe: true,
-        scenes: ['Healthcare', 'Skilled Trades', 'Barber & Beauty', 'Business & Technology', 'Earn While You Learn'],
+        scenes: [
+          'Healthcare',
+          'Skilled Trades',
+          'Barber & Beauty',
+          'Business & Technology',
+          'Earn While You Learn',
+        ],
       },
     });
     return;
@@ -131,7 +317,8 @@ async function processMarketingTask(task: any, run: any, project: any) {
 
   if (task.worker === 'media-director') {
     const organizationId = await resolveOrganizationId(project.tenant_id);
-    if (!organizationId) throw new Error('No active organization is mapped to the agentic project tenant.');
+    if (!organizationId)
+      throw new Error('No active organization is mapped to the agentic project tenant.');
 
     const brief = homeHeroBrief(run.prompt);
     const { plan } = await createCommercialPlan(brief);
@@ -179,8 +366,10 @@ async function processMarketingTask(task: any, run: any, project: any) {
     const media = deps.find((row: any) => row.worker === 'media-director');
     const assetId = media?.output?.asset_id as string | undefined;
     const publicUrl = media?.output?.public_url as string | undefined;
-    if (!assetId || !publicUrl) throw new Error('Rendered hero asset is missing from the Media Director output.');
-    if (!/^https:\/\//.test(publicUrl)) throw new Error('Rendered hero asset does not have a secure public URL.');
+    if (!assetId || !publicUrl)
+      throw new Error('Rendered hero asset is missing from the Media Director output.');
+    if (!/^https:\/\//.test(publicUrl))
+      throw new Error('Rendered hero asset does not have a secure public URL.');
 
     const { data: asset, error } = await db
       .from('media_assets')
@@ -188,11 +377,13 @@ async function processMarketingTask(task: any, run: any, project: any) {
       .eq('id', assetId)
       .single();
     if (error || !asset) throw new Error('Rendered hero asset could not be loaded for QA.');
-    if (asset.mime_type !== 'video/mp4') throw new Error('Homepage hero output is not an MP4 video.');
+    if (asset.mime_type !== 'video/mp4')
+      throw new Error('Homepage hero output is not an MP4 video.');
     if (!asset.duration_seconds || asset.duration_seconds < 25 || asset.duration_seconds > 50) {
       throw new Error('Homepage hero duration is outside the approved commercial range.');
     }
-    if (!asset.transcript) throw new Error('Homepage hero is missing its accessibility transcript.');
+    if (!asset.transcript)
+      throw new Error('Homepage hero is missing its accessibility transcript.');
 
     await db
       .from('media_assets')
@@ -224,7 +415,8 @@ async function processMarketingTask(task: any, run: any, project: any) {
       .select('metadata')
       .eq('id', assetId)
       .single();
-    if (error || !asset) throw new Error('Homepage hero media asset is unavailable at publish time.');
+    if (error || !asset)
+      throw new Error('Homepage hero media asset is unavailable at publish time.');
     await db
       .from('media_assets')
       .update({
@@ -261,37 +453,27 @@ async function processMarketingTask(task: any, run: any, project: any) {
   throw new Error(`Unsupported marketing campaign worker: ${task.worker}`);
 }
 
-export async function runAgenticExecutorOnce() {
-  if (polling) return;
+export async function runAgenticExecutorOnce(input: { runId?: string } = {}): Promise<boolean> {
+  if (polling) return true;
   polling = true;
   try {
     const db = await requireAdminClient();
-    const { data: tasks, error } = await db
-      .from('agentic_build_tasks')
-      .select('id, run_id, worker, action, dependencies, input, status, requires_approval, created_at')
-      .eq('status', 'queued')
-      .order('created_at', { ascending: true })
-      .limit(10);
-    if (error) throw error;
-
-    for (const task of tasks ?? []) {
-      if (!(await dependenciesCompleted(task.run_id, task.dependencies ?? []))) continue;
+    const task = await claimTask(input.runId);
+    if (task) {
       const { data: run } = await db
         .from('agentic_build_runs')
         .select('id, project_id, prompt, status')
         .eq('id', task.run_id)
         .eq('status', 'running')
         .maybeSingle();
-      if (!run) continue;
+      if (!run) throw new Error(`Claimed task ${task.id} has no active run`);
       const { data: project } = await db
         .from('agentic_build_projects')
         .select('id, tenant_id, user_id, target_id, target_type, metadata, status')
         .eq('id', run.project_id)
         .eq('status', 'active')
         .maybeSingle();
-      if (!project || !['marketing_campaign', 'course'].includes(project.target_type)) continue;
-      if (task.requires_approval && project.metadata?.execution_approved !== true) continue;
-      if (!(await claimTask(task.id))) continue;
+      if (!project) throw new Error(`Claimed task ${task.id} has no active project`);
 
       await db.from('agentic_build_events').insert({
         project_id: project.id,
@@ -302,19 +484,27 @@ export async function runAgenticExecutorOnce() {
         payload: {},
       });
 
+      const stopHeartbeat = startTaskHeartbeat(task.id);
       try {
         if (project.target_type === 'course') {
           await processCourseAgenticTask({ task: { ...task, status: 'running' }, run, project });
-        } else {
+        } else if (project.target_type === 'marketing_campaign') {
           await processMarketingTask({ ...task, status: 'running' }, run, project);
+        } else if (project.target_type === 'platform_hardening') {
+          await processPlatformHardeningTask({ ...task, status: 'running' }, run, project);
+        } else {
+          throw new Error(`No executor is registered for target type ${project.target_type}`);
         }
       } catch (err) {
-        await failTask(task.id, run.id, project.id, err);
+        await failTask(task, run.id, project.id, err);
+      } finally {
+        stopHeartbeat();
       }
-      break;
     }
+    return true;
   } catch (err) {
     console.error('[agentic-executor] poll failed', err);
+    return false;
   } finally {
     polling = false;
   }
@@ -323,8 +513,29 @@ export async function runAgenticExecutorOnce() {
 export function startAgenticExecutor() {
   if (started || process.env.ELEVATE_SERVICE !== 'admin') return;
   started = true;
-  void runAgenticExecutorOnce();
-  timer = setInterval(() => void runAgenticExecutorOnce(), POLL_MS);
-  timer.unref?.();
-  console.info('[agentic-executor] Admin agentic executor started');
+
+  const schedule = (delayMs: number) => {
+    timer = setTimeout(async () => {
+      const healthy = await runAgenticExecutorOnce();
+      consecutivePollFailures = healthy ? 0 : consecutivePollFailures + 1;
+      const normalPollMs = pollIntervalMs();
+      const nextDelay = healthy
+        ? normalPollMs
+        : adaptiveBackoffMs(consecutivePollFailures, {
+            baseDelayMs: normalPollMs,
+            maxDelayMs: MAX_OUTAGE_BACKOFF_MS,
+          });
+      if (!healthy) {
+        console.warn('[agentic-executor] database poll backing off', {
+          consecutiveFailures: consecutivePollFailures,
+          nextDelayMs: nextDelay,
+        });
+      }
+      schedule(nextDelay);
+    }, delayMs);
+    timer.unref?.();
+  };
+
+  schedule(0);
+  console.info('[agentic-executor] Admin agentic executor started with outage backoff');
 }

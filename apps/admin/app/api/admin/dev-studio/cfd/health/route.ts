@@ -21,13 +21,13 @@ export async function GET(request: NextRequest) {
     }
 
     const featureEnabled = process.env.CFD_ENABLED === 'true';
-    const containerConfigured = Boolean(process.env.STUDIO_SHELL_WS_URL && process.env.STUDIO_SHELL_SECRET && process.env.STUDIO_TOKEN_SECRET);
+    const containerConfigured = Boolean(process.env.CFD_EXECUTOR_URL && process.env.CFD_EXECUTOR_SECRET);
     const solverConfigured = Boolean(process.env.CFD_OPENFOAM_IMAGE);
 
     return buildCapabilityHealth('cfd', [
       { name: 'feature-flag', passed: featureEnabled, required: true, message: featureEnabled ? 'CFD is enabled.' : 'CFD_ENABLED is not true.' },
       { name: 'cfd-projects-table', passed: tablePassed, required: true, message: tableMessage },
-      { name: 'container-runtime', passed: containerConfigured, required: true, message: containerConfigured ? 'Container runtime is configured.' : 'Studio shell container configuration is incomplete.' },
+      { name: 'container-runtime', passed: containerConfigured, required: true, message: containerConfigured ? 'Dedicated CFD executor is configured.' : 'CFD executor is not configured; retired Studio shell fallback is not supported.' },
       { name: 'openfoam-image', passed: solverConfigured, required: true, message: solverConfigured ? 'OpenFOAM image is configured.' : 'CFD_OPENFOAM_IMAGE is missing.' },
     ]);
   });

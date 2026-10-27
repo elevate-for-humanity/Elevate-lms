@@ -10,8 +10,8 @@ export const estheticsConfig: ProgramConfig = {
   primaryCta: { label: 'Apply Now', href: '/programs/esthetician-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },
   stats: [
-    { value: '700+', label: 'Training Hours' },
-    { value: '12-18', label: 'Months' },
+    { value: '20', label: 'Appendix A Competencies' },
+    { value: '300', label: 'RTI Hours' },
     { value: '$0', label: 'with Funding' },
   ],
 
@@ -48,7 +48,7 @@ export const estheticsConfig: ProgramConfig = {
     { icon: '🏪', title: 'Spa Match', description: 'Get matched with a host spa partner' },
     { icon: '🎓', title: 'Orientation', description: 'Learn the program, meet your mentor' },
     { icon: '✨', title: 'Training Begins', description: 'Start your apprenticeship journey' },
-    { icon: '🎉', title: 'Graduation', description: 'Complete hours, pass state exam, get licensed' },
+    { icon: '🎉', title: 'Completion', description: 'Complete 20 verified competencies and 300 RTI hours, then follow Indiana examination and licensing steps' },
   ],
 
   // Skills
@@ -81,7 +81,7 @@ export const estheticsConfig: ProgramConfig = {
     { title: 'Product Representative', icon: '💼' },
     { title: 'Spa Owner', icon: '🏢' },
   ],
-  tuition: 4980,
+  tuition: 6000,
 
   // Business
   businessItems: [
@@ -100,7 +100,7 @@ export const estheticsConfig: ProgramConfig = {
     {
       name: 'Jennifer Chen',
       role: 'Medical Esthetician',
-      photo: '/images/beauty/esthetician-hero.webp',
+      photo: '/images/programs/esthetician-host-recruitment-2026.webp',
       bio: 'Former dermatology nurse now leading our esthetics program. Expert in clinical skincare treatments.',
       credentials: ['Licensed Esthetician', 'Certified Medical Esthetician', 'PCA Skin Certified'],
     },

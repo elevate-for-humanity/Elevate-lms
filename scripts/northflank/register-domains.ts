@@ -11,8 +11,8 @@
 import { nfFetch, resolveTeamId } from './lib';
 
 const DOMAINS = [
-  'elevateforhumanity.org',
   'www.elevateforhumanity.org',
+  'app.elevateforhumanity.org',
   'admin.elevateforhumanity.org',
 ] as const;
 
@@ -60,7 +60,7 @@ function printDnsInstructions(domains: TeamDomain[]) {
     console.log('');
   }
   console.log(
-    'Add each TXT record at your DNS host (Cloudflare/registrar), then:\n' +
+    'Add each TXT record at Durable / SystemDNS, then:\n' +
       '  npx tsx scripts/northflank/register-domains.ts --verify\n' +
       '  npx tsx scripts/northflank/configure-domains.ts --execute\n',
   );

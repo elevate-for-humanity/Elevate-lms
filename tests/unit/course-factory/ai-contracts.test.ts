@@ -34,6 +34,14 @@ const validLesson = {
       ...validQuestion,
       question: 'When should the learner report an exception?',
     },
+    {
+      ...validQuestion,
+      question: 'Which record proves the procedure was completed?',
+    },
+    {
+      ...validQuestion,
+      question: 'Who receives an unresolved exception report?',
+    },
   ],
   experience: {
     readingGuide: {
@@ -203,8 +211,8 @@ describe('Course Factory AI contracts', () => {
     ).toThrow(/output contract/i);
   });
 
-  it('rejects blueprint slugs and step types outside the canonical contract', () => {
-    const invalid = {
+  it('normalizes provider blueprint vocabulary into the canonical contract', () => {
+    const providerOutput = {
       title: 'Test Course',
       description: 'A workforce training test course.',
       modules: [
@@ -215,8 +223,29 @@ describe('Course Factory AI contracts', () => {
         },
       ],
     };
+    const parsed = parseStrictAIJson(
+      JSON.stringify(providerOutput),
+      generatedBlueprintSchema,
+      'blueprint',
+    );
+    expect(parsed.modules[0]?.lessons[0]).toEqual({
+      title: 'Lesson',
+      slug: 'bad-slug',
+      stepType: 'lesson',
+    });
+  });
+
+  it('still rejects an empty normalized blueprint', () => {
     expect(() =>
-      parseStrictAIJson(JSON.stringify(invalid), generatedBlueprintSchema, 'blueprint'),
+      parseStrictAIJson(
+        JSON.stringify({
+          title: 'Test Course',
+          description: 'A workforce training test course.',
+          modules: [],
+        }),
+        generatedBlueprintSchema,
+        'blueprint',
+      ),
     ).toThrow(/output contract/i);
   });
 });

@@ -3,18 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {
-  date,
-  isRecord,
-  rec,
-  str,
-  num,
-  bool,
-  arr,
-  toDateString,
-  toError,
-  toErrorMessage,
-} from '../../lib/safe';
+import { date, isRecord, rec, str, num, bool, arr, toDateString, toError, toErrorMessage } from '../../lib/safe';
 
 describe('isRecord', () => {
   it('should return true for plain objects', () => {

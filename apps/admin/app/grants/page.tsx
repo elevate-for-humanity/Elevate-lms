@@ -72,7 +72,7 @@ export default async function GrantsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             {
               label: 'Total Grants',

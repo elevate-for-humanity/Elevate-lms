@@ -56,7 +56,7 @@ export default function ConsumerEducationPage() {
         },
         cta: {
           heading: 'Schedule a Free Session',
-          subtitle: `Tax prep, financial coaching, and benefits screening — all free for qualifying Indiana residents. Call ${PLATFORM_DEFAULTS.supportPhone} to schedule.`,
+          subtitle: `Tax prep, financial coaching, and benefits screening — all free for qualifying Indiana residents. Call ${PLATFORM_DEFAULTS.mainPhone} to schedule.`,
           primaryLabel: 'Contact Us',
           primaryHref: '/contact',
           secondaryLabel: 'Community Services',

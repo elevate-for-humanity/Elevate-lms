@@ -31,23 +31,6 @@ const CORIENNE = {
   shopName: 'Style and Scissors Salon',
 };
 
-const AARON = {
-  userId: '17326f0e-4c74-45d9-b024-51fe0aeef19e',
-  partnerId: 'deedb623-7acf-4963-a54e-ffa86e8e6d6c',
-  email: 'razorsimage11@gmail.com',
-  name: 'Aaron Brown',
-  shopName: 'Razors Image Barbershop',
-  supervisorLicense: 'BA11400162',
-  shopLicense: 'BS31100487',
-  address: '155 S Kingston Dr',
-  city: 'Bloomington',
-  state: 'IN',
-  zip: '47403',
-};
-
-const corienneOnly = process.argv.includes('--corienne-only');
-const aaronOnly = process.argv.includes('--aaron-only');
-
 function loadEnvLocal() {
   const p = join(ROOT, '.env.local');
   if (!existsSync(p)) return;
@@ -181,40 +164,6 @@ async function provisionCorienne(apiKey) {
   console.log(`  ✅ Dashboard login email sent (magic link)`);
 }
 
-async function provisionAaron(apiKey) {
-  console.log('\n=== Aaron Brown — Razors Image Barbershop ===');
-  await ensurePartnerAccount(AARON, {
-    programs: ['barber'],
-    partner_type: 'barber',
-    program_type: 'barber',
-    mou_signed: false,
-    onboarding_completed: false,
-    license_number: AARON.shopLicense,
-    supervisor_license_number: AARON.supervisorLicense,
-    address_line1: AARON.address,
-    city: AARON.city,
-    state: AARON.state,
-    zip: AARON.zip,
-  });
-
-  await db
-    .from('barbershop_partner_applications')
-    .update({ status: 'approved', updated_at: now })
-    .eq('contact_email', AARON.email);
-
-  // PDF generation requires TypeScript — use: pnpm tsx scripts/ops/send-aaron-barber-mou.ts
-  const { spawnSync } = await import('child_process');
-  const child = spawnSync(
-    'pnpm',
-    ['tsx', '--env-file=.env.local', 'scripts/ops/send-aaron-barber-mou.ts'],
-    { cwd: ROOT, stdio: 'inherit', env: process.env },
-  );
-  if (child.status !== 0) {
-    throw new Error('send-aaron-barber-mou.ts failed — run it manually');
-  }
-  console.log(`  ✅ Barber MOU email sent with PDF attachment`);
-}
-
 async function main() {
   const apiKey = await loadSendGridKey();
   if (!apiKey) {
@@ -222,8 +171,7 @@ async function main() {
     process.exit(1);
   }
 
-  if (!aaronOnly) await provisionCorienne(apiKey);
-  if (!corienneOnly) await provisionAaron(apiKey);
+  await provisionCorienne(apiKey);
   console.log('\nDone.');
 }
 

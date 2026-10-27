@@ -1,4 +1,4 @@
-import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
+import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
@@ -16,9 +16,14 @@ const PROTECTED_PREFIXES = [
   '/lms/support',
   '/learner',
   '/apprentice',
-  '/host-shop/dashboard',
-  '/parent-portal/dashboard',
-  '/parent-portal/student',
+  '/apprenticeship',
+  '/admin-preview',
+  // Protect the complete Host Shop operational namespace. The login route is
+  // explicitly exempted in isProtectedPath so onboarding, MOU, orientation,
+  // resources, and any future child route fail closed before React renders.
+  '/host-shop',
+  '/parent-portal',
+  '/cosmetology-host-shop',
   '/employer',
   '/workforce',
   '/program-holder',
@@ -32,9 +37,18 @@ const PROTECTED_PREFIXES = [
 ] as const;
 
 function isProtectedPath(pathname: string) {
+  if (pathname === '/host-shop/login' || pathname.startsWith('/host-shop/login/')) {
+    return false;
+  }
+
   // Any route explicitly named as a dashboard is private even if a new role
   // namespace is added and forgotten in PROTECTED_PREFIXES.
-  if (pathname === '/dashboard' || pathname.includes('/dashboard/')) return true;
+  if (
+    pathname === '/dashboard' ||
+    pathname.endsWith('/dashboard') ||
+    pathname.includes('/dashboard/')
+  )
+    return true;
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -60,6 +74,16 @@ function authCookieOptions(
   };
 }
 
+function redirectToLogin(req: NextRequest, pathname: string) {
+  const loginUrl = new URL(loginPathFor(pathname), req.url);
+  loginUrl.searchParams.set('redirect', `${pathname}${req.nextUrl.search}`);
+  const response = NextResponse.redirect(loginUrl);
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('Vary', 'Cookie');
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  return response;
+}
+
 /**
  * Refresh Supabase sessions once at the LMS request boundary and persist any
  * rotated cookies. Protected portal routes fail closed for anonymous/expired
@@ -68,27 +92,33 @@ function authCookieOptions(
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
+  const protectedPath = isProtectedPath(pathname);
+
   if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
-    /\.[a-z0-9]+$/i.test(pathname)
+    !protectedPath &&
+    (pathname.startsWith('/_next') ||
+      pathname.startsWith('/favicon') ||
+      /\.[a-z0-9]+$/i.test(pathname))
   ) {
     return NextResponse.next();
   }
-
-  const protectedPath = isProtectedPath(pathname);
-  const hasSupabaseSession = req.cookies
-    .getAll()
-    .some(({ name }) => name.startsWith('sb-') && name.includes('-auth-token'));
-
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
 
-  if (hasSupabaseSession || protectedPath) {
+  // Public entry points (especially /login and /host-shop/login) must render
+  // without a network session refresh. A stale cross-subdomain cookie used to
+  // make the public login shell wait on Supabase during an outage.
+  if (protectedPath) {
+    // Do not spend the bounded Supabase network timeout proving that a request
+    // with no session cookie is anonymous. This keeps every role-specific PWA
+    // entry point responsive during a Supabase slowdown or cold start.
+    if (!hasSupabaseAuthCookie(req)) return redirectToLogin(req, pathname);
+
     const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
       cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+      requestHeaders.set('cookie', req.cookies.toString());
       response = NextResponse.next({ request: { headers: requestHeaders } });
       cookiesToSet.forEach(({ name, value, options }) => {
         response.cookies.set(
@@ -104,13 +134,12 @@ export async function middleware(req: NextRequest) {
       error,
     } = await supabase.auth.getUser();
 
-    if (protectedPath && (error || !user)) {
-      const loginUrl = new URL(loginPathFor(pathname), req.url);
-      loginUrl.searchParams.set('redirect', `${pathname}${req.nextUrl.search}`);
-      const redirectResponse = NextResponse.redirect(loginUrl);
-      redirectResponse.headers.set('Cache-Control', 'private, no-store, max-age=0');
-      redirectResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
-      return redirectResponse;
+    if (error || !user) {
+      const redirect = redirectToLogin(req, pathname);
+      // Supabase clears revoked/expired sessions through setAll. Preserve those
+      // mutations on the actual response or the browser retries the stale token.
+      for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+      return redirect;
     }
   }
 
@@ -131,5 +160,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
+  runtime: 'nodejs',
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

@@ -12,8 +12,7 @@ export const metadata: Metadata = {
   // MIGRATION TOOL — not a live catalog page.
   // ALL_PRODUCTS (app/data/store-products.ts) is still the active fallback in:
   //   - app/api/licenses/checkout/route.ts
-  //   - app/api/stripe/checkout/route.ts
-  // Do not delete store-products.ts until those routes are fully migrated to DB.
+  // Legacy Stripe checkout is retired. Keep this page only for catalog reconciliation.
   description: 'Compare DB catalog against hardcoded products to verify migration.',
 };
 
@@ -217,11 +216,9 @@ export default async function CatalogSanityPage() {
         </div>
 
         <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-          <strong>Migration incomplete.</strong> <code>ALL_PRODUCTS</code> is still the active
-          fallback in <code>app/api/licenses/checkout</code> and{' '}
-          <code>app/api/stripe/checkout</code>. Do not delete{' '}
-          <code>app/data/store-products.ts</code> until those routes query the DB directly. Once all
-          rows show &quot;Match&quot; and API routes are updated, retire this page.
+          <strong>Historical comparison.</strong> Legacy Stripe checkout is retired. Use this page
+          to reconcile the database catalog with <code>ALL_PRODUCTS</code>; new QuickBooks items use
+          stable canonical keys so a repeated checkout does not create a duplicate item.
         </div>
       </div>
     </div>

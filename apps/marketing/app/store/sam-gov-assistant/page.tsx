@@ -11,7 +11,6 @@ import {
   Building2,
   CreditCard,
   Users,
-  Shield,
   ExternalLink,
   RotateCcw,
   ChevronDown,
@@ -245,7 +244,7 @@ Come back anytime if you need help!`,
   const progress = Math.round(((currentIndex + 1) / stepIds.length) * 100);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Sam Gov Assistant" }]} />
       </div>
@@ -254,15 +253,14 @@ Come back anytime if you need help!`,
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-bold mb-4 border border-white/20">
-              <Shield className="w-4 h-4" />
-              Premium Tool - $149/month
+              Free Public Guidance
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4">
               SAM.gov Registration
               <span className="block text-brand-blue-300">Step-by-Step Guide</span>
             </h1>
             <p className="text-lg text-brand-blue-100 mb-6">
-              I'll walk you through every step of registering your organization in SAM.gov for federal grants and contracts.
+              Use this free educational walkthrough to prepare for SAM.gov registration. SAM.gov and Login.gov are official federal services and do not charge a registration fee.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-brand-blue-200">
               <div className="flex items-center gap-2">
@@ -505,6 +503,6 @@ Come back anytime if you need help!`,
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

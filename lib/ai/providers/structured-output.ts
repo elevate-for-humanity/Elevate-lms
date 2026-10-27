@@ -1,7 +1,7 @@
 import type { ChatCompletionOptions } from '../types';
 
-function requestsJson(options: ChatCompletionOptions): boolean {
-  return options.messages.some((message) => {
+export function requestsJson(options: ChatCompletionOptions): boolean {
+  return options.jsonMode === true || options.messages.some((message) => {
     const content = typeof message.content === 'string' ? message.content : '';
     return /return\s+only\s+valid\s+json|return\s+json\s+only|respond\s+with\s+(?:only\s+)?(?:valid\s+)?json|return\s+only\s+json/i.test(content);
   });

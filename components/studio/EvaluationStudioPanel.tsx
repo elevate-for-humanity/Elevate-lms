@@ -29,6 +29,9 @@ interface EvaluationRun {
     evidence?: string;
   }>;
   created_at: string;
+  total_cases?: number | null;
+  passed_cases?: number | null;
+  failed_cases?: number | null;
 }
 
 
@@ -46,7 +49,7 @@ export default function EvaluationStudioPanel() {
 
     try {
       const response = await fetch(
-        '/api/admin/evaluations',
+        '/api/admin/dev-studio/evaluations',
         {
           credentials: 'include',
           cache: 'no-store',
@@ -54,7 +57,12 @@ export default function EvaluationStudioPanel() {
       );
 
 
-      const payload = await response.json();
+      const contentType = response.headers.get('content-type') ?? '';
+      const rawBody = await response.text();
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Evaluation service returned HTTP ${response.status} instead of JSON.`);
+      }
+      const payload = rawBody ? JSON.parse(rawBody) : {};
 
 
       if (!response.ok || !payload.ok) {
@@ -199,7 +207,13 @@ export default function EvaluationStudioPanel() {
                       <p className="mt-3 font-medium">
                         Score: {run.score}
                       </p>
-                    )}
+                  )}
+
+                  {run.total_cases !== null && run.total_cases !== undefined && (
+                    <p className="mt-2 text-sm text-slate-600">
+                      Cases: {run.passed_cases ?? 0} passed · {run.failed_cases ?? 0} failed · {run.total_cases} total
+                    </p>
+                  )}
 
 
                   {Array.isArray(run.findings) &&

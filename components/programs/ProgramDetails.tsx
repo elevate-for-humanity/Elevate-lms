@@ -73,7 +73,7 @@ export function ProgramDetails({ program }: { program: Program }) {
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 italic">*No cost for most eligible students</p>
+            <p className="text-xs text-slate-500 italic">*Funding, when available, is program- and participant-specific and requires authorization.</p>
 
             {isBarberProgram && (
               <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-3 mt-4">
@@ -242,7 +242,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     Pay Now / See Payment Options
                   </Link>
                   <p className="text-xs text-center text-black">
-                    {`Stripe • ${BNPL_PROVIDER_NAMES} • Pay in 4 available`}
+                    {`QuickBooks • ${BNPL_PROVIDER_NAMES} • Pay in 4 available`}
                   </p>
                 </div>
 
@@ -307,7 +307,7 @@ export function ProgramDetails({ program }: { program: Program }) {
             <UltraVideoPlayer
               src="/videos/hero-home.mp4"
               poster="/images/pages/training-cohort.webp"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain"
             />
           </div>
         </div>

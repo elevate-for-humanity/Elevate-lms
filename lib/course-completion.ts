@@ -38,6 +38,17 @@ export interface CourseCompletionStatus {
   missingRequirements: string[];
 }
 
+export function evaluateCriticalCompetencyStatus(
+  requiredKeys: readonly string[],
+  results: readonly { competency_key: string; status: string }[],
+): { satisfied: boolean; missingKeys: string[] } {
+  const achieved = new Set(
+    results.filter((result) => result.status === 'achieved').map((result) => result.competency_key),
+  );
+  const missingKeys = [...new Set(requiredKeys)].filter((key) => !achieved.has(key));
+  return { satisfied: missingKeys.length === 0, missingKeys };
+}
+
 export async function checkCourseCompletion(
   userId: string,
   courseId: string,
@@ -62,7 +73,9 @@ export async function checkCourseCompletion(
 
   const missingRequirements: string[] = [];
   if (!internal.complete) {
-    missingRequirements.push(`${Math.max(0, internal.total - internal.completed)} required lesson(s) remaining`);
+    missingRequirements.push(
+      `${Math.max(0, internal.total - internal.completed)} required lesson(s) remaining`,
+    );
   }
   if (!external.complete) {
     missingRequirements.push(
@@ -165,7 +178,10 @@ async function checkExternalModules(userId: string, courseId: string) {
     .from('external_partner_progress')
     .select('module_id,status')
     .eq('user_id', userId)
-    .in('module_id', requiredModules.map((module) => module.id))
+    .in(
+      'module_id',
+      requiredModules.map((module) => module.id),
+    )
     .eq('status', 'approved');
   if (progressError) throw progressError;
 
@@ -199,7 +215,10 @@ async function checkRequiredAssessments(userId: string, courseId: string) {
     .select('lesson_id,passed,score,passing_score')
     .eq('user_id', userId)
     .eq('course_id', courseId)
-    .in('lesson_id', lessons.map((lesson) => lesson.id))
+    .in(
+      'lesson_id',
+      lessons.map((lesson) => lesson.id),
+    )
     .eq('passed', true);
   if (scoreError) throw scoreError;
 
@@ -220,7 +239,12 @@ async function checkSeatTime(
   userId: string,
   courseId: string,
   requiredHours: number | null,
-): Promise<{ satisfied: boolean; recordedHours: number; recordedSeconds: number; requiredHours: number | null }> {
+): Promise<{
+  satisfied: boolean;
+  recordedHours: number;
+  recordedSeconds: number;
+  requiredHours: number | null;
+}> {
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('lesson_progress')

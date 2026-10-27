@@ -22,6 +22,7 @@ export default async function StandardStudentApplicationPage({
   const initialProgram = resolveSlug(params?.program || '') || '';
   const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
   const paymentSessionId = params?.session_id || '';
+  const isHvacApplication = initialProgram === 'hvac-technician';
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950">
@@ -41,11 +42,12 @@ export default async function StandardStudentApplicationPage({
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950">Student application</h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">
-                This is the conventional form version. It submits through the same canonical
-                application service used by the PARIS-guided interview.
+                {isHvacApplication
+                  ? 'Apply for HVAC training here. Complete your information and submit directly to our admissions team.'
+                  : 'This is the conventional form version. It submits through the same canonical application service used by the PARIS-guided interview.'}
               </p>
             </div>
-            <Link
+            {!isHvacApplication && <Link
               href={`/apply/student/interview?${new URLSearchParams({
                 ...(initialProgram ? { program: initialProgram } : {}),
                 intent: applicationIntent,
@@ -54,7 +56,7 @@ export default async function StandardStudentApplicationPage({
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-red-700"
             >
               Use PARIS instead
-            </Link>
+            </Link>}
           </div>
           <StudentApplicationForm
             initialProgram={initialProgram}
@@ -67,10 +69,7 @@ export default async function StandardStudentApplicationPage({
             <h2 id="standard-application-payment" className="mb-4 text-2xl font-black text-slate-950">
               Required payment verification
             </h2>
-            <PaymentPlanCalculator
-              programSlug={initialProgram}
-              successUrl={`/apply/student/form?program=${encodeURIComponent(initialProgram)}&intent=enrollment`}
-            />
+            <PaymentPlanCalculator programSlug={initialProgram} />
           </section>
         ) : null}
       </div>

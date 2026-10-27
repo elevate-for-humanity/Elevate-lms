@@ -75,11 +75,11 @@ export const COSMETOLOGY_PROGRAM = {
   slug: 'cosmetology-apprenticeship',
 
   // Hours and Duration
-  totalHours: 1500,
-  totalHoursFormatted: '1,500',
-  durationWeeks: 40,
-  durationMonths: 10,
-  durationFormatted: '10 months',
+  totalHours: 2000,
+  totalHoursFormatted: '2,000',
+  durationWeeks: 50,
+  durationMonths: 12,
+  durationFormatted: '12 months',
   hoursPerWeek: 40,
 
   // Pricing
@@ -114,12 +114,12 @@ export const ESTHETICIAN_PROGRAM = {
   slug: 'esthetician-apprenticeship',
 
   // Hours and Duration
-  totalHours: 700,
-  totalHoursFormatted: '700',
-  durationWeeks: 20,
-  durationMonths: 5,
-  durationFormatted: '5 months',
-  hoursPerWeek: 35,
+  totalHours: 2000,
+  totalHoursFormatted: '2,000',
+  durationWeeks: 50,
+  durationMonths: 12,
+  durationFormatted: '12 months',
+  hoursPerWeek: 40,
 
   // Pricing
   tuitionCents: 349000,
@@ -142,12 +142,12 @@ export const NAIL_TECH_PROGRAM = {
   slug: 'nail-technician-apprenticeship',
 
   // Hours and Duration
-  totalHours: 450,
-  totalHoursFormatted: '450',
-  durationWeeks: 12,
-  durationMonths: 3,
-  durationFormatted: '3 months',
-  hoursPerWeek: 35,
+  totalHours: 2000,
+  totalHoursFormatted: '2,000',
+  durationWeeks: 50,
+  durationMonths: 12,
+  durationFormatted: '12 months',
+  hoursPerWeek: 40,
 
   // Pricing
   tuitionCents: 249000,

@@ -1,9 +1,13 @@
 import { SecureDocumentLink } from '@/components/admin/SecureDocumentLink';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
+import {
+  normalizeDocumentReviewStatus,
+  resolveDocumentStorageLocator,
+} from '@/lib/admin/document-record';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,9 +16,19 @@ export const metadata: Metadata = {
   description: 'Review and approve uploaded documents',
 };
 
-export default async function AdminDocumentReviewPage() {
+export default async function AdminDocumentReviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; includeQa?: string }>;
+}) {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
+  const resolvedSearchParams = await searchParams;
+  const requestedStatus = resolvedSearchParams.status;
+  const includeQa = resolvedSearchParams.includeQa === '1';
+  const activeStatus = ['pending', 'approved', 'rejected'].includes(requestedStatus ?? '')
+    ? requestedStatus
+    : 'all';
 
   // Get all documents with user info
   const { data: rawDocuments, error: documentsError } = await supabase
@@ -29,10 +43,18 @@ export default async function AdminDocumentReviewPage() {
     ? await supabase.from('profiles').select('id, full_name, email, role').in('id', docUserIds)
     : { data: [] };
   const docProfileMap = Object.fromEntries((docProfiles ?? []).map((p: any) => [p.id, p]));
-  const documents = (rawDocuments ?? []).map((d: any) => ({
+  const hydratedDocuments = (rawDocuments ?? []).map((d: any) => ({
     ...d,
     profiles: docProfileMap[d.user_id] ?? null,
+    review_status: normalizeDocumentReviewStatus(d.status),
+    has_storage_locator: Boolean(resolveDocumentStorageLocator(d)),
   }));
+  const isQaDocument = (doc: any) =>
+    [doc.file_name, doc.profiles?.full_name, doc.profiles?.email]
+      .filter(Boolean)
+      .some((value) => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value)));
+  const qaDocuments = hydratedDocuments.filter(isQaDocument);
+  const documents = hydratedDocuments.filter((doc) => includeQa || !isQaDocument(doc));
 
   // Document viewing is handled on-demand via SecureDocumentLink,
   // which routes through /api/admin/documents/signed-url with audit logging.
@@ -42,9 +64,17 @@ export default async function AdminDocumentReviewPage() {
     view_url: null, // URLs generated on-demand via SecureDocumentLink
   }));
 
-  const pendingDocs = docsWithUrls.filter((d) => d.status === 'pending') || [];
-  const approvedDocs = docsWithUrls.filter((d) => d.status === 'approved') || [];
-  const rejectedDocs = docsWithUrls.filter((d) => d.status === 'rejected') || [];
+  const pendingDocs = docsWithUrls.filter((d) => d.review_status === 'pending') || [];
+  const approvedDocs = docsWithUrls.filter((d) => d.review_status === 'approved') || [];
+  const rejectedDocs = docsWithUrls.filter((d) => d.review_status === 'rejected') || [];
+  const visibleDocuments =
+    activeStatus === 'all'
+      ? docsWithUrls
+      : docsWithUrls.filter((doc) => doc.review_status === activeStatus);
+  const documentTypeLabel = (value: unknown) =>
+    typeof value === 'string' && value.trim()
+      ? value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+      : 'Uploaded Document';
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -74,14 +104,14 @@ export default async function AdminDocumentReviewPage() {
       {/* Header */}
       <section className="border-b py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <h1 className="text-4xl font-bold text-black mb-2">Document Review</h1>
               <p className="text-lg text-black">Review and approve uploaded documents</p>
             </div>
             <Link
               href="/dashboard"
-              className="px-6 py-3 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-slate-200 px-6 py-3 font-semibold text-black transition hover:bg-slate-300 sm:w-auto"
             >
               Back to Dashboard
             </Link>
@@ -90,8 +120,34 @@ export default async function AdminDocumentReviewPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="mb-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border-2 border-brand-blue-300 bg-brand-blue-50 p-5">
+            <p className="font-black text-slate-950">Learner & Apprentice Documents</p>
+            <p className="mt-1 text-sm text-slate-700">
+              You are viewing the primary learner-document queue below.
+            </p>
+          </div>
+          <Link
+            href="/program-holder-documents"
+            className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"
+          >
+            <p className="font-black text-slate-950">Program Holder Documents</p>
+            <p className="mt-1 text-sm text-slate-700">
+              Open agreements, insurance, licenses, and provider files.
+            </p>
+          </Link>
+          <Link
+            href="/wioa/documents"
+            className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"
+          >
+            <p className="font-black text-slate-950">WIOA Documents</p>
+            <p className="mt-1 text-sm text-slate-700">
+              Open funding eligibility and workforce documentation.
+            </p>
+          </Link>
+        </div>
         {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
               <FileText className="w-8 h-8 text-brand-blue-600" />
@@ -123,10 +179,17 @@ export default async function AdminDocumentReviewPage() {
             </div>
             <div className="text-sm text-black">Rejected</div>
           </div>
+          <div className="rounded-lg border bg-slate-50 p-6">
+            <div className="mb-2 flex items-center justify-between">
+              <FileText className="h-8 w-8 text-slate-500" />
+              <span className="text-3xl font-bold text-slate-800">{qaDocuments.length}</span>
+            </div>
+            <div className="text-sm text-slate-700">QA/test uploads excluded</div>
+          </div>
         </div>
 
         {/* Pending Documents */}
-        {pendingDocs.length > 0 && (
+        {pendingDocs.length > 0 && (activeStatus === 'all' || activeStatus === 'pending') && (
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
             <h2 className="text-2xl font-bold text-black mb-4">
               Pending Review ({pendingDocs.length})
@@ -135,26 +198,24 @@ export default async function AdminDocumentReviewPage() {
               {pendingDocs.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                  className="flex flex-col items-stretch gap-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    {getStatusIcon(doc.status)}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-black">{doc.file_name}</h3>
-                      <p className="text-sm text-black">
-                        {doc.document_type
-                          .replace(/_/g, ' ')
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
-                        •{(doc.profiles as any)?.full_name || 'Unknown User'} (
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                    {getStatusIcon(doc.review_status)}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words font-semibold text-black">{doc.file_name}</h3>
+                      <p className="mt-1 break-words text-sm text-black">
+                        {documentTypeLabel(doc.document_type)} •
+                        {(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:shrink-0">
                     <Link
                       href={`/documents/review/${doc.id}`}
-                      className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
+                      className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-brand-blue-700 sm:w-auto"
                     >
                       <Eye className="w-4 h-4" />
                       Review
@@ -171,49 +232,38 @@ export default async function AdminDocumentReviewPage() {
           <h2 className="text-2xl font-bold text-black mb-4">All Documents</h2>
 
           {/* Filter Tabs */}
-          <div className="flex gap-2 mb-6 border-b">
-            <button
-              className="px-4 py-2 font-semibold text-brand-blue-600 border-b-2 border-brand-blue-600"
-              aria-label="Action button"
-            >
-              All ({documents?.length || 0})
-            </button>
-            <button
-              className="px-4 py-2 font-semibold text-black hover:text-black"
-              aria-label="Action button"
-            >
-              Pending ({pendingDocs.length})
-            </button>
-            <button
-              className="px-4 py-2 font-semibold text-black hover:text-black"
-              aria-label="Action button"
-            >
-              Approved ({approvedDocs.length})
-            </button>
-            <button
-              className="px-4 py-2 font-semibold text-black hover:text-black"
-              aria-label="Action button"
-            >
-              Rejected ({rejectedDocs.length})
-            </button>
+          <div className="flex flex-wrap gap-2 mb-6 border-b">
+            {[
+              ['all', 'All', documents.length],
+              ['pending', 'Pending', pendingDocs.length],
+              ['approved', 'Approved', approvedDocs.length],
+              ['rejected', 'Rejected', rejectedDocs.length],
+            ].map(([status, label, count]) => (
+              <Link
+                key={String(status)}
+                href={`${status === 'all' ? '/documents/review' : `/documents/review?status=${status}`}${includeQa ? `${status === 'all' ? '?' : '&'}includeQa=1` : ''}`}
+                aria-current={activeStatus === status ? 'page' : undefined}
+                className={`px-4 py-2 font-semibold ${activeStatus === status ? 'border-b-2 border-brand-blue-600 text-brand-blue-600' : 'text-black hover:text-brand-blue-700'}`}
+              >
+                {label} ({count})
+              </Link>
+            ))}
           </div>
 
-          {documents && documents.length > 0 ? (
+          {visibleDocuments.length > 0 ? (
             <div className="space-y-3">
-              {documents.map((doc) => (
+              {visibleDocuments.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
+                  className="flex flex-col items-stretch gap-4 rounded-lg border p-4 transition hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    {getStatusIcon(doc.status)}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-black">{doc.file_name}</h3>
-                      <p className="text-sm text-black">
-                        {doc.document_type
-                          .replace(/_/g, ' ')
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
-                        •{(doc.profiles as any)?.full_name || 'Unknown User'} (
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                    {getStatusIcon(doc.review_status)}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words font-semibold text-black">{doc.file_name}</h3>
+                      <p className="mt-1 break-words text-sm text-black">
+                        {documentTypeLabel(doc.document_type)} •
+                        {(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
@@ -224,20 +274,20 @@ export default async function AdminDocumentReviewPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:shrink-0">
                     <span
-                      className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.status)}`}
+                      className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.review_status)}`}
                     >
-                      {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                      {doc.review_status.charAt(0).toUpperCase() + doc.review_status.slice(1)}
                     </span>
-                    {doc.file_path ? (
+                    {doc.has_storage_locator ? (
                       <SecureDocumentLink documentId={doc.id} />
                     ) : (
                       <span className="text-slate-500 text-sm">No file</span>
                     )}
                     <Link
                       href={`/documents/review/${doc.id}`}
-                      className="px-4 py-2 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"
+                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg bg-slate-200 px-4 py-2 font-semibold text-black transition hover:bg-slate-300 sm:flex-none"
                     >
                       Review
                     </Link>

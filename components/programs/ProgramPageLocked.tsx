@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Clock, DollarSign, Award, Shield, Users, ArrowRight, CheckCircle } from 'lucide-react';
@@ -58,11 +59,12 @@ export function ProgramPageLocked({
   return (
     <main className="bg-white">
       {/* Hero - Name Only */}
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src={heroImage} alt={name} fill className="object-cover" priority sizes="100vw" placeholder="empty" />
+      <section className="bg-white">
+        <div className="relative aspect-video w-full">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={heroImage} alt={name} fill className="object-contain" priority sizes="100vw" />
 
-        <div className="relative">
+        </div>
+        <div className="mx-auto max-w-6xl px-6 py-10 text-slate-950">
           <h1 className="text-4xl md:text-5xl font-bold">{name}</h1>
         </div>
       </section>

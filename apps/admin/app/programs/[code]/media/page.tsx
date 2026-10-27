@@ -59,7 +59,7 @@ export default async function ProgramMediaPage({ params }: { params: Promise<{ c
           <h1 className="text-2xl font-bold text-slate-950">Media — {program.title}</h1>
           <p className="mt-1 text-sm text-slate-600">Canonical course lesson media across {courses?.length ?? 0} course(s).</p>
         </div>
-        <Link href="/course-builder" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 font-bold text-white hover:bg-brand-blue-700">
+        <Link href="/studio/courses" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 font-bold text-white hover:bg-brand-blue-700">
           <WandSparkles className="h-4 w-4" /> Manage in Course Builder
         </Link>
       </div>

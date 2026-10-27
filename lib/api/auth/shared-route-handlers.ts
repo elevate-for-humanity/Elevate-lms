@@ -13,6 +13,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { getRoleDestinationUrl } from '@/lib/auth/role-destinations';
 import { logger } from '@/lib/logger';
+import { linkOrphanedApplications, linkOrphanedEnrollments } from '@/lib/enrollment-service';
 
 const ADMIN_ROLES = ['admin', 'super_admin', 'org_admin', 'staff'];
 
@@ -40,7 +41,9 @@ export async function getAuthLanding(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ redirectTo: '/login' });
 
     const { data: profile, error } = await supabase
@@ -66,7 +69,10 @@ export async function getTwoFactorStatus(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
   if (error || !user) return safeError('Not authenticated', 401);
 
   const { data } = await supabase
@@ -83,7 +89,10 @@ export async function verifyTwoFactor(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
   if (error || !user) return safeError('Not authenticated', 401);
 
   const { token, isBackupCode } = await request.json().catch(() => ({}));
@@ -107,7 +116,9 @@ async function checkRole(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ hasRole: false, authenticated: false }, { status: 401 });
@@ -136,7 +147,9 @@ export async function resolvePortal(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ path: '/login' }, { status: 401 });
@@ -151,7 +164,9 @@ export async function getSession(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) return NextResponse.json({ user: null });
 
@@ -210,10 +225,42 @@ const signup = withErrorHandling(async (request: NextRequest) => {
 
   if (!data.user) throw APIErrors.internal('Failed to create user');
 
+  const adminClient = await requireAdminClient();
   if (!data.user.email_confirmed_at) {
-    const adminClient = await requireAdminClient();
     await adminClient.auth.admin.updateUserById(data.user.id, { email_confirm: true });
   }
+
+  // A learner may be enrolled by staff or a funding partner before they create
+  // portal credentials. Establish the canonical profile and claim those
+  // email-matched records immediately so the first login opens a real dashboard
+  // instead of a disconnected empty account.
+  const normalizedEmail = String(data.user.email || email)
+    .trim()
+    .toLowerCase();
+  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+  const { error: profileError } = await adminClient.from('profiles').upsert(
+    {
+      id: data.user.id,
+      email: normalizedEmail,
+      first_name: firstName || null,
+      last_name: lastName || null,
+      full_name: fullName || normalizedEmail.split('@')[0],
+      role: 'student',
+      is_active: true,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'id' },
+  );
+
+  if (profileError) {
+    logger.error('Signup profile provisioning failed', profileError);
+    throw APIErrors.internal('Failed to provision learner profile');
+  }
+
+  await Promise.all([
+    linkOrphanedEnrollments(adminClient, normalizedEmail),
+    linkOrphanedApplications(adminClient, normalizedEmail),
+  ]);
 
   return NextResponse.json({
     success: true,
@@ -234,7 +281,10 @@ export async function verifyAdminRole(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

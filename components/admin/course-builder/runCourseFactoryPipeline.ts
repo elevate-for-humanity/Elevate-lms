@@ -22,6 +22,8 @@ export type CourseFactoryPipelineResult = {
   videosQueued: number;
   errors: string[];
   dryRun: boolean;
+  governance?: unknown;
+  completionState?: 'content_only' | 'media_pending' | 'ready_for_review';
 };
 
 export type CourseFactoryPipelineEvent = {
@@ -39,14 +41,18 @@ export type CourseFactoryPipelineInput = {
   audience?: string;
   state?: string;
   credential?: string;
+  credentialRegistryKey?: string;
   hours?: number;
   deliveryFormat?: string;
   additionalRequirements?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   moduleCount?: number;
   lessonsPerModule?: number;
+  buildScope?: 'lesson' | 'course';
   includeVideos?: boolean;
   dryRun?: boolean;
+  studioConversationId?: string;
+  studioTaskId?: string;
 };
 
 /**
@@ -66,7 +72,7 @@ export async function runCourseFactoryPipeline(
 
   if (!response.ok || !response.body) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.error || `Course Factory request failed (HTTP ${response.status})`);
+    throw new Error(body.error || body.message || `Course Factory request failed (HTTP ${response.status})`);
   }
 
   const reader = response.body.getReader();

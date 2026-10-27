@@ -45,7 +45,9 @@ function StatCard({ icon, label, value, sub, href, urgent }: StatCardProps) {
         <span className={urgent ? 'text-amber-500' : 'text-slate-400'}>{icon}</span>
         <span className="text-xs font-medium text-slate-500 truncate">{label}</span>
       </div>
-      <span className={`text-xl font-black tabular-nums leading-none ${urgent ? 'text-amber-700' : 'text-slate-900'}`}>
+      <span
+        className={`text-xl font-black tabular-nums leading-none ${urgent ? 'text-amber-700' : 'text-slate-900'}`}
+      >
         {value}
       </span>
       {sub && <span className="text-[11px] text-slate-400 truncate">{sub}</span>}
@@ -55,7 +57,7 @@ function StatCard({ icon, label, value, sub, href, urgent }: StatCardProps) {
 
 function fmt(cents: number) {
   if (cents >= 100_000_00) return `$${(cents / 100_000_00).toFixed(1)}M`;
-  if (cents >= 1_000_00)   return `$${(cents / 1_000_00).toFixed(1)}k`;
+  if (cents >= 1_000_00) return `$${(cents / 1_000_00).toFixed(1)}k`;
   return `$${(cents / 100).toLocaleString('en-US')}`;
 }
 
@@ -68,6 +70,7 @@ export function StatsOverviewBar({ data }: Props) {
     pendingProgramHolders: 0,
     pendingDocuments: 0,
   };
+  const unavailable = (label: string) => data.kpis?.find(card => card.label === label)?.unavailable ?? true;
   const totalStudents = data.totalStudents ?? 0;
   const revenueAllTimeCents = data.revenueAllTimeCents ?? 0;
   const operational = data.operational ?? EMPTY_OPERATIONAL;
@@ -79,35 +82,35 @@ export function StatsOverviewBar({ data }: Props) {
         <StatCard
           icon={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Total Students"
-          value={totalStudents.toLocaleString()}
+          value={data.totalStudentsAvailable ? totalStudents.toLocaleString() : 'Unavailable'}
           sub="all time"
           href="/students"
         />
         <StatCard
           icon={<BookOpen className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Active Enrollments"
-          value={counts.activeEnrollments.toLocaleString()}
+          value={unavailable('Active Enrollments') ? 'Unavailable' : counts.activeEnrollments.toLocaleString()}
           sub="currently enrolled"
           href="/students?status=active"
         />
         <StatCard
           icon={<DollarSign className="w-3.5 h-3.5" aria-hidden="true" />}
-          label="Revenue (Month)"
-          value={fmt(counts.revenueThisMonthCents)}
-          sub={`${fmt(revenueAllTimeCents)} all time`}
-          href="/students?payment_status=paid"
+          label="Paid Invoices (Month)"
+          value={data.paidInvoiceSummary?.monthAvailable ? fmt(counts.revenueThisMonthCents) : 'Unavailable'}
+          sub={data.paidInvoiceSummary?.allTimeAvailable ? `${fmt(revenueAllTimeCents)} paid invoices all time` : 'Invoice totals unavailable'}
+          href="/funding"
         />
         <StatCard
           icon={<BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Certificates"
-          value={counts.certificatesIssued.toLocaleString()}
+          value={unavailable('Certificates Issued') ? 'Unavailable' : counts.certificatesIssued.toLocaleString()}
           sub="issued all time"
           href="/certificates"
         />
         <StatCard
           icon={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Pending Applications"
-          value={counts.pendingApplications.toLocaleString()}
+          value={unavailable('Pending Applications') ? 'Unavailable' : counts.pendingApplications.toLocaleString()}
           sub="awaiting review"
           href="/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding"
           urgent={counts.pendingApplications > 0}
@@ -115,8 +118,12 @@ export function StatsOverviewBar({ data }: Props) {
         <StatCard
           icon={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
           label="New Today"
-          value={(operational.newAppsToday + operational.newLeadsToday + operational.newEnrollmentsToday).toLocaleString()}
-          sub={`${operational.newAppsToday} apps · ${operational.newLeadsToday} leads · ${operational.newEnrollmentsToday} enrolls`}
+          value={data.newTodayAvailable ? (
+            operational.newAppsToday +
+            operational.newLeadsToday +
+            operational.newEnrollmentsToday
+          ).toLocaleString() : 'Unavailable'}
+          sub={data.newTodayAvailable ? `${operational.newAppsToday} apps · ${operational.newLeadsToday} leads · ${operational.newEnrollmentsToday} enrolls` : 'New activity counts unavailable'}
           href="/activity"
         />
       </div>

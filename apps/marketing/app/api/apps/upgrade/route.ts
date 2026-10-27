@@ -1,175 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getStripe } from '@/lib/stripe/client';
-import { hydrateProcessEnv } from '@/lib/secrets';
-import { getIndividualAppCatalog } from '@/lib/apps/individual-app-plans';
-import { individualAppPriceLookupKey } from '@/lib/platform/orchestration/commerce';
-import { resolveCanonicalStripePrice } from '@/lib/stripe/resolve-canonical-price';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
-import { syncIndividualAppLifecycle } from '@/lib/platform/subscription-lifecycle';
+import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
+import { getIndividualAppCatalog } from '@/lib/apps/individual-app-plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SITE_URL = 'https://www.elevateforhumanity.org';
-
 export async function POST(request: NextRequest) {
-  await hydrateProcessEnv();
-
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user?.id || !user.email) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.id || !user.email) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
   const appSlug = typeof body.appSlug === 'string' ? body.appSlug : '';
   const planId = typeof body.plan === 'string' ? body.plan : '';
-
   const catalog = getIndividualAppCatalog(appSlug);
-  if (!catalog) return NextResponse.json({ error: 'Unknown app' }, { status: 400 });
+  const plan = catalog?.plans.find((item) => item.id === planId);
+  if (!catalog || !plan) return NextResponse.json({ error: 'Invalid app or plan' }, { status: 400 });
 
-  const plan = catalog.plans.find((candidate) => candidate.id === planId);
-  if (!plan) return NextResponse.json({ error: 'Unknown subscription plan' }, { status: 400 });
-
-  const stripe = getStripe();
-  if (!stripe) return NextResponse.json({ error: 'Stripe is not configured' }, { status: 503 });
-
-  const lookupKey = individualAppPriceLookupKey(catalog.slug, plan.id);
-  let stripePrice;
-  try {
-    stripePrice = await resolveCanonicalStripePrice(stripe, {
-      lookupKey,
-      unitAmount: Math.round(plan.priceMonthly * 100),
-      recurringInterval: 'month',
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Subscription catalog is temporarily unavailable',
-        detail: error instanceof Error ? error.message : 'Stripe catalog is not configured',
-      },
-      { status: 503 },
-    );
-  }
-
-  const metadata = {
-    checkout_type: 'individual_app',
-    user_id: user.id,
-    app_slug: catalog.slug,
-    plan_id: plan.id,
-    price_lookup_key: lookupKey,
-  };
-
-  const admin = await requireAdminClient();
-  const { data: existing } = await admin
-    .from('user_app_subscriptions')
-    .select('id,status,plan,stripe_subscription_id')
-    .eq('user_id', user.id)
-    .eq('app_slug', catalog.slug)
-    .maybeSingle();
-
-  if (existing?.stripe_subscription_id && ['active', 'trial'].includes(existing.status || '')) {
-    try {
-      const current = await stripe.subscriptions.retrieve(existing.stripe_subscription_id);
-      if (['active', 'trialing'].includes(current.status)) {
-        const item = current.items.data[0];
-        if (!item) {
-          return NextResponse.json({ error: 'The existing Stripe subscription has no billable item.' }, { status: 409 });
-        }
-
-        const updated = item.price.id === stripePrice.id
-          ? current
-          : await stripe.subscriptions.update(current.id, {
-              items: [{ id: item.id, price: stripePrice.id, quantity: 1 }],
-              metadata: { ...current.metadata, ...metadata },
-              proration_behavior: 'create_prorations',
-              payment_behavior: 'error_if_incomplete',
-            });
-
-        if (item.price.id === stripePrice.id && current.metadata?.plan_id !== plan.id) {
-          await stripe.subscriptions.update(current.id, {
-            metadata: { ...current.metadata, ...metadata },
-          });
-        }
-
-        const synchronized = await stripe.subscriptions.retrieve(current.id);
-        await syncIndividualAppLifecycle(admin, synchronized);
-
-        await emitPlatformEvent(admin, {
-          eventType: PlatformEventType.BILLING_SUBSCRIPTION_UPDATED,
-          category: 'billing',
-          source: 'marketing.api.apps.upgrade',
-          actorId: user.id,
-          actorType: 'user',
-          subjectType: 'individual_app_subscription',
-          subjectId: current.id,
-          correlationId: current.id,
-          idempotencyKey: `app-plan-change:${current.id}:${plan.id}:${stripePrice.id}`,
-          dispatch: false,
-          payload: {
-            app_slug: catalog.slug,
-            previous_plan: existing.plan,
-            plan_id: plan.id,
-            stripe_price_id: stripePrice.id,
-          },
-        });
-
-        return NextResponse.json({
-          checkoutUrl: `/apps/${catalog.slug}?subscription=updated&plan=${encodeURIComponent(plan.id)}`,
-          updated: true,
-        });
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Existing subscription could not be updated';
-      return NextResponse.json(
-        { error: 'We could not change the current subscription without creating a duplicate.', detail: message },
-        { status: 409 },
-      );
-    }
-  }
-
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    customer_email: user.email,
-    client_reference_id: user.id,
-    allow_promotion_codes: true,
-    metadata,
-    subscription_data: { metadata },
-    line_items: [{ price: stripePrice.id, quantity: 1 }],
-    success_url: `${SITE_URL}/store/apps/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${SITE_URL}/store/apps/${catalog.slug}?checkout=cancelled`,
-  });
-
-  if (!session.url) return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
-
-  try {
-    await emitPlatformEvent(admin, {
-      eventType: PlatformEventType.COMMERCE_CHECKOUT_CREATED,
-      category: 'commerce',
-      source: 'marketing.api.apps.upgrade',
-      actorId: user.id,
-      actorType: 'user',
-      subjectType: 'individual_app_subscription',
-      subjectId: session.id,
-      correlationId: session.id,
-      idempotencyKey: `stripe-checkout-created:${session.id}`,
-      dispatch: false,
+  const db = await requireAdminClient();
+  const invoice = await createQuickBooksBillingProvider(db).createManualInvoice({
+    idempotencyKey: `individual-app:${user.id}:${catalog.slug}:${plan.id}:${new Date().toISOString().slice(0, 7)}`,
+    customer: {
+      externalKey: `user:${user.id}`,
+      displayName: String(user.user_metadata?.full_name || user.email),
+      email: user.email,
+    },
+    lines: [{
+      canonicalKey: `individual-app-${catalog.slug}-${plan.id}`,
+      name: `${catalog.displayName} — ${plan.name} monthly subscription`,
+      description: catalog.tagline,
+      quantity: 1,
+      unitAmountCents: Math.round(plan.priceMonthly * 100),
+    }],
+    dueDate: new Date().toISOString().slice(0, 10),
+    memo: `Elevate ${catalog.displayName} subscription`,
+    fulfillment: {
+      type: 'individual_app_subscription',
       payload: {
+        user_id: user.id,
         app_slug: catalog.slug,
         plan_id: plan.id,
-        stripe_price_id: stripePrice.id,
-        price_lookup_key: lookupKey,
+        amount_cents: Math.round(plan.priceMonthly * 100),
       },
-    });
-  } catch {
-    // Checkout must not fail because audit/event telemetry is unavailable.
-  }
+    },
+  });
 
-  return NextResponse.json({ checkoutUrl: session.url });
+  const schedule = await db.from('billing_schedules').upsert({
+    customer_external_key: `user:${user.id}`,
+    customer_name: String(user.user_metadata?.full_name || user.email),
+    customer_email: user.email,
+    canonical_product_key: `individual-app-${catalog.slug}`,
+    product_name: `${catalog.displayName} — ${plan.name}`,
+    product_description: catalog.tagline,
+    provider: 'quickbooks',
+    amount_cents: Math.round(plan.priceMonthly * 100),
+    cadence: 'monthly',
+    next_invoice_date: new Date(new Date().setUTCMonth(new Date().getUTCMonth() + 1)).toISOString().slice(0, 10),
+    status: 'active',
+    fulfillment_type: 'individual_app_subscription',
+    fulfillment_payload: { user_id: user.id, app_slug: catalog.slug, plan_id: plan.id, amount_cents: Math.round(plan.priceMonthly * 100) },
+  }, { onConflict: 'provider,customer_external_key,canonical_product_key' });
+  if (schedule.error) throw new Error(schedule.error.message);
+
+  if (!invoice.paymentUrl) return NextResponse.json({ error: 'QuickBooks created the invoice but no Pay Now link was returned.', invoiceId: invoice.providerInvoiceId }, { status: 503 });
+  return NextResponse.json({ checkoutUrl: invoice.paymentUrl, invoiceId: invoice.providerInvoiceId });
 }

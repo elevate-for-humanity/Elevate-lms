@@ -32,7 +32,7 @@ export default async function WorkforceLayout({ children }: { children: React.Re
     .maybeSingle();
 
   if (!profile?.role || !ALLOWED_ROLES.includes(profile.role)) {
-    redirect('/login');
+    redirect('/unauthorized');
   }
 
   // Get pathname for breadcrumbs

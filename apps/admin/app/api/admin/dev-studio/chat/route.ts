@@ -1,3 +1,8 @@
+import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
+import { recordParisObservation } from '@/lib/ai/runtime/supervision';
+import { executeStudioCommand } from '@/lib/studio/runtime-command';
+import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
  * /api/admin/dev-studio/chat
  *
@@ -10,7 +15,8 @@
 
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
+import { createAdminChatClient } from '@/lib/ai/admin-chat-client';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,18 +27,19 @@ import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { aiChat } from '@/lib/ai/ai-service';
+import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
-import {
-  ROUTE_DEPENDENCIES,
-  lookupRoute,
-  lookupTable,
-} from '@/lib/platform/knowledge-graph';
-import {
-  PROGRAM_REGISTRY,
-  getProgramBySlug,
-} from '@/lib/platform/system-registry';
+import { createMasterStudioRun } from '@/lib/studio/master-runtime';
+import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
+import { ROUTE_DEPENDENCIES, lookupRoute, lookupTable } from '@/lib/platform/knowledge-graph';
+import { PROGRAM_REGISTRY, getProgramBySlug } from '@/lib/platform/system-registry';
 import {
   buildAdminAiSystemPrompt,
   isOperationalDiagnosticRequest,
@@ -43,17 +50,126 @@ import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
-type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
+type ChatProvider = 'auto' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
+type StudioAgent = 'ADMIN_AI';
+
+const PUBLIC_ORIGIN = 'https://www.elevateforhumanity.org';
+const ADMIN_ORIGIN = 'https://admin.elevateforhumanity.org';
+const ADMIN_ROUTE_PREFIXES = [
+  '/dashboard',
+  '/studio',
+  '/students',
+  '/applications',
+  '/programs',
+  '/system-health',
+  '/settings',
+  '/integrations',
+  '/operations',
+];
+
+/** Keep browser evidence on the canonical application that owns the route. */
+function normalizeElevateAuditUrl(value: unknown): string {
+  const raw = typeof value === 'string' && value.trim() ? value.trim() : PUBLIC_ORIGIN;
+  try {
+    const url = new URL(raw, PUBLIC_ORIGIN);
+    const isElevateHost = /(^|\.)elevateforhumanity\.org$/i.test(url.hostname);
+    const isAdminRoute = ADMIN_ROUTE_PREFIXES.some(
+      (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),
+    );
+
+    if (isElevateHost && isAdminRoute) {
+      return `${ADMIN_ORIGIN}${url.pathname}${url.search}${url.hash}`;
+    }
+    return url.toString();
+  } catch {
+    return PUBLIC_ORIGIN;
+  }
+}
+
+function normalizeAgent(_value: unknown): StudioAgent {
+  return 'ADMIN_AI';
+}
+
+const UNIFIED_CAPABILITY_RULES = [
+  { pattern: /\b(course|curriculum|lesson|assessment|lms)\b/i, slugs: ['ellie', 'ai-lms-builder'] },
+  { pattern: /\b(website|page|design|seo|content)\b/i, slugs: ['paris', 'ai-website-manager'] },
+  {
+    pattern: /\b(compliance|policy|audit|security|rls|claim)\b/i,
+    slugs: ['zora', 'ai-compliance-assistant'],
+  },
+  { pattern: /\b(workflow|automation|pipeline)\b/i, slugs: ['ai-workflow-builder'] },
+  {
+    pattern: /\b(deploy|test|container|build|ci|workflow run)\b/i,
+    slugs: ['ai-devops-engineer', 'ai-qa-tester'],
+  },
+  {
+    pattern: /\b(code|schema|repository|repo|debug|route|component|typescript)\b/i,
+    slugs: ['ai-architect', 'ai-developer', 'ai-debugger'],
+  },
+  {
+    pattern: /\b(operation|report|application|enrollment|business|analytics)\b/i,
+    slugs: ['ai-business-operations-manager'],
+  },
+] as const;
+
+function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): string[] {
+  const evidence = `${message} ${toolCalls.map((call) => call.tool).join(' ')}`;
+  const selected = new Set<string>(['lizzy']);
+  for (const rule of UNIFIED_CAPABILITY_RULES) {
+    if (rule.pattern.test(evidence)) rule.slugs.forEach((slug) => selected.add(slug));
+  }
+  return [...selected];
+}
+
+async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
+  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
+  return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
+}
+
+async function recordUnifiedCapabilityUse(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  slugs: string[],
+  provider: string,
+  model: string,
+  toolCalls: ToolCallRecord[],
+) {
+  const { data, error } = await db.from('ai_agents').select('slug, metadata').in('slug', slugs);
+  if (error) throw error;
+  const usedAt = new Date().toISOString();
+  await Promise.all(
+    (data ?? []).map((row) =>
+      db
+        .from('ai_agents')
+        .update({
+          metadata: {
+            ...((row.metadata as Record<string, unknown> | null) ?? {}),
+            connected: true,
+            orchestrator: 'admin-ai',
+            execution_route: '/api/admin/dev-studio/chat',
+            last_used_at: usedAt,
+            last_provider: provider,
+            last_model: model,
+            last_tools: toolCalls.map((call) => call.tool),
+          },
+          model_hint: `${provider}:${model}`,
+          status: 'idle',
+          updated_at: usedAt,
+        })
+        .eq('slug', row.slug),
+    ),
+  );
+}
 
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
+  xai: ['grok-4.6'],
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
-  openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
+  openai: ['gpt-6-luna', 'gpt-4.1-mini', 'gpt-4o-mini'],
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
   anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
 };
 
 function normalizeProvider(value: unknown): ChatProvider {
-  return ['auto', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
+  return ['auto', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
     ? (String(value) as ChatProvider)
     : 'auto';
 }
@@ -107,7 +223,8 @@ const TOOLS: any[] = [
     type: 'function',
     function: {
       name: 'get_dashboard_stats',
-      description: 'Get headline metrics from the same canonical tables used by the Admin dashboard.',
+      description:
+        'Get headline metrics from the same canonical tables used by the Admin dashboard.',
       parameters: { type: 'object', properties: {}, required: [] },
     },
   },
@@ -129,13 +246,39 @@ const TOOLS: any[] = [
   {
     type: 'function',
     function: {
+      name: 'scan_live_page',
+      description:
+        'Run the isolated Playwright browser against an Elevate production page and return measured desktop/mobile layout, console, request, response, and accessibility evidence. This is the only tool that proves live browser behavior.',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description:
+              'Exact Elevate production URL. Admin routes such as /dashboard, /studio, /students, /applications, /programs, /settings, and /system-health belong to https://admin.elevateforhumanity.org. Public marketing routes belong to https://www.elevateforhumanity.org.',
+          },
+          include_mobile: {
+            type: 'boolean',
+            description: 'Also inspect a 390x844 mobile viewport. Defaults to true.',
+          },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'inspect_platform_registry',
       description:
         'Search the internal system/program registry and knowledge graph for matching routes, tables, programs, and known platform debt.',
       parameters: {
         type: 'object',
         properties: {
-          query: { type: 'string', description: 'Route, program slug, table, component, or problem terms to inspect' },
+          query: {
+            type: 'string',
+            description: 'Route, program slug, table, component, or problem terms to inspect',
+          },
         },
         required: ['query'],
       },
@@ -150,8 +293,14 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          slug: { type: 'string', description: 'Program slug, for example barber, cna, or hvac-technician' },
-          include_live: { type: 'boolean', description: 'Also query live Supabase program/course metadata' },
+          slug: {
+            type: 'string',
+            description: 'Program slug, for example barber, cna, or hvac-technician',
+          },
+          include_live: {
+            type: 'boolean',
+            description: 'Also query live Supabase program/course metadata',
+          },
         },
         required: ['slug'],
       },
@@ -166,7 +315,10 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          route_path: { type: 'string', description: 'Route path such as /programs/barber or /dashboard' },
+          route_path: {
+            type: 'string',
+            description: 'Route path such as /programs/barber or /dashboard',
+          },
         },
         required: ['route_path'],
       },
@@ -213,7 +365,11 @@ const TOOLS: any[] = [
         type: 'object',
         properties: {
           query: { type: 'string', description: 'Literal or regex search term' },
-          path_hint: { type: 'string', description: 'Optional safe path prefix such as app, apps/admin/app, components, lib, content, data' },
+          path_hint: {
+            type: 'string',
+            description:
+              'Optional safe path prefix such as app, apps/admin/app, components, lib, content, data',
+          },
           limit: { type: 'number', description: 'Maximum matching lines, capped at 80' },
         },
         required: ['query'],
@@ -302,40 +458,37 @@ const TOOLS: any[] = [
     function: {
       name: 'build_course',
       description:
-        'Generate, validate, persist, and governance-normalize a complete course as a governed draft through the canonical Course Factory. ' +
+        'Queue durable generation through the Ultimate Course Builder 20-stage production pipeline, including instructional depth, media, narration, assessment, QA, repair, and LMS release evidence. ' +
         'Use when the user says "build a course", "create a course", "make a course about", or "generate a course". ' +
-        'The course is saved in one tool call; publishing remains a separate governed action.',
+        'Returns a durable Ultimate build/job identity; the Google Cloud Run Ultimate worker claims and checkpoints the build.',
       parameters: {
         type: 'object',
         properties: {
-          title:              { type: 'string',  description: 'Course title' },
-          description:        { type: 'string',  description: 'What the course covers' },
-          audience:           { type: 'string',  description: 'Target learner (e.g. "adult workforce learners")' },
-          modules:            { type: 'number',  description: 'Number of modules (default 5)' },
-          lessons_per_module: { type: 'number',  description: 'Lessons per module (default 3)' },
-          hours:              { type: 'number',  description: 'Target training hours when known' },
-          state:              { type: 'string',  description: 'State/jurisdiction when relevant' },
-          credential:         { type: 'string',  description: 'Credential or license target when relevant' },
-        },
-        required: ['title'],
-      },
-    },
-  },
-  {
-    type: 'function',
-    function: {
-      name: 'save_course',
-      description:
-        'Compatibility tool for an older reviewed course draft. It persists only through the canonical Course Factory; it never writes legacy course/module/lesson tables directly.',
-      parameters: {
-        type: 'object',
-        properties: {
-          course: {
-            type: 'object',
-            description: 'A legacy course draft object that has not already been persisted',
+          course_id: {
+            type: 'string',
+            description: 'Optional existing course UUID. Omit to create a new draft course.',
           },
+          program_id: {
+            type: 'string',
+            description: 'Canonical program UUID that owns the course',
+          },
+          program_slug: {
+            type: 'string',
+            description: 'Registered program slug used to resolve its credential blueprint',
+          },
+          title: { type: 'string', description: 'Course title' },
+          description: { type: 'string', description: 'What the course covers' },
+          audience: {
+            type: 'string',
+            description: 'Target learner (e.g. "adult workforce learners")',
+          },
+          modules: { type: 'number', description: 'Number of modules (default 5)' },
+          lessons_per_module: { type: 'number', description: 'Lessons per module (default 3)' },
+          hours: { type: 'number', description: 'Target training hours when known' },
+          state: { type: 'string', description: 'State/jurisdiction when relevant' },
+          credential: { type: 'string', description: 'Credential or license target when relevant' },
         },
-        required: ['course'],
+        required: ['program_slug', 'title'],
       },
     },
   },
@@ -344,14 +497,15 @@ const TOOLS: any[] = [
     function: {
       name: 'generate_videos',
       description:
-        'Start video generation for a saved course. Uses TTS narration (OpenAI) + Pexels b-roll + ffmpeg pipeline. ' +
+        'Inspect or repair the Ultimate course media stages. Media, Cloudflare narration, licensed Envato assets, Remotion rendering, captions and QA are owned by the Ultimate pipeline; this is not a separate video-generation authority. ' +
         'Use when user says "generate videos", "make videos for this course", "add videos", etc.',
       parameters: {
         type: 'object',
         properties: {
-          course_id:  { type: 'string',  description: 'Canonical course ID from build_course/save_course' },
-          voice:      { type: 'string',  description: 'TTS voice: alloy | echo | fable | onyx | nova | shimmer (default alloy)' },
-          use_pexels: { type: 'boolean', description: 'Use Pexels b-roll footage (default true)' },
+          course_id: {
+            type: 'string',
+            description: 'Canonical course ID from build_course',
+          },
         },
         required: ['course_id'],
       },
@@ -386,8 +540,8 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          document_id:     { type: 'string', description: 'Document ID' },
-          application_id:  { type: 'string', description: 'Application ID to update' },
+          document_id: { type: 'string', description: 'Document ID' },
+          application_id: { type: 'string', description: 'Application ID to update' },
         },
         required: ['document_id', 'application_id'],
       },
@@ -425,7 +579,10 @@ const SAFE_SOURCE_PREFIXES = [
 ];
 
 function toSafeRelativePath(filePath: string): string | null {
-  const normalized = filePath.replace(/\\/g, '/').replace(/^\/workspace\//, '').replace(/^\.\//, '');
+  const normalized = filePath
+    .replace(/\\/g, '/')
+    .replace(/^\/workspace\//, '')
+    .replace(/^\.\//, '');
   if (normalized.includes('..') || normalized.startsWith('/')) return null;
   if (!SAFE_SOURCE_PREFIXES.some((prefix) => normalized.startsWith(prefix))) return null;
   return normalized;
@@ -472,10 +629,12 @@ function routeFromSourceFile(file: string): string | null {
 
   const suffix = routeFile.slice(appPrefix.length).replace(/\/(page|route)\.tsx?$/, '');
   if (suffix === '') return '/';
-  return suffix
-    .replace(/\/\([^)]*\)/g, '')
-    .replace(/\/page$/, '')
-    .replace(/\/route$/, '') || '/';
+  return (
+    suffix
+      .replace(/\/\([^)]*\)/g, '')
+      .replace(/\/page$/, '')
+      .replace(/\/route$/, '') || '/'
+  );
 }
 
 function routePatternMatches(patternRoute: string, requestedRoute: string): boolean {
@@ -501,15 +660,24 @@ function findRouteFiles(routePath: string): string[] {
 }
 
 function inspectPlatformRegistry(query: string): string {
-  const terms = query.toLowerCase().split(/[^a-z0-9/_-]+/).filter(Boolean);
+  const terms = query
+    .toLowerCase()
+    .split(/[^a-z0-9/_-]+/)
+    .filter(Boolean);
   const matchesTerm = (value: string) => terms.some((term) => value.toLowerCase().includes(term));
-  const programMatches = PROGRAM_REGISTRY
-    .filter((program) => matchesTerm(`${program.slug} ${program.title} ${program.category} ${program.canonical_route}`))
-    .slice(0, 12);
+  const programMatches = PROGRAM_REGISTRY.filter((program) =>
+    matchesTerm(`${program.slug} ${program.title} ${program.category} ${program.canonical_route}`),
+  ).slice(0, 12);
   const routeMatches = Object.entries(ROUTE_DEPENDENCIES)
-    .filter(([route, deps]) => matchesTerm(`${route} ${deps.tables.join(' ')} ${deps.apis.join(' ')} ${deps.components.join(' ')}`))
+    .filter(([route, deps]) =>
+      matchesTerm(
+        `${route} ${deps.tables.join(' ')} ${deps.apis.join(' ')} ${deps.components.join(' ')}`,
+      ),
+    )
     .slice(0, 12);
-  const tableMatches = Array.from(new Set(Object.values(ROUTE_DEPENDENCIES).flatMap((deps) => deps.tables)))
+  const tableMatches = Array.from(
+    new Set(Object.values(ROUTE_DEPENDENCIES).flatMap((deps) => deps.tables)),
+  )
     .filter((table) => matchesTerm(table))
     .map((table) => ({ table, owners: lookupTable(table).map((system) => system.id) }))
     .slice(0, 12);
@@ -518,7 +686,11 @@ function inspectPlatformRegistry(query: string): string {
     {
       query,
       program_matches: programMatches,
-      route_dependency_matches: routeMatches.map(([route, deps]) => ({ route, ...deps, owner: lookupRoute(route)?.id ?? null })),
+      route_dependency_matches: routeMatches.map(([route, deps]) => ({
+        route,
+        ...deps,
+        owner: lookupRoute(route)?.id ?? null,
+      })),
       table_matches: tableMatches,
     },
     null,
@@ -529,16 +701,20 @@ function inspectPlatformRegistry(query: string): string {
 function inspectRoute(routePath: string): string {
   const normalized = routePath.startsWith('/') ? routePath : `/${routePath}`;
   const sourceFiles = findRouteFiles(normalized);
-  const dependencyEntry = Object.entries(ROUTE_DEPENDENCIES).find(([route]) =>
-    route === normalized || routePatternMatches(route, normalized)
+  const dependencyEntry = Object.entries(ROUTE_DEPENDENCIES).find(
+    ([route]) => route === normalized || routePatternMatches(route, normalized),
   );
-  const owningSystem = lookupRoute(normalized)?.id ?? (dependencyEntry ? lookupRoute(dependencyEntry[0])?.id ?? null : null);
+  const owningSystem =
+    lookupRoute(normalized)?.id ??
+    (dependencyEntry ? (lookupRoute(dependencyEntry[0])?.id ?? null) : null);
 
   return JSON.stringify(
     {
       route: normalized,
       owning_system: owningSystem,
-      known_dependencies: dependencyEntry ? { route_pattern: dependencyEntry[0], ...dependencyEntry[1] } : null,
+      known_dependencies: dependencyEntry
+        ? { route_pattern: dependencyEntry[0], ...dependencyEntry[1] }
+        : null,
       source_files: sourceFiles,
       source_excerpts: sourceFiles.slice(0, 3).map((file) => sourceExcerpt(file, 90)),
     },
@@ -548,28 +724,20 @@ function inspectRoute(routePath: string): string {
 }
 
 function searchCode(query: string, pathHint?: string, limit = 40): string {
-  const safeHint = pathHint ? toSafeRelativePath(pathHint.endsWith('/') ? pathHint : `${pathHint}/`) : null;
-  const paths = safeHint ? [safeHint] : ['app', 'apps/admin/app', 'components', 'content', 'data', 'lib'];
-  return runRipgrep([
-    '-n',
-    '-F',
-    query.slice(0, 160),
-    ...paths,
-    '-g',
-    '*.{ts,tsx,js,jsx,json,md}',
-  ])
+  const safeHint = pathHint
+    ? toSafeRelativePath(pathHint.endsWith('/') ? pathHint : `${pathHint}/`)
+    : null;
+  const paths = safeHint
+    ? [safeHint]
+    : ['app', 'apps/admin/app', 'components', 'content', 'data', 'lib'];
+  return runRipgrep(['-n', '-F', query.slice(0, 160), ...paths, '-g', '*.{ts,tsx,js,jsx,json,md}'])
     .split('\n')
     .slice(0, Math.min(Math.max(limit, 5), 80))
     .join('\n');
 }
 
 function inspectBuildErrors(kind: string): string {
-  const candidates = [
-    `.next/${kind}.log`,
-    `logs/${kind}.log`,
-    `tmp/${kind}.log`,
-    `${kind}.log`,
-  ];
+  const candidates = [`.next/${kind}.log`, `logs/${kind}.log`, `tmp/${kind}.log`, `${kind}.log`];
   const found = candidates.find((candidate) => existsSync(path.join(REPO_ROOT, candidate)));
   if (!found) {
     const command =
@@ -591,8 +759,9 @@ async function collectAutomaticEvidence(query: string): Promise<ToolCallRecord[]
   records.push({ tool: 'inspect_platform_registry', args: { query }, result: registryResult });
 
   const normalized = query.toLowerCase();
-  const mentionedProgram = PROGRAM_REGISTRY.find((program) =>
-    normalized.includes(program.slug) || normalized.includes(program.title.toLowerCase())
+  const mentionedProgram = PROGRAM_REGISTRY.find(
+    (program) =>
+      normalized.includes(program.slug) || normalized.includes(program.title.toLowerCase()),
   );
   if (mentionedProgram) {
     const result = await execTool('query_program_by_slug', {
@@ -619,6 +788,21 @@ async function collectAutomaticEvidence(query: string): Promise<ToolCallRecord[]
     });
   }
 
+  if (
+    /\b(?:scan|inspect|check|test|audit)\b/i.test(query) &&
+    /\b(?:live|homepage|home page|browser|console|network|mobile|accessibility|layout|broken control)\b/i.test(
+      query,
+    )
+  ) {
+    const urlMatch = query.match(/https?:\/\/[^\s)]+/i);
+    const args = {
+      url: urlMatch?.[0] || 'https://www.elevateforhumanity.org',
+      include_mobile: true,
+    };
+    const result = await execTool('scan_live_page', args);
+    records.push({ tool: 'scan_live_page', args, result });
+  }
+
   return records;
 }
 
@@ -632,10 +816,75 @@ function formatAutomaticEvidence(records: ToolCallRecord[]): string {
     .join('\n\n');
 }
 
-function enforceEvidenceBoundary(message: string, query: string, records: ToolCallRecord[]): string {
+function enforceEvidenceBoundary(
+  message: string,
+  query: string,
+  records: ToolCallRecord[],
+): string {
   if (!isOperationalDiagnosticRequest(query)) return message;
 
-  const hasEvidenceStatus = /Evidence used:/i.test(message) || /No live tool was executed/i.test(message);
+  const browserRecord = records.find((record) => record.tool === 'scan_live_page');
+  if (browserRecord) {
+    try {
+      const result = JSON.parse(browserRecord.result) as {
+        target?: string;
+        results?: Array<{ audit?: { url?: string } }>;
+      };
+      const target = result.target ? new URL(result.target) : null;
+      const finalUrls = (result.results ?? [])
+        .map((entry) => entry.audit?.url)
+        .filter((url): url is string => Boolean(url));
+      const authenticationBlocked =
+        target?.hostname === 'admin.elevateforhumanity.org' &&
+        finalUrls.some((url) => {
+          try {
+            const finalUrl = new URL(url);
+            return (
+              finalUrl.hostname === 'admin.elevateforhumanity.org' && finalUrl.pathname === '/login'
+            );
+          } catch {
+            return false;
+          }
+        });
+
+      if (authenticationBlocked) {
+        return `Problem:\nThe isolated Studio Browser could not verify the protected admin page because it was redirected to the admin login screen. This is an authentication boundary, not evidence that the dashboard is broken.\n\nEvidence used:\n- scan_live_page targeted ${result.target}\n- Final browser URL redirected to ${finalUrls.find((url) => url.includes('/login'))}\n\nLikely causes:\n- The isolated browser does not share the administrator's authenticated session.\n- Protected admin routes correctly require an authenticated admin session.\n\nAffected files/routes/tables:\n- /api/admin/dev-studio/browser/session\n- /api/admin/dev-studio/chat\n- Protected route requested: ${target.pathname}\n\nConfidence:\nHigh confidence that authentication blocked this audit. No conclusion is made about the protected page's functionality.\n\nNext debug step:\nRun the audit with an explicitly authenticated Studio Browser session, or use authenticated admin tools and route-level diagnostics. Do not report the dashboard as failed from this redirect.`;
+      }
+    } catch {
+      // The existing invalid-evidence handling below provides the deterministic fallback.
+    }
+  }
+
+  const requestsBrowserEvidence =
+    /\b(?:live|homepage|home page|browser|console|network|mobile|accessibility|layout|broken control)\b/i.test(
+      query,
+    );
+  if (requestsBrowserEvidence) {
+    let browserFailure = '';
+    if (browserRecord) {
+      try {
+        const result = JSON.parse(browserRecord.result) as {
+          status?: string;
+          verified?: boolean;
+          error?: string;
+        };
+        if (result.status === 'failed' || result.verified === false) {
+          browserFailure = result.error || 'The live browser audit failed without an error detail.';
+        }
+      } catch {
+        browserFailure = 'The live browser audit returned invalid evidence.';
+      }
+    } else {
+      browserFailure = 'No live browser tool was executed for this answer.';
+    }
+
+    if (browserFailure) {
+      return `Problem:\nThe requested live browser verification did not complete.\n\nEvidence used:\n- scan_live_page: failed — ${browserFailure}\n- Any registry or source inspection is architecture evidence only; it does not prove live browser behavior.\n\nLikely causes:\n- The isolated Studio Browser runtime is unavailable, unconfigured, or unreachable from Admin.\n\nAffected files/routes/tables:\n- /api/admin/dev-studio/browser/session\n- /api/admin/dev-studio/chat\n- services/studio-browser/server.mjs\n- STUDIO_BROWSER_URL and STUDIO_BROWSER_SECRET runtime configuration\n\nConfidence:\nHigh confidence that live verification failed; no conclusion is made about homepage quality.\n\nNext debug step:\nRestore Studio Browser health, then rerun this exact request. Do not mark the page clean until scan_live_page returns measured desktop and mobile evidence.`;
+    }
+  }
+
+  const hasEvidenceStatus =
+    /Evidence used:/i.test(message) || /No live tool was executed/i.test(message);
   if (hasEvidenceStatus) return message;
 
   const evidenceLine = records.length
@@ -713,7 +962,11 @@ export default function ${pageTitle.replace(/[^a-zA-Z0-9]/g, '') || 'Template'}P
   );
 }
 
-async function execTool(name: string, args: Record<string, unknown>): Promise<string> {
+async function execTool(
+  name: string,
+  args: Record<string, unknown>,
+  actorUserId?: string,
+): Promise<string> {
   switch (name) {
     case 'list_programs': {
       const db = await requireAdminClient();
@@ -743,19 +996,24 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     case 'get_dashboard_stats': {
       const db = await requireAdminClient();
-      const pendingStatuses = ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review'];
+      const pendingStatuses = [
+        'pending',
+        'submitted',
+        'in_review',
+        'under_review',
+        'pending_admin_review',
+      ];
       const [enrollRes, appRes, certRes, progRes] = await Promise.all([
         db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-        db.from('applications')
+        db
+          .from('applications')
           .select('id', { count: 'exact', head: true })
           .in('status', pendingStatuses),
         db.from('program_completion_certificates').select('id', {
           count: 'exact',
           head: true,
         }),
-        db.from('programs')
-          .select('id', { count: 'exact', head: true })
-          .eq('is_active', true),
+        db.from('programs').select('id', { count: 'exact', head: true }).eq('is_active', true),
       ]);
       return JSON.stringify(
         {
@@ -774,11 +1032,19 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const limit = typeof args.limit === 'number' ? args.limit : 10;
       let q = db
         .from('applications')
-        .select('id, status, created_at, submitted_at, program_interest, program_slug, first_name, last_name, full_name, email')
+        .select(
+          'id, status, created_at, submitted_at, program_interest, program_slug, first_name, last_name, full_name, email',
+        )
         .order('created_at', { ascending: false })
         .limit(limit);
       if (args.status === 'pending') {
-        q = q.in('status', ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review']);
+        q = q.in('status', [
+          'pending',
+          'submitted',
+          'in_review',
+          'under_review',
+          'pending_admin_review',
+        ]);
       } else if (args.status) {
         q = q.eq('status', String(args.status));
       }
@@ -791,8 +1057,34 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       return inspectPlatformRegistry(String(args.query || ''));
     }
 
+    case 'scan_live_page': {
+      try {
+        return JSON.stringify(
+          await runStudioBrowserAudit({
+            url: normalizeElevateAuditUrl(args.url),
+            includeMobile: args.include_mobile !== false,
+          }),
+          null,
+          2,
+        );
+      } catch (error) {
+        return JSON.stringify(
+          {
+            evidenceType: 'live-cdp-browser-audit',
+            status: 'failed',
+            error: error instanceof Error ? error.message : 'Live browser audit failed',
+            verified: false,
+          },
+          null,
+          2,
+        );
+      }
+    }
+
     case 'query_program_by_slug': {
-      const slug = String(args.slug || '').trim().toLowerCase();
+      const slug = String(args.slug || '')
+        .trim()
+        .toLowerCase();
       const registry = getProgramBySlug(slug) ?? null;
       let live: Record<string, unknown> | null = null;
 
@@ -840,7 +1132,10 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
     }
 
     case 'get_component_source': {
-      return sourceExcerpt(String(args.file_path || ''), typeof args.max_lines === 'number' ? args.max_lines : 160);
+      return sourceExcerpt(
+        String(args.file_path || ''),
+        typeof args.max_lines === 'number' ? args.max_lines : 160,
+      );
     }
 
     case 'search_schema': {
@@ -910,184 +1205,73 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       if (!isSafeCommand(cmd)) {
         return `Command not permitted: "${cmd}". Only read-only diagnostics are allowed.`;
       }
-      try {
-        const { execSync } = await import('child_process');
-        const out = execSync(cmd, {
-          encoding: 'utf8',
-          timeout: 10_000,
-          cwd: process.cwd(),
-        });
-        return out.slice(0, 4000);
-      } catch {
-        return 'Command execution failed';
-      }
+      const result = await executeStudioCommand(cmd);
+      return JSON.stringify({...result,stdout:result.stdout.slice(0,4000),stderr:result.stderr.slice(0,4000)});
+
     }
 
     // ── Course generation ──────────────────────────────────────────────────
     case 'build_course': {
-      const title = String(args.title || '').trim();
-      if (!title) return 'title is required to build a course';
+      if (!actorUserId) throw new Error('Authenticated operator identity is required');
+      const db = await requireAdminClient();
+      const requestedCourseId = String(args.course_id || '').trim();
+      const programSlug = String(args.program_slug || '').trim();
+      if (!programSlug) return 'program_slug is required for an Ultimate build';
+      const requestedTitle = String(args.title || '').trim();
+      if (!requestedTitle) return 'title is required for an Ultimate build';
 
-      const description = String(args.description || title).trim();
-      const audience = String(args.audience || 'adult workforce learners').trim();
-      const moduleCount = Math.max(1, Math.min(40, Number(args.modules || 5)));
-      const lessonsPerModule = Math.max(1, Math.min(20, Number(args.lessons_per_module || 3)));
-      const hours = Number(args.hours || 0) || undefined;
-      const state = typeof args.state === 'string' ? args.state.trim() || undefined : undefined;
-      const credential = typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
+      let course: { id: string; title: string; program_id: string | null } | null = null;
+      if (requestedCourseId) {
+        const result = await db.from('courses').select('id,title,program_id')
+          .eq('id', requestedCourseId).maybeSingle();
+        if (result.error) throw result.error;
+        if (!result.data) return `Canonical course not found: ${requestedCourseId}`;
+        course = result.data;
+      } else {
+        // A natural-language request must create a fresh canonical draft first.
+        // Resolve program ownership from the canonical program registry, not an AI-generated UUID.
+        const { data: program, error: programError } = await db.from('programs')
+          .select('id,slug').eq('slug', programSlug).maybeSingle();
+        if (programError) throw programError;
+        if (!program) return `Canonical program not found: ${programSlug}`;
+        const { randomUUID } = await import('node:crypto');
+        const slug = `${requestedTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70)}-${randomUUID().slice(0, 8)}`;
+        const created = await db.from('courses').insert({
+          title: requestedTitle,
+          slug,
+          program_id: program.id,
+          status: 'draft',
+          created_by: actorUserId,
+          description: String(args.description || ''),
+        }).select('id,title,program_id').single();
+        if (created.error || !created.data) throw created.error ?? new Error('ULTIMATE_COURSE_CREATE_FAILED');
+        course = created.data;
+      }
 
-      const { courseFactory } = await import('@/lib/course-factory');
-      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
-      const result = await courseFactory({
-        title,
-        topic: description,
-        audience,
-        ...(hours !== undefined ? { hours } : {}),
-        ...(state !== undefined ? { state } : {}),
-        ...(credential !== undefined ? { credential } : {}),
-        moduleCount,
-        lessonsPerModule,
-        contentSource: 'ai',
-        mode: 'refresh',
-        videoMode: 'queue',
-        dryRun: false,
+      const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
+        courseId:course.id,programSlug,actorId:actorUserId,title:String(args.title || course.title),
+        state:String(args.state || 'IN'),goal:String(args.description || ''),
       });
-
-      let governance = null;
-      if (result.ok && result.courseId) {
-        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
-      }
-
-      return JSON.stringify({
-        __type: 'course_saved',
-        success: result.ok,
-        courseId: result.courseId ?? null,
-        courseSlug: result.courseSlug ?? null,
-        title: result.title ?? title,
-        modulesGenerated: result.moduleCount ?? 0,
-        lessonsGenerated: result.lessonCount ?? 0,
-        assessmentsGenerated: result.assessmentsGenerated ?? 0,
-        videosQueued: result.videosQueued ?? 0,
-        governance,
-        warnings: result.warnings ?? [],
-        errors: result.errors ?? [],
-        status: result.status ?? null,
-        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
-        message: result.ok
-          ? `Course "${result.title ?? title}" was generated and saved through the canonical Course Factory as a governed draft.`
-          : 'Course generation did not persist because the canonical Course Factory did not pass its evidence, completeness, or validation gates.',
-      }, null, 2);
-    }
-
-    case 'save_course': {
-      const course = args.course as Record<string, unknown>;
-      if (!course?.title) return 'course object with title is required';
-
-      const existingId = String(course.courseId || course.course_id || '').trim();
-      if (existingId) {
-        return JSON.stringify({
-          __type: 'course_saved',
-          success: true,
-          courseId: existingId,
-          title: String(course.title),
-          url: `/studio/courses/${existingId}`,
-          message: 'This course is already persisted through the canonical Course Factory. No duplicate save was performed.',
-        }, null, 2);
-      }
-
-      const courseModules = Array.isArray(course.modules) ? course.modules as Array<Record<string, unknown>> : [];
-      const moduleCount = Math.max(1, Math.min(40, courseModules.length || 5));
-      const lessonsPerModule = Math.max(
-        1,
-        Math.min(
-          20,
-          courseModules.length
-            ? Math.max(...courseModules.map((module) => Array.isArray(module.lessons) ? module.lessons.length : 0), 1)
-            : 3,
-        ),
-      );
-      const { courseFactory } = await import('@/lib/course-factory');
-      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
-      const result = await courseFactory({
-        title: String(course.title),
-        topic: String(course.description || course.subtitle || course.title),
-        audience: String(course.audience || 'adult workforce learners'),
-        ...(Number(course.duration_hours || 0) > 0
-          ? { hours: Number(course.duration_hours) }
-          : {}),
-        moduleCount,
-        lessonsPerModule,
-        contentSource: 'ai',
-        mode: 'refresh',
-        videoMode: 'queue',
-        dryRun: false,
-      });
-
-      let governance = null;
-      if (result.ok && result.courseId) {
-        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
-      }
-
-      return JSON.stringify({
-        __type: 'course_saved',
-        success: result.ok,
-        courseId: result.courseId ?? null,
-        courseSlug: result.courseSlug ?? null,
-        title: result.title ?? String(course.title),
-        modulesGenerated: result.moduleCount ?? 0,
-        lessonsGenerated: result.lessonCount ?? 0,
-        assessmentsGenerated: result.assessmentsGenerated ?? 0,
-        videosQueued: result.videosQueued ?? 0,
-        governance,
-        warnings: result.warnings ?? [],
-        errors: result.errors ?? [],
-        status: result.status ?? null,
-        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
-        message: result.ok
-          ? `Course "${result.title ?? String(course.title)}" was persisted through the canonical Course Factory and normalized for governance.`
-          : 'Course persistence was blocked because the canonical Course Factory did not pass its completeness or validation gates.',
-      }, null, 2);
+      return JSON.stringify({__type:'ultimate_course_build_queued',success:true,
+        buildId:queued.build.id,jobId:queued.job.id,courseId:course.id,title:course.title,
+        status:queued.job.status,stage:queued.build.current_step,
+        message:'Command persisted in the existing Ultimate worker queue.'});
     }
 
     case 'generate_videos': {
-      const courseId = String(args.course_id || '');
-      if (!courseId) return 'course_id is required';
-
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
-        const res = await fetch(
-          `${baseUrl}/api/admin/courses/${courseId}/generate-videos`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-internal-key': process.env.INTERNAL_API_KEY || '',
-            },
-            body: JSON.stringify({
-              provider: args.provider || 'auto',
-              voice: args.voice || 'alloy',
-              usePexels: args.use_pexels !== false,
-            }),
-          },
-        ).catch(() => null);
-
-        if (res?.ok) {
-          const data = await res.json();
-          return JSON.stringify({
-            __type: 'video_generation_started',
-            jobId: data.jobId,
-            lessonCount: data.lessonCount,
-            message: `Video generation started for ${data.lessonCount} lessons. TTS + Pexels b-roll pipeline running.`,
-          });
-        }
-        return JSON.stringify({
-          __type: 'video_generation_started',
-          courseId,
-          message: 'Video generation queued. Check /studio/courses/' + courseId + ' for progress.',
-        });
-      } catch {
-        return 'Video generation failed';
-      }
+      if (!actorUserId) throw new Error('Authenticated operator identity is required');
+      const courseId = String(args.course_id || '').trim();
+      if (!courseId) throw new Error('course_id is required');
+      const db = await requireAdminClient();
+      const { data: build, error } = await db.from('ultimate_course_builds')
+        .select('id,course_id,status,current_step').eq('course_id',courseId)
+        .neq('status','published').order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if (error) throw error;
+      if (!build) throw new Error('Create the canonical Ultimate build before requesting lesson media');
+      const queued = await new DevStudioUltimateCourseControl(db).queue(build.id,actorUserId);
+      return JSON.stringify({__type:'ultimate_course_build_queued',success:true,
+        buildId:build.id,jobId:queued.job.id,courseId,status:queued.job.status,
+        message:'Lesson media command persisted in the existing Ultimate worker queue.'});
     }
 
     case 'analyze_document': {
@@ -1097,33 +1281,40 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const db = await requireAdminClient();
       const { data: doc } = await db
         .from('documents')
-        .select('id, file_name, document_type, extracted_data, ocr_text, status, user_id, application_id')
+        .select(
+          'id, file_name, document_type, extracted_data, ocr_text, status, user_id, application_id',
+        )
         .eq('id', documentId)
         .single();
 
       if (!doc) return `Document ${documentId} not found`;
 
-      const fields = doc.extracted_data as Record<string, unknown> || {};
+      const fields = (doc.extracted_data as Record<string, unknown>) || {};
       const fieldCount = Object.keys(fields).length;
-      const ocrPreview = (doc.ocr_text as string || '').slice(0, 500);
+      const ocrPreview = ((doc.ocr_text as string) || '').slice(0, 500);
       const anomalies: string[] = [];
       if (!fields.full_name && !fields.name) anomalies.push('No name detected');
       if (!fields.date_of_birth && !fields.dob) anomalies.push('No date of birth detected');
       if (doc.document_type === 'id' && !fields.id_number) anomalies.push('No ID number detected');
-      if (doc.document_type === 'pay_stub' && !fields.employer) anomalies.push('No employer detected');
+      if (doc.document_type === 'pay_stub' && !fields.employer)
+        anomalies.push('No employer detected');
 
-      return JSON.stringify({
-        __type: 'document_analysis',
-        documentId,
-        fileName: doc.file_name,
-        documentType: doc.document_type,
-        fieldCount,
-        fields,
-        anomalies,
-        ocrPreview,
-        applicationId: doc.application_id,
-        status: doc.status,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          __type: 'document_analysis',
+          documentId,
+          fileName: doc.file_name,
+          documentType: doc.document_type,
+          fieldCount,
+          fields,
+          anomalies,
+          ocrPreview,
+          applicationId: doc.application_id,
+          status: doc.status,
+        },
+        null,
+        2,
+      );
     }
 
     case 'apply_document_to_application': {
@@ -1140,15 +1331,18 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       if (!doc) return `Document ${documentId} not found`;
 
-      const fields = doc.extracted_data as Record<string, unknown> || {};
+      const fields = (doc.extracted_data as Record<string, unknown>) || {};
       const applicationUpdate: Record<string, unknown> = {};
-      if (fields.full_name || fields.name) applicationUpdate.full_name = fields.full_name || fields.name;
-      if (fields.date_of_birth || fields.dob) applicationUpdate.date_of_birth = fields.date_of_birth || fields.dob;
+      if (fields.full_name || fields.name)
+        applicationUpdate.full_name = fields.full_name || fields.name;
+      if (fields.date_of_birth || fields.dob)
+        applicationUpdate.date_of_birth = fields.date_of_birth || fields.dob;
       if (fields.address) applicationUpdate.address = fields.address;
       if (fields.phone) applicationUpdate.phone = fields.phone;
       if (fields.email) applicationUpdate.email = fields.email;
       if (fields.employer) applicationUpdate.employer_name = fields.employer;
-      if (fields.income || fields.gross_pay) applicationUpdate.income = fields.income || fields.gross_pay;
+      if (fields.income || fields.gross_pay)
+        applicationUpdate.income = fields.income || fields.gross_pay;
       if (fields.ssn_last4) applicationUpdate.ssn_last4 = fields.ssn_last4;
 
       if (Object.keys(applicationUpdate).length === 0) {
@@ -1162,11 +1356,14 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       if (error) return 'Failed to update application';
 
-      await db.from('documents').update({
-        application_id: applicationId,
-        status: 'applied',
-        applied_at: new Date().toISOString(),
-      }).eq('id', documentId);
+      await db
+        .from('documents')
+        .update({
+          application_id: applicationId,
+          status: 'applied',
+          applied_at: new Date().toISOString(),
+        })
+        .eq('id', documentId);
 
       return JSON.stringify({
         __type: 'document_applied',
@@ -1194,6 +1391,7 @@ async function _POST(req: NextRequest) {
 
     const body = await req.json();
     const { fileContext, documentsContext, provider: rawProvider, model: rawModel } = body;
+    const agent = normalizeAgent(body.agent);
 
     let messages: ChatMessage[] = [];
     if (Array.isArray(body.messages)) {
@@ -1221,30 +1419,241 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
-    const lastUserMessage = messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
+    // PARIS auto mode uses Elevate-owned inference only. Never silently
+    // select an external metered provider or activate a GPU here.
+    const effectiveProvider: ChatProvider | 'elevate' = providerPreference === 'auto' ? 'elevate' : providerPreference;
+    const lastUserMessage =
+      messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
+    const masterDb = await requireAdminClient();
+    const conversationId = typeof body.conversationId === 'string'
+      ? body.conversationId.trim() : undefined;
+    if (conversationId) {
+      const { data: conversation, error: conversationError } = await masterDb
+        .from('studio_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', auth.userId)
+        .maybeSingle();
+      if (conversationError) {
+        return NextResponse.json({ error: 'Conversation lookup failed' }, { status: 503 });
+      }
+      if (!conversation) {
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      }
+    }
+    const toolsAllowed = !prohibitsToolUse(lastUserMessage);
+    const masterExecution = toolsAllowed && lastUserMessage.trim()
+      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage, conversationId)
+      : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
-      getRAGContext(lastUserMessage),
-      collectAutomaticEvidence(lastUserMessage),
+      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: effectiveProvider === 'elevate' ? 'owned-only' : 'configured-provider' }) : Promise.resolve(''),
+      toolsAllowed ? collectAutomaticEvidence(lastUserMessage) : Promise.resolve([]),
     ]);
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
-      ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
+      agent,
+      contextProfile: effectiveProvider === 'elevate'
+        ? (!toolsAllowed && !fileContext && !documentsContext && !isOperationalDiagnosticRequest(lastUserMessage) ? 'conversation' : 'owned-cpu')
+        : 'full',
+      institutionalContext: getAiCharterContext(),
+      ragContext,
       fileContext,
       documentsContext,
       lastUserMessage,
       automaticEvidence: formatAutomaticEvidence(automaticEvidence),
-      toolInventory: TOOLS.map((tool) => tool.function.name),
+      toolInventory: toolsAllowed ? TOOLS.map((tool) => tool.function.name) : [],
     });
 
     let assistantMessage: string | null = null;
     let provider = 'none';
     let model = 'none';
-    const providerOrder: Exclude<ChatProvider, 'auto'>[] =
-      providerPreference === 'auto'
-        ? ['groq', 'openai', 'anthropic', 'gemini']
-        : [providerPreference];
+    const canonicalProvider = getActiveProviderName();
+
+    // True model streaming for the default Admin conversation. The response is
+    // returned immediately; OpenAI deltas are forwarded as they arrive instead
+    // of waiting for a completed answer and replaying it word-by-word.
+    if (effectiveProvider === 'openai' && isOpenAIConfigured()) {
+      const selectedModel = modelFor('openai', rawModel);
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 503 });
+      }
+      const openai = createAdminChatClient(apiKey);
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(controller) {
+          let complete = '';
+          const streamedToolCalls: Record<number, { id: string; name: string; args: string }> = {};
+          const emit = (payload: Record<string, unknown>) =>
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+          try {
+            const first = await openai.chat.completions.create({
+              model: selectedModel,
+              messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+              tools: toolsAllowed ? TOOLS : undefined,
+              tool_choice: toolsAllowed ? 'auto' : undefined,
+              temperature: 0.4,
+              max_tokens: 4096,
+              stream: true,
+            });
+            for await (const chunk of first) {
+              const delta = chunk.choices[0]?.delta;
+              if (delta?.content) {
+                complete += delta.content;
+                emit({ token: delta.content });
+              }
+              for (const tc of delta?.tool_calls ?? []) {
+                const index = tc.index ?? 0;
+                const row = streamedToolCalls[index] ?? { id: '', name: '', args: '' };
+                if (tc.id) row.id = tc.id;
+                if (tc.function?.name) row.name += tc.function.name;
+                if (tc.function?.arguments) row.args += tc.function.arguments;
+                streamedToolCalls[index] = row;
+              }
+            }
+
+            const calls = Object.values(streamedToolCalls).filter((call) => call.name);
+            if (toolsAllowed && calls.length) {
+              const toolResults = [];
+              const assistantToolCalls = [];
+              for (const call of calls) {
+                let args: Record<string, unknown> = {};
+                try { args = JSON.parse(call.args || '{}'); } catch { /* malformed args become empty */ }
+                const result = await execTool(call.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
+                toolCalls.push({ tool: call.name, args, result });
+                const id = call.id || `call_${crypto.randomUUID()}`;
+                assistantToolCalls.push({
+                  id,
+                  type: 'function' as const,
+                  function: { name: call.name, arguments: JSON.stringify(args) },
+                });
+                toolResults.push({ role: 'tool' as const, tool_call_id: id, content: result });
+                emit({ tool: call.name, toolStatus: 'completed' });
+              }
+
+              const second = await openai.chat.completions.create({
+                model: selectedModel,
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  ...toChatMessages(messages),
+                  { role: 'assistant', content: complete || null, tool_calls: assistantToolCalls },
+                  ...toolResults,
+                ],
+                temperature: 0.4,
+                max_tokens: 4096,
+                stream: true,
+              });
+              for await (const chunk of second) {
+                const token = chunk.choices[0]?.delta?.content;
+                if (token) {
+                  complete += token;
+                  emit({ token });
+                }
+              }
+            }
+
+            const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+            emit({
+              done: true,
+              provider: 'openai',
+              model: selectedModel,
+              providerPreference: effectiveProvider,
+              availableProviders: {
+                xai: isXAIConfigured(),
+                groq: isGroqConfigured(),
+                openai: isOpenAIConfigured(),
+                anthropic: isAnthropicConfigured(),
+                gemini: isGeminiConfigured(),
+              },
+              toolCalls,
+              capabilitiesUsed,
+              studioRun: masterExecution,
+            });
+            after(async () => {
+              try {
+                const db = await requireAdminClient();
+                await db.from('devstudio_chat_log').insert({
+                  user_id: auth.userId,
+                  user_message: lastUserMessage,
+                  assistant_response: complete,
+                  file_context: fileContext || null,
+                  provider: 'openai',
+                  model: selectedModel,
+                });
+                await recordUnifiedCapabilityUse(db, capabilitiesUsed, 'openai', selectedModel, toolCalls);
+              } catch (err: unknown) {
+                logger.warn('[devstudio/chat] streamed DB log failed', normalizeError(err));
+              }
+            });
+          } catch (error) {
+            logger.error('[devstudio/chat] OpenAI stream failed', error);
+            await recordParisObservation({kind:'inference',operation:'studio.openai.stream',status:'failed',durationMs:0,actorId:auth.userId,error});
+            emit({ error: normalizeError(error).message ?? String(error), done: true });
+          } finally {
+            controller.close();
+          }
+        },
+      });
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache, no-transform',
+          'X-Accel-Buffering': 'no',
+          Connection: 'keep-alive',
+        },
+      });
+    }
+
+    if (effectiveProvider === 'elevate') {
+      return studioTextStreamResponse({
+        signal: req.signal,
+        tokens: (signal) => aiChatStream({
+          providerPolicy: 'owned-only',
+          messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+          temperature: 0.4,
+          maxTokens: 2048,
+          signal,
+        }),
+        complete: async (content) => {
+          const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+          try {
+            const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
+              user_id: auth.userId,
+              user_message: lastUserMessage,
+              assistant_response: content,
+              file_context: fileContext || null,
+              provider: 'elevate',
+              model: 'elevate-local',
+            });
+            if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
+            await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
+          } catch (error) {
+            logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
+          }
+          return {
+            provider: 'elevate',
+            model: 'elevate-local',
+            providerPreference,
+            availableProviders: {
+              xai: isXAIConfigured(),
+              groq: isGroqConfigured(),
+              openai: isOpenAIConfigured(),
+              anthropic: isAnthropicConfigured(),
+              gemini: isGeminiConfigured(),
+            },
+            toolCalls,
+            capabilitiesUsed,
+            studioRun: masterExecution,
+          };
+        },
+        onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
+        errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
+      });
+    }
+
+    const providerOrder = [effectiveProvider];
 
     for (const nextProvider of providerOrder) {
       if (assistantMessage) break;
@@ -1256,8 +1665,8 @@ async function _POST(req: NextRequest) {
           const initial = await groq.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...messages],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1268,11 +1677,11 @@ async function _POST(req: NextRequest) {
             (toolCall) => toolCall.type === 'function',
           );
 
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args);
+                const result = await execTool(tc.function.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
                 toolCalls.push({ tool: tc.function.name, args, result });
                 return {
                   role: 'tool' as const,
@@ -1312,12 +1721,14 @@ async function _POST(req: NextRequest) {
       if (nextProvider === 'openai' && isOpenAIConfigured()) {
         try {
           const selectedModel = modelFor('openai', rawModel);
-          const openai = getOpenAIClient();
+          const apiKey = process.env.OPENAI_API_KEY;
+          if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+          const openai = createAdminChatClient(apiKey);
           const initial = await openai.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1326,11 +1737,11 @@ async function _POST(req: NextRequest) {
           const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
             (toolCall) => toolCall.type === 'function',
           );
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args);
+                const result = await execTool(tc.function.name, args, auth.userId);
                 toolCalls.push({ tool: tc.function.name, args, result });
                 return { role: 'tool' as const, tool_call_id: tc.id, content: result };
               }),
@@ -1340,7 +1751,11 @@ async function _POST(req: NextRequest) {
               messages: [
                 { role: 'system', content: systemPrompt },
                 ...toChatMessages(messages),
-                { role: 'assistant', content: choice.message.content ?? '', tool_calls: toolCallRequests },
+                {
+                  role: 'assistant',
+                  content: choice.message.content ?? '',
+                  tool_calls: toolCallRequests,
+                },
                 ...execResults,
               ],
               temperature: 0.4,
@@ -1371,14 +1786,18 @@ async function _POST(req: NextRequest) {
             max_tokens: 4096,
             system: systemPrompt,
             messages: toChatMessages(messages),
-            tools: anthropicTools,
+            tools: toolsAllowed ? anthropicTools : undefined,
           });
           const toolUseBlocks = initial.content.filter((b) => b.type === 'tool_use');
-          if (toolUseBlocks.length > 0) {
+          if (toolsAllowed && toolUseBlocks.length > 0) {
             const toolResults = await Promise.all(
               toolUseBlocks.map(async (b) => {
                 if (b.type !== 'tool_use') return null;
-                const result = await execTool(b.name, b.input as Record<string, unknown>);
+                const result = await execTool(
+                  b.name,
+                  b.input as Record<string, unknown>,
+                  auth.userId,
+                );
                 toolCalls.push({ tool: b.name, args: b.input as Record<string, unknown>, result });
                 return { type: 'tool_result' as const, tool_use_id: b.id, content: result };
               }),
@@ -1393,11 +1812,9 @@ async function _POST(req: NextRequest) {
                 { role: 'user', content: toolResults.filter(Boolean) as never[] },
               ],
             });
-            assistantMessage =
-              second.content.find((block) => block.type === 'text')?.text ?? null;
+            assistantMessage = second.content.find((block) => block.type === 'text')?.text ?? null;
           } else {
-            assistantMessage =
-              initial.content.find((block) => block.type === 'text')?.text ?? null;
+            assistantMessage = initial.content.find((block) => block.type === 'text')?.text ?? null;
           }
           provider = 'anthropic';
           model = selectedModel;
@@ -1412,10 +1829,7 @@ async function _POST(req: NextRequest) {
           const result = await aiChat({
             provider: 'gemini',
             model: selectedModel,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              ...toChatMessages(messages),
-            ],
+            messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
             temperature: 0.4,
             maxTokens: 4096,
           });
@@ -1428,17 +1842,57 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage) {
+    // The owned Elevate stream returns above; only external providers reach this fallback.
+    if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
-        const fallbackResult = await aiChat({
-          model: 'gpt-4.1-mini',
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
-          temperature: 0.4,
-          maxTokens: 2048,
+        const db = await requireAdminClient();
+        const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
+        const projectedCostMicros = Math.max(
+          0,
+          Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS ?? '100000'),
+        );
+        const artifactFingerprint = paidArtifactFingerprint({
+          operation: 'studio-chat',
+          actorId: auth.userId,
+          provider: canonicalProvider,
+          model: typeof rawModel === 'string' ? rawModel : null,
+          message: lastUserMessage,
+          requestNonce,
         });
-        assistantMessage = fallbackResult.content ?? null;
-        provider = 'aiChat-fallback';
-        model = 'gpt-4.1-mini';
+        const paidExecution = await executePaidInference({
+          db,
+          authorize: () =>
+            reservePaidInference(db, {
+              scopeKey: 'studio-chat',
+              actorId: auth.userId,
+              artifactFingerprint,
+              idempotencyKey: `studio-chat:${requestNonce}`,
+              provider: canonicalProvider,
+              model:
+                typeof rawModel === 'string' && rawModel.trim()
+                  ? rawModel.trim()
+                  : process.env.CLOUDFLARE_AI_MODEL || 'canonical',
+              operation: 'studio-chat',
+              projectedCostMicros,
+            }),
+          dispatch: () =>
+            aiChat({
+              messages: [{ role: 'system', content: systemPrompt }, ...messages],
+              temperature: 0.4,
+              maxTokens: 2048,
+              provider: effectiveProvider,
+            }),
+        });
+        if (paidExecution.decision === 'approved' && paidExecution.value) {
+          assistantMessage = paidExecution.value.content ?? null;
+          provider = paidExecution.value.provider ?? canonicalProvider;
+          model = paidExecution.value.model;
+        } else {
+          logger.warn('[devstudio/chat] governed inference was not dispatched', {
+            decision: paidExecution.decision,
+            requestId: paidExecution.requestId,
+          });
+        }
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] aiChat fallback failed', normalizeError(err));
       }
@@ -1447,6 +1901,7 @@ async function _POST(req: NextRequest) {
     if (!assistantMessage) {
       logger.error('[devstudio/chat] no provider available', undefined, {
         hasGroq: isGroqConfigured(),
+        hasXAI: isXAIConfigured(),
         hasGemini: isGeminiConfigured(),
         hasOpenAI: isOpenAIConfigured(),
         hasAnthropic: isAnthropicConfigured(),
@@ -1454,13 +1909,18 @@ async function _POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'AI Assistant is not configured. Add GROQ_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY in Admin → Integrations.',
+            effectiveProvider === 'openai' && !isOpenAIConfigured()
+              ? 'OpenAI is not configured for Admin Studio. Connect OPENAI_API_KEY in Admin → Integrations.'
+              : canonicalProvider === 'none'
+                ? 'No explicitly selected AI provider is available.'
+                : `LIZZY could not reach the selected ${effectiveProvider} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
+            hasXAI: isXAIConfigured(),
             hasOpenAI: isOpenAIConfigured(),
             hasAnthropic: isAnthropicConfigured(),
             hasGemini: isGeminiConfigured(),
-            requestedProvider: providerPreference,
+            requestedProvider: effectiveProvider,
           },
         },
         { status: 503 },
@@ -1468,12 +1928,15 @@ async function _POST(req: NextRequest) {
     }
 
     assistantMessage = enforceEvidenceBoundary(assistantMessage, lastUserMessage, toolCalls);
+    const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
 
     (async () => {
       try {
         const supabase = await createClient();
         const db = await requireAdminClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         const { error: logError } = await db.from('devstudio_chat_log').insert({
           user_id: user?.id || null,
           user_message: messages[messages.length - 1]?.content || '',
@@ -1482,7 +1945,9 @@ async function _POST(req: NextRequest) {
           provider,
           model,
         });
-        if (logError) logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
+        if (logError)
+          logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
+        await recordUnifiedCapabilityUse(db, capabilitiesUsed, provider, model, toolCalls);
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] DB log failed', normalizeError(err));
       }
@@ -1495,19 +1960,26 @@ async function _POST(req: NextRequest) {
         for (const word of words) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: word })}\n\n`));
         }
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          done: true,
-          provider,
-          model,
-          providerPreference,
-          availableProviders: {
-            groq: isGroqConfigured(),
-            openai: isOpenAIConfigured(),
-            anthropic: isAnthropicConfigured(),
-            gemini: isGeminiConfigured(),
-          },
-          toolCalls,
-        })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({
+              done: true,
+              provider,
+              model,
+              providerPreference,
+              availableProviders: {
+                xai: isXAIConfigured(),
+                groq: isGroqConfigured(),
+                openai: isOpenAIConfigured(),
+                anthropic: isAnthropicConfigured(),
+                gemini: isGeminiConfigured(),
+              },
+              toolCalls,
+              capabilitiesUsed,
+              studioRun: masterExecution,
+            })}\n\n`,
+          ),
+        );
         controller.close();
       },
     });

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import Image from 'next/image';
+import ImageMetadata from './ImageMetadata';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -15,12 +16,16 @@ export interface HeroDemoSlide {
   src: string;
   alt: string;
   label?: string;
+  className?: string;
 }
 
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
+  /** Presentation speed for the looping hero video. */
+  videoPlaybackRate?: number;
   posterImage?: string;
+  posterAlt?: string;
   /** Exact first frame mounted beneath the video to prevent a poster/hydration flash. */
   mountedFrameImage?: string;
   voiceoverSrc?: string;
@@ -33,16 +38,29 @@ export interface HeroVideoProps {
   transcript?: string;
   /** Read the approved transcript aloud when the video has no narration track. */
   narrateTranscript?: boolean;
+  /** Voice delivery used for generated transcript narration. */
+  transcriptVoiceStyle?: 'default' | 'assistant' | 'instructor' | 'commercial';
+  /** Narration speed. Existing heroes retain the current 0.96 default. */
+  transcriptVoiceRate?: number;
+  /** Pre-generate narration on mount. Disable on performance-sensitive heroes. */
+  preloadTranscriptVoice?: boolean;
   analyticsName?: string;
   className?: string;
   children?: React.ReactNode;
   mediaFit?: 'cover' | 'contain';
+  /** Optional shared color treatment for a coordinated media set. */
+  mediaClassName?: string;
   demoSlides?: HeroDemoSlide[];
+  demoActiveSlideIndex?: number;
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
   heightClassName?: string;
-  overlayMode?: 'default' | 'none';
+  overlayMode?: 'default' | 'soft' | 'none';
   soundButtonVariant?: 'pill' | 'prominent';
+  /** Allows a parent-level narration controller to remain the single audio authority. */
+  showSoundControl?: boolean;
+  /** Hides the transcript disclosure when the parent supplies its own accessible narration UI. */
+  showTranscriptControl?: boolean;
   /** Delay mounting remote video sources so the first visual frame can paint without competing network work. */
   deferVideoMs?: number;
 }
@@ -50,7 +68,9 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
+  videoPlaybackRate = 1,
   posterImage,
+  posterAlt,
   mountedFrameImage,
   voiceoverSrc,
   microLabel,
@@ -60,14 +80,21 @@ export default function HeroVideo({
   trustIndicators,
   transcript,
   narrateTranscript = false,
+  transcriptVoiceStyle = 'commercial',
+  transcriptVoiceRate = 0.96,
+  preloadTranscriptVoice = true,
   analyticsName,
   className = '',
   children,
-  mediaFit = 'cover',
-  heightClassName = 'h-[clamp(380px,58vh,620px)]',
-  overlayMode = 'default',
+  mediaFit,
+  mediaClassName = '',
+  heightClassName = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]',
   soundButtonVariant = 'pill',
+  showSoundControl = true,
+  showTranscriptControl = true,
   deferVideoMs = 0,
+  demoSlides,
+  demoActiveSlideIndex = 0,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -79,11 +106,14 @@ export default function HeroVideo({
   const [audioFailed, setAudioFailed] = useState(false);
   const soundRequestedRef = useRef(false);
   const transcriptVoice = useNaturalVoice();
+  const prepareTranscriptVoice = transcriptVoice.prepare;
   const transcriptId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const scrollNarrationAttemptedRef = useRef(false);
 
-  const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
+  // Preserve complete videos by default; photo-only callers can fill their frame.
+  const resolvedFit = mediaFit ?? (videoSrcDesktop || videoSrcMobile ? 'contain' : 'cover');
+  const mediaClass = resolvedFit === 'cover' ? 'object-cover' : 'object-contain';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
   const mobileSource = videoSrcMobile || videoSrcDesktop || '';
   const showVideo = Boolean(desktopSource) && !videoFailed && videoEnabled;
@@ -101,7 +131,9 @@ export default function HeroVideo({
     setVideoFailed(false);
     setVideoReady(false);
     setAudioFailed(false);
-    setMuted(true);
+    // Visual slide/source changes must not interrupt active narration or make
+    // the sound control claim it is muted while the narration is still playing.
+    if (!soundRequestedRef.current) setMuted(true);
 
     const video = videoRef.current;
     if (!videoEnabled || !video || !desktopSource) return;
@@ -119,25 +151,51 @@ export default function HeroVideo({
   );
 
   useEffect(() => {
+    if (!preloadTranscriptVoice || !narrateTranscript || !transcript) return;
+    void prepareTranscriptVoice(transcript, {
+      style: transcriptVoiceStyle,
+      rate: transcriptVoiceRate,
+    });
+  }, [
+    narrateTranscript,
+    preloadTranscriptVoice,
+    prepareTranscriptVoice,
+    transcript,
+    transcriptVoiceRate,
+    transcriptVoiceStyle,
+  ]);
+
+  useEffect(() => {
     if (!voiceoverSrc || audioFailed) return;
     const section = sectionRef.current;
     if (!section) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting || entry.intersectionRatio < 0.55 || scrollNarrationAttemptedRef.current) return;
-      scrollNarrationAttemptedRef.current = true;
-      const audio = audioRef.current;
-      if (!audio) return;
-      audio.currentTime = 0;
-      audio.play().then(() => {
-        soundRequestedRef.current = true;
-        setMuted(false);
-      }).catch(() => {
-        // Browsers may require a tap before audible playback. The visible
-        // Play audio control remains available when that policy applies.
-        scrollNarrationAttemptedRef.current = false;
-      });
-    }, { threshold: [0.55] });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Leaving the hero must not interrupt narration the visitor already
+        // started. Stop media only when the component unmounts or the visitor
+        // uses the sound control. This lets program narration continue while
+        // the visitor reads the rest of the page.
+        if (!entry?.isIntersecting || entry.intersectionRatio < 0.2) return;
+        if (entry.intersectionRatio < 0.55 || scrollNarrationAttemptedRef.current) return;
+        scrollNarrationAttemptedRef.current = true;
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.currentTime = 0;
+        audio
+          .play()
+          .then(() => {
+            soundRequestedRef.current = true;
+            setMuted(false);
+          })
+          .catch(() => {
+            // Browsers may require a tap before audible playback. The visible
+            // Play audio control remains available when that policy applies.
+            scrollNarrationAttemptedRef.current = false;
+          });
+      },
+      { threshold: [0, 0.2, 0.55] },
+    );
 
     observer.observe(section);
     return () => observer.disconnect();
@@ -178,8 +236,8 @@ export default function HeroVideo({
           if (video.paused) await video.play();
         }
         const started = await transcriptVoice.play(transcript, {
-          style: 'commercial',
-          rate: 0.96,
+          style: transcriptVoiceStyle,
+          rate: transcriptVoiceRate,
           onEnded: () => {
             soundRequestedRef.current = false;
             setMuted(true);
@@ -204,7 +262,12 @@ export default function HeroVideo({
   }
 
   const hasHeroContent = Boolean(
-    microLabel || belowHeroHeadline || belowHeroSubheadline || ctas?.length || trustIndicators?.length || children,
+    microLabel ||
+    belowHeroHeadline ||
+    belowHeroSubheadline ||
+    ctas?.length ||
+    trustIndicators?.length ||
+    children,
   );
 
   return (
@@ -215,15 +278,37 @@ export default function HeroVideo({
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
         {mountedFrameImage || posterImage ? (
+          <ImageMetadata
+            src={mountedFrameImage || posterImage || ''}
+            description={posterAlt || belowHeroHeadline || microLabel || 'Career training artwork'}
+          />
+        ) : null}
+        {demoSlides?.length ? (
+          demoSlides.map((slide, index) => (
+            <Image
+              key={slide.src}
+              src={slide.src}
+              alt={slide.alt}
+              fill
+              priority={index < 2}
+              sizes="100vw"
+              aria-hidden={index !== demoActiveSlideIndex}
+              className={`absolute inset-0 z-0 h-full w-full ${mediaClass} transform-gpu object-center transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${mediaClassName} ${slide.className || ''} ${
+                index === demoActiveSlideIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          ))
+        ) : mountedFrameImage || posterImage ? (
           <Image
             src={mountedFrameImage || posterImage || ''}
-            alt=""
+            alt={posterAlt || belowHeroHeadline || microLabel || 'Career training artwork'}
             fill
             priority
-            unoptimized
             sizes="100vw"
-            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
-            aria-hidden="true"
+            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center ${mediaClassName}`}
+            style={{
+              objectPosition: posterImage?.includes('/refresh-20261014/') ? 'center 30%' : 'center',
+            }}
           />
         ) : null}
 
@@ -238,11 +323,19 @@ export default function HeroVideo({
             muted
             disablePictureInPicture
             data-video-ready={videoReady ? 'true' : 'false'}
-            onLoadedData={() => setVideoReady(true)}
+            onLoadedData={(event) => {
+              event.currentTarget.defaultPlaybackRate = videoPlaybackRate;
+              event.currentTarget.playbackRate = videoPlaybackRate;
+              setVideoReady(true);
+            }}
             onCanPlay={() => {
               setVideoReady(true);
               const video = videoRef.current;
-              if (video?.paused) void video.play().catch(() => {});
+              if (video) {
+                video.defaultPlaybackRate = videoPlaybackRate;
+                video.playbackRate = videoPlaybackRate;
+                if (video.paused) void video.play().catch(() => {});
+              }
             }}
             onPlaying={() => setVideoReady(true)}
             onError={() => {
@@ -250,7 +343,7 @@ export default function HeroVideo({
               setVideoReady(false);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${mediaClassName} ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (
@@ -258,13 +351,6 @@ export default function HeroVideo({
             ) : null}
             <source src={desktopSource} type="video/mp4" />
           </video>
-        ) : null}
-
-        {overlayMode === 'default' ? (
-          <>
-            <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20" aria-hidden="true" />
-            <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10" aria-hidden="true" />
-          </>
         ) : null}
 
         {voiceoverSrc ? (
@@ -286,8 +372,26 @@ export default function HeroVideo({
           />
         ) : null}
 
+        {showSoundControl &&
+        ((voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo) ? (
+          <button
+            type="button"
+            onClick={() => void toggleSound()}
+            aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
+            className={`absolute right-4 z-40 inline-flex min-h-14 min-w-[10.5rem] touch-manipulation items-center justify-center gap-3 border-2 px-5 py-3 text-sm font-black text-white shadow-2xl transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
+              soundButtonVariant === 'prominent'
+                ? 'top-4 rounded-lg border-red-300 bg-brand-red-700 hover:bg-brand-red-800'
+                : 'bottom-4 rounded-full border-white/70 bg-slate-950/45 backdrop-blur-sm hover:bg-slate-950/70'
+            }`}
+          >
+            {muted ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
+            <span>{muted ? 'Turn sound on' : 'Turn sound off'}</span>
+          </button>
+        ) : null}
+      </section>
+      <div className="bg-slate-950 text-white">
         {hasHeroContent ? (
-          <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-9 pt-24 sm:px-8 sm:pb-12 lg:px-10 lg:pb-16">
+          <div className="relative mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
             <div className="max-w-4xl">
               {microLabel ? (
                 <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/95 sm:text-sm">
@@ -330,8 +434,14 @@ export default function HeroVideo({
                   {trustIndicators?.length ? (
                     <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
                       {Array.from(new Set(trustIndicators)).map((item) => (
-                        <li key={item} className="flex items-center gap-2 text-sm font-bold text-white/90">
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-500" aria-hidden="true" />
+                        <li
+                          key={item}
+                          className="flex items-center gap-2 text-sm font-bold text-white/90"
+                        >
+                          <span
+                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-500"
+                            aria-hidden="true"
+                          />
                           {item}
                         </li>
                       ))}
@@ -342,25 +452,9 @@ export default function HeroVideo({
             </div>
           </div>
         ) : null}
+      </div>
 
-        {(voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo ? (
-          <button
-            type="button"
-            onClick={() => void toggleSound()}
-            aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
-            className={`absolute right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 border px-4 py-2 text-xs font-black text-white shadow-lg transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
-              soundButtonVariant === 'prominent'
-                ? 'top-4 rounded-lg border-red-300 bg-brand-red-700 hover:bg-brand-red-800'
-                : 'bottom-4 rounded-full border-white/70 bg-slate-950/45 backdrop-blur-sm hover:bg-slate-950/70'
-            }`}
-          >
-            {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            <span>{muted ? 'Turn sound on' : 'Turn sound off'}</span>
-          </button>
-        ) : null}
-      </section>
-
-      {transcript ? (
+      {transcript && showTranscriptControl ? (
         <div className="border-b border-slate-100 bg-slate-50">
           <div className="mx-auto max-w-4xl px-6 py-3">
             <button
@@ -374,7 +468,10 @@ export default function HeroVideo({
               Video transcript
             </button>
             {transcriptOpen ? (
-              <p id={transcriptId} className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800">
+              <p
+                id={transcriptId}
+                className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800"
+              >
                 {transcript}
               </p>
             ) : null}

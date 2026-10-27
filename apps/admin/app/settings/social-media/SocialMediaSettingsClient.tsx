@@ -13,9 +13,33 @@ interface PlatformStatus {
   profile_data?: Record<string, unknown>;
   expires_at?: string;
   expired?: boolean;
+  dry_run?: boolean;
+  connection_status?: string;
+  last_verified_at?: string;
+  granted_scopes?: string[];
+}
+
+interface MetaConfigStatus {
+  ready: boolean;
+  service: string;
+  callbackUrl: string;
+  graphVersion: string;
+  clientId: { configured: boolean; canonicalConfigured: boolean; runtimeMatchesCanonical: boolean };
+  clientSecret: { configured: boolean; canonicalConfigured: boolean; runtimeMatchesCanonical: boolean };
+  pageId: { configured: boolean; canonicalConfigured: boolean; runtimeMatchesCanonical: boolean };
 }
 
 const PLATFORMS = [
+  {
+    id: 'google_business',
+    label: 'Google Business Profile',
+    Icon: Globe,
+    color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200',
+    authorizeUrl: '/api/auth/google-business/authorize',
+    connectBg: 'bg-blue-700 hover:bg-blue-800',
+    capabilities: ['Location discovery', 'Profile audit', 'Posts', 'Reviews'],
+    available: true,
+  },
   {
     id: 'facebook',
     label: 'Facebook',
@@ -69,6 +93,7 @@ const PLATFORMS = [
 export default function SocialMediaSettingsClient() {
   const [statuses, setStatuses] = useState<Record<string, PlatformStatus>>({});
   const [loading, setLoading] = useState(true);
+  const [metaConfig, setMetaConfig] = useState<MetaConfigStatus | null>(null);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
@@ -80,12 +105,18 @@ export default function SocialMediaSettingsClient() {
   const loadStatuses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/social-media/status');
-      if (res.ok) {
-        const data = await res.json();
+      const [statusResult, configResult] = await Promise.allSettled([
+        fetch('/api/admin/social-media/status', { cache: 'no-store', signal: AbortSignal.timeout(12_000) }),
+        fetch('/api/admin/social-media/config', { cache: 'no-store', signal: AbortSignal.timeout(12_000) }),
+      ]);
+      if (statusResult.status === 'fulfilled' && statusResult.value.ok) {
+        const data = await statusResult.value.json();
         const map: Record<string, PlatformStatus> = {};
         for (const s of data.statuses ?? []) map[s.platform] = s;
         setStatuses(map);
+      }
+      if (configResult.status === 'fulfilled' && configResult.value.ok) {
+        setMetaConfig(await configResult.value.json());
       }
     } finally {
       setLoading(false);
@@ -160,6 +191,43 @@ export default function SocialMediaSettingsClient() {
         )}
       </div>
 
+      {!loading && metaConfig && (
+        <section className={`mb-6 rounded-xl border p-4 ${metaConfig.ready ? 'border-green-200 bg-green-50' : 'border-amber-300 bg-amber-50'}`}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">Meta production configuration</h2>
+              <p className="mt-1 text-xs text-slate-600">Credentials are scoped to the Admin container. Secrets are never displayed here.</p>
+            </div>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold ${metaConfig.ready ? 'bg-green-600 text-white' : 'bg-amber-600 text-white'}`}>
+              {metaConfig.ready ? 'Ready for OAuth' : 'Configuration required'}
+            </span>
+          </div>
+          <dl className="mt-4 grid gap-2 text-xs sm:grid-cols-3">
+            {([
+              ['App ID', metaConfig.clientId],
+              ['App Secret', metaConfig.clientSecret],
+              ['Page ID', metaConfig.pageId],
+            ] as const).map(([label, value]) => (
+              <div key={label} className="rounded-lg border border-black/5 bg-white/80 p-3">
+                <dt className="font-semibold text-slate-600">{label}</dt>
+                <dd className={`mt-1 font-bold ${value.configured ? 'text-green-700' : 'text-red-700'}`}>
+                  {value.configured ? 'Loaded in Admin' : 'Missing from Admin'}
+                </dd>
+                {value.canonicalConfigured && !value.runtimeMatchesCanonical && (
+                  <dd className="mt-1 text-amber-700">Saved value differs from this running container</dd>
+                )}
+              </div>
+            ))}
+          </dl>
+          <p className="mt-3 break-all text-xs text-slate-600"><span className="font-semibold">Meta callback:</span> {metaConfig.callbackUrl}</p>
+          {!metaConfig.ready && (
+            <a href="/integrations/env-manager" className="mt-3 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800">
+              Open Configuration Manager
+            </a>
+          )}
+        </section>
+      )}
+
       <div className="space-y-3">
         {PLATFORMS.map(({ id, label, Icon, color, bg, border, authorizeUrl, connectBg, capabilities, available }) => {
           const status = statuses[id];
@@ -170,6 +238,8 @@ export default function SocialMediaSettingsClient() {
             (status?.profile_data as any)?.username ||
             (status?.profile_data as any)?.data?.name ||
             null;
+          const authorizedBy = status?.profile_data?.authorized_by as { id?: string; name?: string } | undefined;
+          const publishesTo = status?.profile_data?.publishes_to as { id?: string; name?: string; username?: string } | undefined;
 
           return (
             <div key={id} className={`grid gap-4 rounded-xl border bg-white p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center ${connected ? border : 'border-gray-200'}`}>
@@ -185,6 +255,11 @@ export default function SocialMediaSettingsClient() {
                         <CheckCircle2 className="w-3 h-3" /> Connected
                       </span>
                     )}
+                    {connected && status?.dry_run !== false && (
+                      <span className="flex items-center gap-1 text-xs font-medium text-amber-700">
+                        <AlertTriangle className="h-3 w-3" /> Read-only; external writes blocked
+                      </span>
+                    )}
                     {connected && expired && (
                       <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
                         <AlertTriangle className="w-3 h-3" /> Token expired
@@ -193,6 +268,23 @@ export default function SocialMediaSettingsClient() {
                   </div>
                   {connected && profileName && (
                     <p className="mt-0.5 truncate text-xs text-gray-500">{profileName}</p>
+                  )}
+                  {status?.last_verified_at && (
+                    <p className="mt-0.5 text-xs text-gray-500">Verified {new Date(status.last_verified_at).toLocaleString()}</p>
+                  )}
+                  {(id === 'facebook' || id === 'instagram') && (
+                    <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+                      <div className="rounded-lg bg-slate-50 p-2.5">
+                        <dt className="font-semibold text-slate-500">Authorized by</dt>
+                        <dd className="mt-1 font-bold text-slate-800">{authorizedBy?.name ?? (connected ? 'Reconnect to record identity' : 'Not connected')}</dd>
+                        {authorizedBy?.id && <dd className="mt-0.5 text-slate-500">Profile ID {authorizedBy.id}</dd>}
+                      </div>
+                      <div className="rounded-lg bg-slate-50 p-2.5">
+                        <dt className="font-semibold text-slate-500">Publishes to</dt>
+                        <dd className="mt-1 font-bold text-slate-800">{publishesTo?.name ?? publishesTo?.username ?? profileName ?? 'Not connected'}</dd>
+                        {(publishesTo?.id ?? status?.profile_data?.id) && <dd className="mt-0.5 text-slate-500">Destination ID {publishesTo?.id ?? String(status?.profile_data?.id)}</dd>}
+                      </div>
+                    </dl>
                   )}
                   {!connected && (
                     <p className="mt-0.5 text-xs leading-relaxed text-gray-500">{capabilities.join(' · ')}</p>
@@ -205,12 +297,12 @@ export default function SocialMediaSettingsClient() {
                   <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                 ) : connected && !expired ? (
                   <>
-                    <a
+                    {status?.dry_run === false ? <a
                       href={`/social-media/campaigns/new?platform=${id}`}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                       <Send className="w-3 h-3" /> Post
-                    </a>
+                    </a> : null}
                     <button
                       onClick={() => disconnect(id)}
                       disabled={disconnecting === id}
@@ -220,7 +312,7 @@ export default function SocialMediaSettingsClient() {
                       Disconnect
                     </button>
                   </>
-                ) : available ? (
+                ) : available && (id !== 'facebook' && id !== 'instagram' || metaConfig?.ready) ? (
                   <a
                     href={authorizeUrl}
                     className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors ${connectBg}`}
@@ -228,6 +320,10 @@ export default function SocialMediaSettingsClient() {
                     <ExternalLink className="w-3 h-3" />
                     {id === 'instagram' ? 'Connect with Meta' : 'Connect'}
                   </a>
+                ) : available ? (
+                  <span className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
+                    Configure Admin first
+                  </span>
                 ) : (
                   <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
                     OAuth setup required

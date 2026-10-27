@@ -119,7 +119,7 @@ export default function AudienceRouter() {
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl"><Image src={audience.image} alt={audience.headline} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" /></div>
+                <div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl"><Image src={audience.image} alt={audience.headline} fill className="object-contain" sizes="(max-width: 1024px) 100vw, 50vw" /></div>
                 {audience.objections.map((obj) => <div key={obj.q} className="rounded-xl border border-white/10 bg-white/10 p-4"><p className="text-sm font-semibold text-white">{obj.q}</p><p className="mt-1 text-sm text-slate-200">{obj.a}</p></div>)}
               </div>
             </div>

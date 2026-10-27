@@ -42,17 +42,25 @@ export const metadata: Metadata = {
 };
 
 const founderCredentials = [
-  'U.S. Army veteran — Unit Supply Specialist',
-  'IRS Enrolled Agent (EA)',
-  'EFIN holder and PTIN holder',
+  'U.S. Army Veteran — Unit Supply Specialist',
+  'IRS Enrolled Agent (EA) — Federally Authorized Tax Practitioner',
+  'Electronic Filing Identification Number (EFIN) holder',
+  'Preparer Tax Identification Number (PTIN) holder',
   'Electronic Return Originator (ERO)',
   'SBIN-authorized federal tax software submitter',
-  'Indiana licensed barber',
-  'Indiana substitute teacher',
-  'OSHA 10-Hour Safety certified',
+  'Indiana Licensed Barber — Indiana Professional Licensing Agency',
+  'Indiana Substitute Teacher License',
+  'OSHA 10-Hour Safety Certification',
   'EPA Section 608 Certified Proctor — ESCO Group (#358010)',
   'EPA Section 608 Certified Proctor — Mainstream Engineering',
-  'Certiport Authorized Testing Center operator',
+  'Certiport Authorized Testing Center (CATC) Owner and Operator',
+  'Microsoft Office Specialist Exam Proctor',
+  'IC3 Digital Literacy Exam Proctor',
+  'Information Technology Specialist Exam Proctor',
+  'Entrepreneurship and Small Business Exam Proctor',
+  'Intuit QuickBooks Certification Exam Proctor',
+  'VITA Free Tax Preparation Site Coordinator',
+  'VITA Free Tax Preparation Center Owner and Operator',
 ];
 
 const organizationApprovals = [
@@ -68,6 +76,7 @@ const organizationApprovals = [
   'CareerSafe OSHA training provider relationship',
   'HSI affiliate relationship',
   'NRF RISE Up provider relationship',
+  'VITA Free Tax Preparation Center operated through Selfish Inc.',
 ];
 
 const capabilities = [
@@ -96,7 +105,7 @@ const capabilities = [
       'Understand potential WIOA, Workforce Ready Grant, and other workforce funding pathways before enrollment.',
     icon: CheckCircle2,
     href: '/funding',
-    image: '/images/pages/funding-impact-1.webp',
+    image: '/images/pages/about-funding-nav.webp',
     imageAlt:
       'WIOA and Workforce Ready Grant funding navigation for career training in Indiana',
   },
@@ -200,15 +209,24 @@ export default function AboutPage() {
               training, work-based learning, credential attainment, and employment.
             </p>
             <p>
-              Greene also built much of Elevate&apos;s digital operating environment as a self-taught
-              developer, bringing together applicant intake, learning management, apprenticeship
-              tracking, employer workflows, compliance processes, testing operations, and
-              administrative tooling. The platform supports the same operating model Elevate uses in
-              its workforce programs.
+              As Elevate&apos;s founder and owner, Greene personally designed and built the public
+              website and the integrated workforce technology platform as a self-taught software
+              developer. She built the applicant intake, learning management, course studio,
+              apprenticeship tracking, employer and host-shop portals, compliance workflows,
+              testing-center operations, reporting, and administrative systems that run the
+              organization.
             </p>
             <p>
-              She also leads Selfish Inc., a 501(c)(3) nonprofit connected to community support and
-              VITA free tax preparation services, and oversees Elevate tax operations.
+              Greene also established and leads Elevate&apos;s U.S. Department of Labor Registered
+              Apprenticeship sponsorship through 2Exclusive LLC-S, RAPIDS Sponsor ID
+              2025-IN-132301. She oversees the apprenticeship programs, related technical
+              instruction, host-site participation, apprentice progress, wage schedules, and
+              sponsor compliance.
+            </p>
+            <p>
+              She also leads Selfish Inc., a 501(c)(3) nonprofit, operates its VITA free tax
+              preparation center and community-support programs, serves as a VITA site coordinator,
+              and oversees Elevate tax operations.
             </p>
           </div>
         </div>
@@ -221,12 +239,12 @@ export default function AboutPage() {
               Elizabeth Greene — Credentials
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Personal credentials and professional authorizations
+              Personal licenses, credentials, and testing authorizations
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-200">
-              These items are presented as Elizabeth Greene&apos;s personal credentials or professional
-              authorizations where the repository identifies them that way. Organizational approvals
-              are listed separately below so they are not confused with personal licensure.
+              These are Elizabeth Greene&apos;s personal licenses, credentials, certifications, and
+              professional authorizations. Elevate&apos;s organizational approvals and relationships
+              are listed separately below.
             </p>
           </div>
 

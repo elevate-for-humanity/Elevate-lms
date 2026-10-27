@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FundingBadge } from './FundingBadge';
@@ -51,16 +52,15 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </div>
 
       {/* Hero Image - Compact */}
-      <section className="relative h-[35vh] min-h-[250px] lg:h-[40vh] lg:min-h-[300px] bg-slate-100">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+      <section className="relative h-[clamp(260px,42svh,480px)] bg-slate-100">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={program.image}
           alt={program.title}
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-contain"
           priority
-          quality={85} placeholder="empty"
+          quality={85}
         />
       </section>
 
@@ -181,8 +181,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
               <div className="pt-4">
                 <h3 className="text-xl font-bold text-slate-900 mb-4">Apply Online</h3>
                 <p className="text-slate-600 mb-6">
-                  Complete our simple online application in just 10-15 minutes. We'll review your
-                  eligibility for free WIOA-funded training.
+                  Complete the online application and review the exact program's tuition and funding disclosure. Any WIOA decision is made by the responsible agency, not by this application.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
@@ -338,7 +337,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                         src={image}
                         alt={title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-contain  transition-transform duration-500"
                         quality={85}
                         sizes="100vw" placeholder="empty"
                       />
@@ -419,7 +418,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           </h2>
           <p className="text-slate-500 text-lg mb-8">
             {program.fundingType === 'funded'
-              ? 'Free training for eligible Indiana residents. Check your eligibility in minutes.'
+              ? 'This program has a funding path configured. Review the exact program evidence and complete the responsible agency eligibility and authorization process before relying on funding.'
               : 'Self-pay program with payment options available.'}
           </p>
 

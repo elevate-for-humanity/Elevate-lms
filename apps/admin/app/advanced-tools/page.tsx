@@ -26,7 +26,6 @@ const TOOL_SECTIONS = [
       { label: 'Migrations', href: '/migrations', desc: 'Run and track database migrations' },
       { label: 'Data Import', href: '/data-import', desc: 'Bulk import students, programs, or records' },
       { label: 'Course Import', href: '/course-import', desc: 'Import course content from external sources' },
-      { label: 'Import', href: '/import', desc: 'General import utility' },
       { label: 'Hours Export', href: '/hours-export', desc: 'Export participant hours for reporting' },
     ],
   },
@@ -67,7 +66,7 @@ const TOOL_SECTIONS = [
     description: 'Support tickets, calendar, and tutorial content.',
     tools: [
       { label: 'Support Tickets', href: '/submissions', desc: 'View and respond to support ticket submissions' },
-      { label: 'Calendar Events', href: '/automation', desc: 'Manage calendar_events — orientations, sessions, deadlines' },
+      { label: 'Meetings & Calendar', href: '/phone/meetings', desc: 'Manage scheduled meetings and linked Google Calendar sessions' },
       { label: 'Tutorials', href: '/docs', desc: 'Platform tutorial content management' },
       { label: 'Suboffice Applications', href: '/provider-applications', desc: 'Suboffice/satellite location applications' },
     ],
@@ -107,11 +106,10 @@ const TOOL_SECTIONS = [
     tools: [
       { label: 'Operations Hub', href: '/operations', desc: 'Cron jobs, workflows, dead letters, and admin alerts' },
       { label: 'Dev Studio', href: '/studio', desc: 'Container, deploy, secrets, terminal, and live preview' },
-      { label: 'Automation', href: '/automation', desc: 'Workflow automation rules' },
       { label: 'Workflows', href: '/studio/workflows', desc: 'Automated workflow definitions' },
       { label: 'Studio', href: '/studio', desc: 'Course Studio — builder, curriculum, video, and AI copilot' },
       { label: 'HVAC AI Instructor', href: '/integrations/gemini', desc: 'Marcus Johnson — Gemini-powered HVAC lesson instructor' },
-      { label: 'Sentry Test', href: '/api/sentry-test', desc: 'Dev only — trigger a test error to verify Sentry capture' },
+      { label: 'Monitoring', href: '/monitoring', desc: 'Review platform alerts, error tracking, and schema health' },
     ],
   },
   {
@@ -171,7 +169,7 @@ export default async function AdvancedToolsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-100">
               {tools.map(({ label, href, desc }) => (
                 <Link
-                  key={href}
+                  key={`${label}:${href}`}
                   href={href}
                   className="bg-white px-5 py-4 hover:bg-slate-50 transition-colors group"
                 >

@@ -18,7 +18,7 @@
 import 'server-only';
 
 // Canonical SOC map lives in lib/onet/soc-map.ts — import from there for program→SOC lookups.
-export { PROGRAM_SOC_CODES } from '@/lib/onet/soc-map';
+export { PROGRAM_SOC_CODES } from '../onet/soc-map';
 
 const BASE = 'https://services.onetcenter.org/ws';
 
@@ -88,6 +88,7 @@ async function onetGet<T>(path: string): Promise<T> {
       ...authHeaders(),
       Accept: 'application/json',
     },
+    signal: AbortSignal.timeout(15_000),
     next: { revalidate: 0 }, // always fresh — we cache in Supabase
   });
   if (!res.ok) throw new Error(`O*NET ${path} → ${res.status} ${res.statusText}`);

@@ -74,6 +74,16 @@ BEGIN
  SELECT * INTO media_job FROM pg_temp.claim_ultimate_lesson_autopilot('media-a',300,'media');
  IF media_job.id IS NULL OR media_job.payload#>>'{autopilot,competencyId}' IS DISTINCT FROM reclaimed.payload#>>'{autopilot,competencyId}'
  THEN RAISE EXCEPTION 'TEST: wrong successor claimed'; END IF;
+ output:=pg_temp.delegate_ultimate_autopilot_repair(media_job.id,'media-a',media_job.execution_generation,
+  jsonb_build_object('target','learning_objectives','failedStep','lesson_film_render','requirements',jsonb_build_array(jsonb_build_object('code','INSTRUCTIONAL_QUALITY_FAILED','message','Missing safety scene'))));
+ IF output->>'delegated' IS DISTINCT FROM 'true' OR
+   (SELECT priority FROM pg_temp.ultimate_build_jobs WHERE id=reclaimed.id)<>5 OR
+   (SELECT status FROM pg_temp.ultimate_build_jobs WHERE id=reclaimed.id)<>'queued'
+ THEN RAISE EXCEPTION 'TEST: verified producer repair did not receive prompt queue priority'; END IF;
+ IF (SELECT status FROM pg_temp.ultimate_build_jobs WHERE id=second_job.id)<>'running' OR
+   (SELECT lease_owner FROM pg_temp.ultimate_build_jobs WHERE id=second_job.id)<>'worker-b' OR
+   (SELECT priority FROM pg_temp.ultimate_build_jobs WHERE id=second_job.id)<>30
+ THEN RAISE EXCEPTION 'TEST: prioritizing a repair modified another lesson'; END IF;
  UPDATE pg_temp.ultimate_build_jobs SET available_at=now() WHERE build_id=build AND payload#>>'{autopilot,role}'='quality';
  IF EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_lesson_autopilot('quality-before-film',300,'quality'))
  THEN RAISE EXCEPTION 'TEST: quality bypassed an unfinished media job'; END IF;
@@ -89,6 +99,6 @@ BEGIN
  UPDATE pg_temp.ultimate_build_jobs SET available_at=now() WHERE id=coordinator;
  IF EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_build_job('legacy-overlap',300))
  THEN RAISE EXCEPTION 'TEST: legacy coordinator overlapped a pool'; END IF;
- RAISE NOTICE 'PASS: 13 runtime, role, dependency, recovery, fencing and preservation assertions';
+ RAISE NOTICE 'PASS: 15 runtime, role, dependency, recovery, fencing, priority and preservation assertions';
 END $$;
-SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',13) AS autopilot_database_test;
+SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',15) AS autopilot_database_test;

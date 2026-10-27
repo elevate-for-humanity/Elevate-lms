@@ -1,4 +1,5 @@
 import 'server-only';
+import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
 import { APPLICATION_REVIEW_STATUSES } from './application-filters';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -65,7 +66,7 @@ async function loadDashboardLeads(db: Awaited<ReturnType<typeof requireAdminClie
   const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await db.from('crm_leads')
-      .select('id,full_name,email,status,updated_at')
+      .select('id,full_name,email,status,created_at,updated_at,last_contact_at')
       .order('updated_at', { ascending: true })
       .order('id', { ascending: true })
       .range(offset, offset + pageSize - 1)
@@ -183,6 +184,45 @@ async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof require
   }
 }
 
+async function loadDashboardPaidInvoices(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const {data, error} = await db.rpc('get_admin_paid_invoice_totals');
+  if (error) return {data:null,error};
+  try { return {data:decodePaidInvoiceTotals(data),error:null}; }
+  catch (error) { return {data:null,error}; }
+}
+
+async function loadDashboardLearningActivity(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('lesson_progress')
+      .select('id,user_id,enrollment_id,last_watched,updated_at')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardOutcomes(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('employment_outcomes')
+      .select('id,user_id,user_uuid,program_slug,outcome_type')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -279,6 +319,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     profileRes,
     applicationsRes,
     enrollmentsRes,
+    learningActivityRes,
+    outcomesRes,
     studentsRes,
     certificatesRes,
     holdersRes,
@@ -293,9 +335,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     barberSubsRes,
     cosmetologySubsRes,
     barberPaymentsRes,
-    voucherPaymentsRes,
-    revenueAllTimeRes,
-    revenueThisMonthRes,
+    paidInvoicesRes,
     systemHealth,
   ] = await Promise.all([
     timeboxDashboardQuery(
@@ -306,6 +346,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     ),
     timeboxDashboardQuery(loadDashboardApplications(db), 'applications'),
     timeboxDashboardQuery(loadDashboardEnrollments(db), 'enrollments'),
+    timeboxDashboardQuery(loadDashboardLearningActivity(db), 'learning activity'),
+    timeboxDashboardQuery(loadDashboardOutcomes(db), 'employment outcomes'),
     timeboxDashboardQuery(
       db
         .from('profiles')
@@ -368,12 +410,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     timeboxDashboardQuery(loadDashboardBarberSubscriptions(db), 'barber subscriptions'),
     timeboxDashboardQuery(loadDashboardCosmetologySubscriptions(db), 'cosmetology subscriptions'),
     timeboxDashboardQuery(loadDashboardBarberPayments(db), 'barber payments'),
-    timeboxDashboardQuery(
-      db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
-      'ITA vouchers',
-    ),
-    timeboxDashboardQuery(db.rpc('get_revenue_all_time'), 'all-time revenue'),
-    timeboxDashboardQuery(db.rpc('get_revenue_this_month'), 'monthly revenue'),
+    timeboxDashboardQuery(loadDashboardPaidInvoices(db), 'paid invoices'),
     timeboxDashboardHealth(getSystemHealth(db)),
   ]);
 
@@ -428,6 +465,14 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       href: `/applications/review/${row.id}`,
     };
   });
+
+  const recordedOutcomes = new Set(safeRows(outcomesRes, degradedSections, 'dashboard_data')
+    .filter((row: any) => row.outcome_type && (row.user_id || row.user_uuid) && row.program_slug)
+    .map((row: any) => `${row.user_id || row.user_uuid}:${row.program_slug}`));
+  const programSlugById = new Map(programRows.map((row: any) => [row.id, row.slug]));
+  const noOutcomeEnrollments = outcomesRes.error ? [] : enrollments.filter((row: any) =>
+    !row.revoked_at && String(row.enrollment_state ?? row.status) === 'completed' &&
+    !recordedOutcomes.has(`${row.user_id}:${row.program_slug || programSlugById.get(row.program_id)}`));
 
   const activeEnrollments = enrollments.filter(
     (row: any) =>
@@ -543,33 +588,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     (payment) => !isTestOrSuspiciousPayment(payment),
   );
 
-  if (revenueAllTimeRes.error || revenueThisMonthRes.error) {
+  const invoiceTotals = paidInvoicesRes.error
+    ? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false}
+    : paidInvoicesRes.data ?? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false};
+  if (!invoiceTotals.allTimeAvailable || !invoiceTotals.monthAvailable ||
+      [stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
-  // Use the same payment authorities shown on Funding and Recent Payments.
-  // RPC aggregates can lag, but the overview must never claim $0 while the
-  // underlying received-payment records are already visible to the admin.
-  const selfPayEnrollmentCents = activeEnrollments
-    .filter((row: any) => String(row.funding_source ?? '').toLowerCase() !== 'wioa')
-    .reduce((sum, row: any) => sum + n(row.amount_paid_cents), 0);
-  const wioaPaidCents = (voucherPaymentsRes.error ? [] : (voucherPaymentsRes.data ?? [])).reduce(
-    (sum, row: any) => sum + dollarsToCents(row.payments_to_date),
-    0,
-  );
-  const recentPaymentCents = verifiedRecentPayments.reduce(
-    (sum, payment) => sum + payment.amountCents,
-    0,
-  );
-  const currentMonth = monthKey(new Date().toISOString());
-  const recentThisMonthCents = verifiedRecentPayments
-    .filter((payment) => monthKey(payment.paidAt) === currentMonth)
-    .reduce((sum, payment) => sum + payment.amountCents, 0);
-  const revenueAllTimeCents = Math.max(
-    n(revenueAllTimeRes.data),
-    selfPayEnrollmentCents + wioaPaidCents,
-    recentPaymentCents,
-  );
-  const revenueThisMonthCents = Math.max(n(revenueThisMonthRes.data), recentThisMonthCents);
+  // Paid invoices have an explicit cents contract and one canonical identity.
+  // Enrollment balances and historical receipt snapshots overlap; never add
+  // them together or choose their maximum as an invented revenue total.
+  const revenueAllTimeCents = invoiceTotals.allTimeCents;
+  const revenueThisMonthCents = invoiceTotals.thisMonthCents;
 
   const complianceAlerts = complianceRows.map((row: any) => ({
     id: row.id,
@@ -586,25 +616,38 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       id: row.id,
       name: row.full_name || row.email || null,
       status: row.status ?? null,
-      updated_at: row.updated_at ?? null,
-      days_stale: row.updated_at
-        ? Math.max(0, Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000))
+      updated_at: row.last_contact_at ?? row.created_at ?? null,
+      days_stale: (row.last_contact_at ?? row.created_at)
+        ? Math.max(0, Math.floor((now - new Date(row.last_contact_at ?? row.created_at).getTime()) / 86_400_000))
         : 0,
       href: `/crm/leads/${row.id}`,
     }))
     .filter((row) => row.days_stale >= 7);
 
+  const activityByEnrollment = new Map<string, number>();
+  const activityByUser = new Map<string, number>();
+  for (const progress of safeRows(learningActivityRes, degradedSections, 'dashboard_data')) {
+    const timestamp = Date.parse(progress.last_watched ?? progress.updated_at ?? '');
+    if (!Number.isFinite(timestamp) || timestamp > now) continue;
+    const activity = progress.enrollment_id ? activityByEnrollment : activityByUser;
+    const key = progress.enrollment_id || progress.user_id;
+    if (key) activity.set(key, Math.max(activity.get(key) ?? 0, timestamp));
+  }
+  const lastLearningAt = (row: any) => Math.max(
+    Date.parse(row.enrolled_at ?? row.created_at ?? '') || 0,
+    activityByEnrollment.get(row.id) ?? 0,
+    activityByUser.get(row.user_id) ?? 0,
+  );
   const inactiveLearners = activeEnrollments
-    .filter(
-      (row: any) => row.updated_at && now - new Date(row.updated_at).getTime() >= 7 * 86_400_000,
-    )
+    .filter((row: any) => !learningActivityRes.error && lastLearningAt(row) > 0 &&
+      now - lastLearningAt(row) >= 7 * 86_400_000)
     .map((row: any) => ({
       enrollmentId: row.id,
       userId: row.user_id,
       enrolledAt: row.enrolled_at ?? row.created_at ?? '',
       fullName: row.full_name ?? null,
       email: row.email ?? null,
-      daysInactive: Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000),
+      daysInactive: Math.floor((now - lastLearningAt(row)) / 86_400_000),
       programTitle: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
       href: `/students/${row.user_id}`,
     }));
@@ -709,7 +752,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const newEnrollmentsToday = enrollments.filter(
     (row: any) => (row.created_at ?? '') >= todayIso,
   ).length;
-  const newLeadsToday = leadRows.filter((row: any) => (row.updated_at ?? '') >= todayIso).length;
+  const newLeadsToday = leadRows.filter((row: any) => (row.created_at ?? '') >= todayIso).length;
+  if ([studentsRes, certificatesRes, holdersRes, holderDocsRes, wioaDocsRes].some(result => result.error)) {
+    if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
+  }
   const counts = {
     pendingApplications: pendingApplications.length,
     activeEnrollments: activeEnrollments.length,
@@ -722,6 +768,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const kpis = [
     {
       label: 'Pending Applications',
+      unavailable: Boolean(applicationsRes.error),
       value: counts.pendingApplications,
       delta: 0,
       deltaLabel: 'Live pending count',
@@ -731,6 +778,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Active Enrollments',
+      unavailable: Boolean(enrollmentsRes.error),
       value: counts.activeEnrollments,
       delta: 0,
       deltaLabel: 'Live active count',
@@ -739,16 +787,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       sub: `${inactiveLearners.length} inactive 7+ days`,
     },
     {
-      label: 'Revenue This Month',
+      label: 'Paid Invoices This Month',
+      unavailable: !invoiceTotals.monthAvailable,
       value: revenueThisMonthCents,
       delta: 0,
-      deltaLabel: 'Database aggregate',
+      deltaLabel: 'Paid invoice value (USD)',
       href: '/integrations/quickbooks',
       urgent: false,
-      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time`,
+      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} paid invoices all time`,
     },
     {
       label: 'Certificates Issued',
+      unavailable: Boolean(certificatesRes.error) || typeof certificatesRes.count !== 'number',
       value: counts.certificatesIssued,
       delta: 0,
       deltaLabel: 'Live certificate count',
@@ -757,6 +807,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Program Holders',
+      unavailable: Boolean(holdersRes.error) || typeof holdersRes.count !== 'number',
       value: counts.pendingProgramHolders,
       delta: 0,
       deltaLabel: 'Awaiting approval',
@@ -765,6 +816,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Documents',
+      unavailable: Boolean(holderDocsRes.error) || typeof holderDocsRes.count !== 'number',
       value: counts.pendingDocuments,
       delta: 0,
       deltaLabel: 'Awaiting review',
@@ -781,6 +833,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   return {
     counts,
     revenueAllTimeCents,
+    paidInvoiceSummary: {allTimeAvailable:invoiceTotals.allTimeAvailable,monthAvailable:invoiceTotals.monthAvailable,paidCount:invoiceTotals.paidCount},
+    totalStudentsAvailable: !studentsRes.error && typeof studentsRes.count === 'number',
+    newTodayAvailable: !applicationsRes.error && !enrollmentsRes.error && !leadsRes.error,
     totalStudents: studentsRes.error ? 0 : (studentsRes.count ?? 0),
     recentPayments: verifiedRecentPayments.slice(0, 10),
     operational: {
@@ -814,7 +869,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     stalledApplications: pendingApplications.filter(
       (row) => row.age_days >= 7,
     ) as unknown as Record<string, unknown>[],
-    noOutcomeEnrollments: [],
+    noOutcomeEnrollments: noOutcomeEnrollments as Record<string, unknown>[],
     missingFundingEnrollments: enrollments.filter(
       (row: any) => !row.funding_source && n(row.amount_paid_cents) === 0,
     ) as Record<string, unknown>[],

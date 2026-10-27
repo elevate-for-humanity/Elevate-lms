@@ -105,3 +105,62 @@ test('PARIS confirms recovery only after an observed fresh replacement lease',as
  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now:new Date('2026-10-14T18:00:20Z'),request});
  assert.equal(body.monitor.recoveries,1);
 });
+
+test('same worker identifier confirms a new execution generation only once',async()=>{
+ const row=job({status:'running',execution_generation:3,lease_owner:'worker',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,confirmedAssignments:1,recoveries:0,lastConfirmedLeaseOwner:'worker',lastConfirmedExecutionGeneration:2,lastConfirmedWorkerHeartbeat:'2026-10-14T17:50:00Z',recoveryRequest:{executionGeneration:3,previousExecutionGeneration:2,previousLeaseOwner:'worker',requestedAt:'2026-10-14T17:59:00Z'}}});
+ let body;
+ const request=async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};};
+ const options={env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,request};
+ await monitorCourseQueue(options);
+ assert.equal(body.monitor.confirmedAssignments,2);
+ assert.equal(body.monitor.recoveries,1);
+ row.monitor=body.monitor;
+ row.heartbeat_at='2026-10-14T17:59:55Z';
+ await monitorCourseQueue(options);
+ assert.equal(body.monitor.confirmedAssignments,2);
+ assert.equal(body.monitor.recoveries,1);
+});
+
+test('conditional write conflict rereads current generation and respects an arriving pause',async()=>{
+ const row=job({status:'failed',last_error:'fetch failed'});
+ const writes=[];let reads=0;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+ request:async(url,options)=>{
+  if(options.method){writes.push(JSON.parse(options.body));return {ok:true,json:async()=>writes.length===1?[]:[{id:'job'}]};}
+  reads++;
+  if(reads>1){assert.equal(new URL(url).searchParams.get('id'),'in.(job)');return {ok:true,json:async()=>[{...row,execution_generation:3,ultimate_course_builds:{profile:{ownerPaused:true}}}]};}
+  return {ok:true,json:async()=>[row]};
+ }});
+ assert.equal(writes.length,2);
+ assert.equal(writes[0].status,'queued');
+ assert.equal(writes[1].status,undefined);
+ assert.equal(writes[1].monitor.state,'paused');
+});
+
+test('monitor pagination uses an immutable ID cursor rather than mutable updated time',async()=>{
+ const ids=[];let reads=0;
+ const result=await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+ request:async(url,options)=>{
+  if(options.method)return {ok:true,json:async()=>[{id:'saved'}]};
+  const params=new URL(url).searchParams;
+  assert.equal(params.get('order'),'id.asc');assert.equal(params.has('offset'),false);
+  if(reads++===0)return {ok:true,json:async()=>Array.from({length:100},(_,i)=>job({id:String(i).padStart(3,'0')}))};
+  ids.push(params.get('id'));return {ok:true,json:async()=>[job({id:'100'})]};
+ }});
+ assert.deepEqual(ids,['gt.099']);assert.equal(result.length,101);
+});
+
+test('expired recovery intent cannot credit a later unrelated worker assignment',async()=>{
+ const row=job({status:'running',lease_owner:'worker-new',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,recoveries:0,recoveryRequest:{requestedAt:'2026-10-14T16:00:00Z',executionGeneration:1,previousLeaseOwner:'worker-old'}}});
+ let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+ request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.recoveries,0);assert.equal(body.monitor.recoveryRequest,null);
+});
+
+test('owner pause closes an outstanding recovery intent without dispatching or requeueing',async()=>{
+ const row=job({ultimate_course_builds:{ownerPaused:true},monitor:{enabled:true,recoveryRequest:{requestedAt:'2026-10-14T17:59:00Z',executionGeneration:2}}});let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+ request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.recoveryRequest,null);assert.equal(body.status,undefined);
+});

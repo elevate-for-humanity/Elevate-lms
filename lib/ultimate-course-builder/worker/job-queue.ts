@@ -50,12 +50,10 @@ export class UltimateJobQueue {
     delete checkpointPayload.progress;
     const nextPayload = previous?.status === 'failed' && payload &&
       typeof payload === 'object' && !Array.isArray(payload) ? {...checkpointPayload,...payload} : payload;
-    const { data, error } = await this.db
-      .from('ultimate_build_jobs')
-      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload: nextPayload,
-        ...(previous?.monitor ? {monitor: previous.monitor} : {}) })
-      .select('*')
-      .single();
+    const { data: queued, error } = await this.db.rpc('enqueue_ultimate_build_job', {
+      p_build: buildId, p_payload: nextPayload, p_monitor: previous?.monitor ?? null,
+    });
+    const data = queued?.[0] ?? null;
     if (error?.code === '23505') {
       const { data: concurrent, error: concurrentError } = await active();
       if (concurrentError) throw concurrentError;
@@ -67,11 +65,8 @@ export class UltimateJobQueue {
       }
     }
     if (error) throw error;
-    const { error: buildError } = await this.db.from('ultimate_course_builds')
-      .update({ status: 'queued', updated_at: new Date().toISOString() })
-      .eq('id', buildId);
-    if (buildError) throw buildError;
-    await notifyCourseDispatcher({});
+    if (!data) throw new Error('ULTIMATE_JOB_NOT_PERSISTED');
+    if (data.status === 'queued') await notifyCourseDispatcher({});
     return data;
   }
 
@@ -165,6 +160,7 @@ export class UltimateJobQueue {
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    await notifyCourseDispatcher({});
   }
 
   /** Yield between lessons. A successful checkpoint is progress, not a failed
@@ -224,7 +220,8 @@ export class UltimateJobQueue {
       .select('id');
     if (updateError) throw updateError;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
-    // The database transition atomically blocks or requeues the build. A
-    // separate update here could overwrite a concurrently arriving media wakeup.
+    if (canRetry) await notifyCourseDispatcher({});
+    // The fenced job transition is durable. Runtime persistence owns aggregate
+    // build state; a separate update here could overwrite a media wakeup.
   }
 }

@@ -13,7 +13,7 @@ concurrency:
 jobs:
   preflight:
     name: CI Preflight
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -55,6 +55,10 @@ jobs:
           node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
       - name: Ultimate course builder repair regression tests
         run: node --test tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/objective-practice.test.mjs tests/worker/authored-practice.test.mjs tests/worker/studio-runtime-rate-limit.test.mjs
+      - name: Environment audit repair regression tests
+        run: |
+          pnpm exec vitest run tests/unit/admin-dashboard-data-execution.test.ts tests/unit/admin-header-degradation.test.tsx tests/unit/dashboard-system-health.test.ts tests/unit/normalize-dashboard-data.test.ts tests/unit/dashboard-unavailable-kpi.test.tsx tests/unit/course-production-review.test.ts tests/unit/course-production-resume-cursor.test.ts tests/unit/legacy-lms-publication.test.ts tests/unit/platform-settings-permissions.test.ts tests/unit/course-worker-direct-launch.test.ts tests/unit/ultimate-build-list-pagination.test.ts tests/unit/dashboard-role-routing.test.tsx
+          node --test scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/dispatch-course-job.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/paid-invoice-totals.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-release-media.test.mjs workers/process-job-state.test.mjs workers/ultimate-teaching-cache.test.mjs workers/ultimate-resume-route.test.mjs
       - name: Authored cosmetology sample production adapter regression
         run: pnpm exec vitest run tests/unit/ultimate-authored-sample.test.ts
       - name: Course photographs and saved preview regression tests
@@ -133,7 +137,7 @@ jobs:
 
   typecheck:
     name: TypeScript — ${{ matrix.app }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     strategy:
       fail-fast: false
@@ -167,7 +171,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       NODE_OPTIONS: --max-old-space-size=6144
@@ -195,7 +199,7 @@ jobs:
 
   diagnostics:
     name: Functional Tests & Repo Hygiene
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -255,7 +259,7 @@ jobs:
 
   ci-gate:
     name: CI Required Gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [preflight, typecheck, lint, enrollment-database, diagnostics]
     if: always()
     steps:

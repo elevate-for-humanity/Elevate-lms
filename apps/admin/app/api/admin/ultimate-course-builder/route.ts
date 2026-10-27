@@ -1,3 +1,4 @@
+import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
 import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
 import { applySyllabusPlan, validateSyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
 import { renderReview } from '@/lib/ultimate-course-builder/authoring/render-review';
@@ -133,15 +134,9 @@ export async function GET(req: NextRequest) {
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
-  let query = db
-    .from('ultimate_course_builds')
-    .select(
-      'id,course_id,status,owner_paused:profile->ownerPaused,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,updated_at,heartbeat_at,lease_owner,lease_expires_at,attempts,max_attempts,execution_generation,payload,monitor)',
-    )
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if (courseId) query = query.eq('course_id', courseId);
-  const { data, error } = await query;
+  const page = parseBuildListPage(req.nextUrl.searchParams.get('page'));
+  if (page === null) return NextResponse.json({ error: 'page must be an integer from 1 to 10000' }, { status: 400 });
+  const { data, error, pagination } = await loadUltimateBuildPage(db, courseId, page);
   if (error) return databaseFailure(error);
   let acquisitions: Array<{ id: string; goal: string | null }> = [];
   if (courseId) {
@@ -156,7 +151,7 @@ export async function GET(req: NextRequest) {
     if (requests.error) return databaseFailure(requests.error);
     acquisitions = requests.data ?? [];
   }
-  return NextResponse.json({ builds: data ?? [], acquisitions });
+  return NextResponse.json({ builds: data ?? [], acquisitions, pagination });
 }
 
 export async function POST(req: NextRequest) {

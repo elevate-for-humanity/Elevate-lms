@@ -166,3 +166,14 @@ test('paused builds are excluded by the database before the 50-row queue limit',
  assert.deepEqual(result.jobIds,['queued']);
  assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
 });
+
+test('a full page of storage-blocked jobs cannot hide runnable work',async()=>{
+ const s=setup([],[]);const offsets=[];
+ s.options.request=async url=>{
+  if(url.searchParams.has('id'))return {ok:true,json:async()=>[{id:'queued',status:'running',lease_owner:'worker',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}]};
+  const offset=Number(url.searchParams.get('offset'));offsets.push(offset);
+  return {ok:true,json:async()=>offset===0?Array.from({length:50},(_,i)=>({id:'blocked-'+i,last_error:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'})):[{id:'queued'}]};
+ };
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.deepEqual(offsets,[0,50]);assert.equal(result.status,'assigned');assert.deepEqual(result.jobIds,['queued']);
+});

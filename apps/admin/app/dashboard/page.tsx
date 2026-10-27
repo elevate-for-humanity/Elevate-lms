@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -20,9 +21,9 @@ export const metadata: Metadata = {
  * explicit second boundary so this page cannot render if middleware routing is
  * ever changed or bypassed by a future refactor.
  *
- * Advisor is intentionally included because the canonical role destination
- * registry routes advisors to this operational dashboard. Keep this guard in
- * lockstep with lib/auth/role-destinations.ts and the portal contract audit.
+ * The canonical entry remains reachable for operational roles. Route those
+ * callers to the existing RLS-backed staff portal before loading any privileged
+ * platform aggregates. Only platform administrators receive global reporting.
  */
 export default async function AdminDashboardPage() {
   const { effectiveRoles } = await requireRole([
@@ -33,6 +34,7 @@ export default async function AdminDashboardPage() {
     'staff',
   ]);
   const canAccessDevStudio = effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role));
+  if (!canAccessDevStudio) redirect('/staff-portal');
 
   const [rawData, heroAssets] = await Promise.all([
     getAdminDashboardData(),

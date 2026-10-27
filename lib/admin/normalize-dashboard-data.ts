@@ -77,6 +77,7 @@ const FALLBACK_SITE_PREVIEW: SitePreviewTarget[] = [];
 
 function normalizeKpis(kpis: KPICard[] | null | undefined): KPICard[] {
   return asObjectArray(kpis).map((kpi) => ({
+    unavailable: kpi.unavailable === true,
     label: typeof kpi.label === 'string' ? kpi.label : 'Metric',
     value: asCount(kpi.value),
     delta: asCount(kpi.delta),
@@ -341,6 +342,9 @@ export function normalizeAdminDashboardData(
     recentPayments: asObjectArray(input.recentPayments),
     operational: normalizeOperational(input.operational),
     priorities: normalizePriorities(input.priorities),
+    paidInvoiceSummary: input.paidInvoiceSummary ? {allTimeAvailable:input.paidInvoiceSummary.allTimeAvailable===true,monthAvailable:input.paidInvoiceSummary.monthAvailable===true,paidCount:asCount(input.paidInvoiceSummary.paidCount)} : undefined,
+    totalStudentsAvailable: input.totalStudentsAvailable===true,
+    newTodayAvailable: input.newTodayAvailable===true,
     kpis: normalizeKpis(input.kpis),
     enrollmentTrend: asObjectArray(input.enrollmentTrend),
     studentStatuses: asObjectArray(input.studentStatuses),

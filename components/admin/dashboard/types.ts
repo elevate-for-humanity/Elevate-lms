@@ -2,6 +2,7 @@
 // All route strings are resolved before reaching JSX (never built inline in render).
 
 export interface KPICard {
+  unavailable?: boolean;
   label: string;
   value: number;
   delta: number;
@@ -172,6 +173,9 @@ export interface RecentPayment {
 }
 
 export interface AdminDashboardData {
+  paidInvoiceSummary?: {allTimeAvailable: boolean; monthAvailable: boolean; paidCount: number};
+  totalStudentsAvailable?: boolean;
+  newTodayAvailable?: boolean;
   counts: DashboardCounts;
   revenueAllTimeCents: number;
   totalStudents: number;

@@ -93,7 +93,7 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       ? '/images/partners/cals-kutz/storefront-enhanced-2026.webp'
       : featured?.slug === 'top-shelf-barber-lounge'
         ? '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp'
-        : featured?.slug === 'b-52s-barber-shop' ? '/images/partners/b-52s/interior-derived-2026.webp' : undefined;
+        : undefined;
     if (preferredPhoto) gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {
       id: shop.id,

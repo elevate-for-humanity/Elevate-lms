@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
+import { isCurrentHostShopPartner } from '@/lib/partners/host-shop-directory';
 import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
 
 export const dynamic = 'force-dynamic';
@@ -22,10 +23,6 @@ function isProductionRecord(item: any) {
   return !/(\[qa|qa e2e|test@|@test\.|@example\.|\.invalid|ffff|gggg|qwfh|gert|fvsdf)/.test(identity);
 }
 
-function isApprovedHostShop(partner: any) {
-  const typeText = [partner.partner_type, partner.program_type, ...(Array.isArray(partner.programs) ? partner.programs : [])].filter(Boolean).join(' ').toLowerCase();
-  return partner.status === 'active' && partner.approval_status === 'approved' && partner.is_active !== false && /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(typeText);
-}
 
 export default async function PartnersPage() {
   await requireRole(['super_admin', 'admin']);
@@ -37,7 +34,7 @@ export default async function PartnersPage() {
 
   const productionItems = (items || []).filter(isProductionRecord);
   const activePartners = productionItems.filter((item: any) => item.status === 'active');
-  const hostShopPartners = productionItems.filter(isApprovedHostShop);
+  const hostShopPartners = productionItems.filter(isCurrentHostShopPartner);
   const hostShopIds = hostShopPartners.map((partner: any) => partner.id);
   const [{ data: hostDocuments }, { data: hostUsers }, { data: canonicalShops }, { data: requirementRows }] = hostShopIds.length
     ? await Promise.all([
@@ -84,12 +81,12 @@ export default async function PartnersPage() {
         <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-4">
           <Metric label="Production partners" value={productionItems.length} />
           <Metric label="Active" value={activePartners.length} />
-          <Metric label="Approved Host Shops" value={hostReadiness.length} />
+          <Metric label="Approved Host Shops" value={hostShopPartners.filter((partner) => partner.approval_status === 'approved').length} />
           <Metric label="Pending applications" value={pendingApplications || 0} />
         </div>
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex flex-col gap-3 bg-slate-950 p-6 text-white sm:flex-row sm:items-center sm:justify-between">
-            <div><p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-300">Production source of truth</p><h1 className="mt-1 text-2xl font-black">Approved Host Shop readiness</h1><p className="mt-1 max-w-3xl text-sm text-slate-300">Completion is calculated from account links, canonical shop records, accepted documents, MOU, and onboarding. Database flags alone cannot mark a shop complete.</p></div>
+            <div><p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-300">Production source of truth</p><h1 className="mt-1 text-2xl font-black">Host Shop readiness and onboarding</h1><p className="mt-1 max-w-3xl text-sm text-slate-300">Completion is calculated from account links, canonical shop records, accepted documents, MOU, and onboarding. Database flags alone cannot mark a shop complete.</p></div>
             <Link href="https://app.elevateforhumanity.org/host-shop/dashboard" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">Open Host Shop portal <ExternalLink className="h-4 w-4" /></Link>
           </div>
           <div className="hidden overflow-x-auto lg:block"><table className="w-full min-w-[980px] table-fixed text-left text-sm">

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HostShopHandbook } from '@/components/partners/HostShopHandbook';
 import { redirect } from 'next/navigation';
 import { CheckCircle2, Circle, FileText, PenLine, ShieldCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
@@ -76,6 +77,21 @@ export default async function HostShopOnboardingPage() {
             record.
           </p>
         </section>
+
+        <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+          <h2 className="text-xl font-black text-slate-950">Read your Host Shop handbook</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Your program responsibilities are available while onboarding is in progress. The host
+            shop provides supervised hands-on training; Elevate handles theory and RTI.
+          </p>
+          <a
+            href="#handbook"
+            className="mt-3 inline-flex min-h-11 items-center font-bold text-blue-800 underline"
+          >
+            Read handbook and program responsibilities
+          </a>
+        </section>
+        <HostShopHandbook />
 
         <section className="space-y-3">
           {steps.map(({ title, complete: isComplete, detail, href, icon: Icon }) => (

@@ -5,6 +5,7 @@
  * Used by middleware, layouts, and API routes to enforce gating.
  */
 
+import { siteUrls } from '@/lib/utils/site-urls';
 import { createClient } from '@/lib/supabase/server';
 
 export interface ProgramHolderOnboardingStatus {
@@ -108,7 +109,7 @@ export async function getProgramHolderOnboardingStatus(
       requiredDocsComplete: false,
       requiredDocsList: [],
       onboardingComplete: false,
-      nextStepRoute: 'https://www.elevateforhumanity.org/apply/program-holder',
+      nextStepRoute: `${siteUrls.apply}/program-holder`,
       nextStepLabel: 'Apply as Program Holder',
       completedSteps: 0,
       totalSteps: 5,

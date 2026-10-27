@@ -1,3 +1,4 @@
+import { siteUrls } from '@/lib/utils/site-urls';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requirePortalAccess } from '@/lib/auth/portal-access';
@@ -167,7 +168,7 @@ export async function requireProgramHolder(options: { allowPendingApproval?: boo
     if (error) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
     holderId = ownedHolder?.id ?? null;
   }
-  if (!holderId) redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+  if (!holderId) redirect(`${siteUrls.apply}/program-holder?status=pending`);
   profile.program_holder_id = holderId;
 
   const { data: holder, error: holderError } = await db
@@ -177,7 +178,7 @@ export async function requireProgramHolder(options: { allowPendingApproval?: boo
     .maybeSingle();
 
   if (holderError) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
-  if (!holder) redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+  if (!holder) redirect(`${siteUrls.apply}/program-holder?status=pending`);
   if (holder.mou_terminated || holder.suspended_at || holder.terminated_at || ['inactive','suspended','terminated','rejected'].includes(holder.status)) redirect('/unauthorized');
   if (!options.allowPendingApproval && (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at)) {
     redirect('/program-holder/onboarding?status=pending-approval');

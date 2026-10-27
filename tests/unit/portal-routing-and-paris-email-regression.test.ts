@@ -32,10 +32,10 @@ describe('portal routing and PARIS inbound email', () => {
   });
 
   it('sends ineligible Program Holder sessions to the real Marketing application', () => {
-    const applicationUrl =
-      'https://www.elevateforhumanity.org/apply/program-holder?status=pending';
+    const applicationUrl = '`${siteUrls.apply}/program-holder?status=pending`';
     const holderGuard = fs.readFileSync(path.resolve('lib/auth/require-program-holder.ts'), 'utf8');
     expect(holderGuard).toContain(applicationUrl);
+    expect(holderGuard).toContain("from '@/lib/utils/site-urls'");
     expect(holderMou).toContain('await requireProgramHolder()');
     expect(holderOnboarding).toContain('allowPendingApproval: true');
     expect(holderOnboarding).toContain('Program Holder approval pending');

@@ -450,7 +450,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     href: `/students/${row.user_id || row.id}`,
   }));
 
-  const statusCounts = activeEnrollments.reduce<Record<string, number>>((acc, row: any) => {
+  const statusCounts = enrollments.filter((row: any) => !row.revoked_at).reduce<Record<string, number>>((acc, row: any) => {
     const key = String(row.enrollment_state ?? row.status ?? 'unknown');
     acc[key] = (acc[key] ?? 0) + 1;
     return acc;

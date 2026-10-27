@@ -10,6 +10,7 @@ import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
 import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
+import { assertLessonAccess } from '@/lib/lms/access-control';
 import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 
 export const dynamic = 'force-dynamic';
@@ -180,6 +181,14 @@ export default async function LessonPage({
     : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
+
+  if (!preview.active && user) {
+    const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', { p_course_id: course.id });
+    if (pacingError) throw new Error('Unable to verify lesson release');
+    const scheduled = (pacing as any)?.lessons?.find((item: any) => item.id === lessonId);
+    if (scheduled && !scheduled.available) return <main className="mx-auto max-w-3xl space-y-5 p-8"><Link href={`/lms/courses/${course.id}`} className="font-bold text-cyan-800">Back to course schedule</Link><h1 className="text-3xl font-extrabold">{scheduled.title}</h1><p className="rounded-xl border border-amber-300 bg-amber-50 p-5 font-semibold">{scheduled.published ? `This lesson opens in training week ${scheduled.releaseWeek}. Complete earlier required lessons before continuing.` : 'This lesson is still being produced and verified.'}</p><p>Follow your {pacing.totalWeeks}-week plan. Assessment and supervised practical requirements still apply.</p></main>;
+    await assertLessonAccess(user.id, lessonId);
+  }
 
   let lessonQuery = db
     .from('course_lessons')

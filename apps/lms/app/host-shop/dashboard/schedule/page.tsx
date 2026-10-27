@@ -1,3 +1,4 @@
+import HostShopCourses from '@/components/host-shop/HostShopCourses';
 import Link from 'next/link';
 import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import { Calendar, Clock, BookOpen, BellRing } from 'lucide-react';
@@ -125,6 +126,8 @@ export default async function HostShopSchedulePage() {
           Schedule data could not be loaded. No sample events are being substituted.
         </div>
       ) : null}
+
+      <HostShopCourses userId={user.id} />
 
       <section className="mt-6 rounded-2xl border border-fuchsia-200 bg-fuchsia-50 p-5 sm:p-6">
         <div className="flex gap-3"><BookOpen className="mt-0.5 h-6 w-6 shrink-0 text-fuchsia-800"/><div><h2 className="text-xl font-black text-slate-950">Syllabus and apprentice theory pacing</h2><p className="mt-1 text-sm font-semibold leading-6 text-slate-700">The Host Shop and apprentice see the same course sequence, weekly target, maximum, and reminder window. Theory time remains separate from shop OJL.</p></div></div>

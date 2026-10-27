@@ -1,3 +1,4 @@
+import HostShopCourses from '@/components/host-shop/HostShopCourses';
 import Link from 'next/link';
 import { AlertTriangle, BookOpen, CheckCircle2, Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
@@ -40,6 +41,8 @@ export default async function HostShopProgramsPage() {
           Back to dashboard
         </Link>
       </div>
+
+      <HostShopCourses userId={user.id} />
 
       <section
         className={`mt-6 rounded-3xl border p-7 ${configured ? 'border-green-200 bg-green-50' : 'border-amber-300 bg-amber-50'}`}

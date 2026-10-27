@@ -47,7 +47,7 @@ export default async function ProgramHolderPortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const context = await requireProgramHolder();
+  const context = await requireProgramHolder({ allowPendingApproval: true });
   const profileName = context.profile?.full_name || 'Program Holder';
   const avatarUrl = context.profile?.avatar_url?.trim();
   const initials = profileName

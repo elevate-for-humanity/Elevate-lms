@@ -18,7 +18,7 @@ const responsibilities = [
   'Record attendance, training hours, progress, case notes, credentials, and outcome information on time.',
   'Report safety, eligibility, engagement, attendance, or progress concerns promptly.',
   'Protect student information and use it only for approved training activity.',
-  'Keep business registration, insurance, W-9, credentials, profile photo, and required agreements current.',
+  'Keep your required business documents, W-9, credentials, profile photo, and agreements current.',
 ];
 
 const paymentRequirements = [

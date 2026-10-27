@@ -1,3 +1,4 @@
+import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 import CourseSyllabus from '@/components/learner/CourseSyllabus';
 import { completionAlert } from '@/lib/program-holder/student-training';
@@ -125,9 +126,9 @@ export async function ProgramHolderWorkspaceView({
       .filter((row) => row.approved === true || row.status === 'approved')
       .map((row) => row.document_type),
   );
-  const requiredDocumentTypes = ['government_id', 'business_registration', 'insurance', 'w9'];
   const holderFeatures =
     data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const requiredDocumentTypes = requiredProgramHolderDocuments(isHvac, holderFeatures).map(item => item.type);
   const regionalAssignment =
     holderFeatures.regional_assignment && typeof holderFeatures.regional_assignment === 'object'
       ? (holderFeatures.regional_assignment as Record<string, unknown>)
@@ -231,7 +232,7 @@ export async function ProgramHolderWorkspaceView({
         ]
       : []),
     {
-      label: 'Approved ID, business registration, insurance, and W-9',
+      label: 'Approved required onboarding documents',
       complete: requiredDocumentTypes.every((type) => approvedDocumentTypes.has(type)),
       required: true,
       owner: 'Shared',
@@ -356,6 +357,7 @@ export async function ProgramHolderWorkspaceView({
         rows={data.documents}
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
+        insuranceRequired={holderFeatures.insurance_required !== false}
       />
     );
   if (section === 'reports')
@@ -2025,7 +2027,7 @@ function ProgramCards({
                     <Row label="Published amount" value={formatProgramAmount(program)} />
                     <Row label="Funding path" value={formatProgramFunding(program)} />
                     <Row label="Career pay" value={formatCareerPay(program)} />
-                    <Row label="Course assignments" value={String(courses.length)} />
+                    <Row label="Connected course records" value={String(courses.length)} />
                     <Row
                       label="Delivery"
                       value={program.delivery_method || 'Confirm with the program team'}
@@ -2069,6 +2071,7 @@ function ProgramCards({
                     including Affirm when offered. Approval is made by the payment provider, not by
                     the Program Holder.
                   </div>
+                  {courses.length > 0 && <ul className="mt-4 space-y-2 text-sm">{courses.map((course: any) => <li key={`${program.id}-${course.course_id}`} className="rounded-lg border p-3"><strong>{course.title || 'Assigned course'}</strong><span className="block">{course.source === 'canonical_program' ? 'Canonical program course' : 'Holder delivery assignment'} · {course.status || 'Status requires review'}</span>{course.source === 'canonical_program' && !course.published && <span className="block font-bold text-amber-800">Publication has not been verified. This mapping does not unlock learner access.</span>}</li>)}</ul>}
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
                       This program is assigned, but no delivery course is connected yet.
@@ -2100,7 +2103,7 @@ function Hours({
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
       <HolderHourSubmissionForm enrollments={enrollments} />
-      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
+      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} verifiedHours={rows} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>
         <p className="mt-1 text-sm text-slate-600">
@@ -2154,7 +2157,7 @@ function programHolderRequirementLink(label: string): string | null {
     if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
     if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
     if (label === 'Non-compete agreement') return '/program-holder/non-compete';
-    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
+    if (label === 'Approved required onboarding documents') return '/program-holder/documents';
     if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
     if (label === 'Signed image release') return '/program-holder/documents';
     if (label === 'Program-holder approval') return '/program-holder/onboarding';
@@ -2202,7 +2205,7 @@ function Compliance({
             {items.map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
+                className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 p-4"
               >
                 <span className="font-semibold">
                   {item.label}
@@ -2234,10 +2237,12 @@ function Documents({
   rows,
   isHvac,
   requiresEnchantedHeartsTerms,
+  insuranceRequired,
 }: {
   rows: any[];
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
+  insuranceRequired: boolean;
 }) {
   return (
     <div className="space-y-6">
@@ -2246,14 +2251,14 @@ function Documents({
         title="Documents"
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
-      <ProgramHolderDocumentUpload isHvac={isHvac} />
+      <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
       <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">
           {rows.length ? (
             rows.map((row) => (
-              <div key={row.id} className="flex items-center gap-3 rounded-xl border p-4">
+              <div key={row.id} className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border p-4">
                 <FileText className="h-5 w-5 text-blue-700" />
                 <div className="min-w-0 flex-1">
                   <p className="break-words font-bold">
@@ -2262,8 +2267,8 @@ function Documents({
                   <p className="text-xs capitalize text-slate-500">{row.status || 'submitted'}</p>
                   {row.file_name && row.document_type && <p className="break-all text-xs text-slate-600">{row.file_name}</p>}
                 </div>
-                {typeof row.file_url === 'string' && /^https:\/\//i.test(row.file_url) ? (
-                  <a href={row.file_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">View uploaded file</a>
+                {typeof row.file_url === 'string' && row.file_url.length > 0 ? (
+                  <a href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">View uploaded file</a>
                 ) : (
                   <span className="text-xs font-semibold text-amber-800">File preview unavailable — contact Office Mail</span>
                 )}

@@ -97,11 +97,11 @@ export function CommunicationTodos({
       {items.map((item) => (
         <article
           key={item.id}
-          className="flex flex-wrap items-center gap-3 rounded-xl border-2 border-blue-300 bg-blue-50 p-4"
+          className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border-2 border-blue-300 bg-blue-50 p-4"
         >
-          <div className="min-w-0 flex-1">
-            <h2 className="font-black text-blue-950">{item.title}</h2>
-            <p className="mt-1 text-sm text-slate-800">{item.message}</p>
+          <div className="min-w-[min(100%,16rem)] flex-[1_1_16rem] break-words">
+            <h2 className="break-words font-black text-blue-950">{item.title}</h2>
+            <p className="mt-1 break-words text-sm text-slate-800">{item.message}</p>
           </div>
           <a
             href={
@@ -135,7 +135,7 @@ export function CommunicationTodos({
   return (
     <section
       aria-label="New email and communication to-dos"
-      className="mx-auto my-3 max-w-7xl space-y-2 px-4"
+      className="mx-auto my-3 w-full min-w-0 max-w-7xl space-y-2 overflow-x-hidden px-4"
     >
       <PwaAlertListener key={activeUserId} />
       {learnerPage ? (

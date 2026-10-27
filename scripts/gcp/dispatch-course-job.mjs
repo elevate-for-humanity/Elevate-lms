@@ -15,6 +15,8 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
+  // Role jobs use separate resource profiles and role-filtered claims.
+  url.searchParams.set('job_type','not.like.lesson_autopilot:*');
   url.searchParams.set('select','id,status,available_at,heartbeat_at,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
   // A stopped execution leaves an expired running lease. Claim RPC performs

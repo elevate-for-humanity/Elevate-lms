@@ -13,7 +13,7 @@ export async function loadUltimateBuildPage(db: SupabaseClient, courseId: string
   const pageSize = 50;
   const offset = (page - 1) * pageSize;
   let query = db.from('ultimate_course_builds').select(
-    'id,course_id,status,owner_paused:profile->ownerPaused,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,updated_at,heartbeat_at,lease_owner,lease_expires_at,attempts,max_attempts,execution_generation,payload,monitor)',
+    'id,course_id,status,owner_paused:profile->ownerPaused,current_step,created_at,updated_at,ultimate_build_jobs(id,status,available_at,last_error,created_at,updated_at,heartbeat_at,lease_owner,lease_expires_at,attempts,max_attempts,execution_generation,payload,monitor)',
   ).order('created_at', { ascending: false }).order('id', { ascending: false })
     .range(offset, offset + pageSize);
   if (courseId) query = query.eq('course_id', courseId);

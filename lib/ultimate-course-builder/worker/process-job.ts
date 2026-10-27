@@ -21,6 +21,7 @@ import { materializeUltimateDraft } from './materialize-draft';
 import { isDurableExternalBlocker } from '../core/repair-router';
 import { liveCheckpointRepairReader } from './live-checkpoint-repair';
 import { verifyNewCourseAssessmentContract } from '../instructional/new-course-contract.mjs';
+import {coordinateLessonAutopilots, processLessonAutopilot} from './lesson-autopilot';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -82,6 +83,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .eq('id', job.build_id)
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
+    if (job.payload?.autopilot) return await processLessonAutopilot({db,job,workerId,generation,build,queue,assertActive});
+    if (job.payload?.parallelAutopilotStart === true || build.profile?.parallelAutopilot === 'three-role-v1') {
+      const coordinated = await coordinateLessonAutopilots({db,job,workerId,generation,build,assertActive});
+      if (coordinated) return coordinated;
+    }
     // Upgrade saved owner-review profiles under this worker's fenced write.
     // The checkpoint hash treats this policy migration as operational metadata.
     const storedProfile = {
@@ -130,7 +136,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       }
       const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
       storedProfile.competencies[Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0]?.id;
-    const hydrated = await materializeUltimateDraft(db, build.course_id,
+    const hydrated = storedProfile.parallelAutopilot === 'three-role-v1' ? storedProfile : await materializeUltimateDraft(db, build.course_id,
       await hydrateUltimateProfileSources(db, build.course_id, storedProfile), [currentCompetencyId]);
     // Inherit the owner's approved production identity between lessons. Draft
     // hydration can refresh competency content, but must not reset the saved
@@ -327,6 +333,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     }
     assertActive();
     await queue.complete(job.id, workerId, generation);
+    if (profile.parallelAutopilot === 'three-role-v1') {
+      const closed = await db.rpc('finish_ultimate_autopilot_pool',{p_build:build.id});
+      if (closed.error) throw closed.error;
+      if (closed.data !== true) throw Error('ULTIMATE_AUTOPILOT_COURSE_RELEASE_READBACK_REQUIRED');
+    }
     return { claimed: true, completed: true, jobId: job.id, result };
     }
   } catch (error) {

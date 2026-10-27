@@ -28,6 +28,10 @@ test('resuming a paused build preserves exact instructional checkpoints',()=>{
 test('unchanged standards remain reusable',()=>{
  assert.equal(stepInputHash('standards_lock',profile,{}),legacyHash('standards_lock',[]));
 });
+test('enabling parallel scheduling preserves every instructional checkpoint hash',()=>{
+ for(const step of ULTIMATE_BUILD_STEPS)
+  assert.equal(stepInputHash(step,{...profile,parallelAutopilot:'three-role-v1'},prior),stepInputHash(step,profile,prior));
+});
 test('legacy teaching hash is invalidated without changing the release contract version',()=>{
  const old=legacyHash('learning_objectives',[['standards_lock',contractHash(artifactPayload(prior.standards_lock))]]);
  const current=stepInputHash('learning_objectives',profile,prior);

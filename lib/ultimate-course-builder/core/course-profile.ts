@@ -108,6 +108,7 @@ export async function buildUltimateProfile(
       ...profile,
       title: input.title,
       audience: input.audience?.trim() || undefined,
+      parallelAutopilot: 'three-role-v1',
     });
   }
 
@@ -166,6 +167,7 @@ export async function buildUltimateProfile(
 
   return hydrateUltimateProfileSources(db, input.courseId, {
     id: standard?.standard_key ?? `course:${input.courseId}`,
+    parallelAutopilot: 'three-role-v1',
     title: input.title,
     authority: standard?.source_authority ?? 'course-defined',
     jurisdiction: input.state?.trim() || standard?.state || 'IN',

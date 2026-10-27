@@ -19,6 +19,8 @@ export type UltimateCoursePlan = {
   repairRenderRevision?: string;
   beforeCheckpoint?: UltimateRunContext['beforeCheckpoint'];
   renderPreviewOnly?: boolean;
+  stopAfterStep?: UltimateBuildStep;
+  startAtStep?: UltimateBuildStep;
 };
 export async function runUltimateCourse(
   plan: UltimateCoursePlan,
@@ -84,6 +86,7 @@ export async function runUltimateCourse(
           artifacts: checkpoint.artifacts as any,
           findings: checkpoint.findings.filter((f) => f.severity !== "error"),
         },
+        stageReady: true,
       });
       continue;
     }
@@ -112,6 +115,8 @@ export async function runUltimateCourse(
       assertActive,
       beforeCheckpoint: plan.beforeCheckpoint,
       renderPreviewOnly: plan.renderPreviewOnly,
+      stopAfterStep: plan.stopAfterStep,
+      startAtStep: plan.startAtStep,
       persistStep: async (input) => {
         assertActive?.();
         console.info('[UltimateCourse] step transition', {lessonBuildId: lesson.id, step: input.step, state: input.state});
@@ -150,7 +155,7 @@ export async function runUltimateCourse(
     const result = await makeRunner(competency.id).run(context);
     console.info('[UltimateCourse] runner returned', {lessonBuildId: lesson.id, findings: result.findings.length});
     assertActive?.();
-    if (!plan.renderPreviewOnly && !result.findings.some((f) => f.severity === 'error')) {
+    if (!plan.stopAfterStep && !plan.renderPreviewOnly && !result.findings.some((f) => f.severity === 'error')) {
       try {
         assertCompleteLesson(result.artifacts, plan.profile, competency.id);
         // Reconcile the checkpoint table only after independent acceptance has
@@ -167,18 +172,21 @@ export async function runUltimateCourse(
     }
     await persistence.finishLesson({
       lessonBuildId: lesson.id,
-      status: plan.renderPreviewOnly || result.findings.some((f) => f.severity === 'error') ? 'built_with_findings' : 'built',
+      status: result.findings.some((f) => f.severity === 'error') || plan.renderPreviewOnly ? 'built_with_findings' : plan.stopAfterStep ? 'running' : 'built',
       artifacts: result.artifacts,
       findings: result.findings,
     });
-    lessons.push({ competencyId: competency.id, lessonBuildId: lesson.id, result });
+    const stageReady = Boolean(plan.stopAfterStep && ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(plan.stopAfterStep) + 1)
+      .every(step => context.passedSteps?.has(step)));
+    lessons.push({ competencyId: competency.id, lessonBuildId: lesson.id, result, stageReady });
     if (result.findings.some((f) => f.severity === 'error')) break;
   }
   const findings = lessons.flatMap((x) => x.result.findings);
   const hasErrors = findings.some((f) => f.severity === 'error');
   const previewReady = Boolean(plan.renderPreviewOnly && !hasErrors && lessons.length === 1 &&
     (lessons[0].result.artifacts.lesson_film_render as any)?.render?.videoUrl);
-  const completed = !plan.renderPreviewOnly && !hasErrors && lessons.length === competencies.length;
+  const stageReady = Boolean(plan.stopAfterStep && !hasErrors && lessons.length === competencies.length && lessons.every(lesson => lesson.stageReady));
+  const completed = !plan.stopAfterStep && !plan.renderPreviewOnly && !hasErrors && lessons.length === competencies.length;
   assertActive?.();
   await persistence.updateBuild({
     buildId: plan.buildId,
@@ -188,7 +196,7 @@ export async function runUltimateCourse(
     currentStep: plan.renderPreviewOnly ? 'lesson_film_render' : hasErrors ? ('selective_repair' as UltimateBuildStep) : ('credential_release' as UltimateBuildStep),
     findings,
   });
-  return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed, previewReady,
+  return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed, previewReady, stageReady,
     nextIndex: startIndex + lessons.length, hasRemaining: startIndex + lessons.length < eligible.length };
 }
 

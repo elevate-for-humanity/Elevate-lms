@@ -71,6 +71,14 @@ export class UltimateJobQueue {
   }
 
   async claim(workerId: string, leaseSeconds = 300) {
+    const role = process.env.ULTIMATE_AUTOPILOT_ROLE;
+    if (role) {
+      if (!['instruction','media','quality'].includes(role) || process.env.EXTERNAL_COURSE_ATTEMPT_ID || process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
+        throw new Error('ULTIMATE_AUTOPILOT_ROLE_CONFIGURATION_INVALID');
+      const {data,error} = await this.db.rpc('claim_ultimate_lesson_autopilot',{p_worker:workerId,p_lease_seconds:leaseSeconds,p_role:role});
+      if (error) throw error;
+      return data?.[0] ?? null;
+    }
     if (process.env.EXTERNAL_COURSE_ATTEMPT_ID) {
       if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
         throw new Error('CONFLICTING_EXACT_WORKER_TARGETS');

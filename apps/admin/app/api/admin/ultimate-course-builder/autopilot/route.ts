@@ -13,6 +13,12 @@ export async function POST(req:NextRequest){
   return NextResponse.json({error:'Select a saved build and autopilot setting.'},{status:400});
  try{
   const db=await requireAdminClient();
+  if(input.enabled && input.mode==='three-role-v1'){
+   const planned=await db.rpc('request_ultimate_autopilot_pool',{p_build:input.buildId,p_actor:auth.id});
+   if(planned.error)throw planned.error;
+   const launch=await requestCourseWorker();
+   return NextResponse.json({ok:true,pool:planned.data,launch,message:'Three jobs per lesson requested: instruction, media, and independent quality/publication. The current lesson will keep its saved work and hand off at its checkpoint. '+launch?.message});
+  }
   const {data:job,error}=await db.from('ultimate_build_jobs').select('id,monitor,execution_generation')
    .eq('build_id',input.buildId).eq('job_type','course_build').order('created_at',{ascending:false}).limit(1).maybeSingle();
   if(error)throw error;

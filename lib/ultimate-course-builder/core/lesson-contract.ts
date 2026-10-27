@@ -44,7 +44,7 @@ export function stepInputHash(
 ): string {
   // Publication settings and resume history do not change instructional inputs.
   const { pauseResumeAudit: _resumeAudit, publishCompletedLessons: _publishAsYouGo,
-    preservedPublishedLessonIds: _preservedPublications, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
+    preservedPublishedLessonIds: _preservedPublications, parallelAutopilot: _parallelAutopilot, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,

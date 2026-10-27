@@ -87,12 +87,12 @@ export async function checkAndSendOnboardingCompleteEmail(
     });
   }
 
-  // Mark sent — welcome_email_sent column may not exist yet; ignore error
-  await admin
+  // Persist the delivery marker; never silently discard the write result.
+  const { error: markerError } = await admin
     .from('program_holders')
     .update({ welcome_email_sent: true })
-    .eq('id', holderId)
-    .catch(() => {});
+    .eq('id', holderId);
+  if (markerError) return { sent: true, reason: 'delivery_marker_failed' };
 
   logger.info('[onboarding-complete] Welcome email sent', { userId, email: profile.email });
   return { sent: true };
@@ -105,7 +105,7 @@ async function sendWelcomeEmail(opts: {
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
-  const dashboardUrl = `${siteUrl}/program-holder/dashboard`;
+  const dashboardUrl = 'https://app.elevateforhumanity.org/program-holder/dashboard';
 
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>

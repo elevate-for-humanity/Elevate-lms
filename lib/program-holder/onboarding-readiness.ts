@@ -62,12 +62,13 @@ export async function getProgramHolderPaymentReadiness(
   db: any,
   holderId: string,
 ): Promise<ProgramHolderReadiness> {
-  const { data: holder } = await db
+  const { data: holder, error: holderError } = await db
     .from('program_holders')
     .select('user_id,mou_signed,mou_status,mou_type,features')
     .eq('id', holderId)
     .maybeSingle();
 
+  if (holderError) throw new Error('Program Holder payment readiness could not be verified.');
   if (!holder?.user_id) {
     return {
       ready: false,
@@ -78,14 +79,7 @@ export async function getProgramHolderPaymentReadiness(
     };
   }
 
-  const [
-    { data: acknowledgements },
-    { data: documents },
-    { data: graduated },
-    { data: assignments },
-    { data: imageRelease },
-    { data: payoutProfile },
-  ] = await Promise.all([
+  const evidence = await Promise.all([
     db
       .from('program_holder_acknowledgements')
       .select('document_type')
@@ -120,6 +114,8 @@ export async function getProgramHolderPaymentReadiness(
       .maybeSingle(),
   ]);
 
+  if (evidence.some(result => result.error)) throw new Error('Program Holder payment readiness evidence could not be verified.');
+  const [{ data: acknowledgements }, { data: documents }, { data: graduated }, { data: assignments }, { data: imageRelease }, { data: payoutProfile }] = evidence;
   const approvedTypes = new Set(
     (documents || [])
       .filter((document: any) => document.status === 'approved' || document.approved === true)

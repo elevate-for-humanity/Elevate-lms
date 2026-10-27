@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { DocumentSignatureBlock } from '@/components/documents';
 
 export const dynamic = 'force-dynamic';
@@ -11,37 +10,15 @@ export const metadata = {
 };
 
 export default async function SignMouPage() {
-  const auth = await createClient();
-  const db = await requireAdminClient();
-  const {
-    data: { user },
-  } = await auth.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/program-holder/sign-mou');
-  }
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('id, full_name, program_holder_id')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile?.program_holder_id) {
-    redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
-  }
-
-  const { data: holder } = await db
-    .from('program_holders')
-    .select('id, organization_name, status, approved_at, mou_signed')
-    .eq('id', profile.program_holder_id)
-    .maybeSingle();
-  if (
-    !holder ||
-    !holder.approved_at ||
-    !['approved', 'active'].includes(String(holder.status || ''))
-  ) {
-    redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
-  }
+  const context = await requireProgramHolder();
+  if (context.mode === 'admin') redirect('/program-holder/dashboard');
+  const db = context.db;
+  const { data: holder, error } = await db.from('program_holders')
+    .select('id,organization_name,status,approved_at,mou_signed,mou_final_pdf_url,features')
+    .eq('id', context.holderId).maybeSingle();
+  if (error || !holder) throw new Error('Program Holder agreement could not load.');
+  const executedUrl = typeof holder.mou_final_pdf_url === 'string' && /^https:\/\//i.test(holder.mou_final_pdf_url) ? holder.mou_final_pdf_url : null;
+  const requirements: string[] = Array.isArray(holder.features?.custom_mou?.requirements) ? holder.features.custom_mou.requirements.filter((value: unknown): value is string => typeof value === 'string') : [];
 
   const { data: assignments } = await db
     .from('program_holder_programs')
@@ -84,6 +61,8 @@ export default async function SignMouPage() {
           </Link>
         </section>
 
+        {executedUrl && <a href={executedUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-5 font-bold text-white">Open your recorded MOU document</a>}
+        {requirements.length > 0 && <section className="mt-6 rounded-xl border p-5"><h2 className="text-lg font-black">Your assigned agreement requirements</h2><ul className="mt-3 list-disc space-y-2 pl-5 text-sm">{requirements.map(item => <li key={item}>{item}</li>)}</ul></section>}
         <section className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
           <strong>After signature:</strong> your acceptance is recorded with timestamp and audit
           data. Dashboard access continues, but payout setup and fund access remain locked until the
@@ -93,11 +72,13 @@ export default async function SignMouPage() {
 
         {holder.mou_signed ? (
           <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm font-semibold text-emerald-950">
-            Your Program Holder MOU is already recorded as signed. You may review the terms above at any time.
+            Your Program Holder MOU is recorded as signed. {executedUrl ? "Open the recorded document above to review your agreement." : "The executed document has not been attached to this record. Ask Elevate through Office Mail to attach the original; the general terms above are not a copy of your executed agreement."}
             <Link href="/program-holder/documents" className="mt-3 block font-bold underline">
               View other required documents and acknowledgements
             </Link>
           </div>
+        ) : context.mode === 'preview' ? (
+          <p className="mt-6 rounded-xl bg-blue-50 p-5">Administrator preview is read only. The Program Holder must sign from their own account.</p>
         ) : (
           <DocumentSignatureBlock
             agreementType="program_holder_mou"

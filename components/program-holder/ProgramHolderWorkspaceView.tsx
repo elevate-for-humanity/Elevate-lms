@@ -2027,7 +2027,7 @@ function ProgramCards({
                     <Row label="Published amount" value={formatProgramAmount(program)} />
                     <Row label="Funding path" value={formatProgramFunding(program)} />
                     <Row label="Career pay" value={formatCareerPay(program)} />
-                    <Row label="Course assignments" value={String(courses.length)} />
+                    <Row label="Connected course records" value={String(courses.length)} />
                     <Row
                       label="Delivery"
                       value={program.delivery_method || 'Confirm with the program team'}
@@ -2071,6 +2071,7 @@ function ProgramCards({
                     including Affirm when offered. Approval is made by the payment provider, not by
                     the Program Holder.
                   </div>
+                  {courses.length > 0 && <ul className="mt-4 space-y-2 text-sm">{courses.map((course: any) => <li key={`${program.id}-${course.course_id}`} className="rounded-lg border p-3"><strong>{course.title || 'Assigned course'}</strong><span className="block">{course.source === 'canonical_program' ? 'Canonical program course' : 'Holder delivery assignment'} · {course.status || 'Status requires review'}</span>{course.source === 'canonical_program' && !course.published && <span className="block font-bold text-amber-800">Publication has not been verified. This mapping does not unlock learner access.</span>}</li>)}</ul>}
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
                       This program is assigned, but no delivery course is connected yet.
@@ -2156,7 +2157,7 @@ function programHolderRequirementLink(label: string): string | null {
     if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
     if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
     if (label === 'Non-compete agreement') return '/program-holder/non-compete';
-    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
+    if (label === 'Approved required onboarding documents') return '/program-holder/documents';
     if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
     if (label === 'Signed image release') return '/program-holder/documents';
     if (label === 'Program-holder approval') return '/program-holder/onboarding';

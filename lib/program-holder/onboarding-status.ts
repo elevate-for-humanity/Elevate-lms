@@ -86,11 +86,11 @@ export async function getProgramHolderOnboardingStatus(
   // Check role
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role,program_holder_id')
     .eq('id', currentUserId)
     .maybeSingle();
 
-  const isProgramHolder = ['program_holder', 'site_coordinator'].includes(String(profile?.role || ''));
+  const isProgramHolder = ['program_holder', 'programholder', 'site_coordinator'].includes(String(profile?.role || ''));
 
   if (!isProgramHolder) {
     return {
@@ -108,7 +108,7 @@ export async function getProgramHolderOnboardingStatus(
       requiredDocsComplete: false,
       requiredDocsList: [],
       onboardingComplete: false,
-      nextStepRoute: '/program-holder/apply',
+      nextStepRoute: 'https://www.elevateforhumanity.org/apply/program-holder',
       nextStepLabel: 'Apply as Program Holder',
       completedSteps: 0,
       totalSteps: 5,
@@ -119,11 +119,11 @@ export async function getProgramHolderOnboardingStatus(
   // Check approval status and program type
   const { data: programHolder } = await supabase
     .from('program_holders')
-    .select('status, approved_at, mou_type')
-    .eq('user_id', currentUserId)
+    .select('status, approved_at, mou_type, mou_signed, mou_status, mou_signed_at')
+    .eq(profile?.program_holder_id ? 'id' : 'user_id', profile?.program_holder_id || currentUserId)
     .maybeSingle();
 
-  const isApproved = programHolder?.status === 'approved' || !!programHolder?.approved_at;
+  const isApproved = ['approved','active','approved_pending_mou'].includes(String(programHolder?.status)) && !!programHolder?.approved_at;
 
   if (!isApproved) {
     return {
@@ -150,15 +150,8 @@ export async function getProgramHolderOnboardingStatus(
   }
 
   // Check MOU signed
-  const { data: mouSignature } = await supabase
-    .from('mou_signatures')
-    .select('id, agreed_at')
-    .eq('user_id', currentUserId)
-    .eq('user_type', 'program_holder')
-    .maybeSingle();
-
-  const mouSigned = !!mouSignature;
-  const mouSignedAt = mouSignature?.agreed_at || null;
+  const mouSigned = programHolder?.mou_signed === true && ['signed','fully_executed'].includes(String(programHolder.mou_status || 'signed'));
+  const mouSignedAt = programHolder?.mou_signed_at || null;
 
   if (!mouSigned) {
     return {

@@ -24,12 +24,17 @@ export type PayoutReadiness = {
 const masked = (value?: string | null) =>
   value ? value.replace(/^(.{2}).*(@.*|.{2})$/, '$1••••$2') : null;
 
+function secureProviderUrl(value?: string) {
+  if (!value) return null;
+  try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : null; } catch { return null; }
+}
+
 export async function payoutProviderConfigured(provider: PayoutProvider) {
   await hydrateProcessEnv();
   if (provider === 'paypal') {
-    return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+    return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && secureProviderUrl(process.env.PAYPAL_PAYOUT_SETTINGS_URL));
   }
-  return Boolean(process.env.BRANCH_ONBOARDING_URL);
+  return Boolean(secureProviderUrl(process.env.BRANCH_ONBOARDING_URL));
 }
 
 export async function getProgramHolderPayoutAccount(ctx: HolderContext): Promise<PayoutReadiness> {
@@ -104,8 +109,8 @@ export async function configureProgramHolderPayoutAccount(
 
 export async function payoutProviderUrl(provider: PayoutProvider, action: 'onboard' | 'dashboard') {
   await hydrateProcessEnv();
-  if (provider === 'paypal') return process.env.PAYPAL_PAYOUT_SETTINGS_URL || null;
-  return action === 'dashboard'
+  if (provider === 'paypal') return secureProviderUrl(process.env.PAYPAL_PAYOUT_SETTINGS_URL);
+  return secureProviderUrl(action === 'dashboard'
     ? process.env.BRANCH_DASHBOARD_URL || process.env.BRANCH_ONBOARDING_URL
-    : process.env.BRANCH_ONBOARDING_URL;
+    : process.env.BRANCH_ONBOARDING_URL);
 }

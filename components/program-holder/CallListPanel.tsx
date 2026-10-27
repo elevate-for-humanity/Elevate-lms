@@ -6,6 +6,7 @@ import { Phone, MessageSquare, ChevronDown, ChevronUp, Clock, Calendar, MapPin, 
 interface Applicant {
   id: string;
   applicant_name: string;
+  regional_application_id?: string;
   applicant_email: string;
   applicant_phone: string;
   application_status: string;
@@ -70,6 +71,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           program_holder_student_id: applicant.id,
+          regional_application_id: applicant.regional_application_id,
           outcome: form.outcome,
           notes: form.notes,
           next_follow_up: form.next_follow_up || null,

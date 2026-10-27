@@ -96,7 +96,7 @@ jobs:
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
       - name: Shared dashboard and Program Holder communication regressions
-        run: node --test tests/shared-holder-dashboard-repairs.node.test.mjs
+        run: node --test tests/shared-holder-dashboard-repairs.node.test.mjs tests/program-holder-root-audit.node.test.mjs
       - name: Canonical student lifecycle contract
         run: |
           node --test tests/admission-eligibility.node.test.mjs

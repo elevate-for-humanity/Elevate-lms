@@ -1,56 +1,160 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {dispatchLessonAutopilots} from './dispatch-lesson-autopilots.mjs';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {dispatchLessonAutopilots,LESSON_ROLE_CONCURRENCY} from './dispatch-lesson-autopilots.mjs';
 import {lessonRoleDefinition,LESSON_ROLE_JOBS} from './deploy-lesson-autopilots.mjs';
-const now=new Date('2026-10-27T18:00:00Z');
+const now=new Date('2026-10-27T18:00:00Z'),Gi=2**30;
 const source={spec:{template:{spec:{taskCount:1,parallelism:1,template:{spec:{serviceAccountName:'elevate-worker-runtime@elegant-racer-299721.iam.gserviceaccount.com',maxRetries:0,
- containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'8',memory:'32Gi'}},env:[]}]}}}}}};
-const waiting=role=>({id:'job-'+role,status:'queued',available_at:'2026-10-27T17:59:00Z',attempts:0,max_attempts:5,execution_generation:0,payload:{autopilot:{role}}});
+ containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'4',memory:'8Gi'}},env:[]}]}}}}}};
+const waiting=(role,id='job-'+role)=>({id,status:'queued',available_at:'2026-10-27T17:59:00Z',attempts:0,max_attempts:5,execution_generation:0,payload:{autopilot:{role}}});
 function fixture(rows){
- const calls=[],active=new Map(),templates=new Map(Object.entries(LESSON_ROLE_JOBS).map(([role,c])=>[c.name,lessonRoleDefinition(source,role)]));
+ const calls=[],trace=[],active=new Map(),history=[],controls={};
+ const records=new Map(rows.map(row=>[row.id,structuredClone(row)]));
+ const templates=new Map(Object.entries(LESSON_ROLE_JOBS).map(([role,c])=>[c.name,lessonRoleDefinition(source,role)]));
  const options={now,clock:()=>now.getTime()+2000,assignmentAttempts:1,delay:async()=>{},env:{SUPABASE_SERVICE_ROLE_KEY:'fixture'},
   run:args=>{
    calls.push(args);
-   if(args[2]==='execute'){active.set(args[3],[{status:{}}]);return '';}
+   if(args[2]==='execute'){
+    const role=Object.keys(LESSON_ROLE_JOBS).find(role=>LESSON_ROLE_JOBS[role].name===args[3]);
+    const prefix=args.find(arg=>arg.startsWith('--update-env-vars=ULTIMATE_WORKER_ID=')).slice('--update-env-vars=ULTIMATE_WORKER_ID='.length);
+    trace.push('launch:'+role);active.set(args[3],[...(active.get(args[3])??[]),{status:{}}]);
+    if(controls.noClaim)return '';
+    let available=[...records.values()].filter(row=>row.status==='queued'&&row.payload.autopilot.role===role);
+    if(controls.reverse)available=available.reverse();
+    const row=available[0];assert.ok(row,'paid task must have a distinct queued job');
+    const generation=row.execution_generation+(controls.generationAdvance??1),worker=prefix+'-worker';
+    Object.assign(row,{execution_generation:generation,status:controls.statusFor?.(row)??controls.quickStatus??'running',
+     heartbeat_at:'2026-10-27T18:00:01Z',lease_owner:controls.alienOwner?'another-worker':worker,lease_expires_at:'2026-10-27T18:05:00Z'});
+    if(row.status!=='running')Object.assign(row,{lease_owner:null,lease_expires_at:null});
+    history.push({job_id:row.id,execution_generation:generation,worker_id:worker,event_time:'2026-10-27T18:00:01Z'});
+    return '';
+   }
    if(args[2]==='describe')return JSON.stringify(args[3]==='elevate-course-builder-parallel'?source:templates.get(args[3]));
    if(args[2]==='executions')return JSON.stringify(active.get(args.find(a=>a.startsWith('--job=')).slice(6))??[]);
    throw Error('unexpected command');
   },
-  request:async url=>({ok:true,json:async()=>url.searchParams.has('id')?[{id:url.searchParams.get('id').slice(3),status:'running',lease_owner:'exclusive-worker',lease_expires_at:'2026-10-27T18:05:00Z',heartbeat_at:'2026-10-27T18:00:01Z',execution_generation:1}]:rows}),
-  capacityCheck:async()=>({fits:true}),
+  request:async url=>{
+   if(url.pathname.endsWith('/ultimate_job_attempt_history')){
+    trace.push('history');
+    if(controls.historyUnavailable)return {ok:false,status:503};
+    return {ok:true,json:async()=>controls.unrelatedHistory?history.map(h=>({...h,worker_id:'not-this-launch-worker'})):history};
+   }
+   if(url.searchParams.has('id')){
+    const ids=url.searchParams.get('id').slice(4,-1).split(',');
+    return {ok:true,json:async()=>ids.map(id=>records.get(id)).filter(Boolean)};
+   }
+   return {ok:true,json:async()=>structuredClone(rows)};
+  },
+  capacityCheck:async({task})=>{
+   let cpu=0,memory=0;
+   for(const [name,executions] of active){
+    const limits=templates.get(name).spec.template.spec.template.spec.containers[0].resources.limits;
+    cpu+=Number(limits.cpu)*1000*executions.length;memory+=Number(limits.memory.replace('Gi',''))*Gi*executions.length;
+   }
+   const limits=task.containers[0].resources.limits;
+   return {fits:true,required:{cpu:cpu+Number(limits.cpu)*1000,memory:memory+Number(limits.memory.replace('Gi',''))*Gi},granted:{cpu:32000,memory:64*Gi}};
+  },
  };
- return {options,calls,active,templates};
+ return {options,calls,trace,active,templates,records,history,controls};
 }
-test('three different lessons receive their own instruction, media and quality workers with fresh claims',async()=>{
- const s=fixture(['instruction','media','quality'].map(waiting));
- const result=await dispatchLessonAutopilots(s.options);
- assert.equal(result.status,'assigned');assert.equal(result.assignments.length,3);
- assert.deepEqual(new Set(result.assignments.map(a=>a.jobId)),new Set(['job-instruction','job-media','job-quality']));
- assert.equal(s.calls.filter(args=>args[2]==='execute').length,3);
+const launches=s=>s.calls.filter(args=>args[2]==='execute');
+
+test('multiple lessons fill each role pool before waiting for any assignment',async()=>{
+ const rows=Object.entries({instruction:8,media:6,quality:3}).flatMap(([role,count])=>Array.from({length:count},(_,i)=>waiting(role,role+'-'+i)));
+ const s=fixture(rows),result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.status,'assigned');assert.equal(result.assignments.length,9);
+ assert.equal(new Set(result.assignments.map(a=>a.jobId)).size,9);
+ for(const [role,count] of Object.entries(LESSON_ROLE_CONCURRENCY))assert.equal(result.assignments.filter(a=>a.role===role).length,count);
+ assert.equal(s.trace.indexOf('history'),9,'all admitted workers start before polling their independent claims');
+ assert.equal(new Set(launches(s).map(args=>args.find(a=>a.startsWith('--update-env-vars=')))).size,9);
 });
+
+test('an existing same-role worker does not prevent other lessons receiving workers',async()=>{
+ const live={...waiting('media','live'),status:'running',heartbeat_at:'2026-10-27T17:59:00Z',lease_expires_at:'2026-10-27T18:05:00Z',lease_owner:'existing-worker'};
+ const s=fixture([live,...Array.from({length:4},(_,i)=>waiting('media','next-'+i))]);
+ s.active.set(LESSON_ROLE_JOBS.media.name,[{status:{}}]);
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.assignments.length,2);assert.ok(result.assignments.every(a=>a.role==='media'));
+ assert.equal(s.records.get('live').lease_owner,'existing-worker');
+});
+
+test('a booting existing execution reserves the last queued job',async()=>{
+ const s=fixture([waiting('media')]);s.active.set(LESSON_ROLE_JOBS.media.name,[{status:{}}]);
+ assert.equal((await dispatchLessonAutopilots(s.options)).status,'busy');assert.equal(launches(s).length,0);
+});
+
+test('stale cloud inventory cannot spend acknowledged launch capacity twice',async()=>{
+ const s=fixture(Array.from({length:5},(_,i)=>waiting('media','media-'+i)));
+ s.options.capacityCheck=async()=>({fits:true,required:{cpu:4000,memory:8*Gi},granted:{cpu:8000,memory:16*Gi}});
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.assignments.length,2);assert.equal(launches(s).length,2);
+});
+
+test('the capacity reservation includes launches from different role pools',async()=>{
+ const s=fixture(['quality','media','instruction'].flatMap(role=>Array.from({length:4},(_,i)=>waiting(role,role+'-'+i))));
+ s.options.capacityCheck=async({task})=>({fits:true,required:{cpu:Number(task.containers[0].resources.limits.cpu)*1000,memory:Number(task.containers[0].resources.limits.memory.replace('Gi',''))*Gi},granted:{cpu:10000,memory:16*Gi}});
+ const result=await dispatchLessonAutopilots(s.options);
+ // Two 6-Gi quality workers leave room for two 2-Gi instruction workers;
+ // no 8-Gi renderer can reuse the same remaining four GiB.
+ assert.deepEqual(result.assignments.map(a=>a.role),['quality','quality','instruction','instruction']);
+});
+
+test('a worker can claim a different queue position without borrowing another execution heartbeat',async()=>{
+ const s=fixture([waiting('media','earlier'),waiting('media','later')]);s.controls.reverse=true;
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.deepEqual(new Set(result.assignments.map(a=>a.jobId)),new Set(['earlier','later']));
+ assert.equal(new Set(s.history.map(h=>h.worker_id)).size,2);
+});
+
 test('an empty queue and future prerequisite never launch work',async()=>{
  const s=fixture([]);assert.equal((await dispatchLessonAutopilots(s.options)).status,'empty');assert.equal(s.calls.length,0);
  const future=fixture([{...waiting('media'),available_at:'2026-10-27T18:03:00Z'}]);
- assert.equal((await dispatchLessonAutopilots(future.options)).status,'retry_wait');
- assert.equal(future.calls.some(args=>args[2]==='execute'),false);
+ assert.equal((await dispatchLessonAutopilots(future.options)).status,'retry_wait');assert.equal(launches(future).length,0);
 });
-test('an active role owns its slot and keeps coordination alive',async()=>{
- const row={...waiting('media'),status:'running',lease_expires_at:'2026-10-27T18:05:00Z'};
- const s=fixture([row]);s.active.set(LESSON_ROLE_JOBS.media.name,[{status:{}}]);
- assert.equal((await dispatchLessonAutopilots(s.options)).status,'busy');
- assert.equal(s.calls.some(args=>args[2]==='execute'),false);
+
+test('a leased worker with no eligible successor keeps coordination alive',async()=>{
+ const s=fixture([{...waiting('media'),status:'running',lease_expires_at:'2026-10-27T18:05:00Z'}]);
+ s.active.set(LESSON_ROLE_JOBS.media.name,[{status:{}}]);
+ assert.equal((await dispatchLessonAutopilots(s.options)).status,'busy');assert.equal(launches(s).length,0);
 });
-test('a container launch without a real assignment cannot report started',async()=>{
- const s=fixture([waiting('instruction')]);s.options.request=async url=>({ok:true,json:async()=>url.searchParams.has('id')?[]:[waiting('instruction')]});
+
+for(const control of ['noClaim','unrelatedHistory','alienOwner'])test('launch needs its own live durable claim: '+control,async()=>{
+ const s=fixture([waiting('instruction')]);s.controls[control]=true;
  await assert.rejects(dispatchLessonAutopilots(s.options),/ASSIGNMENT_TIMEOUT/);
 });
-test('a quick cached role completion is verified by a new generation and fresh claim heartbeat',async()=>{
- const s=fixture([waiting('instruction')]);s.options.request=async url=>({ok:true,json:async()=>url.searchParams.has('id')?
-  [{id:'job-instruction',status:'completed',execution_generation:1,heartbeat_at:'2026-10-27T18:00:01Z'}]:[waiting('instruction')]});
- assert.equal((await dispatchLessonAutopilots(s.options)).status,'assigned');
+
+test('quick cached completion is proved by this execution claim history and new generation',async()=>{
+ const s=fixture([waiting('instruction')]);s.controls.quickStatus='completed';
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.status,'assigned');assert.equal(result.assignments[0].state,'completed');
 });
-test('capacity and immutable-image checks remain mandatory for every role',async()=>{
+
+test('stale generation and unavailable claim history cannot prove assignment',async()=>{
+ const s=fixture([waiting('instruction')]);s.controls.generationAdvance=0;
+ await assert.rejects(dispatchLessonAutopilots(s.options),/ASSIGNMENT_TIMEOUT/);
+ const unavailable=fixture([waiting('instruction')]);unavailable.controls.historyUnavailable=true;
+ await assert.rejects(dispatchLessonAutopilots(unavailable.options),/CLAIM_HISTORY_HTTP_503/);
+});
+
+test('a failed claimed lesson does not prevent launching and verifying other lessons',async()=>{
+ const s=fixture([waiting('media','broken'),waiting('media','good'),waiting('instruction')]);
+ s.controls.statusFor=row=>row.id==='broken'?'failed':'running';
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.assignments.length,3);assert.equal(result.assignments.filter(a=>a.state==='running').length,2);
+});
+
+test('explicit concurrency configuration replaces the former one-per-role ceiling',async()=>{
+ const s=fixture(Array.from({length:7},(_,i)=>waiting('instruction','lesson-'+i)));
+ s.options.env.COURSE_AUTOPILOT_INSTRUCTION_CONCURRENCY='6';
+ assert.equal((await dispatchLessonAutopilots(s.options)).assignments.length,6);
+ const invalid=fixture([waiting('media')]);invalid.options.env.COURSE_AUTOPILOT_MEDIA_CONCURRENCY='-1';
+ await assert.rejects(dispatchLessonAutopilots(invalid.options),/CONCURRENCY_INVALID/);
+});
+
+test('capacity and immutable-image checks remain mandatory for every worker',async()=>{
  const s=fixture([waiting('media')]);s.options.capacityCheck=async()=>({fits:false});
- assert.equal((await dispatchLessonAutopilots(s.options)).status,'capacity_wait');assert.equal(s.calls.some(args=>args[2]==='execute'),false);
+ assert.equal((await dispatchLessonAutopilots(s.options)).status,'capacity_wait');assert.equal(launches(s).length,0);
  s.templates.get(LESSON_ROLE_JOBS.media.name).spec.template.spec.template.spec.containers[0].image='old-image';
  await assert.rejects(dispatchLessonAutopilots(s.options),/APPROVED_TEMPLATE_REQUIRED/);
+ const missing=fixture([waiting('instruction')]);missing.options.capacityCheck=async()=>({fits:true});
+ await assert.rejects(dispatchLessonAutopilots(missing.options),/CAPACITY_READBACK_REQUIRED/);assert.equal(launches(missing).length,0);
 });

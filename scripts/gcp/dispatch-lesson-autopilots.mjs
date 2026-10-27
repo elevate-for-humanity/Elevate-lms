@@ -1,6 +1,34 @@
 import {google,PROJECT} from './runtime-config.mjs';
-import {inspectRegionalCapacity,isTerminalExecution} from './regional-capacity.mjs';
+import {inspectRegionalCapacity,isTerminalExecution,allocation} from './regional-capacity.mjs';
 import {LESSON_ROLE_JOBS,LESSON_ROLE_REGION} from './deploy-lesson-autopilots.mjs';
+import {randomUUID} from 'node:crypto';
+
+export const LESSON_ROLE_CONCURRENCY=Object.freeze({instruction:4,media:3,quality:2});
+function concurrency(role,env){
+ const value=env['COURSE_AUTOPILOT_'+role.toUpperCase()+'_CONCURRENCY'];
+ const count=value===undefined?LESSON_ROLE_CONCURRENCY[role]:Number(value);
+ if(!Number.isSafeInteger(count)||count<1)throw Error('ULTIMATE_AUTOPILOT_CONCURRENCY_INVALID:'+role);
+ return count;
+}
+
+// Cloud inventory can lag a just-acknowledged asynchronous launch. Retain its
+// allocation locally until the next coordinated pass, even if a later inventory
+// read has not included that execution yet. Never spend the same capacity twice.
+function reserveCapacity(capacity,task,reserved){
+ if(!capacity.fits)return null;
+ const size=task.containers.reduce((sum,c)=>{
+  const value=allocation(c.resources?.limits);return {cpu:sum.cpu+value.cpu,memory:sum.memory+value.memory};
+ },{cpu:0,memory:0});
+ const next={};
+ for(const key of ['cpu','memory']){
+  const required=capacity.required?.[key],granted=capacity.granted?.[key];
+  if(!Number.isFinite(required)||required<0||!Number.isFinite(granted)||(granted<0&&granted!==-1))
+   throw Error('ULTIMATE_AUTOPILOT_CAPACITY_READBACK_REQUIRED');
+  next[key]=Math.max(required,reserved?reserved[key]+size[key]:required);
+  if(granted!==-1&&next[key]>granted)return null;
+ }
+ return next;
+}
 
 /** All callers share the runtime-operation lane. Claims and prerequisites are
  * rechecked by Postgres; launch/readback is not counted as a completed lesson. */
@@ -28,39 +56,72 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  const source=read(['run','jobs','describe','elevate-course-builder-parallel']);
  const expectedImage=source.spec?.template?.spec?.template?.spec?.containers?.[0]?.image;
  if(!/@sha256:[a-f0-9]{64}$/.test(expectedImage??''))throw Error('IMMUTABLE_APPROVED_WORKER_IMAGE_REQUIRED');
- let activeCount=0,capacityWait=false;const assigned=[];
+ let activeCount=0,capacityWait=false,reserved=null;const launches=[],assigned=[];
  for(const role of ['quality','media','instruction']){
   const candidates=eligible.filter(j=>j.payload?.autopilot?.role===role && Date.parse(j.available_at)<=now.getTime() &&
    (j.status==='queued' || Date.parse(j.lease_expires_at)<=now.getTime()));
   const config=LESSON_ROLE_JOBS[role];
   const active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));
   activeCount+=active.length;
-  if(active.length || !candidates.length)continue;
+  // Executions still booting also reserve a queue row. Otherwise backfilling
+  // beside them could launch more tasks than there is unfinished work.
+  const leased=rows.filter(j=>j.payload?.autopilot?.role===role&&j.status==='running'&&Date.parse(j.lease_expires_at)>now.getTime()).length;
+  const unclaimed=Math.max(0,active.length-leased);
+  const slots=Math.min(Math.max(0,concurrency(role,env)-active.length),Math.max(0,candidates.length-unclaimed));
+  if(!slots)continue;
   const job=read(['run','jobs','describe',config.name]),envelope=job.spec?.template?.spec,task=envelope?.template?.spec;
   if(envelope?.parallelism!==1 || envelope?.taskCount!==1 || task?.containers?.[0]?.image!==expectedImage ||
     task.containers[0].env?.find(e=>e.name==='ULTIMATE_AUTOPILOT_ROLE')?.value!==role)
    throw Error('ULTIMATE_AUTOPILOT_APPROVED_TEMPLATE_REQUIRED:'+role);
-  const capacity=await capacityCheck({region:LESSON_ROLE_REGION,task,taskCount:1,run,request});
-  if(!capacity.fits){capacityWait=true;continue;}
-  run(['run','jobs','execute',config.name,...scope,'--tasks=1','--async','--quiet']);
-  const expected=candidates[0];
-  const verify=new URL(root);verify.searchParams.set('select','id,status,heartbeat_at,lease_owner,lease_expires_at,execution_generation');verify.searchParams.set('id','eq.'+expected.id);
-  let confirmed=false;
-  for(let attempt=0;attempt<assignmentAttempts;attempt++){
-   const check=await request(verify,{headers,signal:AbortSignal.timeout(15000)});
-   if(!check.ok)throw Error('ULTIMATE_AUTOPILOT_ASSIGNMENT_HTTP_'+check.status);
-   const [observed]=await check.json();
-   if(observed?.status==='failed')throw Error('ULTIMATE_AUTOPILOT_FAILED_AFTER_CLAIM:'+expected.id);
-   const fresh=observed?.heartbeat_at>=now.toISOString() && observed.heartbeat_at>(expected.heartbeat_at??'') &&
-    Number(observed.execution_generation)>Number(expected.execution_generation);
-   if(fresh && (observed.status==='completed' || observed.status==='running' && observed.lease_owner && Date.parse(observed.lease_expires_at)>clock())){
-    confirmed=true;break;
-   }
-   if(attempt+1<assignmentAttempts)await delay(5000);
+  for(let slot=0;slot<slots;slot++){
+   const capacity=await capacityCheck({region:LESSON_ROLE_REGION,task,taskCount:1,run,request});
+   const next=reserveCapacity(capacity,task,reserved);
+   if(!next){capacityWait=true;break;}
+   const prefix='autopilot-'+role+'-'+randomUUID();
+   run(['run','jobs','execute',config.name,...scope,'--tasks=1','--update-env-vars=ULTIMATE_WORKER_ID='+prefix,'--async','--quiet']);
+   reserved=next;launches.push({role,prefix,candidates:new Map(candidates.map(j=>[j.id,j]))});activeCount++;
   }
-  if(!confirmed)throw Error('ULTIMATE_AUTOPILOT_ASSIGNMENT_TIMEOUT:'+expected.id);
-  assigned.push({role,jobId:expected.id});activeCount++;
  }
+ // Launch the admitted workers first, then verify their claims together. Each
+ // execution gets a unique worker prefix; its immutable claim history proves
+ // ownership even if another worker takes an earlier queue row or a cached
+ // stage completes between polls. A shared role heartbeat is not sufficient.
+ const pending=new Map(launches.map(launch=>[launch.prefix,launch]));
+ for(let attempt=0;pending.size&&attempt<assignmentAttempts;attempt++){
+  const historyUrl=new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_job_attempt_history');
+  historyUrl.searchParams.set('select','job_id,execution_generation,worker_id,event_time');
+  historyUrl.searchParams.set('event_type','eq.claimed');historyUrl.searchParams.set('event_time','gte.'+now.toISOString());
+  historyUrl.searchParams.set('or','('+[...pending.keys()].map(prefix=>'worker_id.like.'+prefix+'-*').join(',')+')');
+  historyUrl.searchParams.set('limit',String(pending.size+1));
+  const historyResponse=await request(historyUrl,{headers,signal:AbortSignal.timeout(15000)});
+  if(!historyResponse.ok)throw Error('ULTIMATE_AUTOPILOT_CLAIM_HISTORY_HTTP_'+historyResponse.status);
+  const history=await historyResponse.json();if(!Array.isArray(history))throw Error('ULTIMATE_AUTOPILOT_CLAIM_HISTORY_INVALID');
+  if(history.length){
+   const verify=new URL(root);verify.searchParams.set('select','id,status,heartbeat_at,lease_owner,lease_expires_at,execution_generation');
+   verify.searchParams.set('id','in.('+[...new Set(history.map(h=>h.job_id))].join(',')+')');
+   const response=await request(verify,{headers,signal:AbortSignal.timeout(15000)});
+   if(!response.ok)throw Error('ULTIMATE_AUTOPILOT_ASSIGNMENT_HTTP_'+response.status);
+   const observed=await response.json();if(!Array.isArray(observed))throw Error('ULTIMATE_AUTOPILOT_ASSIGNMENT_INVALID');
+   for(const [prefix,launch] of pending){
+    const claims=history.filter(h=>h.worker_id?.startsWith(prefix+'-'));
+    if(claims.length>1)throw Error('ULTIMATE_AUTOPILOT_MULTIPLE_CLAIMS:'+prefix);
+    const claim=claims[0],before=launch.candidates.get(claim?.job_id);
+    const job=observed.find(j=>j.id===claim?.job_id);
+    if(!before||!job)continue;
+    const generation=Number(job.execution_generation);
+    const fresh=Number.isSafeInteger(generation)&&generation>Number(before.execution_generation)&&generation===Number(claim.execution_generation)&&
+     job.heartbeat_at>=now.toISOString()&&job.heartbeat_at>(before.heartbeat_at??'')&&claim.event_time>=now.toISOString();
+    const owned=job.status==='running'&&job.lease_owner===claim.worker_id&&Date.parse(job.lease_expires_at)>clock();
+    // A finished attempt can legitimately complete, park for its producer, or
+    // queue a repair. This certifies the real claim only, never lesson quality.
+    if(fresh&&(owned||['completed','queued','failed'].includes(job.status))){
+     assigned.push({role:launch.role,jobId:job.id,state:job.status});pending.delete(prefix);
+    }
+   }
+  }
+  if(pending.size&&attempt+1<assignmentAttempts)await delay(5000);
+ }
+ if(pending.size)throw Error('ULTIMATE_AUTOPILOT_ASSIGNMENT_TIMEOUT:'+pending.size);
  if(assigned.length)return {status:'assigned',activeExecutions:activeCount,assignments:assigned};
  if(activeCount)return {status:'busy',activeExecutions:activeCount};
  if(eligible.some(j=>Date.parse(j.available_at)>now.getTime()))return {status:'retry_wait',activeExecutions:0};

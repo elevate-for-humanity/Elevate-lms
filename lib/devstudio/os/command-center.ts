@@ -1,6 +1,6 @@
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CommandCenterSnapshot } from './types';
-import { isGoogleRuntimeReady } from '@/lib/google/runtime';
 
 function isMissingTable(error: { code?: string } | null): boolean {
   return error?.code === '42P01' || error?.code === 'PGRST205';
@@ -88,7 +88,8 @@ export async function buildCommandCenterSnapshot(
     integrationPending.push('AI provider key');
   }
   if (!health?.supabaseServiceKeyPresent) integrationPending.push('Supabase service key');
-  if (!isGoogleRuntimeReady()) integrationPending.push('Google runtime identity');
+  const googleConfigured = await isGoogleDeploymentConfigured();
+  if (!googleConfigured) integrationPending.push('Google deployment workflow dispatch');
 
   return {
     activeTasks,
@@ -103,7 +104,7 @@ export async function buildCommandCenterSnapshot(
             kind: lastBuildKind,
           }
         : null,
-      googleConfigured: isGoogleRuntimeReady(),
+      googleConfigured,
     },
     health: {
       website: Boolean(health?.hasGitHub ?? health?.supabaseUrlPresent),

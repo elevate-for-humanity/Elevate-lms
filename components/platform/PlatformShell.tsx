@@ -58,7 +58,16 @@ function isActiveHref(href: string, pathname: string): boolean {
 
 export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = true }: PlatformShellProps) {
   const pathname = usePathname();
-  const dashboardHref = role === 'host_shop' ? '/host-shop/dashboard' : role === 'program_holder' || role === 'site_coordinator' ? '/program-holder/dashboard' : role === 'student' || role === 'apprentice' ? '/student/dashboard' : '/';
+  const dashboardHref = role === 'host_shop' ? '/host-shop/dashboard' : role === 'program_holder' || role === 'site_coordinator' ? '/program-holder/dashboard' : role === 'apprentice' ? '/apprentice' : role === 'student' ? '/learner/dashboard' : '/';
+  const installHref = role === 'host_shop'
+    ? '/install/host-shop'
+    : role === 'program_holder' || role === 'site_coordinator'
+      ? '/install/program-holder'
+      : role === 'apprentice'
+        ? '/install/apprentice'
+        : role === 'student'
+          ? '/install/learner'
+          : '/mobile-app';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -96,7 +105,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
               icon: CalendarDays,
             },
             { id: 'office-mail', label: 'Office Mail', href: '/program-holder/inbox', icon: Mail },
-            { id: 'install-app', label: 'Install App', href: '/install', icon: Download },
+            { id: 'install-app', label: 'Install App', href: installHref, icon: Download },
           ],
         }))
       : baseSections;
@@ -310,7 +319,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
           role={sidebarOpen ? 'dialog' : undefined}
           aria-modal={sidebarOpen ? true : undefined}
           aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}
-          className={`fixed inset-y-0 left-0 z-[70] block h-dvh w-[min(20rem,calc(100vw-2.5rem))] bg-slate-950 text-white shadow-2xl transition-transform duration-200 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:translate-x-0 lg:visible lg:pointer-events-auto lg:shadow-none ${
+          className={`fixed inset-y-0 left-0 z-[70] block h-dvh w-[min(20rem,calc(100vw-2.5rem))] bg-slate-950 text-white shadow-2xl transition-transform duration-200 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:flex lg:flex-col lg:w-64 lg:shrink-0 lg:translate-x-0 lg:visible lg:pointer-events-auto lg:shadow-none ${
             sidebarOpen
               ? 'translate-x-0 visible pointer-events-auto'
               : '-translate-x-full invisible pointer-events-none lg:visible lg:pointer-events-auto'
@@ -432,7 +441,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
             paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')
           }
           portalRole={paris?.portalRole ?? ROLE_DISPLAY_NAMES[role]}
-          personName={paris?.personName || user.full_name || user.first_name || null}
+          personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}
           courseTitle={paris?.courseTitle}
           nextLessonTitle={paris?.nextLessonTitle}
           autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}

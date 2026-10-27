@@ -8,7 +8,7 @@ const read = (relativePath: string) => readFileSync(resolve(root, relativePath),
 const guardedPortals: Array<{ path: string; required: string[] }> = [
   {
     path: 'components/lms/LearnerWorkspaceLayout.tsx',
-    required: ["requireRole(['student', 'learner', 'admin', 'staff'])"],
+    required: ["requireRole([", "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
   },
   {
     path: 'apps/lms/app/employer/layout.tsx',
@@ -30,9 +30,9 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
     path: 'apps/lms/app/host-shop/dashboard/layout.tsx',
     required: [
       'requireRole(HOST_SHOP_ROLES)',
-      "board.partner?.status === 'active'",
-      "board.partner?.approval_status === 'approved'",
-      "if (!partnerApproved) redirect('/host-shop/onboarding')",
+      'getSessionUser()',
+      'getHostShopBoard(user.id)',
+      'HOST_SHOP_ACCESS_DENIED',
     ],
   },
   {

@@ -9,11 +9,12 @@ function database(attempts: number) {
       const query: any = {
         select: () => query,
         eq: (...filter: any[]) => { write?.filters.push(filter); return query; },
+        gt: (...filter: any[]) => { write?.filters.push(['gt',...filter]); return query; },
         update: (values: any) => {
           write = { table, values, filters: [] }; writes.push(write); return query;
         },
         single: async () => ({ data: { attempts, max_attempts: 3, build_id: 'build' }, error: null }),
-        then: (resolve: any) => Promise.resolve({ error: null }).then(resolve),
+        then: (resolve: any) => Promise.resolve({ data:[{id:'job'}],error: null }).then(resolve),
       };
       return query;
     },
@@ -24,22 +25,34 @@ function database(attempts: number) {
 describe('terminal Ultimate job lifecycle', () => {
   it('hands terminal failure to the atomic database transition when repairs are exhausted', async () => {
     const { db, writes } = database(3);
-    await new UltimateJobQueue(db).fail('job', 'owner', 'missing source');
+    await new UltimateJobQueue(db).fail('job', 'owner', 'missing source', 1);
     expect(writes[0].values.status).toBe('failed');
     expect(writes[0].filters).toContainEqual(['lease_owner', 'owner']);
+    expect(writes[0].filters).toContainEqual(['execution_generation', 1]);
     expect(writes).toHaveLength(1); // DB trigger owns build status and pending wakeups.
   });
   it('keeps transient failures queued without blocking a resumable build', async () => {
     const { db, writes } = database(1);
-    await new UltimateJobQueue(db).fail('job', 'owner', 'temporary network error');
+    await new UltimateJobQueue(db).fail('job', 'owner', 'temporary network error', 1);
     expect(writes).toHaveLength(1);
     expect(writes[0].values.status).toBe('queued');
   });
   it('blocks unresolved dependencies even before the retry budget is exhausted', async () => {
     const { db, writes } = database(1);
-    await new UltimateJobQueue(db).fail('job', 'owner', 'dependencies unresolved', false);
+    await new UltimateJobQueue(db).fail('job', 'owner', 'dependencies unresolved', 1, false);
     expect(writes[0].values.status).toBe('failed');
     expect(writes).toHaveLength(1);
+  });
+  it('preserves failure history and fences dependency waits to the current generation',async()=>{
+    const {db,writes}=database(2);
+    await new UltimateJobQueue(db).waitForDependency('job','owner','Google permission required',7);
+    expect(writes[0].values).not.toHaveProperty('attempts');
+    expect(writes[0].values).not.toHaveProperty('pending_dependency_resume');
+    expect(writes[0].values.status).toBe('failed');
+    expect(writes[0].values.last_error).toBe('Google permission required');
+    expect(writes[0].filters).toContainEqual(['lease_owner','owner']);
+    expect(writes[0].filters).toContainEqual(['execution_generation',7]);
+    expect(writes[0].filters.some(f=>f[0]==='gt'&&f[1]==='lease_expires_at')).toBe(true);
   });
 });
 

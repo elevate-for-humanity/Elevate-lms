@@ -5,6 +5,7 @@ import {
   currentEvidence,
   stepInputHash,
   validateStepOutput,
+  practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
 } from '../../lib/ultimate-course-builder/core/lesson-contract';
@@ -37,6 +38,16 @@ const context = (): UltimateRunContext => ({
 });
 const standards = { requirements: { competencies: profile.competencies, version: '1' } };
 describe('versioned lesson contract', () => {
+  it('rechecks practical graphics checkpoints while retaining actual licensed footage', () => {
+    const artifacts: any={storyboard:{storyboard:{scenes:[{id:'demo',stage:'demonstration'}]}},
+      visual_assignment:{media:{assignments:[{sceneId:'demo',assetId:'clip',licenseEvidenceUrl:'https://media.example/license'}],
+        readyAssets:[{id:'clip',entitlement_id:'license',mime_type:'video/mp4',public_url:'https://media.example/video'}]}}};
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual([]);
+    artifacts.visual_assignment.media.assignments[0].generatedInstructionalVisual=true;
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual(['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED']);
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:false})).toEqual([]);
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true,type:'knowledge'})).toEqual([]);
+  });
   it('rejects label-only QA and empty objectives', () => {
     expect(
       validateStepOutput('finished_media_qa', { mediaQA: { pass: true, distinctShots: 7 } }),
@@ -115,4 +126,19 @@ describe('versioned lesson contract', () => {
     await new UltimateBuildRunner({ standards_lock: handler }).run(c);
     expect(handler).toHaveBeenCalledTimes(1);
   });
+  it.each(['ULTIMATE_INSTRUCTIONAL_SOURCES_REQUIRED','ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED'])('defers %s without consuming internal repair attempts',async(code)=>{
+    const handler=vi.fn(async()=>{throw new Error(code);});
+    const c=context();await new UltimateBuildRunner({standards_lock:handler}).run(c);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect((c.artifacts.selective_repair as any).repair.attempts).toEqual([]);
+    expect(c.findings[0].code).toBe(code);
+  });
+});
+
+it('publication settings preserve saved teaching hashes without accepting instructional changes',()=>{
+ for(const step of ['standards_lock','natural_narration','lesson_film_render'] as const){
+  const original=stepInputHash(step,profile,{});
+  expect(stepInputHash(step,{...profile,publishCompletedLessons:true,preservedPublishedLessonIds:['prior-lesson']},{})).toBe(original);
+  expect(stepInputHash(step,{...profile,title:'A different instructional course'},{})).not.toBe(original);
+ }
 });

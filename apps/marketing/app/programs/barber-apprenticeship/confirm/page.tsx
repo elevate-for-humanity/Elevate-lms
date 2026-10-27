@@ -67,7 +67,7 @@ function ConfirmContent() {
             {status === 'declined' && <XCircle className="w-12 h-12 text-white mx-auto mb-3" />}
             {status === 'error' && <XCircle className="w-12 h-12 text-white mx-auto mb-3" />}
             <h1 className="text-xl font-bold text-white">
-              {status === 'success' && 'You\'re Confirmed!'}
+              {status === 'success' && 'Response Received'}
               {status === 'declined' && 'Response Recorded'}
               {status === 'error' && 'Something Went Wrong'}
             </h1>
@@ -81,9 +81,9 @@ function ConfirmContent() {
               <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-5 mb-6">
                 <h3 className="font-semibold text-brand-green-900 mb-3">What Happens Next</h3>
                 <ol className="text-sm text-brand-green-800 space-y-2 list-decimal list-inside">
-                  <li>We will call or email you within 24 hours to schedule your orientation</li>
+                  <li>Review the orientation and next steps provided by Admissions</li>
                   <li>During orientation, we walk through the program and answer your questions</li>
-                  <li>After orientation, you submit your $500 down payment to secure your spot</li>
+                  <li>After orientation, review the current tuition and payment arrangement shown for your program</li>
                   <li>We match you with a licensed partner barbershop</li>
                   <li>You begin your apprenticeship training</li>
                 </ol>

@@ -61,11 +61,11 @@ export default function InquiryPage() {
           </p>
           <div className="flex flex-wrap gap-4">
             <a
-              href="tel:+13179999620"
+              href="tel:+14632401404"
               className="inline-flex items-center gap-2 bg-white text-brand-blue-800 font-bold py-3 px-6 rounded-lg hover:bg-blue-50 transition-colors"
             >
               <Phone className="w-4 h-4" />
-              (317) 999-9620
+              (463) 240-1404
             </a>
             <a
               href="mailto:partnerships@elevateforhumanity.org"
@@ -126,8 +126,8 @@ export default function InquiryPage() {
               <Phone className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-bold text-slate-900 mb-1">Phone</h3>
               <p className="text-slate-600 text-sm mb-2">Mon–Fri, 8am–6pm ET</p>
-              <a href="tel:+13179999620" className="text-brand-blue-600 text-sm font-semibold hover:underline">
-                (317) 999-9620
+              <a href="tel:+14632401404" className="text-brand-blue-600 text-sm font-semibold hover:underline">
+                (463) 240-1404
               </a>
             </div>
             <div className="bg-white rounded-xl p-6 text-center border border-slate-200">

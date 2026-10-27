@@ -1,10 +1,10 @@
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 import { NextRequest } from 'next/server';
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
-import { getGoogleServices, getGoogleService } from '@/lib/google/runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,9 +21,7 @@ export async function GET(request: NextRequest) {
       probeCloudflareWorkersAI(),
     ]);
     const aiConfigured = aiRuntime.anyConfigured;
-    const googleReady = (await Promise.all(getGoogleServices().map(async service => {
-      try { return (await getGoogleService(service)).healthy; } catch { return false; }
-    }))).every(Boolean);
+    const googleConfigured = await isGoogleDeploymentConfigured();
     const browserConfigured = Boolean(
       process.env.STUDIO_BROWSER_URL &&
       (process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
@@ -64,12 +62,12 @@ export async function GET(request: NextRequest) {
           : 'No governed AI provider is configured.',
       },
       {
-        name: 'google-cloud',
-        passed: googleReady,
+        name: 'google-deployment',
+        passed: googleConfigured,
         required: false,
-        message: googleReady
-          ? 'Google application services are healthy.'
-          : 'Google application service health has not passed.',
+        message: googleConfigured
+          ? 'Google deployment workflow dispatch is configured.'
+          : 'Google deployment workflow dispatch is not configured.',
       },
       {
         name: 'cloud-browser',

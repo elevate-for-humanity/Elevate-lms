@@ -5,6 +5,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { getDecryptedPlatformSecret, refreshSecrets } from '@/lib/secrets';
 import { resetProviders } from '@/lib/ai/ai-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { saveGoogleRuntimeConfiguration } from '@/lib/google/runtime-configuration';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,10 +64,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-
-    // The validated provider becomes the single canonical runtime authority.
-    // Persisting this alongside the credential keeps Admin, Course Builder,
-    // Studio, and future Google deployments on the same provider.
+    const synced = await saveGoogleRuntimeConfiguration('admin', [
+      { key: config.key, value: secret }, { key: 'AI_PROVIDER', value: provider },
+    ]);
+    // Persist activation only after the serving Google revision is verified.
     const db = await requireAdminClient();
     const { error: activationError } = await db.rpc('set_platform_secret', {
       p_key: 'AI_PROVIDER',
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       key: config.key,
       valid: true,
       active: true,
-      runtime: { provider: 'google-cloud', persisted: true },
+      google: { synchronized: true, revision: synced.revision },
       checkedAt: new Date().toISOString(),
     });
   } catch (error) {

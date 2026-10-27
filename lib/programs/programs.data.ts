@@ -68,14 +68,14 @@ export const PROGRAMS: Program[] = [
     heroImage: '/images/pages/barber-hero-main.jpg',
     cardImage: '/images/pages/barber-apprenticeship.webp',
     duration: 'Up to 5 months (timeline varies by hours transferred)',
-    cost: 'Funding may cover full cost',
+    cost: 'Self-pay only; review published tuition',
     format: 'Hybrid / In-person',
     level: 'Entry',
     story: {
       whoThisHelps:
         'People who want a skilled trade career with clear licensing and real income potential.',
       theProblem:
-        "Traditional barber school is expensive and doesn't always connect you to real shops or funding.",
+        "Traditional barber school is expensive and doesn't always connect you to real shops and mentorship.",
       theTransformation:
         'You complete hours in a real shop, build a client base, and move toward licensure with support every step.',
       whatToExpect:
@@ -101,7 +101,7 @@ export const PROGRAMS: Program[] = [
     highlights: [
       'Earn while you learn with a structured apprenticeship pathway',
       'Clear hour tracking, milestones, and completion support',
-      'Funding pathways may cover costs based on eligibility',
+      'Self-pay tuition with published payment terms',
       'Transfer hours review available (where applicable)',
     ],
     whatYoullLearn: [
@@ -116,14 +116,14 @@ export const PROGRAMS: Program[] = [
     ],
     stepsToStart: [
       'Submit a quick application',
-      'Confirm eligibility and funding options',
+      'Review self-pay tuition and payment options',
       'Complete intake + program orientation',
       'Begin training and track hours',
       'Complete milestones and prepare for licensing requirements',
     ],
-    funding: { apprenticeship: true, wioa: true, wrg: true, jri: true },
+    funding: { apprenticeship: true, wioa: false, wrg: false, jri: false },
     outcomes: ['Licensed barber track', 'Barbershop employment', 'Independent business pathway'],
-    requirements: ['Valid ID', 'Intake/eligibility verification (if funding applies)'],
+    requirements: ['Valid ID', 'Enrollment intake and identity verification'],
     primaryCtaLabel: 'Start Inquiry',
     primaryCtaHref: '/programs/barber-apprenticeship/apply',
     secondaryCtaLabel: 'Talk to an Advisor',
@@ -134,8 +134,8 @@ export const PROGRAMS: Program[] = [
         a: 'Yes. We can review documentation and map hours where allowed.',
       },
       {
-        q: 'Will funding cover tuition?',
-        a: "Funding is eligibility-based. We'll help you determine options and next steps.",
+        q: 'How do I pay for apprenticeship tuition?',
+        a: "Apprenticeship tuition is self-pay only. Review the published tuition and payment terms.",
       },
     ],
   },

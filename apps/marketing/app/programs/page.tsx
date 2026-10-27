@@ -10,7 +10,9 @@ import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 import { ProgramsExplorer } from './ProgramsExplorer';
 import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 
-// Cache the public catalog briefly so every visit does not block on a fresh database query.\n// Published changes still reach the page within one minute.\nexport const revalidate = 60;
+// Cache the public catalog briefly so every visit does not block on a fresh database query.
+// Published changes still reach the page within one minute.
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildProgramsListingMetadata();
@@ -59,7 +61,7 @@ export default async function ProgramsPage() {
             <div className="max-w-3xl">
               <p className="text-sm font-extrabold uppercase tracking-widest text-brand-blue-800">Earn While You Learn</p>
               <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Registered apprenticeships are a separate pathway</h2>
-              <p className="mt-4 text-lg leading-relaxed text-slate-700">Apprenticeships combine related instruction with paid, supervised work at an approved employer or Host Site. Program participation may be no-cost to eligible apprentices, but employment, placement, funding, and enrollment approval must be confirmed before training begins.</p>
+              <p className="mt-4 text-lg leading-relaxed text-slate-700">Apprenticeships combine related instruction with paid, supervised work at an approved employer or Host Site. Apprenticeship tuition is self-pay unless an exact program page documents another approved payment source. Employment, placement, and enrollment approval must be confirmed before training begins.</p>
             </div>
             <Link href="/apprenticeships" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-6 py-3.5 text-base font-extrabold text-white hover:bg-brand-blue-900">How Apprenticeships Work <ArrowRight className="h-4 w-4" /></Link>
           </div>

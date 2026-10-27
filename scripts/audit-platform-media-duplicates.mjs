@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { renderedSource, withoutImageMetadata } from './visual/rendered-source.mjs';
 import { createHash } from 'node:crypto';
 
 const ROOT = process.cwd();
@@ -114,7 +115,7 @@ function assetFingerprint(app, asset) {
 }
 
 function assetOccurrences(file) {
-  const source = fs.readFileSync(file, 'utf8');
+  const source = withoutImageMetadata(renderedSource(fs.readFileSync(file, 'utf8'), file), file);
   const lines = source.split('\n');
   const out = [];
 

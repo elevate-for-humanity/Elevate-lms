@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -43,7 +44,7 @@ export default function GrievancePage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/grievance-page-1.webp"
           alt="Grievance process"
           fill
@@ -151,8 +152,8 @@ export default function GrievancePage() {
               <p className="text-slate-600 text-sm mb-2">
                 Call to discuss your concern or request a grievance form:
               </p>
-              <a href="tel:+13179999620" className="text-brand-blue-600 font-medium">
-                (317) 999-9620
+              <a href="tel:+14632401404" className="text-brand-blue-600 font-medium">
+                (463) 240-1404
               </a>
             </div>
           </div>

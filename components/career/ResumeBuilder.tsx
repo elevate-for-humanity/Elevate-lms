@@ -60,6 +60,36 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const downloadPdf = async () => {
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    const left = 44;
+    const pageWidth = doc.internal.pageSize.getWidth() - 88;
+    let y = 54;
+    const write = (text: string, heading = false) => {
+      if (!text.trim()) return;
+      doc.setFont('helvetica', heading ? 'bold' : 'normal');
+      doc.setFontSize(heading ? 12 : 10);
+      for (const line of doc.splitTextToSize(text, pageWidth) as string[]) {
+        if (y > 738) { doc.addPage(); y = 54; }
+        doc.text(line, left, y);
+        y += heading ? 18 : 15;
+      }
+      y += 5;
+    };
+    write(resumeData.personal_info.full_name || 'Resume', true);
+    write([resumeData.personal_info.email, resumeData.personal_info.phone, resumeData.personal_info.location].filter(Boolean).join(' | '));
+    write('PROFESSIONAL SUMMARY', true); write(resumeData.summary);
+    write('WORK EXPERIENCE', true);
+    resumeData.work_experience.forEach(exp => { write([exp.title, exp.company, exp.location].filter(Boolean).join(' | '), true); write(`${exp.start_date} - ${exp.current ? 'Present' : exp.end_date}`); write(exp.description); });
+    write('EDUCATION', true); resumeData.education.forEach(e => write([e.degree, e.school, e.graduation_date].filter(Boolean).join(' | ')));
+    write('SKILLS', true); write(resumeData.skills.join(', '));
+    write('CERTIFICATIONS', true); resumeData.certifications.forEach(cert => write([cert.name, cert.issuer, cert.date].filter(Boolean).join(' | ')));
+    const filename = (resumeData.personal_info.full_name || 'resume').replace(/[^a-z0-9_-]+/gi, '-');
+    doc.save(`${filename}-resume.pdf`);
+  };
 
   // Load existing resume from database
   React.useEffect(() => {
@@ -70,7 +100,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase.from('resumes').select('*').eq('user_id', user.id).single();
+      const { data } = await supabase.from('resumes').select('*').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(1).maybeSingle();
 
       if (data?.resume_data) {
         setResumeData(data.resume_data);
@@ -145,22 +175,34 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
         <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
           <FileText className="w-6 h-6 text-brand-orange-400" />
           Resume Builder
         </h2>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-600 transition-colors flex items-center gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => setIsPreviewOpen(value => !value)} className="px-4 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-600 transition-colors flex items-center gap-2">
             <Eye className="w-4 h-4" />
             Preview
           </button>
-          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors flex items-center gap-2">
+          <button type="button" onClick={() => void downloadPdf()} className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             Download PDF
           </button>
         </div>
       </div>
+
+      {isPreviewOpen && (
+        <section aria-label="Resume preview" className="rounded-lg border bg-white p-6 text-slate-900 space-y-3">
+          <h3 className="text-2xl font-bold">{resumeData.personal_info.full_name || 'Your Name'}</h3>
+          <p>{[resumeData.personal_info.email, resumeData.personal_info.phone, resumeData.personal_info.location].filter(Boolean).join(' | ')}</p>
+          <h4 className="font-bold">Professional Summary</h4><p className="whitespace-pre-wrap">{resumeData.summary}</p>
+          <h4 className="font-bold">Experience</h4>{resumeData.work_experience.map((exp, i) => <div key={i}><strong>{exp.title} — {exp.company}</strong><p>{exp.start_date}–{exp.current ? 'Present' : exp.end_date}</p><p className="whitespace-pre-wrap">{exp.description}</p></div>)}
+          <h4 className="font-bold">Education</h4>{resumeData.education.map((ed, i) => <p key={i}>{ed.degree} — {ed.school} ({ed.graduation_date})</p>)}
+          <h4 className="font-bold">Skills</h4><p>{resumeData.skills.join(', ')}</p>
+          <h4 className="font-bold">Certifications</h4>{resumeData.certifications.map((cert, i) => <p key={i}>{cert.name} — {cert.issuer} ({cert.date})</p>)}
+        </section>
+      )}
 
       {/* Personal Information */}
       <div className="bg-white rounded-lg p-6">

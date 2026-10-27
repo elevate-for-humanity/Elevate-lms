@@ -8,6 +8,7 @@ import {
 } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { validTestCredential } from '@/lib/ultimate-course-builder/testing/learner-test-policy';
 import { logger } from '@/lib/logger';
+import { renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       lesson.competency_id !== input.lessonId ||
       input.contractVersion !== ULTIMATE_LESSON_CONTRACT_VERSION ||
       contractHash(a) !== input.artifactHash ||
-      render?.videoUrl !== input.videoUrl ||
+      renderPlaybackUrl(render) !== input.videoUrl ||
       a.finished_media_qa?.mediaQA?.inspection?.mediaSha256 !== input.mediaSha256
     )
       return NextResponse.json(

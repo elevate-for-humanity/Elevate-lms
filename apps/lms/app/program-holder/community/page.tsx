@@ -1,5 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import SocialLearningCommunity from '@/components/SocialLearningCommunity';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { CalendarDays, Mail, MessageSquare, Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -35,9 +38,12 @@ const resources = [
   },
 ];
 
-export default function ProgramHolderCommunityPage() {
+export default async function ProgramHolderCommunityPage() {
+  const { user, profile } = await requireProgramHolder();
   return (
     <main className="space-y-6 px-4 py-6 sm:px-6">
+      <BusinessNetworkCard href="#network-feed" label="Program Holder network" />
+      <div id="network-feed"><SocialLearningCommunity userId={user.id} userName={profile.full_name || 'Program Holder'} /></div>
       <section className="relative isolate min-h-[320px] overflow-hidden rounded-3xl p-6 text-white shadow-xl sm:p-9">
         <Image
           src="/images/pages/community-page-2.webp"

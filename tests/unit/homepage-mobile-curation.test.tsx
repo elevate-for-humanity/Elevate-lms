@@ -14,36 +14,41 @@ afterEach(() => {
 });
 
 describe('homepage curation', () => {
-  it('renders only the two approved shops with one photo and the correct destination each', () => {
+  it('renders the current featured shops once with one photo and the correct destination each', () => {
     const root = document.createElement('div');
     root.innerHTML = renderToStaticMarkup(<HomeFeaturedHostShop />);
     const cards = [...root.querySelectorAll('[data-featured-shop]')];
     expect(cards.map((card) => card.getAttribute('data-featured-shop'))).toEqual([
-      'Salon Saloon', 'Kountry Kutz Barbershop',
+      'Cal’s Kutz Studio', 'Kountry Kutz Barbershop', 'Salon Saloon', 'Top Shelf Barber Lounge',
     ]);
     expect(cards.map((card) => card.querySelector('a')?.getAttribute('href'))).toEqual([
-      '/host-shops/salon-saloon', '/host-shops/kountry-kutz-barbershop',
+      '/host-shops/cals-kutz-studio', '/host-shops/kountry-kutz-barbershop', '/host-shops/salon-saloon', '/host-shops/top-shelf-barber-lounge',
     ]);
-    expect(root.querySelectorAll('img').length).toBe(2);
-    expect(root.innerHTML).not.toMatch(/cals-kutz|razors-image/);
+    expect(new Set(cards.map(card => card.getAttribute('data-featured-shop'))).size).toBe(4);
+    expect(new Set(cards.map(card => card.querySelector('img')?.getAttribute('src'))).size).toBe(4);
     for (const card of cards) {
       expect(card.querySelectorAll('img').length).toBe(1);
       expect(card.querySelector('img')?.getAttribute('alt')).toBeTruthy();
     }
     const grid = root.querySelector('[data-featured-shops]');
     expect(grid?.getAttribute('data-mobile-grid')).toBe('2');
-    expect(grid?.className).toContain('max-w-3xl');
-    expect(grid?.className).not.toContain('lg:grid-cols-4');
+    expect(grid?.className).toContain('grid-cols-2');
+    expect(grid?.className).toContain('lg:grid-cols-4');
   });
 
-  it('does not reintroduce stock-photo sections or the platform-operations wall', () => {
+  it('keeps visual career sections and the program-specific funding notice', () => {
     for (const file of ['components/home/HomeCareerPathways.tsx', 'components/home/HomeFinalCTA.tsx']) {
-      expect(source(file)).not.toMatch(/<Image\b|<img\b|\/images\//);
+      expect(source(file)).toMatch(/<Image\b/);
+    }
+    expect(source('components/home/HomeFinalCTA.tsx')).toContain('/images/hero/hero-hands-on-training.webp');
+    const pathways = source('components/home/HomeCareerPathways.tsx');
+    for (const image of ['hvac-training-vibrant-2026.webp', 'cdl-training-vibrant-2026.webp', 'bookkeeping-training-vibrant-2026.webp', 'business-training-vibrant-2026.webp']) {
+      expect(pathways).toContain(image);
     }
     const page = source('apps/marketing/app/page.tsx');
-    expect(page).not.toContain('<HomePlatformOverview');
+    expect(page.match(/<HomePlatformOverview/g)).toHaveLength(1);
     expect(page).toContain('WORKONE_INDY_BOOKING_URL');
-    expect(page).toContain('eligibility and program requirements apply');
+    expect(page.replace(/\s+/g, ' ')).toContain('eligibility and program requirements apply');
   });
 
   it('keeps mobile overrides scoped away from operational dashboards', () => {
@@ -73,19 +78,19 @@ describe('responsive details', () => {
       addListener: () => {}, removeListener: () => {}, dispatchEvent: () => true,
     })));
     const view = render(<ResponsiveDetails title="Enrollment steps"><p>Complete enrollment information</p></ResponsiveDetails>);
-    const button = screen.getByRole('button', { name: 'Enrollment steps' });
+    const summary = screen.getByText('Enrollment steps').closest('summary')!;
+    const details = summary.parentElement as HTMLDetailsElement;
     const panel = screen.getByText('Complete enrollment information').parentElement!;
-    expect(button.getAttribute('aria-controls')).toBe(panel.id);
-    expect(button.getAttribute('aria-expanded')).toBe('false');
-    expect(panel.hidden).toBe(true);
-    fireEvent.click(button);
-    expect(panel.hidden).toBe(false);
-    fireEvent.click(button);
-    expect(panel.hidden).toBe(true);
+    expect(summary.getAttribute('aria-controls')).toBe(panel.id);
+    expect(details.open).toBe(false);
+    act(() => { details.open = true; fireEvent(details, new Event('toggle')); });
+    expect(details.open).toBe(true);
+    act(() => { details.open = false; fireEvent(details, new Event('toggle')); });
+    expect(details.open).toBe(false);
     act(() => { desktop = true; listeners.forEach((listener) => listener()); });
-    expect(panel.hidden).toBe(false);
+    expect(details.open).toBe(true);
     act(() => { desktop = false; listeners.forEach((listener) => listener()); });
-    expect(panel.hidden).toBe(true);
+    expect(details.open).toBe(false);
     view.unmount();
     expect(listeners.size).toBe(0);
   });

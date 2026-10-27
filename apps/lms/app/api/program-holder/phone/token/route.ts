@@ -1,8 +1,8 @@
-// pre-auth-registry: exempt - requireProgramHolder verifies the holder before a scoped Telnyx token is minted.
+// pre-auth-registry: exempt - requireCommunicationActor verifies the owner before provider-scoped credentials are issued.
 import { NextResponse } from 'next/server';
-import { requireCommunicationActor } from '@/lib/communications/actor';
-import { ensureDeviceCredential } from '@/lib/phone/webrtc';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { provisionAsteriskDevice, asteriskDeviceId } from '@/lib/phone/asterisk';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 export async function POST(request: Request) {
-  const ctx = await requireCommunicationActor();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
   if (ctx.previewing) {
     return NextResponse.json(
       { error: 'Administrator portal previews cannot connect or place calls.' },
@@ -34,6 +35,15 @@ export async function POST(request: Request) {
   if (!extension?.communication_workspaces?.phone_system_id) {
     return NextResponse.json({ error: 'No enabled phone extension is assigned.' }, { status: 404 });
   }
+  // The PBX provisioner rejects legacy carrier assignments. Return the real
+  // migration blocker to the UI instead of a misleading generic 502.
+  // Do not change existing extension ownership or telephone routing here.
+  if (extension.webrtc_provider !== 'asterisk') {
+    return NextResponse.json(
+      { error: 'This extension is still assigned to the retired phone provider. An administrator must migrate this extension to Elevate Phone before device registration.' },
+      { status: 409 },
+    );
+  }
   if (['offline', 'do_not_disturb'].includes(extension.ring_mode)) {
     return NextResponse.json(
       { error: 'Set the phone to Ring, Vibrate, or Silent before connecting.' },
@@ -48,52 +58,23 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!system)
     return NextResponse.json({ error: 'The phone system is not active.' }, { status: 503 });
-  const { data: primaryNumber, error: numberError } = await ctx.db
-    .from('phone_numbers')
-    .select('e164')
-    .eq('phone_system_id', system.id)
-    .eq('status', 'active')
-    .eq('is_primary', true)
-    .maybeSingle();
-  if (numberError || !primaryNumber?.e164) {
-    return NextResponse.json({ error: 'The phone system has no active primary caller ID.' }, { status: 503 });
-  }
   try {
     await hydrateProcessEnv();
-    const credential = await ensureDeviceCredential({
-      db: ctx.db,
-      system,
-      extension,
+    // Twilio is the carrier for external PSTN calls. PWA endpoints register
+    // against Elevate's independent Asterisk WSS transport, not Telnyx.
+    // External dialing must be routed by the verified Twilio PBX trunk.
+    const credential = await provisionAsteriskDevice(ctx.db, {
       profileId: ctx.user.id,
-      deviceId,
-      callerId: primaryNumber.e164,
+      deviceId: asteriskDeviceId(deviceId),
+      extensionId: extension.id,
     });
-    // A credential is only a permission to connect. The PWA reports presence
-    // after Telnyx confirms its socket is ready.
-    const { count: otherLiveDevices } = await ctx.db
-      .from('phone_webrtc_devices')
-      .select('id', { count: 'exact', head: true })
-      .eq('extension_id', extension.id)
-      .eq('status', 'active')
-      .neq('device_id', deviceId)
-      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
-    if (!otherLiveDevices) {
-      await ctx.db
-        .from('communication_extensions')
-        .update({ presence_status: 'offline', updated_at: new Date().toISOString() })
-        .eq('id', extension.id)
-        .eq('profile_id', ctx.user.id);
-    }
-    return NextResponse.json({
-      token: credential.token,
-      sipUsername: credential.sipUsername,
-      extension: extension.extension,
-      callerId: primaryNumber.e164,
-    });
-  } catch (cause) {
-    console.error('WebRTC credential provisioning failed:', cause);
     return NextResponse.json(
-      { error: cause instanceof Error ? cause.message : 'The phone device could not connect.' },
+      { ...credential, callerId: extension.extension },
+      { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
+    );
+  } catch (cause) {
+    return NextResponse.json(
+      { error: 'The phone device could not connect. Please retry or contact the administrator.' },
       { status: 502 },
     );
   }

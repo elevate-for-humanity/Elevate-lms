@@ -1,13 +1,16 @@
+import { getServerPublicSupabaseConfig } from '@/lib/supabase/public-config';
+import { createBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Check if Supabase is configured
 export function isSupabaseConfigured(): boolean {
-  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return getServerPublicSupabaseConfig() !== null;
 }
 
 // Supabase fetch with a hard timeout to prevent cold-start hangs on slow container starts.
@@ -62,18 +65,19 @@ const mockClient = {
 // Returns a real Supabase client. Returns mockClient if env vars are missing.
 // Never throws, never returns null — callers can safely use .auth and .from.
 export async function createClient(): Promise<SupabaseClient<any>> {
-  if (!isSupabaseConfigured()) {
+  const config = getServerPublicSupabaseConfig();
+  if (!config) {
     return mockClient;
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const { url: supabaseUrl, anonKey: supabaseAnonKey } = config;
 
   try {
     const cookieStore = await cookies();
+    const hostname = (await headers()).get('host') ?? '';
 
     return createServerClient(supabaseUrl, supabaseAnonKey, {
-      global: { fetch: timedFetch },
+      global: { fetch: createBrowserAuthFetch(supabaseUrl, { fetchImpl: timedFetch }) },
       cookies: {
         getAll() {
           return cookieStore.getAll();
@@ -86,7 +90,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
               // Only apply to Supabase auth tokens — leave other cookies alone.
               const isAuthCookie = name.startsWith('sb-') && name.includes('-auth-token');
               const cookieOptions = isAuthCookie
-                ? { ...options, domain: '.elevateforhumanity.org' }
+                ? sessionCookieOptions(options, hostname)
                 : options;
               cookieStore.set(name, value, cookieOptions);
             });
@@ -111,12 +115,9 @@ export async function createClient(): Promise<SupabaseClient<any>> {
 // Uses the anon key with no session — do NOT use for auth-gated queries.
 // Returns mockClient if the Supabase constructor fails (e.g. during static prerender).
 export function createPublicClient(): SupabaseClient<any> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return mockClient;
-  }
+  const config = getServerPublicSupabaseConfig();
+  if (!config) return mockClient;
+  const { url: supabaseUrl, anonKey: supabaseAnonKey } = config;
 
   try {
     return createSupabaseClient(supabaseUrl, supabaseAnonKey, {

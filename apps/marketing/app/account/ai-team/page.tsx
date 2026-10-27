@@ -11,7 +11,7 @@ export default async function MarketingAITeamPage() {
   if (!user) redirect('/login?redirect=/account/ai-team');
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8">
-      <div className="mx-auto max-w-6xl"><AITeamConsole /></div>
+      <div className="mx-auto max-w-6xl"><AITeamConsole unified title="PARIS" /></div>
     </main>
   );
 }

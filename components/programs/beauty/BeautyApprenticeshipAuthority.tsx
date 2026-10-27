@@ -67,12 +67,8 @@ function totalHours(program: ProgramSchema): number {
   return Object.values(program.hoursBreakdown).reduce((sum, value) => sum + value, 0);
 }
 
-function fundingAnswer(program: ProgramSchema): string {
-  if (program.funding?.wioa_eligible && program.funding?.etpl_approved) {
-    return 'This track is marked WIOA-eligible and ETPL-approved in Elevate’s canonical program record. Participant eligibility, local authorization, and available funds still determine whether WorkOne can issue funding.';
-  }
-  if (program.funding?.fundingNotes) return program.funding.fundingNotes;
-  return 'Funding varies by program, participant, region, and current authorization. This track is not marked as WIOA-funded in Elevate’s canonical program record, so staff should not promise tuition coverage.';
+function fundingAnswer(): string {
+  return 'Apprenticeship enrollment is self-pay only. Review the published tuition and payment terms before applying.';
 }
 
 function registrationAnswer(program: ProgramSchema): string {
@@ -113,7 +109,7 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
     offers: {
       '@type': 'Offer',
       category: 'Apprenticeship Program',
-      description: fundingAnswer(program),
+      description: fundingAnswer(),
       priceSpecification: program.selfPayCost
         ? {
             '@type': 'PriceSpecification',
@@ -134,11 +130,8 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
       },
       {
         '@type': 'PropertyValue',
-        name: 'Funding status',
-        value:
-          program.funding?.wioa_eligible && program.funding?.etpl_approved
-            ? 'Program record indicates WIOA/ETPL eligibility; participant authorization still required.'
-            : 'Funding varies; WIOA tuition coverage is not represented as guaranteed.',
+        name: 'Payment method',
+        value: 'Self-pay only',
       },
     ],
   };
@@ -148,7 +141,6 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
   const registered = isRAPIDSProgram(program.slug);
   const hours = totalHours(program);
   const requirement = registeredRequirement(program);
-  const wioaEtpl = Boolean(program.funding?.wioa_eligible && program.funding?.etpl_approved);
   const locations = program.locations?.filter((location) => location.status === 'active') ?? [];
   const shopNoun = trackNoun(program);
   const pathwaySteps = [
@@ -157,8 +149,8 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
       'Choose the track, submit the application, and provide the identity, eligibility, and enrollment information requested in your portal.',
     ],
     [
-      'Confirm tuition or funding',
-      'Staff verifies self-pay, an approved payment option, or current workforce funding authorization before enrollment is finalized.',
+      'Confirm self-pay tuition',
+      'Review the published tuition and select an available self-pay payment option before enrollment is finalized.',
     ],
     [
       'Secure an approved Host Site',
@@ -194,8 +186,8 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
         : `Program requirements are confirmed from the registered standard before enrollment.`,
     },
     {
-      question: 'Can I use WorkOne / WIOA funding for this apprenticeship?',
-      answer: fundingAnswer(program),
+      question: 'How do I pay for this apprenticeship?',
+      answer: fundingAnswer(),
     },
     {
       question: 'Is this track DOL registered?',
@@ -203,7 +195,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
     },
     {
       question: `How does the ${program.title} differ from a traditional school-only pathway?`,
-      answer: `This pathway is structured around supervised training in a real ${shopNoun} plus related technical instruction and digital progress tracking. Employment, wages, placement, funding, and licensing outcomes depend on the applicable host-site arrangement and program requirements and are not guaranteed by the website.`,
+      answer: `This pathway is structured around supervised training in a real ${shopNoun} plus related technical instruction and digital progress tracking. Employment, wages, placement, and licensing outcomes depend on the applicable host-site arrangement and program requirements and are not guaranteed by the website.`,
     },
   ];
 
@@ -226,7 +218,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
                 Train in a real Indiana {shopNoun} with a clearly documented pathway.
               </h2>
               <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700">
-                Elevate separates the training model, funding status, host-site relationship, and
+                Elevate separates the training model, self-pay tuition, host-site relationship, and
                 licensing requirements so applicants and workforce partners can see exactly what
                 applies to this track.
               </p>
@@ -246,11 +238,10 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <CircleDollarSign className="h-6 w-6 text-emerald-700" />
                   <div className="mt-3 text-sm font-black text-slate-950">
-                    {wioaEtpl ? 'WIOA / ETPL Eligible' : 'Funding Review Required'}
+                    Self-Pay Only
                   </div>
                   <p className="mt-1 text-xs font-medium leading-5 text-slate-600">
-                    Funding is never represented as guaranteed without current program and
-                    participant authorization.
+                    Apprentices pay the published tuition. Review payment terms before enrollment.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">

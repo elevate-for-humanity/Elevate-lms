@@ -36,14 +36,8 @@ describe('paid provider boundary', () => {
       expect(source).toContain('executePaidInference');
     }
 
-    // The Google job uses owned Kokoro, not a metered inference reservation.
-    const googleJob = readFileSync('scripts/gcp/deploy-course-job.mjs', 'utf8');
-    expect(googleJob).toContain("result.AI_PROVIDER = 'none'");
-    expect(googleJob).toContain("result.AI_NARRATION_PROVIDER = 'kokoro'");
-    expect(googleJob).toContain("result.AI_TRANSCRIPTION_PROVIDER = 'local_whisper'");
-    expect(media).toContain("process.env.AI_NARRATION_PROVIDER = 'kokoro'");
-    expect(media).not.toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
-
+    expect(media).toContain('Course Builder narration is self-hosted Kokoro.');
+    expect(media).toContain('applyLockedCourseBuilderMediaPolicy(job)');
     const studioBrowser = readFileSync(
       'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',
       'utf8',
@@ -56,6 +50,6 @@ describe('paid provider boundary', () => {
 
   it('does not require paid authorization for Elevate-owned chat inference', () => {
     const service = readFileSync('lib/ai/ai-service.ts', 'utf8');
-    expect(service).toContain("if (options.providerPolicy !== 'owned-only') requirePaidInferenceContext('ai-chat')");
+    expect(service).toContain("if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat')");
   });
 });

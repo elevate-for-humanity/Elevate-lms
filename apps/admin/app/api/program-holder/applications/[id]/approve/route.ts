@@ -170,10 +170,36 @@ export async function POST(
         ? (application.data as Record<string, unknown>)
         : {};
     const accountRole = accountRoleForApprovedRole(existingData.approved_role);
+    const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
+      ? [...new Set(existingData.requested_program_slugs.map((value) => String(value || '').trim()).filter(Boolean))]
+      : [];
+
+    let activePrograms: Array<{ id: string; slug: string }> = [];
+    if (requestedProgramSlugs.length > 0) {
+      const { data: requestedPrograms, error: programsError } = await db
+        .from('programs')
+        .select('id,slug,title,name,is_active,status')
+        .in('slug', requestedProgramSlugs);
+      if (programsError) throw programsError;
+
+      activePrograms = (requestedPrograms ?? []).filter(
+        (program) => program.is_active !== false && !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
+      );
+      const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
+      const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));
+      if (missingSlugs.length > 0) {
+        return NextResponse.json(
+          { error: `Cannot approve: requested program is unavailable (${missingSlugs.join(', ')}).` },
+          { status: 409 },
+        );
+      }
+
+    }
+
     const identity = await findOrCreateUser(db, email, contactName, accountRole);
     const { data: priorMou } = await db
       .from('license_agreement_acceptances')
-      .select('accepted_at')
+      .select('accepted_at,document_version')
       .eq('user_id', identity.userId)
       .eq('agreement_type', 'program_holder_mou')
       .order('accepted_at', { ascending: true })
@@ -188,7 +214,7 @@ export async function POST(
       .maybeSingle();
 
     const now = new Date().toISOString();
-    const alreadySigned = Boolean(existingHolder?.mou_signed || priorMou?.accepted_at);
+    const alreadySigned = Boolean(existingHolder?.mou_signed || (existingHolder?.id && priorMou?.document_version === `3.0-${existingHolder.id}`));
     const holderPayload = {
       user_id: identity.userId,
       organization_name: application.organization_name,
@@ -257,29 +283,7 @@ export async function POST(
       if (error) throw error;
     }
 
-    const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
-      ? [...new Set(existingData.requested_program_slugs.map((value) => String(value || '').trim()).filter(Boolean))]
-      : [];
-
     if (requestedProgramSlugs.length > 0) {
-      const { data: requestedPrograms, error: programsError } = await db
-        .from('programs')
-        .select('id,slug,title,name,is_active,status')
-        .in('slug', requestedProgramSlugs);
-      if (programsError) throw programsError;
-
-      const activePrograms = (requestedPrograms ?? []).filter(
-        (program) => program.is_active !== false && !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
-      );
-      const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
-      const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));
-      if (missingSlugs.length > 0) {
-        return NextResponse.json(
-          { error: `Cannot approve: requested program is unavailable (${missingSlugs.join(', ')}).` },
-          { status: 409 },
-        );
-      }
-
       const primaryProgram = activePrograms[0];
       const assignments = activePrograms.map((program, index) => ({
         program_holder_id: holderId,

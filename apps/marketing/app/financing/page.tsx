@@ -1,5 +1,6 @@
 'use client';
 
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -76,7 +77,7 @@ const FAQS = [
     a: 'Do not assume a remaining balance or funding amount. First obtain the responsible agency’s written authorization showing what is approved. Then review the program enrollment agreement for any participant responsibility that remains.',
   },
   {
-    q: "What if I cannot make a scheduled self-pay payment?",
+    q: 'What if I cannot make a scheduled self-pay payment?',
     a: 'Contact the billing or enrollment team before the due date and review the written agreement governing your account. Any change must be documented rather than assumed from this page.',
   },
   {
@@ -90,21 +91,35 @@ export default function FinancingPage() {
 
   return (
     <main className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative advisor reviewing payment options with a learner"
+        actions={[
+          { href: '/programs', label: 'Find my program price' },
+          { href: '/contact', label: 'Discuss payment options' },
+        ]}
+      />
+
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 text-white text-sm font-medium px-4 py-2 rounded-full mb-6">
             <DollarSign className="w-4 h-4" aria-hidden="true" /> Payment & Funding Paths
           </div>
-          <h1 className="text-4xl font-extrabold mb-4">Understand the payment path before you enroll</h1>
+          <h1 className="text-4xl font-extrabold mb-4">
+            Understand the payment path before you enroll
+          </h1>
           <p className="text-slate-300 text-lg leading-relaxed">
-            Self-pay arrangements, third-party financing, and government workforce funding are different processes with different decision-makers and written terms.
+            Self-pay arrangements, third-party financing, and government workforce funding are
+            different processes with different decision-makers and written terms.
           </p>
         </div>
       </section>
 
       <section className="max-w-5xl mx-auto px-4 py-16">
         <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
-          This page is informational. It does not approve credit, create a financing offer, determine WIOA eligibility, guarantee funding, or replace the program enrollment agreement or a funding agency's written authorization.
+          This page is informational. It does not approve credit, create a financing offer,
+          determine WIOA eligibility, guarantee funding, or replace the program enrollment agreement
+          or a funding agency's written authorization.
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {FINANCING_OPTIONS.map((opt) => {
@@ -120,7 +135,10 @@ export default function FinancingPage() {
               amber: 'bg-amber-600 hover:bg-amber-700',
             };
             return (
-              <article key={opt.id} className={`rounded-2xl border-2 p-6 flex flex-col ${colors[opt.color]}`}>
+              <article
+                key={opt.id}
+                className={`rounded-2xl border-2 p-6 flex flex-col ${colors[opt.color]}`}
+              >
                 <div className="mb-4">
                   <Icon className="w-8 h-8 text-slate-700 mb-3" aria-hidden="true" />
                   <h2 className="text-xl font-bold text-slate-900">{opt.name}</h2>
@@ -130,12 +148,18 @@ export default function FinancingPage() {
                 <ul className="space-y-2 mb-6 flex-1">
                   {opt.terms.map((term) => (
                     <li key={term} className="flex items-start gap-2 text-sm text-slate-700">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <CheckCircle
+                        className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
                       {term}
                     </li>
                   ))}
                 </ul>
-                <Link href={opt.href} className={`flex items-center justify-center gap-2 w-full text-white font-bold px-4 py-3 rounded-xl transition-colors text-sm ${btnColors[opt.color]}`}>
+                <Link
+                  href={opt.href}
+                  className={`flex items-center justify-center gap-2 w-full text-white font-bold px-4 py-3 rounded-xl transition-colors text-sm ${btnColors[opt.color]}`}
+                >
                   {opt.cta} <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </Link>
               </article>
@@ -147,9 +171,21 @@ export default function FinancingPage() {
       <section className="bg-slate-50 border-y border-slate-100 py-10 px-4">
         <div className="max-w-4xl mx-auto grid sm:grid-cols-3 gap-6 text-center">
           {[
-            { icon: Shield, label: 'Written terms control', sub: 'Use the applicable agreement and disclosures' },
-            { icon: Landmark, label: 'Agency decisions stay external', sub: 'Elevate does not issue WIOA approval' },
-            { icon: CheckCircle, label: 'Program-specific review', sub: 'Costs and available options can differ by program' },
+            {
+              icon: Shield,
+              label: 'Written terms control',
+              sub: 'Use the applicable agreement and disclosures',
+            },
+            {
+              icon: Landmark,
+              label: 'Agency decisions stay external',
+              sub: 'Elevate does not issue WIOA approval',
+            },
+            {
+              icon: CheckCircle,
+              label: 'Program-specific review',
+              sub: 'Costs and available options can differ by program',
+            },
           ].map(({ icon: Icon, label, sub }) => (
             <div key={label} className="flex flex-col items-center gap-2">
               <Icon className="w-6 h-6 text-slate-500" aria-hidden="true" />
@@ -172,7 +208,10 @@ export default function FinancingPage() {
                 className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
               >
                 {faq.q}
-                <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${openFaq === i ? 'rotate-90' : ''}`} aria-hidden="true" />
+                <ChevronRight
+                  className={`w-4 h-4 text-slate-400 transition-transform ${openFaq === i ? 'rotate-90' : ''}`}
+                  aria-hidden="true"
+                />
               </button>
               {openFaq === i && (
                 <div className="px-5 pb-4 text-sm text-slate-700 leading-relaxed">{faq.a}</div>
@@ -185,9 +224,13 @@ export default function FinancingPage() {
       <section className="bg-slate-900 text-white py-14 px-4 text-center">
         <h2 className="text-2xl font-bold mb-3">Review the exact program first</h2>
         <p className="text-slate-300 mb-6 text-sm">
-          Confirm tuition, required fees, refund terms, credential requirements, and the payment or funding path that applies to your enrollment.
+          Confirm tuition, required fees, refund terms, credential requirements, and the payment or
+          funding path that applies to your enrollment.
         </p>
-        <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors">
+        <Link
+          href="/programs"
+          className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors"
+        >
           Browse Programs <ChevronRight className="w-4 h-4" aria-hidden="true" />
         </Link>
       </section>

@@ -1,113 +1,234 @@
-// @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
-vi.mock('server-only', () => ({}));
-import { getGoogleRuntimeConfiguration, payloadChecksum, saveGoogleRuntimeConfiguration } from '@/lib/google/runtime-configuration';
+import policy from '@/config/google-runtime-policy.json';
+import {
+  payloadChecksum,
+  saveGoogleRuntimeConfiguration,
+  validateRuntimeEntries,
+} from '@/lib/google/runtime-configuration';
 
-const project = 'elegant-racer-299721';
-const prefix = `projects/${project}/locations/us-central1/services/elevate-admin-migration`;
-const oldRevision = `${prefix.replace('/services/', '/revisions/')}-00001`;
-const newRevision = `${prefix.replace('/services/', '/revisions/')}-00002`;
-const secret = 'elevate-admin-sendgrid-api-key';
-const value = 'synthetic-private-value';
-function harness(options: { deny?: string; checksum?: boolean; failed?: boolean; health?: boolean; wrongRevision?: boolean; conflict?: boolean; identity?: string; stale?: boolean; scope?: string; extraAccessor?: boolean } = {}) {
-  const calls: Array<{ url: string; method: string; body?: Record<string, unknown> }> = [];
+const component = 'admin';
+const key = 'XAI_API_KEY';
+const secret = 'elevate-admin-xai-api-key';
+const path = `projects/${policy.project}/locations/${policy.region}/services/${policy.components.admin.service}`;
+function harness(
+  options: {
+    wrongScope?: boolean;
+    publicAccess?: boolean;
+    staleHealth?: boolean;
+    conflict?: boolean;
+    wrongBinding?: boolean;
+  } = {},
+) {
   let patched = false;
-  let time = 0;
-  let containers = [{ image: `us-central1-docker.pkg.dev/${project}/elevate/admin@sha256:${'a'.repeat(64)}`, env: [{ name: 'UNCHANGED', value: 'kept' }, { name: 'SENDGRID_API_KEY', value: 'old-private-value' }], resources: { limits: { cpu: '4', memory: '8Gi' } } }];
-  const request = async (input: string | URL | Request, init?: RequestInit) => {
+  let saved: any;
+  const request = vi.fn(async (input: string | URL | Request, init: RequestInit = {}) => {
     const url = String(input);
-    const method = init?.method ?? 'GET';
-    const body = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
-    calls.push({ url, method, body });
-    if (options.deny && url.includes(options.deny)) return Response.json({ error: { message: `must not leak ${value}` } }, { status: 403 });
-    if (url.includes('metadata.google.internal')) {
-      return url.includes('/identity?') ? new Response('synthetic-identity', { headers: { 'Metadata-Flavor': 'Google' } })
-        : Response.json({ access_token: 'synthetic-access-token' }, { headers: { 'Metadata-Flavor': 'Google' } });
-    }
-    if (url.endsWith('/api/health')) return Response.json({ ready: true, healthy: options.health !== false, revision: options.wrongRevision ? 'wrong-revision' : newRevision.split('/').at(-1) });
-    if (url.includes('secretmanager.googleapis.com')) {
-      if (url.endsWith(':getIamPolicy')) return Response.json({ bindings: [
-        { role: `projects/${project}/roles/elevateRuntimeSecretWriterV1`, members: [`serviceAccount:elevate-admin-runtime@${project}.iam.gserviceaccount.com`] },
-        { role: 'roles/secretmanager.secretAccessor', members: [`serviceAccount:elevate-admin-runtime@${project}.iam.gserviceaccount.com`, ...(options.extraAccessor ? ['serviceAccount:elevate-marketing-runtime@example.test'] : [])] },
-      ] });
-      if (url.endsWith(':addVersion')) return Response.json({ name: `projects/484736877039/secrets/${secret}/versions/7`, state: 'ENABLED', clientSpecifiedPayloadChecksum: options.checksum !== false });
-      if (url.includes('/versions/')) return Response.json({ name: `projects/${project}/secrets/${secret}/versions/7`, state: 'ENABLED', clientSpecifiedPayloadChecksum: true });
-      return Response.json({ labels: { elevate_component: options.scope ?? 'admin', elevate_key: 'sendgrid_api_key' } });
-    }
-    if (method === 'PATCH') {
-      if (options.conflict) return Response.json({}, { status: 409 });
-      containers = body.template.containers;
+    if (url.includes('metadata.google.internal'))
+      return url.includes('/identity?')
+        ? new Response('identity-token', { headers: { 'Metadata-Flavor': 'Google' } })
+        : Response.json(
+            { access_token: 'test-token' },
+            { headers: { 'Metadata-Flavor': 'Google' } },
+          );
+    if (url.includes(':getIamPolicy'))
+      return Response.json({
+        bindings: [
+          {
+            role: `projects/${policy.project}/roles/elevateRuntimeSecretWriterV1`,
+            members: [`serviceAccount:${policy.components.admin.identity}`],
+          },
+          {
+            role: 'roles/secretmanager.secretAccessor',
+            members: [
+              options.publicAccess
+                ? 'allUsers'
+                : `serviceAccount:${policy.components.admin.identity}`,
+            ],
+          },
+        ],
+      });
+    if (url.includes(':addVersion'))
+      return Response.json({
+        name: `projects/${policy.project}/secrets/${secret}/versions/2`,
+        state: 'ENABLED',
+        clientSpecifiedPayloadChecksum: true,
+      });
+    if (url.includes('secretmanager.googleapis.com'))
+      return Response.json({
+        labels: {
+          elevate_component: options.wrongScope ? 'marketing' : 'admin',
+          elevate_key: 'xai_api_key',
+        },
+      });
+    if (url.endsWith('/api/health'))
+      return Response.json({
+        ready: true,
+        healthy: true,
+        revision: options.staleHealth ? 'old' : 'new',
+      });
+    if (init.method === 'PATCH') {
+      if (options.conflict)
+        return new Response('private diagnostic must not escape', { status: 412 });
       patched = true;
-      return Response.json({ name: `projects/${project}/locations/us-central1/operations/operation-a` });
+      saved = JSON.parse(String(init.body));
+      return Response.json({});
     }
-    const ready = patched && !options.stale;
-    const revision = ready ? newRevision : oldRevision;
-    return Response.json({ name: prefix, etag: ready ? 'new-etag' : 'original-etag', generation: ready ? '2' : '1', observedGeneration: ready ? '2' : '1', terminalCondition: { state: options.failed && patched ? 'CONDITION_FAILED' : 'CONDITION_SUCCEEDED' }, latestReadyRevision: revision, latestCreatedRevision: revision,
-      uri: 'https://elevate-admin-migration-example-uc.a.run.app', trafficStatuses: [{ revision, percent: 100 }], template: { serviceAccount: options.identity ?? `elevate-admin-runtime@${project}.iam.gserviceaccount.com`, containers } });
+    const revision = `${path}/revisions/${patched ? 'new' : 'old'}`;
+    return Response.json({
+      name: path,
+      etag: 'original-etag',
+      generation: '2',
+      observedGeneration: '2',
+      terminalCondition: { state: 'CONDITION_SUCCEEDED' },
+      latestReadyRevision: revision,
+      latestCreatedRevision: revision,
+      uri: 'https://admin-test.run.app',
+      trafficStatuses: [{ revision, percent: 100 }],
+      template: {
+        serviceAccount: policy.components.admin.identity,
+        containers:
+          patched && !options.wrongBinding
+            ? saved.template.containers
+            : [
+                {
+                  image: `image@sha256:${'a'.repeat(64)}`,
+                  env: [{ name: 'UNRELATED_SETTING', value: 'preserve-me' }],
+                },
+              ],
+      },
+    });
+  });
+  return {
+    request,
+    saved: () => saved,
+    writes: () =>
+      request.mock.calls.filter(([, init]) => ['POST', 'PATCH'].includes(init?.method || '')),
   };
-  return { calls, dependencies: { request: request as typeof fetch, now: () => time, wait: async (ms: number) => { time += ms; } } };
 }
-describe('Google configuration delivery', () => {
-  it('uses the independently known Castagnoli check vector', () => {
-    expect(payloadChecksum(Buffer.from('123456789'))).toBe(String(0xe3069283));
+
+describe('Google scoped runtime configuration', () => {
+  it('permits Twilio credentials only in Admin and LMS and rejects malformed account credentials', () => {
+    const entries = [{key:'TWILIO_ACCOUNT_SID',value:'AC'+'a'.repeat(32)}, {key:'TWILIO_AUTH_TOKEN',value:'b'.repeat(32)}];
+    expect(()=>validateRuntimeEntries('admin',entries)).not.toThrow();
+    expect(()=>validateRuntimeEntries('lms',entries)).not.toThrow();
+    expect(()=>validateRuntimeEntries('marketing',entries)).toThrow(/key_not_allowed/);
+    expect(()=>validateRuntimeEntries('admin',[{key:'TWILIO_AUTH_TOKEN',value:'placeholder'}])).toThrow(/invalid_twilio_credential/);
+    expect(()=>validateRuntimeEntries('admin',[{key:'TWILIO_API_KEY_SID',value:entries[0].value}])).toThrow(/invalid_twilio_api_key_sid/);
   });
-  it('writes checksum-protected bytes to a service-specific secret and verifies its exact serving revision', async () => {
+  it('verifies numeric secret bindings on the serving revision and preserves unrelated settings', async () => {
     const h = harness();
-    const result = await saveGoogleRuntimeConfiguration('admin', [{ key: 'SENDGRID_API_KEY', value }], h.dependencies);
-    expect(result).toMatchObject({ runtimeSynced: true, configurationVerified: true, revision: newRevision, previousRevision: oldRevision });
-    expect(JSON.stringify(result)).not.toContain(value);
-    const write = h.calls.find(call => call.url.endsWith(':addVersion'))!;
-    expect(write.body).toEqual({ payload: { data: Buffer.from(value).toString('base64'), dataCrc32c: payloadChecksum(Buffer.from(value)) } });
-    const update = h.calls.find(call => call.method === 'PATCH')!;
-    expect(update.body).toMatchObject({ etag: 'original-etag', template: { containers: [{ resources: { limits: { cpu: '4', memory: '8Gi' } }, env: [{ name: 'UNCHANGED', value: 'kept' }, { name: 'SENDGRID_API_KEY', valueSource: { secretKeyRef: { secret, version: '7' } } }] }] } });
-    expect(h.calls.some(call => call.url.includes(':access'))).toBe(false);
-    expect(h.calls.some(call => call.url.includes('supabase') || call.url.includes('northflank'))).toBe(false);
+    const result = await saveGoogleRuntimeConfiguration(
+      component,
+      [{ key, value: 'private-key' }],
+      { request: h.request },
+    );
+    expect(result).toMatchObject({
+      runtimeSynced: true,
+      configurationVerified: true,
+      revision: `${path}/revisions/new`,
+    });
+    expect(h.saved().etag).toBe('original-etag');
+    expect(h.saved().template.containers[0].env).toEqual([
+      { name: 'UNRELATED_SETTING', value: 'preserve-me' },
+      { name: key, valueSource: { secretKeyRef: { secret, version: '2' } } },
+    ]);
+    expect(JSON.stringify(result)).not.toContain('private-key');
+    expect(
+      h.request.mock.calls.every(
+        ([, init]) => init?.redirect === 'error' && init?.cache === 'no-store',
+      ),
+    ).toBe(true);
   });
-  it.each(['NORTHFLANK_API_TOKEN', 'STRIPE_SECRET_KEY', 'OPENAI_API_KEY', 'NEXT_PUBLIC_SUPABASE_URL'])('blocks retired, optional or build-time keys before identity access (%s)', async key => {
-    const h = harness();
-    await expect(saveGoogleRuntimeConfiguration('admin', [{ key, value }], h.dependencies)).rejects.toMatchObject({ code: 'key_not_allowed_for_service' });
-    expect(h.calls).toEqual([]);
+  it.each([{ wrongScope: true }, { publicAccess: true }])(
+    'refuses an incorrectly scoped destination before any write: %j',
+    async (options) => {
+      const h = harness(options);
+      await expect(
+        saveGoogleRuntimeConfiguration(component, [{ key, value: 'private-key' }], {
+          request: h.request,
+        }),
+      ).rejects.toThrow(/scope_mismatch/);
+      expect(h.writes()).toHaveLength(0);
+    },
+  );
+  it.each([{ staleHealth: true }, { wrongBinding: true }, { conflict: true }])(
+    'does not claim success after failed runtime verification: %j',
+    async (options) => {
+      const h = harness(options);
+      await expect(
+        saveGoogleRuntimeConfiguration(component, [{ key, value: 'private-key' }], {
+          request: h.request,
+        }),
+      ).rejects.toThrow(/health_revision_mismatch|runtime_binding_mismatch|concurrent_update/);
+    },
+  );
+  it('rejects cross-service keys, masked credentials and duplicate updates', () => {
+    expect(() => validateRuntimeEntries('marketing', [{ key, value: 'private-key' }])).toThrow(
+      /key_not_allowed/,
+    );
+    expect(() => validateRuntimeEntries(component, [{ key, value: '••••••••' }])).toThrow(
+      /invalid_or_masked/,
+    );
+    expect(() =>
+      validateRuntimeEntries(component, [
+        { key, value: 'one' },
+        { key, value: 'two' },
+      ]),
+    ).toThrow(/invalid_or_masked/);
   });
-  it('does not grant Store the communications credential scope', async () => {
-    const h = harness();
-    await expect(saveGoogleRuntimeConfiguration('store', [{ key: 'TELNYX_API_KEY', value }], h.dependencies)).rejects.toMatchObject({ code: 'key_not_allowed_for_service' });
-    expect(h.calls).toEqual([]);
+  it('validates tax runtime identifiers and encryption keys before storing them', () => {
+    expect(() =>
+      validateRuntimeEntries('marketing', [{ key: 'TAX_DATA_ENCRYPTION_KEY', value: 'short' }]),
+    ).toThrow('invalid_tax_encryption_key');
+    expect(() =>
+      validateRuntimeEntries('marketing', [{ key: 'IRS_SOFTWARE_ID', value: '00000000' }]),
+    ).toThrow('invalid_irs_software_id');
+    expect(() => validateRuntimeEntries('marketing', [{ key: 'IRS_EFIN', value: '123' }])).toThrow(
+      'invalid_irs_efin',
+    );
+    expect(() =>
+      validateRuntimeEntries('marketing', [
+        { key: 'TAX_DATA_ENCRYPTION_KEY', value: 'ab'.repeat(32) },
+        { key: 'IRS_SOFTWARE_ID', value: '12345678' },
+        { key: 'IRS_EFIN', value: '123456' },
+      ]),
+    ).not.toThrow();
   });
-  it.each([
-    [{ deny: '/secrets/' }, 'permission_denied'],
-    [{ scope: 'lms' }, 'secret_scope_mismatch'],
-    [{ identity: 'wrong-account@example.test' }, 'unexpected_runtime_identity_or_shape'],
-    [{ extraAccessor: true }, 'secret_iam_scope_mismatch'],
-  ])('preflights all ownership boundaries before payload writes (%j)', async (options, code) => {
-    const h = harness(options);
-    await expect(saveGoogleRuntimeConfiguration('admin', [{ key: 'SENDGRID_API_KEY', value }], h.dependencies)).rejects.toMatchObject({ code });
-    expect(h.calls.some(call => call.method !== 'GET')).toBe(false);
+  it('uses the known CRC32C vector for integrity checks', () => {
+    expect(payloadChecksum(Buffer.from('123456789'))).toBe('3808858755');
   });
-  it('refuses a write without Google checksum acknowledgement before runtime mutation', async () => {
-    const h = harness({ checksum: false });
-    await expect(saveGoogleRuntimeConfiguration('admin', [{ key: 'SENDGRID_API_KEY', value }], h.dependencies)).rejects.toMatchObject({ code: 'secret_write_not_verified' });
-    expect(h.calls.some(call => call.method === 'PATCH')).toBe(false);
+});
+
+// GitHub dispatch belongs only to the administrative runtime. Saving a token
+// must sync to its bound Google secret rather than silently updating only SQL.
+describe('administrative GitHub runtime binding', () => {
+  it('allows the Admin token and rejects learner and public bindings', () => {
+    expect(() => validateRuntimeEntries('admin', [{ key: 'GITHUB_TOKEN', value: 'test-github-credential' }])).not.toThrow();
+    for (const component of ['lms', 'marketing', 'store'] as const) {
+      expect(() => validateRuntimeEntries(component, [{ key: 'GITHUB_TOKEN', value: 'test-github-credential' }])).toThrow();
+    }
   });
-  it.each([
-    [{ conflict: true }, 'concurrent_update'],
-    [{ failed: true }, 'revision_failed'],
-    [{ health: false }, 'service_unhealthy'],
-    [{ wrongRevision: true }, 'health_revision_mismatch'],
-    [{ stale: true }, 'verification_timeout'],
-  ])('never declares incomplete delivery verified (%j)', async (options, code) => {
-    const h = harness(options);
-    await expect(saveGoogleRuntimeConfiguration('admin', [{ key: 'SENDGRID_API_KEY', value }], h.dependencies)).rejects.toMatchObject({ code });
+});
+
+describe('phone runtime ownership', () => {
+  it('binds device provisioning and relay configuration to the two owning services', () => {
+    for (const key of ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET', 'TWILIO_PHONE_NUMBER']) {
+      for (const component of ['admin', 'lms'] as const) {
+        expect(policy.components[component].keys).toContain(key);
+      }
+      for (const component of ['marketing', 'store'] as const) {
+        expect(policy.components[component].keys).not.toContain(key);
+      }
+    }
   });
-  it('keeps raw inline credentials out of the operational inventory', async () => {
-    const h = harness();
-    // An unhealthy/stale runtime cannot be mislabeled as verified.
-    h.dependencies.request = (async (input, init) => {
-      if (String(input).endsWith('/api/health')) return Response.json({ ready: true, healthy: true, revision: oldRevision.split('/').at(-1) });
-      return await harnessRequest(input, init);
-    }) as typeof fetch;
-    const harnessRequest = harness().dependencies.request;
-    const result = await getGoogleRuntimeConfiguration('admin', h.dependencies);
-    expect(JSON.stringify(result)).not.toContain('old-private-value');
-    expect(result.settings.find(item => item.key === 'SENDGRID_API_KEY')).toMatchObject({ value: '••••••••', verification_status: 'unverified', migration_status: 'legacy-inline' });
+});
+
+describe('independent commerce configuration', () => {
+  it.each(['admin', 'lms', 'marketing', 'store'] as const)('allows %s to own the exact PayPal settings used by billing and webhook verification', component => {
+    expect(() => validateRuntimeEntries(component, [
+      { key: 'PAYPAL_ENVIRONMENT', value: 'production' },
+      { key: 'PAYPAL_BILLING_WEBHOOK_ID', value: 'billing-webhook-fixture' },
+      { key: 'PAYPAL_PAYOUT_WEBHOOK_ID', value: 'payout-webhook-fixture' },
+    ])).not.toThrow();
   });
 });

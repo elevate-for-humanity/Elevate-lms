@@ -42,7 +42,7 @@ export function SmsComposer({ enabled, recipients }: { enabled: boolean; recipie
       </form>
       <label className="mt-4 flex items-start gap-2 text-sm text-gray-700"><input name="consentConfirmed" value="yes" type="checkbox" required form="sms-outreach-form" className="mt-1" /><span>I verified that this learner consented to receive this operational text. The sender and learner will be recorded in the delivery audit.</span></label>
       {state.message && <p role="status" className={`mt-3 text-sm font-medium ${state.ok ? 'text-green-700' : 'text-red-700'}`}>{state.message}</p>}
-      {!enabled && <p className="mt-3 text-sm text-red-700">Set TELNYX_API_KEY and an SMS-enabled TELNYX_PHONE_NUMBER on the Admin service to enable sending.</p>}
+      {!enabled && <p className="mt-3 text-sm text-red-700">Configure Telnyx and an active primary business number with SMS enabled before sending.</p>}
     </section>
   );
 }

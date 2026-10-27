@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getGoogleServices,getGoogleService } from '@/lib/google/runtime';
+import { getGoogleServices } from '@/lib/google/runtime';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 
 const DAY_MS = 86_400_000;
@@ -90,7 +90,8 @@ export function buildCostRecommendations(input: {
     recommendations.push({
       severity: 'critical',
       title: 'Queued work cannot reach the GPU',
-      detail: 'Restore the configured GPU worker before adding capacity or replaying the queue. Repeated dispatches would spend retries without producing assets.',
+      detail:
+        'Restore the configured GPU worker before adding capacity or replaying the queue. Repeated dispatches would spend retries without producing assets.',
       estimatedMonthlySavings: null,
     });
   }
@@ -122,7 +123,8 @@ export function buildCostRecommendations(input: {
     recommendations.push({
       severity: 'opportunity',
       title: 'GPU is eligible to scale to zero',
-      detail: 'There is no queued or rendering work. Keep Admin and LMS online, but let the isolated GPU worker sleep until the durable queue receives work.',
+      detail:
+        'There is no queued or rendering work. Keep Admin and LMS online, but let the isolated GPU worker sleep until the durable queue receives work.',
       estimatedMonthlySavings: null,
     });
   }
@@ -144,14 +146,19 @@ export async function getInfrastructureCostIntelligence(
   const generatedAt = new Date();
   const since = new Date(generatedAt.getTime() - windowDays * DAY_MS).toISOString();
   const rate = finiteNonNegative(
-    process.env.GPU_COST_PER_HOUR,
+    process.env.GOOGLE_GPU_COST_PER_HOUR ?? process.env.GPU_COST_PER_HOUR,
   );
 
   const [usageResult, jobsResult, gpuReadyResult] = await Promise.all([
     db
       .from('platform_usage_events')
       .select('metric,quantity,metadata')
-      .in('metric', ['gpu_video_seconds', 'gpu_render_seconds', 'gpu_output_bytes', 'video_generation_attempt'])
+      .in('metric', [
+        'gpu_video_seconds',
+        'gpu_render_seconds',
+        'gpu_output_bytes',
+        'video_generation_attempt',
+      ])
       .gte('occurred_at', since),
     db
       .from('video_jobs')
@@ -159,21 +166,28 @@ export async function getInfrastructureCostIntelligence(
     gpuVideoAvailable().catch(() => false),
   ]);
 
-  if (usageResult.error) throw new Error(`GPU usage ledger unavailable: ${usageResult.error.message}`);
-  if (jobsResult.error) throw new Error(`Video job ledger unavailable: ${jobsResult.error.message}`);
+  if (usageResult.error)
+    throw new Error(`GPU usage ledger unavailable: ${usageResult.error.message}`);
+  if (jobsResult.error)
+    throw new Error(`Video job ledger unavailable: ${jobsResult.error.message}`);
 
   const usage = (usageResult.data ?? []) as UsageRow[];
   const jobs = (jobsResult.data ?? []) as VideoJobRow[];
-  const sumMetric = (metric: string) => usage
-    .filter((row) => row.metric === metric)
-    .reduce((sum, row) => sum + numberFrom(row.quantity), 0);
+  const sumMetric = (metric: string) =>
+    usage
+      .filter((row) => row.metric === metric)
+      .reduce((sum, row) => sum + numberFrom(row.quantity), 0);
   const failedAttemptSeconds = usage
-    .filter((row) => row.metric === 'video_generation_attempt' && row.metadata?.outcome === 'failed')
+    .filter(
+      (row) => row.metric === 'video_generation_attempt' && row.metadata?.outcome === 'failed',
+    )
     .reduce((sum, row) => sum + numberFrom(row.metadata?.elapsed_seconds), 0);
   const nowIso = generatedAt.toISOString();
   const queued = jobs.filter((job) => job.status === 'queued' && !job.dead_lettered_at).length;
   const rendering = jobs.filter((job) => job.status === 'rendering').length;
-  const stale = jobs.filter((job) => job.status === 'rendering' && job.lease_expires_at && job.lease_expires_at < nowIso).length;
+  const stale = jobs.filter(
+    (job) => job.status === 'rendering' && job.lease_expires_at && job.lease_expires_at < nowIso,
+  ).length;
   const completed = jobs.filter((job) => job.status === 'complete').length;
   const failed = jobs.filter((job) => job.status === 'failed').length;
   const deadLettered = jobs.filter((job) => Boolean(job.dead_lettered_at)).length;
@@ -183,9 +197,29 @@ export async function getInfrastructureCostIntelligence(
   const estimatedWindowCost = rate == null ? null : (renderSeconds / 3600) * rate;
   const estimatedFailedAttemptCost = rate == null ? null : (failedAttemptSeconds / 3600) * rate;
 
-  const serviceConfigs=getGoogleServices();
-  const services=await Promise.all(serviceConfigs.map(async config=>{try{const service=await getGoogleService(config);return {key:config.key,label:config.label,status:service.status,deployedCommit:service.commit};}catch{return {key:config.key,label:config.label,status:'unavailable',deployedCommit:null};}}));
-  const googleConfigured=services.every(service=>service.status==='healthy');
+  const configs = getGoogleServices();
+  const services = await Promise.all(
+    configs.map(async (config) => {
+      try {
+        const url = new URL(config.healthPath, config.url);
+        const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+        const health = await response.json();
+        return {
+          key: config.key,
+          label: config.label,
+          status: response.ok && health.healthy === true ? 'healthy' : 'degraded',
+          deployedCommit: serviceField(health, ['commit', 'gitSha', 'sha']),
+        };
+      } catch {
+        return {
+          key: config.key,
+          label: config.label,
+          status: 'unavailable',
+          deployedCommit: null,
+        };
+      }
+    }),
+  );
 
   const recommendations = buildCostRecommendations({
     gpuReady: gpuReadyResult,
@@ -219,7 +253,7 @@ export async function getInfrastructureCostIntelligence(
       estimatedWindowCost,
       estimatedFailedAttemptCost,
     },
-    google: { configured: googleConfigured, services },
+    google: { configured: services.every((service) => service.status === 'healthy'), services },
     recommendations,
   };
 }

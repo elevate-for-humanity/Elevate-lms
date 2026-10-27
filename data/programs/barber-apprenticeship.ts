@@ -45,7 +45,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   },
   schedule: `Supervised host-shop work is scheduled according to the employment/placement agreement. ${RTI_HOURS} verified RTI hours and all ${COMPETENCY_COUNT} registered competencies are required; state licensing-hour records are tracked separately.`,
   cohortSize: 'Enrollment and host-shop capacity vary by placement availability',
-  fundingStatement: `Funding eligibility varies by participant and funding source. Self-pay tuition is ${TUITION_LABEL}; payment plan and eligible BNPL options are available at checkout.`,
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
   selfPayCost: TUITION_LABEL,
   badge: 'DOL Registered',
   badgeColor: 'blue',
@@ -271,10 +271,10 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   deliveryModel: 'internal',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'Elevate for Humanity',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingOptions: ['self_pay'],
   funding: {
-    fssa_eligible: true,
-    snap_et_eligible: true,
+    fssa_eligible: false,
+    snap_et_eligible: false,
     wioa_eligible: false,
     etpl_approved: false,
     wrg_eligible: false,
@@ -304,7 +304,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   faqs: [
-    { question: 'How much does the program cost?', answer: `Current self-pay tuition is ${TUITION_LABEL}. Payment plan and eligible BNPL options are available. Public funding eligibility is determined separately.` },
+    { question: 'How much does the program cost?', answer: `Current self-pay tuition is ${TUITION_LABEL}. Payment plan and eligible BNPL options are available.` },
     { question: 'How long is the program?', answer: `This is a competency-based registered occupation. Completion requires all ${COMPETENCY_COUNT} competencies plus ${RTI_HOURS} verified RTI hours and the required placement, supervision, wage, work-evidence, and sponsor records. Calendar duration depends on competency progression, RTI completion, work schedule, transfer decisions, and applicable state licensing requirements.` },
     { question: 'Do I need my own barbershop?', answer: 'No. Applicants without a host shop can request placement assistance. Supervised work can begin only at an approved participating host shop.' },
     { question: 'What credential do I earn?', answer: 'Successful registered-program completers receive the Registered Apprenticeship completion credential. Indiana barber licensure is a separate state process and requires satisfaction of current licensing and examination requirements.' },

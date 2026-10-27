@@ -117,7 +117,7 @@ export default function Page() {
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                   <a
-                    href="/images/programs/financial-literacy-flyer.jpg"
+                    href="/images/pages/team-collaboration.webp"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3.5 font-extrabold text-slate-800 hover:border-slate-500"
@@ -144,7 +144,7 @@ export default function Page() {
               </h2>
             </div>
             <a
-              href="/images/programs/financial-literacy-flyer.jpg"
+              href="/images/pages/team-collaboration.webp"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-extrabold text-white hover:bg-slate-800"
@@ -154,7 +154,7 @@ export default function Page() {
           </div>
           <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
             <Image
-              src="/images/programs/financial-literacy-flyer.jpg"
+              src="/images/pages/team-collaboration.webp"
               alt="Elevate Financial Empowerment Program — 8-week practical financial literacy course led by Dr. Carlina A. Wilkes"
               width={1189}
               height={1536}

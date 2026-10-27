@@ -1,3 +1,6 @@
+import { connection } from 'next/server';
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { getProgramHeroImage } from '@/lib/images/programImages';
 import { notFound } from 'next/navigation';
 
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
@@ -16,6 +19,8 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function CosmetologyApprenticeshipPage() {
+  // Live approved host-shop galleries and placement guides require runtime credentials.
+  await connection();
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
   if (!program) return notFound();
@@ -24,8 +29,6 @@ export default async function CosmetologyApprenticeshipPage() {
     ? {
         ...baseBanner,
         voiceoverSrc: undefined,
-        videoSrcDesktop: undefined,
-        videoSrcMobile: undefined,
         belowHeroHeadline: 'Build your cosmetology career through supervised salon training.',
         belowHeroSubheadline:
           'Registered Hair Stylist/Cosmetologist occupation 0096HY V1: complete the 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, required work processes, and the applicable Indiana examination and licensing process.',
@@ -52,12 +55,16 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        heroOverride={<CosmetologyVisualExperience />}
-        afterHero={<BeautyEnrollmentPromotion />}
+        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="cosmetology-apprenticeship" />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="cosmetology-apprenticeship" programLabel={program.title} />}
+        visualContent={<CosmetologyVisualExperience />}
         featuredContent={
           <>
-            <ApprenticeshipExperienceGuide programTitle={program.title} applyHref={program.cta.applyHref} />
-            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
+            <ApprenticeshipExperienceGuide
+              programTitle={program.title}
+              applyHref={program.cta.applyHref}
+            />
+            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" showDirectory={false} />
             <HostShopPlacementGuide programSlug="cosmetology-apprenticeship" />
           </>
         }

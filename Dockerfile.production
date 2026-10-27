@@ -48,7 +48,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 # Optimize for production
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # Build the application with standalone output
 ENV NEXT_STANDALONE_OUTPUT=1

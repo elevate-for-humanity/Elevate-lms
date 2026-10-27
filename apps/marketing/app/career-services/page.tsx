@@ -1,13 +1,40 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Briefcase, FileText, Users, Target, Clock, CheckCircle, Phone } from 'lucide-react';
+import {
+  ArrowRight,
+  Briefcase,
+  FileText,
+  Users,
+  Target,
+  Clock,
+  CheckCircle,
+  Phone,
+} from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Career Services | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Career coaching, job placement, resume building, and interview prep services to help you launch your career after training.',
-  keywords: ['career services', 'job placement', 'resume help', 'interview prep', 'career coaching'],
+  description:
+    'Career coaching, job placement, resume building, and interview prep services to help you launch your career after training.',
+  keywords: [
+    'career services',
+    'job placement',
+    'resume help',
+    'interview prep',
+    'career coaching',
+  ],
+
+  ...publicArtworkMetadata({
+    path: '/career-services',
+    image: '/images/refresh-20261014/admissions.webp',
+    alt: 'Illustrative career advisor meeting with an adult learner',
+    title: `Career Services | ${PLATFORM_DEFAULTS.orgName}`,
+    description:
+      'Career coaching, job placement, resume building, and interview prep services to help you launch your career after training.',
+  }),
 };
 
 const SERVICES = [
@@ -48,22 +75,33 @@ const EMPLOYER_BENEFITS = [
 export default function CareerServicesPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative career advisor meeting with an adult learner"
+        actions={[
+          { href: '/contact', label: 'Request career support' },
+          { href: '/programs', label: 'Explore career pathways' },
+        ]}
+      />
+
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <Image src="/images/pages/career-services-page-1.webp" alt="Career Services - Elevate for Humanity" fill className="object-cover" sizes="100vw" />
-        </div>
+      <section className="relative bg-slate-950 text-white py-8 sm:py-10 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <p className="text-blue-300 font-semibold mb-4 uppercase tracking-wide text-sm">Career Services</p>
+            <p className="text-blue-300 font-semibold mb-4 uppercase tracking-wide text-sm">
+              Career Services
+            </p>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               From Training to Career — We Stay With You
             </h1>
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Our career services don't end when your program does. We provide ongoing support to help you 
-              land a job, advance in your career, and achieve your professional goals.
+              Our career services don't end when your program does. We provide ongoing support to
+              help you land a job, advance in your career, and achieve your professional goals.
             </p>
-            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Schedule a Consultation <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
@@ -74,16 +112,27 @@ export default function CareerServicesPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Career Services</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Our Career Services
+            </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Comprehensive support at every stage of your career journey.
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             {SERVICES.map((service) => (
-              <div key={service.title} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div
+                key={service.title}
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+              >
                 <div className="relative h-48 bg-slate-200">
-                  <Image src={service.image} alt={service.title} fill className="object-cover" sizes="100vw" />
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                  />
                 </div>
                 <div className="p-8">
                   <div className="flex items-center gap-4 mb-4">
@@ -104,7 +153,9 @@ export default function CareerServicesPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Your Path to Employment</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Your Path to Employment
+            </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               We guide you every step of the way from enrollment to your first day on the job.
             </p>
@@ -136,8 +187,8 @@ export default function CareerServicesPage() {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">For Employers</h2>
               <p className="text-lg text-slate-700 mb-8">
-                Partner with us to access a pipeline of skilled, certified workers ready to contribute 
-                to your team from day one.
+                Partner with us to access a pipeline of skilled, certified workers ready to
+                contribute to your team from day one.
               </p>
               <ul className="space-y-4 mb-8">
                 {EMPLOYER_BENEFITS.map((benefit) => (
@@ -147,12 +198,21 @@ export default function CareerServicesPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/for-employers" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/for-employers"
+                className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 Learn About Hiring <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </div>
             <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/pages/team-collaboration.webp" alt="Employer partnership" fill className="object-cover" sizes="100vw" />
+              <Image
+                src="/images/pages/team-collaboration.webp"
+                alt="Employer partnership"
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
             </div>
           </div>
         </div>
@@ -161,16 +221,25 @@ export default function CareerServicesPage() {
       {/* CTA */}
       <section className="py-20 bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Career Journey?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Ready to Start Your Career Journey?
+          </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Whether you're finishing a program or looking for your next opportunity, we're here to help.
+            Whether you're finishing a program or looking for your next opportunity, we're here to
+            help.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Contact Us <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <a href="tel:+13173141234" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              <Phone className="mr-2 w-5 h-5" /> Call (317) 999-9620
+            <a
+              href="tel:+13173141234"
+              className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
+              <Phone className="mr-2 w-5 h-5" /> Call (463) 240-1404
             </a>
           </div>
         </div>

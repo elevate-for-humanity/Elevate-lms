@@ -12,6 +12,7 @@ import { getEmployerState } from '@/lib/orchestration/state-machine';
 import { StateAwareDashboard, SectionCard } from '@/components/dashboards/StateAwareDashboard';
 import WorkforceLiveWidget from '@/components/employer/WorkforceLiveWidget';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -130,6 +131,7 @@ export default async function EmployerDashboardOrchestrated() {
       lockedSections={stateData.lockedSections}
       alerts={stateData.alerts}
     >
+      <BusinessNetworkCard href="/employer/community" label="Employer community" />
       <section className="mb-7 rounded-2xl border border-cyan-300 bg-gradient-to-r from-slate-950 to-blue-950 p-5 text-white shadow-lg sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>

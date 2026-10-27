@@ -1,7 +1,7 @@
 /**
  * GET /api/health
  *
- * Dependency-aware service health. Northflank readiness uses /api/ready so a
+ * Dependency-aware service health. Container readiness uses /api/ready so a
  * downstream outage is reported truthfully without evicting every runnable pod.
  */
 
@@ -20,13 +20,13 @@ export async function GET() {
   return NextResponse.json(
     {
       service: 'admin',
-      revision: process.env.K_REVISION ?? null,
       status: healthy ? 'healthy' : readiness.ready ? 'degraded' : 'unhealthy',
       healthy,
       ready: readiness.ready,
       canonicalDashboard: '/dashboard',
       healthContract: 'admin-v4',
       commit: readiness.commit,
+      revision: readiness.revision,
       buildId: readiness.buildId,
       builtAt: readiness.builtAt,
       configuration: {

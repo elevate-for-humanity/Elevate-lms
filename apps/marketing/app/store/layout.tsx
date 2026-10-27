@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import StoreClientWrapper from './StoreClientWrapper';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const STORE_URL = 'https://www.elevateforhumanity.org/store';
+const STORE_URL = 'https://store.elevateforhumanity.org/store';
 
 export const metadata: Metadata = {
   title: 'Elevate Store | Workforce Software, Apps, Courses & Licensing',

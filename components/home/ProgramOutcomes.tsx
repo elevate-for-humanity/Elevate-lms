@@ -97,7 +97,7 @@ export default function ProgramOutcomes() {
                       src={program.image}
                       alt={`${program.title} training program`}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-contain  transition-transform duration-500"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
 

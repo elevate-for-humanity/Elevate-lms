@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
+import { browserConfiguration } from '@/lib/devstudio/browser-configuration';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function configuration() {
-  const internalUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  const publicUrl = (
-    process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL ||
-    process.env.STUDIO_BROWSER_PUBLIC_URL ||
-    ''
-  ).replace(/\/$/, '');
-  const secret = process.env.STUDIO_BROWSER_SECRET || '';
-  return { internalUrl, publicUrl, secret, configured: !!(internalUrl && publicUrl && secret) };
+  return browserConfiguration(process.env);
 }
 
 export async function GET(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+  await hydrateProcessEnv();
   const config = configuration();
   if (!config.configured) return NextResponse.json({ configured: false, ready: false });
   try {
@@ -27,7 +23,7 @@ export async function GET(req: NextRequest) {
       signal: AbortSignal.timeout(5000),
     });
     const health = await response.json();
-    return NextResponse.json({ configured: true, ready: response.ok, health });
+    return NextResponse.json({ configured: true, ready: response.ok && health?.ready === true, health });
   } catch (error) {
     logger.warn('[studio-browser] Health check failed', {
       error: error instanceof Error ? error.message : String(error),
@@ -43,6 +39,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+  await hydrateProcessEnv();
   const config = configuration();
   if (!config.configured) {
     return NextResponse.json(

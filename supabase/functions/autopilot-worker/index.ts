@@ -5,21 +5,6 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const AUTOPILOT_SECRET = Deno.env.get('AUTOPILOT_SECRET')!;
 const SLACK_WEBHOOK_URL = Deno.env.get('SLACK_WEBHOOK_URL') || '';
-const GOOGLE_DEPLOY_WEBHOOK_URL = Deno.env.get('GOOGLE_DEPLOY_WEBHOOK_URL') || '';
-const GOOGLE_DEPLOY_WEBHOOK_SECRET = Deno.env.get('GOOGLE_DEPLOY_WEBHOOK_SECRET') || '';
-
-async function triggerGoogleDeployment(serviceId: string) {
-  if (!GOOGLE_DEPLOY_WEBHOOK_URL || !GOOGLE_DEPLOY_WEBHOOK_SECRET) {
-    throw new Error('Google deployment webhook is not configured');
-  }
-  const response = await fetch(GOOGLE_DEPLOY_WEBHOOK_URL, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json','Authorization':`Bearer ${GOOGLE_DEPLOY_WEBHOOK_SECRET}`},
-    body: JSON.stringify({service:serviceId, source:'supabase-autopilot'}),
-  });
-  if (!response.ok) throw new Error(`Google deployment trigger failed for ${serviceId}: ${response.status}`);
-  return response.json().catch(()=>({}));
-}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -59,7 +44,6 @@ async function notifySlack(text: string) {
     // Notification failures must not fail the worker task.
   }
 }
-
 
 // =============================================
 // Task Management
@@ -172,22 +156,11 @@ async function runTask(task: any) {
       }
 
       case 'redeploy': {
-        const [lmsRes, adminRes] = await Promise.allSettled([
-          triggerGoogleDeployment('lms'),
-          triggerGoogleDeployment('admin'),
-        ]);
-        const lmsOk = lmsRes.status === 'fulfilled';
-        const adminOk = adminRes.status === 'fulfilled';
-        if (!lmsOk || !adminOk) {
-          const detail = [
-            lmsRes.status === 'rejected' ? `LMS: ${lmsRes.reason?.message ?? lmsRes.reason}` : null,
-            adminRes.status === 'rejected' ? `Admin: ${adminRes.reason?.message ?? adminRes.reason}` : null,
-          ].filter(Boolean).join(' | ');
-          throw new Error(`Google deploy trigger incomplete. ${detail}`);
-        }
-        await log('worker', 'deploy', 'ok', `Google builds triggered — LMS:${lmsOk} Admin:${adminOk}`, undefined, task.id);
-        await notifySlack(`✅ Task #${task.id}: Google builds triggered (LMS:${lmsOk} Admin:${adminOk})`);
-        break;
+        // Legacy redeploy tasks must never invoke Northflank. Dispatch Google
+        // using the approved, service-specific authenticated release workflow.
+        // This worker cannot establish revision/traffic acceptance and must
+        // not claim a successful deployment.
+        throw new Error('Legacy autopilot redeploy disabled: use Google Cloud Run release workflows on main.');
       }
 
       case 'cache_purge': {

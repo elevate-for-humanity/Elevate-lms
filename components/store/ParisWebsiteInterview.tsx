@@ -179,7 +179,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
                 placeholder={current.placeholder}
                 rows={5}
                 autoFocus
-                className="min-h-[150px] flex-1 resize-none rounded-2xl border border-slate-300 bg-slate-50 px-5 py-4 text-base font-medium leading-7 text-slate-950 outline-none placeholder:text-slate-400 focus:border-slate-950 focus:bg-white focus:ring-2 focus:ring-slate-950/10"
+                className="min-h-[150px] flex-1 resize-none rounded-2xl border border-slate-300 bg-slate-50 px-5 py-4 text-base font-medium leading-7 text-slate-950 outline-none placeholder:text-slate-600 focus:border-slate-950 focus:bg-white focus:ring-2 focus:ring-slate-950/10"
               />
               <button
                 type="button"

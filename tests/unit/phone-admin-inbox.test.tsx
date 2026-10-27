@@ -81,7 +81,7 @@ describe('Admin call and voicemail oversight', () => {
   });
   it('renders the caller, responsible holder, recording, transcript and shared callback status', async () => {
     const html = renderToStaticMarkup(await PhoneInboxPage({}));
-    for (const expected of ['Josanna George', '+13175550100', 'contacted', 'Please call me about esthetician', 'message.mp3', 'Linked call:']) expect(html).toContain(expected);
+    for (const expected of ['Josanna George', '+13175550100', 'contacted', 'Please call me about esthetician', '/api/communications/recordings/voicemail/vm', 'Linked call:']) expect(html).toContain(expected);
     expect(html).toContain('assigned program holder remains responsible');
     expect(html).not.toContain('Other tenant');
   });

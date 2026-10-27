@@ -305,7 +305,7 @@ export const ENROLLMENT_STEPS: GuideStep[] = [
   {
     title: 'Step 2: Check Eligibility',
     script:
-      "Great! Now let's check if you qualify for FREE training through WIOA funding. Most adults do! Answer a few quick questions.",
+      "Next, review whether your selected program has a verified funding pathway and complete the responsible agency's eligibility process. This screening does not approve WIOA funding.",
     action: { label: 'Check Eligibility', href: '/eligibility' },
   },
   {

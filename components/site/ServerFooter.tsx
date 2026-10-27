@@ -155,7 +155,7 @@ export default function ServerFooter() {
             <span>WorkOne Workforce Partner</span>
           </div>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
-            <strong className="text-white">Funding notice:</strong> Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
+            <strong className="text-white">Funding notice:</strong> Apprenticeship programs are self-pay only. Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
           </p>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
             HQ: {formatHeadquartersLine()} — administrative and enrollment support. Hands-on training
@@ -235,7 +235,7 @@ export default function ServerFooter() {
               <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">
                 Main: {PLATFORM_DEFAULTS.mainPhone}
               </a>
-              <a href="tel:+13173143757" className="hover:text-white">Technical Support: {PLATFORM_DEFAULTS.supportPhone}</a>
+              <a href="tel:+14632401404" className="hover:text-white">Technical Support: {PLATFORM_DEFAULTS.supportPhone}</a>
               <span className="text-white">|</span>
               <a href="mailto:info@elevateforhumanity.org" className="hover:text-white">
                 info@elevateforhumanity.org

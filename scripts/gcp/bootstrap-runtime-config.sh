@@ -32,4 +32,3 @@ for COMPONENT in marketing admin lms store ultimate-worker studio-browser; do
   done
 done
 printf 'Google runtime configuration resources and scoped deployment access prepared. Run the one-time import workflow for each component.\n'
-

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Enterprise Infrastructure Demo',
   keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'See how workforce boards and regional systems govern programs without direct operational involvement.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/demo/enterprise',
+    canonical: 'https://store.elevateforhumanity.org/store/demo/enterprise',
   },
 };
 

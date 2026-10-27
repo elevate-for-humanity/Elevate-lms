@@ -40,7 +40,7 @@ jobs:
       (
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
         contains(
-          fromJSON('["RUN COURSE MEDIA CANARY: barber-apprenticeship","RUN COURSE MEDIA CANARY: cosmetology-apprenticeship","RUN COURSE MEDIA CANARY: hvac-technician","RUN COURSE MEDIA FULL: barber-apprenticeship","RUN COURSE MEDIA FULL: cosmetology-apprenticeship","RUN COURSE MEDIA FULL: hvac-technician"]'),
+          fromJSON('["RUN COURSE MEDIA CANARY: barber-apprenticeship","RUN COURSE MEDIA FULL: barber-apprenticeship","RUN COURSE MEDIA CANARY: cosmetology-apprenticeship","RUN COURSE MEDIA FULL: cosmetology-apprenticeship","RUN COURSE MEDIA CANARY: hvac-technician","RUN COURSE MEDIA FULL: hvac-technician"]'),
           github.event.issue.title
         )
       )

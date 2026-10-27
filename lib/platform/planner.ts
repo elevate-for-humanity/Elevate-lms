@@ -10,6 +10,7 @@
  */
 
 import { buildUnifiedEngineeringStages } from '@/lib/devstudio/engineering-runner/plan';
+import { affirmativeActionText, isReadOnlyRequest, prohibitsToolUse } from '@/lib/ai/command-intent';
 
 export type StepStatus =
   | 'pending'
@@ -319,6 +320,24 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
     },
   ],
 
+  read_only_course_audit: () => [
+    {
+      id: 's1', order: 1, title: 'Course production status',
+      command: 'Inspect current course status', status: 'pending',
+      expected_output: 'Saved course build, worker claim, heartbeat, and checkpoint evidence',
+    },
+    {
+      id: 's2', order: 2, title: 'Course Builder health',
+      command: 'Inspect Course Builder health checks', status: 'pending',
+      expected_output: 'Current Course Builder checks and specific failures',
+    },
+    {
+      id: 's3', order: 3, title: 'Studio and browser readiness',
+      command: 'Check Studio provider health status', status: 'pending',
+      expected_output: 'Current Studio provider and browser runtime readiness',
+    },
+  ],
+
   read_only_studio_diagnostic: () => [
     {
       id: 's1',
@@ -335,7 +354,6 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
       title: 'Platform health',
       command: 'Check current platform health status',
       status: 'pending',
-      depends_on: ['s1'],
       expected_output: 'Current platform health result',
       verification_rule: 'The read-only platform health tool must return a current result.',
     },
@@ -346,7 +364,6 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
       command:
         'Inspect current Studio workflow status. Read-only: do not modify, start, stop, deploy, publish, send, upload, or delete anything.',
       status: 'pending',
-      depends_on: ['s2'],
       expected_output: 'Current workflow state from a registered read-only tool',
       verification_rule: 'The read-only workflow inspector must return evidence without mutation.',
     },
@@ -387,31 +404,39 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 };
 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
-  const g = goal.toLowerCase();
-  const explicitReadOnly = /\bread[- ]?only\b/.test(g);
+  if (prohibitsToolUse(goal)) throw new Error('Tool execution is disabled by this request. Use conversational chat.');
+  const g = affirmativeActionText(goal).toLowerCase();
+  const explicitReadOnly = isReadOnlyRequest(goal);
+  const explicitReadOnlyStudioDiagnostic =
+    explicitReadOnly &&
+    /\b(studio|provider|router|tool(?:-response)?|platform|system|health|diagnostic)\b/.test(g);
   const affirmativeDeployment =
     /\bdeploy(?:ment|ing|ed)?\b/.test(g) &&
     !explicitReadOnly &&
     !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,3}deploy(?:ment|ing|ed)?\b/.test(g);
   let steps: PlanStep[];
+  // Product mentions inside a repository repair must not replace the owner's
+  // complete engineering goal with a single product's operational template.
   const compoundEngineeringExecution =
+    !explicitReadOnly &&
     /\b(code|codebase|repo|repository|commit|source|files? changed|regression tests?|typecheck|build)\b/.test(
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
-  if (explicitReadOnly && /\bstudio\b/.test(g) && /\b(diagnostic|provider|router|tool-response)\b/.test(g)) {
+  const courseAudit = /\b(course\s*builder|course|lesson)s?\b/.test(g) &&
+    (explicitReadOnly
+      ? /\b(audit|inspect|diagnostic|status|health)\b/.test(g)
+      : /\b(audit|inspect|diagnose)\b/.test(g) &&
+        !/\b(fix|repair|start|resume|publish|generate|create|build)\b/.test(g));
+  if (courseAudit) {
+    steps = GOAL_TEMPLATES.read_only_course_audit!({});
+  } else if (explicitReadOnlyStudioDiagnostic) {
     steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
-  } else if (explicitReadOnly) {
-    // Keep the exact read scope ahead of every template that can mutate state.
-    // A deployment prohibition must never become a deployment/snapshot plan.
-    steps = [{ id: 's1', order: 1, title: 'Execute requested outcome', command: goal,
-      status: 'pending', expected_output: 'Read-only evidence for the requested scope',
-      verification_rule: 'Return current evidence using read-only tools; do not mutate state.' }];
-  } else if (g.includes('quickbooks')) {
+  } else if (g.includes('quickbooks') && !compoundEngineeringExecution) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})
       : GOAL_TEMPLATES.quickbooks_connection!({});
-  } else if (g.includes('enrollment') || g.includes('enroll')) {
+  } else if ((g.includes('enrollment') || g.includes('enroll')) && !compoundEngineeringExecution) {
     steps = GOAL_TEMPLATES.fix_enrollment_failures!({});
   } else if (compoundEngineeringExecution) {
     const unifiedStages = buildUnifiedEngineeringStages(goal);

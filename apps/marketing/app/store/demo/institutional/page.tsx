@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description:
     'See how institutions operate multiple programs while maintaining clean, auditable records.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/demo/institutional',
+    canonical: 'https://store.elevateforhumanity.org/store/demo/institutional',
   },
 };
 

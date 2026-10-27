@@ -3,6 +3,7 @@ import { UltimateAppendixAStandardsSource } from '../credential/appendix-a-sourc
 import { registeredInstructionalSources } from '../credential/registered-instructional-sources';
 import { getRegisteredProgramStandardByProfileId } from '@/lib/apprenticeship/registered-program-contract';
 import type { UltimateCredentialProfile } from './types';
+import { classifyCompetency } from '../instructional/competency-classification.mjs';
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -12,7 +13,7 @@ type CompetencyRow = {
 };
 
 function competencyType(row: CompetencyRow, regulated: boolean) {
-  if (!regulated) return 'knowledge' as const;
+  if (!regulated) return classifyCompetency(row.category || row.source_label).type;
   const value = `${row.category ?? ''} ${row.source_label ?? ''}`;
   if (/trim|clean|covering|cut|shav|sanit|disinfect|chemical|color/i.test(value)) {
     return 'practical_skill' as const;
@@ -26,41 +27,56 @@ export async function hydrateUltimateProfileSources(
   courseId: string,
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
+  // An explicitly selected owner reference is durable course data. Loading or
+  // resuming a course must never silently discard its approved presentation.
   const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
+  // Teaching modality does not waive the registered mentor performance requirement.
+  if (registeredContract) {
+    const authority = new Map(registeredContract.standard.competencies.map(c => [c.id, c]));
+    profile = {...profile, competencies: profile.competencies.map(c => {
+      const standard = authority.get(c.id);
+      return standard ? {...c, type: competencyType({category:standard.category}, true)} : c;
+    })};
+  }
   const registeredSources = registeredContract
     ? registeredInstructionalSources(registeredContract.canonicalProgramSlug)
     : [];
+  if ((profile as any).sourcePolicy === 'frozen-reference-v1') return profile;
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id,title,learning_objectives,content')
+    .select('id,slug,title,learning_objectives,content,content_json')
     .eq('course_id', courseId)
     .order('order_index');
   if (error) throw error;
 
   const competencyIds = new Set(profile.competencies.map((competency) => competency.id));
   const canonicalSources = (lessons ?? [])
-    .filter((lesson: any) => competencyIds.has(lesson.id))
-    .map((lesson: any) => {
+    .flatMap((lesson: any) => {
+      // Preserve the exact competency identifier used by the instructional
+      // generator. A canonical UUID, slug, and content_json key may differ.
+      const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId]
+        .filter((key): key is string => typeof key === 'string' && competencyIds.has(key));
+      if (!keys.length) return [];
       const objectives = Array.isArray(lesson.learning_objectives)
-        ? lesson.learning_objectives.filter(Boolean).join('; ')
-        : '';
-      const content =
-        typeof lesson.content === 'string'
-          ? lesson.content
-          : lesson.content
-            ? JSON.stringify(lesson.content)
-            : '';
-      const text = [
-        lesson.title ? `Lesson: ${lesson.title}` : '',
+        ? lesson.learning_objectives.filter(Boolean).join('; ') : '';
+      // The source reader consumes a JSON envelope. Plain authored text must
+      // enter that same schema instead of becoming invalid transport on resume.
+      // Historical repair evidence remains stored, but must not become a
+      // competing teaching source after the current lesson has been corrected.
+      const currentContent = lesson.content && typeof lesson.content === 'object'
+        ? Object.fromEntries(Object.entries(lesson.content).filter(([key]) =>
+          !['production_content_repairs', 'previous_sanitation_html'].includes(key)))
+        : lesson.content;
+      const content = typeof currentContent === 'string'
+        ? (currentContent.trim() ? JSON.stringify({html:currentContent}) : '')
+        : currentContent ? JSON.stringify(currentContent) : '';
+      // Titles and objectives alone are not an authorized teaching source.
+      if (!content.trim()) return [];
+      const text = [lesson.title ? `Lesson: ${lesson.title}` : '',
         objectives ? `Learning objectives: ${objectives}` : '',
-        content ? `Authorized course content: ${content}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n');
-      return text.trim() ? { id: `course-lesson:${lesson.id}`, text } : null;
-    })
-    .filter((source): source is { id: string; text: string } => Boolean(source));
-
+        `Authorized course content: ${content}`].filter(Boolean).join('\\n');
+      return [...new Set(keys)].map(key => ({ id: `course-lesson:${key}`, text }));
+    });
   if (!canonicalSources.length && !registeredSources.length) return profile;
   const sources = new Map(registeredSources.map((source) => [source.id, source]));
   for (const source of profile.instructionalSources ?? []) sources.set(source.id, source);
@@ -171,13 +187,10 @@ export async function buildUltimateProfile(
       description: row.description || row.source_label || `Demonstrate competency ${index + 1}`,
       type: competencyType(row, Boolean(standard)),
       authorityRequirementIds: standard && row.competency_key ? [row.competency_key] : [],
-      requiresDemonstration: Boolean(standard),
-      requiresPracticalEvidence: Boolean(standard),
-      criticalSafetyCompetency: standard
-        ? /clean|sanit|disinfect|protective|safety/i.test(
-            `${row.category ?? ''} ${row.description ?? ''}`,
-          )
-        : false,
+      requiresDemonstration: Boolean(standard) || classifyCompetency(row.category || row.source_label).requiresDemonstration,
+      requiresPracticalEvidence: Boolean(standard) || classifyCompetency(row.category || row.source_label).requiresPracticalEvidence,
+      criticalSafetyCompetency: classifyCompetency(row.category || row.source_label).criticalSafetyCompetency ||
+        Boolean(standard && /clean|sanit|disinfect|protective|safety/i.test(`${row.category ?? ''} ${row.description ?? ''}`)),
     })),
   });
 }

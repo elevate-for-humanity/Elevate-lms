@@ -14,6 +14,8 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,12 +36,8 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const mode = (process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto').toLowerCase();
-  const hasGitHub = Boolean(process.env.GITHUB_TOKEN);
   const keys = [
     'OPENHANDS_API_KEY',
-    'GITHUB_TOKEN',
-    'ELEVATE_LLM_URL',
-    'ELEVATE_LLM_SECRET',
     'STUDIO_BROWSER_URL',
     'STUDIO_BROWSER_PUBLIC_URL',
     'STUDIO_BROWSER_SECRET',
@@ -49,32 +47,45 @@ export async function GET(request: NextRequest) {
       keys.map(async (key) => [key, await getDecryptedPlatformSecret(key).catch(() => undefined)]),
     ),
   ) as Record<(typeof keys)[number], string | undefined>;
-  const [ai, cloudflareProbe] = await Promise.all([
+  const [ai, cloudflareProbe, googleReachable, githubProbe] = await Promise.all([
     resolveAIRuntimeState(),
     probeCloudflareWorkersAI(),
+    isGoogleDeploymentConfigured(),
+    (async () => {
+      try {
+        const token = await getGitHubToken();
+        if (!token) return {ok:false, detail:'GitHub authentication is not configured'};
+        const response = await fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main', {
+          headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},
+          redirect:'error',cache:'no-store',signal:AbortSignal.timeout(8000),
+        });
+        if (!response.ok) return {ok:false,detail:`GitHub repository probe failed (HTTP ${response.status})`};
+        const ref = await response.json();
+        return /^[a-f0-9]{40}$/.test(ref.object?.sha ?? '')
+          ? {ok:true,detail:'Repository main ref verified; write and dispatch authority require an actual operation'}
+          : {ok:false,detail:'GitHub repository probe returned an invalid main ref'};
+      } catch { return {ok:false,detail:'GitHub authentication or repository probe unavailable'}; }
+    })(),
   ]);
-  const { xai: hasXAI, groq: hasGroq, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
+  const {
+    xai: hasXAI,
+    groq: hasGroq,
+    gemini: hasGemini,
+    openai: hasOpenAI,
+    anthropic: hasAnthropic,
+  } = ai.providers;
   const hasCloudflare = cloudflareProbe.reachable;
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
-  const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
-  const elevateLlmUrl =
-    selectedSecrets.ELEVATE_LLM_URL || process.env.ELEVATE_LLM_URL || '';
-  const elevateLlmSecret =
-    selectedSecrets.ELEVATE_LLM_SECRET || process.env.ELEVATE_LLM_SECRET || '';
-  const hasElevateOwnedAI = Boolean(elevateLlmUrl && elevateLlmSecret);
+  const hasElevateOwnedAI = ai.elevate;
   const studioBrowserUrl = (
     selectedSecrets.STUDIO_BROWSER_URL ||
     process.env.STUDIO_BROWSER_URL ||
     ''
   ).replace(/\/$/, '');
   const studioBrowserPublicUrl =
-    selectedSecrets.STUDIO_BROWSER_PUBLIC_URL ||
-    process.env.STUDIO_BROWSER_PUBLIC_URL ||
-    '';
+    selectedSecrets.STUDIO_BROWSER_PUBLIC_URL || process.env.STUDIO_BROWSER_PUBLIC_URL || '';
   const studioBrowserSecret =
-    selectedSecrets.STUDIO_BROWSER_SECRET ||
-    process.env.STUDIO_BROWSER_SECRET ||
-    '';
+    selectedSecrets.STUDIO_BROWSER_SECRET || process.env.STUDIO_BROWSER_SECRET || '';
   const browserConfigured = Boolean(
     studioBrowserUrl && studioBrowserPublicUrl && studioBrowserSecret,
   );
@@ -98,7 +109,7 @@ export async function GET(request: NextRequest) {
   }
 
   const hasAnyAI = ai.anyConfigured;
-  const githubOk = hasGitHub || dbGitHub;
+  const githubOk = githubProbe.ok;
 
   const checks: Check[] = [];
 
@@ -107,13 +118,13 @@ export async function GET(request: NextRequest) {
     checks.push({
       name: 'Devcontainer',
       status: 'fail',
-      detail: 'github-only mode but GITHUB_TOKEN is missing',
+      detail: 'github-only mode but GitHub repository access was not verified',
     });
   } else if (mode === 'github-only') {
     checks.push({
       name: 'Devcontainer',
       status: 'ok',
-      detail: 'mode: github-only — GitHub writes enabled',
+      detail: 'mode: github-only — GitHub repository read access verified',
     });
   } else if (mode === 'local-only') {
     checks.push({
@@ -125,25 +136,23 @@ export async function GET(request: NextRequest) {
     checks.push({
       name: 'Devcontainer',
       status: 'ok',
-      detail: `mode: auto — ${githubOk ? 'GitHub writes enabled' : 'local fallback (no GITHUB_TOKEN)'}`,
+      detail: `mode: auto — ${githubOk ? 'GitHub repository read verified' : 'GitHub repository access unavailable'}`,
     });
   }
 
   // ── GitHub token ───────────────────────────────────────────────────────────
   checks.push({
-    name: 'GitHub Token',
+    name: 'GitHub Authorization',
     status: githubOk ? 'ok' : 'warn',
-    detail: githubOk
-      ? 'configured — workflow dispatch and devcontainer writes available'
-      : 'not configured — deploy buttons and devcontainer saves will fail',
+    detail: githubProbe.detail,
   });
 
   checks.push({
     name: 'Elevate Owned AI',
     status: hasElevateOwnedAI ? 'ok' : 'fail',
     detail: hasElevateOwnedAI
-      ? 'ELEVATE_LLM_URL and ELEVATE_LLM_SECRET configured — no-paid default inference available'
-      : 'Elevate-owned AI is not configured; automatic Dev Studio reasoning cannot run without external providers',
+      ? 'Selected Elevate-owned model responded to authenticated discovery; command results require independent verification'
+      : 'Selected Elevate-owned model is unavailable or failed authenticated discovery; configured external inference remains separate',
   });
 
   checks.push({
@@ -151,7 +160,7 @@ export async function GET(request: NextRequest) {
     status: githubOk && hasElevateOwnedAI ? 'ok' : 'fail',
     detail:
       githubOk && hasElevateOwnedAI
-        ? 'Elevate-owned branch/PR engineering path is available; OpenHands is optional'
+        ? 'Elevate-owned inference discovery and repository reads passed; completed engineering requires independent execution evidence'
         : 'Internal engineering requires both Elevate-owned AI and GitHub authorization',
   });
 
@@ -184,11 +193,7 @@ export async function GET(request: NextRequest) {
 
   checks.push({
     name: 'Cloudflare Workers AI',
-    status: cloudflareProbe.reachable
-      ? 'ok'
-      : cloudflareProbe.configured
-        ? 'fail'
-        : 'warn',
+    status: cloudflareProbe.reachable ? 'ok' : cloudflareProbe.configured ? 'fail' : 'warn',
     detail: cloudflareProbe.detail,
   });
 
@@ -203,18 +208,18 @@ export async function GET(request: NextRequest) {
   // ── Upload storage ─────────────────────────────────────────────────────────
   const hasObjectStorage = Boolean(
     (process.env.ELEVATE_MEDIA_ENDPOINT || process.env.S3_ENDPOINT || process.env.R2_ENDPOINT) &&
-      (process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
-        process.env.S3_ACCESS_KEY_ID ||
-        process.env.R2_ACCESS_KEY ||
-        process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
-      (process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
-        process.env.S3_SECRET_ACCESS_KEY ||
-        process.env.R2_SECRET_KEY ||
-        process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
-      (process.env.ELEVATE_MEDIA_BUCKET ||
-        process.env.S3_BUCKET ||
-        process.env.R2_BUCKET ||
-        process.env.CLOUDFLARE_R2_BUCKET_NAME),
+    (process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
+      process.env.S3_ACCESS_KEY_ID ||
+      process.env.R2_ACCESS_KEY ||
+      process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
+    (process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
+      process.env.S3_SECRET_ACCESS_KEY ||
+      process.env.R2_SECRET_KEY ||
+      process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
+    (process.env.ELEVATE_MEDIA_BUCKET ||
+      process.env.S3_BUCKET ||
+      process.env.R2_BUCKET ||
+      process.env.CLOUDFLARE_R2_BUCKET_NAME),
   );
   checks.push({
     name: 'Upload Storage',
@@ -225,17 +230,12 @@ export async function GET(request: NextRequest) {
   });
 
   // ── Deploy identity ────────────────────────────────────────────────────────
-  const hasGoogleRuntime=Boolean(process.env.GOOGLE_CLOUD_PROJECT||process.env.GCP_PROJECT||process.env.K_SERVICE);
-  const deployReady=hasGoogleRuntime||githubOk;
-
   checks.push({
     name: 'Deploy Identity',
-    status: deployReady ? 'ok' : 'warn',
-    detail: deployReady
-      ? githubOk
-        ? 'GitHub Actions dispatch available'
-        : 'Google runtime identity available'
-      : 'no Google runtime identity or GitHub token — deploy buttons will fail',
+    status: googleReachable ? 'ok' : 'fail',
+    detail: googleReachable
+      ? 'Google deployment workflow is active and readable with the configured credential; dispatch permission is verified when requested'
+      : 'Google deployment workflow is unreachable, inactive, or the configured GitHub credential was rejected',
   });
 
   const failCount = checks.filter((c) => c.status === 'fail').length;
@@ -245,6 +245,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ok: failCount === 0 && hasElevateOwnedAI && browserReachable && githubOk,
     summary: { okCount, warnCount, failCount },
+    message: checks.filter((check) => check.status === 'fail').map((check) => `${check.name}: ${check.detail}`).join(' | ') || 'Studio checks completed. Review warnings before execution.',
     checks,
     meta: {
       devcontainerMode: mode,

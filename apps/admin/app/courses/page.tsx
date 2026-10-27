@@ -27,7 +27,7 @@ export default async function CoursesPage() {
   const db = await requireAdminClient();
 
   const [{ data: programs, error: programsError }, { data: enrollments }] = await Promise.all([
-    db.from('programs').select('id, title, name, status, is_active, is_published, total_hours').order('created_at', { ascending: false }).limit(100),
+    db.from('programs').select('id, title, name, status, is_active, is_published:published, total_hours').order('created_at', { ascending: false }).limit(100),
     db.from('program_enrollments').select('program_id', { count: 'exact', head: true }),
   ]);
 

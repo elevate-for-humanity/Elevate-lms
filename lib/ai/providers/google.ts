@@ -56,7 +56,8 @@ export class GoogleProvider implements AIProvider {
         if (!response.ok) {
           const body = await response.text().catch(() => '');
           lastError = new Error(`Google ${model} returned ${response.status}${body ? `: ${body.slice(0, 240)}` : ''}`);
-          if ([404, 429, 503].includes(response.status)) continue;
+          if (response.status === 429) throw lastError;
+          if ([404, 503].includes(response.status)) continue;
           throw lastError;
         }
 
@@ -82,6 +83,7 @@ export class GoogleProvider implements AIProvider {
         };
       } catch (error) {
         lastError = error as Error;
+        if (lastError.message.includes(' returned 429')) throw lastError;
       }
     }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -347,7 +348,7 @@ export default function NewWorkflowPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-50">
       {/* Hero */}
       <div className="relative h-[220px] w-full overflow-hidden">
-        <Image src="/images/hero/hero-barber.webp" alt="New Workflow" fill className="object-cover" priority sizes="100vw" />
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src="/images/hero/hero-barber.webp" alt="New Workflow" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/80 to-violet-900/60" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-4xl mx-auto px-6 w-full">

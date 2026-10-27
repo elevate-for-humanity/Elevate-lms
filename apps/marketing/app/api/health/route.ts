@@ -1,11 +1,12 @@
 /**
  * GET /api/health
  *
- * Dependency-aware service health. Northflank readiness uses /api/ready so a
+ * Dependency-aware service health. Container readiness uses /api/ready so a
  * downstream outage is reported truthfully without evicting every runnable pod.
  */
 
 import { NextResponse } from 'next/server';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { checkSupabaseHealth, getRuntimeReadiness } from '@/lib/health/service-health';
 
 export const runtime = 'nodejs';
@@ -19,13 +20,13 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      service: 'marketing',
-      revision: process.env.K_REVISION ?? null,
+      service: getPublicRuntimeService(),
       status: healthy ? 'healthy' : readiness.ready ? 'degraded' : 'unhealthy',
       healthy,
       ready: readiness.ready,
-      healthContract: 'marketing-v4',
+      healthContract: `${getPublicRuntimeService()}-v4`,
       commit: readiness.commit,
+      revision: readiness.revision,
       github: process.env.GITHUB_SHA ?? 'unknown',
       publicCommit: process.env.NEXT_PUBLIC_GIT_SHA ?? 'unknown',
       buildId: readiness.buildId,

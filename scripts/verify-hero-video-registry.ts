@@ -16,6 +16,12 @@ const expectedPageKeys = [
   'cna',
   'cdl-training',
   'hvac-technician',
+  'medical-assistant',
+  'phlebotomy',
+  'cybersecurity',
+  'excel',
+  'osha-10',
+  'tax-preparation',
   'how-it-works',
   'for-providers',
   'platform',
@@ -70,7 +76,7 @@ for (const pageKey of expectedPageKeys) {
 
   const expectedSlug = pageKey === 'home'
     ? '/'
-    : pageKey === 'barber-apprenticeship' || pageKey === 'cna' || pageKey === 'cdl-training' || pageKey === 'hvac-technician'
+    : pageKey === 'barber-apprenticeship' || pageKey === 'cna' || pageKey === 'cdl-training' || pageKey === 'hvac-technician' || pageKey === 'medical-assistant' || pageKey === 'phlebotomy' || pageKey === 'cybersecurity' || pageKey === 'excel' || pageKey === 'osha-10' || pageKey === 'tax-preparation'
       ? `/programs/${pageKey}`
       : pageKey === 'for-providers'
         ? '/for-providers'

@@ -6,10 +6,10 @@
  *
  * Supported playbooks:
  *   auth-gap          — adds apiAuthGuard to unprotected API routes
- *   env-gap           — checks whether Google environment sync is configured
+ *   env-gap           — checks whether Northflank environment sync is configured
  *   devcontainer-readonly — rotates/sets GITHUB_TOKEN + switches mode to github-only
- *   stale-image       — triggers Google builds for the LMS/Admin services
- *   google-env    — reports Google env sync status
+ *   stale-image       — triggers Northflank builds for the LMS/Admin services
+ *   northflank-env    — reports Northflank env sync status
  *
  * POST body: { playbook: string; dryRun?: boolean; options?: Record<string, unknown> }
  * Response:  { ok, playbook, dryRun, actions: ActionResult[], summary, timestamp }
@@ -20,7 +20,7 @@ import { spawn } from 'child_process';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { getGoogleServices,getGoogleService } from '@/lib/google/runtime';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -113,10 +113,14 @@ async function playbookAuthGap(dryRun: boolean): Promise<ActionResult[]> {
   return actions;
 }
 
-/**
- * env-gap: verify Google API configuration is present.
- */
-async function playbookEnvGap(_dryRun:boolean):Promise<ActionResult[]>{const actions:ActionResult[]=[];const results=await Promise.all(getGoogleServices().map(async s=>{try{return (await getGoogleService(s)).healthy}catch{return false}}));actions.push(results.every(Boolean)?ok('google-runtime','All Google production services are healthy'):error('google-runtime',results.filter(Boolean).length+'/'+results.length+' Google services healthy'));return actions;}
+/** Google deployment configuration check, never source-host dispatch. */
+async function playbookEnvGap(_dryRun: boolean): Promise<ActionResult[]> {
+  return [{
+    action: 'google-deploy-config',
+    status: 'skipped',
+    detail: 'Google Cloud Run deploys use authenticated GitHub workflows; a live dispatch verifies credentials. No Northflank credential is required.',
+  }];
+}
 
 /**
  * devcontainer-readonly: switch DEVSTUDIO_DEVCONTAINER_MODE to github-only
@@ -139,7 +143,7 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
   }
 
   if (!dryRun) {
-    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in the Google secret group, then redeploy'));
+    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in Google Secret Manager, then deploy Google Admin'));
   } else {
     actions.push(skipped('set-mode', `dry-run: would set DEVSTUDIO_DEVCONTAINER_MODE=github-only (currently: ${currentMode})`));
   }
@@ -147,15 +151,36 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
   return actions;
 }
 
-/**
- * stale-image: trigger Google builds for LMS/Admin.
- */
-async function playbookStaleImage(_dryRun:boolean,_options:Record<string,unknown>):Promise<ActionResult[]>{return [skipped('google-deploy','Production images are deployed from GitHub main to Google; direct provider build triggers are disabled.')];}
+/** Dispatch only the approved Google build workflows. */
+async function playbookStaleImage(dryRun: boolean, options: Record<string, unknown>): Promise<ActionResult[]> {
+  const requested = Array.isArray(options.services) ? options.services : ['admin'];
+  const actions: ActionResult[] = [];
+  for (const service of requested) {
+    if (service !== 'admin' && service !== 'marketing') {
+      actions.push(error('google-deploy', 'Unsupported Google self-build target: ' + String(service)));
+      continue;
+    }
+    if (dryRun) {
+      actions.push(skipped('google-deploy', 'dry-run: would dispatch Google ' + service));
+      continue;
+    }
+    try {
+      await dispatchGoogleDeployment(service);
+      actions.push(ok('google-deploy', service + ' workflow dispatched (live revision not yet verified)'));
+    } catch (err) {
+      console.error('Google deployment dispatch failed', err);
+      actions.push(error('google-deploy', 'Google dispatch failed; inspect server logs for details'));
+    }
+  }
+  return actions;
+}
 
 /**
- * google-env: read-only Google environment readiness check.
+ * northflank-env: read-only Northflank environment readiness check.
  */
-async function playbookGoogleEnv():Promise<ActionResult[]>{return playbookEnvGap(true);}
+async function playbookNorthflankEnv(): Promise<ActionResult[]> {
+  return playbookEnvGap(true);
+}
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 
@@ -164,7 +189,7 @@ const PLAYBOOKS: Record<string, (dryRun: boolean, options: Record<string, unknow
   'env-gap':                (d) => playbookEnvGap(d),
   'devcontainer-readonly':  (d) => playbookDevcontainerReadonly(d),
   'stale-image':            (d, o) => playbookStaleImage(d, o),
-  'google-env':             () => playbookGoogleEnv(),
+  'northflank-env':         () => playbookNorthflankEnv(),
 };
 
 // ── Handlers ──────────────────────────────────────────────────────────────────
@@ -217,10 +242,10 @@ export async function GET(request: NextRequest) {
     method: 'POST',
     playbooks: {
       'auth-gap':              'Scan for unprotected API routes; mark with TODO in non-dry-run',
-      'env-gap':               'Check Google env sync configuration',
-      'devcontainer-readonly': 'Verify GITHUB_TOKEN and remind operator to set github-only mode in Google',
-      'stale-image':           'Trigger Google builds for services',
-      'google-env':        'Read-only Google env readiness check',
+      'env-gap':               'Check Google deployment configuration',
+      'devcontainer-readonly': 'Verify GITHUB_TOKEN and set github-only mode in Google',
+      'stale-image':           'Dispatch approved Google Cloud Run build workflows',
+      'northflank-env':        'Read-only Google deployment readiness guidance',
     },
     body: {
       playbook: 'string (required)',

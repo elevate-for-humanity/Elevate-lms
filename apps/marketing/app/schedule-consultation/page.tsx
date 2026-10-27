@@ -167,7 +167,7 @@ export default function ScheduleConsultationPage() {
       setGoogleCalendarUrl(payload.googleCalendarUrl || '');
       setConfirmed(true);
     } catch {
-      setError('Something went wrong. Please try again or call us at (317) 999-9620.');
+      setError('Something went wrong. Please try again or call us at (463) 240-1404.');
     } finally {
       setSubmitting(false);
     }

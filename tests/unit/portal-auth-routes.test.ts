@@ -19,7 +19,7 @@ describe('deployed portal middleware auth coverage', () => {
     '/lms/courses',
     '/apprentice',
     '/host-shop/dashboard',
-    '/parent-portal/dashboard',
+    '/parent-portal',
     '/employer',
     '/workforce',
     '/program-holder',
@@ -39,7 +39,8 @@ describe('deployed portal middleware auth coverage', () => {
 
   it('validates the Supabase user before protected LMS rendering', () => {
     expect(lms).toContain('supabase.auth.getUser()');
-    expect(lms).toContain('if (error || !user) return redirectToLogin(req, pathname)');
+    expect(lms).toContain('if (error || !user) {');
+    expect(lms).toContain('redirect.cookies.set(cookie)');
     expect(lms).toContain("X-Robots-Tag', 'noindex, nofollow, noarchive'");
   });
 
@@ -55,12 +56,12 @@ describe('deployed portal middleware auth coverage', () => {
     expect(lms).not.toContain('hasSupabaseSession || protectedPath');
   });
 
-  it('renders the marketing homepage from the curated video hero', () => {
+  it('renders the marketing homepage from the conversion-focused static hero', () => {
     expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
     expect(marketingHome).toContain('<PlatformHubHero />');
     expect(marketingHome).not.toContain('<HomeHeroVideo');
-    expect(homeHero).toContain('hero-home-fast.mp4');
-    expect(homeHero).toContain('poster="/images/pages/hero-home-first-frame.webp"');
+    expect(homeHero).toContain('Build a career. Build a workforce. Build a business.');
+    expect(homeHero).toContain('href="/programs"');
     expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });
 

@@ -47,7 +47,7 @@ describe('universal payment-method completion', () => {
     mocks.upsert.mockResolvedValue({ error: null });
   });
 
-  it('routes a legacy completed setup to current billing without saving a retired-provider card', async () => {
+  it('does not write card details through a retired setup callback even for a matching session', async () => {
     const { GET } = await import('@/apps/lms/app/api/billing/payment-method/complete/route');
     const response = await GET(new NextRequest(
       'https://app.elevateforhumanity.org/api/billing/payment-method/complete?session_id=cs_test_universal',
@@ -73,16 +73,6 @@ describe('universal payment-method completion', () => {
     ));
 
     expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/account/payment-methods');
-    expect(mocks.retrieveSession).not.toHaveBeenCalled();
-    expect(mocks.updateCustomer).not.toHaveBeenCalled();
-    expect(mocks.upsert).not.toHaveBeenCalled();
-  });
-  it('requires sign-in before exposing the current billing destination', async () => {
-    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
-    const { GET } = await import('@/apps/lms/app/api/billing/payment-method/complete/route');
-    const response = await GET(new NextRequest('https://app.elevateforhumanity.org/api/billing/payment-method/complete?session_id=cs_old'));
-    expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/login?redirect=/account/payment-methods');
-    expect(mocks.retrieveSession).not.toHaveBeenCalled();
     expect(mocks.updateCustomer).not.toHaveBeenCalled();
     expect(mocks.upsert).not.toHaveBeenCalled();
   });

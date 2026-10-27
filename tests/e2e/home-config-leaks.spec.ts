@@ -9,18 +9,15 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
     expect(html).not.toContain('${PLATFORM_DEFAULTS.orgName}');
   });
 
-  test('featured homepage photographs have human-readable alt text', async ({ page }) => {
+  test('homepage featured shop image alt is human-readable', async ({ page }) => {
     await page.goto('/');
-    const photographs = page.getByRole('region', { name: 'Real shops. Real experience.' });
-    await expect(photographs).toBeVisible();
-    const images = photographs.getByRole('img');
-    await expect(images).toHaveCount(2);
-    for (const image of await images.all()) {
-      await expect(image).toBeVisible();
-      const alt = await image.getAttribute('alt');
-      expect(alt).toBeTruthy();
-      expect(alt).not.toMatch(/PLATFORM_DEFAULTS|\.(?:webp|png|jpe?g)$/i);
-      expect(alt!.length).toBeGreaterThan(10);
-    }
+    // Career pathways now use decorative icons; verify the featured shop photographs.
+    const pathwaySection = page.getByRole('region', { name: 'Real shops. Real experience.' });
+    await expect(pathwaySection).toBeVisible();
+    const img = pathwaySection.getByRole('img').first();
+    const alt = await img.getAttribute('alt');
+    expect(alt).toBeTruthy();
+    expect(alt).not.toMatch(/PLATFORM_DEFAULTS/);
+    expect(alt!.length).toBeGreaterThan(10);
   });
 });

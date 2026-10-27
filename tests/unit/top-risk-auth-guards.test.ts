@@ -32,10 +32,9 @@ describe('Top-risk routes have auth guards', () => {
     expect(fs.existsSync(path.resolve('apps/marketing/app/api/store/create-payment-intent/route.ts'))).toBe(false);
   });
 
-  it('retired Stripe Connect has no reachable create endpoint in any application', () => {
-    for (const app of ['marketing', 'admin', 'lms']) {
-      expect(fs.existsSync(path.resolve(`apps/${app}/app/api/stripe/connect/create/route.ts`))).toBe(false);
-    }
+  it('retires the former Stripe Connect account creation endpoint', () => {
+    expect(fs.existsSync(path.resolve('apps/lms/app/api/stripe/connect/create/route.ts'))).toBe(false);
+    expect(fs.existsSync(path.resolve('lib/api/stripe/shared-route-handlers.ts'))).toBe(false);
   });
 
   it('/api/store/licenses/create-payment-intent requires apiAuthGuard', () => {

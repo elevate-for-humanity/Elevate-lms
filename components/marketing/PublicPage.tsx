@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs, BreadcrumbItem } from '@/components/ui/Breadcrumbs';
@@ -47,14 +48,13 @@ export default function PublicPage({
 
       {/* Hero Image — no text overlay */}
       <section className={`relative ${heroHeight} overflow-hidden`}>
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={config.heroImage.src}
           alt={config.heroImage.alt}
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
       </section>
 

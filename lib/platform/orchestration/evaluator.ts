@@ -42,6 +42,9 @@ function errorLooksRetryable(error: string): boolean {
     'temporarily unavailable',
     '503',
     '502',
+    '504',
+    'etimedout',
+    'econnreset',
     'network',
     'connection reset',
     'circuit open',
@@ -139,6 +142,52 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
       status: retryable ? 'FAIL_RETRYABLE' : 'FAIL_BLOCKING',
       reasons,
       evidence: { tool: input.tool, attempts, max_attempts: maxAttempts, error: input.error },
+    };
+  }
+
+  const resultRecord = asRecord(input.result);
+  if (resultRecord?.ok === false || resultRecord?.success === false) {
+    const structuredError = asRecord(resultRecord.error);
+    const message =
+      typeof resultRecord.error === 'string' && resultRecord.error.trim()
+        ? resultRecord.error
+        : typeof structuredError?.message === 'string' && structuredError.message.trim()
+          ? structuredError.message
+        : typeof resultRecord.message === 'string' && resultRecord.message.trim()
+          ? resultRecord.message
+          : 'The tool explicitly reported an unsuccessful result.';
+    const errorCode = String(structuredError?.code ?? resultRecord.code ?? '');
+    const httpStatus = Number(
+      structuredError?.statusCode ?? resultRecord.statusCode ?? resultRecord.httpStatus,
+    );
+    const transientFailure =
+      errorLooksRetryable(`${message} ${errorCode}`) ||
+      [408, 429, 502, 503, 504].includes(httpStatus);
+    return {
+      status:
+        transientFailure && attempts < maxAttempts
+          ? 'FAIL_RETRYABLE'
+          : 'FAIL_BLOCKING',
+      reasons: [message],
+      evidence: { tool: input.tool, attempts, max_attempts: maxAttempts, error: message },
+    };
+  }
+
+  const reportedStatus = String(resultRecord?.status ?? '').toLowerCase();
+  const reportedOverall = String(resultRecord?.overall ?? '').toLowerCase();
+  if (['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'blocked'].includes(reportedStatus) ||
+      ['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'unhealthy'].includes(reportedOverall)) {
+    return {
+      status: 'FAIL_BLOCKING',
+      reasons: [`The tool reported ${reportedOverall || reportedStatus}; this is not verified success.`],
+      evidence: { tool: input.tool, status: reportedStatus, overall: reportedOverall },
+    };
+  }
+  if (['pending', 'queued', 'running', 'in_progress', 'awaiting_approval'].includes(reportedStatus)) {
+    return {
+      status: 'REQUIRES_HUMAN_REVIEW',
+      reasons: ['The operation has not returned terminal verification evidence.'],
+      evidence: { tool: input.tool, status: reportedStatus },
     };
   }
 

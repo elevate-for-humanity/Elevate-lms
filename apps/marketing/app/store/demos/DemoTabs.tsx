@@ -15,7 +15,8 @@ import {
   Sparkles,
   Replace,
 } from 'lucide-react';
-import ParisChat from '@/components/paris/ParisChat';
+import StoreDemoAdvisor from '@/components/store/StoreDemoAdvisor';
+import StoreDemoPreview from '@/components/store/StoreDemoPreview';
 
 const DEMOS = [
   {
@@ -51,7 +52,8 @@ const DEMOS = [
       'Employers spend less time emailing documents and status questions back and forth because candidate, apprentice and program activity is connected to the same operating system.',
     differentiator:
       'The employer experience is connected to the learner, apprenticeship, workforce and compliance records behind the scenes—not a standalone job board with another login and another database.',
-    replaces: 'Email chains + shared spreadsheets + separate recruiting/OJT/apprenticeship trackers',
+    replaces:
+      'Email chains + shared spreadsheets + separate recruiting/OJT/apprenticeship trackers',
     features: [
       'Browse candidates with training and credential context',
       'Apprenticeship hour and wage-progression workflows',
@@ -72,7 +74,8 @@ const DEMOS = [
       'Learners do not have to figure out which system holds the class, which form tracks hours, or where credentials live. Their training journey stays together.',
     differentiator:
       'Elevate combines LMS delivery with workforce and apprenticeship context. The learner portal can reflect the full career pathway, not only course completion.',
-    replaces: 'Standalone LMS + paper/hour logs + separate certificate folders + scattered career-service links',
+    replaces:
+      'Standalone LMS + paper/hour logs + separate certificate folders + scattered career-service links',
     features: [
       'Course modules with video lessons and quizzes',
       'Progress and completion tracking',
@@ -93,7 +96,8 @@ const DEMOS = [
       'Program teams can reduce manual reconciliation because eligibility, participant activity, funding and outcomes are linked instead of reported from disconnected files after the fact.',
     differentiator:
       'Elevate is designed around the operating workflow behind workforce reporting. Data can originate in intake, enrollment, training and employer activity before it becomes a report.',
-    replaces: 'Eligibility spreadsheets + separate provider trackers + manual funding logs + after-the-fact reporting files',
+    replaces:
+      'Eligibility spreadsheets + separate provider trackers + manual funding logs + after-the-fact reporting files',
     features: [
       'Eligibility screening with document-verification workflows',
       'ITA and funding-allocation management',
@@ -132,33 +136,48 @@ export default function DemoTabs() {
 
       <div className="grid gap-7 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <div className="flex aspect-video flex-col items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-8 text-center text-white shadow-xl">
-            <active.icon className="h-16 w-16 text-brand-red-400" />
-            <span className="mt-4 rounded bg-white/10 px-3 py-1 text-xs font-bold">Interactive sample workspace</span>
-            <h2 className="mt-4 text-3xl font-black">{active.label}</h2>
-            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-300">Open the working sample portal and use its guided controls. No missing video or prerecorded screen is required.</p>
-            <Link href={active.liveHref} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black hover:bg-brand-red-500">
-              <Play className="h-5 w-5" /> Launch interactive demo
-            </Link>
-          </div>
+          <StoreDemoPreview role={active.id} />
+          <Link
+            href={active.liveHref}
+            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 text-sm font-bold text-white hover:bg-brand-red-800"
+          >
+            <Play className="h-4 w-4" /> Launch interactive demo
+          </Link>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-              <CheckCircle2 className="h-5 w-5 text-emerald-700" />
-              <p className="mt-3 text-xs font-black uppercase tracking-wide text-emerald-800">Business benefit</p>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{active.benefit}</p>
+          <details className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
+            <summary className="min-h-11 cursor-pointer text-sm font-bold">
+              Benefits for your organization
+            </summary>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                <p className="mt-3 text-xs font-black uppercase tracking-wide text-emerald-800">
+                  Business benefit
+                </p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">
+                  {active.benefit}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-5">
+                <Sparkles className="h-5 w-5 text-brand-red-700" />
+                <p className="mt-3 text-xs font-black uppercase tracking-wide text-brand-red-800">
+                  Why Elevate is different
+                </p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">
+                  {active.differentiator}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-300 bg-slate-100 p-5">
+                <Replace className="h-5 w-5 text-slate-800" />
+                <p className="mt-3 text-xs font-black uppercase tracking-wide text-slate-700">
+                  What it can replace
+                </p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">
+                  {active.replaces}
+                </p>
+              </div>
             </div>
-            <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-5">
-              <Sparkles className="h-5 w-5 text-brand-red-700" />
-              <p className="mt-3 text-xs font-black uppercase tracking-wide text-brand-red-800">Why Elevate is different</p>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{active.differentiator}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-300 bg-slate-100 p-5">
-              <Replace className="h-5 w-5 text-slate-800" />
-              <p className="mt-3 text-xs font-black uppercase tracking-wide text-slate-700">What it can replace</p>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{active.replaces}</p>
-            </div>
-          </div>
+          </details>
         </div>
 
         <div className="flex flex-col lg:col-span-2">
@@ -172,10 +191,15 @@ export default function DemoTabs() {
             <h2 className="mt-5 text-2xl font-black text-slate-950">{active.label}</h2>
             <p className="mt-2 text-base leading-7 text-slate-700">{active.description}</p>
 
-            <h3 className="mt-6 text-sm font-black uppercase tracking-wide text-slate-700">What you will see</h3>
+            <h3 className="mt-6 text-sm font-black uppercase tracking-wide text-slate-700">
+              What you will see
+            </h3>
             <ul className="mt-3 flex-1 space-y-3">
               {active.features.map((feature) => (
-                <li key={feature} className="flex items-start gap-2 text-sm font-medium leading-6 text-slate-800">
+                <li
+                  key={feature}
+                  className="flex items-start gap-2 text-sm font-medium leading-6 text-slate-800"
+                >
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
                   {feature}
                 </li>
@@ -205,14 +229,7 @@ export default function DemoTabs() {
         </div>
       </div>
 
-      <section className="mt-8 overflow-hidden rounded-3xl border border-cyan-200 bg-white shadow-lg">
-        <div className="border-b border-cyan-100 bg-gradient-to-r from-cyan-50 via-white to-orange-50 px-5 py-4">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">Embedded demo advisor</p>
-          <h2 className="mt-1 text-xl font-black text-slate-950">Explore {active.label} with PARIS</h2>
-          <p className="mt-1 text-sm font-semibold text-slate-700">PARIS will explain the demo, ask what your organization needs, answer questions, and recommend the next demo or plan.</p>
-        </div>
-        <ParisChat surface="store" showHeader={false} voiceEnabled className="h-[min(620px,72dvh)] min-h-[440px]" />
-      </section>
+      <StoreDemoAdvisor key={active.id} label={active.label} />
     </div>
   );
 }

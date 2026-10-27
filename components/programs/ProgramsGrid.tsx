@@ -28,13 +28,13 @@ export async function ProgramsGrid() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid auto-rows-fr items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
         {programs.map((program) => (
           <article
             key={program.slug}
             className="flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 shadow-sm"
           >
-            <div className="relative h-40 w-full bg-slate-100">
+            <div className="relative aspect-[4/3] shrink-0 w-full bg-slate-100">
               {program.hero_image_url || program.image_url ? (
                 <Image
                   src={
@@ -45,7 +45,7 @@ export async function ProgramsGrid() {
                   alt={program.title || program.name}
                   fill
                   sizes="100vw"
-                  className="object-cover" placeholder="empty"
+                  className="object-contain contrast-105 saturate-110" placeholder="empty"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center   ">

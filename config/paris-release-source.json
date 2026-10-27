@@ -1,0 +1,217 @@
+{
+  "repository": "elevate-for-humanity/next-platform-starter",
+  "commit": "da64dcbbab9347e9e94b6ec29668a946db6427e5",
+  "files": [
+    {
+      "source": "app/tax/page.tsx",
+      "target": "apps/marketing/app/tax/page.tsx",
+      "sha256": "973ae7b53ef5748a69e9e8a80adbc4f28a021857051d266596f895d441d1cd9d",
+      "sourceSha256": "822b3f5d64b755432f21a1b691dc5eb5f76fdfb1f3ab123dca70df8a1655880b",
+      "localRevisionReason": "Reviewed PR #2159 adds only the Supersonic PWA manifest metadata to the canonical tax page; preserve the immutable upstream source digest."
+    },
+    {
+      "source": "app/tax-software/_components/TaxSiteShell.tsx",
+      "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
+      "sha256": "30bd570692bb874af95beda59fcefbe5fa045de204e40b9ee3d4036e40a83d46",
+      "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough",
+      "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
+    },
+    {
+      "source": "app/tax-software/about/page.tsx",
+      "target": "apps/marketing/app/tax-software/about/page.tsx",
+      "sha256": "9c83a25cf6e7b935f1a00f2154520d3deaf71c79965694f2bd6cc75480033633",
+      "sourceSha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough",
+      "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
+    },
+    {
+      "source": "app/tax-software/bank-products/page.tsx",
+      "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
+      "sha256": "5e4e37febeb234a291d9f55613ebc4809a1d6e9802eaa95f66777463574c6b97",
+      "sourceSha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+    },
+    {
+      "source": "app/tax-software/contact/page.tsx",
+      "target": "apps/marketing/app/tax-software/contact/page.tsx",
+      "sha256": "0c0eaf9517b68e4df449da42939e4b234cba1ae529adb21ef8905a428702ba6e",
+      "sourceSha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths",
+      "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
+    },
+    {
+      "source": "app/tax-software/demo/page.tsx",
+      "target": "apps/marketing/app/tax-software/demo/page.tsx",
+      "sha256": "e4b8da7de5620c49552f86015c54ac0a8c6874dec5167cbeb01dbae3a27bee1c",
+      "sourceSha256": "66f6adea7f5207c15638e6dd6151e6cddfd2dbb5b2635981bbfd0acc6eec2cfc",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
+    },
+    {
+      "source": "app/tax-software/features/page.tsx",
+      "target": "apps/marketing/app/tax-software/features/page.tsx",
+      "sha256": "1166e13ed4fdd462ff08e655b130db421d9b11948abcd3a579f2063624d3e45c",
+      "sourceSha256": "84328a80ec33aa372c58e7e7e806d38e251b712342aeaf61216a5ee039d89ffc",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
+    },
+    {
+      "source": "app/tax-software/login/layout.tsx",
+      "target": "apps/marketing/app/tax-software/login/layout.tsx",
+      "sha256": "7c47d81f288d520a28cd2dd8650e21dbaf3552d5272b445356f1c2dcfd0dc96b"
+    },
+    {
+      "source": "app/tax-software/login/page.tsx",
+      "target": "apps/marketing/app/tax-software/login/page.tsx",
+      "sha256": "41f11019cec6948f1b9e29948ad0ee9b39ea973b6cbe85f761fe0bdfc4dbc114",
+      "sourceSha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+    },
+    {
+      "source": "app/tax-software/page.tsx",
+      "target": "apps/marketing/app/tax-software/page.tsx",
+      "sha256": "d1aabff2cf2d71518d8831a9122ce6b9c95f68ac39bec02fa0ac0f5cfa571f88",
+      "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+    },
+    {
+      "source": "app/tax-software/pricing/page.tsx",
+      "target": "apps/marketing/app/tax-software/pricing/page.tsx",
+      "sha256": "d755d65595c0ddf8f49c4da7796a7cc6649cf24f38c6b969f2bd8b7ea2f80c9b",
+      "sourceSha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+    },
+    {
+      "source": "app/tax-software/professional/page.tsx",
+      "target": "apps/marketing/app/tax-software/professional/page.tsx",
+      "sha256": "2a278c535d2ac89033393dad45349be38f2184a745109c7e4df7f3c55ddb6154",
+      "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+    },
+    {
+      "source": "app/tax-software/self-file/layout.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/layout.tsx",
+      "sha256": "d49c246b2ce522ca92aca62b65e524e54c5978bdaefcbe4c35deb1ab3fdd8d99"
+    },
+    {
+      "source": "app/tax-software/self-file/page.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/page.tsx",
+      "sha256": "dfd70447bc4078d61ed787a153bf9129c4eade3b209dfbe4cdd1e3b3fd29733d"
+    },
+    {
+      "source": "app/tax-software/self-file/return/page.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
+      "sha256": "f4953f0278c24665041b13a448509261d22ec6751fbaa2fb3647428692535a25",
+      "sourceSha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
+      "changeReason": "Connect owned business worksheets and separate Supersonic payment preferences to the return workspace."
+    },
+    {
+      "source": "app/tax-software/self-file/w2/confirm/page.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
+      "sha256": "0d8d82364d6c7d79645f4397a46ec5fc9d06d5b630d374cde69973b87d22f28d",
+      "sourceSha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
+    },
+    {
+      "source": "app/api/tax/interview/route.ts",
+      "target": "apps/marketing/app/api/tax/interview/route.ts",
+      "sha256": "8789d334beea2446fe2c108dba8af7759080fe65f6a7e754e09336dd28d7c026",
+      "sourceSha256": "160b55896475b8aefdb8847d1d7b361b0a2e19db7a018ad3a9133ac54dbd26a3",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
+    },
+    {
+      "source": "app/api/tax/returns/calculate/route.ts",
+      "target": "apps/marketing/app/api/tax/returns/calculate/route.ts",
+      "sha256": "6287b7e96fb4ef6b88af52bbe0889a64c5a5044e6fffe2bd01b292e226bbe804",
+      "sourceSha256": "4abe0d40e8551ecb71e3ef731fe56f27c3af6a93e7c929c9e4a4ce77de732bd1",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
+      "changeReason": "Connect owned Schedule C records and complete business-source snapshots to federal calculations and exports."
+    },
+    {
+      "source": "app/api/tax/returns/route.ts",
+      "target": "apps/marketing/app/api/tax/returns/route.ts",
+      "sha256": "d8c5413e56a596c6ab7a9c8e0742a02519d98bb00519ee3af16c51c370c7d755"
+    },
+    {
+      "source": "app/api/tax/w2/confirm/route.ts",
+      "target": "apps/marketing/app/api/tax/w2/confirm/route.ts",
+      "sha256": "2ac78a774ef2e43dab742b7aa3c4ee80fdaf9d43e5ae3c727d307e831356a3d5",
+      "sourceSha256": "4747d469384b4bad80336f73f855d70e409ac966a62aa65e253be67811a904bf",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
+    },
+    {
+      "source": "app/api/ocr/extract/route.ts",
+      "target": "apps/marketing/app/api/ocr/extract/route.ts",
+      "sha256": "ea9463cdc4bd4801118eb5c56eb47e985bc79bdb8d9336f41fd745c37526f56f"
+    },
+    {
+      "source": "lib/tax-software/calculation/ty2026-base-1040.ts",
+      "target": "lib/tax-software/calculation/ty2026-base-1040.ts",
+      "sha256": "c5c8d5dff55f54117098a8efa9965a00c69bb2d328dd1183b4ed1abe4fa47068"
+    },
+    {
+      "source": "lib/tax-software/diagnostics/return-diagnostics.ts",
+      "target": "lib/tax-software/diagnostics/return-diagnostics.ts",
+      "sha256": "c8b88a996244500d8286f36831054bb53c219e1bf801da664a4fdaf7366f12fe"
+    },
+    {
+      "source": "lib/tax-software/document-extraction.ts",
+      "target": "lib/tax-software/document-extraction.ts",
+      "sha256": "699c0b1fea5c4506d6674a50cb70ebeccaad789948eea57265933c923bde1baf"
+    },
+    {
+      "source": "lib/tax-software/form-registry-2026.ts",
+      "target": "lib/tax-software/form-registry-2026.ts",
+      "sha256": "ddf592b6b822b4a63ab71aedd8fe6d1a3149d95392e5926835cdba722d3ea11a"
+    },
+    {
+      "source": "lib/tax-software/mef-readiness.ts",
+      "target": "lib/tax-software/mef-readiness.ts",
+      "sha256": "0921468264849007bb8e19edf14184fabbdb59b39828d23ee6170fafecd2af3c"
+    },
+    {
+      "source": "lib/tax-software/paris-interview.ts",
+      "target": "lib/tax-software/paris-interview.ts",
+      "sha256": "90c17b439e4a5f5ba52b77c00191996c410da0d53e79401d639e3778f1bedfad"
+    },
+    {
+      "source": "lib/tax-software/self-file-pricing.ts",
+      "target": "lib/tax-software/self-file-pricing.ts",
+      "sha256": "6d1d79ab71a2c02f691c2b4eccea98ff08b973dedecbb3fb6565fe44f0024d78"
+    },
+    {
+      "source": "lib/tax-software/transmission/adapters/certification-export.ts",
+      "target": "lib/tax-software/transmission/adapters/certification-export.ts",
+      "sha256": "246dfdc1b0a50852451e82b92cffcacad32dec961fc04f3fa3647e8c5d4827b5",
+      "sourceSha256": "5f6867666c2a0c4facd92322fc579e92f29e3e9877086780d4ffbf0a7af9c7af",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+    },
+    {
+      "source": "lib/tax-software/transmission/hub.ts",
+      "target": "lib/tax-software/transmission/hub.ts",
+      "sha256": "a86cfdbf224337691719db7064de50f3d7f94eba1b5fec33fa1b05745eacb8d6",
+      "sourceSha256": "9bc9973640ccc8aa09f17a67178cd3c14a85a84159cd1b9406769f011b22e187",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+    },
+    {
+      "source": "app/tax-software/_components/TaxSecurityVerification.tsx",
+      "target": "apps/marketing/app/tax-software/_components/TaxSecurityVerification.tsx",
+      "sha256": "ead69024a1edd57bba57848c337a1546d25ed3bad46d69b6f1b7ae3f3a2fe426"
+    },
+    {
+      "source": "public/images/tax/supersonic-tax-hero-2026.webp",
+      "target": "public/images/tax/supersonic-tax-hero-2026.webp",
+      "sha256": "d5ab104a3b7c710cf89c14c325f7a6b183cb4af66e1fe4ec02c14798486d4265"
+    },
+    {
+      "source": "public/images/tax/supersonic-tax-training-2026.webp",
+      "target": "public/images/tax/supersonic-tax-training-2026.webp",
+      "sha256": "c7003e19b900c3bf2102e166179f1f7acfff76fd194522e28c69bbd0e8fdc365"
+    },
+    {
+      "source": "public/images/tax/supersonic-fast-cash-logo.webp",
+      "target": "public/images/tax/supersonic-fast-cash-logo.webp",
+      "sha256": "51f961cf460976756216bd44a56b25a693a729e69c79cb94e37590481b9056ad"
+    }
+  ]
+}

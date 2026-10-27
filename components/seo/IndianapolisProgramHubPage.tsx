@@ -21,7 +21,7 @@ export function indianapolisHubMetadata(config: IndianapolisProgramHubConfig): M
       siteName: PLATFORM_DEFAULTS.orgName,
       images: [
         {
-          url: '/images/og-default.webp',
+          url: '/images/social/elevate-career-training-20261009.jpg',
           width: 1200,
           height: 630,
           alt: config.breadcrumbLabel,

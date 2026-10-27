@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import runtimePolicy from '@/config/google-runtime-policy.json';
-type RuntimeComponent = keyof typeof runtimePolicy.components;
+import { useState, useEffect, useCallback } from 'react';
 import {
   Save,
   Eye,
@@ -22,10 +20,6 @@ interface EnvEntry {
   value: string;
   is_secret: boolean;
   updated_at?: string;
-  component?: RuntimeComponent;
-  secret_name?: string;
-  migration_status?: string;
-  verification_status?: string;
 }
 
 interface ServiceGroup {
@@ -150,14 +144,12 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Telnyx phone and messaging',
-    keys: [
-      'TELNYX_API_KEY',
-      'TELNYX_PUBLIC_KEY',
-      'TELNYX_PHONE_NUMBER',
-      'TELNYX_CONNECTION_ID',
-      'TELNYX_MESSAGING_PROFILE_ID',
-    ],
+    label: 'Twilio phone and messaging',
+    keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_API_KEY_SID', 'TWILIO_API_KEY_SECRET', 'TWILIO_PHONE_NUMBER'],
+  },
+  {
+    label: 'Elevate PWA phone connection',
+    keys: ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET'],
   },
   {
     label: 'Elevate Media Storage — Backblaze B2',
@@ -199,19 +191,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
       'R2_BUCKET',
       'R2_ENDPOINT',
       'NEXT_PUBLIC_R2_URL',
-    ],
-  },
-  {
-    label: 'Northflank',
-    keys: [
-      'NORTHFLANK_API_TOKEN',
-      'NORTHFLANK_TEAM_ID',
-      'NORTHFLANK_PROJECT_ID',
-      'NORTHFLANK_LMS_SERVICE_ID',
-      'NORTHFLANK_ADMIN_SERVICE_ID',
-      'NORTHFLANK_SECRET_GROUP_ID',
-      'NORTHFLANK_DEPLOYMENT_PLAN',
-      'NORTHFLANK_BUILD_PLAN',
     ],
   },
   {
@@ -602,28 +581,21 @@ const SERVICE_GROUPS: ServiceGroup[] = [
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function EnvManagerClient() {
-  const [component, setComponent] = useState<RuntimeComponent>('admin');
-  const loadingRequest = useRef<AbortController | null>(null);
   const [settings, setSettings] = useState<Record<string, EnvEntry>>({});
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [saveNotice, setSaveNotice] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    loadingRequest.current?.abort();
-    const controller = new AbortController();
-    loadingRequest.current = controller;
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/env-vars?component=${component}`, { signal: controller.signal });
+      const res = await fetch('/api/admin/env-vars');
       const data = await res.json();
-      if (controller.signal.aborted) return;
       if (!res.ok) {
         setError(data.error ?? 'Failed to load');
         return;
@@ -632,15 +604,14 @@ export default function EnvManagerClient() {
       for (const row of data.settings ?? []) map[row.key] = row;
       setSettings(map);
     } catch {
-      if (!controller.signal.aborted) setError('Network error loading settings');
+      setError('Network error loading settings');
     } finally {
-      if (!controller.signal.aborted) setLoading(false);
+      setLoading(false);
     }
-  }, [component]);
+  }, []);
 
   useEffect(() => {
-    void load();
-    return () => loadingRequest.current?.abort();
+    load();
   }, [load]);
 
   const handleChange = (key: string, value: string) => {
@@ -658,19 +629,14 @@ export default function EnvManagerClient() {
       const res = await fetch('/api/admin/env-vars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entries, component }),
+        body: JSON.stringify({ entries }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? 'Save failed');
         return;
       }
-      if (data.configurationVerified !== true || data.runtimeSynced !== true) {
-        setError('Google has not confirmed this configuration on the serving runtime.');
-        return;
-      }
       setEdits({});
-      setSaveNotice(data.message || 'Saved and verified on Google.');
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       await load();
@@ -690,7 +656,7 @@ export default function EnvManagerClient() {
 
   const filteredGroups = SERVICE_GROUPS.map((g) => ({
     ...g,
-    keys: g.keys.filter((k) => runtimePolicy.components[component].keys.includes(k) && (!search || k.toLowerCase().includes(search.toLowerCase()))),
+    keys: g.keys.filter((k) => !search || k.toLowerCase().includes(search.toLowerCase())),
   })).filter((g) => g.keys.length > 0);
 
   return (
@@ -713,7 +679,7 @@ export default function EnvManagerClient() {
           </button>
           <button
             onClick={handleSave}
-            disabled={saving || loading || dirtyCount === 0}
+            disabled={saving || dirtyCount === 0}
             className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -726,7 +692,7 @@ export default function EnvManagerClient() {
       {saved && (
         <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl mb-4 text-sm">
           <CheckCircle className="w-4 h-4 flex-shrink-0" />
-          {saveNotice}
+          Settings saved successfully.
         </div>
       )}
       {error && (
@@ -735,26 +701,6 @@ export default function EnvManagerClient() {
           {error}
         </div>
       )}
-
-      <label className="mb-6 block text-sm font-semibold text-slate-700">
-        Runtime service
-        <select
-          value={component}
-          disabled={saving || loading}
-          onChange={(event) => {
-            loadingRequest.current?.abort();
-            setComponent(event.target.value as RuntimeComponent);
-            setSettings({});
-            setEdits({});
-            setSaved(false);
-            setError(null);
-            setLoading(true);
-          }}
-          className="mt-2 block w-full rounded-lg border border-slate-200 px-3 py-2"
-        >
-          {Object.keys(runtimePolicy.components).map((name) => <option key={name} value={name}>{name}</option>)}
-        </select>
-      </label>
 
       {/* Search */}
       <div className="relative mb-6">
@@ -819,9 +765,6 @@ export default function EnvManagerClient() {
                                 <span className="text-xs text-blue-600 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">
                                   unsaved
                                 </span>
-                              )}
-                              {entry?.verification_status && (
-                                <span className="text-xs text-slate-500">{entry.verification_status}</span>
                               )}
                               {entry?.updated_at && (
                                 <span className="text-xs text-slate-400">

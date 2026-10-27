@@ -113,7 +113,7 @@ export const PAGE_METADATA: Record<
   wioaEligibility: {
     title: 'WIOA Funding Eligibility',
     description:
-      'Check your eligibility for WIOA-funded training programs. Free career training for qualifying individuals.',
+      'Learn how WIOA eligibility review works and verify whether a specific program has a documented funding pathway before relying on agency payment.',
     path: '/wioa-eligibility',
   },
 

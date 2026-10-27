@@ -1,3 +1,4 @@
+import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
@@ -7,20 +8,9 @@ import TestingCheckoutClient from './TestingCheckoutClient';
 export const metadata: Metadata = {
   title: 'Choose Exam & Checkout | Elevate Testing Center',
   description:
-    'Select an available exam, review the exact configured retail total, and continue to secure checkout.',
+    'Choose an available credential exam, select a testing date, review your total and continue to secure checkout.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/checkout' },
 };
-
-function examAmountCents(
-  provider: (typeof ACTIVE_PROVIDERS)[number],
-  exam: (typeof ACTIVE_PROVIDERS)[number]['exams'][number],
-): number | null {
-  if (typeof exam === 'object' && exam.amountCents && exam.amountCents > 0) return exam.amountCents;
-  if (provider.fees?.length === 1 && provider.fees[0].amount > 0) {
-    return Math.round(provider.fees[0].amount * 100);
-  }
-  return null;
-}
 
 export default async function TestingCheckoutPage({
   searchParams,
@@ -39,7 +29,7 @@ export default async function TestingCheckoutPage({
         name: typeof exam === 'string' ? exam : exam.name,
         description: typeof exam === 'string' ? '' : exam.description || '',
         durationMinutes: typeof exam === 'string' ? null : exam.durationMinutes || null,
-        amountCents: examAmountCents(provider, exam),
+        amountCents: getPublicExamAmountCents(provider, exam),
       }))
       .filter((exam) => Boolean(exam.amountCents && exam.amountCents > 0)),
     addOn: provider.addOn
@@ -67,14 +57,15 @@ export default async function TestingCheckoutPage({
             <ShieldCheck className="mt-1 h-7 w-7 shrink-0 text-emerald-600" />
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
-                Server-authoritative checkout
+                Secure exam checkout
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
                 Choose the exact exam you are taking.
               </h1>
               <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-                Every exam shown here has a positive configured retail amount in the canonical testing registry.
-                The server re-resolves that amount before it creates the payment invoice, so the browser cannot set the price.
+                Choose your exam and testing day, review the total, and pay securely through
+                QuickBooks. After payment is confirmed, we will email your reserved time and a link
+                to add it to Google Calendar.
               </p>
             </div>
           </div>
@@ -84,7 +75,9 @@ export default async function TestingCheckoutPage({
           <TestingCheckoutClient
             providers={providers}
             initialProvider={
-              providers.some((provider) => provider.key === selectedProvider) ? selectedProvider : ''
+              providers.some((provider) => provider.key === selectedProvider)
+                ? selectedProvider
+                : ''
             }
             initialExam={selectedExam}
           />

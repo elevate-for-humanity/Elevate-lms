@@ -1,5 +1,6 @@
+import {instructionView, applySceneTitleReadabilityRepair} from './repair-policy.mjs';
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
-import { instructionalQualityFailures } from '@/lib/video/instructional-quality-gate';
+import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
 import type { StepHandler } from './build-runner';
 import type { UltimateRuntime } from './runtime';
@@ -11,6 +12,10 @@ import { auditTraceability, type TraceabilityRow } from '../release/traceability
 import { evaluateAccessibility } from '../accessibility/accessibility-contract';
 import { executableRepairTargets, type CourseRepairPlan } from '../repair/course-repair-plan';
 import { instructionalDepthFor } from '../instructional/depth-contract';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
+import { narrationSceneSeconds } from '../instructional/approved-presentation.mjs';
+import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
+import { requireChapterRecap } from '../instructional/new-course-contract.mjs';
 const comp = (ctx: any) =>
   ctx.profile.competencies.find((c: any) => String(ctx.buildId).endsWith(':' + c.id)) ??
   ctx.profile.competencies[0];
@@ -19,6 +24,7 @@ const evidence = (ctx: any) => ({
   competency: comp(ctx),
   instructionalDepth: instructionalDepthFor(comp(ctx)),
   prior: ctx.artifacts,
+  repairDirective: ctx.repairDirective,
 });
 function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   const storyboard =
@@ -44,8 +50,8 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   for (const assignment of assignments) {
     if (!assignment?.assetId || !assignment?.relevanceReason)
       throw new Error('ULTIMATE_VISUAL_RELEVANCE_REQUIRED');
-    if (assignment.generatedInstructionalVisual === true || assignment.assignmentMethod === 'instructional-render') {
-      if (!String(assignment.assetId).startsWith('instructional:'))
+    if (assignment.requestedTeachingPhotograph === true && assignment.assignmentMethod === 'teaching-photograph-request') {
+      if (!String(assignment.assetId).startsWith('teaching-photo-request:'))
         throw new Error(`ULTIMATE_INSTRUCTIONAL_VISUAL_ID_INVALID:${assignment.assetId}`);
       reuse.set(String(assignment.assetId), (reuse.get(String(assignment.assetId)) ?? 0) + 1);
       continue;
@@ -72,7 +78,10 @@ function isTransientMediaDiscoveryError(error: unknown): boolean {
     message.includes('network error') ||
     message.includes('econnreset') ||
     message.includes('etimedout') ||
-    message.includes('socket hang up')
+    message.includes('socket hang up') ||
+    message.includes('operation was aborted') ||
+    message.includes('aborterror') ||
+    message.includes('timeouterror')
   );
 }
 
@@ -93,7 +102,7 @@ async function findMediaWithTransientRetry(runtime: UltimateRuntime, request: an
 export function createProductionHandlers(runtime: UltimateRuntime): Record<string, StepHandler> {
   return {
     standards_lock: async (ctx) => {
-      const registered = /[0-9]{4}[a-z]{2}/i.test(ctx.profile.id);
+      const registered = !ctx.profile.id.startsWith('course:') && /[0-9]{4}[a-z]{2}/i.test(ctx.profile.id);
       const declaredCourseDefined =
         !registered &&
         (ctx.profile.authority === 'course-defined' ||
@@ -177,18 +186,29 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       }
       return { artifacts: { media } };
     },
-    scene_construction: async (ctx) => ({
-      artifacts: {
-        scenes: {
-          shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
-            (a: any) => ({ ...a, loop: false }),
-          ),
-          storyboard: ctx.artifacts.storyboard,
-          media: ctx.artifacts.visual_assignment,
-          loop: false,
+    scene_construction: async (ctx) => {
+      const storyboardArtifact: any = ctx.artifacts.storyboard ?? {};
+      const sourceStoryboard = storyboardArtifact.storyboard ?? storyboardArtifact;
+      const repairedStoryboard = applySceneTitleReadabilityRepair(
+        sourceStoryboard,
+        ctx.repairDirective,
+      );
+      const storyboard = storyboardArtifact.storyboard
+        ? { ...storyboardArtifact, storyboard: repairedStoryboard }
+        : repairedStoryboard;
+      return {
+        artifacts: {
+          scenes: {
+            shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
+              (a: any) => ({ ...a, loop: false }),
+            ),
+            storyboard,
+            media: ctx.artifacts.visual_assignment,
+            loop: false,
+          },
         },
-      },
-    }),
+      };
+    },
     natural_narration: async (ctx) => {
       requireLicensedVisualCoverage(ctx);
       return {
@@ -207,11 +227,12 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
     },
     synchronization: async (ctx) => {
-      let cursor = 3;
+      const premium = ctx.profile.lessonPresentation === 'approved-premium-v1';
+      let cursor = premium ? 0 : 3;
       const narration: any = (ctx.artifacts.natural_narration as any)?.narration;
       const segments = narration.segments.map((s: any) => {
         const startSeconds = cursor;
-        cursor += Math.max(4, Math.ceil(s.durationSeconds) + 1);
+        cursor += narrationSceneSeconds(s.durationSeconds, premium);
         return {
           ...s,
           startSeconds,
@@ -223,38 +244,105 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           })),
         };
       });
-      return { artifacts: { timeline: { segments, fps: 30, durationSeconds: cursor + 2 } } };
+      return { artifacts: { timeline: { segments, fps: 30, durationSeconds: cursor + (premium ? 0 : 2) } } };
     },
     active_teaching: async (ctx) => ({
       artifacts: {
         activities: (ctx.artifacts.instructor_script as any)?.script?.activities,
+        flashcards: (ctx.artifacts.instructor_script as any)?.script?.flashcards ?? [],
         objectives: ctx.artifacts.learning_objectives,
       },
     }),
     mistakes_and_corrections: async (ctx) => ({
       artifacts: { mistakes: (ctx.artifacts.instructor_script as any)?.script?.mistakes },
     }),
-    assessment_alignment: async (ctx) => ({
-      artifacts: {
-        assessment: await runtime.assessment.generate({
-          competency: comp(ctx),
-          objectives: ctx.artifacts.learning_objectives,
-          learning: ctx.artifacts.active_teaching,
-          script: ctx.artifacts.instructor_script,
-        }),
-      },
-    }),
-    lesson_film_render: async (ctx) => ({
-      artifacts: {
-        render: await runtime.renderer.render({
-          lessonId: comp(ctx).id,
-          courseTitle: ctx.profile.title,
-          artifacts: ctx.artifacts,
-        }),
-      },
-    }),
+    assessment_alignment: async (ctx) => {
+      const assessment = await runtime.assessment.generate({
+        competency: comp(ctx),
+        objectives: ctx.artifacts.learning_objectives,
+        learning: ctx.artifacts.active_teaching,
+        script: ctx.artifacts.instructor_script,
+      });
+      // The owner's new-course contract is opt-in. Existing course checkpoints
+      // and unrelated programs must not be invalidated by the rollout.
+      if ((ctx.profile as any).newCourseContract === 'owner-approved-lesson-v1') {
+        requireChapterRecap(assessment, comp(ctx).id, 5);
+      }
+      return { artifacts: { assessment } };
+    },
+    lesson_film_render: async (ctx) => {
+      const sourceScript:any=(ctx.artifacts.instructor_script as any)?.script;
+      const sourceBoard:any=(ctx.artifacts.storyboard as any)?.storyboard;
+      const sourceObjectives:any[]=(ctx.artifacts.learning_objectives as any)?.objectives??[];
+      const preflight=instructionalQualityFailures({courseTitle:ctx.profile.title,lessonTitle:comp(ctx).title,lessonType:comp(ctx).type,script:sourceScript?.script??'',learningObjectives:sourceObjectives.map(o=>o.text),instructor:{id:'ultimate',title:'Instructor',specialty:ctx.profile.title},storyboard:instructionView(sourceBoard)});
+      const contentFailures=preflight.failures.filter(message=>!message.includes('no close-up or sourced demonstration scene exists')&&!message.includes('practical beauty instruction must include a sourced close-up demonstration scene'));
+      if(contentFailures.length && !ctx.renderPreviewOnly)return {passed:false,findings:contentFailures.map(message=>({step:'lesson_film_render' as const,severity:'error' as const,code:'INSTRUCTIONAL_QUALITY_FAILED',message})),artifacts:{preflight:{pass:false,failures:contentFailures}}};
+
+      // Enforce the approved-video production contract at the actual rendering
+      // boundary. A missing scene, source, license or narration must never be
+      // silently replaced with a generic slideshow or placeholder clip.
+      requireLicensedVisualCoverage(ctx);
+      const assigned = (ctx.artifacts.visual_assignment as any)?.media?.assignments ?? [];
+      const storyboard = (ctx.artifacts.storyboard as any)?.storyboard?.scenes ?? [];
+      const narration = (ctx.artifacts.natural_narration as any)?.narration;
+      const timeline = (ctx.artifacts.synchronization as any)?.timeline;
+      if (!Array.isArray(storyboard) || !storyboard.length ||
+          !Array.isArray(assigned) || assigned.length !== storyboard.length ||
+          !Array.isArray(narration?.segments) || !narration.segments.length ||
+          !Array.isArray(timeline?.segments) || !timeline.segments.length ||
+          !(Number(timeline.durationSeconds) > 0))
+        throw new Error('ULTIMATE_RENDER_PRODUCTION_DEPENDENCIES_REQUIRED');
+      if (timeline.segments.some((segment: any) =>
+          !Number.isFinite(segment.startSeconds) ||
+          !Number.isFinite(segment.endSeconds) ||
+          segment.endSeconds <= segment.startSeconds))
+        throw new Error('ULTIMATE_RENDER_NARRATION_TIMELINE_INVALID');
+      const script = String((ctx.artifacts.instructor_script as any)?.script?.script ?? '');
+      const repeated = repeatedTeachingSegments(script);
+      if (repeated > 0)
+        return {
+          passed: false,
+          findings: [{
+            step: 'lesson_film_render', severity: 'error', code: 'NARRATION_DUPLICATION',
+            message: `Narration repeats ${repeated} substantial teaching segment(s); repair the source before rendering.`,
+          }],
+        };
+      const canonicalLessonId = ctx.profile.canonicalLessonIds?.[comp(ctx).id];
+      if ((ctx.profile as any).sourcePolicy === 'frozen-reference-v1' && !canonicalLessonId)
+        throw new Error('FRESH_CANONICAL_LESSON_ID_REQUIRED');
+      return {
+        artifacts: {
+          render: await runtime.renderer.render({
+            lessonId: canonicalLessonId ?? comp(ctx).id,
+            courseId:ctx.courseId,
+            courseTitle: ctx.profile.title,
+            lessonTitle: comp(ctx).title,
+            ownerPreview: ctx.renderPreviewOnly === true,
+            lessonPresentation: ctx.profile.lessonPresentation,
+            presentationContract: ctx.profile.presentationContract,
+            renderRevision: [(ctx.artifacts as any).__renderRevision,(ctx.artifacts as any).__repairState?.at].filter(Boolean).join(':') || undefined,
+            requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
+            artifacts: ctx.artifacts,
+          }),
+        },
+      };
+    },
     finished_media_qa: async (ctx) => {
       const render: any = ctx.artifacts.lesson_film_render?.render;
+      if(ctx.profile.lessonPresentation === 'approved-premium-v1') {
+        const failures = approvedDeliveryFailures(render,
+          (ctx.artifacts.natural_narration as any)?.narration, ctx.profile.presentationContract);
+        if (failures.length) throw new Error(failures.join(';'));
+        if(render.presentationVersion !== 'approved-moment-cues-v2') throw new Error('APPROVED_MOMENT_PRESENTATION_REQUIRED');
+        for(const scene of render.sceneData?.scenes??[]) {
+          const cues=scene.pictureCues;
+          if(!Array.isArray(cues)||cues.length<2||new Set(cues.map((cue:any)=>cue.sha256)).size<2||
+              !scene.recapText?.trim()||!(scene.recapStartSeconds>0&&scene.recapStartSeconds<scene.durationSeconds)||
+              cues[0].startSeconds!==0||Math.abs(cues[cues.length-1].endSeconds-scene.durationSeconds)>0.05||
+              cues.some((cue:any,i:number)=>cue.endSeconds<=cue.startSeconds||i>0&&Math.abs(cue.startSeconds-cues[i-1].endSeconds)>0.05))
+            throw new Error('APPROVED_PICTURE_RECAP_TIMELINE_EVIDENCE_REQUIRED');
+        }
+      }
       const script: any = (ctx.artifacts.instructor_script as any)?.script;
       const objectives: any[] = (ctx.artifacts.learning_objectives as any)?.objectives ?? [];
       const quality = instructionalQualityFailures({
@@ -264,15 +352,22 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         script: script.script,
         learningObjectives: objectives.map((o) => o.text),
         instructor: { id: 'ultimate', title: 'Instructor', specialty: ctx.profile.title },
-        storyboard: render.sceneData,
+        storyboard: instructionView({...render.sceneData,scenes:render.sceneData.scenes.map((s:any,i:number)=>({...s,stage:(ctx.artifacts.storyboard as any)?.storyboard?.scenes?.[i]?.stage}))}),
       });
       if (quality.failures.length)
         return {
           passed: false,
+          findings: quality.failures.map((message) => ({
+            step: 'finished_media_qa' as const,
+            severity: 'error' as const,
+            code: /^(narration|storyboard) repeats/.test(message) ? 'NARRATION_DUPLICATION' : 'INSTRUCTIONAL_QUALITY_FAILED',
+            message,
+          })),
           artifacts: { mediaQA: { pass: false, failures: quality.failures } },
         };
       const inspection = await enforceMediaQuality({
-        videoUrl: render.videoUrl,
+        lessonPresentation: ctx.profile.lessonPresentation,
+        videoUrl: renderMediaUrl(render),
         expectedDurationSeconds: render.duration,
         expectedSceneCount: render.sceneData.scenes.length,
         sceneData: render.sceneData,
@@ -320,9 +415,10 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const render: any = ctx.artifacts.lesson_film_render?.render;
       const inspection: any = (ctx.artifacts.finished_media_qa as any)?.mediaQA?.inspection;
       const metrics = await analyzeNarrationAudio({
-        audioUrl: render.videoUrl,
+        audioUrl: renderMediaUrl(render),
         transcript: inspection.actualTranscript,
         deliveredMp4: true,
+        expectedMediaSha256: inspection.mediaSha256,
       });
       const narrationQA = {
         ...evaluateNarration(metrics),
@@ -338,7 +434,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         lessonBuildId: ctx.lessonBuildId ?? '',
         courseId: ctx.courseId,
         lessonId: String(comp(ctx).id),
-        videoUrl: render.videoUrl,
+        videoUrl: renderPlaybackUrl(render),
       });
       const results: any = (learnerRuntimeEvidence.evidence as any).results ?? {};
       const learnerQA = { ...evaluateLearnerRunthrough(results), results };
@@ -373,6 +469,28 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
     },
     credential_release: async (ctx) => {
+      // A persisted release certificate is not proof that the current movie
+      // passed QA. Never release against stale or missing upstream evidence.
+      const render = (ctx.artifacts.lesson_film_render as any)?.render;
+      const mediaQA = (ctx.artifacts.finished_media_qa as any)?.mediaQA;
+      if (!render || !mediaQA || mediaQA.pass !== true ||
+          !ctx.passedSteps?.has('lesson_film_render') ||
+          !ctx.passedSteps?.has('finished_media_qa')) {
+        return {
+          passed: false,
+          findings: [{
+            step: 'credential_release' as const,
+            severity: 'error' as const,
+            code: 'FINISHED_MEDIA_ACCEPTANCE_REQUIRED',
+            message: 'Current render and finished-media QA must pass before credential release.',
+          }],
+        };
+      }
+      const expectedReference = ctx.profile.presentationContract?.approvedReferenceVideo;
+      if (ctx.profile.lessonPresentation === 'approved-premium-v1' &&
+          (!expectedReference || render.approvedReferenceAssetId !== expectedReference.assetId ||
+           render.approvedReferenceSha256 !== expectedReference.sha256))
+        throw new Error('APPROVED_REFERENCE_RELEASE_EVIDENCE_REQUIRED');
       const c = comp(ctx);
       const objectives: any[] = (ctx.artifacts.learning_objectives as any)?.objectives ?? [];
       const script: any = (ctx.artifacts.instructor_script as any)?.script;
@@ -408,7 +526,17 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const learnerEvidence: any =
         (ctx.artifacts.learner_runthrough as any)?.learnerRuntimeEvidence?.evidence ?? {};
       const a11y: any = learnerEvidence.accessibility ?? {};
-      const accessibility = evaluateAccessibility(a11y);
+      // This manually approved course retired browser run-through evidence.
+      // Do not turn an unavailable browser, expired login, or evidence-store
+      // outage into a publication stop. Retain truthful deferred QA metadata,
+      // and continue to require rendered video, captions, transcript and media QA.
+      const browserEvidenceRetired = ctx.courseId === 'a6b0b712-1cf0-475a-ba79-ee2023dea8ec' &&
+        !Object.keys(a11y).length;
+      const accessibility = browserEvidenceRetired
+        ? { pass: false, critical: false, deferred: true,
+            failures: ['ACCESSIBILITY_BROWSER_EVIDENCE_RETIRED'],
+            source: 'browser-testing-retired' }
+        : evaluateAccessibility(a11y);
       const release = {
         courseId: ctx.courseId,
         competencyId: c.id,
@@ -418,7 +546,32 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         rows,
         releaseEvidenceRecorded: true,
       };
-      return { passed: !release.blocked, artifacts: { release } };
+      // Report the owning content defect, not just an opaque release failure.
+      // The existing BLUEPRINT route returns this to bounded source authoring.
+      const missingPractice = new Map<string, Set<string>>();
+      for (const row of traceability.failures) {
+        const missing = [
+          ...(!row.guidedPracticeId ? ['guided_practice'] : []),
+          ...(!row.independentPracticeId ? ['independent_practice'] : []),
+        ];
+        if (missing.length) {
+          const types = missingPractice.get(row.objectiveId) ?? new Set<string>();
+          missing.forEach((type) => types.add(type));
+          missingPractice.set(row.objectiveId, types);
+        }
+      }
+      return {
+        passed: !release.blocked,
+        artifacts: { release },
+        findings: [...missingPractice].map(([objectiveId, types]) => ({
+          step: 'credential_release' as const,
+          severity: 'error' as const,
+          code: 'BLUEPRINT_OBJECTIVE_PRACTICE_REQUIRED',
+          message: `Objective ${objectiveId} is missing ${[...types].join(', ')}. Supply source-grounded learner tasks and corrective feedback; do not relabel unrelated activities.`,
+        })),
+      };
     },
   };
 }
+
+

@@ -1,3 +1,4 @@
+import { loadApprovedSchoolApplicants } from './school-applicants';
 import { after } from 'next/server';
 import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
 import { logger } from '@/lib/logger';
@@ -15,6 +16,7 @@ export type ProgramHolderWorkspace = {
   profile: any | null;
   programs: any[];
   enrollments: any[];
+  schoolApplicants: any[];
   upcomingEnrollments: any[];
   applicants: any[];
   convertedStudents: any[];
@@ -101,6 +103,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       profile: null,
       programs: [],
       enrollments: [],
+      schoolApplicants: [],
       upcomingEnrollments: [],
       applicants: [],
       convertedStudents: [],
@@ -526,8 +529,13 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       !(key && canonicalEnrollmentKeys.has(key));
   });
 
+  const schoolApplicants = await loadApprovedSchoolApplicants(
+    db, holderRes.data?.features, programsRes.data || [], contactAccessGranted,
+  );
+
   return {
     mode: 'holder',
+    schoolApplicants,
     holder: holderRes.data ?? null,
     profile,
     programs: programsRes.data ?? [],

@@ -4,7 +4,7 @@ import { aiChat } from '@/lib/ai/ai-service';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {executePaidInference,reservePaidInference,paidArtifactFingerprint} from '@/lib/ai/paid-inference-gateway';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { getGitHubHeaders } from '@/lib/devstudio/github-token';
+import { getGitHubHeaders, githubApiErrorMessage } from '@/lib/devstudio/github-token';
 import { logger } from '@/lib/logger';
 import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 
@@ -79,7 +79,7 @@ async function githubJson(path: string, init: RequestInit = {}) {
   const payload = text ? JSON.parse(text) : {};
   if (!response.ok) {
     throw new Error(
-      `GitHub API ${response.status} for ${path}: ${String(payload?.message ?? text).slice(0, 500)}`,
+      `GitHub API ${response.status} for ${path}: ${githubApiErrorMessage(response.status)}; provider message: ${String(payload?.message ?? '').slice(0, 140)}`,
     );
   }
   return payload;

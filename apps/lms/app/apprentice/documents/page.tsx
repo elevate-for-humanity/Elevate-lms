@@ -28,7 +28,7 @@ export default async function ApprenticeDocumentsPage() {
   const programSlug = await resolveApprenticeProgramSlug(admin, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
-  const [{ data: requirements }, { data: documents }, { data: agreement }] = await Promise.all([
+  const documentResults = await Promise.all([
     admin
       .from('apprentice_document_types')
       .select('id,name,description,document_type,is_required,accepted_formats,max_file_size_mb,display_order')
@@ -47,6 +47,11 @@ export default async function ApprenticeDocumentsPage() {
       .eq('document_version', '1.0')
       .maybeSingle(),
   ]);
+
+  for (const result of documentResults) {
+    if (result.error) throw result.error;
+  }
+  const [{ data: requirements }, { data: documents }, { data: agreement }] = documentResults;
 
   const docs = documents ?? [];
   // Never render a blank documents portal for a valid apprentice enrollment.

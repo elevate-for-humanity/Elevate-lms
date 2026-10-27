@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DOMAIN = 'https://elevateforhumanity.org';
+const DOMAIN = 'https://www.elevateforhumanity.org';
 const GOOGLE_ANALYTICS_ID = 'G-EFHWORKFORCE01';
 
 const metaTags = `

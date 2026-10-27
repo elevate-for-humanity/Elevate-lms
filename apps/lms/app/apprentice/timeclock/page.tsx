@@ -234,7 +234,7 @@ export default function TimeclockPage() {
 
   // Send heartbeat
   const sendHeartbeat = useCallback(async () => {
-    if (!shift.entryId) return;
+    if (!shift.entryId || context?.previewing || shift.clockOutAt) return;
 
     try {
       const position = await getLocation();
@@ -253,6 +253,9 @@ export default function TimeclockPage() {
       const data = await response.json();
 
       if (response.ok) {
+        if (data.clock_out_at) {
+          setShift((previous) => ({ ...previous, clockOutAt: data.clock_out_at }));
+        }
         setGeofence({
           withinGeofence: data.within_geofence,
           distance: data.distance_m,
@@ -266,7 +269,7 @@ export default function TimeclockPage() {
         getErrorContext(err),
       );
     }
-  }, [shift.entryId, getLocation]);
+  }, [shift.entryId, shift.clockOutAt, context?.previewing, getLocation]);
 
   // Start heartbeat polling
   const startHeartbeat = useCallback(() => {
@@ -320,7 +323,7 @@ export default function TimeclockPage() {
 
   // Timeclock action handler
   const handleAction = async (action: 'clock_in' | 'lunch_start' | 'lunch_end' | 'clock_out') => {
-    if (!context) return;
+    if (!context || context.previewing) return;
 
     setActionLoading(action);
     setError(null);
@@ -780,7 +783,7 @@ export default function TimeclockPage() {
                 {!isOnLunch && !shift.lunchEndAt && (
                   <button
                     onClick={() => handleAction('lunch_start')}
-                    disabled={actionLoading !== null}
+                    disabled={actionLoading !== null || context.previewing}
                     className="w-full flex items-center justify-center px-6 py-3 bg-yellow-500 hover:bg-yellow-600 disabled:bg-slate-400 text-white font-semibold rounded-lg transition-colors"
                   >
                     {actionLoading === 'lunch_start' ? (
@@ -795,7 +798,7 @@ export default function TimeclockPage() {
                 {isOnLunch && (
                   <button
                     onClick={() => handleAction('lunch_end')}
-                    disabled={actionLoading !== null}
+                    disabled={actionLoading !== null || context.previewing}
                     className="w-full flex items-center justify-center px-6 py-3 bg-yellow-500 hover:bg-yellow-600 disabled:bg-slate-400 text-white font-semibold rounded-lg transition-colors"
                   >
                     {actionLoading === 'lunch_end' ? (
@@ -809,7 +812,7 @@ export default function TimeclockPage() {
 
                 <button
                   onClick={() => handleAction('clock_out')}
-                  disabled={actionLoading !== null || isOnLunch}
+                  disabled={actionLoading !== null || isOnLunch || context.previewing}
                   className="w-full flex items-center justify-center px-6 py-4 bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-400 text-white font-bold rounded-lg transition-colors"
                 >
                   {actionLoading === 'clock_out' ? (

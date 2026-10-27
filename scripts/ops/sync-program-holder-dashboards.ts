@@ -23,9 +23,10 @@ function canonicalProgramSlugs(slugs: string[]) {
 /** contact_email → program slugs they oversee */
 const HOLDER_PROGRAMS: Record<string, string[]> = {
   'mesmerizedbybeautyl@yahoo.com': [
+    'cosmetology-apprenticeship',
+    'barber-apprenticeship',
     'esthetician-apprenticeship',
     'nail-technician-apprenticeship',
-    'cosmetology-apprenticeship',
   ],
   'info@centerofdestiny.org': [
     'business-startup',

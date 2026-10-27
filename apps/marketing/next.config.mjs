@@ -29,6 +29,7 @@ const nextConfig = {
   },
 
   images: { unoptimized: true },
+  experimental: { staticGenerationRetryCount: 3 },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
   transpilePackages: ['buffer', 'process'],

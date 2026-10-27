@@ -69,11 +69,14 @@ export async function loadApprenticePortalData(programSlug: string) {
     supabase
       .from('apprentices')
       .select('id, shop_id, employer_id, start_date, status, rapids_id')
-      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+      .eq('user_id', user.id)
       .eq('status', 'active')
       .maybeSingle(),
   ]);
 
+  for (const result of [profileRes, enrollmentRes, apprenticeRes]) {
+    if (result.error) throw result.error;
+  }
   let enrollment: ApprenticePortalEnrollment | null = enrollmentRes.data;
   const apprentice = apprenticeRes.data;
 
@@ -160,13 +163,15 @@ export async function loadApprenticePortalData(programSlug: string) {
       .eq('user_id', user.id),
   ]);
 
+  if (docsRes.error) throw docsRes.error;
+
   const firstName = profileRes.data?.full_name?.split(' ')[0] ?? 'Apprentice';
   const fullName = profileRes.data?.full_name ?? 'Apprentice';
 
   const creditedTransfer =
     transferHoursVerified != null && transferHoursVerified > 0
       ? transferHoursVerified
-      : transferHoursClaimed;
+      : 0;
 
   return {
     config,

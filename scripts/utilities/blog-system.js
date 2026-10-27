@@ -452,7 +452,7 @@ class BlogSystem {
 
       post.shares += 1;
 
-      const shareUrl = `https://elevateforhumanity.org/blog/${post.slug}`;
+      const shareUrl = `https://www.elevateforhumanity.org/blog/${post.slug}`;
       const shareText = `${post.title} - ${post.excerpt}`;
 
       const shareUrls = {
@@ -527,7 +527,7 @@ class BlogSystem {
   // Check if enrollment script is present on Durable site
   async checkDurableStatus(req, res) {
     try {
-      const siteResponse = await fetch('https://elevateforhumanity.org');
+      const siteResponse = await fetch('https://www.elevateforhumanity.org');
       const html = await siteResponse.text();
 
       const hasEnrollmentScript =

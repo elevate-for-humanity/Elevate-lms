@@ -1,3 +1,4 @@
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import Link from 'next/link';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
@@ -18,16 +19,18 @@ export default async function TimeclockPolicyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/policies/timeclock');
   const db = await requireAdminClient();
-  const { data: acceptance } = await db
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/policies/timeclock');
+  const { data: acceptance, error } = await db
     .from('agreement_acceptances')
     .select('id')
     .eq('subject_type', 'apprentice')
-    .eq('subject_id', user.id)
+    .eq('subject_id', subject.userId)
     .eq('agreement_key', APPRENTICE_POLICY_KEYS.timeclock)
     .eq('agreement_version', APPRENTICE_POLICY_VERSION)
     .maybeSingle();
+  if (error) throw error;
   return (
     <main className="mx-auto max-w-4xl space-y-6 px-4 py-8">
       <Link href="/apprentice" className="font-bold text-brand-blue-700">
@@ -75,10 +78,10 @@ export default async function TimeclockPolicyPage() {
           <Clock3 className="h-5 w-5" /> Open timeclock
         </Link>
       </section>
-      <PolicyAcknowledgment
+      {subject.previewing ? <p role="status" className="rounded-xl bg-amber-50 p-4 font-bold">Admin preview is read-only. The learner must acknowledge this policy from their own account.</p> : <PolicyAcknowledgment
         agreementKey={APPRENTICE_POLICY_KEYS.timeclock}
         alreadyAccepted={Boolean(acceptance)}
-      />
+      />}
     </main>
   );
 }

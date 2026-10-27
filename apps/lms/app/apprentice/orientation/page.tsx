@@ -29,19 +29,18 @@ async function completeOrientation(formData: FormData) {
   const writer = db ?? supabase;
   const now = new Date().toISOString();
 
-  const { error } = await writer
+  const { data: saved, error } = await writer
     .from('program_enrollments')
     .update({
       orientation_completed_at: now,
-      access_granted_at: now,
-      enrollment_state: 'active',
-      status: 'active',
       updated_at: now,
     })
-    .eq('user_id', user.id)
-    .eq('program_slug', programSlug);
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+    .eq('program_slug', programSlug)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
+    .select('id');
 
-  if (error) redirect(`/apprentice/orientation?program=${encodeURIComponent(programSlug)}&error=save`);
+  if (error || !saved?.length) redirect(`/apprentice/orientation?program=${encodeURIComponent(programSlug)}&error=save`);
   redirect('/apprentice?orientation=complete');
 }
 
@@ -63,7 +62,7 @@ export default async function ApprenticeOrientationPage({
   const { data: enrollment } = await db
     .from('program_enrollments')
     .select('orientation_completed_at')
-    .eq('user_id', subject.userId)
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .eq('program_slug', programSlug)
     .order('created_at', { ascending: false })
     .limit(1)

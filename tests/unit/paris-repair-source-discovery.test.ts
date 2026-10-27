@@ -11,7 +11,7 @@ const h = vi.hoisted(() => ({
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: async () => {} }));
-vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubHeaders: async () => ({ Authorization: 'Bearer test-only' }) }));
+vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubHeaders: async () => ({ Authorization: 'Bearer test-only' }), githubApiErrorMessage: (status: number) => `GitHub diagnostic ${status}` }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({}) }));
 vi.mock('@/lib/ai/paid-inference-gateway', () => ({
   paidArtifactFingerprint: () => 'test-fingerprint',
@@ -104,3 +104,11 @@ it.each(['lib/ai/runtime/repair-events.ts', 'lib/control-plane/workflow-repairs.
     expect(h.writes).toEqual([]);
   },
 );
+
+
+it('recovers a genuine missing-file read while retaining HTTP status classification', async () => {
+  h.actions = [{ type: 'read', path: 'lib/missing.ts' }, ...patch];
+  const response = await stageParisCodeRepair('Fix the known retry defect', 'repair', 'owner');
+  expect(response.status).toBe(200);
+  expect(h.writes).toEqual(['lib/example.ts', 'tests/unit/example-regression.test.ts']);
+});

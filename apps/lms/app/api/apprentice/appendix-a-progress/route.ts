@@ -14,7 +14,7 @@ export async function GET() {
   if (!subject.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: enrollments, error } = await db.from('program_enrollments')
     .select('id, user_id, program_id, program_slug, status, created_at')
-    .eq('user_id', subject.userId).in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`).in('status', ['active', 'enrolled', 'in_progress', 'confirmed']).order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const enrollment = (enrollments || []).find((row: any) => getRegisteredProgramStandard(row.program_slug));

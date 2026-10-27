@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
+import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
@@ -185,6 +186,7 @@ export default function HomePage() {
             </p>
           </div>
         </section>
+        <HomeSocialAppCTA />
         <HomeFinalCTA />
       </main>
     </>

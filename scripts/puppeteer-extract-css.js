@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const TARGET_URL = 'https://elevateforhumanity.org';
+const TARGET_URL = 'https://www.elevateforhumanity.org';
 const OUTPUT_DIR = path.join(process.cwd(), 'extracted-styles');
 
 async function extractAllCSS() {

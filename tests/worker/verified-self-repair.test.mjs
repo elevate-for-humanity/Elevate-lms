@@ -1,3 +1,4 @@
+import { runInNewContext } from 'node:vm';
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {stripTypeScriptTypes} from 'node:module';import {repairDirective,instructionView} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
 const src=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/build-runner.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
 const reviewSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/lesson-contract.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?;\n/gm,'').replaceAll('export ','');
@@ -116,4 +117,16 @@ test('explicitly named safety teaching survives concept stage normalization',()=
 test('incidental safety words do not invent a safety scene',()=>{
  const view=instructionView({scenes:[{id:'color-wheel',stage:'concept_explanation',text:'Gloves protect the stylist.'},{id:'safety',stage:'concept_explanation',text:'Color theory explains hues.'},{id:'warning',stage:'concept_explanation',sceneType:'safety_warning',text:'Wear protective gloves.'}]});
  assert.equal(view.scenes[0].sceneType,'mental_model');assert.equal(view.scenes[1].sceneType,'mental_model');assert.equal(view.scenes[2].sceneType,'safety_warning');
+});
+
+
+test('errors crossing worker realms retain their message and external-blocker classification', async () => {
+ const error=runInNewContext("new Error('MEDIA_LICENSE_REQUIRED: actual entitlement unavailable')");
+ assert.equal(error instanceof Error,false);
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set()};
+ const R=runner();
+ await new R({learning_objectives:async()=>{throw error;},lesson_film_render:()=>assert.fail('must not render without licensed input')}).run(ctx);
+ assert.equal(ctx.findings.at(-1).code,'MEDIA_LICENSE_REQUIRED');
+ assert.equal(ctx.findings.at(-1).message,'MEDIA_LICENSE_REQUIRED: actual entitlement unavailable');
+ assert.equal(ctx.artifacts.selective_repair.repair.unresolved,1);
 });

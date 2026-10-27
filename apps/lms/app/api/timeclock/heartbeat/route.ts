@@ -43,12 +43,11 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Reject low-accuracy GPS readings
-    if (accuracy_m && accuracy_m > MAX_ACCURACY_M) {
-      return NextResponse.json(
-        { error: 'GPS accuracy too low', accuracy_m, max_allowed: MAX_ACCURACY_M },
-        { status: 400 },
-      );
+    if (typeof lat !== 'number' || !Number.isFinite(lat) || Math.abs(lat) > 90 ||
+        typeof lng !== 'number' || !Number.isFinite(lng) || Math.abs(lng) > 180 ||
+        (accuracy_m !== undefined && (typeof accuracy_m !== 'number' ||
+          !Number.isFinite(accuracy_m) || accuracy_m < 0 || accuracy_m > MAX_ACCURACY_M))) {
+      return NextResponse.json({ error: 'Invalid or inaccurate GPS coordinates' }, { status: 400 });
     }
 
     // Verify authenticated user
@@ -124,7 +123,7 @@ async function _POST(request: NextRequest) {
 
     // Call update_geofence_state — DB function takes (p_entry_id, p_lat, p_lng)
     // and handles geofence math + auto-clock-out internally.
-    const { data: geofenceResult, error: geofenceError } = await supabase.rpc(
+    const { error: geofenceError } = await supabase.rpc(
       'update_geofence_state',
       {
         p_entry_id: progress_entry_id,
@@ -135,6 +134,7 @@ async function _POST(request: NextRequest) {
 
     if (geofenceError) {
       logger.error('[Heartbeat] update_geofence_state error:', geofenceError);
+      return NextResponse.json({ error: 'Geofence update unavailable' }, { status: 503 });
     }
 
     // Call auto_clock_out_if_needed — DB function takes only (p_entry_id UUID)
@@ -144,19 +144,11 @@ async function _POST(request: NextRequest) {
 
     if (autoClockError) {
       logger.error('[Heartbeat] auto_clock_out_if_needed error:', autoClockError);
+      return NextResponse.json({ error: 'Shift validation unavailable' }, { status: 503 });
     }
 
-    // Use result from update_geofence_state if available, otherwise reload
-    const geofenceRow = Array.isArray(geofenceResult) ? geofenceResult[0] : geofenceResult;
-
-    if (geofenceRow) {
-      return NextResponse.json({
-        within_geofence: geofenceRow.within_geofence ?? false,
-        auto_clocked_out: geofenceRow.auto_clocked_out ?? false,
-        clock_out_at: geofenceRow.clock_out_at ?? null,
-      });
-    }
-
+    // Auto-clock-out may close the shift after the geofence RPC. Reload the
+    // authoritative final row instead of returning the earlier RPC snapshot.
     // Fallback: reload row
     const { data: updatedEntry, error: reloadError } = await supabase
       .from('progress_entries')
@@ -164,7 +156,7 @@ async function _POST(request: NextRequest) {
       .eq('id', progress_entry_id)
       .maybeSingle();
 
-    if (reloadError) {
+    if (reloadError || !updatedEntry) {
       return NextResponse.json({ error: 'Failed to reload entry state' }, { status: 500 });
     }
 

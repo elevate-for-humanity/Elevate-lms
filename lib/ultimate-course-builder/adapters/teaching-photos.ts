@@ -1,6 +1,5 @@
 import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
-import {recoverTeachingPhoto} from './photo-repair.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
@@ -16,6 +15,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const photos: Record<string, any[]> = {};
   const approvedReference=await approvedReferencePhotoPicker(input,db);
   let placedPhotos: any[] | undefined;
+  const usedPhotoHashes=new Set<string>();
+  const assignPhoto=(sceneId:string,photo:any)=>{
+    if(!photo.sha256||usedPhotoHashes.has(photo.sha256))return false;
+    usedPhotoHashes.add(photo.sha256);
+    photos[sceneId].push(photo);
+    return true;
+  };
 
   for (const scene of scenes) {
     const steps = scene.teachingVisual?.steps;
@@ -32,7 +38,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(approvedReference){
         try {
           const photo=await approvedReference(scene,index,step,index===requests.length-1);
-          photos[scene.id].push({...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
+          if(!assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))throw new Error('COURSE_PHOTO_ALREADY_USED');
           reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
           continue;
         } catch(error) {
@@ -55,13 +61,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'});
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'}))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
       const selected=await courseSelectedStill(input,db,scene,index,step);
       if(selected){
-        photos[scene.id].push({...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
+        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -74,7 +80,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
         usedLicensedPhotos.add(sha256);
-        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url});
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url}))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }

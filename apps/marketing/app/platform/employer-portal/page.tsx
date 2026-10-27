@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -104,7 +105,7 @@ export default function EmployerPortalPage() {
               </div>
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                  <Image
+                  <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                     src="/images/pages/apply-employer-hero.jpg"
                     alt="Employer Portal Dashboard"
                     fill
@@ -119,23 +120,23 @@ export default function EmployerPortalPage() {
         </section>
 
         {/* Stats Bar */}
-        <section className="bg-blue-600 text-white py-8">
+        <section aria-label="Employer network highlights" className="bg-blue-600 text-white py-8">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
               <div>
-                <div className="text-4xl font-black">Active</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl break-words font-black">Active</div>
                 <div className="text-blue-100">Employer Network</div>
               </div>
               <div>
-                <div className="text-4xl font-black">Career</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl break-words font-black">Career</div>
                 <div className="text-blue-100">Placement Support</div>
               </div>
               <div>
-                <div className="text-4xl font-black">OJT</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl break-words font-black">OJT</div>
                 <div className="text-blue-100">Reimbursement Available</div>
               </div>
               <div>
-                <div className="text-4xl font-black">Ongoing</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl break-words font-black">Ongoing</div>
                 <div className="text-blue-100">Graduate Support</div>
               </div>
             </div>

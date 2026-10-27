@@ -1,4 +1,5 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { timingSafeEqual } from 'node:crypto';
 
 // app/api/webhooks/partners/[partner]/route.ts
 // Webhook endpoint for partner progress updates
@@ -19,6 +20,14 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
+
+function safeSecretEqual(provided: string, expected: string): boolean {
+  const providedBytes = Buffer.from(provided, 'utf8');
+  const expectedBytes = Buffer.from(expected, 'utf8');
+  return (
+    providedBytes.length === expectedBytes.length && timingSafeEqual(providedBytes, expectedBytes)
+  );
+}
 
 async function _POST(request: NextRequest, { params }: { params: Promise<{ partner: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -41,7 +50,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ partn
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
     }
 
-    if (providedSecret !== webhookSecret) {
+    if (!safeSecretEqual(providedSecret, webhookSecret)) {
       logger.error(`[Webhook] Invalid secret for ${partner}`);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }

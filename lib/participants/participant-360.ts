@@ -1,4 +1,5 @@
 import 'server-only';
+import { requireRole } from '@/lib/auth/require-role';
 
 /**
  * Canonical participant 360 read model.
@@ -55,6 +56,7 @@ export async function loadParticipant360ByApplication(
   db: DbClient,
   applicationId: string,
 ): Promise<Participant360 | null> {
+  await requireRole(['case_manager', 'admin', 'super_admin', 'staff']);
   const { data: application, error: applicationError } = await db
     .from('applications')
     .select('*')
@@ -116,7 +118,7 @@ export async function loadParticipant360ByApplication(
     rows('documents', db.from('documents').select('*').eq('user_id', learnerId).order('created_at', { ascending: false })),
     rows('case_notes', db.from('case_notes').select('*').eq('student_id', learnerId).order('created_at', { ascending: false })),
     rows('communication_messages', db.from('communication_messages').select('*').eq('recipient_user_id', learnerId).order('created_at', { ascending: false }).limit(100)),
-    rows('apprenticeship_enrollments', db.from('apprenticeship_enrollments').select('*').eq('student_id', learnerId).order('created_at', { ascending: false })),
+    rows('apprenticeship_records', db.from('program_enrollments').select('*').eq('student_id', learnerId).eq('enrollment_type', 'apprentice').order('created_at', { ascending: false })),
   ];
 
   if (enrollmentIds.length) {
@@ -144,7 +146,7 @@ export async function loadParticipant360ByApplication(
     fundingAssignments: results.student_funding_assignments?.data ?? [],
     activity: results.student_activity_log?.data ?? [],
     communications: results.communication_messages?.data ?? [],
-    apprenticeshipEnrollments: results.apprenticeship_enrollments?.data ?? [],
+    apprenticeshipEnrollments: results.apprenticeship_records?.data ?? [],
     sourceErrors,
   };
 }

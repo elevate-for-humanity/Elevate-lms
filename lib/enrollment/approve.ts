@@ -37,6 +37,8 @@ export interface ApproveApplicationResult {
 
 const APPROVABLE_APPLICATION_STATUSES = new Set([
   'under_review',
+  'pending_admin_review',
+  'submitted',
   'funding_review',
   'pending_workone',
   'in_review',
@@ -58,24 +60,16 @@ export async function approveApplication(
     .maybeSingle();
 
   if (appError || !app) return { success: false, error: 'Application not found' };
-  if (app.status === 'approved') {
-    return { success: true, userId: app.user_id, error: 'Already approved' };
-  }
+  // Reconcile previously approved applications rather than returning before LMS provisioning.
+  // Re-running approval must be safe when an earlier attempt partially completed.
 
-  if (!APPROVABLE_APPLICATION_STATUSES.has(app.status)) {
+  if (app.status !== 'approved' && !APPROVABLE_APPLICATION_STATUSES.has(app.status)) {
     return {
       success: false,
       error: `Application must be under review before approval (current status: ${app.status})`,
     };
   }
 
-  if (app.status === 'pending_workone' && !app.has_workone_approval) {
-    return {
-      success: false,
-      error:
-        'This application is pending WorkOne eligibility confirmation. Update has_workone_approval before approving.',
-    };
-  }
 
   const isRepair = (input as any).source === 'stripe_repair';
   const NON_SELF_PAY = [
@@ -283,9 +277,8 @@ export async function approveApplication(
     // duplicating inserts in application code.
     const { data: courses, error: coursesError } = await db
       .from('lms_courses')
-      .select('id')
-      .eq('program_id', resolvedProgramId)
-      .eq('is_active', true);
+      .select('id,status,is_active')
+      .eq('program_id', resolvedProgramId);
     if (coursesError) {
       logger.error('[approve] failed to load program courses', new Error(coursesError.message), {
         resolvedProgramId,
@@ -293,7 +286,23 @@ export async function approveApplication(
       return { success: false, error: 'Failed to verify course provisioning' };
     }
 
-    const courseIds = (courses ?? []).map((course: { id: string }) => course.id);
+    const mappedCourses = courses ?? [];
+    const availableCourses = mappedCourses.filter(
+      (course: { status?: string | null; is_active?: boolean | null }) =>
+        course.status === 'published' && course.is_active === true,
+    );
+    // Program admission and course-content release are separate workflows.
+    // An unpublished curriculum must not block an otherwise authorized
+    // program enrollment. The database trigger grants only published courses;
+    // additional course access is provisioned when content is released.
+    if (mappedCourses.length > 0 && availableCourses.length === 0) {
+      logger.info('[approve] program enrollment created; curriculum not yet published', {
+        resolvedProgramId,
+        mappedCourseIds: mappedCourses.map((course: { id: string }) => course.id),
+      });
+    }
+
+    const courseIds = availableCourses.map((course: { id: string }) => course.id);
     if (courseIds.length > 0) {
       const { data: provisionedCourses, error: provisionError } = await db
         .from('course_enrollments')
@@ -341,7 +350,8 @@ export async function approveApplication(
       status: 'approved',
       user_id: userId,
       program_id: resolvedProgramId,
-      eligibility_status: 'verified',
+      // Admission grants access; eligibility is owned by its separate review.
+      // In particular, an audited payment-gate exception is not funding proof.
       updated_at: new Date().toISOString(),
     })
     .eq('id', applicationId);

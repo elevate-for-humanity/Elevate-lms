@@ -24,11 +24,29 @@ export const metadata: Metadata = {
 export default async function StudentApplicationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string }>;
+  searchParams: Promise<{
+    program?: string;
+    intent?: string;
+    payment?: string;
+    funding?: string;
+    session_id?: string;
+  }>;
 }) {
   const params = await searchParams;
   const program = resolveSlug(params?.program || '') || '';
+  // Keep the shopper's validated enrollment choices intact across the canonical PARIS redirect.
   const query = new URLSearchParams();
   if (program) query.set('program', program);
-  redirect(`/apply/student/interview${query.toString() ? `?${query.toString()}` : ''}`);
+  if (params?.intent === 'enrollment') query.set('intent', 'enrollment');
+  if (['full', 'plan', 'bnpl', 'success'].includes(params?.payment || '')) {
+    query.set('payment', params.payment as string);
+  }
+  if (['self_pay', 'workone', 'wioa', 'grant', 'employer'].includes(params?.funding || '')) {
+    query.set('funding', params.funding as string);
+  }
+  if (params?.session_id) query.set('session_id', params.session_id);
+  // HVAC uses the standard application independently of PARIS.
+  // Other programs retain the existing guided interview behavior.
+  const destination = program === 'hvac-technician' ? '/apply/student/form' : '/apply/student/interview';
+  redirect(`${destination}${query.toString() ? `?${query.toString()}` : ''}`);
 }

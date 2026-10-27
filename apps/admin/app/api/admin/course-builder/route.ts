@@ -5,6 +5,7 @@
  * Studio controls this surface. Course Builder owns orchestration and delegates
  * execution to private/internal Course Builder capability services.
  */
+import { courseLibraryPlayback } from '@/lib/storage/course-library-playback';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,9 +30,15 @@ import {
 } from '@/lib/course-builder/edit-service';
 import { publishPersistedCourse } from '@/lib/course-builder/persisted-publish-service';
 import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-builder/review-service';
+import {
+  normalizeManualAssessmentQuestions,
+  persistAssessmentQuestions,
+  toQuizQuestion,
+} from '@/lib/course-builder/assessment-generator';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
 import {
   CourseBuilderCreditsError,
   getCourseBuilderCreditBalance,
@@ -43,6 +50,16 @@ import {
   reserveCourseBuilderRequestCredits,
   type CreditReservation,
 } from '@/lib/course-builder/request-metering';
+import {
+  loadCredentialConfigs,
+  validateCredentialAuthority,
+} from '@/lib/course-builder/credential-engine/registry-loader';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
+import { loadCourseSession } from '@/lib/studio/course-session';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -69,6 +86,7 @@ type CourseBuilderAction =
   | 'delete-lesson'
   | 'reorder-lessons'
   | 'link-scorm'
+  | 'save-assessment'
   | 'review-course'
   | 'review-lessons'
   | 'audit'
@@ -76,7 +94,8 @@ type CourseBuilderAction =
   | 'publish'
   | 'publish-persisted'
   | 'repair'
-  | 'generate-missing';
+  | 'generate-missing'
+  | 'start-existing';
 
 function toPipelineStage(stage: FactoryStage): PipelineStage {
   if (stage === 'enrich') return 'lessons';
@@ -114,6 +133,7 @@ async function reserveCredits(input: {
     operation: input.operation,
     metadata: {
       course_id: input.body.courseId ?? null,
+      lesson_id: input.body.lessonId ?? null,
       program_id: input.body.programId ?? null,
       blueprint_id: input.body.blueprintId ?? null,
     },
@@ -128,6 +148,14 @@ export async function GET(req: NextRequest) {
 
   const action = req.nextUrl.searchParams.get('action') || 'blueprints';
   try {
+    if (action === 'session') {
+      const courseId = req.nextUrl.searchParams.get('courseId')?.trim() || '';
+      if (!courseId) {
+        return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      }
+      return NextResponse.json({ session: await loadCourseSession(courseId) });
+    }
+
     if (action === 'blueprints') {
       const id = req.nextUrl.searchParams.get('id');
       const registry = await loadAllBlueprints();
@@ -152,6 +180,27 @@ export async function GET(req: NextRequest) {
           socCode: blueprint.socCode ?? null,
         })),
       });
+    }
+
+    if (action === 'media-library') {
+      const courseId = req.nextUrl.searchParams.get('courseId');
+      if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      const db = await requireAdminClient();
+      const course = await loadCourse(courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+
+      const { data: videos, error } = await db
+        .from('course_videos')
+        .select('id,title,lesson_id,storage_path,video_url,status,asset_role,created_at')
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const rows = await Promise.all(
+        (videos ?? []).map(video => courseLibraryPlayback(db,video)),
+      );
+
+      return NextResponse.json({ ok: true, course, videos: rows });
     }
 
     if (action === 'instructor-media') {
@@ -187,6 +236,56 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    if (action === 'authoring-options') {
+      const db = await requireAdminClient();
+      const [{ data: programs, error: programsError }, { data: workforceCredentials }] =
+        await Promise.all([
+          db.from('programs').select('id,title,slug,status,is_active').order('title'),
+          db
+            .from('credential_registry')
+            .select('id,name,abbreviation,issuing_authority,is_active')
+            .order('name'),
+        ]);
+      if (programsError) throw programsError;
+      const standards = loadCredentialConfigs().map((credential) => {
+        const gaps = validateCredentialAuthority(credential);
+        return {
+          id: credential.id,
+          slug: credential.slug,
+          name: credential.name,
+          provider: credential.provider,
+          category: credential.category,
+          type: credential.type,
+          states: credential.states ?? [],
+          registryKey: credential.authority?.registryKey ?? null,
+          sourceUrl: credential.authority?.sourceUrl ?? null,
+          version: credential.authority?.version ?? null,
+          effectiveDate: credential.authority?.effectiveDate ?? null,
+          standardStatus: credential.authority?.status ?? 'draft',
+          checkedAt: credential.authority?.checkedAt ?? null,
+          objectiveCount: credential.objectives?.length ?? 0,
+          claimReady: gaps.length === 0,
+          gaps,
+        };
+      });
+      return NextResponse.json({
+        programs: programs ?? [],
+        standards,
+        workforceCredentials: (workforceCredentials ?? []).map((credential) => ({
+          id: credential.id,
+          name: credential.name,
+          credential_code: credential.abbreviation,
+          issuing_authority: credential.issuing_authority,
+          status: credential.is_active ? 'active' : 'inactive',
+        })),
+        policy: {
+          drafting: 'allowed',
+          externalClaims: 'verified-evidence-required',
+          unsupportedStandardAction: 'create-standards-development-record',
+        },
+      });
+    }
+
     return NextResponse.json(
       { error: `Unsupported Course Builder GET action: ${action}` },
       { status: 400 },
@@ -213,6 +312,71 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
+  const archivedGenerationActions: CourseBuilderAction[] = [
+    'generate',
+    'generate-from-blueprint',
+    'queue-media',
+    'repair',
+    'generate-missing',
+    'start-existing',
+  ];
+  if (archivedGenerationActions.includes(action)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'COURSE_FACTORY_ARCHIVED',
+        message:
+          'Course Factory is archived. Start or resume production through Ultimate Course Builder.',
+        ultimateEndpoint: '/api/admin/ultimate-course-builder',
+        ultimateRoute: '/studio/courses?tab=ultimate',
+      },
+      { status: 410 },
+    );
+  }
+  if (
+    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing', 'start-existing'].includes(
+      action,
+    )
+  ) {
+    const db = await requireAdminClient();
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : null;
+    try {
+      await assertCourseBuilderGenerationEnabled(db, courseId);
+    } catch (error) {
+      const code =
+        error instanceof Error && error.message === 'COURSE_GENERATION_PAUSED'
+          ? 'COURSE_GENERATION_PAUSED'
+          : 'COURSE_BUILDER_GENERATION_PAUSED';
+      return NextResponse.json(
+        {
+          error: code,
+          message:
+            code === 'COURSE_GENERATION_PAUSED'
+              ? 'Generation is paused for this course.'
+              : 'Course and video generation are paused during the authority consolidation audit.',
+        },
+        { status: 423 },
+      );
+    }
+  }
+
+  if (action === 'start-existing') {
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    const course = await loadCourse(courseId);
+    if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    const result = await courseFactory(
+      {
+        courseId,
+        programSlug: course.slug,
+        mode: 'refresh',
+        contentSource: 'curriculum_lessons',
+        videoMode: 'queue',
+      },
+      () => {},
+    );
+    return NextResponse.json({ ok: result.ok, action: 'start-existing', course, result });
+  }
 
   if (action === 'generate-from-blueprint') {
     if (!body.blueprintId || !body.programId) {
@@ -265,21 +429,57 @@ export async function POST(req: NextRequest) {
   if (action === 'queue-media') {
     if (!body.courseId)
       return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    const lessonId =
+      typeof body.lessonId === 'string' && body.lessonId.trim() ? body.lessonId.trim() : null;
+    const validateOnly = body.validateOnly === true;
+    if (!lessonId && !(body.scope === 'course' && body.confirmCourseBatch === true)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'lessonId is required. Whole-course media generation requires scope="course" and confirmCourseBatch=true.',
+        },
+        { status: 400 },
+      );
+    }
     let reservation: CreditReservation | null = null;
     try {
+      const course = await loadCourse(body.courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+      const validation = await queueCourseMedia({
+        courseId: body.courseId,
+        lessonId,
+        onlyMissing: body.onlyMissing !== false,
+        force: body.force === true,
+        limit: typeof body.limit === 'number' ? body.limit : null,
+        validateOnly: true,
+      });
+      if (validation.failed > 0 || validation.attempted === 0) {
+        return NextResponse.json(
+          { ok: false, error: 'Lesson media validation failed', course, result: validation },
+          { status: 422 },
+        );
+      }
+      if (validateOnly || validation.wouldQueue === 0) {
+        return NextResponse.json({
+          ok: true,
+          status: validateOnly ? 'validated' : 'already_active',
+          charged: false,
+          course,
+          instructor: getInstructorForCourse(course.title),
+          result: validation,
+        });
+      }
       reservation = await reserveCredits({
         req,
-        body,
+        body: { ...body, lessonId },
         userId: auth.id,
         effectiveRoles: auth.effectiveRoles,
         operation: 'queue-media',
       });
-      const course = await loadCourse(body.courseId);
-      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
       const result = await queueCourseMedia({
         courseId: body.courseId,
-        lessonId:
-          typeof body.lessonId === 'string' && body.lessonId.trim() ? body.lessonId.trim() : null,
+        lessonId,
         onlyMissing: body.onlyMissing !== false,
         force: body.force === true,
         limit: typeof body.limit === 'number' ? body.limit : null,
@@ -362,6 +562,78 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { ok: false, error: 'Failed to link SCORM package' },
         { status: 400 },
+      );
+    }
+  }
+  if (action === 'save-assessment') {
+    const lessonId = typeof body.lessonId === 'string' ? body.lessonId.trim() : '';
+    const passingScore = Number(body.passingScore);
+    if (!lessonId) {
+      return NextResponse.json({ ok: false, error: 'lessonId is required' }, { status: 400 });
+    }
+    if (!Number.isInteger(passingScore) || passingScore < 1 || passingScore > 100) {
+      return NextResponse.json(
+        { ok: false, error: 'passingScore must be an integer between 1 and 100' },
+        { status: 400 },
+      );
+    }
+    try {
+      const db = await requireAdminClient();
+      const { data: lesson, error: lessonError } = await db
+        .from('course_lessons')
+        .select('id,module_id,domain_key,competency_checks')
+        .eq('id', lessonId)
+        .maybeSingle();
+      if (lessonError) throw lessonError;
+      if (!lesson) {
+        return NextResponse.json({ ok: false, error: 'Assessment lesson not found' }, { status: 404 });
+      }
+
+      let moduleDomainKey: string | undefined;
+      if (lesson.module_id) {
+        const { data: courseModule, error: moduleError } = await db
+          .from('course_modules')
+          .select('domain_key')
+          .eq('id', lesson.module_id)
+          .maybeSingle();
+        if (moduleError) throw moduleError;
+        moduleDomainKey = courseModule?.domain_key ?? undefined;
+      }
+      const competencyKeys = Array.isArray(lesson.competency_checks)
+        ? lesson.competency_checks
+            .map((item: unknown) => {
+              if (typeof item === 'string') return item;
+              if (item && typeof item === 'object' && 'key' in item) return String(item.key);
+              return '';
+            })
+            .filter(Boolean)
+        : [];
+      const questions = normalizeManualAssessmentQuestions(lessonId, body.questions, {
+        domainKey: lesson.domain_key ?? moduleDomainKey,
+        competencyKeys,
+      });
+      const result = await persistAssessmentQuestions(db, lessonId, questions, {
+        replaceExisting: true,
+        passingScore,
+      });
+      if (result.errors.length) {
+        return NextResponse.json(
+          { ok: false, error: result.errors.join('; '), errors: result.errors },
+          { status: 422 },
+        );
+      }
+      return NextResponse.json({
+        ok: true,
+        lessonId,
+        writtenToDb: result.writtenToDb,
+        questions: result.questions.map(toQuizQuestion).filter(Boolean),
+        passingScore,
+      });
+    } catch (error) {
+      logger.error('[course-builder] Assessment save failed', error);
+      return NextResponse.json(
+        { ok: false, error: error instanceof Error ? error.message : 'Failed to save assessment' },
+        { status: 422 },
       );
     }
   }
@@ -491,6 +763,115 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const requestedModuleCount = body.buildScope === 'lesson' ? 1 : Number(body.moduleCount ?? 1);
+  const requestedLessonsPerModule =
+    body.buildScope === 'lesson' ? 1 : Number(body.lessonsPerModule ?? 1);
+  const requestedLessonCount = requestedModuleCount * requestedLessonsPerModule;
+  const paidProvider = process.env.AI_PROVIDER?.trim() || 'configured';
+  const paidModel = process.env.AI_MODEL?.trim() || 'course-factory-router';
+  const projectedCostMicros = Math.max(
+    0,
+    Number(
+      process.env.COURSE_BUILDER_PROJECTED_COST_MICROS ??
+        String(Math.max(250_000, requestedLessonCount * 250_000)),
+    ),
+  );
+  const artifactFingerprint = paidArtifactFingerprint({
+    operation: 'course-builder-generate',
+    title,
+    topic,
+    programId,
+    moduleCount: requestedModuleCount,
+    lessonsPerModule: requestedLessonsPerModule,
+    buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
+    difficulty: body.difficulty ?? 'intermediate',
+    credentialRegistryKey: body.credentialRegistryKey ?? null,
+    state: body.state ?? null,
+    audience: body.audience ?? null,
+    hours: body.hours ?? null,
+    deliveryFormat: body.deliveryFormat ?? null,
+    additionalRequirements: body.additionalRequirements ?? null,
+  });
+  const db = await requireAdminClient();
+  const creditOwner = await getCourseBuilderCreditOwner({
+    db,
+    userId: auth.id,
+    effectiveRoles: auth.effectiveRoles,
+  });
+  const tenantId = creditOwner.tenantId ?? null;
+  const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+  const studioConversationId =
+    typeof body.studioConversationId === 'string' && body.studioConversationId.trim()
+      ? body.studioConversationId.trim()
+      : null;
+
+  if (body.dryRun === true) {
+    const { data: cachedArtifact } = await db
+      .from('paid_inference_artifacts')
+      .select('id')
+      .eq('scope_key', scopeKey)
+      .eq('artifact_fingerprint', artifactFingerprint)
+      .eq('validation_status', 'valid')
+      .maybeSingle();
+    return NextResponse.json({
+      ok: true,
+      status: 'preflight',
+      dryRun: true,
+      paidProviderCalls: 0,
+      provider: paidProvider,
+      model: paidModel,
+      requestedModuleCount,
+      requestedLessonCount,
+      buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
+      targetDurationMinutes:
+        body.targetDurationMinutes != null
+          ? Number(body.targetDurationMinutes)
+          : body.hours != null
+            ? Number(body.hours) * 60
+            : 0,
+      estimatedSceneCount: Number(body.estimatedSceneCount ?? requestedLessonCount * 6),
+      cacheHits: cachedArtifact ? 1 : 0,
+      artifactFingerprint,
+      projectedCostMicros,
+      requiresExplicitApproval: projectedCostMicros > 0,
+      videosWillQueue: false,
+    });
+  }
+
+  const paidAuthorization = creditOwner.operator
+    ? null
+    : await reservePaidInference(db, {
+        scopeKey,
+        tenantId,
+        actorId: auth.id,
+        artifactFingerprint,
+        idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
+        provider: paidProvider,
+        model: paidModel,
+        operation: 'course-builder-generate',
+        projectedCostMicros,
+      });
+  if (
+    paidAuthorization &&
+    (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId)
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+        status: paidAuthorization.decision,
+        requestId: paidAuthorization.requestId,
+        projectedCostMicros,
+        provider: paidProvider,
+        model: paidModel,
+        message:
+          paidAuthorization.decision === 'approval_required'
+            ? 'Explicit approval is required before this paid generation can run.'
+            : 'Paid course generation is not authorized.',
+      },
+      { status: paidAuthorization.decision === 'budget_exceeded' ? 402 : 409 },
+    );
+  }
+
   let generationReservation: CreditReservation | null = null;
   try {
     generationReservation = await reserveCredits({
@@ -506,14 +887,41 @@ export async function POST(req: NextRequest) {
     throw error;
   }
 
+  const taskCorrelationId = crypto.randomUUID();
+  const { data: studioTask } = await db
+    .from('ai_tasks')
+    .insert({
+      task_id: taskCorrelationId,
+      title: `Build course: ${title}`,
+      description: 'Course Builder generation owned by the unified Studio conversation',
+      command: topic,
+      status: 'running',
+      priority: 'medium',
+      requested_by: auth.id,
+      created_by: auth.id,
+      user_id: auth.id,
+      tenant_id: tenantId,
+      agent_type: 'LIZZY',
+      intent: 'course_builder',
+      correlation_id: taskCorrelationId,
+      conversation_id: studioConversationId,
+      tool_name: 'build_course',
+      payload: { title, topic, programId, sourceTaskId: body.studioTaskId || null },
+      metadata: { source: '/api/admin/course-builder', unifiedStudio: true },
+      started_at: new Date().toISOString(),
+    })
+    .select('id')
+    .maybeSingle();
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       const write = (data: object) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       try {
-        const result = await courseFactory(
-          {
+        const runFactory = () =>
+          courseFactory(
+            {
             title,
             topic,
             difficulty: body.difficulty ?? 'intermediate',
@@ -522,6 +930,8 @@ export async function POST(req: NextRequest) {
             moduleCount: body.moduleCount,
             lessonsPerModule: body.lessonsPerModule,
             credential: body.credential,
+            credentialRegistryKey: body.credentialRegistryKey,
+            buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
             state: body.state,
             audience: body.audience,
             hours: body.hours,
@@ -529,11 +939,24 @@ export async function POST(req: NextRequest) {
             additionalRequirements: body.additionalRequirements,
             contentSource: 'ai',
             mode: 'refresh',
-            videoMode: body.includeVideos === false ? 'off' : 'queue',
-            dryRun: Boolean(body.dryRun),
-          },
-          (stage, message, progress) => write({ stage: toPipelineStage(stage), message, progress }),
-        );
+              // Media has its own approval, metering, and artifact lifecycle.
+              // Never turn a course-drafting approval into an implicit render approval.
+              videoMode: 'off',
+              dryRun: false,
+            },
+            (stage, message, progress) =>
+              write({ stage: toPipelineStage(stage), message, progress }),
+          );
+        const result = creditOwner.operator
+          ? await runFactory()
+          : (
+              await executePaidInference({
+                db,
+                authorize: async () => paidAuthorization!,
+                dispatch: runFactory,
+              })
+            ).value;
+        if (!result) throw new Error('Course generation completed without a result');
 
         let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
           null;
@@ -548,6 +971,20 @@ export async function POST(req: NextRequest) {
         if (!result.ok) {
           await refundReservation(generationReservation, auth.id, 'course_generation_failed');
         }
+        if (studioTask?.id) {
+          await db.from('ai_tasks').update({
+            status: result.ok ? 'completed' : 'failed',
+            result_json: {
+              courseId: result.courseId ?? null,
+              modulesGenerated: result.moduleCount ?? 0,
+              lessonsGenerated: result.lessonCount ?? 0,
+              completionState: result.completionState,
+            },
+            error_message: result.ok ? null : (result.errors ?? []).join('; '),
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }).eq('id', studioTask.id);
+        }
         write({
           stage: 'complete',
           result: {
@@ -558,6 +995,7 @@ export async function POST(req: NextRequest) {
             lessonsGenerated: result.lessonCount ?? 0,
             lessonsWithQuizzes: result.assessmentsGenerated ?? 0,
             videosQueued: result.videosQueued ?? 0,
+            completionState: result.completionState,
             governance,
             errors: result.errors ?? [],
             dryRun: Boolean(result.dryRun),
@@ -565,6 +1003,14 @@ export async function POST(req: NextRequest) {
         });
       } catch (error) {
         await refundReservation(generationReservation, auth.id, 'course_generation_exception');
+        if (studioTask?.id) {
+          await db.from('ai_tasks').update({
+            status: 'failed',
+            error_message: error instanceof Error ? error.message : 'Course generation failed',
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }).eq('id', studioTask.id);
+        }
         logger.error('[course-builder] Course Factory error', error);
         write({
           stage: 'error',

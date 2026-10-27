@@ -21,18 +21,16 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const courseId = url.searchParams.get('courseId')?.trim();
+    const courseSlug = url.searchParams.get('slug')?.trim();
 
-    if (!courseId) {
-      return safeError('courseId query param is required', 400);
+    if (!courseId && !courseSlug) {
+      return safeError('courseId or slug query param is required', 400);
     }
 
     const db = await requireAdminClient();
-
-    const { data: course, error: courseErr } = await db
-      .from('courses')
-      .select('id, title, status, created_at, updated_at')
-      .eq('id', courseId)
-      .maybeSingle();
+    let courseQuery = db.from('courses').select('id, slug, title, status, created_at, updated_at');
+    courseQuery = courseId ? courseQuery.eq('id', courseId) : courseQuery.eq('slug', courseSlug!);
+    const { data: course, error: courseErr } = await courseQuery.maybeSingle();
 
     if (courseErr) {
       return safeInternalError(courseErr, 'Failed to load course');
@@ -43,12 +41,12 @@ export async function GET(request: NextRequest) {
     }
 
     const [modulesRes, lessonsRes, jobsRes] = await Promise.all([
-      db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', courseId),
+      db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', course.id),
       db
         .from('course_lessons')
-        .select('id, content, learning_objectives, video_status, video_url')
-        .eq('course_id', courseId),
-      db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', courseId),
+        .select('id, title, slug, order_index, content, learning_objectives, video_status, video_url, media_origin, media_quality_status')
+        .eq('course_id', course.id),
+      db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', course.id),
     ]);
 
     if (modulesRes.error) {
@@ -74,6 +72,17 @@ export async function GET(request: NextRequest) {
     let videosPending = 0;
     let videosFailed = 0;
     let videosMissing = 0;
+    const mediaOrigins: Record<string, number> = {};
+    const mediaGaps: Array<{
+      lessonId: string;
+      title: string;
+      slug: string;
+      orderIndex: number;
+      videoStatus: string;
+      mediaOrigin: string | null;
+      qualityStatus: string | null;
+      reason: 'missing' | 'pending' | 'failed' | 'qa_pending';
+    }> = [];
 
     for (const lesson of lessons) {
       const hasContent =
@@ -97,16 +106,39 @@ export async function GET(request: NextRequest) {
       if (hasObjective) lessonsWithObjective += 1;
 
       const state = String(lesson.video_status ?? '').toLowerCase();
+      const origin = String(lesson.media_origin ?? 'none').toLowerCase();
+      mediaOrigins[origin] = (mediaOrigins[origin] ?? 0) + 1;
       const hasVideoUrl = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
 
-      if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl) {
+      // Completion is based on playable, quality-approved media, not on who produced it.
+      // Generated, uploaded, and licensed/assisted assets all use the same QA gate.
+      const qualityApproved = lesson.media_quality_status === 'approved';
+      if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl && qualityApproved) {
         videosComplete += 1;
-      } else if (VIDEO_PENDING_STATES.has(state)) {
-        videosPending += 1;
-      } else if (VIDEO_FAILED_STATES.has(state)) {
-        videosFailed += 1;
-      } else if (!hasVideoUrl) {
-        videosMissing += 1;
+      } else {
+        let reason: 'missing' | 'pending' | 'failed' | 'qa_pending' = 'missing';
+        if (VIDEO_PENDING_STATES.has(state)) {
+          videosPending += 1;
+          reason = 'pending';
+        } else if (VIDEO_FAILED_STATES.has(state)) {
+          videosFailed += 1;
+          reason = 'failed';
+        } else if (hasVideoUrl && !qualityApproved) {
+          videosMissing += 1;
+          reason = 'qa_pending';
+        } else {
+          videosMissing += 1;
+        }
+        mediaGaps.push({
+          lessonId: lesson.id,
+          title: lesson.title ?? 'Untitled lesson',
+          slug: lesson.slug ?? '',
+          orderIndex: Number(lesson.order_index ?? 0),
+          videoStatus: state || 'missing',
+          mediaOrigin: lesson.media_origin ?? null,
+          qualityStatus: lesson.media_quality_status ?? null,
+          reason,
+        });
       }
     }
 
@@ -173,13 +205,17 @@ export async function GET(request: NextRequest) {
         storageFailures,
         retryBudgetExhausted,
         deadLetterJobs,
+        mediaOrigins,
       },
+      mediaGaps: mediaGaps.sort((a, b) => a.orderIndex - b.orderIndex),
       nextAction: isComplete
         ? 'Course generation pipeline complete.'
         : mediaReady
           ? 'Course content is ready. Verify learner-facing pages and publish status.'
           : buildReady
-            ? 'Course content is ready. Continue polling until media jobs complete.'
+            ? videosMissing > 0
+              ? `Course content is ready. ${videosMissing} lesson${videosMissing === 1 ? '' : 's'} still need approved playable media.`
+              : 'Course content is ready. Media production or QA is still in progress.'
             : 'Course content generation is still in progress or has gaps to resolve.',
       checkedAt: new Date().toISOString(),
     });

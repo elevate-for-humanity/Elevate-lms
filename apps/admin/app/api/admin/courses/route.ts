@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/with-auth';
 import { API_ADMIN_ROLES } from '@/lib/rbac/role-matrix';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { safeDbError, safeInternalError } from '@/lib/api/safe-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,31 +15,17 @@ type CourseInput = {
   status?: 'draft' | 'published';
 };
 
-function getConfiguration() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRole) throw new Error('Missing Supabase server configuration');
-  return { url, serviceRole };
-}
-
 export const GET = withAuth(async () => {
   try {
-    const { url, serviceRole } = getConfiguration();
-    const response = await fetch(`${url}/rest/v1/courses?select=*&order=updated_at.desc`, {
-      headers: {
-        apikey: serviceRole,
-        Authorization: `Bearer ${serviceRole}`,
-      },
-      cache: 'no-store',
-    });
-    const result = await response.json();
-    return NextResponse.json(result, {
-      status: response.status,
-      headers: { 'Cache-Control': 'no-store' },
-    });
+    const db = await requireAdminClient();
+    const { data, error } = await db.from('courses').select('*').order('updated_at', { ascending: false });
+    if (error) return safeDbError(error, 'Unable to load courses');
+    return NextResponse.json(
+      { courses: data ?? [], count: data?.length ?? 0 },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
   } catch (error) {
-    console.error('[admin/courses] GET failed', error);
-    return NextResponse.json({ error: 'Unable to load courses' }, { status: 500 });
+    return safeInternalError(error, 'Unable to load courses');
   }
 }, { roles: API_ADMIN_ROLES });
 
@@ -51,32 +39,36 @@ export const POST = withAuth(async (request: NextRequest) => {
       );
     }
 
-    const { url, serviceRole } = getConfiguration();
-    const response = await fetch(`${url}/rest/v1/courses`, {
-      method: 'POST',
-      headers: {
-        apikey: serviceRole,
-        Authorization: `Bearer ${serviceRole}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=representation',
-      },
-      body: JSON.stringify({
+    const db = await requireAdminClient();
+    let courseSlug = input.slug.trim();
+    if (input.programId) {
+      const { data: program, error: programError } = await db
+        .from('programs')
+        .select('slug')
+        .eq('id', input.programId)
+        .maybeSingle();
+      if (programError) return safeDbError(programError, 'Unable to resolve program');
+      if (!program) {
+        return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+      }
+      courseSlug = String(program.slug || courseSlug).trim();
+    }
+
+    const { data, error } = await db
+      .from('courses')
+      .insert({
         title: input.title,
-        slug: input.slug,
+        slug: courseSlug,
         description: input.description,
         program_id: input.programId || null,
         status: input.status ?? 'draft',
         updated_at: new Date().toISOString(),
-      }),
-      cache: 'no-store',
-    });
-    const result = await response.json();
-    return NextResponse.json(result, {
-      status: response.status,
-      headers: { 'Cache-Control': 'no-store' },
-    });
+      })
+      .select('*')
+      .single();
+    if (error) return safeDbError(error, 'Unable to create course');
+    return NextResponse.json(data, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    console.error('[admin/courses] POST failed', error);
-    return NextResponse.json({ error: 'Unable to create course' }, { status: 500 });
+    return safeInternalError(error, 'Unable to create course');
   }
 }, { roles: API_ADMIN_ROLES });

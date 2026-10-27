@@ -42,7 +42,7 @@ const indianaPathways = [
     title: 'Apprenticeship Pathways',
     description:
       'Earn-while-you-learn options that combine structured instruction with supervised workplace progression.',
-    href: '/programs/apprenticeships',
+    href: '/apprenticeships',
   },
 ];
 

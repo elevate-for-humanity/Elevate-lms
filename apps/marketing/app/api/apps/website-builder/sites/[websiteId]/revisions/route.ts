@@ -1,5 +1,7 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const runtime = 'nodejs';
@@ -22,16 +24,17 @@ async function authorize(websiteId: string) {
     };
   }
 
-  const { data: site, error } = await supabase
+  const admin = await requireAdminClient();
+  const { data: site, error } = await admin
     .from('user_websites')
     .select('id, user_id, site_name, subdomain, site_config, is_published')
     .eq('id', websiteId)
     .maybeSingle();
   if (error) return { supabase, user, site: null, response: NextResponse.json({ error: error.message }, { status: 500 }) };
-  if (!site || site.user_id !== user.id) {
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) {
     return { supabase, user, site: null, response: NextResponse.json({ error: 'Website not found' }, { status: 404 }) };
   }
-  return { supabase, user, site, response: null };
+  return { supabase: admin, user, site, response: null };
 }
 
 export async function GET(
@@ -47,7 +50,6 @@ export async function GET(
     .from('website_revisions')
     .select('id, site_name, subdomain, is_published, reason, created_at')
     .eq('website_id', websiteId)
-    .eq('user_id', auth.user.id)
     .order('created_at', { ascending: false })
     .limit(30);
 
@@ -73,7 +75,6 @@ export async function POST(
     .select('id, site_name, subdomain, site_config, is_published')
     .eq('id', revisionId)
     .eq('website_id', websiteId)
-    .eq('user_id', auth.user.id)
     .maybeSingle();
 
   if (revisionError) return NextResponse.json({ error: revisionError.message }, { status: 500 });
@@ -100,7 +101,6 @@ export async function POST(
       updated_at: new Date().toISOString(),
     })
     .eq('id', websiteId)
-    .eq('user_id', auth.user.id)
     .select('id, site_name, subdomain, site_config, is_published')
     .maybeSingle();
 
@@ -109,7 +109,7 @@ export async function POST(
   }
 
   const publicUrl = restored.subdomain && restored.is_published
-    ? `https://${restored.subdomain}.app.elevateforhumanity.org`
+    ? `/sites/${restored.subdomain}`
     : null;
   return NextResponse.json({ website: restored, publicUrl });
 }

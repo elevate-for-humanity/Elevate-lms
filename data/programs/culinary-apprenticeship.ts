@@ -160,8 +160,8 @@ export const CULINARY: ProgramSchema = {
       description: 'Training meets National Restaurant Association food safety standards.',
     },
     {
-      standard: 'DOL Registered Apprenticeship',
-      description: 'Program registered with U.S. Department of Labor.',
+      standard: 'Federal registration disclosure',
+      description: 'Culinary is not included in Elevate’s current canonical Registered Apprenticeship occupation standards.',
     },
     {
       standard: 'WIOA Title I',
@@ -242,6 +242,6 @@ export const CULINARY: ProgramSchema = {
     fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
+    fundingNotes: 'FSSA IMPACT or other support may be available only after individual eligibility and written authorization. No federal Registered Apprenticeship claim is made for this pathway.',
   },
 };

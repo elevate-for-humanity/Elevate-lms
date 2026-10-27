@@ -12,14 +12,14 @@ interface ProgramHighlightsProps {
 
 const defaultHighlights: Highlight[] = [
   {
-    title: 'No-Cost Training Available',
+    title: 'Funding Options Vary by Program',
     description:
-      'No tuition for eligible participants. Funded through WIOA, WRG, and JRI programs.',
+      'Review the exact program page for verified funding options. Agency-funded enrollment requires program-level eligibility and written authorization.',
     image: '/images/pages/cna-clinical.jpg',
   },
   {
-    title: 'Earn While You Learn',
-    description: 'Get paid during training through work-study programs and apprenticeships.',
+    title: 'Work-Based Learning Options',
+    description: 'Some approved pathways include paid, supervised work. Employment and placement must be confirmed for the applicable program.',
     image: '/images/pages/hvac-technician.webp',
   },
   {
@@ -56,7 +56,7 @@ export default function ProgramHighlights({
             Why Choose This Program
           </h2>
           <p className="text-lg sm:text-xl text-black max-w-3xl mx-auto">
-            Everything you need to launch your career, completely free
+            Program details, training expectations, credentials, and available support in one place
           </p>
         </div>
 

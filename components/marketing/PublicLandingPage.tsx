@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -49,18 +50,16 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
 
       {/* Hero — clean full-bleed image, no overlay or text on top */}
       <section
-        className="relative w-full overflow-hidden"
-        style={{ height: 'clamp(320px, 38vw, 520px)' }}
+        className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden"
         aria-label={`${config.hero.title} hero image`}
       >
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={config.hero.image}
           alt={config.hero.title}
           fill
           className="object-cover object-center"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
         {/* Micro-label — bottom-left, 2–4 words max */}
         {config.hero.tag && (

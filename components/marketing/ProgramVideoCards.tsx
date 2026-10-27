@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
@@ -21,18 +22,17 @@ function ProgramCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
     : '';
 
   return (
-    <div className="group flex flex-col rounded-2xl overflow-hidden bg-slate-900 shadow-md hover:shadow-xl transition-shadow">
+    <div className="group flex h-full flex-col rounded-2xl overflow-hidden bg-slate-900 shadow-md hover:shadow-xl transition-shadow">
       {/* Image — aspect ratio keeps subjects visible at all viewport widths */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden flex-shrink-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+      <div className="relative w-full aspect-[4/3] overflow-hidden flex-shrink-0">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={prog.heroImage}
           alt={prog.heroImageAlt || prog.title}
           fill
-          className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+          className="object-cover object-center contrast-105 saturate-110 transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           priority={priority}
-          loading={priority ? undefined : 'lazy'} placeholder="empty"
+          loading={priority ? undefined : 'lazy'}
         />
         {/* Category badge top-left */}
         <div className="absolute top-3 left-3">
@@ -81,7 +81,7 @@ function ProgramCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
 export function ProgramVideoCards({ count = 8 }: { count?: number }) {
   const featuredPrograms = ALL_PROGRAMS.slice(0, count);
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid auto-rows-fr items-stretch grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {featuredPrograms.map((prog, i) => (
         <ProgramCard key={prog.slug} prog={prog} priority={i < 4} />
       ))}

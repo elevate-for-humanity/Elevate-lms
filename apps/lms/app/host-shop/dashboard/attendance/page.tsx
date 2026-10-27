@@ -19,8 +19,22 @@ export default async function HostShopAttendancePage() {
   const db = await requireAdminClient();
   const placementIds = board.apprentices.map((apprentice) => apprentice.id).filter(Boolean);
 
+  const shopIds = board.shops.map((shop) => shop.id).filter(Boolean);
+  const [{ data: partnerUsers, error: partnerUsersError }, { data: shopStaff, error: shopStaffError }] = await Promise.all([
+    db.from('partner_users').select('user_id').eq('partner_id', board.partner.id).eq('status', 'active'),
+    shopIds.length
+      ? db.from('shop_staff').select('user_id').in('shop_id', shopIds).eq('active', true)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const hostUserIds = Array.from(new Set([
+    ...(partnerUsers || []).map((row: any) => row.user_id),
+    ...(shopStaff || []).map((row: any) => row.user_id),
+  ].filter(Boolean)));
   const [{ data: sessions, error: sessionsError }, attendanceResult] = await Promise.all([
-    db.from('attendance_sessions').select('id, title, scheduled_at, status, created_at').eq('host_id', user.id).order('scheduled_at', { ascending: false }).limit(25),
+    hostUserIds.length
+      ? db.from('attendance_sessions').select('id, title, scheduled_at, status, created_at')
+          .in('host_id', hostUserIds).order('scheduled_at', { ascending: false }).limit(25)
+      : Promise.resolve({ data: [], error: null }),
     placementIds.length
       ? db.from('host_shop_attendance_records').select('id, placement_id, student_id, attendance_date, status, notes, recorded_by, created_at, updated_at').eq('partner_id', board.partner.id).in('placement_id', placementIds).order('attendance_date', { ascending: false }).order('created_at', { ascending: false }).limit(100)
       : Promise.resolve({ data: [], error: null }),
@@ -47,7 +61,7 @@ export default async function HostShopAttendancePage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5"><CheckCircle2 className="h-5 w-5 text-brand-green-700" /><p className="mt-3 text-3xl font-black text-slate-950">{presentCount}</p><p className="text-sm text-slate-600">Present records</p></div>
       </div>
 
-      {sessionsError || attendanceError ? <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900">Some attendance data could not be loaded. No records from another shop are substituted.</div> : null}
+      {partnerUsersError || shopStaffError || sessionsError || attendanceError ? <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900">Some attendance data could not be loaded. No records from another shop are substituted.</div> : null}
 
       <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-4 sm:px-6"><h2 className="font-black text-slate-950">Recorded attendance</h2></div>

@@ -44,6 +44,151 @@ function readBaseline(root: string): DriftBaseline | null {
 
 type TableSchema = Map<string, Set<string>>;
 
+function mergeGeneratedDatabaseTypes(schema: TableSchema, generatedTypesPath: string): boolean {
+  if (!fs.existsSync(generatedTypesPath)) return false;
+
+  const lines = fs.readFileSync(generatedTypesPath, 'utf8').split('\n');
+  let inPublicSchema = false;
+  let inRelations = false;
+  let currentRelation: string | null = null;
+  let inRow = false;
+
+  for (const line of lines) {
+    if (line === '  public: {') {
+      inPublicSchema = true;
+      continue;
+    }
+    if (!inPublicSchema) continue;
+
+    if (line === '    Tables: {' || line === '    Views: {') {
+      inRelations = true;
+      currentRelation = null;
+      inRow = false;
+      continue;
+    }
+    if (/^    (?:Functions|Enums|CompositeTypes): \{$/.test(line)) {
+      inRelations = false;
+      currentRelation = null;
+      inRow = false;
+      continue;
+    }
+    if (!inRelations) continue;
+
+    const relationMatch = line.match(/^      "?([A-Za-z_][A-Za-z0-9_]*)"?: \{$/);
+    if (relationMatch) {
+      currentRelation = relationMatch[1].toLowerCase();
+      if (!schema.has(currentRelation)) schema.set(currentRelation, new Set());
+      inRow = false;
+      continue;
+    }
+    if (currentRelation && line === '        Row: {') {
+      inRow = true;
+      continue;
+    }
+    if (inRow && line === '        }') {
+      inRow = false;
+      continue;
+    }
+    if (!inRow || !currentRelation) continue;
+
+    const columnMatch = line.match(/^          "?([A-Za-z_][A-Za-z0-9_]*)"?\??:/);
+    if (columnMatch) schema.get(currentRelation)!.add(columnMatch[1].toLowerCase());
+  }
+
+  return true;
+}
+
+function splitTopLevelCommaList(input: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  let depth = 0;
+  let quote: "'" | '"' | null = null;
+
+  for (let i = 0; i < input.length; i += 1) {
+    const char = input[i];
+    if (quote) {
+      if (char === quote && input[i + 1] === quote) {
+        i += 1;
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+    } else if (char === '(') {
+      depth += 1;
+    } else if (char === ')') {
+      depth = Math.max(0, depth - 1);
+    } else if (char === ',' && depth === 0) {
+      parts.push(input.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(input.slice(start));
+  return parts;
+}
+
+function findTopLevelKeyword(input: string, start: number, keyword: string): number {
+  let depth = 0;
+  let quote: "'" | '"' | null = null;
+  const lower = input.toLowerCase();
+
+  for (let i = start; i < input.length; i += 1) {
+    const char = input[i];
+    if (quote) {
+      if (char === quote && input[i + 1] === quote) {
+        i += 1;
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+      continue;
+    }
+    if (char === '(') {
+      depth += 1;
+      continue;
+    }
+    if (char === ')') {
+      depth = Math.max(0, depth - 1);
+      continue;
+    }
+    if (
+      depth === 0 &&
+      lower.startsWith(keyword, i) &&
+      !/[a-z0-9_]/i.test(input[i - 1] ?? '') &&
+      !/[a-z0-9_]/i.test(input[i + keyword.length] ?? '')
+    ) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function mergeMigrationViews(schema: TableSchema, sql: string): void {
+  const viewRe = /CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?(?:\s*\([^)]*\))?\s+AS\s+SELECT\s+/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = viewRe.exec(sql)) !== null) {
+    const table = match[1].toLowerCase();
+    const selectStart = match.index + match[0].length;
+    const fromIndex = findTopLevelKeyword(sql, selectStart, 'from');
+    if (fromIndex === -1) continue;
+    if (!schema.has(table)) schema.set(table, new Set());
+
+    for (const rawExpression of splitTopLevelCommaList(sql.slice(selectStart, fromIndex))) {
+      const expression = rawExpression.replace(/--[^\n]*/g, '').trim();
+      const alias = expression.match(/\s+AS\s+"?([A-Za-z_][A-Za-z0-9_]*)"?\s*$/i);
+      const direct = expression.match(/(?:^|\.)(?:"?([A-Za-z_][A-Za-z0-9_]*)"?)(?:::[A-Za-z_][A-Za-z0-9_]*(?:\[\])?)?\s*$/);
+      const column = alias?.[1] ?? direct?.[1];
+      if (column) schema.get(table)!.add(column.toLowerCase());
+    }
+  }
+}
+
 async function fetchLiveSchema(supabaseUrl: string, serviceKey: string): Promise<TableSchema | null> {
   try {
     const res = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/`, {
@@ -80,9 +225,9 @@ function parseMigrations(migrationsDir: string): TableSchema {
     while ((m = createRe.exec(sql)) !== null) {
       const t = m[1].toLowerCase();
       if (!schema.has(t)) schema.set(t, new Set());
-      const lineRe = /^\s+"?(\w+)"?\s+\w/gm;
-      let lm: RegExpExecArray | null;
-      while ((lm = lineRe.exec(m[2])) !== null) {
+      for (const definition of splitTopLevelCommaList(m[2])) {
+        const lm = definition.trim().match(/^"?(\w+)"?\s+\w/);
+        if (!lm) continue;
         const col = lm[1].toLowerCase();
         if (!['primary', 'unique', 'check', 'foreign', 'constraint', 'index'].includes(col)) {
           schema.get(t)!.add(col);
@@ -90,14 +235,14 @@ function parseMigrations(migrationsDir: string): TableSchema {
       }
     }
 
-    const addRe = /ALTER\s+TABLE\s+(?:public\.)?(\w+)\s+ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
+    const addRe = /ALTER\s+TABLE\s+(?:public\.)?"?(\w+)"?\s+ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
     while ((m = addRe.exec(sql)) !== null) {
       const t = m[1].toLowerCase();
       if (!schema.has(t)) schema.set(t, new Set());
       schema.get(t)!.add(m[2].toLowerCase());
     }
 
-    const multiRe = /ALTER\s+TABLE\s+(?:public\.)?(\w+)\s*\n([\s\S]*?)(?=;\s*\n|ALTER\s+TABLE|CREATE\s+)/gi;
+    const multiRe = /ALTER\s+TABLE\s+(?:public\.)?"?(\w+)"?\s*\n([\s\S]*?)(?=;\s*\n|ALTER\s+TABLE|CREATE\s+)/gi;
     while ((m = multiRe.exec(sql)) !== null) {
       const t = m[1].toLowerCase();
       const blockRe = /ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
@@ -107,6 +252,8 @@ function parseMigrations(migrationsDir: string): TableSchema {
         schema.get(t)!.add(lm[1].toLowerCase());
       }
     }
+
+    mergeMigrationViews(schema, sql);
   }
   return schema;
 }
@@ -203,6 +350,35 @@ interface DriftResult {
   tableKnown: boolean;
 }
 
+type DriftSignatureParts = {
+  file: string;
+  table: string;
+  detail: string;
+};
+
+function parseDriftSignature(signature: string): DriftSignatureParts | null {
+  const parts = signature.split('|');
+  if (parts.length !== 3 || parts.some((part) => !part)) return null;
+  return { file: parts[0], table: parts[1], detail: parts[2] };
+}
+
+function isCoveredByBaseline(signature: string, baselineEntries: string[]): boolean {
+  const current = parseDriftSignature(signature);
+  if (!current) return baselineEntries.includes(signature);
+
+  return baselineEntries.some((entry) => {
+    const baseline = parseDriftSignature(entry);
+    if (!baseline || baseline.file !== current.file || baseline.table !== current.table) {
+      return false;
+    }
+    if (baseline.detail === 'TABLE_NOT_IN_SCHEMA') return true;
+    if (current.detail === 'TABLE_NOT_IN_SCHEMA') return false;
+
+    const baselineColumns = new Set(baseline.detail.split(','));
+    return current.detail.split(',').every((column) => baselineColumns.has(column));
+  });
+}
+
 function auditDrift(calls: SelectCall[], schema: TableSchema): DriftResult[] {
   const drifts: DriftResult[] = [];
   for (const call of calls) {
@@ -221,6 +397,7 @@ function auditDrift(calls: SelectCall[], schema: TableSchema): DriftResult[] {
 async function main() {
   const root = path.resolve(__dirname, '..');
   const migrationsDir = path.join(root, 'supabase', 'migrations');
+  const generatedTypesPath = path.join(root, 'types', 'database.generated.ts');
   const baseline = readBaseline(root);
   const baselineUsesMigrations = baseline?.schemaSource?.startsWith('migrations') === true;
   const srcDirs = ['app', 'apps', 'lib', 'components', 'packages']
@@ -253,11 +430,13 @@ async function main() {
     } else {
       process.stdout.write(' failed, falling back to migrations\n');
       schema = parseMigrations(migrationsDir);
-      schemaSource = `migrations (${schema.size} tables — live schema unavailable)`;
+      const mergedGeneratedTypes = mergeGeneratedDatabaseTypes(schema, generatedTypesPath);
+      schemaSource = `migrations${mergedGeneratedTypes ? ' + generated types' : ''} (${schema.size} relations — live schema unavailable)`;
     }
   } else {
     schema = parseMigrations(migrationsDir);
-    schemaSource = `migrations (${schema.size} tables — live schema credentials unavailable)`;
+    const mergedGeneratedTypes = mergeGeneratedDatabaseTypes(schema, generatedTypesPath);
+    schemaSource = `migrations${mergedGeneratedTypes ? ' + generated types' : ''} (${schema.size} relations — live schema credentials unavailable)`;
   }
   console.log(` ${schemaSource}`);
 
@@ -294,8 +473,9 @@ async function main() {
       process.exit(1);
     }
     const baselineEntries = Array.isArray(baseline?.entries) ? baseline.entries : [];
-    const baselineSet = new Set(baselineEntries);
-    newDriftSignatures = driftSignatures.filter((signature) => !baselineSet.has(signature));
+    newDriftSignatures = driftSignatures.filter(
+      (signature) => !isCoveredByBaseline(signature, baselineEntries),
+    );
     const resolvedCount = baselineEntries.filter((signature) => !currentSignatureSet.has(signature)).length;
     console.log(`Schema drift regression check: ${newDriftSignatures.length} new, ${resolvedCount} resolved, ${driftSignatures.length} current signatures.`);
   }

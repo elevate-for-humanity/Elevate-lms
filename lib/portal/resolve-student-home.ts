@@ -41,7 +41,7 @@ export async function resolveStudentHomePath(
     .from('program_enrollments')
     .select('program_slug, program_id')
     .eq('user_id', userId)
-    .in('enrollment_state', [...ACTIVE_ENROLLMENT_STATES])
+    .or(`enrollment_state.in.(${[...ACTIVE_ENROLLMENT_STATES].join(',')}),status.in.(${[...ACTIVE_ENROLLMENT_STATES].join(',')})`)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();

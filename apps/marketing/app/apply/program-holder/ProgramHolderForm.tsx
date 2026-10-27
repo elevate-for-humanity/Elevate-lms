@@ -14,12 +14,24 @@ const PROGRAM_TYPE_OPTIONS = [
   ['workforce', 'Workforce / Career Services'],
 ] as const;
 
-export default function ProgramHolderForm() {
+type ProgramOption = { slug: string; name: string };
+
+export default function ProgramHolderForm({
+  programOptions,
+  initialProgram = '',
+  initialContactName = '',
+  initialEmail = '',
+}: {
+  programOptions: ProgramOption[];
+  initialProgram?: string;
+  initialContactName?: string;
+  initialEmail?: string;
+}) {
   const router = useRouter();
   const [form, setForm] = useState({
     orgName: '',
-    contactName: '',
-    email: '',
+    contactName: initialContactName,
+    email: initialEmail,
     phone: '',
     website: '',
     orgType: '',
@@ -31,6 +43,9 @@ export default function ProgramHolderForm() {
     yearsInBusiness: '',
     licenseNumber: '',
     programTypes: [] as string[],
+    requestedProgram: initialProgram,
+    preferredTitle: initialProgram === 'project-management' ? 'Project Management Program Holder' : '',
+    professionalBio: '',
     approvals: '',
     instructorCapacity: '',
     facilityCapacity: '',
@@ -100,6 +115,9 @@ export default function ProgramHolderForm() {
           phone: form.phone,
           website: form.website,
           programTypes: form.programTypes,
+          requestedProgramSlugs: [form.requestedProgram],
+          preferredTitle: form.preferredTitle,
+          professionalBio: form.professionalBio,
           notes,
         }),
       });
@@ -161,6 +179,14 @@ export default function ProgramHolderForm() {
 
       <section className="border-t border-slate-200 pt-7">
         <h2 className="mb-2 text-xl font-black text-slate-950">Programs and operating capacity</h2>
+        <div className="mb-5">
+          <label className={labelClass}>Primary program you will manage *</label>
+          <select name="requestedProgram" required value={form.requestedProgram} onChange={handleChange} className={fieldClass}>
+            <option value="">Select a program</option>
+            {programOptions.map((program) => <option key={program.slug} value={program.slug}>{program.name}</option>)}
+          </select>
+          <p className="mt-2 text-sm text-slate-600">The selected program is assigned to your dashboard only after application review and approval.</p>
+        </div>
         <p className="mb-4 text-sm text-slate-700">Select every training/service category you intend to operate or manage.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           {PROGRAM_TYPE_OPTIONS.map(([value, label]) => (
@@ -178,6 +204,10 @@ export default function ProgramHolderForm() {
           <div><label className={labelClass}>Delivery Model</label><select name="deliveryModel" value={form.deliveryModel} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online</option><option value="multiple">Multiple delivery models</option></select></div>
         </div>
         <div className="mt-4"><label className={labelClass}>Organization / Program Description</label><textarea name="description" rows={4} value={form.description} onChange={handleChange} className={fieldClass} /></div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div><label className={labelClass}>Preferred Public Position / Title</label><input name="preferredTitle" value={form.preferredTitle} onChange={handleChange} className={fieldClass} placeholder="Project Management Program Holder" /></div>
+          <div className="sm:col-span-2"><label className={labelClass}>Professional Bio</label><textarea name="professionalBio" rows={5} value={form.professionalBio} onChange={handleChange} className={fieldClass} placeholder="Share 100–150 words about your professional background, credentials, and experience. This is reviewed before any public team profile is published." /></div>
+        </div>
       </section>
 
       <label className="flex items-start gap-3 rounded-xl border border-slate-300 p-4 text-sm font-semibold leading-6 text-slate-900">

@@ -8,8 +8,16 @@ const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const PRECACHE_ASSETS = [
   '/offline.html',
   '/manifest-lms.json',
+  '/manifest-student.json',
+  '/manifest-apprentice.json',
+  '/manifest-employer.json',
+  '/manifest-program-holder.json',
+  '/manifest-shop-owner.json',
   `${CDN}/icons/student-192.png`,
   `${CDN}/icons/student-512.png`,
+  `${CDN}/icons/employer-192.png`,
+  `${CDN}/icons/program-holder-192.png`,
+  `${CDN}/icon-192.png`,
 ];
 
 function isCacheableResponse(response) {
@@ -86,15 +94,12 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Never cache authenticated HTML/RSC, application APIs, auth routes, range
-  // requests, or protected dashboard/course navigations. Navigations are always
-  // network-only with the public offline shell as the only fallback.
+  // Every LMS document navigation may carry authentication redirects, cookies,
+  // role routing, or protected data. Leave all navigations to the browser. A
+  // previous network-first handler converted transient Android/PWA request
+  // failures into the offline shell even while the device was online, trapping
+  // valid users immediately after sign-in.
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() =>
-        caches.match('/offline.html'),
-      ),
-    );
     return;
   }
 
@@ -151,7 +156,45 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-hours') event.waitUntil(syncHoursData());
+  if (event.tag === 'sync-lesson') event.waitUntil(syncQueuedRequests('lesson'));
+  if (event.tag === 'sync-other') event.waitUntil(syncQueuedRequests('other'));
 });
+
+async function syncQueuedRequests(type) {
+  const db = await openPendingRequestDB();
+  const tx = db.transaction('pending-requests', 'readwrite');
+  const store = tx.objectStore('pending-requests');
+  const requests = await getAllFromStore(store);
+  for (const req of requests.filter((item) => item.type === type)) {
+    try {
+      const response = await fetch(req.url, {
+        method: req.method || 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: req.body,
+      });
+      if (response.ok) store.delete(req.id);
+    } catch (error) {
+      console.warn('[SW-lms] queued request sync deferred:', error?.message || String(error));
+    }
+  }
+}
+
+function openPendingRequestDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('elevate-offline-queue', 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('pending-requests')) {
+        const store = db.createObjectStore('pending-requests', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('type', 'type', { unique: false });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+    };
+  });
+}
 
 async function syncHoursData() {
   const db = await openOfflineDB();
@@ -208,9 +251,10 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification',
+    silent: data.silent === true,
     icon: `${CDN}/icons/student-192.png`,
     badge: `${CDN}/icons/student-192.png`,
-    vibrate: [100, 50, 100],
+    ...(data.silent === true ? {} : { vibrate: [100, 50, 100] }),
     tag: data.tag || 'elevate-lms',
     renotify: true,
     data: { url: data.url || '/', type: data.type },

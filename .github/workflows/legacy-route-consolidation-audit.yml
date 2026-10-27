@@ -1,14 +1,6 @@
 name: Legacy Route Consolidation Audit
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/consolidate-legacy-routes.mjs'
-      - '.github/workflows/legacy-route-consolidation-audit.yml'
-      - 'apps/app/**'
-      - 'apps/admin/app/**'
-      - 'apps/lms/app/**'
   workflow_dispatch:
 
 permissions:

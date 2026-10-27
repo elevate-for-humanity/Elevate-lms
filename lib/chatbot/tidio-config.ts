@@ -47,7 +47,7 @@ What can I help you with today?`,
     enabled: true,
     offlineMessage: `Thanks for chatting! Our team will follow up with you within 24 hours.
 
-Need immediate help? Call us at 317-314-3757 or email admissions@elevateforhumanity.org.`,
+Need immediate help? Call us at 463-240-1404 or email admissions@elevateforhumanity.org.`,
     queueMessage: `You're #{{position}} in queue. An advisor will be with you shortly!`,
   },
   

@@ -9,12 +9,12 @@ interface Props {
 
 const SELECT_FIELDS = [
   {
-    key: 'stripe_mode',
-    label: 'Stripe Mode',
-    hint: 'Switch between live and test payment processing.',
+    key: 'paypal_environment',
+    label: 'PayPal Environment',
+    hint: 'Use sandbox for testing and production only after the live webhook is verified.',
     options: [
-      { value: 'live', label: 'Live — real payments' },
-      { value: 'test', label: 'Test — Stripe test mode' },
+      { value: 'production', label: 'Production — real payouts' },
+      { value: 'sandbox', label: 'Sandbox — test mode' },
     ],
   },
   {
@@ -32,13 +32,11 @@ const TOGGLE_FIELDS = [
   { key: 'bnpl_enabled', label: 'BNPL Enabled', hint: 'Allow Affirm, Sezzle, Klarna, and other BNPL providers at checkout.' },
   { key: 'affirm_enabled', label: 'Affirm', hint: 'Enable Affirm monthly installment financing.' },
   { key: 'sezzle_enabled', label: 'Sezzle', hint: 'Enable Sezzle 4-payment interest-free option.' },
-  { key: 'klarna_enabled', label: 'Klarna', hint: 'Enable Klarna via Stripe.' },
-  { key: 'afterpay_enabled', label: 'Afterpay', hint: 'Enable Afterpay via Stripe.' },
   { key: 'payment_plans_enabled', label: 'Payment Plans', hint: 'Allow students to set up custom weekly payment plans.' },
 ];
 
 const TEXT_FIELDS = [
-  { key: 'stripe_webhook_endpoint', label: 'Stripe Webhook Endpoint', placeholder: 'https://www.elevateforhumanity.org/api/webhooks/stripe', hint: 'Registered in Stripe Dashboard → Webhooks.', type: 'url' },
+  { key: 'paypal_webhook_endpoint', label: 'PayPal Payout Webhook Endpoint', placeholder: 'https://lms.elevateforhumanity.org/api/paypal/payout-webhook', hint: 'Register this URL in the PayPal Developer Dashboard.', type: 'url' },
   { key: 'payment_success_url', label: 'Payment Success URL', placeholder: 'https://www.elevateforhumanity.org/enroll/success', hint: 'Redirect after successful checkout.', type: 'url' },
   { key: 'payment_cancel_url', label: 'Payment Cancel URL', placeholder: 'https://www.elevateforhumanity.org/enroll', hint: 'Redirect when checkout is abandoned.', type: 'url' },
 ];
@@ -148,7 +146,7 @@ export function PaymentsSettingsClient({ initialSettings }: Props) {
       </div>
 
       <p className="text-xs text-slate-400">
-        Stripe API keys are managed in Dev Studio → Secrets. Keys are never stored in platform_settings.
+        PayPal and QuickBooks credentials are managed in Dev Studio → Secrets. Secret values are never stored in platform_settings.
       </p>
 
       {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{error}</p>}

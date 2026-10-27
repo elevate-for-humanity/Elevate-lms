@@ -103,6 +103,12 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     // At least one must be set for natural-language commands to work.
     label: 'AI Providers (required for AI features)',
     keys: [
+      'XAI_API_KEY',
+      'GROK_API_KEY',
+      'XAI_MODEL',
+      'ANTHROPIC_API_KEY',
+      'CLAUDE_API_KEY',
+      'ANTHROPIC_MODEL',
       'GROQ_API_KEY',
       'GEMINI_API_KEY',
       'AI_PROVIDER',
@@ -138,17 +144,38 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Twilio',
+    label: 'Twilio phone and messaging',
+    keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_API_KEY_SID', 'TWILIO_API_KEY_SECRET', 'TWILIO_PHONE_NUMBER'],
+  },
+  {
+    label: 'Elevate PWA phone connection',
+    keys: ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET'],
+  },
+  {
+    label: 'Elevate Media Storage — Backblaze B2',
     keys: [
-      'TWILIO_ACCOUNT_SID',
-      'TWILIO_AUTH_TOKEN',
-      'TWILIO_PHONE',
-      'TWILIO_PHONE_NUMBER',
-      'TWILIO_SID',
+      'ELEVATE_MEDIA_PROVIDER',
+      'ELEVATE_MEDIA_ENDPOINT',
+      'ELEVATE_MEDIA_REGION',
+      'ELEVATE_MEDIA_ACCESS_KEY_ID',
+      'ELEVATE_MEDIA_SECRET_ACCESS_KEY',
+      'ELEVATE_MEDIA_BUCKET',
+      'ELEVATE_MEDIA_PUBLIC_URL',
+      'NEXT_PUBLIC_ELEVATE_MEDIA_URL',
+      'ELEVATE_MEDIA_FORCE_PATH_STYLE',
+      'S3_ENDPOINT',
+      'S3_REGION',
+      'S3_ACCESS_KEY_ID',
+      'S3_SECRET_ACCESS_KEY',
+      'S3_BUCKET',
+      'S3_PUBLIC_URL',
+      'S3_FORCE_PATH_STYLE',
+      'COURSE_VIDEO_STORAGE_BACKEND',
+      'ELEVATE_MEDIA_VIDEO_MIN_BYTES',
     ],
   },
   {
-    label: 'Cloudflare R2',
+    label: 'Cloudflare — legacy R2 / AI / Stream',
     keys: [
       'CLOUDFLARE_ACCOUNT_ID',
       'CLOUDFLARE_API_TOKEN',
@@ -167,19 +194,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Northflank',
-    keys: [
-      'NORTHFLANK_API_TOKEN',
-      'NORTHFLANK_TEAM_ID',
-      'NORTHFLANK_PROJECT_ID',
-      'NORTHFLANK_LMS_SERVICE_ID',
-      'NORTHFLANK_ADMIN_SERVICE_ID',
-      'NORTHFLANK_SECRET_GROUP_ID',
-      'NORTHFLANK_DEPLOYMENT_PLAN',
-      'NORTHFLANK_BUILD_PLAN',
-    ],
-  },
-  {
     label: 'GitHub',
     keys: [
       'GITHUB_TOKEN',
@@ -191,6 +205,10 @@ const SERVICE_GROUPS: ServiceGroup[] = [
   {
     label: 'Upstash Redis',
     keys: ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN', 'REDIS_URL'],
+  },
+  {
+    label: 'Redis Agent Memory — Iris',
+    keys: ['AGENT_MEMORY_BASE_URL', 'AGENT_MEMORY_STORE_ID', 'AGENT_MEMORY_API_KEY'],
   },
   {
     label: 'Video — D-ID',
@@ -223,6 +241,8 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     label: 'Social Media',
     keys: [
       'FACEBOOK_ACCESS_TOKEN',
+      'FACEBOOK_APP_ID',
+      'FACEBOOK_APP_SECRET',
       'FACEBOOK_CLIENT_ID',
       'FACEBOOK_CLIENT_SECRET',
       'FACEBOOK_PAGE_ID',
@@ -311,6 +331,19 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
+    label: 'QuickBooks Online',
+    keys: [
+      'QB_CLIENT_ID',
+      'QB_CLIENT_SECRET',
+      'QB_REDIRECT_URI',
+      'QB_ACCESS_TOKEN',
+      'QB_REFRESH_TOKEN',
+      'QB_REALM_ID',
+      'QB_TOKEN_EXPIRES',
+      'QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN',
+    ],
+  },
+  {
     label: 'IRS / Tax (MeF)',
     keys: [
       'IRS_EFIN',
@@ -375,10 +408,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
       'NRF_API_SECRET',
       'NRF_API_BASE_URL',
       'NRF_ORGANIZATION_ID',
-      'HSI_API_KEY',
-      'HSI_API_SECRET',
-      'HSI_API_BASE_URL',
-      'HSI_ORGANIZATION_ID',
     ],
   },
   {

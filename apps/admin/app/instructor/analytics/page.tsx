@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -34,14 +35,14 @@ export default async function InstructorAnalyticsPage() {
   const { count: totalStudents } =
     courseIds.length > 0
       ? await supabase
-          .from('training_enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true })
           .in('course_id', courseIds)
       : { count: 0 };
   const { count: completedEnrollments } =
     courseIds.length > 0
       ? await supabase
-          .from('training_enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true })
           .in('course_id', courseIds)
           .eq('status', 'completed')
@@ -55,7 +56,7 @@ export default async function InstructorAnalyticsPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/instructor-page-1.webp"
           alt="Instructor portal"
           fill

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { storeSignInHref } from '@/lib/store/sign-in-return.mjs';
 import Link from 'next/link';
 import { Check, Clock, Code2, Loader2, ShoppingCart, Sparkles } from 'lucide-react';
 import type { IndividualAppCatalog } from '@/lib/apps/individual-app-plans';
@@ -25,7 +26,7 @@ export function IndividualAppPlansSection({ catalog }: Props) {
       const data = await res.json();
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = `/login?redirect=${encodeURIComponent(`/store/apps/${catalog.slug}`)}`;
+          window.location.href = storeSignInHref(`/store/apps/${catalog.slug}`);
           return;
         }
         throw new Error(data.error || 'Checkout failed');

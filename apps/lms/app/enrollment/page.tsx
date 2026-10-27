@@ -66,7 +66,7 @@ export default function EnrollmentPage() {
               Start Your Training Journey
             </h1>
             <p className="text-slate-200 max-w-xl">
-              Complete your enrollment in 4 simple steps. Most eligible students pay $0 in tuition.
+              Complete your enrollment in 4 simple steps. Workforce funding may apply only when the participant and selected program are approved by the responsible agency in writing.
             </p>
           </div>
         </div>
@@ -197,9 +197,9 @@ export default function EnrollmentPage() {
                 Check Your Eligibility
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <a href="tel:3173143757" className="bg-white/10 backdrop-blur text-white font-bold py-3 px-8 rounded-lg hover:bg-white/20 inline-flex items-center justify-center gap-2 border border-white/20">
+              <a href="tel:4632401404" className="bg-white/10 backdrop-blur text-white font-bold py-3 px-8 rounded-lg hover:bg-white/20 inline-flex items-center justify-center gap-2 border border-white/20">
                 <Phone className="w-4 h-4" />
-                Call (317) 314-3757
+                Call (463) 240-1404
               </a>
             </div>
           </div>

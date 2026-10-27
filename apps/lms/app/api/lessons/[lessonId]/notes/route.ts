@@ -12,7 +12,7 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function _GET(_req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+async function _GET(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
   const supabase = await createClient();
   const user = await getCurrentUser();
 
@@ -29,15 +29,21 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ lessonId:
     return NextResponse.json(body, { status });
   }
 
-  const { data, error }: any = await supabase
+  const queryText = req.nextUrl.searchParams.get('q')?.trim().slice(0, 100);
+  let query = supabase
     .from('lesson_notes')
     .select('id, position_seconds, body, created_at')
     .eq('lesson_id', lessonId)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
+    .eq('user_id', user.id);
+  if (queryText) query = query.textSearch('body', queryText, { type: 'websearch' });
+  const { data, error }: any = await query.order('created_at', { ascending: false }).limit(200);
 
   if (error) {
-    logger.error('notes GET error', normalizeError(error, 'Failed to fetch notes'), getErrorContext(error));
+    logger.error(
+      'notes GET error',
+      normalizeError(error, 'Failed to fetch notes'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -69,23 +75,45 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ lessonId:
 
   const noteText = text || noteBody;
 
-  if (!noteText || !noteText.trim()) {
+  if (typeof noteText !== 'string' || !noteText.trim()) {
     return NextResponse.json({ error: 'text required' }, { status: 400 });
   }
+  if (noteText.trim().length > 10000) {
+    return NextResponse.json({ error: 'Note exceeds 10,000 characters' }, { status: 400 });
+  }
+  if (
+    positionSeconds != null &&
+    (typeof positionSeconds !== 'number' ||
+      !Number.isFinite(positionSeconds) ||
+      positionSeconds < 0)
+  ) {
+    return NextResponse.json(
+      { error: 'positionSeconds must be a positive number' },
+      { status: 400 },
+    );
+  }
 
-  const { error } = await supabase.from('lesson_notes').insert({
-    user_id: user.id,
-    lesson_id: lessonId,
-    body: noteText,
-    position_seconds: typeof positionSeconds === 'number' ? Math.floor(positionSeconds) : null,
-  });
+  const { data: note, error } = await supabase
+    .from('lesson_notes')
+    .insert({
+      user_id: user.id,
+      lesson_id: lessonId,
+      body: noteText.trim(),
+      position_seconds: typeof positionSeconds === 'number' ? Math.floor(positionSeconds) : null,
+    })
+    .select('id, position_seconds, body, created_at')
+    .single();
 
   if (error) {
-    logger.error('notes POST error', normalizeError(error, 'Failed to create note'), getErrorContext(error));
+    logger.error(
+      'notes POST error',
+      normalizeError(error, 'Failed to create note'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ note }, { status: 201 });
 }
 export const GET = withApiAudit(
   '/api/lessons/[lessonId]/notes',

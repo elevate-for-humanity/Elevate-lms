@@ -13,7 +13,7 @@ export default async function OutcomesPage() {
   const db = await createClient();
 
   const { data: participants } = await db
-    .from('workforce_participants')
+    .from('participants')
     .select('*')
     .eq('status', 'completed');
 

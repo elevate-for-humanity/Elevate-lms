@@ -12,7 +12,7 @@ function walk(dir, out = []) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, ent.name);
     if (ent.isDirectory()) walk(p, out);
-    else if (/\.(?:png|jpe?g|webp|avif)$/i.test(ent.name)) out.push(p);
+    else if (/\.(?:png|jpe?g|webp|avif|svg)$/i.test(ent.name)) out.push(p);
   }
   return out;
 }
@@ -23,9 +23,17 @@ const literalMatches = [...registry.matchAll(/(?:card|hero):\s*(?:`\$\{P\}\/([^`
   .filter(Boolean);
 const counts = new Map();
 for (const p of literalMatches) counts.set(p, (counts.get(p) || 0) + 1);
-const duplicates = [...counts.entries()].filter(([, n]) => n > 1).sort((a,b)=>b[1]-a[1]);
+// A single campaign visual may be intentionally shared by closely related
+// badge modules in the same program family. Keep that explicit; every other
+// repeated canonical assignment remains an audit failure.
+const ALLOWED_FAMILY_SHARED_ASSETS = new Set(['/hero-images/jri-hero.webp']);
+const duplicates = [...counts.entries()]
+  .filter(([asset, n]) => n > 1 && !ALLOWED_FAMILY_SHARED_ASSETS.has(asset))
+  .sort((a,b)=>b[1]-a[1]);
 const missing = [...new Set(literalMatches)].filter((p) => p.startsWith('/images/') && !assetFiles.includes(p));
-const unifiedResolver = /export function getProgramHeroImage[\s\S]*?return getProgramCardImage\(slug\);/.test(registry);
+const unifiedResolver =
+  /export function getProgramCardImage[\s\S]*?PROGRAM_IMAGES\[slug\]\?\.card/.test(registry) &&
+  /export function getProgramHeroImage[\s\S]*?PROGRAM_IMAGES\[slug\]\?\.hero/.test(registry);
 
 const keywords = [
   'barber','cosmet','esthetic','nail','hvac','cdl','truck','cna','nurs','medical','phleb','pharmacy','sanit','cpr','electr','weld','plumb','construction','network','cyber','software','web','graphic','design','cad','business','office','project','bookkeep','account','entrepren','culinary','forklift','hospitality','technology','training'

@@ -1,3 +1,9 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
+import CourseSyllabus, { type CourseSyllabusRecord } from '@/components/learner/CourseSyllabus';
+import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
+import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
+import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
+import HvacStartHere from '@/components/learner/HvacStartHere';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,13 +13,20 @@ import {
   BadgeCheck,
   BarChart2,
   BookOpen,
+  CalendarDays,
   CheckCircle,
   Clock,
   CreditCard,
   ExternalLink,
+  FileText,
   GraduationCap,
+  Mail,
+  MessageSquare,
   Play,
+  Trophy,
   Upload,
+  Users,
+  Video,
 } from 'lucide-react';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 import { createClient } from '@/lib/supabase/server';
@@ -23,9 +36,14 @@ import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { loadLearnerWorkspace } from '@/lib/learner/workspace';
-import { getActiveJobs } from '@/lib/data/jobs';
+import { getLearnerCareerMatches } from '@/lib/learner/career-matches';
 import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
+import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
 export const metadata: Metadata = generateInternalMetadata({
   title: 'Student Dashboard',
@@ -62,35 +80,114 @@ function paidStatus(status: string | null | undefined) {
   return value === 'completed' || value === 'succeeded' || value === 'paid';
 }
 
-function isBlockedExternalTraining(course: { partner_name?: string | null; external_url?: string | null }) {
+function isBlockedExternalTraining(course: {
+  partner_name?: string | null;
+  external_url?: string | null;
+}) {
   const provider = String(course.partner_name || '').toLowerCase();
   const url = String(course.external_url || '').toLowerCase();
   return provider.includes('coursera') || url.includes('coursera.org');
 }
 
 export default async function StudentDashboard() {
-  const { user, profile } = await requireRole(['student', 'learner', 'admin']);
-  const supabase = await createClient();
-  const workspace = await loadLearnerWorkspace(user.id, profile?.role || 'student');
-  const careerJobs = await getActiveJobs({ limit: 4 });
+  const { user, profile } = await requireRole(['student', 'learner', 'admin', 'super_admin']);
+  const actorDb = await createClient();
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const supabase = subject.previewing ? db : actorDb;
+  const isAdminActor = ['admin', 'super_admin'].includes(String(profile?.role || ''));
+  if (isAdminActor && !subject.previewing) return <NeutralStudentPortalPreview />;
+
+  const subjectId = subject.userId;
+  const { data: subjectProfile } = subject.previewing
+    ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
+    : { data: profile };
+  const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
+  const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
+  const billingRequirement = showBilling
+    ? await loadLearnerBillingRequirement(db, subjectId)
+    : null;
+  const careerMatches = await getLearnerCareerMatches(subjectId, 4);
+  const { data: holderStudentRows } = await db
+    .from('program_holder_students')
+    .select('id,program_holder_id,status')
+    .eq('user_id', subjectId);
+  const bookkeeping = workspace.enrollments.some((row) =>
+    ['bookkeeping', 'finance-bookkeeping-accounting'].includes(
+      String(row.program_slug || '').toLowerCase(),
+    ),
+  );
+  const wilkesHolderId = '34876b7d-bce0-44fb-9550-5dc5fff00791';
+  const linkedToWilkes = (holderStudentRows ?? []).some(
+    (row) =>
+      row.program_holder_id === wilkesHolderId &&
+      ['applied', 'pending', 'active', 'enrolled', 'completed'].includes(String(row.status)),
+  );
+  const { data: instructorMailbox } =
+    bookkeeping && linkedToWilkes
+      ? await db
+          .from('communication_email_mailboxes')
+          .select('address')
+          .eq('program_holder_id', wilkesHolderId)
+          .eq('active', true)
+          .eq('mailbox_kind', 'program_holder')
+          .limit(1)
+          .maybeSingle()
+      : { data: null };
+  const [{ data: courseAccessNotice }, { data: syllabusHolder }] = await Promise.all([
+    supabase.from('notifications').select('title,message,created_at')
+      .eq('user_id', subjectId).eq('metadata->>kind', 'course_access_notice')
+      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    bookkeeping && linkedToWilkes
+      ? db.from('program_holders').select('features').eq('id', wilkesHolderId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  const courseSyllabus = syllabusHolder?.features?.course_syllabus as CourseSyllabusRecord | undefined;
+  const holderStudentIds = (holderStudentRows ?? []).map((row) => row.id);
+  const { data: meetingRows } = holderStudentIds.length
+    ? await db
+        .from('program_holder_meetings')
+        .select('id,title,starts_at,duration_minutes,communication_room_id,status')
+        .in('program_holder_student_id', holderStudentIds)
+        .eq('meeting_method', 'video')
+        .in('status', ['scheduled'])
+        .gte('starts_at', new Date(Date.now() - 15 * 60 * 1000).toISOString())
+        .order('starts_at', { ascending: true })
+        .limit(3)
+    : { data: [] };
+  const videoMeetings = (meetingRows ?? []).filter((meeting) => meeting.communication_room_id);
 
   const [
     certificationsRes,
+    earnedCredentialsRes,
+    reportedCredentialsRes,
     workoneAppRes,
     quizAttemptsRes,
     paymentLogsRes,
     externalCoursesRes,
     externalCompletionsRes,
+    personalCourseAccessRes,
   ] = await Promise.all([
     supabase
       .from('certificates')
       .select('id, course_title, issued_at, verification_code')
-      .eq('user_id', user.id)
+      .eq('user_id', subjectId)
       .order('issued_at', { ascending: false }),
+    supabase
+      .from('learner_credentials')
+      .select('id, issued_at, verification_code, credentials(name)')
+      .eq('learner_id', subjectId)
+      .eq('status', 'active')
+      .order('issued_at', { ascending: false }),
+    supabase
+      .from('credential_verification')
+      .select('id, credential_name, issue_date, verification_status')
+      .eq('student_id', subjectId)
+      .order('issue_date', { ascending: false }),
     supabase
       .from('applications')
       .select('id, status, requested_funding_source')
-      .eq('user_id', user.id)
+      .eq('user_id', subjectId)
       .eq('status', 'pending_workone')
       .order('created_at', { ascending: false })
       .limit(1)
@@ -98,16 +195,18 @@ export default async function StudentDashboard() {
     supabase
       .from('quiz_attempts')
       .select('id, score, passed, completed_at, quiz_id, quizzes(title)')
-      .eq('user_uuid', user.id)
+      .eq('user_uuid', subjectId)
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false })
       .limit(5),
-    supabase
-      .from('payment_logs')
-      .select('id, amount, status, completed_at, created_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(5),
+    showBilling
+      ? supabase
+          .from('payment_logs')
+          .select('id, amount, status, completed_at, created_at')
+          .eq('user_id', subjectId)
+          .order('created_at', { ascending: false })
+          .limit(5)
+      : Promise.resolve({ data: [] }),
     supabase
       .from('program_external_courses')
       .select(
@@ -118,31 +217,73 @@ export default async function StudentDashboard() {
       .limit(30),
     supabase
       .from('external_course_completions')
-      .select('id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored, stripe_session_id')
-      .eq('user_id', user.id),
+      .select(
+        'id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored',
+      )
+      .eq('user_id', subjectId),
+    supabase
+      .from('external_course_access')
+      .select('id, provider, provider_course_id, activation_url, access_status, issued_at, notes')
+      .eq('student_id', subjectId)
+      .eq('access_status', 'active')
+      .order('issued_at', { ascending: true }),
   ]);
 
-  const programEnrollments = workspace.enrollments.filter((row) => row.program_id).map((row) => ({
-    id: row.enrollment_id,
-    status: row.status,
-    enrolled_at: row.created_at,
-    program_id: row.program_id,
-    programs: { id: row.program_id, title: row.program_title, slug: row.program_slug },
-  }));
+  const programEnrollments = workspace.enrollments
+    .filter((row) => row.program_id || row.program_slug)
+    .map((row) => ({
+      id: row.enrollment_id,
+      status: row.status,
+      enrolled_at: row.created_at,
+      program_id: row.program_id,
+      program_slug: row.program_slug,
+      programs: { id: row.program_id, title: row.program_title, slug: row.program_slug },
+    }));
   const courseEnrollments = workspace.enrollments
     .filter((row) => row.course_id)
-    .map((row) => ({ id: row.enrollment_id, status: row.status, course_id: row.course_id, created_at: row.created_at, completed_at: null })) as CourseEnrollmentRow[];
-  const certifications = certificationsRes.data ?? [];
+    .map((row) => ({
+      id: row.enrollment_id,
+      status: row.status,
+      course_id: row.course_id,
+      created_at: row.created_at,
+      completed_at: null,
+    })) as CourseEnrollmentRow[];
+  const certifications = [
+    ...(certificationsRes.data ?? []),
+    ...(earnedCredentialsRes.data ?? []).map((row: any) => ({
+      id: row.id,
+      course_title:
+        (Array.isArray(row.credentials) ? row.credentials[0] : row.credentials)?.name ??
+        'Credential',
+      issued_at: row.issued_at,
+      verification_code: row.verification_code,
+    })),
+    ...(reportedCredentialsRes.data ?? []).map((row: any) => ({
+      id: row.id,
+      course_title: row.credential_name ?? 'Reported credential',
+      issued_at: row.issue_date,
+      verification_code: null,
+      verification_status: row.verification_status,
+    })),
+  ];
+  const personalCourseAccess = personalCourseAccessRes.data ?? [];
   const recentQuizAttempts = quizAttemptsRes.data ?? [];
   const recentPayments = paymentLogsRes.data ?? [];
   const workoneApp = workoneAppRes.data;
   const isPendingWorkone = Boolean(workoneApp);
 
   const courseIds = Array.from(
-    new Set(courseEnrollments.map((row) => row.course_id).filter((value): value is string => Boolean(value))),
+    new Set(
+      courseEnrollments
+        .map((row) => row.course_id)
+        .filter((value): value is string => Boolean(value)),
+    ),
   );
   const { data: courseRows, error: courseRowsError } = courseIds.length
-    ? await supabase.from('courses').select('id, title, description, status, is_active').in('id', courseIds)
+    ? await supabase
+        .from('courses')
+        .select('id, title, description, status, is_active')
+        .in('id', courseIds)
     : { data: [], error: null };
   if (courseRowsError) throw new Error(`STUDENT_COURSES_FAILED:${courseRowsError.message}`);
 
@@ -151,19 +292,35 @@ export default async function StudentDashboard() {
   );
 
   const activeWorkspaceEnrollment =
-    workspace.enrollments.find((row) => row.source_table === 'partner_lms_enrollments' && ['active', 'enrolled', 'in_progress'].includes(String(row.status))) ??
-    workspace.enrollments.find((row) => ['active', 'enrolled', 'in_progress'].includes(String(row.status))) ??
+    workspace.enrollments.find(
+      (row) =>
+        row.source_table === 'partner_lms_enrollments' &&
+        ['active', 'enrolled', 'in_progress'].includes(String(row.status)),
+    ) ??
+    workspace.enrollments.find((row) =>
+      ['active', 'enrolled', 'in_progress'].includes(String(row.status)),
+    ) ??
     workspace.enrollments[0] ??
     null;
   const activeCourseEnrollment = activeWorkspaceEnrollment
-    ? courseEnrollments.find((row) => row.id === activeWorkspaceEnrollment.enrollment_id) ?? null
+    ? (courseEnrollments.find((row) => row.id === activeWorkspaceEnrollment.enrollment_id) ?? null)
     : null;
   const activeCourseId = activeCourseEnrollment?.course_id ?? null;
   const isPartnerCourse = activeWorkspaceEnrollment?.source_table === 'partner_lms_enrollments';
   const activeCourse = activeCourseId
-    ? courseMap.get(activeCourseId) ?? (isPartnerCourse ? { id: activeCourseId, title: activeWorkspaceEnrollment?.course_title, description: activeWorkspaceEnrollment?.course_description, status: 'published', is_active: true } : null)
+    ? (courseMap.get(activeCourseId) ??
+      (isPartnerCourse
+        ? {
+            id: activeCourseId,
+            title: activeWorkspaceEnrollment?.course_title,
+            description: activeWorkspaceEnrollment?.course_description,
+            status: 'published',
+            is_active: true,
+          }
+        : null))
     : null;
-  const activeCourseIsAvailable = isPartnerCourse || (activeCourse?.status === 'published' && activeCourse.is_active === true);
+  const activeCourseIsAvailable =
+    isPartnerCourse || (activeCourse?.status === 'published' && activeCourse.is_active === true);
 
   let lessons: LessonRow[] = [];
   let completedLessonIds = new Set<string>();
@@ -178,12 +335,13 @@ export default async function StudentDashboard() {
       supabase
         .from('lesson_progress')
         .select('lesson_id, completed')
-        .eq('user_id', user.id)
+        .eq('user_id', subjectId)
         .eq('course_id', activeCourseId),
     ]);
 
     if (lessonsRes.error) throw new Error(`STUDENT_LESSONS_FAILED:${lessonsRes.error.message}`);
-    if (progressRes.error) throw new Error(`STUDENT_LESSON_PROGRESS_FAILED:${progressRes.error.message}`);
+    if (progressRes.error)
+      throw new Error(`STUDENT_LESSON_PROGRESS_FAILED:${progressRes.error.message}`);
 
     lessons = (lessonsRes.data ?? []) as LessonRow[];
     completedLessonIds = new Set(
@@ -195,30 +353,30 @@ export default async function StudentDashboard() {
 
   const totalLessons = lessons.length;
   const completedLessons = completedLessonIds.size;
-  const courseProgress = totalLessons > 0
-    ? Math.min(100, Math.round((completedLessons / totalLessons) * 100))
-    : 0;
+  const courseProgress =
+    totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;
   const nextLesson = lessons.find((lesson) => !completedLessonIds.has(lesson.id)) ?? null;
   const isComplete = totalLessons > 0 && completedLessons >= totalLessons;
   const isFirstVisit = completedLessons === 0;
   const lessonsLeft = Math.max(0, totalLessons - completedLessons);
-  const phaseNumber = totalLessons > 0
-    ? Math.min(5, Math.max(1, Math.ceil((courseProgress || 1) / 20)))
-    : 1;
+  const phaseNumber =
+    totalLessons > 0 ? Math.min(5, Math.max(1, Math.ceil((courseProgress || 1) / 20))) : 1;
 
-  const resumeHref = isPartnerCourse && activeWorkspaceEnrollment?.continue_url
-    ? activeWorkspaceEnrollment.continue_url
-    : activeCourseId && activeCourseIsAvailable
-      ? nextLesson
-      ? `/lms/courses/${activeCourseId}/lessons/${nextLesson.id}`
-      : `/lms/courses/${activeCourseId}`
-    : null;
+  const resumeHref =
+    isPartnerCourse && activeWorkspaceEnrollment?.continue_url
+      ? activeWorkspaceEnrollment.continue_url
+      : activeCourseId && activeCourseIsAvailable
+        ? nextLesson
+          ? `/lms/courses/${activeCourseId}/lessons/${nextLesson.id}`
+          : `/lms/courses/${activeCourseId}`
+        : null;
 
   const enrolledProgramIds = new Set(
     programEnrollments.map((row: any) => row.program_id).filter(Boolean),
   );
   const externalCourses = (externalCoursesRes.data ?? []).filter(
-    (course: any) => enrolledProgramIds.has(course.program_id) && !isBlockedExternalTraining(course),
+    (course: any) =>
+      enrolledProgramIds.has(course.program_id) && !isBlockedExternalTraining(course),
   );
   const completionByExternalCourseId = new Map(
     (externalCompletionsRes.data ?? []).map((row: any) => [row.external_course_id, row]),
@@ -229,52 +387,117 @@ export default async function StudentDashboard() {
     .reduce((sum: number, payment: any) => sum + Number(payment.amount ?? 0), 0);
 
   const firstName =
-    profile?.full_name?.split(' ')[0] ||
-    user.email?.split('@')[0] ||
+    subjectProfile?.full_name?.split(' ')[0] ||
+    subjectProfile?.email?.split('@')[0] ||
+    (!subject.previewing ? user.email?.split('@')[0] : '') ||
     'there';
+  const studentHeroImage = activeWorkspaceEnrollment?.program_slug
+    ? getProgramCardImage(activeWorkspaceEnrollment.program_slug)
+    : programEnrollments[0]?.programs?.slug
+      ? getProgramCardImage(programEnrollments[0].programs.slug)
+      : '/images/pages/for-students-hero.webp';
 
   const learningTools = [
-    { href: '/lms/courses', label: 'My Courses', text: 'Open your assigned courses and curriculum.', image: '/images/pages/training-classroom.webp' },
-    { href: '/lms/assignments', label: 'Assignments', text: 'Review work, activities, and required submissions.', image: '/images/pages/office-admin-desk.jpg' },
-    { href: '/lms/certificates', label: 'Certificates', text: 'View earned and verified training credentials.', image: '/images/pages/comp-home-highlight-success.webp' },
-    { href: '/lms/calendar', label: 'Schedule', text: 'Review classes, deadlines, and upcoming activity.', image: '/images/pages/career-counseling.jpg' },
-    { href: '/lms/messages', label: 'Messages', text: 'Open learner communications and program messages.', image: '/images/pages/contact-hero.jpg' },
-    { href: '/lms/support', label: 'Get Help', text: 'Reach learner support when you need assistance.', image: '/images/pages/about-hero.webp' },
+    {
+      href: '/lms/courses',
+      label: 'My Courses',
+      text: 'Open your assigned courses and curriculum.',
+      image: '/images/pages/training-classroom.webp',
+    },
+    {
+      href: '/lms/assignments',
+      label: 'Assignments',
+      text: 'Review work, activities, and required submissions.',
+      image: '/images/pages/office-admin-desk.jpg',
+    },
+    {
+      href: '/lms/certificates',
+      label: 'Certificates',
+      text: 'View earned and verified training credentials.',
+      image: '/images/pages/admin-courses-partners-hero.webp',
+    },
+    {
+      href: '/lms/certification/upload',
+      label: 'Upload Credentials',
+      text: 'Submit earned certifications and licenses for staff verification.',
+      image: '/images/pages/comp-home-highlight-success.webp',
+    },
+    {
+      href: '/lms/resume-builder',
+      label: 'Resume Builder',
+      text: 'Create, update, and save your professional resume.',
+      image: '/images/pages/career-services-page-5.webp',
+    },
+    {
+      href: '/lms/calendar',
+      label: 'Schedule',
+      text: 'Review classes, deadlines, and upcoming activity.',
+      image: '/images/pages/career-counseling.jpg',
+    },
+    {
+      href: '/communications/email',
+      label: 'Interoffice Email',
+      text: 'Access your interoffice staff communications and program messages.',
+      image: '/images/pages/admin-live-chat-detail.webp',
+    },
+    {
+      href: '/lms/messages',
+      label: 'Messages',
+      text: 'Open learner communications and program messages.',
+      image: '/images/pages/contact-hero.jpg',
+    },
+    {
+      href: '/lms/support',
+      label: 'Get Help',
+      text: 'Reach learner support when you need assistance.',
+      image: '/images/pages/about-hero.webp',
+    },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <div className="border-b border-slate-200 bg-white px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm">
+        <div className="flex w-full min-w-0 max-w-none items-center justify-between gap-2 sm:gap-4">
+          <div className="flex shrink-0 items-center gap-2 text-sm">
             <GraduationCap className="h-4 w-4 text-brand-blue-700" aria-hidden="true" />
             <span className="font-bold text-slate-950">My Dashboard</span>
           </div>
-          <div className="flex items-center gap-3">
-            <GlobalSearch />
-            <NotificationBell />
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
+            <div className="min-w-0 max-w-sm flex-1">
+              <GlobalSearch />
+            </div>
+            <div className="shrink-0">
+              <NotificationBell />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
-        {workspace.nextRequiredAction ? (
-          <section role="alert" className="rounded-3xl border-2 border-red-400 bg-red-50 p-6">
-            <p className="text-xs font-black uppercase tracking-widest text-red-800">Onboarding incomplete · {workspace.onboardingPercent}% complete</p>
-            <h1 className="mt-2 text-2xl font-black text-red-950">Next required action: {workspace.nextRequiredAction.title}</h1>
-            <p className="mt-2 text-red-900">{workspace.nextRequiredAction.description}</p>
-            <div className="mt-4 flex flex-wrap gap-3"><Link href={workspace.nextRequiredAction.href} className="rounded-xl bg-red-700 px-5 py-3 font-black text-white">Complete now</Link><Link href="/lms/onboarding" className="rounded-xl border border-red-500 bg-white px-5 py-3 font-black text-red-950">View checklist</Link></div>
-          </section>
-        ) : null}
-        {activeCourseEnrollment && activeCourseId ? (
-          <section className="overflow-hidden rounded-3xl bg-slate-950 text-white">
-            <div className="p-6 sm:p-8">
+      <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6">
+        {activeWorkspaceEnrollment ? (
+          <section className="relative isolate min-h-[260px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+            <Image
+              src={studentHeroImage}
+              alt={
+                bookkeeping
+                  ? 'Bookkeeping and accounting training'
+                  : 'Students building career skills in class'
+              }
+              fill
+              priority
+              sizes="100vw"
+              className="-z-20 object-cover object-center"
+            />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-slate-950/65 to-transparent" />
+            <div className="p-6 sm:p-8 lg:max-w-[60%] lg:p-8">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-300">
-                {activeCourse?.title ?? 'Active Course'}
+                {activeCourse?.title ??
+                  activeWorkspaceEnrollment.program_title ??
+                  (bookkeeping ? 'Bookkeeping & Accounting' : 'Your training')}
               </p>
               <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">
                 {!activeCourseIsAvailable
-                  ? `Your course is being prepared, ${firstName}`
+                  ? `Welcome to your program, ${firstName}`
                   : isComplete
                     ? `Training complete, ${firstName}`
                     : isFirstVisit
@@ -283,243 +506,746 @@ export default async function StudentDashboard() {
               </h1>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-100">
                 {!activeCourseIsAvailable
-                  ? 'Your enrollment is recorded. Training will open here after the curriculum and media pass final review.'
+                  ? 'Your active program enrollment is confirmed. Open the class guide below and use the sidebar for your courses, documents, and program contact.'
                   : isComplete
-                  ? 'Every lesson in this course is recorded complete.'
-                  : nextLesson
-                    ? `${lessonsLeft} lesson${lessonsLeft === 1 ? '' : 's'} remaining. Next: ${nextLesson.title ?? 'lesson'}.`
-                    : 'Your course is active and ready.'}
+                    ? 'Every lesson in this course is recorded complete.'
+                    : nextLesson
+                      ? `${lessonsLeft} lesson${lessonsLeft === 1 ? '' : 's'} remaining. Next: ${nextLesson.title ?? 'lesson'}.`
+                      : 'Your course is active and ready.'}
               </p>
-              {activeCourse?.description ? <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-200">{activeCourse.description}</p> : null}
-
               {totalLessons > 0 && (
                 <div className="mt-6 max-w-3xl">
                   <div className="mb-2 flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-100">{completedLessons} of {totalLessons} verified lessons complete</span>
+                    <span className="text-slate-100">
+                      {completedLessons} of {totalLessons} verified lessons complete
+                    </span>
                     <span>{courseProgress}%</span>
                   </div>
-                  <div className="h-3 overflow-hidden rounded-full bg-slate-700" role="progressbar" aria-valuenow={courseProgress} aria-valuemin={0} aria-valuemax={100}>
-                    <div className="h-full rounded-full bg-blue-500" style={{ width: `${courseProgress}%` }} />
+                  <div
+                    className="h-3 overflow-hidden rounded-full bg-slate-700"
+                    role="progressbar"
+                    aria-valuenow={courseProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <div
+                      className="h-full rounded-full bg-blue-500"
+                      style={{ width: `${courseProgress}%` }}
+                    />
                   </div>
                 </div>
               )}
 
               <div className="mt-7 flex flex-wrap gap-3">
-                {resumeHref ? (
-                  <Link href={resumeHref} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-500">
-                    <Play className="h-4 w-4" /> {isComplete ? 'Review Course' : isFirstVisit ? 'Start Training' : 'Continue Training'}
+                {activeCourseIsAvailable && resumeHref ? (
+                  <Link
+                    href={resumeHref}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-500"
+                  >
+                    <Play className="h-4 w-4" />{' '}
+                    {isComplete
+                      ? 'Review Course'
+                      : isFirstVisit
+                        ? 'Start Training'
+                        : 'Continue Training'}
                   </Link>
-                ) : null}
-                {activeCourseIsAvailable && !isPartnerCourse ? (
-                  <Link href={`/lms/courses/${activeCourseId}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white hover:bg-white/10">
-                    View Curriculum <ArrowRight className="h-4 w-4" />
+                ) : (
+                  <Link
+                    href="#orientation"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-500"
+                  >
+                    Start class guide
                   </Link>
-                ) : null}
+                )}
               </div>
             </div>
           </section>
         ) : (
-          <section className="rounded-3xl border border-blue-300 bg-blue-50 p-7 sm:p-9">
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-900">Welcome, {firstName}</p>
-            <h1 className="mt-2 text-3xl font-black text-slate-950">Choose your next training step</h1>
-            <p className="mt-3 max-w-2xl font-medium text-slate-700">
-              You do not currently have an active course enrollment. Review your programs, application status, and funding options before starting training.
+          <section className="relative isolate min-h-[340px] overflow-hidden rounded-3xl bg-slate-950 p-7 text-white shadow-xl sm:p-9 lg:p-6">
+            <Image
+              src="/images/pages/for-students-hero.webp"
+              alt="Elevate students learning together"
+              fill
+              priority
+              sizes="100vw"
+              className="-z-20 object-cover object-center"
+            />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/30" />
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-200">
+              Welcome, {firstName}
+            </p>
+            <h1 className="mt-2 max-w-2xl text-3xl font-black text-white sm:text-4xl">
+              Choose your next training step
+            </h1>
+            <p className="mt-3 max-w-2xl font-medium leading-7 text-slate-100">
+              You do not currently have an active course enrollment. Review your programs,
+              application status, and funding options before starting training.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/lms/courses" className="rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800">Browse Courses</Link>
-              <Link href="/lms/apply/status" className="rounded-xl border border-blue-400 bg-white px-5 py-3 font-bold text-blue-950 hover:bg-blue-100">Application Status</Link>
+              <Link
+                href="/lms/courses"
+                className="rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800"
+              >
+                Browse Courses
+              </Link>
+              <Link
+                href="/lms/apply/status"
+                className="rounded-xl border border-white/60 bg-white/10 px-5 py-3 font-bold text-white backdrop-blur hover:bg-white/20"
+              >
+                Application Status
+              </Link>
             </div>
           </section>
         )}
 
-        {isPendingWorkone && (
-          <WorkOneChecklistSection
-            pendingWorkone={isPendingWorkone}
-            fundingSource={workoneApp?.requested_funding_source ?? undefined}
-          />
-        )}
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-5">
-          <div className="flex items-center justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-widest text-blue-700">Career feed</p><h2 className="mt-1 text-xl font-black">Opportunities for your next step</h2></div><Link href="/lms/career" className="text-sm font-black text-blue-800 underline">Career Services</Link></div>
-          {careerJobs.length > 0 ? <div className="mt-5 grid gap-4 sm:grid-cols-2">{careerJobs.map((job) => <JobCard key={job.id} job={job} showApply href="/lms/placement" />)}</div> : <div className="mt-5 rounded-xl bg-slate-50 p-5"><p className="font-bold">No current job matches.</p><p className="mt-1 text-sm text-slate-600">Placement support and career coaching remain available.</p></div>}
+        {workspace.enrollments.some((row) => row.program_slug === 'hvac-technician') ? <HvacStartHere /> : null}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Documents and agreements">
+          <h2 className="text-xl font-black">Your documents & agreements</h2>
+          <p className="mt-2 text-sm text-slate-700">Read your handbook, MOU, and enrollment documents anytime, including after signing.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/lms/documents" className="rounded-xl bg-slate-950 px-4 py-3 font-bold text-white">Documents & uploads</Link>
+            <Link href="/lms/handbook" className="rounded-xl border px-4 py-3 font-bold">Student handbook</Link>
+            <Link href="/lms/legal/student-mou" className="rounded-xl border px-4 py-3 font-bold">Participation MOU</Link>
+            <Link href="/lms/agreements" className="rounded-xl border px-4 py-3 font-bold">All agreements & signatures</Link>
+          </div>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            {programEnrollments.length > 0 && (
-              <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                  <h2 className="font-black text-slate-950">My Programs</h2>
-                  <Link href="/lms/courses" className="text-sm font-bold text-brand-blue-800 hover:underline">View courses</Link>
+        {courseAccessNotice ? (
+          <section role="status" className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+            <h2 className="text-xl font-black text-blue-950">{courseAccessNotice.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-blue-950">{courseAccessNotice.message}</p>
+            <div className="mt-4 flex flex-wrap gap-4">
+              <Link href="/lms/documents" className="font-bold underline">Review documents & agreements</Link>
+              <Link href="/lms/messages" className="font-bold underline">Contact your instructor</Link>
+            </div>
+          </section>
+        ) : null}
+        <CourseSyllabus syllabus={workspace.enrollments.some((row) => row.program_id === courseSyllabus?.program_id) ? courseSyllabus : null} />
+        <ProgramGuideResources />
+        <DashboardOrientationPanel
+          hvac={workspace.enrollments.some(row => row.program_slug === 'hvac-technician' && ['active','enrolled','in_progress','onboarding','orientation','pending'].includes(String(row.status)))}
+          bookkeeping={bookkeeping}
+          instructorEmail={instructorMailbox?.address}
+        />
+        {subject.previewing ? (
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            <span className="font-semibold">
+              Admin preview: viewing {subjectProfile?.full_name || 'this learner'}&apos;s read-only
+              Student dashboard.
+            </span>
+            <a className="font-black underline" href="/api/admin/preview?end=1">
+              Exit learner preview
+            </a>
+          </section>
+        ) : null}
+        {workspace.nextRequiredAction ? (
+          <section role="alert" className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-xs font-black uppercase tracking-widest text-red-800">
+              Onboarding incomplete · {workspace.onboardingPercent}% complete
+            </p>
+            <h1 className="mt-2 text-2xl font-black text-slate-950">
+              Next required action: {workspace.nextRequiredAction.title}
+            </h1>
+            <p className="mt-2 text-slate-700">{workspace.nextRequiredAction.description}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href={workspace.nextRequiredAction.href}
+                className="rounded-xl bg-red-700 px-5 py-3 font-black text-white"
+              >
+                Complete now
+              </Link>
+              <Link
+                href="/lms/onboarding"
+                className="rounded-xl border border-red-500 bg-white px-5 py-3 font-black text-slate-950"
+              >
+                View checklist
+              </Link>
+            </div>
+          </section>
+        ) : null}
+        {billingRequirement ? (
+          <details className="rounded-xl border border-slate-200 p-4">
+            <summary className="cursor-pointer font-bold">Payment setup and status</summary>
+            <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
+          </details>
+        ) : null}
+        <details className="rounded-2xl border border-slate-200 bg-white p-4">
+          <summary className="min-h-11 cursor-pointer font-bold text-slate-950">
+            Training dates, documents, and study clock
+          </summary>
+          <StudentCompletionTasks userId={subjectId} />
+          {programEnrollments.some((row: any) =>
+            ['hvac-technician'].includes(String(row.programs?.slug || row.program_slug || '')),
+          ) ? (
+            <OnlineStudyClock />
+          ) : null}
+        </details>
+        <details className="rounded-2xl border border-slate-200 bg-white p-4">
+          <summary className="min-h-11 cursor-pointer font-bold text-slate-950">
+            More: programs, meetings, progress, and career tools
+          </summary>
+          <div className="mt-4 space-y-6">
+            {isPendingWorkone && (
+              <WorkOneChecklistSection
+                pendingWorkone={isPendingWorkone}
+                fundingSource={workoneApp?.requested_funding_source ?? undefined}
+              />
+            )}
+
+            {videoMeetings.length > 0 ? (
+              <section className="overflow-hidden rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm sm:p-6">
+                <div className="flex items-start gap-3">
+                  <span className="rounded-xl bg-indigo-700 p-3 text-white">
+                    <Video className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-indigo-700">
+                      Upcoming video meeting
+                    </p>
+                    <h2 className="mt-1 text-xl font-black text-slate-950">
+                      Meet from your Student Dashboard
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-700">
+                      Camera, microphone, room chat, and screen sharing open securely inside
+                      Elevate.
+                    </p>
+                  </div>
                 </div>
-                <div className="grid gap-4 p-5 sm:grid-cols-2">
-                  {programEnrollments.slice(0, 6).map((enrollment: any) => {
-                    const slug = String(enrollment.programs?.slug || '');
-                    const title = enrollment.programs?.title ?? 'Program';
-                    return (
-                      <article key={enrollment.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="mt-4 grid gap-3">
+                  {videoMeetings.map((meeting) => (
+                    <article
+                      key={meeting.id}
+                      className="flex flex-col gap-3 rounded-xl border border-indigo-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-black text-slate-950">{meeting.title}</p>
+                        <p className="mt-1 text-sm text-slate-600">
+                          {new Date(meeting.starts_at).toLocaleString()} ·{' '}
+                          {meeting.duration_minutes} minutes
+                        </p>
+                      </div>
+                      <Link
+                        href={`/lms/meetings/${meeting.communication_room_id}`}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-indigo-700 px-4 py-2 text-sm font-black text-white"
+                      >
+                        <Video className="h-4 w-4" aria-hidden="true" /> Join room
+                      </Link>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-widest text-blue-700">
+                    Career feed
+                  </p>
+                  <h2 className="mt-1 text-xl font-black">Opportunities for your next step</h2>
+                </div>
+                <Link href="/lms/career" className="text-sm font-black text-blue-800 underline">
+                  Career Services
+                </Link>
+              </div>
+              {careerMatches.length > 0 ? (
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  {careerMatches.map(
+                    ({ job, eligibility, reasons, missingCredentials, applyUrl, source }) => (
+                      <div key={job.id} className="min-w-0 space-y-2">
+                        <JobCard job={job} showApply href={applyUrl ?? '/lms/placement'} />
+                        <p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
+                          {eligibility === 'credential_match'
+                            ? 'Verified credential match'
+                            : 'Explore this opportunity'}
+                          {reasons.length ? ` · ${reasons.join('; ')}` : ''}
+                          {missingCredentials.length
+                            ? ` · Credentials not verified: ${missingCredentials.join(', ')}`
+                            : ''}
+                          {source ? ` · Jobs sourced by ${source}` : ''}
+                        </p>
+                      </div>
+                    ),
+                  )}
+                </div>
+              ) : (
+                <div className="mt-5 rounded-xl bg-slate-50 p-5">
+                  <p className="font-bold">No current job matches.</p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Placement support and career coaching remain available.
+                  </p>
+                </div>
+              )}
+            </section>
+
+            <section className="overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-violet-50 shadow-sm">
+              <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
+                <div className="relative min-h-64 overflow-hidden lg:min-h-full">
+                  <Image
+                    src="/images/pages/community-page-2.webp"
+                    alt="Elevate school community members collaborating"
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-200">
+                      School &amp; Community Hub
+                    </p>
+                    <h2 className="mt-2 text-2xl font-black">You belong here</h2>
+                    <p className="mt-2 max-w-lg text-sm font-medium leading-6 text-slate-100">
+                      Connect with classmates, career circles, school events, and people who can
+                      help you move forward.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid gap-3 p-5 sm:grid-cols-2 sm:p-6">
+                  {[
+                    {
+                      href: '/lms/community',
+                      label: 'Community Feed',
+                      detail: 'Join conversations and see what is happening across Elevate.',
+                      icon: MessageSquare,
+                      tone: 'bg-blue-100 text-blue-800',
+                    },
+                    {
+                      href: '/lms/groups',
+                      label: 'Groups & Career Circles',
+                      detail: 'Find study groups, cohorts, and professional interests.',
+                      icon: Users,
+                      tone: 'bg-violet-100 text-violet-800',
+                    },
+                    {
+                      href: '/lms/events',
+                      label: 'School Events',
+                      detail: 'See workshops, networking events, and upcoming activities.',
+                      icon: CalendarDays,
+                      tone: 'bg-emerald-100 text-emerald-800',
+                    },
+                    {
+                      href: '/lms/leaderboard',
+                      label: 'Achievements',
+                      detail: 'Celebrate participation, progress, and community milestones.',
+                      icon: Trophy,
+                      tone: 'bg-amber-100 text-amber-800',
+                    },
+                  ].map(({ href, label, detail, icon: Icon, tone }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="group rounded-2xl border border-white bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    >
+                      <span className={`inline-flex rounded-xl p-2.5 ${tone}`}>
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <h3 className="mt-3 font-black text-slate-950 group-hover:text-blue-800">
+                        {label}
+                      </h3>
+                      <p className="mt-1 text-sm leading-6 text-slate-600">{detail}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="space-y-6 lg:col-span-2">
+                {programEnrollments.length > 0 && (
+                  <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                      <h2 className="font-black text-slate-950">My Programs</h2>
+                      <Link
+                        href="/lms/courses"
+                        className="text-sm font-bold text-brand-blue-800 hover:underline"
+                      >
+                        View courses
+                      </Link>
+                    </div>
+                    <div className="grid gap-4 p-5 sm:grid-cols-2">
+                      {programEnrollments.slice(0, 6).map((enrollment: any) => {
+                        const slug = String(enrollment.programs?.slug || '');
+                        const title = enrollment.programs?.title ?? 'Program';
+                        return (
+                          <article
+                            key={enrollment.id}
+                            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                          >
+                            <div className="relative aspect-[16/9] w-full bg-slate-100">
+                              <Image
+                                src={getProgramCardImage(slug)}
+                                alt={`${title} program`}
+                                fill
+                                sizes="(max-width: 640px) 100vw, 50vw"
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="p-4">
+                              <p className="font-bold text-slate-950">{title}</p>
+                              <p className="mt-1 text-xs font-semibold capitalize text-slate-700">
+                                Program status:{' '}
+                                {String(enrollment.status ?? 'recorded').replace(/_/g, ' ')}
+                              </p>
+                              {slug ? (
+                                <a
+                                  href={`${MARKETING_HOST}/programs/${slug}`}
+                                  className="mt-3 inline-flex text-sm font-bold text-brand-blue-800 hover:underline"
+                                >
+                                  View program
+                                </a>
+                              ) : null}
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+
+                {personalCourseAccess.length > 0 && (
+                  <section className="overflow-hidden rounded-2xl border border-blue-200 bg-white">
+                    <div className="border-b border-blue-100 bg-blue-50 px-5 py-4">
+                      <h2 className="flex items-center gap-2 font-black text-slate-950">
+                        <ExternalLink className="h-4 w-4" /> My Assigned Training
+                      </h2>
+                      <p className="mt-1 text-xs font-medium text-slate-700">
+                        These secure training links were assigned directly to your learner account.
+                      </p>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {personalCourseAccess.map((course: any, index: number) => (
+                        <div
+                          key={course.id}
+                          className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-950">
+                              {course.notes || `HVACR assigned course ${index + 1}`}
+                            </p>
+                            <p className="mt-1 text-xs font-medium text-slate-700">
+                              {course.provider} · Course {course.provider_course_id}
+                            </p>
+                          </div>
+                          <a
+                            href={course.activation_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-800"
+                          >
+                            <ExternalLink className="h-4 w-4" /> Start Training
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {externalCourses.length > 0 && (
+                  <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div className="border-b border-slate-100 px-5 py-4">
+                      <h2 className="flex items-center gap-2 font-black text-slate-950">
+                        <ExternalLink className="h-4 w-4" /> Industry Partner Courses
+                      </h2>
+                      <p className="mt-1 text-xs font-medium text-slate-700">
+                        External course content stays on the approved provider platform; Elevate
+                        tracks your completion evidence.
+                      </p>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {externalCourses.map((course: any) => {
+                        const completion: any = completionByExternalCourseId.get(course.id);
+                        const approved = Boolean(completion?.approved_at);
+                        const uploaded = Boolean(completion?.certificate_url);
+                        return (
+                          <div key={course.id} className="px-5 py-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <p className="font-bold text-slate-950">{course.title}</p>
+                                <p className="mt-1 text-xs font-medium text-slate-700">
+                                  {course.partner_name}
+                                  {course.credential_type ? ` · ${course.credential_type}` : ''}
+                                </p>
+                                {course.description ? (
+                                  <p className="mt-2 text-sm font-medium leading-5 text-slate-700">
+                                    {course.description}
+                                  </p>
+                                ) : null}
+                                {course.duration_display ? (
+                                  <p className="mt-2 text-xs font-bold text-slate-900">
+                                    Expected duration: {course.duration_display}
+                                  </p>
+                                ) : null}
+                                {course.credential_name ? (
+                                  <p className="mt-1 text-xs font-bold text-slate-900">
+                                    Credential: {course.credential_name}
+                                  </p>
+                                ) : null}
+                                {course.enrollment_instructions ? (
+                                  <p className="mt-2 text-xs font-medium leading-5 text-slate-700">
+                                    {course.enrollment_instructions}
+                                  </p>
+                                ) : null}
+                              </div>
+                              {approved ? (
+                                <BadgeCheck className="h-5 w-5 shrink-0 text-green-700" />
+                              ) : null}
+                            </div>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              <a
+                                href={course.external_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-blue-700 px-3 py-2 text-xs font-bold text-white hover:bg-brand-blue-800"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" /> Open Course
+                              </a>
+                              {!approved && (
+                                <Link
+                                  href={`/lms/external-pathways/${course.id}/upload`}
+                                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-400 px-3 py-2 text-xs font-bold text-slate-900 hover:bg-slate-50"
+                                >
+                                  <Upload className="h-3.5 w-3.5" />{' '}
+                                  {uploaded ? 'Replace Certificate' : 'Upload Certificate'}
+                                </Link>
+                              )}
+                              <span
+                                className={`inline-flex items-center rounded-lg px-3 py-2 text-xs font-bold ${approved ? 'bg-green-100 text-green-900' : uploaded ? 'bg-amber-100 text-amber-950' : 'bg-slate-100 text-slate-800'}`}
+                              >
+                                {approved
+                                  ? 'Approved'
+                                  : uploaded
+                                    ? 'Under review'
+                                    : 'Not submitted'}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+
+                {recentQuizAttempts.length > 0 && (
+                  <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div className="border-b border-slate-100 px-5 py-4">
+                      <h2 className="flex items-center gap-2 font-black text-slate-950">
+                        <BarChart2 className="h-4 w-4" /> Recent Practice Scores
+                      </h2>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {recentQuizAttempts.map((attempt: any) => (
+                        <div key={attempt.id} className="flex items-center gap-4 px-5 py-4">
+                          <div
+                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-black ${attempt.passed ? 'bg-green-100 text-green-900' : 'bg-red-100 text-slate-700'}`}
+                          >
+                            {Number(attempt.score ?? 0)}%
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-bold text-slate-950">
+                              {attempt.quizzes?.title ?? 'Practice Assessment'}
+                            </p>
+                            <p className="mt-1 text-xs font-semibold text-slate-700">
+                              {attempt.passed ? 'Passed' : 'Not passed'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                <section className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <h2 className="font-black text-slate-950">Learning Tools</h2>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    {learningTools.map((tool) => (
+                      <Link
+                        key={tool.href}
+                        href={tool.href}
+                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"
+                      >
                         <div className="relative aspect-[16/9] w-full bg-slate-100">
                           <Image
-                            src={getProgramCardImage(slug)}
-                            alt={`${title} program`}
+                            src={tool.image}
+                            alt={`${tool.label} learner workspace`}
                             fill
-                            sizes="(max-width: 640px) 100vw, 50vw"
-                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, 33vw"
+                            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                           />
                         </div>
                         <div className="p-4">
-                          <p className="font-bold text-slate-950">{title}</p>
-                          <p className="mt-1 text-xs font-semibold capitalize text-slate-700">Program status: {String(enrollment.status ?? 'recorded').replace(/_/g, ' ')}</p>
-                          {slug ? <a href={`${MARKETING_HOST}/programs/${slug}`} className="mt-3 inline-flex text-sm font-bold text-brand-blue-800 hover:underline">View program</a> : null}
+                          <p className="font-black text-slate-950">{tool.label}</p>
+                          <p className="mt-1 text-xs font-medium leading-5 text-slate-700">
+                            {tool.text}
+                          </p>
                         </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              </div>
 
-            {externalCourses.length > 0 && (
-              <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 px-5 py-4">
-                  <h2 className="flex items-center gap-2 font-black text-slate-950"><ExternalLink className="h-4 w-4" /> Industry Partner Courses</h2>
-                  <p className="mt-1 text-xs font-medium text-slate-700">External course content stays on the approved provider platform; Elevate tracks your completion evidence.</p>
-                </div>
-                <div className="divide-y divide-slate-100">
-                  {externalCourses.map((course: any) => {
-                    const completion: any = completionByExternalCourseId.get(course.id);
-                    const approved = Boolean(completion?.approved_at);
-                    const uploaded = Boolean(completion?.certificate_url);
-                    return (
-                      <div key={course.id} className="px-5 py-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <p className="font-bold text-slate-950">{course.title}</p>
-                            <p className="mt-1 text-xs font-medium text-slate-700">{course.partner_name}{course.credential_type ? ` · ${course.credential_type}` : ''}</p>
-                            {course.description ? <p className="mt-2 text-sm font-medium leading-5 text-slate-700">{course.description}</p> : null}
-                            {course.duration_display ? <p className="mt-2 text-xs font-bold text-slate-900">Expected duration: {course.duration_display}</p> : null}
-                            {course.credential_name ? <p className="mt-1 text-xs font-bold text-slate-900">Credential: {course.credential_name}</p> : null}
-                            {course.enrollment_instructions ? <p className="mt-2 text-xs font-medium leading-5 text-slate-700">{course.enrollment_instructions}</p> : null}
+              <aside className="space-y-5">
+                <section className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <h2 className="font-black text-slate-950">Verified Course Progress</h2>
+                  <div className="mt-4 space-y-3 text-sm">
+                    <Stat
+                      label="Lessons complete"
+                      value={`${completedLessons} / ${totalLessons || '—'}`}
+                    />
+                    <Stat label="Course progress" value={`${courseProgress}%`} />
+                    <Stat label="Current phase" value={`Phase ${phaseNumber} of 5`} />
+                    <Stat label="Certificates" value={String(certifications.length)} />
+                  </div>
+                </section>
+
+                {certifications.length > 0 && (
+                  <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
+                    <h2 className="flex items-center gap-2 font-black text-amber-950">
+                      <Award className="h-4 w-4" /> Certificates
+                    </h2>
+                    <div className="mt-4 space-y-3">
+                      {certifications.slice(0, 4).map((cert: any) => (
+                        <div key={cert.id} className="rounded-xl bg-white p-3">
+                          <p className="text-sm font-bold text-slate-950">
+                            {cert.course_title ?? 'Certificate'}
+                          </p>
+                          {cert.issued_at ? (
+                            <p className="mt-1 text-xs font-medium text-slate-700">
+                              {new Date(cert.issued_at).toLocaleDateString()}
+                            </p>
+                          ) : null}
+                          {cert.verification_status ? (
+                            <p className="mt-1 text-xs font-bold capitalize text-amber-800">
+                              {String(cert.verification_status).replaceAll('_', ' ')}
+                            </p>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                    <Link
+                      href="/lms/certificates"
+                      className="mt-4 inline-flex text-sm font-bold text-amber-950 hover:underline"
+                    >
+                      View all certificates
+                    </Link>
+                  </section>
+                )}
+
+                {showBilling ? (
+                  <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div className="border-b border-slate-100 px-5 py-4">
+                      <h2 className="flex items-center gap-2 font-black text-slate-950">
+                        <CreditCard className="h-4 w-4" /> Payments
+                      </h2>
+                    </div>
+                    <div className="p-5">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+                        Recorded paid total
+                      </p>
+                      <p className="mt-1 text-2xl font-black text-slate-950">
+                        ${(paidTotalCents / 100).toFixed(2)}
+                      </p>
+                      <div className="mt-4 space-y-2">
+                        {recentPayments.slice(0, 3).map((payment: any) => (
+                          <div
+                            key={payment.id}
+                            className="flex items-center justify-between gap-3 text-xs"
+                          >
+                            <span className="capitalize font-medium text-slate-700">
+                              {payment.status ?? 'recorded'}
+                            </span>
+                            <span className="font-bold text-slate-900">
+                              ${(Number(payment.amount ?? 0) / 100).toFixed(2)}
+                            </span>
                           </div>
-                          {approved ? <BadgeCheck className="h-5 w-5 shrink-0 text-green-700" /> : null}
-                        </div>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <a href={course.external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-brand-blue-700 px-3 py-2 text-xs font-bold text-white hover:bg-brand-blue-800">
-                            <ExternalLink className="h-3.5 w-3.5" /> Open Course
-                          </a>
-                          {!approved && (
-                            <Link href={`/lms/external-pathways/${course.id}/upload`} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-400 px-3 py-2 text-xs font-bold text-slate-900 hover:bg-slate-50">
-                              <Upload className="h-3.5 w-3.5" /> {uploaded ? 'Replace Certificate' : 'Upload Certificate'}
-                            </Link>
-                          )}
-                          <span className={`inline-flex items-center rounded-lg px-3 py-2 text-xs font-bold ${approved ? 'bg-green-100 text-green-900' : uploaded ? 'bg-amber-100 text-amber-950' : 'bg-slate-100 text-slate-800'}`}>
-                            {approved ? 'Approved' : uploaded ? 'Under review' : 'Not submitted'}
-                          </span>
-                        </div>
+                        ))}
                       </div>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+                      <Link
+                        href="/lms/payments"
+                        className="mt-4 inline-flex text-sm font-bold text-brand-blue-800 hover:underline"
+                      >
+                        View payment history
+                      </Link>
+                    </div>
+                  </section>
+                ) : null}
 
-            {recentQuizAttempts.length > 0 && (
-              <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 px-5 py-4">
-                  <h2 className="flex items-center gap-2 font-black text-slate-950"><BarChart2 className="h-4 w-4" /> Recent Practice Scores</h2>
-                </div>
-                <div className="divide-y divide-slate-100">
-                  {recentQuizAttempts.map((attempt: any) => (
-                    <div key={attempt.id} className="flex items-center gap-4 px-5 py-4">
-                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-black ${attempt.passed ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900'}`}>
-                        {Number(attempt.score ?? 0)}%
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-bold text-slate-950">{attempt.quizzes?.title ?? 'Practice Assessment'}</p>
-                        <p className="mt-1 text-xs font-semibold text-slate-700">{attempt.passed ? 'Passed' : 'Not passed'}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            <section className="rounded-2xl border border-slate-200 bg-white p-5">
-              <h2 className="font-black text-slate-950">Learning Tools</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                {learningTools.map((tool) => (
-                  <Link key={tool.href} href={tool.href} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md">
-                    <div className="relative aspect-[16/9] w-full bg-slate-100">
-                      <Image src={tool.image} alt={`${tool.label} learner workspace`} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-                    </div>
-                    <div className="p-4">
-                      <p className="font-black text-slate-950">{tool.label}</p>
-                      <p className="mt-1 text-xs font-medium leading-5 text-slate-700">{tool.text}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
+                <section className="rounded-2xl bg-slate-950 p-5 text-white">
+                  <h2 className="font-black text-white">Credential Pathway</h2>
+                  <div className="mt-4 space-y-3 text-sm">
+                    <PathStep label="Complete all lessons" done={isComplete} />
+                    <PathStep
+                      label="Complete assessments"
+                      done={recentQuizAttempts.some((attempt: any) => attempt.passed)}
+                    />
+                    <PathStep label="Earn certification" done={certifications.length > 0} />
+                  </div>
+                </section>
+              </aside>
+            </div>
           </div>
-
-          <aside className="space-y-5">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5">
-              <h2 className="font-black text-slate-950">Verified Course Progress</h2>
-              <div className="mt-4 space-y-3 text-sm">
-                <Stat label="Lessons complete" value={`${completedLessons} / ${totalLessons || '—'}`} />
-                <Stat label="Course progress" value={`${courseProgress}%`} />
-                <Stat label="Current phase" value={`Phase ${phaseNumber} of 5`} />
-                <Stat label="Certificates" value={String(certifications.length)} />
-              </div>
-            </section>
-
-            {certifications.length > 0 && (
-              <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
-                <h2 className="flex items-center gap-2 font-black text-amber-950"><Award className="h-4 w-4" /> Certificates</h2>
-                <div className="mt-4 space-y-3">
-                  {certifications.slice(0, 4).map((cert: any) => (
-                    <div key={cert.id} className="rounded-xl bg-white p-3">
-                      <p className="text-sm font-bold text-slate-950">{cert.course_title ?? 'Certificate'}</p>
-                      {cert.issued_at ? <p className="mt-1 text-xs font-medium text-slate-700">{new Date(cert.issued_at).toLocaleDateString()}</p> : null}
-                    </div>
-                  ))}
-                </div>
-                <Link href="/lms/certificates" className="mt-4 inline-flex text-sm font-bold text-amber-950 hover:underline">View all certificates</Link>
-              </section>
-            )}
-
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div className="border-b border-slate-100 px-5 py-4">
-                <h2 className="flex items-center gap-2 font-black text-slate-950"><CreditCard className="h-4 w-4" /> Payments</h2>
-              </div>
-              <div className="p-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Recorded paid total</p>
-                <p className="mt-1 text-2xl font-black text-slate-950">${(paidTotalCents / 100).toFixed(2)}</p>
-                <div className="mt-4 space-y-2">
-                  {recentPayments.slice(0, 3).map((payment: any) => (
-                    <div key={payment.id} className="flex items-center justify-between gap-3 text-xs">
-                      <span className="capitalize font-medium text-slate-700">{payment.status ?? 'recorded'}</span>
-                      <span className="font-bold text-slate-900">${(Number(payment.amount ?? 0) / 100).toFixed(2)}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/lms/payments" className="mt-4 inline-flex text-sm font-bold text-brand-blue-800 hover:underline">View payment history</Link>
-              </div>
-            </section>
-
-            <section className="rounded-2xl bg-slate-950 p-5 text-white">
-              <h2 className="font-black text-white">Credential Pathway</h2>
-              <div className="mt-4 space-y-3 text-sm">
-                <PathStep label="Complete all lessons" done={isComplete} />
-                <PathStep label="Complete assessments" done={recentQuizAttempts.some((attempt: any) => attempt.passed)} />
-                <PathStep label="Earn certification" done={certifications.length > 0} />
-              </div>
-            </section>
-          </aside>
-        </div>
+        </details>
       </div>
-
     </div>
+  );
+}
+
+function NeutralStudentPortalPreview() {
+  const modules = [
+    'Onboarding',
+    'Documents & Records',
+    'Agreements',
+    'My Courses',
+    'Progress',
+    'Assignments',
+    'Schedule',
+    'Certificates',
+    'Career Services',
+  ];
+  return (
+    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Administrator portal preview
+          </p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Student PWA</h1>
+          <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">
+            No learner is selected. Select a learner from secured Admin student management to open
+            their saved enrollment, payment, progress, and career records in an audited, read-only
+            dashboard preview.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="https://admin.elevateforhumanity.org/students"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+            >
+              Select a learner in Admin
+            </a>
+            <a
+              href="https://admin.elevateforhumanity.org/dashboard"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950"
+            >
+              Return to Admin dashboard
+            </a>
+          </div>
+        </section>
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {modules.map((label) => (
+            <article
+              key={label}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            >
+              <GraduationCap className="h-5 w-5 text-blue-700" />
+              <h2 className="mt-3 font-black text-slate-950">{label}</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Available after an authorized learner is selected.
+              </p>
+            </article>
+          ))}
+        </section>
+      </div>
+    </main>
   );
 }
 
@@ -535,10 +1261,14 @@ function Stat({ label, value }: { label: string; value: string }) {
 function PathStep({ label, done }: { label: string; done: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className={`flex h-5 w-5 items-center justify-center rounded-full ${done ? 'bg-green-600' : 'bg-slate-700'}`}>
+      <div
+        className={`flex h-5 w-5 items-center justify-center rounded-full ${done ? 'bg-green-600' : 'bg-slate-700'}`}
+      >
         {done ? <CheckCircle className="h-3 w-3" /> : null}
       </div>
-      <span className={done ? 'font-medium text-green-200' : 'font-medium text-slate-100'}>{label}</span>
+      <span className={done ? 'font-medium text-green-200' : 'font-medium text-slate-100'}>
+        {label}
+      </span>
     </div>
   );
 }

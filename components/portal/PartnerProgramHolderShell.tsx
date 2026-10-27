@@ -4,10 +4,28 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
-  LayoutDashboard, Users, Clock, AlertTriangle, GraduationCap,
-  BookOpen, Megaphone, Bell, FileText, Shield, Book, LifeBuoy,
-  HelpCircle, ClipboardCheck, BarChart3, Settings, Menu, X,
-  LogOut, CheckCircle, CalendarDays, Briefcase,
+  LayoutDashboard,
+  Users,
+  Clock,
+  AlertTriangle,
+  GraduationCap,
+  BookOpen,
+  Megaphone,
+  Bell,
+  FileText,
+  Shield,
+  Book,
+  LifeBuoy,
+  HelpCircle,
+  ClipboardCheck,
+  BarChart3,
+  Settings,
+  Menu,
+  X,
+  LogOut,
+  CheckCircle,
+  CalendarDays,
+  Briefcase,
 } from 'lucide-react';
 
 interface NavItem {
@@ -18,34 +36,161 @@ interface NavItem {
   section: string;
 }
 
-const PH = ['program_holder', 'admin', 'staff', 'org_admin'];
+const PH = ['program_holder', 'site_coordinator', 'admin', 'staff', 'org_admin'];
 const PA = ['partner', 'admin', 'staff', 'org_admin'];
 
 const NAV: NavItem[] = [
-  { href: '/program-holder/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: PH, section: 'Overview' },
-  { href: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: PA, section: 'Overview' },
-  { href: '/program-holder/students', label: 'Students', icon: Users, roles: PH, section: 'Students' },
-  { href: '/program-holder/students/pending', label: 'Pending', icon: Clock, roles: PH, section: 'Students' },
-  { href: '/program-holder/students/at-risk', label: 'At-Risk', icon: AlertTriangle, roles: PH, section: 'Students' },
+  {
+    href: '/program-holder/dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    roles: PH,
+    section: 'Overview',
+  },
+  {
+    href: '/partner/dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    roles: PA,
+    section: 'Overview',
+  },
+  {
+    href: '/program-holder/students',
+    label: 'Students',
+    icon: Users,
+    roles: PH,
+    section: 'Students',
+  },
+  {
+    href: '/program-holder/students/pending',
+    label: 'Pending',
+    icon: Clock,
+    roles: PH,
+    section: 'Students',
+  },
+  {
+    href: '/program-holder/students/at-risk',
+    label: 'At-Risk',
+    icon: AlertTriangle,
+    roles: PH,
+    section: 'Students',
+  },
   { href: '/partner/students', label: 'My Students', icon: Users, roles: PA, section: 'Students' },
-  { href: '/partner/attendance', label: 'Attendance', icon: CalendarDays, roles: PA, section: 'Training' },
+  {
+    href: '/partner/attendance',
+    label: 'Attendance',
+    icon: CalendarDays,
+    roles: PA,
+    section: 'Training',
+  },
   { href: '/partner/hours', label: 'Hours', icon: Clock, roles: PA, section: 'Training' },
-  { href: '/partner/competencies', label: 'Competencies', icon: CheckCircle, roles: PA, section: 'Training' },
+  {
+    href: '/partner/competencies',
+    label: 'Competencies',
+    icon: CheckCircle,
+    roles: PA,
+    section: 'Training',
+  },
   { href: '/partner/programs', label: 'Programs', icon: Briefcase, roles: PA, section: 'Training' },
-  { href: '/program-holder/grades', label: 'Grades', icon: GraduationCap, roles: PH, section: 'Training' },
-  { href: '/program-holder/courses/create', label: 'Create Course', icon: BookOpen, roles: PH, section: 'Training' },
-  { href: '/program-holder/documents', label: 'Documents', icon: FileText, roles: PH, section: 'Compliance' },
-  { href: '/partner/documents', label: 'Documents', icon: FileText, roles: PA, section: 'Compliance' },
-  { href: '/program-holder/verification', label: 'Verification', icon: Shield, roles: PH, section: 'Compliance' },
-  { href: '/program-holder/compliance', label: 'Compliance', icon: ClipboardCheck, roles: PH, section: 'Compliance' },
+  {
+    href: '/program-holder/grades',
+    label: 'Grades',
+    icon: GraduationCap,
+    roles: PH,
+    section: 'Training',
+  },
+  {
+    href: '/program-holder/courses/create',
+    label: 'Create Course',
+    icon: BookOpen,
+    roles: PH,
+    section: 'Training',
+  },
+  {
+    href: '/program-holder/documents',
+    label: 'Documents',
+    icon: FileText,
+    roles: PH,
+    section: 'Compliance',
+  },
+  {
+    href: '/partner/documents',
+    label: 'Documents',
+    icon: FileText,
+    roles: PA,
+    section: 'Compliance',
+  },
+  {
+    href: '/program-holder/verification',
+    label: 'Verification',
+    icon: Shield,
+    roles: PH,
+    section: 'Compliance',
+  },
+  {
+    href: '/program-holder/compliance',
+    label: 'Compliance',
+    icon: ClipboardCheck,
+    roles: PH,
+    section: 'Compliance',
+  },
   { href: '/program-holder/mou', label: 'MOU', icon: FileText, roles: PH, section: 'Compliance' },
-  { href: '/program-holder/reports', label: 'Reports', icon: BarChart3, roles: PH, section: 'Reports' },
-  { href: '/program-holder/campaigns', label: 'Campaigns', icon: Megaphone, roles: PH, section: 'Reports' },
-  { href: '/program-holder/notifications', label: 'Notifications', icon: Bell, roles: PH, section: 'Settings' },
-  { href: '/program-holder/how-to-use', label: 'How to Use', icon: HelpCircle, roles: PH, section: 'Settings' },
-  { href: '/program-holder/documentation', label: 'Documentation', icon: Book, roles: PH, section: 'Settings' },
-  { href: '/program-holder/support', label: 'Support', icon: LifeBuoy, roles: PH, section: 'Settings' },
-  { href: '/program-holder/settings', label: 'Settings', icon: Settings, roles: PH, section: 'Settings' },
+  {
+    href: '/program-holder/reports',
+    label: 'Reports',
+    icon: BarChart3,
+    roles: PH,
+    section: 'Reports',
+  },
+  {
+    href: '/program-holder/campaigns',
+    label: 'Campaigns',
+    icon: Megaphone,
+    roles: PH,
+    section: 'Reports',
+  },
+  {
+    href: '/program-holder/notifications',
+    label: 'Notifications',
+    icon: Bell,
+    roles: PH,
+    section: 'Settings',
+  },
+  {
+    href: '/program-holder/how-to-use',
+    label: 'Start Here',
+    icon: HelpCircle,
+    roles: PH,
+    section: 'Settings',
+  },
+  {
+    href: '/program-holder/documentation',
+    label: 'Documentation',
+    icon: Book,
+    roles: PH,
+    section: 'Settings',
+  },
+  {
+    href: '/program-holder/support',
+    label: 'Support',
+    icon: LifeBuoy,
+    roles: PH,
+    section: 'Settings',
+  },
+  {
+    href: '/employer/dashboard',
+    label: 'Employer Workspace',
+    icon: Briefcase,
+    roles: PH,
+    section: 'Settings',
+  },
+  {
+    href: '/program-holder/settings',
+    label: 'Settings',
+    icon: Settings,
+    roles: PH,
+    section: 'Settings',
+  },
   { href: '/partner/settings', label: 'Settings', icon: Settings, roles: PA, section: 'Settings' },
 ];
 
@@ -67,7 +212,9 @@ function PortalNav({
         if (!sectionItems.length) return null;
         return (
           <div key={section}>
-            <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">{section}</p>
+            <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              {section}
+            </p>
             {sectionItems.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
@@ -76,13 +223,15 @@ function PortalNav({
                   key={item.href}
                   href={item.href}
                   onClick={onNavigate}
-                  className={`mb-0.5 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`mb-0.5 flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                     active
                       ? 'bg-brand-blue-50 text-brand-blue-700'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-brand-blue-600' : 'text-slate-400'}`} />
+                  <Icon
+                    className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-brand-blue-600' : 'text-slate-400'}`}
+                  />
                   <span className="truncate">{item.label}</span>
                 </Link>
               );
@@ -127,20 +276,29 @@ export function PartnerProgramHolderShell({
     : visibleNav;
 
   const isPartner = role === 'partner';
-  const portalName = isPartner ? 'Host Site Portal' : 'Program Holder Portal';
+  const portalName = isPartner
+    ? 'Host Site Portal'
+    : role === 'site_coordinator'
+      ? 'Site Coordinator Portal'
+      : 'Program Holder Portal';
   const homeHref = isPartner ? '/partner/dashboard' : '/program-holder/dashboard';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div
+      data-elevate-dashboard-shell={role}
+      className="min-h-screen w-full overflow-x-clip bg-slate-50"
+    >
       {/* Mobile navigation participates in normal document flow. Nothing is
           fixed over dashboard content, so pages cannot be hidden underneath it. */}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
-          <Link href={homeHref} className="text-sm font-bold text-brand-blue-700">{portalName}</Link>
+          <Link href={homeHref} className="text-sm font-bold text-brand-blue-700">
+            {portalName}
+          </Link>
           <button
             type="button"
             onClick={() => setMobileOpen((value) => !value)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-slate-500 hover:bg-slate-100"
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
           >
@@ -159,10 +317,15 @@ export function PartnerProgramHolderShell({
         <aside className="hidden border-r border-slate-200 bg-white lg:flex lg:min-h-screen lg:flex-col">
           <div className="sticky top-0 flex max-h-screen flex-col">
             <div className="border-b border-slate-100 px-4 py-4">
-              <Link href={homeHref} className="block text-sm font-bold leading-tight text-brand-blue-700">
+              <Link
+                href={homeHref}
+                className="block text-sm font-bold leading-tight text-brand-blue-700"
+              >
                 {portalName}
               </Link>
-              {orgName ? <p className="mt-0.5 truncate text-[11px] text-slate-400">{orgName}</p> : null}
+              {orgName ? (
+                <p className="mt-0.5 truncate text-[11px] text-slate-400">{orgName}</p>
+              ) : null}
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto">
               <PortalNav items={allNav} pathname={pathname} />
@@ -170,15 +333,22 @@ export function PartnerProgramHolderShell({
             <div className="border-t border-slate-100 px-4 py-3">
               <p className="truncate text-xs font-medium text-slate-700">{userName}</p>
               <p className="truncate text-[11px] text-slate-400">{userEmail}</p>
-              <Link href="/api/auth/signout" className="mt-2 flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-700">
+              <Link
+                href="/api/auth/signout"
+                className="mt-2 flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-700"
+              >
                 <LogOut className="h-3 w-3" /> Sign out
               </Link>
             </div>
           </div>
         </aside>
 
-        <main id="portal-main-content" className="min-w-0 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
+        <main
+          data-elevate-dashboard-content
+          id="portal-main-content"
+          className="min-w-0 w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
+        >
+          <div className="w-full max-w-none">{children}</div>
         </main>
       </div>
     </div>

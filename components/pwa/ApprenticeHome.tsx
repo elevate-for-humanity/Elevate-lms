@@ -30,40 +30,48 @@ const DISCIPLINE_CONFIG = {
     icon: <Sparkles className="w-10 h-10 text-white" />,
     color: 'bg-purple-700',
     lightColor: 'bg-purple-500',
-    targetHours: 2000, // Indiana DOL Registered Apprenticeship
+    targetHours: 2000, // RAPIDS 0096HY V1 minimum hybrid term
     applyHref: '/programs/cosmetology-apprenticeship/apply',
     logHref: '/apprentice/hours/log',
     historyHref: '/apprentice/hours/history',
     progressHref: '/apprentice',
     lmsHref: '/lms/dashboard',
-    subtitle: 'Track your hours, access training, and progress toward your cosmetology license.',
+    requiredRtiHours: 154,
+    probationHours: 500,
+    subtitle: 'Hair Stylist/Cosmetologist 0096HY V1: 2,000–2,500-hour hybrid term, 154 RTI hours, and a 500-hour probationary period.',
   },
   'nail-tech': {
     label: 'Nail Tech Apprentice',
     icon: <Hand className="w-10 h-10 text-white" />,
     color: 'bg-pink-700',
     lightColor: 'bg-pink-500',
-    targetHours: 450,
+    targetHours: 2000,
+    targetCompetencies: 19,
+    requiredRtiHours: 210,
+    probationHours: 500,
     applyHref: '/apply?program=nail-technician-apprenticeship',
     logHref: '/pwa/nail-tech/log-hours',
     historyHref: '/pwa/nail-tech/history',
     progressHref: '/pwa/nail-tech/progress',
     lmsHref: '/lms/dashboard',
     subtitle:
-      'Track your hours, access training, and progress toward your nail technician license.',
+      'Complete 19 Appendix A competencies and 210 RTI hours while documenting supervised work. The 500-hour figure is probation, not graduation.',
   },
   esthetician: {
     label: 'Esthetician Apprentice',
     icon: <Flower2 className="w-10 h-10 text-white" />,
     color: 'bg-rose-700',
     lightColor: 'bg-rose-500',
-    targetHours: 700,
+    targetHours: 2000,
+    targetCompetencies: 20,
+    requiredRtiHours: 300,
+    probationHours: 500,
     applyHref: '/programs/esthetician/apply',
     logHref: '/pwa/esthetician/log-hours',
     historyHref: '/pwa/esthetician/history',
     progressHref: '/pwa/esthetician/progress',
     lmsHref: '/lms/dashboard',
-    subtitle: 'Track your hours, access training, and progress toward your esthetician license.',
+    subtitle: 'Complete 20 Appendix A competencies and 300 RTI hours while documenting supervised work. The 500-hour figure is probation, not graduation.',
   },
 };
 
@@ -131,6 +139,7 @@ function Dashboard({
   discipline: Props['discipline'];
 }) {
   const config = DISCIPLINE_CONFIG[discipline];
+  const isCompetencyBased = false;
   const pct = Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
   const remaining = Math.max(0, config.targetHours - data.totalHours);
 
@@ -143,7 +152,30 @@ function Dashboard({
       </div>
 
       <div className="px-4 -mt-4 space-y-4 max-w-lg mx-auto">
-        {/* Hours progress card */}
+        {/* Registered-program progress card */}
+        {isCompetencyBased ? (
+          <div className="bg-slate-800 rounded-2xl p-5">
+            <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
+              <Award className="w-4 h-4" /> Appendix A completion
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-slate-900 p-4">
+                <p className="text-3xl font-black text-white">20</p>
+                <p className="mt-1 text-xs font-semibold text-slate-400">verified competencies</p>
+              </div>
+              <div className="rounded-xl bg-slate-900 p-4">
+                <p className="text-3xl font-black text-white">300</p>
+                <p className="mt-1 text-xs font-semibold text-slate-400">required RTI hours</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-slate-300">
+              Esthetician completion is competency-based. Supervised work hours remain auditable evidence and are not a fixed completion denominator.
+            </p>
+            <Link href={config.progressHref} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">
+              View competency progress <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+        ) : (
         <div className="bg-slate-800 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
@@ -171,6 +203,7 @@ function Dashboard({
             </p>
           )}
         </div>
+        )}
 
         {/* This week */}
         <div className="bg-slate-800 rounded-2xl p-5 flex items-center justify-between">

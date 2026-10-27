@@ -37,6 +37,7 @@ export type UserRole =
   | 'workforce_board'
   | 'workforce_board_admin'
   | 'program_holder'
+  | 'site_coordinator'
   | 'provider'
   | 'provider_admin';
 
@@ -56,6 +57,8 @@ const ROLE_ALIASES: Record<string, UserRole> = {
   'workforce-partner': 'workforce_partner',
   programholder: 'program_holder',
   'program-holder': 'program_holder',
+  sitecoordinator: 'site_coordinator',
+  'site-coordinator': 'site_coordinator',
   provideradmin: 'provider_admin',
   'provider-admin': 'provider_admin',
   workforceboard: 'workforce_board',
@@ -70,7 +73,7 @@ const CANONICAL_ROLES = new Set<UserRole>([
   'grant_client', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice',
   'sponsor', 'employer', 'recruiter', 'partner', 'host_shop', 'host_shop_admin',
   'workforce_partner', 'parent', 'creator', 'case_manager', 'workforce_board',
-  'workforce_board_admin', 'program_holder', 'provider', 'provider_admin',
+  'workforce_board_admin', 'program_holder', 'site_coordinator', 'provider', 'provider_admin',
 ]);
 
 export function normalizeRole(value: unknown): UserRole | null {
@@ -94,7 +97,7 @@ export const TESTING_CENTER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff'
 export const EMPLOYER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'employer', 'sponsor', 'recruiter', 'org_admin'];
 export const STAFF_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager'];
 export const WORKFORCE_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager', 'workforce_partner'];
-export const PROGRAM_HOLDER_ROLES: UserRole[] = ['super_admin', 'admin', 'program_holder', 'provider_admin'];
+export const PROGRAM_HOLDER_ROLES: UserRole[] = ['super_admin', 'admin', 'program_holder', 'site_coordinator', 'provider_admin'];
 export const HOST_SHOP_ROLES: UserRole[] = ['super_admin', 'admin', 'partner', 'host_shop', 'host_shop_admin', 'program_holder'];
 export const APPRENTICE_ROLES: UserRole[] = ['super_admin', 'admin', 'student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice'];
 

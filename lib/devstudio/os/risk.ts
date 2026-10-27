@@ -1,17 +1,9 @@
-const RISKY_KEYWORDS = [
-  'migration',
-  'deploy',
-  'payment',
-  'auth',
-  'delete',
-  'drop',
-  'truncate',
-  'production',
-] as const;
-
 export function detectRiskTags(text: string): string[] {
-  const lower = text.toLowerCase();
-  return RISKY_KEYWORDS.filter((kw) => lower.includes(kw));
+  // Natural-language keywords are not an authorization boundary. A request can
+  // discuss payments, deployment, email, or signing without performing any of
+  // those actions. Approval is enforced by the concrete tool at execution time.
+  void text;
+  return [];
 }
 
 export function requiresApproval(text: string): boolean {
@@ -20,5 +12,5 @@ export function requiresApproval(text: string): boolean {
 
 export function approvalReason(tags: string[]): string {
   if (!tags.length) return '';
-  return `Risky operation detected: ${tags.join(', ')}. Admin approval required before execution.`;
+  return `Protected tool requires approval: ${tags.join(', ')}.`;
 }

@@ -4,9 +4,9 @@ import { createClient } from '@/lib/supabase/client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import LogoImage from '@/components/site/LogoImage';
+import { ProfileImage } from '@/components/profile/ProfileImage';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -107,14 +107,15 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
     { href: '/lms/chat', label: 'Chat', desc: 'Peer chat', icon: MessageSquare },
     { href: '/lms/adaptive', label: 'Adaptive', desc: 'Personalized learning', icon: TrendingUp },
     { href: '/lms/integrations', label: 'Integrations', desc: 'Connected tools', icon: Settings },
-    { href: '/lms/payments', label: 'Payments', desc: 'Billing & invoices', icon: Award },
     { href: '/lms/settings', label: 'Settings', desc: 'Account settings', icon: Settings },
   ];
 
   // Resources available to learners inside the LMS — not surfaced on the marketing site.
   const resourceItems = [
     { href: '/lms/orientation', label: 'Orientation' },
-    { href: '/student-handbook', label: 'Student Handbook' },
+    { href: '/lms/handbook', label: 'Student Handbook' },
+    { href: '/lms/documents', label: 'Documents & Records' },
+    { href: '/lms/agreements', label: 'MOUs & Agreements' },
     { href: '/academic-calendar', label: 'Academic Calendar' },
     { href: '/resources', label: 'Learning Resources' },
     { href: '/career-services', label: 'Career Services' },
@@ -196,7 +197,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Resources dropdown — student-facing links that don't belong on the marketing site */}
             <div className="relative group">
               <button
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-slate-900/90 hover:bg-white/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white/90 hover:bg-white/10 transition-all"
                 aria-haspopup="true"
               >
                 <BookMarked className="w-4 h-4" />
@@ -224,7 +225,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 hover:bg-white/10 rounded-lg transition text-slate-900"
+              className="p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
@@ -236,7 +237,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Settings - Desktop */}
             <Link
               href="/lms/settings"
-              className="hidden md:flex p-2 hover:bg-white/10 rounded-lg transition text-slate-900"
+              className="hidden md:flex p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label="Settings"
             >
               <Settings className="w-5 h-5" />
@@ -245,11 +246,9 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* User Menu - Desktop */}
             <div className="hidden md:flex items-center gap-3 ml-2 pl-4 border-l border-white/20">
               {profile?.avatar_url ? (
-                <Image sizes="100vw"
+                <ProfileImage
                   src={profile.avatar_url}
                   alt={userName}
-                  width={32}
-                  height={32}
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
@@ -266,7 +265,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition text-slate-900"
+              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -337,7 +336,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-slate-900/80 hover:bg-white/10 rounded-lg text-sm"
+                  className="flex items-center gap-3 px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg text-sm"
                 >
                   {item.label}
                 </Link>
@@ -348,11 +347,9 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             <div className="mt-4 pt-4 border-t border-white/10">
               <div className="flex items-center gap-3 px-4 py-2">
                 {profile?.avatar_url ? (
-                  <Image sizes="100vw"
+                  <ProfileImage
                     src={profile.avatar_url}
                     alt={userName}
-                    width={40}
-                    height={40}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
@@ -370,7 +367,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 <Link
                   href="/lms/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-slate-900 hover:bg-white/10 rounded-lg"
+                  className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/10 rounded-lg"
                 >
                   <User className="w-5 h-5" />
                   Profile
@@ -378,7 +375,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 <Link
                   href="/lms/settings"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-slate-900 hover:bg-white/10 rounded-lg"
+                  className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/10 rounded-lg"
                 >
                   <Settings className="w-5 h-5" />
                   Settings

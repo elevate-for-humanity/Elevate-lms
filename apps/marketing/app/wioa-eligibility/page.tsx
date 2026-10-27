@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import EligibilityPreQualifier from '@/components/enrollment/EligibilityPreQualifier';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/wioa-eligibility' },
@@ -71,8 +72,8 @@ export default function WIOAEligibilityPage() {
                 title: 'WorkOne Appointment',
                 desc: 'Schedule a meeting at your local WorkOne center. They determine your funding eligibility.',
                 image: '/images/pages/admin-funding-hero.webp',
-                cta: 'Find WorkOne',
-                href: 'https://www.in.gov/dwd/workone/workone-locations/',
+                cta: 'Schedule WorkOne Appointment',
+                href: WORKONE_INDY_BOOKING_URL,
                 external: true,
               },
               {

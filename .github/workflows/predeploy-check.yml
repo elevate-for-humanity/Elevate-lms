@@ -35,6 +35,11 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Verify reviewed source manifest and active phone provider before installation
+        run: |
+          node --test scripts/verify-paris-release-source.test.mjs scripts/test-phone-sending-number.mjs
+          node --input-type=module -e "import { readFileSync } from 'node:fs'; import { verifyLocalSource } from './scripts/verify-paris-release-source.mjs'; verifyLocalSource(JSON.parse(readFileSync('config/paris-release-source.json', 'utf8')));"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
@@ -106,10 +111,11 @@ jobs:
           console.log('Platform Doctor delta gate passed: no new static CRITICAL findings.');
           NODE
 
-      - name: Run Platform Doctor Strict (main)
+      - name: Block Platform Doctor regressions on main
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: node scripts/run-platform-doctor-strict.mjs
         env:
+          PLATFORM_DOCTOR_BASE_SHA: ${{ github.event.before }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, RotateCcw, X } from 'lucide-react';
 import { destinationTours, GUIDE_STORAGE_KEYS } from '@/lib/guide/flows';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type Props = {
   tourId: string;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = false }: Props) {
+  const naturalVoice = useNaturalVoice();
   const tour = destinationTours[tourId];
   const steps = tour?.steps ?? [];
   const [isActive, setIsActive] = useState(false);
@@ -24,6 +26,7 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
   }, []);
 
   const endTour = useCallback((completed: boolean) => {
+    naturalVoice.stop();
     setIsActive(false);
     setCurrentStep(0);
     setTargetRect(null);
@@ -33,7 +36,7 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
     } else {
       onSkip?.();
     }
-  }, [tourId, onComplete, onSkip]);
+  }, [naturalVoice, tourId, onComplete, onSkip]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -42,6 +45,16 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
   }, [autoStart, startTour, tourId]);
 
   const current = steps[currentStep];
+
+  useEffect(() => {
+    if (!isActive || !current) return;
+    void naturalVoice.play(`${current.title}. ${current.content}`, {
+      voice: 'coral',
+      style: 'commercial',
+      rate: 0.96,
+    });
+    return () => naturalVoice.stop();
+  }, [currentStep, isActive]);
 
   useEffect(() => {
     if (!isActive || !current) return;
@@ -89,18 +102,20 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-black/60" aria-hidden="true" />
       {targetRect ? (
         <div
           className="fixed z-[101] rounded-xl ring-4 ring-brand-orange-500 pointer-events-none"
           style={{ top: targetRect.top - 6, left: targetRect.left - 6, width: targetRect.width + 12, height: targetRect.height + 12 }}
         />
       ) : null}
-      <div className="fixed z-[102] w-80 rounded-2xl bg-white shadow-2xl" style={{ top, left }} role="dialog" aria-modal="true">
+      <div className="fixed z-[102] w-80 rounded-2xl bg-white shadow-2xl" style={{ top, left }} role="dialog" aria-modal="false">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <div>
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-rose-600 to-orange-400 font-black text-white shadow" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-3 w-3 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span>
+            <div>
             <p className="text-xs font-semibold text-slate-500">Step {currentStep + 1} of {steps.length}</p>
-            <p className="font-bold text-slate-950">{tour.name}</p>
+            <p className="font-bold text-slate-950">PARIS · {tour.name}</p>
+            </div>
           </div>
           <button type="button" onClick={() => endTour(false)} aria-label="Close tour"><X className="h-4 w-4" /></button>
         </div>

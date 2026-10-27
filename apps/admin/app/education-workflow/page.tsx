@@ -137,7 +137,7 @@ export default function EducationWorkflowPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6 grid grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
         {activeTab === 'authoring' ? (
         <div className="col-span-2 space-y-6">
           <div className="bg-white rounded-lg shadow p-4">
@@ -242,7 +242,7 @@ export default function EducationWorkflowPage() {
               <div className="flex justify-between text-sm mb-1"><span>Overall Progress</span><span>{studentProgress.percentage}%</span></div>
               <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{ width: `${studentProgress.percentage}%` }} /></div>
             </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
               <div className="bg-gray-50 p-3 rounded"><div className="text-2xl font-bold">{studentProgress.completedCount}</div><div className="text-xs text-gray-500">Completed</div></div>
               <div className="bg-gray-50 p-3 rounded"><div className="text-2xl font-bold">{studentProgress.totalLessons}</div><div className="text-xs text-gray-500">Total Lessons</div></div>
               <div className="bg-gray-50 p-3 rounded"><div className="text-2xl font-bold">{studentProgress.totalLessons - studentProgress.completedCount}</div><div className="text-xs text-gray-500">Remaining</div></div>

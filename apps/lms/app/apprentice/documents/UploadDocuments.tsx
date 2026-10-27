@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AlertCircle, CheckCircle, Upload } from 'lucide-react';
 import { getDocumentUploadGuidance } from './document-guidance';
 
@@ -12,6 +13,7 @@ interface DocumentType {
 }
 
 export default function UploadDocuments({ programSlug }: { programSlug: string }) {
+  const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,20 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
         if (cancelled) return;
         const types = Array.isArray(data.documentTypes) ? data.documentTypes : [];
         setDocumentTypes(types);
-        setSelectedDocType(types[0]?.id || '');
+        const requestedType = new URLSearchParams(window.location.search).get('documentType');
+        const requestedRequirement = types.find(
+          (item: DocumentType) =>
+            item.id === requestedType || item.document_type === requestedType,
+        );
+        setSelectedDocType(requestedRequirement?.id || types[0]?.id || '');
+        if (requestedRequirement) {
+          window.requestAnimationFrame(() =>
+            document.getElementById('document-upload')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            }),
+          );
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load document requirements');
       } finally {
@@ -70,7 +85,9 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Upload failed');
       setSuccess('Document uploaded and sent for review.');
-      setTimeout(() => window.location.reload(), 700);
+      // Refresh server-rendered document status without rebooting the entire LMS.
+      // A hard reload flashes the global loading shell and resets the portal UI.
+      setTimeout(() => router.refresh(), 700);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
@@ -80,7 +97,7 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
   };
 
   return (
-    <div className="space-y-4">
+    <div id="document-upload" className="scroll-mt-24 space-y-4">
       <div>
         <label htmlFor="doc-type" className="mb-2 block text-sm font-bold text-slate-800">Document type</label>
         {loadingTypes ? (

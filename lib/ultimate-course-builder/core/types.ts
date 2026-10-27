@@ -1,0 +1,81 @@
+export const ULTIMATE_BUILD_STEPS = [
+  'standards_lock',
+  'learning_objectives',
+  'prerequisites',
+  'teaching_sequence',
+  'instructor_script',
+  'storyboard',
+  'visual_assignment',
+  'scene_construction',
+  'natural_narration',
+  'synchronization',
+  'active_teaching',
+  'mistakes_and_corrections',
+  'assessment_alignment',
+  'lesson_film_render',
+  'finished_media_qa',
+  'instructional_qa',
+  'narration_qa',
+  'learner_runthrough',
+  'selective_repair',
+  'credential_release',
+] as const;
+export type UltimateBuildStep = (typeof ULTIMATE_BUILD_STEPS)[number];
+export type UltimateStepState = 'pending' | 'running' | 'passed' | 'failed' | 'blocked';
+export interface UltimateCredentialProfile {
+  presentationContract?: {
+    version: string;
+    approvedReferenceVideo: { assetId: string; storagePath: string; sha256: string; approvedAt: string; permittedUses: string[] };
+    visualStyle: { cropMode: 'contain'; transition: 'crossfade' };
+    instructions: string[];
+  };
+  lessonPresentation?: 'approved-premium-v1';
+  publishCompletedLessons?: boolean;
+  preservedPublishedLessonIds?: string[];
+  /** Opt-in, immutable authoring configuration for new acceptance builds. */
+  instructionalAuthoring?: { provider: 'google'; model: string; location?: string; version: string };
+  id: string;
+  title: string;
+  /** Learner audience carried from the canonical course record into lesson generation. */
+  audience?: string;
+  authority: string;
+  jurisdiction?: string;
+  standardVersion: string;
+  effectiveDate?: string;
+  sourceDocuments: string[];
+  mediaAcquisitionOwnerId?: string;
+  /** Stable canonical draft lessons for non-UUID standards competency keys. */
+  canonicalLessonIds?: Record<string, string>;
+  sceneAssignments?: Record<string, Array<{ sceneId: string; assetId: string; relevanceReason: string }>>;
+  instructionalSources?: Array<{ id: string; text: string }>;
+  lessonBlueprints?: Record<string, import('../instructional/lesson-blueprint').LessonBlueprint>;
+  competencies: UltimateCompetency[];
+  socCodes?: string[];
+  examBlueprint?: {
+    domains: Array<{ id: string; title: string; weight?: number }>;
+    passingScore?: number;
+  };
+  trainingRequirements?: {
+    instructionalHours?: number;
+    ojlHours?: number;
+    clinicalHours?: number;
+    externshipHours?: number;
+  };
+}
+export interface UltimateCompetency {
+  id: string;
+  title: string;
+  description: string;
+  type: 'knowledge' | 'decision' | 'procedure' | 'practical_skill';
+  authorityRequirementIds: string[];
+  requiresDemonstration: boolean;
+  requiresPracticalEvidence: boolean;
+  criticalSafetyCompetency?: boolean;
+}
+export interface UltimateBuildContext {
+  buildId: string;
+  courseId: string;
+  profile: UltimateCredentialProfile;
+  currentStep: UltimateBuildStep;
+  stepStates: Record<UltimateBuildStep, UltimateStepState>;
+}

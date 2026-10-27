@@ -106,7 +106,7 @@ export function HomeSegmentedCTA() {
                   src={seg.img}
                   alt={seg.alt}
                   fill
-                  className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  className="object-contain object-center transition-transform duration-500 "
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   loading="lazy"
                   placeholder="empty"

@@ -11,7 +11,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const metadata: Metadata = {
   title: 'HVAC Technician Course License',
   description: 'License the complete 640-hour HVAC Technician course for your workforce program, community college, or training center. 16 modules, 94 lessons, EPA 608, OSHA 10, CPR/AED.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/courses/hvac-technician-course-license' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/courses/hvac-technician-course-license' },
 };
 
 const MODULES = [

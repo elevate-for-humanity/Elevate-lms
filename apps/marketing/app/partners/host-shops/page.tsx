@@ -1,20 +1,47 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ExternalLink, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
-import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
-import { ROUTES } from '@/lib/navigation/routes';
-import { getApprovedShops, PROGRAM_LABELS } from '@/lib/programs/host-shops';
-import { BARBER_PRICING } from '@/lib/programs/pricing';
+import Image from 'next/image';
+import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import HostShopBenefits from '@/components/partners/HostShopBenefits';
+import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Approved Apprenticeship Host Sites | Elevate for Humanity',
-  description: 'Meet approved Elevate apprenticeship Host Sites, explore each partner location, and apply to host or train through the network.',
+  title: 'Become a Free Apprenticeship Host Shop in Indiana | Barber & Beauty Network',
+  description: 'Apply free to become an apprenticeship Host Shop in Indiana. Elevate is recruiting licensed barbershops, salons, nail studios, spas, and esthetics businesses statewide to train apprentices and grow their teams.',
+  keywords: ['become a host shop Indiana', 'free host shop application', 'Indiana barber network', 'barber apprenticeship host shop', 'cosmetology apprenticeship host salon', 'nail technician apprenticeship host shop', 'esthetician apprenticeship spa', 'barber apprentices looking for shops', 'Indianapolis host shops', 'Fort Wayne host shops', 'Evansville host shops', 'South Bend host shops', 'Gary host shops', 'Bloomington host shops', 'Lafayette host shops', 'Terre Haute host shops'],
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/host-shops' },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+  openGraph: {
+    title: 'Join the Indiana Barber & Beauty Host Shop Network for Free',
+    description: 'Licensed barbershops, salons, nail studios, spas, and esthetics businesses can apply free to train apprentices and grow their teams across Indiana.',
+    url: 'https://www.elevateforhumanity.org/partners/host-shops',
+    type: 'website',
+    images: [{ url: '/images/partners/kountry-kutz-interior.webp', alt: 'Elevate apprenticeship Host Shop network' }],
+  },
 };
 
-const HOST_SITE_APPLY_HREF = '/host-shop/apply';
+const HOST_SITE_APPLY_HREF = '/partners/host-shop/apply';
+
+const HOST_SHOP_HERO_ORDER = [
+  'top-shelf-barber-lounge',
+  'salon-saloon',
+  'kountry-kutz-barbershop',
+  'cals-kutz-studio',
+  'b-52s-barber-shop',
+  'generations-hair-llc',
+] as const;
+
+const HOST_SHOP_HERO_SHOPS = HOST_SHOP_HERO_ORDER.flatMap((slug) => {
+  const shop = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) => candidate.slug === slug);
+  return shop ? [shop] : [];
+});
 
 const REQUIREMENTS = [
   'Current business or establishment license appropriate to the occupation.',
@@ -39,35 +66,66 @@ const CALLER_CHECKLIST = [
   'Confirm the shop can employ, pay, supervise, and retain the apprentice and keep payroll and training records.',
   'Submit the no-cost Host Site application.',
   'Meet with Elevate for document verification, worksite review, training-plan setup, and portal onboarding.',
-  'Before hiring, ask the local WorkOne office to screen the candidate and employer for OJT reimbursement eligibility and obtain written authorization.',
 ] as const;
 
-const barberWeeklyEstimate = Math.ceil(
-  ((BARBER_PRICING.fullPrice - BARBER_PRICING.minDownPayment) * 100) /
-    BARBER_PRICING.paymentTermWeeks,
-) / 100;
-
-function address(shop: Awaited<ReturnType<typeof getApprovedShops>>[number]) {
-  return [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
-}
-function embedUrl(value: string) {
-  return `https://www.google.com/maps?q=${encodeURIComponent(value)}&z=14&output=embed`;
-}
 
 export default async function HostShopsPage() {
-  const approvedShops = await getApprovedShops();
+  const networkShops = await getHostShopNetwork();
 
   return (
-    <main className="min-h-screen bg-white text-slate-950">
-      <section className="border-b border-brand-blue-200 bg-brand-blue-50 px-4 py-16 text-slate-950 sm:py-20">
+    <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
+      <HostShopShowcase
+        shops={HOST_SHOP_HERO_SHOPS}
+        asHero
+        portraitTour
+        videoTourShopSlug="salon-saloon"
+        autoPlayVideoOnVisible
+        narrationSources={{
+          '/videos/partners/salon-saloon-tour.mp4': '/audio/narration/salon-saloon-host-tour.mp3',
+          '/images/partners/salon-saloon/team-sign.webp': '/audio/narration/salon-saloon-host-tour.mp3',
+        }}
+        mediaSequence={[
+          { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
+          { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
+          { shopSlug: 'kountry-kutz-barbershop', media: { src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz', kind: 'photo' } },
+          { shopSlug: 'kountry-kutz-barbershop', media: { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop', kind: 'video', backdropSrc: '/images/partners/kountry-kutz-official.webp' } },
+          { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp', alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop', kind: 'photo' } },
+          { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/salon-service.webp', alt: 'Professional salon service inside an Indiana apprenticeship Host Shop', kind: 'photo' } },
+        ]}
+        tourScripts={{
+          '/videos/partners/salon-saloon-tour.mp4': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
+          '/images/partners/salon-saloon/team-sign.webp': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
+          '/videos/partners/kountry-kutz-tour.mp4': 'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
+        }}
+        narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, required documents, and the free Host Shop application."
+      />
+
+      <section className="bg-white px-4 py-10 sm:py-14" aria-labelledby="host-trades-heading">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Apprenticeship Host Site Network</p>
-          <h1 className="mt-4 max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">Meet the businesses training the next generation.</h1>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">Approved barbershops, salons, spas, and beauty businesses provide supervised work-based learning while Elevate manages registered-program governance, RTI, records, and compliance workflows.</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Become a Host Site</Link>
-            <a href={ROUTES.hostShopPortal} className="rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-800 hover:bg-brand-blue-100">Host Site Portal</a>
+          <h2 id="host-trades-heading" className="text-3xl font-black">Barbering. Cosmetology. Nails. Esthetics.</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-700">Discover your training community or help the next generation grow. We're looking for new Host Shops in every pathway.</p>
+          <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(PROGRAM_LABELS).map(([slug, label]) => {
+              const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug)).length;
+              return <article key={slug} className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramHeroImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
+                <div className="flex flex-1 flex-col p-4"><h3 className="text-lg font-black">{label.replace(' Apprenticeship', '')}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{count ? `${count} participating ${count === 1 ? 'location' : 'locations'}. Explore the shops and start your journey.` : "We're looking for new Host Shops. Bring your licensed business into the network."}</p>
+                  <Link href={`/programs/${slug}`} className="mt-4 inline-flex min-h-11 items-center font-bold text-red-700">Explore this pathway →</Link>
+                  <Link href="/partners/host-shop/apply" className="mt-auto inline-flex min-h-11 items-center font-bold text-blue-800">Become a Host Shop →</Link>
+                </div>
+              </article>;
+            })}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Statewide Indiana recruitment</p>
+          <h2 className="mt-2 text-3xl font-black">We’re recruiting Host Shops in cities and communities across Indiana</h2>
+          <p className="mt-4 max-w-3xl leading-7 text-slate-700">Elevate is looking for licensed barbershops, beauty salons, nail studios, spas, and esthetics businesses in every Indiana region. Choose your nearest market to see local information and start the free application.</p>
+          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{HOST_SHOP_REGIONS.map((region) => <Link key={region.slug} href={`/partners/host-shops/indiana/${region.slug}`} className="rounded-2xl border border-slate-200 bg-white p-5 font-black shadow-sm hover:border-brand-red-400">{region.city} Host Shops <span aria-hidden="true">→</span></Link>)}</div>
         </div>
       </section>
 
@@ -76,12 +134,7 @@ export default async function HostShopsPage() {
           <div className="max-w-4xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Host Site overview</p>
             <h2 id="host-site-overview" className="mt-2 text-3xl font-black sm:text-4xl">Train an apprentice, grow your team, and keep the process clear.</h2>
-            <p className="mt-4 text-lg leading-8 text-slate-700">
-              An approved Host Site is the apprentice’s employer and supervised work-based learning location.
-              Elevate administers the apprenticeship program, Related Technical Instruction, progress records,
-              and compliance workflow. The shop provides paid employment, day-to-day supervision, practical
-              experience, accurate records, and a safe licensed workplace.
-            </p>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">The shop employs and supervises the apprentice. Elevate manages instruction, records, progress tracking, and apprenticeship compliance.</p>
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -89,50 +142,31 @@ export default async function HostShopsPage() {
               <p className="text-sm font-black uppercase tracking-wider text-emerald-800">Host Site cost</p>
               <h3 className="mt-2 text-3xl font-black text-emerald-950">$0 to apply or participate</h3>
               <p className="mt-3 text-sm leading-6 text-emerald-950">
-                Elevate does not charge a Host Site application or apprentice-placement fee. The employer
-                remains responsible for apprentice wages, payroll obligations, insurance, tools, supplies,
-                supervision, and normal business costs. Optional software or services are separate if selected.
+                No application or placement fee. The host shop covers wages, insurance, and normal business expenses. Students are responsible for their personal tools and supplies.
               </p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Barber apprentice tuition</p>
-              <h3 className="mt-2 text-3xl font-black">{`${BARBER_PRICING.fullPrice.toLocaleString('en-US')}`}</h3>
+              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Apprentice enrollment</p>
+              <h3 className="mt-2 text-2xl font-black">Elevate handles tuition and payment setup</h3>
               <p className="mt-3 text-sm leading-6 text-slate-700">
-                Current self-pay barber tuition: at least {`${BARBER_PRICING.minDownPayment.toLocaleString('en-US')}`} down,
-                then about {`${barberWeeklyEstimate.toFixed(2)}`} weekly for {BARBER_PRICING.paymentTermWeeks} weeks
-                (the final payment is adjusted to the exact balance). Approved workforce funding may cover eligible
-                participant costs. Tuition is paid to Elevate—not to the Host Site.
+                Apprentices review program-specific self-pay tuition, full-payment, and available BNPL options on their program page. The Host Site does not collect tuition or approve financing.
               </p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">How the shop earns</p>
               <h3 className="mt-2 text-2xl font-black">Business revenue plus a trained employee</h3>
               <p className="mt-3 text-sm leading-6 text-slate-700">
-                The shop may earn its ordinary client-service and retail revenue from work completed under proper
-                supervision while building a skilled employee. The apprentice must be paid under the approved wage
-                schedule and applicable law. Elevate does not promise a commission, guaranteed revenue, or profit.
+                Shops keep normal service and retail revenue while developing a skilled employee. Apprentices must be properly supervised and paid under the approved wage schedule.
               </p>
             </article>
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <article className="rounded-2xl border border-blue-300 bg-blue-50 p-6">
-              <p className="text-sm font-black uppercase tracking-wider text-brand-blue-800">Workforce reimbursement</p>
-              <h3 className="mt-2 text-2xl font-black text-slate-950">Eligible shops may receive an OJT wage reimbursement.</h3>
-              <p className="mt-3 leading-7 text-slate-700">
-                Indiana WorkOne says approved On-the-Job Training arrangements can reimburse an employer for up to
-                50% of an eligible new employee’s wages during training, generally for up to six months. The current
-                state overview says the job must pay at least $13.50 per hour and the employer must commit to retaining
-                the employee for at least six months after training.
-              </p>
-              <p className="mt-3 text-sm font-bold leading-6 text-slate-800">
-                This is a conditional direct reimbursement—not an automatic rebate. The apprentice and employer must
-                qualify, WorkOne must approve the training plan before covered work begins, and payroll/training evidence
-                must be retained. WOTC is a separate federal tax credit requiring targeted-group certification.
-              </p>
-              <a href="https://www.in.gov/dwd/business-services/grants-credits-and-reimbursements/on-the-job-training/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex rounded-xl border-2 border-brand-blue-700 bg-white px-5 py-3 text-sm font-black text-brand-blue-900">
-                Review Indiana OJT reimbursement
-              </a>
+            <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-sm font-black uppercase tracking-wider text-brand-blue-800">Apprenticeship tuition</p>
+              <h3 className="mt-2 text-2xl font-black text-slate-950">Self-pay enrollment only.</h3>
+              <p className="mt-3 leading-7 text-slate-700">Apprentices pay the tuition published on their program page. The Host Shop provides employment, wages and licensed supervision; Elevate supports related instruction and training records.</p>
+              <Link href="/apprenticeships" className="mt-5 inline-flex min-h-11 rounded-xl border-2 border-brand-blue-700 px-5 py-3 font-black text-brand-blue-900">Review apprenticeship tuition</Link>
             </article>
 
             <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -149,70 +183,34 @@ export default async function HostShopsPage() {
             </article>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 rounded-2xl bg-slate-950 p-6 text-white sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col gap-3 rounded-2xl border-2 border-brand-red-200 bg-brand-red-50 p-6 text-slate-950 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-2xl font-black">Ready to become a Host Site?</h3>
-              <p className="mt-1 text-sm leading-6 text-slate-200">Apply at no cost. Have your five required documents ready for the fastest review.</p>
+              <p className="mt-1 text-sm leading-6 text-slate-700">Apply at no cost. Have your five required documents ready for the fastest review.</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 text-center font-black text-white hover:bg-brand-red-700">Start No-Cost Application</Link>
-              <a href="tel:+13173142050" className="rounded-xl border-2 border-white px-6 py-3 text-center font-black text-white hover:bg-white hover:text-slate-950">Call (317) 314-2050</a>
+              <a href="tel:+13173142050" className="rounded-xl border-2 border-slate-300 bg-white px-6 py-3 text-center font-black text-slate-950 hover:border-brand-red-600">Call (317) 314-2050</a>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-slate-50 px-4 py-12">
+      <section className="bg-red-50 px-4 py-10">
+        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 md:items-center">
+          <img src="/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg" alt="Professional barbering work at Top Shelf Barber Lounge" className="aspect-[16/10] w-full rounded-3xl object-cover" loading="lazy" />
+          <div><p className="text-sm font-black uppercase text-red-700">Your next chapter starts here</p><h2 className="mt-2 text-3xl font-black">Become a barber. Build a career.</h2><p className="mt-3 leading-7">Explore the program, apply through Elevate, and tell us which host shop interests you. Admissions confirms placement and helps you review a payment plan before enrollment.</p><p className="mt-3 text-sm leading-6">Payment plans are available for self-pay barber apprentices. Students provide their personal tools and supplies. Deposits are non-refundable administrative fees used to enroll.</p><div className="mt-5 flex flex-col gap-3 sm:flex-row"><Link href="/programs/barber-apprenticeship" className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white">Explore Barber Apprenticeship</Link><Link href="/programs/barber-apprenticeship/payment-setup" className="rounded-xl border border-red-700 bg-white px-5 py-3 text-center font-black">Review Payment Plans</Link></div></div>
+        </div>
+      </section>
+      <HostShopBenefits />
+      <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-14 text-white">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Approved network</p>
-            <h2 className="mt-2 text-3xl font-black">Every approved Host Site gets a public profile.</h2>
-            <p className="mt-3 leading-7 text-slate-700">Profiles are tied to the approved operational record. Original partner photos, videos and promotional media are shown from the approved public profile, while address and contact details remain tied to the approved worksite record.</p>
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-red-400">Elevate Host Shop Network</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Find your next barber, salon, or beauty professional.</h2>
+            <p className="mt-3 leading-7 text-slate-300">Explore real shop portfolios, get directions, and contact or book directly with the business. Ask the shop about hours and walk-ins before visiting. Students can explore participating training locations; apprentice capacity is confirmed separately.</p>
           </div>
-
-          {approvedShops.length === 0 ? (
-            <div className="mt-8 rounded-2xl border border-slate-300 bg-white p-6 font-semibold text-slate-700">The approved Host Site directory is temporarily unavailable. Contact Elevate for current placement partners.</div>
-          ) : (
-            <div className="mt-10 space-y-8">
-              {approvedShops.map((shop) => {
-                const shopAddress = address(shop);
-                const media = shop.mediaGallery ?? [];
-                const profileHref = shop.publicSlug ? `/host-shops/${shop.publicSlug}` : undefined;
-                const carouselItems = [
-                  ...media,
-                  ...(shop.logoUrl ? [{ url: shop.logoUrl, alt: `${shop.name} logo` }] : []),
-                  ...(shop.flyerUrl ? [{ url: shop.flyerUrl, alt: `${shop.name} flyer` }] : []),
-                ];
-                return (
-                  <article key={shop.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                    <div className="grid lg:grid-cols-[1.05fr_.95fr]">
-                      <div className="p-6 sm:p-8">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Host Site</span>
-                          {shop.programs.map((slug) => <span key={slug} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{PROGRAM_LABELS[slug] ?? slug}</span>)}
-                        </div>
-                        <h3 className="mt-5 text-3xl font-black">{shop.name}</h3>
-                        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700">{shop.description || 'Approved worksite participating in supervised apprenticeship training through Elevate.'}</p>
-                        {shopAddress ? <p className="mt-5 flex items-start gap-2 text-sm font-bold text-slate-700"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /> {shopAddress}</p> : null}
-                        {shop.phone ? <a href={`tel:${shop.phone}`} className="mt-3 flex items-center gap-2 text-sm font-semibold text-slate-700"><Phone className="h-4 w-4 text-brand-red-700" /> {shop.phone}</a> : null}
-                        {shop.email ? <a href={`mailto:${shop.email}`} className="mt-3 flex items-center gap-2 break-all text-sm font-semibold text-slate-700"><Mail className="h-4 w-4 shrink-0 text-brand-red-700" /> {shop.email}</a> : null}
-                        {shop.supervisor ? <p className="mt-3 text-sm font-semibold text-slate-600">Approved supervisor: {shop.supervisor}</p> : null}
-                        <div className="mt-6 flex flex-wrap gap-3">
-                          {profileHref ? <Link href={profileHref} className="rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">View Host Site profile</Link> : null}
-                          {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Visit business website <ExternalLink className="h-4 w-4" /></a> : null}
-                          {shop.googleMapsUrl ? <a href={shop.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Google Maps</a> : null}
-                        </div>
-                      </div>
-                      <div className="grid min-h-[360px] gap-4 bg-slate-100 p-4 sm:p-6">
-                        {carouselItems.length || shop.videoUrl ? <HostShopMediaCarousel shopName={shop.name} items={carouselItems} videoUrl={shop.videoUrl} /> : null}
-                        {shopAddress ? <div className="min-h-[260px] overflow-hidden rounded-2xl border border-slate-200 bg-white"><iframe title={`Map — ${shop.name}`} src={embedUrl(shopAddress)} className="h-full min-h-[260px] w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
+          <HostShopNetworkDirectory shops={networkShops} />
         </div>
       </section>
 
@@ -233,12 +231,31 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
+      <section className="border-y border-slate-200 bg-gradient-to-br from-sky-50 via-white to-amber-50 px-4 py-14">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Grow beyond the directory</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Your network profile is free. Your next business tools are optional.</h2>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">Showcase your work and connect through the Barber & Beauty Network at no listing fee. When you are ready to grow, Elevate Store offers business tools including the AI Website Builder and additional subscription products. A Store purchase is never required to remain listed in the network.</p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link href="/store/apps/website-builder" className="rounded-xl bg-slate-950 px-6 py-3 text-center font-black text-white hover:bg-brand-red-700">Build Your Business Website</Link>
+              <Link href="/store#marketplace" className="rounded-xl border-2 border-slate-950 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-50">Explore Business Tools</Link>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-blue-800">Free network membership</p>
+            <img src="/images/partners/generations-hair/premium-curls.jpg" alt="Hair styling portfolio in the Barber & Beauty Network" className="mb-5 aspect-[16/10] w-full rounded-2xl object-cover" loading="lazy" /><h3 className="mt-2 text-2xl font-black">Get discovered. Show your work.</h3>
+            <p className="mt-3 leading-7 text-slate-700">Build a public profile, share portfolio work, link your booking and social channels, and tell visitors whether you are accepting clients or apprentices. Customers can explore your work and find your booking links. Students can discover apprenticeship host shops.</p><Link href="/barber-beauty-network#join" className="mt-5 inline-flex min-h-12 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white">Explore &amp; Join the Free Network</Link>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-brand-red-200 bg-brand-red-50 px-4 py-14 text-center text-slate-950">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2"><div className="relative aspect-[4/3] overflow-hidden rounded-2xl"><Image src="/images/pages/barber-hands-on-bright.webp" alt="Barber training and mentorship" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div><div>
           <h2 className="text-3xl font-black">Want your business in the Host Site network?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>
           <Link href={HOST_SITE_APPLY_HREF} className="mt-7 inline-flex rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white">Start Host Site Application</Link>
-        </div>
+        </div></div>
       </section>
     </main>
   );

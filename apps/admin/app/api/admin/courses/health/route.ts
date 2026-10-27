@@ -1,19 +1,44 @@
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 /** Course Builder Health Endpoint */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+import { refreshSecrets } from '@/lib/secrets';
+import { getGroqClient } from '@/lib/ai/groq-client';
+import { getOpenAIClient } from '@/lib/ai/openai-client';
+import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
+import { logger } from '@/lib/logger';
+import { getXAIAPIKey } from '@/lib/ai/xai-config';
+
+interface IntegrityIssue {
+  courseId: string;
+  title: string;
+  slug: string;
+  issues: string[];
+}
 
 interface CapabilityHealth {
   capability: string;
   status: 'healthy' | 'degraded' | 'unavailable';
   configured: boolean;
-  checks: Array<{ name: string; passed: boolean; message: string }>;
+  checks: Array<{
+    name: string;
+    passed: boolean;
+    message: string;
+    issues?: IntegrityIssue[];
+    state?: 'ready' | 'paused' | 'attention';
+  }>;
   checkedAt: string;
 }
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
@@ -31,21 +56,132 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const { error } = await supabase.from('modules').select('id').limit(1);
-    checks.push({ name: 'Modules Table', passed: !error, message: error ? 'Table not accessible' : 'Accessible' });
+    const { error } = await supabase.from('course_modules').select('id').limit(1);
+    checks.push({ name: 'Canonical Modules', passed: !error, message: error ? 'course_modules is not accessible' : 'course_modules is accessible' });
+    if (error) status = 'degraded';
   } catch {
-    checks.push({ name: 'Modules Table', passed: false, message: 'Check failed' });
+    checks.push({ name: 'Canonical Modules', passed: false, message: 'course_modules check failed' });
+    status = 'degraded';
   }
 
   try {
-    const { error } = await supabase.from('lessons').select('id').limit(1);
-    checks.push({ name: 'Lessons Table', passed: !error, message: error ? 'Table not accessible' : 'Accessible' });
+    const { error } = await supabase.from('course_lessons').select('id').limit(1);
+    checks.push({ name: 'Canonical Lessons', passed: !error, message: error ? 'course_lessons is not accessible' : 'course_lessons is accessible' });
+    if (error) status = 'degraded';
   } catch {
-    checks.push({ name: 'Lessons Table', passed: false, message: 'Check failed' });
+    checks.push({ name: 'Canonical Lessons', passed: false, message: 'course_lessons check failed' });
+    status = 'degraded';
   }
 
-  const hasAiKey = !!process.env.OPENAI_API_KEY || !!process.env.ANTHROPIC_API_KEY;
-  checks.push({ name: 'AI Course Builder', passed: hasAiKey, message: hasAiKey ? 'AI provider configured' : 'No AI provider - course builder will use manual mode' });
+  try {
+    const [{ data: published, error: courseError }, { data: modules, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
+      supabase
+        .from('courses')
+        .select('id, title, slug, duration_hours, program_id')
+        .eq('status', 'published'),
+      supabase.from('course_modules').select('course_id'),
+      supabase.from('course_lessons').select('course_id'),
+    ]);
+    if (courseError || moduleError || lessonError) throw new Error('Integrity query failed');
+    const moduleCourses = new Set((modules ?? []).map((row) => row.course_id));
+    const lessonCourses = new Set((lessons ?? []).map((row) => row.course_id));
+    const invalid: IntegrityIssue[] = (published ?? []).flatMap((course) => {
+      const issues: string[] = [];
+      if (!course.program_id) issues.push('canonical program missing');
+      if (Number(course.duration_hours ?? 0) <= 0) issues.push('duration must be greater than zero');
+      if (!moduleCourses.has(course.id)) issues.push('canonical modules missing');
+      if (!lessonCourses.has(course.id)) issues.push('canonical lessons missing');
+      return issues.length
+        ? [{ courseId: course.id, title: course.title, slug: course.slug, issues }]
+        : [];
+    });
+    checks.push({
+      name: 'Published Course Integrity',
+      passed: invalid.length === 0,
+      message: invalid.length === 0
+        ? `${published?.length ?? 0} published courses pass the basic program, duration, module, and lesson checks`
+        : `${invalid.length} of ${published?.length ?? 0} published courses require governed repair`,
+      ...(invalid.length ? { issues: invalid } : {}),
+    });
+    if (invalid.length) status = 'degraded';
+  } catch {
+    checks.push({ name: 'Published Course Integrity', passed: false, message: 'Unable to calculate course integrity' });
+    status = 'degraded';
+  }
+
+  const generationPaused = await isCourseBuilderGenerationPaused(supabase);
+  checks.push({
+    name: 'Course Factory Generation',
+    passed: true,
+    state: generationPaused ? 'paused' : 'ready',
+    message: generationPaused
+      ? 'Paused by the canonical generation control'
+      : 'Enabled',
+  });
+
+  await refreshSecrets().catch(() => undefined);
+  const aiAvailable = isAIAvailable();
+  const provider = getActiveProviderName();
+  let aiVerified = false;
+  let aiMessage = 'Canonical AI provider is unavailable; manual editing remains available';
+  if (aiAvailable) {
+    try {
+      if (provider === 'elevate') {
+        const owned = await probeOwnedModel();
+        if (!owned.verified) throw new Error('Owned model discovery failed: ' + owned.status);
+      } else if (provider === 'xai') {
+        const token = getXAIAPIKey();
+        if (!token) throw new Error('xAI configuration is incomplete');
+        // Catalog lookup only: health checks must never generate paid content.
+        const response = await fetch('https://api.x.ai/v1/models', {
+          headers: { Authorization: `Bearer ${token}` },
+          redirect: 'error',
+          signal: AbortSignal.timeout(10_000),
+        });
+        if (!response.ok) throw new Error(`xAI model catalog returned ${response.status}`);
+        const catalog = await response.json() as { data?: Array<{ id?: string }> };
+        const model = process.env.XAI_MODEL?.trim() || 'grok-4.6';
+        if (!catalog.data?.some((entry) => entry.id === model)) {
+          throw new Error('Configured xAI model is not available to this credential');
+        }
+      } else if (provider === 'cloudflare') {
+        const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+        const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
+        if (!accountId || !token) throw new Error('Cloudflare Workers AI credentials are incomplete');
+        const response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/models/search?per_page=1`,
+          { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10_000) },
+        );
+        if (!response.ok) throw new Error(`Cloudflare provider returned ${response.status}`);
+      } else if (provider === 'groq') {
+        await runWithPaidInferenceContext(
+          `course-builder-health:${crypto.randomUUID()}`,
+          () => getGroqClient().models.list(),
+        );
+      } else if (provider === 'openai') {
+        await runWithPaidInferenceContext(
+          `course-builder-health:${crypto.randomUUID()}`,
+          () => getOpenAIClient().models.list(),
+        );
+      } else {
+        throw new Error('No read-only live health check is implemented for the configured provider');
+      }
+      aiVerified = true;
+      aiMessage = `${provider} authenticated and reachable`;
+    } catch (error) {
+      logger.warn('Course Builder provider health check failed', {
+        provider,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      aiMessage = `${provider} is configured but the live provider check failed`;
+    }
+  }
+  checks.push({
+    name: 'AI Course Builder',
+    passed: aiVerified,
+    message: aiMessage,
+  });
+  if (!aiVerified) status = 'degraded';
 
   const response: CapabilityHealth = { capability: 'course-builder', status, configured: true, checks, checkedAt: new Date().toISOString() };
   return NextResponse.json(response, { status: status === 'unavailable' ? 503 : 200 });

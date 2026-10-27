@@ -24,7 +24,7 @@ export function LizzyVideoPanel() {
             Course Builder owns instructor assignment, lesson video queues, microclips, and media status for the canonical course graph.
           </p>
           <Link
-            href="/course-builder"
+            href="/studio/courses"
             className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-brand-blue-700"
           >
             Open Course Builder <ExternalLink className="h-4 w-4" />

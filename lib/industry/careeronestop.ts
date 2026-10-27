@@ -49,6 +49,7 @@ function userId(): string {
 async function cosGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}/${userId()}${path}`, {
     headers: authHeaders(),
+    signal: AbortSignal.timeout(15_000),
     next: { revalidate: 0 },
   });
   if (!res.ok) throw new Error(`CareerOneStop ${path} → ${res.status}`);
@@ -60,13 +61,13 @@ async function cosGet<T>(path: string): Promise<T> {
  * Uses /v1/jobsearch — confirmed working.
  */
 async function fetchJobPostings(socCode: string, state: string): Promise<number> {
-  try {
-    const data = await cosGet<any>(`/jobsearch/${encodeURIComponent(socCode)}/${state}/0/10`);
-    const count = parseInt(data?.Jobcount ?? data?.TotalJobsFound ?? '0', 10);
-    return isNaN(count) ? 0 : count;
-  } catch {
-    return 0;
+  const data = await cosGet<{ Jobcount?: number | string; TotalJobsFound?: number | string }>(`/jobsearch/${encodeURIComponent(socCode)}/${state}/0/10`);
+  const rawCount = data?.Jobcount ?? data?.TotalJobsFound;
+  const count = Number(rawCount);
+  if (rawCount == null || !Number.isFinite(count) || count < 0) {
+    throw new Error('CareerOneStop jobsearch returned no valid job count');
   }
+  return count;
 }
 
 /**
@@ -79,7 +80,7 @@ export async function fetchCareerOneStopData(
   title: string,
   state: string = 'IN',
 ): Promise<CareerOneStopData> {
-  const jobPostings = await fetchJobPostings(socCode, state).catch(() => 0);
+  const jobPostings = await fetchJobPostings(socCode, state);
 
   return {
     soc_code: socCode,

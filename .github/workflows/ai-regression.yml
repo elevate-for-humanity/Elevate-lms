@@ -21,6 +21,12 @@ on:
       - 'supabase/migrations/*ai_evaluation*'
       - '.github/workflows/ai-regression.yml'
   workflow_dispatch:
+    inputs:
+      approve_paid_eval:
+        description: 'I approve one paid AI regression evaluation'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -64,6 +70,7 @@ jobs:
         run: pnpm vitest run tests/unit/course-factory/ai-contracts.test.ts
 
       - name: Require AI evaluation credentials
+        if: github.event_name == 'workflow_dispatch' && inputs.approve_paid_eval == true
         shell: bash
         run: |
           if [ -z "$GITHUB_TOKEN" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$GEMINI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
@@ -72,6 +79,7 @@ jobs:
           fi
 
       - name: Run Promptfoo Course Factory regression suite
+        if: github.event_name == 'workflow_dispatch' && inputs.approve_paid_eval == true
         id: promptfoo
         continue-on-error: true
         run: >-
@@ -84,7 +92,7 @@ jobs:
           -o ai-regression-results.json
 
       - name: Normalize regression evidence
-        if: always()
+        if: github.event_name == 'workflow_dispatch' && inputs.approve_paid_eval == true
         shell: bash
         run: |
           if [ -f ai-regression-results.json ]; then
@@ -102,14 +110,14 @@ jobs:
         run: pnpm tsx scripts/ai/check-eval-baseline.ts ai-regression-normalized.json evals/ai/course-factory/baseline.json
 
       - name: Persist regression evidence to Supabase
-        if: always() && vars.AI_EVAL_PERSIST == 'true'
+        if: github.event_name == 'workflow_dispatch' && inputs.approve_paid_eval == true && vars.AI_EVAL_PERSIST == 'true'
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: pnpm tsx scripts/ai/record-eval-results.ts ai-regression-results.json evals/ai/course-factory/cases.json
 
       - name: Upload regression evidence
-        if: always()
+        if: github.event_name == 'workflow_dispatch' && inputs.approve_paid_eval == true
         uses: actions/upload-artifact@v4
         with:
           name: course-factory-ai-regression-results

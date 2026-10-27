@@ -18,11 +18,50 @@ export async function POST(req: Request) {
 
   const db = await getAdminClient();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  // Keep the callback on the same public origin that received the login request.
+  // Supabase PKCE state/session cookies are origin-bound; sending an LMS login
+  // request through app.elevateforhumanity.org can strand the verifier on the
+  // wrong host and produce an invalid/expired-looking first login.
+  const requestOrigin = new URL(req.url).origin;
+  const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL || requestOrigin;
+  let appOrigin = requestOrigin;
+
+  try {
+    const candidate = new URL(configuredAppUrl);
+    const allowedProductionHosts = new Set([
+      'lms.elevateforhumanity.org',
+      'app.elevateforhumanity.org',
+    ]);
+    const requestHost = new URL(requestOrigin).hostname;
+    const requestIsPublicElevateHost =
+      new URL(requestOrigin).protocol === 'https:' &&
+      allowedProductionHosts.has(requestHost);
+
+    if (process.env.NODE_ENV !== 'production') {
+      appOrigin = candidate.origin;
+    } else if (requestIsPublicElevateHost) {
+      // Same-origin callback is required for the browser PKCE verifier/session.
+      appOrigin = requestOrigin;
+    } else if (
+      candidate.protocol === 'https:' &&
+      allowedProductionHosts.has(candidate.hostname) &&
+      !candidate.port
+    ) {
+      appOrigin = candidate.origin;
+    } else {
+      appOrigin = 'https://lms.elevateforhumanity.org';
+    }
+  } catch {
+    appOrigin =
+      process.env.NODE_ENV === 'production'
+        ? 'https://lms.elevateforhumanity.org'
+        : requestOrigin;
+  }
+
   // Always route through /auth/callback so the session is established correctly
   // and role-based destination routing runs. Never redirect directly to a page.
   const destination = redirectTo || getRoleDestination('student');
-  const finalRedirect = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(destination)}`;
+  const finalRedirect = `${appOrigin}/auth/callback?redirect=${encodeURIComponent(destination)}`;
 
   // generateLink fails with "User not found" for unknown emails — use that as
   // the existence check instead of O(n) listUsers() scan.
@@ -46,6 +85,10 @@ export async function POST(req: Request) {
   }
 
   const magicLink = link.properties.action_link;
+  // This address is intentionally credential-free so recipients can safely bookmark it.
+  const permanentLoginUrl = destination.startsWith('/host-shop')
+    ? `${appOrigin}/host-shop/login`
+    : `${appOrigin}/login?redirect=${encodeURIComponent(destination)}`;
   const firstName = email.split('@')[0];
 
   const sgKey = process.env.SENDGRID_API_KEY;
@@ -80,7 +123,9 @@ export async function POST(req: Request) {
       Sign In Now
     </a>
   </div>
-  <p style="color:#94a3b8;font-size:13px;">This link expires in 1 hour. If you didn't request this, you can safely ignore it.</p>
+  <p style="color:#64748b;font-size:13px;line-height:1.6;">The secure sign-in button expires. Your regular portal address never expires:</p>
+  <p style="margin:16px 0;"><a href="${permanentLoginUrl}" style="color:#1d4ed8;font-weight:bold;">Permanent Portal Login</a></p>
+  <p style="color:#94a3b8;font-size:13px;">Bookmark the permanent login page and use your password there. If you didn't request this, you can safely ignore it.</p>
   <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
   <p style="color:#94a3b8;font-size:12px;">Elevate for Humanity · Indianapolis, IN</p>
 </div>`,

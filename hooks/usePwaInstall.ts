@@ -8,11 +8,13 @@
  * const { canInstall, isInstalled, promptInstall } = usePwaInstall();
  */
 import { useState, useEffect, useCallback } from 'react';
+import {
+  clearPwaInstallPrompt,
+  subscribeToPwaInstallPrompt,
+  type DeferredPwaInstallPrompt,
+} from '@/lib/pwa/install-prompt';
 
-export type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-};
+export type BeforeInstallPromptEvent = DeferredPwaInstallPrompt;
 
 export interface UsePwaInstallReturn {
   /** True when beforeinstallprompt has fired and user has not yet responded */
@@ -67,15 +69,10 @@ export function usePwaInstall(): UsePwaInstallReturn {
         (navigator as unknown as { standalone?: boolean }).standalone === true
     );
 
-    const onBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setPromptEvent(e as BeforeInstallPromptEvent);
-    };
-
     const onAppInstalled = () => {
       setIsInstalled(true);
       setIsStandalone(true);
-      setPromptEvent(null);
+      clearPwaInstallPrompt();
     };
 
     const onDisplayChange = (e: MediaQueryListEvent) => {
@@ -83,14 +80,14 @@ export function usePwaInstall(): UsePwaInstallReturn {
     };
 
     const mq = window.matchMedia('(display-mode: standalone)');
+    const unsubscribe = subscribeToPwaInstallPrompt(setPromptEvent);
     mq.addEventListener('change', onDisplayChange);
-    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     window.addEventListener('appinstalled', onAppInstalled);
 
     return () => {
       mq.removeEventListener('change', onDisplayChange);
-      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
       window.removeEventListener('appinstalled', onAppInstalled);
+      unsubscribe();
     };
   }, []);
 
@@ -100,7 +97,7 @@ export function usePwaInstall(): UsePwaInstallReturn {
       await promptEvent.prompt();
       const { outcome } = await promptEvent.userChoice;
       if (outcome === 'accepted') {
-        setPromptEvent(null);
+        clearPwaInstallPrompt();
         return true;
       }
       return false;
@@ -110,7 +107,7 @@ export function usePwaInstall(): UsePwaInstallReturn {
   }, [promptEvent]);
 
   const dismiss = useCallback(() => {
-    setPromptEvent(null);
+    clearPwaInstallPrompt();
   }, []);
 
   return {

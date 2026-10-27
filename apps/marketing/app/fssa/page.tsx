@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 };
 
 const fssaPrograms = [
-  { title: 'TANF Employment Services', description: 'Temporary Assistance for Needy Families employment support and job training.', icon: Users, href: '/programs/tanf' },
-  { title: 'SNAP Employment & Training', description: 'Food assistance recipients can access free job training through SNAP E&T.', icon: Briefcase, href: '/programs/snap' },
-  { title: 'Vocational Rehabilitation', description: 'Services for individuals with disabilities seeking employment.', icon: GraduationCap, href: '/programs/voc-rehab' },
-  { title: 'Aging & In-Home Services', description: 'Training for careers in elder care and home health.', icon: Heart, href: '/programs/aging' },
+  { title: 'TANF Employment Services', description: 'Temporary Assistance for Needy Families employment support and job training.', icon: Users, href: '/funding' },
+  { title: 'SNAP Employment & Training', description: 'Food assistance recipients can access free job training through SNAP E&T.', icon: Briefcase, href: '/funding' },
+  { title: 'Vocational Rehabilitation', description: 'Services for individuals with disabilities seeking employment.', icon: GraduationCap, href: '/funding' },
+  { title: 'Aging & In-Home Services', description: 'Training for careers in elder care and home health.', icon: Heart, href: '/programs/healthcare' },
 ];
 
 export default function FSSAPage() {

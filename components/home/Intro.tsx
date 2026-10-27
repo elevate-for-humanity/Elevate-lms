@@ -11,9 +11,9 @@ export default function Intro() {
             <div className="relative h-64">
               <Image
                 src="/images/heroes/hero-homepage.webp"
-                alt="Free Workforce Training"
+                alt="Workforce training options"
                 fill
-                className="object-cover"
+                className="object-contain"
                 priority
                 sizes="100vw"
               />
@@ -23,10 +23,10 @@ export default function Intro() {
                 Funded Workforce Training
               </h3>
               <p className="text-sm text-black leading-relaxed mb-2">
-                Training funded through WIOA, WRG, and DOL programs for eligible participants.
+                Selected programs have documented workforce-funding pathways. Eligibility, covered costs, and authorization are determined by the responsible agency.
               </p>
               <p className="text-xs text-black">
-                <strong>No tuition for those who qualify. No debt. No barriers.</strong>
+                <strong>Funding is program-specific and is not guaranteed.</strong>
               </p>
             </div>
           </div>
@@ -37,7 +37,7 @@ export default function Intro() {
                 src="/images/heroes/hero-homepage.webp"
                 alt="Industry Credentials"
                 fill
-                className="object-cover"
+                className="object-contain"
                 priority
                 sizes="100vw"
               />
@@ -45,7 +45,7 @@ export default function Intro() {
             <div className="p-6">
               <h3 className="text-xl font-bold text-brand-green-900 mb-3">Industry Credentials</h3>
               <p className="text-sm text-black leading-relaxed mb-2">
-                Nationally recognized certifications from Certiport, HSI, CareerSafe, and NRF.
+                Nationally recognized certifications from Certiport, CareerSafe, and NRF.
               </p>
               <p className="text-xs text-black">
                 <strong>Real credentials employers recognize.</strong>
@@ -58,9 +58,8 @@ export default function Intro() {
           <h3 className="text-2xl font-bold text-black mb-4">Who We Serve</h3>
           <p className="text-lg text-black leading-relaxed max-w-4xl mx-auto">
             Students seeking career training, displaced workers needing new skills, veterans
-            transitioning to civilian careers, and anyone eligible for workforce development
-            funding. We help you access the training you qualify for and guide you from enrollment
-            through certification to employment.
+            transitioning to civilian careers, and adults exploring workforce development pathways. We help you review the training, payment,
+            and support options documented for your program and guide you through the applicable next steps.
           </p>
         </div>
       </div>

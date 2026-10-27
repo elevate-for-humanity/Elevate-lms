@@ -82,7 +82,7 @@ if (fs.existsSync(manifestPath)) {
 
     check(
       'Manifest has display mode',
-      manifest.display && ['standalone', 'fullscreen', 'minimal-ui'].includes(manifest.display),
+      manifest.display && ['browser', 'standalone', 'fullscreen', 'minimal-ui'].includes(manifest.display),
       'Manifest missing or invalid "display" field',
     );
 

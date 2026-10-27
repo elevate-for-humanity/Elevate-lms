@@ -8,8 +8,6 @@ import {
   FileSpreadsheet,
   Calendar,
   Users,
-  Filter,
-  Clock,
   CheckCircle,
   ArrowLeft,
 } from 'lucide-react';
@@ -82,7 +80,7 @@ export default async function ExportAttendancePage() {
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-6">Export Options</h2>
 
-              <form className="space-y-6">
+              <form action="/api/staff/attendance/export" method="get" className="space-y-6">
                 {/* Date Range */}
                 <div>
                   <label className="block text-sm font-medium text-slate-900 mb-2">
@@ -94,6 +92,8 @@ export default async function ExportAttendancePage() {
                       <label className="block text-xs text-slate-700 mb-1">Start Date</label>
                       <input
                         type="date"
+                        name="start"
+                        required
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
                         defaultValue={
                           new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
@@ -106,6 +106,8 @@ export default async function ExportAttendancePage() {
                       <label className="block text-xs text-slate-700 mb-1">End Date</label>
                       <input
                         type="date"
+                        name="end"
+                        required
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
                         defaultValue={new Date().toISOString().split('T')[0]}
                       />
@@ -119,7 +121,7 @@ export default async function ExportAttendancePage() {
                     <Users className="w-4 h-4 inline mr-2" />
                     Cohort/Program
                   </label>
-                  <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+                  <select name="cohort_id" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
                     <option value="">All Cohorts</option>
                     {cohortList.map((cohort: any) => (
                       <option key={cohort.id} value={cohort.id}>
@@ -129,80 +131,15 @@ export default async function ExportAttendancePage() {
                   </select>
                 </div>
 
-                {/* Status Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-900 mb-2">
-                    <Filter className="w-4 h-4 inline mr-2" />
-                    Attendance Status
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    {['All', 'Present', 'Absent', 'Late', 'Excused'].map((status) => (
-                      <label key={status} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          defaultChecked={status === 'All'}
-                          className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                        />
-                        <span className="text-sm text-slate-900">{status}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Export Format */}
                 <div>
                   <label className="block text-sm font-medium text-slate-900 mb-2">
                     <FileSpreadsheet className="w-4 h-4 inline mr-2" />
                     Export Format
                   </label>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {[
-                      { id: 'csv', label: 'CSV', desc: 'Spreadsheet compatible' },
-                      { id: 'xlsx', label: 'Excel', desc: 'Microsoft Excel format' },
-                      { id: 'pdf', label: 'PDF', desc: 'Print-ready report' },
-                    ].map((format) => (
-                      <label
-                        key={format.id}
-                        className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:border-emerald-300 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50"
-                      >
-                        <input
-                          type="radio"
-                          name="format"
-                          value={format.id}
-                          defaultChecked={format.id === 'csv'}
-                          className="text-emerald-600 focus:ring-emerald-500"
-                        />
-                        <div>
-                          <div className="font-medium text-slate-900">{format.label}</div>
-                          <div className="text-xs text-slate-700">{format.desc}</div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Include Options */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-900 mb-2">
-                    Include in Export
-                  </label>
-                  <div className="space-y-2">
-                    {[
-                      'Student names and IDs',
-                      'Hours worked per day',
-                      'Weekly/monthly summaries',
-                      'Absence reasons',
-                      'Instructor notes',
-                    ].map((option) => (
-                      <label key={option} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                        />
-                        <span className="text-sm text-slate-900">{option}</span>
-                      </label>
-                    ))}
+                  <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4">
+                    <p className="font-medium text-slate-900">CSV</p>
+                    <p className="text-xs text-slate-700">Live attendance rows, spreadsheet compatible</p>
                   </div>
                 </div>
 
@@ -214,12 +151,6 @@ export default async function ExportAttendancePage() {
                   >
                     <Download className="w-5 h-5" />
                     Generate Export
-                  </button>
-                  <button
-                    type="button"
-                    className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-white text-slate-900"
-                  >
-                    Preview
                   </button>
                 </div>
               </form>
@@ -236,45 +167,7 @@ export default async function ExportAttendancePage() {
                   <span className="text-slate-700">Total Records</span>
                   <span className="font-semibold text-slate-900">{totalRecords || 0}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-700">Date Range</span>
-                  <span className="font-semibold text-slate-900">30 days</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-700">Estimated Size</span>
-                  <span className="font-semibold text-slate-900">~50 KB</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Exports */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="font-semibold text-slate-900 mb-4">Recent Exports</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
-                  <FileSpreadsheet className="w-8 h-8 text-emerald-600" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-slate-900 text-sm truncate">
-                      attendance_jan_2024.csv
-                    </div>
-                    <div className="text-xs text-slate-700">2 days ago</div>
-                  </div>
-                  <button className="p-2 text-slate-700 hover:text-emerald-600">
-                    <Download className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
-                  <FileSpreadsheet className="w-8 h-8 text-emerald-600" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-slate-900 text-sm truncate">
-                      monthly_report_dec.xlsx
-                    </div>
-                    <div className="text-xs text-slate-700">1 week ago</div>
-                  </div>
-                  <button className="p-2 text-slate-700 hover:text-emerald-600">
-                    <Download className="w-4 h-4" />
-                  </button>
-                </div>
+                <p className="text-sm text-slate-700">The selected date and cohort filters are applied when the CSV is generated.</p>
               </div>
             </div>
 
@@ -288,11 +181,7 @@ export default async function ExportAttendancePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                  Excel format includes formatting and formulas
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                  PDF is best for printing and sharing
+                  Exports contain the canonical enrollment ID, date, hours, type, and verification state
                 </li>
               </ul>
             </div>

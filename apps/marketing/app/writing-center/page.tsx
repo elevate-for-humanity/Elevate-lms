@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -97,8 +98,8 @@ export default function WritingCenterPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[clamp(420px,58vh,720px)] overflow-hidden">
-        <Image
+      <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/hero-banner.webp"
           alt="Student receiving writing assistance at the Elevate Writing Center"
           fill

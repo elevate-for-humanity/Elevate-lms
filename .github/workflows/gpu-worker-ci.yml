@@ -23,6 +23,8 @@ jobs:
           python-version: '3.11'
       - name: Python syntax
         run: python -m py_compile services/media-gpu-worker/worker.py
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Docker build
         run: docker build -f services/media-gpu-worker/Dockerfile -t elevate-media-gpu-worker:${{ github.sha }} .
 
@@ -37,6 +39,6 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile
       - name: Typecheck media integration
         run: pnpm exec tsc --noEmit --pretty false

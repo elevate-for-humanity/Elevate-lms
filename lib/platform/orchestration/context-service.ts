@@ -72,7 +72,7 @@ export async function loadSharedContext(input: {
     recentToolResults = (logs ?? []) as Array<Record<string, unknown>>;
   }
 
-  const retrievalContext = await getRAGContext(input.goal);
+  const retrievalContext = await getRAGContext(input.goal, { providerPolicy: 'owned-only' });
   const provenance = [
     ...(memories ?? []).map((memory) => ({
       source: 'ai_memory',

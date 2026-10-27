@@ -43,13 +43,15 @@ for (const retiredFile of [
 requireText('apps/marketing/app/apply/student/page.tsx', '/apply/student/interview', 'PARIS-first canonical redirect');
 requireText('apps/marketing/app/apply/student/form/page.tsx', 'StudentApplicationForm', 'standard form fallback');
 requireText('apps/marketing/app/apply/student/interview/page.tsx', 'ParisApplicationWorkspace', 'PARIS interview workspace');
-requireText('apps/marketing/app/apply/student/interview/page.tsx', 'ApplicationDocumentsPanel', 'document review panel');
+requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'ApplicationDocumentsPanel', 'document review panel after interview session initialization');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'SpeechRecognition', 'voice input support');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "'/api/applications'", 'canonical application submission');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "'X-Idempotency-Key'", 'application idempotency');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "setDraftInputMode('voice')", 'voice transcription review mode');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'Do not persist speech automatically', 'voice must be reviewed before persistence');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'sendAnswer(input, draftInputMode)', 'reviewed transcript keeps input origin');
+requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "!session.state.pendingConfirmation && question?.field === 'program'", 'program picker cannot override critical confirmation');
+requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "session.state.pendingConfirmation\n    ? question?.options ?? []", 'pending confirmation actions remain authoritative');
 
 requireText('apps/marketing/app/api/paris/application-interview/route.ts', 'paris_application_resume', 'persistent resume cookie');
 requireText('apps/marketing/app/api/paris/application-interview/route.ts', "inputMode: z.enum(['text', 'voice'])", 'shared voice/text state authority');

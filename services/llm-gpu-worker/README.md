@@ -1,7 +1,7 @@
 # Elevate LLM GPU Worker
 
 Self-hosted OpenAI-compatible LLM inference for the Elevate platform, running
-on a Northflank managed GPU with vLLM.
+on an explicitly provisioned GPU with vLLM. No deployment is implied by this source.
 
 ## Purpose
 
@@ -33,13 +33,37 @@ service is the fully-owned path.
 
 ## Deployment
 
-Provisioned by `scripts/northflank/provision-llm-worker.ts` into the
-`elevate-media-gpu` project (an L4-24GB GPU fits 7B-class models at fp16 and
-32B-class models at AWQ/GPTQ quantization). The provisioner wires the public
-URL and shared secret into the `elevate-platform` project as:
+Use a reviewed immutable worker image containing this entrypoint. For the
+Runpod pilot, expose only the authenticated model server through the HTTPS proxy;
+do not enable Jupyter or an unauthenticated model endpoint. Configure the model
+cache on the persistent volume and verify the model fits before sending traffic.
 
-- `ELEVATE_LLM_URL`
-- `ELEVATE_LLM_SECRET`
+PARIS web configuration (server-side only):
 
-The AI router (`lib/ai/providers/elevate.ts`) reads those variables (hydrated
-from `platform_secrets`) and treats `elevate` as a first-class provider.
+- `ELEVATE_LLM_GPU_URL`: root HTTPS Runpod proxy URL, without `/v1`.
+- `ELEVATE_LLM_GPU_SECRET`: same secret as `LLM_WORKER_SECRET`.
+- `ELEVATE_LLM_GPU_GOOGLE_IAM=false`: the Runpod GPU uses application authentication.
+- `PARIS_GPU_ENABLED=true` and `PARIS_INFERENCE_TIER=gpu`: select GPU only after acceptance.
+
+The existing `ELEVATE_LLM_GOOGLE_IAM` setting remains authoritative for the Google
+CPU connection. Do not disable CPU IAM to enable an external GPU. Authenticate
+`/v1/models` and verify `elevate-local`, then test a streamed conversation before
+activating web traffic. Redirects are rejected by both health and inference.
+
+For the PBX turn adapter, separately configure `PARIS_PHONE_INFERENCE_PROVIDER=owned`,
+`PARIS_PHONE_LLM_URL` (root HTTPS Runpod proxy) and `PARIS_PHONE_LLM_SECRET_REF`
+(a Google Secret Manager version resource). The turn launcher resolves that
+reference into `PARIS_PHONE_LLM_SECRET`; the ARI gateway never receives it.
+This changes the conversational model only; Google speech recognition/synthesis
+and the existing carrier, SIP, ARI and RTP transport remain in place. Keep secrets
+in the existing protected runtime configuration. No browser may receive them.
+Phone inference has an eight-second timeout, no retry or automatic model fallback.
+The existing gateway owns call fallback and operator handoff.
+
+Use a dedicated voice inference worker or measure contention before sharing a
+GPU with batch course rendering. Validate greeting, multi-turn speech, two-way
+audio, operator 0, voicemail and model outage behavior on an authorized test call
+before routing public calls. Retain the current configuration for rollback.
+
+These changes do not create a Runpod resource, activate public phone routing,
+implement the Runpod course-job dispatcher, or establish live acceptance.

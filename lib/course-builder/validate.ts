@@ -17,6 +17,10 @@ import { findUnregisteredKeys, getCompetenciesForProgram } from './competencies'
 import { resolveCourseId } from './schema';
 import { validateHours } from './hours-engine';
 import { logger } from '@/lib/logger';
+import {
+  missingLearningPhases,
+  resolveLearningExperienceProfile,
+} from '@/lib/curriculum/learning-experience';
 
 export type LessonValidationError = {
   moduleSlug: string;
@@ -39,7 +43,13 @@ function visibleLength(html: string): number {
   return html.replace(/<[^>]*>/g, '').trim().length;
 }
 
-function mkErr(moduleSlug: string, lessonSlug: string, field: string, message: string, severity: 'error' | 'warning' = 'error'): LessonValidationError {
+function mkErr(
+  moduleSlug: string,
+  lessonSlug: string,
+  field: string,
+  message: string,
+  severity: 'error' | 'warning' = 'error',
+): LessonValidationError {
   return { moduleSlug, lessonSlug, field, message, severity };
 }
 
@@ -65,47 +75,138 @@ function validateActivities(lesson: CourseLesson, moduleSlug: string): LessonVal
   const effective: ActivityType[] = declared ?? DEFAULT_ACTIVITIES[lesson.type] ?? [];
   for (const activity of effective) {
     const check = ACTIVITY_REQUIRES[activity];
-    if (check && !check(lesson)) errs.push(mkErr(moduleSlug, lesson.slug, 'activities', `activity '${activity}' declared but no backing content — ${ACTIVITY_HINT[activity] ?? 'add required content'}`));
+    if (check && !check(lesson))
+      errs.push(
+        mkErr(
+          moduleSlug,
+          lesson.slug,
+          'activities',
+          `activity '${activity}' declared but no backing content — ${ACTIVITY_HINT[activity] ?? 'add required content'}`,
+        ),
+      );
   }
-  if (['checkpoint', 'exam'].includes(lesson.type) && effective.includes('video') && !lesson.videoUrl) errs.push(mkErr(moduleSlug, lesson.slug, 'activities', `${lesson.type} has a 'video' activity but no videoUrl — remove the video activity or add a URL`));
+  if (
+    ['checkpoint', 'exam'].includes(lesson.type) &&
+    effective.includes('video') &&
+    !lesson.videoUrl
+  )
+    errs.push(
+      mkErr(
+        moduleSlug,
+        lesson.slug,
+        'activities',
+        `${lesson.type} has a 'video' activity but no videoUrl — remove the video activity or add a URL`,
+      ),
+    );
   return errs;
 }
 
-export function validateCourseLesson(lesson: CourseLesson, moduleSlug: string): LessonValidationError[] {
+export function validateCourseLesson(
+  lesson: CourseLesson,
+  moduleSlug: string,
+): LessonValidationError[] {
   const errs: LessonValidationError[] = [];
-  const e = (field: string, message: string, severity: 'error' | 'warning' = 'error') => errs.push(mkErr(moduleSlug, lesson.slug, field, message, severity));
-  if (!lesson.slug || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(lesson.slug)) e('slug', 'must be lowercase kebab-case');
+  const e = (field: string, message: string, severity: 'error' | 'warning' = 'error') =>
+    errs.push(mkErr(moduleSlug, lesson.slug, field, message, severity));
+  if (!lesson.slug || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(lesson.slug))
+    e('slug', 'must be lowercase kebab-case');
   if (!lesson.title || lesson.title.trim().length < 3) e('title', 'must be at least 3 characters');
   if (!lesson.type) e('type', 'lesson type is required');
-  if (!lesson.learningObjectives || lesson.learningObjectives.length === 0) e('learningObjectives', 'at least one learning objective is required');
+  if (lesson.learningExperience) {
+    const expectedProfile = resolveLearningExperienceProfile({
+      lessonType: lesson.type,
+      practicalRequired: lesson.practicalRequired,
+    });
+    if (lesson.learningExperience.profile !== expectedProfile) {
+      e(
+        'learningExperience',
+        `expected '${expectedProfile}' experience for ${lesson.type}, got '${lesson.learningExperience.profile}'`,
+      );
+    }
+    const missing = missingLearningPhases(
+      lesson.learningExperience.profile,
+      lesson.learningExperience.phases.map((item) => item.phase),
+    );
+    if (missing.length > 0) {
+      e('learningExperience', `missing required learning phases: ${missing.join(', ')}`);
+    }
+    if (
+      expectedProfile === 'hands_on_procedure' &&
+      !lesson.learningExperience.mediaPolicy.requireHumanTechnicalReview
+    ) {
+      e('learningExperience', 'hands-on procedure media requires human technical review');
+    }
+  } else if (lesson.aiGenerated) {
+    e('learningExperience', 'AI-generated lessons require a universal learning experience plan');
+  }
+  if (!lesson.learningObjectives || lesson.learningObjectives.length === 0)
+    e('learningObjectives', 'at least one learning objective is required');
   else {
-    const generic = lesson.learningObjectives.filter((o) => o.toLowerCase().startsWith('understand') && o.split(' ').length < 5);
-    if (generic.length > 0) e('learningObjectives', `${generic.length} objective(s) too generic — use measurable verbs (demonstrate, identify, apply)`, 'warning');
+    const generic = lesson.learningObjectives.filter(
+      (o) => o.toLowerCase().startsWith('understand') && o.split(' ').length < 5,
+    );
+    if (generic.length > 0)
+      e(
+        'learningObjectives',
+        `${generic.length} objective(s) too generic — use measurable verbs (demonstrate, identify, apply)`,
+        'warning',
+      );
   }
   if (CONTENT_LESSON_TYPES.includes(lesson.type as any)) {
     const hasContent = lesson.content && visibleLength(lesson.content) >= 200;
-    if (!hasContent && !lesson.videoUrl) e('content', `${lesson.type} requires content (≥200 visible chars) or videoUrl`);
+    if (!hasContent && !lesson.videoUrl)
+      e('content', `${lesson.type} requires content (≥200 visible chars) or videoUrl`);
   }
-  if (lesson.durationMinutes == null) e('durationMinutes', 'duration_minutes is null — run the hours engine before publishing', 'warning');
-  else if (lesson.durationMinutes <= 0) e('durationMinutes', `duration_minutes must be > 0 (got ${lesson.durationMinutes})`);
+  if (lesson.durationMinutes == null)
+    e(
+      'durationMinutes',
+      'duration_minutes is null — run the hours engine before publishing',
+      'warning',
+    );
+  else if (lesson.durationMinutes <= 0)
+    e('durationMinutes', `duration_minutes must be > 0 (got ${lesson.durationMinutes})`);
   if (ASSESSED_LESSON_TYPES.includes(lesson.type as any)) {
-    if (!lesson.quizQuestions || lesson.quizQuestions.length < 5) e('quizQuestions', `${lesson.type} requires ≥5 quiz questions (got ${lesson.quizQuestions?.length ?? 0})`);
+    if (!lesson.quizQuestions || lesson.quizQuestions.length < 5)
+      e(
+        'quizQuestions',
+        `${lesson.type} requires ≥5 quiz questions (got ${lesson.quizQuestions?.length ?? 0})`,
+      );
     if (lesson.passingScore == null) e('passingScore', `${lesson.type} requires a passingScore`);
-    else if (lesson.passingScore < 1 || lesson.passingScore > 100) e('passingScore', `passingScore must be 1–100 (got ${lesson.passingScore})`);
+    else if (lesson.passingScore < 1 || lesson.passingScore > 100)
+      e('passingScore', `passingScore must be 1–100 (got ${lesson.passingScore})`);
   }
-  if (!ASSESSED_LESSON_TYPES.includes(lesson.type as any) && lesson.passingScore != null) e('passingScore', `'${lesson.type}' is not assessed — remove passingScore to prevent false gates`, 'warning');
+  if (!ASSESSED_LESSON_TYPES.includes(lesson.type as any) && lesson.passingScore != null)
+    e(
+      'passingScore',
+      `'${lesson.type}' is not assessed — remove passingScore to prevent false gates`,
+      'warning',
+    );
   errs.push(...validateActivities(lesson, moduleSlug));
   if (lesson.competencyChecks?.length) {
-    if (!lesson.practicalRequired) e('practicalRequired', 'lesson has competencyChecks but practicalRequired is not true');
+    if (!lesson.practicalRequired)
+      e('practicalRequired', 'lesson has competencyChecks but practicalRequired is not true');
     const unregistered = findUnregisteredKeys(lesson.competencyChecks.map((c) => c.key));
-    if (unregistered.length > 0) e('competencyChecks', `unregistered key(s): ${unregistered.join(', ')} — add to lib/course-builder/competencies.ts`);
-    for (const check of lesson.competencyChecks) if (check.requiresInstructorSignoff && !check.key) e('competencyChecks', 'sign-off check must have a key');
+    if (unregistered.length > 0)
+      e(
+        'competencyChecks',
+        `unregistered key(s): ${unregistered.join(', ')} — add to lib/course-builder/competencies.ts`,
+      );
+    for (const check of lesson.competencyChecks)
+      if (check.requiresInstructorSignoff && !check.key)
+        e('competencyChecks', 'sign-off check must have a key');
   }
-  if (lesson.practicalRequired && !lesson.competencyChecks?.length) e('competencyChecks', 'practicalRequired=true but no competencyChecks defined', 'warning');
+  if (lesson.practicalRequired && !lesson.competencyChecks?.length)
+    e('competencyChecks', 'practicalRequired=true but no competencyChecks defined', 'warning');
   for (const [i, q] of (lesson.quizQuestions ?? []).entries()) {
-    if (!q.question || q.question.trim().length < 10) e('quizQuestions', `question[${i}] text too short`);
+    if (!q.question || q.question.trim().length < 10)
+      e('quizQuestions', `question[${i}] text too short`);
     if (!q.options || q.options.length < 2) e('quizQuestions', `question[${i}] needs ≥2 options`);
-    if (q.correctAnswer == null || q.correctAnswer < 0 || q.correctAnswer >= (q.options?.length ?? 0)) e('quizQuestions', `question[${i}] correctAnswer out of range`);
+    if (
+      q.correctAnswer == null ||
+      q.correctAnswer < 0 ||
+      q.correctAnswer >= (q.options?.length ?? 0)
+    )
+      e('quizQuestions', `question[${i}] correctAnswer out of range`);
   }
   return errs;
 }
@@ -115,13 +216,23 @@ export function validateModuleSequence(mod: CourseModule): LessonValidationError
   const lessons = [...mod.lessons].sort((a, b) => a.order - b.order);
   if (lessons.length === 0) return errs;
   const seqErr = (slug: string, msg: string) => errs.push(mkErr(mod.slug, slug, 'sequence', msg));
-  if (['checkpoint', 'exam'].includes(lessons[0].type)) seqErr(lessons[0].slug, `${lessons[0].type} cannot be the first lesson — students need content before a gate`);
+  if (['checkpoint', 'exam'].includes(lessons[0].type))
+    seqErr(
+      lessons[0].slug,
+      `${lessons[0].type} cannot be the first lesson — students need content before a gate`,
+    );
   let hasContent = false;
   let prevType = '';
   for (const lesson of lessons) {
-    if (['lab', 'assignment'].includes(lesson.type) && !hasContent) seqErr(lesson.slug, `${lesson.type} appears before any content lesson — add instruction first`);
-    if (lesson.type === 'checkpoint' && prevType === 'checkpoint') seqErr(lesson.slug, 'consecutive checkpoints — add content between them');
-    if (CONTENT_LESSON_TYPES.includes(lesson.type as any) && lesson.type !== 'checkpoint') hasContent = true;
+    if (['lab', 'assignment'].includes(lesson.type) && !hasContent)
+      seqErr(
+        lesson.slug,
+        `${lesson.type} appears before any content lesson — add instruction first`,
+      );
+    if (lesson.type === 'checkpoint' && prevType === 'checkpoint')
+      seqErr(lesson.slug, 'consecutive checkpoints — add content between them');
+    if (CONTENT_LESSON_TYPES.includes(lesson.type as any) && lesson.type !== 'checkpoint')
+      hasContent = true;
     prevType = lesson.type;
   }
   return errs;
@@ -129,32 +240,63 @@ export function validateModuleSequence(mod: CourseModule): LessonValidationError
 
 export function validateCourseTemplate(template: CourseTemplate): CourseValidationResult {
   const allErrors: LessonValidationError[] = [];
-  const cErr = (field: string, msg: string, sev: 'error' | 'warning' = 'error') => allErrors.push(mkErr('_course', '_course', field, msg, sev));
-  if (!resolveCourseId(template.programSlug)) cErr('programSlug', `'${template.programSlug}' is not available in the static compatibility map — register the program/course relationship through the canonical Course Builder authority before using this legacy synchronous validator`);
-  if (!template.courseSlug || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(template.courseSlug)) cErr('courseSlug', 'must be lowercase kebab-case');
+  const cErr = (field: string, msg: string, sev: 'error' | 'warning' = 'error') =>
+    allErrors.push(mkErr('_course', '_course', field, msg, sev));
+  if (!resolveCourseId(template.programSlug))
+    cErr(
+      'programSlug',
+      `'${template.programSlug}' is not available in the static compatibility map — register the program/course relationship through the canonical Course Builder authority before using this legacy synchronous validator`,
+    );
+  if (!template.courseSlug || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(template.courseSlug))
+    cErr('courseSlug', 'must be lowercase kebab-case');
   if (!template.title || template.title.trim().length < 3) cErr('title', 'course title required');
   if (!template.modules?.length) cErr('modules', 'course must have at least one module');
   const seen = new Set<string>();
-  for (const mod of template.modules ?? []) for (const lesson of mod.lessons ?? []) {
-    if (seen.has(lesson.slug)) allErrors.push(mkErr(mod.slug, lesson.slug, 'slug', `duplicate slug '${lesson.slug}'`));
-    seen.add(lesson.slug);
-  }
+  for (const mod of template.modules ?? [])
+    for (const lesson of mod.lessons ?? []) {
+      if (seen.has(lesson.slug))
+        allErrors.push(mkErr(mod.slug, lesson.slug, 'slug', `duplicate slug '${lesson.slug}'`));
+      seen.add(lesson.slug);
+    }
   for (const mod of template.modules ?? []) {
-    for (const lesson of mod.lessons ?? []) allErrors.push(...validateCourseLesson(lesson, mod.slug));
+    for (const lesson of mod.lessons ?? [])
+      allErrors.push(...validateCourseLesson(lesson, mod.slug));
     allErrors.push(...validateModuleSequence(mod));
   }
-  const allLessons = (template.modules ?? []).flatMap((m) => [...m.lessons].sort((a, b) => a.order - b.order));
+  const allLessons = (template.modules ?? []).flatMap((m) =>
+    [...m.lessons].sort((a, b) => a.order - b.order),
+  );
   const hasAssessed = allLessons.some((l) => ASSESSED_LESSON_TYPES.includes(l.type as any));
-  if (!hasAssessed) cErr('modules', 'course has no assessed lessons — students cannot demonstrate mastery', 'warning');
+  if (!hasAssessed)
+    cErr(
+      'modules',
+      'course has no assessed lessons — students cannot demonstrate mastery',
+      'warning',
+    );
   const exams = allLessons.filter((l) => l.type === 'exam');
   if (exams.length > 0) {
     const last = allLessons[allLessons.length - 1];
-    if (last?.type !== 'exam' && last?.type !== 'certification') allErrors.push(mkErr('_course', exams[0].slug, 'sequence', `exam '${exams[0].slug}' is not the last lesson — move it to the end`));
+    if (last?.type !== 'exam' && last?.type !== 'certification')
+      allErrors.push(
+        mkErr(
+          '_course',
+          exams[0].slug,
+          'sequence',
+          `exam '${exams[0].slug}' is not the last lesson — move it to the end`,
+        ),
+      );
   }
-  if (template.requiresFinalExam && exams.length === 0) cErr('requiresFinalExam', 'requiresFinalExam=true but no exam lesson found');
-  if (exams.length > 0 && exams[0].passingScore == null) cErr('finalExam', `final exam '${exams[0].slug}' has no passingScore`);
+  if (template.requiresFinalExam && exams.length === 0)
+    cErr('requiresFinalExam', 'requiresFinalExam=true but no exam lesson found');
+  if (exams.length > 0 && exams[0].passingScore == null)
+    cErr('finalExam', `final exam '${exams[0].slug}' has no passingScore`);
   const last = allLessons[allLessons.length - 1];
-  if (last && !['exam', 'certification'].includes(last.type)) cErr('sequence', `course ends on '${last.type}' — consider ending with an exam or certification step`, 'warning');
+  if (last && !['exam', 'certification'].includes(last.type))
+    cErr(
+      'sequence',
+      `course ends on '${last.type}' — consider ending with an exam or certification step`,
+      'warning',
+    );
   if (template.minimumHours) {
     const hoursResult = validateHours(template);
     if (!hoursResult.valid) for (const e of hoursResult.errors) cErr('minimumHours', e);
@@ -163,21 +305,56 @@ export function validateCourseTemplate(template: CourseTemplate): CourseValidati
   for (const mod of template.modules ?? []) {
     if (mod.quizRequired) {
       const hasAssessment = mod.lessons.some((l) => ASSESSED_LESSON_TYPES.includes(l.type as any));
-      if (!hasAssessment) allErrors.push(mkErr(mod.slug, '_module', 'quizRequired', `module '${mod.slug}' has quizRequired=true but no checkpoint/quiz/exam lesson`));
+      if (!hasAssessment)
+        allErrors.push(
+          mkErr(
+            mod.slug,
+            '_module',
+            'quizRequired',
+            `module '${mod.slug}' has quizRequired=true but no checkpoint/quiz/exam lesson`,
+          ),
+        );
     }
     if (mod.practicalRequired) {
       const hasPractical = mod.lessons.some((l) => l.type === 'lab' || l.type === 'assignment');
-      if (!hasPractical) allErrors.push(mkErr(mod.slug, '_module', 'practicalRequired', `module '${mod.slug}' has practicalRequired=true but no lab/assignment lesson`));
+      if (!hasPractical)
+        allErrors.push(
+          mkErr(
+            mod.slug,
+            '_module',
+            'practicalRequired',
+            `module '${mod.slug}' has practicalRequired=true but no lab/assignment lesson`,
+          ),
+        );
     }
   }
   const programCompetencies = getCompetenciesForProgram(template.programSlug);
   const criticalKeys = programCompetencies.filter((c) => c.isCritical).map((c) => c.key);
   if (criticalKeys.length > 0) {
-    const coveredKeys = new Set((template.modules ?? []).flatMap((m) => m.lessons).flatMap((l) => l.competencyChecks ?? []).map((c) => c.key));
-    for (const key of criticalKeys) if (!coveredKeys.has(key)) cErr('competencyCoverage', `critical competency '${key}' is not covered by any lesson`);
+    const coveredKeys = new Set(
+      (template.modules ?? [])
+        .flatMap((m) => m.lessons)
+        .flatMap((l) => l.competencyChecks ?? [])
+        .map((c) => c.key),
+    );
+    for (const key of criticalKeys)
+      if (!coveredKeys.has(key))
+        cErr('competencyCoverage', `critical competency '${key}' is not covered by any lesson`);
   }
   const errors = allErrors.filter((e) => e.severity === 'error');
   const warnings = allErrors.filter((e) => e.severity === 'warning');
-  if (errors.length > 0) logger.warn('[course-builder] validation failed', { courseSlug: template.courseSlug, errorCount: errors.length, warningCount: warnings.length });
-  return { valid: errors.length === 0, errors, warnings, lessonCount: allLessons.length, errorCount: errors.length, warningCount: warnings.length };
+  if (errors.length > 0)
+    logger.warn('[course-builder] validation failed', {
+      courseSlug: template.courseSlug,
+      errorCount: errors.length,
+      warningCount: warnings.length,
+    });
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+    lessonCount: allLessons.length,
+    errorCount: errors.length,
+    warningCount: warnings.length,
+  };
 }

@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { ensureCanonicalHostShopInfrastructure } from '@/lib/partners/ensure-canonical-host-shop';
+import { ensureHostShopOwnerAccess } from '@/lib/partners/provision-host-shop-application';
 import { uploadApplicationDocument } from '@/lib/partners/upload-application-document';
 import { sendEmail } from '@/lib/email/sendgrid';
 
@@ -194,6 +196,33 @@ export async function submitSalonHostShopApplication(
   if (!partner?.id) {
     throw new Error('Partner insert returned no id');
   }
+
+  // Salon, cosmetology, esthetics, and nail intake must create the same
+  // operational graph as barber intake. This is intentionally idempotent so a
+  // later admin approval/reconciliation can safely run it again.
+  const ownerIdentity = await ensureHostShopOwnerAccess({
+    db,
+    partnerId: partner.id,
+    email: contactEmail,
+    contactName: contactName || ownerName,
+    phone: contactPhone,
+  });
+  await ensureCanonicalHostShopInfrastructure({
+    db,
+    partnerId: partner.id,
+    ownerId: ownerIdentity.userId,
+    businessName: salonDbaName || salonLegalName,
+    businessType: cfg.programType,
+    contactName: contactName || ownerName,
+    contactEmail,
+    contactPhone,
+    address1: salonAddressLine1,
+    address2: salonAddressLine2,
+    city: salonCity,
+    state: salonState || 'IN',
+    zip: salonZip,
+    licenseNumber: indianaSalonLicenseNumber,
+  });
 
   logger.info(
     `${cfg.adminEmailSubjectTag} application submitted: ${partner.id} — ${salonLegalName}`,

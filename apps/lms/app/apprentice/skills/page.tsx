@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { redirect } from 'next/navigation';
 import { Circle, Target, TrendingUp } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,27 +18,26 @@ export default async function ApprenticeSkillsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/apprentice/skills');
-  }
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/skills');
 
   // Get apprentice profile
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
     .select('*, program:program_id(name)')
-    .eq('user_id', user.id)
+    .eq('user_id', subject.userId)
     .maybeSingle();
 
   // Get skill categories
-  const { data: rawCategories } = await supabase
+  const { data: rawCategories } = await db
     .from('skill_categories')
     .select('*')
     .eq('program_id', apprentice?.program_id)
     .order('order', { ascending: true });
 
   // Get skills with progress (non-fatal if table missing)
-  const { data: rawSkills } = await supabase
+  const { data: rawSkills } = await db
     .from('apprentice_skills')
     .select('*, progress:apprentice_skill_progress(*)')
     .eq('program_id', apprentice?.program_id);
@@ -48,7 +49,7 @@ export default async function ApprenticeSkillsPage() {
   }));
 
   // Overall progress from apprentice_skill_progress
-  const { data: progressSummary } = await supabase
+  const { data: progressSummary } = await db
     .from('apprentice_skill_progress')
     .select('*')
     .eq('apprentice_id', apprentice?.id);
@@ -183,4 +184,3 @@ export default async function ApprenticeSkillsPage() {
     </div>
   );
 }
-

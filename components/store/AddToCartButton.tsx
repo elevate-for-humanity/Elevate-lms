@@ -51,7 +51,7 @@ export default function AddToCartButton({
         disabled
         className="w-full px-8 py-4 bg-slate-300 text-slate-500 font-bold rounded-lg cursor-not-allowed"
       >
-        Out of Stock
+        Not Available for Purchase
       </button>
     );
   }

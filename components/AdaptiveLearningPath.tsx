@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -47,24 +46,9 @@ export function AdaptiveLearningPath() {
   useEffect(() => {
     async function loadPaths() {
       try {
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        const { data: skills } = user
-          ? await supabase
-              .from('user_skills')
-              .select('skill_name, proficiency_level')
-              .eq('user_id', user.id)
-          : { data: [] as any[] };
-
-        const { data: paths, error } = await supabase
-          .from('learning_paths')
-          .select('*, learning_path_courses(*, training_programs(*))')
-          .eq('is_active', true);
-
-        if (error) throw error;
+        const response = await fetch('/api/learning-paths', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Unable to load learning paths');
+        const { paths, skills } = await response.json();
 
         setLearningPaths(
           (paths ?? []).map((path: any) => ({
@@ -73,15 +57,15 @@ export function AdaptiveLearningPath() {
             description: path.description || '',
             totalDuration: path.total_duration || 'Duration varies',
             matchScore: calculateMatchScore(path, skills || []),
-            courses: (path.learning_path_courses || []).map((entry: any) => ({
-              id: entry.id,
-              title: entry.training_programs?.name || entry.course_name || 'Course',
-              difficulty: entry.difficulty || 'intermediate',
-              duration: entry.duration || 'Schedule varies',
-              recommended: Boolean(entry.recommended ?? true),
-              matchScore: Number(entry.match_score ?? 0),
-              prerequisites: entry.prerequisites || [],
-              skills: entry.skills || [],
+            courses: (path.programs || []).map((entry: any) => ({
+              id: entry.program_id,
+              title: entry.name || 'Program',
+              difficulty: path.difficulty || 'intermediate',
+              duration: entry.duration_weeks ? `${entry.duration_weeks} weeks` : 'Schedule varies',
+              recommended: true,
+              matchScore: calculateMatchScore(path, skills || []),
+              prerequisites: [],
+              skills: Array.isArray(path.skills) ? path.skills : [],
             })),
           })),
         );
@@ -98,21 +82,13 @@ export function AdaptiveLearningPath() {
   }, []);
 
   async function enrollInPath(pathId: string) {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase.from('user_learning_paths').insert({
-      user_id: user.id,
-      learning_path_id: pathId,
-      started_at: new Date().toISOString(),
-      status: 'active',
+    const response = await fetch('/api/learning-paths', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path_id: pathId }),
     });
-
-    if (error) {
-      logger.error('Unable to start learning path', error);
+    if (!response.ok) {
+      logger.error('Unable to start learning path', { status: response.status });
       return;
     }
 
@@ -126,7 +102,9 @@ export function AdaptiveLearningPath() {
   if (loadError) {
     return (
       <Card className="p-6">
-        <h2 className="text-xl font-bold text-slate-950">Learning paths are temporarily unavailable</h2>
+        <h2 className="text-xl font-bold text-slate-950">
+          Learning paths are temporarily unavailable
+        </h2>
         <p className="mt-2 text-slate-700">
           Your course access is not affected. Personalized recommendations will return when the
           learning-path service is available.
@@ -209,7 +187,9 @@ export function AdaptiveLearningPath() {
               <div key={course.id} className="rounded-xl bg-slate-50 p-4">
                 <div className="flex justify-between gap-4">
                   <div>
-                    <p className="text-xs font-bold uppercase text-brand-blue-700">Step {index + 1}</p>
+                    <p className="text-xs font-bold uppercase text-brand-blue-700">
+                      Step {index + 1}
+                    </p>
                     <h3 className="text-lg font-bold">{course.title}</h3>
                     <p className="text-sm text-slate-600">{course.duration}</p>
                   </div>

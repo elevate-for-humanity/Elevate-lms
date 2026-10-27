@@ -56,28 +56,28 @@ const services = [
   {
     title: 'Financial Aid',
     description:
-      'WIOA funding, scholarships, grants, and flexible payment plans. Our team helps you find and apply for every dollar available.',
+      'Program-specific funding guidance, scholarships when available, and payment options. Eligibility and authorization are determined by the applicable funding source.',
     link: '/student-support/financial-aid',
     image: '/images/pages/financial-aid-page-1.webp',
   },
   {
     title: 'Career Services',
     description:
-      'Job placement assistance, resume writing, interview coaching, and employer connections. We stay with you through your first 90 days on the job.',
+      'Resume support, interview preparation, job-search assistance, and employer connections. Available follow-up depends on the student and placement plan.',
     link: '/student-support/career',
     image: '/images/pages/career-services-page-1.webp',
   },
   {
     title: 'Counseling & Wellness',
     description:
-      'Personal counseling, mental health resources, and crisis support. Confidential services available to all enrolled students at no cost.',
+      'Referrals and resource navigation for counseling, mental health, and crisis-support services. Availability, cost, and confidentiality terms depend on the service provider.',
     link: '/student-support/counseling',
     image: '/images/pages/career-counseling-page-1.webp',
   },
   {
     title: 'Accessibility Services',
     description:
-      'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.',
+      'Reasonable-accommodation coordination, assistive-technology support where available, and individualized accessibility planning. Contact Student Support to request an accommodation.',
     link: '/student-support/accessibility',
     image: '/images/pages/support-page-2.webp',
   },
@@ -185,14 +185,14 @@ export default function StudentSupportPage() {
               <Phone className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Phone Support</h3>
               <a
-                href="tel:+13173143757"
+                href="tel:+14632401404"
                 className="text-brand-green-600 font-semibold hover:underline"
               >
-                (317) 314-3757
+                (463) 240-1404
               </a>
               <p className="text-sm text-slate-500 mt-1">Mon–Fri 8am–6pm EST</p>
               <Link
-                href="tel:+13173143757"
+                href="tel:+14632401404"
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
               >
                 Call Now
@@ -201,8 +201,8 @@ export default function StudentSupportPage() {
             <div className="bg-white rounded-xl p-6 text-center">
               <MessageSquare className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Live Chat</h3>
-              <p className="text-slate-600">Available 24/7</p>
-              <p className="text-sm text-slate-500 mt-1">Average response: under 2 minutes</p>
+              <p className="text-slate-600">Chat availability varies by staffing</p>
+              <p className="text-sm text-slate-500 mt-1">For urgent matters, use the published phone or emergency resources.</p>
               <Link
                 href="/support/chat"
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
@@ -213,8 +213,8 @@ export default function StudentSupportPage() {
             <div className="bg-white rounded-xl p-6 text-center">
               <Calendar className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Schedule Meeting</h3>
-              <p className="text-slate-600">Book a one-on-one</p>
-              <p className="text-sm text-slate-500 mt-1">In-person or virtual available</p>
+              <p className="text-slate-600">Request a one-on-one appointment</p>
+              <p className="text-sm text-slate-500 mt-1">Available formats are shown during scheduling.</p>
               <Link
                 href="/student-support/schedule"
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
@@ -240,8 +240,7 @@ export default function StudentSupportPage() {
             Ready to Start Your Career?
           </h2>
           <p className="text-white text-lg mb-8">
-            Check your eligibility for funded career training programs. Most students pay $0 out of
-            pocket.
+            Review possible funding pathways for your selected program. Funding is program- and participant-specific and requires approval from the responsible source.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

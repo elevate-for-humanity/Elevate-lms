@@ -44,6 +44,6 @@ export async function sendAdminSms(
   });
   revalidatePath('/operations/sms-logs');
   return result.success
-    ? { ok: true, message: `Message sent${result.messageId ? ` (${result.messageId})` : ''}.` }
+    ? { ok: true, message: `Telnyx accepted the message${result.messageId ? ` (${result.messageId})` : ''}. Check delivery status before calling it delivered.` }
     : { ok: false, message: result.error || 'The message could not be sent.' };
 }

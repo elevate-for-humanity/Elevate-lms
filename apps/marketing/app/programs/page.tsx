@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -9,8 +8,11 @@ import {
 } from '@/lib/programs/public-programs-page';
 import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 import { ProgramsExplorer } from './ProgramsExplorer';
+import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 
-// Cache the public catalog briefly so every visit does not block on a fresh database query.\n// Published changes still reach the page within one minute.\nexport const revalidate = 60;
+// Cache the public catalog briefly so every visit does not block on a fresh database query.
+// Published changes still reach the page within one minute.
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildProgramsListingMetadata();
@@ -18,25 +20,28 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ProgramsPage() {
   const { programs } = await getPublicProgramsPageData();
-  const funded = programs.filter((program) => program.funding_tier === 'workforce-funded');
-  const selfPay = programs.filter((program) => program.funding_tier === 'self-pay');
+  const isApprenticeship = (program: (typeof programs)[number]) =>
+    program.category.toLowerCase().includes('apprenticeship') ||
+    program.slug.includes('apprenticeship') ||
+    program.title.toLowerCase().includes('apprenticeship');
+  const apprenticeships = programs.filter(isApprenticeship);
+  const careerTraining = programs.filter((program) => !isApprenticeship(program));
+  const funded = careerTraining.filter((program) => program.funding_tier === 'workforce-funded');
+  const selfPay = careerTraining.filter((program) => program.funding_tier === 'self-pay');
 
   return (
     <main className="min-h-screen bg-white">
-      <section className="overflow-hidden bg-white">
-        <div className="relative min-h-[360px] bg-slate-100">
-          <Image src="/images/programs-hero-vibrant.webp" alt="Elevate career training programs" fill priority className="object-cover" sizes="100vw" />
-        </div>
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="max-w-3xl">
-            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-brand-red-700">Career Training</p>
-            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-6xl">Find the right program without sorting through a wall of choices.</h1>
-            <p className="mt-5 text-lg leading-relaxed text-slate-700 sm:text-xl">Search by career or credential, filter by category and duration, and review workforce-funding pathways separately from regular self-pay programs.</p>
-          </div>
-        </div>
-      </section>
+      <div
+        data-scroll-narration
+        data-narration-src="/audio/heroes/home.mp3"
+        data-narration="Welcome. Let's find the training path that fits where you want to go. First, think about the kind of work you want to do. If you want career training, you can explore hands-on options such as HVAC and commercial driving, or business-focused options such as Bookkeeping and Business. Some programs may be free if you qualify for workforce funding and receive written approval before training begins. If you want to earn while you learn, choose an apprenticeship. That path combines instruction with paid, supervised training at an approved employer or Host Site. You do not need to decide everything at once. Open the program that interests you, listen to what it prepares you to do, and review the schedule and requirements. Then complete the application. Elevate will help you understand the correct funding, apprenticeship, or payment step from there."
+        data-narration-rate="0.82"
+        data-narration-style="instructor"
+      >
+        <HomeProgramShowcase asHero />
+      </div>
 
-      <section className="border-b border-emerald-200 bg-emerald-50 py-12 sm:py-16">
+      <section id="program-catalog" className="scroll-mt-24 border-b border-emerald-200 bg-emerald-50 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
@@ -50,12 +55,26 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
+      <section className="border-b border-blue-200 bg-blue-50 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="max-w-3xl">
+              <p className="text-sm font-extrabold uppercase tracking-widest text-brand-blue-800">Earn While You Learn</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Registered apprenticeships are a separate pathway</h2>
+              <p className="mt-4 text-lg leading-relaxed text-slate-700">Apprenticeships combine related instruction with paid, supervised work at an approved employer or Host Site. Apprenticeship tuition is self-pay unless an exact program page documents another approved payment source. Employment, placement, and enrollment approval must be confirmed before training begins.</p>
+            </div>
+            <Link href="/apprenticeships" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-6 py-3.5 text-base font-extrabold text-white hover:bg-brand-blue-900">How Apprenticeships Work <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+          {apprenticeships.length > 0 ? <ProgramsExplorer programs={apprenticeships} variant="apprenticeship" /> : <p className="mt-8 rounded-xl bg-white p-6 text-slate-700">View the apprenticeship directory for current occupations and application steps.</p>}
+        </div>
+      </section>
+
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-3xl">
             <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">Regular Courses</p>
             <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Self-pay and payment-plan programs</h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-700">Use the filters to narrow the catalog instead of scrolling every program. Related names remain consolidated when they represent the same public pathway.</p>
+            <p className="mt-4 text-lg leading-relaxed text-slate-700">These are career-training courses with pay-in-full, installment, employer-sponsored, or Buy Now Pay Later options. BNPL requires separate provider approval and is not the same as free workforce funding.</p>
           </div>
           <ProgramsExplorer programs={selfPay} />
         </div>

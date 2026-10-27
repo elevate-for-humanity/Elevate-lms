@@ -31,8 +31,8 @@ export const TEAM: TeamMember[] = [
     id: '2',
     name: 'Jozanna George',
     title: 'Director of Enrollment & Beauty Industry Programs',
-    orgRole: 'Enrollment & Instruction',
-    bio: 'Jozanna is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. She oversees the nail program at Textures Institute of Cosmetology and manages enrollment operations for Elevate for Humanity.',
+    orgRole: 'Nail & Esthetics Industry Leadership',
+    bio: 'Jozanna George is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. Through Mesmerized by Beauty Cosmetology Academy, she leads beauty-industry education and brings hands-on experience in nail care, skincare, sanitation, client consultation, salon and spa professionalism, technical skill development, and student preparation. At Elevate for Humanity, she directs enrollment and beauty-industry programs and supports Nail Technician and Esthetician apprentices from application through career readiness.',
     headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/jozanna-george.jpg',
     email: 'jozanna@elevateforhumanity.org',
   },
@@ -40,9 +40,9 @@ export const TEAM: TeamMember[] = [
     id: '3',
     name: 'Dr. Carlina Wilkes',
     title: 'Executive Director of Financial Operations & Organizational Compliance',
-    orgRole: 'Grants & Compliance',
-    bio: 'Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/carlina-wilkes.jpg',
+    orgRole: 'Chair, Financial Literacy',
+    bio: 'Dr. Carlina Wilkes brings more than 24 years of federal financial management experience with the Defense Finance and Accounting Service (DFAS) and holds DoD Financial Management Certification Level II. Her expertise includes federal cost accounting, budget development and monitoring, audit readiness, regulatory compliance, financial reporting, and long-term financial planning. At Elevate for Humanity, she oversees financial operations and organizational compliance and leads the Elevate Financial Empowerment Program, helping participants turn financial knowledge into practical plans for stability, independence, and long-term wellness.',
+    headshotSrc: '/images/carlina-wilkes.jpg',
     email: 'carlina@elevateforhumanity.org',
   },
   {
@@ -74,29 +74,18 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: '11',
-    name: 'Ameco Martin',
-    title: 'Director of Information Technology',
+    name: 'Ameco L. Martin',
+    title: 'IT/IS Technology Instructor',
     orgRole: 'Information Technology Programs',
-    bio: 'Ameco Martin holds an Associate\'s Degree in Business and a Bachelor\'s Degree in Computer Programming. She is the owner of Ameco\'s Enterprise LLC, located at 6110 West 25th Street, Unit 241022, Indianapolis, IN 46224. She serves as Director of Information Technology at Elevate for Humanity, overseeing all IT and technology credential programs including IT Help Desk / CompTIA A+, Cybersecurity Analyst, Network Administration, Network Support Technician, Web Development, Software Development, Graphic Design, CAD/Drafting, and related business technology programs. She also serves as the dedicated Career Coach embedded full-time at Warren Central High School under Elevate\'s WIOA In-School Youth contract with EmployIndy.',
+    bio: `Ameco L. Martin is an experienced information technology professional, business leader, and educator who brings technical knowledge, healthcare information systems experience, and real-world business expertise to her role as an IT/IS Technology Instructor with Elevate for Humanity.
+
+Ameco holds a Bachelor's degree in Business Information Systems with a major in Computer Programming. Her professional background includes work as a Clinical Information Systems Specialist and Cerner programmer with Indiana University Health, connecting computer systems, healthcare operations, data, workflow processes, and end-user support.
+
+With more than 27 years of professional experience in healthcare, Ameco's career has evolved from direct patient care and rehabilitation services to healthcare billing, information systems, technology, operations, and executive leadership. She is also an entrepreneur, business consultant, author, and organizational leader with experience developing businesses, implementing administrative systems, training staff, and improving technology-driven workflows.
+
+Her teaching emphasizes hands-on learning, digital literacy, problem-solving, computer and information systems fundamentals, workplace technology, and practical application. She helps students connect technical skills to career opportunities in information technology, information systems, healthcare technology, business technology, and other technology-driven careers. Her philosophy is simple: technology is more than learning a computer - it is learning how to use information, systems, and innovation to create opportunities and solve real-world problems.`,
+    headshotSrc: '/images/ameco-martin.jpg',
     email: 'amecosenterprise@gmail.com',
-  },
-  {
-    id: '10',
-    name: 'Naomi Jordan',
-    title: 'Director of Healthcare Administration',
-    orgRole: 'Healthcare Programs & Administration',
-    bio: 'Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). She serves as Director of Healthcare Administration at Elevate for Humanity, overseeing all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/naomi-jordan.jpg',
-    email: 'naomi@elevateforhumanity.org',
-  },
-  {
-    id: '9',
-    name: 'Alberta Davis',
-    title: 'Testing Center Coordinator & Exam Proctor',
-    orgRole: 'Credential Testing',
-    bio: "Alberta Davis serves as a Testing Center Coordinator and Exam Proctor at Elevate for Humanity's Workforce Credential Testing Center in Indianapolis. She supports the administration of industry-recognized certification exams and workforce assessments for individuals, employers, schools, and workforce development partners.\n\nIn her role, Alberta coordinates testing appointments, prepares testing stations, and assists candidates through the check-in and identity verification process to ensure each testing session begins smoothly. As an exam proctor, she monitors in-person and live testing sessions to maintain compliance with certification provider policies and exam security standards.\n\nAlberta also assists with onsite testing events for partner organizations and workforce programs, helping expand access to credential testing opportunities across the community. Through her work, she helps maintain a secure, organized, and professional testing environment where candidates can focus on earning the certifications needed to advance in the workforce.",
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/alberta-davis.webp',
-    email: 'alberta@elevateforhumanity.org',
   },
 ];
 

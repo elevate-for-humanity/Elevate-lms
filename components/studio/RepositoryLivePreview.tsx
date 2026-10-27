@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Monitor, RefreshCw, Smartphone, Tablet } from 'lucide-react';
+import { resolveStudioPreviewUrl } from '@/lib/devstudio/preview-target-url';
 
 type Viewport = 'desktop' | 'tablet' | 'mobile';
 
@@ -28,7 +29,11 @@ function cleanRouteSegments(path: string) {
 
 function inferTarget(filePath: string): PreviewTarget | null {
   const definitions = [
-    { prefix: 'apps/marketing/app/', origin: 'https://www.elevateforhumanity.org', label: 'Marketing' },
+    {
+      prefix: 'apps/marketing/app/',
+      origin: 'https://www.elevateforhumanity.org',
+      label: 'Marketing',
+    },
     { prefix: 'apps/admin/app/', origin: 'https://admin.elevateforhumanity.org', label: 'Admin' },
     { prefix: 'apps/lms/app/', origin: 'https://app.elevateforhumanity.org', label: 'LMS' },
   ];
@@ -47,7 +52,7 @@ function inferTarget(filePath: string): PreviewTarget | null {
     const pathname = segments.length ? `/${segments.join('/')}` : '/';
     return {
       origin: definition.origin,
-      url: dynamic ? null : `${definition.origin}${pathname === '/' ? '' : pathname}`,
+      url: dynamic ? null : definition.label === 'Admin' ? pathname : `${definition.origin}${pathname === '/' ? '' : pathname}`,
       label: definition.label,
       dynamic,
     };
@@ -75,9 +80,19 @@ function htmlPreview(filePath: string, content: string, baseOrigin: string) {
 export default function RepositoryLivePreview({
   filePath,
   content,
+  initialUrl = '',
+  trustedInteractive = false,
+  allowManualTarget = true,
+  allowExternalOpen = true,
+  targetLabel,
 }: {
   filePath: string | null;
   content: string;
+  initialUrl?: string;
+  trustedInteractive?: boolean;
+  allowManualTarget?: boolean;
+  allowExternalOpen?: boolean;
+  targetLabel?: string;
 }) {
   const target = useMemo(() => inferTarget(filePath ?? ''), [filePath]);
   const defaultOrigin = target?.origin ?? 'https://www.elevateforhumanity.org';
@@ -90,16 +105,19 @@ export default function RepositoryLivePreview({
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    setManualUrl(target?.url ?? target?.origin ?? '');
-  }, [target?.url, target?.origin]);
+    setManualUrl(resolveStudioPreviewUrl(target?.url ?? (target?.label === 'Admin' ? '/' : target?.origin) ?? initialUrl, window.location.origin));
+  }, [target?.url, target?.origin, initialUrl]);
 
   const previewUrl = manualUrl.trim();
   const canOpen = /^https?:\/\//i.test(previewUrl);
+  let platformPreview=false;
+  try {platformPreview=['https://www.elevateforhumanity.org','https://elevateforhumanity.org','https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org',window.location.origin].includes(new URL(previewUrl).origin);}catch{platformPreview=false;}
+  const interactivePreview=trustedInteractive||platformPreview;
   const modeLabel = sourcePreview
     ? 'Unsaved source preview'
     : target
       ? `${target.label} deployed route preview`
-      : 'Manual URL preview';
+      : (targetLabel ?? (allowManualTarget ? 'Manual URL preview' : 'Active run preview'));
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-950 text-slate-100">
@@ -131,7 +149,7 @@ export default function RepositoryLivePreview({
           >
             <RefreshCw className="h-4 w-4" />
           </button>
-          {canOpen ? (
+          {canOpen && allowExternalOpen ? (
             <a
               href={previewUrl}
               target="_blank"
@@ -144,7 +162,7 @@ export default function RepositoryLivePreview({
           ) : null}
         </div>
 
-        {!sourcePreview ? (
+        {!sourcePreview && allowManualTarget ? (
           <div className="mt-2">
             <input
               value={manualUrl}
@@ -152,22 +170,28 @@ export default function RepositoryLivePreview({
               className="h-9 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 font-mono text-[11px] text-slate-200 outline-none focus:border-cyan-500"
               placeholder="https://www.elevateforhumanity.org/..."
             />
+            {target && !target.dynamic && <p className="mt-2 text-xs text-amber-200">This Next.js preview shows the deployed page. Saved container edits appear after a successful build and deployment.</p>}
             {target?.dynamic ? (
               <p className="mt-1 text-[10px] text-amber-300">
                 Dynamic route detected. Enter a real record URL above to preview that page.
               </p>
             ) : null}
           </div>
-        ) : (
+        ) : sourcePreview ? (
           <p className="mt-2 rounded-lg border border-emerald-900 bg-emerald-950/40 px-2 py-1.5 text-[10px] text-emerald-200">
-            HTML/SVG changes render directly from the unsaved editor buffer. They do not need a commit or deployment.
+            HTML/SVG changes render directly from the unsaved editor buffer. They do not need a
+            commit or deployment.
+          </p>
+        ) : (
+          <p className="mt-2 truncate rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-[11px] text-slate-300">
+            {previewUrl || 'Waiting for the active run target'}
           </p>
         )}
       </header>
 
-      <div className="min-h-0 flex-1 overflow-auto bg-slate-800 p-3">
+      <div className="min-h-0 flex-1 overflow-auto bg-slate-800">
         <div
-          className="mx-auto h-full min-h-[480px] overflow-hidden rounded-lg bg-white shadow-2xl transition-[width]"
+          className={`mx-auto h-full min-h-[480px] overflow-hidden bg-white transition-[width] ${viewport === 'desktop' ? '' : 'rounded-lg shadow-2xl'}`}
           style={{ width: VIEWPORT_WIDTH[viewport], maxWidth: '100%' }}
         >
           {sourcePreview ? (
@@ -184,13 +208,19 @@ export default function RepositoryLivePreview({
               key={`${previewUrl}-${refreshKey}`}
               title="Deployed route preview"
               src={previewUrl}
-              sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
-              referrerPolicy="strict-origin-when-cross-origin"
+              sandbox={
+                interactivePreview
+                  ? 'allow-forms allow-modals allow-same-origin allow-scripts allow-downloads'
+                  : ''
+              }
+              referrerPolicy="no-referrer"
+              allow="autoplay 'none'; camera 'none'; geolocation 'none'; microphone 'none'"
               className="h-full min-h-[480px] w-full border-0 bg-white"
             />
           ) : (
             <div className="flex h-full min-h-[480px] items-center justify-center p-8 text-center text-sm text-slate-500">
-              Select an HTML/SVG file for immediate source preview, select a Next page to infer its deployed route, or enter a URL above.
+              Select an HTML/SVG file for immediate source preview, select a Next page to infer its
+              deployed route, or enter a URL above.
             </div>
           )}
         </div>
@@ -198,7 +228,9 @@ export default function RepositoryLivePreview({
 
       {!sourcePreview && target ? (
         <footer className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 py-2 text-[10px] text-slate-400">
-          React/Next preview is the deployed route. Unsaved TSX cannot be executed safely without mounting the full dependency graph; use Runtime + Terminal to execute code before committing.
+          React/Next preview is the deployed route. Unsaved TSX cannot be executed safely without
+          mounting the full dependency graph; use Runtime + Terminal to execute code before
+          committing.
         </footer>
       ) : null}
     </section>

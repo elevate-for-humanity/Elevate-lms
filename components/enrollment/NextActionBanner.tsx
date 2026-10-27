@@ -11,6 +11,9 @@ interface NextAction {
   cta: string;
   description: string;
   program_name?: string;
+  why?: string;
+  estimated_minutes?: number;
+  progress_percentage?: number;
 }
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
@@ -21,6 +24,8 @@ const ACTION_ICONS: Record<string, React.ReactNode> = {
   AWAIT_PLACEMENT: <Clock className="w-5 h-5" />,
   AWAIT_APPROVAL: <Clock className="w-5 h-5" />,
   COMPLETE_PAYMENT: <ArrowRight className="w-5 h-5" />,
+  OPEN_DASHBOARD: <ArrowRight className="w-5 h-5" />,
+  EXPLORE_PROGRAMS: <BookOpen className="w-5 h-5" />,
 };
 
 export function NextActionBanner() {
@@ -33,7 +38,7 @@ export function NextActionBanner() {
         const response = await fetch('/api/enrollment/next-action');
         if (response.ok) {
           const data = await response.json();
-          if (data.action && data.action !== 'CONTINUE_LEARNING') {
+          if (data.action) {
             setNextAction(data);
           }
         }
@@ -51,11 +56,6 @@ export function NextActionBanner() {
     return null;
   }
 
-  // Don't show banner if user is already active and learning
-  if (nextAction.action === 'CONTINUE_LEARNING') {
-    return null;
-  }
-
   return (
     <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 mb-6">
       <div className="flex items-center justify-between gap-4">
@@ -66,6 +66,12 @@ export function NextActionBanner() {
           <div>
             <h3 className="font-semibold text-slate-900">Next required action</h3>
             <p className="text-sm text-slate-700">{nextAction.description}</p>
+            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+              {nextAction.why ? <span>Why: {nextAction.why}</span> : null}
+              {nextAction.estimated_minutes ? (
+                <span>About {nextAction.estimated_minutes} minutes</span>
+              ) : null}
+            </div>
           </div>
         </div>
         <Link

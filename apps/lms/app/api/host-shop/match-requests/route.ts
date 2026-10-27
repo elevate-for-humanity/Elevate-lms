@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,6 +83,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Math.max(1, Number.parseInt(searchParams.get('limit') || '10', 10) || 10));
   const offset = (page - 1) * limit;
   const { user, db, role } = ctx;
+  const subject = await resolvePortalPreviewSubject(db, user.id);
 
   let query = db
     .from('host_shop_match_requests')
@@ -98,7 +100,9 @@ export async function GET(req: NextRequest) {
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (PLATFORM_ADMIN_ROLES.has(role) || HOST_ROLES.has(role)) {
+  if (subject.previewing) {
+    query = query.eq('apprentice_id', subject.userId);
+  } else if (PLATFORM_ADMIN_ROLES.has(role) || HOST_ROLES.has(role)) {
     const shopIds = await getAuthorizedHostShopIds(db, user.id, role);
     if (!shopIds.length) {
       return NextResponse.json({ requests: [], pagination: { page, limit, total: 0, pages: 0 } });

@@ -5,18 +5,9 @@
  * Uses keyword matching and pattern analysis with confidence scoring.
  */
 
-import {
-  AIAgent,
-  AgentIntent,
-  TaskPriority,
-} from './types';
+import { AIAgent, AgentIntent, TaskPriority } from './types';
 
-import type {
-  AIRequest,
-  IntentClassification,
-  RoutingDecision,
-  TaskPayload,
-} from './types';
+import type { AIRequest, IntentClassification, RoutingDecision, TaskPayload } from './types';
 
 // ============================================================
 // Intent Classification Rules
@@ -34,12 +25,26 @@ interface IntentRule {
 const INTENT_RULES: IntentRule[] = [
   {
     intent: AgentIntent.ADMISSION,
-    agent: AIAgent.PARS,
+    agent: AIAgent.PARIS,
     defaultPriority: TaskPriority.HIGH,
     keywords: [
-      'interview', 'apply', 'program', 'eligibility', 'admission', 'admissions',
-      'enroll', 'application', 'applicant', 'candidate', 'qualify', 'qualification',
-      'paris', 'assessment', 'screening', 'intake', 'intake',
+      'interview',
+      'apply',
+      'program',
+      'eligibility',
+      'admission',
+      'admissions',
+      'enroll',
+      'application',
+      'applicant',
+      'candidate',
+      'qualify',
+      'qualification',
+      'paris',
+      'assessment',
+      'screening',
+      'intake',
+      'intake',
     ],
     patterns: [
       /^(i want to|I'd like to|I'd love to)\s+(apply|enroll|sign up|get started)/i,
@@ -56,9 +61,21 @@ const INTENT_RULES: IntentRule[] = [
     agent: AIAgent.ELLIE,
     defaultPriority: TaskPriority.HIGH,
     keywords: [
-      'enroll', 'enrollment', 'payment', 'funding', 'WIOA', 'tuition',
-      'financial', 'scholarship', 'grant', 'loan', 'installment',
-      'register', 'registration', 'course selection', 'class',
+      'enroll',
+      'enrollment',
+      'payment',
+      'funding',
+      'WIOA',
+      'tuition',
+      'financial',
+      'scholarship',
+      'grant',
+      'loan',
+      'installment',
+      'register',
+      'registration',
+      'course selection',
+      'class',
     ],
     patterns: [
       /^(how much|what('s| is) the)\s+(cost|tuition|price|fee)/i,
@@ -74,10 +91,27 @@ const INTENT_RULES: IntentRule[] = [
     agent: AIAgent.ELLIE,
     defaultPriority: TaskPriority.MEDIUM,
     keywords: [
-      'progress', 'course', 'lesson', 'complete', 'completion', 'module',
-      'syllabus', 'curriculum', 'learning', 'study', 'assignment',
-      'quiz', 'exam', 'test', 'grade', 'score', 'result',
-      'video', 'content', 'material', 'resource',
+      'progress',
+      'course',
+      'lesson',
+      'complete',
+      'completion',
+      'module',
+      'syllabus',
+      'curriculum',
+      'learning',
+      'study',
+      'assignment',
+      'quiz',
+      'exam',
+      'test',
+      'grade',
+      'score',
+      'result',
+      'video',
+      'content',
+      'material',
+      'resource',
     ],
     patterns: [
       /^(how('s| is)|what's|what is)\s+(my|the)\s+(progress|course|lesson)/i,
@@ -93,10 +127,25 @@ const INTENT_RULES: IntentRule[] = [
     agent: AIAgent.ELLIE,
     defaultPriority: TaskPriority.MEDIUM,
     keywords: [
-      'help', 'support', 'question', 'issue', 'problem', 'trouble',
-      'confused', 'confusing', 'unclear', 'lost', 'stuck',
-      'need', 'want', 'looking for', 'searching',
-      'information', 'info', 'details', 'more about',
+      'help',
+      'support',
+      'question',
+      'issue',
+      'problem',
+      'trouble',
+      'confused',
+      'confusing',
+      'unclear',
+      'lost',
+      'stuck',
+      'need',
+      'want',
+      'looking for',
+      'searching',
+      'information',
+      'info',
+      'details',
+      'more about',
     ],
     patterns: [
       /^(i('m| am)|I)\s+(confused|having trouble|stuck|lost)/i,
@@ -110,11 +159,30 @@ const INTENT_RULES: IntentRule[] = [
     agent: AIAgent.LIZZY,
     defaultPriority: TaskPriority.MEDIUM,
     keywords: [
-      'approve', 'approval', 'review', 'admin', 'queue', 'document',
-      'process', 'operation', 'workflow', 'automation', 'batch',
-      'export', 'import', 'report', 'analytics', 'dashboard',
-      'schedule', 'calendar', 'reminder', 'notification',
-      'update', 'change', 'modify', 'edit',
+      'approve',
+      'approval',
+      'review',
+      'admin',
+      'queue',
+      'document',
+      'process',
+      'operation',
+      'workflow',
+      'automation',
+      'batch',
+      'export',
+      'import',
+      'report',
+      'analytics',
+      'dashboard',
+      'schedule',
+      'calendar',
+      'reminder',
+      'notification',
+      'update',
+      'change',
+      'modify',
+      'edit',
     ],
     patterns: [
       /^(please|can you|could you)\s+(approve|review|process)/i,
@@ -130,11 +198,29 @@ const INTENT_RULES: IntentRule[] = [
     agent: AIAgent.ZORA,
     defaultPriority: TaskPriority.HIGH,
     keywords: [
-      'WIOA', 'DOL', 'compliance', 'compliant', 'credential', 'audit',
-      'certification', 'regulation', 'regulatory', 'reporting', 'report',
-      'accreditation', 'licensing', 'license', 'permit',
-      'documentation', 'records', 'verification', 'verify',
-      'violation', 'violation', 'issue', 'warning',
+      'WIOA',
+      'DOL',
+      'compliance',
+      'compliant',
+      'credential',
+      'audit',
+      'certification',
+      'regulation',
+      'regulatory',
+      'reporting',
+      'report',
+      'accreditation',
+      'licensing',
+      'license',
+      'permit',
+      'documentation',
+      'records',
+      'verification',
+      'verify',
+      'violation',
+      'violation',
+      'issue',
+      'warning',
     ],
     patterns: [
       /^(is this|are we|are they)\s+(compliant|WIOA-certified)/i,
@@ -152,11 +238,29 @@ const INTENT_RULES: IntentRule[] = [
     agent: AIAgent.ZORA,
     defaultPriority: TaskPriority.MEDIUM,
     keywords: [
-      'job', 'career', 'placement', 'hire', 'hiring', 'employment',
-      'resume', 'CV', 'interview', 'interviewing', 'job search',
-      'employer', 'company', 'workforce', 'work', 'career services',
-      'salary', 'wage', 'compensation', 'benefits',
-      'networking', 'connection', 'referral',
+      'job',
+      'career',
+      'placement',
+      'hire',
+      'hiring',
+      'employment',
+      'resume',
+      'CV',
+      'interview',
+      'interviewing',
+      'job search',
+      'employer',
+      'company',
+      'workforce',
+      'work',
+      'career services',
+      'salary',
+      'wage',
+      'compensation',
+      'benefits',
+      'networking',
+      'connection',
+      'referral',
     ],
     patterns: [
       /^(help me|I want to|I need to)\s+(find|get|land)\s+(a |an |the )?(job|work|employment)/i,
@@ -236,7 +340,7 @@ export class IntentRouter {
    */
   private matchesContext(context?: Record<string, unknown>, rule?: IntentRule): boolean {
     if (!context || !rule?.contexts) return false;
-    
+
     const contextStr = JSON.stringify(context).toLowerCase();
     return rule.contexts.some((ctx) => contextStr.includes(ctx.toLowerCase()));
   }
@@ -244,10 +348,7 @@ export class IntentRouter {
   /**
    * Classify an intent from text and optional context
    */
-  classify(
-    text: string,
-    context?: Record<string, unknown>
-  ): IntentClassification {
+  classify(text: string, context?: Record<string, unknown>): IntentClassification {
     // Check cache first
     const cacheKey = `${text}:${JSON.stringify(context || {})}`;
     const cached = this.classificationCache.get(cacheKey);
@@ -364,10 +465,8 @@ export class IntentRouter {
     }
 
     // Determine priority
-    let priority = classification.confidence > 0.7 
-      ? TaskPriority.HIGH 
-      : TaskPriority.MEDIUM;
-    
+    let priority = classification.confidence > 0.7 ? TaskPriority.HIGH : TaskPriority.MEDIUM;
+
     if (request.priority) {
       priority = request.priority;
     }
@@ -435,7 +534,8 @@ export class IntentRouter {
     if (!rule) return null;
 
     const descriptions: Record<AgentIntent, string> = {
-      [AgentIntent.ADMISSION]: 'Handles admission interviews, eligibility assessments, and program applications',
+      [AgentIntent.ADMISSION]:
+        'Handles admission interviews, eligibility assessments, and program applications',
       [AgentIntent.STUDENT_SUPPORT]: 'Student support, questions, and general assistance',
       [AgentIntent.ENROLLMENT]: 'Enrollment, payment, and funding inquiries',
       [AgentIntent.COURSE_BUILDER]: 'Course progress, lessons, and learning management',

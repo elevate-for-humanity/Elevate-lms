@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { runPostApprovalActions } from '@/lib/enrollment/post-approval';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -51,8 +52,10 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
     if (prog?.slug) programSlug = prog.slug;
   }
 
-  // Get temp password from profile if user exists (for new-account emails)
+  // Existing provisioned accounts may never have received credentials. Generate
+  // a fresh one-time recovery link instead of assuming they know a password.
   const tempPassword: string | null = null;
+  let passwordSetupLink: string | null = null;
   let enrollmentId: string | null = null;
 
   if (app.user_id) {
@@ -64,6 +67,22 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
       .limit(1)
       .maybeSingle();
     enrollmentId = pe?.id ?? null;
+
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl).trim();
+    const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
+      type: 'recovery',
+      email: app.email,
+      options: { redirectTo: `${siteUrl}/auth/callback?redirect=/onboarding/learner` },
+    });
+    if (!linkError && linkData?.properties?.action_link) {
+      passwordSetupLink = linkData.properties.action_link;
+    } else {
+      logger.warn('[resend-onboarding] Recovery link generation failed; forgot-password remains available', {
+        applicationId: id,
+        email: app.email,
+        error: linkError?.message,
+      });
+    }
   }
 
   const studentName = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.email;
@@ -78,6 +97,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
       studentPhone: app.phone ?? null,
       fundingType: app.funding_type ?? null,
       tempPassword,
+      passwordSetupLink,
       enrollmentId,
     });
 

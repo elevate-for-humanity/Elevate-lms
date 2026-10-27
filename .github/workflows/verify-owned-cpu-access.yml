@@ -1,0 +1,91 @@
+name: Verify effective private model access and connect Paris
+# This owner-requested verification uses existing identities and permissions.
+# It never creates credentials or grants IAM access.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-owned-cpu-access.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-owned-cpu-access-verification
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-owned-cpu-access.yml/dispatches" -f ref=main
+  verify:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    env:
+      CPU_MODEL_URL: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify identity proof, endpoint activation and bounded acceptance contracts
+        run: node --test scripts/gcp/probe-owned-cpu-admin.test.mjs scripts/gcp/activate-owned-cpu-model.test.mjs scripts/gcp/accept-owned-cpu-model.test.mjs
+      - uses: google-github-actions/auth@v3
+        id: invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify real private inference as the deployment identity
+        env:
+          MODEL_INVOKER_TOKEN: ${{ steps.invocation.outputs.id_token }}
+        run: |
+          node --input-type=module <<'JS'
+          import {loadGoogleConfig} from './scripts/gcp/runtime-config.mjs';
+          import {modelCredential} from './scripts/gcp/deploy-owned-llm.mjs';
+          import {acceptOwnedCpuModel} from './scripts/gcp/accept-owned-cpu-model.mjs';
+          const result=await acceptOwnedCpuModel({base:process.env.CPU_MODEL_URL,token:modelCredential(loadGoogleConfig('admin')),invokerToken:process.env.MODEL_INVOKER_TOKEN});
+          console.log(JSON.stringify({deploymentIdentityPrivateAcceptance:result}));
+          JS
+      - name: Prove model discovery under the actual serving Admin identity
+        run: node scripts/gcp/probe-owned-cpu-admin.mjs
+  connect:
+    needs: verify
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify.result == 'success'
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        id: invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Recheck actual access and atomically activate all Admin endpoint aliases
+        env:
+          CPU_MODEL_URL: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          MODEL_INVOKER_TOKEN: ${{ steps.invocation.outputs.id_token }}
+        run: node scripts/gcp/activate-owned-cpu-model.mjs

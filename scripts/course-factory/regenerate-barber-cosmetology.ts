@@ -1,57 +1,83 @@
-// Production regeneration runner for canonical Barber and Cosmetology courses.
+// Production recovery runner for the canonical Cosmetology course.
 import { courseFactory } from '../../lib/course-factory';
+import { normalizeGeneratedCourseForGovernance } from '../../lib/course-factory/post-generation-governance';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
-const AI_SECRET_KEYS = [
-  'OPENAI_API_KEY',
-  'GROQ_API_KEY',
-  'GEMINI_API_KEY',
-  'ANTHROPIC_API_KEY',
-  'AZURE_OPENAI_API_KEY',
+// Governance uses production's generated lifecycle state; recovery is scoped to Cosmetology. Barbering remains a separate
+// canonical course and must never block or consume this course's recovery run.
+const TARGETS = [
+  {
+    programSlug: 'cosmetology-apprenticeship',
+    title: 'Indiana Cosmetology License',
+    topic: 'Indiana cosmetology apprenticeship theory and practical preparation',
+    expectedModules: 8,
+    expectedLessons: 40,
+  },
 ] as const;
-
-const TARGETS = ['barber-apprenticeship', 'cosmetology-apprenticeship'] as const;
 let failureStage = 'startup';
 
-async function hydrateProductionAISecrets() {
+async function normalizePersistedCourse(target: (typeof TARGETS)[number]) {
+  if (process.env.COURSE_FACTORY_FORCE_REGENERATE === 'true') return null;
+
   const db = await requireAdminClient();
-  const available: string[] = [];
+  const { data: course, error } = await db
+    .from('courses')
+    .select('id')
+    .eq('slug', target.programSlug)
+    .maybeSingle();
+  if (error) throw error;
+  if (!course?.id) return null;
 
-  for (const key of AI_SECRET_KEYS) {
-    if (process.env[key]?.trim()) {
-      available.push(key);
-      continue;
-    }
-
-    const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
-    if (error) {
-      console.warn(`[course-regeneration] ${key} unavailable: ${error.message}`);
-      continue;
-    }
-    if (typeof data === 'string' && data.trim()) {
-      process.env[key] = data.trim();
-      available.push(key);
-    }
+  const [{ count: moduleCount, error: moduleError }, { count: lessonCount, error: lessonError }] =
+    await Promise.all([
+      db
+        .from('course_modules')
+        .select('id', { count: 'exact', head: true })
+        .eq('course_id', course.id),
+      db
+        .from('course_lessons')
+        .select('id', { count: 'exact', head: true })
+        .eq('course_id', course.id),
+    ]);
+  if (moduleError) throw moduleError;
+  if (lessonError) throw lessonError;
+  if (moduleCount !== target.expectedModules || lessonCount !== target.expectedLessons) {
+    throw new Error(
+      `${target.programSlug} persisted package is incomplete: ${moduleCount ?? 0}/${target.expectedModules} modules, ${lessonCount ?? 0}/${target.expectedLessons} lessons`,
+    );
   }
 
-  if (!available.length) {
-    throw new Error('No production AI provider credential is available');
+  const governance = await normalizeGeneratedCourseForGovernance(course.id);
+  if (governance.lessonsNormalized !== lessonCount || governance.warnings.length) {
+    throw new Error(
+      `${target.programSlug} governance normalization failed: ${governance.lessonsNormalized}/${lessonCount} lessons; ${JSON.stringify(governance.warnings)}`,
+    );
   }
-  console.log(`[course-regeneration] hydrated ${available.length} AI provider credential(s)`);
+  return { courseId: course.id, moduleCount, lessonCount, governance };
 }
 
 async function main() {
-  failureStage = 'ai-secret-hydration';
-  await hydrateProductionAISecrets();
+  for (const target of TARGETS) {
+    const { programSlug } = target;
+    failureStage = `${programSlug}-persisted-governance`;
+    const persisted = await normalizePersistedCourse(target);
+    if (persisted) {
+      console.log(
+        `COURSE_REGENERATION_SUCCESS ${programSlug} ${persisted.courseId} ${persisted.moduleCount} ${persisted.lessonCount} ${persisted.governance.totalDurationHours}h normalized-existing`,
+      );
+      continue;
+    }
 
-  for (const programSlug of TARGETS) {
     failureStage = `${programSlug}-course-factory`;
-    console.log(`\n=== Regenerating ${programSlug} ===`);
+    console.log(`
+=== Regenerating ${programSlug} ===`);
     const result = await courseFactory(
       {
         programSlug,
+        title: target.title,
+        topic: target.topic,
         mode: 'refresh',
-        contentSource: 'ai',
+        contentSource: 'blueprint',
         videoMode: 'queue',
       },
       (stage, message, progress) =>
@@ -89,8 +115,21 @@ async function main() {
       );
     }
 
+    failureStage = `${programSlug}-governance-normalization`;
+    const governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+    if (governance.lessonsNormalized !== result.lessonCount) {
+      throw new Error(
+        `${programSlug} governance normalized ${governance.lessonsNormalized} of ${result.lessonCount} lessons`,
+      );
+    }
+    if (governance.warnings.length) {
+      throw new Error(
+        `${programSlug} governance normalization warnings: ${JSON.stringify(governance.warnings)}`,
+      );
+    }
+
     console.log(
-      `COURSE_REGENERATION_SUCCESS ${programSlug} ${result.courseId} ${result.moduleCount} ${result.lessonCount}`,
+      `COURSE_REGENERATION_SUCCESS ${programSlug} ${result.courseId} ${result.moduleCount} ${result.lessonCount} ${governance.totalDurationHours}h`,
     );
   }
 }

@@ -4,11 +4,13 @@
  * Admin-only. Targets the full Elevate-lms repository.
  */
 
+import { studioRepository } from '@/lib/devstudio/repository';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { getGitHubHeaders } from '@/lib/devstudio/github-token';
+import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -20,8 +22,7 @@ const MAX_FILE_BYTES = 512 * 1024;
 const BLOCKED_PATTERNS = [/^\.env/, /node_modules/, /\.git\//, /\.next\//];
 
 function getRepo(): string {
-  const repo = (process.env.GITHUB_REPO ?? DEFAULT_REPO).trim();
-  return repo || DEFAULT_REPO;
+  return studioRepository();
 }
 
 function getBranch(): string {
@@ -67,7 +68,7 @@ async function fetchTree(dirPath: string, depth: number): Promise<TreeNode[]> {
     headers: await ghHeaders(),
     cache: 'no-store',
   });
-  if (!response.ok) return [];
+  if (!response.ok) throw new Error(`Repository file list failed (HTTP ${response.status}). Check the GitHub connection.`);
 
   const entries: GHEntry[] = await response.json();
   const nodes: TreeNode[] = [];
@@ -93,6 +94,11 @@ export async function GET(request: NextRequest) {
   const filePath = request.nextUrl.searchParams.get('path') ?? '';
   const tree = request.nextUrl.searchParams.get('tree') === '1';
   try {
+    if(request.nextUrl.searchParams.get('source')==='container'){
+      if(isBlocked(filePath)||/(?:^|\/)\.env(?:[./]|$)/.test(filePath))return safeError('Path not allowed',403);
+      const {readContainerRepository}=await import('@/lib/studio/container-repository');
+      return NextResponse.json(await readContainerRepository(filePath));
+    }
     if (!filePath) {
       const nodes = await fetchTree('', 2);
       return NextResponse.json({ tree: nodes, repo: getRepo(), branch: getBranch() });
@@ -133,6 +139,10 @@ export async function PUT(request: NextRequest) {
   if (!body.sha) return safeError('sha is required to update a file', 400);
   if (isBlocked(body.path)) return safeError('Path not allowed', 403);
   if (Buffer.byteLength(body.content, 'utf-8') > MAX_FILE_BYTES) return safeError(`Content exceeds ${MAX_FILE_BYTES / 1024} KB write limit`, 413);
+  if (getBranch() === 'main') {
+    const confirmation = requireTypedConfirmation(body.confirmation, 'git_push');
+    if (!confirmation.ok) return NextResponse.json({ error: 'Direct main-branch commit requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
+  }
 
   const message = body.message ?? `chore: update ${body.path} via Dev Studio`;
   const encoded = Buffer.from(body.content, 'utf-8').toString('base64');
@@ -150,7 +160,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-interface CreateFileBody { path: string; content: string; message?: string }
+interface CreateFileBody { path: string; content: string; message?: string; confirmation?: string }
 
 async function readCreateBody(request: NextRequest): Promise<CreateFileBody | null> {
   const contentType = request.headers.get('content-type') ?? '';
@@ -165,7 +175,7 @@ async function readCreateBody(request: NextRequest): Promise<CreateFileBody | nu
   }
   const body = await request.json().catch(() => null);
   if (!body) return null;
-  return { path: String(body.path ?? ''), content: typeof body.content === 'string' ? body.content : '', message: typeof body.message === 'string' ? body.message : undefined };
+  return { path: String(body.path ?? ''), content: typeof body.content === 'string' ? body.content : '', message: typeof body.message === 'string' ? body.message : undefined, confirmation: typeof body.confirmation === 'string' ? body.confirmation : undefined };
 }
 
 export async function POST(request: NextRequest) {
@@ -179,6 +189,10 @@ export async function POST(request: NextRequest) {
   body.path = normalizePath(body.path);
   if (isBlocked(body.path)) return safeError('Path not allowed', 403);
   if (Buffer.byteLength(body.content, 'utf-8') > MAX_FILE_BYTES) return safeError(`Content exceeds ${MAX_FILE_BYTES / 1024} KB write limit`, 413);
+  if (getBranch() === 'main') {
+    const confirmation = requireTypedConfirmation(body.confirmation, 'git_push');
+    if (!confirmation.ok) return NextResponse.json({ error: 'Direct main-branch commit requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
+  }
 
   const message = body.message ?? `chore: create ${body.path} via Dev Studio`;
   const encoded = Buffer.from(body.content, 'utf-8').toString('base64');
@@ -209,6 +223,10 @@ export async function DELETE(request: NextRequest) {
   if (!body?.path) return safeError('path is required', 400);
   if (!body?.sha) return safeError('sha is required to delete a file', 400);
   if (isBlocked(body.path)) return safeError('Path not allowed', 403);
+  if (getBranch() === 'main') {
+    const confirmation = requireTypedConfirmation(body.confirmation, 'git_push');
+    if (!confirmation.ok) return NextResponse.json({ error: 'Direct main-branch deletion requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
+  }
   const message = body.message ?? `chore: delete ${body.path} via Dev Studio`;
   try {
     const response = await fetch(`${GH_API}/repos/${getRepo()}/contents/${encodePath(body.path)}`, {

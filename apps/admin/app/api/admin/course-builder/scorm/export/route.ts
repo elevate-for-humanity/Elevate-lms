@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { generateScormPackage, type ScormFormat } from '@/lib/scorm/course-package';
 import { logger } from '@/lib/logger';
+import { loadCourseSession } from '@/lib/studio/course-session';
+import { coursePackageFromSession } from '@/lib/course-package/from-course-session';
+import { evaluateCourseReadiness } from '@/lib/course-package/readiness';
+import { ZodError } from 'zod';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,27 +28,19 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const db = await requireAdminClient();
-    const [{ data: course, error: courseError }, { data: lessons, error: lessonError }] =
-      await Promise.all([
-        db.from('training_courses').select('id, title, course_name').eq('id', courseId).single(),
-        db
-          .from('training_lessons')
-          .select('lesson_number, title, content, video_url, quiz_questions')
-          .eq('course_id', courseId)
-          .order('lesson_number'),
-      ]);
-
-    if (courseError || !course) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    const coursePackage = coursePackageFromSession(await loadCourseSession(courseId));
+    const readiness = evaluateCourseReadiness(coursePackage);
+    if (!readiness.pass) {
+      return NextResponse.json(
+        {
+          error: 'Course is not ready for SCORM export',
+          code: 'COURSE_PACKAGE_NOT_READY',
+          readiness,
+        },
+        { status: 422 },
+      );
     }
-    if (lessonError) throw lessonError;
-    if (!lessons?.length) {
-      return NextResponse.json({ error: 'Course has no lessons to export' }, { status: 422 });
-    }
-
-    const title = course.title || course.course_name || `Course ${courseId}`;
-    const pkg = generateScormPackage({ courseId, title, lessons, format });
+    const pkg = generateScormPackage({ course: coursePackage, format });
 
     return new Response(new Uint8Array(pkg.data), {
       status: 200,
@@ -57,6 +52,16 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          error: 'Course data does not satisfy the canonical package contract',
+          code: 'INVALID_COURSE_PACKAGE',
+          issues: error.issues,
+        },
+        { status: 422 },
+      );
+    }
     logger.error('[course-builder/scorm-export] Export failed', error);
     return NextResponse.json({ error: 'Unable to generate SCORM package' }, { status: 500 });
   }

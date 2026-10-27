@@ -42,6 +42,13 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain("job.status === 'complete' && !options.force");
   });
 
+  it('requires manual review for storage and quality errors before retrying media', () => {
+    const manager = read('lib/course-factory/media-manager.ts');
+    expect(manager).toContain("if (!message) return false;");
+    expect(manager).toContain("['transient', 'renderer'].includes(classifyVideoFailure(message))");
+    expect(manager).toContain('COURSE_MEDIA_MAX_RETRIES = 3');
+  });
+
   it('caps retries and applies retry backoff', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     expect(manager).toContain('COURSE_MEDIA_MAX_RETRIES = 3');
@@ -50,20 +57,39 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain('Retry backoff has not elapsed');
   });
 
-  it('recovers stale rendering through Course Factory rather than the renderer route', () => {
+  it('keeps stale-state recovery in Course Factory while expired leases release capacity', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     expect(manager).toContain('COURSE_MEDIA_STALE_RENDER_MS');
     expect(manager).toContain('Recovered stale rendering job through Course Factory policy');
-    expect(worker).not.toContain('staleBefore');
+    expect(worker).toContain('lease_expires_at.gt.');
+    expect(worker).toContain('started_at.gt.');
+    expect(worker).not.toContain('resetCanonicalMediaJob');
     expect(worker).not.toContain('retried403');
     expect(worker).not.toContain('Unexpected server response: 403');
+    const boundedLease = read(
+      'supabase/migrations/20260913112500_bound_expired_video_lease_retries.sql',
+    );
+    expect(boundedLease).toContain('coalesce(v.retry_count, 0) < 3');
+    expect(boundedLease).toContain("failure_class = coalesce(v.failure_class, 'retry_exhausted')");
+    expect(boundedLease).toContain('dead_lettered_at = coalesce(v.dead_lettered_at, now())');
+    const retryClass = read(
+      'supabase/migrations/20260913120000_allow_retry_exhausted_video_failure.sql',
+    );
+    expect(retryClass).toContain("'retry_exhausted'::text");
+    expect(read('lib/video/job-queue.ts')).toContain("| 'retry_exhausted'");
+    const lessonSync = read(
+      'supabase/migrations/20260913121500_sync_retry_exhaustion_to_lesson.sql',
+    );
+    expect(lessonSync).toContain('l.video_job_id = v.id');
+    expect(lessonSync).toContain("v.asset_kind = 'lesson'");
+    expect(lessonSync).toContain("video_status = 'failed'");
   });
 
   it('preserves microclip asset_key during retry', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     expect(manager).toContain('assetKey: row.asset_key');
-    expect(manager).toContain("String(clip.id) === identity.assetKey");
+    expect(manager).toContain('String(clip.id) === identity.assetKey');
   });
 
   it('resets retry evidence without violating the production NOT NULL contract', () => {
@@ -78,8 +104,33 @@ describe('canonical Course Factory media architecture', () => {
     expect(worker).toContain('maxJobs ?? maxConcurrent');
     expect(worker).toContain("db.rpc('claim_video_jobs'");
     expect(worker).toContain('p_course_id: courseId');
+    expect(worker).toContain(".lt('retry_count', 3)");
     expect(worker).toContain('processClaimedVideoJob(job)');
+    expect(worker).toContain('await Promise.allSettled');
+    expect(worker).not.toContain('after(async');
     expect(worker).toContain('activeBeforeClaim');
+  });
+
+  it('schedules the video worker on the Admin service that owns its route', () => {
+    const scheduler = read('.github/workflows/cron-scheduler.yml');
+    expect(scheduler).toContain('$ADMIN_URL/api/internal/videos/process-queue');
+    expect(scheduler).not.toContain('$APP_URL/api/internal/videos/process-queue');
+    expect(scheduler).toContain('--max-time 1800');
+  });
+
+  it('keeps long course builds alive and resumes completed builds at media finalization', () => {
+    const scheduler = read('.github/workflows/cron-scheduler.yml');
+    const route = read('apps/admin/app/api/cron/process-course-builder-jobs/route.ts');
+    const handler = read('lib/jobs/handlers/course-build.ts');
+    expect(scheduler).toContain('--max-time 3600');
+    expect(route).toContain('export const maxDuration = 3600');
+    expect(handler).toContain('resumableMediaCheckpoint');
+    expect(handler).toContain('Resuming completed build at media finalization');
+    expect(handler).toContain("generation_status: 'generating'");
+    expect(handler).toContain('generation_progress: 95');
+    expect(read('lib/course-builder/build-lifecycle.ts')).toContain(
+      "generation_status: 'completed'",
+    );
   });
 
   it('claims work atomically and renews an expiring database lease', () => {
@@ -104,23 +155,39 @@ describe('canonical Course Factory media architecture', () => {
 
   it('keeps render capacity global during course-scoped runs', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
-    const activeBlock = worker.slice(worker.indexOf('activeCount'), worker.indexOf('availableSlots'));
+    const activeBlock = worker.slice(
+      worker.indexOf('activeCount'),
+      worker.indexOf('availableSlots'),
+    );
     expect(activeBlock).not.toContain("eq('course_id', courseId)");
   });
 
-  it('keeps GPU fallback and Remotion on the same canonical job identity', () => {
+  it('keeps the active Remotion renderer on the canonical job identity', () => {
     const renderer = read('lib/video/process-video-job.ts');
-    expect(renderer).toContain('GPU scene failed; falling back to Remotion');
-    expect(renderer).toContain('markComplete(job.id');
-    expect(renderer).toContain('markFailed(job.id');
+    expect(renderer).toContain('const result = await renderStoryboardVideo');
+    expect(renderer).toContain('this worker never dispatches to it');
+    expect(renderer).toMatch(/markComplete\(\s*job\.id/);
+    expect(renderer).toMatch(/markFailed\(\s*job\.id/);
     expect(renderer).not.toMatch(/createJob\s*\(/);
+  });
+
+  it('bounds every final storyboard and its projected cost before rendering', () => {
+    const renderer = read('lib/video/process-video-job.ts');
+    const directMediaIndex = renderer.indexOf('let storyboard = directMedia');
+    const finalBoundaryIndex = renderer.indexOf('const finalCompaction = compactLegacySceneData');
+    const renderIndex = renderer.indexOf('const result = await renderStoryboardVideo');
+    expect(directMediaIndex).toBeGreaterThan(-1);
+    expect(finalBoundaryIndex).toBeGreaterThan(directMediaIndex);
+    expect(renderIndex).toBeGreaterThan(finalBoundaryIndex);
+    expect(renderer).toContain('compactLegacySceneData');
+    expect(renderer).toContain('MAX_LESSON_VIDEO_SCENES');
   });
 
   it('records renderer provider evidence on terminal state', () => {
     const renderer = read('lib/video/process-video-job.ts');
-    expect(renderer).toContain('provider: generated.provider');
+    expect(renderer).toContain('model:');
     expect(renderer).toContain('provider: REMOTION_PROVIDER');
-    expect(renderer).toContain('provider_model: REMOTION_MODEL');
+    expect(renderer).toContain("storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL");
   });
 
   it('rejects missing and unreachable media from Course Factory readiness', () => {
@@ -136,6 +203,80 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain('microclipStateMismatches === 0');
   });
 
+  it('publishes the complete course through automated verification from the worker', () => {
+    const factory = read('lib/course-factory/factory.ts');
+    const lifecycle = read('lib/course-builder/build-lifecycle.ts');
+    const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
+    expect(factory).toContain('Creating the canonical draft shell for unified lesson builds.');
+    expect(factory).toContain(
+      "completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'",
+    );
+    expect(lifecycle).toContain('finalizeUnifiedCourseBuildWithClient');
+    expect(lifecycle).toContain('publishPersistedCourseWithClient');
+    expect(lifecycle).toContain('if (!media.completePackage)');
+    expect(lifecycle).toContain('if (!contract.pass)');
+    expect(lifecycle).toContain('actorId: null');
+    expect(worker).toContain('finalizeUnifiedCourseBuildWithClient');
+    expect(worker).not.toContain('finalizeCourseAutomaticallyIfReadyWithClient');
+  });
+
+  it('starts the primary video after each locked lesson narration', () => {
+    const checkpoints = read('lib/course-factory/generation-checkpoints.ts');
+    const media = read('lib/course-factory/media-service.ts');
+    expect(checkpoints).toContain(
+      'Its primary video can render while the next lesson is generated.',
+    );
+    expect(checkpoints).toContain('lessonId: target.id');
+    expect(media).toContain('sourceChanged');
+    expect(media).toContain('Canonical lesson narration changed during unified course rebuild');
+  });
+
+  it('completes a lesson only after matching version-locked media passes', () => {
+    const checkpoints = read('lib/course-factory/generation-checkpoints.ts');
+    const media = read('lib/course-factory/media-service.ts');
+    const renderer = read('lib/video/process-video-job.ts');
+    const queue = read('lib/video/job-queue.ts');
+    const manager = read('lib/course-factory/media-manager.ts');
+    const publisher = read('lib/course-factory/publisher.ts');
+    const factory = read('lib/course-factory/factory.ts');
+    expect(checkpoints).toContain("generation_status: 'generating'");
+    expect(checkpoints).toContain('source_fingerprint: sourceFingerprint');
+    expect(media).toContain('has no locked unified-media fingerprint');
+    expect(renderer).toContain('MEDIA_SOURCE_VERSION_MISMATCH');
+    expect(queue).toContain("generation_status: 'generated'");
+    expect(manager).toContain("lesson.generation_status !== 'generated'");
+    expect(publisher).toContain('source_fingerprint: sourceFingerprint');
+    expect(publisher).toContain('experience.instructionalTimeline?.scenes');
+    expect(publisher).toContain("overlay_template: 'caption-only-v1'");
+    expect(publisher).toContain("practice: 'knowledge_check'");
+    expect(publisher).not.toContain("practice: 'field_scenario'");
+    expect(publisher).toContain('const alignedEvidence =');
+    expect(publisher).toContain('const teachingAction =');
+    expect(publisher).toContain('required_visual_evidence: teachingAction');
+    expect(publisher).toContain("purpose === 'practice'");
+    expect(publisher).toContain("purpose === 'demonstration' ? 'close-up' : 'medium'");
+    expect(publisher).toContain("generation_status: experience ? 'generating' : 'queued'");
+    expect(factory.indexOf('await markCourseMediaPendingWithClient')).toBeLessThan(
+      factory.indexOf("tracker.emit('media'"),
+    );
+  });
+
+  it('does not let obsolete opt-out microclips block primary lesson readiness', () => {
+    const manager = read('lib/course-factory/media-manager.ts');
+    expect(manager).toContain('videoConfig.enableMicroclips === true');
+    expect(manager).toContain('const canonicalRows = rows.filter');
+    expect(manager).toContain('jobsTotal: canonicalRows.length');
+  });
+
+  it('guards superseded-media deletion behind a verified replacement package', () => {
+    const cleanup = read('scripts/course-builder/retire-superseded-course-media.ts');
+    expect(cleanup).toContain("args.includes('--execute')");
+    expect(cleanup).toContain('if (!media.completePackage)');
+    expect(cleanup).toContain('Refusing to retire media from a published or active course');
+    expect(cleanup).toContain("storage.from('course-videos').remove");
+    expect(cleanup).toContain(".eq('asset_kind', 'lesson')");
+  });
+
   it('keeps ESB acceptance fixed to 35 lesson videos and 70 microclips', () => {
     const acceptance = read('scripts/course-factory/build-esb-acceptance.ts');
     expect(acceptance).toContain('EXPECTED_MAIN_VIDEOS = 35');
@@ -146,7 +287,7 @@ describe('canonical Course Factory media architecture', () => {
   it('uses bounded course-scoped recovery for Business acceptance without replacing completed assets', () => {
     const acceptance = read('scripts/course-factory/build-business-program.ts');
     expect(acceptance).toContain('recoverCourseMediaJobs({ courseId })');
-    expect(acceptance).not.toContain("recoverCourseMediaJobs({ courseId, force: true })");
+    expect(acceptance).not.toContain('recoverCourseMediaJobs({ courseId, force: true })');
     expect(acceptance).toContain('Authorized media recovery left blocked jobs');
     expect(acceptance).toContain('EXPECTED_MAIN_VIDEOS = 35');
     expect(acceptance).toContain('EXPECTED_MICROCLIPS = 70');
@@ -157,7 +298,8 @@ describe('canonical Course Factory media architecture', () => {
     const renderer = read('lib/video/remotion-render.ts');
     expect(worker).not.toContain('ENABLE_DIRECT_GPU_MICROCLIPS');
     expect(renderer).not.toContain('ENABLE_GPU_INSTRUCTIONAL_SCENES');
-    expect(renderer).toContain('const canGenerateMotion = await gpuVideoAvailable()');
+    expect(renderer).toContain('enabled(process.env.ENABLE_GPU_LESSON_SCENES)');
+    expect(renderer).toContain('enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR)');
     expect(worker).toContain('const result = await renderStoryboardVideo');
   });
 
@@ -170,10 +312,12 @@ describe('canonical Course Factory media architecture', () => {
   it('uses Supabase resumable uploads instead of retrying a 413 whole-file request', () => {
     const uploader = read('lib/video/upload-lesson-media.ts');
     expect(uploader).toContain('/storage/v1/upload/resumable');
-    expect(uploader).toContain("'Tus-Resumable': '1.0.0'");
-    expect(uploader).toContain("'Content-Type': 'application/offset+octet-stream'");
-    expect(uploader).toContain('SUPABASE_TUS_CHUNK_BYTES = 6 * 1024 * 1024');
-    expect(uploader).toContain('resumableOffset');
+    expect(uploader).toContain('uploadSupabaseResumable');
+    const transport = read('lib/video/supabase-resumable-upload.mjs');
+    expect(transport).toContain("'Tus-Resumable':'1.0.0'");
+    expect(transport).toContain("'Content-Type':'application/offset+octet-stream'");
+    expect(transport).toContain('CHUNK_BYTES = 6 * 1024 * 1024');
+    expect(transport).toContain('offsetOf');
   });
 
   it('classifies terminal failures and records dead-letter state', () => {
@@ -195,21 +339,22 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain("mode: 'refresh'");
     expect(acceptance).toContain("contentSource: 'ai'");
     expect(acceptance).not.toContain("mode: 'replace'");
-    expect(acceptance).toContain("build.courseId !== COURSE_ID");
+    expect(acceptance).toContain('build.courseId !== COURSE_ID');
   });
 
-  it('uses the same Course Factory media state in Studio and ESB acceptance', () => {
+  it('keeps Studio on Ultimate status and retains archived ESB media compatibility', () => {
     const executor = read('lib/agentic/course-executor.ts');
     const acceptance = read('scripts/course-factory/build-esb-acceptance.ts');
-    expect(executor).toContain('getCourseMediaState');
+    expect(executor).toContain('DevStudioUltimateCourseControl');
+    expect(executor).toContain('Ultimate owns media acquisition, narration, rendering and media QA inside the build.');
     expect(acceptance).toContain('getCourseMediaState');
     expect(executor).not.toMatch(/async function courseMediaState\s*\(/);
   });
 
   it('blocks Studio publication until canonical media is complete', () => {
     const executor = read('lib/agentic/course-executor.ts');
-    expect(executor).toContain('if (!media.completePackage)');
-    expect(executor).toContain('Publication blocked: canonical media package incomplete');
+    expect(executor).toContain("if (task.worker === 'publisher')");
+    expect(executor).toContain('Publication is owned by UltimateLmsPublisher after Ultimate release evidence is complete.');
   });
 
   it('publishes ESB only through the canonical persisted Course Builder publisher', () => {
@@ -217,4 +362,82 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('publishPersistedCourseWithClient');
     expect(acceptance).not.toContain('publish_course_from_staging');
   });
+  it('locks repository voice and licensed media policy in Course Builder jobs', () => {
+    const media = read('lib/course-factory/media-service.ts');
+    const renderer = read('lib/video/process-video-job.ts');
+    const narration = read('lib/video/edge-tts.ts');
+    expect(media).toContain("locked_by: 'course_builder'");
+    expect(media).toContain("strategy: 'repository_voice'");
+    expect(media).toContain('allow_paid_provider: allowPaidNarration');
+    expect(media).toContain("strategy: 'repository_voice'");
+    expect(media).toContain("strategy: 'licensed_envato_then_existing'");
+    expect(media).toContain("strategy: 'licensed_envato_then_existing_then_generated'");
+    expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
+    expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
+    expect(renderer).toContain('Course Builder narration is self-hosted Kokoro.');
+    expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
+    expect(narration).toContain('const provider = configuredNarrationProvider()');
+    expect(narration).toContain("provider === 'cloudflare'");
+    expect(narration).toContain("if (env.NODE_ENV === 'production') return 'kokoro'");
+  });
+  it('uses the strict credential lesson contract as a production completion gate', () => {
+    const gate = read('lib/course-factory/canonical-course-gate.ts');
+    const readiness = read('lib/course-package/readiness.ts');
+    const adapter = read('lib/course-package/from-course-session.ts');
+    expect(gate).toContain('CanonicalCredentialLessonSchema.safeParse');
+    expect(gate).toContain('strictCredentialLessonFindings');
+    expect(readiness).toContain('CourseExperienceSchema.safeParse(exp)');
+    expect(readiness).not.toContain('CourseExperienceSchema.partial().safeParse(exp)');
+    expect(adapter).toContain('lesson.scene_data');
+    expect(adapter).toContain('practicalRequired: lesson.practical_required === true');
+  });
+
+  it('does not equate media approval with credential lesson completion', () => {
+    const queue = read('lib/video/job-queue.ts');
+    expect(queue).toContain('evaluatePersistedCredentialLesson');
+    expect(queue).toContain("generation_status: 'generating'");
+    expect(queue).toContain("generation_status: 'generated'");
+    expect(queue.indexOf('evaluatePersistedCredentialLesson')).toBeLessThan(
+      queue.lastIndexOf("generation_status: 'generated'"),
+    );
+    expect(queue).toContain('automated_media_quality_gate');
+  });
+
+  it('rejects backward replay and preserves licensed-source provenance', () => {
+    const quality = read('lib/video/media-quality-gate.ts');
+    const director = read('lib/video/media-director.ts');
+    const renderer = read('lib/video/process-video-job.ts');
+    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v8'");
+    expect(quality).toContain('detectBackwardTimelineReplay');
+    expect(quality).toContain('backwardTimelineJumpDetected');
+    expect(quality).toContain('licenseEvidenceCoverage');
+    expect(director).toContain('sourceLicenseEvidenceUrl');
+    expect(renderer).toContain('licensed_media_entitlements');
+    expect(renderer).toContain('source_license_evidence_url');
+  });
+
+  it('wakes the canonical video worker from Supabase cron instead of relying only on GitHub cron', () => {
+    const migration = read(
+      'supabase/migrations/20260925104000_course_video_worker_supabase_schedule.sql',
+    );
+    expect(migration).toContain('course-video-worker-every-minute');
+    expect(migration).toContain('private.wake_course_video_worker');
+    expect(migration).toContain('/api/internal/videos/process-queue');
+  });
+
+  it('keeps Stripe and checkout payment flows out of Course Builder generation', () => {
+    const runtimeFiles = [
+      'lib/course-builder/orchestrator.ts',
+      'lib/course-builder/build-lifecycle.ts',
+      'lib/course-factory/factory.ts',
+      'lib/course-factory/publisher.ts',
+      'lib/course-factory/canonical-course-gate.ts',
+      'lib/course-factory/persisted-authored-upgrade.ts',
+    ];
+    for (const file of runtimeFiles) {
+      const source = read(file);
+      expect(source).not.toMatch(/stripe|payment_intent|checkout_session|stripe_checkout/i);
+    }
+  });
+
 });

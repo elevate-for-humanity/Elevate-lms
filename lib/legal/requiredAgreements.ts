@@ -17,9 +17,29 @@ export interface RequiredAgreement {
   documentUrl: string;
 }
 
+export const APPRENTICESHIP_AGREEMENT: RequiredAgreement = {
+  type: 'apprenticeship_agreement',
+  version: '1.0',
+  title: 'Apprenticeship Agreement',
+  description: 'Program terms, supervised work requirements, wage records, related instruction, and apprentice responsibilities',
+  documentUrl: '/lms/legal/apprenticeship-agreement',
+};
+
+export function isApprenticeshipProgram(programSlug?: string | null): boolean {
+  return /apprentice|barber|cosmetology|esthetic|manicur|nail-technician/i.test(programSlug || '');
+}
+
+export function getRequiredAgreementsForProgram(role: string, programSlug?: string | null): RequiredAgreement[] {
+  const agreements = getRequiredAgreements(role);
+  return isApprenticeshipProgram(programSlug)
+    ? [...agreements, APPRENTICESHIP_AGREEMENT]
+    : agreements;
+}
+
 export type UserRole =
   | 'student'
   | 'program_holder'
+  | 'site_coordinator'
   | 'employer'
   | 'staff'
   | 'admin'
@@ -76,6 +96,16 @@ export const REQUIRED_AGREEMENTS: Record<UserRole, RequiredAgreement[]> = {
       version: '1.0',
       title: 'Program Holder MOU',
       description: 'Memorandum of Understanding for program delivery partnership',
+      documentUrl: '/legal/program-holder-mou',
+    },
+  ],
+
+  site_coordinator: [
+    {
+      type: 'program_holder_mou',
+      version: '1.0',
+      title: 'Site Coordinator MOU',
+      description: 'Memorandum of Understanding for regional program coordination responsibilities',
       documentUrl: '/legal/program-holder-mou',
     },
   ],
@@ -207,7 +237,7 @@ export const PROTECTED_ROUTES: Record<string, UserRole[]> = {
   '/lms': ['student', 'instructor', 'admin', 'staff', 'super_admin'],
   '/student-portal': ['student'],
   '/lms/dashboard': ['student'],
-  '/program-holder': ['program_holder'],
+  '/program-holder': ['program_holder', 'site_coordinator'],
   '/employer': ['employer'],
   '/admin/staff-portal': ['staff', 'admin', 'super_admin'],
   '/admin': ['admin', 'super_admin'],

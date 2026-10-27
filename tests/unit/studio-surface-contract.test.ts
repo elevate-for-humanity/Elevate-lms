@@ -6,6 +6,13 @@ const root = process.cwd();
 const source = (relativePath: string) => readFileSync(path.join(root, relativePath), 'utf8');
 
 describe('Admin Dashboard and Studio surface contract', () => {
+  it('registers implemented top-level Studio operations pages in navigation', () => {
+    const registry = source('lib/devstudio/workspace-registry.ts');
+    for (const route of ['/studio/agents', '/studio/builds', '/studio/logs']) {
+      expect(registry).toContain(`route: '${route}'`);
+    }
+  });
+
   it('keeps one canonical Admin Dashboard and Studio route', () => {
     const contracts = JSON.parse(source('lib/routes/platform-surface-contracts.json'));
 
@@ -20,23 +27,44 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(nextConfig).not.toContain("source: '/admin'");
     expect(nextConfig).not.toContain("source: '/admin/");
     expect(nextConfig).not.toContain("source: '/dev-studio/:path*'");
-    expect(middleware).toContain("const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio']");
+    expect(middleware).toContain(
+      "const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio']",
+    );
     expect(middleware).toContain("pathname === '/admin/dashboard'");
     expect(middleware).toContain("pathname === '/admin' || pathname.startsWith('/admin/')");
   });
 
-  it('uses the single canonical Course Builder route from the Studio UI', () => {
-    const builder = source('components/course/AutomaticCourseBuilder.tsx');
-    const client = source('components/admin/course-builder/runCourseFactoryPipeline.ts');
+  it('uses Ultimate Course Builder as the single production generator', () => {
     const unified = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+    const ultimateRoute = source('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
+    const legacyRoute = source('apps/admin/app/api/admin/course-builder/route.ts');
 
-    expect(builder).toContain('runCourseFactoryPipeline');
-    expect(client).toContain("fetch('/api/admin/course-builder'");
-    expect(client).not.toContain('/api/admin/course-builder/pipeline');
-    expect(unified).toContain("fetch('/api/admin/course-builder?action=blueprints'");
-    expect(unified).not.toContain('/api/admin/course-builder/generate-from-blueprint');
-    expect(builder).not.toContain('/api/admin/courses/generate');
-    expect(builder).not.toContain('/api/ai/generate-and-publish-course');
+    expect(unified).toContain('/api/admin/ultimate-course-builder');
+    expect(unified).toContain("action: 'queue-course'");
+    expect(unified).toContain('Legacy Course Factory is archived');
+    expect(unified).not.toContain('runCourseFactoryPipeline');
+    expect(ultimateRoute).toContain('UltimateJobQueue');
+    expect(ultimateRoute).toContain("body.action === 'queue-course'");
+    expect(legacyRoute).toContain('COURSE_FACTORY_ARCHIVED');
+    expect(legacyRoute).toContain('{ status: 410 }');
+  });
+
+  it('provides shared voice control without bypassing course-generation confirmation', () => {
+    const builder = source('components/course/AutomaticCourseBuilder.tsx');
+    const chat = source('components/studio/UnifiedEllieChat.tsx');
+    const dictation = source('components/voice/VoiceDictationButton.tsx');
+    const dashboard = source('components/admin/dashboard/DashboardVoiceAssistant.tsx');
+
+    expect(builder).toContain('VoiceDictationButton');
+    expect(builder).toContain('Review Course Request');
+    expect(builder).toContain('Confirm &amp; generate');
+    expect(builder).not.toContain('onTranscript={generate}');
+    expect(chat).toContain('createBrowserSpeechRecognition');
+    expect(dictation).toContain('createBrowserSpeechRecognition');
+    expect(dictation).not.toContain('onTranscript(transcript)');
+    expect(dictation).toContain('callbackRef.current(transcript)');
+    expect(dashboard).toContain('<UnifiedEllieChat');
+    expect(dashboard).toContain('Talk to Admin AI');
   });
 
   it('uses the canonical workflow API from dashboard and Studio panels', () => {
@@ -57,4 +85,285 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(panel).toContain("fetch('/api/admin/dev-studio/chat'");
     expect(panel).not.toContain('/api/admin/studio/');
   });
+
+  it('routes commercial generation through the live Media Studio endpoint', () => {
+    const registry = source('lib/ai/tools/registry.ts');
+    const commercialRoute = source('apps/admin/app/api/admin/media-studio/commercial/route.ts');
+
+    expect(registry).toContain("name: 'video.generate'");
+    expect(registry).toContain("path: '/api/admin/media-studio/commercial'");
+    expect(registry).not.toContain("path: '/api/video/generate'");
+    expect(commercialRoute).toContain("z.enum(['plan', 'revise', 'render'])");
+    expect(commercialRoute).toContain('renderCommercialVideo(plan, brief)');
+  });
+
+  it('keeps organization lookup separate from protected student search', () => {
+    const registry = source('lib/ai/tools/registry.ts');
+    const planner = source('lib/ai/tools/planner.ts');
+    const execute = source('apps/admin/app/api/admin/dev-studio/execute/route.ts');
+
+    expect(registry).toContain("name: 'organization.directory'");
+    expect(planner).toContain("name: 'organization.directory'");
+    expect(execute).toContain("toolName === 'organization.directory'");
+    expect(execute).toContain("'students.search': 'Student records were found.");
+  });
+
+  it('enforces production confirmation at server execution boundaries', () => {
+    const shell = source('apps/admin/app/api/admin/dev-studio/shell/route.ts');
+    const files = source('apps/admin/app/api/admin/dev-studio/files/route.ts');
+    const builds = source('apps/admin/app/api/admin/dev-studio/builds/route.ts');
+    const services = source('apps/admin/app/api/admin/dev-studio/services/route.ts');
+    const environment = source('apps/admin/app/api/admin/dev-studio/env/route.ts');
+
+    expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
+    expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
+    expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
+    expect(builds).toContain("deploymentProvider: 'google-cloud-run'");
+    expect(builds).toContain('dispatchGoogleDeployment(service)');
+    expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
+    expect(environment).toContain(
+      "requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')",
+    );
+  });
+
+  it('preflights the isolated browser runtime before enabling Chromium', () => {
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(workspace).toContain(
+      "fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })",
+    );
+    expect(workspace).toContain('disabled={runtimeReady !== true || !target.trim()}');
+    expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
+  });
+
+  it('pauses the canonical browser task when the worker detects provider authentication', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const worker = source('services/studio-browser/server.mjs');
+    expect(worker).toContain("BrowserServiceError('authentication_required', 409");
+    expect(route).toContain("actionMetrics.error === 'authentication_required'");
+    expect(route).toContain(
+      "mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction'",
+    );
+    expect(route).toContain("snapshot.error === 'interaction_required'");
+    expect(route).toContain("emit({ type: 'interaction_required'");
+    expect(route).toContain('pauseForAuthentication(');
+  });
+
+  it('continues the same browser task from its durable checkpoint instead of failing at the request batch limit', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(route).not.toContain('AI browser reached the 20-step safety limit');
+    expect(route).toContain('continueFromCheckpoint');
+    expect(route).toContain("type: 'continue'");
+    expect(workspace).toContain('setContinuationTaskId(canonicalTaskId)');
+    expect(workspace).toContain('void runAgent(taskId)');
+    expect(workspace).toContain('continuationTaskId !== activeTaskId');
+  });
+
+  it('reconnects expired sessions only after verifying the administrator owns the live browser', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(route).toContain('/identity');
+    expect(route).toContain('identity?.ownerId !== auth.id');
+    expect(route).toContain('browserTaskMatches(task, { command, sessionId: priorSessionId })');
+    expect(route).toContain(".eq('requested_by', auth.id)");
+    expect(workspace).toContain('response?.status === 410');
+    expect(workspace).toContain('lifecycle !== lifecycleRef.current');
+  });
+
+  it('binds browser evidence to the canonical task identity for the full stream', () => {
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const tasks = source('apps/admin/app/studio/tasks/TasksClient.tsx');
+    expect(route).toContain("'X-Studio-Task-Id': taskId");
+    expect(workspace).toContain("response.headers.get('x-studio-task-id')");
+    expect(workspace).toContain('event.taskId !== canonicalTaskId');
+    expect(workspace).toContain('AI browser task identity changed during execution');
+    expect(tasks).toContain('Task ID: {task.id}');
+    expect(tasks).toContain('Trace ID: ${task.trace_id}');
+    expect(tasks).not.toContain('{task.trace_id || task.id}');
+  });
+
+  it('keeps core Studio available when only GitHub repository writes are unavailable', () => {
+    const health = source('lib/devstudio/health-handler.ts');
+    const panel = source('components/studio/DevStudioHealthPanel.tsx');
+    expect(health).toContain('const githubToken = await getGitHubToken()');
+    expect(health).toContain('repositoryWritesReady: githubTokenValid');
+    expect(health).toContain('ready: executionPrerequisitesReady');
+    expect(panel).toContain(
+      "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
+    );
+    expect(panel).toContain("'Repository writes'");
+    expect(panel).toContain('connected GitHub plugin is separate');
+  });
+
+  it('opens the Studio browser container directly and preserves mobile task width', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const tasks = source('apps/admin/app/studio/tasks/TasksClient.tsx');
+    expect(workspace).toContain("setSurface('browser')");
+    expect(workspace).toContain('data-studio-root="unified"');
+    expect(tasks).toContain('flex min-w-0 flex-col gap-4 sm:flex-row');
+    expect(tasks).toContain('w-full min-w-0 flex-1 overflow-hidden');
+  });
+
+  it('does not advertise the unconnected Live Canvas without its feature flag', () => {
+    const registry = source('lib/devstudio/workspace-registry.ts');
+    expect(registry).toContain("route: '/studio/canvas'");
+    expect(registry).toContain("featureFlag: 'LIVE_CANVAS_ENABLED'");
+  });
+
+  it('keeps live preview and isolated browser inspection beside Admin AI', () => {
+    const page = source('apps/admin/app/studio/page.tsx');
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+
+    expect(page).toContain('StudioCommandWorkspace');
+    expect(workspace).toContain('<UnifiedEllieChat');
+    expect(workspace).toContain('<RepositoryLivePreview');
+    expect(workspace).toContain('<CloudBrowserWorkspace');
+    expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
+    expect(workspace).toContain(
+      "type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability'",
+    );
+  });
+
+  it('mounts the first-party Course Builder directly instead of framing it', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const courseBuilder = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+
+    expect(workspace).toContain("import('@/components/admin/course-builder/UnifiedCourseBuilder')");
+    expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
+    expect(courseBuilder).toContain('embedded?: boolean');
+    expect(courseBuilder).toContain('syncLocationWithUrl = !embedded');
+    expect(courseBuilder).toContain('if (!syncLocationWithUrl) return;');
+  });
+
+  it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const chat = source('components/studio/UnifiedEllieChat.tsx');
+    const upload = source('apps/admin/app/api/admin/dev-studio/upload/route.ts');
+    const plan = source('apps/admin/app/api/admin/dev-studio/plan/route.ts');
+
+    expect(workspace).toContain(
+      "type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser'",
+    );
+    expect(workspace).toContain('buildConversationWorkspaceUrl');
+    expect(workspace).toContain("url.searchParams.set('studioConversationId', conversationId)");
+    expect(workspace).toContain("url.searchParams.set('studioTaskId', taskId)");
+    expect(workspace).toContain('workspaces.some((workspace) => workspace.id === id)');
+    expect(workspace).not.toContain('Choose AI agent');
+    expect(workspace).not.toContain("(['ELLIE', 'LIZZY', 'PARIS'] as const)");
+    expect(workspace).toContain("onOpenTasks={() => openCapability('tasks')}");
+    expect(workspace).not.toContain('href={workspace.route}');
+    expect(chat).toContain('Studio document ID: ${documentId}');
+    expect(chat).not.toContain('Authorized source URL: ${result.url}');
+    expect(upload).toContain('extracted_text: contentPreview || null');
+    expect(plan).toContain(
+      ".select('id,name,original_name,content_type,size_bytes,extracted_text,extraction_status')",
+    );
+    expect(plan).toContain('conversationId');
+    expect(source('apps/admin/app/api/admin/dev-studio/tasks/route.ts')).toContain(
+      "query = query.eq('conversation_id', conversationId)",
+    );
+    expect(source('apps/admin/app/studio/tasks/TasksClient.tsx')).toContain('window.setInterval');
+    const tasksPage = source('apps/admin/app/studio/tasks/page.tsx');
+    expect(tasksPage).toContain('StudioCommandWorkspace');
+    expect(tasksPage).toContain('initialWorkspace="tasks"');
+    expect(tasksPage).not.toContain('redirect(');
+    expect(workspace).toContain('onConversationChange={setActiveConversationId}');
+    expect(workspace).toContain('conversationId={activeConversationId}');
+    expect(workspace).toContain('studio_run_id');
+    expect(workspace).toContain("'/studio/courses'");
+    expect(workspace).toContain('allowManualTarget={false}');
+    expect(chat).toContain('This conversation’s live work');
+    expect(chat).toContain("window.dispatchEvent(new CustomEvent('studio:task-approved'");
+    expect(source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts')).toContain(
+      'conversationId: conversationId || undefined',
+    );
+    expect(source('apps/admin/app/api/admin/dev-studio/browser/session/route.ts')).toContain(
+      'conversationId:',
+    );
+    expect(source('components/studio/CloudBrowserWorkspace.tsx')).toContain(
+      'conversationId: conversationId || undefined',
+    );
+  });
+
+  it('commits only finalized browser speech results to the composer', () => {
+    const chat = source('components/studio/UnifiedEllieChat.tsx');
+    expect(chat).toContain('recognition.interimResults = false');
+    expect(chat).toContain('event.results[index].isFinal !== false');
+  });
+
+  it('does not frame the full-screen Studio command workspace twice', () => {
+    const navigation = source('apps/admin/app/studio/StudioNavigation.client.tsx');
+    const chrome = source('components/admin/AdminApplicationChrome.tsx');
+    const globalStyles = source('apps/admin/app/globals.css');
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const page = source('apps/admin/app/studio/page.tsx');
+    const layout = source('apps/admin/app/studio/layout.tsx');
+
+    expect(navigation).toContain('usePathname');
+    expect(navigation).toContain('useSearchParams');
+    expect(navigation).toContain("pathname === '/studio'");
+    expect(navigation).toContain("searchParams.get('embedded') === 'studio'");
+    expect(chrome).toContain('admin-studio-viewport min-h-0 min-w-0 flex-1 overflow-hidden');
+    expect(chrome).toContain('flex h-dvh min-w-0 flex-col overflow-hidden');
+    expect(globalStyles).toContain('.admin-studio-viewport > section');
+    expect(globalStyles).not.toContain('.admin-studio-viewport section');
+    expect(globalStyles).not.toContain('.admin-studio-viewport main,');
+    expect(globalStyles).toContain('padding: 0 !important');
+    expect(workspace).toContain('className="flex h-full min-h-0');
+    expect(workspace).not.toContain('h-[100dvh]');
+    expect(page).toContain('className="h-full w-full');
+    expect(page).not.toContain('h-[100dvh]');
+    expect(layout).toContain('className="flex h-full');
+    expect(layout).not.toContain('h-dvh');
+  });
+
+  it('requires durable evidence before engineering, CI, deployment, or browser verification passes', () => {
+    const evaluator = source('lib/platform/orchestration/evaluator.ts');
+    expect(evaluator).toContain("tool === 'openhands.execute'");
+    expect(evaluator).toContain("tool === 'workflows.runTests'");
+    expect(evaluator).toContain("tool === 'deployments.autopilot'");
+    expect(evaluator).toContain("tool === 'browser.execute'");
+    expect(evaluator).toContain('Generic success flags are not verification');
+  });
+
+  it('greets Store visitors with the PARIS product interview', () => {
+    const wrapper = source('apps/marketing/app/store/StoreClientWrapper.tsx');
+    const guide = source('components/store/StoreGuideChat.tsx');
+    expect(wrapper).toContain(
+      "forceOpen={pathname === '/store' || pathname === '/store/apps/website-builder'}",
+    );
+    expect(guide).toContain("I'll start with a quick interview");
+    expect(guide).toContain('Let PARIS interview you');
+    expect(guide).toContain("useState<'recommend' | 'chat'>('chat')");
+    expect(guide).toContain('Guided interview');
+    expect(guide).toContain('aria-label="Minimize PARIS"');
+  });
+
+  it('consolidates the legacy testing screen into the governed Testing Center', () => {
+    const legacy = source('apps/admin/app/testing/page.tsx');
+    const canonical = source('apps/admin/app/testing-center/page.tsx');
+
+    expect(legacy).toContain("redirect('/testing-center')");
+    expect(legacy).not.toContain("from('testing_sessions')");
+    expect(canonical).toContain("from('exam_bookings')");
+    expect(canonical).toContain("from('exam_sessions')");
+    expect(canonical).toContain("from('testing_slots')");
+  });
+
+  it('does not duplicate the Course Builder under multiple program labels', () => {
+    const programs = source('apps/admin/app/programs/page.tsx');
+
+    expect(programs.match(/href="\/studio\/courses"/g)).toHaveLength(1);
+    expect(programs).not.toContain('>Program Builder<');
+    expect(programs).toContain('>Course Library<');
+  });
+
+  it('validates GitHub credentials before declaring repository writes ready', () => {
+    const health = source('lib/devstudio/health-handler.ts');
+    expect(health).toContain("fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main'");
+    expect(health).toContain("redirect: 'error'");
+    expect(health).toContain('repositoryWritesReady: githubTokenValid');
+  });
 });
+

@@ -31,7 +31,7 @@ export default function PaymentOptions({ price, programName }: Props) {
         <div className="rounded-xl border p-4">
           <div className="font-semibold">Pay in 4 (If Available)</div>
           <div className="mt-1 text-sm text-black">
-            {BNPL_PROVIDER_NAMES} (availability depends on Stripe settings, purchase amount, and
+            {BNPL_PROVIDER_NAMES} (availability depends on QuickBooks settings, purchase amount, and
             eligibility).
           </div>
           <ul className="mt-2 list-disc pl-5 text-sm text-black">
@@ -61,7 +61,7 @@ export default function PaymentOptions({ price, programName }: Props) {
       <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-black">
         <div className="font-medium">Note:</div>
         <div className="mt-1">
-          Pay-over-time options show automatically at checkout if they're enabled in Stripe and
+          Pay-over-time options show automatically at checkout if they're enabled in QuickBooks and
           supported for your cart. If you don't see them, it usually means that option isn't
           available for that purchase amount or eligibility.
         </div>

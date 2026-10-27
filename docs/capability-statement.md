@@ -108,7 +108,7 @@ The system is designed to align with WIOA (Title I), DOL Registered Apprenticesh
 | Hair Stylist                        | 154       | 2Exclusive LLC-S     | 206251    |
 | Barber                              | 260       | Elevate for Humanity | 208029    |
 | Esthetician                         | 300       | Elevate for Humanity | 208029    |
-| Nail Tech                           | 200       | Elevate for Humanity | 208029    |
+| Nail Tech / Manicurist              | 210       | Elevate for Humanity | 208029    |
 | Youth Culinary                      | 144       | Elevate for Humanity | 208029    |
 
 ---

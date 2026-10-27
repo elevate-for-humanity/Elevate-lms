@@ -86,8 +86,8 @@ export default async function ReelsPage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply" className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition">Apply Now</Link>
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`} className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition">
-              <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9+]/g, '')}`} className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition">
+              <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { respondToParisMail } from '@/lib/email/paris-mail';
 import { logger } from '@/lib/logger';
 // PUBLIC ROUTE: SendGrid inbound webhook
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,6 +8,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { storeInboundCommunicationEmail } from '@/lib/email/communication-inbound';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -52,8 +54,24 @@ async function _POST(request: NextRequest) {
     }
 
     if (!confident) {
-      logger.error('[SendGrid Inbound] Cannot verify idempotency — rejecting for retry', undefined, { eventId });
+      logger.error(
+        '[SendGrid Inbound] Cannot verify idempotency — rejecting for retry',
+        undefined,
+        { eventId },
+      );
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
+    }
+
+    const workspaceDelivery = await storeInboundCommunicationEmail(parsed);
+    if(workspaceDelivery.filtered){await finalizeWebhookEvent('sendgrid-inbound',eventId,'processed');return NextResponse.json({ok:true,filtered:true});}
+    if (workspaceDelivery.stored) {
+      await respondToParisMail(parsed);
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
+      logger.info('[SendGrid Inbound] Stored in Elevate Email', {
+        eventId,
+        mailboxCount: workspaceDelivery.mailboxCount,
+      });
+      return NextResponse.json({ ok: true, stored: true });
     }
 
     const forwardTo = resolveForwardTarget(to);
@@ -71,12 +89,7 @@ async function _POST(request: NextRequest) {
 
     if (!result.success) {
       logger.error('[SendGrid Inbound] Forward failed:', result.error);
-      await finalizeWebhookEvent(
-        'sendgrid-inbound',
-        eventId,
-        'errored',
-        String(result.error),
-      );
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'errored', String(result.error));
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
@@ -84,7 +97,11 @@ async function _POST(request: NextRequest) {
     logger.info('[SendGrid Inbound] Forwarded successfully', { forwardTo, subject });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    logger.error('[SendGrid Inbound] Webhook error', normalizeError(err, 'SendGrid webhook error'), getErrorContext(err));
+    logger.error(
+      '[SendGrid Inbound] Webhook error',
+      normalizeError(err, 'SendGrid webhook error'),
+      getErrorContext(err),
+    );
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 /**
  * cosmetology Blueprint
- * 
+ *
  * © 2026 Elevate for Humanity
  * All Rights Reserved
  *
@@ -43,18 +43,19 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
   expectedLessonCount: 40,
 
   videoConfig: {
-    videoGenerator: 'runway',
-    template: 'elevate-slide',
-    instructorName: 'Maria Santos',
-    instructorTitle: 'Instructor',
-    instructorImagePath: 'https://example.com/default-instructor.jpg',
+    videoGenerator: 'remotion',
+    template: 'trade-demonstration',
+    instructorId: 'avery-brooks',
+    instructorName: 'Avery Brooks',
+    instructorTitle: 'Cosmetology Education Specialist',
+    instructorImagePath: '/images/team/instructors/instructor-beauty.jpg',
     topBarColor: '#9333ea',
     accentColor: '#c084fc',
     backgroundColor: '#1e1b4b',
     ttsVoice: 'shimmer',
     ttsSpeed: 0.95,
     slideCount: 5,
-    segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
+    segments: ['objective', 'safety', 'procedure', 'correct-vs-incorrect', 'practice', 'knowledge-check'],
     generateDalleImage: true,
     dalleImageStyle: 'natural',
     width: 1920,
@@ -62,8 +63,20 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
   },
 
   assessmentRules: [
-    { assessmentType: 'module', scope: 'all', minQuestions: 5, maxQuestions: 10, passingThreshold: 0.7 },
-    { assessmentType: 'final', scope: 'all', minQuestions: 25, maxQuestions: 50, passingThreshold: 0.75 },
+    {
+      assessmentType: 'module',
+      scope: 'all',
+      minQuestions: 5,
+      maxQuestions: 10,
+      passingThreshold: 0.7,
+    },
+    {
+      assessmentType: 'final',
+      scope: 'all',
+      minQuestions: 25,
+      maxQuestions: 50,
+      passingThreshold: 0.75,
+    },
   ],
 
   modules: [
@@ -456,9 +469,7 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
       quizRequired: false,
       practicalRequired: true,
       isCritical: true,
-      requiredLessonTypes: [
-        { lessonType: 'exam', requiredCount: 1 },
-      ],
+      requiredLessonTypes: [{ lessonType: 'exam', requiredCount: 1 }],
       competencies: [],
       lessons: [
         {

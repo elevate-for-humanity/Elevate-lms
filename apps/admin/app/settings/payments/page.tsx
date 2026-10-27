@@ -7,17 +7,16 @@ import SettingsFormClient, { SettingsField } from '@/components/admin/settings/S
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Payments | Admin Settings' };
 
-const KEYS = ['stripe_mode', 'currency', 'payment_methods'];
+const KEYS = ['billing_provider', 'currency', 'payment_methods'];
 
 const FIELDS: SettingsField[] = [
   {
-    key: 'stripe_mode',
-    label: 'Stripe Mode',
-    description: 'Live or test mode for payment processing',
+    key: 'billing_provider',
+    label: 'Primary Billing Provider',
+    description: 'QuickBooks is the invoice and accounting ledger for every new billing plan.',
     type: 'select',
-    options: [
-      { value: 'test', label: 'Test' },
-      { value: 'live', label: 'Live' },
+        options: [
+      { value: 'quickbooks', label: 'QuickBooks — invoices and Pay Now links' },
     ],
   },
   {
@@ -35,17 +34,11 @@ const FIELDS: SettingsField[] = [
   {
     key: 'payment_methods',
     label: 'Payment Methods',
-    description: 'Enabled payment providers',
+    description: 'Collection and ledger services used by Admin billing schedules',
     type: 'select',
     options: [
-      { value: 'card',                  label: 'Card only' },
-      { value: 'stripe',                label: 'Stripe only' },
-      { value: 'card,affirm',           label: 'Card + Affirm (BNPL)' },
-      { value: 'card,sezzle',           label: 'Card + Sezzle (BNPL)' },
-      { value: 'card,affirm,sezzle',    label: 'Card + Affirm + Sezzle' },
-      { value: 'stripe,affirm',         label: 'Stripe + Affirm (BNPL)' },
-      { value: 'stripe,sezzle',         label: 'Stripe + Sezzle (BNPL)' },
-      { value: 'stripe,affirm,sezzle',  label: 'Stripe + Affirm + Sezzle' },
+      { value: 'quickbooks_invoice,paypal', label: 'PayPal automatic collection + QuickBooks ledger' },
+      { value: 'quickbooks_invoice,paypal,manual', label: 'PayPal automatic collection + QuickBooks ledger + manual invoice' },
     ],
   },
 ];
@@ -63,9 +56,9 @@ export default async function PaymentSettingsPage() {
   const initialValues: Record<string, string> = Object.fromEntries(
     (rows ?? []).map((r: any) => [r.key, r.value ?? '']),
   );
-  if (!initialValues['stripe_mode'])     initialValues['stripe_mode']     = 'test';
+  if (!initialValues['billing_provider']) initialValues['billing_provider'] = 'quickbooks';
   if (!initialValues['currency'])        initialValues['currency']        = 'USD';
-  if (!initialValues['payment_methods']) initialValues['payment_methods'] = 'card,affirm,sezzle';
+  if (!initialValues['payment_methods']) initialValues['payment_methods'] = 'quickbooks_invoice,paypal';
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
@@ -74,7 +67,7 @@ export default async function PaymentSettingsPage() {
           <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Payments
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment Settings</h1>
-        <p className="text-slate-500">Stripe configuration, payment methods, and currency.</p>
+        <p className="text-slate-500">Admin payment plans with PayPal automatic collection and QuickBooks invoicing.</p>
       </div>
 
       <SettingsFormClient
@@ -85,10 +78,10 @@ export default async function PaymentSettingsPage() {
       />
 
       <p className="text-xs text-slate-400 max-w-xl">
-        Stripe API keys are managed in{' '}
+        The Admin billing dashboard is the subscription authority. PayPal collects approved recurring payments, and QuickBooks records invoices, balances, and Pay Now links. Prior provider records remain read-only for reconciliation. Integration secrets are managed in{' '}
         <Link href="/settings/integrations" className="text-brand-blue-600 underline">
           Dev Studio → Secrets
-        </Link>. Webhook endpoints and price IDs live in the{' '}
+        </Link>. Connection settings live in the{' '}
         <Link href="/integrations/env-manager" className="text-brand-blue-600 underline">
           Env Manager
         </Link>.

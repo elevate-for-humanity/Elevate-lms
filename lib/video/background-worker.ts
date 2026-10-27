@@ -3,10 +3,11 @@ import 'server-only';
 import { logger } from '@/lib/logger';
 import { getSecret } from '@/lib/secrets';
 import { recoverCourseMediaJobs } from '@/lib/course-factory/media-manager';
+import { adaptiveBackoffMs } from '@/lib/resilience/adaptive-backoff';
 
 const START_DELAY_MS = 15_000;
 const TICK_DELAY_MS = 30_000;
-const ERROR_DELAY_MS = 60_000;
+const MAX_ERROR_DELAY_MS = 15 * 60_000;
 
 type WorkerGlobal = typeof globalThis & {
   __elevateAdminVideoWorkerStarted?: boolean;
@@ -47,11 +48,9 @@ async function kickCanonicalWorker(): Promise<void> {
 
   const text = await response.text();
   if (!response.ok) {
-    logger.warn('[video-background-worker] canonical worker tick rejected', {
-      status: response.status,
-      body: text.slice(0, 500),
-    });
-    return;
+    throw new Error(
+      `Canonical worker tick rejected with HTTP ${response.status}: ${text.slice(0, 500)}`,
+    );
   }
 
   logger.info('[video-background-worker] canonical worker tick accepted', {
@@ -63,17 +62,28 @@ async function kickCanonicalWorker(): Promise<void> {
 async function runLoop(): Promise<void> {
   await sleep(START_DELAY_MS);
   logger.info('[video-background-worker] Admin queue trigger loop started');
+  let consecutiveFailures = 0;
 
   for (;;) {
     try {
       await kickCanonicalWorker();
+      consecutiveFailures = 0;
       await sleep(TICK_DELAY_MS);
     } catch (error) {
+      consecutiveFailures += 1;
+      const delayMs = adaptiveBackoffMs(consecutiveFailures, {
+        baseDelayMs: TICK_DELAY_MS,
+        maxDelayMs: MAX_ERROR_DELAY_MS,
+      });
       logger.error(
         '[video-background-worker] trigger loop error',
         error instanceof Error ? error : new Error(String(error)),
       );
-      await sleep(ERROR_DELAY_MS);
+      logger.warn('[video-background-worker] database queue backing off', {
+        consecutiveFailures,
+        nextDelayMs: delayMs,
+      });
+      await sleep(delayMs);
     }
   }
 }

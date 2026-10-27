@@ -1,47 +1,26 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { listApprenticeInvoices } from '@/lib/billing/apprentice-invoice-batch';
+import { PaymentMethodsClient } from './PaymentMethodsClient';
 
-import { useState } from 'react';
-import { AccountBillingShell } from '@/components/billing/AccountBillingShell';
-import { Loader2, CreditCard } from 'lucide-react';
-import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 
-export default function AccountPaymentMethodsPage() {
-  const [loading, setLoading] = useState(false);
-
-  const openPortal = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/license/portal', { method: 'POST' });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <AccountBillingShell title="Payment methods">
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <CreditCard className="w-10 h-10 text-slate-400 mb-4" />
-        <p className="text-slate-600 text-sm mb-4">
-          Update cards and default payment method in the secure Stripe portal.
-        </p>
-        <button
-          type="button"
-          onClick={openPortal}
-          disabled={loading}
-          className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-700 disabled:opacity-60"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-          Manage payment methods
-        </button>
-        <p className="mt-6 text-sm text-slate-500">
-          Need a new plan?{' '}
-          <Link href="/store/plans" className="text-brand-blue-600 font-semibold hover:underline">
-            Compare plans
-          </Link>
-        </p>
-      </div>
-    </AccountBillingShell>
-  );
+export default async function AccountPaymentMethodsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/account/payment-methods');
+  const db = await requireAdminClient();
+  const [invoices, schedulesResult] = await Promise.all([
+    listApprenticeInvoices(db, user.id),
+    db.from('billing_schedules')
+      .select('id,product_name,amount_cents,cadence,status,collection_mode,provider_status,provider_approval_url')
+      .in('customer_external_key', [user.id, `user:${user.id}`])
+      .eq('provider', 'quickbooks')
+      .order('created_at', { ascending: false }),
+  ]);
+  if (schedulesResult.error) throw new Error('Could not load billing schedules.');
+  return <PaymentMethodsClient invoices={invoices} schedules={schedulesResult.data || []} />;
 }

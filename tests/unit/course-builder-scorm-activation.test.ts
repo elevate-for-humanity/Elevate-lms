@@ -16,8 +16,10 @@ describe('production SCORM export', () => {
   it('protects the export route and resolves the selected course dynamically', () => {
     expect(route).toContain('apiRequireAdmin');
     expect(route).toContain("searchParams.get('courseId')");
-    expect(route).toContain(".from('training_courses')");
-    expect(route).toContain(".from('training_lessons')");
+    expect(route).toContain('loadCourseSession(courseId)');
+    expect(route).toContain('coursePackageFromSession');
+    expect(route).toContain('evaluateCourseReadiness');
+    expect(route).not.toContain(".from('training_courses')");
     expect(route).toContain("'application/zip'");
   });
 

@@ -7,6 +7,9 @@ describe('Admin service worker navigation contract', () => {
     const worker = readFileSync(path.resolve('public/sw-admin.js'), 'utf8');
 
     expect(worker).toContain("if (request.mode === 'navigate') return;");
-    expect(worker).not.toContain("event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' })");
+    const navigationGuard = worker.indexOf("if (request.mode === 'navigate') return;");
+    const nextFetchHandler = worker.indexOf("event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' })");
+    expect(navigationGuard).toBeGreaterThan(-1);
+    expect(nextFetchHandler).toBeGreaterThan(navigationGuard);
   });
 });

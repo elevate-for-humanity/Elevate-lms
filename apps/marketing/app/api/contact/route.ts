@@ -35,15 +35,27 @@ const DemoScheduleSchema = z.object({
 });
 
 async function _POST(req: Request) {
+  const contentType = req.headers.get('content-type') || '';
+  const isNativeForm =
+    contentType.includes('application/x-www-form-urlencoded') ||
+    contentType.includes('multipart/form-data');
+
+  const redirectToContact = (status: 'submitted' | 'invalid' | 'error') =>
+    NextResponse.redirect(new URL(`/contact?${status === 'submitted' ? 'submitted=1' : `error=${status}`}`, req.url), 303);
+
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
-    // Parse and validate request body
-    const body = await req.json().catch(() => null);
+    // Accept JSON clients and the progressively enhanced public HTML form.
+    const body = isNativeForm
+      ? Object.fromEntries(await req.formData())
+      : await req.json().catch(() => null);
 
     if (!body) {
-      return NextResponse.json({ ok: false, error: 'Invalid request body' }, { status: 400 });
+      return isNativeForm
+        ? redirectToContact('invalid')
+        : NextResponse.json({ ok: false, error: 'Invalid request body' }, { status: 400 });
     }
 
     // Verify Turnstile token server-side if provided
@@ -102,6 +114,7 @@ async function _POST(req: Request) {
     const parsed = ContactSchema.safeParse(body);
 
     if (!parsed.success) {
+      if (isNativeForm) return redirectToContact('invalid');
       return NextResponse.json(
         {
           ok: false,
@@ -154,9 +167,12 @@ async function _POST(req: Request) {
 
     // Return success - form submission is valid even if DB save failed
     // Email notification serves as backup
-    return NextResponse.json({ ok: true, dbSaved });
+    return isNativeForm
+      ? redirectToContact('submitted')
+      : NextResponse.json({ ok: true, dbSaved });
   } catch (err) {
     logger.error('Contact API error:', err);
+    if (isNativeForm) return redirectToContact('error');
     return NextResponse.json(
       { ok: false, error: 'Something went wrong. Please try again.' },
       { status: 500 },

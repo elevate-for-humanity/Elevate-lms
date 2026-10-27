@@ -23,6 +23,7 @@ export type AppendixAStandard = {
   approach: 'competency-based';
   competencyCount: number;
   relatedInstructionHours: number;
+  totalOjlHours: number;
   apprenticeToMentorRatio: '1:1';
   probationaryHours: number;
   mentorHourlyRate: number;
@@ -65,6 +66,7 @@ export const APPENDIX_A_STANDARDS: Record<string, AppendixAStandard> = {
     approach: 'competency-based',
     competencyCount: 14,
     relatedInstructionHours: 260,
+    totalOjlHours: 2000,
     apprenticeToMentorRatio: '1:1',
     probationaryHours: 500,
     mentorHourlyRate: 10,
@@ -108,6 +110,7 @@ export const APPENDIX_A_STANDARDS: Record<string, AppendixAStandard> = {
     approach: 'competency-based',
     competencyCount: 20,
     relatedInstructionHours: 300,
+    totalOjlHours: 2000,
     apprenticeToMentorRatio: '1:1',
     probationaryHours: 500,
     mentorHourlyRate: 9.25,
@@ -158,6 +161,7 @@ export const APPENDIX_A_STANDARDS: Record<string, AppendixAStandard> = {
     approach: 'competency-based',
     competencyCount: 19,
     relatedInstructionHours: 210,
+    totalOjlHours: 2000,
     apprenticeToMentorRatio: '1:1',
     probationaryHours: 500,
     mentorHourlyRate: 15,

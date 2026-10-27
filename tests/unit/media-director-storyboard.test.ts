@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { directMedia } from '@/lib/video/media-director';
+import {
+  compactLegacySceneData,
+  directMedia,
+  MAX_LESSON_VIDEO_SCENES,
+} from '@/lib/video/media-director';
 import { buildStoryboardWebVtt } from '@/lib/video/remotion-render';
 
 describe('canonical media storyboard compatibility', () => {
@@ -18,8 +22,12 @@ describe('canonical media storyboard compatibility', () => {
     });
 
     expect(storyboard.scenes).toHaveLength(3);
-    expect(storyboard.scenes.every((scene) => scene.environment.includes('Cinematic small-business owner'))).toBe(true);
-    expect(storyboard.scenes.every((scene) => scene.durationSeconds === 15)).toBe(true);
+    expect(
+      storyboard.scenes.every((scene) =>
+        scene.environment.includes('Cinematic small-business owner'),
+      ),
+    ).toBe(true);
+    expect(storyboard.scenes.every((scene) => scene.durationSeconds === 90)).toBe(true);
   });
 
   it('keeps explicit structured scenes authoritative', () => {
@@ -45,6 +53,50 @@ describe('canonical media storyboard compatibility', () => {
   });
 });
 
+describe('lesson media production bounds', () => {
+  it('compacts all legacy scenes into ordered bounded segments without losing narration', () => {
+    const scenes = Array.from({ length: 77 }, (_, index) => ({
+      id: `legacy-${index + 1}`,
+      dialogue: `Narration sentence ${index + 1}.`,
+      action: `Demonstration ${index + 1}.`,
+      required_visual_evidence: `Evidence ${index + 1}.`,
+    }));
+    const result = compactLegacySceneData({ scenes, source_contract: { fingerprint: 'source-1' } });
+    expect(result.compacted).toBe(true);
+    expect(result.originalSceneCount).toBe(77);
+    expect(result.sceneData.source_contract).toEqual({ fingerprint: 'source-1' });
+    const compacted = result.sceneData.scenes as Array<Record<string, unknown>>;
+    expect(compacted).toHaveLength(MAX_LESSON_VIDEO_SCENES);
+    expect(compacted.map((scene) => String(scene.dialogue)).join(' ')).toContain(
+      'Narration sentence 77.',
+    );
+    expect(compacted[0]?.legacy_scene_range).toEqual({ start: 1, end: 7, count: 7 });
+    expect(compacted.at(-1)?.legacy_scene_range).toEqual({ start: 70, end: 77, count: 8 });
+  });
+
+  it('coalesces long scripts into eight narration-preserving scenes', () => {
+    const script = Array.from(
+      { length: 77 },
+      (_, i) => `Sentence ${i + 1} teaches required detail.`,
+    ).join(' ');
+    const storyboard = directMedia({ title: 'Bounded lesson', script });
+    expect(storyboard.scenes).toHaveLength(8);
+    expect(storyboard.scenes.map((scene) => scene.dialogue).join(' ')).toContain('Sentence 77');
+  });
+
+  it('rejects oversized persisted storyboards before narration or rendering', () => {
+    const scenes = Array.from({ length: MAX_LESSON_VIDEO_SCENES + 1 }, (_, i) => ({
+      id: `scene-${i + 1}`,
+      action: `Action ${i + 1}`,
+    }));
+    expect(() =>
+      directMedia({ title: 'Oversized', script: 'Script.', sceneData: { scenes } }),
+    ).toThrow(
+      `MEDIA_SCENE_LIMIT_EXCEEDED:${MAX_LESSON_VIDEO_SCENES + 1}:${MAX_LESSON_VIDEO_SCENES}`,
+    );
+  });
+});
+
 describe('storyboard caption adapter', () => {
   it('uses the actual scene timeline after the branded intro', () => {
     const vtt = buildStoryboardWebVtt([
@@ -63,5 +115,50 @@ describe('storyboard caption adapter', () => {
 
     expect(vtt).toContain('00:00:03.000 --> 00:00:08.000');
     expect(vtt).toContain('Define the business plan.');
+  });
+});
+
+describe('canonical storyboard round trips', () => {
+  it('preserves camelCase fields written by the renderer on retry', () => {
+    const storyboard = directMedia({
+      title: 'Workplace Safety',
+      script: 'Watch this safety demonstration and observe the correct tool handling.',
+      sceneData: {
+        scenes: [
+          {
+            id: 'scene-1',
+            action: 'Demonstrate safe tool handling.',
+            dialogue: 'Watch this safety demonstration.',
+            durationSeconds: 30,
+            shotSize: 'close-up',
+            cameraMove: 'locked',
+            referenceImageUrl: 'https://example.com/safety.jpg',
+            sourceVideoUrl: 'https://example.com/safety.mp4',
+            procedurePhase: 'safety',
+            requiredVisualEvidence: 'Correct hand placement.',
+            sceneType: 'worked_example',
+            mediaSource: 'elevate-motion',
+            overlayTemplate: 'elevate-callout-v1',
+            contentHash: 'canonical-hash',
+            reviewStatus: 'approved',
+          },
+        ],
+      },
+    });
+
+    expect(storyboard.scenes[0]).toMatchObject({
+      durationSeconds: 30,
+      shotSize: 'close-up',
+      cameraMove: 'locked',
+      referenceImageUrl: 'https://example.com/safety.jpg',
+      sourceVideoUrl: 'https://example.com/safety.mp4',
+      procedurePhase: 'safety',
+      requiredVisualEvidence: 'Correct hand placement.',
+      sceneType: 'worked_example',
+      mediaSource: 'elevate-motion',
+      overlayTemplate: 'elevate-callout-v1',
+      contentHash: 'canonical-hash',
+      reviewStatus: 'approved',
+    });
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CheckCircle, Download, ExternalLink } from 'lucide-react';
 import {
   EMPTY_CREDENTIAL_REGISTRY_RECORD,
@@ -11,6 +11,7 @@ import {
 } from '@/lib/course-builder/credential-registry';
 
 type CourseSeed = {
+  id?: string;
   title?: string;
   duration_hours?: number | null;
 };
@@ -27,9 +28,30 @@ export default function CredentialRegistryPanel({ course }: { course?: CourseSee
     durationHours: course?.duration_hours ?? null,
   });
   const [error, setError] = useState('');
+  const edited = useRef(new Set<string>());
+  const [lookup, setLookup] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    edited.current.clear();
+    setRecord({...EMPTY_CREDENTIAL_REGISTRY_RECORD, credentialName: course?.title ?? '', durationHours: course?.duration_hours ?? null});
+    setError('');
+    if (!course?.id) { setLookup('Select a course to retrieve supplied facts.'); return () => controller.abort(); }
+    setLookup('Retrieving supplied course and program facts…');
+    fetch('/api/admin/course-builder/registry?courseId=' + encodeURIComponent(course.id), {signal: controller.signal})
+      .then(async response => {
+        const body = await response.json();
+        if (!response.ok) throw new Error(body?.error || 'Unable to retrieve supplied facts');
+        if (controller.signal.aborted) return;
+        setRecord(current => ({...current, ...Object.fromEntries(Object.entries(body.facts || {}).filter(([key]) => !edited.current.has(key)))}));
+        setLookup('Supplied course and program facts loaded automatically.');
+      })
+      .catch(error => { if (!controller.signal.aborted) setLookup(error.message); });
+    return () => controller.abort();
+  }, [course?.id, course?.title, course?.duration_hours]);
   const validation = useMemo(() => validateCredentialRegistryRecord(record), [record]);
 
   function patch(update: Partial<CredentialRegistryRecord>) {
+    Object.keys(update).forEach(key => edited.current.add(key));
     setRecord((current) => ({ ...current, ...update }));
     setError('');
   }
@@ -151,7 +173,7 @@ export default function CredentialRegistryPanel({ course }: { course?: CourseSee
         ) : (
           <div className="mt-4">
             <p className="flex gap-2 text-sm font-semibold text-amber-300">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Missing required information
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Facts still to retrieve or add
             </p>
             <ul className="mt-2 space-y-1 text-xs text-slate-400">
               {validation.missing.map((item) => <li key={item}>• {item}</li>)}
@@ -166,13 +188,14 @@ export default function CredentialRegistryPanel({ course }: { course?: CourseSee
             </ul>
           </div>
         )}
+        {lookup && <p className="mt-4 text-sm text-cyan-200" role="status">{lookup}</p>}
         {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
-        <button type="button" disabled={!validation.ready} onClick={() => void download()}
+        <button type="button" onClick={() => void download()}
           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 px-4 py-2.5 text-sm font-bold text-slate-950 hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40">
           <Download className="h-4 w-4" /> Export Credential Engine CSV
         </button>
         <p className="mt-3 text-xs leading-relaxed text-slate-500">
-          Credential Engine may require its latest generated template. Copy or map this validated
+          Credential Engine may require its latest generated template. Copy or map this prepared
           record into that template before final approval.
         </p>
       </aside>

@@ -10,7 +10,9 @@
  * - All primary messaging renders in the below-hero content slot.
  */
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
+import ImageMetadata from './ImageMetadata';
 import { useId, useState } from 'react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -35,7 +37,10 @@ export interface HeroPictureProps {
   children?: React.ReactNode;
   /** Canonical site-wide hero height. Override only for a documented layout need. */
   heightStyle?: string;
+  /** Render the complete artwork at its native 4:3 ratio instead of cropping it. */
+  preserveAspectRatio?: boolean;
   priority?: boolean;
+  imageFit?: 'cover' | 'contain';
 }
 
 export default function HeroPicture({
@@ -52,30 +57,49 @@ export default function HeroPicture({
   className = '',
   children,
   heightStyle,
+  preserveAspectRatio = false,
   priority = true,
+  imageFit = 'cover',
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[clamp(420px,58vh,720px)]';
+  const canonicalHeight = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]';
 
   return (
     <div className={`w-full ${className}`}>
+      <ImageMetadata src={src} description={alt} />
       <section
-        className={`relative w-full overflow-hidden bg-slate-900 ${heightStyle ?? canonicalHeight}`}
+        className={`relative w-full overflow-hidden ${preserveAspectRatio ? 'bg-white' : 'bg-slate-900'} ${
+          preserveAspectRatio ? '' : (heightStyle ?? canonicalHeight)
+        }`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="100vw"
-          className="object-cover object-center"
-          priority={priority}
-          placeholder="empty"
-        />
+        {preserveAspectRatio ? (
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+            src={src}
+            alt={alt}
+            width={1536}
+            height={1152}
+            sizes="100vw"
+            className="h-auto w-full"
+            priority={priority}
+          />
+        ) : (
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+            src={src}
+            alt={alt}
+            fill
+            sizes="100vw"
+            className={
+              imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'
+            }
+            priority={priority}
+          />
+        )}
 
         {showBrandBug && (
           <div className="absolute left-4 top-4 z-10">
+            {/* IMAGE-CONTRACT: allow raw img because this optional intrinsic-size brand bug preserves its source aspect ratio independently of the hero crop. */}
             <img
               src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}
@@ -94,7 +118,7 @@ export default function HeroPicture({
       </section>
 
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="border-b border-slate-100 py-10 sm:py-14">
+        <section className="border-b border-slate-100 py-6 sm:py-8">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             {children ? (
               children
@@ -130,7 +154,10 @@ export default function HeroPicture({
                 {trustIndicators && trustIndicators.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
                     {Array.from(new Set(trustIndicators)).map((item) => (
-                      <li key={item} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                      <li
+                        key={item}
+                        className="flex items-center gap-1.5 text-sm font-semibold text-slate-900"
+                      >
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-600" />
                         {item}
                       </li>
@@ -157,7 +184,10 @@ export default function HeroPicture({
               Image transcript
             </button>
             {transcriptOpen && (
-              <p id={transcriptId} className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800">
+              <p
+                id={transcriptId}
+                className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800"
+              >
                 {transcript}
               </p>
             )}

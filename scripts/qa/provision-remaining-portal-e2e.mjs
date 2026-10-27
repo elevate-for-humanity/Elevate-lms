@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_REMAINING_PORTAL_E2E_STATE_PATH || '.qa-remaining-portal-e2e-state.json';
@@ -30,15 +31,15 @@ async function provision() {
     for (const [kind, role, label] of roles) {
       const email = `${marker}-${kind}@qa.invalid`;
       const pass = password();
-      const created = await db.auth.admin.createUser({
+      const user = await createQaAuthUser({
+        db,
         email,
         password: pass,
-        email_confirm: true,
-        app_metadata: { qa_e2e: true, qa_run_id: runId, role },
-        user_metadata: { qa_e2e: true, qa_run_id: runId, full_name: `[QA E2E] ${label}` },
+        role,
+        fullName: `[QA E2E] ${label}`,
+        runId,
+        label: `create ${kind} auth user`,
       });
-      if (created.error || !created.data.user) throw new Error(`create ${kind}: ${created.error?.message || 'no user returned'}`);
-      const user = created.data.user;
       const profile = await db.from('profiles').upsert({
         id: user.id,
         email,

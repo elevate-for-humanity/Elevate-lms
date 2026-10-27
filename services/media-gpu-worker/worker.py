@@ -195,7 +195,15 @@ def _run_wan(req: GenerateRequest, output: Path, image: str | None) -> None:
         cmd += ["--base_seed", str(req.seed)]
     if image:
         cmd += ["--image", image]
-    subprocess.run(cmd, cwd=repo, check=True, timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")))
+    subprocess.run(
+        cmd,
+        cwd=repo,
+        check=True,
+        timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
 
 
 def _asset_path(job_id: str) -> Path:

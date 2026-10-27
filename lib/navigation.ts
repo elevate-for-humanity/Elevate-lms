@@ -3,28 +3,89 @@
 
 import type { NavItem, NavSubItem } from '@/types/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export type { NavItem, NavSubItem } from '@/types/navigation';
 
+// Keep public programs discoverable by name in both desktop and mobile navigation.
 export const NAV_ITEMS: NavItem[] = [
+  {
+    id: 'students',
+    name: 'Students',
+    href: ROUTES.studentPortal,
+    subItems: [
+      { name: 'Student Dashboard', href: ROUTES.studentPortal, isSectionLink: true, isAuth: true },
+      { name: 'Apply for Training', href: ROUTES.apply, isSectionLink: true },
+      { name: 'My Courses', href: ROUTES.lmsPortal, isSectionLink: true, isAuth: true },
+      { name: 'Check Eligibility', href: ROUTES.eligibility, isSectionLink: true },
+      { name: 'Student Support', href: '/student-support', isSectionLink: true },
+    ],
+  },
   {
     id: 'programs',
     name: 'Programs',
     href: ROUTES.programs,
     subItems: [
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
+      { name: 'Bookkeeping & Business', isHeader: true, href: '/programs/bookkeeping' },
+      {
+        name: 'Business Administration',
+        href: '/programs/business-administration',
+        isSectionLink: true,
+      },
+      {
+        name: 'Administrative Assistant',
+        href: '/programs/administrative-assistant',
+        isSectionLink: true,
+      },
+      {
+        name: 'Bookkeeping & QuickBooks',
+        href: '/programs/bookkeeping',
+        isSectionLink: true,
+      },
+      { name: 'Tax Preparation', href: '/programs/tax-preparation', isSectionLink: true },
+      { name: 'Project Management', href: '/programs/project-management', isSectionLink: true },
+      { name: 'Business Start-Up', href: '/programs/business-startup', isSectionLink: true },
       { name: 'Healthcare', isHeader: true, href: ROUTES.programsHealthcare },
       { name: 'CNA', href: ROUTES.programsCNA, isSectionLink: true },
       { name: 'QMA', href: ROUTES.programsQMA, isSectionLink: true },
       { name: 'Medical Assistant', href: ROUTES.programsMedicalAssistant, isSectionLink: true },
       { name: 'Phlebotomy', href: ROUTES.programsPhlebotomy, isSectionLink: true },
-      { name: 'Skilled Trades', isHeader: true, href: '/programs/skilled-trades' },
+      { name: 'Dental Assistant', href: '/programs/dental-assistant', isSectionLink: true },
+      { name: 'Pharmacy Technician', href: '/programs/pharmacy-technician', isSectionLink: true },
+      { name: 'Skilled Trades & Transportation', isHeader: true, href: '/programs/skilled-trades' },
       { name: 'HVAC', href: ROUTES.programsHVAC, isSectionLink: true },
       { name: 'CDL Training', href: ROUTES.programsCDL, isSectionLink: true },
-      { name: 'Beauty', isHeader: true, href: ROUTES.programsBeauty },
-      { name: 'Barber & Beauty', href: ROUTES.programsBarber, isSectionLink: true },
-      { name: 'Tech & Business', isHeader: true },
-      { name: 'Technology Programs', href: ROUTES.programsTechnology, isSectionLink: true },
+      { name: 'Welding', href: '/programs/welding', isSectionLink: true },
+      {
+        name: 'Automotive Technician',
+        href: '/programs/automotive-technician',
+        isSectionLink: true,
+      },
+      {
+        name: 'Construction Trades',
+        href: '/programs/construction-trades-certification',
+        isSectionLink: true,
+      },
+      { name: 'Beauty Apprenticeships', isHeader: true, href: ROUTES.programsBeauty },
+      { name: 'Barber', href: ROUTES.programsBarber, isSectionLink: true },
+      { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
+      { name: 'Esthetics', href: ROUTES.programsEsthetician, isSectionLink: true },
+      { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
+      { name: 'Technology', isHeader: true, href: ROUTES.programsTechnology },
+      { name: 'IT Help Desk', href: '/programs/it-help-desk', isSectionLink: true },
+      {
+        name: 'Cybersecurity Analyst',
+        href: '/programs/cybersecurity-analyst',
+        isSectionLink: true,
+      },
+      { name: 'Web Development', href: '/programs/web-development', isSectionLink: true },
+      { name: 'Data Analytics', href: '/programs/data-analytics', isSectionLink: true },
+      { name: 'Microcourses & Certifications', isHeader: true, href: '/microclasses' },
+      { name: 'All Microcourses', href: '/microclasses', isSectionLink: true },
+      { name: 'Job Ready Indy', href: ROUTES.fundingJobReadyIndy, isSectionLink: true },
+      { name: 'Certification Testing', href: '/testing/nha', isSectionLink: true },
+      { name: 'Testing Products', href: '/store/testing', isSectionLink: true },
     ],
   },
   {
@@ -34,11 +95,52 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'How It Works', href: ROUTES.apprenticeshipsHowItWorks, isSectionLink: true },
       { name: 'All Apprenticeships', href: ROUTES.apprenticeships, isSectionLink: true },
+      { name: 'All Host Sites', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
+      { name: 'Become a Host Site', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
       { name: 'Programs', isHeader: true },
       { name: 'Barber', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
       { name: 'Esthetics', href: ROUTES.programsEsthetician, isSectionLink: true },
       { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
+    ],
+  },
+  {
+    id: 'barber-beauty-network',
+    name: 'Barber & Beauty Network',
+    href: '/barber-beauty-network',
+    subItems: [
+      { name: 'Network Home', href: '/barber-beauty-network', isSectionLink: true },
+      { name: 'Join the Community', href: '/community', isSectionLink: true },
+      { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
+      { name: 'Host Shop Directory', href: '/partners/host-shops', isSectionLink: true },
+      { name: 'Job Board', href: '/jobs', isSectionLink: true },
+      { name: 'Join the Barber & Beauty Network', href: `${siteUrls.app}/signup`, isSectionLink: true },
+      { name: 'Apply as a Host Shop', href: '/partners/host-shop/apply', isSectionLink: true },
+      { name: 'Barber Apprenticeship', href: ROUTES.programsBarber, isSectionLink: true },
+      { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
+      { name: 'Esthetics', href: ROUTES.programsEsthetician, isSectionLink: true },
+      { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
+    ],
+  },
+  {
+    id: 'tax-services',
+    name: 'Get Your Taxes Prepared',
+    href: '/tax',
+    subItems: [
+      { name: 'Supersonic Fast Cash', href: '/tax', isSectionLink: true },
+      { name: 'Prepare My Taxes', href: '/tax-software/self-file', isSectionLink: true },
+      { name: 'Get Professional Tax Help', href: '/tax-software/contact', isSectionLink: true },
+    ],
+  },
+  {
+    id: 'community',
+    name: 'Community',
+    href: '/community',
+    subItems: [
+      { name: 'Explore the Community', href: '/community', isSectionLink: true },
+      { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
+      { name: 'Barber & Beauty Network', href: '/barber-beauty-network', isSectionLink: true },
+      { name: 'Employer Directory', href: '/employers/directory', isSectionLink: true },
     ],
   },
   {
@@ -62,7 +164,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Platform Overview', href: '/platform', isSectionLink: true },
       { name: 'Online Apps & Portals', href: '/online-apps', isSectionLink: true },
       { name: 'Workforce Board Platform', href: '/platform/workforce-boards', isSectionLink: true },
-      { name: 'Dev Studio', href: '/store/dev-studio', isSectionLink: true },
       { name: 'Website Builder', href: '/store', isSectionLink: true },
       { name: 'Plans & Products', href: '/store#marketplace', isSectionLink: true },
     ],
@@ -72,8 +173,10 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Employers',
     href: ROUTES.employers,
     subItems: [
+      { name: 'Partner With Us', href: '/apply/employer', isSectionLink: true },
+      { name: 'Employer Directory', href: '/employers/directory', isSectionLink: true },
+      { name: 'Browse Jobs', href: '/jobs', isSectionLink: true },
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
-      { name: 'Become a Host Site', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },
       { name: 'Request Demo', href: ROUTES.storeDemo, isSectionLink: true },
@@ -96,26 +199,20 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Portals',
     href: '/online-apps',
     subItems: [
-      { name: 'All Apps & Portals', href: '/online-apps', isSectionLink: true },
-      { name: 'Learners', isHeader: true },
-      { name: 'Student / LMS Portal', href: ROUTES.studentPortal, isSectionLink: true, isAuth: true },
-      { name: 'Apprentice Portal', href: ROUTES.apprenticePortal, isSectionLink: true, isAuth: true },
-      { name: 'Parent Portal', href: ROUTES.parentPortal, isSectionLink: true, isAuth: true },
-      { name: 'Employers & Host Sites', isHeader: true },
-      { name: 'Employer Portal', href: ROUTES.employerPortal, isSectionLink: true, isAuth: true },
-      { name: 'Host Site Portal', href: ROUTES.hostShopPortal, isSectionLink: true, isAuth: true },
-      { name: 'Workforce & Providers', isHeader: true },
-      { name: 'Workforce Portal', href: ROUTES.workforcePortal, isSectionLink: true, isAuth: true },
-      { name: 'Workforce Board Portal', href: ROUTES.workforceBoardPortal, isSectionLink: true, isAuth: true },
-      { name: 'Case Manager Portal', href: ROUTES.caseManagerPortal, isSectionLink: true, isAuth: true },
-      { name: 'Provider Portal', href: ROUTES.providerPortal, isSectionLink: true, isAuth: true },
-      { name: 'Program Holder Portal', href: ROUTES.programHolderPortal, isSectionLink: true, isAuth: true },
-      { name: 'Staff & Platform', isHeader: true },
-      { name: 'Instructor Portal', href: ROUTES.instructorPortal, isSectionLink: true, isAuth: true },
-      { name: 'Staff Portal', href: ROUTES.staffPortal, isSectionLink: true, isAuth: true },
-      { name: 'Testing Center Operations', href: ROUTES.testingPortal, isSectionLink: true, isAuth: true },
+      { name: 'Choose Your Portal', href: '/online-apps', isSectionLink: true },
       { name: 'Creator Studio', href: ROUTES.creatorPortal, isSectionLink: true, isAuth: true },
-      { name: 'Admin Portal', href: ROUTES.adminPortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Testing Center Operations',
+        href: ROUTES.testingPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
+      {
+        name: 'Secure Sign In',
+        href: ROUTES.login,
+        isSectionLink: true,
+        isAuth: true,
+      },
     ],
   },
   { id: 'store', name: 'Store', href: ROUTES.store },
@@ -130,12 +227,18 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.about,
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
-      { name: 'Apprenticeship Sponsor of Record', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
+      {
+        name: 'Apprenticeship Sponsor of Record',
+        href: ROUTES.apprenticeshipSponsor,
+        isSectionLink: true,
+      },
     ],
   },
 ];
 
-export function findDuplicateNavHrefs(navItems: NavItem[]): Array<{ href: string; items: NavItem[] }> {
+export function findDuplicateNavHrefs(
+  navItems: NavItem[],
+): Array<{ href: string; items: NavItem[] }> {
   const hrefMap = new Map<string, NavItem[]>();
   for (const item of navItems) {
     if (!item.href) continue;

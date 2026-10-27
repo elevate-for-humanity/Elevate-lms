@@ -16,8 +16,8 @@ on:
       - 'lib/workflows/**'
       - 'lib/devstudio/os/**'
       - 'lib/devstudio/openhands/**'
-      - 'apps/admin/app/api/devstudio/plan/**'
-      - 'apps/admin/app/api/devstudio/openhands/**'
+      - 'apps/admin/app/api/admin/dev-studio/plan/**'
+      - 'apps/admin/app/api/admin/dev-studio/openhands/**'
       - 'services/llm-gpu-worker/**'
       - 'scripts/northflank/provision-llm-worker.ts'
       - 'scripts/check-synthetic-intelligence-architecture.mjs'
@@ -107,15 +107,15 @@ jobs:
               lib/devstudio/openhands/client.ts \
               lib/devstudio/openhands/runtime.ts \
               lib/devstudio/openhands/github-verifier.ts \
-              apps/admin/app/api/devstudio/openhands/chat/route.ts \
-              apps/admin/app/api/devstudio/openhands/agent/route.ts \
+              apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts \
+              apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts \
               lib/platform/planner.ts \
               lib/platform/orchestration/context-service.ts \
               lib/platform/orchestration/evaluator.ts \
               lib/workflows/action-policy.ts \
               lib/workflows/tool-registry.ts \
               lib/workflows/engine.ts \
-              apps/admin/app/api/devstudio/plan/route.ts \
+              apps/admin/app/api/admin/dev-studio/plan/route.ts \
               --quiet >> /tmp/synthetic-validation.log 2>&1 || code=1
           fi
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"

@@ -1,6 +1,8 @@
+import { siteUrls } from '@/lib/utils/site-urls';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requirePortalAccess } from '@/lib/auth/portal-access';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 interface ProgramHolderProfile {
   id: string;
@@ -9,6 +11,7 @@ interface ProgramHolderProfile {
   email?: string;
   program_holder_id: string | null;
   tenant_id?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface ProgramHolderScopedContext {
@@ -33,7 +36,46 @@ export interface ProgramHolderAdminContext {
   db: any;
 }
 
-export type ProgramHolderContext = ProgramHolderScopedContext | ProgramHolderAdminContext;
+export interface ProgramHolderPreviewContext {
+  mode: 'preview';
+  isPlatformAdmin: true;
+  user: { id: string; email?: string };
+  profile: ProgramHolderProfile;
+  holderId: string;
+  tenantId: string | null;
+  programIds: string[];
+  db: any;
+}
+
+export type ProgramHolderContext =
+  | ProgramHolderScopedContext
+  | ProgramHolderAdminContext
+  | ProgramHolderPreviewContext;
+
+async function resolveProgramIdsForHolder(db: any, holderId: string): Promise<string[]> {
+  const [{ data: associations, error: associationError }, { data: holder, error: featuresError }] = await Promise.all([
+    db
+      .from('program_holder_programs')
+      .select('program_id')
+      .eq('program_holder_id', holderId)
+      .eq('status', 'active'),
+    db.from('program_holders').select('features').eq('id', holderId).maybeSingle(),
+  ]);
+
+  if (associationError || featuresError) throw new Error('PROGRAM_HOLDER_PROGRAMS_UNAVAILABLE');
+  const regional = holder?.features?.regional_assignment;
+  if (regional?.all_programs_in_region === true) {
+    const { data: regionalPrograms, error: regionalError } = await db
+      .from('programs')
+      .select('id')
+      .eq('is_active', true)
+      .eq('status', 'active');
+    if (regionalError) throw new Error('PROGRAM_HOLDER_PROGRAMS_UNAVAILABLE');
+    return (regionalPrograms || []).map((row: { id: string }) => row.id);
+  }
+
+  return (associations || []).map((item: { program_id: string }) => item.program_id);
+}
 
 /**
  * Canonical Program Holder portal context.
@@ -42,10 +84,61 @@ export type ProgramHolderContext = ProgramHolderScopedContext | ProgramHolderAdm
  * The active platform `admin` role receives oversight access without being
  * assigned a fake holder/tenant identity.
  */
-export async function requireProgramHolder(): Promise<ProgramHolderContext> {
-  const access = await requirePortalAccess('programholder');
+export async function requireProgramHolder(options: { allowPendingApproval?: boolean } = {}): Promise<ProgramHolderContext> {
   const db = await requireAdminClient();
 
+  // A cross-domain Admin preview arrives with a short-lived signed handoff
+  // cookie, not an LMS Supabase session. Resolve that verified handoff before
+  // the normal role guard so the preview does not bounce through /login.
+  const handoffPreview = await resolvePortalPreviewSubject(db, null);
+  if (handoffPreview.previewing && handoffPreview.userId) {
+    const { data: targetProfile } = await db
+      .from('profiles')
+      .select('id,role,full_name,email,program_holder_id,tenant_id,avatar_url')
+      .eq('id', handoffPreview.userId)
+      .maybeSingle();
+    if (targetProfile?.program_holder_id && ['program_holder', 'programholder', 'site_coordinator'].includes(targetProfile.role)) {
+      const programIds = await resolveProgramIdsForHolder(db, targetProfile.program_holder_id);
+      return {
+        mode: 'preview',
+        isPlatformAdmin: true,
+        user: { id: targetProfile.id, email: targetProfile.email || undefined },
+        profile: targetProfile,
+        holderId: targetProfile.program_holder_id,
+        tenantId: targetProfile.tenant_id ?? null,
+        programIds,
+        db,
+      };
+    }
+  }
+
+  const access = await requirePortalAccess('programholder');
+
+  if (access.isPlatformAdmin) {
+    const preview = await resolvePortalPreviewSubject(db, access.user.id);
+    if (preview.previewing && preview.userId !== access.user.id) {
+      const { data: targetProfile } = await db
+        .from('profiles')
+        .select('id,role,full_name,email,program_holder_id,tenant_id,avatar_url')
+        .eq('id', preview.userId)
+        .maybeSingle();
+      if (targetProfile?.program_holder_id && ['program_holder', 'programholder', 'site_coordinator'].includes(targetProfile.role)) {
+        const programIds = await resolveProgramIdsForHolder(db, targetProfile.program_holder_id);
+        return {
+          mode: 'preview',
+          isPlatformAdmin: true,
+          user: { id: targetProfile.id, email: targetProfile.email || undefined },
+          profile: targetProfile,
+          holderId: targetProfile.program_holder_id,
+          tenantId: targetProfile.tenant_id ?? null,
+          programIds,
+          db,
+        };
+      }
+    }
+  }
+
+  if (access.profile.is_active === false || access.profile.suspended === true) redirect('/unauthorized');
   const profile: ProgramHolderProfile = {
     id: access.profile.id,
     role: access.profile.role,
@@ -53,6 +146,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     email: access.profile.email,
     program_holder_id: access.profile.program_holder_id ?? null,
     tenant_id: access.profile.tenant_id ?? null,
+    avatar_url: access.profile.avatar_url ?? null,
   };
 
   if (access.isPlatformAdmin) {
@@ -68,26 +162,33 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     };
   }
 
-  const holderId = profile.program_holder_id;
-  if (!holderId) redirect('/program-holder?error=pending-approval');
+  let holderId = profile.program_holder_id;
+  if (!holderId) {
+    const { data: ownedHolder, error } = await db.from('program_holders').select('id').eq('user_id', access.user.id).maybeSingle();
+    if (error) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
+    holderId = ownedHolder?.id ?? null;
+  }
+  if (!holderId) redirect(`${siteUrls.apply}/program-holder?status=pending`);
+  profile.program_holder_id = holderId;
 
-  const { data: holder } = await db
+  const { data: holder, error: holderError } = await db
     .from('program_holders')
-    .select('status, mou_signed, approved_at, payout_status')
+    .select('user_id, status, mou_signed, approved_at, payout_status, mou_terminated, suspended_at, terminated_at')
     .eq('id', holderId)
     .maybeSingle();
 
-  if (!holder) redirect('/program-holder?error=pending-approval');
-  if (!['approved', 'active'].includes(holder.status) || !holder.approved_at) {
+  if (holderError) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
+  if (!holder) redirect(`${siteUrls.apply}/program-holder?status=pending`);
+  if (holder.user_id !== access.user.id) redirect('/unauthorized');
+  if (holder.mou_terminated || holder.suspended_at || holder.terminated_at || ['inactive','suspended','terminated','rejected'].includes(holder.status)) redirect('/unauthorized');
+  if (!options.allowPendingApproval && (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at)) {
     redirect('/program-holder/onboarding?status=pending-approval');
   }
-  if (!holder.mou_signed) redirect('/program-holder/sign-mou?required=true');
+  // Program Holders may view their dashboard while completing onboarding.
+  // Money movement and other privileged actions enforce the full checklist
+  // independently; an unsigned MOU must never make student records invisible.
 
-  const { data: associations } = await db
-    .from('program_holder_programs')
-    .select('program_id')
-    .eq('program_holder_id', holderId)
-    .eq('status', 'active');
+  const programIds = await resolveProgramIdsForHolder(db, holderId);
 
   return {
     mode: 'holder',
@@ -96,7 +197,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     profile,
     holderId,
     tenantId: profile.tenant_id ?? null,
-    programIds: (associations || []).map((a: { program_id: string }) => a.program_id),
+    programIds,
     db,
   };
 }
@@ -119,14 +220,10 @@ export async function getProgramHolderContext(db: any, userId: string) {
 
   if (!profile?.program_holder_id) return null;
 
-  const { data: associations } = await db
-    .from('program_holder_programs')
-    .select('program_id')
-    .eq('program_holder_id', profile.program_holder_id)
-    .eq('status', 'active');
+  const programIds = await resolveProgramIdsForHolder(db, profile.program_holder_id);
 
   return {
     holderId: profile.program_holder_id as string,
-    programIds: (associations || []).map((a: { program_id: string }) => a.program_id),
+    programIds,
   };
 }

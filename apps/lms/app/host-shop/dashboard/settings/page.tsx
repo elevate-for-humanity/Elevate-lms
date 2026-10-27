@@ -1,46 +1,35 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 import PartnerSettingsForm from './PartnerSettingsForm';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Settings | Partner Portal',
-  description: 'Manage your organization profile and preferences.',
+  title: 'Settings | Host Shop Portal',
+  description: 'Manage the selected Host Shop profile and notification preferences.',
 };
 
 export default async function PartnerSettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/partner/settings');
-
-  const { data: partnerUser } = await supabase
-    .from('partner_users')
-    .select('partner_id')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (!partnerUser) redirect('/unauthorized');
-
-  const orgId = partnerUser?.partner_id ?? null;
+  // Resolve the same canonical Host Shop context used by the rest of the
+  // workspace. This preserves owner access through partner_users and lets a
+  // platform administrator inspect the explicitly selected shop without an
+  // unrelated partner membership capturing the request.
+  const { user, db, partner } = await requireCurrentHostShopPartner();
+  const orgId = partner.id;
 
   const { data: org } = orgId
-    ? await supabase
+      ? await db
         .from('partners')
         .select(
-          'name, city, state, address, contact_name, contact_email, contact_phone, notification_preferences',
+          'name, city, state, address_line1, owner_name, supervisor_name, contact_name, contact_email, contact_phone, phone, notification_preferences',
         )
         .eq('id', orgId)
         .maybeSingle()
     : { data: null };
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('full_name, email')
     .eq('id', user.id)
@@ -49,12 +38,12 @@ export default async function PartnerSettingsPage() {
   const initialData = {
     orgId,
     orgName: org?.name ?? '',
-    address: org?.address ?? '',
+    address: org?.address_line1 ?? '',
     city: org?.city ?? '',
     state: org?.state ?? '',
-    contactName: org?.contact_name ?? profile?.full_name ?? '',
+    contactName: org?.contact_name ?? org?.owner_name ?? org?.supervisor_name ?? profile?.full_name ?? '',
     contactEmail: org?.contact_email ?? profile?.email ?? user.email ?? '',
-    contactPhone: org?.contact_phone ?? '',
+    contactPhone: org?.contact_phone ?? org?.phone ?? '',
     emailNotifications: org?.notification_preferences?.email ?? true,
     weeklyDigest: org?.notification_preferences?.weekly_digest ?? true,
     outcomeAlerts: org?.notification_preferences?.outcome_alerts ?? true,
@@ -75,13 +64,13 @@ export default async function PartnerSettingsPage() {
       </section>
       <div className="mb-6">
         <Breadcrumbs
-          items={[{ label: 'Partner', href: '/partner/attendance' }, { label: 'Settings' }]}
+          items={[{ label: 'Host Shop', href: '/host-shop/dashboard' }, { label: 'Settings' }]}
         />
       </div>
       <div className="max-w-3xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Partner Settings</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Host Shop Settings</h1>
             <p className="text-slate-700">Manage your organization profile and preferences</p>
           </div>
         </div>

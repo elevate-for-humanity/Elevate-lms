@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ApplicationsTableClient, {
   type ApplicationRow,
-} from '@/apps/admin/app/admin/applications/ApplicationsTableClient';
+} from '@/apps/admin/app/applications/ApplicationsTableClient';
 
 describe('ApplicationsTableClient', () => {
   afterEach(() => {

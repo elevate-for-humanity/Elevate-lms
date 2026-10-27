@@ -9,6 +9,6 @@ export default async function PartnerProgramEditRedirect({
 }: {
   params: Promise<{ program: string }>;
 }) {
-  const { program } = await params;
-  redirect(`/partner/courses/create?programId=${encodeURIComponent(program)}`);
+  await params;
+  redirect('/host-shop/dashboard/programs');
 }

@@ -1,118 +1,663 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
-import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
-import { getHostShopAdminPartnerOptions, getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
+import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
-
-async function selectAdminPartner(formData: FormData) {
-  'use server';
-  await requireRole(['super_admin', 'admin', 'org_admin']);
-  const partnerId = String(formData.get('partnerId') ?? '').trim();
-  if (!partnerId) redirect('/host-shop/dashboard');
-  const db = await requireAdminClient();
-  const { data: partner } = await db.from('partners').select('id, status, approval_status, verification_status, is_active, partner_type, program_type, programs').eq('id', partnerId).maybeSingle();
-  const typeText = [partner?.partner_type, partner?.program_type, ...(Array.isArray(partner?.programs) ? partner.programs : [])].filter(Boolean).join(' ').toLowerCase();
-  const eligible = partner && partner.status === 'active' && partner.approval_status === 'approved' && partner.verification_status === 'verified' && partner.is_active !== false && /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(typeText);
-  if (!eligible) redirect('/host-shop/dashboard?error=inactive_partner');
-  const cookieStore = await cookies();
-  cookieStore.set(HOST_SHOP_ADMIN_COOKIE, partnerId, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 3600 });
-  redirect('/host-shop/dashboard');
-}
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
+import { HostShopProgramGuide } from '@/components/portal/HostShopProgramGuide';
+import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
+import {
+  HOST_SHOP_PREVIEW_SESSION_COOKIE,
+  resolveHostShopAdminPreview,
+} from '@/lib/admin/host-shop-preview';
+import {
+  PORTAL_PREVIEW_ACTOR_COOKIE,
+  PORTAL_PREVIEW_COOKIE,
+  PORTAL_PREVIEW_SESSION_COOKIE,
+} from '@/lib/admin/portal-preview';
+import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
 
 async function clearAdminPartner() {
   'use server';
   await requireRole(['super_admin', 'admin', 'org_admin']);
   const cookieStore = await cookies();
-  cookieStore.set(HOST_SHOP_ADMIN_COOKIE, '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 0 });
+  for (const name of [
+    HOST_SHOP_ADMIN_COOKIE,
+    HOST_SHOP_PREVIEW_SESSION_COOKIE,
+    PORTAL_PREVIEW_COOKIE,
+    PORTAL_PREVIEW_ACTOR_COOKIE,
+    PORTAL_PREVIEW_SESSION_COOKIE,
+  ]) {
+    cookieStore.set(name, '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0,
+    });
+  }
   redirect('/host-shop/dashboard');
 }
 
 async function ensureCanonicalPartner(user: { id: string; email?: string | null }) {
   const db = await requireAdminClient();
-  const { data: link } = await db.from('partner_users').select('partner_id,status').eq('user_id', user.id).eq('status', 'active').limit(1).maybeSingle();
+  const { data: link } = await db
+    .from('partner_users')
+    .select('partner_id,status')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle();
   if (link?.partner_id || !user.email) return;
 
   // Historical Barber applications can still be promoted once into the
   // canonical partner model. New applications must enter through partners.
-  const { data: legacyApplication } = await db.from('barbershop_partner_applications')
-    .select('id, shop_legal_name, shop_dba_name, owner_name, contact_name, contact_email, contact_phone, shop_address_line1, shop_address_line2, shop_city, shop_state, shop_zip, indiana_shop_license_number, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, can_supervise_and_verify, mou_signed_at, mou_signature_data, status')
-    .eq('contact_email', user.email).order('created_at', { ascending: false }).limit(1).maybeSingle();
+  const { data: legacyApplication } = await db
+    .from('barbershop_partner_applications')
+    .select(
+      'id, shop_legal_name, shop_dba_name, owner_name, contact_name, contact_email, contact_phone, shop_address_line1, shop_address_line2, shop_city, shop_state, shop_zip, indiana_shop_license_number, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, can_supervise_and_verify, mou_signed_at, mou_signature_data, status',
+    )
+    .eq('contact_email', user.email)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   if (legacyApplication?.status === 'approved') {
-    const provisioned = await provisionPartnerFromBarberApplication(db, legacyApplication, { linkUserId: user.id });
+    const provisioned = await provisionPartnerFromBarberApplication(db, legacyApplication, {
+      linkUserId: user.id,
+    });
     if (!provisioned) redirect('/host-shop/login?error=provisioning');
     return;
   }
-  if (legacyApplication?.status === 'pending' || legacyApplication?.status === 'submitted') redirect('/host-shop/login?status=pending');
+  if (legacyApplication?.status === 'pending' || legacyApplication?.status === 'submitted')
+    redirect('/host-shop/login?status=pending');
 }
 
-type PortalCard = { href: string; title: string; value?: string | number; detail: string; image: string };
+type PortalCard = {
+  href: string;
+  title: string;
+  value?: string | number;
+  detail: string;
+  image: string;
+};
 function PortalImageCard({ card }: { card: PortalCard }) {
-  return <Link href={card.href} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"><div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100"><Image src={card.image} alt={`${card.title} Host Shop workspace`} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" /></div><div className="p-5">{card.value !== undefined ? <p className="text-3xl font-black text-slate-950">{card.value}</p> : null}<h2 className={`${card.value !== undefined ? 'mt-1' : ''} font-black text-slate-950`}>{card.title}</h2><p className="mt-1 text-sm font-medium leading-6 text-slate-700">{card.detail}</p></div></Link>;
+  return (
+    <Link
+      href={card.href}
+      className="group min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"
+    >
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+        <Image
+          src={card.image}
+          alt={`${card.title} Host Shop workspace`}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        />
+      </div>
+      <div className="min-w-0 p-5">
+        {card.value !== undefined ? (
+          <p className="break-words text-2xl font-black leading-tight text-slate-950 sm:text-3xl">{card.value}</p>
+        ) : null}
+        <h2 className={`${card.value !== undefined ? 'mt-1' : ''} break-words text-base font-black leading-snug text-slate-950 sm:text-lg`}>
+          {card.title}
+        </h2>
+        <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{card.detail}</p>
+      </div>
+    </Link>
+  );
 }
 
 export default async function HostShopDashboardView() {
-  const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
-  const isPlatformAdmin = effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+  const preview = await resolveHostShopAdminPreview();
+  const { user, effectiveRoles } = preview
+    ? {
+        user: { id: preview.actorId, email: preview.actorEmail },
+        effectiveRoles: [preview.actorRole],
+      }
+    : await requireRole(HOST_SHOP_ROLES);
+  const db = await requireAdminClient();
+  const { data: actorProfile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+  const authoritativeActorRole = normalizeRole(actorProfile?.role);
+  const isPlatformAdmin =
+    (authoritativeActorRole !== null &&
+      ['super_admin', 'admin', 'org_admin'].includes(authoritativeActorRole)) ||
+    effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
   if (!isPlatformAdmin) await ensureCanonicalPartner(user);
 
   let board: Awaited<ReturnType<typeof getHostShopBoard>> | null = null;
   try {
+    // Host Shop tenancy is selected with HOST_SHOP_ADMIN_COOKIE. Do not reuse
+    // an apprentice/student preview subject here: a learner preview cookie can
+    // otherwise replace the administrator identity and make the selected Host
+    // Shop appear inaccessible immediately after it is opened.
     board = await getHostShopBoard(user.id);
   } catch (error) {
-    if (isPlatformAdmin && error instanceof Error && error.message === 'HOST_SHOP_ADMIN_PARTNER_REQUIRED') {
-      const partners = (await getHostShopAdminPartnerOptions()).filter((partner: any) => partner.status === 'active' && partner.approval_status === 'approved' && partner.verification_status === 'verified' && partner.is_active !== false);
-      return <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6"><section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"><div className="relative h-52 w-full"><Image src="/images/pages/barber-gallery-1.webp" alt="Host Shop apprenticeship workspace" fill priority className="object-cover" sizes="100vw" /></div><div className="p-7 sm:p-9"><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Admin portal access</p><h1 className="mt-2 text-3xl font-black text-slate-950">Choose an active verified Host Shop</h1><form action={selectAdminPartner} className="mt-6 flex flex-col gap-3 sm:flex-row"><select name="partnerId" required className="min-h-12 flex-1 rounded-xl border border-slate-400 bg-white px-4 py-3 font-semibold"><option value="">Select Host Shop</option>{partners.map((partner: any) => <option key={partner.id} value={partner.id}>{partner.name} {partner.city ? `— ${partner.city}, ${partner.state || ''}` : ''}</option>)}</select><button className="min-h-12 rounded-xl bg-brand-blue-700 px-6 py-3 font-black text-white">Open Host Shop portal</button></form></div></section></main>;
+    if (
+      isPlatformAdmin &&
+      error instanceof Error &&
+      ['HOST_SHOP_ADMIN_PARTNER_REQUIRED', 'HOST_SHOP_ACCESS_DENIED'].includes(error.message)
+    ) {
+      return (
+        <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="relative h-52 w-full">
+              <Image
+                src="/images/pages/barber-gallery-1.webp"
+                alt="Host Shop apprenticeship workspace"
+                fill
+                priority
+                className="object-cover"
+                sizes="100vw"
+              />
+            </div>
+            <div className="p-7 sm:p-9">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
+                Admin portal access
+              </p>
+              <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop PWA</h1>
+              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">
+                No Host Shop is selected. Select a shop from the secured Admin dashboard
+                to open its saved records in the audited portal preview.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="https://admin.elevateforhumanity.org/partners"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-black text-white"
+                >
+                  Select a Host Shop in Admin
+                </a>
+                <a
+                  href="https://admin.elevateforhumanity.org/partners"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-black text-slate-950"
+                >
+                  Manage partners
+                </a>
+              </div>
+            </div>
+          </section>
+        </main>
+      );
     }
-    if (!isPlatformAdmin && error instanceof Error && error.message === 'HOST_SHOP_ACCESS_DENIED') redirect('/host-shop/login?error=no_partner');
+    if (!isPlatformAdmin && error instanceof Error && error.message === 'HOST_SHOP_ACCESS_DENIED')
+      redirect('/host-shop/login?error=no_partner');
     throw error;
   }
   if (!board) redirect('/host-shop/login?error=no_partner');
 
-  if (board.partner?.approval_status !== 'approved' || board.partner?.verification_status !== 'verified' || board.partner?.status !== 'active') redirect('/host-shop/onboarding');
-  if (!board.partner?.mou_signed) redirect(board.onboardingPaths.signMou);
-  if (!board.partner?.onboarding_completed) redirect('/host-shop/orientation');
+  const partnerApproved =
+    board.partner?.approval_status === 'approved' && board.partner?.status === 'active';
+  const partnerVerified = board.partner?.verification_status === 'verified';
+  const partnerMouSigned = board.partner?.mou_signed === true;
+  const partnerOnboardingComplete = board.partner?.onboarding_completed === true;
+
+  // Approved owners retain operational portal access while every incomplete
+  // compliance milestone remains prominently visible across the portal.
+  if (!isPlatformAdmin) {
+    if (!partnerApproved) redirect('/host-shop/onboarding');
+  }
 
   const registeredCount = board.registeredPrograms.length;
+  const timeBasedCount = board.timeBasedPrograms.length;
   const competencyValue = registeredCount
     ? `${registeredCount} registered occupation${registeredCount === 1 ? '' : 's'}`
-    : 'Blocked';
+    : timeBasedCount
+      ? `${Number(board.timeBasedPrograms[0]?.hours || 0).toLocaleString()}h target`
+      : 'Blocked';
   const competencyDetail = registeredCount
-    ? board.registeredPrograms.map((program) => `${program.rapidsCode}: ${program.competencyCount} competencies / ${program.rtiHours} RTI`).join(' · ')
-    : 'No active registered-program standard is configured for the assigned occupation.';
+    ? board.registeredPrograms
+        .map(
+          (program) =>
+            program.progressModel === 'hybrid'
+              ? `${program.rapidsCode}: ${program.hours?.toLocaleString()}–${program.maxHours?.toLocaleString()} OJL hours / ${program.rtiHours} RTI hours / required work processes`
+              : `${program.rapidsCode}: ${program.competencyCount} competencies / ${program.rtiHours} RTI hours`,
+        )
+        .join(' · ')
+    : timeBasedCount
+      ? 'Time-based apprenticeship progress from Host Shop-approved OJL records.'
+      : 'No active registered-program standard is configured for the assigned occupation.';
 
   const summaryCards: PortalCard[] = [
-    { href: '/host-shop/dashboard/apprentices', title: 'Active apprentices', value: board.apprentices.length, detail: 'View apprentices currently placed with this verified Host Shop.', image: '/images/pages/admin-employers-hero.webp' },
-    { href: '/host-shop/dashboard/hours/pending', title: 'Work entries pending review', value: board.pendingHoursCount, detail: 'Verify supervised work records assigned to this Host Shop.', image: '/images/pages/training-classroom.webp' },
-    { href: '/host-shop/dashboard/competencies', title: 'Registered standards', value: competencyValue, detail: competencyDetail, image: '/images/pages/competency-test-hero.webp' },
-    { href: '/host-shop/dashboard/documents', title: 'Required documents', value: board.requiredDocumentCount ? `${board.acceptedDocumentCount}/${board.requiredDocumentCount}` : board.partner?.documents_verified ? 'Complete' : 'Review', detail: 'Maintain MOU, licenses, insurance, payroll evidence, and required Host Shop records.', image: '/images/pages/comp-home-highlight-success.webp' },
+    {
+      href: '/host-shop/dashboard/apprentices',
+      title: 'Active apprentices',
+      value: board.apprentices.length,
+      detail: 'View apprentices currently placed with this verified Host Shop.',
+      image: '/images/pages/admin-employers-hero.webp',
+    },
+    {
+      href: '/host-shop/dashboard/hours/pending',
+      title: 'Work entries pending review',
+      value: board.pendingHoursCount,
+      detail: 'Verify supervised work records assigned to this Host Shop.',
+      image: '/images/pages/training-classroom.webp',
+    },
+    {
+      href: registeredCount ? '/host-shop/dashboard/competencies' : '/host-shop/dashboard/hours',
+      title: registeredCount ? 'Registered standards' : 'Apprenticeship progress',
+      value: competencyValue,
+      detail: competencyDetail,
+      image: '/images/pages/competency-test-hero.webp',
+    },
+    {
+      href: '/host-shop/dashboard/documents',
+      title: 'Required documents',
+      value: `${board.acceptedDocumentCount}/${board.requiredDocumentCount}`,
+      detail: board.documentsComplete
+        ? 'All required compliance documents are accepted.'
+        : `${board.missingDocuments.length} missing and ${board.pendingDocuments.length} awaiting review.`,
+      image: '/images/pages/comp-home-highlight-success.webp',
+    },
   ];
   const toolCards: PortalCard[] = [
-    { href: '/host-shop/orientation', title: 'Required orientation', detail: 'Review recruiting, payroll, WIOA, geofencing, work approval, competencies, transfer-credit rules, RAPIDS, and compliance.', image: '/images/pages/academic-integrity-hero.webp' },
-    { href: '/host-shop/dashboard/match-requests', title: 'Match requests', detail: 'Review apprentice placement requests for your shop.', image: '/images/pages/workone-packet-2.webp' },
-    { href: '/host-shop/dashboard/attendance/record', title: 'Record attendance', detail: 'Record attendance against the active apprentice placement.', image: '/images/pages/program-holder-page-1.webp' },
-    { href: '/host-shop/dashboard/wages', title: 'Wage compliance', detail: 'Verify actual wages against the registered occupation and employer-specific RAPIDS schedule.', image: '/images/pages/admin-wioa-hero.webp' },
-    { href: '/host-shop/dashboard/reports', title: 'Reporting center', detail: 'Review documented work, competencies, attendance, RTI, and compliance records.', image: '/images/heroes/lms-analytics.webp' },
-    { href: '/host-shop/dashboard/profile', title: 'Shop profile', detail: 'Maintain the approved shop profile, logo, flyer, and operating information.', image: '/images/pages/about-employer-partners.webp' },
+    {
+      href: '/host-shop/email',
+      title: 'Host Shop email',
+      detail: 'Open the shop inbox, compose official email, reply, and share attachments.',
+      image: '/images/pages/student-support-page-1.webp',
+    },
+    {
+      href: '/host-shop/dashboard/communications',
+      title: 'Host Shop communications',
+      detail: 'Use the Host Shop communication workspace for official email, apprentice messages, routed calls, and meeting access.',
+      image: '/images/pages/program-holder-page-1.webp',
+    },
+    {
+      href: '/host-shop/dashboard/communications',
+      title: 'Phone, meetings & follow-up',
+      detail: 'Open Host Shop communications for the assigned phone extension, PARIS callback intake, messages, and scheduling.',
+      image: '/images/heroes/lms-analytics.webp',
+    },
+    {
+      href: '/host-shop/dashboard/resources',
+      title: 'Guides, handbook & MOU',
+      detail:
+        'Open the Host Shop user guide, operating handbook, current MOU, orientation, and required compliance documents.',
+      image: '/images/pages/workone-packet-1.webp',
+    },
+    {
+      href: '/host-shop/orientation',
+      title: 'Required orientation',
+      detail:
+        'Review recruiting, payroll, WIOA, geofencing, work approval, competencies, transfer-credit rules, RAPIDS, and compliance.',
+      image: '/images/pages/academic-integrity-hero.webp',
+    },
+    {
+      href: '/host-shop/dashboard/match-requests',
+      title: 'Match requests',
+      detail: 'Review apprentice placement requests for your shop.',
+      image: '/images/pages/workone-packet-2.webp',
+    },
+    {
+      href: '/host-shop/dashboard/attendance/record',
+      title: 'Record attendance',
+      detail: 'Record attendance against the active apprentice placement.',
+      image: '/images/pages/orientation-page-1.webp',
+    },
+    {
+      href: '/host-shop/dashboard/wages',
+      title: 'Wage compliance',
+      detail:
+        'Verify actual wages against the registered occupation and employer-specific RAPIDS schedule.',
+      image: '/images/pages/admin-wioa-hero.webp',
+    },
+    {
+      href: '/host-shop/dashboard/reports',
+      title: 'Reporting center',
+      detail: 'Review documented work, competencies, attendance, RTI, and compliance records.',
+      image: '/images/pages/career-services-page-7.webp',
+    },
+    {
+      href: '/host-shop/dashboard/profile',
+      title: 'Shop profile',
+      detail: 'Maintain the approved shop profile, logo, flyer, and operating information.',
+      image: '/images/pages/about-employer-partners.webp',
+    },
+    {
+      href: '/host-shop/dashboard/programs',
+      title: 'Programs & standards',
+      detail:
+        'Review the occupation assigned to this Host Shop and whether its registered standard is configured.',
+      image: '/images/pages/programs-hero-vibrant.webp',
+    },
+    {
+      href: '/host-shop/dashboard/schedule',
+      title: 'Training schedule',
+      detail: 'View attendance sessions hosted by active users assigned to this Host Shop.',
+      image: '/images/pages/admin-apprenticeships-classroom.webp',
+    },
+    {
+      href: '/host-shop/dashboard/store',
+      title: 'Host Shop store',
+      detail: 'Open verified purchasing options and approved service requests.',
+      image: '/images/pages/store-page-1.webp',
+    },
   ];
+  const operatingSteps = [
+    {
+      href: '/host-shop/orientation',
+      title: '1. Complete Host Shop orientation',
+      detail:
+        'Review responsibilities, payroll, safety, geofencing, work approvals, competencies, and required records.',
+    },
+    {
+      href: '/host-shop/dashboard/apprentices',
+      title: '2. Confirm each apprentice',
+      detail:
+        'Verify the apprentice, active placement, supervisor, occupation, start date, and contact information.',
+    },
+    {
+      href: '/host-shop/dashboard/schedule',
+      title: '3. Set the training schedule',
+      detail: 'Keep the apprentice schedule and supervised training sessions current.',
+    },
+    {
+      href: '/host-shop/dashboard/attendance/record',
+      title: '4. Record attendance and work',
+      detail:
+        'Make sure apprentices clock at the approved site and that supervised work is documented.',
+    },
+    {
+      href: '/host-shop/dashboard/hours/pending',
+      title: '5. Review hours every week',
+      detail:
+        'Approve accurate OJL entries promptly; return incorrect entries with a clear correction note.',
+    },
+    {
+      href: '/host-shop/dashboard/competencies',
+      title: '6. Verify competencies',
+      detail:
+        'Record observed skills only after the apprentice demonstrates them under qualified supervision.',
+    },
+    {
+      href: '/host-shop/dashboard/reports',
+      title: '7. Check compliance monthly',
+      detail:
+        'Review wages, RTI, OJL, attendance, documents, and exceptions before reporting deadlines.',
+    },
+  ] as const;
+
   const partnerName = board.partner?.name || board.shops[0]?.name || '';
-  const db = await requireAdminClient();
   const { data: publicProfile } = partnerName
-    ? await db.from('public_host_shops').select('media_gallery,video_url').ilike('display_name', `%${partnerName}%`).limit(1).maybeSingle()
+    ? await db
+        .from('public_host_shops')
+        .select('media_gallery,video_url,logo_url,flyer_url')
+        .eq('id', board.partner.id)
+        .limit(1)
+        .maybeSingle()
     : { data: null };
   const publicMedia = Array.isArray(publicProfile?.media_gallery)
     ? publicProfile.media_gallery.filter((item: any) => item && typeof item.url === 'string')
     : [];
+  const networkShop = (await getHostShopNetwork()).find((shop) => shop.id === board.partner.id);
+  const heroIsLogo = Boolean(publicProfile?.logo_url);
+  const heroImage = publicProfile?.logo_url || publicMedia[0]?.url || networkShop?.image || publicProfile?.flyer_url || '/images/logo.png';
 
-  return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"><div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch"><div className="p-6 sm:p-8"><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Host Shop</p><h1 className="mt-2 text-3xl font-black text-slate-950">{board.partner?.name || board.shops[0]?.name || 'Host Shop'}</h1><p className="mt-2 font-medium text-slate-700">Shared registered-apprenticeship workspace</p>{board.registeredPrograms.length ? <div className="mt-3 flex flex-wrap gap-2">{board.registeredPrograms.map((program) => <span key={program.rapidsCode} className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-bold text-cyan-900">{program.label} · RAPIDS {program.rapidsCode}</span>)}</div> : null}{board.shops[0]?.city ? <p className="mt-2 text-sm font-medium text-slate-700">{board.shops[0].city}, {board.shops[0].state}</p> : null}</div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-900">Verified Partner</span><span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-900">MOU Signed</span>{isPlatformAdmin ? <form action={clearAdminPartner}><button className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-bold">Change Host Shop</button></form> : null}</div></div>{board.unconfiguredPrograms.length ? <div role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">Regulated progress is blocked for: {board.unconfiguredPrograms.map((program) => program.programSlug || 'unknown occupation').join(', ')}. An active approved registered-program standard must be configured before competencies, RTI, or regulated OJL are credited.</div> : null}</div><div className="relative min-h-[240px]"><Image src="/images/pages/workforce-board-page-7.webp" alt="Host Shop supervised apprenticeship workspace" fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 42vw" /></div></div></section>
-    <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{summaryCards.map((card) => <PortalImageCard key={card.title} card={card} />)}</section>
-    {publicMedia.length || publicProfile?.video_url ? <section className="mt-8"><h2 className="mb-4 text-2xl font-black text-slate-950">Your public Host Shop gallery</h2><HostShopMediaCarousel shopName={partnerName} items={publicMedia} videoUrl={publicProfile?.video_url || undefined} /></section> : null}
-    <section className="mt-8"><h2 className="text-2xl font-black text-slate-950">Host Shop tools</h2><p className="mt-1 text-sm font-medium text-slate-700">Every workspace uses the same verified partner, shop, placement, registered-program contract, and audit records.</p><div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{toolCards.map((card) => <PortalImageCard key={card.title} card={card} />)}</div></section>
-  </main>;
+  return (
+    <main className="w-full max-w-none px-4 py-8 sm:px-6">
+      <ProgramGuideResources />
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
+                  Host Shop
+                </p>
+                <h1 className="mt-2 text-3xl font-black text-slate-950">
+                  {board.partner?.name || board.shops[0]?.name || 'Host Shop'}
+                </h1>
+                <p className="mt-2 font-medium text-slate-700">
+                  Shared registered-apprenticeship workspace
+                </p>
+                {board.registeredPrograms.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {board.registeredPrograms.map((program) => (
+                      <span
+                        key={program.rapidsCode}
+                        className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-bold text-cyan-900"
+                      >
+                        {program.label} · RAPIDS {program.rapidsCode}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                {board.shops[0]?.city ? (
+                  <p className="mt-2 text-sm font-medium text-slate-700">
+                    {board.shops[0].city}, {board.shops[0].state}
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${partnerVerified ? 'bg-green-100 text-green-900' : 'bg-amber-100 text-amber-950'}`}
+                >
+                  {partnerVerified ? 'Verified Partner' : 'Verification Pending'}
+                </span>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${partnerMouSigned ? 'bg-green-100 text-green-900' : 'bg-amber-100 text-amber-950'}`}
+                >
+                  {partnerMouSigned ? 'MOU Signed' : 'MOU Pending'}
+                </span>
+                {isPlatformAdmin ? (
+                  <form action={clearAdminPartner}>
+                    <button className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-bold">
+                      Change Host Shop
+                    </button>
+                  </form>
+                ) : null}
+              </div>
+            </div>
+            {isPlatformAdmin &&
+            (!partnerVerified || !partnerMouSigned || !partnerOnboardingComplete) ? (
+              <div
+                role="alert"
+                className="mt-5 rounded-xl border border-blue-300 bg-blue-50 p-4 text-sm font-semibold leading-6 text-blue-950"
+              >
+                Admin review mode: this Host Shop record is accessible for audit and setup, but
+                owner access remains gated until verification, MOU, and onboarding requirements are
+                complete.
+              </div>
+            ) : null}
+            {board.unconfiguredPrograms.length ? (
+              <div
+                role="alert"
+                className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950"
+              >
+                Regulated progress is blocked for:{' '}
+                {board.unconfiguredPrograms
+                  .map((program) => program.programSlug || 'unknown occupation')
+                  .join(', ')}
+                . An active approved registered-program standard must be configured before
+                competencies, RTI, or regulated OJL are credited.
+              </div>
+            ) : null}
+          </div>
+          <div className="relative min-h-[240px]">
+            <Image
+              src={heroImage}
+              alt={`${partnerName || 'Host Shop'} supervised apprenticeship workspace`}
+              fill
+              priority
+              className={heroIsLogo || heroImage === '/images/logo.png' ? 'bg-white object-contain p-6' : 'object-cover'}
+              sizes="(max-width: 1024px) 100vw, 42vw"
+            />
+          </div>
+        </div>
+      </section>
+      {!board.documentsComplete ? (
+        <section
+          role="alert"
+          className="mt-6 rounded-2xl border border-red-300 bg-red-50 p-5 text-red-950"
+        >
+          <h2 className="text-lg font-black">Required compliance documents are incomplete</h2>
+          <p className="mt-1 text-sm font-semibold">
+            Upload or replace every item below before the Host Shop is considered fully ready.
+          </p>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {board.missingDocuments.map((item: any) => (
+              <li
+                key={item.document_type}
+                className="rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold"
+              >
+                Missing: {item.document_name}
+              </li>
+            ))}
+            {board.pendingDocuments.map((item: any) => (
+              <li
+                key={item.document_type}
+                className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-950"
+              >
+                In review: {item.document_name}
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/host-shop/dashboard/documents"
+            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-red-700 px-5 py-3 font-black text-white hover:bg-red-800"
+          >
+            Complete required documents
+          </Link>
+        </section>
+      ) : null}
+      <section className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">This week</p><h2 className="mt-1 text-2xl font-black text-slate-950">Host Shop weekly responsibilities</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">These checks come from this shop's live apprentices, submitted work hours, registered standards, documents, and partner record. Use the linked workspace to finish anything still open.</p></div><span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">{[board.pendingHoursCount === 0, board.documentsComplete, partnerMouSigned, board.unconfiguredPrograms.length === 0].filter(Boolean).length}/4 core checks clear</span></div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {[
+            { label: 'Review apprentice roster and progress', detail: `${board.apprentices.length} active apprentice${board.apprentices.length === 1 ? '' : 's'} assigned. Review work progress and next required skill for each apprentice.`, done: board.apprentices.length > 0, href: '/host-shop/dashboard/apprentices' },
+            { label: 'Approve submitted work hours', detail: board.pendingHoursCount ? `${board.pendingHoursCount} work entr${board.pendingHoursCount === 1 ? 'y' : 'ies'} need Host Shop review.` : 'No submitted work-hour records are waiting for review.', done: board.pendingHoursCount === 0, href: '/host-shop/dashboard/hours/pending' },
+            { label: 'Verify Appendix A skills and services', detail: board.registeredPrograms.length ? 'Open the apprentice competency record and sign only skills/services personally observed with required evidence.' : 'A registered standard must be configured before regulated competency progress can be credited.', done: board.registeredPrograms.length > 0 && board.unconfiguredPrograms.length === 0, href: '/host-shop/dashboard/competencies' },
+            { label: 'Keep compliance documents current', detail: board.documentsComplete ? 'Required Host Shop documents are accepted.' : `${board.missingDocuments.length} missing and ${board.pendingDocuments.length} awaiting review.`, done: board.documentsComplete, href: '/host-shop/dashboard/documents' },
+            { label: 'Review wage compliance and attendance', detail: 'Confirm the apprentice is being paid under the applicable registered wage schedule and that attendance/work evidence matches actual supervised work.', done: false, href: '/host-shop/dashboard/wages' },
+            { label: 'Check messages, phone, and follow-up', detail: 'Review official communications, missed calls, apprentice issues, meetings, and any follow-up that must be documented this week.', done: false, href: '/host-shop/dashboard/communications' },
+          ].map((item) => <Link key={item.label} href={item.href} className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"><span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>{item.done ? '✓' : '!'}</span><span className="min-w-0"><span className="block font-black text-slate-950">{item.label}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span><span className="mt-2 block text-xs font-black text-blue-800">{item.done ? 'Review record' : 'Open weekly action'} →</span></span></Link>)}
+        </div>
+      </section>
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {summaryCards.map((card) => (
+          <PortalImageCard key={card.title} card={card} />
+        ))}
+      </section>
+      <div className="mt-8">
+        <PortalStartChecklist role="host-shop" />
+        <BusinessNetworkCard href="/host-shop/dashboard/community" label="Barber & Beauty Network" />
+        <HostShopProgramGuide />
+        <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-black text-slate-950">Host Shop app</p>
+            <p className="mt-1 text-sm font-medium text-slate-700">
+              Install this exact Host Shop dashboard for direct access to apprentices, hours,
+              attendance, competencies, and reports.
+            </p>
+          </div>
+          <PwaInstallButton
+            label="Install Host Shop App"
+            installedLabel="Host Shop App Installed"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
+          />
+        </section>
+        {!isPlatformAdmin ? (
+          <div className="mb-5">
+            <EmailAccountNotice href="/host-shop/email" />
+          </div>
+        ) : null}
+        <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">
+                Host Shop Network launch
+              </p>
+              <h2 className="mt-2 text-2xl font-black">
+                Put your shop in front of apprentices and local customers.
+              </h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-200">
+                Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then
+                share your profile link from your website, Google Business Profile, and social pages.
+                Visibility and results vary; a complete, accurate profile gives people more ways to
+                discover and contact your business.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
+              <Link
+                href="/host-shop/dashboard/profile"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950"
+              >
+                Complete My Network Profile
+              </Link>
+              <a
+                href="https://www.elevateforhumanity.org/partners/host-shops"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white"
+              >
+                View the Public Network
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+      {publicMedia.length || publicProfile?.video_url ? (
+        <section className="mt-8">
+          <h2 className="mb-4 text-2xl font-black text-slate-950">Your public Host Shop gallery</h2>
+          <HostShopMediaCarousel
+            shopName={partnerName}
+            items={publicMedia}
+            videoUrl={publicProfile?.video_url || undefined}
+          />
+        </section>
+      ) : null}
+      <section
+        className="mt-8 rounded-3xl border border-cyan-200 bg-cyan-50 p-6 sm:p-8"
+        aria-labelledby="host-shop-operating-guide"
+      >
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-800">
+          Start here and repeat weekly
+        </p>
+        <h2 id="host-shop-operating-guide" className="mt-2 text-2xl font-black text-slate-950">
+          Run your apprenticeship step by step
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">
+          Use this checklist for every apprentice. Each step opens the same verified shop,
+          placement, geofence, hours, competency, and compliance records used by the program.
+        </p>
+        <ol className="mt-5 grid gap-3 md:grid-cols-2">
+          {operatingSteps.map((step) => (
+            <li key={step.title}>
+              <Link
+                href={step.href}
+                className="block h-full rounded-2xl border border-cyan-200 bg-white p-4 transition hover:border-brand-blue-400 hover:shadow-sm"
+              >
+                <h3 className="font-black text-slate-950">{step.title}</h3>
+                <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{step.detail}</p>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section className="mt-8">
+        <h2 className="text-2xl font-black text-slate-950">Host Shop tools</h2>
+        <p className="mt-1 text-sm font-medium text-slate-700">
+          Every workspace uses the same verified partner, shop, placement, registered-program
+          contract, and audit records.
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {toolCards.map((card) => (
+            <PortalImageCard key={card.title} card={card} />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
 }

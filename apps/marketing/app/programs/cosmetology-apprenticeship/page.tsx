@@ -1,8 +1,17 @@
+import { connection } from 'next/server';
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { getProgramHeroImage } from '@/lib/images/programImages';
 import { notFound } from 'next/navigation';
+
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
+import BeautyApprenticeshipAuthority, {
+  buildBeautyProgramStructuredData,
+} from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
+import CosmetologyVisualExperience from '@/components/programs/beauty/CosmetologyVisualExperience';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
+import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { getStaticProgram } from '@/data/programs';
@@ -10,36 +19,57 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function CosmetologyApprenticeshipPage() {
+  // Live approved host-shop galleries and placement guides require runtime credentials.
+  await connection();
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
   if (!program) return notFound();
-  const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const baseBanner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const banner = baseBanner
+    ? {
+        ...baseBanner,
+        voiceoverSrc: undefined,
+        belowHeroHeadline: 'Build your cosmetology career through supervised salon training.',
+        belowHeroSubheadline:
+          'Registered Hair Stylist/Cosmetologist occupation 0096HY V1: complete the 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, required work processes, and the applicable Indiana examination and licensing process.',
+        trustIndicators: [
+          'Supervised salon training',
+          'Related Technical Instruction',
+          'Hours and competency tracking',
+          'Licensing preparation',
+        ],
+        transcript:
+          'Hair Stylist, existing title Cosmetologist, is registered in RAPIDS as occupation 0096HY V1 using a hybrid model. Apprentices complete a 2,000 to 2,500 hour registered term, including 154 hours of Related Technical Instruction, supervised Host Salon training, required work processes, and program records. The 500-hour figure is the probationary period, not graduation. After registered apprenticeship completion, the apprentice follows the applicable Indiana examination and licensing process.',
+      }
+    : null;
   const structuredData = buildBeautyProgramStructuredData(program);
-  const heroOverride = banner?.videoSrcDesktop ? (
-    <HeroVideo
-      videoSrcDesktop={banner.videoSrcDesktop}
-      videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
-      posterImage={banner.posterImage || program.heroImage}
-      voiceoverSrc={banner.voiceoverSrc}
-      microLabel={banner.microLabel}
-      analyticsName={banner.analyticsName}
-      belowHeroHeadline={banner.belowHeroHeadline}
-      belowHeroSubheadline={banner.belowHeroSubheadline}
-      ctas={[banner.primaryCta, banner.secondaryCta].filter(Boolean) as any}
-      trustIndicators={banner.trustIndicators}
-      transcript={banner.transcript}
-    />
-  ) : undefined;
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
+        }}
       />
-      <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
+      <ProgramDetailPage
+        program={program}
+        banner={banner}
+        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="cosmetology-apprenticeship" />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="cosmetology-apprenticeship" programLabel={program.title} />}
+        visualContent={<CosmetologyVisualExperience />}
+        featuredContent={
+          <>
+            <ApprenticeshipExperienceGuide
+              programTitle={program.title}
+              applyHref={program.cta.applyHref}
+            />
+            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" showDirectory={false} />
+            <HostShopPlacementGuide programSlug="cosmetology-apprenticeship" />
+          </>
+        }
+      >
         <BeautyApprenticeshipAuthority program={program} />
-        <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
       </ProgramDetailPage>
     </>
   );
@@ -49,7 +79,7 @@ export async function generateMetadata() {
   return {
     title: 'Cosmetology Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Indiana cosmetology apprenticeship pathway with 2,000 hours of supervised salon training, related instruction, host-site placement, progress tracking and licensing preparation. Current funding status is verified per program before enrollment.',
+      'Registered Indiana Hair Stylist/Cosmetologist apprenticeship, RAPIDS 0096HY V1: hybrid 2,000–2,500-hour term, 154 RTI hours, 500-hour probation, supervised Host Salon training, progress tracking, and licensing preparation.',
     keywords: [
       'cosmetology apprenticeship Indiana',
       'Indiana cosmetology apprenticeship program',
@@ -64,7 +94,8 @@ export async function generateMetadata() {
     },
     openGraph: {
       title: 'Cosmetology Apprenticeship Program | Indiana',
-      description: 'Complete supervised salon training and related instruction with Elevate’s cosmetology apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+      description:
+        'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1) with a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, and licensing preparation.',
       url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
       type: 'website',
     },

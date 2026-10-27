@@ -2,9 +2,11 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { classifyVideoFailure, type VideoAssetKind, type VideoJob } from '@/lib/video/job-queue';
+import { MEDIA_QUALITY_GATE_VERSION, mediaQualityFailures, type MediaQualityEvidence } from '@/lib/video/media-quality-gate';
 
 export const COURSE_MEDIA_MAX_RETRIES = 3;
-export const COURSE_MEDIA_STALE_RENDER_MS = 45 * 60 * 1000;
+export const COURSE_MEDIA_STALE_RENDER_MS = 2 * 60 * 60 * 1000;
+export const COURSE_MEDIA_RENDER_LEASE_SECONDS = 60 * 60;
 export const COURSE_MEDIA_RETRY_BASE_MS = 60 * 1000;
 export const COURSE_MEDIA_RETRY_MAX_BACKOFF_MS = 15 * 60 * 1000;
 
@@ -31,7 +33,14 @@ export interface CourseMediaState {
   staleRendering: number;
   lessonStateMismatches: number;
   microclipStateMismatches: number;
+  invalidQualityEvidence: number;
   completePackage: boolean;
+}
+
+export function hasCanonicalMediaQualityEvidence(value: unknown): value is MediaQualityEvidence {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const evidence = value as MediaQualityEvidence;
+  return evidence.gateVersion === MEDIA_QUALITY_GATE_VERSION && mediaQualityFailures(evidence).length === 0;
 }
 
 export function canonicalMediaIdentityKey(
@@ -41,10 +50,11 @@ export function canonicalMediaIdentityKey(
 }
 
 export function isCourseMediaFailureRetryable(message: string | null): boolean {
-  if (!message) return true;
-  return !['configuration', 'authorization', 'not_found', 'content'].includes(
-    classifyVideoFailure(message),
-  );
+  // Only transport/runtime failures may be retried without a source repair.
+  // Quality, storage, unknown and configuration failures require investigation;
+  // repeated rendering cannot resolve missing capacity or bad narration.
+  if (!message) return false;
+  return ['transient', 'renderer'].includes(classifyVideoFailure(message));
 }
 
 export function courseMediaRetryDelayMs(retryCount: number): number {
@@ -61,7 +71,7 @@ function retryBackoffElapsed(job: VideoJob, now = Date.now()): boolean {
 
 export async function resetCanonicalMediaJob(
   identity: CourseMediaIdentity,
-  options: { force?: boolean; reason?: string } = {},
+  options: { force?: boolean; sourceRepaired?: boolean; reason?: string } = {},
 ): Promise<VideoJob> {
   const db = await requireAdminClient();
   let query = db
@@ -82,7 +92,7 @@ export async function resetCanonicalMediaJob(
   // Force may bypass backoff and terminal classification for an operator repair,
   // but it must never bypass the hard retry ceiling. Otherwise deterministic
   // renderer failures loop forever and repeatedly consume paid GPU capacity.
-  if ((job.retry_count ?? 0) >= COURSE_MEDIA_MAX_RETRIES) {
+  if ((job.retry_count ?? 0) >= COURSE_MEDIA_MAX_RETRIES && !options.sourceRepaired) {
     throw new Error(`Retry limit reached for media job ${job.id}`);
   }
   if (job.status === 'failed' && !isCourseMediaFailureRetryable(job.error_message) && !options.force) {
@@ -93,7 +103,9 @@ export async function resetCanonicalMediaJob(
   }
 
   const now = new Date().toISOString();
-  const nextRetry = (job.retry_count ?? 0) + 1;
+  // A deliberate operator repair changes the canonical source and starts a
+  // fresh bounded retry budget. Ordinary transient failures retain the ceiling.
+  const nextRetry = options.sourceRepaired ? 1 : (job.retry_count ?? 0) + 1;
   const { data: reset, error: resetError } = await db
     .from('video_jobs')
     .update({
@@ -185,10 +197,14 @@ export async function recoverCourseMediaJobs(input: { courseId?: string | null; 
       ? new Date(row.started_at).getTime() < staleBefore
       : false;
     const stale = leaseExpired || legacyStale;
+    // A failed render must remain failed until an operator has corrected the
+    // underlying source or renderer and explicitly requests recovery. Time
+    // passing alone is not authority to repeat an identical expensive render.
     const eligibleFailed =
+      input.force === true &&
       row.status === 'failed' &&
       isCourseMediaFailureRetryable(row.error_message) &&
-      (input.force === true || retryBackoffElapsed(row, now));
+      retryBackoffElapsed(row, now);
     if (!stale && !eligibleFailed) continue;
     try {
       await resetCanonicalMediaJob(
@@ -251,7 +267,7 @@ async function verifyPlayableRows(rows: VideoJob[]) {
 export async function getCourseMediaState(courseId: string, options: { verifyUrls?: boolean } = {}): Promise<CourseMediaState> {
   const db = await requireAdminClient();
   const [{ data: lessons, error: lessonError }, { data: jobs, error: jobError }] = await Promise.all([
-    db.from('course_lessons').select('id,content_json,video_status,video_url,video_job_id').eq('course_id', courseId),
+    db.from('course_lessons').select('id,content_json,video_config,video_status,video_url,video_job_id,generation_status,media_origin,media_quality_status').eq('course_id', courseId),
     db.from('video_jobs').select('*').eq('course_id', courseId),
   ]);
   if (lessonError) throw lessonError;
@@ -260,28 +276,43 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   const rows = (jobs ?? []) as VideoJob[];
   const lessonJobs = new Map<string, VideoJob>();
   const microJobs = new Map<string, VideoJob>();
-  const identities = new Set<string>();
-  let duplicates = 0;
+  const approvedExternalLessonIds = new Set(
+    (lessons ?? [])
+      .filter((lesson) =>
+        lesson.media_origin === 'uploaded' &&
+        lesson.media_quality_status === 'approved' &&
+        ['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) &&
+        Boolean(typeof lesson.video_url === 'string' && lesson.video_url.trim()),
+      )
+      .map((lesson) => lesson.id),
+  );
   for (const row of rows) {
-    const key = canonicalMediaIdentityKey(row);
-    if (identities.has(key)) duplicates += 1;
-    identities.add(key);
     if ((row.asset_kind ?? 'lesson') === 'lesson') lessonJobs.set(row.lesson_id, row);
     else microJobs.set(`${row.lesson_id}:${row.asset_key ?? ''}`, row);
   }
 
   let requiredMicroclips = 0;
+  const requiredMicroclipIdentities = new Set<string>();
   let lessonStateMismatches = 0;
   let microclipStateMismatches = 0;
   for (const lesson of lessons ?? []) {
     const lessonJob = lessonJobs.get(lesson.id);
     const lessonUrl = typeof lesson.video_url === 'string' ? lesson.video_url.trim() : '';
     const jobUrl = typeof lessonJob?.video_url === 'string' ? lessonJob.video_url.trim() : '';
+    const approvedExternalMedia =
+      lesson.media_origin === 'uploaded' &&
+      lesson.media_quality_status === 'approved' &&
+      ['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) &&
+      Boolean(lessonUrl);
     if (
-      !lessonJob ||
-      lesson.video_job_id !== lessonJob.id ||
-      lesson.video_status !== lessonJob.status ||
-      (lessonJob.status === 'complete' && lessonUrl !== jobUrl)
+      !approvedExternalMedia &&
+      (
+        !lessonJob ||
+        lesson.generation_status !== 'generated' ||
+        lesson.video_job_id !== lessonJob.id ||
+        lesson.video_status !== lessonJob.status ||
+        (lessonJob.status === 'complete' && lessonUrl !== jobUrl)
+      )
     ) {
       lessonStateMismatches += 1;
     }
@@ -292,7 +323,12 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     const experience = content.experience && typeof content.experience === 'object'
       ? content.experience as Record<string, any>
       : {};
-    const clips = Array.isArray(experience.quickClips) ? experience.quickClips.slice(0, 2) : [];
+    const videoConfig = lesson.video_config && typeof lesson.video_config === 'object'
+      ? lesson.video_config as Record<string, any>
+      : {};
+    const clips = videoConfig.enableMicroclips === true && Array.isArray(experience.quickClips)
+      ? experience.quickClips.slice(0, 2)
+      : [];
     requiredMicroclips += clips.length;
     for (const clip of clips) {
       const key = typeof clip?.id === 'string' ? clip.id : '';
@@ -300,6 +336,7 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
         microclipStateMismatches += 1;
         continue;
       }
+      requiredMicroclipIdentities.add(`${lesson.id}:${key}`);
       const job = microJobs.get(`${lesson.id}:${key}`);
       if (!job) {
         microclipStateMismatches += 1;
@@ -314,36 +351,56 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     }
   }
 
+  // Historical microclips are not part of the universal one-video-per-lesson
+  // contract unless the lesson explicitly opts in. They must not block a new
+  // primary lesson package or consume its readiness counts.
+  const canonicalRows = rows.filter((row) =>
+    ((row.asset_kind ?? 'lesson') === 'lesson' && !approvedExternalLessonIds.has(row.lesson_id)) ||
+    requiredMicroclipIdentities.has(`${row.lesson_id}:${row.asset_key ?? ''}`),
+  );
+  const canonicalIdentities = new Set<string>();
+  let duplicates = 0;
+  for (const row of canonicalRows) {
+    const key = canonicalMediaIdentityKey(row);
+    if (canonicalIdentities.has(key)) duplicates += 1;
+    canonicalIdentities.add(key);
+  }
+
   const requiredLessonVideos = lessons?.length ?? 0;
+  const approvedExternalLessons = approvedExternalLessonIds.size;
+  const expectedJobTotal = Math.max(0, requiredLessonVideos - approvedExternalLessons) + requiredMicroclips;
   const expectedTotal = requiredLessonVideos + requiredMicroclips;
   const now = Date.now();
-  const staleRendering = rows.filter(
+  const staleRendering = canonicalRows.filter(
     (row) => row.status === 'rendering' && (
       row.lease_expires_at
         ? new Date(row.lease_expires_at).getTime() < now
         : Boolean(row.started_at && now - new Date(row.started_at).getTime() > COURSE_MEDIA_STALE_RENDER_MS)
     ),
   ).length;
-  const completeRows = rows.filter((row) => row.status === 'complete' && Boolean(row.video_url));
-  let playable = options.verifyUrls ? 0 : completeRows.length;
+  const completeRows = canonicalRows.filter((row) => row.status === 'complete' && Boolean(row.video_url));
+  const invalidQualityEvidence = completeRows.filter((row) =>
+    row.review_status !== 'approved' || !hasCanonicalMediaQualityEvidence(row.quality_evidence),
+  ).length;
+  let playable = options.verifyUrls ? 0 : completeRows.length + approvedExternalLessons;
   let unreachable: Array<{ jobId: string; url: string; reason: string }> = [];
 
   if (options.verifyUrls) {
     const verified = await verifyPlayableRows(completeRows);
-    playable = verified.playable;
+    playable = verified.playable + approvedExternalLessons;
     unreachable = verified.unreachable;
   }
 
-  const queued = rows.filter((row) => row.status === 'queued').length;
-  const rendering = rows.filter((row) => row.status === 'rendering').length;
-  const failed = rows.filter((row) => row.status === 'failed').length;
-  const complete = completeRows.length;
+  const queued = canonicalRows.filter((row) => row.status === 'queued').length;
+  const rendering = canonicalRows.filter((row) => row.status === 'rendering').length;
+  const failed = canonicalRows.filter((row) => row.status === 'failed').length;
+  const complete = completeRows.length + approvedExternalLessons;
   return {
     courseId,
     requiredLessonVideos,
     requiredMicroclips,
     expectedTotal,
-    jobsTotal: rows.length,
+    jobsTotal: canonicalRows.length,
     queued,
     rendering,
     failed,
@@ -354,11 +411,13 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     staleRendering,
     lessonStateMismatches,
     microclipStateMismatches,
+    invalidQualityEvidence,
     completePackage:
-      rows.length === expectedTotal &&
+      canonicalRows.length === expectedJobTotal &&
       duplicates === 0 &&
       queued === 0 && rendering === 0 && failed === 0 && staleRendering === 0 &&
       lessonStateMismatches === 0 && microclipStateMismatches === 0 &&
+      invalidQualityEvidence === 0 &&
       complete === expectedTotal && playable === expectedTotal && unreachable.length === 0,
   };
 }

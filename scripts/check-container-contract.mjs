@@ -37,9 +37,17 @@ const requiredUrls = {
   NEXT_PUBLIC_APP_URL: 'https://app.elevateforhumanity.org',
 };
 
+const workspaceConfig = read('pnpm-workspace.yaml');
+
 let failures = 0;
 const fail = (message) => { console.error(`❌ ${message}`); failures += 1; };
 const pass = (message) => console.log(`✅ ${message}`);
+
+if (!/^  ffmpeg-static: false$/m.test(workspaceConfig)) {
+  fail('workspace: ffmpeg-static install scripts must stay blocked; production images use system FFmpeg.');
+} else {
+  pass('workspace: network-dependent ffmpeg-static postinstall is blocked.');
+}
 
 for (const service of services) {
   const config = readJson(service.configPath);

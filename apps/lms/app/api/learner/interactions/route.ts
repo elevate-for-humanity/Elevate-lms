@@ -7,6 +7,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';
 import { createClient } from '@/lib/supabase/server';
+import {
+  resolveLessonMasteryPolicy,
+  resolveStoredLessonExperience,
+} from '@/lib/course-factory/mastery-policy';
+import {
+  buildLessonLearningObjects,
+  type LearningObject,
+} from '@/lib/course-factory/learning-objects';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,6 +25,12 @@ const AttemptSchema = z.object({
   interactionId: z.string().min(1).max(240),
   interactionType: z.enum(['knowledge-check', 'scenario', 'case-study']),
   responses: z.array(z.number().int().nonnegative()).min(1).max(50),
+});
+
+const LearningObjectCompletionSchema = z.object({
+  courseId: z.string().uuid(),
+  lessonId: z.string().uuid(),
+  learningObjectId: z.string().min(1).max(300),
 });
 
 export async function GET(request: NextRequest) {
@@ -45,12 +59,7 @@ export async function GET(request: NextRequest) {
       lesson.content_json && typeof lesson.content_json === 'object'
         ? (lesson.content_json as Record<string, any>)
         : {};
-    const contentRecord = normalizeContent(lesson.content);
-    const storedExperience = contentJson.experience ?? contentRecord.experience;
-    const authored =
-      storedExperience && typeof storedExperience === 'object'
-        ? (storedExperience as Record<string, any>)
-        : null;
+    const authored = resolveStoredLessonExperience(contentJson, lesson.content);
     // Interaction-specific persistence is optional; lesson completion remains canonical.
     // Do not fail the entire lesson when the optional interaction_progress table is absent.
     let progressRows: Array<Record<string, any>> = [];
@@ -65,17 +74,35 @@ export async function GET(request: NextRequest) {
 
     if (authored && Object.keys(authored).length > 0) {
       const interactions = experienceToInteractions(lessonSlug, authored, progressRows);
+      const storedObjects = Array.isArray(contentJson.learning_objects)
+        ? (contentJson.learning_objects as LearningObject[])
+        : buildLessonLearningObjects({
+            slug: lessonSlug,
+            videoUrl: lesson.video_url,
+            quizQuestions: lesson.quiz_questions,
+            experience: authored,
+          });
+      const completedIds = new Set(
+        progressRows.filter((row) => row.completed).map((row) => String(row.interaction_id)),
+      );
+      const learningObjects = storedObjects.map((object) => ({
+        ...object,
+        completed: completedIds.has(object.id),
+      }));
       return NextResponse.json({
         success: true,
         source: 'lesson-experience',
         lessonSlug,
+        learningObjects,
         interactions,
         flashcards: Array.isArray(authored.flashcards) ? authored.flashcards : [],
         narrationScript: authored.narrationScript ?? null,
         visualPrompt: authored.visualPrompt ?? null,
         practicalTask: authored.practicalTask ?? null,
         interactiveVideo: authored.interactiveVideo ?? null,
+        instructionalTimeline: authored.instructionalTimeline ?? null,
         experience: authored,
+        masteryPolicy: resolveLessonMasteryPolicy(authored),
         meta: {
           totalInteractions: interactions.length,
           completedInteractions: interactions.filter((i) => i.completed).length,
@@ -100,7 +127,12 @@ export async function POST(request: NextRequest) {
   const { user, error: authError } = await requireAuth(request);
   if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const parsed = AttemptSchema.safeParse(await request.json().catch(() => null));
+  const body = await request.json().catch(() => null);
+  const objectCompletion = LearningObjectCompletionSchema.safeParse(body);
+  if (objectCompletion.success) {
+    return completeLearningObject(user.id, objectCompletion.data);
+  }
+  const parsed = AttemptSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid interaction attempt' }, { status: 400 });
   }
@@ -123,12 +155,7 @@ export async function POST(request: NextRequest) {
       lesson.content_json && typeof lesson.content_json === 'object'
         ? (lesson.content_json as Record<string, any>)
         : {};
-    const contentRecord = normalizeContent(lesson.content);
-    const storedExperience = contentJson.experience ?? contentRecord.experience;
-    const experience =
-      storedExperience && typeof storedExperience === 'object'
-        ? (storedExperience as Record<string, any>)
-        : null;
+    const experience = resolveStoredLessonExperience(contentJson, lesson.content);
     if (!experience) {
       return NextResponse.json(
         { error: 'This lesson has not passed the interactive Course Builder gate' },
@@ -138,7 +165,11 @@ export async function POST(request: NextRequest) {
 
     const expectedId =
       interactionType === 'knowledge-check'
-        ? `${lesson.slug}-kc`
+        ? interactionId === `${lesson.slug}-reassessment` &&
+          Array.isArray(experience.reassessment) &&
+          experience.reassessment.length
+          ? `${lesson.slug}-reassessment`
+          : `${lesson.slug}-kc`
         : interactionType === 'case-study'
           ? `${lesson.slug}-case`
           : `${lesson.slug}-scenario`;
@@ -149,7 +180,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const scored = scoreAttempt(interactionType, responses, experience);
+    const scored = scoreAttempt(
+      interactionType,
+      responses,
+      interactionId === `${lesson.slug}-reassessment`
+        ? { ...experience, knowledgeChecks: experience.reassessment }
+        : experience,
+    );
     if (!scored) {
       return NextResponse.json(
         { error: 'Interaction is not configured for scoring' },
@@ -196,17 +233,71 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function normalizeContent(value: unknown): Record<string, any> {
-  if (value && typeof value === 'object' && !Array.isArray(value))
-    return value as Record<string, any>;
-  if (typeof value !== 'string' || !value.trim()) return {};
+async function completeLearningObject(
+  learnerId: string,
+  input: z.infer<typeof LearningObjectCompletionSchema>,
+) {
   try {
-    const parsed = JSON.parse(value);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
-  } catch {
-    return { html: value };
+    const db = await createClient();
+    const { data: lesson, error } = await db
+      .from('course_lessons')
+      .select('id,slug,title,course_id,content_json,content')
+      .eq('id', input.lessonId)
+      .eq('course_id', input.courseId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+
+    const contentJson = (lesson.content_json ?? {}) as Record<string, any>;
+    const experience = resolveStoredLessonExperience(contentJson, lesson.content);
+    if (!experience)
+      return NextResponse.json({ error: 'Lesson is not publishable' }, { status: 409 });
+    const objects = Array.isArray(contentJson.learning_objects)
+      ? (contentJson.learning_objects as LearningObject[])
+      : buildLessonLearningObjects({
+          slug: lesson.slug,
+          experience,
+        });
+    const object = objects.find((item) => item.id === input.learningObjectId);
+    if (!object) return NextResponse.json({ error: 'Learning object not found' }, { status: 404 });
+    if (!['view', 'conditional'].includes(object.completion)) {
+      return NextResponse.json(
+        {
+          error: 'This object must be completed through its assessment, submission, or media flow',
+        },
+        { status: 409 },
+      );
+    }
+    const now = new Date().toISOString();
+    const { data: saved, error: saveError } = await db
+      .from('interaction_progress')
+      .upsert(
+        {
+          learner_id: learnerId,
+          course_id: input.courseId,
+          lesson_id: input.lessonId,
+          lesson_slug: lesson.slug,
+          interaction_id: object.id,
+          interaction_type: 'learning-object',
+          answers: [],
+          score: null,
+          completed: true,
+          attempts: 1,
+          weak_objectives: [],
+          feedback: { completion: object.completion, source: object.source },
+          completed_at: now,
+          updated_at: now,
+        },
+        { onConflict: 'learner_id,lesson_id,interaction_id' },
+      )
+      .select('interaction_id,completed,updated_at')
+      .single();
+    if (saveError) throw saveError;
+    return NextResponse.json({ success: true, learningObject: saved });
+  } catch (error) {
+    console.error('[learner/interactions/learning-object]', error);
+    return NextResponse.json({ error: 'Failed to save learning-object progress' }, { status: 500 });
   }
-  return { html: value };
 }
 
 function scoreAttempt(
@@ -230,7 +321,7 @@ function scoreAttempt(
     });
     const correctCount = questions.length - missed.length;
     const score = Math.round((correctCount / questions.length) * 100);
-    const passingScore = Number(experience.remediation?.passingScore ?? 80);
+    const passingScore = resolveLessonMasteryPolicy(experience).threshold;
     const objectiveMap = Array.isArray(experience.remediation?.objectiveMap)
       ? experience.remediation.objectiveMap
       : [];
@@ -316,6 +407,12 @@ function experienceToInteractions(
       remediation: experience.remediation ?? null,
     });
   }
+  if (Array.isArray(experience.reassessment) && experience.reassessment.length)
+    add('reassessment', 'knowledge-check', 'Reassessment', {
+      questions: experience.reassessment,
+      passingScore: experience.remediation?.passingScore ?? 80,
+      remediation: experience.remediation ?? null,
+    });
   add(
     'scenario',
     'scenario',

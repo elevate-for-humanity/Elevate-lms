@@ -34,14 +34,14 @@ export default function PaymentButton({
     setError(null);
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await fetch('/api/programs/enroll/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          programId,
-          paymentType,
+          program_id: programId,
+          funding_source: 'self_pay',
         }),
       });
 
@@ -51,9 +51,8 @@ export default function PaymentButton({
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
-      if (data.url) {
-        // Redirect to Stripe Checkout
-        window.location.href = data.url;
+      if (data.url || data.checkoutUrl) {
+        window.location.href = data.checkoutUrl || data.url;
       } else {
         throw new Error('No checkout URL received');
       }
@@ -129,8 +128,8 @@ export default function PaymentButton({
 
       {!loading && !error && (
         <div className="text-xs text-black text-center">
-          <p>Secure checkout powered by Stripe</p>
-          <p className="mt-1">Pay with card, Klarna, Afterpay, Zip, or bank account</p>
+          <p>Secure invoice payment through QuickBooks</p>
+          <p className="mt-1">Pay by card or bank transfer</p>
         </div>
       )}
     </div>

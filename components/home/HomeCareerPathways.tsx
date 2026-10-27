@@ -1,138 +1,136 @@
-/**
- * HomeCareerPathways — primary conversion pathways for first-time visitors.
- */
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 
 const PATHWAYS = [
   {
-    slug: 'business',
-    title: 'Business & Entrepreneurship',
+    slug: 'beauty-barber-network',
+    title: 'Beauty & Barber Network',
     description:
-      'Learn how to start, organize, market, and grow a business while building practical career and office skills you can use right away.',
-    image: '/images/business/office-admin.webp',
-    imageAlt: 'Business and entrepreneurship training with adults working together',
-    ctaHref: '/programs/business',
-    badge: 'Business',
-    cta: 'Explore Business Training',
+      'Train in real professional environments and explore barber, cosmetology, esthetics, and nail pathways.',
+    image: '/images/pages/barber-hands-on-bright.webp',
+    imageAlt: 'Barber and beauty professional training in a working shop',
+    ctaHref: '/apprenticeships',
+    cta: 'Explore Beauty & Barber',
   },
   {
     slug: 'hvac-technician',
-    title: 'HVAC Technician Training',
+    title: 'HVAC Technician',
     description:
-      'Train for hands-on work with heating and cooling systems, safety, diagnostics, installation, maintenance, and service calls.',
-    image: '/images/pages/hvac-technician.webp',
-    imageAlt: 'HVAC technician working with heating and cooling equipment',
+      'Build hands-on heating, cooling, safety, diagnostics, installation, and service skills.',
+    image: '/images/hvac-training-vibrant-2026.webp',
+    imageAlt: 'Illustrative HVAC training scene with a trainee and mentor',
     ctaHref: '/programs/hvac-technician',
-    badge: 'Skilled Trades',
-    cta: 'Explore HVAC Training',
+    cta: 'View HVAC Program',
   },
   {
     slug: 'cdl-training',
     title: 'CDL Training',
     description:
-      'Prepare for commercial driving with permit preparation, safety instruction, and coordinated behind-the-wheel training.',
-    image: '/images/pages/cdl-hero.webp',
-    imageAlt: 'Commercial truck driver training',
+      'Prepare for commercial driving through permit, safety, inspection, and road-training requirements.',
+    image: '/images/cdl-training-vibrant-2026.webp',
+    imageAlt: 'Illustrative commercial driving training scene',
     ctaHref: '/programs/cdl-training',
-    badge: 'Transportation',
-    cta: 'Explore CDL Training',
+    cta: 'View CDL Program',
   },
   {
-    slug: 'barber-apprenticeship',
-    title: 'Barber Apprenticeship',
+    slug: 'bookkeeping',
+    title: 'Bookkeeping',
     description:
-      'Learn in a real barbershop, build your skills with experienced professionals, and earn wages while completing your apprenticeship pathway.',
-    image: '/images/pages/barber-hero-main.webp',
-    imageAlt: 'Barber apprentice serving a client in a working barbershop',
-    ctaHref: '/programs/barber-apprenticeship',
-    badge: 'Earn While You Learn',
-    cta: 'Explore Barber Apprenticeship',
+      'Learn practical bookkeeping, QuickBooks, payroll, financial records, and business-office workflows.',
+    image: '/images/bookkeeping-training-vibrant-2026.webp',
+    imageAlt: 'Illustrative bookkeeping learner and mentor',
+    ctaHref: '/programs/bookkeeping',
+    cta: 'View Bookkeeping Program',
   },
   {
-    slug: 'beauty-apprenticeships',
-    title: 'Beauty Apprenticeships',
-    description:
-      'Turn your interest in hair, skin, nails, and client service into supervised workplace training in the beauty industry.',
-    image: '/images/pages/cosmetology-apprenticeship-hero.webp',
-    imageAlt: 'Beauty professional working with a client in a salon',
-    ctaHref: '/barber-and-beauty-apprenticeships',
-    badge: 'Beauty Industry',
-    cta: 'Explore Beauty Apprenticeships',
-  },
-  {
-    slug: 'host-shop',
-    title: 'Host an Apprentice — Sign Up Free',
-    description:
-      'Grow your salon, barbershop, spa, or nail business with an apprentice while Elevate supports onboarding, training records, and program administration. There is no cost for a business to apply or enroll as a Host Shop.',
-    image: '/images/partners/salon-saloon/team-sign.webp',
-    imageAlt: 'Salon Saloon team at an Elevate participating Host Salon',
-    ctaHref: '/partners/host-shops',
-    badge: 'For Shop Owners',
-    cta: 'See Host Shop Benefits & Sign Up',
+    slug: 'business',
+    title: 'Business & Entrepreneurship',
+    description: 'Learn how to organize, launch, market, operate, and grow a business.',
+    image: '/images/business-training-vibrant-2026.webp',
+    imageAlt: 'Illustrative business planning collaboration',
+    ctaHref: '/programs/business',
+    cta: 'View Business Program',
   },
 ] as const;
 
 export function HomeCareerPathways() {
   return (
-    <section className="bg-white px-4 py-16 sm:py-20" aria-labelledby="featured-pathways-heading">
+    <section
+      className="bg-white px-4 py-8 sm:py-12"
+      aria-labelledby="featured-pathways-heading"
+      aria-label="Choose the program you want to explore."
+    >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-10 max-w-3xl">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
-            Start With a Career Path
+        <div className="max-w-4xl">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
+            Flagship opportunities
           </p>
-          <h2 id="featured-pathways-heading" className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-            Choose where you want to go next.
+          <h2
+            id="featured-pathways-heading"
+            className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl"
+          >
+            Choose a path that can move you forward.
           </h2>
-          <p className="mt-4 text-lg leading-8 text-slate-700">
-            Elevate connects career training, apprenticeships, funding guidance, and employer-based learning. Pick a pathway below to see what the experience looks like and how to get started.
+          <p className="mt-5 text-lg leading-8 text-slate-700">
+            Career-training program pages show current tuition, duration, delivery format,
+            credentials, requirements, funding information, payment options, and enrollment steps.
+            State or workforce funding may cover tuition for eligible participants in approved
+            programs; eligibility and authorization are determined individually.
           </p>
         </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PATHWAYS.map((p) => (
-            <article key={p.slug} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl">
-              <Link href={p.ctaHref} className="block h-full">
-                <div className="relative aspect-[4/3] overflow-hidden bg-white">
+            <article
+              key={p.slug}
+              className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <Link href={p.ctaHref} className="flex h-full flex-col">
+                <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-100">
                   <Image
                     src={p.image}
                     alt={p.imageAlt}
                     fill
-                    className="object-cover brightness-105 contrast-105 saturate-110 transition duration-500 group-hover:scale-[1.04] group-hover:brightness-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover object-center transition duration-500 "
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                     loading="lazy"
                   />
-                  {p.slug !== 'host-shop' && (
-                    <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-950 shadow-sm">
-                      {p.badge}
-                    </div>
-                  )}
                 </div>
-                <div className="p-6 sm:p-7">
-                  <h3 className="text-2xl font-black leading-tight text-slate-950">{p.title}</h3>
-                  <p className="mt-3 text-base leading-7 text-slate-700">{p.description}</p>
-                  {p.slug === 'host-shop' && (
-                    <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-slate-800">
-                      <li>• Build and train your future workforce</li>
-                      <li>• Earn revenue from supervised client services</li>
-                      <li>• Get help with apprenticeship records and compliance</li>
-                      <li>• Explore available workforce rebates and tax-credit eligibility</li>
-                    </ul>
-                  )}
-                  <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-brand-red-700">
-                    {p.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <div className="flex flex-1 flex-col p-4 sm:p-5">
+                  <h3 className="text-xl font-black leading-tight text-slate-950">
+                    {p.slug === 'business' ? (
+                      <>
+                        Business & <span className="sm:hidden">Entrepre&shy;neurship</span>
+                        <span className="hidden sm:inline">Entrepreneurship</span>
+                      </>
+                    ) : p.slug === 'bookkeeping' ? (
+                      <span className="whitespace-nowrap">Bookkeeping</span>
+                    ) : (
+                      p.title
+                    )}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-700">{p.description}</p>
+                  <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-extrabold text-brand-red-700">
+                    {p.cta}{' '}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
               </Link>
             </article>
           ))}
         </div>
-
-        <div className="mt-10 flex justify-center">
-          <Link href="/programs" className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-8 py-4 text-base font-extrabold text-white transition hover:bg-brand-red-700">
-            View Every Program <ArrowRight className="h-5 w-5" />
+        <div className="mt-10 flex flex-wrap gap-3">
+          <Link
+            href="/programs"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-7 py-4 font-extrabold text-white hover:bg-brand-red-700"
+          >
+            View All Career Programs <ArrowRight className="h-5 w-5" />
+          </Link>
+          <Link
+            href="/check-eligibility"
+            className="inline-flex items-center rounded-xl border-2 border-slate-900 px-7 py-4 font-extrabold text-slate-950 hover:bg-slate-50"
+          >
+            Check Funding Options
           </Link>
         </div>
       </div>

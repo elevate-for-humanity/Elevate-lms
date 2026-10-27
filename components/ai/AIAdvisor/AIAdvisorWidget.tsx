@@ -62,10 +62,19 @@ export function AIAdvisorWidget() {
     setIsLoading(true);
     setShowSuggestions(false);
 
-    // Simulate AI response
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const response = generateResponse(userMessage);
+    let response: string;
+    try {
+      const apiResponse = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage }),
+      });
+      if (!apiResponse.ok) throw new Error('advisor unavailable');
+      const payload = await apiResponse.json();
+      response = payload.response || payload.message || payload.content || generateResponse(userMessage);
+    } catch {
+      response = generateResponse(userMessage);
+    }
     
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
@@ -82,34 +91,34 @@ export function AIAdvisorWidget() {
     const q = question.toLowerCase();
     
     if (q.includes('cost') || q.includes('price') || q.includes('tuition') || q.includes('pay')) {
-      return "Great question about cost! Many students pay $0 through WIOA funding, Vocational Rehabilitation, or employer sponsorship. We also offer payment plans starting at $179/month. Most students qualify for some form of financial assistance. Want me to help you check your eligibility?";
+      return "Program prices, duration, funding status, and payment options vary by program. Use the program page for the current published tuition and length. Workforce funding requires program and participant eligibility plus authorization from the responsible agency; self-pay and approved payment options are shown when available.";
     }
     
     if (q.includes('work') && (q.includes('while') || q.includes('during'))) {
-      return "Yes! That's one of the best parts about our apprenticeship programs. You can earn $14-18/hour while you train at a real workplace. Unlike traditional school where you pay to learn, you'll actually get PAID to gain experience. The barbering apprenticeship takes 12-18 months, and you work 40 hours a week at a partner salon.";
+      return "Registered apprenticeship compensation, schedules, and completion requirements depend on the occupation, employer, and applicable standards. Review the specific apprenticeship page and your employer agreement for current wage, hours, and competency requirements.";
     }
     
     if (q.includes('funding') || q.includes('wioa') || q.includes('eligible') || q.includes('qualify')) {
-      return "We have several funding options! WIOA (Workforce Innovation and Opportunity Act) covers full tuition for qualifying individuals. Vocational Rehabilitation can cover training for people with disabilities. Many employers also sponsor their employees' training. The best way to find out what you qualify for is our free 60-second eligibility quiz. Want me to direct you there?";
+      return "Funding is program- and participant-specific. WIOA, Vocational Rehabilitation, employer sponsorship, or other workforce support may apply only when the selected program and participant meet the applicable requirements and the responsible source authorizes payment. The eligibility check is preliminary, not an award decision.";
     }
     
     if (q.includes('how long') || q.includes('duration') || q.includes('time') || q.includes('months')) {
-      return "Program length varies by path. Our barbering apprenticeship takes 12-18 months working 40 hours/week. Traditional programs like HVAC or medical assisting can be 6-12 months. CDL training is typically 4-8 weeks. Apprenticeship programs let you earn while you train, which is why many students prefer that route.";
+      return "Program length varies by program and some apprenticeships are competency-based rather than a fixed number of weeks. The current program page is the source for published duration, required hours, schedule, tuition, and enrollment options.";
     }
     
     if (q.includes('job') || q.includes('hire') || q.includes('employ') || q.includes('career') || q.includes('placement')) {
-      return "Job placement is one of our strengths! 95% of our apprenticeship graduates are hired by their host shop when they complete. We have partnerships with 75+ employers in Indianapolis including Great Clips, Sport Clips, and many local businesses. We also help with resume writing, interview prep, and connecting you with hiring partners.";
+      return "Career services can include resume support, interview preparation, employer introductions, and placement assistance. Employment, wages, interviews, and placement are not guaranteed; available employer relationships and openings change over time.";
     }
     
     if (q.includes('certif') || q.includes('license')) {
-      return "You'll earn industry-recognized credentials! For barbering, you'll receive your Indiana barber license after passing the state board exam. HVAC students get EPA 608 certification. Medical assistants can earn CCMA or RMA credentials. These certifications are recognized nationwide and help you get hired immediately.";
+      return "Credential outcomes depend on the selected program and the requirements of the issuing organization. Training can prepare learners for listed exams or licensing steps, but Elevate does not guarantee third-party certification, licensure, or employment.";
     }
     
     if (q.includes('help') || q.includes('advisor') || q.includes('talk') || q.includes('human')) {
-      return "I'd love to connect you with a human advisor! You can text us at (317) 314-3757, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
+      return "I'd love to connect you with a human advisor! You can text us at (463) 240-1404, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
     }
     
-    return "That's a great question! Based on what you've told me, I think our Barbering Registered Apprenticeship might be a perfect fit - you can earn $14-18/hour while you train, and most students pay nothing upfront. Would you like to learn more about this program, or do you have other questions I can help with?";
+    return "I can help with program tuition, duration, credentials, funding pathways, applications, and apprenticeship requirements. For program-specific facts, use the current published program record rather than assuming the same terms apply to every pathway.";
   };
 
   return (

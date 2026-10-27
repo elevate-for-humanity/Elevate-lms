@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { generateBlogSocialPackage } from '@/lib/social/blog-social-pipeline';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -52,16 +53,16 @@ const _POST = withAuth(
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    const generated = (posts ?? []).map((post) =>
-      post.social_post_caption?.trim() ||
-      [
-        post.title,
-        post.excerpt?.trim() || null,
-        `https://www.elevateforhumanity.org/blog/${post.slug}`,
-      ]
-        .filter(Boolean)
-        .join('\n\n'),
-    );
+    const generated = await Promise.all((posts ?? []).map(async (post) => {
+      const result = await generateBlogSocialPackage(post);
+      return {
+        blogId: post.id,
+        caption: `${result.package.caption}\n\n${result.package.hashtags.join(' ')}`,
+        reel: result.package,
+        provider: result.provider,
+        model: result.model,
+      };
+    }));
 
     return NextResponse.json({
       success: true,

@@ -1,0 +1,56 @@
+name: Audit Google GPU readiness
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/audit-google-gpu-readiness.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-gpu-readiness.yml/dispatches" -f ref=main
+  audit:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Read GPU configuration, services and quotas without allocating compute
+        run: |
+          python - <<'PY'
+          import subprocess,json,urllib.request,datetime
+          project='elegant-racer-299721'
+          def command(args):
+            p=subprocess.run(['gcloud']+args+['--project='+project],capture_output=True,text=True)
+            if p.returncode:raise RuntimeError('Google read unavailable')
+            return p.stdout
+          try:
+            archive=json.loads(command(['secrets','versions','access','latest','--secret=elevate-gpu-archive-config']))
+            print(json.dumps({'kind':'gpuArchive','state':archive.get('profile',{}).get('state'),'transferComplete':archive.get('transferComplete'),'accelerator':archive.get('profile',{}).get('accelerator'),'volumes':[{'id':v.get('id'),'bytesVerified':v.get('bytesVerified')} for v in archive.get('sourcePersistence',[])]}))
+          except Exception:print(json.dumps({'kind':'gpuArchive','readable':False}))
+          for region in ['us-central1','us-east1']:
+            services=json.loads(command(['run','services','list','--region='+region,'--format=json']))
+            for s in services:
+              spec=s['spec']['template']['spec'];containers=spec['containers']
+              if any(c.get('resources',{}).get('limits',{}).get('nvidia.com/gpu') for c in containers):
+                print(json.dumps({'kind':'gpuService','region':region,'service':s['metadata']['name'],'limits':[c.get('resources',{}).get('limits') for c in containers],'scaling':{k:v for k,v in s['spec']['template']['metadata'].get('annotations',{}).items() if 'scal' in k.lower()},'ready':s.get('status',{}).get('conditions',[{}])[0].get('status')}))
+          token=command(['auth','print-access-token']).strip()
+          url='https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global/services/run.googleapis.com/quotaInfos?pageSize=100'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'Authorization':'Bearer '+token}),timeout=30) as r:data=json.load(r)
+          for q in data.get('quotaInfos',[]):
+            if 'gpu' in q.get('quotaId','').lower():
+              print(json.dumps({'kind':'gpuQuota','id':q.get('quotaId'),'unit':q.get('metricUnit'),'dimensions':q.get('dimensionsInfos')}))
+          PY

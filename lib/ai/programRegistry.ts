@@ -172,16 +172,16 @@ export const PROGRAMS: Record<string, ProgramFacts> = {
     careerOutcomes: ['Forklift operator', 'Warehouse associate'],
     applyUrl: '/apply?program=forklift',
   },
-  'cpr-first-aid-hsi': {
-    slug: 'cpr-first-aid-hsi',
+  'cpr-first-aid': {
+    slug: 'cpr-first-aid',
     name: 'CPR, AED & First Aid',
     category: 'Healthcare',
-    credentials: ['HSI CPR/AED/First Aid certification'],
+    credentials: ['CPR/AED/First Aid certification'],
     duration: '1 day',
     format: 'In-person',
     fundingNotes: ['Included with many programs', 'Available standalone'],
     careerOutcomes: ['Required for healthcare and trades programs'],
-    applyUrl: '/apply?program=cpr-first-aid-hsi',
+    applyUrl: '/apply?program=cpr-first-aid',
   },
 };
 

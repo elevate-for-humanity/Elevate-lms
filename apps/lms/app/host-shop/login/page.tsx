@@ -5,9 +5,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { Building2, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 
-const MARKETING_HOST_SHOP_APPLICATION = 'https://www.elevateforhumanity.org/host-shop/apply';
+const MARKETING_HOST_SHOP_APPLICATION = 'https://www.elevateforhumanity.org/partners/host-shop/apply';
 
 const IDENTITY_ERRORS: Record<string, string> = {
   identity: 'Your account could not be verified. Please contact support.',
@@ -33,12 +32,28 @@ export default function HostShopLoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
+      let response: Response;
+      try {
+        response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          cache: 'no-store',
+          signal: controller.signal,
+          body: JSON.stringify({ email: email.trim(), password }),
+        });
+      } catch (cause) {
+        if (controller.signal.aborted) {
+          throw new Error(
+            'The sign-in service took too long to respond. Your internet may be working; please retry once or send a secure magic link.',
+            { cause },
+          );
+        }
+        throw cause;
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
       const body = (await response.json().catch(() => null)) as { success?: boolean; error?: string } | null;
       if (!response.ok || body?.success !== true) {
         throw new Error(body?.error || 'Invalid email or password.');
@@ -64,12 +79,19 @@ export default function HostShopLoginPage() {
     setIsLoading(true);
     setError('');
     try {
-      const supabase = createClient();
-      const { error: magicLinkError } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      const response = await fetch('/api/auth/send-magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({
+          email: email.trim(),
+          redirectTo: '/host-shop/dashboard',
+        }),
       });
-      if (magicLinkError) throw new Error('We could not send the secure sign-in link. Please try again.');
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error || 'We could not send the secure sign-in link. Please try again.');
+      }
       setMagicLinkSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to send a sign-in link.');

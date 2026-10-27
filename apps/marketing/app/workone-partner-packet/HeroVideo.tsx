@@ -10,7 +10,7 @@ export default function WorkOneHeroVideo() {
       posterImage="/images/pages/workone-partner-packet-page-1.webp"
       microLabel="WorkOne Partner Packet"
       analyticsName="workone-partner-packet"
-      heightClassName="h-[clamp(520px,72vh,900px)]"
+      heightClassName="h-[clamp(260px,42svh,480px)]"
     />
   );
 }

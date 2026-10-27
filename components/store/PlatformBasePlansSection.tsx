@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { storeSignInHref } from '@/lib/store/sign-in-return.mjs';
 import Link from 'next/link';
 import { Check, Loader2, Building2, CreditCard } from 'lucide-react';
 import {
@@ -20,7 +21,7 @@ export function PlatformBasePlansSection({
   headline = 'Base plans',
   subheadline = 'Start simple. Add workforce, LMS, and apprenticeship modules when you are ready.',
 }: Props) {
-  const [interval, setInterval] = useState<BillingInterval>('monthly');
+  const [interval, setBillingInterval] = useState<BillingInterval>('monthly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +40,7 @@ export function PlatformBasePlansSection({
 
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent('https://www.elevateforhumanity.org/store/plans')}`;
+          window.location.href = storeSignInHref('/store/plans');
           return;
         }
         if (res.status === 409 && data.trialUrl) {
@@ -66,8 +67,8 @@ export function PlatformBasePlansSection({
 
         <div className="mb-10 flex justify-center">
           <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
-            <button type="button" onClick={() => setInterval('monthly')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'monthly' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Monthly</button>
-            <button type="button" onClick={() => setInterval('annual')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'annual' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Annual <span className="ml-1 text-xs text-brand-green-600">save ~17%</span></button>
+            <button type="button" aria-pressed={interval === 'monthly'} onClick={() => setBillingInterval('monthly')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'monthly' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Monthly</button>
+            <button type="button" aria-pressed={interval === 'annual'} onClick={() => setBillingInterval('annual')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'annual' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Annual <span className="ml-1 text-xs text-brand-green-600">save ~17%</span></button>
           </div>
         </div>
 
@@ -93,6 +94,7 @@ export function PlatformBasePlansSection({
                   {loadingPlan === plan.id ? 'Loading secure checkout…' : `Subscribe — $${price}${priceLabel}`}
                 </button>
                 <Link href="/store/trial" className={`mt-2 block w-full rounded-lg border py-2.5 text-center text-sm font-semibold ${popular ? 'border-white/40 text-white hover:bg-white/10' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}>14-day free trial — no card required</Link>
+                <Link href={`/store/proof#offer-plan-${plan.id}`} className={`mt-3 text-center text-sm font-black underline underline-offset-4 ${popular ? 'text-white' : 'text-emerald-800'}`}>Verify included capabilities</Link>
               </div>
             );
           })}

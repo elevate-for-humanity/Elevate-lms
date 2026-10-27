@@ -1,0 +1,59 @@
+name: Verify private CPU model candidate without deployment
+on:
+  pull_request:
+    paths:
+      - 'services/llm-cpu-worker/**'
+      - 'lib/ai/providers/google-runtime-auth*'
+      - 'lib/ai/providers/elevate.ts'
+      - 'scripts/gcp/accept-owned-cpu-model*'
+      - '.github/workflows/verify-owned-cpu-model.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: owned-cpu-model-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify CPU workload policy and bounded acceptance tests
+        run: |
+          node scripts/check-build-memory-policy.mjs --source-only
+          node --test scripts/gcp/accept-owned-cpu-model.test.mjs lib/ai/providers/google-runtime-auth.test.mjs
+          python3 -m unittest discover -s services/llm-cpu-worker -p 'test_*.py'
+          bash -n services/llm-cpu-worker/entrypoint.sh
+      - name: Make room for the approved checkpoint on the ephemeral runner
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - name: Build CPU-only model from checksum-verified approved weights
+        run: docker build -f services/llm-cpu-worker/Dockerfile.google -t elevate-owned-cpu-candidate .
+      - name: Run actual model within four CPU and eight GiB limits
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          export LLM_WORKER_SECRET="$(openssl rand -hex 32)"
+          echo "::add-mask::$LLM_WORKER_SECRET"
+          docker run --detach --name elevate-cpu-acceptance --cpus=4 --memory=8g --memory-swap=8g \
+            --env LLM_WORKER_SECRET --publish 127.0.0.1:8080:8080 elevate-owned-cpu-candidate
+          trap 'docker rm --force elevate-cpu-acceptance >/dev/null 2>&1 || true' EXIT
+          ready=false
+          for attempt in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:8080/health >/dev/null; then ready=true; break; fi
+            if test "$(docker inspect --format='{{.State.Running}}' elevate-cpu-acceptance)" != true; then break; fi
+            sleep 5
+          done
+          if test "$ready" != true; then
+            docker logs --tail=80 elevate-cpu-acceptance
+            echo 'CPU model startup failed'; exit 1
+          fi
+          CPU_MODEL_LOCAL_TEST=true CPU_MODEL_URL=http://127.0.0.1:8080 node scripts/gcp/accept-owned-cpu-model.mjs
+          test "$(docker inspect --format='{{.State.OOMKilled}}' elevate-cpu-acceptance)" = false
+          docker stats --no-stream --format='{{.CPUPerc}} {{.MemUsage}}' elevate-cpu-acceptance
+          echo 'Real model auth, inference, forced tool call and streaming passed within Docker 4 CPU / 8 GiB. No production resources, permissions or configuration changed.' >> "$GITHUB_STEP_SUMMARY"

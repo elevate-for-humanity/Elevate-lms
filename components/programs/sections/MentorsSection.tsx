@@ -52,9 +52,9 @@ export function MentorsSection({
                   src={mentor.photo}
                   alt={mentor.name}
                   fill
-                  className="object-cover" sizes="100vw"
+                  className="object-contain" sizes="100vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{mentor.name}</h3>

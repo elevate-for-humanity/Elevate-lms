@@ -8,10 +8,9 @@ const CodeEditor = dynamic(
   () => import('@/components/studio/CodeEditor').then((m) => m.default || m),
   { ssr: false },
 );
-const GitPanel = dynamic(
-  () => import('@/components/studio/GitPanel').then((m) => m.default || m),
-  { ssr: false },
-);
+const GitPanel = dynamic(() => import('@/components/studio/GitPanel').then((m) => m.default || m), {
+  ssr: false,
+});
 
 type TreeNode = { type: string; path: string; name: string; children?: TreeNode[] };
 type SidebarMode = 'files' | 'git';
@@ -33,20 +32,29 @@ export default function DevStudioEditorWorkspace({
 }) {
   const [sidebar, setSidebar] = useState<SidebarMode>('files');
   const [files, setFiles] = useState<string[]>([]);
+  const [fileSearch, setFileSearch] = useState('');
+  const matchingFiles = files.filter((path) =>
+    path.toLowerCase().includes(fileSearch.trim().toLowerCase()),
+  );
   const [selected, setSelected] = useState('');
   const [content, setContent] = useState('');
   const [sha, setSha] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const [branch, setBranch] = useState('');
+  const [confirmMainCommit, setConfirmMainCommit] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/dev-studio/files', { cache: 'no-store' });
+      const res = await fetch('/api/admin/dev-studio/files?source=container', {
+        cache: 'no-store',
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setFiles(walkFiles(data.tree ?? []));
+      setBranch(String(data.branch ?? ''));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'File tree unavailable');
     }
@@ -60,14 +68,38 @@ export default function DevStudioEditorWorkspace({
     onFileContextChange?.(selected || null, content);
   }, [selected, content, onFileContextChange]);
 
+  async function saveContainerFile() {
+    if (!selected) return;
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/dev-studio/runtime', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ operation: 'file-write', path: selected, content }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw Error(result.error ?? 'Container save failed');
+      setStatus('Saved in your Studio container. Commit separately to publish.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Container save failed');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function loadFile(path: string) {
     setSelected(path);
+    setConfirmMainCommit(false);
     setLoading(true);
     setStatus('');
     try {
-      const res = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`, {
-        cache: 'no-store',
-      });
+      const res = await fetch(
+        `/api/admin/dev-studio/files?source=container&path=${encodeURIComponent(path)}`,
+        {
+          cache: 'no-store',
+        },
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setContent(data.content ?? '');
@@ -82,6 +114,11 @@ export default function DevStudioEditorWorkspace({
 
   async function saveFile() {
     if (!selected) return;
+    if (branch === 'main' && !confirmMainCommit) {
+      setConfirmMainCommit(true);
+      setStatus('Direct main commit: press Confirm Main Commit to continue.');
+      return;
+    }
     const updating = Boolean(sha);
     setLoading(true);
     setStatus(updating ? 'Committing update…' : 'Creating file…');
@@ -93,6 +130,7 @@ export default function DevStudioEditorWorkspace({
           path: selected,
           content,
           message,
+          ...(branch === 'main' ? { confirmation: 'CONFIRM PUSH' } : {}),
           ...(updating ? { sha } : {}),
         }),
       });
@@ -100,6 +138,7 @@ export default function DevStudioEditorWorkspace({
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setSha(data.sha ?? sha);
       setStatus(data.commit ? 'Committed to GitHub' : 'Committed');
+      setConfirmMainCommit(false);
       await refreshFiles();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Save failed');
@@ -133,7 +172,7 @@ export default function DevStudioEditorWorkspace({
           className="inline-flex items-center gap-1 rounded bg-[#0078d4] px-2 py-1 text-[11px] text-white disabled:opacity-40"
         >
           {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-          Commit
+          {branch === 'main' && confirmMainCommit ? 'Confirm Main Commit' : 'Commit'}
         </button>
         <input
           ref={fileInputRef}
@@ -166,29 +205,58 @@ export default function DevStudioEditorWorkspace({
         </button>
       </div>
 
+      <button
+        type="button"
+        disabled={!selected || loading}
+        onClick={() => void saveContainerFile()}
+        className="self-start rounded border border-slate-500 px-3 py-2 text-xs text-white disabled:opacity-40"
+      >
+        Save in container
+      </button>
       <div className="flex min-h-0 flex-1">
         <div className="w-56 shrink-0 overflow-y-auto border-r border-[#3c3c3c] bg-[#252526]">
           {sidebar === 'git' ? (
             <GitPanel />
           ) : (
-            <ul className="py-1 text-[11px]">
-              {files.map((path) => (
-                <li key={path}>
-                  <button
-                    type="button"
-                    onClick={() => void loadFile(path)}
-                    className={`block w-full truncate px-3 py-1 text-left hover:bg-[#2a2d2e] ${selected === path ? 'bg-[#094771] text-white' : ''}`}
-                  >
-                    {path}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <div className="sticky top-0 bg-[#252526] p-2">
+                <input
+                  aria-label="Search repository files"
+                  placeholder="Search file path…"
+                  value={fileSearch}
+                  onChange={(event) => setFileSearch(event.target.value)}
+                  className="w-full rounded border border-slate-500 bg-slate-950 px-2 py-2 text-xs text-white"
+                />
+                <p className="mt-1 text-[10px] text-slate-300">
+                  {matchingFiles.length} matches · showing up to 200. Search to narrow files.
+                </p>
+              </div>
+              <ul className="py-1 text-[11px]">
+                {matchingFiles.slice(0, 200).map((path) => (
+                  <li key={path}>
+                    <button
+                      type="button"
+                      onClick={() => void loadFile(path)}
+                      className={`block w-full truncate px-3 py-1 text-left hover:bg-[#2a2d2e] ${selected === path ? 'bg-[#094771] text-white' : ''}`}
+                    >
+                      {path}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
         <div className="min-w-0 flex-1">
           {selected ? (
-            <CodeEditor value={content} onChange={(value) => setContent(value ?? '')} filePath={selected} />
+            <CodeEditor
+              value={content}
+              onChange={(value) => {
+                setContent(value ?? '');
+                setConfirmMainCommit(false);
+              }}
+              filePath={selected}
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-[#858585]">
               Select a file or switch to Git

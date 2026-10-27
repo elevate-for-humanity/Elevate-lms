@@ -47,7 +47,7 @@ const CANONICAL_PORTALS = {
   '/instructor/dashboard':     ['instructor', 'admin', 'super_admin'],
   '/admin/staff-portal/dashboard':   ['staff', 'admin', 'super_admin'],
   '/mentor/dashboard':         ['mentor', 'admin', 'super_admin'],
-  '/program-holder/dashboard': ['program_holder', 'admin', 'super_admin'],
+  '/program-holder/dashboard': ['program_holder', 'site_coordinator', 'admin', 'super_admin'],
 };
 
 const LEGACY_PORTAL_PATHS = [

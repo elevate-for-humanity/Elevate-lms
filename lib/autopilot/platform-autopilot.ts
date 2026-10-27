@@ -5,6 +5,8 @@ import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { emitEvent } from '@/lib/platform/events';
 import { reconcileApplicationRemediations } from '@/lib/automation/reconcile-application-remediations';
+import { reconcileOpenHandsTasks } from '@/lib/devstudio/openhands/runtime';
+import { recoverStaleAiTasks } from '@/lib/devstudio/os/task-runner';
 
 export type AutopilotTickResult = {
   ok: boolean;
@@ -27,6 +29,13 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
     checks.push(`platform_health:${health.overall ?? 'unknown'}`);
 
     const db = await requireAdminClient();
+
+    try {
+      const {tickParisCodeRepairs}=await import('@/lib/ai/runtime/code-repair');
+      const repair=await tickParisCodeRepairs();
+      checks.push(`paris_code_repair_enabled:${repair.enabled}`);
+      if(repair.dispatched)actions.push(`paris_code_repair_dispatched:${repair.dispatched}`);
+    } catch { errors.push('paris_code_repair_tick_failed'); }
 
     const now = new Date();
     const inThreeDays = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
@@ -99,6 +108,24 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
       const message = error instanceof Error ? error.message : 'application_remediation_failed';
       errors.push(`application_remediation_failed:${message}`);
       logger.warn('[autopilot] application remediation reconciliation failed', { error: message });
+    }
+
+    try {
+      const recoveredTasks = await recoverStaleAiTasks(db);
+      checks.push(`stale_studio_tasks_recovered:${recoveredTasks}`);
+      if (recoveredTasks) actions.push(`closed_stale_studio_tasks:${recoveredTasks}`);
+
+      const engineering = await reconcileOpenHandsTasks(10);
+      checks.push(`engineering_tasks_checked:${engineering.checked}`);
+      if (engineering.running) actions.push(`engineering_tasks_running:${engineering.running}`);
+      if (engineering.completed) actions.push(`engineering_tasks_verified:${engineering.completed}`);
+      if (engineering.retried) actions.push(`engineering_repairs_retried:${engineering.retried}`);
+      if (engineering.failed) errors.push(`engineering_tasks_failed:${engineering.failed}`);
+      errors.push(...engineering.errors.map((message) => `engineering_reconcile_failed:${message}`));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'engineering_reconcile_failed';
+      errors.push(`engineering_reconcile_failed:${message}`);
+      logger.warn('[autopilot] engineering reconciliation failed', { error: message });
     }
 
     await emitEvent('autopilot.tick_complete', 'system', {

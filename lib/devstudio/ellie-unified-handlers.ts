@@ -1,4 +1,12 @@
-import { ELLIE_ROUTE_LABEL, routeEllieMessage, type EllieMessageRoute } from '@/lib/devstudio/ellie-message-router';
+import { consumeStudioChatStream } from '@/lib/devstudio/chat-stream';
+import {
+  ELLIE_ROUTE_LABEL,
+  routeEllieMessage,
+  shouldOrchestrateMessage,
+  selectStudioAgent,
+  type StudioSpecialist,
+  type EllieMessageRoute,
+} from '@/lib/devstudio/ellie-message-router';
 
 export type UnifiedChatMessage = {
   role: 'user' | 'assistant';
@@ -9,7 +17,89 @@ export type UnifiedChatMessage = {
   action?: unknown;
 };
 
-export { routeEllieMessage, ELLIE_ROUTE_LABEL, type EllieMessageRoute };
+export type OrchestratedPlanCheckpoint = {
+  planId: string;
+  taskId: string;
+  status: 'awaiting_approval' | 'running' | 'done' | 'failed';
+  title?: string;
+  reason?: string;
+  runId?: string;
+};
+
+export {
+  routeEllieMessage,
+  shouldOrchestrateMessage,
+  selectStudioAgent,
+  ELLIE_ROUTE_LABEL,
+  type EllieMessageRoute,
+  type StudioSpecialist,
+};
+
+export async function streamOrchestratedPlan(
+  goal: string,
+  onLine: (text: string) => void,
+  options: {
+    planId?: string;
+    documentIds?: string[];
+    conversationId?: string;
+    onCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint) => void;
+    onRunId?: (runId: string) => void;
+  } = {},
+): Promise<void> {
+  const res = await fetch('/api/admin/dev-studio/plan', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      goal,
+      planId: options.planId,
+      documentIds: options.documentIds ?? [],
+      conversationId: options.conversationId,
+    }),
+  });
+  if (!res.ok || !res.body) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data as { error?: string }).error || `HTTP ${res.status}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  const consume = (event: string) => {
+    const raw = event
+      .split('\n')
+      .filter((line) => line.startsWith('data: '))
+      .map((line) => line.slice(6).trim())
+      .join('');
+    if (!raw || raw === '[DONE]') return;
+    try {
+      const parsed = JSON.parse(raw) as {
+        text?: string;
+        line?: string;
+        checkpoint?: OrchestratedPlanCheckpoint;
+        runId?: string;
+      };
+      const line = parsed.text ?? parsed.line;
+      if (line) onLine(`${line}\n`);
+      if (parsed.runId) options.onRunId?.(parsed.runId);
+      if (parsed.checkpoint) {
+        if (parsed.checkpoint.runId) options.onRunId?.(parsed.checkpoint.runId);
+        options.onCheckpoint?.(parsed.checkpoint);
+      }
+    } catch {
+      onLine(`${raw}\n`);
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop() ?? '';
+    for (const event of events) consume(event);
+  }
+  if (buffer.trim()) consume(buffer);
+}
 
 export async function fetchAiHealth(): Promise<{
   ok: boolean;
@@ -17,24 +107,23 @@ export async function fetchAiHealth(): Promise<{
   providers: Record<string, boolean>;
 }> {
   try {
-    const res = await fetch('/api/admin/dev-studio/health');
+    const res = await fetch('/api/admin/dev-studio/health', {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
+    });
     const data = await res.json().catch(() => ({}));
     const providers = {
+      elevate: Boolean(data.hasElevate || data.availableProviders?.elevate),
+      cloudflare: Boolean(data.hasCloudflare || data.availableProviders?.cloudflare),
+      xai: Boolean(data.hasXAI || data.availableProviders?.xai),
       groq: Boolean(data.hasGroq),
       openai: Boolean(data.hasOpenAI),
       anthropic: Boolean(data.hasAnthropic),
       gemini: Boolean(data.hasGemini),
     };
-    const ok = res.ok && (providers.groq || providers.openai || providers.anthropic || providers.gemini);
-    const label = [
-      providers.groq && 'Groq',
-      providers.openai && 'OpenAI',
-      providers.anthropic && 'Claude',
-      providers.gemini && 'Gemini',
-    ]
-      .filter(Boolean)
-      .join(' / ');
-    return { ok, label: label || 'no keys', providers };
+    const ok = res.ok && providers.elevate;
+    const label = ok ? 'Private model verified reachable' : 'Private model unavailable';
+    return { ok, label, providers };
   } catch {
     return { ok: false, label: 'offline', providers: {} };
   }
@@ -65,6 +154,8 @@ export async function sendOpsMessage(
 export async function streamPlatformChat(
   messages: { role: string; content: string }[],
   opts: {
+    agent?: 'ADMIN_AI';
+    conversationId?: string;
     fileContext?: string;
     documentsContext?: string;
     provider?: string;
@@ -74,6 +165,7 @@ export async function streamPlatformChat(
       toolCalls?: UnifiedChatMessage['toolCalls'];
       provider?: string;
       model?: string;
+      capabilitiesUsed?: string[];
     }) => void;
   },
 ): Promise<void> {
@@ -82,6 +174,8 @@ export async function streamPlatformChat(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       messages,
+      agent: opts.agent,
+      conversationId: opts.conversationId,
       fileContext: opts.fileContext,
       documentsContext: opts.documentsContext,
       provider: opts.provider,
@@ -92,43 +186,24 @@ export async function streamPlatformChat(
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error ?? `HTTP ${res.status}`);
   }
-  const reader = res.body?.getReader();
-  if (!reader) {
-    const data = await res.json();
-    opts.onToken(data.message ?? data.reply ?? '');
-    opts.onDone({ toolCalls: data.toolCalls, provider: data.provider, model: data.model });
-    return;
+  if (!res.body || !res.headers.get('content-type')?.includes('text/event-stream')) {
+    throw new Error('Studio did not return an event stream');
   }
-  const decoder = new TextDecoder();
-  let buffer = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n\n');
-    buffer = lines.pop() ?? '';
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue;
-      try {
-        const chunk = JSON.parse(line.slice(6));
-        if (chunk.token !== undefined) opts.onToken(chunk.token);
-        if (chunk.done) {
-          opts.onDone({
-            toolCalls: chunk.toolCalls,
-            provider: chunk.provider,
-            model: chunk.model,
-          });
-        }
-      } catch {
-        /* skip */
-      }
-    }
-  }
+  await consumeStudioChatStream(res.body, (chunk) => {
+    if (chunk.token !== undefined) opts.onToken(chunk.token);
+    if (chunk.done === true) opts.onDone({
+      toolCalls: chunk.toolCalls,
+      provider: chunk.provider,
+      model: chunk.model,
+      capabilitiesUsed: chunk.capabilitiesUsed,
+    });
+  });
 }
 
 export async function streamExecuteCommand(
   command: string,
   onLine: (text: string) => void,
+  agent: StudioSpecialist = 'PARIS',
 ): Promise<void> {
   const isSmoke = /smoke.?test|health.?check|check.*platform/i.test(command);
   const res = await fetch(
@@ -138,7 +213,7 @@ export async function streamExecuteCommand(
       : {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ command }),
+          body: JSON.stringify({ command, agent }),
         },
   );
   if (!res.ok || !res.body) {

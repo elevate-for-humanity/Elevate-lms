@@ -22,7 +22,24 @@ function mustNotContain(file, patterns) {
   }
 }
 
-mustNotContain('apps/admin/server.js', ['STUDIO_SHELL_WS_URL', 'attachWsProxy', 'shell-ws']);
+for (const file of [
+  'apps/admin/server.js',
+  'lib/admin/required-ecs-secrets.ts',
+  'apps/admin/app/api/admin/monitoring/errors/route.ts',
+  'apps/admin/app/api/admin/dev-studio/cfd/health/route.ts',
+  '.env.example',
+  '.env.production.example',
+]) {
+  mustNotContain(file, ['STUDIO_SHELL_WS_URL', 'STUDIO_SHELL_SECRET', 'STUDIO_TOKEN_SECRET', 'attachWsProxy', 'shell-ws']);
+}
+
+for (const retired of [
+  'lib/devstudio/studio-runtime.ts',
+  'components/studio/DevStudioRuntimeStatus.tsx',
+  'components/studio/RunWorkspace.tsx',
+]) {
+  if (fs.existsSync(path.join(root, retired))) failures.push(`${retired}: retired Studio ECS runtime file must be deleted`);
+}
 
 if (fs.existsSync(path.join(root, 'studio-shell'))) {
   failures.push('studio-shell/ directory must be deleted');

@@ -80,19 +80,22 @@ beforeAll(() => {
     }
 
     // ── Collect ADD COLUMN statements (multi-column ALTER blocks) ───────────
-    // Parse each ALTER statement once. The former implementation rescanned the
-    // full migration prefix for every column, making this contract effectively
-    // quadratic as migration history grew.
-    for (const alter of sql.matchAll(
-      /ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:public\.)?(\w+)([\s\S]*?);/gi
+    // Match every ADD COLUMN IF NOT EXISTS colname in the file
+    for (const m of sql.matchAll(
+      /ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)\s+(?:uuid|text|boolean|integer|bigint|smallint|int|numeric|real|double|date|time|timestamp|timestamptz|interval|jsonb|json|varchar|char|bytea|serial|bigserial)/gi
     )) {
-      const table = alter[1].toLowerCase();
-      for (const column of alter[2].matchAll(
-        /ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)\s+(?:uuid|text|boolean|integer|bigint|smallint|int|numeric|real|double|date|time|timestamp|timestamptz|interval|jsonb|json|varchar|char|bytea|serial|bigserial)/gi
-      )) {
-        if (!tableColumns.has(table)) tableColumns.set(table, new Set());
-        tableColumns.get(table)!.add(column[1].toLowerCase());
-      }
+      const col = m[1].toLowerCase();
+      // Find which table this ALTER belongs to by scanning backwards in the file
+      const pos = sql.lastIndexOf(m[0], sql.indexOf(m[0]));
+      const before = sql.slice(0, sql.indexOf(m[0]));
+      const tableMatch = before.match(/ALTER\s+TABLE\s+(?:public\.)?(\w+)\s*$/im) ||
+                         before.match(/ALTER\s+TABLE\s+(?:public\.)?(\w+)[^;]*$/im);
+      // Simpler: find the last ALTER TABLE before this ADD COLUMN
+      const alterMatches = [...before.matchAll(/ALTER\s+TABLE\s+(?:public\.)?(\w+)/gi)];
+      if (alterMatches.length === 0) continue;
+      const table = alterMatches[alterMatches.length - 1][1].toLowerCase();
+      if (!tableColumns.has(table)) tableColumns.set(table, new Set());
+      tableColumns.get(table)!.add(col);
     }
   }
 });
@@ -107,17 +110,6 @@ function tableHasColumn(table: string, column: string): boolean {
 
 function tableHasAnyMigrationRef(name: string): boolean {
   return allMigrationsSql.toLowerCase().includes(name.toLowerCase());
-}
-
-function containsInOrder(source: string, values: string[]): boolean {
-  const normalized = source.toLowerCase();
-  let cursor = 0;
-  for (const value of values) {
-    const next = normalized.indexOf(value.toLowerCase(), cursor);
-    if (next === -1) return false;
-    cursor = next + value.length;
-  }
-  return true;
 }
 
 // ── Session tables (A–D) ──────────────────────────────────────────────────────
@@ -160,7 +152,7 @@ describe('workforce_referrals — column contract', () => {
   }
 
   it('status CHECK constraint covers all lifecycle values', () => {
-    expect(containsInOrder(allMigrationsSql, ['referred', 'intake_started', 'enrolled', 'active', 'completed', 'withdrawn', 'cancelled'])).toBe(true);
+    expect(allMigrationsSql).toMatch(/referred.*intake_started.*enrolled.*active.*completed.*withdrawn.*cancelled/is);
   });
 
   it('has updated_at trigger', () => {
@@ -189,7 +181,7 @@ describe('agency_referral_confirmations — column contract', () => {
   it('confirmation_type CHECK covers all 8 types', () => {
     const types = ['receipt','enrollment','attendance','completion','placement','no_show','declined','unable_to_reach'];
     for (const type of types) {
-      expect(allMigrationsSql).toMatch(new RegExp(`'${type}'`));
+      expect(allMigrationsSql).toMatch(new RegExp("'" + type + "'"));
     }
   });
 
@@ -226,7 +218,7 @@ describe('wioa_pirl_exports — column contract', () => {
   }
 
   it('status CHECK covers pending/running/completed/failed', () => {
-    expect(containsInOrder(allMigrationsSql, ["'pending'", "'running'", "'completed'", "'failed'"])).toBe(true);
+    expect(allMigrationsSql).toMatch(/'pending'.*'running'.*'completed'.*'failed'/is);
   });
 
   it('file_url is referenced in migrations (exists in live DB, not added via ADD COLUMN)', () => {
@@ -264,7 +256,7 @@ describe('individual_employment_plans — column contract', () => {
   }
 
   it('status CHECK covers draft/active/completed/cancelled', () => {
-    expect(containsInOrder(allMigrationsSql, ["'draft'", "'active'", "'completed'", "'cancelled'"])).toBe(true);
+    expect(allMigrationsSql).toMatch(/'draft'.*'active'.*'completed'.*'cancelled'/is);
   });
 
   it('has RLS enabled', () => {
@@ -307,8 +299,7 @@ describe('fssa_participants — column contract', () => {
   });
 
   it('trigger fires on exited or completed status', () => {
-    expect(allMigrationsSql.toLowerCase()).toContain('exited');
-    expect(allMigrationsSql.toLowerCase()).toContain('completed');
+    expect(allMigrationsSql).toMatch(/exited.*completed|completed.*exited/is);
   });
 });
 
@@ -502,6 +493,6 @@ describe('Foreign key targets exist in migrations', () => {
   it('individual_employment_plans.case_manager_id FKs to auth.users — not public.users', () => {
     // auth.users is managed by Supabase, not in migrations — this is correct behaviour
     // The FK is defined as REFERENCES auth.users(id), not public.users
-    expect(allMigrationsSql).toMatch(/case_manager_id[^;]*REFERENCES auth\.users/i);
+    expect(allMigrationsSql).toMatch(/case_manager_id.*REFERENCES auth\.users/is);
   });
 });

@@ -11,10 +11,11 @@
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 import { provisionAccount } from '@/lib/enrollment/provision-account';
+import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { COSMETOLOGY_COURSE_ID } from '@/lib/cosmetology/pricing';
 
 const COSMETOLOGY_PROGRAM_SLUG = 'cosmetology-apprenticeship';
-const COSMETOLOGY_COURSE_ID = 'b427be5e-c85b-4b41-91d6-4288aec8c975';
 
 export interface CosmetologyPostPaymentInput {
   db: SupabaseClient;
@@ -49,7 +50,7 @@ export async function runCosmetologyPostPayment(
       updated_at: new Date().toISOString(),
     })
     .eq('id', applicationId)
-    .select('id, email, first_name, last_name, phone, status, enrollment_id')
+    .select('id, email, first_name, last_name, phone, status, enrollment_id, user_id')
     .maybeSingle();
 
   if (appErr || !app) {
@@ -63,7 +64,6 @@ export async function runCosmetologyPostPayment(
 
   const studentEmail = app.email;
   const studentName = [app.first_name, app.last_name].filter(Boolean).join(' ') || studentEmail;
-  const firstName = app.first_name || 'there';
 
   // ── Step 2: Find or create profile + program_enrollment (CRITICAL) ──────
   let enrollmentId: string | undefined = app.enrollment_id ?? undefined;
@@ -91,7 +91,9 @@ export async function runCosmetologyPostPayment(
         postLoginUrl: `${siteUrl}/apprentice`,
       });
       if (provision.error || !provision.userId) {
-        logger.error('[cosmetology-post-payment] Account provisioning failed', undefined, { error: provision.error });
+        logger.error('[cosmetology-post-payment] Account provisioning failed', undefined, {
+          error: provision.error,
+        });
         steps['provision_account'] = 'failed';
       } else {
         profileId = provision.userId;
@@ -135,8 +137,11 @@ export async function runCosmetologyPostPayment(
               email: studentEmail,
               full_name: studentName,
               phone: app.phone ?? null,
+              // Verified payment is the enrollment gate. Staff review may audit
+              // records later, but it does not block learner access.
               status: 'active',
               enrollment_state: 'enrolled',
+              payment_status: 'paid',
               funding_source: 'self_pay',
               amount_paid_cents: amountPaidCents,
               stripe_checkout_session_id: stripeSessionId,
@@ -170,10 +175,50 @@ export async function runCosmetologyPostPayment(
       }
     }
   } else {
-    steps['create_enrollment'] = 'skipped';
+    const { error: updateEnrollmentErr } = await db
+      .from('program_enrollments')
+      .update({
+        student_id: app.user_id ?? undefined,
+        user_id: app.user_id ?? undefined,
+        course_id: COSMETOLOGY_COURSE_ID,
+        status: 'active',
+        enrollment_state: 'enrolled',
+        payment_status: 'paid',
+        amount_paid_cents: amountPaidCents,
+        stripe_checkout_session_id: stripeSessionId,
+        stripe_payment_intent_id: stripePaymentIntentId ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', enrollmentId);
+    steps['create_enrollment'] = updateEnrollmentErr ? 'failed' : 'skipped';
   }
 
-  // ── Step 3: Create follow-up reminder for admin ───────────────────────────
+  // ── Step 3: Repair dashboard routing + digital binder idempotently ────────
+  if (enrollmentId) {
+    const { data: enrolled } = await db
+      .from('program_enrollments')
+      .select('user_id')
+      .eq('id', enrollmentId)
+      .maybeSingle();
+
+    if (enrolled?.user_id) {
+      await Promise.all([
+        db
+          .from('profiles')
+          .update({
+            enrollment_status: 'active',
+            portal_type: 'apprentice',
+          })
+          .eq('id', enrolled.user_id),
+        ensureDigitalBinder({ db, userId: enrolled.user_id, enrollmentId }),
+      ]);
+      steps['dashboard_and_binder'] = 'ok';
+    } else {
+      steps['dashboard_and_binder'] = 'failed';
+    }
+  }
+
+  // ── Step 4: Create follow-up reminder for admin ───────────────────────────
   try {
     const { data: lead } = await db
       .from('crm_leads')
@@ -209,7 +254,7 @@ export async function runCosmetologyPostPayment(
     steps['crm_reminder'] = 'failed';
   }
 
-  // ── Step 4: Welcome + credentials email ──────────────────────────────────
+  // ── Step 5: Welcome + credentials email ──────────────────────────────────
   // provisionAccount already sends this for new users.
   // For existing users (profile already existed), send enrollment confirmation now.
   if (steps['provision_account'] === 'skipped') {
@@ -225,7 +270,10 @@ export async function runCosmetologyPostPayment(
       });
       steps['student_email'] = 'ok';
     } catch (err) {
-      logger.warn('[cosmetology-post-payment] Enrollment confirmation email failed (non-fatal)', err);
+      logger.warn(
+        '[cosmetology-post-payment] Enrollment confirmation email failed (non-fatal)',
+        err,
+      );
       steps['student_email'] = 'failed';
     }
   } else {
@@ -235,11 +283,16 @@ export async function runCosmetologyPostPayment(
   try {
     await db
       .from('applications')
-      .update({ onboarding_sent_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .update({
+        onboarding_sent_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', applicationId);
-  } catch { /* non-fatal */ }
+  } catch {
+    /* non-fatal */
+  }
 
-  // ── Step 5: Send internal admin notification ───────────────────────────────
+  // ── Step 6: Send internal admin notification ───────────────────────────────
   try {
     const { sendEmail } = await import('@/lib/email/sendgrid');
     const adminUrl = `${siteUrl}/admin/applications`;
@@ -285,7 +338,7 @@ export async function runCosmetologyPostPayment(
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:20px;">
       <p style="margin:0 0 8px;font-weight:700;color:#dc2626;">Required Actions:</p>
       <ol style="margin:0;padding-left:20px;color:#374151;font-size:14px;">
-        <li style="margin-bottom:6px;">Confirm host shop placement at Mesmerized by Beauty within 1–2 business days</li>
+        <li style="margin-bottom:6px;">Confirm the student's assigned Host Shop in the apprenticeship placement record within 1–2 business days. Do not assume or hard-code a shop.</li>
         <li style="margin-bottom:0;">Contact student to confirm start date</li>
       </ol>
     </div>
@@ -304,7 +357,11 @@ export async function runCosmetologyPostPayment(
     steps['admin_email'] = 'failed';
   }
 
-  logger.info('[cosmetology-post-payment] Pipeline complete', { applicationId, enrollmentId, steps });
+  logger.info('[cosmetology-post-payment] Pipeline complete', {
+    applicationId,
+    enrollmentId,
+    steps,
+  });
 
   return { success: true, enrollmentId, steps };
 }

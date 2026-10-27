@@ -1,5 +1,5 @@
 /**
- * Shared Northflank API helpers for Elevate production scripts.
+ * Read-only source inventory helpers. Production mutations use Google workflows.
  */
 
 import dotenv from 'dotenv';
@@ -32,6 +32,9 @@ export async function nfFetch<T = unknown>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  if (!['GET', 'HEAD'].includes((options.method || 'GET').toUpperCase())) {
+    throw new Error('Source deployment writes are retired. Use scripts/gcp/dispatch-release.mjs for Google production.');
+  }
   const token = getToken();
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
   const res = await fetch(url, {
@@ -109,4 +112,15 @@ export function combinedServicePatchPath(projectId: string, serviceId: string): 
  */
 export function combinedServicePath(projectId: string, serviceId: string): string {
   return serviceGetPath(projectId, serviceId);
+}
+
+
+/** Create a deployment-only service from an external or internal image. */
+export function deploymentServiceCreatePath(projectId: string): string {
+  return projectApiPath(projectId, '/services/deployment');
+}
+
+/** PATCH deployment-only service configuration. */
+export function deploymentServicePatchPath(projectId: string, serviceId: string): string {
+  return projectApiPath(projectId, `/services/deployment/${serviceId}`);
 }

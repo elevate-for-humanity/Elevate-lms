@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
 import { FEATURES } from '@/lib/platform/feature-catalog';
 import { importExistingWebsite } from '@/lib/websites/import-site-service';
+import { mergeWebsiteImports } from '@/lib/websites/merge-imports';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 import { logger } from '@/lib/logger';
@@ -114,11 +115,15 @@ async function _POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const url = typeof body.url === 'string' ? body.url.trim() : '';
+    const urls = Array.isArray(body.urls)
+      ? body.urls.filter((value: unknown): value is string => typeof value === 'string').map((value: string) => value.trim()).filter(Boolean).slice(0, 3)
+      : typeof body.url === 'string' && body.url.trim()
+        ? [body.url.trim()]
+        : [];
     const includePages = Array.isArray(body.includePages)
       ? body.includePages.filter((value: unknown): value is string => typeof value === 'string').slice(0, 6)
       : undefined;
-    if (!url) return NextResponse.json({ error: 'URL required' }, { status: 400 });
+    if (!urls.length) return NextResponse.json({ error: 'At least one URL is required' }, { status: 400 });
 
     // Meter the expensive crawl/AI mapping for individual trials. Paid/admin and
     // organization-entitled imports remain unmetered here.
@@ -132,7 +137,10 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    const imported = normalizeImportedConfig(await importExistingWebsite(url, includePages), url);
+    const imports = await Promise.all(
+      urls.map(async (url: string) => normalizeImportedConfig(await importExistingWebsite(url, includePages), url)),
+    );
+    const imported = imports.length === 1 ? imports[0] : mergeWebsiteImports(imports as any);
     return NextResponse.json({ success: true, ...imported });
   } catch (error) {
     logger.warn('[website-builder-import] import failed', { error: String(error) });

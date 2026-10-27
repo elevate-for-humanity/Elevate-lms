@@ -1,5 +1,9 @@
 import { LMS_HOST } from '@/lib/routing/portal-map';
 
+/** Host-qualified so shared and admin-preview surfaces cannot inherit the Admin host. */
+export const APPRENTICE_TIMECLOCK_URL = `${LMS_HOST}/apprentice/timeclock`;
+export const APPRENTICE_TIMECLOCK_HISTORY_URL = `${APPRENTICE_TIMECLOCK_URL}/history`;
+
 /**
  * Apprenticeship program slugs all resolve to the single operational
  * /apprentice dashboard. Program context is retained as a query parameter;
@@ -35,9 +39,26 @@ export const ACTIVE_ENROLLMENT_STATES = [
   'documents_complete',
 ] as const;
 
+export function isApprenticeshipSlug(programSlug: string | null | undefined): boolean {
+  if (!programSlug) return false;
+  const normalized = programSlug.toLowerCase().trim();
+  return Boolean(
+    APPRENTICESHIP_SLUG_TO_PORTAL_PATH[normalized] ||
+    normalized.endsWith('-apprenticeship') ||
+    normalized.includes('apprentice')
+  );
+}
+
 export function portalPathForProgramSlug(programSlug: string | null | undefined): string | null {
   if (!programSlug) return null;
-  return APPRENTICESHIP_SLUG_TO_PORTAL_PATH[programSlug] ?? `${LMS_HOST}/apprentice`;
+  const normalized = programSlug.toLowerCase().trim();
+  if (APPRENTICESHIP_SLUG_TO_PORTAL_PATH[normalized]) {
+    return APPRENTICESHIP_SLUG_TO_PORTAL_PATH[normalized];
+  }
+  if (isApprenticeshipSlug(normalized)) {
+    return `${LMS_HOST}/apprentice?program=${normalized}`;
+  }
+  return null;
 }
 
 export function portalTypeForProgramSlug(programSlug: string | null | undefined): string | null {

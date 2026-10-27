@@ -4,7 +4,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -15,21 +15,8 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const { data: actor } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (!actor || !['admin'].includes(actor.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const actor = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+    if (actor.error) return actor.error;
 
     const { userId, status } = await request.json();
 
@@ -45,7 +32,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Prevent self-deactivation
-    if (userId === user.id && status !== 'active') {
+    if (userId === actor.id && status !== 'active') {
       return NextResponse.json({ error: 'Cannot deactivate your own account' }, { status: 400 });
     }
 

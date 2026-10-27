@@ -87,7 +87,7 @@ const PATHWAYS: Pathway[] = [
       { label: 'Expand', description: 'Add medication aide' },
       { label: 'Hire', description: 'Healthcare placement' },
     ],
-    href: '/programs/cna-medication-aide',
+    href: '/programs/healthcare',
   },
   {
     id: 'cdl',

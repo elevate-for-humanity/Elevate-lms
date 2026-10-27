@@ -37,9 +37,24 @@ export async function updateEnrollment(
 ) {
   const { user, supabase } = await requireAdminAction();
   const db = await requireAdminClient();
+
+  if (
+    fields.status &&
+    ['active', 'enrolled', 'in_progress'].includes(
+      fields.status.toLowerCase()
+    )
+  ) {
+    throw new Error(
+      'Enrollment activation requires verified approval'
+    );
+  }
+
   const { error } = await db
     .from('program_enrollments')
-    .update({ ...fields, updated_at: new Date().toISOString() })
+    .update({
+      ...fields,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', enrollmentId);
   if (error) {
     logger.error('updateEnrollment', undefined, { reason: error?.message });
@@ -58,11 +73,21 @@ export async function createEnrollment(data: {
   user_id: string;
   course_id: string;
   program_id?: string | null;
+  cohort_id?: string | null;
   status?: string;
   progress?: number;
 }) {
   const { user, supabase } = await requireAdminAction();
   const db = await requireAdminClient();
+  const { data: course, error: courseError } = await db
+    .from('courses')
+    .select('id,program_id,slug')
+    .eq('id', data.course_id)
+    .maybeSingle();
+  if (courseError || !course) throw new Error('Course configuration could not be resolved');
+  const programId = data.program_id ?? course.program_id;
+  if (!programId) throw new Error('Course is not connected to a program');
+
   const { data: existing } = await db
     .from('program_enrollments')
     .select('id')
@@ -75,11 +100,17 @@ export async function createEnrollment(data: {
     .from('program_enrollments')
     .insert({
       user_id: data.user_id,
+      student_id: data.user_id,
       course_id: data.course_id,
-      program_id: data.program_id ?? null,
-      status: data.status ?? 'active',
-      enrollment_state: data.status ?? 'active',
+      program_id: programId,
+      program_slug: course.slug ?? null,
+      cohort_id: data.cohort_id ?? null,
+      status: 'pending',
+      enrollment_state: 'pending',
       progress: data.progress ?? 0,
+      progress_percent: data.progress ?? 0,
+      lms_enrolled: false,
+      access_granted_at: null,
       enrolled_at: now,
       created_at: now,
       updated_at: now,
@@ -162,6 +193,48 @@ export async function markEnrollmentComplete(enrollmentId: string) {
 export async function approveEnrollment(enrollmentId: string, userId: string) {
   const { user, supabase } = await requireAdminAction();
   const db = await requireAdminClient();
+  const { data: requirements, error: requirementsError } =
+    await db
+      .from('enrollment_requirements')
+      .select('id,status')
+      .eq('enrollment_id', enrollmentId);
+
+  if (
+    requirementsError ||
+    !requirements?.length ||
+    requirements.some(
+      (r) =>
+        r.status !== 'verified' &&
+        r.status !== 'not_applicable'
+    )
+  ) {
+    throw new Error(
+      'All enrollment requirements must be verified before approval'
+    );
+  }
+
+  const { data: enrollment, error: enrollmentError } =
+    await db
+      .from('program_enrollments')
+      .select(
+        'id,user_id,student_id,funding_verified,eligibility_status,revoked_at'
+      )
+      .eq('id', enrollmentId)
+      .maybeSingle();
+
+  if (
+    enrollmentError ||
+    !enrollment ||
+    ![enrollment.user_id, enrollment.student_id].includes(userId) ||
+    enrollment.revoked_at ||
+    enrollment.funding_verified !== true ||
+    enrollment.eligibility_status !== 'eligible'
+  ) {
+    throw new Error(
+      'Enrollment funding, eligibility, or authorization check failed'
+    );
+  }
+
   const now = new Date().toISOString();
   const { error } = await db
     .from('program_enrollments')

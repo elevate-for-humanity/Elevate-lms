@@ -13,7 +13,7 @@ concurrency:
 jobs:
   preflight:
     name: CI Preflight
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -137,7 +137,7 @@ jobs:
 
   typecheck:
     name: TypeScript — ${{ matrix.app }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     strategy:
       fail-fast: false
@@ -171,7 +171,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       NODE_OPTIONS: --max-old-space-size=6144
@@ -199,7 +199,7 @@ jobs:
 
   diagnostics:
     name: Functional Tests & Repo Hygiene
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -259,7 +259,7 @@ jobs:
 
   ci-gate:
     name: CI Required Gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [preflight, typecheck, lint, enrollment-database, diagnostics]
     if: always()
     steps:

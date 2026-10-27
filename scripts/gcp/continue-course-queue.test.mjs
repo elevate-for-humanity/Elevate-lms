@@ -50,7 +50,19 @@ test('pending worker deployment yields the lane without launching work or replac
 });
 test('release inventory uses actual main worker runs and fails closed on an unreadable inventory',async()=>{
  const env={GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',GH_TOKEN:'test'};
- assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'in_progress'}]})})}),true);
+ for (const status of ['queued','in_progress','completed']) {
+  const calls=[];
+  const pending=await courseReleasePending({env,request:async(url)=>{
+   calls.push(url);return {ok:true,json:async()=>url.includes('/jobs?')
+    ? {jobs:[{name:'build',status:'in_progress'},{name:'deploy',status}]}
+    : {workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]}};
+  }});
+  assert.equal(pending,status==='in_progress');
+  assert.match(calls[1],/actions\/runs\/123\/jobs/);
+ }
+ await assert.rejects(courseReleasePending({env,request:async url=>url.includes('/jobs?')
+  ? {ok:false,status:503}
+  : {ok:true,json:async()=>({workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]})}}),/JOBS_HTTP_503/);
  assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'completed'},{head_branch:'untrusted',status:'queued'}]})})}),false);
  assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'queued'}]})})}),false);
  await assert.rejects(courseReleasePending({env,request:async()=>({ok:false,status:403})}),/HTTP_403/);

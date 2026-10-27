@@ -103,7 +103,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(!file){
         const generated=await recoverTeachingPhoto({
           primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,
-          persistFailure:async(detail:any)=>{
+          persistFailure:async(detail:any = {})=>{
             const saved=await db.storage.from('course_videos').upload(
               'approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',
               Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),

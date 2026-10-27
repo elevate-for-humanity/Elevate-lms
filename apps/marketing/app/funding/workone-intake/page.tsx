@@ -4,6 +4,7 @@ import { CalendarDays, CheckCircle2, ClipboardList } from 'lucide-react';
 
 import StudentApplicationForm from '@/apps/marketing/app/apply/student/StudentApplicationForm';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
+import { resolveSlug } from '@/lib/program-registry';
 
 export const metadata: Metadata = {
   title: 'WorkOne Funding Intake | Elevate for Humanity',
@@ -20,7 +21,9 @@ export default async function WorkOneFundingIntakePage({
   searchParams: Promise<{ program?: string }>;
 }) {
   const params = await searchParams;
-  const initialProgram = params.program === 'tax-preparation' ? 'tax-preparation' : '';
+  // Preserve the selected program throughout the WorkOne funding application.
+  // Previously only tax-preparation survived this handoff.
+  const initialProgram = resolveSlug(params.program || '') || '';
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <section className="border-b border-slate-800 bg-slate-950 px-4 py-12 text-white sm:py-16">
@@ -42,13 +45,13 @@ export default async function WorkOneFundingIntakePage({
               href={WORKONE_INDY_BOOKING_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-black text-white hover:bg-orange-600"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-center text-sm font-black text-white hover:bg-orange-600 sm:w-auto sm:px-6"
             >
               <CalendarDays className="h-5 w-5" /> Schedule Your WorkOne Orientation for Funding
             </a>
             <Link
               href="/apply/track"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 text-sm font-black text-white hover:bg-white/10"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/40 px-4 py-3 text-center text-sm font-black text-white hover:bg-white/10 sm:w-auto sm:px-6"
             >
               Track an Existing Application
             </Link>

@@ -5,7 +5,6 @@ import { resolveSlug } from '@/lib/program-registry';
 import { ALL_PROGRAMS } from '@/lib/programs/static-registry';
 import { getAdminClient } from '@/lib/supabase/admin';
 import ParisApplicationWorkspace from './ParisApplicationWorkspace';
-import ApplicationDocumentsPanel from './ApplicationDocumentsPanel';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 
 export const dynamic = 'force-dynamic';
@@ -145,8 +144,6 @@ export default async function ParisStudentApplicationPage({
               />
             </section>
           )}
-
-          <ApplicationDocumentsPanel />
 
           <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-xs leading-5 text-slate-600">
             PARIS assists with intake and completeness. Workforce agencies determine workforce-funding

@@ -17,6 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test scripts/gcp/audit-runtime-parity.test.mjs scripts/gcp/verify-public-health.test.mjs
+      - run: node --test scripts/gcp/audit-runtime-parity.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/service-health.test.mjs
       - name: Verify public Google liveness, readiness, Supabase and QuickBooks
         run: node scripts/gcp/verify-public-health.mjs

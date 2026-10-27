@@ -216,3 +216,11 @@ test('a pending latest-revision traffic assignment protects its candidate tag', 
   } };
   assert.deepEqual(unusedCandidateTags(state), []);
 });
+
+test('Store deployment creates a zero-traffic revision before verified activation', async () => {
+  const { readFileSync } = await import('node:fs');
+  const workflow = readFileSync('.github/workflows/deploy-google-store-runtime.yml', 'utf8');
+  const update = workflow.slice(workflow.indexOf('gcloud run services update elevate-store-migration'), workflow.indexOf('- name: Collect exact failed Store revision logs'));
+  assert.match(update, /--no-traffic/);
+  assert.ok(workflow.indexOf('Verify and activate the exact Store candidate') > workflow.indexOf('gcloud run services update elevate-store-migration'));
+});

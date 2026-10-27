@@ -1,3 +1,4 @@
+// Native fetch Response bodies avoid mixing Node 22 fetch with jsdom Blob implementations.
 import { expect, it, vi, afterEach } from 'vitest';
 import {
   normalizeAlertSettings,
@@ -25,7 +26,7 @@ it('announces recorded activity and inbox events, not arbitrary notification tex
 });
 it('plays natural voice for generic alerts without bypassing mute', async () => {
   const played = vi.fn().mockResolvedValue(undefined);
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(new Blob(['audio']))));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('audio', { headers: { 'Content-Type': 'audio/mpeg' } })));
   vi.stubGlobal('Audio', class {
     preload = '';
     playbackRate = 1;

@@ -2,8 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { AdminApplicationChrome } from '@/components/admin/AdminApplicationChrome';
 
-const route = vi.hoisted(() => ({ pathname: '/login' }));
-vi.mock('next/navigation', () => ({ usePathname: () => route.pathname }));
+const route = vi.hoisted(() => ({ pathname: '/login', search: '' }));
+vi.mock('next/navigation', () => ({ usePathname: () => route.pathname, useSearchParams: () => new URLSearchParams(route.search) }));
+vi.mock('@/components/communications/CommunicationTodos', () => ({ CommunicationTodos: () => <aside>Communication to-dos</aside> }));
 vi.mock('@/components/admin/AdminNavShell', () => ({
   AdminNavShell: () => <header>Dashboard navigation</header>,
 }));
@@ -12,6 +13,14 @@ vi.mock('@/components/admin/AdminMobileDock', () => ({
 }));
 
 describe('Admin authentication layout', () => {
+  it('embeds tools without nesting dashboard chrome', () => {
+    route.pathname = '/studio/courses'; route.search = 'embedded=studio';
+    const html = renderToStaticMarkup(<AdminApplicationChrome navSections={[]}>Course Builder</AdminApplicationChrome>);
+    expect(html).toContain('Course Builder');
+    expect(html).not.toContain('Dashboard navigation');
+    expect(html).not.toContain('Communication to-dos');
+    route.search = '';
+  });
   it.each(['/login', '/auth/reset-password'])(
     'keeps %s free of dashboard navigation that can cover mobile credentials',
     (pathname) => {

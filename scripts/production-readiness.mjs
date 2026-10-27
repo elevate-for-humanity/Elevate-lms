@@ -145,11 +145,8 @@ await runCommand('npm', ['run', 'lint'], 'Code linting');
 
 // Results Summary
 
-const totalChecks =
-  results.critical.length + results.warnings.length + results.passed.length;
 const criticalIssues = results.critical.length;
 const warningIssues = results.warnings.length;
-const passedChecks = results.passed.length;
 
 // Display results
 if (results.passed.length > 0) {
@@ -171,10 +168,9 @@ if (results.info.length > 0) {
 // Final Assessment
 
 const productionReady = criticalIssues === 0 && warningIssues <= 3;
-const readinessScore = Math.round((passedChecks / totalChecks) * 100);
 
 console.log(
-  `\n🎯 PRODUCTION READINESS: ${productionReady ? '✅ READY' : '❌ NOT READY'} (${readinessScore}% checks passed)`,
+  `\n🎯 PRODUCTION READINESS: ${productionReady ? '✅ READY' : '❌ NOT READY'} `,
 );
 
 if (!productionReady) {

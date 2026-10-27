@@ -65,3 +65,27 @@ test('materialization does not author future lessons or change their planned IDs
  const output=await materialize({from:()=>q},'new-course',profile,['first']);
  assert.equal(drafts,0);assert.deepEqual(output.canonicalLessonIds,profile.canonicalLessonIds);
 });
+test('an exact owner preview returns the rendered movie without certifying or advancing the course',async()=>{
+ const events=[],run=makeCourseRunner(()=>{throw Error('preview must not certify QA');});
+ const out=await run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'},{id:'second'}]},
+  targetLessonBuildId:'saved-first',targetCompetencyId:'first',maxLessons:1,renderPreviewOnly:true},
+  ()=>({run:async ctx=>{
+   assert.equal(ctx.renderPreviewOnly,true);
+   return {...ctx,artifacts:{lesson_film_render:{render:{videoUrl:'https://media.example/preview.mp4'}}}};
+  }}),persistence(events));
+ assert.equal(out.previewReady,true);assert.equal(out.completed,false);
+ assert.equal(out.lessons.length,1);assert.deepEqual(events,['finish:built_with_findings']);
+});
+test('preview cannot become an untargeted full-course execution',async()=>{
+ const run=makeCourseRunner(()=>{});
+ await assert.rejects(()=>run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'}]},renderPreviewOnly:true},
+  ()=>({run:async ctx=>ctx}),persistence([])),/OWNER_PREVIEW_REQUIRES_EXACT_SINGLE_LESSON/);
+});
+
+
+test('a complete saved checkpoint restores built status before retrying attachment without rerendering',async()=>{
+ const events=[],run=makeCourseRunner(()=>{}),p=persistence(events);
+ p.loadLessonCheckpoint=async()=>({passedSteps:['standards_lock','lesson_film_render','finished_media_qa','credential_release'],artifacts:{lesson_film_render:{render:{videoUrl:'saved.mp4'}}},findings:[]});
+ const out=await run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'}]}},()=>{throw Error('saved media must not rerender');},p);
+ assert.equal(out.completed,true);assert.deepEqual(events,['create:first','finish:built']);
+});

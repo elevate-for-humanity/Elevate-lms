@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 30

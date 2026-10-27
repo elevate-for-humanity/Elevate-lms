@@ -1,0 +1,73 @@
+name: Release approved Google web repairs
+# User authorized clearing the release hold on 2026-10-17 at 10:16 America/New_York.
+# This management workflow must be able to change that setting while it is true.
+# The actual service workflows retain their hold, CI, capacity and health gates.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release-approved-google-web.yml'
+      - 'scripts/gcp/release-approved-web.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-approved-web-release-controller
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch through trusted main identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/release-approved-google-web.yml/dispatches" -f ref=main
+  release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - run: node --test scripts/gcp/release-approved-web.test.mjs
+      - name: Wait for required CI on this exact commit
+        id: ci
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+            if test "$latest" != "$GITHUB_SHA"; then
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/release-approved-google-web.yml/dispatches" -f ref=main
+              echo "Handed off to current main; release setting unchanged."
+              exit 0
+            fi
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&event=push&per_page=20" --jq '.workflow_runs[0].id // empty')"
+            if test -n "$run_id"; then
+              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '.jobs[] | select(.name == "CI Required Gate") | .conclusion // empty')"
+              if test "$conclusion" = success; then echo "ready=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+              if test -n "$conclusion"; then echo "::error::Required CI did not pass"; exit 1; fi
+            fi
+            sleep 10
+          done
+          echo "::error::Required CI did not finish within the release window"
+          exit 1
+      - uses: google-github-actions/auth@v3
+        if: steps.ci.outputs.ready == 'true'
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        if: steps.ci.outputs.ready == 'true'
+        with: { skip_install: true }
+      - run: node scripts/gcp/verify-sdk.mjs
+        if: steps.ci.outputs.ready == 'true'
+      - name: Clear authorized hold and dispatch existing guarded web releases
+        if: steps.ci.outputs.ready == 'true'
+        run: node scripts/gcp/release-approved-web.mjs

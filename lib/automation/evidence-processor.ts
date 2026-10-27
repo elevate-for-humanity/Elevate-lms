@@ -17,7 +17,7 @@ import 'server-only';
  */
 
 import { createAdminClient, requireAdminClient } from '@/lib/supabase/admin';
-import { extractTextFromImage, autoExtract, OCRResult } from '@/lib/ocr/tesseract-ocr';
+import { autoExtract } from '@/lib/ocr/tesseract-ocr';
 import { logger } from '@/lib/logger';
 import { setAuditContext } from '@/lib/audit-context';
 
@@ -276,9 +276,11 @@ export async function processDocument(
     const buffer = Buffer.from(await response.arrayBuffer());
     const ocrResult = await autoExtract(buffer);
 
-    const confidence = ocrResult.confidence;
-    const extractedData = ocrResult.data || {};
-    const detectedType = (ocrResult.documentType as DocumentType) || declaredType || 'unknown';
+    // OCRResult contains text and a 0–100 confidence, not structured fields.
+    // Normalize confidence and retain text for the reviewer without inventing fields.
+    const confidence = Math.max(0, Math.min(1, ocrResult.confidence / 100));
+    const extractedData: Record<string, unknown> = { text: ocrResult.text, source: ocrResult.source };
+    const detectedType: DocumentType = declaredType || 'unknown';
 
     logger.info('[EvidenceProcessor] OCR complete', {
       documentId,

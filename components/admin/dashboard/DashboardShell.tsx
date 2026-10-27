@@ -1,6 +1,7 @@
 // Server component. Operational Admin dashboard using canonical routes and live data only.
 
 import Link from 'next/link';
+import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
 import LogoImage from '@/components/site/LogoImage';
 import Image from 'next/image';
 import type { DashboardHeroAsset } from '@/lib/admin/dashboard/get-hero-assets';
@@ -71,6 +72,11 @@ function OperationalShortcuts() {
       title: 'Applications',
       description: 'Review submitted applications and resolve intake decisions.',
       href: '/applications',
+    },
+    {
+      title: 'Application Checker',
+      description: 'Check public application steps and record broken Continue buttons or routing. Opens your private tool in a new tab; ChatGPT sign-in is required.',
+      href: APPLICATION_CHECKER_URL,
     },
     {
       title: 'Students',
@@ -162,6 +168,9 @@ function OperationalShortcuts() {
           <Link
             key={item.href}
             href={item.href}
+            target={item.href === APPLICATION_CHECKER_URL ? '_blank' : undefined}
+            rel={item.href === APPLICATION_CHECKER_URL ? 'noopener noreferrer' : undefined}
+            aria-label={item.href === APPLICATION_CHECKER_URL ? 'Application Checker (opens private tool in a new tab)' : undefined}
             className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
           >
             <div className="flex items-center justify-between gap-3">
@@ -284,7 +293,7 @@ export function AdminDashboardContent({
               <ShieldCheck className="h-4 w-4" /> Admin session protected
             </span>
             <span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-black text-blue-900">
-              Live Supabase data
+              {data.degradedSections.length ? 'Dashboard data incomplete' : 'Dashboard data snapshot'}
             </span>
           </div>
           <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">

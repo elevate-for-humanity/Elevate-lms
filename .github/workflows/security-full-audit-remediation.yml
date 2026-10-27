@@ -1,0 +1,50 @@
+name: Remediate full dependency audit
+on:
+  push:
+    branches:
+      - security/remediate-full-audit-20261022
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: security/remediate-full-audit-20261022
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reconcile lockfile from patched manifests
+        run: pnpm install --lockfile-only --no-frozen-lockfile
+      - name: Apply pnpm vulnerability remediations without ignoring advisories
+        shell: bash
+        run: |
+          set +e
+          pnpm audit --fix
+          result=$?
+          set -e
+          echo "Audit remediation command exit: $result"
+          pnpm install --lockfile-only --no-frozen-lockfile
+      - name: Commit regenerated dependency graph only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json pnpm-workspace.yaml pnpm-lock.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate lockfile and advisory fixes for complete security audit"
+            git push origin HEAD:security/remediate-full-audit-20261022
+          fi
+      - name: Verify frozen lockfile installation
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Demand zero low moderate high and critical vulnerabilities
+        run: pnpm audit --audit-level low
+      - name: Verify project regression tests
+        run: |
+          pnpm exec tsc --noEmit --pretty false

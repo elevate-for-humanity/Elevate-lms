@@ -43,6 +43,9 @@ export function ProgramHolderPhoneReceiver() {
     let active = true;
     const controller = new AbortController();
     let heartbeat: ReturnType<typeof setInterval> | null = null;
+    let retry: ReturnType<typeof setTimeout> | null = null;
+    let starting = false;
+    let reconnecting = false;
     let client: PhoneClient | null = null;
     let ready = false;
     const id = currentDeviceId();
@@ -62,8 +65,16 @@ export function ProgramHolderPhoneReceiver() {
     }
 
     async function start() {
+      if (!active || starting || ready || reconnecting) return;
+      starting = true;
+      try {
       const settingsResponse = await fetch('/api/program-holder/phone', { cache: 'no-store', signal: controller.signal });
-      if (!settingsResponse.ok || !active) return;
+      if (!active) return;
+      if (settingsResponse.status >= 500) throw new Error('phone_settings_unavailable');
+      if (!settingsResponse.ok) {
+        if (settingsResponse.status === 429) scheduleReconnect();
+        return;
+      }
       const settings = await settingsResponse.json();
       const ringMode = String(settings?.extension?.ringMode || 'offline');
       if (['offline', 'do_not_disturb'].includes(ringMode)) return;
@@ -73,9 +84,10 @@ export function ProgramHolderPhoneReceiver() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deviceId: id }),
       });
-      if (!tokenResponse.ok || !active) return;
+      if (!active) return;
+      if (!tokenResponse.ok) throw new Error('phone_enrollment_unavailable');
       const token = await tokenResponse.json();
-      if (!audioRef.current) return;
+      if (!audioRef.current) throw new Error('phone_audio_unavailable');
       client = await createPhoneClient(token, audioRef.current);
       if (!active) { await client.disconnect(); return; }
       clientRef.current = client;
@@ -87,11 +99,11 @@ export function ProgramHolderPhoneReceiver() {
       });
       client.on('offline', () => {
         ready = false;
-        if (active) setOnline(false);
+        if (active) { setOnline(false); scheduleReconnect(); }
       });
       client.on('error', () => {
         ready = false;
-        if (active) setOnline(false);
+        if (active) { setOnline(false); scheduleReconnect(); }
       });
       client.on('call', (notification: any) => {
         const call = notification?.call as BrowserPhoneCall | undefined;
@@ -122,15 +134,28 @@ export function ProgramHolderPhoneReceiver() {
           setNumber('');
           setMuted(false);
           navigator.vibrate?.(0);
+          if (!ready) scheduleReconnect();
         }
       });
       await client.connect();
       if (!active) { await client.disconnect(); return; }
       heartbeat = setInterval(() => void ping(), 45_000);
+      } finally { starting = false; }
     }
 
-    void start().catch(async () => {
-      if (!active) return;
+    function scheduleReconnect() {
+      if (!active || retry || callRef.current) return;
+      retry = setTimeout(() => {
+        retry = null;
+        void recover();
+      }, 30_000);
+    }
+
+    async function recover() {
+      if (reconnecting) return;
+      reconnecting = true;
+      if (!active) { reconnecting = false; return; }
+      ready = false;
       setOnline(false);
       try {
         await client?.disconnect();
@@ -143,11 +168,18 @@ export function ProgramHolderPhoneReceiver() {
         body: JSON.stringify({ action: 'disconnect', deviceId: id }),
         keepalive: true,
       }).catch(() => undefined);
-    });
+      client = null;
+      clientRef.current = null;
+      if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+      reconnecting = false;
+      if (active) void start().catch(() => scheduleReconnect());
+    }
+    void start().catch(recover);
     return () => {
       active = false;
       controller.abort();
       if (heartbeat) clearInterval(heartbeat);
+      if (retry) clearTimeout(retry);
       void client?.disconnect();
       clientRef.current = null;
       callRef.current = null;

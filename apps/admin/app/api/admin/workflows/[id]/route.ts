@@ -48,8 +48,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (body.status === 'active') {
     const [{ count: triggerCount, error: triggerError }, { count: stepCount, error: stepError }] =
       await Promise.all([
-        db.from('workflow_triggers').select('id', { count: 'exact', head: true }).eq('workflow_id', id),
-        db.from('workflow_steps').select('id', { count: 'exact', head: true }).eq('workflow_id', id),
+        db.from('workflow_triggers').select('id', { count: 'exact', head: true }).eq('workflow_id', id).eq('enabled', true),
+        db.from('workflow_steps').select('id', { count: 'exact', head: true }).eq('workflow_id', id).eq('enabled', true),
       ]);
     if (triggerError || stepError) {
       return NextResponse.json({ error: 'Unable to verify workflow configuration' }, { status: 503 });

@@ -65,3 +65,33 @@ test('readiness permits deliberate memory mode but rejects unencrypted persisten
     ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_encryption_unavailable',
   });
 });
+
+test('configured persistence without encryption fails closed when saving', async () => {
+  const store = new ProviderSessionStore({ directory: '/unused' });
+  await assert.rejects(() => store.save('envato:admin-a', {
+    storageState: async () => ({ cookies: [], origins: [] }),
+  }), /ENCRYPTION_UNAVAILABLE/);
+  assert.equal(await store.load('envato:admin-a'), undefined);
+});
+
+test('failed checkpoint preserves the last durable state in memory and on disk', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'provider-durable-'));
+  const state = value => ({ storageState: async () => ({
+    cookies: [{ name: 'session', value, domain: '.envato.com' }], origins: [],
+  }) });
+  try {
+    const store = new ProviderSessionStore({ secret: 'test-only', directory });
+    const scope = 'envato:admin-a';
+    await store.save(scope, state('saved'));
+    // A file at the directory path deterministically prevents a new checkpoint.
+    await fs.rename(directory, directory + '-saved');
+    await fs.writeFile(directory, 'unavailable');
+    await assert.rejects(() => store.save(scope, state('unsaved')));
+    assert.equal((await store.load(scope)).cookies[0].value, 'saved');
+    const restored = new ProviderSessionStore({ secret: 'test-only', directory: directory + '-saved' });
+    assert.equal((await restored.load(scope)).cookies[0].value, 'saved');
+  } finally {
+    await fs.rm(directory, { recursive: true, force: true });
+    await fs.rm(directory + '-saved', { recursive: true, force: true });
+  }
+});

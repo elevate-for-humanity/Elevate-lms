@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -62,15 +63,14 @@ export default function ProgramPageTemplate({
       {/* Hero Banner */}
       <section className="relative h-[clamp(260px,42svh,480px)] flex items-center">
         <div className="absolute inset-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
             alt={heroTitle}
             fill
             sizes="100vw"
             className="object-cover"
             priority
-            quality={90} placeholder="empty"
+            quality={90}
           />
         </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -73,14 +74,13 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
 
       {/* Hero — clean image, no text overlay */}
       <section className="relative h-[320px] sm:h-[420px]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={data.heroImage}
           alt={data.name}
           fill
           sizes="100vw"
           className="object-contain"
-          priority placeholder="empty"
+          priority
         />
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">

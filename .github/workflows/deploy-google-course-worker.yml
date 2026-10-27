@@ -43,7 +43,7 @@ on:
       - 'scripts/gcp/audit-course-production.mjs'
       - 'scripts/gcp/audit-course-production.test.mjs'
       - 'workers/admin-speech-cache.mjs'
-      - '.github/workflows/deploy-google-course-worker.yml'
+      # Workflow-only orchestration edits do not require rebuilding the worker image.
   workflow_dispatch:
 permissions:
   contents: read
@@ -51,6 +51,7 @@ permissions:
   id-token: write
 jobs:
   authoring-access:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -83,7 +84,7 @@ jobs:
           console.log(JSON.stringify({teachingPhotoProvider:'google',courseServiceIdentityConfigured:Boolean(task.serviceAccountName)}));
           NODE
   dispatch:
-    if: github.event_name == 'workflow_dispatch' && false
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && false)
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch Google-trusted workflow event
@@ -95,7 +96,7 @@ jobs:
     concurrency:
       group: google-course-worker-image
       cancel-in-progress: true
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
@@ -145,7 +146,7 @@ jobs:
             -v "$PWD/packages:/app/packages:ro" \
             -v "$PWD/Dockerfile.ultimate-worker:/app/Dockerfile.ultimate-worker:ro" \
             -v "$PWD/.dockerignore:/app/.dockerignore:ro" \
-            "elevate-ultimate-worker:$GITHUB_SHA" --test tests/worker/photo-cue-repair.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/renderer-fallback-source.test.mjs tests/worker/checkpoint-fallback.test.mjs tests/worker/progress-watch.test.mjs tests/worker/fresh-lesson-render-identity.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/worker/citation-repair.test.mjs tests/worker/source-grounding.test.mjs tests/worker/batch-write-deadline.test.mjs tests/worker/photo-format.test.mjs tests/worker/approved-frame-checks.test.mjs tests/worker/approved-repair-routing.test.mjs tests/worker/checkpoint-source-refresh.test.mjs tests/worker/approved-delivery.test.mjs lib/ultimate-course-builder/testing/source-path-precedence.test.mjs lib/ultimate-course-builder/testing/reviewed-photo-selection.test.mjs lib/ultimate-course-builder/instructional/vertex-response.test.mjs tests/worker/approved-motion-excerpt.test.mjs tests/worker/google-teaching-photo.test.mjs tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+            "elevate-ultimate-worker:$GITHUB_SHA" --test tests/worker/continuous-course-execution.test.mjs lib/ultimate-course-builder/worker/continuous-course-lease.test.mjs tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/photo-cue-repair.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/renderer-fallback-source.test.mjs tests/worker/checkpoint-fallback.test.mjs tests/worker/progress-watch.test.mjs tests/worker/fresh-lesson-render-identity.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/worker/citation-repair.test.mjs tests/worker/source-grounding.test.mjs tests/worker/batch-write-deadline.test.mjs tests/worker/photo-format.test.mjs tests/worker/approved-frame-checks.test.mjs tests/worker/approved-repair-routing.test.mjs tests/worker/checkpoint-source-refresh.test.mjs tests/worker/approved-delivery.test.mjs lib/ultimate-course-builder/testing/source-path-precedence.test.mjs lib/ultimate-course-builder/testing/reviewed-photo-selection.test.mjs lib/ultimate-course-builder/instructional/vertex-response.test.mjs tests/worker/approved-motion-excerpt.test.mjs tests/worker/google-teaching-photo.test.mjs tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/worker/attach-lesson-media.test.mjs workers/course-publication-policy.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
       # Builds can outlive the federated token; refresh only after build acceptance.
       - name: Refresh Google credentials after build
         uses: google-github-actions/auth@v3
@@ -170,7 +171,7 @@ jobs:
           gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
   deploy:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:
@@ -197,11 +198,17 @@ jobs:
         env:
           IMAGE_SHA: ${{ github.sha }}
         run: node scripts/gcp/deploy-course-job.mjs
-      - name: Dispatch queued work through the existing overlap guard
+      - name: Synchronize approved regional worker image and verify readback
+        run: node scripts/gcp/sync-course-worker-regions.mjs
+      - name: Dispatch course work in the approved secondary region
         env:
           COURSE_WORKER_PARALLELISM: '1'
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/gcp/dispatch-course-job.mjs
+        run: |
+          node --input-type=module <<'NODE'
+          import {dispatchApprovedRegionalCourses} from './scripts/gcp/continue-approved-regional-courses.mjs';
+          console.log(JSON.stringify(await dispatchApprovedRegionalCourses()));
+          NODE
       - name: Record deployment boundary
         run: |
           echo 'Exact CPU worker image deployed and dispatcher invoked. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"

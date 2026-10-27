@@ -85,7 +85,7 @@ export function LizzyContainer({
   return (
     <ColoredLivePreviewFrame
       targets={targets}
-      defaultUrl={resolvedDefaultUrl}
+      defaultUrl={previewFromOps ?? resolvedDefaultUrl}
       minHeight={previewMinHeight}
       className={className}
       workspaceTop={

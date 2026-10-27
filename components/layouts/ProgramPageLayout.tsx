@@ -48,7 +48,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
                 <Flame className="w-4 h-4" /> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
-                Free Career Training - 100% Government Funded • Start in 2 Weeks
+                Career training enrollment open • Review program tuition, funding status, and start dates
               </p>
             </div>
             <Link

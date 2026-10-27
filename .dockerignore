@@ -69,9 +69,8 @@ tests
 gha-creds-*.json
 **/gha-creds-*.json
 
-# Nested generated diagnostics, caches, and temporary workspaces
-**/reports
-**/logs
+# Nested generated caches and temporary workspaces
+# Do not exclude **/reports or **/logs: these names are live Next.js pages and API routes.
 **/tmp
 **/temp
 **/coverage
@@ -99,3 +98,9 @@ docs/ultimate-course-builder/lessons/*
 
 # Worker acceptance checks for the owner-approved teaching format.
 !tests/integration/approved-teaching-recaps.test.ts
+
+# Only the approved narration-storage regression fixture enters worker images.
+# Keep the general tests/ exclusion and all secret exclusions intact.
+!tests/worker
+tests/worker/*
+!tests/worker/narration-storage-reference.test.mjs

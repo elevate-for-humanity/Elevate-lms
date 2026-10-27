@@ -1,3 +1,5 @@
+import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
 import { recordParisObservation } from '@/lib/ai/runtime/supervision';
 import { executeStudioCommand } from '@/lib/studio/runtime-command';
 import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
@@ -25,7 +27,7 @@ import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
+import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
 import { isXAIConfigured } from '@/lib/ai/xai-config';
 import {
   executePaidInference,
@@ -119,8 +121,8 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
   return [...selected];
 }
 
-async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string) {
-  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command });
+async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
+  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
   return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
 }
 
@@ -1417,30 +1419,51 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
-    // While the self-hosted GPU is archived, Admin auto mode uses the lowest-cost
-    // connected OpenAI model. This is scoped to authenticated Dev Studio chat only.
-    const effectiveProvider: ChatProvider = providerPreference === 'auto' ? 'openai' : providerPreference;
+    // PARIS auto mode uses Elevate-owned inference only. Never silently
+    // select an external metered provider or activate a GPU here.
+    const effectiveProvider: ChatProvider | 'elevate' = providerPreference === 'auto' ? 'elevate' : providerPreference;
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
-    const masterExecution = lastUserMessage.trim()
-      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage)
+    const conversationId = typeof body.conversationId === 'string'
+      ? body.conversationId.trim() : undefined;
+    if (conversationId) {
+      const { data: conversation, error: conversationError } = await masterDb
+        .from('studio_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', auth.userId)
+        .maybeSingle();
+      if (conversationError) {
+        return NextResponse.json({ error: 'Conversation lookup failed' }, { status: 503 });
+      }
+      if (!conversation) {
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      }
+    }
+    const toolsAllowed = !prohibitsToolUse(lastUserMessage);
+    const masterExecution = toolsAllowed && lastUserMessage.trim()
+      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage, conversationId)
       : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
-      getRAGContext(lastUserMessage),
-      collectAutomaticEvidence(lastUserMessage),
+      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: effectiveProvider === 'elevate' ? 'owned-only' : 'configured-provider' }) : Promise.resolve(''),
+      toolsAllowed ? collectAutomaticEvidence(lastUserMessage) : Promise.resolve([]),
     ]);
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
       agent,
-      ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
+      contextProfile: effectiveProvider === 'elevate'
+        ? (!toolsAllowed && !fileContext && !documentsContext && !isOperationalDiagnosticRequest(lastUserMessage) ? 'conversation' : 'owned-cpu')
+        : 'full',
+      institutionalContext: getAiCharterContext(),
+      ragContext,
       fileContext,
       documentsContext,
       lastUserMessage,
       automaticEvidence: formatAutomaticEvidence(automaticEvidence),
-      toolInventory: TOOLS.map((tool) => tool.function.name),
+      toolInventory: toolsAllowed ? TOOLS.map((tool) => tool.function.name) : [],
     });
 
     let assistantMessage: string | null = null;
@@ -1469,8 +1492,8 @@ async function _POST(req: NextRequest) {
             const first = await openai.chat.completions.create({
               model: selectedModel,
               messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-              tools: TOOLS,
-              tool_choice: 'auto',
+              tools: toolsAllowed ? TOOLS : undefined,
+              tool_choice: toolsAllowed ? 'auto' : undefined,
               temperature: 0.4,
               max_tokens: 4096,
               stream: true,
@@ -1492,7 +1515,7 @@ async function _POST(req: NextRequest) {
             }
 
             const calls = Object.values(streamedToolCalls).filter((call) => call.name);
-            if (calls.length) {
+            if (toolsAllowed && calls.length) {
               const toolResults = [];
               const assistantToolCalls = [];
               for (const call of calls) {
@@ -1583,6 +1606,53 @@ async function _POST(req: NextRequest) {
       });
     }
 
+    if (effectiveProvider === 'elevate') {
+      return studioTextStreamResponse({
+        signal: req.signal,
+        tokens: (signal) => aiChatStream({
+          providerPolicy: 'owned-only',
+          messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+          temperature: 0.4,
+          maxTokens: 2048,
+          signal,
+        }),
+        complete: async (content) => {
+          const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+          try {
+            const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
+              user_id: auth.userId,
+              user_message: lastUserMessage,
+              assistant_response: content,
+              file_context: fileContext || null,
+              provider: 'elevate',
+              model: 'elevate-local',
+            });
+            if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
+            await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
+          } catch (error) {
+            logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
+          }
+          return {
+            provider: 'elevate',
+            model: 'elevate-local',
+            providerPreference,
+            availableProviders: {
+              xai: isXAIConfigured(),
+              groq: isGroqConfigured(),
+              openai: isOpenAIConfigured(),
+              anthropic: isAnthropicConfigured(),
+              gemini: isGeminiConfigured(),
+            },
+            toolCalls,
+            capabilitiesUsed,
+            studioRun: masterExecution,
+          };
+        },
+        onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
+        errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
+      });
+    }
+
     const providerOrder = [effectiveProvider];
 
     for (const nextProvider of providerOrder) {
@@ -1595,8 +1665,8 @@ async function _POST(req: NextRequest) {
           const initial = await groq.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...messages],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1607,7 +1677,7 @@ async function _POST(req: NextRequest) {
             (toolCall) => toolCall.type === 'function',
           );
 
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
@@ -1657,8 +1727,8 @@ async function _POST(req: NextRequest) {
           const initial = await openai.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1667,7 +1737,7 @@ async function _POST(req: NextRequest) {
           const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
             (toolCall) => toolCall.type === 'function',
           );
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
@@ -1716,10 +1786,10 @@ async function _POST(req: NextRequest) {
             max_tokens: 4096,
             system: systemPrompt,
             messages: toChatMessages(messages),
-            tools: anthropicTools,
+            tools: toolsAllowed ? anthropicTools : undefined,
           });
           const toolUseBlocks = initial.content.filter((b) => b.type === 'tool_use');
-          if (toolUseBlocks.length > 0) {
+          if (toolsAllowed && toolUseBlocks.length > 0) {
             const toolResults = await Promise.all(
               toolUseBlocks.map(async (b) => {
                 if (b.type !== 'tool_use') return null;
@@ -1772,6 +1842,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
+    // The owned Elevate stream returns above; only external providers reach this fallback.
     if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();

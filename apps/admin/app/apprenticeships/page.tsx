@@ -134,7 +134,7 @@ export default async function ApprenticeshipsPage() {
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
+            <table className="w-full min-w-[720px] text-sm hours-review-table">
               <thead className="bg-slate-50">
                 <tr>
                   {['Apprentice', 'Program', 'Hours', 'Status', 'Start Date'].map((h) => (
@@ -157,14 +157,21 @@ export default async function ApprenticeshipsPage() {
                     : 0;
                   return (
                     <tr key={e.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3">
+                      <td data-label="Apprentice" className="px-4 py-3">
                         <p className="text-xs font-medium text-slate-800">
-                          {e.profile?.full_name ?? '—'}
+                          <Link
+                            href={`/students/${e.user_id}`}
+                            className="font-semibold text-blue-800 underline underline-offset-2"
+                          >
+                            {e.profile?.full_name ?? 'Open student record'}
+                          </Link>
                         </p>
                         <p className="text-xs text-slate-400">{e.profile?.email ?? '—'}</p>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{e.program?.name ?? '—'}</td>
-                      <td className="px-4 py-3">
+                      <td data-label="Program" className="px-4 py-3 text-xs text-slate-600">
+                        {e.program?.name ?? '—'}
+                      </td>
+                      <td data-label="Approved hours" className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
                             <div
@@ -179,19 +186,19 @@ export default async function ApprenticeshipsPage() {
                               ? ` (${e.total_hours_pending} pending review)`
                               : ''}
                             <span className="block text-slate-500">
-                              {e.verified_ojt_hours} verified OJT hours
+                              {creditDifferenceLabel(e.total_hours_completed, e.verified_ojt_hours)}
                             </span>
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td data-label="Status" className="px-4 py-3">
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[e.status] ?? 'bg-slate-100 text-slate-600'}`}
                         >
                           {e.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-500">
+                      <td data-label="Start date" className="px-4 py-3 text-xs text-slate-500">
                         {formatHoursDate(e.start_date)}
                       </td>
                     </tr>
@@ -204,4 +211,12 @@ export default async function ApprenticeshipsPage() {
       </div>
     </div>
   );
+}
+
+function creditDifferenceLabel(approved: number, source: number) {
+  return approved === source
+    ? 'Approved OJL hours'
+    : source > approved
+      ? 'Additional work records need review'
+      : 'Approved hours, including verified adjustments';
 }

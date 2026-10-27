@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Platform Licensing Guide',
   description:
     'How Elevate platform licensing, checkout, organization access, roles, domains, billing enforcement, and support work.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/guides/licensing' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/guides/licensing' },
   robots: { index: true, follow: true },
 };
 

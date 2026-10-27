@@ -3,10 +3,12 @@ import {inspectRegionalCapacity,isTerminalExecution,allocation} from './regional
 import {LESSON_ROLE_JOBS,LESSON_ROLE_REGION} from './deploy-lesson-autopilots.mjs';
 import {randomUUID} from 'node:crypto';
 
-export const LESSON_ROLE_CONCURRENCY=Object.freeze({instruction:4,media:3,quality:2});
-function concurrency(role,env){
+// Default to one execution per runnable lesson, rather than a small role pool.
+// An explicit operational limit can still reduce demand during an incident.
+function concurrency(role,env,demand){
  const value=env['COURSE_AUTOPILOT_'+role.toUpperCase()+'_CONCURRENCY'];
- const count=value===undefined?LESSON_ROLE_CONCURRENCY[role]:Number(value);
+ if(value===undefined || value==='')return demand;
+ const count=Number(value);
  if(!Number.isSafeInteger(count)||count<1)throw Error('ULTIMATE_AUTOPILOT_CONCURRENCY_INVALID:'+role);
  return count;
 }
@@ -56,9 +58,24 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  const source=read(['run','jobs','describe','elevate-course-builder-parallel']);
  const expectedImage=source.spec?.template?.spec?.template?.spec?.containers?.[0]?.image;
  if(!/@sha256:[a-f0-9]{64}$/.test(expectedImage??''))throw Error('IMMUTABLE_APPROVED_WORKER_IMAGE_REQUIRED');
+ // Ask the same database predicate used by claims before reserving paid capacity.
+ // Waiting media/QA stages must not occupy slots intended for runnable lessons.
+ const ready=[];
+ for(const job of eligible){
+  if(Date.parse(job.available_at)>now.getTime() ||
+    (job.status==='running' && Date.parse(job.lease_expires_at)>now.getTime()))continue;
+  const response=await request(new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_job_ready'),{
+   method:'POST',headers:{...headers,'Content-Type':'application/json'},
+   body:JSON.stringify({p_job:job.id}),signal:AbortSignal.timeout(15000),
+  });
+  if(!response.ok)throw Error('ULTIMATE_AUTOPILOT_READINESS_HTTP_'+response.status);
+  const result=await response.json();
+  if(typeof result!=='boolean')throw Error('ULTIMATE_AUTOPILOT_READINESS_INVALID');
+  if(result)ready.push(job);
+ }
  let activeCount=0,capacityWait=false,reserved=null;const launches=[],assigned=[];
  for(const role of ['quality','media','instruction']){
-  const candidates=eligible.filter(j=>j.payload?.autopilot?.role===role && Date.parse(j.available_at)<=now.getTime() &&
+  const candidates=ready.filter(j=>j.payload?.autopilot?.role===role && Date.parse(j.available_at)<=now.getTime() &&
    (j.status==='queued' || Date.parse(j.lease_expires_at)<=now.getTime()));
   const config=LESSON_ROLE_JOBS[role];
   const active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));
@@ -67,7 +84,7 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   // beside them could launch more tasks than there is unfinished work.
   const leased=rows.filter(j=>j.payload?.autopilot?.role===role&&j.status==='running'&&Date.parse(j.lease_expires_at)>now.getTime()).length;
   const unclaimed=Math.max(0,active.length-leased);
-  const slots=Math.min(Math.max(0,concurrency(role,env)-active.length),Math.max(0,candidates.length-unclaimed));
+  const slots=Math.min(Math.max(0,concurrency(role,env,candidates.length+leased)-active.length),Math.max(0,candidates.length-unclaimed));
   if(!slots)continue;
   const job=read(['run','jobs','describe',config.name]),envelope=job.spec?.template?.spec,task=envelope?.template?.spec;
   if(envelope?.parallelism!==1 || envelope?.taskCount!==1 || task?.containers?.[0]?.image!==expectedImage ||

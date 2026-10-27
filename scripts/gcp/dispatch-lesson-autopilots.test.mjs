@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {dispatchLessonAutopilots,LESSON_ROLE_CONCURRENCY} from './dispatch-lesson-autopilots.mjs';
+import {dispatchLessonAutopilots} from './dispatch-lesson-autopilots.mjs';
 import {lessonRoleDefinition,LESSON_ROLE_JOBS} from './deploy-lesson-autopilots.mjs';
 const now=new Date('2026-10-27T18:00:00Z'),Gi=2**30;
 const source={spec:{template:{spec:{taskCount:1,parallelism:1,template:{spec:{serviceAccountName:'elevate-worker-runtime@elegant-racer-299721.iam.gserviceaccount.com',maxRetries:0,
@@ -32,7 +32,11 @@ function fixture(rows){
    if(args[2]==='executions')return JSON.stringify(active.get(args.find(a=>a.startsWith('--job=')).slice(6))??[]);
    throw Error('unexpected command');
   },
-  request:async url=>{
+  request:async (url,init)=>{
+   if(url.pathname.endsWith('/rpc/ultimate_autopilot_job_ready')){
+    const id=JSON.parse(init.body).p_job;
+    return {ok:true,json:async()=>!controls.notReady?.includes(id)};
+   }
    if(url.pathname.endsWith('/ultimate_job_attempt_history')){
     trace.push('history');
     if(controls.historyUnavailable)return {ok:false,status:503};
@@ -51,21 +55,21 @@ function fixture(rows){
     cpu+=Number(limits.cpu)*1000*executions.length;memory+=Number(limits.memory.replace('Gi',''))*Gi*executions.length;
    }
    const limits=task.containers[0].resources.limits;
-   return {fits:true,required:{cpu:cpu+Number(limits.cpu)*1000,memory:memory+Number(limits.memory.replace('Gi',''))*Gi},granted:{cpu:32000,memory:64*Gi}};
+   return {fits:true,required:{cpu:cpu+Number(limits.cpu)*1000,memory:memory+Number(limits.memory.replace('Gi',''))*Gi},granted:{cpu:256000,memory:512*Gi}};
   },
  };
  return {options,calls,trace,active,templates,records,history,controls};
 }
 const launches=s=>s.calls.filter(args=>args[2]==='execute');
 
-test('multiple lessons fill each role pool before waiting for any assignment',async()=>{
+test('multiple lessons receive a worker each before waiting for any assignment',async()=>{
  const rows=Object.entries({instruction:8,media:6,quality:3}).flatMap(([role,count])=>Array.from({length:count},(_,i)=>waiting(role,role+'-'+i)));
  const s=fixture(rows),result=await dispatchLessonAutopilots(s.options);
- assert.equal(result.status,'assigned');assert.equal(result.assignments.length,9);
- assert.equal(new Set(result.assignments.map(a=>a.jobId)).size,9);
- for(const [role,count] of Object.entries(LESSON_ROLE_CONCURRENCY))assert.equal(result.assignments.filter(a=>a.role===role).length,count);
- assert.equal(s.trace.indexOf('history'),9,'all admitted workers start before polling their independent claims');
- assert.equal(new Set(launches(s).map(args=>args.find(a=>a.startsWith('--update-env-vars=')))).size,9);
+ assert.equal(result.status,'assigned');assert.equal(result.assignments.length,17);
+ assert.equal(new Set(result.assignments.map(a=>a.jobId)).size,17);
+ for(const [role,count] of Object.entries({instruction:8,media:6,quality:3}))assert.equal(result.assignments.filter(a=>a.role===role).length,count);
+ assert.equal(s.trace.indexOf('history'),17,'all admitted workers start before polling their independent claims');
+ assert.equal(new Set(launches(s).map(args=>args.find(a=>a.startsWith('--update-env-vars=')))).size,17);
 });
 
 test('an existing same-role worker does not prevent other lessons receiving workers',async()=>{
@@ -73,7 +77,7 @@ test('an existing same-role worker does not prevent other lessons receiving work
  const s=fixture([live,...Array.from({length:4},(_,i)=>waiting('media','next-'+i))]);
  s.active.set(LESSON_ROLE_JOBS.media.name,[{status:{}}]);
  const result=await dispatchLessonAutopilots(s.options);
- assert.equal(result.assignments.length,2);assert.ok(result.assignments.every(a=>a.role==='media'));
+ assert.equal(result.assignments.length,4);assert.ok(result.assignments.every(a=>a.role==='media'));
  assert.equal(s.records.get('live').lease_owner,'existing-worker');
 });
 
@@ -158,3 +162,14 @@ test('capacity and immutable-image checks remain mandatory for every worker',asy
  const missing=fixture([waiting('instruction')]);missing.options.capacityCheck=async()=>({fits:true});
  await assert.rejects(dispatchLessonAutopilots(missing.options),/CAPACITY_READBACK_REQUIRED/);assert.equal(launches(missing).length,0);
 });
+
+ test('forty ready lessons each receive a worker without the former media ceiling',async()=>{
+ const s=fixture(Array.from({length:40},(_,i)=>waiting('media','lesson-'+i)));
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.assignments.length,40);assert.equal(new Set(result.assignments.map(a=>a.jobId)).size,40);
+ });
+ test('prerequisite waits do not launch paid executions',async()=>{
+ const s=fixture([waiting('media','waiting'),waiting('instruction','ready')]);s.controls.notReady=['waiting'];
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.deepEqual(result.assignments.map(a=>a.jobId),['ready']);
+ });

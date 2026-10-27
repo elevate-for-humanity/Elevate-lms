@@ -34,7 +34,6 @@ const HOST_SHOP_HERO_ORDER = [
   'salon-saloon',
   'kountry-kutz-barbershop',
   'cals-kutz-studio',
-  'b-52s-barber-shop',
   'generations-hair-llc',
 ] as const;
 

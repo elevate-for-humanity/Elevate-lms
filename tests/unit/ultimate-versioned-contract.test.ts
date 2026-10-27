@@ -134,3 +134,11 @@ describe('versioned lesson contract', () => {
     expect(c.findings[0].code).toBe(code);
   });
 });
+
+it('publication settings preserve saved teaching hashes without accepting instructional changes',()=>{
+ for(const step of ['standards_lock','natural_narration','lesson_film_render'] as const){
+  const original=stepInputHash(step,profile,{});
+  expect(stepInputHash(step,{...profile,publishCompletedLessons:true,preservedPublishedLessonIds:['prior-lesson']},{})).toBe(original);
+  expect(stepInputHash(step,{...profile,title:'A different instructional course'},{})).not.toBe(original);
+ }
+});

@@ -59,6 +59,23 @@ async function loadDashboardEnrollments(db: Awaited<ReturnType<typeof requireAdm
   }
 }
 
+async function loadDashboardLeads(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('crm_leads')
+      .select('id,full_name,email,status,updated_at')
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -229,14 +246,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
         .limit(50),
       'compliance alerts',
     ),
-    timeboxDashboardQuery(
-      db
-        .from('crm_leads')
-        .select('id,full_name,email,status,updated_at')
-        .order('updated_at', { ascending: true })
-        .limit(100),
-      'CRM leads',
-    ),
+    timeboxDashboardQuery(loadDashboardLeads(db), 'CRM leads'),
     timeboxDashboardQuery(
       db
         .from('documents')

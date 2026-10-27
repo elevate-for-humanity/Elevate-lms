@@ -1,3 +1,4 @@
+import { DashboardReadingSupport } from '@/components/accessibility/DashboardReadingSupport';
 /**
  * Production release marker: PARIS mobile controls, 2026-09-10.
  * IMPORTANT: client-polyfills MUST be the first import in this file.
@@ -155,7 +156,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             footer={storeOnly ? <StoreFooter /> : <SiteFooter />}
             paris={<ParisFloatingWrapper surface="public" />}
           >
-            {children}
+            <DashboardReadingSupport dashboardOnly>{children}</DashboardReadingSupport>
           </MarketingChromeBoundary>
         </Suspense>
         </I18nProvider>

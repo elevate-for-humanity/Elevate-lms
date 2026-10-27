@@ -1,3 +1,4 @@
+import { DashboardReadingSupport } from '@/components/accessibility/DashboardReadingSupport';
 /**
  * Admin application root layout.
  *
@@ -79,7 +80,9 @@ export default async function AdminGroupLayout({ children }: { children: React.R
         <AdminPwaRegister />
         <I18nProvider>
           <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
-            <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+            <DashboardReadingSupport>
+              <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+            </DashboardReadingSupport>
           </Suspense>
         </I18nProvider>
       </body>

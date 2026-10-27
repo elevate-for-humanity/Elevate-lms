@@ -1,3 +1,4 @@
+import { ReadingDashboard } from './ReadingDashboard';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
@@ -89,6 +90,9 @@ export async function ProgramHolderWorkspaceView({
   studentStatus?: string;
 }) {
   const data = await getProgramHolderWorkspace();
+  if (section === 'dashboard' && data.holder?.features?.reading_support === true) {
+    return <ReadingDashboard data={data} />;
+  }
   const coordinatorRole =
     data.mode === 'holder'
       ? String(
@@ -332,7 +336,7 @@ export async function ProgramHolderWorkspaceView({
   const completedRequirements = requiredComplianceItems.filter((item) => item.complete).length;
   const missingRequirements = requiredComplianceItems.length - completedRequirements;
   const primaryProgramLabel =
-    data.programs[0]?.title || data.programs[0]?.name || 'Assigned program';
+    data.programs.map(program => program.title || program.name).filter(Boolean).join(', ') || 'Assigned program';
   const callQueue = data.applicants.filter((row) => !row.call_date || !row.call_outcome);
   const payoutReady = Boolean(
     data.payoutProfile?.payouts_enabled &&
@@ -883,6 +887,8 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                 >
                   Record progress
                 </Link>
+                {row.phone && <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a>}
+                {row.email && <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a>}
                 <StudentCommunicationActions
                   enrollmentId={row.id}
                   studentName={row.full_name || 'Student'}
@@ -940,7 +946,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">{completionAlert(row) || row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
-                      <StudentCommunicationActions
+                      {row.phone && <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a>}
+                      {row.email && <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a>}
+                      {row.phone && <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a>}
+                {row.email && <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a>}
+                <StudentCommunicationActions
                         enrollmentId={row.id}
                         studentName={row.full_name || 'Student'}
                         hasEmail={Boolean(row.email)}

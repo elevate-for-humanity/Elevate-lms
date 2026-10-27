@@ -155,6 +155,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const enrollmentContactColumns = contactProjection.enrollment;
   const applicantContactColumns = contactProjection.applicant;
   const applicantNotesColumns = contactProjection.notes;
+  const programWideStudentAccess = holderRes.data?.features?.program_wide_student_access === true;
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -210,7 +211,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .select(
             `id,user_id,student_id,program_holder_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,expected_end_date,completed_at,completion_date${enrollmentContactColumns}`,
           )
-          .eq('program_holder_id', holderId)
+          .match(programWideStudentAccess ? {} : { program_holder_id: holderId })
           .in('program_id', programIds)
           .is('revoked_at', null)
           .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'graduated'])
@@ -222,7 +223,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .select(
             `id,user_id,student_id,program_holder_id,full_name,status,enrollment_state,program_id,program_slug,training_start_date,training_end_date,student_start_date,expected_end_date,start_date${enrollmentContactColumns}`,
           )
-          .eq('program_holder_id', holderId)
+          .match(programWideStudentAccess ? {} : { program_holder_id: holderId })
           .in('program_id', programIds)
           .is('revoked_at', null)
           .in('status', ['active', 'enrolled', 'in_progress', 'funded'])
@@ -365,7 +366,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     : { data: [], error: null };
   if (progressEntriesRes.error) throw new Error('Program Holder verified training hours could not load.');
   const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
-    ? await db.from('profiles').select('id,role,email,full_name').in('id', rosterUserIds)
+    ? await db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
     : { data: [], error: null };
   if (rosterProfilesError)
     throw new Error(
@@ -380,8 +381,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const emailByUserId = new Map<string, string>((rosterProfiles ?? [])
     .filter(row => typeof row.email === 'string' && row.email.trim())
     .map(row => [row.id, String(row.email).trim()]));
+  const phoneByUserId = new Map<string, string>((rosterProfiles ?? [])
+    .filter(row => typeof row.phone === 'string' && row.phone.trim())
+    .map(row => [row.id, String(row.phone).trim()]));
   const trainingRecord = (row: any) => holderTrainingRecord({
-    ...row, ...(contactAccessGranted ? { email: row.email || emailByUserId.get(row.user_id || row.student_id) } : {}), ...holderCredentialStatus(row, credentialUploads ?? []),
+    ...row, ...(contactAccessGranted ? { email: row.email || emailByUserId.get(row.user_id || row.student_id), phone: row.phone || phoneByUserId.get(row.user_id || row.student_id) } : {}), ...holderCredentialStatus(row, credentialUploads ?? []),
   });
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])

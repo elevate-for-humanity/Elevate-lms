@@ -1,3 +1,4 @@
+import { DashboardReadingSupport } from '@/components/accessibility/DashboardReadingSupport';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 // Production recovery deploy marker: 2026-08-13.
 import type { Metadata } from 'next';
@@ -42,13 +43,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="lms-portal efh-contrast">
         <SupabaseConfigBootstrap />
-        <CommunicationTodos />
-        <LmsPwaRegistration />
-        <ClientProviders>{children}</ClientProviders>
-        <PwaInstallBanner
-          message="Install the Elevate dashboard for quick access to your courses, hours, messages, and documents."
-          storageKey="lms-pwa-phone-install-banner-v1"
-        />
+        <DashboardReadingSupport>
+          <CommunicationTodos />
+          <LmsPwaRegistration />
+          <ClientProviders>{children}</ClientProviders>
+          <PwaInstallBanner
+            message="Install the Elevate dashboard for quick access to your courses, hours, messages, and documents."
+            storageKey="lms-pwa-phone-install-banner-v1"
+          />
+        </DashboardReadingSupport>
       </body>
     </html>
   );

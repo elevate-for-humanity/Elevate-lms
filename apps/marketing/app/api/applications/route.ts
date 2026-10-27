@@ -1,3 +1,4 @@
+import { copyApplicationToProgramHolders } from '@/lib/program-holder/application-copy';
 import {
   apprenticeshipPaymentError,
   isSelfPayApprenticeship,
@@ -965,6 +966,16 @@ async function _POST(req: Request) {
         '[Applications] Failed to queue automation job',
         queueError instanceof Error ? queueError.message : String(queueError),
       );
+    }
+
+    try {
+      await copyApplicationToProgramHolders(supabase, {
+        id: data.id, programSlug: data.program_interest || program,
+        name: `${body.firstName} ${body.lastName}`.trim(), email: body.email,
+        phone: body.phone || '', userId,
+      });
+    } catch (copyError) {
+      logger.error('[Applications] Program Holder copy failed', copyError instanceof Error ? copyError : undefined, { applicationId: data.id });
     }
 
     const requiresSelfPayCheckout =

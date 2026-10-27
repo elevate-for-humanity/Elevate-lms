@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, FileUp, Globe2, Loader2, Sparkles, WandSparkles } from 'lucide-react';
 
@@ -29,6 +29,16 @@ export default function WebsiteImportClient() {
   const [busy, setBusy] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [existingSites, setExistingSites] = useState<Array<{id:string;site_name:string}>>([]);
+  const [existingSiteId, setExistingSiteId] = useState('');
+  useEffect(() => {
+    let active = true;
+    fetch('/api/apps/website-builder/site-list', { credentials: 'same-origin' })
+      .then(r => r.ok ? r.json() : { websites: [] })
+      .then(data => { if (active) setExistingSites(Array.isArray(data.websites) ? data.websites : []); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   const analyze = async () => {
     setBusy(true);
@@ -71,6 +81,7 @@ export default function WebsiteImportClient() {
         body: JSON.stringify({
           siteName: result.extracted.title || (result.originalUrl ? new URL(result.originalUrl).hostname : 'Imported Website'),
           siteConfig: importedConfig,
+          ...(existingSiteId ? { existingSiteId } : {}),
         }),
       });
       const data = await response.json();
@@ -160,6 +171,13 @@ export default function WebsiteImportClient() {
               </div>
             </div>
 
+            {existingSites.length > 0 && <label className="mt-6 block text-sm font-bold text-slate-800">Website destination
+              <select value={existingSiteId} onChange={e => setExistingSiteId(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3">
+                <option value="">Create a new website</option>
+                {existingSites.map(site => <option key={site.id} value={site.id}>Update existing: {site.site_name}</option>)}
+              </select>
+              <span className="mt-2 block text-xs font-normal text-slate-600">Updating an existing website creates a recovery revision before replacing its content. Publishing still requires review.</span>
+            </label>}
             <button type="button" onClick={createImportedSite} disabled={creating} className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-black text-white disabled:opacity-50 sm:w-auto">
               {creating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
               {creating ? 'Creating…' : 'Create Draft & Open PARIS Editor'}

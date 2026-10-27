@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: read
-  actions: read
+  actions: write
 
 concurrency:
   group: google-deployment-coordination
@@ -22,6 +22,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Retire superseded unstarted web release requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRUNE_SUPERSEDED_RELEASES: 'true'
+        run: |
+          node --test scripts/gcp/prune-web-release-requests.test.mjs
+          node scripts/gcp/prune-web-release-requests.mjs
       - name: Verify each production service has its own automatic trigger
         shell: bash
         run: |

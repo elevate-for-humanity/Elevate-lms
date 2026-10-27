@@ -1,4 +1,10 @@
+import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
+import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
+import CourseSyllabus from '@/components/learner/CourseSyllabus';
+import { completionAlert } from '@/lib/program-holder/student-training';
+import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
+import { StudentProgressReportForm } from './StudentProgressReportForm';
 import Image from 'next/image';
 import {
   AlertTriangle,
@@ -82,7 +88,7 @@ export async function ProgramHolderWorkspaceView({
 }) {
   const data = await getProgramHolderWorkspace();
   const coordinatorRole =
-    data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
+    data.mode === 'holder' ? String(data.holder?.features?.approved_role || (data.profile?.role === 'site_coordinator' ? 'Site Coordinator' : '')) : '';
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
   const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
@@ -120,9 +126,9 @@ export async function ProgramHolderWorkspaceView({
       .filter((row) => row.approved === true || row.status === 'approved')
       .map((row) => row.document_type),
   );
-  const requiredDocumentTypes = ['government_id', 'business_registration', 'insurance', 'w9'];
   const holderFeatures =
     data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const requiredDocumentTypes = requiredProgramHolderDocuments(isHvac, holderFeatures).map(item => item.type);
   const regionalAssignment =
     holderFeatures.regional_assignment && typeof holderFeatures.regional_assignment === 'object'
       ? (holderFeatures.regional_assignment as Record<string, unknown>)
@@ -226,7 +232,7 @@ export async function ProgramHolderWorkspaceView({
         ]
       : []),
     {
-      label: 'Approved ID, business registration, insurance, and W-9',
+      label: 'Approved required onboarding documents',
       complete: requiredDocumentTypes.every((type) => approvedDocumentTypes.has(type)),
       required: true,
       owner: 'Shared',
@@ -351,20 +357,24 @@ export async function ProgramHolderWorkspaceView({
         rows={data.documents}
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
+        insuranceRequired={holderFeatures.insurance_required !== false}
       />
     );
   if (section === 'reports')
     return (
-      <Reports
-        rows={data.reports}
-        enrolled={data.enrollments.length}
-        active={active.length}
-        completed={completed.length}
-        programLabel={primaryProgramLabel}
-      />
+      <div className="space-y-6">
+        <Reports
+          rows={data.reports}
+          enrolled={data.enrollments.length}
+          active={active.length}
+          completed={completed.length}
+          programLabel={primaryProgramLabel}
+        />
+        <StudentProgressReportForm students={data.enrollments.map(row => ({id:row.id, full_name:row.full_name}))} />
+      </div>
     );
   if (section === 'payouts')
-    return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;
+    return <section className="space-y-4 p-4"><h1 className="text-2xl font-black">Financial records</h1><p>Student funding, reimbursements, and payment records are managed by authorized Elevate administrators.</p>{payoutPanel}</section>;
   if (section === 'settings')
     return (
       <Settings
@@ -376,7 +386,7 @@ export async function ProgramHolderWorkspaceView({
     );
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="w-full min-w-0 space-y-6 px-3 pb-28 sm:space-y-8 sm:px-6 lg:pb-8 [&_h1]:[overflow-wrap:normal] [&_h2]:[overflow-wrap:normal] [&_h3]:[overflow-wrap:normal] [&_h1]:[word-break:normal] [&_h2]:[word-break:normal] [&_h3]:[word-break:normal] [&_section]:min-w-0 [&_article]:min-w-0">
       <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -471,6 +481,7 @@ export async function ProgramHolderWorkspaceView({
           ))}
         </div>
       </section>
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       {texasLaunchKit}
       <ProgramHolderOperationsGuide
         holderName={data.holder?.organization_name || data.holder?.name || data.profile?.full_name}
@@ -1115,6 +1126,13 @@ export async function ProgramHolderWorkspaceView({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
+                {programHolderRequirementLink(item.label) ? (
+                  <Link href={programHolderRequirementLink(item.label)!} className="ml-auto inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">
+                    {item.complete ? 'View' : 'Open'}
+                  </Link>
+                ) : item.owner === 'Elevate' ? (
+                  <span className="ml-auto text-xs font-semibold text-slate-500">Elevate-managed</span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -1517,36 +1535,10 @@ function Metric({
   );
 }
 
-function voucherStatus(row: any) {
-  const paid =
-    Boolean(row.voucher_paid_date) ||
-    Number(row.amount_paid_cents || 0) > 0 ||
-    ['paid', 'completed', 'succeeded'].includes(String(row.payment_status || '').toLowerCase());
-  if (paid) return 'Paid';
-
-  const verified = Boolean(row.voucher_issued_date) || row.funding_verified === true;
-  return verified ? 'Voucher verified' : 'Voucher pending';
-}
-
-function expectedPaymentStatus(row: any) {
-  const cents = Number(row.expected_payout_cents || 0);
-  if (cents <= 0) return 'Not projected';
-
-  const amount = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(cents / 100);
-  const status =
-    row.expected_payout_status === 'pending_voucher_payment'
-      ? 'pending voucher/payment'
-      : String(row.expected_payout_status || 'projected').replaceAll('_', ' ');
-  return `${amount} — ${status}`;
-}
-
 function completionStatus(row: any) {
   const state = String(row.enrollment_state || row.status || '').toLowerCase();
   if (
-    Boolean(row.completed_at) ||
+    Boolean(row.completed_at || row.completion_date) ||
     ['completed', 'graduated'].includes(state) ||
     String(row.work_progress || '').toLowerCase() === 'completed'
   ) {
@@ -1569,6 +1561,13 @@ function applicantPipelineStatus(row: any) {
   return status === 'approved' ? 'Voucher pending' : status.replaceAll('_', ' ');
 }
 
+function isCompletionOverdue(row: any): boolean {
+  const status = String(row.status || row.enrollment_state || '').toLowerCase();
+  if (['completed', 'graduated', 'withdrawn', 'cancelled'].includes(status) || row.completed_at || row.completion_date) return false;
+  const end = String(row.expected_end_date || row.training_end_date || '').slice(0, 10);
+  return Boolean(end && end < new Date().toISOString().slice(0, 10));
+}
+
 function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
   return (
     <div className="mt-5 min-w-0">
@@ -1578,7 +1577,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <article
               key={row.id}
               data-testid="student-card"
-              className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"
+              className={isCompletionOverdue(row) ? "min-w-0 rounded-xl border-2 border-red-600 bg-red-50 p-4" : "min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"}
             >
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -1596,14 +1595,17 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   label="Program"
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
-                <Row label="Voucher" value={voucherStatus(row)} />
-                <Row label="Expected payment" value={expectedPaymentStatus(row)} />
                 <Row label="Completion" value={completionStatus(row)} />
+                {isCompletionOverdue(row) && <p role="alert" className="rounded-lg bg-red-700 p-2 text-xs font-black text-white">Completion overdue — review testing and closeout</p>}
+                <Row label="Actual completion" value={(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'} />
+                <Row label="Certification evidence" value={row.certification_status || 'Upload missing'} />
+                {row.credential_earned_date && <Row label="Credential earned" value={row.credential_earned_date} />}
+                {row.certificate_verified_at && <Row label="Credential verified" value={row.certificate_verified_at.slice(0, 10)} />}
                 <Row
                   label="Training"
-                  value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`}
+                  value={`${row.training_start_date || 'Start missing'} — ${row.expected_end_date || row.training_end_date || 'End missing'}`}
                 />
-                <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+                <Row label="Next action" value={completionAlert(row) || row.next_required_action || 'Continue training'} />
                 <Row
                   label="WorkOne hours"
                   value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
@@ -1622,11 +1624,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   hasEmail={Boolean(row.email)}
                   hasPhone={Boolean(row.phone)}
                 />
-                <StudentReadyForTestingButton
+                {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
                   studentId={row.id}
                   studentName={row.full_name || 'Student'}
                   source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
-                />
+                /> : null}
               </div>
             </article>
           ))
@@ -1636,14 +1638,12 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           </div>
         )}
       </div>
-      <div className="hidden overflow-x-auto md:block">
+      <div className="hidden max-w-full overflow-x-auto md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-3 py-3">Student</th>
               <th className="px-3 py-3">Program</th>
-              <th className="px-3 py-3">Voucher</th>
-              <th className="px-3 py-3">Expected payment</th>
               <th className="px-3 py-3">Completion</th>
               <th className="px-3 py-3">Progress</th>
               <th className="px-3 py-3">WorkOne hours</th>
@@ -1655,7 +1655,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           <tbody className="divide-y divide-slate-100">
             {rows.length ? (
               rows.map((row) => (
-                <tr key={row.id} data-testid="student-row">
+                <tr key={row.id} data-testid="student-row" className={isCompletionOverdue(row) ? "bg-red-50" : undefined}>
                   <td className="px-3 py-4">
                     <p className="font-bold">{row.full_name || 'Student'}</p>
                     <p className="text-xs text-slate-500">{row.email || ''}</p>
@@ -1663,18 +1663,16 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4 font-bold">{voucherStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{expectedPaymentStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{completionStatus(row)}</td>
+                  <td className="px-3 py-4"><p className={isCompletionOverdue(row) ? "font-black text-red-800" : "font-bold"}>{completionStatus(row)}</p>{isCompletionOverdue(row) && <p role="alert" className="text-xs font-black text-red-800">Completion overdue</p>}<p className="text-xs">{row.certification_status || 'Upload missing'}</p>{row.credential_earned_date && <p className="text-xs">Earned: {row.credential_earned_date}</p>}{row.certificate_verified_at && <p className="text-xs">Verified: {row.certificate_verified_at.slice(0, 10)}</p>}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
                     {Math.min(48, Number(row.total_hours_completed || 0))} / 48
                   </td>
                   <td className="px-3 py-4 text-xs">
                     <span className="block">Start: {row.training_start_date || 'Missing'}</span>
-                    <span className="block">End: {row.training_end_date || 'Missing'}</span>
+                    <span className="block">End: {row.expected_end_date || row.training_end_date || 'Missing'}</span><span className="block">Actual completion: {(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'}</span>
                   </td>
-                  <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
+                  <td className="px-3 py-4">{completionAlert(row) || row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
                       <StudentCommunicationActions
@@ -1683,20 +1681,20 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                         hasEmail={Boolean(row.email)}
                         hasPhone={Boolean(row.phone)}
                       />
-                      <StudentReadyForTestingButton
+                      {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
                         studentId={row.id}
                         studentName={row.full_name || 'Student'}
                         source={
                           row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
                         }
-                      />
+                      /> : null}
                     </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
                   No confirmed student enrollments are linked.
                 </td>
               </tr>
@@ -1915,6 +1913,7 @@ function Programs({ data }: { data: any }) {
         title={label}
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>
   );
@@ -2028,7 +2027,7 @@ function ProgramCards({
                     <Row label="Published amount" value={formatProgramAmount(program)} />
                     <Row label="Funding path" value={formatProgramFunding(program)} />
                     <Row label="Career pay" value={formatCareerPay(program)} />
-                    <Row label="Course assignments" value={String(courses.length)} />
+                    <Row label="Connected course records" value={String(courses.length)} />
                     <Row
                       label="Delivery"
                       value={program.delivery_method || 'Confirm with the program team'}
@@ -2072,6 +2071,7 @@ function ProgramCards({
                     including Affirm when offered. Approval is made by the payment provider, not by
                     the Program Holder.
                   </div>
+                  {courses.length > 0 && <ul className="mt-4 space-y-2 text-sm">{courses.map((course: any) => <li key={`${program.id}-${course.course_id}`} className="rounded-lg border p-3"><strong>{course.title || 'Assigned course'}</strong><span className="block">{course.source === 'canonical_program' ? 'Canonical program course' : 'Holder delivery assignment'} · {course.status || 'Status requires review'}</span>{course.source === 'canonical_program' && !course.published && <span className="block font-bold text-amber-800">Publication has not been verified. This mapping does not unlock learner access.</span>}</li>)}</ul>}
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
                       This program is assigned, but no delivery course is connected yet.
@@ -2102,7 +2102,8 @@ function Hours({
         title="Training Hours"
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
-      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
+      <HolderHourSubmissionForm enrollments={enrollments} />
+      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} verifiedHours={rows} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>
         <p className="mt-1 text-sm text-slate-600">
@@ -2151,6 +2152,23 @@ function Hours({
     </div>
   );
 }
+function programHolderRequirementLink(label: string): string | null {
+    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
+    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+    if (label === 'Approved required onboarding documents') return '/program-holder/documents';
+    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
+    if (label === 'Signed image release') return '/program-holder/documents';
+    if (label === 'Program-holder approval') return '/program-holder/onboarding';
+    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+    if (label === 'QuickBooks payment-record connection') return '/program-holder/payouts';
+    if (label === 'Graduated-student back work and 48-hour sign-offs') return '/program-holder/students';
+    if (label === 'Course delivery assignment' || label === 'HVAC program assignment') return '/program-holder/programs';
+    return null;
+}
+
 function Compliance({
   score,
   items,
@@ -2165,6 +2183,7 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
+
   return (
     <div className="space-y-6">
       <Hero
@@ -2186,7 +2205,7 @@ function Compliance({
             {items.map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
+                className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 p-4"
               >
                 <span className="font-semibold">
                   {item.label}
@@ -2194,11 +2213,18 @@ function Compliance({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
-                {item.complete ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {programHolderRequirementLink(item.label) ? (
+                    <Link href={programHolderRequirementLink(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                      {item.complete ? 'View form' : 'Open form'}
+                    </Link>
+                  ) : null}
+                  {item.complete ? (
+                    <CheckCircle2 aria-label="Completed" className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle aria-label="Action required" className="h-5 w-5 text-amber-600" />
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -2211,10 +2237,12 @@ function Documents({
   rows,
   isHvac,
   requiresEnchantedHeartsTerms,
+  insuranceRequired,
 }: {
   rows: any[];
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
+  insuranceRequired: boolean;
 }) {
   return (
     <div className="space-y-6">
@@ -2223,21 +2251,27 @@ function Documents({
         title="Documents"
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
-      <ProgramHolderDocumentUpload isHvac={isHvac} />
+      <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
       <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">
           {rows.length ? (
             rows.map((row) => (
-              <div key={row.id} className="flex items-center gap-3 rounded-xl border p-4">
+              <div key={row.id} className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border p-4">
                 <FileText className="h-5 w-5 text-blue-700" />
-                <div>
-                  <p className="font-bold">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words font-bold">
                     {row.document_type || row.file_name || 'Program document'}
                   </p>
                   <p className="text-xs capitalize text-slate-500">{row.status || 'submitted'}</p>
+                  {row.file_name && row.document_type && <p className="break-all text-xs text-slate-600">{row.file_name}</p>}
                 </div>
+                {typeof row.file_url === 'string' && row.file_url.length > 0 ? (
+                  <a href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">View uploaded file</a>
+                ) : (
+                  <span className="text-xs font-semibold text-amber-800">File preview unavailable — contact Office Mail</span>
+                )}
               </div>
             ))
           ) : (

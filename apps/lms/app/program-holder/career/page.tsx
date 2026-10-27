@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import Image from 'next/image';
 import { BriefcaseBusiness, ClipboardCheck, GraduationCap } from 'lucide-react';
 import JobCard from '@/components/jobs/JobCard';
@@ -11,7 +12,8 @@ export const metadata = {
 };
 
 export default async function ProgramHolderCareerPage() {
-  const jobs = await getActiveJobs({ limit: 12 });
+  await requireProgramHolder();
+  const jobs = await getActiveJobs({ limit: 12, throwOnError: true });
   return (
     <main className="space-y-6 px-4 py-6 sm:px-6">
       <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
@@ -36,7 +38,7 @@ export default async function ProgramHolderCareerPage() {
       </section>
       {jobs.length ? (
         <section className="grid gap-4 lg:grid-cols-2">
-          {jobs.map((job) => <JobCard key={job.id} job={job} href="/program-holder/career" />)}
+          {jobs.map((job) => <JobCard key={job.id} job={job} href={`/program-holder/career/${job.id}`} />)}
         </section>
       ) : (
         <section className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-700 shadow-sm">

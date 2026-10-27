@@ -2,14 +2,14 @@ name: Dispatch and recover Google course work
 on:
   push:
     branches: [main]
-    paths: ['scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', 'scripts/gcp/paris-course-monitor.mjs', 'lib/ultimate-course-builder/worker/paris-monitor.mjs', '.github/workflows/dispatch-google-course-job.yml']
+    paths: ['scripts/gcp/course-worker-stop-diagnostics.mjs', 'scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', 'scripts/gcp/paris-course-monitor.mjs', 'lib/ultimate-course-builder/worker/paris-monitor.mjs', '.github/workflows/dispatch-google-course-job.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
   workflow_dispatch:
   schedule:
-    # Five-minute fallback (GitHub's minimum supported schedule) if the immediate dispatch is lost or delayed.
-    # Recovery kick: resume the existing Barber build after its validator deployment.
+    # Scheduled events request an explicit workflow_dispatch, whose OIDC event
+    # is accepted by the production Workload Identity provider.
     - cron: '*/5 * * * *'
 permissions:
   contents: read
@@ -17,7 +17,7 @@ permissions:
   id-token: write
 jobs:
   request-dispatch:
-    if: github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    if: github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     steps:
       - name: Request Google-trusted recovery dispatch
@@ -27,7 +27,7 @@ jobs:
   dispatch:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     concurrency:
-      group: google-course-continuation
+      group: google-course-runtime-operations
       cancel-in-progress: false
     runs-on: ubuntu-24.04
     environment: production
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/continue-course-queue.test.mjs scripts/gcp/regional-capacity.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs lib/video/supabase-resumable-upload.test.mjs
+      - run: node --test scripts/gcp/allow-admin-course-worker-execution.test.mjs scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/continue-course-queue.test.mjs scripts/gcp/regional-capacity.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs lib/video/supabase-resumable-upload.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -57,3 +57,21 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/gcp/continue-approved-regional-courses.mjs
+
+  diagnose:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - run: node scripts/gcp/course-worker-stop-diagnostics.mjs

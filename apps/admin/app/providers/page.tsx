@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -15,35 +14,17 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminProvidersPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-
-  // Guard against null user
-  if (!user) redirect('/login');
+  await requireRole(['admin']);
   const db = await requireAdminClient();
-  if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['admin'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
-
-  const { data: tenants } = await supabase
+  const { data: tenants } = await db
     .from('tenants')
     .select('id, name, slug, status, active, created_at')
     .eq('type', 'partner_provider')
     .order('created_at', { ascending: false });
 
   // Pending applications count for the badge
-  const { count: pendingCount } = await supabase
+  const { count: pendingCount } = await db
     .from('provider_applications')
     .select('*', { count: 'exact', head: true })
     .in('status', ['pending', 'under_review']);
@@ -52,7 +33,7 @@ export default async function AdminProvidersPage() {
   const tenantIds = (tenants ?? []).map((t) => t.id);
   let ghostTenantIds = new Set<string>();
   if (tenantIds.length > 0) {
-    const { data: adminProfiles } = await supabase
+    const { data: adminProfiles } = await db
       .from('profiles')
       .select('tenant_id')
       .in('tenant_id', tenantIds)

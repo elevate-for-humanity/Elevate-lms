@@ -11,7 +11,7 @@ on:
     paths:
       - 'Dockerfile.marketing'
       - 'Dockerfile.northflank-lms'
-      - 'Dockerfile.northflank-admin'
+      - 'Dockerfile.admin'
       - 'apps/marketing/**'
       - 'apps/admin/**'
       - 'apps/lms/**'
@@ -43,7 +43,7 @@ jobs:
           - service: lms
             dockerfile: Dockerfile.northflank-lms
           - service: admin
-            dockerfile: Dockerfile.northflank-admin
+            dockerfile: Dockerfile.admin
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}

@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   try {
     const result = await processPendingPlatformEvents(limit);
     return NextResponse.json(result, {
-      status: result.failed > 0 ? 207 : 200,
+      status: result.blocked ? 409 : result.failed > 0 ? 207 : 200,
       headers: { 'Cache-Control': 'no-store, max-age=0' },
     });
   } catch (error) {

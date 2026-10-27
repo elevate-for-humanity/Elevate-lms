@@ -8,7 +8,7 @@ export const dynamic = 'force-static';
 export const metadata = {
   title: 'Managed Platform | Elevate Store',
   description: 'Managed workforce LMS licensing with onboarding, hosting, support, and organization-specific configuration.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/licenses/managed-platform' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/licenses/managed-platform' },
 };
 
 const managedPlans = [

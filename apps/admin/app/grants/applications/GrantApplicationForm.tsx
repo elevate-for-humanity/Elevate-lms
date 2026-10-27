@@ -313,7 +313,7 @@ export default function GrantApplicationForm({
                       <div className="flex items-center justify-between mb-1">
                         <label className="text-xs font-medium text-slate-600">{field.label}</label>
                         {field.locked && (
-                          <span className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">from org profile</span>
+                          <span className="text-xs text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">from org profile</span>
                         )}
                         {isNarrative && !field.locked && (
                           <button

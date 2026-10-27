@@ -1,3 +1,4 @@
+import { resolveStoredNarrationUrl } from '../ultimate-course-builder/quality/narration-audio-analysis';
 import { storyboardRenderFingerprint } from './render-checkpoint-contract.mjs';
 import {createCheckpointFallback,privateCheckpointStorage} from './checkpoint-fallback.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../ultimate-course-builder/worker/progress-watch.mjs';
@@ -16,6 +17,7 @@ import 'server-only';
 
 import path from 'path';
 import {createHash} from 'node:crypto';
+import { videoEncoderArgs } from './ffmpeg-runtime';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
@@ -117,6 +119,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 }
 
 export interface StoryboardRenderInput {
+  ownerPreview?: boolean;
   renderRevision?: string;
   teachingPhotos?: any[][];
   motionEvidence?: Array<{visibleActions:string[];contentSha256?:string}>;
@@ -609,7 +612,8 @@ export async function renderStoryboardVideo(
       let audioSrc: string;
       let measuredNarrationSeconds: number | null;
       if (approvedAudio) {
-        const response = await fetch(approvedAudio.audioUrl, {
+        const approvedAudioUrl = (await resolveStoredNarrationUrl(approvedAudio.audioUrl)).href;
+        const response = await fetch(approvedAudioUrl, {
           signal: AbortSignal.timeout(60000),
         });
         if (!response.ok) throw new Error(`Approved narration returned HTTP ${response.status}`);
@@ -617,7 +621,7 @@ export async function renderStoryboardVideo(
         const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
         await writeFile(sceneAudioPath, audio);
         measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
-        if (input.lessonPresentation === 'approved-premium-v1') {
+        if (input.lessonPresentation === 'approved-premium-v1' && !input.ownerPreview) {
           const { stderr } = await execFileAsync('ffmpeg', ['-hide_banner','-i',sceneAudioPath,'-af','silencedetect=noise=-40dB:d=1.5,volumedetect','-f','null','-'], {timeout:120000,maxBuffer:2000000});
           assertPremiumSpeechSignal(String(stderr));
         }
@@ -626,7 +630,7 @@ export async function renderStoryboardVideo(
           Math.abs(measuredNarrationSeconds - approvedAudio.durationSeconds) > 0.1
         )
           throw new Error('ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED');
-        audioSrc = approvedAudio.audioUrl;
+        audioSrc = approvedAudioUrl;
       } else {
         const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
         const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
@@ -997,7 +1001,6 @@ export async function renderStoryboardVideo(
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition, makeCancelSignal } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
-    let checkpointFallbackUsed=false;
     const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
       logger.info('[RemotionRender] selecting storyboard composition', {lessonId: input.lessonId, totalFrames});
       const selected = await selectComposition({
@@ -1037,7 +1040,7 @@ export async function renderStoryboardVideo(
           },
           readFallback:(key:string)=>privateStorage.read(key),
           writeFallback:(key:string,bytes:Buffer)=>privateStorage.write(key,bytes),
-          onFallback:()=>logger.warn('[RemotionRender] storage cap: switched to private Supabase checkpoints'),
+          onFallback:()=>logger.warn('[RemotionRender] external storage unavailable; legacy checkpoint reads remain available, new video writes require external storage'),
         });
         let existing = await stat(chunkPath).catch(() => null);
         if(!existing?.size){
@@ -1073,7 +1076,6 @@ export async function renderStoryboardVideo(
           await checkpoints.write(segmentKey,await readFile(chunkPath));
           logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
         }
-        checkpointFallbackUsed ||= checkpoints.usingFallback();
         reportCourseProgress('render-checkpoint',end,totalFrames);
         chunkPaths.push(chunkPath);
       }
@@ -1082,11 +1084,36 @@ export async function renderStoryboardVideo(
       const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
       await writeFile(manifestPath, 'ffconcat version 1.0\n' +
         chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
-      await execFileAsync('ffmpeg', [
+      // Never dispatch a concat without both verified inputs and a destination.
+      // Past worker logs showed ffmpeg invoked with only the input arguments.
+      if (!chunkPaths.length) throw new Error('REMOTION_CONCAT_SEGMENTS_MISSING');
+      // Resolve the final destination independently of the segment manifest. A
+      // render must never be marked successful without a concrete MP4 target.
+      const concatOutputPath = path.resolve(paths.videoPath || '');
+      if (!paths.videoPath || concatOutputPath === path.resolve(manifestPath) ||
+          path.extname(concatOutputPath).toLowerCase() !== '.mp4') {
+        throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      }
+      await mkdir(path.dirname(concatOutputPath), {recursive: true});
+      const concatArgs = [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
-        '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
-      ], {timeout: 600_000, maxBuffer: 2_000_000});
-      const output = await stat(paths.videoPath);
+        // Frame-range chunks have independent timebases. Normalize timestamps
+        // and re-encode to prevent replay at segment boundaries.
+        '-fflags', '+genpts',
+        ...videoEncoderArgs(20),
+        '-r', String(composition.fps), '-fps_mode', 'cfr',
+        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',
+        '-movflags', '+faststart',
+        concatOutputPath,
+      ];
+      if (concatArgs.at(-1) !== concatOutputPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      try {
+        await execFileAsync('ffmpeg', concatArgs, {timeout: 600_000, maxBuffer: 2_000_000});
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error('REMOTION_FFMPEG_ASSEMBLY_FAILED:' + detail, {cause: error});
+      }
+      const output = await stat(concatOutputPath);
       if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
       logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});
     };
@@ -1104,13 +1131,34 @@ export async function renderStoryboardVideo(
       // corrected, source-locked job is retried.
       throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
     }
+    // Deliver the already encoded MP4 before ancillary text assets. A VTT upload
+    // failure must not prevent the completed video from reaching durable storage.
+    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {});
+    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
+    // Bounded delivery retries reuse the completed movie. Never restart narration
+    // or frame encoding for a transient ancillary object-storage error.
+    const uploadAncillary = async (buffer: Buffer, key: string, mime: string): Promise<string> => {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          return await uploadCourseVideosObject(buffer, key, mime, {});
+        } catch (error) {
+          const reason = error instanceof Error ? error.message : String(error);
+          // Authorization, quota, and configuration faults cannot be healed by retries.
+          if (attempt === 3 || /(?:401|403|unauthoriz|forbidden|quota|cap exceeded|not configured|invalid credentials|accessdenied)/i.test(reason))
+            throw error;
+          await new Promise(resolve => setTimeout(resolve, 350 * attempt));
+        }
+      }
+      throw new Error('COURSE_ANCILLARY_DELIVERY_FAILED');
+    };
     logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
-    const captionUrl = await uploadCourseVideosObject(
+    const captionUrl = await uploadAncillary(
       Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
     );
-    const transcriptUrl = await uploadCourseVideosObject(
+    const transcriptUrl = await uploadAncillary(
       Buffer.from(scenes.map((scene) => scene.narration).join('\n\n'), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.txt`,
       'text/plain',
@@ -1119,9 +1167,6 @@ export async function renderStoryboardVideo(
     (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;
     (resolvedStoryboard as any).scenes.forEach((scene: any, index: number) => { scene.captionCues = scenes[index].captionCues; });
     resolvedStoryboard.transcriptUrl = transcriptUrl;
-    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
-    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});
-    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
     await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
     return {
       success: true,

@@ -14,16 +14,26 @@ function DocumentUploadForm() {
     setError('');
     const form = new FormData(event.currentTarget);
     form.set('requirement_id', requirement);
-    const response = await fetch('/api/learner/documents', { method: 'POST', body: form });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      setError(body.error || 'Upload failed');
+    try {
+      const response = await fetch('/api/learner/documents', { method: 'POST', body: form });
+      if (response.redirected || response.status === 401) {
+        setError('Your session expired. Sign in again before uploading your document.');
+        return;
+      }
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body.success !== true) {
+        setError(body.error || 'Upload could not be confirmed. Please try again.');
+        return;
+      }
+      router.push('/lms/documents');
+      router.refresh();
+    } catch {
+      setError('Upload could not finish. Check your connection and try again.');
+    } finally {
       setBusy(false);
-      return;
     }
-    router.push('/lms/documents');
-    router.refresh();
   }
+
   if (!requirement)
     return (
       <div

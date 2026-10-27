@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
@@ -162,6 +163,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     image: items.map((item) => absoluteMediaUrl(item.url)),
     address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
     sameAs: [externalUrl, featuredFallback?.socialUrl, featuredFallback?.bookingUrl].filter(Boolean),
+    potentialAction: featuredFallback?.bookingUrl ? { '@type': 'ReserveAction', target: featuredFallback.bookingUrl, name: `Book with ${approved.name}` } : undefined,
     hasMap: mapUrl,
     parentOrganization: { '@id': `${SITE_URL}/#organization` },
     knowsAbout: programs.map(programLabel),
@@ -190,6 +192,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
               {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
               {featuredFallback?.socialUrl ? <a href={featuredFallback.socialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">{featuredFallback.socialUrl.includes('instagram.com/') ? 'View shop Instagram' : 'View shop social pages'} <ExternalLink className="h-4 w-4" /></a> : null}
               {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
+              {featuredFallback?.bookingUrl ? <a href={featuredFallback.bookingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Book a service <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
           <div className="min-w-0">
@@ -269,7 +272,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
-          <figure className="mb-7"><div className="relative h-[clamp(260px,42svh,480px)] overflow-hidden rounded-2xl"><Image src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="100vw" className="object-cover" priority /></div><figcaption className="mt-2 text-xs text-slate-300">Training illustration. Shop portfolio photos are being added.</figcaption></figure>
+          <figure className="mb-7"><div className="relative h-[clamp(260px,42svh,480px)] overflow-hidden rounded-2xl"><Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="100vw" className="object-cover" priority /></div><figcaption className="mt-2 text-xs text-slate-300">Training illustration. Shop portfolio photos are being added.</figcaption></figure>
           <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{shop.description}</p>

@@ -213,3 +213,21 @@ describe('normalizeAdminDashboardData', () => {
     expect(typeof normalized.operational.needsReviewDetail).toBe('string');
   });
 });
+
+describe('unavailable metrics', () => {
+  it('retains unavailable state through normalization rather than displaying a false zero', () => {
+    const data = normalizeAdminDashboardData({
+      kpis: [
+        {
+          label: 'Certificates Issued',
+          value: 0,
+          unavailable: true,
+          delta: 0,
+          deltaLabel: '',
+          href: '/certificates',
+        },
+      ],
+    });
+    expect(data.kpis[0].unavailable).toBe(true);
+  });
+});

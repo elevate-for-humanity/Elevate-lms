@@ -4,9 +4,12 @@ import {timingSafeEqual} from 'node:crypto';
 import {hydrateProcessEnv} from '@/lib/secrets';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {notifyAssignee} from '@/lib/phone/message-notifications';
+import {usesGooglePhoneBindings} from '@/lib/phone/runtime-authority';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Only emit fixed diagnostic classes. Never log recordings, callers, credentials or provider bodies.
+const SAFE_VOICEMAIL_FAILURES=new Set(['voice_identity_unavailable','system_lookup_unavailable','workspace_lookup_unavailable','extension_lookup_unavailable','voicemail_lookup_unavailable','private_audio_storage_unavailable','voicemail_bucket_must_be_private','audio_persistence_unavailable','call_persistence_unavailable','voicemail_persistence_unavailable','callback_persistence_unavailable']);
 async function readBody(request:Request){
  const reader=request.body?.getReader();if(!reader)throw Error('missing_body');
  const chunks:Uint8Array[]=[];let size=0;
@@ -28,7 +31,7 @@ export async function POST(request:Request){
   const expected=process.env.PBX_PROVISIONING_TOKEN||'';
   const given=request.headers.get('authorization')?.replace(/^Bearer /,'')||'';
   if(expected.length<32 || given.length!==expected.length || !timingSafeEqual(Buffer.from(given),Buffer.from(expected)))return NextResponse.json({error:'Unauthorized'},{status:401});
-  if(process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER!=='google-secret-manager' || !UUID.test(process.env.PBX_PHONE_SYSTEM_ID||''))return NextResponse.json({error:'Owned voicemail is not configured.'},{status:503});
+  if(!usesGooglePhoneBindings() || !UUID.test(process.env.PBX_PHONE_SYSTEM_ID||''))return NextResponse.json({error:'Owned voicemail is not configured.'},{status:503});
   const body=await readBody(request);
   if(!UUID.test(body.id||'')||!/^(0|[1-9][0-9]{2})$/.test(body.extension||'')||typeof body.audioBase64!=='string'||body.audioBase64.length>1500000)return NextResponse.json({error:'Invalid voicemail.'},{status:400});
   const audio=Buffer.from(body.audioBase64,'base64');
@@ -67,5 +70,10 @@ export async function POST(request:Request){
   if(taskError)throw Error('callback_persistence_unavailable');
   await notifyAssignee(db,{profileId:extension.profile_id,taskId:body.id,caller,urgency:'normal',source:'voicemail',transcript:transcript||undefined,summary:transcript?undefined:'No speech was detected. Open the recording to listen.'},system);
   return NextResponse.json({saved:true,transcriptAvailable:Boolean(transcript)});
- }catch(error){const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.',code},{status:503});}
+ }catch(error){
+  const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';
+  const reason=error instanceof Error && SAFE_VOICEMAIL_FAILURES.has(error.message)?error.message:code==='voicemail_processing_unavailable'?'unexpected_failure':code;
+  console.error('phone_voicemail_processing_failed',{reason});
+  return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.',code},{status:503});
+ }
 }

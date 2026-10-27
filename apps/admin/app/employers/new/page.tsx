@@ -10,9 +10,12 @@ export const metadata: Metadata = { title: 'New Employer | Admin' };
 
 async function createEmployer(formData: FormData) {
   'use server';
+  await requireRole(['admin', 'staff']);
+  const name = String(formData.get('name') || '').trim();
+  if (!name) throw new Error('EMPLOYER_NAME_REQUIRED');
   const db = await requireAdminClient();
   const { error } = await db.from('employers').insert({
-    name: formData.get('name') as string,
+    name,
     industry: (formData.get('industry') as string) || null,
     city: (formData.get('city') as string) || null,
     state: (formData.get('state') as string) || null,
@@ -20,7 +23,8 @@ async function createEmployer(formData: FormData) {
     email: (formData.get('email') as string) || null,
     status: 'active',
   });
-  if (!error) redirect('/employers');
+  if (error) throw new Error('EMPLOYER_CREATE_FAILED');
+  redirect('/employers');
 }
 
 export default async function NewEmployerPage() {

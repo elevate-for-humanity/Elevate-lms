@@ -19,6 +19,14 @@ export default async function ProgramHolderHandbookPage() {
       'Maintain accurate enrollment, attendance, 48-hour WorkOne progress, milestones, completion evidence, and credential records for every assigned student.',
     ],
     [
+      'Office Mail and Elevate administration',
+      'Use Office Mail inside your Program Holder portal to contact Elevate administration about applicants, documents, enrollment, funding, attendance, scheduling, or support. Open Office Mail, choose the authorized administrative recipient, enter a descriptive subject and message, and send. Do not rely on outside personal email for official student records.',
+    ],
+    [
+      'Calendar and meetings',
+      'Open Calendar & Meetings to review the live calendar, scheduled appointments, and meeting invitations. Select Create a meeting, choose an assigned student, date, time, and available meeting method, then save. Verify the meeting appears on the calendar. If it does not, contact Elevate through Office Mail.',
+    ],
+    [
       'Communication',
       'Contact students about attendance, deadlines, missing documents, onboarding, and career services through approved portal channels. Record meaningful follow-up notes.',
     ],
@@ -99,6 +107,8 @@ export default async function ProgramHolderHandbookPage() {
           </p>
         </section>
         <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/program-holder/inbox" className="rounded-xl border border-blue-300 bg-white px-5 py-3 text-sm font-black text-blue-800">Contact Elevate via Office Mail</Link>
+          <Link href="/program-holder/meetings" className="rounded-xl border border-blue-300 bg-white px-5 py-3 text-sm font-black text-blue-800">Open calendar</Link>
           <Link
             href="/program-holder/documents"
             className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-black text-white"

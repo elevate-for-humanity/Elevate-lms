@@ -16,6 +16,7 @@ interface Props {
 
 function patchKpi(cards: KPICard[], labelFragment: string, updater: (v: number) => number): KPICard[] {
   return cards.map((c) => {
+    if (c.unavailable) return c;
     const label = typeof c.label === 'string' ? c.label : '';
     const value = typeof c.value === 'number' && Number.isFinite(c.value) ? c.value : 0;
     return label.toLowerCase().includes(labelFragment)

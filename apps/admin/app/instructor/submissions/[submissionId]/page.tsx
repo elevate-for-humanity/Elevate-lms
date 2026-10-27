@@ -112,7 +112,6 @@ export default function SubmissionReviewPage() {
             id, user_id, course_lesson_id, lesson_id, course_id, step_type,
             submission_text, file_urls, status, instructor_note,
             reviewed_at, created_at, competency_key,
-            profiles:user_id ( full_name, email ),
             course_lessons:course_lesson_id ( title, slug, competency_checks )
           `,
           )
@@ -120,7 +119,7 @@ export default function SubmissionReviewPage() {
           .maybeSingle(),
         supabase
           .from('competency_audit_log')
-          .select('id, action, note, created_at, actor:actor_id ( full_name, email )')
+          .select('id, action, note, created_at, actor_id')
           .eq('submission_id', submissionId)
           .order('created_at', { ascending: false }),
       ]);
@@ -128,10 +127,18 @@ export default function SubmissionReviewPage() {
       if (subErr || !sub) {
         setError('Submission not found.');
       } else {
-        setSubmission(sub as unknown as Submission);
+        const profileIds = [...new Set([sub.user_id, ...(audit ?? []).map((row) => row.actor_id)].filter(Boolean))];
+        const { data: identities, error: identityError } = await supabase.from('profiles').select('id,full_name,email').in('id', profileIds);
+        if (identityError) {
+          setError('Could not load submission identities. Please refresh.');
+          setLoading(false);
+          return;
+        }
+        const identityById = new Map((identities ?? []).map((row) => [row.id, row]));
+        setSubmission({ ...sub, profiles: identityById.get(sub.user_id) ?? null } as unknown as Submission);
+        setAuditLog((audit ?? []).map((row) => ({ ...row, actor: identityById.get(row.actor_id) ?? null })) as unknown as AuditEntry[]);
         setNote(sub.instructor_note ?? '');
       }
-      setAuditLog((audit ?? []) as unknown as AuditEntry[]);
       setLoading(false);
     }
     load();
@@ -163,7 +170,7 @@ export default function SubmissionReviewPage() {
         setSuccess(`Marked as "${STATUS_LABELS[newStatus]}".`);
         const { data: newAudit } = await supabase
           .from('competency_audit_log')
-          .select('id, action, note, created_at, actor:actor_id ( full_name, email )')
+          .select('id, action, note, created_at, actor_id')
           .eq('submission_id', submission.id)
           .order('created_at', { ascending: false });
         setAuditLog((newAudit ?? []) as unknown as AuditEntry[]);

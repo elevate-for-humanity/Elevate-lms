@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { storeSignInHref } from '@/lib/store/sign-in-return.mjs';
 import Link from 'next/link';
 import { Check, Loader2, Building2, CreditCard } from 'lucide-react';
 import {
@@ -39,7 +40,7 @@ export function PlatformBasePlansSection({
 
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent('https://www.elevateforhumanity.org/store/plans')}`;
+          window.location.href = storeSignInHref('/store/plans');
           return;
         }
         if (res.status === 409 && data.trialUrl) {

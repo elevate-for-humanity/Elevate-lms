@@ -1,7 +1,4 @@
-import {
-  createMiddlewareSupabaseClient,
-  hasSupabaseAuthCookie,
-} from '@/lib/supabase/middleware';
+import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
@@ -46,7 +43,12 @@ function isProtectedPath(pathname: string) {
 
   // Any route explicitly named as a dashboard is private even if a new role
   // namespace is added and forgotten in PROTECTED_PREFIXES.
-  if (pathname === '/dashboard' || pathname.endsWith('/dashboard') || pathname.includes('/dashboard/')) return true;
+  if (
+    pathname === '/dashboard' ||
+    pathname.endsWith('/dashboard') ||
+    pathname.includes('/dashboard/')
+  )
+    return true;
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -92,11 +94,12 @@ export async function middleware(req: NextRequest) {
 
   const protectedPath = isProtectedPath(pathname);
 
-  if (!protectedPath && (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
-    /\.[a-z0-9]+$/i.test(pathname)
-  )) {
+  if (
+    !protectedPath &&
+    (pathname.startsWith('/_next') ||
+      pathname.startsWith('/favicon') ||
+      /\.[a-z0-9]+$/i.test(pathname))
+  ) {
     return NextResponse.next();
   }
   const requestHeaders = new Headers(req.headers);
@@ -115,6 +118,7 @@ export async function middleware(req: NextRequest) {
 
     const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
       cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+      requestHeaders.set('cookie', req.cookies.toString());
       response = NextResponse.next({ request: { headers: requestHeaders } });
       cookiesToSet.forEach(({ name, value, options }) => {
         response.cookies.set(
@@ -130,7 +134,13 @@ export async function middleware(req: NextRequest) {
       error,
     } = await supabase.auth.getUser();
 
-    if (error || !user) return redirectToLogin(req, pathname);
+    if (error || !user) {
+      const redirect = redirectToLogin(req, pathname);
+      // Supabase clears revoked/expired sessions through setAll. Preserve those
+      // mutations on the actual response or the browser retries the stale token.
+      for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+      return redirect;
+    }
   }
 
   response.cookies.set('__efh_pathname', pathname, {
@@ -150,5 +160,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
+  runtime: 'nodejs',
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

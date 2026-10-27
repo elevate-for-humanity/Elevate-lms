@@ -33,6 +33,16 @@ export function sourceTeaching(sources: Source[], title: string) {
   const teaching: string[] = [], terminology: string[] = [], examples: string[] = [];
   const procedure: string[] = [], safety: string[] = [], exercises: string[] = [], recap: string[] = [];
   const questions: Question[] = [];
+  const flashcards: Array<{front: string; back: string}> = [];
+  const practiceFeedback: string[] = [];
+  const cardKeys = new Set<string>();
+  const addCard = (front: unknown, back: unknown) => {
+    const card = {front: spokenText(front), back: spokenText(back)};
+    const key = `${card.front.toLowerCase()}\n${card.back.toLowerCase()}`;
+    if (card.front && card.back && !cardKeys.has(key)) {
+      cardKeys.add(key); flashcards.push(card);
+    }
+  };
   for (const source of sources) {
     const marker = 'Authorized course content: ';
     const at = source.text.indexOf(marker);
@@ -66,12 +76,16 @@ export function sourceTeaching(sources: Source[], title: string) {
       for (const term of experience.glossary ?? []) {
         const text = spokenText(`${term.term ?? ''}: ${term.definition ?? ''}`);
         if (text) terminology.push(text);
+        addCard(term.term, term.definition);
       }
+      for (const card of experience.flashcards ?? []) addCard(card.front, card.back);
       if (typeof payload.scenario === 'string') examples.push(spokenText(payload.scenario));
       if (experience.caseStudy?.context) examples.push(spokenText(experience.caseStudy.context));
       for (const exercise of experience.exercises ?? []) {
         const text = spokenText([exercise.title, ...(exercise.instructions ?? []), exercise.expectedArtifact].filter(Boolean).join('. '));
         if (text) exercises.push(text);
+        const expected = spokenText(exercise.expectedArtifact);
+        if (expected) practiceFeedback.push(expected);
       }
       const practical = experience.practicalTask;
       if (typeof practical === 'string') procedure.push(spokenText(practical));
@@ -152,7 +166,9 @@ export function sourceTeaching(sources: Source[], title: string) {
     if (!stageText[stage]) stageText[stage] =
       `For ${stage.replace(/_/g, ' ')} in ${title}, explain the taught information in your own words and check your response against the lesson.`;
   }
-  return { stageText, questions, precautions, procedureEvidence: steps, sequence: ULTIMATE_TEACHING_SEQUENCE };
+  return { stageText, questions, flashcards, practice,
+    practiceFeedback: clean(practiceFeedback), precautions,
+    procedureEvidence: steps, sequence: ULTIMATE_TEACHING_SEQUENCE };
 }
 // Keep source sentences intact while bounding individual narration/ASR work.
 export function narrationChunks(text: string, maximumWords = 160): string[] {

@@ -113,6 +113,24 @@ describe('durable orchestration planning', () => {
     ]);
     expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
   });
+
+  it.each(['QuickBooks billing', 'enrollment forms', 'QuickBooks billing and enrollment forms'])(
+    'preserves repository repair scope when the goal mentions %s', (feature) => {
+      const goal = `Repair the repository code for Admin, Course Builder, Store, and ${feature}; add regression tests, deploy the verified build, and verify production.`;
+      const plan = decomposePlan(goal);
+      expect(plan.steps[0]).toMatchObject({
+        title: 'Implement repository outcome', command: goal, runner: 'studio-engineering',
+      });
+      expect(plan.steps.at(-1)?.title).toBe('Verify production');
+      expect(plan.steps.some(step => step.title === 'Prepare authorized reconnection')).toBe(false);
+    },
+  );
+
+  it('keeps a focused QuickBooks reconnection request on its existing operational flow', () => {
+    expect(decomposePlan('Reconnect QuickBooks').steps.map(step => step.title)).toEqual([
+      'Verify QuickBooks connection', 'Prepare authorized reconnection',
+    ]);
+  });
 });
 
 describe('selectStudioAgent', () => {
@@ -123,5 +141,22 @@ describe('selectStudioAgent', () => {
     ['Inspect the failed deployment workflow', 'PARIS'],
   ])('routes %s to %s', (message, agent) => {
     expect(selectStudioAgent(message)).toBe(agent);
+  });
+});
+
+
+describe('explicit execution constraints', () => {
+  const prompt = 'Audit test: reply with PARIS_AUDIT_READY. Do not call tools, change data, run workflows, deploy, purchase credits, or send messages.';
+  it('keeps an explicit no-tools reply out of durable orchestration', () => {
+    expect(shouldOrchestrateMessage(prompt)).toBe(false);
+    expect(() => decomposePlan(prompt)).toThrow('Tool execution is disabled');
+  });
+  it('does not turn prohibited action lists into requested actions', () => {
+    expect(shouldOrchestrateMessage('Say hello. Do not change data, run workflows, deploy, or send messages.')).toBe(false);
+    const plan = decomposePlan('Fix the repository code, add regression tests. Do not send messages, publish, or deploy.');
+    expect(plan.steps.some(step => step.title === 'Deploy the verified build')).toBe(false);
+  });
+  it('retains an affirmative repair after a prohibition', () => {
+    expect(shouldOrchestrateMessage('Do not deploy, but fix the routing code.')).toBe(true);
   });
 });

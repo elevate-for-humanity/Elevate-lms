@@ -34,10 +34,23 @@ it('publishes only the validated SHA without force and dispatches actual Google 
  const writes=vi.mocked(fetch).mock.calls.filter(([,o])=>o?.method==='PATCH');
  expect(writes).toHaveLength(1);expect(JSON.parse(String(writes[0][1]?.body))).toEqual({sha:'b'.repeat(40),force:false});
  expect(h.updates).toContainEqual(expect.objectContaining({status:'deploying',release_sha:'b'.repeat(40)}));
- expect(vi.mocked(fetch).mock.calls.filter(([u])=>String(u).endsWith('/dispatches')).map(([u])=>String(u))).toEqual(expect.arrayContaining([expect.stringContaining('deploy-google-lms-trigger.yml'),expect.stringContaining('deploy-google-marketing-trigger.yml')]));
+ expect(vi.mocked(fetch).mock.calls.filter(([u])=>String(u).endsWith('/dispatches')).map(([u])=>String(u))).toEqual([expect.stringContaining('deploy-admin.yml')]);
 });
 it('a stale repair state or another workflow run cannot publish',async()=>{
  await expect(publishParisRepair('repair',8)).rejects.toThrow('STATE_MISMATCH');
  h.row.status='blocked';await expect(publishParisRepair('repair',7)).rejects.toThrow('STATE_MISMATCH');
  expect(vi.mocked(fetch)).not.toHaveBeenCalled();
+});
+it('binds the requested Admin deployment to the validated immutable release',async()=>{
+ await publishParisRepair('repair',7);
+ const dispatch=vi.mocked(fetch).mock.calls.find(([url])=>String(url).endsWith('/dispatches'));
+ expect(JSON.parse(String(dispatch?.[1]?.body))).toEqual({ref:'main',inputs:{requested_sha:'b'.repeat(40)}});
+ expect(h.updates).toContainEqual(expect.objectContaining({verification:expect.objectContaining({requestedDeploymentAt:expect.objectContaining({'deploy-admin.yml':expect.any(String)})})}));
+});
+it('preserves the published release and surfaces a rejected deployment dispatch as blocked',async()=>{
+ const original=vi.mocked(fetch).getMockImplementation()!;
+ vi.mocked(fetch).mockImplementation(async(input:any,init:any)=>String(input).endsWith('/dispatches')?new Response(null,{status:403}):original(input,init));
+ await expect(publishParisRepair('repair',7)).rejects.toThrow('PARIS_GITHUB_HTTP_403');
+ expect(h.updates).toContainEqual(expect.objectContaining({release_sha:'b'.repeat(40)}));
+ expect(h.updates.at(-1)).toMatchObject({status:'blocked',error_code:'REPAIR_DEPLOYMENT_DISPATCH_FAILED'});
 });

@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getSystemHealth } from '@/lib/admin/dashboard/get-system-health';
-import { loadQuickBooksConfig } from '@/lib/integrations/quickbooks-client';
+import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
 import { loadBillingProviderConfig } from '@/lib/billing/config';
 
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn().mockResolvedValue(undefined) }));
-vi.mock('@/lib/integrations/quickbooks-client', () => ({ loadQuickBooksConfig: vi.fn() }));
+vi.mock('@/lib/integrations/quickbooks-client', () => ({ loadQuickBooksConfig: vi.fn(), quickBooksRequest: vi.fn() }));
 vi.mock('@/lib/billing/config', () => ({ loadBillingProviderConfig: vi.fn() }));
 
 const credentials = {
@@ -15,6 +15,7 @@ const credentials = {
   realmId: 'private-realm',
 };
 const tables: string[] = [];
+const filters: Array<{ table: string; expression: string }> = [];
 let queryError: unknown = null;
 const db = {
   from: (table: string) => {
@@ -23,6 +24,10 @@ const db = {
       select: () => query,
       eq: () => query,
       lt: () => query,
+      or: (expression: string) => {
+        filters.push({ table, expression });
+        return query;
+      },
       then: (resolve: (v: unknown) => unknown) =>
         Promise.resolve({ count: 0, error: queryError }).then(resolve),
     };
@@ -34,12 +39,14 @@ describe('dashboard billing health', () => {
   afterEach(() => vi.unstubAllEnvs());
   beforeEach(() => {
     tables.length = 0;
+    filters.length = 0;
     queryError = null;
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'private-db');
     vi.stubEnv('SENDGRID_API_KEY', 'private-email');
     vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', 'private-webhook');
     vi.mocked(loadQuickBooksConfig).mockResolvedValue(credentials);
+    vi.mocked(quickBooksRequest).mockReset().mockResolvedValue({CompanyInfo:{CompanyName:'Authorized company'}});
     vi.mocked(loadBillingProviderConfig).mockResolvedValue({ primary: 'quickbooks' });
   });
   it('uses canonical billing configuration and never exposes credentials', async () => {
@@ -74,4 +81,24 @@ describe('dashboard billing health', () => {
     expect(health.degraded).toBe(true);
     expect(JSON.stringify(health)).not.toContain('private-provider-error');
   });
+
+  it('includes missing document states and expired or missing Course Builder leases in health checks', async () => {
+    await getSystemHealth(db as never);
+    expect(filters.find((f) => f.table === 'program_enrollments')?.expression).toBe(
+      'docs_verified.is.null,docs_verified.eq.false',
+    );
+    expect(filters.find((f) => f.table === 'ultimate_build_jobs')?.expression).toContain(
+      'lease_expires_at.is.null,lease_expires_at.lt.',
+    );
+    expect(filters.find((f) => f.table === 'ultimate_build_jobs')?.expression).toContain(
+      'heartbeat_at.is.null,heartbeat_at.lt.',
+    );
+  });
+  it('requires a successful company lookup rather than credential presence', async () => {
+    vi.mocked(quickBooksRequest).mockRejectedValue(new Error('provider rejected token'));
+    expect((await getSystemHealth(db as never)).quickBooksBillingOk).toBe(false);
+    vi.mocked(quickBooksRequest).mockResolvedValue({});
+    expect((await getSystemHealth(db as never)).quickBooksBillingOk).toBe(false);
+  });
+
 });

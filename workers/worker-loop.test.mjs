@@ -47,3 +47,7 @@ test('persisted dependency wait exits normally without claiming lesson completio
 test('non-persisted incomplete lesson still fails Cloud Run task', async () => {
   await assert.rejects(runWorkerLoop(options(async () => ({claimed:true,completed:false}))),/ULTIMATE_TASK_INCOMPLETE/);
 });
+test('a saved owner preview ends the finite task without claiming course completion',async()=>{
+  const result={claimed:true,completed:false,previewReady:true};
+  assert.equal(await runWorkerLoop(options(async()=>result)),result);
+});

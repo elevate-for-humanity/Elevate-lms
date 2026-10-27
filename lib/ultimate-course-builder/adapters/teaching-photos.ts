@@ -18,6 +18,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const approvedReference=await approvedReferencePhotoPicker(input,db);
   let placedPhotos: any[] | undefined;
   const usedPhotoHashes=new Set<string>();
+  const usedSelections=new Set<string>();
   const assignPhoto=(sceneId:string,photo:any)=>{
     if(!photo.sha256||usedPhotoHashes.has(photo.sha256))return false;
     usedPhotoHashes.add(photo.sha256);
@@ -68,7 +69,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      const selected=await courseSelectedStill(input,db,scene,index,step);
+      const selected=await courseSelectedStill(input,db,scene,index,step,{allowRelatedCoursePhoto:true,usedSelections});
       if(selected){
         if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);

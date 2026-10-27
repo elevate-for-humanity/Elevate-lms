@@ -123,7 +123,7 @@ function safeRows<T>(
 }
 
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
-  await requireRole(['super_admin', 'admin', 'org_admin', 'advisor', 'staff']);
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
   const db = await requireAdminClient();
   const degradedSections: DegradedSection[] = [];

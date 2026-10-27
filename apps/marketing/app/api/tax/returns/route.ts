@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { taxJson } from '@/lib/tax-software/server/response';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { STANDARD_DEDUCTION_2026 } from '@/lib/tax-software/calculation/ty2026-base-1040';
@@ -9,7 +10,7 @@ export async function GET() {
   const {
     data: { user },
   } = await s.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return taxJson({ error: 'Unauthorized' }, { status: 401 });
   const { data, error } = await s
     .from('tax_returns')
     .select('id,tax_year,filing_status,status')
@@ -17,7 +18,7 @@ export async function GET() {
     .eq('service_type', 'self_file')
     .order('updated_at', { ascending: false });
   if (error) return returnError(error, 'Unable to load returns');
-  return NextResponse.json({ returns: data ?? [] });
+  return taxJson({ returns: data ?? [] });
 }
 export async function POST(req: NextRequest) {
   const limited = await applyRateLimit(req, 'api');
@@ -26,17 +27,14 @@ export async function POST(req: NextRequest) {
   const {
     data: { user },
   } = await s.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return taxJson({ error: 'Unauthorized' }, { status: 401 });
   const b = await req.json().catch(() => null);
   if (
     !b ||
     b.taxYear !== 2026 ||
     !Object.prototype.hasOwnProperty.call(STANDARD_DEDUCTION_2026, b.filingStatus)
   )
-    return NextResponse.json(
-      { error: 'Select tax year 2026 and a valid filing status' },
-      { status: 400 },
-    );
+    return taxJson({ error: 'Select tax year 2026 and a valid filing status' }, { status: 400 });
   const { data, error } = await s
     .from('tax_returns')
     .insert({
@@ -50,16 +48,16 @@ export async function POST(req: NextRequest) {
     .select('id')
     .single();
   if (error) return returnError(error, 'Unable to start return');
-  return NextResponse.json({ success: true, returnId: data.id }, { status: 201 });
+  return taxJson({ success: true, returnId: data.id }, { status: 201 });
 }
 
 function returnError(error: { code?: string; message: string }, fallback: string) {
   if (error.code === '42501' && error.message.includes('require_privileged_aal2')) {
-    return NextResponse.json(
+    return taxJson(
       { error: 'Verify your account to access your tax return.', code: 'MFA_REQUIRED' },
       { status: 403 },
     );
   }
   console.error('[tax/returns] Database operation failed', { code: error.code });
-  return NextResponse.json({ error: fallback }, { status: 500 });
+  return taxJson({ error: fallback }, { status: 500 });
 }

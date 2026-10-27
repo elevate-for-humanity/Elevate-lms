@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { taxJson } from '@/lib/tax-software/server/response';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const money = (v: unknown) => {
+  if (v === null || v === undefined || (typeof v === 'string' && !v.trim())) return null;
+  if (typeof v !== 'number' && typeof v !== 'string') return null;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 };
@@ -15,11 +18,11 @@ export async function POST(req: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return taxJson({ error: 'Unauthorized' }, { status: 401 });
   const body = await req.json().catch(() => null);
-  if (!body) return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  if (!body) return taxJson({ error: 'Invalid request' }, { status: 400 });
   const returnId = String(body.returnId || '');
-  if (!returnId) return NextResponse.json({ error: 'returnId is required' }, { status: 400 });
+  if (!returnId) return taxJson({ error: 'returnId is required' }, { status: 400 });
   const { data: taxReturn, error: returnError } = await supabase
     .from('tax_returns')
     .select('id,created_by_user_id,filing_status')
@@ -27,14 +30,13 @@ export async function POST(req: NextRequest) {
     .eq('created_by_user_id', user.id)
     .eq('service_type', 'self_file')
     .maybeSingle();
-  if (returnError || !taxReturn)
-    return NextResponse.json({ error: 'Return not found' }, { status: 404 });
+  if (returnError || !taxReturn) return taxJson({ error: 'Return not found' }, { status: 404 });
   const required = ['employerEin', 'employerName', 'wages'];
   for (const k of required)
     if (!String(body[k] ?? '').trim())
-      return NextResponse.json({ error: `${k} is required` }, { status: 400 });
+      return taxJson({ error: `${k} is required` }, { status: 400 });
   if (!/^\d{2}-?\d{7}$/.test(String(body.employerEin)))
-    return NextResponse.json({ error: 'Enter a valid employer EIN' }, { status: 400 });
+    return taxJson({ error: 'Enter a valid employer EIN' }, { status: 400 });
   for (const k of [
     'wages',
     'federalWithholding',
@@ -51,14 +53,11 @@ export async function POST(req: NextRequest) {
       String(body[k]).trim() !== '' &&
       (money(body[k]) === null || Number(body[k]) < 0)
     )
-      return NextResponse.json({ error: `${k} must be a nonnegative amount` }, { status: 400 });
+      return taxJson({ error: `${k} must be a nonnegative amount` }, { status: 400 });
   }
   const owner = body.incomeOwner === 'spouse' ? 'spouse' : 'primary';
   if (owner === 'spouse' && taxReturn.filing_status !== 'married_joint')
-    return NextResponse.json(
-      { error: 'Spouse wage statements require a joint return.' },
-      { status: 400 },
-    );
+    return taxJson({ error: 'Spouse wage statements require a joint return.' }, { status: 400 });
   const row = {
     income_owner: owner,
     tax_return_id: returnId,
@@ -82,7 +81,7 @@ export async function POST(req: NextRequest) {
     state_withholding: money(body.stateWithholding),
   };
   const { data, error } = await supabase.from('tax_w2_income').insert(row).select('id').single();
-  if (error) return NextResponse.json({ error: 'Unable to save confirmed W-2' }, { status: 500 });
+  if (error) return taxJson({ error: 'Unable to save confirmed W-2' }, { status: 500 });
   await supabase
     .from('tax_return_events')
     .insert({
@@ -95,5 +94,5 @@ export async function POST(req: NextRequest) {
       () => {},
       () => {},
     );
-  return NextResponse.json({ success: true, w2Id: data.id });
+  return taxJson({ success: true, w2Id: data.id });
 }

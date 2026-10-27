@@ -6,7 +6,7 @@ export function prepareUltimatePublication(p: any, actorId: string) {
   if (p.contractVersion !== ULTIMATE_LESSON_CONTRACT_VERSION || !p.lessons?.length)
     throw new Error('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
   const now = new Date().toISOString();
-  return p.lessons.map((l: any) => {
+  return p.lessons.filter((l: any) => !l.preservedPublished).map((l: any) => {
     assertCompleteLesson(l.contractArtifacts, p.profile, l.competencyId);
     const film = l.contractArtifacts.lesson_film_render.render;
     if (renderPlaybackUrl(film) !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
@@ -126,7 +126,7 @@ export function prepareUltimatePublication(p: any, actorId: string) {
       scene_count: l.storyboard?.scenes?.length ?? l.segments.length,
       completed_at: now, review_status: 'approved', reviewed_by: actorId,
       reviewed_at: now,
-      review_notes: 'Current Ultimate twenty-step contract passed before canonical publication.',
+      review_notes: 'Current required Ultimate lesson contract passed; release authorized by the configured course owner.',
       quality_evidence: {
         ...l.contractArtifacts.finished_media_qa.mediaQA.inspection,
         ultimateBuildId: p.buildId,

@@ -1,7 +1,6 @@
 export type PartnerSystem =
   | 'MILADY'
   | 'CAREERSAFE'
-  | 'HSI'
   | 'RISE'
   | 'CERTIPORT'
   | 'NATIONAL_DRUG'

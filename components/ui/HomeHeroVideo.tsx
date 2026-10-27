@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight, BadgeCheck, CreditCard, Store } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
@@ -25,150 +27,252 @@ export interface HomeHeroVideoProps {
 }
 
 interface HomeHeroSlide {
-  type: 'video' | 'image';
-  src?: string;
-  mobileSrc?: string;
+  type: 'image';
+  src: string;
   alt: string;
   label: string;
+  description: string;
+  exposureClass: string;
+  focalClass: string;
 }
 
-const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
-const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
 const HOME_SLIDE_SECONDS = 5;
+const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]';
+const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 
-const HOME_NARRATION =
-  'Welcome to Elevate for Humanity, where career training, registered apprenticeships, workforce support, and technology come together in one connected platform. Whether you want to begin a new career, earn while you learn, grow your business, host an apprentice, or build and manage training online, Elevate can help you take the next step. Explore hands-on pathways in healthcare, skilled trades, transportation, barbering, beauty, business, and technology. Eligible participants can also learn about available workforce funding pathways and payment options before enrolling. Shop and salon owners can join at no cost as apprenticeship host sites, train new talent inside their businesses, receive program support from Elevate, and may qualify for eligible workforce incentives. Apprentices gain supervised experience, documented skills, and the opportunity to earn wages while completing their pathway. Elevate also provides online applications, learner and employer portals, course-building tools, website and app development, testing support, and workforce-management technology. Explore a program, apply for training, become a host site, or request a demonstration. Your next opportunity can start right here with Elevate for Humanity.';
-
-function withMediaRevision(src?: string) {
-  if (!src) return undefined;
-  return `${src}${src.includes('?') ? '&' : '?'}v=${HOME_MEDIA_REVISION}`;
+function revisionedHeroAsset(src: string): string {
+  if (!DEPLOYED_COMMIT_SHA) return src;
+  const separator = src.includes('?') ? '&' : '?';
+  return `${src}${separator}v=${encodeURIComponent(DEPLOYED_COMMIT_SHA)}`;
 }
+const HOME_NARRATION =
+  'Welcome to Elevate for Humanity. Registered apprenticeships connect structured instruction with supervised experience in a real workplace. You can earn while you learn, build skills by doing real work, document your progress, and move toward an industry-recognized career. Local salons, spas, nail studios, barbershops, and other employers can join as Host Shops, train future team members, and connect with qualified candidates. Employers looking to fill open jobs can partner with Elevate to reach trained talent and strengthen their workforce pipeline. Business owners can also use Elevate tools to build a website, organize customer outreach, and manage the systems behind their growth. Whether you want to begin an apprenticeship, become a Host Shop, find trained employees, or grow your business, Elevate gives you a clear next step. PARIS is here whenever you need guidance.';
+const HOME_SLIDES: HomeHeroSlide[] = [
+  {
+    type: 'image',
+    src: '/images/partners/salon-saloon/team-interior.webp',
+    alt: 'Salon Saloon professional team inside their South Bend salon',
+    label: 'Join a polished professional salon community',
+    description:
+      'Build your career alongside a polished salon team with workplace guidance and measurable progress.',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/kountry-kutz/interior-active.webp',
+    alt: 'Barbers serving clients inside Kountry Kutz Barbershop',
+    label: 'Learn in the rhythm of a real shop',
+    description:
+      'Experience supervised workplace learning, client service, and professional shop routines.',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/cals-kutz-official.webp',
+    alt: 'Cals Kutz Studio participating apprenticeship barbershop',
+    label: 'Build skills with local barber professionals',
+    description:
+      'Explore structured apprenticeships connected to participating local shops, experienced professionals, and supervised workplace learning.',
+    exposureClass: 'brightness-[1.12]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/b52s-official.webp',
+    alt: "B-52's Barbershop participating apprenticeship host shop",
+    label: 'Learn inside established neighborhood businesses',
+    description:
+      'Connect structured instruction with supervised workplace learning in a participating local shop.',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/generations-hair/highlighted-curls-home.webp',
+    alt: 'Dimensional curls created by Generations Hair Co',
+    label: 'See the professional standard apprentices work toward',
+    description:
+      'Develop technique, consistency, and confidence through structured training in a real salon environment.',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-[center_42%]',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/salon-saloon/team-studio.webp',
+    alt: 'Salon Saloon professionals gathered inside their modern studio',
+    label: 'See the professional environment up close',
+    description:
+      'Build confidence through supervised service, professional routines, and direct workplace experience.',
+    exposureClass: 'brightness-[1.11]',
+    focalClass: 'object-[center_42%]',
+  },
+];
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
-  const slides = ([
-    {
-      type: 'video',
-      src: withMediaRevision(banner.videoSrcDesktop),
-      mobileSrc: withMediaRevision(banner.videoSrcMobile),
-      alt: 'Elevate for Humanity career training and apprenticeship opportunities',
-      label: 'Career training and apprenticeships',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/salon-saloon/team-sign.webp',
-      alt: 'Salon Saloon team at an Elevate participating Host Salon',
-      label: 'Host shops train the next generation',
-    },
-    {
-      type: 'image',
-      src: '/images/pages/barber-hero-main.webp',
-      alt: 'Barber apprentice serving a client in a working barbershop',
-      label: 'Earn while you learn',
-    },
-    {
-      type: 'image',
-      src: '/images/pexels/cosmetology.webp',
-      alt: 'Beauty professional working with a client in a salon',
-      label: 'Beauty apprenticeship pathways',
-    },
-  ] satisfies HomeHeroSlide[]).filter(
-    (slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc),
-  );
+  const mediaRef = useRef<HTMLDivElement | null>(null);
+  const [heroVisible, setHeroVisible] = useState(false);
+  const slides = HOME_SLIDES;
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [paused, setPaused] = useState(false);
   const slide = slides[activeSlide] ?? slides[0];
 
-  const selectSlide = useCallback(
+  const transitionToSlide = useCallback(
     (index: number) => {
-      setActiveSlide((index + slides.length) % slides.length);
+      setActiveSlide((current) => {
+        const next = (index + slides.length) % slides.length;
+        if (next === current) return current;
+
+        return next;
+      });
     },
-    [slides.length],
+    [slides],
   );
 
   useEffect(() => {
-    if (paused || slides.length < 2) return;
+    const element = mediaRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroVisible(entry.isIntersecting && entry.intersectionRatio >= 0.1),
+      { threshold: [0, 0.1, 0.5] },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const selectSlide = useCallback((index: number) => transitionToSlide(index), [transitionToSlide]);
+
+  useEffect(() => {
+    if (paused || !heroVisible || slides.length < 2) return;
     const timer = window.setInterval(
-      () => setActiveSlide((current) => (current + 1) % slides.length),
+      () => transitionToSlide(activeSlide + 1),
       HOME_SLIDE_SECONDS * 1000,
     );
     return () => window.clearInterval(timer);
-  }, [paused, slides.length]);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mediaQuery.matches) setPaused(true);
-  }, []);
+  }, [activeSlide, heroVisible, paused, slides.length, transitionToSlide]);
 
   if (!slide) return null;
 
   return (
-    <div
-      className="relative"
+    <section
+      className="relative overflow-hidden border-b border-slate-200 bg-white"
       role="region"
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
     >
-      <HeroVideo
-        videoSrcDesktop={slide.type === 'video' ? slide.src : undefined}
-        videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}
-        mountedFrameImage={slide.type === 'video' ? HOME_FIRST_FRAME : slide.src}
-        transcript={HOME_NARRATION}
-        narrateTranscript
-        analyticsName={banner.analyticsName}
-        overlayMode="none"
-        soundButtonVariant="prominent"
-        heightClassName="h-[clamp(400px,62vh,680px)]"
-        deferVideoMs={slide.type === 'video' ? 250 : 0}
-      />
-
-      {slides.length > 1 ? (
-        <>
-          <button
-            type="button"
-            onClick={() => selectSlide(activeSlide - 1)}
-            aria-label="Show previous hero slide"
-            className="absolute left-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-r-lg border-y border-r border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            <span aria-hidden="true" className="text-4xl font-light leading-none">‹</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => selectSlide(activeSlide + 1)}
-            aria-label="Show next hero slide"
-            className="absolute right-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-l-lg border-y border-l border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            <span aria-hidden="true" className="text-4xl font-light leading-none">›</span>
-          </button>
-
-          <div className="absolute bottom-5 left-1/2 z-50 flex w-[min(88vw,32rem)] -translate-x-1/2 items-center gap-2 rounded-lg border border-white/40 bg-slate-950/55 px-3 py-2 shadow-lg backdrop-blur-sm">
-            {slides.map((item, index) => (
-              <button
-                key={`${item.type}-${item.src}-${index}`}
-                type="button"
-                onClick={() => selectSlide(index)}
-                aria-label={`Show slide ${index + 1}: ${item.label}`}
-                aria-current={index === activeSlide ? 'true' : undefined}
-                className={`h-1.5 flex-1 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                  index === activeSlide ? 'bg-white' : 'bg-white/35 hover:bg-white/70'
-                }`}
-              />
-            ))}
-            <button
-              type="button"
-              onClick={() => setPaused((value) => !value)}
-              aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
-              className="ml-1 inline-flex h-8 min-w-10 items-center justify-center rounded-md border border-white/50 px-2 text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              <span aria-hidden="true" className="text-sm font-black leading-none">{paused ? '▶' : 'Ⅱ'}</span>
-            </button>
+      <div className="mx-auto grid max-w-7xl items-center gap-8 py-0 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-12 lg:px-8 lg:py-12">
+        <div className="relative z-20 order-1 px-4 pb-8 pt-8 sm:px-6 sm:pb-4 sm:pt-0 lg:px-0">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.13em] text-blue-800">
+            <BadgeCheck className="h-4 w-4" aria-hidden="true" />
+            Career training built around your next step
           </div>
-
-          <p className="sr-only" aria-live="polite">
-            Slide {activeSlide + 1} of {slides.length}: {slide.label}
+          <h2 className="max-w-2xl text-4xl font-black leading-[1.04] tracking-[-0.035em] text-slate-950 sm:text-5xl lg:text-6xl">
+            Earn while you learn—or become a Host Shop for free.
+          </h2>
+          <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700 sm:text-xl">
+            Apprentices earn wages and get hands-on training inside a participating shop. Salon,
+            spa, nail studio, and barbershop owners can apply at no cost, train future staff, and
+            earn revenue from supervised services performed in their business.
           </p>
-        </>
-      ) : null}
-    </div>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/apprenticeships"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 text-base font-extrabold text-white shadow-lg shadow-red-900/15 transition hover:-translate-y-0.5 hover:bg-brand-red-700"
+            >
+              Explore Apprenticeships <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </Link>
+            <Link
+              href="/partners/host-shops"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-6 py-3.5 text-base font-extrabold text-slate-900 transition hover:-translate-y-0.5 hover:border-blue-500 hover:text-blue-700"
+            >
+              <Store className="h-5 w-5" aria-hidden="true" /> Participating Shops: Sign Up Free
+            </Link>
+          </div>
+          <div className="mt-7 grid max-w-xl gap-3 text-sm font-bold text-slate-700 sm:grid-cols-3">
+            <span className="flex items-center gap-2">
+              <BadgeCheck className="h-5 w-5 text-emerald-600" /> Apprentices earn wages
+            </span>
+            <span className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-blue-600" /> Hands-on shop training
+            </span>
+            <span className="flex items-center gap-2">
+              <Store className="h-5 w-5 text-orange-600" /> Host Shops join free
+            </span>
+          </div>
+        </div>
+
+        <div ref={mediaRef} className="relative order-2 w-full overflow-hidden bg-[#f4f1ec]">
+          <HeroVideo
+            transcript={HOME_NARRATION}
+            narrateTranscript
+            demoSlides={slides.map((candidate) => ({
+              src: revisionedHeroAsset(candidate.src),
+              alt: candidate.alt,
+              label: candidate.label,
+              className: `${candidate.exposureClass} ${candidate.focalClass}`,
+            }))}
+            demoActiveSlideIndex={activeSlide}
+            analyticsName={`${banner.analyticsName}-${activeSlide + 1}`}
+            heightClassName="h-[clamp(260px,42svh,480px)]"
+            mediaClassName={SALON_EDITORIAL_GRADE}
+            overlayMode="none"
+            showSoundControl={false}
+            soundButtonVariant="prominent"
+            showTranscriptControl={false}
+          />
+          {slides.length > 1 ? (
+            <>
+              <button
+                type="button"
+                onClick={() => selectSlide(activeSlide - 1)}
+                aria-label="Show previous hero slide"
+                className="absolute left-2 top-1/2 z-50 inline-flex h-12 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/55 text-white backdrop-blur transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <span aria-hidden="true" className="text-4xl font-light leading-none">
+                  ‹
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => selectSlide(activeSlide + 1)}
+                aria-label="Show next hero slide"
+                className="absolute right-2 top-1/2 z-50 inline-flex h-12 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/55 text-white backdrop-blur transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <span aria-hidden="true" className="text-4xl font-light leading-none">
+                  ›
+                </span>
+              </button>
+
+              <div className="absolute bottom-4 right-4 z-50 flex items-center gap-3 rounded-full border border-white/40 bg-slate-950/65 px-4 py-2 text-white shadow-lg backdrop-blur-md">
+                <span
+                  className="min-w-10 text-center text-xs font-black tracking-[0.12em]"
+                  aria-hidden="true"
+                >
+                  {activeSlide + 1} / {slides.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPaused((value) => !value)}
+                  aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
+                  className="inline-flex h-10 w-10 min-h-0 min-w-0 touch-manipulation items-center justify-center rounded-full border border-white/60 bg-white/15 p-0 text-white transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  style={{ minHeight: '2.5rem', minWidth: '2.5rem', padding: 0 }}
+                >
+                  <span aria-hidden="true" className="text-sm font-black leading-none">
+                    {paused ? '▶' : 'Ⅱ'}
+                  </span>
+                </button>
+              </div>
+
+              <p className="sr-only" aria-live="polite">
+                Slide {activeSlide + 1} of {slides.length}: {slide.label}
+              </p>
+            </>
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }

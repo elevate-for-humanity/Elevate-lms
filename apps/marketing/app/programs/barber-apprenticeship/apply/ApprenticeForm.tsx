@@ -1,5 +1,6 @@
 'use client';
 import Turnstile from '@/components/Turnstile';
+import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -19,8 +20,6 @@ import {
   remainingHoursDisplay,
   TOTAL_HOURS_REQUIRED,
 } from '@/lib/barber/pricing';
-import { loadStripe } from '@stripe/stripe-js';
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -28,8 +27,6 @@ import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
   uploadTransferHoursEvidence,
 } from '@/lib/applications/upload-transfer-hours-evidence';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Single source of truth — do not duplicate pricing constants here.
 const PRICING = BARBER_PRICING;
@@ -53,20 +50,13 @@ function getNextFriday(): string {
   return nextFriday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm' | 'stripe_bnpl';
+type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm';
 
 function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'pay_in_full') return 'full';
   if (param === 'payment_plan') return 'custom';
   if (param === 'affirm') return 'affirm';
   if (param === 'sezzle') return 'sezzle';
-  // Stripe-native methods — all go through Stripe checkout
-  if (
-    ['bnpl', 'klarna', 'afterpay', 'zip', 'cashapp', 'amazon_pay', 'us_bank_account'].includes(
-      param ?? '',
-    )
-  )
-    return 'stripe_bnpl';
   return 'weekly';
 }
 
@@ -74,7 +64,7 @@ type TransferHoursChoice = 'undecided' | 'yes' | 'no';
 
 export default function ApprenticeForm({
   initialPayment,
-  initialFunding,
+  initialFunding: _initialFunding,
   initialEmail,
   initialName,
   initialApplicationId,
@@ -90,9 +80,6 @@ export default function ApprenticeForm({
   const [error, setError] = useState('');
   const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');
   const [nextFriday, setNextFriday] = useState('Friday');
-
-  // Embedded Stripe checkout (BNPL — Klarna / Afterpay)
-  const [embeddedClientSecret, setEmbeddedClientSecret] = useState<string | null>(null);
 
   // Transfer hours — progress credit only, does not affect price or term.
   const [transferHoursChoice, setTransferHoursChoice] =
@@ -129,10 +116,11 @@ export default function ApprenticeForm({
       phone: '',
       hasHostShop: '',
       hostShopName: '',
-      fundingInterest: initialFunding ?? '',
+      fundingInterest: 'self-pay',
     };
   });
   const [smsConsent, setSmsConsent] = useState(false);
+  const [fundingApprovalConfirmed, setFundingApprovalConfirmed] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string>('');
   const [fundingEligibilityStatus, setFundingEligibilityStatus] =
     useState<EligibilityStatus | null>(null);
@@ -154,6 +142,7 @@ export default function ApprenticeForm({
   const handleFundingChange = (value: string) => {
     updateField('fundingInterest', value);
     setFundingEligibilityStatus(null);
+    setFundingApprovalConfirmed(false);
   };
 
   const fundedOptionsReady =
@@ -168,6 +157,12 @@ export default function ApprenticeForm({
   const handlePayNow = async () => {
     if (!formData.email || !formData.firstName || !formData.lastName || !formData.phone) {
       setError('Please fill in all required fields');
+      setErrorSeverity('info');
+      return;
+    }
+
+    if (!isSelfPay && !fundingApprovalConfirmed) {
+      setError('Confirm that your apprenticeship funding was approved or specifically made available to you by Elevate.');
       setErrorSeverity('info');
       return;
     }
@@ -235,6 +230,9 @@ export default function ApprenticeForm({
           fundingEligibilityStatus: !isSelfPay
             ? (fundingEligibilityStatus ?? undefined)
             : undefined,
+          apprenticeshipFundingApprovalAcknowledged: !isSelfPay
+            ? fundingApprovalConfirmed
+            : undefined,
           source: 'barber-apply-page',
           paymentOption: isSelfPay ? paymentOption : undefined,
           turnstileToken: isSelfPay ? turnstileToken : undefined,
@@ -264,7 +262,7 @@ export default function ApprenticeForm({
           // If we found the existing application, continue to checkout
           if (!applicationId) {
             setError(
-              `You already have an application on file. Please call ${PLATFORM_DEFAULTS.supportPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.`,
+              `You already have an application on file. Please call ${PLATFORM_DEFAULTS.mainPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.`,
             );
             setErrorSeverity('info');
             setLoading(false);
@@ -276,8 +274,8 @@ export default function ApprenticeForm({
           const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
           setError(
             isBotError
-              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.supportPhone}.`
-              : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.mainPhone}.`
+              : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`,
           );
           setErrorSeverity('critical');
           setLoading(false);
@@ -304,7 +302,7 @@ export default function ApprenticeForm({
         has_host_shop: formData.hasHostShop,
         host_shop_name: formData.hostShopName,
         hours_per_week: 40,
-        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}&redirect=/apply/confirmation?program=barber-apprenticeship`,
+        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success`,
         cancel_url: `${window.location.origin}/programs/barber-apprenticeship/apply`,
       };
 
@@ -443,35 +441,6 @@ export default function ApprenticeForm({
           setErrorSeverity('info');
           setLoading(false);
         }
-        return;
-      } else if (paymentOption === 'stripe_bnpl') {
-        // Klarna / Afterpay — open embedded checkout inline (no redirect)
-        const embeddedRes = await fetch('/api/barber/checkout/embedded', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customer_email: formData.email,
-            customer_name: `${formData.firstName} ${formData.lastName}`,
-            customer_phone: formData.phone,
-            sms_consent: smsConsent,
-            application_id: applicationId,
-            transferred_hours_verified: transferHours,
-            hours_per_week: 40,
-            has_host_shop: formData.hasHostShop,
-            host_shop_name: formData.hostShopName,
-          }),
-        });
-        const embeddedData = await embeddedRes.json();
-        if (!embeddedRes.ok || !embeddedData.clientSecret) {
-          setError(
-            embeddedData.error || 'Unable to start checkout. Please try another payment option.',
-          );
-          setErrorSeverity('info');
-          setLoading(false);
-          return;
-        }
-        setEmbeddedClientSecret(embeddedData.clientSecret);
-        setLoading(false);
         return;
       } else if (paymentOption === 'full') {
         // Pay in full - one-time payment
@@ -625,7 +594,7 @@ export default function ApprenticeForm({
                   ) : (
                     <>
                       <div className="text-2xl font-black">May be covered</div>
-                      <p className="text-xs text-white/80 mt-2">WIOA, WRG, and FSSA may cover tuition for eligible Indiana residents.</p>
+                      <p className="text-xs text-white/80 mt-2">Apprenticeship tuition is self-pay only.</p>
                     </>
                   )}
                 </div>
@@ -685,7 +654,7 @@ export default function ApprenticeForm({
                     href="/support"
                     className="inline-block mt-2 text-brand-red-600 font-medium hover:underline"
                   >
-                    Need help? Call {PLATFORM_DEFAULTS.supportPhone}
+                    Need help? Call {PLATFORM_DEFAULTS.mainPhone}
                   </a>
                 )}
               </div>
@@ -744,7 +713,7 @@ export default function ApprenticeForm({
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
                     className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    placeholder={PLATFORM_DEFAULTS.supportPhone}
+                    placeholder={PLATFORM_DEFAULTS.mainPhone}
                   />
                 </div>
 
@@ -874,17 +843,13 @@ export default function ApprenticeForm({
 
                 {!completingExistingPayment && (
                   <div className="border-t border-slate-200 pt-6 mt-6">
+                    <ApprenticeshipFundingNotice />
                     <label className="block text-sm font-bold text-slate-800 mb-3">
                       How do you plan to pay for training? *
                     </label>
                     <div className="space-y-2">
                       {[
                         { value: 'self-pay', label: 'Self-pay', sub: 'Card, BNPL, or weekly payment plan — pay at checkout' },
-                        { value: 'wioa', label: 'WIOA Funding', sub: 'WorkOne — no tuition if eligible' },
-                        { value: 'wrg', label: 'Workforce Ready Grant / Next Level Jobs', sub: 'Indiana state grant — no tuition if eligible' },
-                        { value: 'fssa', label: 'FSSA IMPACT', sub: 'SNAP/TANF recipients referred by your case worker' },
-                        { value: 'employer', label: 'Employer-sponsored', sub: 'Host shop or employer pays tuition' },
-                        { value: 'unsure', label: 'Not sure', sub: 'Enrollment team will help you find funding' },
                       ].map((opt) => (
                         <label
                           key={opt.value}
@@ -909,6 +874,12 @@ export default function ApprenticeForm({
                         </label>
                       ))}
                     </div>
+                    {!isSelfPay && (
+                      <label className="mt-4 flex items-start gap-3 rounded-xl border-2 border-red-300 bg-red-50 p-4 text-sm font-bold text-red-950">
+                        <input type="checkbox" checked={fundingApprovalConfirmed} onChange={(event) => setFundingApprovalConfirmed(event.target.checked)} className="mt-1 h-5 w-5" />
+                        <span>I confirm that I already have written approval for this apprenticeship funding or an Elevate enrollment representative specifically told me it is available.</span>
+                      </label>
+                    )}
                     {(formData.fundingInterest === 'wioa' || formData.fundingInterest === 'wrg' || formData.fundingInterest === 'fssa') && (
                       <div className="mt-4">
                         <FundingEligibilityFlow
@@ -918,7 +889,7 @@ export default function ApprenticeForm({
                         />
                       </div>
                     )}
-                    {(formData.fundingInterest === 'employer' || formData.fundingInterest === 'unsure') && (
+                    {formData.fundingInterest === 'employer' && (
                       <div className="mt-4 bg-brand-green-50 border border-brand-green-200 rounded-xl p-4 flex items-start gap-3">
                         <Shield className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                         <div>
@@ -1150,33 +1121,8 @@ export default function ApprenticeForm({
                 </div>
                 )}
 
-                {/* Embedded Stripe Checkout — Klarna / Afterpay */}
-                {embeddedClientSecret && (
-                  <div className="mt-4 border-2 border-pink-200 rounded-xl overflow-hidden">
-                    <div className="bg-pink-50 px-4 py-3 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-pink-900">
-                        Klarna / Afterpay Checkout
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setEmbeddedClientSecret(null)}
-                        className="text-xs text-pink-700 hover:underline"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                    <EmbeddedCheckoutProvider
-                      stripe={stripePromise}
-                      options={{ clientSecret: embeddedClientSecret }}
-                    >
-                      <EmbeddedCheckout />
-                    </EmbeddedCheckoutProvider>
-                  </div>
-                )}
-
-                {/* Submit — hidden while embedded checkout is open */}
-                {!embeddedClientSecret && (
-                  <>
+                {/* Submit */}
+                <>
                     {isSelfPay && (
                       <Turnstile
                         onVerify={(token) => setTurnstileToken(token)}
@@ -1195,7 +1141,7 @@ export default function ApprenticeForm({
                         (!completingExistingPayment && !formData.fundingInterest) ||
                         (isSelfPay && !turnstileToken) ||
                         (transferHoursChoice === 'yes' && (!transferHoursDocument || transferHours <= 0)) ||
-                        (!isSelfPay && !completingExistingPayment && !fundedOptionsReady)
+                        (!isSelfPay && !completingExistingPayment && (!fundedOptionsReady || !fundingApprovalConfirmed))
                       }
                       className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
                     >
@@ -1213,21 +1159,17 @@ export default function ApprenticeForm({
                           )}
                           {!isSelfPay
                             ? 'Submit Application'
-                            : paymentOption === 'stripe_bnpl'
-                              ? 'Open Klarna / Afterpay'
-                              : 'Continue to Payment'}
+                            : 'Continue to Payment'}
                         </>
                       )}
                     </button>
 
                     {isSelfPay && (
                       <p className="text-center text-sm text-black mt-4">
-                        Secure payment via Stripe. Card, Apple Pay, Google Pay, PayPal, Venmo, Cash
-                        App accepted.
+                        Secure payment through Elevate billing. Available payment methods are shown during checkout.
                       </p>
                     )}
                   </>
-                )}
               </div>
             </div>
 

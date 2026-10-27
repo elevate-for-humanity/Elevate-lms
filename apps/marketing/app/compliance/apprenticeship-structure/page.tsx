@@ -27,7 +27,7 @@ export default function ApprenticeshipStructurePage() {
         description="Registered Apprenticeships follow occupation-specific standards. Elevate combines supervised on-the-job learning, related technical instruction, mentor verification, and documented completion requirements."
         actions={(
           <>
-            <Link href="/programs/apprenticeships" className="rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">View Apprenticeships</Link>
+            <Link href="/apprenticeships" className="rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">View Apprenticeships</Link>
             <Link href="/partners/host-shop/apply" className="rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Host Site Application</Link>
           </>
         )}

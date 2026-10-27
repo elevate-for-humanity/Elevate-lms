@@ -12,12 +12,45 @@ export type SceneLayout =
   | 'split_right_text'
   | 'top_label';
 export type SceneTransition = 'cut' | 'fade' | 'crossfade';
+export type InstructionalSceneType =
+  | 'problem_hook'
+  | 'mental_model'
+  | 'system_diagram'
+  | 'equipment_closeup'
+  | 'worked_example'
+  | 'field_scenario'
+  | 'common_mistake'
+  | 'safety_warning'
+  | 'memory_recap'
+  | 'knowledge_check'
+  | 'service_setup'
+  | 'sanitation_check'
+  | 'procedure_step'
+  | 'critical_closeup'
+  | 'quality_check'
+  | 'cleanup_aftercare'
+  | 'evidence_capture';
+
+export type SceneAssetRequirement =
+  | 'stock_context'
+  | 'generated_diagram'
+  | 'original_capture'
+  | 'licensed_demonstration';
+
+export interface TeachingModel {
+  name: string;
+  memoryAnchor: string;
+  plainLanguageMap: string;
+  misconception: string;
+  transferQuestion: string;
+}
 
 // ── GPT output (draft) ────────────────────────────────────────────────────────
 
 export interface LessonSceneDraft {
   id: string;
   order: number;
+  sceneType: InstructionalSceneType;
   /** What the learner will know or be able to do after this scene */
   instructionalObjective: string;
   dolCompetencyId: string;
@@ -31,6 +64,9 @@ export interface LessonSceneDraft {
   videoQuery: string;
   /** Exactly what should be visible on screen — drives video selection over raw videoQuery */
   visualFocus?: string;
+  assetRequirement: SceneAssetRequirement;
+  /** Stable step number lets the builder emit one reusable microvideo per procedure step. */
+  procedureStepNumber?: number;
   layout: SceneLayout;
   minClipSeconds?: number;
   maxClipSeconds?: number;
@@ -44,6 +80,7 @@ export interface LessonRenderPlanDraft {
   voice: VoiceName;
   videoStyle: VideoStyle;
   targetResolution: '1920x1080' | '1280x720';
+  teachingModel: TeachingModel;
   scenes: LessonSceneDraft[];
 }
 

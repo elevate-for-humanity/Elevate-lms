@@ -10,7 +10,7 @@ function isExternal(href: string) {
 
 function DropdownContent({ subItems, embedded = false }: { subItems: NavSubItem[]; embedded?: boolean }) {
   return (
-    <div className={embedded ? 'min-w-0 p-1' : 'min-w-[260px] max-w-[360px] rounded-xl border border-slate-200 bg-white p-3 shadow-2xl'}>
+    <div className={embedded ? 'min-w-0 p-1' : 'max-h-[min(78vh,44rem)] min-w-[280px] max-w-[380px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-2xl'}>
       {subItems.map((sub) => {
         if (sub.isHeader) {
           return (
@@ -52,9 +52,9 @@ function DropdownContent({ subItems, embedded = false }: { subItems: NavSubItem[
 
 function MoreDropdown({ items }: { items: NavItem[] }) {
   return (
-    <div className="grid w-[min(92vw,42rem)] grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl sm:grid-cols-3">
+    <div className="w-[min(92vw,20rem)] space-y-1 rounded-xl border border-slate-200 bg-white p-3 shadow-2xl">
       {items.map((item) => (
-        <section key={item.id ?? item.name} className="min-w-0">
+        <div key={item.id ?? item.name} className="min-w-0">
           {item.href ? (
             <Link href={item.href} prefetch={false} className="block rounded-md px-2 py-2 text-sm font-extrabold text-slate-950 hover:bg-slate-50 hover:text-brand-blue-700">
               {item.name}
@@ -62,8 +62,8 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
           ) : (
             <p className="px-2 py-2 text-sm font-extrabold text-slate-950">{item.name}</p>
           )}
-          {item.subItems?.length ? <DropdownContent subItems={item.subItems} embedded /> : null}
-        </section>
+          
+        </div>
       ))}
     </div>
   );
@@ -76,14 +76,14 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   // Platform and Resources are public discovery surfaces, not hidden utilities.
   // Authenticated portals remain discoverable while authorization still gates data/actions.
   const primaryItems = items.filter((item) =>
-    ['programs', 'apprenticeships', 'funding', 'platform', 'employers', 'resources', 'portals'].includes(item.id ?? ''),
+    ['students', 'programs', 'apprenticeships', 'funding', 'resources'].includes(item.id ?? ''),
   );
   const secondaryItems = items.filter((item) => !primaryItems.includes(item));
 
   return (
     <nav
       aria-label="Main navigation"
-      className="flex min-w-0 flex-row flex-nowrap items-center justify-center gap-0 overflow-visible whitespace-nowrap xl:gap-0.5"
+      className="flex w-full min-w-0 flex-row flex-nowrap items-center justify-center gap-2 overflow-visible whitespace-nowrap xl:gap-3"
     >
       {primaryItems.map((item) => {
         const key = item.id ?? item.name;

@@ -162,7 +162,9 @@ for (const staleConfig of ['next.config.mjs.current', 'next.config.mjs.green']) 
 }
 
 const sitemapSource = readFile('apps/marketing/app/sitemap.ts') || '';
-const homepageEntries = sitemapSource.match(/path:\s*ROUTES\.home/g)?.length || 0;
+const routeRegistrySource = readFile('lib/navigation/public-route-registry.ts') || '';
+const homepageEntries = routeRegistrySource.match(/path:\s*ROUTES\.home/g)?.length || 0;
+if (!sitemapSource.includes('PUBLIC_ROUTE_REGISTRY.map')) fail('Sitemap source does not include the public route registry');
 if (homepageEntries !== 1) fail(`Sitemap source must declare one homepage, found ${homepageEntries}`);
 else pass('Sitemap source declares exactly one canonical homepage');
 

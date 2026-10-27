@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getSecret } from '@/lib/secrets';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
 
 const GH_API = 'https://api.github.com';
 const DEFAULT_REPOSITORY = 'elevate-for-humanity/Elevate-lms';
@@ -47,7 +48,8 @@ function normalizeRepo(repository?: string | null): string {
   return requested;
 }
 
-async function githubToken(): Promise<string | undefined> {
+async function githubToken(repository: string): Promise<string | undefined> {
+  if (repository.toLowerCase() === DEFAULT_REPOSITORY.toLowerCase()) return (await getGitHubToken()) ?? undefined;
   return (
     (await getSecret('GITHUB_TOKEN')) ||
     (await getSecret('GH_TOKEN')) ||
@@ -78,7 +80,7 @@ export async function verifyOpenHandsGitHubOutcome(input: {
   prNumbers?: number[] | null;
 }): Promise<OpenHandsGitHubEvidence> {
   const repository = normalizeRepo(input.repository);
-  const token = await githubToken();
+  const token = await githubToken(repository);
   const reasons: string[] = [];
   let branchEvidence: OpenHandsGitHubEvidence['branch'] = null;
 

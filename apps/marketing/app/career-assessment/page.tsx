@@ -1,14 +1,11 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Career Interest Assessment | Elevate for Humanity',
+  title: 'Career Interest Assessment',
   description:
     'Discover which career training programs match your interests. Take the free O*NET Interest Profiler — powered by the U.S. Department of Labor.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/career-assessment' },
 };
-
-const ONET_API_KEY = process.env.ONET_API_KEY ?? '';
 
 export default function CareerAssessmentPage() {
   return (
@@ -29,33 +26,25 @@ export default function CareerAssessmentPage() {
       </section>
 
       <section className="py-10 max-w-4xl mx-auto px-4 sm:px-6">
-        {ONET_API_KEY ? (
-          <>
-            {/* O*NET Interest Profiler widget */}
-            <Script
-              src={`https://services.onetcenter.org/embed/onet-ip.js?x-api-key=${ONET_API_KEY}`}
-              strategy="afterInteractive"
-            />
-            <div className="embed-onet-ip" />
-
-            {/* Spanish version */}
-            <div className="mt-8 text-center">
-              <p className="text-sm text-slate-500 mb-2">¿Prefiere español?</p>
-              <div className="embed-onet-ip-es" />
-            </div>
-          </>
-        ) : (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center">
-            <p className="text-amber-800 font-semibold mb-2">Assessment temporarily unavailable</p>
-            <p className="text-amber-700 text-sm">
-              Please check back shortly or{' '}
-              <a href="/contact" className="underline">
-                contact us
-              </a>{' '}
-              for program guidance.
-            </p>
-          </div>
-        )}
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center sm:p-10">
+          <h2 className="text-2xl font-bold text-slate-900">Start the official O*NET profiler</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-600">
+            Complete the free assessment on My Next Move, the public career-exploration service
+            sponsored by the U.S. Department of Labor. Return here afterward to compare your results
+            with Elevate training programs.
+          </p>
+          <a
+            href="https://www.mynextmove.org/explore/ip"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-brand-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-600"
+          >
+            Take the career assessment
+          </a>
+          <p className="mt-4 text-sm text-slate-500">
+            ¿Prefiere español? Use the language options provided by My Next Move.
+          </p>
+        </div>
       </section>
 
       {/* O*NET Attribution — required by license */}

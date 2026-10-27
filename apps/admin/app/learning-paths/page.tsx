@@ -48,7 +48,7 @@ export default async function LearningPathsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { label: 'Total Paths', value: allPaths.length, icon: BookOpen, color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },
             { label: 'Credential Paths', value: published, icon: Star, color: 'text-green-600', bg: 'bg-green-50' },

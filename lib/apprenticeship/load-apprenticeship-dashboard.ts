@@ -9,8 +9,7 @@ import {
   getProgramDashboardExtras,
   type ProgramDashboardExtras,
 } from '@/lib/apprenticeship/program-dashboard-extras';
-import { ensureBarberLmsEnrollment } from '@/lib/barber/ensure-lms-enrollment';
-import { BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
+import { ensureApprenticeshipLmsEnrollment } from '@/lib/apprenticeship/ensure-lms-enrollment';
 import { resolveCourseEntryLinks } from '@/lib/lms/resolve-course-entry-links';
 
 export interface RtiTrainingSummary {
@@ -47,21 +46,27 @@ export async function loadApprenticeshipDashboard(
     return { ...base, extras, complianceLinks, rti: null };
   }
 
-  const courseId = await resolveCourseIdFromDb(supabase, programSlug);
+  const courseId =
+    (await resolveCourseIdFromDb(supabase, programSlug)) ||
+    (base.enrollment as any)?.course_id ||
+    null;
   if (!courseId) {
     return { ...base, extras, complianceLinks, rti: null };
   }
 
-  if (programSlug === BARBER_PROGRAM_SLUG && base.enrollment) {
+  if (base.enrollment) {
     const adminDb = await getAdminClient();
-    await ensureBarberLmsEnrollment(adminDb ?? supabase, user.id, {
+    await ensureApprenticeshipLmsEnrollment(adminDb ?? supabase, {
+      userId: user.id,
+      programSlug,
+      courseId,
       grantAccess: Boolean(base.enrollment.orientation_completed_at),
     });
   }
 
   const [{ data: course }, { data: lmsProgress }, lessonCountRes, completedRes, entryLinks] =
     await Promise.all([
-    supabase.from('courses').select('id, title').eq('id', courseId).maybeSingle(),
+    supabase.from('lms_courses').select('id, title').eq('id', courseId).maybeSingle(),
     supabase
       .from('lms_progress')
       .select('progress_percent, status, last_activity_at')

@@ -39,6 +39,7 @@ type Experience = {
   remediation?: any;
   readiness?: any;
   interactiveVideo?: any;
+  instructionalTimeline?: any;
 };
 
 export default function CourseInteractionStudio({
@@ -165,6 +166,8 @@ export default function CourseInteractionStudio({
     practical: experience.practicalTask ? 1 : 0,
     visual: experience.visualPrompt ? 1 : 0,
     audio: experience.narrationScript ? 1 : 0,
+    scenes: experience.instructionalTimeline?.scenes?.length ?? 0,
+    timelineEvents: experience.instructionalTimeline?.events?.length ?? 0,
   };
 
   return (

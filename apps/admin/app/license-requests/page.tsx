@@ -52,7 +52,7 @@ export default async function LicenseRequestsPage() {
         <p className="text-sm text-slate-500 mt-1">Pending license upgrade and access requests from users</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {stats.map(s => {
           const Icon = s.icon;
           return (

@@ -2,7 +2,13 @@
 
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
-import { recordAgreementAcceptance, type AgreementType } from '@/lib/legal/recordAgreementAcceptance';
+import {
+  recordAgreementAcceptance,
+  type AgreementType,
+} from '@/lib/legal/recordAgreementAcceptance';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
 
 export async function signAgreement(data: {
   agreementType: string;
@@ -13,20 +19,28 @@ export async function signAgreement(data: {
   studentId?: string;
 }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.email) return { success: false, error: 'You must be signed in to sign this agreement.' };
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email)
+    return { success: false, error: 'You must be signed in to sign this agreement.' };
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, full_name, tenant_id, organization_id')
+    .select('role, full_name, tenant_id, organization_id, program_holder_id')
     .eq('id', user.id)
     .maybeSingle();
 
+  if (data.agreementType === 'program_holder_mou') {
+    const context = await requireProgramHolder();
+    if (context.mode !== 'holder' || context.user.id !== user.id || data.agreementVersion !== `3.0-${context.holderId}`) return { success: false, error: 'Sign the current Program Holder agreement from your own portal.' };
+  }
   const requestHeaders = await headers();
-  const ipAddress = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || requestHeaders.get('x-real-ip')
-    || requestHeaders.get('cf-connecting-ip')
-    || '0.0.0.0';
+  const ipAddress =
+    requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    requestHeaders.get('x-real-ip') ||
+    requestHeaders.get('cf-connecting-ip') ||
+    '0.0.0.0';
   const userAgent = requestHeaders.get('user-agent') || 'unknown';
   const signerName = String(data.typedName || profile?.full_name || user.email).trim();
 
@@ -49,7 +63,37 @@ export async function signAgreement(data: {
     tenantId: profile?.tenant_id || undefined,
   });
 
-  return result.success
-    ? { success: true, id: result.id, alreadyExists: result.alreadyExists, timestamp: new Date().toISOString() }
-    : { success: false, error: result.error || 'Agreement could not be recorded.' };
+  if (!result.success)
+    return { success: false, error: result.error || 'Agreement could not be recorded.' };
+
+  if (data.agreementType === 'program_holder_mou' && profile?.program_holder_id) {
+    const db = await requireAdminClient();
+    const signedAt = new Date().toISOString();
+    const { error: holderError } = await db
+      .from('program_holders')
+      .update({
+        mou_signed: true,
+        mou_signed_at: signedAt,
+        mou_holder_signed_at: signedAt,
+        mou_holder_name: signerName,
+        mou_status: 'signed',
+        status: 'active',
+        updated_at: signedAt,
+      })
+      .eq('id', profile.program_holder_id);
+    if (holderError)
+      return {
+        success: false,
+        error:
+          'The signature was recorded, but the Program Holder record could not be activated. Please contact support.',
+      };
+    await checkAndSendOnboardingCompleteEmail(db, user.id);
+  }
+
+  return {
+    success: true,
+    id: result.id,
+    alreadyExists: result.alreadyExists,
+    timestamp: new Date().toISOString(),
+  };
 }

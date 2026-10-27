@@ -27,6 +27,7 @@ describe('admin monitoring routes', () => {
     }
     const src = readFileSync(errorsPath, 'utf8');
     expect(src).toContain('errors,');
-    expect(src).toContain('auditFailures: rows');
+    expect(src).toContain('auditFailures: normalizedFailures');
+    expect(src).toContain('const errors = normalizedFailures.map');
   });
 });

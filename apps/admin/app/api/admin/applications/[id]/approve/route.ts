@@ -52,12 +52,15 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
 
     let resolvedProgramId = program_id || application.program_id || null;
     const programSlug = application.program_slug || application.program_interest || null;
+    const normalizedProgramSlug = typeof programSlug === 'string'
+      ? programSlug.trim().toLowerCase().replace(/\s+/g, '-')
+      : null;
 
-    if (!resolvedProgramId && programSlug) {
+    if (!resolvedProgramId && normalizedProgramSlug) {
       const { data: programRow, error: programError } = await db
         .from('programs')
         .select('id')
-        .eq('slug', programSlug)
+        .eq('slug', normalizedProgramSlug)
         .maybeSingle();
 
       if (programError) {

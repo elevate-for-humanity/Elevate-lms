@@ -3,6 +3,7 @@
  * Returns deterministic build identity and never caches the response.
  */
 import { NextResponse } from 'next/server';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { getBuildTimestamp } from '@/lib/version/getAppVersion';
 
 export const runtime = 'nodejs';
@@ -24,7 +25,7 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      service: 'marketing',
+      service: getPublicRuntimeService(),
       commitSha,
       buildId,
       builtAt: getBuildTimestamp(),

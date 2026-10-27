@@ -26,6 +26,7 @@ import {
   getLearnerCompetencyStatus,
   allCriticalCompetenciesAchieved,
 } from '@/lib/course-builder/competency-mapper';
+import { evaluateCriticalCompetencyStatus } from '@/lib/course-completion';
 import { computeCertificateHours } from '@/lib/course-builder/hours-engine';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -236,13 +237,17 @@ export async function checkCertificateGate(
     courseId,
     programSlug,
   });
-  const criticalUnachieved = competencyStatuses.filter(
-    (s) => s.isCritical && s.status !== 'achieved',
+  const criticalKeys = competencyStatuses
+    .filter((status) => status.isCritical)
+    .map((status) => status.key);
+  const criticalStatus = evaluateCriticalCompetencyStatus(
+    criticalKeys,
+    competencyStatuses.map((status) => ({ competency_key: status.key, status: status.status })),
   );
 
-  if (criticalUnachieved.length > 0) {
+  if (!criticalStatus.satisfied) {
     blockers.push(
-      `${criticalUnachieved.length} critical competency(ies) not yet achieved: ${criticalUnachieved.map((c) => c.key).join(', ')}`,
+      `${criticalStatus.missingKeys.length} critical competency(ies) not yet achieved: ${criticalStatus.missingKeys.join(', ')}`,
     );
   }
 
@@ -344,7 +349,11 @@ export async function issueProgramCertificate(
     .maybeSingle();
 
   if (certErr) {
-    logger.error('[cert-compiler] Insert failed', undefined, { userId, courseId, error: certErr.message });
+    logger.error('[cert-compiler] Insert failed', undefined, {
+      userId,
+      courseId,
+      error: certErr.message,
+    });
     return { success: false, alreadyIssued: false, error: certErr.message };
   }
 

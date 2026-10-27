@@ -23,31 +23,41 @@ export default async function VerifyIdentityPage() {
   if (!user) redirect('/login?redirect=/onboarding/learner/verify-identity');
 
   const supabase = await requireAdminClient();
-  const [{ data: idDocs }, ssnOnFile] = await Promise.all([
+  const [{ data: idDocs }, { data: providerVerification }, ssnOnFile] = await Promise.all([
     supabase
       .from('documents')
       .select('id, status, verification_status, created_at, metadata')
       .eq('user_id', user.id)
       .eq('document_type', 'photo_id')
       .order('created_at', { ascending: false }),
+    supabase
+      .from('id_verifications')
+      .select('id,status,provider,created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     hasSSNOnFile(user.id),
   ]);
 
   const documents = idDocs ?? [];
-  const isVerified =
-    ssnOnFile &&
-    documents.some((doc) =>
-      ['approved', 'verified'].includes(
-        String(doc.verification_status || doc.status || '').toLowerCase(),
-      ),
-    );
-  const isPending =
+  const providerVerified = ['approved', 'verified'].includes(String(providerVerification?.status || '').toLowerCase());
+  const approvedParts = new Set(
+    documents
+      .filter((doc) => ['approved', 'verified'].includes(String(doc.verification_status || doc.status || '').toLowerCase()))
+      .map((doc: any) => String(doc.metadata?.identity_part || '').toLowerCase())
+      .filter(Boolean),
+  );
+  const documentPackageVerified = approvedParts.has('front') && approvedParts.has('selfie') &&
+    (approvedParts.has('back') || documents.some((doc: any) => String(doc.metadata?.id_type || '').toLowerCase() === 'passport'));
+  const isVerified = ssnOnFile && (providerVerified || documentPackageVerified);
+  const isPending = providerVerification?.status === 'processing' || (
     ssnOnFile &&
     documents.some((doc) =>
       ['pending', 'pending_review', 'submitted', 'under_review'].includes(
         String(doc.verification_status || doc.status || '').toLowerCase(),
       ),
-    );
+    ));
 
   return (
     <div className="min-h-screen bg-white text-slate-950">
@@ -93,6 +103,10 @@ export default async function VerifyIdentityPage() {
               Continue onboarding
             </Link>
           </div>
+        ) : providerVerified ? (
+          <div className="mt-8">
+            <SecureIdentityVerificationForm providerVerified />
+          </div>
         ) : isPending ? (
           <div className="mt-8 rounded-xl border border-amber-300 bg-amber-50 p-6">
             <h2 className="text-xl font-black text-amber-950">Identity review pending</h2>
@@ -109,8 +123,14 @@ export default async function VerifyIdentityPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-8">
-            <SecureIdentityVerificationForm />
+          <div className="mt-8 space-y-6">
+            <section className="rounded-xl border border-blue-200 bg-blue-50 p-6">
+              <h2 className="text-xl font-black text-blue-950">Secure document review</h2>
+              <p className="mt-2 text-sm leading-6 text-blue-900">
+                Submit your ID and selfie securely for authorized staff review. Your verification remains pending until that review is complete.
+              </p>
+              <div className="mt-6"><SecureIdentityVerificationForm /></div>
+            </section>
           </div>
         )}
       </div>

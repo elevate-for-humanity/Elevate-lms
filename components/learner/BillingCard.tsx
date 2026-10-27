@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { CreditCard, AlertCircle, Clock, DollarSign, CalendarDays } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -14,13 +14,19 @@ export interface BillingSummary {
   nextPaymentDate: string | null;
   fullyPaid: boolean;
   setupFeePaid: boolean;
+  hasSubscription: boolean;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   active: {
     label: 'Active',
     color: 'bg-brand-green-100 text-brand-green-800',
-    icon: <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />,
+    icon: (
+      <span
+        className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+        aria-hidden="true"
+      />
+    ),
   },
   past_due: {
     label: 'Payment Due',
@@ -40,7 +46,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
   paid_in_full: {
     label: 'Paid in Full',
     color: 'bg-brand-green-100 text-brand-green-800',
-    icon: <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />,
+    icon: (
+      <span
+        className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+        aria-hidden="true"
+      />
+    ),
   },
   pending_payment_method: {
     label: 'Setup Pending',
@@ -68,10 +79,13 @@ function fmtDate(iso: string | null): string {
   });
 }
 
-export default function BillingCard({ billing }: { billing: BillingSummary }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
+export default function BillingCard({
+  billing,
+  readOnly = false,
+}: {
+  billing: BillingSummary;
+  readOnly?: boolean;
+}) {
   const statusCfg = STATUS_CONFIG[billing.paymentStatus] ?? {
     label: billing.paymentStatus,
     color: 'bg-slate-100 text-slate-700',
@@ -83,28 +97,6 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
     billing.fullTuitionAmount !== null && billing.remainingBalance !== null
       ? billing.fullTuitionAmount - billing.remainingBalance
       : null;
-
-  async function handleUpdatePayment() {
-    setLoading(true);
-    setError('');
-    try {
-      const endpoint =
-        billing.program === 'barber'
-          ? '/api/barber/update-payment'
-          : '/api/cosmetology/update-payment';
-      const res = await fetch(endpoint, { method: 'POST' });
-      const json = await res.json();
-      if (!res.ok) {
-        setError(json.error ?? 'Unable to open billing portal. Please contact support.');
-        return;
-      }
-      window.location.href = json.url;
-    } catch {
-      setError('Unable to reach the billing portal. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200">
@@ -147,6 +139,24 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
         </div>
 
         <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Enrollment Deposit Paid</span>
+          <span className="font-semibold text-brand-green-700">
+            {billing.setupFeePaid ? fmtDollars(billing.amountPaidAtCheckout) : 'Not paid'}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Automatic Drafts</span>
+          <span
+            className={`font-semibold ${billing.hasSubscription ? 'text-brand-green-700' : 'text-red-700'}`}
+          >
+            {billing.hasSubscription
+              ? 'PayPal agreement active'
+              : 'Release and PayPal approval required'}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
           <span className="text-slate-600">Remaining Balance</span>
           <span
             className={`font-semibold ${
@@ -163,10 +173,7 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
             <div className="flex justify-between text-xs text-slate-500 mb-1">
               <span>Tuition progress</span>
               <span>
-                {Math.round(
-                  ((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100,
-                )}
-                %
+                {Math.round(((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100)}%
               </span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-2">
@@ -175,9 +182,7 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
                 style={{
                   width: `${Math.min(
                     100,
-                    Math.round(
-                      ((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100,
-                    ),
+                    Math.round(((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100),
                   )}%`,
                 }}
               />
@@ -192,9 +197,7 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
               <CalendarDays className="w-4 h-4 text-slate-400" />
               Next Payment
             </span>
-            <span className="font-semibold text-slate-900">
-              {fmtDate(billing.nextPaymentDate)}
-            </span>
+            <span className="font-semibold text-slate-900">{fmtDate(billing.nextPaymentDate)}</span>
           </div>
         )}
 
@@ -203,7 +206,7 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
           <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
-              Your payment is past due. Update your payment method below to avoid suspension.
+              Your payment is past due. Review the billing agreement below or contact support.
             </span>
           </div>
         )}
@@ -213,7 +216,10 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
               Your account is suspended due to non-payment. Call{' '}
-              <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="font-semibold underline">
+              <a
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                className="font-semibold underline"
+              >
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>{' '}
               to restore access.
@@ -221,21 +227,36 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
           </div>
         )}
 
-        {/* Error */}
-        {error && (
-          <p className="text-xs text-red-600 bg-red-50 rounded p-2">{error}</p>
+        {/* PayPal owns recurring collection; QuickBooks records the accounting entry. */}
+        {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && !readOnly && (
+          <div className="space-y-3 pt-2">
+            {!billing.hasSubscription && !billing.setupFeePaid && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
+                Complete the enrollment deposit first. The recurring-payment release and PayPal
+                approval become available after the deposit is recorded.
+              </div>
+            )}
+            {!billing.hasSubscription && billing.setupFeePaid && (
+              <p className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
+                Upload the signed recurring-payment release, then approve the PayPal billing
+                agreement. PayPal collects the scheduled amount automatically and QuickBooks records
+                the payment; you do not pay a separate invoice each week.
+              </p>
+            )}
+            <Link
+              href="/lms/documents"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
+            >
+              <CreditCard className="w-4 h-4" />
+              {billing.hasSubscription ? 'Review Billing Documents' : 'Complete PayPal Authorization'}
+            </Link>
+          </div>
         )}
-
-        {/* Update payment method — only if not paid in full and has Stripe */}
-        {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && (
-          <button
-            onClick={handleUpdatePayment}
-            disabled={loading}
-            className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
-          >
-            <CreditCard className="w-4 h-4" />
-            {loading ? 'Opening portal…' : 'Update Payment Method'}
-          </button>
+        {readOnly && !billing.fullyPaid && !billing.hasSubscription && billing.setupFeePaid && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
+            Admin preview is read-only. The learner will see the recurring-payment release and
+            PayPal approval steps after the enrollment deposit is paid.
+          </div>
         )}
       </div>
     </div>

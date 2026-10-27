@@ -1,8 +1,7 @@
 name: Business Course Builder Draft Bootstrap
 
 on:
-  issues:
-    types: [opened, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read

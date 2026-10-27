@@ -44,7 +44,7 @@ const process = [
 
 export default function AccessibilityPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <main className="min-h-screen bg-white text-slate-900">
       <div className="border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Accessibility Statement' }]} />
@@ -121,6 +121,6 @@ export default function AccessibilityPage() {
           </div>
         </section>
       </section>
-    </div>
+    </main>
   );
 }

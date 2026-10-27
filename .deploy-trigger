@@ -1,1 +1,4 @@
-2026-08-20T01:59:36Z
+Marketing deployment trigger
+Target: current main
+Reason: deploy responsive homepage media and hardened production verification
+Timestamp marker: 2026-10-02T17:17:00-04:00

@@ -7,7 +7,7 @@
  *
  * Examples:
  *   pnpm tsx scripts/course-builder/run.ts --course entrepreneurship
- *   pnpm tsx scripts/course-builder/run.ts --course barber-apprenticeship
+ *   pnpm tsx scripts/course-builder/run.ts --course barber-apprenticeship --authorize-paid-inference
  *   pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --validate
  */
 
@@ -15,6 +15,7 @@ import * as dotenv from 'dotenv';
 import { courseFactory } from '../../lib/course-factory';
 import type { BuildMode } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
+import { runWithPaidInferenceContext } from '../../lib/ai/paid-inference-context';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
 dotenv.config({ path: '.env.local' });
@@ -130,7 +131,24 @@ async function main() {
   }, null, 2));
 }
 
-main().catch((error) => {
+const dryRun = args.includes('--validate') || args.includes('--dry-run');
+const paidInferenceAuthorized = args.includes('--authorize-paid-inference');
+const programSlug = valueAfter('--course');
+
+const execution = dryRun
+  ? main()
+  : paidInferenceAuthorized
+    ? runWithPaidInferenceContext(
+        `course-builder-cli:${programSlug ?? 'unknown'}:${Date.now()}`,
+        main,
+      )
+    : Promise.reject(
+        new Error(
+          'Paid Course Builder execution requires --authorize-paid-inference. Validation and dry runs remain free.',
+        ),
+      );
+
+execution.catch((error) => {
   console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 });

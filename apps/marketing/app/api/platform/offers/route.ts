@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import { resolveWebsiteOwnerContext } from '@/lib/websites/resolve-website-owner-context';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getMarketplaceBillingReadiness } from '@/lib/billing/marketplace-readiness';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,20 +52,8 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query.order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: 'Could not load offers.' }, { status: 500 });
 
-  const { data: account } = await db
-    .from('organization_payment_accounts')
-    .select('id,status,charges_enabled,stripe_account_id')
-    .eq('tenant_id', auth.tenantId)
-    .maybeSingle();
-
-  return NextResponse.json({
-    offers: data ?? [],
-    commerce: {
-      ready: Boolean(account?.charges_enabled && account.status === 'active' && account.stripe_account_id),
-      status: account?.status ?? 'not_connected',
-      connectUrl: '/account/payments',
-    },
-  });
+  const commerce = await getMarketplaceBillingReadiness(db);
+  return NextResponse.json({ offers: data ?? [], commerce });
 }
 
 export async function POST(request: NextRequest) {
@@ -102,16 +91,9 @@ export async function POST(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
-  const { data: account } = await db
-    .from('organization_payment_accounts')
-    .select('id,status,charges_enabled,stripe_account_id')
-    .eq('tenant_id', auth.tenantId)
-    .maybeSingle();
-  if (!account?.charges_enabled || account.status !== 'active' || !account.stripe_account_id) {
-    return NextResponse.json({
-      error: 'Connect and finish Stripe onboarding for this website workspace before creating paid offers.',
-      connectUrl: '/account/payments',
-    }, { status: 409 });
+  const commerce = await getMarketplaceBillingReadiness(db);
+  if (!commerce.ready) {
+    return NextResponse.json({ error: 'Marketplace payments are unavailable. The platform administrator must verify the active billing connection before creating paid offers.', commerce }, { status: 409 });
   }
 
   let publicSlug = requestedSlug;

@@ -8,7 +8,7 @@ const requiredFiles = [
   'pnpm-lock.yaml',
   'pnpm-workspace.yaml',
   'Dockerfile.marketing',
-  'Dockerfile.northflank-admin',
+  'Dockerfile.admin',
   'Dockerfile.northflank-lms',
   'apps/marketing/package.json',
   'apps/admin/package.json',

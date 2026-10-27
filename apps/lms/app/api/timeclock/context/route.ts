@@ -2,16 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
+import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
+import { getTimeclockWorkDate, getTimeclockWeekEnding } from '@/lib/timeclock/work-date';
+import { APPRENTICE_TIME_POLICY } from '@/lib/timeclock/policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-type ShopRelation = { id?: string; name?: string | null } | Array<{ id?: string; name?: string | null }> | null;
-
-function relatedShopName(value: ShopRelation): string | null {
-  const row = Array.isArray(value) ? value[0] : value;
-  return row?.name ?? null;
-}
 
 async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -19,60 +18,121 @@ async function _GET(request: NextRequest) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  const isAdmin = ['admin', 'super_admin'].includes(profile?.role ?? '');
-
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
-    .select('id, shop_id, employer_id')
-    .eq('user_id', user.id)
+    .select('id, user_id, program_id, shop_id, employer_id, created_at')
+    .eq('user_id', subject.userId)
     .maybeSingle();
   const apprenticeSiteScopeId = apprentice?.shop_id || apprentice?.employer_id || null;
+  const { data: identityDocuments } = apprentice
+    ? await db
+        .from('documents')
+        .select('document_type,status,verification_status,verified,metadata')
+        .eq('user_id', subject.userId)
+        .eq('document_type', 'photo_id')
+    : { data: [] };
+  const { data: providerIdentity } = apprentice
+    ? await db
+        .from('id_verifications')
+        .select('id')
+        .eq('user_id', subject.userId)
+        .in('status', ['approved', 'verified'])
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+  const identity = evaluateIdentityClockEligibility(
+    apprentice?.created_at,
+    identityDocuments || [],
+    Boolean(providerIdentity),
+  );
 
-  let sitesQuery = supabase
-    .from('work_sites')
-    .select(`
-      id,
-      name,
-      latitude,
-      longitude,
-      radius_meters,
-      shop_id,
-      shops:shop_id (
-        id,
-        name
-      )
-    `)
-    .eq('is_active', true);
+  // The action endpoint validates apprentice_sites.id, so the context must
+  // return that same canonical site identity. Returning shops.id here makes the
+  // UI look configured but every clock action fail with "Site not found".
+  const { data: sites } = apprenticeSiteScopeId
+    ? await db
+        .from('apprentice_sites')
+        .select('id,name,latitude,longitude,radius_meters,shop_id,partner_id,is_active')
+        .eq('shop_id', apprenticeSiteScopeId)
+        .eq('is_active', true)
+    : { data: [] };
+  const allowedSites = (sites || [])
+    .filter(
+      (site: any) =>
+        Number.isFinite(Number(site.latitude)) &&
+        Number.isFinite(Number(site.longitude)) &&
+        Number.isFinite(Number(site.radius_meters)) &&
+        Number(site.radius_meters) > 0,
+    )
+    .map((site: any) => ({
+      id: site.id,
+      name: site.name || 'Approved Host Shop',
+      lat: Number(site.latitude),
+      lng: Number(site.longitude),
+      radius_m: Number(site.radius_meters),
+      shopId: site.shop_id,
+    }));
 
-  if (!isAdmin && apprenticeSiteScopeId) {
-    sitesQuery = sitesQuery.eq('shop_id', apprenticeSiteScopeId);
-  } else if (!isAdmin) {
-    sitesQuery = sitesQuery.eq('id', '00000000-0000-0000-0000-000000000000');
-  }
-
-  const { data: sites } = await sitesQuery;
-  const allowedSites = (sites || []).map((site: any) => ({
-    id: site.id,
-    name: site.name || relatedShopName(site.shops as ShopRelation) || 'Unknown Site',
-    lat: site.latitude,
-    lng: site.longitude,
-    radius_m: site.radius_meters || 100,
-    shopId: site.shop_id,
-  }));
+  const { data: enrollment } = await db.from('program_enrollments')
+    .select('program_slug,program_id').eq('user_id', subject.userId)
+    .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  const { data: program } = enrollment?.program_id
+    ? await db.from('programs').select('name').eq('id', enrollment.program_id).maybeSingle()
+    : { data: null };
+  const { data: approvedHours } = await db.from('hour_entries')
+    .select('accepted_hours,hours_claimed').eq('user_id', subject.userId).eq('status', 'approved');
+  const hoursCompleted = (approvedHours || []).reduce((sum: number, row: any) => sum + Number(row.accepted_hours || row.hours_claimed || 0), 0);
 
   let activeShift = null;
+  let weeklyOjlHours = 0;
+  let weeklyTheoryRecordedHours = 0;
+  let weeklyTheoryVerifiedHours = 0;
   if (apprentice) {
-    const { data: shift } = await supabase
+    const workDate = getTimeclockWorkDate();
+    const weekEnding = getTimeclockWeekEnding(workDate);
+    const weekStart = new Date(`${weekEnding}T12:00:00Z`);
+    weekStart.setUTCDate(weekStart.getUTCDate() - 6);
+    const weekStartDate = weekStart.toISOString().slice(0, 10);
+    const [{ data: weeklyEntries }, { data: weeklyTheory }, { data: weeklyTheorySessions }] = await Promise.all([
+      db.from('progress_entries')
+        .select('hours_worked')
+        .eq('apprentice_id', apprentice.id)
+        .gte('work_date', weekStartDate)
+        .lte('work_date', weekEnding)
+        .not('clock_out_at', 'is', null),
+      db.from('apprenticeship_rti_entries')
+        .select('minutes_verified')
+        .eq('user_id', subject.userId)
+        .eq('status', 'verified')
+        .gte('instruction_date', weekStartDate)
+        .lte('instruction_date', weekEnding),
+      db.from('theory_activity_sessions')
+        .select('active_seconds')
+        .eq('user_id', subject.userId)
+        .eq('week_ending', weekEnding),
+    ]);
+    weeklyOjlHours = (weeklyEntries || []).reduce(
+      (sum: number, row: any) => sum + Number(row.hours_worked || 0),
+      0,
+    );
+    weeklyTheoryVerifiedHours = (weeklyTheory || []).reduce(
+      (sum: number, row: any) => sum + Number(row.minutes_verified || 0) / 60,
+      0,
+    );
+    weeklyTheoryRecordedHours = (weeklyTheorySessions || []).reduce(
+      (sum: number, row: any) => sum + Number(row.active_seconds || 0) / 3600,
+      0,
+    );
+    const { data: shift } = await db
       .from('progress_entries')
       .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
       .eq('apprentice_id', apprentice.id)
+      .eq('work_date', workDate)
+      .not('clock_in_at', 'is', null)
       .is('clock_out_at', null)
       .order('clock_in_at', { ascending: false })
       .limit(1)
@@ -83,9 +143,45 @@ async function _GET(request: NextRequest) {
   return NextResponse.json({
     success: true,
     apprenticeId: apprentice?.id ?? null,
+    userId: subject.userId,
+    programId: enrollment?.program_id ?? apprentice?.program_id ?? null,
+    programName: program?.name || String(enrollment?.program_slug || '').replace(/-/g, ' '),
+    partnerId: apprenticeSiteScopeId,
+    defaultSiteId: allowedSites[0]?.id ?? null,
     allowedSites,
-    activeShift,
-    canClock: Boolean(apprentice || isAdmin),
+    hoursCompleted,
+    hoursRequired: getApprenticeshipRequiredHours(enrollment?.program_slug ?? null) ?? 0,
+    activeShift: activeShift
+      ? {
+          entryId: activeShift.id,
+          clockInAt: activeShift.clock_in_at,
+          lunchStartAt: activeShift.lunch_start_at,
+          lunchEndAt: activeShift.lunch_end_at,
+          siteId: activeShift.site_id,
+        }
+      : null,
+    weeklyOjlHours: Math.round(weeklyOjlHours * 100) / 100,
+    weeklyTheoryRecordedHours: Math.round(weeklyTheoryRecordedHours * 100) / 100,
+    weeklyTheoryVerifiedHours: Math.round(weeklyTheoryVerifiedHours * 100) / 100,
+    weeklyOjlMaxHours: APPRENTICE_TIME_POLICY.weeklyOjlMaxHours,
+    weeklyTheoryTargetHours: APPRENTICE_TIME_POLICY.weeklyTheoryTargetHours,
+    weeklyTheoryMaxHours: APPRENTICE_TIME_POLICY.weeklyTheoryMaxHours,
+    weeklyCombinedMaxHours: APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours,
+    outsideGeofenceGraceMinutes: APPRENTICE_TIME_POLICY.outsideGeofenceGraceMinutes,
+    canClock: Boolean(apprentice && allowedSites.length && identity.eligible && !subject.previewing && weeklyOjlHours < APPRENTICE_TIME_POLICY.weeklyOjlMaxHours),
+    identityVerification: identity,
+    previewing: subject.previewing,
+    configurationMessage: !apprentice
+      ? 'Apprentice record is not configured.'
+      : !allowedSites.length
+        ? 'Host Shop geofence coordinates must be verified before clock-in is enabled.'
+        : !identity.eligible
+          ? 'Complete secure ID and selfie verification before clock-in is enabled.'
+        : subject.previewing
+          ? 'Admin preview is read-only. The learner can clock in from their own account at the verified Host Shop.'
+          : weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours
+            ? `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`
+          : null,
   });
 }
 

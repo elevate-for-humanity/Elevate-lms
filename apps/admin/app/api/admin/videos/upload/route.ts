@@ -5,16 +5,397 @@ import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
+import { attachLicensedMediaUpload } from '@/lib/course-builder/licensed-media';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MAX_BYTES = 200 * 1024 * 1024;
+// Paid Supabase projects support much larger objects. Keep this aligned with
+// the private course_videos bucket limit so 4K licensed masters are accepted.
+const MAX_BYTES = 1024 * 1024 * 1024;
+const LICENSED_MEDIA_TYPES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const COURSE_VIDEO_ROLES = new Set([
+  'source_broll',
+  'course_preroll',
+  'lesson_preroll',
+  'lesson_outro',
+  'reference',
+]);
 
 function cleanName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/-+/g, '-');
+}
+
+function directStorageUploadEndpoint() {
+  const configuredUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  if (!configuredUrl) throw new Error('Supabase project URL is not configured');
+  const projectUrl = new URL(configuredUrl);
+  const projectRef = projectUrl.hostname.split('.')[0];
+  if (!projectRef) throw new Error('Supabase project URL is invalid');
+  return `https://${projectRef}.storage.supabase.co/storage/v1/upload/resumable`;
+}
+
+type CourseUploadControl = {
+  action?: 'prepare' | 'finalize' | 'prepare-library' | 'finalize-library';
+  title?: string;
+  description?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  courseId?: string;
+  lessonId?: string;
+  storagePath?: string;
+  licensedMatchId?: string;
+  assetRole?: 'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference';
+  providerItemId?: string;
+  provider?: 'envato';
+  sourceUrl?: string;
+  resolution?: string;
+  durationSeconds?: number;
+  programTags?: string[];
+  lessonTags?: string[];
+};
+
+function cleanTags(values: unknown) {
+  if (!Array.isArray(values)) return [];
+  return [
+    ...new Set(values.map((value) => String(value).trim().toLowerCase()).filter(Boolean)),
+  ].slice(0, 40);
+}
+
+async function queueLicensedLessonRender(courseId: string, lessonId: string) {
+  const db = await requireAdminClient();
+  const { data: lesson, error: lessonError } = await db
+    .from('course_lessons')
+    .select('video_config')
+    .eq('id', lessonId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+  if (lessonError || !lesson) {
+    throw lessonError ?? new Error('Lesson not found while preparing its render policy');
+  }
+  const videoConfig =
+    lesson.video_config && typeof lesson.video_config === 'object'
+      ? (lesson.video_config as Record<string, unknown>)
+      : {};
+  const { error: policyError } = await db
+    .from('course_lessons')
+    .update({
+      video_config: {
+        ...videoConfig,
+        allow_paid_narration: true,
+        narration_locked: true,
+      },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', lessonId)
+    .eq('course_id', courseId);
+  if (policyError) throw policyError;
+
+  // Always pass through Course Factory. It refreshes the canonical job's
+  // locked narration policy as well as requeueing it; directly resetting a
+  // legacy job can preserve the obsolete Edge route that now returns 403.
+  const queued = await queueCourseMedia({
+    courseId,
+    lessonId,
+    onlyMissing: false,
+    force: true,
+  });
+  if (queued.queued < 1 && queued.alreadyActive < 1 && queued.lessonVideosReady < 1) {
+    throw new Error('Canonical lesson video job was not queued');
+  }
+  return queued;
+}
+
+async function controlCourseUpload(
+  input: CourseUploadControl,
+  userId: string,
+  request: NextRequest,
+) {
+  const title = String(input.title ?? '').trim();
+  const courseId = String(input.courseId ?? '').trim();
+  const lessonId = String(input.lessonId ?? '').trim();
+  const fileName = cleanName(String(input.fileName ?? '').trim());
+  const fileType = String(input.fileType ?? '').trim();
+  const fileSize = Number(input.fileSize ?? 0);
+  const assetRole = input.licensedMatchId ? 'source_broll' : (input.assetRole ?? 'source_broll');
+  const libraryAction = input.action === 'prepare-library' || input.action === 'finalize-library';
+  const providerItemId = cleanName(String(input.providerItemId ?? '').trim());
+  if (libraryAction) {
+    if (!title || !providerItemId || input.provider !== 'envato') {
+      return NextResponse.json(
+        { error: 'A title, Envato item ID, and provider are required for the licensed library' },
+        { status: 400 },
+      );
+    }
+    if (!fileName || !LICENSED_MEDIA_TYPES.has(fileType) || fileSize <= 0 || fileSize > MAX_BYTES) {
+      return NextResponse.json(
+        { error: 'A valid licensed photo or video file of 1 GB or less is required' },
+        { status: 400 },
+      );
+    }
+    const db = await requireAdminClient();
+    if (input.action === 'prepare-library') {
+      const storagePath = `licensed-library/envato/${providerItemId}/${Date.now()}-${fileName}`;
+      const { data, error } = await db.storage
+        .from('course_videos')
+        .createSignedUploadUrl(storagePath);
+      if (error || !data?.token) {
+        return NextResponse.json(
+          { error: 'Could not prepare the secure licensed-media upload' },
+          { status: 500 },
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        bucket: 'course_videos',
+        storagePath,
+        token: data.token,
+        uploadEndpoint: directStorageUploadEndpoint(),
+      });
+    }
+    const storagePath = String(input.storagePath ?? '');
+    if (!storagePath.startsWith(`licensed-library/envato/${providerItemId}/`)) {
+      return NextResponse.json({ error: 'Invalid licensed-media storage path' }, { status: 400 });
+    }
+    const folder = storagePath.slice(0, storagePath.lastIndexOf('/'));
+    const storedName = storagePath.slice(storagePath.lastIndexOf('/') + 1);
+    const { data: storedFiles, error: verifyError } = await db.storage
+      .from('course_videos')
+      .list(folder, { search: storedName, limit: 2 });
+    const storedFile = storedFiles?.find((file) => file.name === storedName);
+    if (verifyError || !storedFile) {
+      return NextResponse.json(
+        { error: 'Uploaded licensed media could not be verified' },
+        { status: 400 },
+      );
+    }
+    const { data: existing, error: existingError } = await db
+      .from('licensed_media_entitlements')
+      .select('id,metadata')
+      .eq('provider', 'envato')
+      .eq('provider_item_id', providerItemId)
+      .maybeSingle();
+    if (existingError) throw existingError;
+    const existingMetadata =
+      existing?.metadata && typeof existing.metadata === 'object'
+        ? (existing.metadata as Record<string, unknown>)
+        : {};
+    const metadata = {
+      ...existingMetadata,
+      storage_bucket: 'course_videos',
+      storage_path: storagePath,
+      file_name: fileName,
+      mime_type: fileType,
+      file_size: fileSize,
+      resolution: String(input.resolution ?? '').trim() || null,
+      duration_seconds:
+        Number.isFinite(Number(input.durationSeconds)) && Number(input.durationSeconds) > 0
+          ? Number(input.durationSeconds)
+          : null,
+      program_tags: cleanTags(input.programTags),
+      lesson_tags: cleanTags(input.lessonTags),
+      source_url: String(input.sourceUrl ?? '').trim() || null,
+      storage_verified_at: new Date().toISOString(),
+    };
+    const row = {
+      provider: 'envato',
+      provider_item_id: providerItemId,
+      title,
+      item_url: String(input.sourceUrl ?? '').trim() || null,
+      license_type: 'Envato lifetime commercial license',
+      metadata,
+      created_by: userId,
+    };
+    const { data: entitlement, error: entitlementError } = existing
+      ? await db
+          .from('licensed_media_entitlements')
+          .update(row)
+          .eq('id', existing.id)
+          .select('id,title,provider_item_id,license_type,metadata')
+          .single()
+      : await db
+          .from('licensed_media_entitlements')
+          .insert(row)
+          .select('id,title,provider_item_id,license_type,metadata')
+          .single();
+    if (entitlementError) {
+      await db.storage.from('course_videos').remove([storagePath]);
+      throw entitlementError;
+    }
+    await logAdminAudit({
+      action: AdminAction.VIDEO_UPLOADED,
+      actorId: userId,
+      entityType: 'licensed_media_entitlements',
+      entityId: entitlement.id,
+      metadata: { provider: 'envato', provider_item_id: providerItemId, storage_path: storagePath },
+      req: request,
+    });
+    return NextResponse.json({ success: true, entitlement });
+  }
+  if (!title || !courseId || !lessonId || !UUID.test(courseId) || !UUID.test(lessonId)) {
+    return NextResponse.json(
+      { error: 'A valid title, courseId, and lessonId are required' },
+      { status: 400 },
+    );
+  }
+  if (!COURSE_VIDEO_ROLES.has(assetRole)) {
+    return NextResponse.json({ error: 'Unsupported course video placement role' }, { status: 400 });
+  }
+
+  const db = await requireAdminClient();
+  const { data: lesson, error: lessonLookupError } = await db
+    .from('course_lessons')
+    .select('id')
+    .eq('id', lessonId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+  if (lessonLookupError || !lesson) {
+    return NextResponse.json(
+      { error: 'Lesson does not belong to the selected course' },
+      { status: 400 },
+    );
+  }
+
+  if (input.action === 'prepare') {
+    if (!fileName || !fileType.startsWith('video/') || fileSize <= 0 || fileSize > MAX_BYTES) {
+      return NextResponse.json(
+        { error: 'A valid video file of 500 MB or less is required' },
+        { status: 400 },
+      );
+    }
+    const storagePath = `${courseId}/${Date.now()}-${fileName}`;
+    const { data, error } = await db.storage
+      .from('course_videos')
+      .createSignedUploadUrl(storagePath);
+    if (error || !data?.token) {
+      return NextResponse.json(
+        { error: 'Could not prepare the private video upload' },
+        { status: 500 },
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      bucket: 'course_videos',
+      storagePath,
+      token: data.token,
+    });
+  }
+
+  if (input.action !== 'finalize' || !input.storagePath?.startsWith(`${courseId}/`)) {
+    return NextResponse.json({ error: 'Invalid upload finalization request' }, { status: 400 });
+  }
+
+  const storagePath = input.storagePath;
+  const { data: signed, error: signedError } = await db.storage
+    .from('course_videos')
+    .createSignedUrl(storagePath, 60 * 60);
+  if (signedError || !signed?.signedUrl) {
+    return NextResponse.json({ error: 'Uploaded video could not be verified' }, { status: 400 });
+  }
+  const { data: videoData, error: videoError } = await db
+    .from('course_videos')
+    .insert({
+      title,
+      course_id: courseId,
+      lesson_id: lessonId,
+      storage_path: storagePath,
+      generated_by: 'manual',
+      asset_role: assetRole,
+      status: 'ready',
+      created_by: userId,
+    })
+    .select('id,title,course_id,lesson_id,storage_path,status,created_at')
+    .single();
+  if (videoError) {
+    await db.storage.from('course_videos').remove([storagePath]);
+    return NextResponse.json(
+      { error: 'Uploaded video metadata could not be saved' },
+      { status: 500 },
+    );
+  }
+  if (input.licensedMatchId) {
+    try {
+      await attachLicensedMediaUpload({
+        db,
+        matchId: input.licensedMatchId,
+        courseId,
+        lessonId,
+        courseVideoId: videoData.id,
+        actorId: userId,
+      });
+    } catch (matchError) {
+      await db.from('course_videos').delete().eq('id', videoData.id);
+      await db.storage.from('course_videos').remove([storagePath]);
+      return NextResponse.json({ error: toErrorMessage(matchError) }, { status: 400 });
+    }
+  }
+  const shouldRenderLesson = assetRole === 'source_broll';
+  const { error: lessonError } = await db
+    .from('course_lessons')
+    .update({
+      ...(shouldRenderLesson
+        ? {
+            media_origin: 'uploaded',
+            media_quality_status: 'pending',
+            video_status: 'queued',
+            video_error: null,
+          }
+        : {}),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', lessonId)
+    .eq('course_id', courseId);
+  if (lessonError) {
+    await db.from('course_videos').delete().eq('id', videoData.id);
+    await db.storage.from('course_videos').remove([storagePath]);
+    return NextResponse.json(
+      { error: 'Uploaded video could not be linked to its lesson' },
+      { status: 500 },
+    );
+  }
+  try {
+    if (shouldRenderLesson) await queueLicensedLessonRender(courseId, lessonId);
+  } catch (queueError) {
+    await db
+      .from('course_lessons')
+      .update({
+        video_status: 'failed',
+        video_error: `Licensed footage saved, but render queue failed: ${toErrorMessage(queueError)}`,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', lessonId)
+      .eq('course_id', courseId);
+    return NextResponse.json(
+      { error: 'Video was saved, but its lesson render could not be queued' },
+      { status: 500 },
+    );
+  }
+  await logAdminAudit({
+    action: AdminAction.VIDEO_UPLOADED,
+    actorId: userId,
+    entityType: 'course_videos',
+    entityId: videoData.id,
+    metadata: {
+      file_name: fileName,
+      course_id: courseId,
+      lesson_id: lessonId,
+      licensed_match_id: input.licensedMatchId ?? null,
+      asset_role: assetRole,
+    },
+    req: request,
+  });
+  return NextResponse.json({ success: true, url: signed.signedUrl, video: videoData });
 }
 
 const _POST = withAuth(
@@ -23,6 +404,9 @@ const _POST = withAuth(
     if (rateLimited) return rateLimited;
 
     try {
+      if (request.headers.get('content-type')?.includes('application/json')) {
+        return controlCourseUpload((await request.json()) as CourseUploadControl, user.id, request);
+      }
       const formData = await request.formData();
       const file = formData.get('file');
       const title = String(formData.get('title') ?? '').trim();
@@ -59,7 +443,13 @@ const _POST = withAuth(
       const folder = isCourseVideo ? courseId || 'unassigned' : 'public';
       const storagePath = `${folder}/${Date.now()}-${cleanName(file.name)}`;
 
-      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, file, {
+      // Supabase's Node storage client expects bytes/Blob data. Passing the
+      // undici File returned by NextRequest.formData() is unreliable in the
+      // production runtime and was causing valid MP4 uploads to fail before an
+      // object was ever created.
+      const fileBytes = Buffer.from(await file.arrayBuffer());
+
+      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, fileBytes, {
         contentType: file.type,
         upsert: false,
       });
@@ -75,6 +465,7 @@ const _POST = withAuth(
             course_id: courseId || null,
             lesson_id: lessonId || null,
             storage_path: storagePath,
+            duration_seconds: null,
             generated_by: 'manual',
             status: 'ready',
             created_by: user.id,
@@ -91,7 +482,52 @@ const _POST = withAuth(
           .from(bucket)
           .createSignedUrl(storagePath, 60 * 60);
         if (signedError || !signed?.signedUrl) {
-          return NextResponse.json({ error: 'Course video saved but playback URL could not be created' }, { status: 500 });
+          return NextResponse.json(
+            { error: 'Course video saved but playback URL could not be created' },
+            { status: 500 },
+          );
+        }
+
+        // lesson_id is the durable association. The video worker resolves a
+        // fresh signed URL from this row at render time, so private licensed
+        // footage never depends on an expired URL stored in scene_data.
+        if (lessonId) {
+          const { error: lessonError } = await db
+            .from('course_lessons')
+            .update({
+              media_origin: 'uploaded',
+              media_quality_status: 'pending',
+              video_status: 'queued',
+              video_error: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', lessonId)
+            .eq('course_id', courseId);
+          if (lessonError) {
+            await db.from('course_videos').delete().eq('id', videoData.id);
+            await db.storage.from(bucket).remove([storagePath]);
+            return NextResponse.json(
+              { error: 'Video uploaded but lesson linking failed' },
+              { status: 500 },
+            );
+          }
+          try {
+            await queueLicensedLessonRender(courseId, lessonId);
+          } catch (queueError) {
+            await db
+              .from('course_lessons')
+              .update({
+                video_status: 'failed',
+                video_error: `Licensed footage saved, but render queue failed: ${toErrorMessage(queueError)}`,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', lessonId)
+              .eq('course_id', courseId);
+            return NextResponse.json(
+              { error: 'Video was saved, but its lesson render could not be queued' },
+              { status: 500 },
+            );
+          }
         }
 
         await logAdminAudit({
@@ -99,7 +535,11 @@ const _POST = withAuth(
           actorId: user.id,
           entityType: 'course_videos',
           entityId: videoData.id,
-          metadata: { file_name: file.name, course_id: courseId || null, lesson_id: lessonId || null },
+          metadata: {
+            file_name: file.name,
+            course_id: courseId || null,
+            lesson_id: lessonId || null,
+          },
           req: request,
         });
 

@@ -19,13 +19,19 @@ import {
   ExternalLink,
   Settings,
 } from 'lucide-react';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import {
+  RUNTIME_INTEGRATIONS,
+  runtimeConfiguration,
+  runtimeRequirementPresent,
+} from '@/lib/integrations/runtime-status';
 
 export const metadata: Metadata = {
   title: 'Integrations | Admin | Elevate For Humanity',
   alternates: { canonical: 'https://admin.elevateforhumanity.org/integrations' },
 };
 
-type IntegrationStatus = 'active' | 'configured' | 'not_configured';
+type IntegrationStatus = 'configured' | 'partial' | 'not_configured';
 
 interface Integration {
   name: string;
@@ -41,9 +47,9 @@ interface Integration {
 
 function getStatus(envVars: string[]): IntegrationStatus {
   const allSet = envVars.every((v) => !!process.env[v]);
-  if (allSet && envVars.length > 0) return 'active';
+  if (allSet && envVars.length > 0) return 'configured';
   const someSet = envVars.some((v) => !!process.env[v]);
-  if (someSet) return 'configured';
+  if (someSet) return 'partial';
   return 'not_configured';
 }
 
@@ -107,7 +113,8 @@ const INTEGRATIONS: Integration[] = [
   {
     name: 'Stripe',
     slug: 'stripe',
-    description: 'Payment processing for licensing, course purchases, and subscription billing. Klarna, Afterpay, Zip, and Cash App Pay enabled.',
+    description:
+      'Payment processing for licensing, course purchases, and subscription billing. Eligible payment methods are selected dynamically from the live Stripe payment configuration.',
     icon: CreditCard,
     category: 'payments',
     envVars: ['STRIPE_SECRET_KEY', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET'],
@@ -117,7 +124,8 @@ const INTEGRATIONS: Integration[] = [
   {
     name: 'Affirm',
     slug: 'affirm',
-    description: 'Standalone BNPL — monthly installment financing at 0–36% APR over 3–36 months. No Stripe required.',
+    description:
+      'Standalone BNPL — monthly installment financing at 0–36% APR over 3–36 months. No Stripe required.',
     icon: CreditCard,
     category: 'payments',
     envVars: ['AFFIRM_PUBLIC_KEY', 'AFFIRM_PRIVATE_KEY'],
@@ -168,14 +176,27 @@ const INTEGRATIONS: Integration[] = [
     configUrl: '/integrations/gemini',
   },
   {
+    name: 'Intuit for Education / Edlink',
+    slug: 'edlink',
+    description:
+      'Connect Intuit for Education to Elevate for class rostering and learning-data exchange. Configuration stays disabled until Edlink credentials and a verified OneRoster or LTI connection are present.',
+    icon: GraduationCap,
+    category: 'learning',
+    envVars: ['EDLINK_CLIENT_ID', 'EDLINK_CLIENT_SECRET', 'EDLINK_CONNECTION_ID'],
+    status: 'not_configured',
+    configUrl: '/integrations/edlink',
+    docsUrl: 'https://ed.link/docs/providers',
+  },
+  {
     name: 'LTI 1.3',
     slug: 'lti',
     description:
-      'Learning Tools Interoperability — allows Canvas, Moodle, and other LMS platforms to embed Elevate courses. Config URL: /api/lti/config · JWKS: /api/lti/jwks · Launch: /api/lti/launch',
+      'Direct LTI 1.3 is not production-active. Platform registration records exist, but Core launch, key management, Names and Roles, and grade services must pass external certification before activation.',
     icon: GraduationCap,
     category: 'learning',
-    envVars: ['LTI_TOOL_URL', 'LTI_PLATFORM_JWKS_URI', 'LTI_CLIENT_ID'],
+    envVars: [],
     status: 'not_configured',
+    configUrl: '/partners/lms-integrations',
     docsUrl: 'https://www.imsglobal.org/spec/lti/v1p3/',
   },
   {
@@ -206,8 +227,12 @@ const statusConfig: Record<
   IntegrationStatus,
   { label: string; color: string; Icon: typeof CheckCircle2 }
 > = {
-  active: { label: 'Active', color: 'bg-brand-green-100 text-brand-green-700', Icon: CheckCircle2 },
-  configured: { label: 'Partial', color: 'bg-amber-100 text-amber-700', Icon: AlertCircle },
+  configured: {
+    label: 'Configured',
+    color: 'bg-brand-green-100 text-brand-green-700',
+    Icon: CheckCircle2,
+  },
+  partial: { label: 'Partial', color: 'bg-amber-100 text-amber-700', Icon: AlertCircle },
   not_configured: { label: 'Not Configured', color: 'bg-slate-100 text-slate-500', Icon: XCircle },
 };
 
@@ -222,13 +247,23 @@ const categoryLabels: Record<string, string> = {
 
 export default async function AdminIntegrationsPage() {
   await requireRole(['admin', 'staff']);
-  const integrations = INTEGRATIONS.map((i) => ({
-    ...i,
-    status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status,
-  }));
+  await hydrateProcessEnv();
+  const canonicalIds = new Set(RUNTIME_INTEGRATIONS.map((item) => item.id));
+  const integrations = INTEGRATIONS.map((i) => {
+    if (!canonicalIds.has(i.slug)) {
+      return { ...i, status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status };
+    }
+    const runtime = runtimeConfiguration(i.slug);
+    const status: IntegrationStatus = runtime.configured
+      ? 'configured'
+      : runtime.partial
+        ? 'partial'
+        : 'not_configured';
+    return { ...i, status };
+  });
 
-  const activeCount = integrations.filter((i) => i.status === 'active').length;
   const configuredCount = integrations.filter((i) => i.status === 'configured').length;
+  const partialCount = integrations.filter((i) => i.status === 'partial').length;
 
   const categories = Object.entries(
     integrations.reduce<Record<string, Integration[]>>((acc, i) => {
@@ -251,9 +286,8 @@ export default async function AdminIntegrationsPage() {
           <div>
             <p className="text-sm font-semibold text-slate-900">Environment Manager</p>
             <p className="mt-0.5 text-xs text-slate-600">
-              API keys (Groq, OpenAI, Stripe, Supabase, email) stored in{' '}
-              <code className="rounded bg-white px-1">platform_settings</code> — powers Ellie, course
-              builder, and integrations below.
+              Review the effective runtime configuration. Secret values remain in the protected
+              secret store and are never displayed or saved as plaintext settings.
             </p>
           </div>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-blue-700">
@@ -269,13 +303,13 @@ export default async function AdminIntegrationsPage() {
             <p className="text-3xl font-bold text-slate-900">{integrations.length}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <p className="text-sm text-slate-500 mb-1">Active</p>
-            <p className="text-3xl font-bold text-brand-green-600">{activeCount}</p>
+            <p className="text-sm text-slate-500 mb-1">Configured</p>
+            <p className="text-3xl font-bold text-brand-green-600">{configuredCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <p className="text-sm text-slate-500 mb-1">Needs Setup</p>
             <p className="text-3xl font-bold text-slate-400">
-              {integrations.length - activeCount - configuredCount}
+              {integrations.length - configuredCount - partialCount}
             </p>
           </div>
         </div>
@@ -330,14 +364,14 @@ export default async function AdminIntegrationsPage() {
                         </a>
                       )}
                     </div>
-                    {integration.status !== 'active' && integration.envVars.length > 0 && (
+                    {integration.status !== 'configured' && integration.envVars.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-slate-100">
                         <p className="text-xs text-slate-400">Required env vars:</p>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {integration.envVars.map((v) => (
                             <span
                               key={v}
-                              className={`text-xs px-1.5 py-0.5 rounded font-mono ${process.env[v] ? 'bg-brand-green-50 text-brand-green-700' : 'bg-slate-100 text-slate-400'}`}
+                              className={`text-xs px-1.5 py-0.5 rounded font-mono ${runtimeRequirementPresent(v) ? 'bg-brand-green-50 text-brand-green-700' : 'bg-slate-100 text-slate-400'}`}
                             >
                               {v}
                             </span>

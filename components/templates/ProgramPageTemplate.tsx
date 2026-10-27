@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
@@ -97,7 +98,7 @@ export function ProgramPageTemplate({
       </div>
 
       {/* Hero Image — clean, no overlays */}
-      <section className="relative w-full h-[clamp(220px,34vw,390px)] overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
         {heroVideo ? (
           <UltraVideoPlayer
             src={heroVideo}
@@ -105,7 +106,7 @@ export function ProgramPageTemplate({
             className="w-full h-full object-cover"
           />
         ) : (
-          <Image src={heroImage} alt={title} fill className="object-cover" priority sizes="100vw" placeholder="empty" />
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={heroImage} alt={title} fill className="object-cover" priority sizes="100vw" />
         )}
       </section>
 

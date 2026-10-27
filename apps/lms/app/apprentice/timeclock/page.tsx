@@ -1,5 +1,8 @@
 'use client';
 
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
+import { offlineQueue } from '@/lib/pwa/offline-queue';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -34,6 +37,17 @@ interface TimeclockContext {
   allowedSites: { id: string; name: string; lat: number; lng: number; radius_m: number }[];
   hoursCompleted: number;
   hoursRequired: number;
+  weeklyOjlHours: number;
+  weeklyTheoryRecordedHours: number;
+  weeklyTheoryVerifiedHours: number;
+  weeklyOjlMaxHours: number;
+  weeklyTheoryTargetHours: number;
+  weeklyTheoryMaxHours: number;
+  weeklyCombinedMaxHours: number;
+  outsideGeofenceGraceMinutes: number;
+  canClock: boolean;
+  previewing?: boolean;
+  configurationMessage?: string | null;
   activeShift: {
     entryId: string;
     clockInAt: string;
@@ -162,7 +176,7 @@ export default function TimeclockPage() {
 
   // Fetch recent shift history once context is loaded
   useEffect(() => {
-    if (!context) return;
+    if (!context || context.previewing) return;
     setHistoryLoading(true);
     const supabase = createClient();
     supabase
@@ -246,7 +260,11 @@ export default function TimeclockPage() {
         });
       }
     } catch (err) {
-      logger.error('Heartbeat failed', normalizeError(err, 'Heartbeat failed'), getErrorContext(err));
+      logger.error(
+        'Heartbeat failed',
+        normalizeError(err, 'Heartbeat failed'),
+        getErrorContext(err),
+      );
     }
   }, [shift.entryId, getLocation]);
 
@@ -275,6 +293,18 @@ export default function TimeclockPage() {
   useEffect(() => {
     return () => stopHeartbeat();
   }, [stopHeartbeat]);
+
+  // Start or restore heartbeat whenever an open shift exists. This is critical
+  // after a page refresh/PWA restart: context restores the shift asynchronously,
+  // so the clock must not rely only on the original clock-in click to start polling.
+  useEffect(() => {
+    if (shift.entryId && shift.clockInAt && !shift.clockOutAt) {
+      startHeartbeat();
+      return () => stopHeartbeat();
+    }
+    stopHeartbeat();
+    return undefined;
+  }, [shift.entryId, shift.clockInAt, shift.clockOutAt, startHeartbeat, stopHeartbeat]);
 
   // Resume heartbeat on visibility change
   useEffect(() => {
@@ -332,7 +362,7 @@ export default function TimeclockPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Action failed');
+        setError(data.message || data.error || 'Action failed');
         setActionLoading(null);
         return;
       }
@@ -364,7 +394,37 @@ export default function TimeclockPage() {
           break;
       }
     } catch (err) {
-      setError('An error occurred');
+      // Preserve a timestamped, geolocated attendance intent when the LMS
+      // origin is temporarily unreachable. It will sync when service returns.
+      // Server-side validation remains authoritative; queued events are not
+      // treated as approved hours until accepted by the canonical API.
+      try {
+        const position = location.lat != null && location.lng != null
+          ? { lat: location.lat, lng: location.lng, accuracy: location.accuracy }
+          : null;
+        await offlineQueue.add({
+          url: '/api/timeclock/action',
+          method: 'POST',
+          body: JSON.stringify({
+            action,
+            apprentice_id: context.apprenticeId,
+            partner_id: context.partnerId,
+            program_id: context.programId,
+            site_id: selectedSiteId,
+            progress_entry_id: shift.entryId,
+            lat: position?.lat,
+            lng: position?.lng,
+            accuracy_m: position?.accuracy,
+            client_recorded_at: new Date().toISOString(),
+            offline_submission: true,
+          }),
+          timestamp: Date.now(),
+          type: 'hours',
+        });
+        setError('Connection unavailable. Your clock action was saved on this device and will be submitted for validation when service returns.');
+      } catch {
+        setError('Connection unavailable and the clock action could not be saved. Do not leave this page; retry when service returns.');
+      }
     } finally {
       setActionLoading(null);
     }
@@ -422,7 +482,7 @@ export default function TimeclockPage() {
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-md mx-auto px-4">
         {/* Nav strip */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/apprentice"
             className="inline-flex items-center text-slate-700 hover:text-slate-900"
@@ -430,7 +490,7 @@ export default function TimeclockPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Dashboard
           </Link>
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs">
             <Link
               href="/apprentice/timeclock/history"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg transition"
@@ -459,6 +519,28 @@ export default function TimeclockPage() {
           </h1>
           <p className="text-sm text-slate-700 mb-6">{context.programName}</p>
 
+          <div className="mb-6 rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+            <div className="flex gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-800" />
+              <div>
+                <p className="font-black text-amber-950">Clock out before leaving the shop</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">
+                  Clock in only after arriving inside the approved site radius. If you leave the
+                  geofence for {context.outsideGeofenceGraceMinutes} continuous minutes, the system
+                  may clock you out and no later time is accepted.
+                </p>
+                <Link
+                  href="/apprentice/policies/timeclock"
+                  className="mt-2 inline-flex text-sm font-black text-amber-950 underline"
+                >
+                  Read and sign the complete clocking policy
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <TimeclockAttendanceNotice />
+
           {/* Hours Progress */}
           <div className="mb-6 p-3 bg-brand-blue-50 rounded-lg">
             <div className="flex justify-between text-sm mb-1">
@@ -469,13 +551,65 @@ export default function TimeclockPage() {
             </div>
             <div className="w-full bg-brand-blue-200 rounded-full h-2">
               <div
-                className="bg-white h-2 rounded-full transition-all"
+                className="h-2 rounded-full bg-brand-blue-600 transition-all"
                 style={{
-                  width: `${Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100)}%`,
+                  width: `${context.hoursRequired > 0 ? Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100) : 0}%`,
                 }}
               />
             </div>
           </div>
+
+          {/* Weekly limits and attendance rules */}
+          <section
+            className="mb-6 rounded-lg border border-brand-blue-200 bg-brand-blue-50 p-4"
+            aria-labelledby="timeclock-rules-heading"
+          >
+            <h2 id="timeclock-rules-heading" className="font-bold text-slate-900">
+              Weekly hours and timeclock rules
+            </h2>
+            <div className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+              <div className="rounded-md bg-white p-3">
+                <p className="font-semibold text-slate-900">OJL this week</p>
+                <p className="text-brand-blue-700">
+                  {context.weeklyOjlHours} / {context.weeklyOjlMaxHours} hours
+                </p>
+              </div>
+              <div className="rounded-md bg-white p-3">
+                <p className="font-semibold text-slate-900">Recorded theory</p>
+                <p className="text-brand-blue-700">
+                  {context.weeklyTheoryRecordedHours} / {context.weeklyTheoryMaxHours} hours
+                </p>
+              </div>
+              <div className="rounded-md bg-white p-3">
+                <p className="font-semibold text-slate-900">Verified RTI</p>
+                <p className="text-brand-blue-700">{context.weeklyTheoryVerifiedHours} hours</p>
+              </div>
+            </div>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-800">
+              <li>Do not exceed {context.weeklyOjlMaxHours} OJL/work hours in one week.</li>
+              <li>
+                Complete at least {context.weeklyTheoryTargetHours} theory hours weekly; no more
+                than {context.weeklyTheoryMaxHours} may be credited.
+              </li>
+              <li>
+                Combined OJL and theory may not exceed {context.weeklyCombinedMaxHours} hours per
+                week.
+              </li>
+              <li>
+                Theory and workplace hours cannot overlap. Clock out before starting an online
+                lesson.
+              </li>
+              <li>Clock in and out only at your approved Host Shop with location enabled.</li>
+              <li>
+                Leaving the geofence continuously for {context.outsideGeofenceGraceMinutes} minutes
+                automatically clocks you out.
+              </li>
+              <li>
+                Login alone does not earn theory credit. Active lesson time is recorded
+                automatically, then reviewed before it becomes verified RTI.
+              </li>
+            </ul>
+          </section>
 
           {/* Site Selection (only show if not clocked in and has multiple sites) */}
           {!isClockedIn && context.allowedSites.length > 0 && (
@@ -508,8 +642,31 @@ export default function TimeclockPage() {
               <div className="flex items-center">
                 <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" />
                 <span className="text-sm text-yellow-700">
-                  No work site assigned. Please contact your program coordinator.
+                  {context.configurationMessage ||
+                    'No verified work site is assigned. Please contact your program coordinator.'}
                 </span>
+              </div>
+            </div>
+          )}
+
+          {/* Eligibility warning (identity or read-only preview) */}
+          {!isClockedIn && context.allowedSites.length > 0 && !context.canClock && (
+            <div className="mb-6 rounded-lg bg-yellow-50 p-4">
+              <div className="flex items-start">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />
+                <div className="ml-2">
+                  <p className="text-sm text-yellow-800">
+                    {context.configurationMessage || 'Clock-in is not available for this account.'}
+                  </p>
+                  {context.configurationMessage?.includes('ID and selfie') && (
+                    <Link
+                      href="/verify-identity"
+                      className="mt-2 inline-flex text-sm font-bold text-brand-blue-700 hover:underline"
+                    >
+                      Complete identity verification
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -606,7 +763,9 @@ export default function TimeclockPage() {
             {!isClockedIn ? (
               <button
                 onClick={() => handleAction('clock_in')}
-                disabled={actionLoading !== null || location.loading || !selectedSiteId}
+                disabled={
+                  actionLoading !== null || location.loading || !selectedSiteId || !context.canClock
+                }
                 className="w-full flex items-center justify-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-slate-400 text-white font-bold rounded-lg transition-colors"
               >
                 {actionLoading === 'clock_in' ? (
@@ -700,7 +859,10 @@ export default function TimeclockPage() {
                         {s.auto_clocked_out ? (
                           <XCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
                         ) : s.clock_out_at ? (
-                          <span className="w-4 h-4 rounded-full bg-brand-green-500 inline-block flex-shrink-0" aria-hidden="true" />
+                          <span
+                            className="w-4 h-4 rounded-full bg-brand-green-500 inline-block flex-shrink-0"
+                            aria-hidden="true"
+                          />
                         ) : (
                           <Clock className="w-4 h-4 text-brand-blue-500 flex-shrink-0 animate-pulse" />
                         )}
@@ -770,4 +932,3 @@ export default function TimeclockPage() {
     </div>
   );
 }
-

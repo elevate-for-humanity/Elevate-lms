@@ -7,6 +7,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -84,7 +85,22 @@ for (const filename of config[service].files) {
 // Stamp the copied worker here as well as in the root source so Northflank
 // cannot ship the literal __CACHE_VERSION__ placeholder and retain stale
 // Admin/LMS/Marketing caches across releases.
-const sha = process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? process.env.NEXT_PUBLIC_GIT_SHA;
+function resolveBuildSha() {
+  const configured = process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? process.env.NEXT_PUBLIC_GIT_SHA;
+  if (configured) return configured;
+
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
+
+const sha = resolveBuildSha();
 if (sha && /^[a-f0-9]{7,40}$/i.test(sha)) {
   const workerPath = join(targetDir, config[service].worker);
   const workerSource = readFileSync(workerPath, 'utf8');

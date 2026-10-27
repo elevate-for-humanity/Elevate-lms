@@ -1,125 +1,147 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import Link from 'next/link';
-import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://admin.elevateforhumanity.org/partners/lms-integrations',
-  },
-  title: 'Lms Integrations | Elevate For Humanity',
-  description: 'Manage partner LMS integrations.',
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/partners/lms-integrations' },
+  title: 'Partner LMS Integrations | Elevate For Humanity',
+  description: 'Manage verified partner learning-platform connections.',
 };
 
 export default async function LmsIntegrationsPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
-
-  // Fetch relevant data
-  const { data: items, count } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  const { count: activeItems } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
-
+  const db = await createClient();
+  const [{ data: platforms, error: ltiError }, { data: providers, error: providerError }] =
+    await Promise.all([
+      db
+        .from('lti_platforms')
+        .select('id,name,status,auth_login_url,jwks_uri,updated_at')
+        .order('updated_at', { ascending: false }),
+      db
+        .from('integrations')
+        .select('id,slug,status,is_active,note,updated_at')
+        .in('slug', ['edlink', 'google-classroom', 'lti']),
+    ]);
+  const ltiPlatforms = ltiError ? [] : (platforms ?? []);
+  const integrations = providerError ? [] : (providers ?? []);
+  const activeLti = ltiPlatforms.filter(
+    (platform) => platform.status === 'active' && platform.auth_login_url && platform.jwks_uri,
+  );
+  const activeProviders = integrations.filter(
+    (provider) => provider.is_active === true && provider.status === 'active',
+  );
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Image */}
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/pages/admin-partners-lms-detail.webp"
-          alt="Lms Integrations"
-          fill
-          className="object-cover"
-          quality={90}
-          priority
-          sizes="100vw"
-        />
-      </section>
-
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">Total Items</h3>
-                <p className="text-3xl font-bold text-brand-blue-600">{count || 0}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">Active</h3>
-                <p className="text-3xl font-bold text-brand-green-600">{activeItems || 0}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">Recent</h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {items?.filter((i) => {
-                    const created = new Date(i.created_at);
-                    const weekAgo = new Date();
-                    weekAgo.setDate(weekAgo.getDate() - 7);
-                    return created > weekAgo;
-                  }).length || 0}
-                </p>
-              </div>
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="mx-auto max-w-7xl">
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-700">Partners</p>
+        <h1 className="mt-2 text-4xl font-black text-slate-950">LMS integration control center</h1>
+        <p className="mt-3 max-w-3xl text-slate-600">
+          Connection records shown here come from integration tables—not student profiles. A
+          provider is active only after configuration and a verified operational connection.
+        </p>
+        <section className="mt-8 grid gap-4 sm:grid-cols-3">
+          <Metric label="Configured providers" value={integrations.length} />
+          <Metric label="Verified providers" value={activeProviders.length} />
+          <Metric label="Verified LTI platforms" value={activeLti.length} />
+        </section>
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-black">Institutional gateways</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Edlink, Google Classroom, and direct LTI records.
+              </p>
             </div>
-
-            {/* Data Display */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-2xl font-bold mb-4">Items</h2>
-              {items && items.length > 0 ? (
-                <div className="space-y-4">
-                  {items.map((item: any) => (
-                    <div key={item.id} className="p-4 border rounded-lg hover:bg-slate-50">
-                      <p className="font-semibold">{item.title || item.name || item.id}</p>
-                      <p className="text-sm text-black">
-                        {new Date(item.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-black text-center py-8">No items found</p>
-              )}
-            </div>
+            <Link
+              href="/integrations"
+              className="rounded-lg border px-4 py-2 text-sm font-bold hover:bg-slate-50"
+            >
+              Integration settings
+            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Partner LMS Integrations</h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Manage LTI and API connections with partner learning platforms.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/partners/lms-integrations"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
-              >
-                View Integrations
-              </Link>
-              <Link
-                href="/partners"
-                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
-              >
-                View Partners
-              </Link>
-            </div>
+          <div className="mt-5 divide-y divide-slate-200">
+            {integrations.length ? (
+              integrations.map((provider) => (
+                <Connection
+                  key={provider.id}
+                  name={provider.slug}
+                  active={provider.is_active === true && provider.status === 'active'}
+                  updatedAt={provider.updated_at}
+                  note={provider.note}
+                />
+              ))
+            ) : (
+              <Empty message="No institutional gateway has been configured." />
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-black">Direct LTI platforms</h2>
+          <div className="mt-5 divide-y divide-slate-200">
+            {ltiPlatforms.length ? (
+              ltiPlatforms.map((platform) => (
+                <Connection
+                  key={platform.id}
+                  name={platform.name || 'Unnamed platform'}
+                  active={
+                    platform.status === 'active' &&
+                    Boolean(platform.auth_login_url && platform.jwks_uri)
+                  }
+                  updatedAt={platform.updated_at}
+                  note={
+                    !platform.auth_login_url || !platform.jwks_uri
+                      ? 'OIDC login or JWKS configuration is incomplete.'
+                      : null
+                  }
+                />
+              ))
+            ) : (
+              <Empty message="No direct LTI platform registrations exist." />
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-sm font-semibold text-slate-500">{label}</p>
+      <p className="mt-2 text-3xl font-black">{value}</p>
     </div>
   );
+}
+function Connection({
+  name,
+  active,
+  updatedAt,
+  note,
+}: {
+  name: string;
+  active: boolean;
+  updatedAt: string | null;
+  note?: string | null;
+}) {
+  return (
+    <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="font-black capitalize text-slate-950">{name.replaceAll('-', ' ')}</p>
+        <p className="text-sm text-slate-500">
+          {note ||
+            `Last configuration change: ${updatedAt ? new Date(updatedAt).toLocaleString() : 'unknown'}`}
+        </p>
+      </div>
+      <span
+        className={`w-fit rounded-full px-3 py-1 text-xs font-black ${active ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}
+      >
+        {active ? 'Verified' : 'Setup required'}
+      </span>
+    </div>
+  );
+}
+function Empty({ message }: { message: string }) {
+  return <p className="py-8 text-center text-slate-500">{message}</p>;
 }

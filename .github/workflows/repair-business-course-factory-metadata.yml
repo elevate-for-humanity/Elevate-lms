@@ -28,6 +28,6 @@ jobs:
         run: |
           grep -F "duration_hours: totalDurationMinutes / 60" lib/course-factory/publisher.ts
           grep -F "passing_score: passingScore" lib/course-factory/publisher.ts
-          grep -F "generation_progress: 100" lib/course-factory/publisher.ts
+          grep -F "generation_progress: 70" lib/course-factory/publisher.ts
           grep -F "total_lessons:" lib/course-factory/publisher.ts
           grep -F "Canonical course metadata normalization failed" lib/course-factory/publisher.ts

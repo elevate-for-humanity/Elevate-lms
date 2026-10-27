@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -10,28 +11,8 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createClient();
-
-    // Verify user is authenticated
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (profile?.role !== 'admin' && profile?.role !== 'staff') {
-      return NextResponse.json({ error: 'Forbidden - Admin only' }, { status: 403 });
-    }
+    const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+    if (auth.error) return auth.error;
 
     // Get target user ID from request
     const { userId } = await request.json();
@@ -41,7 +22,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Use admin client to revoke all sessions
-    const adminSupabase = await createClient();
+    const adminSupabase = await requireAdminClient();
 
     // Sign out user from all devices
     const { error: signOutError } = await adminSupabase.auth.admin.signOut(userId);

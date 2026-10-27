@@ -126,7 +126,7 @@ export default function MobileVideoPlayer({
       />
       {/* Controls Overlay */}
       {showControls && (
-        <div className="absolute inset-0     flex flex-col justify-between p-4">
+        <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-b from-black/80 via-black/30 to-black/80 p-4">
           {/* Top Bar */}
           <div className="flex items-center justify-between">
             <h3 className="text-white font-medium text-sm line-clamp-1">{title}</h3>
@@ -135,6 +135,7 @@ export default function MobileVideoPlayer({
           <div className="flex items-center justify-center">
             <button
               onClick={togglePlay}
+              aria-label={isPlaying ? "Pause video" : "Play video"}
               className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
             >
               {isPlaying ? (

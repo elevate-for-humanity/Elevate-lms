@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_PORTAL_E2E_STATE_PATH || '.qa-learner-program-holder-e2e-state.json';
@@ -21,10 +22,9 @@ async function must(resultPromise, label) { const result = await resultPromise; 
 async function createQaUser(kind, role, fullName, tenantId) {
   const email = `${marker}-${kind}@qa.invalid`;
   const pass = password();
-  const { data, error } = await db.auth.admin.createUser({ email, password: pass, email_confirm: true, app_metadata: { qa_e2e: true, qa_run_id: runId, role }, user_metadata: { qa_e2e: true, qa_run_id: runId, full_name: fullName } });
-  if (error || !data.user) throw new Error(`create ${kind} auth user: ${error?.message || 'no user returned'}`);
-  await must(db.from('profiles').upsert({ id: data.user.id, email, full_name: fullName, role, tenant_id: tenantId, updated_at: new Date().toISOString() }, { onConflict: 'id' }), `upsert ${kind} profile`);
-  return { id: data.user.id, email, password: pass };
+  const user = await createQaAuthUser({ db, email, password: pass, role, fullName, runId, label: `create ${kind} auth user` });
+  await must(db.from('profiles').upsert({ id: user.id, email, full_name: fullName, role, tenant_id: tenantId, updated_at: new Date().toISOString() }, { onConflict: 'id' }), `upsert ${kind} profile`);
+  return { id: user.id, email, password: pass };
 }
 
 async function provision() {

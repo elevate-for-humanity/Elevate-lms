@@ -3,7 +3,12 @@
 import React, { useState } from 'react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardSidebar } from './DashboardSidebar';
-import type { UserRole, BreadcrumbItem, ActionItem, NavSection } from '@/lib/navigation/navigation-config';
+import type {
+  UserRole,
+  BreadcrumbItem,
+  ActionItem,
+  NavSection,
+} from '@/lib/navigation/navigation-config';
 import { getNavigationForRole, generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 
 interface DashboardPageProps {
@@ -35,7 +40,10 @@ export function DashboardPage({
   const autoBreadcrumbs = breadcrumbs || generateBreadcrumbs(window.location.pathname);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div
+      data-elevate-dashboard-shell={role}
+      className="min-h-screen w-full overflow-x-clip bg-slate-50"
+    >
       {/* Header */}
       <DashboardHeader
         user={user}
@@ -56,10 +64,8 @@ export function DashboardPage({
         />
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0">
-          <div className="p-4 lg:p-6 max-w-7xl mx-auto">
-            {children}
-          </div>
+        <main data-elevate-dashboard-content className="min-w-0 w-full flex-1">
+          <div className="w-full max-w-none p-4 lg:p-6">{children}</div>
         </main>
       </div>
     </div>

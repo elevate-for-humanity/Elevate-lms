@@ -1,4 +1,6 @@
+import { recordParisObservation } from './runtime/supervision';
 import { logger } from '@/lib/logger';
+import { requirePaidInferenceContext } from './paid-inference-context';
 import { withResilience, breakers, CircuitBreaker, CircuitOpenError } from '@/lib/resilience';
 import type {
   AIProvider,
@@ -24,6 +26,7 @@ import {
   AzureProvider,
   StabilityProvider,
   GroqProvider,
+  XAIProvider,
 } from './providers';
 
 const chatProviders: Record<string, () => AIProvider> = {
@@ -31,6 +34,7 @@ const chatProviders: Record<string, () => AIProvider> = {
   gemini: () => new GeminiProvider(),
   google: () => new GoogleProvider(),
   groq: () => new GroqProvider(),
+  xai: () => new XAIProvider(),
   cloudflare: () => new CloudflareProvider(),
   openai: () => new OpenAIProvider(),
   anthropic: () => new AnthropicProvider(),
@@ -47,25 +51,32 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 // first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
 // that same single authority. Course generation must repair a failed provider,
 // never produce divergent artifacts through a silent provider substitution.
-const PROVIDER_DISCOVERY_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+// An unset provider must not discover a billable external API by accident.
+// Self-hosted inference is the platform default; operators may explicitly
+// select another provider for a separately authorized workload.
+const PROVIDER_DISCOVERY_ORDER = ['elevate'];
 let discoveredProviderName: string | null = null;
 
 function configuredProviderName(): string {
   const explicit = process.env.AI_PROVIDER?.trim().toLowerCase();
   if (explicit) return explicit;
   if (discoveredProviderName) return discoveredProviderName;
-  const ordered = process.env.AI_PROVIDER_ORDER?.split(',')
-    .map((name) => name.trim().toLowerCase())
-    .filter((name) => name && name !== 'none') ?? [];
-  const candidates = [...ordered, ...PROVIDER_DISCOVERY_ORDER]
-    .filter((name, index, names) => names.indexOf(name) === index);
+  const ordered =
+    process.env.AI_PROVIDER_ORDER?.split(',')
+      .map((name) => name.trim().toLowerCase())
+      .filter((name) => name && name !== 'none') ?? [];
+  const candidates = [...ordered, ...PROVIDER_DISCOVERY_ORDER].filter(
+    (name, index, names) => names.indexOf(name) === index,
+  );
   const discovered = candidates.find((name) => {
     const createProvider = chatProviders[name];
     return Boolean(createProvider && createProvider().isAvailable());
   });
   if (!discovered) return ordered[0] ?? PROVIDER_DISCOVERY_ORDER[0]!;
   discoveredProviderName = discovered;
-  logger.warn(`[aiChat] AI_PROVIDER is not explicitly set; locking this process to discovered provider "${discovered}"`);
+  logger.warn(
+    `[aiChat] AI_PROVIDER is not explicitly set; locking this process to discovered provider "${discovered}"`,
+  );
   return discovered;
 }
 const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
@@ -89,9 +100,12 @@ function isTerminalProviderError(error: unknown): boolean {
 
 function disableProviderForProcess(providerName: string, error: unknown): void {
   disabledChatProviders.add(providerName);
-  logger.warn(`[aiChat] provider "${providerName}" quarantined for this process after terminal credential/billing failure`, {
-    error: error instanceof Error ? error.message : String(error),
-  });
+  logger.warn(
+    `[aiChat] provider "${providerName}" quarantined for this process after terminal credential/billing failure`,
+    {
+      error: error instanceof Error ? error.message : String(error),
+    },
+  );
 }
 
 function configuredDefaultProvider(): string {
@@ -106,16 +120,44 @@ function resolveChatProvider(): AIProvider {
     if (!createProvider) throw new Error(`Unknown AI chat provider: ${preferred}`);
     const provider = createProvider();
     if (provider.isAvailable()) return provider;
-    throw new Error(`Configured AI provider "${preferred}" is unavailable; repair its canonical configuration`);
+    throw new Error(
+      `Configured AI provider "${preferred}" is unavailable; repair its canonical configuration`,
+    );
   }
 
-  throw new Error(`Configured AI provider "${preferred}" is unknown or disabled; repair AI_PROVIDER configuration`);
+  throw new Error(
+    `Configured AI provider "${preferred}" is unknown or disabled; repair AI_PROVIDER configuration`,
+  );
 }
 
 function resolveConfiguredChatProvider(options: ChatCompletionOptions): AIProvider {
-  const configured = configuredDefaultProvider();
-  if (options.provider && options.provider !== 'none' && options.provider !== configured) {
-    throw new Error(`Provider override "${options.provider}" is not allowed; configured authority is "${configured}"`);
+  if (options.providerPolicy === 'owned-only') {
+    const provider = new ElevateProvider();
+    if (provider.isAvailable()) return provider;
+    throw new Error(
+      'Elevate-owned AI is unavailable; repair ELEVATE_LLM_URL / ELEVATE_LLM_SECRET before retrying',
+    );
+  }
+  const requested = options.provider?.trim().toLowerCase();
+  if (requested && requested !== 'none' && requested !== 'auto') {
+    const configured = configuredDefaultProvider();
+    if (requested !== configured) {
+      throw new Error(
+        `Provider override "${requested}" is not allowed; the configured provider is "${configured}"`,
+      );
+    }
+    const createProvider = chatProviders[requested];
+    if (!createProvider) throw new Error(`Unknown AI chat provider: ${requested}`);
+    if (disabledChatProviders.has(requested)) {
+      throw new Error(
+        `Selected AI provider "${requested}" is quarantined after a terminal failure`,
+      );
+    }
+    const provider = createProvider();
+    if (!provider.isAvailable()) {
+      throw new Error(`Selected AI provider "${requested}" is not configured`);
+    }
+    return provider;
   }
   return resolveChatProvider();
 }
@@ -141,7 +183,22 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+  const started = Date.now();
+  try {
+    const result = await executeConfiguredChat(options);
+    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'completed', durationMs:Date.now()-started, provider:result.provider});
+    return result;
+  } catch (error) {
+    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'failed', durationMs:Date.now()-started, error});
+    throw error;
+  }
+}
+
+async function executeConfiguredChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+  // Elevate-owned inference is part of the platform runtime and must not require
+  // paid-inference authorization. Metered/external providers retain the paid gate.
   let provider = resolveConfiguredChatProvider(options);
+  if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat');
   const allowCircuitRecoveryWait = process.env.AI_CIRCUIT_RECOVERY_WAIT === '1';
   const passes = allowCircuitRecoveryWait ? 2 : 1;
 
@@ -158,16 +215,19 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
         label: `aiChat:${provider.name}`,
         shouldRetry: (err) => {
           const msg = err instanceof Error ? err.message : String(err);
-          return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+          return !/\b(400|401|403|404|429)\b/.test(msg) && !msg.includes('content_policy') && !msg.includes('insufficient_quota');
         },
       });
       return { ...result, provider: provider.name };
     } catch (error) {
       if (isTerminalProviderError(error)) disableProviderForProcess(provider.name, error);
       if (pass === 0 && allowCircuitRecoveryWait && error instanceof CircuitOpenError) {
-        logger.warn('[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window', {
-          waitMs: CIRCUIT_RECOVERY_WAIT_MS,
-        });
+        logger.warn(
+          '[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window',
+          {
+            waitMs: CIRCUIT_RECOVERY_WAIT_MS,
+          },
+        );
         await sleep(CIRCUIT_RECOVERY_WAIT_MS);
         provider = resolveConfiguredChatProvider(options);
         continue;
@@ -183,9 +243,26 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
-  const provider = resolveChatProvider();
-  if ('chatStream' in provider && typeof (provider as { chatStream?: unknown }).chatStream === 'function') {
-    const streamProvider = provider as { chatStream: (opts: ChatCompletionOptions) => AsyncIterable<string> };
+  const started = Date.now();
+  try {
+    yield* executeConfiguredStream(options);
+    await recordParisObservation({kind:'inference',operation:'ai.stream',status:'completed',durationMs:Date.now()-started});
+  } catch (error) {
+    await recordParisObservation({kind:'inference',operation:'ai.stream',status:'failed',durationMs:Date.now()-started,error});
+    throw error;
+  }
+}
+
+async function* executeConfiguredStream(options: ChatCompletionOptions): AsyncIterable<string> {
+  const provider = resolveConfiguredChatProvider(options);
+  if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat-stream');
+  if (
+    'chatStream' in provider &&
+    typeof (provider as { chatStream?: unknown }).chatStream === 'function'
+  ) {
+    const streamProvider = provider as {
+      chatStream: (opts: ChatCompletionOptions) => AsyncIterable<string>;
+    };
     yield* streamProvider.chatStream(options);
   } else {
     const result = await provider.chat(options);
@@ -225,7 +302,10 @@ Return ONLY a JSON array, no markdown fences.`,
   });
 
   try {
-    const cleaned = result.content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    const cleaned = result.content
+      .replace(/```json?\n?/g, '')
+      .replace(/```/g, '')
+      .trim();
     return JSON.parse(cleaned);
   } catch {
     logger.error('Failed to parse quiz generation response');
@@ -255,80 +335,53 @@ Passing threshold is 80%. Be specific in feedback. Return ONLY JSON.`,
   });
 
   try {
-    const cleaned = result.content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    const cleaned = result.content
+      .replace(/```json?\n?/g, '')
+      .replace(/```/g, '')
+      .trim();
     return JSON.parse(cleaned);
   } catch {
-    return { score: 0, maxScore, feedback: 'Unable to grade automatically. Please contact your instructor.', passed: false };
+    return {
+      score: 0,
+      maxScore,
+      feedback: 'Unable to grade automatically. Please contact your instructor.',
+      passed: false,
+    };
   }
 }
 
 export function getActiveProviderName(): string {
-  try { return resolveChatProvider().name; } catch { return 'none'; }
+  try {
+    return resolveChatProvider().name;
+  } catch {
+    return 'none';
+  }
 }
 
 export function isAIAvailable(): boolean {
-  try { resolveChatProvider(); return true; } catch { return false; }
+  try {
+    resolveChatProvider();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function resetProviders(): void {
   disabledChatProviders.clear();
 }
 
-function preferredReasoningProvider(): 'anthropic' | 'azure' | 'default' {
-  const configured = process.env.AI_REASONING_PROVIDER?.trim().toLowerCase();
-  if (configured === 'anthropic' || configured === 'claude') return 'anthropic';
-  if (configured === 'azure') return 'azure';
-  if (new AnthropicProvider().isAvailable()) return 'anthropic';
-  if (new AzureProvider().isAvailable()) return 'azure';
-  return 'default';
-}
-
+/**
+ * Reasoning uses the same configured provider authority as every other chat
+ * request. Callers may request a reasoning-oriented model through options, but
+ * they may not open a second provider route or fallback chain.
+ */
 export async function aiReason(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-  const preferred = preferredReasoningProvider();
-  if (preferred === 'anthropic') {
-    const provider = new AnthropicProvider();
-    try {
-      const result = await withResilience(() => provider.chat({ ...options, provider: 'anthropic' }), {
-        circuitBreaker: CircuitBreaker.for('ai:anthropic', { failureThreshold: 5, resetTimeoutMs: 30_000 }),
-        attempts: 2,
-        baseDelayMs: 1500,
-        label: 'aiReason:anthropic',
-        shouldRetry: (err) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          return !msg.includes('401') && !msg.includes('400');
-        },
-      });
-      return { ...result, provider: provider.name };
-    } catch (error) {
-      logger.warn('[aiReason] Claude reasoning failed; trying fallback', { error: error instanceof Error ? error.message : String(error) });
-    }
-  }
-
-  if (preferred === 'azure' || new AzureProvider().isAvailable()) {
-    const provider = new AzureProvider();
-    if (provider.isAvailable()) {
-      try {
-        const result = await withResilience(() => provider.reason(options), {
-          circuitBreaker: CircuitBreaker.for('ai:azure', { failureThreshold: 5, resetTimeoutMs: 30_000 }),
-          attempts: 2,
-          baseDelayMs: 2000,
-          label: 'aiReason:azure',
-          shouldRetry: (err) => {
-            const msg = err instanceof Error ? err.message : String(err);
-            return !msg.includes('401') && !msg.includes('400');
-          },
-        });
-        return { ...result, provider: provider.name };
-      } catch (error) {
-        logger.warn('[aiReason] Azure reasoning failed; falling back to standard AI', { error: error instanceof Error ? error.message : String(error) });
-      }
-    }
-  }
   return aiChat(options);
 }
 
 export function isReasoningAvailable(): boolean {
-  return new AnthropicProvider().isAvailable() || new AzureProvider().isAvailable() || isAIAvailable();
+  return isAIAvailable();
 }
 
 export type ToolDefinition = {

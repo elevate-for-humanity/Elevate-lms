@@ -10,17 +10,17 @@ export default function Pathways() {
         <div className="flex flex-col md:flex-row gap-4 mb-12 overflow-x-auto">
           <Link
             href="/programs"
-            className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
+            className="flex-1 min-w-0 bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
           >
             <div className="relative h-48">
               <Image
                 src="/images/pages/comp-home-pathways-train.webp"
                 alt="Students learning"
                 fill
-                className="object-cover group-hover:scale-105 transition"
+                className="object-contain  transition"
                 sizes="100vw"
               />
-              <div className="absolute inset-0 " />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                 <h3 className="text-xl font-bold mb-1">Explore Programs</h3>
                 <p className="text-sm">Healthcare, Trades, Tech & More →</p>
@@ -30,20 +30,20 @@ export default function Pathways() {
 
           <Link
             href="/wioa-eligibility"
-            className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
+            className="flex-1 min-w-0 bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
           >
             <div className="relative h-48">
               <Image
                 src="/images/pages/comp-home-pathways-support.webp"
                 alt="Career pathways"
                 fill
-                className="object-cover group-hover:scale-105 transition"
+                className="object-contain  transition"
                 sizes="100vw"
               />
-              <div className="absolute inset-0 " />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                <h3 className="text-xl font-bold mb-1">Get Funded</h3>
-                <p className="text-sm">No-Cost Training for Eligible Participants →</p>
+                <h3 className="text-xl font-bold mb-1">Explore Funding</h3>
+                <p className="text-sm">WorkOne orientation and eligibility review →</p>
               </div>
             </div>
           </Link>

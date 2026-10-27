@@ -13,6 +13,12 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { aiChat } from '@/lib/ai/ai-service';
+import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
 
 import { withRuntime } from '@/lib/api/withRuntime';
 
@@ -128,16 +134,20 @@ async function _POST(req: NextRequest) {
     const db = await requireAdminClient();
     const { data: profile } = await db
       .from('profiles')
-      .select('role')
+      .select('role,tenant_id')
       .eq('id', user.id)
       .maybeSingle();
     if (!profile || !ADMIN_ROLES.has(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const aiRuntime = await resolveAIRuntimeState();
+    if (!aiRuntime.anyConfigured) {
       return NextResponse.json(
-        { error: 'OPENAI_API_KEY is not configured. Add OPENAI_API_KEY to the Northflank production secret group.' },
+        {
+          error:
+            'No AI provider is configured. Add and validate a provider in AI Provider Keys.',
+        },
         { status: 503 },
       );
     }
@@ -148,16 +158,62 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'raw_text is required' }, { status: 400 });
     }
 
-    const completion = await aiChat({
+    const tenantId =
+      typeof profile.tenant_id === 'string' && profile.tenant_id
+        ? profile.tenant_id
+        : null;
+    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+    const artifactFingerprint = paidArtifactFingerprint({
+      operation: 'course-draft',
       model: 'gpt-4.1',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: `Input type: ${input_type || 'syllabus'}\n\n${raw_text.trim()}` },
-      ],
-      temperature: 0.3,
-      maxTokens: 8000,
+      inputType: input_type || 'syllabus',
+      source: raw_text.trim(),
+      systemPrompt: SYSTEM_PROMPT,
     });
+    const projectedCostMicros = Math.max(
+      0,
+      Number(process.env.COURSE_DRAFT_MAX_COST_MICROS ?? '2000000'),
+    );
+    const paidResult = await executePaidInference({
+      db,
+      authorize: () =>
+        reservePaidInference(db, {
+          scopeKey,
+          tenantId,
+          actorId: user.id,
+          artifactFingerprint,
+          idempotencyKey: `course-draft:${artifactFingerprint}`,
+          provider: process.env.AI_PROVIDER?.trim() || 'configured',
+          model: 'gpt-4.1',
+          operation: 'course-draft',
+          projectedCostMicros,
+        }),
+      dispatch: () =>
+        aiChat({
+          model: 'gpt-4.1',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            {
+              role: 'user',
+              content: `Input type: ${input_type || 'syllabus'}\n\n${raw_text.trim()}`,
+            },
+          ],
+          temperature: 0.3,
+          maxTokens: 8000,
+        }),
+    });
+    if (paidResult.decision !== 'approved' || !paidResult.value) {
+      return NextResponse.json(
+        {
+          error: 'Paid course drafting is not authorized.',
+          decision: paidResult.decision,
+          projected_cost_micros: projectedCostMicros,
+        },
+        { status: paidResult.decision === 'budget_exceeded' ? 402 : 409 },
+      );
+    }
 
+    const completion = paidResult.value;
     const raw = completion.content;
     if (!raw) return NextResponse.json({ error: 'Empty response from AI service' }, { status: 500 });
 

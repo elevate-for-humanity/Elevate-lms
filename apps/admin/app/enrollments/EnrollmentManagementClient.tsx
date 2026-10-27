@@ -140,6 +140,7 @@ export default function EnrollmentManagementClient({
         await createEnrollment({
           user_id: formData.user_id,
           course_id: formData.course_id,
+          cohort_id: formData.cohort_id || null,
           status: formData.status,
           progress: parseInt(formData.progress) || 0,
         });

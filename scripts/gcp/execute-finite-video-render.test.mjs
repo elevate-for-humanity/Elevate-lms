@@ -1,0 +1,167 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { executeFiniteVideoJob } from './execute-finite-video-render.mjs';
+const image = 'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin@sha256:' + 'a'.repeat(64);
+const source = 'VIDEO_VALIDATE_ONLY;startRenderHealthCheck';
+const probe = { httpGet: { path: '/ready', port: 3101 }, timeoutSeconds: 5, periodSeconds: 10, failureThreshold: 60 };
+function fixture({ active = [], outcome = 'True', altered = false } = {}) {
+  let job = { spec: { template: { metadata: { labels: { 'client.knative.dev/nonce': 'before' } }, spec: { taskCount: 1, parallelism: 1, template: { spec: {
+    serviceAccountName: 'runtime', maxRetries: 0, timeoutSeconds: '3600',
+    containers: [{ image: image.replace(/a{64}$/, 'b'.repeat(64)), command: ['node'], args: [source], startupProbe: structuredClone(probe),
+      resources: { limits: { cpu: '8000m', memory: '32Gi' } },
+      env: [{ name: 'VIDEO_JOB_ID', value: 'saved-id' }, { name: 'SECRET', valueFrom: { secretKeyRef: { name: 'bound-secret', key: 'latest' } } }, { name: 'VIDEO_HEALTH_PORT', value: '3101' }] }],
+  } } } } } };
+  const before = structuredClone(job);
+  const calls = [], logs = [];
+  const run = args => {
+    calls.push(args);
+    const command = args.slice(0, 4).join(' ');
+    if (args[0] === 'auth') return 'test-token';
+    if (['run services list', 'run revisions list', 'run jobs list'].includes(args.slice(0, 3).join(' '))) return '[]';
+    if (command === 'run jobs describe elevate-video-render') return JSON.stringify(job);
+    if (command === 'run jobs executions list') return JSON.stringify(active);
+    if (command === 'run services describe elevate-admin-migration') return JSON.stringify({
+      spec: { template: { spec: { containers: [{ image: 'unready-candidate' }] } } },
+      status: { latestReadyRevisionName: 'other', traffic: [{ percent: 100, revisionName: 'serving' }] },
+    });
+    if (command === 'run revisions describe serving') return JSON.stringify({ spec: { serviceAccountName: 'runtime' }, status: { imageDigest: image, conditions: [{ type: 'Ready', status: 'True' }] } });
+    if (command === 'run jobs update elevate-video-render') {
+      job.spec.template.metadata.labels['client.knative.dev/nonce'] = 'after';
+      const container = job.spec.template.spec.template.spec.containers[0];
+      Object.assign(container, { image, command: ['node'], args: args.find(x => x.startsWith('--args=')).slice('--args=^~^'.length).split('~') });
+      if (args.some(x => x.startsWith('--startup-probe='))) container.startupProbe = structuredClone(probe);
+      if (!container.env.some(e => e.name === 'VIDEO_HEALTH_PORT')) container.env.push({ name: 'VIDEO_HEALTH_PORT', value: '3101' });
+      if (altered) job.spec.template.spec.template.spec.containers[0].resources.limits.memory = '8Gi';
+      return '{}';
+    }
+    if (command === 'run jobs execute elevate-video-render') return JSON.stringify({ metadata: { name: 'elevate-video-render-test' } });
+    if (command === 'run jobs executions describe') return JSON.stringify({ metadata: { name: 'elevate-video-render-test' }, status: { completionTime: 'now', conditions: [{ type: 'Completed', status: outcome, message: outcome === 'False' ? 'Internal error running task.' : '' }] } });
+    if (command === 'run jobs executions tasks') return JSON.stringify([{ metadata: { name: 'task0' }, status: { lastAttemptResult: { status: { code: 14, message: 'Internal error running task.' } } } }]);
+    throw new Error('Unexpected command: ' + command);
+  };
+  const request = async url => ({ ok: true, json: async () => ({ dimensionsInfos: [{ dimensions: { region: 'us-central1' }, details: { value: String(url.endsWith('CpuAllocPerProjectRegion') ? 20000 : 40 * 2 ** 30) } }] }) });
+  return { calls, logs, before, job, options: { run, request, log: x => logs.push(x), source } };
+}
+test("refresh tolerates Google's changed nonce while preserving 8 CPU/32 GiB, exact IDs, secrets and retry settings", async () => {
+  const f = fixture();
+  await executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true });
+  const update = f.calls.find(c => c[2] === 'update');
+  assert.equal(update.some(x => /^--(cpu|memory|tasks|parallelism|max-retries|env-vars-file|service-account)=/.test(x)), false);
+  const task = f.job.spec.template.spec.template.spec;
+  assert.deepEqual(task.containers[0].resources.limits, { cpu: '8000m', memory: '32Gi' });
+  assert.deepEqual(task.containers[0].env, f.before.spec.template.spec.template.spec.containers[0].env);
+  assert.ok(f.calls.some(c => c.join(' ').includes('run revisions describe serving')));
+  assert.ok(f.calls.find(c => c[2] === 'execute').includes('--update-env-vars=VIDEO_VALIDATE_ONLY=true'));
+  assert.deepEqual(task.containers[0].startupProbe, probe);
+});
+test('refresh adds a configured HTTP probe and its port without changing saved identities or resources', async () => {
+  const f = fixture(); const container = f.job.spec.template.spec.template.spec.containers[0];
+  delete container.startupProbe; container.env = container.env.filter(e => e.name !== 'VIDEO_HEALTH_PORT');
+  await executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true });
+  assert.deepEqual(container.startupProbe, probe);
+  const update = f.calls.find(c => c[2] === 'update');
+  assert.ok(update.includes('--startup-probe=httpGet.path=/ready,httpGet.port=3101,timeoutSeconds=5,periodSeconds=10,failureThreshold=60'));
+  assert.ok(update.includes('--update-env-vars=VIDEO_HEALTH_PORT=3101'));
+  assert.deepEqual(container.resources.limits, { cpu: '8000m', memory: '32Gi' });
+  assert.deepEqual(container.env, f.before.spec.template.spec.template.spec.containers[0].env);
+});
+test('saved execution refuses a missing or mismatched startup health check', async () => {
+  const f = fixture(); f.job.spec.template.spec.template.spec.containers[0].startupProbe.httpGet.port = 8080;
+  await assert.rejects(executeFiniteVideoJob(f.options), /startup health check/);
+  assert.equal(f.calls.some(c => c[2] === 'execute'), false);
+});
+test('saved mode never updates the job and explicitly clears validation-only on actual rendering', async () => {
+  const f = fixture(); await executeFiniteVideoJob(f.options);
+  assert.equal(f.calls.some(c => c[2] === 'update'), false);
+  assert.ok(f.calls.find(c => c[2] === 'execute').includes('--update-env-vars=VIDEO_VALIDATE_ONLY=false'));
+});
+test('active Google task blocks updates and duplicate execution with visible identity', async () => {
+  const f = fixture({ active: [{ metadata: { name: 'elevate-video-render-active' }, status: { conditions: [{ type: 'Completed', status: 'Unknown' }] } }] });
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configuration: 'redeploy' }), /already active/);
+  assert.equal(f.calls.some(c => ['update', 'execute'].includes(c[2])), false);
+  assert.equal(f.logs[0].activeExecution.execution, 'elevate-video-render-active');
+});
+test('configuration-only refresh preserves an active execution and never launches or cancels work', async () => {
+  const execution = { metadata: { name: 'elevate-video-render-active' }, spec: { immutable: 'original' }, status: { runningCount: 1 } };
+  const f = fixture({ active: [execution] });
+  const original = f.options.run;
+  f.options.run = args => args.slice(0, 4).join(' ') === 'run jobs executions describe' ? JSON.stringify(execution) : original(args);
+  const result = await executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true, configureOnly: true });
+  assert.equal(result.configured, true);
+  assert.equal(result.activeExecutionsPreserved, 1);
+  assert.deepEqual(result.startupProbe, probe);
+  assert.equal(f.calls.some(c => c.includes('execute') || c.includes('cancel')), false);
+  assert.equal(f.logs.some(l => l.regionalCapacity), false);
+});
+test('configuration-only mode cannot be combined with a regional migration or saved execution', async () => {
+  const f = fixture();
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configureOnly: true }), /Configuration-only/);
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true, configureOnly: true, sourceRegion: 'us-east1' }), /Configuration-only/);
+  assert.equal(f.calls.length, 0);
+});
+test('an existing job also checks granted quota before changing settings or executing', async () => {
+  const f = fixture();
+  f.options.request = async () => ({ ok: true, json: async () => ({ dimensionsInfos: [
+    { dimensions: { region: 'us-central1' }, details: { value: '0' } },
+  ] }) });
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configuration: 'redeploy' }), /does not cover/);
+  assert.equal(f.calls.some(c => ['update', 'execute', 'cancel'].includes(c[2])), false);
+});
+test('terminal platform error is a failure, and task code 14 survives reporting', async () => {
+  const f = fixture({ outcome: 'False' });
+  await assert.rejects(executeFiniteVideoJob(f.options), /execution failed/);
+  assert.equal(f.logs.at(-1).taskFailures[0].result.status.code, 14);
+});
+test('unexpected settings drift aborts before execution', async () => {
+  const f = fixture({ altered: true });
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configuration: 'redeploy' }), /changed unexpectedly/);
+  assert.equal(f.calls.some(c => c[2] === 'execute'), false);
+});
+test('validation refuses legacy runners that could accidentally render', async () => {
+  const f = fixture(); f.job.spec.template.spec.template.spec.containers[0].args = ['old-runner'];
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, validateOnly: true }), /Refresh the runner/);
+  assert.equal(f.calls.some(c => c[2] === 'execute'), false);
+});
+
+const targetService = { metadata: { name: 'marketing' }, status: { traffic: [{ revisionName: 'marketing-live', percent: 100 }] } };
+const targetRevision = { metadata: { name: 'marketing-live', annotations: { 'autoscaling.knative.dev/maxScale': '2' } }, spec: { containers: [{ resources: { limits: { cpu: '2', memory: '4Gi' } } }] } };
+function migrationFixture({ memoryQuota = 40 * 2 ** 30, realSourceRender = false } = {}) {
+  const f = fixture(); let target; let cancelled = false; let submitted = false;
+  const source = structuredClone(f.job);
+  const run = args => {
+    const east = args.includes('--region=us-east1');
+    const command = args.slice(0, 4).join(' ');
+    f.calls.push(args);
+    if (args[0] === 'auth') return 'test-token';
+    if (command.startsWith('run jobs list')) return '[]';
+    if (command.startsWith('run services list')) return JSON.stringify([targetService]);
+    if (command.startsWith('run revisions list')) return JSON.stringify([targetRevision]);
+    if (command === 'run jobs describe elevate-video-render') return JSON.stringify(east ? target : source);
+    if (command === 'run jobs executions list') return JSON.stringify([{ metadata: { name: 'elevate-video-render-validation' }, spec: { template: { spec: { containers: [{ env: [{ name: 'VIDEO_VALIDATE_ONLY', value: realSourceRender ? 'false' : 'true' }] }] } } } }]);
+    if (args.slice(0, 3).join(' ') === 'run jobs replace') { target = JSON.parse(readFileSync(args[3], 'utf8')); return '{}'; }
+    if (command === 'run jobs executions cancel') { cancelled = true; return '{}'; }
+    if (command === 'run jobs execute elevate-video-render') submitted = true;
+    return f.options.run(args);
+  };
+  const request = async () => ({ ok: true, json: async () => ({ dimensionsInfos: [{ dimensions: { region: 'us-east1' }, details: { value: String(request.count++ === 0 ? 20000 : memoryQuota) } }] }) });
+  request.count = 0;
+  return { ...f, options: { ...f.options, run, request, configuration: 'redeploy', validateOnly: true, region: 'us-east1', sourceRegion: 'us-central1' }, state: () => ({ target, cancelled, submitted }) };
+}
+test('regional validation copies the saved job within approved quota and cancels only its old validation', async () => {
+  const f = migrationFixture(); await executeFiniteVideoJob(f.options);
+  assert.equal(f.state().cancelled, true); assert.equal(f.state().submitted, true);
+  assert.deepEqual(f.state().target.spec.template.spec.template.spec.containers[0].env, f.before.spec.template.spec.template.spec.containers[0].env);
+  assert.deepEqual(f.state().target.spec.template.spec.template.spec.containers[0].resources.limits, { cpu: '8000m', memory: '32Gi' });
+  assert.ok(f.calls.filter(c => c[1] === 'revisions' && c[2] === 'describe').every(c => c.includes('--region=us-central1')));
+});
+test('insufficient regional quota prevents creation, cancellation and execution', async () => {
+  const f = migrationFixture({ memoryQuota: 32 * 2 ** 30 });
+  await assert.rejects(executeFiniteVideoJob(f.options), /does not cover/);
+  assert.deepEqual(f.state(), { target: undefined, cancelled: false, submitted: false });
+});
+test('regional placement never cancels a real source render', async () => {
+  const f = migrationFixture({ realSourceRender: true });
+  await assert.rejects(executeFiniteVideoJob(f.options), /real source render is active/);
+  assert.deepEqual(f.state(), { target: undefined, cancelled: false, submitted: false });
+});

@@ -57,7 +57,7 @@ export default function InteractiveDemoPlayer({
   const [currentId, setCurrentId] = useState(startSceneId);
   const [history, setHistory] = useState<string[]>([]);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [ended, setEnded] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -158,7 +158,7 @@ export default function InteractiveDemoPlayer({
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
           playsInline
-          muted
+          muted={muted}
           preload="metadata"
           poster={scene.poster}
           onLoadedData={() => setLoaded(true)}

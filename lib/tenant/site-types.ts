@@ -36,7 +36,10 @@ export type TenantSiteSectionType =
   | 'pricing'
   | 'cta'
   | 'contact_form'
-  | 'booking';
+  | 'booking'
+  | 'assessment'
+  | 'journal'
+  | 'events';
 
 export type TenantSiteSection = {
   id: string;
@@ -58,6 +61,15 @@ export type TenantSitePage = {
     keywords?: string[];
   };
   sections: TenantSiteSection[];
+};
+
+export type TenantSiteClaim = {
+  key: string;
+  value: unknown;
+  text?: string;
+  source: string | null;
+  verifiedAt: string | null;
+  status: 'verified' | 'owner_attested' | 'owner_verification_required';
 };
 
 export type TenantSiteConfig = {
@@ -109,6 +121,7 @@ export type TenantSiteConfig = {
   navigation: Array<{ label: string; href: string }>;
   footer: { description: string; contactEmail?: string };
   seo?: { title: string; description: string; keywords?: string[] };
+  claims?: TenantSiteClaim[];
   meta?: Record<string, unknown>;
 };
 
@@ -118,4 +131,5 @@ export type PublishedTenantSite = {
   siteName: string;
   organizationId: string | null;
   config: TenantSiteConfig;
+  parisEnabled?: boolean;
 };

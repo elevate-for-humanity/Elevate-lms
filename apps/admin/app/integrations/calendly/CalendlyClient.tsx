@@ -173,7 +173,7 @@ export default function CalendlyClient() {
       </div>
 
       {/* Stats */}
-      <div className="mt-4 grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Event Types</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{eventTypes.length}</p>

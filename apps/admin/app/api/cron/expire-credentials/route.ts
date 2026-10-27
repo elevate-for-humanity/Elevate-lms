@@ -1,6 +1,5 @@
-import { safeInternalError } from '@/lib/api/safe-error';
 // GET /api/cron/expire-credentials
-// Runs daily via Northflank cron when pg_cron is not available.
+// Runs daily via the Google-backed scheduler when pg_cron is not available.
 // Calls expire_stale_credentials() RPC and reports results.
 // Protected by CRON_SECRET header (same pattern as expire-licenses).
 import { NextResponse } from 'next/server';
@@ -23,12 +22,8 @@ async function _GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = await requireAdminClient();
-  if (!db) {
-    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-  }
-
   try {
+    const db = await requireAdminClient();
     const { data, error } = await db.rpc('expire_stale_credentials');
 
     if (error) {

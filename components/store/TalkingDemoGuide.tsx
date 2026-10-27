@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -14,18 +14,26 @@ export function TalkingDemoGuide({
   productName,
   steps,
   onStepChange,
+  activeIndex,
+  compact = false,
 }: {
   productName: string;
   steps: DemoStep[];
   onStepChange?: (index: number) => void;
+  activeIndex?: number;
+  compact?: boolean;
 }) {
-  const [index, setIndex] = useState(0);
+  const [localIndex, setIndex] = useState(0);
+  const index = Math.max(0, Math.min(steps.length - 1, activeIndex ?? localIndex));
   const [muted, setMuted] = useState(false);
   const naturalVoice = useNaturalVoice();
   const step = steps[index];
   const speaking = naturalVoice.isPlaying || naturalVoice.isPaused || naturalVoice.isLoading;
 
-  const stop = () => naturalVoice.stop();
+  const stop = naturalVoice.stop;
+  useEffect(() => {
+    stop();
+  }, [index, stop]);
 
   const speak = () => {
     if (muted || !step) return;
@@ -46,16 +54,28 @@ export function TalkingDemoGuide({
   if (!step) return null;
 
   return (
-    <aside className="rounded-2xl border border-brand-red-300 bg-white p-5 shadow-sm" aria-label={`${productName} narrated demo guide`}>
+    <aside
+      className={
+        compact
+          ? 'rounded-xl border border-slate-200 bg-white p-3 shadow-sm'
+          : 'rounded-2xl border border-brand-red-300 bg-white p-5 shadow-sm'
+      }
+      aria-label={`${productName} narrated demo guide`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Interactive guided demo</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+            Interactive guided demo
+          </p>
           <h2 className="mt-1 text-lg font-black text-slate-950">{productName}</h2>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => { setMuted((value) => !value); stop(); }}
+            onClick={() => {
+              setMuted((value) => !value);
+              stop();
+            }}
             className="rounded-lg border border-slate-400 p-2 text-slate-800 hover:bg-slate-50"
             aria-label={muted ? 'Unmute natural demo narration' : 'Mute natural demo narration'}
           >
@@ -72,13 +92,24 @@ export function TalkingDemoGuide({
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl bg-slate-50 p-4">
+      <div
+        className={compact ? 'mt-3 rounded-lg bg-slate-50 p-3' : 'mt-5 rounded-xl bg-slate-50 p-4'}
+      >
         <div className="flex items-center justify-between gap-3 text-xs font-bold text-slate-700">
-          <span>Step {index + 1} of {steps.length}</span>
+          <span>
+            Step {index + 1} of {steps.length}
+          </span>
           <span>{step.actionLabel || 'Explore the screen'}</span>
         </div>
         <h3 className="mt-2 text-base font-black text-slate-950">{step.title}</h3>
-        <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{step.narration}</p>
+        {compact ? (
+          <details className="mt-2 text-sm leading-6 text-slate-700">
+            <summary className="min-h-11 cursor-pointer font-bold">Read this step</summary>
+            <p>{step.narration}</p>
+          </details>
+        ) : (
+          <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{step.narration}</p>
+        )}
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3">
@@ -97,8 +128,14 @@ export function TalkingDemoGuide({
               type="button"
               aria-label={`Go to demo step ${dot + 1}`}
               onClick={() => selectStep(dot)}
-              className={`h-2.5 w-2.5 rounded-full ${dot === index ? 'bg-brand-red-600' : 'bg-slate-400'}`}
-            />
+              className="flex h-11 w-11 items-center justify-center rounded-full p-0"
+              aria-current={dot === index ? 'step' : undefined}
+            >
+              <span
+                aria-hidden="true"
+                className={`h-2.5 w-2.5 rounded-full ${dot === index ? 'bg-brand-red-600' : 'bg-slate-400'}`}
+              />
+            </button>
           ))}
         </div>
         <button
@@ -110,7 +147,11 @@ export function TalkingDemoGuide({
           Next <ChevronRight className="h-4 w-4" />
         </button>
       </div>
-      {naturalVoice.error ? <p className="mt-3 text-sm font-semibold text-red-800">Natural narration is temporarily unavailable; the written demo remains available.</p> : null}
+      {naturalVoice.error ? (
+        <p className="mt-3 text-sm font-semibold text-red-800">
+          Natural narration is temporarily unavailable; the written demo remains available.
+        </p>
+      ) : null}
     </aside>
   );
 }

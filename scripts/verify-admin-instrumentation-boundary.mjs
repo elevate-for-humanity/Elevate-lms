@@ -25,19 +25,23 @@ const forbidden = [
 ];
 
 const violations = forbidden.filter((token) => instrumentation.includes(token));
-if (rootInstrumentation.includes("./lib/agentic/executor")) {
+if (rootInstrumentation.includes('./lib/agentic/executor')) {
   violations.push('root instrumentation imports the Admin agentic executor');
 }
 if (violations.length) {
   console.error(
     `[verify-admin-instrumentation-boundary] Admin instrumentation imports Node-only rendering dependencies: ${violations.join(', ')}`,
   );
-  console.error('Keep heavy rendering dependencies behind the canonical agentic executor/domain worker boundary.');
+  console.error(
+    'Keep heavy rendering dependencies behind the canonical agentic executor/domain worker boundary.',
+  );
   process.exit(1);
 }
 
 if (!instrumentation.includes("process.env.NEXT_RUNTIME !== 'nodejs'")) {
-  console.error('[verify-admin-instrumentation-boundary] Missing explicit nodejs runtime boundary.');
+  console.error(
+    '[verify-admin-instrumentation-boundary] Missing explicit nodejs runtime boundary.',
+  );
   process.exit(1);
 }
 
@@ -46,7 +50,9 @@ const roleContracts = [
   "serviceRole === 'admin'",
   "process.env.ELEVATE_SERVICE = 'admin'",
 ];
-const missingRoleContracts = roleContracts.filter((token) => !(instrumentation + nodeInstrumentation).includes(token));
+const missingRoleContracts = roleContracts.filter(
+  (token) => !(instrumentation + nodeInstrumentation).includes(token),
+);
 if (missingRoleContracts.length) {
   console.error(
     `[verify-admin-instrumentation-boundary] Admin service-role normalization regressed: ${missingRoleContracts.join(', ')}`,
@@ -54,28 +60,43 @@ if (missingRoleContracts.length) {
   process.exit(1);
 }
 
-if (!instrumentation.includes("import('./instrumentation-node')") || !instrumentation.includes('startAdminAgenticExecutor()')) {
-  console.error('[verify-admin-instrumentation-boundary] Admin runtime does not start the canonical agentic executor.');
+if (
+  !instrumentation.includes("import('./instrumentation-node')") ||
+  !instrumentation.includes('startAdminAgenticExecutor()')
+) {
+  console.error(
+    '[verify-admin-instrumentation-boundary] Admin runtime does not start the canonical agentic executor.',
+  );
   process.exit(1);
 }
 
-if (!nodeInstrumentation.includes("import { startAgenticExecutor } from '../../lib/agentic/executor'") || !nodeInstrumentation.includes('startAgenticExecutor()')) {
-  console.error('[verify-admin-instrumentation-boundary] Node instrumentation does not start the canonical agentic executor.');
+if (
+  !nodeInstrumentation.includes(
+    "import { startAgenticExecutor } from '../../lib/agentic/executor'",
+  ) ||
+  !nodeInstrumentation.includes('startAgenticExecutor()')
+) {
+  console.error(
+    '[verify-admin-instrumentation-boundary] Node instrumentation does not start the canonical agentic executor.',
+  );
   process.exit(1);
 }
 
 if (!nodeInstrumentation.includes("process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true'")) {
-  console.error('[verify-admin-instrumentation-boundary] Admin runtime does not expose canonical executor startup readiness.');
+  console.error(
+    '[verify-admin-instrumentation-boundary] Admin runtime does not expose canonical executor startup readiness.',
+  );
   process.exit(1);
 }
 
 const executorContracts = [
   "import { processCourseAgenticTask } from './course-executor'",
-  "['marketing_campaign', 'course'].includes(project.target_type)",
+  "db.rpc('claim_agentic_build_task'",
+  "db.rpc('heartbeat_agentic_build_task'",
   "project.target_type === 'course'",
+  "project.target_type === 'marketing_campaign'",
   'processCourseAgenticTask',
-  ".eq('status', 'queued')",
-  'claimTask(task.id)',
+  'const task = await claimTask(input.runId)',
 ];
 
 const missingExecutorContracts = executorContracts.filter((token) => !executor.includes(token));
@@ -99,4 +120,6 @@ if (missingReadinessContracts.length) {
   process.exit(1);
 }
 
-console.info('[verify-admin-instrumentation-boundary] Admin runtime normalizes service role, starts canonical course/marketing agentic execution, and cannot report ready without executor startup.');
+console.info(
+  '[verify-admin-instrumentation-boundary] Admin runtime normalizes service role, starts canonical course/marketing agentic execution, and cannot report ready without executor startup.',
+);

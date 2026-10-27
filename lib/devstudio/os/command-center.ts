@@ -1,3 +1,4 @@
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CommandCenterSnapshot } from './types';
 
@@ -87,7 +88,8 @@ export async function buildCommandCenterSnapshot(
     integrationPending.push('AI provider key');
   }
   if (!health?.supabaseServiceKeyPresent) integrationPending.push('Supabase service key');
-  if (!process.env.NORTHFLANK_API_TOKEN) integrationPending.push('Northflank API token');
+  const googleConfigured = await isGoogleDeploymentConfigured();
+  if (!googleConfigured) integrationPending.push('Google deployment workflow dispatch');
 
   return {
     activeTasks,
@@ -102,7 +104,7 @@ export async function buildCommandCenterSnapshot(
             kind: lastBuildKind,
           }
         : null,
-      northflankConfigured: Boolean(process.env.NORTHFLANK_API_TOKEN),
+      googleConfigured,
     },
     health: {
       website: Boolean(health?.hasGitHub ?? health?.supabaseUrlPresent),

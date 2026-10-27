@@ -14,7 +14,8 @@ import { barberModule8 } from './module-8';
 const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
   videoGenerator: 'runway',
   template: 'elevate-slide',
-  instructorName: 'Brandon Williams',
+  instructorId: 'james-williams',
+  instructorName: 'James Williams',
   instructorTitle: 'Master Barber · 12 yrs',
   instructorImagePath: '/images/team/instructors/instructor-barber.jpg',
   topBarColor: '#ea580c',

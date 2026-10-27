@@ -1,0 +1,8 @@
+Launch the canonical authored-course repair and media renderer for:
+- 3fb5ce19-1cde-434c-a8c6-f138d7d7aa17 (Barber)
+- 9ca9fb50-7119-46ea-ab81-9b0193c29c31 (Cosmetology)
+
+Requested: 2026-09-18
+Release: 9574e05681aa0ea766cee81c0115f7172051b654
+Mode: preserve curriculum, canonical job-state recovery, Cloudflare TTS narration, CPU Remotion 1080p render, quality-gated publish
+Reason: emergency student access for morning classes

@@ -13,6 +13,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from '@/lib/audit';
 import { logger } from '@/lib/logger';
+import { requireRole } from '@/lib/auth/require-role';
+
+async function requireEnrollmentOperator() {
+  await requireRole(['admin', 'super_admin', 'staff']);
+}
 
 async function getDb() {
   return requireAdminClient();
@@ -67,6 +72,7 @@ export interface UpdateFundingAmountsInput {
 // CREATE ENROLLMENT
 // ============================================================================
 export async function createEnrollment(input: CreateEnrollmentInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Verify student exists
@@ -169,26 +175,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
         /* Module progress created successfully */
       }
     }
-    // 8. If this is an apprenticeship program, create apprenticeship_enrollments record
-    if (program.is_apprenticeship) {
-      const { error: apprenticeError } = await (db).from('apprenticeship_enrollments').insert({
-        student_id: input.student_id,
-        program_id: input.program_id,
-        enrollment_id: enrollment.id,
-        status: 'pending',
-        related_instruction_hours: 0,
-        on_the_job_hours: 0,
-        transferred_related_instruction_hours: 0,
-        transferred_ojt_hours: 0,
-      });
-      if (apprenticeError) {
-        logger.error('Apprenticeship enrollment error:', apprenticeError);
-        // Don't fail the whole enrollment
-      } else {
-        /* Apprenticeship enrollment created successfully */
-      }
-    }
-    // 9. Revalidate relevant paths
+    // Apprenticeships use the canonical program_enrollments record created above.\n    // Program-specific hours and transfer evidence are maintained on that record\n    // and in transfer_hours; no parallel enrollment authority is created.\n    // 9. Revalidate relevant paths
     revalidatePath('/enrollments');
     revalidatePath(`/admin/students/${input.student_id}`);
     revalidatePath(`/admin/programs/${program.slug}`);
@@ -210,6 +197,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
 // ADD TRANSFER HOURS
 // ============================================================================
 export async function addTransferHours(input: AddTransferHoursInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Verify enrollment exists
@@ -266,6 +254,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
 // APPROVE TRANSFER HOURS
 // ============================================================================
 export async function approveTransferHours(input: ApproveTransferHoursInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Get transfer hours record
@@ -315,7 +304,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
       // Error: $1
       throw new Error(`Failed to approve transfer hours: ${updateError.message}`);
     }
-    // 4. If this is an apprenticeship, update apprenticeship_enrollments
+    // 4. If this is an apprenticeship, update the canonical enrollment row.
     if (transferHours.enrollment?.program?.is_apprenticeship) {
       // Calculate total transferred hours for this enrollment
       const { data: allTransfers } = await db
@@ -334,14 +323,13 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
         );
         const totalOther = allTransfers.reduce((sum, t) => sum + (t.hours_other_accepted || 0), 0);
         // Update apprenticeship record
-        db
-          .from('apprenticeship_enrollments')
+        await db
+          .from('program_enrollments')
           .update({
-            transferred_related_instruction_hours: totalTheory,
-            transferred_ojt_hours: totalPractical + totalOther,
+            transfer_hours: totalTheory + totalPractical + totalOther,
             updated_at: new Date().toISOString(),
           })
-          .eq('enrollment_id', transferHours.enrollment_id);
+          .eq('id', transferHours.enrollment_id);
       }
     }
     // 5. Revalidate paths
@@ -364,6 +352,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
 // REJECT TRANSFER HOURS
 // ============================================================================
 export async function rejectTransferHours(transfer_hours_id: string, reason: string) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     const { error } = await db
@@ -394,6 +383,7 @@ export async function rejectTransferHours(transfer_hours_id: string, reason: str
 // UPDATE FUNDING AMOUNTS
 // ============================================================================
 export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Verify enrollment exists
@@ -440,6 +430,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
 // GET ENROLLMENT WITH FULL DETAILS
 // ============================================================================
 export async function getEnrollmentDetails(enrollment_id: string) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     const { data, error }: any = await db
@@ -460,8 +451,7 @@ export async function getEnrollmentDetails(enrollment_id: string) {
             *,
             scorm_packages(*)
           )
-        ),
-        apprenticeship:apprenticeship_enrollments(*)
+        )
       `,
       )
       .eq('id', enrollment_id)

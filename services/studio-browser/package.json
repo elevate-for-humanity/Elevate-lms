@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --test server.test.mjs"
+    "check": "node --check server.mjs && node --check cdp-browser.mjs && node --test *.test.mjs"
   },
   "dependencies": {
-    "playwright": "1.57.0"
+    "@google-cloud/storage": "8.4.0",
+    "axe-core": "^4.10.3"
   }
 }

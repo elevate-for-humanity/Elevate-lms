@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 
 export interface EmailTemplate {
   subject: string;
@@ -103,17 +104,23 @@ export class EmailService {
       `Document review: ${studentName} — ${documentType}`,
       `${studentName} uploaded ${documentType} for ${programName}.`,
       'Open the administrative document-review queue to review the submission.',
+      adminUrl('/documents/review'),
     ));
   }
 
-  private template(to: string, subject: string, heading: string, body: string): EmailNotification {
-    const dashboard = `${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard`;
+  private template(
+    to: string,
+    subject: string,
+    heading: string,
+    body: string,
+    actionUrl = `${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard`,
+  ): EmailNotification {
     return {
       to,
       from: this.fromEmail,
       subject,
-      text: `${heading}\n\n${body}\n\n${dashboard}\n\n— ${PLATFORM_DEFAULTS.orgName}`,
-      html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#0f172a"><div style="max-width:600px;margin:auto;padding:24px"><h2>${heading}</h2><p>${body}</p><p><a href="${dashboard}">Open dashboard</a></p><p style="color:#64748b;font-size:13px">${PLATFORM_DEFAULTS.orgName}</p></div></body></html>`,
+      text: `${heading}\n\n${body}\n\n${actionUrl}\n\n— ${PLATFORM_DEFAULTS.orgName}`,
+      html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#0f172a"><div style="max-width:600px;margin:auto;padding:24px"><h2>${heading}</h2><p>${body}</p><p><a href="${actionUrl}">Open dashboard</a></p><p style="color:#64748b;font-size:13px">${PLATFORM_DEFAULTS.orgName}</p></div></body></html>`,
     };
   }
 }

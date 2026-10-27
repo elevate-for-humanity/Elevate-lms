@@ -3,9 +3,9 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
-import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent } from '@/lib/ai/tools/registry';
+import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent, type AIAgentId } from '@/lib/ai/tools/registry';
+import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
-import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -19,6 +19,13 @@ type PlannedCommand = {
   answer?: string;
 };
 
+function internalAdminOrigin(): string {
+  const configured = process.env.ADMIN_INTERNAL_ORIGIN?.trim();
+  if (configured) return configured.replace(/\/$/, '');
+  const port = process.env.PORT?.trim() || '3000';
+  return `http://127.0.0.1:${port}`;
+}
+
 function sseLine(text: string): Uint8Array {
   return new TextEncoder().encode(`data: ${JSON.stringify({ line: text })}\n\n`);
 }
@@ -29,7 +36,7 @@ function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 function extractUuid(text: string): string | null {
-  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
+  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i)?.[0] ?? null;
 }
 function extractJsonObject(text: string): Record<string, unknown> | null {
   const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -51,6 +58,10 @@ function heuristicPlan(command: string): PlannedCommand | null {
   const lower = command.toLowerCase();
   const id = extractUuid(command);
 
+  if (/\b(?:open|launch|start)\b.*\b(?:cloud |studio )?browser\b/.test(lower)) {
+    const requestedUrl = command.match(/https:\/\/[^\s)]+/i)?.[0];
+    return { tool: 'browser.launch', input: { url: requestedUrl || 'https://elements.envato.com' } };
+  }
   if (/health|system status|platform status/.test(lower)) return { tool: 'system.health', input: {} };
   if (/\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower)) return { tool: 'applications.search', input: {} };
   if (/\bapprove\b.*\bapplication\b/.test(lower)) return { tool: 'applications.approve', input: id ? { id } : {} };
@@ -60,7 +71,12 @@ function heuristicPlan(command: string): PlannedCommand | null {
   if (/\banalytics|metrics\b/.test(lower)) return { tool: 'analytics.read', input: {} };
   if (/\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)) return { tool: 'payouts.list', input: {} };
   if (/\bmark\b.*\bpayout\b.*\bpaid\b/.test(lower)) return { tool: 'payouts.markPaid', input: id ? { enrollmentId: id } : {} };
-  if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) return { tool: 'courses.generate', input: { prompt: command } };
+  if (/\b(generate|build|create|finish|complete|resume)\b.*\bcourse\b/.test(lower)) {
+    return {
+      tool: 'courses.generate',
+      input: { action: 'start', goal: command, ...(id ? { courseId: id } : {}) },
+    };
+  }
   if (/\brun\b.*\btests?\b/.test(lower)) return { tool: 'workflows.runTests', input: {} };
   if (/\bdeploy\b/.test(lower)) return { tool: 'deployments.autopilot', input: {} };
   if (/\bapply\b.*\ball\b.*\bmigrations?\b/.test(lower)) return { tool: 'migrations.applyAll', input: {} };
@@ -70,12 +86,16 @@ function heuristicPlan(command: string): PlannedCommand | null {
   return null;
 }
 
-async function classifyCommand(command: string): Promise<PlannedCommand> {
+async function classifyCommand(command: string, agent: AIAgentId): Promise<PlannedCommand> {
+  const deterministic = planAIToolFromCommand(command);
+  if (deterministic) return { tool: deterministic.name, input: deterministic.input };
+
   const heuristic = heuristicPlan(command);
   if (heuristic) return heuristic;
 
-  const toolCatalog = getAIToolCatalogForPrompt('LIZZY');
+  const toolCatalog = unifiedToolCatalog();
   const result = await aiChat({
+    providerPolicy: 'owned-only',
     messages: [
       {
         role: 'system',
@@ -97,12 +117,69 @@ async function classifyCommand(command: string): Promise<PlannedCommand> {
   };
 }
 
-function summarizePayload(payload: unknown): string {
+/** Dev Studio is one assistant interface; tool owners remain internal execution adapters. */
+function resolveToolAgent(toolName: string): AIAgentId {
+  const allowed = getAITool(toolName)?.allowedAgents ?? [];
+  for (const candidate of ['LIZZY', 'PARIS', 'ELLIE', 'ZORA'] as const) {
+    if (allowed.includes(candidate)) return candidate;
+  }
+  return 'LIZZY';
+}
+
+function unifiedToolCatalog(): string {
+  return (['LIZZY', 'PARIS', 'ELLIE', 'ZORA'] as const)
+    .map((agent) => getAIToolCatalogForPrompt(agent))
+    .filter(Boolean)
+    .join('\\n');
+}
+
+function redactSecrets(value: string): string {
+  return value
+    .replace(/\bsk_(?:live|test)_[A-Za-z0-9_*.-]+/gi, '[REDACTED STRIPE KEY]')
+    .replace(/\bSG\.[A-Za-z0-9_.-]+/g, '[REDACTED SENDGRID KEY]')
+    .replace(/\bBearer\s+[A-Za-z0-9_.-]+/gi, 'Bearer [REDACTED]');
+}
+
+function summarizePayload(toolName: string, payload: unknown): string {
   if (payload == null) return 'Completed with no response body.';
-  if (typeof payload === 'string') return payload.slice(0, 2200);
+  if (typeof payload === 'string') return redactSecrets(payload.slice(0, 2200));
+
+  const record = asRecord(payload);
+  if (toolName === 'system.health') {
+    const services = asRecord(record.services);
+    const lines = Object.values(services).map((value) => {
+      const service = asRecord(value);
+      const name = String(service.name ?? 'Service');
+      const status = String(service.status ?? 'unknown');
+      const message = typeof service.message === 'string' ? ` â ${redactSecrets(service.message)}` : '';
+      return `â¢ ${name}: ${status}${message}`;
+    });
+    return [`Overall platform status: ${String(record.overall ?? 'unknown')}`, ...lines].join('\n');
+  }
+
+  if (toolName === 'organization.directory') {
+    const members = Array.isArray(record.members) ? record.members : [];
+    if (!members.length) return 'No matching active team member was found in the approved organization directory.';
+    return members.map((value) => {
+      const member = asRecord(value);
+      const summary = [member.name, member.title].filter(Boolean).join(' â ');
+      return member.bio ? `${summary}\n${String(member.bio)}` : summary;
+    }).join('\n\n');
+  }
+
+  const protectedTools: Record<string, string> = {
+    'students.search': 'Student records were found. Open the protected Students workspace to review authorized details.',
+    'enrollments.search': 'Enrollment records were found. Open the protected Enrollments workspace to review authorized details.',
+    'applications.search': 'Application records were found. Open the protected Applications workspace to review authorized details.',
+    'payouts.list': 'Payout records were found. Open the protected payout queue to review authorized details.',
+    'wioa.list': 'WIOA records were found. Open the protected WIOA workspace to review authorized details.',
+    'workflows.inspect': 'Workflow state was inspected. Open AI Task Queue or Workflow Designer for the complete protected audit record.',
+  };
+  if (protectedTools[toolName]) return protectedTools[toolName];
+
   try {
-    const json = JSON.stringify(payload, null, 2);
-    return json.length > 2200 ? `${json.slice(0, 2200)}\n…` : json;
+    const json = redactSecrets(JSON.stringify(payload, null, 2));
+    return json.length > 2200 ? `${json.slice(0, 2200)}\nâ¦` : json;
   } catch {
     return 'Completed.';
   }
@@ -117,6 +194,8 @@ export async function POST(request: NextRequest) {
 
   const body = asRecord(await request.json().catch(() => ({})));
   const command = typeof body.command === 'string' ? body.command.trim() : '';
+  // Legacy client-selected agent names do not partition the Admin Studio assistant.
+  const agent: AIAgentId = 'LIZZY';
   if (!command) return Response.json({ error: 'command is required' }, { status: 400 });
 
   try {
@@ -133,18 +212,19 @@ export async function POST(request: NextRequest) {
       const write = (text: string) => controller.enqueue(sseLine(text));
       try {
         write(`Command: ${command}`);
-        const plan = await classifyCommand(command);
+        const plan = await classifyCommand(command, agent);
 
         if (!plan.tool) {
-          write('Mode: analysis only — no tool executed.');
+          write('Mode: analysis only â no tool executed.');
           if (plan.answer) {
             write(plan.answer);
           } else {
             const answer = await aiChat({
+              providerPolicy: 'owned-only',
               messages: [
                 {
                   role: 'system',
-                  content: `You are LIZZY, the Elevate Dev Studio operations assistant. Answer concisely. Do not claim an action ran. Available registered tools:\n${getAIToolCatalogForPrompt('LIZZY')}`,
+                  content: `You are ${agent}, an Elevate Admin AI specialist. Answer concisely. Do not claim an action ran. Available registered tools:\n${getAIToolCatalogForPrompt(agent)}`,
                 },
                 { role: 'user', content: command },
               ],
@@ -155,7 +235,7 @@ export async function POST(request: NextRequest) {
           }
         } else {
           const tool = getAITool(plan.tool)!;
-          write(`Tool: ${tool.name} · ${tool.classification} · risk ${tool.risk}${plan.explanation ? ` — ${plan.explanation}` : ''}`);
+          write(`Tool: ${tool.name} Â· ${tool.classification} Â· risk ${tool.risk}${plan.explanation ? ` â ${plan.explanation}` : ''}`);
 
           const required = tool.confirmationPhrase;
           const confirmationText = typeof body.confirmationText === 'string'
@@ -168,14 +248,14 @@ export async function POST(request: NextRequest) {
             ...plan.input,
             ...asRecord(body.toolInput),
           }, {
-            agent: 'LIZZY',
+            agent: resolveToolAgent(tool.name),
             actorId: auth.id,
             actorRoles: auth.effectiveRoles,
             tenantId: typeof body.tenantId === 'string' ? body.tenantId : null,
             correlationId,
             confirmationText,
             requestHeaders: request.headers,
-            adminOrigin: getAdminUrl(),
+            adminOrigin: internalAdminOrigin(),
             appOrigin: request.nextUrl.origin,
             idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : null,
           });
@@ -183,10 +263,10 @@ export async function POST(request: NextRequest) {
           if (result.status === 'approval_required') {
             write(`Blocked pending human approval. Type exactly: "${result.requiredConfirmation}"`);
           } else if (!result.ok) {
-            write(`Failed · HTTP ${result.httpStatus} · Tool execution failed.`);
+            write(`Failed Â· HTTP ${result.httpStatus} Â· Tool execution failed.`);
           } else {
-            write(`Completed · ${result.tool} · HTTP ${result.httpStatus}`);
-            write(summarizePayload(result.payload));
+            write(`${result.status === 'accepted' ? 'Running' : 'Completed'} · ${result.tool} · HTTP ${result.httpStatus}`);
+            write(summarizePayload(result.tool, result.payload));
           }
         }
       } catch (error) {

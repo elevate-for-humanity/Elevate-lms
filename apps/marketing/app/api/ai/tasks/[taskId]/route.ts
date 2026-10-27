@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { getTaskOrchestrator } from '@/lib/ai/task-orchestrator';
 import { TaskStatus } from '@/lib/ai/types';
 
@@ -13,6 +14,7 @@ export async function GET(
   { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
+    await apiRequireDevStudio(request);
     const { taskId } = await params;
     const orchestrator = getTaskOrchestrator();
     const task = orchestrator.getTask(taskId);
@@ -52,6 +54,7 @@ export async function PATCH(
   { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
+    await apiRequireDevStudio(request);
     const { taskId } = await params;
     const body = await request.json();
     const orchestrator = getTaskOrchestrator();

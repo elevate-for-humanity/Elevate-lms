@@ -11,19 +11,19 @@ type BeforeInstallPromptEvent = Event & {
 type InstallableApp = {
   name: string;
   description: string;
-  href: string;
+  manageHref: string;
+  installHref: string;
   local: boolean;
-  manifest?: string;
 };
 
+const LMS_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org';
 const apps: readonly InstallableApp[] = [
-  { name: 'Admin', description: 'Administrative operations and Dev Studio', href: 'https://admin.elevateforhumanity.org/dashboard', manifest: '/manifest-admin.json', local: true },
-  { name: 'Student / Learner', description: 'Courses, assignments, progress and credentials', href: 'https://app.elevateforhumanity.org/lms', local: false },
-  { name: 'Apprentice', description: 'OJL, RTI, skills and apprenticeship progress', href: 'https://app.elevateforhumanity.org/apprentice', local: false },
-  { name: 'Employer', description: 'Employer workforce and participant workspace', href: 'https://app.elevateforhumanity.org/employer', local: false },
-  { name: 'Program Holder', description: 'Program-holder operations and compliance', href: 'https://app.elevateforhumanity.org/program-holder', local: false },
-  { name: 'Host Shop', description: 'Host-shop apprenticeship workspace', href: 'https://app.elevateforhumanity.org/host-shop', local: false },
-  { name: 'Elevate', description: 'Public Elevate for Humanity application', href: 'https://www.elevateforhumanity.org/', local: false },
+  { name: 'Admin', description: 'Administrative operations and Dev Studio', manageHref: '/dashboard', installHref: '/install', local: true },
+  { name: 'Student / Learner', description: 'Select a real learner for an audited dashboard preview.', manageHref: '/students', installHref: `${LMS_ORIGIN}/install/learner`, local: false },
+  { name: 'Apprentice', description: 'Select an enrolled apprentice before opening hours, RTI, and progress.', manageHref: '/students', installHref: `${LMS_ORIGIN}/install/apprentice`, local: false },
+  { name: 'Employer', description: 'Select an employer record before opening its workforce dashboard.', manageHref: '/employers', installHref: `${LMS_ORIGIN}/install/employer`, local: false },
+  { name: 'Program Holder', description: 'Select a Program Holder and open its secured dashboard preview.', manageHref: '/program-holders', installHref: `${LMS_ORIGIN}/install/program-holder`, local: false },
+  { name: 'Host Shop', description: 'Use the live Host Shop selector below to open a connected shop.', manageHref: '/partners', installHref: `${LMS_ORIGIN}/install/host-shop`, local: false },
 ];
 
 export function PwaInstallCenter() {
@@ -66,7 +66,7 @@ export function PwaInstallCenter() {
           <div>
             <h2 id="pwa-install-center-title" className="text-xl font-black text-slate-950">PWA downloads &amp; install apps</h2>
             <p className="mt-1 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-              Install the Admin app on this device or open each role portal to install its PWA. Each role keeps its canonical portal and manifest instead of creating duplicate applications.
+              Install the Admin app on this device or open each role portal to install its PWA. Each card opens the canonical role portal with its own installable manifest; no duplicate applications are created.
             </p>
           </div>
         </div>
@@ -85,15 +85,16 @@ export function PwaInstallCenter() {
               {app.local && installed ? (
                 <span className="inline-flex min-h-11 items-center rounded-xl bg-emerald-100 px-4 py-2 text-sm font-black text-emerald-900">Installed</span>
               ) : null}
-              <a href={app.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-900 hover:bg-slate-100">
-                {app.local ? 'Open app' : 'Open to install'} <ExternalLink className="h-4 w-4" />
+              <a href={app.manageHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-900 hover:bg-slate-100">
+                {app.local ? 'Open app' : 'Select account'} <ExternalLink className="h-4 w-4" />
               </a>
+              {!app.local ? <a href={app.installHref} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-blue-800"><Download className="h-4 w-4" />Install PWA</a> : null}
             </div>
           </article>
         ))}
       </div>
       <div className="border-t border-slate-100 px-6 py-4 text-xs font-medium leading-5 text-slate-600 sm:px-8">
-        On browsers that do not expose an Install button, open the portal and use the browser menu → Install app or Add to Home Screen.
+        Every portal includes its manifest, icons, and public offline shell. Secure student, partner, and administrative records remain network-only and are not stored on the device. If the browser does not expose an Install button, open the portal and use the browser menu → Install app or Add to Home Screen.
       </div>
     </section>
   );

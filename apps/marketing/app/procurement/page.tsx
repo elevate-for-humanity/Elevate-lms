@@ -3,10 +3,21 @@ import Link from 'next/link';
 import { Accessibility, Activity, Boxes, Database, FileLock2, FileText, KeyRound, LifeBuoy, Network, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Procurement Center | Elevate for Humanity',
+  title: 'Procurement Center',
   description: 'Buyer-oriented procurement, architecture, security, accessibility, implementation, data ownership, and auditability resources for the Elevate platform.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/procurement' },
 };
+
+const reviewMaterials = [
+  { item: 'Privacy and data handling', access: 'Public', href: '/privacy', detail: 'Collection, use, sharing, retention, payment data, participant rights, and request handling.' },
+  { item: 'Security control description', access: 'Public', href: '/security-and-data-protection', detail: 'Identity, authorization, audit logging, encryption, incident handling, and control boundaries.' },
+  { item: 'Accessibility statement', access: 'Public', href: '/accessibility', detail: 'WCAG 2.2 Level AA target, testing approach, accommodations, and barrier reporting.' },
+  { item: 'Platform demonstration', access: 'Public demo', href: '/platform/demo', detail: 'Synthetic personas and example workflows; no production participant information is exposed.' },
+  { item: 'Support process', access: 'Public', href: '/support', detail: 'Support channels, business hours, help topics, and ticket intake.' },
+  { item: 'Architecture, data flow, and subprocessors', access: 'Authorized review', href: '/contact', detail: 'Shared during due diligence at the level appropriate to the proposed implementation.' },
+  { item: 'Availability, recovery, and escalation commitments', access: 'Contract', href: '/contact', detail: 'Defined in the executed agreement for the purchased scope; not implied by public marketing.' },
+  { item: 'Independent attestations and test reports', access: 'On request', href: '/contact', detail: 'Provided only when a current report exists and the recipient is authorized to receive it.' },
+] as const;
 
 const buyerTopics = [
   { title: 'Architecture & tenancy', text: 'Review the multi-service platform model, role separation, tenant boundaries, and deployment architecture.', icon: Network },
@@ -49,6 +60,24 @@ export default function ProcurementPage() {
             </article>
           ))}
         </div>
+
+        <section className="mt-12" aria-labelledby="buyer-review-checklist">
+          <p className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Buyer review checklist</p>
+          <h2 id="buyer-review-checklist" className="mt-2 text-3xl font-black tracking-tight">What is public, what requires review, and what belongs in the contract</h2>
+          <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200">
+            <div className="hidden grid-cols-[1.1fr_0.45fr_1.6fr] gap-4 bg-slate-950 px-6 py-4 text-sm font-black text-white md:grid">
+              <span>Review item</span><span>Access</span><span>What it covers</span>
+            </div>
+            {reviewMaterials.map((material) => (
+              <div key={material.item} className="grid gap-2 border-t border-slate-200 px-6 py-5 first:border-t-0 md:grid-cols-[1.1fr_0.45fr_1.6fr] md:gap-4">
+                <Link href={material.href} className="font-black text-slate-950 underline-offset-4 hover:underline">{material.item}</Link>
+                <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-wide text-slate-700">{material.access}</span>
+                <p className="leading-6 text-slate-600">{material.detail}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-sm leading-6 text-slate-600">A public description is not a substitute for a signed service level, completed security questionnaire, current accessibility evaluation, or independent assurance report.</p>
+        </section>
 
         <section className="mt-12 grid gap-6 lg:grid-cols-2">
           <div className="rounded-3xl bg-slate-50 p-7">

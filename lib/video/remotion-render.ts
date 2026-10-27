@@ -1,3 +1,7 @@
+import { resolveStoredNarrationUrl } from '../ultimate-course-builder/quality/narration-audio-analysis';
+import { storyboardRenderFingerprint } from './render-checkpoint-contract.mjs';
+import {createCheckpointFallback,privateCheckpointStorage} from './checkpoint-fallback.mjs';
+import {reportCourseProgress,courseProgressSignal} from '../ultimate-course-builder/worker/progress-watch.mjs';
 /**
  * lib/video/remotion-render.ts
  *
@@ -12,11 +16,21 @@
 import 'server-only';
 
 import path from 'path';
-import os from 'os';
-import { mkdir, writeFile, unlink, rm } from 'fs/promises';
+import {createHash} from 'node:crypto';
+import { videoEncoderArgs } from './ffmpeg-runtime';
+import { renderConcurrency } from './render-concurrency.mjs';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+import { motionExcerptWindow } from '../ultimate-course-builder/instructional/motion-excerpt.mjs';
+import { pictureTimeline, pictureSceneTiming } from '../ultimate-course-builder/instructional/picture-timeline.mjs';
+import { assertPremiumSpeechSignal } from '../ultimate-course-builder/instructional/approved-presentation.mjs';
+import { installRemotionHostCompatibility } from './remotion-host-compat.mjs';
+import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
 import { logger } from '@/lib/logger';
+import { getElevateMediaStorageClient, getElevateMediaStorageConfig, isElevateMediaStorageConfigured } from '@/lib/storage/elevate-media-storage';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -34,7 +48,13 @@ import {
   gpuVideoAvailable,
 } from './gpu-video-client';
 import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/SlideLesson';
-import { instructionalLayoutForTitle } from '@/remotion-src/instructional-layout';
+import { instructionalLayoutForScene } from '@/remotion-src/instructional-layout';
+import { FOOTAGE_TITLE_LAYOUT } from '@/remotion-src/footage-title-layout.mjs';
+import { deriveInstructionalVisualIntent } from '@/server/video-generator/visual-intelligence';
+
+export function cpuOnlyCourseMedia(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.COURSE_MEDIA_RENDER_MODE !== 'legacy-gpu-opt-in';
+}
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -67,11 +87,97 @@ export interface RemotionRenderResult {
   sceneData?: MediaStoryboard;
 }
 
+const STORYBOARD_RENDER_FPS = 30;
+const execFileAsync = promisify(execFile);
+const EXACT_INSTRUCTIONAL_SCENE_TYPES = new Set([
+  'equipment_closeup',
+  'worked_example',
+  'common_mistake',
+  'safety_warning',
+]);
+
+async function measuredAudioDurationSeconds(audioPath: string): Promise<number | null> {
+  try {
+    const { stdout } = await execFileAsync(
+      'ffprobe',
+      [
+        '-v',
+        'error',
+        '-show_entries',
+        'format=duration',
+        '-of',
+        'default=noprint_wrappers=1:nokey=1',
+        audioPath,
+      ],
+      { timeout: 30_000, maxBuffer: 100_000 },
+    );
+    const seconds = Number.parseFloat(String(stdout).trim());
+    return Number.isFinite(seconds) && seconds > 0 ? seconds : null;
+  } catch {
+    return null;
+  }
+}
+
 export interface StoryboardRenderInput {
+  ownerPreview?: boolean;
+  renderRevision?: string;
+  teachingPhotos?: any[][];
+  motionEvidence?: Array<{visibleActions:string[];contentSha256?:string}>;
+  lessonPresentation?: 'approved-premium-v1';
+  visualStyle?: {cropMode?: 'contain' | 'cover-safe'; transition?: 'cut' | 'crossfade'};
   lessonId: string;
   courseTitle: string;
   storyboard: MediaStoryboard;
   instructorId?: string;
+  preRollUrl?: string | null;
+  preRollDurationSeconds?: number;
+  postRollUrl?: string | null;
+  postRollDurationSeconds?: number;
+  ultimateStrict?: boolean;
+  /** Fail before encoding when any scene would render without a concrete
+   * image or video URL, or when scenes reuse the same visual. */
+  requireVisualEvidence?: boolean;
+  narrationSegments?: Array<{
+    segmentId: string;
+    text: string;
+    audioUrl: string;
+    durationSeconds: number;
+    wordAlignment?: Array<{word:string;start:number;end:number}>;
+    parts?: Array<{text:string;isRecap:boolean;startSeconds:number;durationSeconds:number;audioUrl:string}>;
+    captions?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
+  }>;
+}
+
+function enabled(value: string | undefined): boolean {
+  return value?.trim().toLowerCase() === 'true';
+}
+
+/** Never pass provider response objects into Remotion media components.
+ * Some media providers return `{url}`/`{src}` wrappers even when their SDK
+ * types claim a string. Chromium stringifies those values to `[object Object]`
+ * and the entire paid render fails after narration has already been created. */
+export function normalizeRemotionMediaUrl(value: unknown): string | null {
+  let candidate: unknown = value;
+  if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+    const record = candidate as Record<string, unknown>;
+    candidate = record.url ?? record.src ?? record.href ?? record.publicUrl ?? record.public_url;
+  }
+  if (typeof candidate !== 'string' || !candidate.trim()) return null;
+  try {
+    const parsed = new URL(candidate.trim());
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+export function normalizeSlideLessonScenes(scenes: SceneData[]): SceneData[] {
+  return scenes.map((scene) => ({
+    ...scene,
+    clipUrl: normalizeRemotionMediaUrl(scene.clipUrl),
+    imageUrl: normalizeRemotionMediaUrl(scene.imageUrl),
+    audioSrc: normalizeRemotionMediaUrl(scene.audioSrc),
+  }));
 }
 
 function vttTimestamp(seconds: number): string {
@@ -80,19 +186,78 @@ function vttTimestamp(seconds: number): string {
   const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
   const secs = Math.floor((milliseconds % 60_000) / 1000);
   const millis = milliseconds % 1000;
-  return [hours, minutes, secs]
-    .map((value) => String(value).padStart(2, '0'))
-    .join(':') + `.${String(millis).padStart(3, '0')}`;
+  return (
+    [hours, minutes, secs].map((value) => String(value).padStart(2, '0')).join(':') +
+    `.${String(millis).padStart(3, '0')}`
+  );
 }
 
-export function buildStoryboardWebVtt(scenes: SceneData[]): string {
-  let cursor = 3;
-  const cues = scenes.map((scene, index) => {
-    const start = cursor;
-    cursor += scene.durationFrames / 30;
-    return `${index + 1}\n${vttTimestamp(start)} --> ${vttTimestamp(cursor)}\n${scene.narration}`;
-  });
+export function buildStoryboardWebVtt(scenes: SceneData[], introSeconds = 3): string {
+  let cursor = introSeconds;
+  const cues: string[] = [];
+  for (const scene of scenes) {
+    const timed = scene.captionCues ?? [
+      {
+        startSeconds: 0,
+        endSeconds: scene.durationFrames / STORYBOARD_RENDER_FPS,
+        text: scene.narration,
+      },
+    ];
+    for (const cue of timed)
+      cues.push(
+        `${cues.length + 1}\n${vttTimestamp(cursor + cue.startSeconds)} --> ${vttTimestamp(cursor + cue.endSeconds)}\n${cue.text}`,
+      );
+    cursor += scene.durationFrames / STORYBOARD_RENDER_FPS;
+  }
   return `WEBVTT\n\n${cues.join('\n\n')}\n`;
+}
+
+async function createOpeningStillFromLicensedVideo(input: {
+  videoUrl: string;
+  outputDir: string;
+  lessonId: string;
+}): Promise<string> {
+  const response = await fetch(input.videoUrl, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!response.ok) {
+    throw new Error(`licensed video returned ${response.status}`);
+  }
+  const video = Buffer.from(await response.arrayBuffer());
+  if (!video.length || video.length > 512 * 1024 * 1024) {
+    throw new Error(`licensed video size is invalid (${video.length} bytes)`);
+  }
+
+  const safeLessonId = input.lessonId.replace(/[^a-z0-9_-]+/gi, '-');
+  const sourcePath = path.join(input.outputDir, `opening-${safeLessonId}.mp4`);
+  const stillPath = path.join(input.outputDir, `opening-${safeLessonId}.jpg`);
+  await writeFile(sourcePath, video);
+  await execFileAsync(
+    'ffmpeg',
+    [
+      '-y',
+      '-ss',
+      '1',
+      '-i',
+      sourcePath,
+      '-frames:v',
+      '1',
+      '-vf',
+      'scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black',
+      '-q:v',
+      '2',
+      stillPath,
+    ],
+    { timeout: 120_000, maxBuffer: 2_000_000 },
+  );
+  const still = await readFile(stillPath);
+  if (!still.length) throw new Error('licensed video produced an empty opening still');
+  return uploadCourseVideosObject(
+    still,
+    `generated-lessons/lesson-${safeLessonId}-opening.jpg`,
+    'image/jpeg',
+  );
 }
 
 // ── Instructor config ─────────────────────────────────────────────────────────
@@ -107,6 +272,13 @@ interface InstructorConfig {
 }
 
 const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
+  'avery-brooks': {
+    name: 'Avery Brooks',
+    title: 'Cosmetology Education Specialist',
+    voice: EDGE_TTS_VOICES.female,
+    topBarColor: '#a855f7',
+    accentColor: '#ec4899',
+  },
   'marcus-johnson': {
     name: 'Marcus Johnson',
     title: 'Workforce Development Specialist',
@@ -172,8 +344,8 @@ function requiredInstructor(id: string): InstructorConfig {
 const DEFAULT_INSTRUCTOR = requiredInstructor('marcus-johnson');
 
 function getInstructor(instructorId?: string): InstructorConfig {
-  const instructor = instructorId ? INSTRUCTOR_CONFIGS[instructorId] : undefined;
-  return instructor ?? DEFAULT_INSTRUCTOR;
+  if (!instructorId) return DEFAULT_INSTRUCTOR;
+  return requiredInstructor(instructorId);
 }
 
 // ── Segment frame calculator ──────────────────────────────────────────────────
@@ -228,6 +400,7 @@ function getOutputPaths(lessonId: string) {
 let _bundleUrl: string | null = null;
 
 async function getBundleUrl(): Promise<string> {
+  installRemotionHostCompatibility();
   if (_bundleUrl) return _bundleUrl;
 
   logger.info('[RemotionRender] Bundling Remotion composition...');
@@ -295,7 +468,10 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     // ── Step 2: Fetch background image ────────────────────────────────────────
     logger.info(`[RemotionRender] Fetching background image (domain: ${domainKey})`);
     const imageQuery = input.visualPrompt?.replace(/[^a-zA-Z0-9 ,'-]/g, ' ').slice(0, 180);
-    const backgroundImageSrc = await getPexelsImage(domainKey, imageQuery ? { query: imageQuery } : {});
+    const backgroundImageSrc = await getPexelsImage(
+      domainKey,
+      imageQuery ? { query: imageQuery } : {},
+    );
 
     // ── Step 3: Build Remotion props ──────────────────────────────────────────
     const segmentFrames = calcSegmentFrames(duration);
@@ -326,7 +502,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const bundleUrl = await getBundleUrl();
 
     // Dynamic imports — keep Remotion renderer out of Next.js webpack bundle
-    const { renderMedia, selectComposition } = await import('@remotion/renderer');
+    const { renderMedia, selectComposition, makeCancelSignal } = await import('@remotion/renderer');
     const { registerUsageEvent } = await import('@remotion/licensing');
 
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
@@ -357,8 +533,8 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       codec: 'h264',
       outputLocation: paths.videoPath,
       inputProps: compositionProps,
-      // Use all available CPU cores for encoding
-      concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
+      // Bound render fan-out independently of the underlying host CPU count
+      concurrency: renderConcurrency(),
       // Reasonable quality for LMS delivery
       crf: 23,
       // Log progress every 10%
@@ -402,7 +578,9 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 /** Render the canonical Media Director storyboard through the existing rich
  * SlideLesson composition. Each scene gets its own narration and relevant
  * full-frame motion or image fallback instead of collapsing to one backdrop. */
-export async function renderStoryboardVideo(input: StoryboardRenderInput): Promise<RemotionRenderResult> {
+export async function renderStoryboardVideo(
+  input: StoryboardRenderInput,
+): Promise<RemotionRenderResult> {
   const paths = getOutputPaths(input.lessonId);
   const instructor = getInstructor(input.instructorId);
   try {
@@ -411,22 +589,96 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
     // GPU instructional scenes flow through
     // the compositor, captions/transcript generation, compression, and the
     // canonical quality gate.
-    const canGenerateMotion = await gpuVideoAvailable();
+    // Full lesson storyboards can contain many scenes. Sending every scene to
+    // the long-running GPU endpoint serially can keep one lesson leased for
+    // hours and starve the entire course queue. Rich, narration-aligned stock
+    // motion and deterministic teaching diagrams remain the default. GPU
+    // enhancement is an explicit deployment choice until it has a bounded,
+    // asynchronous per-scene contract.
+    const canGenerateMotion =
+      !input.ultimateStrict &&
+      !cpuOnlyCourseMedia() &&
+      enabled(process.env.ENABLE_GPU_LESSON_SCENES) &&
+      (await gpuVideoAvailable());
     const resolvedStoryboard: MediaStoryboard = structuredClone(input.storyboard);
+    const premium = input.lessonPresentation === 'approved-premium-v1';
 
     for (const [index, scene] of input.storyboard.scenes.entries()) {
       const narration = scene.dialogue?.trim() || scene.action.trim();
-      const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
-      const audioSrc = await uploadLessonMediaBuffer(audio, `${input.lessonId}-scene-${index + 1}`, 'mp3');
-      const query = [scene.subject, scene.environment, scene.action].join(' ').slice(0, 180);
-      const instructionalLayout = instructionalLayoutForTitle(scene.subject);
-      let clipUrl = instructionalLayout ? null : scene.sourceVideoUrl || null;
+      const approvedAudio = input.narrationSegments?.[index];
+      if(premium&&!approvedAudio?.wordAlignment?.length) throw new Error('APPROVED_MEASURED_WORD_ALIGNMENT_REQUIRED');
+      if (input.ultimateStrict && (!approvedAudio || approvedAudio.text !== narration))
+        throw new Error('ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED');
+      let audioSrc: string;
+      let measuredNarrationSeconds: number | null;
+      if (approvedAudio) {
+        const approvedAudioUrl = (await resolveStoredNarrationUrl(approvedAudio.audioUrl)).href;
+        const response = await fetch(approvedAudioUrl, {
+          signal: AbortSignal.timeout(60000),
+        });
+        if (!response.ok) throw new Error(`Approved narration returned HTTP ${response.status}`);
+        const audio = Buffer.from(await response.arrayBuffer());
+        const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
+        await writeFile(sceneAudioPath, audio);
+        measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
+        if (input.lessonPresentation === 'approved-premium-v1' && !input.ownerPreview) {
+          const { stderr } = await execFileAsync('ffmpeg', ['-hide_banner','-i',sceneAudioPath,'-af','silencedetect=noise=-40dB:d=1.5,volumedetect','-f','null','-'], {timeout:120000,maxBuffer:2000000});
+          assertPremiumSpeechSignal(String(stderr));
+        }
+        if (
+          !measuredNarrationSeconds ||
+          Math.abs(measuredNarrationSeconds - approvedAudio.durationSeconds) > 0.1
+        )
+          throw new Error('ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED');
+        audioSrc = approvedAudioUrl;
+      } else {
+        const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
+        const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
+        await writeFile(sceneAudioPath, audio);
+        measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
+        audioSrc = await uploadLessonMediaBuffer(
+          audio,
+          `${input.lessonId}-scene-${index + 1}`,
+          'mp3',
+        );
+      }
+      const visualIntent = deriveInstructionalVisualIntent({
+        domainKey: /hvac|epa 608|refriger/i.test(input.courseTitle) ? 'hvac_epa608' : null,
+        title: scene.subject,
+        action: scene.action,
+        visualFocus: scene.requiredVisualEvidence,
+        sceneType: scene.sceneType,
+      });
+      const query = visualIntent.query;
+      const hasResolvedVisual = Boolean(
+        normalizeRemotionMediaUrl(scene.sourceVideoUrl) ||
+        normalizeRemotionMediaUrl(scene.referenceImageUrl),
+      );
+      const instructionalLayout =
+        !hasResolvedVisual &&
+        (scene.mediaSource === 'elevate-motion' ||
+          visualIntent.deterministicDiagram ||
+          EXACT_INSTRUCTIONAL_SCENE_TYPES.has(scene.sceneType))
+          ? instructionalLayoutForScene({
+              title: scene.subject,
+              action: scene.action,
+              sceneType: scene.sceneType,
+            })
+          : null;
+      let clipUrl = instructionalLayout ? null : normalizeRemotionMediaUrl(scene.sourceVideoUrl);
       let lipSyncedInstructor = false;
 
       // A visible instructor may appear only when the delivered narration is
       // actually driving the mouth movement. Keep this to the opening scene so
       // the rest of the lesson can teach with cinematic and exact graphics.
-      if (index === 0 && process.env.DID_API_KEY?.trim()) {
+      // D-ID polling is also an optional enrichment. It must not sit in the
+      // critical path of the canonical lesson render unless explicitly enabled.
+      if (
+        !input.ultimateStrict &&
+        index === 0 &&
+        enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR) &&
+        process.env.DID_API_KEY?.trim()
+      ) {
         try {
           const { createTalk, pollTalkResult } = await import('@/lib/d-id/generate-talk');
           const talk = await createTalk({
@@ -449,19 +701,69 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
             };
           }
         } catch (error) {
-          logger.warn('[RemotionRender] Lip-synced instructor unavailable; using non-speaking cinematic footage', {
-            lessonId: input.lessonId,
-            scene: index + 1,
-            error: error instanceof Error ? error.message : String(error),
-          });
+          logger.warn(
+            '[RemotionRender] Lip-synced instructor unavailable; using non-speaking cinematic footage',
+            {
+              lessonId: input.lessonId,
+              scene: index + 1,
+              error: error instanceof Error ? error.message : String(error),
+            },
+          );
         }
       }
 
-      const imageUrl = lipSyncedInstructor
+      let imageUrl = lipSyncedInstructor
         ? CANONICAL_TALKING_INSTRUCTOR_IMAGE
         : instructionalLayout
           ? null
-          : scene.referenceImageUrl || await getPexelsImage('default', { query });
+          : normalizeRemotionMediaUrl(scene.referenceImageUrl);
+      if (!imageUrl && !input.ultimateStrict) {
+        imageUrl = normalizeRemotionMediaUrl(
+          await getPexelsImage('default', {
+            query,
+            deterministicKey: scene.contentHash,
+            allowGeneratedFallback: !input.ultimateStrict,
+          }),
+        );
+      }
+      // Pollinations can take longer than Chromium's delayRender window. Fetch
+      // the generated image once on the server and persist it beside the lesson
+      // media before Remotion starts. The composition then reads a stable CDN
+      // object instead of waiting on a live image-generation endpoint.
+      if (imageUrl?.includes('image.pollinations.ai/')) {
+        try {
+          const imageResponse = await fetch(imageUrl, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(90_000),
+          });
+          const contentType = imageResponse.headers.get('content-type')?.toLowerCase() ?? '';
+          if (!imageResponse.ok || !contentType.startsWith('image/')) {
+            throw new Error(
+              `AI image returned ${imageResponse.status} ${contentType || 'without an image content type'}`,
+            );
+          }
+          const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+          if (!imageBuffer.length || imageBuffer.length > 20 * 1024 * 1024) {
+            throw new Error(`AI image size is invalid (${imageBuffer.length} bytes)`);
+          }
+          const extension = contentType.includes('png') ? 'png' : 'jpg';
+          imageUrl = await uploadCourseVideosObject(
+            imageBuffer,
+            `generated-lessons/lesson-${input.lessonId}-scene-${index + 1}.${extension}`,
+            contentType,
+          );
+        } catch (error) {
+          logger.warn(
+            '[RemotionRender] AI scene image unavailable; using the bright instructional canvas',
+            {
+              lessonId: input.lessonId,
+              scene: index + 1,
+              error: error instanceof Error ? error.message : String(error),
+            },
+          );
+          imageUrl = null;
+        }
+      }
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
       if (!clipUrl && canGenerateMotion) {
         try {
@@ -503,98 +805,373 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
           if (generated) await deleteGpuVideoAsset(generated);
         }
       }
-      if (!clipUrl) {
-        clipUrl = await getPexelsVideoClip(query, {
-          minDuration: 3,
-          maxDuration: 30,
-          perPage: 8,
-        });
+      if (!clipUrl && !input.ultimateStrict) {
+        clipUrl = normalizeRemotionMediaUrl(
+          await getPexelsVideoClip(query, {
+            minDuration: 3,
+            maxDuration: 30,
+            perPage: 8,
+          }),
+        );
       }
       const currentScene = resolvedStoryboard.scenes[index];
       if (!currentScene) throw new Error(`MEDIA_SCENE_MISSING:${index}`);
       const resolvedProvider = instructionalLayout
         ? 'remotion'
         : currentScene.resolvedProvider ||
-          (clipUrl ? 'pexels' : imageUrl?.includes('pollinations') ? 'pollinations' : imageUrl ? 'pexels' : undefined);
+          (clipUrl
+            ? 'pexels'
+            : imageUrl?.includes('pollinations')
+              ? 'pollinations'
+              : imageUrl
+                ? 'pexels'
+                : undefined);
       const resolvedModel = instructionalLayout
         ? `deterministic-${instructionalLayout.kind}`
-        : currentScene.resolvedModel || (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
+        : currentScene.resolvedModel ||
+          (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
       resolvedStoryboard.scenes[index] = {
         ...currentScene,
+        titleLayout: !input.ultimateStrict && !scene.teachingVisual && !instructionalLayoutForScene({
+          title: scene.subject, action: narration, sceneType: scene.sceneType,
+        })
+          ? FOOTAGE_TITLE_LAYOUT
+          : undefined,
         ...(imageUrl ? { referenceImageUrl: imageUrl } : {}),
         ...(clipUrl ? { sourceVideoUrl: clipUrl } : {}),
         ...(resolvedProvider ? { resolvedProvider } : {}),
         ...(resolvedModel ? { resolvedModel } : {}),
       };
-      const narrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60) + 1;
-      const durationSeconds = Math.max(scene.durationSeconds, narrationSeconds, 4);
+      const estimatedNarrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60);
+      const premiumTiming = premium ? pictureSceneTiming(approvedAudio!.durationSeconds, STORYBOARD_RENDER_FPS) : null;
+      const narrationSeconds = premium
+        // MP3 encoder padding is not an instructional hold. Use the measured
+        // PCM speech timeline shared by captions, pictures and synchronization.
+        ? premiumTiming!.durationSeconds
+        : Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;
+      // A lesson's instructional seat time includes reading, practice, checks,
+      // and review; it must not become one continuous hour-long MP4. Time each
+      // visual to its spoken narration so malformed blueprint durations cannot
+      // keep Chromium encoding indefinitely.
+      const durationSeconds = premium ? narrationSeconds : Math.max(narrationSeconds, 4);
+      resolvedStoryboard.scenes[index].durationSeconds = durationSeconds;
+      let motionCue:any;
+      if (input.ultimateStrict && clipUrl) {
+        const response = await fetch(clipUrl, { signal: AbortSignal.timeout(60000) });
+        if (!response.ok) throw new Error(`Licensed visual returned HTTP ${response.status}`);
+        const visualPath = path.join(paths.outputDir, `visual-${index}.mp4`);
+        const clipBytes=Buffer.from(await response.arrayBuffer());
+        if(premium&&createHash('sha256').update(clipBytes).digest('hex')!==input.motionEvidence?.[index]?.contentSha256)
+          throw new Error('INSPECTED_MOTION_BYTES_CHANGED');
+        await writeFile(visualPath,clipBytes);
+        const sourceSeconds = await measuredAudioDurationSeconds(visualPath);
+        if(premium) {
+          const photos=input.teachingPhotos?.[index];
+          const primaryEnd=approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds;
+          const timed=pictureTimeline(photos,approvedAudio?.wordAlignment?.map(w=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??approvedAudio?.captions??[],durationSeconds,primaryEnd);
+          motionCue=motionExcerptWindow(timed,input.motionEvidence?.[index],sourceSeconds,primaryEnd);
+        } else if (!sourceSeconds || sourceSeconds < durationSeconds)
+          throw new Error(`ULTIMATE_VISUAL_DURATION_INSUFFICIENT:${index + 1}`);
+      }
       const bullets = narration
         .split(/(?<=[.!?])\s+/)
         .map((value) => value.trim())
         .filter(Boolean)
-        .slice(0, 4);
+        .slice(0, 3)
+        .map((sentence) => {
+          const words = sentence.split(/\s+/);
+          return words.length > 12 ? `${words.slice(0, 12).join(' ')}…` : sentence;
+        });
 
       scenes.push({
         scene_number: index + 1,
         title: scene.subject,
-        bullets: bullets.length ? bullets : [scene.action],
+        titleFontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+          ? scene.titleFontSize
+          : undefined,
+        bullets: bullets.length ? bullets : [scene.action.split(/\s+/).slice(0, 12).join(' ')],
         narration,
         clip_keyword: query,
         clipUrl,
         imageUrl,
+        imageIsInstructional: scene.resolvedModel === 'script-bound-instructional-image' && Boolean(scene.teachingVisual),
         audioSrc,
-        durationFrames: Math.ceil(durationSeconds * 30),
+        captionCues: approvedAudio?.captions,
+        wordAlignment: approvedAudio?.wordAlignment,
+        durationFrames: premiumTiming?.durationFrames ?? Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
+        sceneType: scene.sceneType,
+        memoryAnchor: scene.memoryAnchor,
+        strictBlueprint: input.ultimateStrict,
+        teachingVisual: scene.teachingVisual,
+        physicalDemonstration: scene.physicalDemonstration,
+        motionCue,
+        recapStartSeconds: approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds,
+        recapText: approvedAudio?.parts?.find(p=>p.isRecap)?.text,
+        ...(premium ? {pictureCues: pictureTimeline(input.teachingPhotos?.[index],approvedAudio?.wordAlignment?.map(w=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??approvedAudio?.captions??[],durationSeconds,approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds)} : {}),
       });
     }
 
+    // Final trust boundary before Chromium. Runtime provider and storage values
+    // must be normalized even when their SDK declarations claim strings.
+    const normalizedScenes = normalizeSlideLessonScenes(scenes);
+    if(premium) resolvedStoryboard.scenes.forEach((scene:any,i:number)=>{scene.wordAlignment=normalizedScenes[i].wordAlignment;scene.captionCues=normalizedScenes[i].captionCues;scene.motionCue=normalizedScenes[i].motionCue;scene.pictureCues=normalizedScenes[i].pictureCues;scene.recapStartSeconds=normalizedScenes[i].recapStartSeconds;scene.recapText=normalizedScenes[i].recapText;});
+    if (input.requireVisualEvidence) {
+      const primaryVisuals = normalizedScenes.map((scene) => scene.clipUrl || scene.imageUrl);
+      const missing = primaryVisuals
+        .map((url, index) => (url ? null : index + 1))
+        .filter((index): index is number => index !== null);
+      if (missing.length) {
+        throw new Error(`MEDIA_RESOLVED_VISUALS_MISSING:${missing.join(',')}`);
+      }
+      const distinctVisuals = new Set(primaryVisuals).size;
+      if (distinctVisuals < normalizedScenes.length) {
+        throw new Error(
+          `MEDIA_RESOLVED_VISUALS_REPEATED:${distinctVisuals}:${normalizedScenes.length}`,
+        );
+      }
+    }
+    const firstStoryboardScene = resolvedStoryboard.scenes[0];
+    let openingImageUrl = normalizeRemotionMediaUrl(firstStoryboardScene?.referenceImageUrl);
+    const openingVideoUrl = normalizeRemotionMediaUrl(normalizedScenes[0]?.clipUrl);
+    if (!openingImageUrl && openingVideoUrl) {
+      try {
+        openingImageUrl = await createOpeningStillFromLicensedVideo({
+          videoUrl: openingVideoUrl,
+          outputDir: paths.outputDir,
+          lessonId: input.lessonId,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (input.ultimateStrict) {
+          throw new Error(`MEDIA_OPENING_STILL_EXTRACTION_FAILED:${message}`, { cause: error });
+        }
+        logger.warn('[RemotionRender] Could not derive an opening still from lesson video', {
+          lessonId: input.lessonId,
+          error: message,
+        });
+      }
+    }
+    if (!openingImageUrl && !input.ultimateStrict) {
+      openingImageUrl = normalizeRemotionMediaUrl(
+        await getPexelsImage('default', {
+          query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
+          deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
+          allowGeneratedFallback: true,
+        }),
+      );
+    }
+    if (!openingImageUrl || !firstStoryboardScene) {
+      throw new Error('MEDIA_OPENING_STILL_MISSING');
+    }
+    resolvedStoryboard.scenes[0] = {
+      ...firstStoryboardScene,
+      referenceImageUrl: openingImageUrl,
+      resolvedProvider: firstStoryboardScene.resolvedProvider || 'pexels',
+      resolvedModel: firstStoryboardScene.resolvedModel || 'opening-still',
+    };
     const props: SlideLessonProps & Record<string, unknown> = {
       courseTitle: input.courseTitle,
       lessonTitle: input.storyboard.title,
-      scenes,
+      scenes: normalizedScenes,
+      visualStyle: input.visualStyle,
       primaryColor: instructor.topBarColor,
       accentColor: instructor.accentColor,
-      backgroundColor: '#0f172a',
+      backgroundColor: '#f8fafc',
+      surfaceMode: 'bright',
+      ...(input.lessonPresentation === 'approved-premium-v1' ? {
+        lessonPresentation: input.lessonPresentation,
+        primaryColor: '#cdb79e', accentColor: '#e9dccb', backgroundColor: '#171717', surfaceMode: 'dark' as const,
+      } : {}),
       logoText: 'Elevate LMS',
+      openingImageUrl,
+      preRollUrl: normalizeRemotionMediaUrl(input.preRollUrl),
+      preRollDurationFrames: input.preRollUrl
+        ? Math.ceil(Math.max(1, input.preRollDurationSeconds ?? 5) * STORYBOARD_RENDER_FPS)
+        : 0,
+      postRollUrl: normalizeRemotionMediaUrl(input.postRollUrl),
+      postRollDurationFrames: input.postRollUrl
+        ? Math.ceil(Math.max(1, input.postRollDurationSeconds ?? 5) * STORYBOARD_RENDER_FPS)
+        : 0,
     };
-    const totalFrames = 180 + scenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
+    const totalFrames =
+      (props.preRollDurationFrames ?? 0) +
+      (props.postRollDurationFrames ?? 0) +
+      STORYBOARD_RENDER_FPS * (input.lessonPresentation === 'approved-premium-v1' ? 0 : 5) +
+      normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
-    const { renderMedia, selectComposition } = await import('@remotion/renderer');
+    const { renderMedia, selectComposition, makeCancelSignal } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
-    const selected = await selectComposition({
-      serveUrl: bundleUrl,
-      ...(browserExecutable ? { browserExecutable } : {}),
-      id: 'SlideLesson',
-      inputProps: props,
-    });
-    const composition = { ...selected, durationInFrames: totalFrames };
-    await renderMedia({
-      composition,
-      serveUrl: bundleUrl,
-      ...(browserExecutable ? { browserExecutable } : {}),
-      codec: 'h264',
-      outputLocation: paths.videoPath,
-      inputProps: props,
-      concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
-      crf: 20,
-    });
-    const captionUrl = await uploadCourseVideosObject(
-      Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
-      `generated-lessons/lesson-${input.lessonId}.vtt`,
+    const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
+      logger.info('[RemotionRender] selecting storyboard composition', {lessonId: input.lessonId, totalFrames});
+      const selected = await selectComposition({
+        serveUrl: bundleUrl,
+        ...(browserExecutable ? { browserExecutable } : {}),
+        id: 'SlideLesson',
+        inputProps,
+      });
+      const composition = { ...selected, durationInFrames: totalFrames };
+      logger.info('[RemotionRender] storyboard encoding started', {lessonId: input.lessonId, totalFrames, fps: composition.fps, concurrency: renderConcurrency()});
+      // Bound Chromium lifetime by rendering frame ranges independently.
+      // Keep the original composition timeline so scene transitions, captions,
+      // and audio remain aligned with their absolute frame positions.
+      const framesPerChunk = 900; // 30 seconds at 30 fps
+      const chunkPaths: string[] = [];
+      let checkpoints:any;
+      const privateStorage=privateCheckpointStorage();
+      for (let start = 0; start < totalFrames; start += framesPerChunk) {
+        const end = Math.min(totalFrames - 1, start + framesPerChunk - 1);
+        const chunkPath = path.join(paths.outputDir, `segment-${String(start).padStart(8, '0')}.mp4`);
+        // Persist each segment in B2 so a new Cloud Run execution can resume.
+        // A storyboard fingerprint prevents reuse after a scene/narration change.
+        const fingerprint = storyboardRenderFingerprint({scenes, renderRevision: input.renderRevision, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', visualStyle: input.visualStyle, layoutVersion: 4});
+        const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
+        const storageReady = isElevateMediaStorageConfigured();
+        const storage = storageReady ? getElevateMediaStorageClient() : null;
+        const bucket = storageReady ? getElevateMediaStorageConfig().bucket : null;
+        if(!checkpoints)checkpoints=createCheckpointFallback({
+          readPrimary:async(key:string)=>{
+            if(!storage||!bucket)return privateStorage.read(key);
+            try {const object=await storage.send(new GetObjectCommand({Bucket:bucket,Key:key}));return object.Body?Buffer.from(await object.Body.transformToByteArray()):null;}
+            catch(error){if(['NoSuchKey','NotFound'].includes((error as any).name))return null;throw error;}
+          },
+          writePrimary:async(key:string,bytes:Buffer)=>{
+            if(!storage||!bucket)return privateStorage.write(key,bytes);
+            await storage.send(new PutObjectCommand({Bucket:bucket,Key:key,Body:bytes,ContentType:'video/mp4'}));
+          },
+          readFallback:(key:string)=>privateStorage.read(key),
+          writeFallback:(key:string,bytes:Buffer)=>privateStorage.write(key,bytes),
+          onFallback:()=>logger.warn('[RemotionRender] external storage unavailable; legacy checkpoint reads remain available, new video writes require external storage'),
+        });
+        let existing = await stat(chunkPath).catch(() => null);
+        if(!existing?.size){
+          const bytes=await checkpoints.read(segmentKey);
+          if(bytes?.length){await writeFile(chunkPath,bytes);existing=await stat(chunkPath);}
+        }
+        if (!existing?.size) {
+          logger.info('[RemotionRender] segment started', {lessonId: input.lessonId, start, end});
+          const cancellation=makeCancelSignal();
+          const signal=courseProgressSignal();
+          signal?.throwIfAborted();
+          signal?.addEventListener('abort',cancellation.cancel,{once:true});
+          await renderMedia({
+            cancelSignal:cancellation.cancelSignal,
+            composition,
+            serveUrl: bundleUrl,
+            ...(browserExecutable ? { browserExecutable } : {}),
+            codec: 'h264',
+            outputLocation: chunkPath,
+            inputProps,
+            frameRange: [start, end],
+            concurrency: renderConcurrency(),
+            crf: 20,
+            onProgress: ({renderedFrames, encodedFrames}) => {
+              reportCourseProgress('render-frames:'+start,renderedFrames+encodedFrames,(end-start+1)*2);
+              logger.info('[RemotionRender] segment progress', {
+                lessonId: input.lessonId, start, end, renderedFrames, encodedFrames,
+              });
+            },
+          }).finally(()=>signal?.removeEventListener('abort',cancellation.cancel));
+          const written = await stat(chunkPath);
+          if (!written.size) throw new Error(`REMOTION_SEGMENT_EMPTY:${start}-${end}`);
+          await checkpoints.write(segmentKey,await readFile(chunkPath));
+          logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
+        }
+        reportCourseProgress('render-checkpoint',end,totalFrames);
+        chunkPaths.push(chunkPath);
+      }
+      // FFmpeg concat demuxer accepts absolute paths with safe shell-independent
+      // quoting. Never mark the lesson complete unless assembly succeeds.
+      const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
+      await writeFile(manifestPath, 'ffconcat version 1.0\n' +
+        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
+      // Never dispatch a concat without both verified inputs and a destination.
+      // Past worker logs showed ffmpeg invoked with only the input arguments.
+      if (!chunkPaths.length) throw new Error('REMOTION_CONCAT_SEGMENTS_MISSING');
+      // Resolve the final destination independently of the segment manifest. A
+      // render must never be marked successful without a concrete MP4 target.
+      const concatOutputPath = path.resolve(paths.videoPath || '');
+      if (!paths.videoPath || concatOutputPath === path.resolve(manifestPath) ||
+          path.extname(concatOutputPath).toLowerCase() !== '.mp4') {
+        throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      }
+      await mkdir(path.dirname(concatOutputPath), {recursive: true});
+      const concatArgs = [
+        '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
+        // Frame-range chunks have independent timebases. Normalize timestamps
+        // and re-encode to prevent replay at segment boundaries.
+        '-fflags', '+genpts',
+        ...videoEncoderArgs(20),
+        '-r', String(composition.fps), '-fps_mode', 'cfr',
+        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',
+        '-movflags', '+faststart',
+        concatOutputPath,
+      ];
+      if (concatArgs.at(-1) !== concatOutputPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      try {
+        await execFileAsync('ffmpeg', concatArgs, {timeout: 600_000, maxBuffer: 2_000_000});
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error('REMOTION_FFMPEG_ASSEMBLY_FAILED:' + detail, {cause: error});
+      }
+      const output = await stat(concatOutputPath);
+      if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
+      logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});
+    };
+
+    try {
+      await renderSlideLesson(props);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!message.includes('Failed to load image with src [object Object]')) throw error;
+
+      // Never turn a broken provider asset into a learner-facing white/canvas
+      // slideshow. That fallback used planning metadata as if the intended
+      // visuals had actually rendered, so it could survive the provenance gate.
+      // Fail closed and keep the previous approved lesson video active while a
+      // corrected, source-locked job is retried.
+      throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
+    }
+    // Deliver the already encoded MP4 before ancillary text assets. A VTT upload
+    // failure must not prevent the completed video from reaching durable storage.
+    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {});
+    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
+    // Bounded delivery retries reuse the completed movie. Never restart narration
+    // or frame encoding for a transient ancillary object-storage error.
+    const uploadAncillary = async (buffer: Buffer, key: string, mime: string): Promise<string> => {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          return await uploadCourseVideosObject(buffer, key, mime, {});
+        } catch (error) {
+          const reason = error instanceof Error ? error.message : String(error);
+          // Authorization, quota, and configuration faults cannot be healed by retries.
+          if (attempt === 3 || /(?:401|403|unauthoriz|forbidden|quota|cap exceeded|not configured|invalid credentials|accessdenied)/i.test(reason))
+            throw error;
+          await new Promise(resolve => setTimeout(resolve, 350 * attempt));
+        }
+      }
+      throw new Error('COURSE_ANCILLARY_DELIVERY_FAILED');
+    };
+    logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
+    const captionUrl = await uploadAncillary(
+      Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
+      `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
     );
-    const transcriptUrl = await uploadCourseVideosObject(
+    const transcriptUrl = await uploadAncillary(
       Buffer.from(scenes.map((scene) => scene.narration).join('\n\n'), 'utf8'),
-      `generated-lessons/lesson-${input.lessonId}.txt`,
+      `generated-lessons/lesson-${input.lessonId}-${Date.now()}.txt`,
       'text/plain',
     );
     resolvedStoryboard.captionUrl = captionUrl;
+    (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;
+    (resolvedStoryboard as any).scenes.forEach((scene: any, index: number) => { scene.captionCues = scenes[index].captionCues; });
     resolvedStoryboard.transcriptUrl = transcriptUrl;
-    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4');
     await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
     return {
       success: true,
       videoUrl,
-      duration: totalFrames / 30,
+      duration: totalFrames / STORYBOARD_RENDER_FPS,
       method: 'remotion-free',
       sceneData: resolvedStoryboard,
     };
@@ -663,3 +1240,4 @@ export function inferDomainKey(courseName: string, lessonTitle = ''): string {
 
   return 'default';
 }
+

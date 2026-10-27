@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_E2E_STATE_PATH || '.qa-apprenticeship-e2e-state.json';
@@ -23,27 +24,44 @@ function password() {
   return `Qa!${randomBytes(18).toString('base64url')}7z`;
 }
 
+const TRANSIENT_DATABASE_ERROR = /statement timeout|canceling statement|schema cache|fetch failed|connection reset|gateway timeout|temporarily unavailable/i;
+
 async function must(resultPromise, label) {
-  const result = await resultPromise;
-  if (result.error) throw new Error(`${label}: ${result.error.message}`);
-  return result.data;
+  const maxAttempts = 4;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const result = await resultPromise;
+    if (!result.error) return result.data;
+
+    const message = String(result.error.message || result.error);
+    const retryable = TRANSIENT_DATABASE_ERROR.test(message);
+    if (!retryable || attempt === maxAttempts) {
+      throw new Error(`${label}: ${message}`);
+    }
+
+    const delayMs = 1_500 * attempt;
+    console.warn(`[QA fixture] ${label} hit a transient database error; retrying ${attempt}/${maxAttempts} in ${delayMs}ms`);
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  throw new Error(`${label}: exhausted retry policy`);
 }
 
 async function createQaUser(kind, role, fullName) {
   const email = `${marker}-${kind}@qa.invalid`;
   const pass = password();
-  const { data, error } = await db.auth.admin.createUser({
+  const user = await createQaAuthUser({
+    db,
     email,
     password: pass,
-    email_confirm: true,
-    app_metadata: { qa_e2e: true, qa_run_id: runId, role },
-    user_metadata: { qa_e2e: true, qa_run_id: runId, full_name: fullName },
+    role,
+    fullName,
+    runId,
+    label: `create ${kind} auth user`,
   });
-  if (error || !data.user) throw new Error(`create ${kind} auth user: ${error?.message || 'no user returned'}`);
 
   await must(
     db.from('profiles').upsert({
-      id: data.user.id,
+      id: user.id,
       email,
       full_name: fullName,
       role,
@@ -52,16 +70,16 @@ async function createQaUser(kind, role, fullName) {
     }, { onConflict: 'id' }),
     `upsert ${kind} profile`,
   );
-  return { id: data.user.id, email, password: pass };
+  return { id: user.id, email, password: pass };
 }
 
 async function provision() {
-  const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
-  let apprentice;
-  let state = { runId, marker, host, apprentice: null, partnerId: null, shopId: null, enrollmentId: null, placementId: null };
+  let state = { runId, marker, host: null, apprentice: null, partnerId: null, shopId: null, hostShopId: null, enrollmentId: null, placementId: null };
 
   try {
-    apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
+    const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
+    state.host = host;
+    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
     state.apprentice = apprentice;
 
     const program = await must(
@@ -145,6 +163,20 @@ async function provision() {
     );
     state.shopId = shop.id;
 
+    const hostShop = await must(
+      db.from('host_shops').insert({
+        name: `[QA E2E] Host Shop ${runId}`,
+        owner_id: host.id,
+        tenant_id: program.tenant_id || tenantId,
+        address: '100 QA Test Way', city: 'Indianapolis', state: 'IN', zip_code: '46201',
+        email: host.email, owner_name: '[QA E2E] Host Shop Supervisor', owner_email: host.email,
+        shop_status: 'active', approval_status: 'approved', is_approved: true, verified: true,
+        is_accepting_apprentices: true,
+      }).select('id').single(),
+      'create canonical QA host_shop',
+    );
+    state.hostShopId = hostShop.id;
+
     await must(
       db.from('shop_staff').insert({
         shop_id: shop.id,
@@ -179,7 +211,7 @@ async function provision() {
         tenant_id: program.tenant_id || tenantId,
         source: 'qa_e2e',
         draft_data: { qa_e2e: true, qa_run_id: runId, disposable: true },
-        host_shop_id: partner.id,
+        host_shop_id: hostShop.id,
         host_shop_name: `[QA E2E] Host Shop ${runId}`,
         has_host_shop: true,
         supervisor_id: host.id,
@@ -250,6 +282,7 @@ async function cleanup() {
   const enrollmentId = state.enrollmentId;
   const placementId = state.placementId;
   const shopId = state.shopId;
+  const hostShopId = state.hostShopId;
   const partnerId = state.partnerId;
   const hostId = state.host?.id;
   const apprenticeId = state.apprentice?.id;
@@ -262,6 +295,7 @@ async function cleanup() {
   if (shopId) await db.from('shop_staff').delete().eq('shop_id', shopId);
   if (hostId && partnerId) await db.from('partner_users').delete().eq('user_id', hostId).eq('partner_id', partnerId);
   if (shopId) await db.from('shops').delete().eq('id', shopId);
+  if (hostShopId) await db.from('host_shops').delete().eq('id', hostShopId);
   if (partnerId) await db.from('partners').delete().eq('id', partnerId);
 
   for (const userId of [apprenticeId, hostId].filter(Boolean)) {

@@ -17,7 +17,7 @@ export default function TextToSpeech({
   className = '',
   contentId,
 }: TextToSpeechProps) {
-  const [rate, setRate] = useState(1);
+  const [rate, setRate] = useState(0.85);
   const naturalVoice = useNaturalVoice();
   const supabase = useMemo(() => createClient(), []);
 
@@ -57,6 +57,7 @@ export default function TextToSpeech({
       voice: 'coral',
       style: 'instructor',
       rate,
+      userControlledRate: true,
     });
     if (started) void logTTSUsage();
   };
@@ -124,6 +125,7 @@ export default function TextToSpeech({
           disabled={naturalVoice.isPlaying}
         >
           <option value="0.75">0.75x</option>
+          <option value="0.85">0.85x (recommended)</option>
           <option value="1">1x</option>
           <option value="1.25">1.25x</option>
           <option value="1.5">1.5x</option>

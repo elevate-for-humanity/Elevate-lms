@@ -76,7 +76,7 @@ export default function BarberApprenticeshipClient({
         />
       ) : (
         <>
-          <section className="relative h-[clamp(260px,42vw,520px)] overflow-hidden bg-slate-100">
+          <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden bg-slate-100">
             <Image src={canonicalHero} alt={canonicalHeroAlt} fill priority sizes="100vw" className="object-cover" />
           </section>
           <section className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6">
@@ -135,7 +135,7 @@ export default function BarberApprenticeshipClient({
               <Link href="/programs/barber-apprenticeship/apply" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700">
                 Start Apprentice Application <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/host-shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-950 hover:bg-slate-50">
+              <Link href="/partners/host-shops?program=barber" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-950 hover:bg-slate-50">
                 Host Shop Information
               </Link>
             </div>
@@ -190,10 +190,10 @@ export default function BarberApprenticeshipClient({
 
       <section id="funding" className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Funding & payment</p>
+          <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Self-pay tuition & payment</p>
           <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">One price source. Multiple payment paths.</h2>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-800">
-            Current self-pay tuition is <strong>${BARBER_PRICING.fullPrice.toLocaleString()}</strong>. Prior-training or experience credit does not automatically reduce tuition. Public or employer funding must be separately authorized before it is treated as payment.
+            Current self-pay tuition is <strong>${BARBER_PRICING.fullPrice.toLocaleString()}</strong>. Prior-training or experience credit does not automatically reduce tuition. Apprenticeship enrollment is self-pay only.
           </p>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             <article className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -207,8 +207,8 @@ export default function BarberApprenticeshipClient({
               <Link href="/programs/barber-apprenticeship/apply?payment=payment_plan" className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline">Open payment calculator →</Link>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-xl font-black text-slate-950">BNPL / Funding Review</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-800">Eligible checkout options currently configured include {bnplNames.length ? bnplNames.join(', ') : 'available providers shown at checkout'}. Provider approval and terms vary. Workforce funding requires separate eligibility and authorization.</p>
+              <h3 className="text-xl font-black text-slate-950">Self-pay financing</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-800">Eligible checkout options currently configured include {bnplNames.length ? bnplNames.join(', ') : 'available providers shown at checkout'}. Provider approval and terms vary.</p>
               <Link href="/programs/barber-apprenticeship/apply" className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline">Review all options →</Link>
             </article>
           </div>
@@ -223,7 +223,7 @@ export default function BarberApprenticeshipClient({
           <article className="rounded-3xl border border-slate-200 bg-white p-7">
             <Scissors className="h-7 w-7 text-brand-red-700" aria-hidden="true" />
             <h2 className="mt-4 text-2xl font-black text-slate-950">I want to become an apprentice</h2>
-            <p className="mt-3 leading-7 text-slate-800">Use the apprentice application for enrollment, prior-training evidence, funding, payment options, and host-shop placement information.</p>
+            <p className="mt-3 leading-7 text-slate-800">Use the apprentice application for enrollment, prior-training evidence, self-pay payment options, and host-shop placement information.</p>
             <Link href="/programs/barber-apprenticeship/apply" className="mt-5 inline-flex items-center gap-2 font-bold text-brand-red-700 hover:underline">Apprentice application <ArrowRight className="h-4 w-4" /></Link>
           </article>
           <article className="rounded-3xl border border-slate-200 bg-white p-7">
@@ -234,6 +234,27 @@ export default function BarberApprenticeshipClient({
           </article>
         </div>
       </section>
-    </main>
+    
+      <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-5xl rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-9">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">For Indiana employers and Host Shops</p>
+          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Build your workforce with apprenticeship support</h2>
+          <p className="mt-4 text-base font-medium leading-7 text-slate-700">
+            It is free to apply to join Elevate’s Host Shop network. Approved employers can grow service capacity by hiring and training apprentices, developing future licensed talent, and earning revenue from the apprentice’s supervised work in accordance with wage, licensing, supervision, and program requirements.
+          </p>
+          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+            Eligible employers may also qualify for workforce reimbursement or training-cost support through WorkOne, WIOA, on-the-job training, or another workforce partner. Reimbursement is not automatic or guaranteed; the employer, apprentice, occupation, costs, and funding authorization must be approved by the responsible workforce agency before costs are incurred.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/partners/host-shop/apply?program=barber" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800">
+              Become a Host Shop — Free
+            </Link>
+            <Link href="/funding/wioa" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50">
+              Review workforce funding
+            </Link>
+          </div>
+        </div>
+      </section>
+</main>
   );
 }

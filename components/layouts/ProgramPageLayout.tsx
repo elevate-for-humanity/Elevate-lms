@@ -48,7 +48,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
                 <Flame className="w-4 h-4" /> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
-                Free Career Training - 100% Government Funded • Start in 2 Weeks
+                Career training enrollment open • Review program tuition, funding status, and start dates
               </p>
             </div>
             <Link
@@ -62,7 +62,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
       </section>
 
       {/* HERO */}
-      <section className="relative h-[32vh] min-h-[200px] max-h-[400px] w-full overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
         <Image
           src="/images/pages/comp-layout-hero.webp"
           alt={title}

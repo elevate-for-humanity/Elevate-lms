@@ -1,10 +1,12 @@
 /**
- * Legacy AI Course Create compatibility endpoint.
+ * RETIRED legacy AI Course Create compatibility endpoint.
+ *
+ * Ultimate Course Builder is the sole course creation authority.
  *
  * COURSE GENERATION IS OWNED BY lib/course-factory/factory.ts.
  * This Edge Function previously implemented an independent AI generator and
  * wrote directly to courses/modules/lessons with the service-role client.
- * Keeping that execution path would violate the single-authority Course Factory
+ * Keeping that execution path would violate the single-authority Ultimate Course Builder
  * contract and bypass Admin authorization/governance.
  *
  * The endpoint is intentionally retained as a non-writing compatibility surface
@@ -29,7 +31,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: 'Method not allowed',
-        code: 'COURSE_FACTORY_REQUIRED',
+        code: 'COURSE_BUILDER_ROOT_REQUIRED',
       }),
       { status: 405, headers: corsHeaders },
     );
@@ -37,10 +39,10 @@ serve(async (req) => {
 
   return new Response(
     JSON.stringify({
-      error: 'Legacy AI course creation is disabled. Use the canonical Admin Course Factory.',
-      code: 'COURSE_FACTORY_REQUIRED',
-      canonicalSurface: '/admin/course-builder',
-      canonicalApi: '/api/admin/course-builder',
+      error: 'Legacy AI course creation is disabled. Use the canonical Admin Ultimate Course Builder.',
+      code: 'COURSE_BUILDER_ROOT_REQUIRED',
+      canonicalSurface: '/studio/courses',
+      canonicalApi: '/api/studio/courses',
     }),
     { status: 410, headers: corsHeaders },
   );

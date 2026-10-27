@@ -6,7 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 
 /**
  * POST /api/subscriptions/cancel
- * Marks organization subscription canceled (Stripe cancel-at-period-end is phase 2).
+ * Marks organization subscription canceled (provider cancellation is handled through the billing portal).
  */
 async function _POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);

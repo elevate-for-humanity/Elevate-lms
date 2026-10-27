@@ -8,7 +8,7 @@ const read = (relativePath: string) => readFileSync(resolve(root, relativePath),
 const guardedPortals: Array<{ path: string; required: string[] }> = [
   {
     path: 'components/lms/LearnerWorkspaceLayout.tsx',
-    required: ["requireRole(['student', 'learner', 'admin', 'staff'])"],
+    required: ["requireRole([", "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
   },
   {
     path: 'apps/lms/app/employer/layout.tsx',
@@ -20,11 +20,20 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
   },
   {
     path: 'apps/lms/app/apprentice/layout.tsx',
-    required: ['supabase.auth.getUser()', 'resolveApprenticeProgramSlug', 'if (!privileged && !programSlug)'],
+    required: [
+      'supabase.auth.getUser()',
+      'resolveApprenticeProgramSlug',
+      'if (!privileged && !programSlug)',
+    ],
   },
   {
     path: 'apps/lms/app/host-shop/dashboard/layout.tsx',
-    required: ['getMyPartnerContext()', "partner.status !== 'active'", "partner.approval_status !== 'approved'"],
+    required: [
+      'requireRole(HOST_SHOP_ROLES)',
+      'getSessionUser()',
+      'getHostShopBoard(user.id)',
+      'HOST_SHOP_ACCESS_DENIED',
+    ],
   },
   {
     path: 'apps/lms/app/program-holder/dashboard/layout.tsx',
@@ -39,16 +48,16 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
     required: ["requireRole(['employer', 'sponsor', 'admin', 'staff'])"],
   },
   {
-    path: 'apps/marketing/app/provider/dashboard/layout.tsx',
-    required: ["requireRole(['provider', 'provider_admin', 'admin', 'staff'])"],
+    path: 'apps/marketing/app/provider/layout.tsx',
+    required: ['OperationalPortalShell', 'portalKey="provider"'],
   },
   {
-    path: 'apps/marketing/app/case-manager/dashboard/layout.tsx',
-    required: ['requireRole([', "'case_manager'", "'workforce_partner'"],
+    path: 'apps/marketing/app/case-manager/layout.tsx',
+    required: ['OperationalPortalShell', 'portalKey="casemanager"'],
   },
   {
-    path: 'apps/marketing/app/workforce-board/dashboard/layout.tsx',
-    required: ['requireRole([', "'workforce_board'", "'government'"],
+    path: 'apps/marketing/app/workforce-board/layout.tsx',
+    required: ['OperationalPortalShell', 'portalKey="workforceboard"'],
   },
   {
     path: 'apps/marketing/app/workforce/layout.tsx',
@@ -63,7 +72,10 @@ describe('portal authorization boundaries', () => {
       for (const token of portal.required) {
         expect(source, `${portal.path} must contain ${token}`).toContain(token);
       }
-      expect(source).toContain('@/components/platform/PlatformShell');
+      expect(
+        source.includes('@/components/platform/PlatformShell') ||
+          source.includes('@/components/platform/OperationalPortalShell'),
+      ).toBe(true);
     });
   }
 

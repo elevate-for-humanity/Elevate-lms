@@ -1,3 +1,4 @@
+import {PwaAlertSettings} from '@/components/notifications/PwaAlertSettings';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
   description: 'Manage your notification preferences.',
 };
 
-export default async function NotificationSettingsPage() {
+export default async function NotificationSettingsPage({searchParams}:{searchParams:Promise<{saved?:string}>}) {
+  const {saved}=await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,7 +27,7 @@ export default async function NotificationSettingsPage() {
 
   // Fetch user's notification preferences
   const { data: preferences } = await supabase
-    .from('profiles')
+    .from('notification_preferences')
     .select('*')
     .eq('user_id', user.id)
     .maybeSingle();
@@ -76,6 +78,8 @@ export default async function NotificationSettingsPage() {
           <p className="text-slate-700 mt-1">Choose how you want to be notified</p>
         </div>
 
+        <PwaAlertSettings />
+        {saved === '1' && <p role="status" className="my-4 rounded bg-green-50 p-3 text-green-900">Notification preferences saved.</p>}
         {/* Notification Preferences */}
         <form action="/api/account/notifications" method="POST" className="space-y-6">
           {/* Email Notifications */}

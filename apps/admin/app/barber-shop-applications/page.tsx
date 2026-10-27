@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -56,8 +56,21 @@ type Application = {
   status: string | null;
 };
 
+type ApplicationStatus = 'pending' | 'approved' | 'denied';
+
+function normalizeStatus(status: string | null): ApplicationStatus {
+  const normalized = status?.trim().toLowerCase();
+
+  if (normalized === 'approved') return 'approved';
+  if (normalized === 'denied' || normalized === 'rejected') return 'denied';
+
+  // Legacy intake rows use null, submitted, in_review, and other pre-decision
+  // values. Every undecided row belongs in the actionable pending queue.
+  return 'pending';
+}
+
 function StatusBadge({ status }: { status: string | null }) {
-  switch (status) {
+  switch (normalizeStatus(status)) {
     case 'approved':
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
@@ -89,45 +102,21 @@ function ComplianceFlag({ ok, label }: { ok: boolean; label: string }) {
 }
 
 export default async function BarberShopApplicationsPage() {
-  const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-
-  // Guard against null user
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
+  await requireRole(['admin', 'staff']);
+  const supabase = await requireAdminClient();
 
   const { data: applications, error } = await supabase
     .from('barbershop_partner_applications')
-    .select(`
-      id, created_at, shop_legal_name, shop_dba_name,
-      owner_name, contact_name, contact_email, contact_phone,
-      shop_city, shop_state, shop_zip, shop_physical_address,
-      indiana_shop_license_number,
-      supervisor_name, supervisor_license_number,
-      compensation_model, workers_comp_status,
-      has_general_liability, apprentices_on_payroll,
-      can_supervise_and_verify,
-      mou_acknowledged, mou_signed_at, mou_signer_name,
-      consent_acknowledged, consent_signed_at, consent_signer_name,
-      employer_acceptance_acknowledged, employer_acceptance_signed_at, employer_acceptance_signer_name,
-      ein, ein_document_path, ein_qa_notes,
-      number_of_employees, notes, status
-    `)
+    // Select the live row shape so an older deployment schema does not make the
+    // entire review queue fail when an optional intake column has not migrated yet.
+    .select('*')
     .order('created_at', { ascending: false });
 
   const rows = (applications ?? []) as Application[];
 
-  const pending = rows.filter(r => !r.status || r.status === 'pending');
-  const approved = rows.filter(r => r.status === 'approved');
-  const denied = rows.filter(r => r.status === 'denied');
+  const pending = rows.filter(r => normalizeStatus(r.status) === 'pending');
+  const approved = rows.filter(r => normalizeStatus(r.status) === 'approved');
+  const denied = rows.filter(r => normalizeStatus(r.status) === 'denied');
 
   return (
     <div className="min-h-screen bg-white">
@@ -158,7 +147,7 @@ export default async function BarberShopApplicationsPage() {
         </div>
 
         {/* Summary counts */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-3">
           {[
             { label: 'Pending', count: pending.length, color: 'amber' },
             { label: 'Approved', count: approved.length, color: 'green' },

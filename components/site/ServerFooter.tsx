@@ -64,7 +64,10 @@ const footerLinks = {
   ],
 
   legal: [
-    { name: 'Terms of Service', href: '/legal' },
+    { name: 'Trust Center', href: '/trust' },
+    { name: 'Procurement Center', href: '/procurement' },
+    { name: 'Support', href: '/support' },
+    { name: 'Terms of Service', href: '/terms-of-service' },
     { name: 'Privacy Policy', href: '/legal/privacy' },
     { name: 'Security & Data', href: '/security-and-data-protection' },
     { name: 'Accessibility', href: '/accessibility' },
@@ -101,7 +104,6 @@ const footerLinks = {
 
   compliance: [
     { name: 'Compliance', href: '/compliance' },
-    { name: 'Competency Verification', href: '/compliance/competency-verification' },
     { name: 'Credential Partners', href: '/compliance/credential-partners' },
     { name: 'Internship Agreement', href: '/compliance/internship-agreement' },
     { name: 'Internship Evaluation', href: '/compliance/internship-evaluation' },
@@ -153,7 +155,7 @@ export default function ServerFooter() {
             <span>WorkOne Workforce Partner</span>
           </div>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
-            <strong className="text-white">Funding notice:</strong> Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
+            <strong className="text-white">Funding notice:</strong> Apprenticeship programs are self-pay only. Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
           </p>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
             HQ: {formatHeadquartersLine()} — administrative and enrollment support. Hands-on training
@@ -230,9 +232,10 @@ export default function ServerFooter() {
 
             {/* Contact */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-white text-sm mb-4">
-              <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">
-                {PLATFORM_DEFAULTS.supportPhone}
+              <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">
+                Main: {PLATFORM_DEFAULTS.mainPhone}
               </a>
+              <a href="tel:+14632401404" className="hover:text-white">Technical Support: {PLATFORM_DEFAULTS.supportPhone}</a>
               <span className="text-white">|</span>
               <a href="mailto:info@elevateforhumanity.org" className="hover:text-white">
                 info@elevateforhumanity.org

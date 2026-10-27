@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { ListTodo, RefreshCw, CheckCircle, XCircle, Clock, ShieldAlert } from 'lucide-react';
 
 interface Task {
@@ -14,17 +13,33 @@ interface Task {
   approval_reason: string | null;
   ai_agents: { name: string; role: string } | null;
   created_at: string;
+  source?: 'ai_task' | 'agentic_build';
+  project_id?: string;
+  error_message?: string | null;
+  credits_used?: number;
+  tool_name?: string | null;
+  trace_id?: string | null;
+  result_json?: Record<string, unknown> | null;
 }
 
-export default function TasksClient() {
+export default function TasksClient({
+  embedded = false,
+  conversationId,
+}: {
+  embedded?: boolean;
+  conversationId?: string | null;
+}) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchTasks() {
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/dev-studio/tasks');
+      const query = conversationId
+        ? `?conversationId=${encodeURIComponent(conversationId)}`
+        : '';
+      const res = await fetch(`/api/admin/dev-studio/tasks${query}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setTasks(json.tasks ?? []);
@@ -34,67 +49,83 @@ export default function TasksClient() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [conversationId]);
 
   async function approveTask(id: string) {
-    await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
+    const task = tasks.find((candidate) => candidate.id === id);
+    if (task?.source === 'agentic_build' && task.project_id) {
+      await fetch('/api/admin/dev-studio/course-agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'resume-after-review', projectId: task.project_id }),
+      });
+    } else {
+      await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
+    }
     fetchTasks();
   }
 
-  async function rollbackTask(id: string) {
-    await fetch(`/api/admin/dev-studio/tasks/${id}/rollback`, { method: 'POST' });
+  async function cancelTask(id: string) {
+    await fetch(`/api/admin/dev-studio/tasks/${id}/cancel`, { method: 'POST' });
     fetchTasks();
   }
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    let active = true;
+    const refresh = async () => {
+      if (active) await fetchTasks();
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 2500);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [fetchTasks]);
 
   const STATUS_STYLES: Record<string, { icon: typeof Clock; color: string; bg: string }> = {
     pending: { icon: Clock, color: 'text-slate-500', bg: 'bg-slate-100' },
+    queued: { icon: Clock, color: 'text-cyan-700', bg: 'bg-cyan-50' },
     awaiting_approval: { icon: ShieldAlert, color: 'text-amber-600', bg: 'bg-amber-50' },
     approved: { icon: CheckCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
     running: { icon: RefreshCw, color: 'text-blue-600', bg: 'bg-blue-50' },
     completed: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     failed: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' },
     rolled_back: { icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
+    cancelled: { icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} bg-white`}>
       {/* Hero Section */}
-      <div className="relative h-[280px] w-full overflow-hidden">
-        <Image
-          src="/images/pages/admin-ai-console-hero.webp"
-          alt="AI Tasks"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 to-fuchsia-900/60" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-6 w-full">
-            <div className="flex items-center gap-3 mb-3">
-              <ListTodo className="h-8 w-8 text-white/90" />
-              <span className="text-xs font-semibold tracking-widest uppercase bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white">
-                Task Runner
-              </span>
+      {!embedded ? (
+        <div className="relative h-[220px] w-full overflow-hidden bg-slate-950">
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-violet-950 to-slate-900" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-5xl mx-auto px-6 w-full">
+              <div className="flex items-center gap-3 mb-3">
+                <ListTodo className="h-8 w-8 text-white/90" />
+                <span className="text-xs font-semibold tracking-widest uppercase bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white">
+                  Task Runner
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                AI Tasks
+              </h1>
+              <p className="text-purple-100 text-lg mt-2 max-w-2xl">
+                LIZZY execution history, progress, evidence, and verified results.
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-              AI Tasks
-            </h1>
-            <p className="text-purple-100 text-lg mt-2 max-w-2xl">
-              Autonomous task execution with approval gating for risky operations.
-            </p>
           </div>
         </div>
-      </div>
+      ) : null}
 
       {/* Content Section */}
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className={`mx-auto max-w-5xl px-6 ${embedded ? 'py-5' : 'py-10'}`}>
         <div className="flex items-center justify-between mb-8">
-          <p className="text-sm text-slate-500">{tasks.length} tasks — sorted newest first</p>
+          <p className="text-sm text-slate-500">
+            {tasks.length} {conversationId ? 'conversation' : 'Studio'} tasks — live activity
+          </p>
           <button
             onClick={fetchTasks}
             className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm"
@@ -124,8 +155,8 @@ export default function TasksClient() {
                   <Icon className={`h-5 w-5 ${style.color}`} />
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
+                  <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="w-full min-w-0 flex-1 overflow-hidden">
                       <p className="font-bold text-slate-900">{task.title}</p>
                       {task.ai_agents && (
                         <p className="text-sm text-slate-500 mt-0.5">
@@ -137,24 +168,61 @@ export default function TasksClient() {
                           Requires approval: {task.approval_reason}
                         </p>
                       )}
+                      {task.description && (
+                        <p className="mt-2 line-clamp-3 text-sm text-slate-600">
+                          {task.description}
+                        </p>
+                      )}
+                      {task.error_message && (
+                        <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                          {task.error_message}
+                        </p>
+                      )}
+                      <p className="mt-2 break-words font-mono text-[10px] text-slate-500">
+                        {task.tool_name || 'advisory'} · Task ID: {task.id}
+                        {task.trace_id && task.trace_id !== task.id
+                          ? ` · Trace ID: ${task.trace_id}`
+                          : ''}
+                      </p>
+                      {task.result_json && (
+                        <details className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs">
+                          <summary className="cursor-pointer font-semibold text-slate-700">
+                            Task evidence
+                          </summary>
+                          <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap text-[10px] text-slate-600">
+                            {JSON.stringify(task.result_json, null, 2)}
+                          </pre>
+                        </details>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0 sm:justify-end">
                       {task.status === 'awaiting_approval' && (
                         <>
                           <button
                             onClick={() => approveTask(task.id)}
-                            className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm"
+                            className="min-h-11 flex-1 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 sm:flex-none"
                           >
                             Approve
                           </button>
-                          <button
-                            onClick={() => rollbackTask(task.id)}
-                            className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
-                          >
-                            Reject
-                          </button>
+                          {task.source !== 'agentic_build' && (
+                            <button
+                              onClick={() => cancelTask(task.id)}
+                              className="min-h-11 flex-1 rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200 sm:flex-none"
+                            >
+                              Reject and cancel
+                            </button>
+                          )}
                         </>
                       )}
+                      {task.source !== 'agentic_build' &&
+                        ['queued', 'running'].includes(task.status) && (
+                          <button
+                            onClick={() => cancelTask(task.id)}
+                            className="min-h-11 flex-1 rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200 sm:flex-none"
+                          >
+                            Cancel
+                          </button>
+                        )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
@@ -164,6 +232,14 @@ export default function TasksClient() {
                       {task.status.replace(/_/g, ' ')}
                     </span>
                     <span>{new Date(task.created_at).toLocaleString()}</span>
+                    {task.source === 'agentic_build' && (
+                      <span>
+                        Course Builder
+                        {typeof task.credits_used === 'number'
+                          ? ` · ${task.credits_used} credits`
+                          : ''}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

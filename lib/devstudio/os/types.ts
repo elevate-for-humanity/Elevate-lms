@@ -36,6 +36,12 @@ export interface CreateTaskInput {
   command?: string;
   priority?: number;
   traceId?: string;
+  toolName?: string;
+  toolInput?: Record<string, unknown>;
+  executionMode?: 'automatic' | 'interactive';
+  conversationId?: string;
+  studioRunId?: string;
+  studioRunStepId?: string;
 }
 
 export interface TaskPlanStep {
@@ -57,7 +63,7 @@ export interface CommandCenterSnapshot {
   }>;
   buildStatus: {
     lastBuild: { id: string; status: string; kind: string } | null;
-    northflankConfigured: boolean;
+    googleConfigured: boolean;
   };
   health: {
     website: boolean;

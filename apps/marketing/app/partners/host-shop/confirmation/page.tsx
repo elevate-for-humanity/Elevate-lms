@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import HostShopApplicationConversion from '@/components/partners/HostShopApplicationConversion';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -19,6 +20,7 @@ export default async function HostSiteConfirmationPage({
 
   return (
     <main className="min-h-[75vh] bg-slate-50 px-4 py-12 text-slate-950">
+      <HostShopApplicationConversion />
       <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-7 shadow-sm sm:p-10">
         <p className="text-sm font-black uppercase tracking-[0.15em] text-brand-red-700">
           Host Site application received

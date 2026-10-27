@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig, sanitizePages } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { buildLicensedAssetProjectPolicy } from '@/lib/media/licensed-asset-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,22 +83,39 @@ export async function POST(request: NextRequest) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason }, { status: 403 });
 
-  const { data: ownedSites } = await supabase.from('user_websites').select('id, site_config').eq('user_id', user.id).order('updated_at', { ascending: false });
-  const reusable = (ownedSites || []).find((site) => interviewPending(site.site_config));
+  const admin = await requireAdminClient();
+  const { data: ownedSites } = await admin.from('user_websites').select('id, site_config').eq('user_id', user.id).order('updated_at', { ascending: false });
+  const body = await request.json().catch(() => ({}));
+  const existingSiteId = typeof body.existingSiteId === 'string' && /^[0-9a-f-]{36}$/i.test(body.existingSiteId) ? body.existingSiteId : null;
+  const existing = existingSiteId ? (ownedSites || []).find((site) => site.id === existingSiteId) : null;
+  if (existingSiteId && !existing) return NextResponse.json({ error: 'Existing website not found or not owned by you' }, { status: 404 });
+  const reusable = existing || (ownedSites || []).find((site) => interviewPending(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !interviewPending(site.site_config)).length;
   const plan = access.plan || 'starter';
   const limit = PLAN_SITE_LIMITS[plan] ?? 1;
   if (!reusable && limit !== null && completedCount >= limit) return NextResponse.json({ error: `${plan} plan allows ${limit} website${limit === 1 ? '' : 's'}`, upgradeUrl: '/store/apps/website-builder' }, { status: 409 });
 
-  const body = await request.json().catch(() => ({}));
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';
   const fallback = buildDefaultSiteConfig({ organizationName: siteName, contactEmail: user.email || undefined });
-  const config = normalizeProvidedConfig(body.siteConfig, fallback);
+  const normalizedConfig = normalizeProvidedConfig(body.siteConfig, fallback);
+  const config = ensureComposableSiteConfig({
+    ...normalizedConfig,
+    meta: {
+      ...(normalizedConfig.meta || {}),
+      licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }),
+    },
+  });
   const payload = { user_id: user.id, site_name: siteName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
 
+  if (existing && !interviewPending(existing.site_config)) {
+    const { data: current, error: currentError } = await admin.from('user_websites').select('id,user_id,site_name,subdomain,site_config,is_published').eq('id', existing.id).eq('user_id', user.id).single();
+    if (currentError || !current) return NextResponse.json({ error: 'Unable to preserve existing website revision' }, { status: 503 });
+    const { error: revisionError } = await admin.from('website_revisions').insert({ website_id: current.id, user_id: current.user_id, site_name: current.site_name, subdomain: current.subdomain, site_config: current.site_config, is_published: current.is_published, reason: 'Before importing updated website content' });
+    if (revisionError) return NextResponse.json({ error: 'Unable to create backup revision; original site unchanged' }, { status: 503 });
+  }
   const query = reusable?.id
-    ? supabase.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
-    : supabase.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });
+    ? admin.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
+    : admin.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });
   const { data: site, error } = await query.select('id, site_name, subdomain, is_published, updated_at').maybeSingle();
   if (error || !site) return NextResponse.json({ error: error?.message || 'Could not create website' }, { status: 500 });
   return NextResponse.json({ website: site }, { status: reusable?.id ? 200 : 201 });

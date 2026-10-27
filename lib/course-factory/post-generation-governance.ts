@@ -1,13 +1,20 @@
 import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
+import {
+  deriveLessonDurationMinutes,
+  normalizeLearningObjectives,
+} from './governance-normalization';
 
 function asRecord(value: unknown): Record<string, any> {
-  if (value && typeof value === 'object' && !Array.isArray(value)) return value as Record<string, any>;
+  if (value && typeof value === 'object' && !Array.isArray(value))
+    return value as Record<string, any>;
   if (typeof value === 'string' && value.trim()) {
     try {
       const parsed = JSON.parse(value);
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed as Record<string, any>;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+        return parsed as Record<string, any>;
     } catch {
       return {};
     }
@@ -21,6 +28,7 @@ function asArray(value: unknown): any[] {
 
 export type GovernanceNormalizationResult = {
   lessonsNormalized: number;
+  lessonObjectivesSynced: number;
   assessmentQuestionsSynced: number;
   flashcardsSynced: number;
   progressionRulesSynced: number;
@@ -42,12 +50,15 @@ export async function normalizeGeneratedCourseForGovernance(
 
   const { data: modules, error: moduleError } = await db
     .from('course_modules')
-    .select('id,title,slug,domain_key,target_hours,order_index,course_lessons(id,title,slug,domain_key,learning_objectives,competency_checks,quiz_questions,content,content_json,lesson_type,ai_generated,approved,generation_status,hour_category,delivery_method,practical_required,evidence_type,requires_instructor_signoff,duration_minutes,passing_score,order_index)')
+    .select(
+      'id,title,slug,domain_key,target_hours,order_index,course_lessons(id,title,slug,domain_key,learning_objectives,competency_checks,quiz_questions,content,content_json,script,script_text,lesson_type,ai_generated,approved,generation_status,hour_category,delivery_method,practical_required,evidence_type,requires_instructor_signoff,duration_minutes,passing_score,order_index)',
+    )
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });
   if (moduleError) throw moduleError;
 
   let lessonsNormalized = 0;
+  let lessonObjectivesSynced = 0;
   let assessmentQuestionsSynced = 0;
   let flashcardsSynced = 0;
   let progressionRulesSynced = 0;
@@ -74,7 +85,11 @@ export async function normalizeGeneratedCourseForGovernance(
       const contentJson = asRecord(lesson.content_json);
       const content = asRecord(lesson.content);
       const experience = asRecord(contentJson.experience ?? content.experience);
-      const objectives = asArray(lesson.learning_objectives).map((v) => String(v).trim()).filter(Boolean);
+      const objectives = normalizeLearningObjectives({
+        learningObjectives: lesson.learning_objectives,
+        content,
+        contentJson,
+      });
       const domainKey = String(lesson.domain_key || moduleDomain).trim();
       const competencyChecks = asArray(lesson.competency_checks);
       const derivedCompetencies = competencyChecks.length
@@ -99,25 +114,64 @@ export async function normalizeGeneratedCourseForGovernance(
 
       const lessonType = String(lesson.lesson_type || '');
       const isAssessment = ['quiz', 'checkpoint', 'exam', 'final_exam'].includes(lessonType);
-      const isPractical = Boolean(lesson.practical_required) || ['practical', 'lab', 'fieldwork', 'observation', 'practicum'].includes(lessonType);
-      const duration = Math.max(0, Number(lesson.duration_minutes ?? 0));
+      const isPractical =
+        Boolean(lesson.practical_required) ||
+        ['practical', 'lab', 'fieldwork', 'observation', 'practicum'].includes(lessonType);
+      const governedExperience =
+        experience && Object.keys(experience).length ? { ...experience } : null;
+      if (
+        governedExperience &&
+        !LearningIntelligenceSchema.safeParse(governedExperience.intelligence).success
+      ) {
+        governedExperience.intelligence = compileLearningIntelligence({
+          lessonSlug: String(lesson.slug || lesson.id),
+          lessonTitle: String(lesson.title || lesson.slug || 'Lesson'),
+          domainKey: domainKey || String(moduleDomain || 'course'),
+          competencyKeys: derivedCompetencies
+            .map((competency: any) => String(competency.key))
+            .filter(Boolean),
+          objectives,
+          masteryThreshold: Number(
+            lesson.passing_score ?? governedExperience?.remediation?.passingScore ?? 80,
+          ),
+          assessment: isAssessment,
+          practical: isPractical,
+          critical: derivedCompetencies.some((competency: any) => competency.isCritical === true),
+          criticalMasteryThreshold: 100,
+        });
+      }
+      const duration = deriveLessonDurationMinutes({
+        durationMinutes: lesson.duration_minutes,
+        lessonType,
+        script: lesson.script,
+        scriptText: lesson.script_text,
+        experienceNarration: experience.narrationScript,
+      });
       moduleDurationMinutes += duration;
       totalDurationMinutes += duration;
 
       if (['checkpoint', 'quiz'].includes(lessonType)) {
         checkpointLessonId = lesson.id;
-        checkpointPassingScore = Number(lesson.passing_score ?? experience?.remediation?.passingScore ?? 80);
+        checkpointPassingScore = Number(
+          lesson.passing_score ?? experience?.remediation?.passingScore ?? 80,
+        );
       }
 
       const update: Record<string, unknown> = {
         domain_key: domainKey || null,
         competency_checks: derivedCompetencies,
         quiz_questions: questions,
-        hour_category: lesson.hour_category || (isPractical ? 'practical' : isAssessment ? 'exam' : 'didactic'),
+        learning_objectives: objectives,
+        duration_minutes: duration,
+        hour_category:
+          lesson.hour_category || (isPractical ? 'practical' : isAssessment ? 'exam' : 'didactic'),
         delivery_method: lesson.delivery_method || 'online_async',
-        // Generation has completed successfully, but human approval remains separate.
-        generation_status: 'verification_ready',
+        // Generation completion is separate from the versioned automated publication gate.
+        generation_status: 'generated',
       };
+      if (governedExperience) {
+        update.content_json = { ...contentJson, experience: governedExperience };
+      }
 
       if (isPractical) {
         // The system may create the requirement, but it may not impersonate a human approval.
@@ -125,24 +179,33 @@ export async function normalizeGeneratedCourseForGovernance(
         update.requires_instructor_signoff = true;
       }
 
-      if (lesson.ai_generated === true && lesson.approved !== true) {
-        // Preserve human-review requirement. Never auto-approve AI content.
-        update.approved = false;
-      }
-
-      const { error: updateError } = await db.from('course_lessons').update(update).eq('id', lesson.id);
+      const { error: updateError } = await db
+        .from('course_lessons')
+        .update(update)
+        .eq('id', lesson.id);
       if (updateError) warnings.push(`${lesson.slug || lesson.id}: ${updateError.message}`);
       else lessonsNormalized += 1;
 
-      if (isAssessment) {
-        const { error: removeQuestionsError } = await db
-          .from('assessment_questions')
-          .delete()
-          .eq('lesson_id', lesson.id);
-        if (removeQuestionsError) {
-          warnings.push(`${lesson.slug || lesson.id} assessment cleanup: ${removeQuestionsError.message}`);
-        } else if (questions.length) {
-          const assessmentRows = questions.map((question: any, index: number) => ({
+      if (objectives.length) {
+        const objectiveRows = objectives.map((text, position) => ({
+          lesson_id: lesson.id,
+          position,
+          text,
+        }));
+        const { error: objectiveError } = await db
+          .from('lesson_objectives')
+          .upsert(objectiveRows, { onConflict: 'lesson_id,position' });
+        if (objectiveError)
+          warnings.push(`${lesson.slug || lesson.id} objectives: ${objectiveError.message}`);
+        else lessonObjectivesSynced += objectiveRows.length;
+      }
+
+      // Knowledge checks on instructional lessons are assessable evidence too.
+      // Keep the normalized relational bank aligned for every lesson, rather
+      // than syncing only rows whose lesson_type happens to be "assessment".
+      if (questions.length) {
+        const assessmentRows = questions
+          .map((question: any, index: number) => ({
             lesson_id: lesson.id,
             question_type: 'multiple_choice',
             prompt: String(question.question ?? question.prompt ?? '').trim(),
@@ -153,12 +216,17 @@ export async function normalizeGeneratedCourseForGovernance(
             difficulty: String(question.difficulty ?? 'medium'),
             domain_key: String(question.domainKey ?? domainKey ?? '').trim() || null,
             sort_order: index,
-          })).filter((row: any) => row.prompt);
-          if (assessmentRows.length) {
-            const { error: assessmentError } = await db.from('assessment_questions').insert(assessmentRows);
-            if (assessmentError) warnings.push(`${lesson.slug || lesson.id} assessment bank: ${assessmentError.message}`);
-            else assessmentQuestionsSynced += assessmentRows.length;
-          }
+          }))
+          .filter((row: any) => row.prompt);
+        if (assessmentRows.length) {
+          const { error: assessmentError } = await db
+            .from('assessment_questions')
+            .upsert(assessmentRows, { onConflict: 'lesson_id,sort_order' });
+          if (assessmentError)
+            warnings.push(
+              `${lesson.slug || lesson.id} assessment bank: ${assessmentError.message}`,
+            );
+          else assessmentQuestionsSynced += assessmentRows.length;
         }
       }
 
@@ -177,7 +245,8 @@ export async function normalizeGeneratedCourseForGovernance(
           .filter((card: any) => card.front && card.back);
         if (rows.length) {
           const { error: flashcardError } = await db.from('flashcards').insert(rows);
-          if (flashcardError) warnings.push(`${lesson.slug || lesson.id} flashcards: ${flashcardError.message}`);
+          if (flashcardError)
+            warnings.push(`${lesson.slug || lesson.id} flashcards: ${flashcardError.message}`);
           else flashcardsSynced += rows.length;
         }
       }
@@ -197,9 +266,14 @@ export async function normalizeGeneratedCourseForGovernance(
         course_id: courseId,
         module_id: (module as any).id,
         required_previous_module_id:
-          (modules ?? []).find((candidate: any) => Number(candidate.order_index) === Number((module as any).order_index) - 1)?.id ?? null,
+          (modules ?? []).find(
+            (candidate: any) =>
+              Number(candidate.order_index) === Number((module as any).order_index) - 1,
+          )?.id ?? null,
         required_checkpoint_lesson_id: checkpointLessonId,
-        minimum_score: checkpointLessonId ? Math.max(1, Math.min(100, Math.round(checkpointPassingScore))) : null,
+        minimum_score: checkpointLessonId
+          ? Math.max(1, Math.min(100, Math.round(checkpointPassingScore)))
+          : null,
       },
       { onConflict: 'course_id,module_id' },
     );
@@ -208,11 +282,14 @@ export async function normalizeGeneratedCourseForGovernance(
   }
 
   const totalDurationHours = Math.round((totalDurationMinutes / 60) * 100) / 100;
+  // Governance normalizes content and instructional metadata only. It must
+  // never declare a video-enabled course complete; the audiovisual package is
+  // finalized exclusively by finalizeUnifiedCourseBuildWithClient().
   const { error: courseUpdateError } = await db
     .from('courses')
     .update({
-      generation_status: 'completed',
-      generation_progress: 100,
+      // Course duration is self-paced instructional seat time. Regulatory RTI
+      // and OJL totals remain in the registered-apprenticeship standards layer.
       duration_hours: totalDurationHours > 0 ? totalDurationHours : null,
       updated_at: new Date().toISOString(),
     })
@@ -221,6 +298,7 @@ export async function normalizeGeneratedCourseForGovernance(
 
   return {
     lessonsNormalized,
+    lessonObjectivesSynced,
     assessmentQuestionsSynced,
     flashcardsSynced,
     progressionRulesSynced,

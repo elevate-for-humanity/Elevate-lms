@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { sendEmail } from '@/lib/email';
-import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { auditedMutation } from '@/lib/audit/transactional';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -20,42 +18,38 @@ async function _POST(request: NextRequest) {
     const auth = await apiRequireAdmin(request);
     if (auth.error) return auth.error;
 
-    const supabase = await createClient();
     const db = await requireAdminClient();
 
-    const { documentId, action, rejectionReason, adminId } = await request.json();
+    const { documentId, action, rejectionReason } = await request.json();
 
-    if (!documentId || !action) {
+    if (!documentId || !['approve', 'reject'].includes(action)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const status = action === 'approve' ? 'approved' : 'rejected';
+    if (action === 'reject' && !String(rejectionReason || '').trim()) {
+      return NextResponse.json({ error: 'A rejection reason is required' }, { status: 400 });
+    }
 
-    const { data: updatedDoc, error: updateError } = await auditedMutation({
-      table: 'documents',
-      operation: 'update',
-      rowData: {
-        status,
-        reviewed_by: adminId,
-        reviewed_at: new Date().toISOString(),
-        rejection_reason: action === 'reject' ? rejectionReason : null,
+    const status = action === 'approve' ? 'approved' : 'rejected';
+    const { data: updatedDoc, error: updateError } = await db.rpc(
+      'review_document_with_audit',
+      {
+        p_document_id: documentId,
+        p_action: action,
+        p_actor_id: auth.id,
+        p_rejection_reason: action === 'reject' ? String(rejectionReason).trim() : null,
       },
-      filter: { id: documentId },
-      audit: {
-        action: 'api:post:/api/admin/documents/review',
-        actorId: auth.id,
-        targetType: 'documents',
-        targetId: documentId,
-        metadata: { decision: action },
-      },
-    });
+    );
 
     if (updateError) {
-      return NextResponse.json({ error: 'Failed to update document' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to update document', code: updateError.code ?? 'DOCUMENT_UPDATE_FAILED' },
+        { status: 500 },
+      );
     }
 
     // Fetch document record
-    const { data: document } = await supabase
+    const { data: document } = await db
       .from('documents')
       .select('*')
       .eq('id', documentId)
@@ -67,7 +61,7 @@ async function _POST(request: NextRequest) {
 
     // Hydrate profile separately (documents.user_id has no FK to profiles)
     const { data: docUserProfile } = document.user_id
-      ? await supabase
+      ? await db
           .from('profiles')
           .select('id, full_name, email')
           .eq('id', document.user_id)
@@ -77,33 +71,43 @@ async function _POST(request: NextRequest) {
     const studentUserId = document.user_id;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
-    await logAdminAudit({
-      action: AdminAction.DOCUMENT_REVIEWED,
-      actorId: auth.id,
-      entityType: 'documents',
-      entityId: documentId,
-      metadata: { decision: action, file_name: document.file_name, student_user_id: studentUserId },
-      req: request,
-    });
+    // The authoritative audit row was committed atomically by review_document_with_audit.
+    // Legacy telemetry must never turn a successful review into a false failure.
+    try {
+      await logAdminAudit({
+        action: AdminAction.DOCUMENT_REVIEWED,
+        actorId: auth.id,
+        entityType: 'documents',
+        entityId: documentId,
+        metadata: { decision: action, file_name: document.file_name, student_user_id: studentUserId },
+        req: request,
+      });
+    } catch {
+      // Non-fatal: the transactional audit above is the compliance record.
+    }
 
     if (userProfile?.email) {
-      await sendEmail({
-        to: userProfile.email,
-        subject: `Document ${status === 'approved' ? 'Approved' : 'Rejected'} - ${document.file_name}`,
-        html: `
-          <h2>Document Review Update</h2>
-          <p>Your document <strong>${document.file_name}</strong> has been ${status}.</p>
-          ${status === 'rejected' ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
-          <p>Login to view details: <a href="${siteUrl}/lms/documents">View Documents</a></p>
-        `,
-      });
+      try {
+        await sendEmail({
+          to: userProfile.email,
+          subject: `Document ${status === 'approved' ? 'Approved' : 'Rejected'} - ${document.file_name}`,
+          html: `
+            <h2>Document Review Update</h2>
+            <p>Your document <strong>${document.file_name}</strong> has been ${status}.</p>
+            ${status === 'rejected' ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
+            <p>Login to view details: <a href="${siteUrl}/lms/documents">View Documents</a></p>
+          `,
+        });
+      } catch {
+        // Notification delivery is best-effort and must not roll back or mask review success.
+      }
     }
 
     // Check if this approval completes employer onboarding
     let employerActivated = false;
     if (action === 'approve' && studentUserId) {
       try {
-        const { data: ownerProfile } = await supabase
+        const { data: ownerProfile } = await db
           .from('profiles')
           .select('role')
           .eq('id', studentUserId)

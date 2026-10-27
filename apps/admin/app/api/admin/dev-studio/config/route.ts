@@ -27,7 +27,8 @@ function normalizeAdminTarget(url: string, adminUrl: string): string {
   if (!url.startsWith(adminUrl)) return url;
   return url
     .replace(`${adminUrl}/admin/studio`, `${adminUrl}/studio`)
-    .replace(`${adminUrl}/admin/course-builder`, `${adminUrl}/course-builder`)
+    .replace(`${adminUrl}/admin/course-builder`, `${adminUrl}/studio/courses`)
+    .replace(`${adminUrl}/course-builder`, `${adminUrl}/studio/courses`)
     .replace(`${adminUrl}/admin`, `${adminUrl}/dashboard`);
 }
 
@@ -45,9 +46,9 @@ export async function GET(req: NextRequest) {
       'List open ports','Show loaded secret names only','Open AI course builder','Run platform stabilize check',
     ],
     workflowButtons: [
-      { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy LMS plus Admin on Northflank from main' },
-      { key: 'deploy-lms', label: 'Deploy LMS', description: 'Build and deploy the LMS service on Northflank' },
-      { key: 'deploy-admin', label: 'Deploy Admin', description: 'Build and deploy the Admin service on Northflank' },
+      { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy LMS plus Admin on Google Cloud from main' },
+      { key: 'deploy-lms', label: 'Deploy LMS', description: 'Build and deploy the LMS service on Google Cloud' },
+      { key: 'deploy-admin', label: 'Deploy Admin', description: 'Build and deploy the Admin service on Google Cloud' },
       { key: 'ci', label: 'Run CI', description: 'Run the full validation pipeline' },
       { key: 'lint', label: 'Lint', description: 'Run the lint check' },
     ],
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
       { label: 'Programs', url: `${siteUrl}/programs` },
       { label: 'Apply', url: `${siteUrl}/apply` },
       { label: 'Admin Dashboard', url: `${adminUrl}/dashboard` },
-      { label: 'Course Builder', url: `${adminUrl}/course-builder` },
+      { label: 'Ultimate Course Builder', url: `${adminUrl}/studio/courses?tab=ultimate` },
       { label: 'Dev Studio', url: `${adminUrl}/studio` },
       { label: 'LMS', url: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org' },
     ],

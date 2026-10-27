@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "pr": 1293,
+  "allowedStates": [
+    "NOT_STARTED",
+    "IN_PROGRESS",
+    "BLOCKED_EXTERNAL",
+    "FAILED",
+    "VERIFIED"
+  ],
+  "updatedAt": "2026-09-26T14:06:58.825Z",
+  "areas": {
+    "A_repository_ci": {
+      "state": "IN_PROGRESS",
+      "evidence": [
+        "56b14b16e24d7abeea6bcd75f9e4e7f2082cc00c: CourseBlueprint parse/lint root fix",
+        "877a0bfe1507ec3518c07cb45c158c86219082a7: marketing standalone Next runtime packaging root fix"
+      ],
+      "blockers": []
+    },
+    "B_persistence_integrity": {
+      "state": "IN_PROGRESS",
+      "evidence": [
+        "c0c98b77457f00987d689d85192ab71580f4d97e: referential integrity migration",
+        "e147f355143197fd6a5a201b3f07dd1f1e54c561: referential integrity architecture guard",
+        "29acbe18cd98f7ee3b80a123cb5229a779fc729f: worker writes stage outputs to versioned artifact store"
+      ],
+      "blockers": []
+    },
+    "C_durable_execution": {
+      "state": "VERIFIED",
+      "evidence": [
+        "6c12322762a21fcd94ee97635fc6dbcaf5c0ae94: queue lease/heartbeat/recovery",
+        "ebd36dc18820ccab620cd99d45ad38da3c859269: checkpoint resume",
+        "LIVE 2026-09-26: production migrations applied; job 098cf7c7-4ec7-4e8e-967a-208dc6271c93 claimed by acceptance-worker-1 attempt 1, expired, reclaimed by acceptance-worker-2 attempt 2; same job/build identity preserved; passed standards_lock checkpoint/artifact persisted; fixture removed"
+      ],
+      "blockers": []
+    },
+    "D_universal_authoring": {
+      "state": "VERIFIED",
+      "evidence": [
+        "5fd3ab75bacedea6a14367e20e79f549e9749254: Standards Registry contract + versioned UltimateBlueprintService",
+        "LIVE 2026-09-26: registered Barber acceptance build 48fe8b10-0431-4eab-9f4d-b029211f54da persisted Blueprint v1 AUTOPILOT approved and v2 GUIDED review with RAPIDS standards mapping; blueprint competency matched canonical build profile; fixture removed"
+      ],
+      "blockers": []
+    },
+    "E_20_stage_production": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "F_instructional_sophistication": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "G_media_film": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "H_narration": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "I_learning_pace": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "J_accessibility": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "K_professional_review": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "L_package_interoperability": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "M_real_qa": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "N_controlled_learner_acceptance": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "O_full_barber_acceptance": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "P_universality_acceptance": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "Q_destructive_acceptance": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    },
+    "R_production_verification": {
+      "state": "NOT_STARTED",
+      "evidence": [],
+      "blockers": []
+    }
+  }
+}

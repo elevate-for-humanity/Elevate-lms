@@ -5,12 +5,21 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { TEAM } from '@/data/team';
 
+function teamMemberSlug(member: { name: string }): string {
+  return member.name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Our Team | Elevate for Humanity',
   description:
-    'Meet the educators, workforce specialists, and community advocates behind Elevate for Humanity.',
+    'Meet the executive leaders, credentialed educators, workforce specialists, and community advocates behind Elevate for Humanity.',
 };
 
 export default async function TeamPage() {
@@ -54,9 +63,11 @@ export default async function TeamPage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">
             Elevate for Humanity
           </p>
-          <h1 className="text-4xl font-extrabold text-white mb-4">Our Team</h1>
+          <h1 className="text-4xl font-extrabold text-white mb-4">A Workforce Powerhouse</h1>
           <p className="text-slate-300 text-lg max-w-2xl">
-            Educators, workforce specialists, and community advocates committed to learner success.
+            Executive leaders, credentialed educators, workforce specialists, and community
+            advocates combining deep public-sector, industry, compliance, and learner-support
+            experience to move people from training to employment.
           </p>
         </div>
       </section>
@@ -74,7 +85,8 @@ export default async function TeamPage() {
                   alt={member.name}
                   width={80}
                   height={80}
-                  className="rounded-full object-cover shrink-0 self-start" sizes="(max-width: 768px) 100vw, 50vw"
+                  className="rounded-full object-cover shrink-0 self-start"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               )}
               <div>
@@ -83,7 +95,7 @@ export default async function TeamPage() {
                 <p className="text-sm text-slate-700 line-clamp-3">{member.bio}</p>
                 {member.id && (
                   <Link
-                    href={`/about/team/${member.id}`}
+                    href={`/about/team/${teamMemberSlug(member)}`}
                     className="mt-3 inline-block text-sm font-medium text-brand-red-600 hover:underline"
                   >
                     Read more →

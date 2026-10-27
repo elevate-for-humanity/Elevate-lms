@@ -8,6 +8,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { MediaQualityEvidence } from './media-quality-gate';
+import { evaluatePersistedCredentialLesson } from '@/lib/course-factory/canonical-course-gate';
 
 export type VideoJobStatus = 'draft' | 'queued' | 'rendering' | 'complete' | 'failed';
 export type VideoAssetKind = 'lesson' | 'microclip';
@@ -58,18 +59,22 @@ export type VideoFailureClass =
   | 'quality'
   | 'content'
   | 'not_found'
+  | 'retry_exhausted'
   | 'unknown';
 
 export function classifyVideoFailure(message: string): VideoFailureClass {
   const text = message.toLowerCase();
   if (/413|request entity too large|upload|storage|bucket|tus/.test(text)) return 'storage';
-  if (/unauthorized|forbidden|invalid api key|401|403/.test(text)) return 'authorization';
+  if (/unauthorized|authorization(?:_| )required|forbidden|invalid api key|401|403/.test(text))
+    return 'authorization';
   if (/not configured|missing .*key|missing .*url|configuration/.test(text)) return 'configuration';
   if (/lesson not found|course not found|not found/.test(text)) return 'not_found';
-  if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text)) return 'quality';
+  if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text))
+    return 'quality';
   if (/storyboard|script|scene|content/.test(text)) return 'content';
   if (/render|ffmpeg|remotion|chromium|gpu|cuda|codec/.test(text)) return 'renderer';
-  if (/timeout|timed out|rate limit|429|502|503|504|network|connection|econn/.test(text)) return 'transient';
+  if (/timeout|timed out|rate limit|429|502|503|504|network|connection|econn/.test(text))
+    return 'transient';
   return 'unknown';
 }
 
@@ -78,10 +83,36 @@ export async function heartbeatJob(job: Pick<VideoJob, 'id' | 'lease_token'>): P
   const { data, error } = await db().rpc('heartbeat_video_job', {
     p_job_id: job.id,
     p_lease_token: job.lease_token,
-    p_lease_seconds: 900,
+    p_lease_seconds: 3600,
   });
   if (error) throw error;
   return data === true;
+}
+
+export async function markAwaitingPaidApproval(
+  job: Pick<VideoJob, 'id' | 'lesson_id'>,
+): Promise<void> {
+  const supabase = db();
+  const now = new Date().toISOString();
+  const message = 'Awaiting explicit paid inference approval';
+  const { error } = await supabase
+    .from('video_jobs')
+    .update({
+      status: 'draft',
+      started_at: null,
+      lease_token: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+      error_message: message,
+      updated_at: now,
+    })
+    .eq('id', job.id)
+    .eq('status', 'rendering');
+  if (error) throw error;
+  await supabase
+    .from('course_lessons')
+    .update({ video_status: 'draft', video_error: message, updated_at: now })
+    .eq('id', job.lesson_id);
 }
 
 export interface CreateJobInput {
@@ -116,10 +147,7 @@ async function findCanonicalJob(
   return data as VideoJob | null;
 }
 
-async function syncLessonJobLink(
-  supabase: ReturnType<typeof db>,
-  job: VideoJob,
-): Promise<void> {
+async function syncLessonJobLink(supabase: ReturnType<typeof db>, job: VideoJob): Promise<void> {
   if (job.asset_kind !== 'lesson') return;
   await supabase
     .from('course_lessons')
@@ -144,6 +172,53 @@ export async function createJob(input: CreateJobInput): Promise<VideoJob> {
   const assetKind = input.asset_kind ?? 'lesson';
   const existing = await findCanonicalJob(supabase, input);
   if (existing) {
+    // A new locked source contract is a new render attempt on the same canonical
+    // asset identity. Obsolete retry/dead-letter history must not strand it.
+    const sourceChanged =
+      (existing.script ?? '') !== (input.script ?? '') ||
+      JSON.stringify(existing.scene_data ?? null) !== JSON.stringify(input.scene_data ?? null);
+    // A curriculum refresh may replace narration and scene direction while
+    // retaining the canonical asset identity. Never render a stale queued job.
+    if (existing.status !== 'rendering') {
+      const { data: refreshed, error: refreshError } = await supabase
+        .from('video_jobs')
+        .update({
+          lesson_title: input.lesson_title,
+          script: input.script ?? null,
+          bullet_points: input.bullet_points ?? [],
+          scene_data: input.scene_data ?? null,
+          // Draft is an authoring state. Once Course Builder supplies the
+          // canonical lesson payload, the same durable job must become
+          // claimable by the renderer instead of remaining stranded.
+          ...(existing.status === 'draft' || sourceChanged
+            ? {
+                status: 'queued' as const,
+                queued_at: new Date().toISOString(),
+                started_at: null,
+                completed_at: null,
+                error_message: null,
+                retry_count: 0,
+                failure_class: null,
+                next_retry_at: null,
+                dead_lettered_at: null,
+                lease_token: null,
+                lease_expires_at: null,
+                heartbeat_at: null,
+                review_status: 'not_ready' as const,
+                quality_evidence: {},
+              }
+            : {}),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id)
+        .select('*')
+        .single();
+      if (refreshError || !refreshed) {
+        throw refreshError ?? new Error('Unable to refresh video job source');
+      }
+      await syncLessonJobLink(supabase, refreshed as VideoJob);
+      return refreshed as VideoJob;
+    }
     await syncLessonJobLink(supabase, existing);
     return existing;
   }
@@ -222,9 +297,10 @@ async function updateMicroclipExperience(
         ? (lesson.content as Record<string, any>)
         : {};
   const contentJson = structuredClone(source);
-  const experience = contentJson.experience && typeof contentJson.experience === 'object'
-    ? contentJson.experience as Record<string, any>
-    : {};
+  const experience =
+    contentJson.experience && typeof contentJson.experience === 'object'
+      ? (contentJson.experience as Record<string, any>)
+      : {};
   const clips = Array.isArray(experience.quickClips) ? experience.quickClips : [];
   experience.quickClips = clips.map((clip: Record<string, any>) =>
     String(clip.id) === assetKey ? { ...clip, ...patch } : clip,
@@ -238,19 +314,99 @@ async function updateMicroclipExperience(
   if (updateError) throw updateError;
 }
 
-export async function markRendering(jobId: string): Promise<void> {
+export async function markRendering(jobId: string, leaseToken?: string | null): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
-  const { data: job } = await supabase
+  let failureQuery = supabase
     .from('video_jobs')
-    .update({ status: 'rendering', started_at: now, completed_at: null, updated_at: now })
+    .update({
+      status: 'rendering',
+      started_at: now,
+      completed_at: null,
+      error_message: null,
+      updated_at: now,
+    })
     .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) failureQuery = failureQuery.eq('lease_token', leaseToken);
+  const { data: job, error: failureError } = await failureQuery
     .select('lesson_id, asset_kind, asset_key')
-    .single();
+    .maybeSingle();
+  if (failureError) throw failureError;
+  if (!job) throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
 
-  if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
-    await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'rendering', error: null });
+  if (job.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
+    await updateMicroclipExperience(job.lesson_id, job.asset_key, {
+      status: 'rendering',
+      error: null,
+    });
   }
+}
+
+export async function markCandidate(
+  jobId: string,
+  result: {
+    video_url: string;
+    audio_url?: string;
+    duration_seconds?: number;
+    scene_count?: number;
+    scene_data?: unknown;
+    provider?: string;
+    provider_model?: string;
+  },
+  leaseToken?: string | null,
+): Promise<void> {
+  const now = new Date().toISOString();
+  const patch: Record<string, unknown> = {
+    // A candidate is durable evidence, but it remains non-promoted until
+    // markComplete records successful quality evidence.
+    video_url: result.video_url,
+    audio_url: result.audio_url ?? null,
+    duration_seconds: result.duration_seconds ?? null,
+    scene_count: result.scene_count ?? null,
+    last_provider: result.provider ?? null,
+    last_provider_model: result.provider_model ?? null,
+    provider: result.provider ?? null,
+    review_status: 'not_ready',
+    quality_evidence: {},
+    updated_at: now,
+  };
+  if (result.scene_data != null) {
+    patch.scene_data = result.scene_data;
+    patch.procedure_schema = result.scene_data;
+  }
+  let candidateQuery = db()
+    .from('video_jobs')
+    .update(patch)
+    .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) candidateQuery = candidateQuery.eq('lease_token', leaseToken);
+  const { data: candidate, error } = await candidateQuery.select('id').maybeSingle();
+  if (error) throw error;
+  if (!candidate) {
+    // A long-running renderer can cross an infrastructure response boundary
+    // after PostgREST committed the candidate write. Reconcile the durable row
+    // before declaring the lease lost so a successful upload is not discarded
+    // merely because the update representation was empty.
+    const { data: persisted, error: persistedError } = await db()
+      .from('video_jobs')
+      .select('id,status,lease_token,video_url')
+      .eq('id', jobId)
+      .maybeSingle();
+    if (persistedError) throw persistedError;
+    const sameLease = !leaseToken || persisted?.lease_token === leaseToken;
+    if (
+      persisted?.status !== 'rendering' ||
+      !sameLease ||
+      persisted.video_url !== result.video_url
+    ) {
+      throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
+    }
+    logger.warn('[VideoJob] Reconciled committed candidate after an empty update response', {
+      jobId,
+    });
+  }
+  logger.info(`[VideoJob] Candidate persisted before quality review: ${jobId}`);
 }
 
 export async function markComplete(
@@ -265,6 +421,7 @@ export async function markComplete(
     provider_model?: string;
     quality_evidence?: MediaQualityEvidence;
   },
+  leaseToken?: string | null,
 ): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
@@ -298,16 +455,52 @@ export async function markComplete(
   // A renderer that returns no replacement storyboard must not erase the
   // canonical plan that was attached when the job was queued.
   if (result.scene_data != null) completionPatch.scene_data = result.scene_data;
-  const { data: job } = await supabase
+  let completionQuery = supabase
     .from('video_jobs')
     .update(completionPatch)
     .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) completionQuery = completionQuery.eq('lease_token', leaseToken);
+  const { data: initialJob, error: completionError } = await completionQuery
     .select('course_id, lesson_id, asset_kind, asset_key, script')
-    .single();
+    .maybeSingle();
+  if (completionError) throw completionError;
+  let job = initialJob;
+  if (!job) {
+    // Completion is idempotent. If the guarded write committed but its
+    // representation was lost at the request boundary, continue from the
+    // durable complete row instead of overwriting it with a failure.
+    const { data: persisted, error: persistedError } = await supabase
+      .from('video_jobs')
+      .select(
+        'course_id, lesson_id, asset_kind, asset_key, script, status, video_url, review_status',
+      )
+      .eq('id', jobId)
+      .maybeSingle();
+    if (persistedError) throw persistedError;
+    if (
+      persisted?.status !== 'complete' ||
+      persisted.review_status !== 'approved' ||
+      persisted.video_url !== result.video_url
+    ) {
+      throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
+    }
+    job = persisted;
+    logger.warn('[VideoJob] Reconciled committed completion after an empty update response', {
+      jobId,
+    });
+  }
 
   if (job?.lesson_id && job.asset_kind === 'lesson') {
-    const { data: lesson } = await supabase.from('course_lessons').select('video_url').eq('id', job.lesson_id).maybeSingle();
-    await supabase.from('video_jobs').update({ previous_video_url: lesson?.video_url ?? null }).eq('id', jobId);
+    const { data: lesson } = await supabase
+      .from('course_lessons')
+      .select('video_url,content_json')
+      .eq('id', job.lesson_id)
+      .maybeSingle();
+    await supabase
+      .from('video_jobs')
+      .update({ previous_video_url: lesson?.video_url ?? null })
+      .eq('id', jobId);
     const candidateVersion = {
       course_id: job.course_id,
       lesson_id: job.lesson_id,
@@ -318,32 +511,94 @@ export async function markComplete(
       quality_evidence: result.quality_evidence ?? {},
       procedure_schema: result.scene_data ?? {},
       transcript: job.script ?? null,
-      caption_url: result.scene_data && typeof result.scene_data === 'object'
-        ? (result.scene_data as Record<string, unknown>).captionUrl ?? null
-        : null,
-      transcript_url: result.scene_data && typeof result.scene_data === 'object'
-        ? (result.scene_data as Record<string, unknown>).transcriptUrl ?? null
-        : null,
+      caption_url:
+        result.scene_data && typeof result.scene_data === 'object'
+          ? ((result.scene_data as Record<string, unknown>).captionUrl ?? null)
+          : null,
+      transcript_url:
+        result.scene_data && typeof result.scene_data === 'object'
+          ? ((result.scene_data as Record<string, unknown>).transcriptUrl ?? null)
+          : null,
       // lesson_video_versions uses active as the promoted learner-facing state.
       status: 'active',
       approved_at: now,
     };
     const { data: existingVersion } = await supabase
-      .from('lesson_video_versions').select('id').eq('video_job_id', jobId).maybeSingle();
+      .from('lesson_video_versions')
+      .select('id')
+      .eq('video_job_id', jobId)
+      .maybeSingle();
     const versionResult = existingVersion?.id
-      ? await supabase.from('lesson_video_versions').update(candidateVersion).eq('id', existingVersion.id)
+      ? await supabase
+          .from('lesson_video_versions')
+          .update(candidateVersion)
+          .eq('id', existingVersion.id)
       : await supabase.from('lesson_video_versions').insert(candidateVersion);
     if (versionResult.error) throw versionResult.error;
-    const { error: lessonPromotionError } = await supabase.from('course_lessons').update({
-      video_url: result.video_url,
-      video_status: 'complete',
-      video_error: null,
-      video_generated_at: now,
-      scene_data: result.scene_data ?? null,
-      duration_seconds: result.duration_seconds ?? null,
-      updated_at: now,
-    }).eq('id', job.lesson_id);
+    const currentContentJson =
+      lesson?.content_json && typeof lesson.content_json === 'object'
+        ? structuredClone(lesson.content_json as Record<string, any>)
+        : {};
+    const currentExperience =
+      currentContentJson.experience && typeof currentContentJson.experience === 'object'
+        ? (currentContentJson.experience as Record<string, any>)
+        : {};
+    currentExperience.technicalReview = {
+      approved: true,
+      mode: 'automated_media_quality_gate',
+      gateVersion:
+        result.quality_evidence && typeof result.quality_evidence === 'object'
+          ? (result.quality_evidence as unknown as Record<string, unknown>).gateVersion ?? null
+          : null,
+      checkedAt: now,
+      evidence: result.quality_evidence ?? {},
+    };
+    currentContentJson.experience = currentExperience;
+
+    const { error: lessonPromotionError } = await supabase
+      .from('course_lessons')
+      .update({
+        content_json: currentContentJson,
+        video_url: result.video_url,
+        video_status: 'complete',
+        video_error: null,
+        video_generated_at: now,
+        media_origin: 'generated',
+        media_quality_status: 'approved',
+        media_quality_evidence: result.quality_evidence ?? {},
+        media_verified_at: now,
+        // Media completion is necessary but not sufficient for credential
+        // lesson completion. The strict persisted lesson contract runs below
+        // before generation_status may advance to generated.
+        generation_status: 'generating',
+        scene_data: result.scene_data ?? null,
+        duration_seconds: result.duration_seconds ?? null,
+        updated_at: now,
+      })
+      .eq('id', job.lesson_id);
     if (lessonPromotionError) throw lessonPromotionError;
+
+    const lessonContract = await evaluatePersistedCredentialLesson(job.lesson_id);
+    if (lessonContract.pass) {
+      const { error: lessonCompletionError } = await supabase
+        .from('course_lessons')
+        .update({
+          generation_status: 'generated',
+          updated_at: now,
+        })
+        .eq('id', job.lesson_id);
+      if (lessonCompletionError) throw lessonCompletionError;
+    } else {
+      logger.warn('[VideoJob] Media approved but credential lesson contract remains incomplete', {
+        jobId,
+        lessonId: job.lesson_id,
+        findings: lessonContract.findings.map((finding) => ({
+          gate: finding.gate,
+          path: finding.path,
+          message: finding.message,
+        })),
+      });
+    }
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'approved',
@@ -362,23 +617,35 @@ export async function markFailed(
   jobId: string,
   errorMessage: string,
   evidence: { provider?: string; provider_model?: string } = {},
+  leaseToken?: string | null,
 ): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
   const failureClass = classifyVideoFailure(errorMessage);
-  const { data: current } = await supabase
+  const { data: current, error: currentError } = await supabase
     .from('video_jobs')
-    .select('retry_count')
+    .select('retry_count,status,lease_token')
     .eq('id', jobId)
     .maybeSingle();
+  if (currentError) throw currentError;
+  if (current?.status === 'complete') {
+    logger.warn('[VideoJob] Ignored late failure for an already completed job', { jobId });
+    return;
+  }
+  if (leaseToken && (current?.status !== 'rendering' || current.lease_token !== leaseToken)) {
+    logger.warn('[VideoJob] Ignored failure from a worker that no longer owns the lease', {
+      jobId,
+    });
+    return;
+  }
   const retryCount = Number(current?.retry_count ?? 0);
   const terminalFailure =
     retryCount >= 3 ||
     ['configuration', 'authorization', 'not_found', 'content'].includes(failureClass);
   const nextRetryAt = terminalFailure
     ? null
-    : new Date(Date.now() + Math.min(60_000 * (2 ** retryCount), 15 * 60_000)).toISOString();
-  const { data: job } = await supabase
+    : new Date(Date.now() + Math.min(60_000 * 2 ** retryCount, 15 * 60_000)).toISOString();
+  let failureQuery = supabase
     .from('video_jobs')
     .update({
       status: 'failed',
@@ -396,11 +663,53 @@ export async function markFailed(
       dead_lettered_at: terminalFailure ? now : null,
     })
     .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) failureQuery = failureQuery.eq('lease_token', leaseToken);
+  const { data: job, error: failureError } = await failureQuery
     .select('lesson_id, asset_kind, asset_key')
-    .single();
+    .maybeSingle();
+  if (failureError) throw failureError;
+  if (!job) {
+    logger.warn('[VideoJob] Failure transition skipped because the lease changed', { jobId });
+    return;
+  }
+
+  try {
+    await supabase.from('platform_events').insert({
+      event_type: 'video_job_failed',
+      category: 'course_media',
+      severity: terminalFailure ? 'error' : 'warning',
+      actor_type: 'system',
+      subject_id: jobId,
+      subject_type: 'video_job',
+      source: 'video-worker',
+      correlation_id: jobId,
+      idempotency_key: `video-job-failure:${jobId}:${retryCount}:${now}`,
+      message: errorMessage,
+      payload: {
+        job_id: jobId,
+        lesson_id: job?.lesson_id ?? null,
+        asset_kind: job?.asset_kind ?? null,
+        asset_key: job?.asset_key ?? null,
+        retry_count: retryCount,
+        failure_class: failureClass,
+        terminal: terminalFailure,
+        provider: evidence.provider ?? null,
+        provider_model: evidence.provider_model ?? null,
+      },
+    });
+  } catch (eventError) {
+    logger.warn('[VideoJob] Unable to persist failure event', {
+      jobId,
+      error: eventError instanceof Error ? eventError.message : String(eventError),
+    });
+  }
 
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
-    await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'failed', error: errorMessage });
+    await updateMicroclipExperience(job.lesson_id, job.asset_key, {
+      status: 'failed',
+      error: errorMessage,
+    });
   }
 
   logger.error('[VideoJob] Failed: ' + jobId + ' — ' + errorMessage);

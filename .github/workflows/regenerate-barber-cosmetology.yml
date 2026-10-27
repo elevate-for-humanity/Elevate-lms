@@ -1,13 +1,6 @@
-name: Regenerate Barber and Cosmetology Courses
+name: Regenerate Cosmetology Course
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/regenerate-barber-cosmetology.yml'
-      - 'scripts/course-factory/regenerate-barber-cosmetology.ts'
-  issues:
-    types: [reopened]
   workflow_dispatch:
 
 permissions:
@@ -17,7 +10,11 @@ permissions:
 env:
   CI: true
   NODE_ENV: production
+  AI_PROVIDER: cloudflare
+  AI_PROVIDER_ORDER: cloudflare
   AI_CIRCUIT_RECOVERY_WAIT: '1'
+  SUPABASE_FETCH_TIMEOUT_MS: '30000'
+  SUPABASE_READ_MAX_ATTEMPTS: '3'
   SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -25,18 +22,17 @@ env:
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+  CLOUDFLARE_AI_MODEL: ${{ secrets.CLOUDFLARE_AI_MODEL }}
   NODE_OPTIONS: --conditions=react-server
 
 jobs:
   regenerate:
-    if: >-
-      github.event_name != 'issues' ||
-      (github.event.issue.number == 928 &&
-       github.event.issue.title == 'RUN BARBER COSMETOLOGY COURSE REGENERATION')
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
-      group: barber-cosmetology-course-regeneration
+      group: cosmetology-course-regeneration
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +59,7 @@ jobs:
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
 
-      - name: Regenerate both courses through canonical Course Factory
+      - name: Reconcile Cosmetology through canonical Course Factory
         id: regenerate
         shell: bash
         run: |
@@ -77,7 +73,7 @@ jobs:
 
       - name: Verify apprenticeship architecture
         id: audit
-        run: pnpm tsx scripts/audit-apprenticeship-architecture.ts
+        run: node scripts/check-registered-apprenticeship-architecture.mjs
 
       - name: Report sanitized stage outcomes
         if: always() && github.event_name == 'issues'

@@ -8,7 +8,10 @@ import { describe, expect, it } from 'vitest';
  */
 describe('deployed portal middleware auth coverage', () => {
   const lms = readFileSync(resolve(process.cwd(), 'apps/lms/middleware.ts'), 'utf8');
+  const admin = readFileSync(resolve(process.cwd(), 'apps/admin/middleware.ts'), 'utf8');
   const marketing = readFileSync(resolve(process.cwd(), 'apps/marketing/middleware.ts'), 'utf8');
+  const marketingHome = readFileSync(resolve(process.cwd(), 'apps/marketing/app/page.tsx'), 'utf8');
+  const homeHero = readFileSync(resolve(process.cwd(), 'components/home/PlatformHubHero.tsx'), 'utf8');
 
   const lmsProtectedPrefixes = [
     '/learner',
@@ -16,7 +19,7 @@ describe('deployed portal middleware auth coverage', () => {
     '/lms/courses',
     '/apprentice',
     '/host-shop/dashboard',
-    '/parent-portal/dashboard',
+    '/parent-portal',
     '/employer',
     '/workforce',
     '/program-holder',
@@ -36,8 +39,30 @@ describe('deployed portal middleware auth coverage', () => {
 
   it('validates the Supabase user before protected LMS rendering', () => {
     expect(lms).toContain('supabase.auth.getUser()');
-    expect(lms).toMatch(/protectedPath\s*&&\s*\(error\s*\|\|\s*!user\)/);
+    expect(lms).toContain('if (error || !user) {');
+    expect(lms).toContain('redirect.cookies.set(cookie)');
     expect(lms).toContain("X-Robots-Tag', 'noindex, nofollow, noarchive'");
+  });
+
+  it('short-circuits anonymous portal requests without caching the decision', () => {
+    expect(lms).toContain('if (!hasSupabaseAuthCookie(req)) return redirectToLogin');
+    expect(admin).toContain('if (!hasSupabaseAuthCookie(req)) return unauthenticatedRedirect');
+    expect(lms).toContain("response.headers.set('Vary', 'Cookie')");
+    expect(admin).toContain("response.headers.set('Vary', 'Cookie')");
+  });
+
+  it('does not refresh Supabase sessions on public LMS entry points', () => {
+    expect(lms).toMatch(/if \(protectedPath\) \{[\s\S]*supabase\.auth\.getUser\(\)/);
+    expect(lms).not.toContain('hasSupabaseSession || protectedPath');
+  });
+
+  it('renders the marketing homepage from the conversion-focused static hero', () => {
+    expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
+    expect(marketingHome).toContain('<PlatformHubHero />');
+    expect(marketingHome).not.toContain('<HomeHeroVideo');
+    expect(homeHero).toContain('Build a career. Build a workforce. Build a business.');
+    expect(homeHero).toContain('href="/programs"');
+    expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });
 
   it('validates the Supabase user before protected Marketing portal rendering', () => {

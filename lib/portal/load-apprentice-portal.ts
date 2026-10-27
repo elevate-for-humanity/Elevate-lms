@@ -7,12 +7,11 @@ import { remainingHoursDisplay } from '@/lib/barber/pricing';
 
 export type ApprenticePortalEnrollment = {
   id: string;
+  course_id?: string | null;
   program_id?: string | null;
   program_slug?: string | null;
   enrollment_state: string;
   orientation_completed_at?: string | null;
-  stripe_subscription_id?: string | null;
-  stripe_subscription_status?: string | null;
 };
 
 export type ApprenticePortalBilling = {
@@ -60,9 +59,9 @@ export async function loadApprenticePortalData(programSlug: string) {
     supabase
       .from('program_enrollments')
       .select(
-        'id, program_id, program_slug, enrollment_state, orientation_completed_at, stripe_subscription_id, stripe_subscription_status',
+        'id, course_id, program_id, program_slug, enrollment_state, orientation_completed_at',
       )
-      .eq('user_id', user.id)
+      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
       .eq('program_slug', programSlug)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -70,7 +69,7 @@ export async function loadApprenticePortalData(programSlug: string) {
     supabase
       .from('apprentices')
       .select('id, shop_id, employer_id, start_date, status, rapids_id')
-      .eq('user_id', user.id)
+      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
       .eq('status', 'active')
       .maybeSingle(),
   ]);
@@ -86,7 +85,7 @@ export async function loadApprenticePortalData(programSlug: string) {
     const { data: barberSub } = await supabase
       .from('barber_subscriptions')
       .select(
-        'id, status, stripe_subscription_id, setup_fee_paid, weekly_payment_cents, remaining_balance, fully_paid, bnpl_provider, transferred_hours_verified, hours_remaining',
+        'id, status, setup_fee_paid, weekly_payment_cents, remaining_balance, fully_paid, bnpl_provider, transferred_hours_verified, hours_remaining',
       )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -114,15 +113,6 @@ export async function loadApprenticePortalData(programSlug: string) {
           program_slug: programSlug,
           enrollment_state: 'active',
           orientation_completed_at: null,
-          stripe_subscription_id: barberSub.stripe_subscription_id,
-          stripe_subscription_status: barberSub.status,
-        };
-      } else if (!enrollment.stripe_subscription_id && barberSub.stripe_subscription_id) {
-        enrollment = {
-          ...enrollment,
-          stripe_subscription_id: barberSub.stripe_subscription_id,
-          stripe_subscription_status:
-            enrollment.stripe_subscription_status ?? barberSub.status,
         };
       }
     }

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
 
 export const revalidate = 3600;
 
@@ -74,6 +75,7 @@ export default function BarberApplyIndexPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-10">
+        <div className="mb-5"><ApprenticeshipFundingNotice /></div>
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
           Self-pay applicants can review the server-priced $600 minimum deposit, pay-in-full,
           payment estimate, and available BNPL options from the Barber program page. Payment does

@@ -4,11 +4,11 @@
  * Docker logs.
  *
  * NEXT_PUBLIC_* values are public client configuration, not service-role
- * secrets. Northflank/GitHub build arguments should provide them. A production
- * public fallback is kept here so direct Northflank git builds do not fail when
+ * secrets. Google Cloud/GitHub build arguments should provide them. A production
+ * public fallback is kept here so direct Google Cloud git builds do not fail when
  * the service has not yet been patched with build arguments. The fallback is
  * intentionally written from Node and sourced by the Docker RUN step so the
- * values are not expanded into the Docker build command shown in Northflank UI.
+ * values are not expanded into the Docker build command shown in Google Cloud UI.
  */
 
 import { writeFileSync } from 'node:fs';
@@ -34,7 +34,7 @@ const PUBLIC_BUILD_DEFAULTS = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co',
   // Supabase anon keys are intentionally public client config. Keep the
   // fallback encoded as character codes so repository scanners do not treat it
-  // like a service-role secret while direct Northflank git builds still work.
+  // like a service-role secret while direct Google Cloud git builds still work.
   NEXT_PUBLIC_SUPABASE_ANON_KEY: publicAnonFallback(),
 };
 
@@ -105,7 +105,7 @@ if (errors.length > 0) {
     console.error(`- ${error}`);
   }
   console.error(
-    'Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY as Northflank build-time env/build args. Values are intentionally not echoed.',
+    'Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY as Google Cloud build-time env/build args. Values are intentionally not echoed.',
   );
   process.exit(1);
 }

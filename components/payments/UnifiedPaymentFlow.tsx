@@ -50,13 +50,18 @@ export default function UnifiedPaymentFlow({
   const [error, setError] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountType: 'fixed' | 'percentage';
+    discountValue: number;
+    discountAmount: number;
+  } | null>(null);
   const [couponError, setCouponError] = useState('');
 
   const monthlyPayment = Math.ceil(price / 4);
   
   // Calculate discounted price if coupon applied
-  const discountAmount = appliedCoupon ? Math.round(price * (appliedCoupon.discount / 100)) : 0;
+  const discountAmount = appliedCoupon?.discountAmount || 0;
   const discountedPrice = price - discountAmount;
   const discountedMonthlyPayment = Math.ceil(discountedPrice / 4);
 
@@ -74,7 +79,12 @@ export default function UnifiedPaymentFlow({
       const data = await res.json();
       
       if (data.valid) {
-        setAppliedCoupon({ code: couponCode.toUpperCase(), discount: data.coupon.discount_value });
+        setAppliedCoupon({
+          code: couponCode.toUpperCase(),
+          discountType: data.coupon.discount_type,
+          discountValue: data.coupon.discount_value,
+          discountAmount: Number(data.coupon.discount_amount_cents || 0) / 100,
+        });
         setCouponCode('');
       } else {
         setCouponError(data.error || 'Invalid coupon code');
@@ -125,16 +135,15 @@ export default function UnifiedPaymentFlow({
     setError('');
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await fetch('/api/programs/enroll/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          programId,
-          paymentType,
-          preferredMethod: selectedMethod,
-          couponCode: appliedCoupon?.code,
+          program_id: programId,
+          funding_source: 'self_pay',
+          payment_plan: paymentType === 'plan' ? 'installments' : 'full',
         }),
       });
 
@@ -144,9 +153,8 @@ export default function UnifiedPaymentFlow({
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
-      if (data.url) {
-        // Redirect to Stripe Checkout
-        window.location.href = data.url;
+      if (data.url || data.checkoutUrl) {
+        window.location.href = data.checkoutUrl || data.url;
       } else {
         throw new Error('No checkout URL received');
       }
@@ -365,7 +373,11 @@ export default function UnifiedPaymentFlow({
               <CheckCircle className="w-5 h-5 text-brand-green-600" />
               <div>
                 <p className="font-bold text-brand-green-700">{appliedCoupon.code}</p>
-                <p className="text-sm text-brand-green-600">{appliedCoupon.discount}% discount applied</p>
+                <p className="text-sm text-brand-green-600">
+                  {appliedCoupon.discountType === 'fixed'
+                    ? `$${appliedCoupon.discountValue.toLocaleString('en-US')} discount applied`
+                    : `${appliedCoupon.discountValue}% discount applied`}
+                </p>
               </div>
             </div>
             <button
@@ -386,7 +398,7 @@ export default function UnifiedPaymentFlow({
           <div className="text-sm text-black">
             <p className="font-semibold mb-1">Secure Payment Processing</p>
             <p>
-              Your payment is processed securely through Stripe. We never store your payment
+              Your payment is processed securely through QuickBooks. We never store your payment
               information. All transactions are encrypted and PCI-DSS compliant.
             </p>
           </div>

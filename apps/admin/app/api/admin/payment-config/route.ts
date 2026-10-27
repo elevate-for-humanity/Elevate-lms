@@ -1,18 +1,15 @@
 /**
- * Admin-only diagnostic endpoint — checks BNPL provider configuration status.
- * Returns which env vars are present (not their values).
- * Requires admin/admin/staff authentication.
+ * Admin-only diagnostic endpoint for the canonical billing stack.
+ * Reports configuration presence only; secret values are never returned.
  */
 
 import { NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { handleRoute } from '@/lib/api/route';
-import { sezzle } from '@/lib/sezzle/client';
-import { affirm } from '@/lib/affirm/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-
 import { withRuntime } from '@/lib/api/withRuntime';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,35 +20,62 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const auth = await apiRequireAdmin(request);
-
     if (auth.error) return auth.error;
+
+    const db = await requireAdminClient();
+    const { data: quickBooksRows } = await db
+      .from('app_settings')
+      .select('key, value')
+      .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']);
+    const quickBooksStored = Object.fromEntries(
+      (quickBooksRows ?? []).map((row) => [row.key, row.value ?? '']),
+    );
+    const hasQuickBooksValue = (key: string) => Boolean(process.env[key] || quickBooksStored[key]);
+    const quickBooksCredentialsConfigured =
+      hasQuickBooksValue('QB_CLIENT_ID') && hasQuickBooksValue('QB_CLIENT_SECRET');
+    const quickBooksConnected =
+      quickBooksCredentialsConfigured &&
+      hasQuickBooksValue('QB_REFRESH_TOKEN') &&
+      hasQuickBooksValue('QB_REALM_ID');
+    const payPalConfigured = Boolean(
+      process.env.PAYPAL_CLIENT_ID &&
+        process.env.PAYPAL_CLIENT_SECRET &&
+        process.env.PAYPAL_BILLING_WEBHOOK_ID,
+    );
+
     const response = NextResponse.json({
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
-      sezzle: {
-        configured: sezzle.isConfigured(),
+      billing: {
+        authority: 'admin_dashboard',
+        dashboardPath: '/billing/subscriptions',
+        automaticCollection: 'paypal',
+        invoiceLedger: 'quickbooks',
+        configured: payPalConfigured && quickBooksConnected,
+      },
+      paypal: {
+        configured: payPalConfigured,
+        environment: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
         envVars: {
-          SEZZLE_PUBLIC_KEY: !!process.env.SEZZLE_PUBLIC_KEY,
-          SEZZLE_PRIVATE_KEY: !!process.env.SEZZLE_PRIVATE_KEY,
-          SEZZLE_ENVIRONMENT: process.env.SEZZLE_ENVIRONMENT || '(not set, defaults to sandbox)',
-          SEZZLE_WEBHOOK_SECRET: !!process.env.SEZZLE_WEBHOOK_SECRET,
+          PAYPAL_CLIENT_ID: !!process.env.PAYPAL_CLIENT_ID,
+          PAYPAL_CLIENT_SECRET: !!process.env.PAYPAL_CLIENT_SECRET,
+          PAYPAL_BILLING_WEBHOOK_ID: !!process.env.PAYPAL_BILLING_WEBHOOK_ID,
         },
       },
-      affirm: {
-        configured: affirm.isConfigured(),
+      quickbooks: {
+        configured: quickBooksCredentialsConfigured,
+        connected: quickBooksConnected,
         envVars: {
-          AFFIRM_PUBLIC_KEY: !!process.env.AFFIRM_PUBLIC_KEY,
-          NEXT_PUBLIC_AFFIRM_PUBLIC_KEY: !!process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY,
-          AFFIRM_PRIVATE_KEY: !!process.env.AFFIRM_PRIVATE_KEY,
-          AFFIRM_ENVIRONMENT: process.env.AFFIRM_ENVIRONMENT || '(not set, defaults to production)',
+          QB_CLIENT_ID: hasQuickBooksValue('QB_CLIENT_ID'),
+          QB_CLIENT_SECRET: hasQuickBooksValue('QB_CLIENT_SECRET'),
+          QB_ACCESS_TOKEN: hasQuickBooksValue('QB_ACCESS_TOKEN'),
+          QB_REFRESH_TOKEN: hasQuickBooksValue('QB_REFRESH_TOKEN'),
+          QB_REALM_ID: hasQuickBooksValue('QB_REALM_ID'),
         },
       },
-      stripe: {
-        envVars: {
-          STRIPE_SECRET_KEY: !!process.env.STRIPE_SECRET_KEY,
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-          STRIPE_WEBHOOK_SECRET: !!process.env.STRIPE_WEBHOOK_SECRET,
-        },
+      legacyPayments: {
+        mode: 'archive_only',
+        acceptsNewTransactions: false,
       },
       supabase: {
         envVars: {
@@ -66,4 +90,5 @@ async function _GET(request: Request) {
     return response;
   });
 }
+
 export const GET = withRuntime(withApiAudit('/api/admin/payment-config', _GET));

@@ -13,14 +13,18 @@ import {
   generatedBlueprintSchema,
   generatedLessonContentSchema,
   parseStrictAIJson,
+  quizQuestionSchema,
 } from './ai-contracts';
 import {
   loadAssessmentCheckpoint,
+  loadPartialAssessmentCheckpoint,
   loadLessonGenerationCheckpoint,
   persistAssessmentCheckpoint,
   persistLessonGenerationCheckpoint,
 } from './generation-checkpoints';
 import type { BlueprintLessonRef, QuizQuestion } from './types';
+import { normalizeLessonContract } from './lesson-contract-normalizer';
+import { normalizeProviderJson } from './provider-json-normalizer';
 
 export interface GeneratedLessonContent {
   objective: string;
@@ -36,91 +40,123 @@ interface LessonGenerationInput {
   courseTitle: string;
   state?: string;
   standardsBlock?: string;
+  /** Invalidates durable/database checkpoints when the governing blueprint changes. */
+  checkpointNamespace?: string;
+  /** Canonical draft shell used to persist and queue this lesson as one unit. */
+  courseId?: string;
 }
 
-function normalizeLessonContract(raw: string): string {
-  try {
-    const parsed = JSON.parse(raw) as Record<string, any>;
-    const experience = parsed?.experience;
-    const remediation = experience?.remediation;
-    const specificObjectives = [
-      ...(Array.isArray(parsed.learning_points) ? parsed.learning_points : []),
-      parsed.objective,
-    ].filter(
-      (value, index, values): value is string =>
-        typeof value === 'string' &&
-        value.trim().length > 0 &&
-        values.indexOf(value) === index,
+const GOVERNED_COURSE_RULES = `
+GOVERNED COURSE RULES:
+- Teach the named lesson and mapped competency; never substitute adjacent trades or generic filler.
+- Separate instruction, guided examples, hands-on practice, knowledge checks, and remediation.
+- Use measurable learner actions and realistic workplace decisions with safety and infection-control consequences where applicable.
+- Explain why correct answers are correct and why distractors are unsafe, incomplete, or unsupported.
+- State licensing or regulatory requirements cautiously; do not invent hours, legal guarantees, official exam questions, or agency approval.
+- Keep all content original and brand-neutral; do not reproduce Milady or any proprietary textbook or test bank.
+- Support accessibility with plain language, meaningful headings, narration that works without visuals, and text instruction that works without video.
+- Produce complete, learner-ready content with no placeholders, TODOs, unsupported links, or promises of automatic licensure or state-board passage.
+- Keep every workplace, person, tool, credential, and visual inside the named course discipline. Never borrow a setting or role from another trade.
+- Do not name, invent, or introduce an instructor in narration. The governed media layer adds the approved instructor identity after content validation.
+`.trim();
+
+const CROSS_DOMAIN_MARKERS: Array<{ family: RegExp; forbidden: RegExp }> = [
+  {
+    family: /\b(hvac|refriger|epa[_ -]?608|heating|air[_ -]?conditioning)\b/i,
+    forbidden: /\b(cosmetolog|salon|barber|haircut|esthetician|nail technician|technology training lead|certiport-certified it)\b/i,
+  },
+  {
+    family: /\b(cosmetolog|salon|barber|esthetic|nail)\b/i,
+    forbidden: /\b(hvac technician|refrigerant recovery|epa[_ -]?608|technology training lead|certiport-certified it)\b/i,
+  },
+];
+
+const GOVERNED_INSTRUCTOR_MARKERS =
+  /\b(Dr\. Sarah Chen|Marcus Johnson|Avery Brooks|James Williams|Lisa Martinez|Robert Davis|Angela Thompson)\b/i;
+
+/** Reject structurally valid output that belongs to the wrong training domain. */
+export function assertLessonDomainIsolation(
+  context: Pick<LessonGenerationInput, 'courseTitle' | 'moduleTitle' | 'lesson'>,
+  generated: unknown,
+): void {
+  const familyText = `${context.courseTitle} ${context.moduleTitle} ${context.lesson.domainKey ?? ''}`;
+  const output = JSON.stringify(generated);
+  if (GOVERNED_INSTRUCTOR_MARKERS.test(output)) {
+    throw new Error(
+      'Lesson generation violated domain isolation: instructor identity is owned by the governed media layer',
     );
-
-    if (
-      remediation &&
-      Array.isArray(remediation.objectiveMap) &&
-      remediation.objectiveMap.length < 3 &&
-      specificObjectives.length >= 3
-    ) {
-      remediation.objectiveMap = specificObjectives.slice(0, 3);
-    }
-
-    const lessonFocus =
-      specificObjectives[0] ||
-      (typeof parsed.objective === 'string' ? parsed.objective : 'the lesson objective');
-    const expandToMinimum = (value: unknown, minimum: number, context: string) => {
-      if (typeof value !== 'string' || value.trim().length >= minimum) return value;
-      const addition =
-        ` Apply this to ${lessonFocus} by identifying the relevant evidence, comparing realistic choices, documenting the decision, and checking the result against the stated objective. ${context}`;
-      let expanded = value.trim();
-      while (expanded.length < minimum) expanded = `${expanded}${addition}`;
-      return expanded;
-    };
-
-    if (Array.isArray(experience?.readingGuide?.sections)) {
-      experience.readingGuide.sections = experience.readingGuide.sections.map(
-        (section: Record<string, unknown>, index: number) => ({
-          ...section,
-          body: expandToMinimum(
-            section?.body,
-            120,
-            `This is guided reading section ${index + 1}; the learner should be able to explain and use the concept after reviewing it.`,
-          ),
-        }),
-      );
-    }
-
-    if (Array.isArray(experience?.quickClips)) {
-      experience.quickClips = experience.quickClips.map(
-        (clip: Record<string, unknown>, index: number) => ({
-          ...clip,
-          script: expandToMinimum(
-            clip?.script,
-            120,
-            `The instructor should model one concrete example, name the decision criteria, and close clip ${index + 1} with an observable learner action.`,
-          ),
-        }),
-      );
-    }
-
-    return JSON.stringify(parsed);
-  } catch {
-    return raw;
   }
+  for (const rule of CROSS_DOMAIN_MARKERS) {
+    if (rule.family.test(familyText) && rule.forbidden.test(output)) {
+      throw new Error(
+        `Lesson generation violated domain isolation: cross-discipline content matched ${String(rule.forbidden)}`,
+      );
+    }
+  }
+}
+
+/**
+ * Keep the complete lesson contract inside the smallest production provider's
+ * request budget. The prompt is roughly 1.5k tokens; a 6k output allowance
+ * leaves headroom under Groq's 8k TPM gate while remaining ample for the
+ * required 700-word lesson and interactive experience. GPU operators may tune
+ * downward, but not back into an unbounded request.
+ */
+export function lessonGenerationMaxTokens(): number {
+  const configured = Number.parseInt(process.env.COURSE_FACTORY_LESSON_MAX_TOKENS ?? '', 10);
+  if (!Number.isFinite(configured)) return 6000;
+  return Math.min(6500, Math.max(3500, configured));
+}
+
+/**
+ * Bound full-provider retries so malformed output cannot consume an open-ended
+ * GPU or API budget. Contract normalization runs locally before a retry.
+ */
+export function lessonGenerationMaxAttempts(): number {
+  const configured = Number.parseInt(process.env.COURSE_FACTORY_LESSON_MAX_ATTEMPTS ?? '', 10);
+  if (!Number.isFinite(configured)) return 3;
+  return Math.min(3, Math.max(1, configured));
 }
 
 export async function generateLessonContent(
   input: LessonGenerationInput,
 ): Promise<GeneratedLessonContent> {
-  const cached = await loadLessonGenerationCheckpoint(input.courseTitle, input.lesson.slug);
+  const checkpointSlug = input.checkpointNamespace
+    ? `${input.lesson.slug}@${input.checkpointNamespace}`
+    : input.lesson.slug;
+  const cached = await loadLessonGenerationCheckpoint(input.courseTitle, checkpointSlug);
   if (cached) {
     logger.info('[course-factory/content-generator] Reusing generated lesson checkpoint', {
       lesson: input.lesson.slug,
       courseTitle: input.courseTitle,
     });
+    try {
+      const content = JSON.parse(cached.content) as Record<string, any>;
+      await persistLessonGenerationCheckpoint({
+        courseId: input.courseId,
+        courseTitle: input.courseTitle,
+        canonicalLessonSlug: input.lesson.slug,
+        lessonSlug: checkpointSlug,
+        objective: cached.objective,
+        html: String(content.html ?? ''),
+        learningPoints: cached.learning_points,
+        scenario: cached.scenario,
+        quizQuestions: cached.quiz_questions,
+        experience: content.experience as Record<string, any>,
+      });
+    } catch (error) {
+      logger.error('[course-factory/content-generator] Cached lesson handoff failed', error, {
+        lesson: input.lesson.slug,
+      });
+      throw error;
+    }
     return cached;
   }
 
   if (!isAIAvailable()) throw new Error('AI service not available');
 
-  const domainKey = input.lesson.domainKey || input.moduleTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const domainKey =
+    input.lesson.domainKey || input.moduleTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_');
   const prompt = `
 Generate a complete commercial-quality, self-paced workforce-training lesson for:
 - Lesson: ${input.lesson.title}
@@ -129,6 +165,8 @@ Generate a complete commercial-quality, self-paced workforce-training lesson for
 - Domain key: ${domainKey}
 ${input.state ? `- State: ${input.state}` : ''}
 ${input.standardsBlock ? `\nIndustry Standards:\n${input.standardsBlock}` : ''}
+
+${GOVERNED_COURSE_RULES}
 
 The lesson must be ORIGINAL Elevate for Humanity instructional content. Do not copy provider courseware, screenshots, proprietary question banks, or branded third-party lesson text. Do not imply that Elevate-authored content is official provider courseware.
 
@@ -142,7 +180,7 @@ Return ONLY valid JSON with exactly this shape:
   "content": "HTML formatted instructional lesson content of at least 700 words, with headings, examples, worked application steps, a short recap, and accessibility-friendly plain language",
   "quiz_questions": [
     {
-      "question": "Formative question text",
+    "question": "Five or more formative questions, each mapped to the objective",
       "options": ["Option A", "Option B", "Option C", "Option D"],
       "correct": 0,
       "explanation": "Why this answer is correct and why the distractors are weaker"
@@ -204,12 +242,40 @@ Return ONLY valid JSON with exactly this shape:
       "domainKey":"${domainKey}",
       "masteryThreshold":80,
       "evidenceSignals":["knowledge-check mastery","applied exercise completion","assessment performance"]
+    },
+    "instructionalTimeline": {
+      "version":1,
+      "width":1920,
+      "height":1080,
+      "fps":30,
+      "durationSeconds":360,
+      "scenes":[
+        {"id":"scene-1","startTime":0,"endTime":60,"purpose":"introduction","visualType":"instructor","narration":"lesson objective","visualDirection":"Instructor and lesson roadmap","onScreenText":["Objective"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-2","startTime":60,"endTime":120,"purpose":"explanation","visualType":"animated-text","narration":"core explanation","visualDirection":"Three sourced teaching points","onScreenText":["Key concept"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-3","startTime":120,"endTime":180,"purpose":"diagram","visualType":"technical-diagram","narration":"process explanation","visualDirection":"Labeled sequence diagram","onScreenText":["Correct sequence"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-4","startTime":180,"endTime":240,"purpose":"demonstration","visualType":"equipment-image","narration":"worked example","visualDirection":"Side-by-side correct and incorrect examples","onScreenText":["Correct","Needs correction"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-5","startTime":240,"endTime":300,"purpose":"practice","visualType":"screen-demonstration","narration":"guided practice","visualDirection":"Decision and evidence checklist","onScreenText":["Your turn"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-6","startTime":300,"endTime":360,"purpose":"summary","visualType":"animated-text","narration":"lesson recap","visualDirection":"Three takeaways and completed-work evidence","onScreenText":["Lesson recap"],"sourceReferences":["approved lesson source"]}
+      ],
+      "captions":[
+        {"start":0,"end":60,"text":"caption aligned to scene narration"},
+        {"start":60,"end":120,"text":"caption aligned to scene narration"},
+        {"start":120,"end":180,"text":"caption aligned to scene narration"},
+        {"start":180,"end":240,"text":"caption aligned to scene narration"},
+        {"start":240,"end":300,"text":"caption aligned to scene narration"},
+        {"start":300,"end":360,"text":"caption aligned to scene narration"}
+      ],
+      "events":[{"type":"question","id":"event-1","at":300,"questionId":"knowledge-check-1","required":true}],
+      "requiredWatchPercent":95,
+      "minimumSeatTimeSeconds":300,
+      "preventSeekPastRequiredEvents":true,
+      "resumeEnabled":true
     }
   }
 }
 
 Quality requirements:
-- 3 to 5 formative quiz_questions with rationales.
+- At least 5 formative quiz_questions with rationales. Never return fewer than five.
 - At least 6 lesson-specific flashcards.
 - At least 2 distinct short concept clips, each 1 to 5 minutes.
 - At least 3 experience knowledge checks.
@@ -225,7 +291,8 @@ The content must be original, job-ready, factually grounded, and aligned to the 
 `.trim();
 
   let lastError: unknown;
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  const maxAttempts = lessonGenerationMaxAttempts();
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       const response = await aiChat({
         messages: [
@@ -239,18 +306,20 @@ The content must be original, job-ready, factually grounded, and aligned to the 
             content:
               attempt === 1
                 ? prompt
-                : `${prompt}\n\nYour previous response failed the strict contract. Return the complete JSON object with every required field, at least 6 flashcards, 2 quickClips, 3 knowledgeChecks, 1 exercise, 2 resources, 4 glossary terms, readiness and targeted remediation. No markdown.`,
+                : `${prompt}\n\nYour previous response failed the strict contract with this exact validation error:\n${lastError instanceof Error ? lastError.message : String(lastError)}\n\nCorrect every named defect. Return the complete JSON object with every required field, at least 5 quiz_questions, exactly 4 substantive options for every quiz question and knowledge check, at least 6 flashcards, 2 quickClips, 3 knowledgeChecks, 1 exercise, 2 resources, 4 glossary terms, readiness and targeted remediation. No markdown.`,
           },
         ],
         temperature: attempt === 1 ? 0.65 : 0.35,
-        maxTokens: 12000,
+        maxTokens: lessonGenerationMaxTokens(),
+        jsonMode: true,
       });
 
       const parsed = parseStrictAIJson(
-        normalizeLessonContract(response.content),
+        normalizeLessonContract(normalizeFourOptionQuestions(response.content)),
         generatedLessonContentSchema,
         'Lesson generation',
       );
+      assertLessonDomainIsolation(input, parsed);
 
       const generated: GeneratedLessonContent = {
         objective: parsed.objective,
@@ -266,8 +335,10 @@ The content must be original, job-ready, factually grounded, and aligned to the 
       };
 
       await persistLessonGenerationCheckpoint({
+        courseId: input.courseId,
         courseTitle: input.courseTitle,
-        lessonSlug: input.lesson.slug,
+        canonicalLessonSlug: input.lesson.slug,
+        lessonSlug: checkpointSlug,
         objective: parsed.objective,
         html: parsed.content,
         learningPoints: parsed.learning_points,
@@ -304,6 +375,91 @@ interface GeneratedAssessment {
   questions: QuizQuestion[];
 }
 
+/**
+ * Some providers occasionally return the fourth answer as index 4 even though
+ * the contract is zero-based. Normalize only that unambiguous boundary case;
+ * every other invalid value still fails strict validation.
+ */
+type ProviderQuestion = {
+  options?: unknown[];
+  correct?: unknown;
+  correct_index?: unknown;
+  correctIndex?: unknown;
+  correctAnswer?: unknown;
+  explanation?: unknown;
+  rationale?: unknown;
+  feedback?: unknown;
+  reason?: unknown;
+  answer_explanation?: unknown;
+};
+
+/**
+ * Repair provider formatting without changing the correct answer.
+ *
+ * Some OpenAI-compatible providers return extra distractors even when JSON
+ * mode is enabled. Throwing away the whole assessment wastes the completed
+ * course checkpoints. Keep the selected answer plus three distractors and
+ * remap its zero-based index. Responses with fewer than four choices remain
+ * invalid and are retried by the bounded generator loop.
+ */
+export function normalizeFourOptionQuestions(raw: string): string {
+  const parsed = JSON.parse(normalizeProviderJson(raw)) as {
+    questions?: ProviderQuestion[];
+    quiz_questions?: ProviderQuestion[];
+    experience?: { knowledgeChecks?: ProviderQuestion[] };
+  };
+  const groups = [parsed.questions, parsed.quiz_questions, parsed.experience?.knowledgeChecks];
+
+  for (const questions of groups) {
+    for (const question of questions ?? []) {
+      if (!Array.isArray(question.options)) continue;
+
+      const providerCorrect =
+        question.correct ??
+        question.correct_index ??
+        question.correctIndex ??
+        question.correctAnswer;
+      let correct = Number(providerCorrect);
+      if (!Number.isInteger(correct) && typeof providerCorrect === 'string') {
+        correct = question.options.findIndex(
+          (option) =>
+            String(option).trim().toLocaleLowerCase() ===
+            providerCorrect.trim().toLocaleLowerCase(),
+        );
+      }
+      if (Number.isInteger(correct) && correct === question.options.length) {
+        correct = question.options.length - 1;
+      }
+
+      if (question.options.length > 4 && Number.isInteger(correct)) {
+        const correctOption = question.options[correct];
+        if (correctOption !== undefined) {
+          const selected = question.options.filter((_, index) => index !== correct).slice(0, 3);
+          selected.push(correctOption);
+          question.options = selected;
+          correct = 3;
+        }
+      }
+
+      question.correct = correct;
+      question.explanation =
+        question.explanation ??
+        question.rationale ??
+        question.feedback ??
+        question.reason ??
+        question.answer_explanation;
+      delete question.correct_index;
+      delete question.correctIndex;
+      delete question.correctAnswer;
+      delete question.rationale;
+      delete question.feedback;
+      delete question.reason;
+      delete question.answer_explanation;
+    }
+  }
+  return JSON.stringify(parsed);
+}
+
 export async function generateAssessment(
   input: AssessmentGenerationInput,
 ): Promise<GeneratedAssessment> {
@@ -329,6 +485,8 @@ Generate ${count} assessment questions for:
 
 Question types: ${types.join(', ')}
 
+${GOVERNED_COURSE_RULES}
+
 Return JSON with:
 {
   "questions": [
@@ -345,47 +503,65 @@ Make questions original, job-relevant, scenario-rich, and aligned to the lesson 
 Return ONLY valid JSON.
 `.trim();
 
-  try {
-    const response = await aiChat({
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert in creating original assessments for workforce training. Create job-relevant questions that test practical knowledge without copying proprietary exam items. Return ONLY valid JSON.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.7,
-      maxTokens: 5000,
-    });
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      const response = await aiChat({
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert in creating original assessments for workforce training. Create job-relevant questions that test practical knowledge without copying proprietary exam items. Return ONLY valid JSON.',
+          },
+          {
+            role: 'user',
+            content:
+              attempt === 1
+                ? prompt
+                : `${prompt}\n\nThe previous response failed validation. Return exactly ${count} questions with exactly four options per question and zero-based correct indexes.`,
+          },
+        ],
+        temperature: attempt === 1 ? 0.7 : 0.3,
+        maxTokens: 5000,
+        jsonMode: true,
+      });
 
-    const parsed = parseStrictAIJson(
-      response.content,
-      generatedAssessmentSchema,
-      'Assessment generation',
-    );
-    if (parsed.questions.length < count) {
-      throw new Error(
-        `Assessment generation returned ${parsed.questions.length}/${count} required questions`,
+      const parsed = parseStrictAIJson(
+        normalizeFourOptionQuestions(response.content),
+        generatedAssessmentSchema,
+        'Assessment generation',
       );
+      if (parsed.questions.length < count) {
+        throw new Error(
+          `Assessment generation returned ${parsed.questions.length}/${count} required questions`,
+        );
+      }
+      const questions = parsed.questions.slice(0, count);
+      await persistAssessmentCheckpoint({
+        courseTitle: input.courseTitle,
+        lessonSlug: input.lessonSlug,
+        questions,
+      });
+      return { questions };
+    } catch (error) {
+      lastError = error;
+      logger.warn('[course-factory/content-generator] Assessment contract retry', {
+        lesson: input.lessonSlug,
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    const questions = parsed.questions.slice(0, count);
-    await persistAssessmentCheckpoint({
-      courseTitle: input.courseTitle,
-      lessonSlug: input.lessonSlug,
-      questions,
-    });
-    return { questions };
-  } catch (error) {
-    logger.error('[course-factory/content-generator] Assessment generation failed', error);
-    throw error;
   }
+  logger.error('[course-factory/content-generator] Assessment generation failed', lastError);
+  throw lastError instanceof Error ? lastError : new Error('Assessment generation failed');
 }
 
 export async function generateFinalExam(
   courseTitle: string,
   moduleCount: number,
   questionCount: number = 25,
+  requiredDomains: string[] = [],
+  checkpointSlug?: string,
 ): Promise<GeneratedAssessment> {
   if (!isAIAvailable()) throw new Error('AI service not available');
 
@@ -393,6 +569,9 @@ export async function generateFinalExam(
 Generate a ${questionCount}-question original final readiness exam for: "${courseTitle}"
 
 This course has ${moduleCount} modules. Cover the complete course proportionally and test knowledge recall, application, quantitative reasoning where appropriate, and scenario-based decision making. Do not copy or paraphrase proprietary certification exam questions.
+${requiredDomains.length ? `Required domains (cover every domain):\n${requiredDomains.map((domain) => `- ${domain}`).join('\n')}` : ''}
+
+${GOVERNED_COURSE_RULES}
 
 Return JSON with exactly ${questionCount} questions:
 {
@@ -409,35 +588,107 @@ Return JSON with exactly ${questionCount} questions:
 Return ONLY valid JSON.
 `.trim();
 
-  try {
-    const response = await aiChat({
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert assessment writer. Create comprehensive original final exams that test full course competency without copying proprietary certification questions. Return ONLY valid JSON.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.7,
-      maxTokens: 8000,
-    });
+  let lastError: unknown;
+  const questions: GeneratedAssessment['questions'] = [];
+  const seenQuestions = new Set<string>();
+  const maxAttempts = 4;
 
-    const parsed = parseStrictAIJson(
-      response.content,
-      generatedAssessmentSchema,
-      'Final exam generation',
-    );
-    if (parsed.questions.length < questionCount) {
-      throw new Error(
-        `Final exam generation returned ${parsed.questions.length}/${questionCount} required questions`,
-      );
+  if (checkpointSlug) {
+    const cached = await loadPartialAssessmentCheckpoint(courseTitle, checkpointSlug);
+    for (const question of cached ?? []) {
+      const key = question.question.trim().toLocaleLowerCase();
+      if (!seenQuestions.has(key)) {
+        seenQuestions.add(key);
+        questions.push(question);
+      }
+      if (questions.length === questionCount) break;
     }
-    return { questions: parsed.questions.slice(0, questionCount) };
-  } catch (error) {
-    logger.error('[course-factory/content-generator] Final exam generation failed', error);
-    throw error;
+    if (questions.length) {
+      logger.info('[course-factory/content-generator] Resuming partial final exam checkpoint', {
+        lesson: checkpointSlug,
+        questions: questions.length,
+        required: questionCount,
+      });
+    }
   }
+
+  // A complete persisted checkpoint is already a valid final exam. Return it
+  // before entering the repair loop; otherwise the loop is skipped and the
+  // function incorrectly falls through to the terminal failure below.
+  if (questions.length === questionCount) return { questions };
+
+  // Providers occasionally stop one or two items short of a large JSON array.
+  // Accumulate valid, unique items across bounded calls instead of discarding a
+  // nearly-complete exam and regenerating the whole response.
+  for (let attempt = 1; attempt <= maxAttempts && questions.length < questionCount; attempt += 1) {
+    try {
+      const missingCount = questionCount - questions.length;
+      const repairPrompt =
+        questions.length === 0
+          ? prompt
+          : `Generate exactly ${missingCount} replacement questions for the final readiness exam for "${courseTitle}".\n\nDo not repeat any of these existing questions:\n${questions.map((question, index) => `${index + 1}. ${question.question}`).join('\n')}\n\nReturn ONLY this JSON contract:\n{"questions":[{"question":"Complete question text","options":["A","B","C","D"],"correct":0,"explanation":"A substantive explanation of why the correct answer is right and the distractors are weaker"}]}\n\nUse the exact keys question, options, correct, and explanation. The correct value must be a zero-based integer. Do not use correct_index, correctAnswer, rationale, feedback, null, or omitted fields.`;
+      const response = await aiChat({
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert assessment writer. Create comprehensive original final exams that test full course competency without copying proprietary certification questions. Return ONLY valid JSON.',
+          },
+          {
+            role: 'user',
+            content: repairPrompt,
+          },
+        ],
+        temperature: attempt === 1 ? 0.7 : 0.3,
+        maxTokens: Math.min(8000, Math.max(1200, missingCount * 450)),
+        jsonMode: true,
+      });
+
+      const normalized = JSON.parse(normalizeFourOptionQuestions(response.content)) as {
+        questions?: unknown[];
+      };
+      const candidates = Array.isArray(normalized.questions) ? normalized.questions : [];
+      let invalidCount = 0;
+      for (const candidate of candidates) {
+        const parsedQuestion = quizQuestionSchema.safeParse(candidate);
+        if (!parsedQuestion.success) {
+          invalidCount += 1;
+          continue;
+        }
+        const question = parsedQuestion.data;
+        const key = question.question.trim().toLocaleLowerCase();
+        if (!seenQuestions.has(key)) {
+          seenQuestions.add(key);
+          questions.push(question);
+        }
+        if (questions.length === questionCount) break;
+      }
+
+      if (checkpointSlug && questions.length) {
+        await persistAssessmentCheckpoint({ courseTitle, lessonSlug: checkpointSlug, questions });
+      }
+
+      if (questions.length === questionCount) return { questions };
+
+      lastError = new Error(
+        `Final exam generation accumulated ${questions.length}/${questionCount} required unique questions`,
+      );
+      logger.warn('[course-factory/content-generator] Final exam gap repair required', {
+        attempt,
+        accumulated: questions.length,
+        required: questionCount,
+        invalid: invalidCount,
+      });
+    } catch (error) {
+      lastError = error;
+      logger.warn('[course-factory/content-generator] Final exam contract retry', {
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+  logger.error('[course-factory/content-generator] Final exam generation failed', lastError);
+  throw lastError instanceof Error ? lastError : new Error('Final exam generation failed');
 }
 
 export interface BlueprintGenerationInput {
@@ -511,6 +762,7 @@ Return ONLY valid JSON:
       ],
       temperature: 0.6,
       maxTokens: 6000,
+      jsonMode: true,
     });
 
     const parsed = parseStrictAIJson(
@@ -572,6 +824,7 @@ Only map standards that are genuinely applicable to the lesson. Do not fabricate
       ],
       temperature: 0.5,
       maxTokens: 1000,
+      jsonMode: true,
     });
 
     return parseStrictAIJson(response.content, competencyMappingSchema, 'Competency mapping');

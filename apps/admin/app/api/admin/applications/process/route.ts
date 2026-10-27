@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // APPROVE — use the canonical pipeline (creates auth user + profile + training_enrollments)
+    // APPROVE — use the canonical pipeline (creates auth user, profile, and program enrollment)
     if (step === 'approve') {
       const result = await approveApplication(db, {
         applicationId: application_id,

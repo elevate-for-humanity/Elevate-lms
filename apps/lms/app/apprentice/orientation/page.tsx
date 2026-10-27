@@ -1,3 +1,4 @@
+import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CheckCircle2, ClipboardCheck, Clock3, FileText, GraduationCap, Scissors } from 'lucide-react';
@@ -5,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { apprenticeshipLmsCoursePath, apprenticeshipRtiLabel } from '@/lib/portal/program-portal-paths';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,16 +53,17 @@ export default async function ApprenticeOrientationPage({
   const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/orientation');
-
-  const resolvedProgram = await resolveApprenticeProgramSlug(supabase, user.id);
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/orientation');
+  const resolvedProgram = await resolveApprenticeProgramSlug(db, subject.userId);
   const programSlug = params.program || resolvedProgram;
   if (!programSlug) redirect('/apprentice?notice=apprentice-access-required');
 
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('program_enrollments')
     .select('orientation_completed_at')
-    .eq('user_id', user.id)
+    .eq('user_id', subject.userId)
     .eq('program_slug', programSlug)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -100,6 +104,7 @@ export default async function ApprenticeOrientationPage({
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+      <VisualDashboardOrientation audience="apprentice" />
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 text-white shadow-sm">
         <div className="grid lg:grid-cols-[1.05fr_.95fr]">
           <div className="p-6 sm:p-8">
@@ -155,13 +160,15 @@ export default async function ApprenticeOrientationPage({
           {courseHref ? <Link href={courseHref} className="rounded-xl border border-slate-300 px-4 py-3 font-bold text-slate-900 hover:bg-slate-50">Open {courseLabel}</Link> : null}
         </div>
 
-        {!completed ? (
+        {!completed && !subject.previewing ? (
           <form action={completeOrientation} className="mt-6">
             <input type="hidden" name="programSlug" value={programSlug} />
             <button type="submit" className="rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">
               I reviewed the orientation — mark complete
             </button>
           </form>
+        ) : subject.previewing && !completed ? (
+          <p className="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-900">Preview mode: This learner must mark orientation complete from their own account.</p>
         ) : (
           <Link href="/apprentice" className="mt-6 inline-flex rounded-xl bg-slate-950 px-6 py-3 font-black text-white hover:bg-slate-800">Return to apprentice dashboard</Link>
         )}

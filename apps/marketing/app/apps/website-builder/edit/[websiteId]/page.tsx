@@ -1,5 +1,7 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
 import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
 import { AutonomousWebsiteBuilder } from '@/components/website-builder/AutonomousWebsiteBuilder';
@@ -10,6 +12,9 @@ import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-si
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { WebsiteClaimsPanel } from '@/components/website-builder/WebsiteClaimsPanel';
+
+export const metadata = { robots: { index: false, follow: false } };
 
 export const dynamic = 'force-dynamic';
 
@@ -24,13 +29,14 @@ export default async function WebsiteEditorPage({ params }: Props) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
 
-  const { data: site } = await supabase
+  const admin = await requireAdminClient();
+  const { data: site } = await admin
     .from('user_websites')
     .select('id, user_id, site_name, subdomain, is_published, site_config')
     .eq('id', websiteId)
     .maybeSingle();
 
-  if (!site || site.user_id !== user.id) notFound();
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) notFound();
 
   const name = (site.site_name as string | null) ?? 'My Site';
   const base = buildDefaultSiteConfig({ organizationName: name });
@@ -43,7 +49,6 @@ export default async function WebsiteEditorPage({ params }: Props) {
   return (
     <>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
-      <ZeroCodeStructureEditor websiteId={site.id} initialConfig={config} />
       <AutonomousWebsiteBuilder
         websiteId={site.id}
         initialSiteName={name}
@@ -51,7 +56,9 @@ export default async function WebsiteEditorPage({ params }: Props) {
         initiallyPublished={Boolean(site.is_published)}
         initialConfig={config}
       />
+      <ZeroCodeStructureEditor websiteId={site.id} initialConfig={config} />
       <BusinessCardsPanel websiteId={site.id} />
+      <WebsiteClaimsPanel websiteId={site.id} />
       <DomainPanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
       <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
     </>

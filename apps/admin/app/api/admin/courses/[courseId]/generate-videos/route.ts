@@ -23,17 +23,25 @@ export async function POST(
 
   const { courseId } = await params;
   const body = await request.json().catch(() => ({}));
-  const lessonId = typeof body.lessonId === 'string' && body.lessonId.trim()
-    ? body.lessonId.trim()
-    : null;
+  const lessonId =
+    typeof body.lessonId === 'string' && body.lessonId.trim() ? body.lessonId.trim() : null;
+  if (!lessonId) {
+    return NextResponse.json(
+      { ok: false, error: 'lessonId is required for single-lesson video production' },
+      { status: 400 },
+    );
+  }
   const force = body.force === true;
+  const validateOnly = body.validateOnly === true;
 
   const url = new URL('/api/admin/course-builder', request.url);
   const headers = new Headers({ 'Content-Type': 'application/json' });
   const cookie = request.headers.get('cookie');
   const authorization = request.headers.get('authorization');
+  const idempotencyKey = request.headers.get('idempotency-key');
   if (cookie) headers.set('cookie', cookie);
   if (authorization) headers.set('authorization', authorization);
+  if (idempotencyKey) headers.set('idempotency-key', idempotencyKey);
 
   const response = await fetch(url, {
     method: 'POST',
@@ -43,6 +51,7 @@ export async function POST(
       courseId,
       lessonId,
       force,
+      validateOnly,
       onlyMissing: !force,
     }),
     cache: 'no-store',
@@ -55,7 +64,8 @@ export async function POST(
   const failed = Number(result?.result?.failed ?? 0);
   return NextResponse.json({
     ok: failed === 0,
-    status: 'queued',
+    status: result.status ?? (validateOnly ? 'validated' : 'queued'),
+    charged: result.charged ?? !validateOnly,
     queued,
     microclipsQueued,
     failed,

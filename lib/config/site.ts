@@ -19,15 +19,20 @@ export const siteConfig = {
 
   // Contact
   phone: {
+    display: PLATFORM_DEFAULTS.mainPhone,
+    href: 'tel:+14632401404',
+    e164: '+14632401404',
+  },
+  technicalSupport: {
     display: PLATFORM_DEFAULTS.supportPhone,
-    href: 'tel:+13173143757',
-    e164: '+13173143757',
+    href: 'tel:+14632401404',
+    e164: '+14632401404',
   },
   email: {
-    general: 'info@elevateforhumanity.org',
-    enrollment: 'info@elevateforhumanity.org',
-    support: 'info@elevateforhumanity.org',
-    careers: 'info@elevateforhumanity.org',
+    general: 'elevate4humanityedu@gmail.com',
+    enrollment: 'elevate4humanityedu@gmail.com',
+    support: 'elevate4humanityedu@gmail.com',
+    careers: 'elevate4humanityedu@gmail.com',
   },
 
   // Public Indianapolis location. Keep this synchronized with lib/contact-info.ts

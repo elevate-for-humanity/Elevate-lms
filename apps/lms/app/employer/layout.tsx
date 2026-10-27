@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
 
@@ -18,6 +19,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function EmployerPortalLayout({ children }: { children: React.ReactNode }) {
   const { user, profile } = await requireRole(['employer', 'sponsor', 'admin', 'staff']);
+  const isAdmin = ['admin', 'super_admin'].includes(String(profile.role || ''));
+  if (isAdmin) redirect('https://admin.elevateforhumanity.org/employers');
 
   return (
     <PlatformShell

@@ -1,26 +1,54 @@
-import { Redis } from 'ioredis';
+import { Redis as IoRedis } from 'ioredis';
+import { Redis as UpstashRedis } from '@upstash/redis';
 import { logger } from '@/lib/logger';
 
-// Shared standard Redis client. REDIS_URL is the canonical runtime secret.
-let redis: Redis | null = null;
+type DistributedRedis =
+  | { kind: 'upstash'; client: UpstashRedis }
+  | { kind: 'ioredis'; client: IoRedis };
 
-function getRedis(): Redis | null {
-  if (redis) return redis;
+let redis: DistributedRedis | null = null;
 
-  const url = process.env.REDIS_URL;
-  if (!url) return null;
+function getTlsRedisUrl(): string | null {
+  const raw = process.env.REDIS_URL?.trim();
+  if (!raw) return null;
 
   try {
-    redis = new Redis(url, {
+    const parsed = new URL(raw);
+    return parsed.protocol === 'rediss:' ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function getRedis(): DistributedRedis | null {
+  if (redis) return redis;
+
+  const restUrl = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const restToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+
+  try {
+    if (restUrl && restToken) {
+      redis = {
+        kind: 'upstash',
+        client: new UpstashRedis({ url: restUrl, token: restToken }),
+      };
+      return redis;
+    }
+
+    const tlsUrl = getTlsRedisUrl();
+    if (!tlsUrl) return null;
+
+    const client = new IoRedis(tlsUrl, {
       maxRetriesPerRequest: 1,
       connectTimeout: 5_000,
       enableReadyCheck: true,
     });
-    redis.on('error', (error) => {
+    client.on('error', (error) => {
       logger.warn('[redis] connection error', {
         error: error instanceof Error ? error.message : String(error),
       });
     });
+    redis = { kind: 'ioredis', client };
     return redis;
   } catch (error) {
     logger.warn('[redis] client initialization failed', {
@@ -43,12 +71,26 @@ export interface RedisClientCompat {
 let redisCompat: RedisClientCompat | null = null;
 
 export function getRedisClient(): RedisClientCompat | null {
-  const client = getRedis();
-  if (!client) return null;
+  const backend = getRedis();
+  if (!backend) return null;
   if (redisCompat) return redisCompat;
 
   redisCompat = {
     async set(key, value, options) {
+      if (backend.kind === 'upstash') {
+        const client = backend.client;
+        if (options?.nx && options?.ex) {
+          return client.set(key, value, { nx: true, ex: options.ex });
+        }
+        if (options?.nx) {
+          return client.set(key, value, { nx: true });
+        }
+        if (options?.ex) {
+          return client.set(key, value, { ex: options.ex });
+        }
+        return client.set(key, value);
+      }
+      const client = backend.client;
       if (options?.nx && options?.ex) {
         return client.set(key, value, 'EX', options.ex, 'NX');
       }
@@ -61,7 +103,8 @@ export function getRedisClient(): RedisClientCompat | null {
       return client.set(key, value);
     },
     async get(key) {
-      return client.get(key);
+      const value = await backend.client.get<string>(key);
+      return value ?? null;
     },
   };
 
@@ -69,7 +112,10 @@ export function getRedisClient(): RedisClientCompat | null {
 }
 
 export const RATE_LIMITS = {
-  auth: { requests: 5, window: '1 m' },
+  // Shared school, shop, and workforce-office networks can legitimately sign in
+  // several users at once. Keep the IP throttle protective without blocking the
+  // sixth valid user behind the same NAT. Supabase also enforces account-level auth limits.
+  auth: { requests: 20, window: '1 m' },
   payment: { requests: 10, window: '1 m' },
   contact: { requests: 3, window: '1 m' },
   api: { requests: 180, window: '1 m' },
@@ -125,13 +171,16 @@ return {current, ttl}
 `;
 
 async function consumeRedisWindow(
-  client: Redis,
+  backend: DistributedRedis,
   key: string,
   limit: number,
   windowMs: number,
 ): Promise<RateLimitResult> {
   const now = Date.now();
-  const raw = (await client.eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs))) as unknown;
+  const raw =
+    backend.kind === 'upstash'
+      ? await backend.client.eval(FIXED_WINDOW_SCRIPT, [key], [String(windowMs)])
+      : await backend.client.eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs));
   const pair = Array.isArray(raw) ? raw : [];
   const current = Number(pair[0] ?? 1);
   const ttl = Number(pair[1] ?? windowMs);

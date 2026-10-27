@@ -7,12 +7,17 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { extractJSON } from '@/lib/extract-json';
+import { requirePaidInferenceContext } from './paid-inference-context';
+import {
+  getAnthropicAPIKey,
+  isAnthropicConfigured as hasAnthropicCredential,
+} from './anthropic-config';
 
 let _client: Anthropic | null = null;
 
 export function getAnthropicClient(): Anthropic {
   if (!_client) {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = getAnthropicAPIKey();
     if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set');
     _client = new Anthropic({ apiKey });
   }
@@ -20,7 +25,7 @@ export function getAnthropicClient(): Anthropic {
 }
 
 export function isAnthropicConfigured(): boolean {
-  return !!process.env.ANTHROPIC_API_KEY;
+  return hasAnthropicCredential();
 }
 
 /**
@@ -28,6 +33,7 @@ export function isAnthropicConfigured(): boolean {
  * Uses claude-3-5-haiku for speed and cost efficiency.
  */
 export async function anthropicJSON<T = unknown>(prompt: string): Promise<T> {
+  requirePaidInferenceContext('anthropic');
   const client = getAnthropicClient();
 
   const message = await client.messages.create({

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -51,8 +52,8 @@ export default function EducatorHubPage() {
 
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[clamp(420px,58vh,720px)] w-full overflow-hidden">
-          <Image
+        <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/hero-images/how-it-works-hero.webp"
             alt="Educator Hub"
             fill

@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { requirePaidInferenceContext } from './paid-inference-context';
 
 // Canonical placeholder sentinels — must match lib/ai/providers/openai.ts and app/api/grants/draft/route.ts
 const PLACEHOLDER_KEYS = ['placeholder-build-key', 'sk-placeholder-build-key'];
@@ -6,6 +7,7 @@ const PLACEHOLDER_KEYS = ['placeholder-build-key', 'sk-placeholder-build-key'];
 let client: OpenAI | null = null;
 
 export function getOpenAIClient(): OpenAI {
+  requirePaidInferenceContext('openai');
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey || PLACEHOLDER_KEYS.includes(apiKey)) {

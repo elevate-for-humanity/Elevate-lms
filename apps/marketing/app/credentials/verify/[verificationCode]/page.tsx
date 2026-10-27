@@ -61,7 +61,6 @@ export default async function CredentialVerificationPage({
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 p-8 text-center">
             {badgeImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={badgeImage}
                 alt={`${definition.name} credential badge`}

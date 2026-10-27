@@ -218,10 +218,10 @@ export async function createMatchProposal(
 ): Promise<{ success: boolean; matchId?: string; error?: string }> {
   // Check if match already exists
   const { data: existing } = await supabase
-    .from('apprentice_sites')
+    .from('host_shop_match_requests')
     .select('id')
     .eq('apprentice_id', apprenticeId)
-    .eq('employer_id', employerId)
+    .eq('host_shop_id', employerId)
     .single();
 
   if (existing) {
@@ -230,13 +230,12 @@ export async function createMatchProposal(
 
   // Create match proposal
   const { data: match, error } = await supabase
-    .from('apprentice_sites')
+    .from('host_shop_match_requests')
     .insert({
       apprentice_id: apprenticeId,
-      employer_id: employerId,
+      host_shop_id: employerId,
       status: 'pending',
-      proposed_by: proposedBy,
-      proposed_at: new Date().toISOString(),
+      admin_notes: `Proposed by ${proposedBy}`,
     })
     .select('id')
     .single();
@@ -259,27 +258,16 @@ export async function acceptMatch(
   acceptedBy: string
 ): Promise<{ success: boolean; error?: string }> {
   const { error } = await supabase
-    .from('apprentice_sites')
+    .from('host_shop_match_requests')
     .update({
       status: 'active',
-      accepted_by: acceptedBy,
-      accepted_at: new Date().toISOString(),
+      responded_by: acceptedBy,
+      responded_at: new Date().toISOString(),
     })
     .eq('id', matchId);
 
   if (error) {
     return { success: false, error: error.message };
-  }
-
-  // Decrement available slots
-  const { data: match } = await supabase
-    .from('apprentice_sites')
-    .select('employer_id')
-    .eq('id', matchId)
-    .single();
-
-  if (match?.employer_id) {
-    await supabase.rpc('decrement_available_slots', { employer_id: match.employer_id });
   }
 
   logger.info('[matching] Match accepted', { matchId });

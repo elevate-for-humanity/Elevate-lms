@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import type { AgentMessage, ConversationSession, AgentConfig } from '@/lib/studio/agent';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
@@ -24,24 +24,27 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
-    const { data, error } = await supabase
+    const id = request.nextUrl.searchParams.get('id');
+    const summary = request.nextUrl.searchParams.get('summary') === '1';
+    const query = supabase
       .from('studio_conversations')
-      .select('*')
+      .select(summary ? 'id,title,updated_at' : '*')
       .eq('user_id', auth.id)
       .order('updated_at', { ascending: false })
       .limit(50);
+    if (id) query.eq('id', id);
+    const { data, error } = await query;
 
     if (error) throw error;
+    if (id && !data?.length)
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
 
     return NextResponse.json({ conversations: data });
   } catch (error) {
     console.error('Error fetching conversations:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch conversations' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch conversations' }, { status: 500 });
   }
 }
 
@@ -53,7 +56,7 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const body = await request.json();
     const { title, messages, config } = body;
@@ -74,10 +77,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ conversation: data });
   } catch (error) {
     console.error('Error creating conversation:', error);
-    return NextResponse.json(
-      { error: 'Failed to create conversation' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create conversation' }, { status: 500 });
   }
 }
 
@@ -89,7 +89,7 @@ export async function PUT(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const body = await request.json();
     const { id, title, messages } = body;
@@ -111,10 +111,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ conversation: data });
   } catch (error) {
     console.error('Error updating conversation:', error);
-    return NextResponse.json(
-      { error: 'Failed to update conversation' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update conversation' }, { status: 500 });
   }
 }
 
@@ -126,7 +123,7 @@ export async function DELETE(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -146,9 +143,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting conversation:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete conversation' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete conversation' }, { status: 500 });
   }
 }

@@ -4,13 +4,14 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
-import { resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
-import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { isSharedPostLoginDestination, resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
 const APPRENTICE_ROLES = new Set([
+  'student',
+  'learner',
   'apprentice',
   'barber_apprentice',
   'cosmetology_apprentice',
@@ -24,15 +25,32 @@ type SignInApiResponse = {
 };
 
 async function serverSignIn(email: string, password: string): Promise<string> {
-  const response = await fetch('/api/auth/signin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
-    body: JSON.stringify({ email: email.trim(), password }),
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
+  let response: Response;
+
+  try {
+    response = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify({ email: email.trim(), password }),
+    });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(
+        'The sign-in service took too long to respond. Your internet may be working; please retry once or use password reset.',
+        { cause: error },
+      );
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
   if (!contentType.includes('application/json')) {
@@ -42,7 +60,9 @@ async function serverSignIn(email: string, password: string): Promise<string> {
       contentType,
       preview: raw.slice(0, 120),
     });
-    throw new Error(`Authentication service returned an invalid response (HTTP ${response.status || 500}).`);
+    throw new Error(
+      `Authentication service returned an invalid response (HTTP ${response.status || 500}).`,
+    );
   }
 
   const body = (await response.json()) as SignInApiResponse;
@@ -54,10 +74,12 @@ async function serverSignIn(email: string, password: string): Promise<string> {
 }
 
 export default function LoginPage() {
-  const searchParams = useSafeSearchParams();
+  const [searchParams, setSearchParams] = useState(() => new URLSearchParams());
   const requestedRedirect = searchParams.get('next') || searchParams.get('redirect') || '';
   const safeRedirect = validateRedirect(requestedRedirect, '');
+  const isProgramHolderLogin = safeRedirect.startsWith('/program-holder');
   const reason = searchParams.get('reason');
+  const callbackError = searchParams.get('error');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -65,8 +87,21 @@ export default function LoginPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setSearchParams(new URLSearchParams(window.location.search));
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (callbackError === 'magic_link_expired') {
+      setError(
+        'That secure sign-in link has expired. Request a new link or sign in with your password.',
+      );
+    } else if (callbackError === 'magic_link_failed') {
+      setError(
+        'That secure sign-in link is invalid. Request a new link or sign in with your password.',
+      );
+    }
+  }, [callbackError]);
 
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.
@@ -125,38 +160,39 @@ export default function LoginPage() {
         new Set([profile.role, ...secondaryRoles].filter(Boolean)),
       ) as string[];
 
-      let destination: string;
-      let allowRequestedRedirect = true;
+      const requestedDestination = safeRedirect
+        ? resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles)
+        : '';
+      const isSharedReturn = isSharedPostLoginDestination(requestedDestination);
 
-      if (profile.role === 'employer' && profile.onboarding_completed !== true) {
+      let destination: string;
+
+      // Store checkout and Website Builder retain their deployed owner after login.
+      // Their routes enforce the actual subscription and website ownership.
+      if (isSharedReturn) {
+        destination = requestedDestination;
+      } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
-        allowRequestedRedirect = false;
       } else if (effectiveRoles.some((role) => APPRENTICE_ROLES.has(role))) {
         // Resolve program context while keeping every apprenticeship on the
-        // canonical /apprentice runtime. Do not let a stale redirect override it.
+        // canonical /apprentice runtime. Non-Store redirects cannot override it.
         destination = await resolveStudentHomePath(
           supabase,
           userId,
           typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
         );
-        allowRequestedRedirect = false;
+      } else if (safeRedirect) {
+        destination = requestedDestination;
       } else {
         // portal_type is retained as enrollment metadata, not as permission to
         // invent /portal/* routes. Role ownership determines the actual portal.
         destination = resolveDashboardUrl(profile.role, effectiveRoles);
       }
 
-      if (safeRedirect && allowRequestedRedirect) {
-        destination = resolveRoleCompatiblePostLoginUrl(
-          safeRedirect,
-          profile.role,
-          effectiveRoles,
-        );
-      }
-
       window.location.assign(destination);
     } catch (caughtError) {
-      const message = caughtError instanceof Error ? caughtError.message : 'Invalid email or password.';
+      const message =
+        caughtError instanceof Error ? caughtError.message : 'Invalid email or password.';
       setError(message);
       setLoading(false);
     }
@@ -170,26 +206,42 @@ export default function LoginPage() {
     <main className="min-h-screen bg-slate-50 px-4 py-12">
       <section className="mx-auto w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Elevate for Humanity</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-950">Student and Partner Login</h1>
-          <p className="mt-3 text-sm text-slate-600">Access courses, progress, credentials, apprenticeship records, and portal tools.</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+            Elevate for Humanity
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-950">
+            {isProgramHolderLogin ? 'Program Holder Login' : 'Student and Partner Login'}
+          </h1>
+          <p className="mt-3 text-sm text-slate-600">
+            {isProgramHolderLogin
+              ? 'Access onboarding, enrolled students, training records, documents, and payouts.'
+              : 'Access courses, progress, credentials, apprenticeship records, and portal tools.'}
+          </p>
         </div>
 
         {reason === 'idle' && !error ? (
-          <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          <div
+            role="alert"
+            className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"
+          >
             Your session expired due to inactivity. Please sign in again.
           </div>
         ) : null}
 
         {error ? (
-          <div role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          <div
+            role="alert"
+            className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+          >
             {error}
           </div>
         ) : null}
 
         <form onSubmit={handleSubmit} className="space-y-5" aria-busy={!hydrated || loading}>
           <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-900">Email address</label>
+            <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-900">
+              Email address
+            </label>
             <input
               id="email"
               type="email"
@@ -203,7 +255,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-2 block text-sm font-semibold text-slate-900">Password</label>
+            <label htmlFor="password" className="mb-2 block text-sm font-semibold text-slate-900">
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -217,7 +271,16 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-end">
-            <Link href="/reset-password" className="text-sm font-semibold text-blue-700 hover:underline">Forgot password?</Link>
+            <Link
+              href={
+                isProgramHolderLogin
+                  ? '/reset-password?portal=program-holder'
+                  : '/reset-password'
+              }
+              className="text-sm font-semibold text-blue-700 hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
 
           <button
@@ -231,11 +294,18 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-slate-600">
           Need an account?{' '}
-          <Link href={signupHref} className="font-semibold text-blue-700 hover:underline">Create one</Link>
+          <Link href={signupHref} className="font-semibold text-blue-700 hover:underline">
+            Create one
+          </Link>
         </p>
 
         <div className="mt-8 border-t border-slate-200 pt-6 text-center">
-          <a href={siteUrls.adminLogin} className="text-sm font-semibold text-slate-800 hover:underline">Staff and administrator login →</a>
+          <a
+            href={siteUrls.adminLogin}
+            className="text-sm font-semibold text-slate-800 hover:underline"
+          >
+            Staff and administrator login →
+          </a>
         </div>
       </section>
     </main>

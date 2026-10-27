@@ -19,6 +19,7 @@ export default function BuildsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [triggering, setTriggering] = useState(false);
+  const [googleConfigured, setGoogleConfigured] = useState(false);
 
   async function fetchBuilds() {
     setLoading(true);
@@ -27,6 +28,7 @@ export default function BuildsClient() {
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setBuilds(json.builds ?? []);
+      setGoogleConfigured(json.googleConfigured === true);
       setError(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load');
@@ -36,14 +38,20 @@ export default function BuildsClient() {
   }
 
   async function triggerBuild(service: string) {
+    if (!googleConfigured) return;
+    if (!window.confirm(`Deploy ${service} to production?`)) return;
     setTriggering(true);
     try {
-      await fetch('/api/admin/dev-studio/builds', {
+      const response = await fetch('/api/admin/dev-studio/builds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service }),
+        body: JSON.stringify({ service, confirmation: 'CONFIRM DEPLOY' }),
       });
-      fetchBuilds();
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'Deployment could not be started.');
+      await fetchBuilds();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Deployment could not be started.');
     } finally {
       setTriggering(false);
     }
@@ -85,7 +93,7 @@ export default function BuildsClient() {
               Builds & Deploy
             </h1>
             <p className="text-amber-100 text-lg mt-2 max-w-2xl">
-              Trigger, monitor, and track Northflank deployments in real time.
+              Trigger, monitor, and track Google Cloud Run deployments in real time.
             </p>
           </div>
         </div>
@@ -94,20 +102,27 @@ export default function BuildsClient() {
       <div className="max-w-5xl mx-auto px-6 py-10">
         {/* Action bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => triggerBuild('admin')}
-              disabled={triggering}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy Admin
             </button>
             <button
               onClick={() => triggerBuild('lms')}
-              disabled={triggering}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy LMS
+            </button>
+            <button
+              onClick={() => triggerBuild('store')}
+              disabled={triggering || !googleConfigured}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-700 disabled:opacity-50 transition shadow-sm"
+            >
+              <Play className="h-4 w-4" /> Deploy Store
             </button>
           </div>
           <button
@@ -118,10 +133,9 @@ export default function BuildsClient() {
           </button>
         </div>
 
-        {!process.env.NEXT_PUBLIC_NORTHFLANK_CONFIGURED && (
+        {!googleConfigured && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-700 mb-6">
-            Integration pending: NORTHFLANK_API_TOKEN env var not configured — builds will record
-            but not trigger Northflank
+            Google deployment requires a valid GitHub Actions dispatch token.
           </div>
         )}
 
@@ -166,7 +180,7 @@ export default function BuildsClient() {
             <Hammer className="mx-auto h-12 w-12 text-slate-300" />
             <p className="mt-3 text-sm font-medium text-slate-500">No builds recorded yet</p>
             <p className="text-xs text-slate-400 mt-1">
-              Integration pending: ai_deployments table migration not yet applied
+              No governed build records have been created.
             </p>
           </div>
         )}

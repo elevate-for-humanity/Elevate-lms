@@ -17,7 +17,7 @@ export default async function PlacementsPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
   const employer = await getEmployerRecord(supabase, user.id);
-  if (!employer) redirect('/employer/onboarding');
+  if (!employer) redirect('/employer/register');
 
   const { data: rawPlacements, count } = await supabase
     .from('job_placements')

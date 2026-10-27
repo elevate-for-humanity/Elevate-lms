@@ -20,7 +20,7 @@ export default async function EmployerWotcPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
   const employer = await getEmployerRecord(supabase, user.id);
-  if (!employer) redirect('/employer/onboarding');
+  if (!employer) redirect('/employer/register');
 
   const { data: jobs } = await supabase
     .from('job_postings')

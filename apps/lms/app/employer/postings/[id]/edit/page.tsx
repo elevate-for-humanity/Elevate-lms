@@ -19,7 +19,7 @@ export default async function EmployerPostingEditPage({ params }: Props) {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const employer = await getEmployerRecord(supabase, user.id);
-  if (!employer) redirect('/employer/onboarding');
+  if (!employer) redirect('/employer/register');
 
   const { data: posting } = await supabase
     .from('job_postings')

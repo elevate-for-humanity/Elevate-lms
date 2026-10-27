@@ -18,7 +18,7 @@ export default async function OpportunitiesPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
   const employer = await getEmployerRecord(supabase, user.id);
-  if (!employer) redirect('/employer/onboarding');
+  if (!employer) redirect('/employer/register');
 
   const { data: opportunities } = await supabase
     .from('job_postings')

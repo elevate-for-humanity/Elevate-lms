@@ -1,3 +1,4 @@
+import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import Link from 'next/link';
 
 type Program = { title?: string | null; name?: string | null; slug?: string | null; estimated_weeks?: number | null; total_hours?: number | null; credential_name?: string | null };
@@ -6,6 +7,8 @@ export function ProgramHolderOperationsGuide({ holderName, programs, role }: { h
   const names = programs.map((p) => p.title || p.name || p.slug).filter(Boolean) as string[];
   return (
     <section className="space-y-5" aria-labelledby="program-holder-operations-guide">
+      <VisualDashboardOrientation audience={role?.toLowerCase().includes('coordinator') ? 'site-coordinator' : 'program-holder'} />
+      <details className="rounded-2xl border border-slate-200 bg-white p-4"><summary className="min-h-11 cursor-pointer font-bold">Detailed operations guide, communication templates, and office tools</summary>
       <div className="rounded-3xl border border-blue-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Program Holder Operations Center</p>
         <h2 id="program-holder-operations-guide" className="mt-2 text-2xl font-black text-slate-950 sm:text-3xl">How to run your assigned programs from application through completion</h2>
@@ -132,6 +135,7 @@ Thank you,
           <Link href="/program-holder/reports" className="rounded-xl border border-blue-700 bg-white px-5 py-3 text-sm font-black text-blue-950">Reports</Link>
         </div>
       </article>
+      </details>
     </section>
   );
 }

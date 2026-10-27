@@ -86,6 +86,11 @@ export function PaymentDisclosure({
         </div>
       </div>
 
+      <section className="mb-6 rounded-lg border border-blue-300 bg-blue-50 p-4">
+        <h3 className="font-bold text-blue-950">New enrollment tuition late-fee policy (October 16, 2026)</h3>
+        <p className="mt-2 text-sm text-blue-950">For new self-pay internal payment agreements that expressly include this policy: payments have a three-calendar-day grace period. Starting on the fourth overdue day, a $10 daily late fee is proposed for each day the qualifying installment remains unpaid. After seven overdue days, designated instructional access may be reviewed for suspension under the signed agreement. If instructional access is actually suspended for nonpayment, a one-time $50 reactivation fee is proposed before eligible instructional access resumes; this fee is not charged repeatedly for the same suspension. Billing, support, wage records, timekeeping, and required apprenticeship records remain accessible. This notice does not amend existing agreements or apply to funded or externally financed payments.</p>
+        <p className="mt-2 text-xs font-semibold text-blue-900">The updated terms must be incorporated into the signed enrollment agreement before fees may be assessed. Existing payment-plan terms continue to govern until a valid new agreement is executed.</p>
+      </section>
       {/* Acknowledgments */}
       <div className="space-y-4 mb-6">
         <h3 className="font-semibold text-slate-900">Required Acknowledgments</h3>

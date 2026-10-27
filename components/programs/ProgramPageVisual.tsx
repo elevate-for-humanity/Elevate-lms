@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign, TrendingUp, ArrowRight, Briefcase } from 'lucide-react';
@@ -56,14 +57,14 @@ export function ProgramPageVisual({ program }: Props) {
             className="absolute inset-0 w-full h-full object-contain"
           />
         ) : (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={program.heroImage}
             alt={program.title}
             fill
             className="object-contain"
             priority
             quality={90}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         )}
 

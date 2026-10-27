@@ -74,8 +74,8 @@ export function LizzyErrorsPanel() {
                   ok={data.sentry.configured}
                   detail={data.sentry.configured ? `env: ${data.sentry.environment}` : 'Set SENTRY_DSN on the admin container'}
                 />
-                <Link href="/api/sentry-test" target="_blank" className="text-[#4fc1ff] hover:underline">
-                  Trigger test event (dev)
+                <Link href="/monitoring" className="text-[#4fc1ff] hover:underline">
+                  Open monitoring
                 </Link>
               </div>
             </section>

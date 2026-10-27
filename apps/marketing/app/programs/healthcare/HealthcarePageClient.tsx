@@ -47,7 +47,7 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
               Healthcare Programs
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mb-8">
-              Start your career in healthcare with WIOA-funded training programs — no cost for eligible participants
+              Explore healthcare training with program-specific tuition, clinical, credential, and funding disclosures.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -84,7 +84,7 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
               Choose Your Healthcare Path
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Funding is available for eligible participants through WIOA and state grants.
+              Funding varies by healthcare program. Review the exact program record before relying on WIOA, Workforce Ready Grant, or another payment source.
             </p>
           </div>
 
@@ -111,7 +111,7 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
                   )}
                   {program.funded && (
                     <div className="absolute top-3 left-3 bg-brand-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      Free
+                      Review funding
                     </div>
                   )}
                 </div>
@@ -137,7 +137,7 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
               What You&apos;ll Learn
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Our healthcare programs prepare you for real-world patient care and clinical settings.
+              Healthcare curriculum and clinical requirements differ by program. Review the exact program page for the skills, lab, and supervised-practice requirements that apply.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -212,13 +212,13 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold text-blue-700 mb-4">For Free Training (WIOA)</h3>
+              <h3 className="text-xl font-bold text-blue-700 mb-4">For Agency Funding Review</h3>
               <ul className="space-y-3">
                 {[
-                  'Indiana resident',
-                  'Unemployed or underemployed',
-                  'OR receiving public assistance',
-                  'OR veteran status',
+                  'Open the exact program funding disclosure',
+                  'Complete the responsible agency intake',
+                  'Confirm both participant and program eligibility',
+                  'Obtain written authorization before funded training begins',
                 ].map((req) => (
                   <li key={req} className="flex items-start gap-3">
                     <svg
@@ -247,15 +247,15 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Career Outcomes</h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Healthcare is one of the fastest-growing industries with strong job security.
+              Healthcare labor-market conditions vary by occupation, employer, geography, and reporting period.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { stat: '$15-$22', label: 'Starting hourly wage for CNAs' },
-              { stat: '100+', label: 'Hiring employer partners' },
-              { stat: '4-8 wks', label: 'Typical program duration' },
-              { stat: 'High', label: 'Demand for healthcare workers' },
+              { stat: 'Program', label: 'Duration varies by healthcare pathway' },
+              { stat: 'Credential', label: 'Authority disclosed by program' },
+              { stat: 'Clinical', label: 'Requirements disclosed by program' },
+              { stat: 'Employment', label: 'Outcomes are not guaranteed' },
             ].map(({ stat, label }) => (
               <div key={label} className="text-center">
                 <div className="text-5xl font-black text-white mb-2">{stat}</div>
@@ -284,11 +284,11 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
               },
               {
                 q: 'Is the training really free?',
-                a: 'Yes, for eligible participants. WIOA funding covers tuition, books, scrubs, and certification exam fees. Check your eligibility to see if you qualify.',
+                a: 'Do not assume a healthcare program is free. Review the exact program page. If workforce funding is verified for that program, the responsible agency still determines participant eligibility, covered costs, available funds, and written authorization.',
               },
               {
                 q: 'Where will I do clinical training?',
-                a: 'Clinical training takes place at approved healthcare facilities in the Indianapolis area, including nursing homes, hospitals, and clinics.',
+                a: 'Clinical or supervised-practice requirements vary by program. The applicable program page and enrollment materials identify whether clinical training is required and where an approved placement will occur.',
               },
               {
                 q: 'Can I work while in training?',
@@ -300,11 +300,11 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
               },
               {
                 q: 'Do you help with job placement?',
-                a: 'Yes! We have partnerships with healthcare employers throughout Indianapolis. We provide resume help, interview prep, and direct connections to hiring managers.',
+                a: 'Career services can include resume help, interview preparation, job-search support, and employer connections. Placement and employment are not guaranteed.',
               },
               {
                 q: 'What is the state CNA exam like?',
-                a: 'The Indiana CNA exam has two parts: a written test and a skills demonstration. We prepare you for both and our pass rate is over 90%.',
+                a: 'The Indiana CNA competency evaluation includes knowledge and skills requirements. Review the current state testing instructions and your program materials for the applicable exam process. No pass-rate guarantee is made.',
               },
             ].map((faq, i) => (
               <details key={i} className="group bg-slate-50 rounded-2xl overflow-hidden">
@@ -340,7 +340,7 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
             Ready to Start Your Healthcare Career?
           </h2>
           <p className="text-blue-100 mb-8">
-            Free training available for eligible Indiana residents.
+            Review the selected healthcare program for current tuition and any verified funding pathway.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

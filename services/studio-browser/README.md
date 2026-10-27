@@ -38,6 +38,22 @@ repository Playwright tests remain available.
 
 ## Running and verifying
 
+Ordinary session close and idle expiry require the final provider checkpoint to
+succeed before deleting the session, ending streams or removing its downloads.
+Persistence failures return retryable `session_checkpoint_failed` (HTTP 503) for
+explicit close and retain idle sessions for a later retry. Concurrent retirement
+requests share the same checkpoint operation. Forced process shutdown and a dead
+browser cannot retain a usable live context; they log a fixed, nonsecret failure
+message before cleanup. This protects existing provider authentication during a
+storage outage. It does not persist generic browser tabs, terminal processes or
+workspace files, and does not authorize reducing minimum instances or changing
+regions. Those restoration gates remain open.
+
+The Studio validation workflow builds and tests the actual nonroot Chromium
+container on relevant `main` changes without deploying Google resources. Its
+source/schema checks use the current Google identity/cutover contracts and no
+longer require the retired hosting provider.
+
 Use Node 22, Chromium, and `zip` (the production Dockerfile installs these).
 `STUDIO_BROWSER_EXECUTABLE_PATH` defaults to `/usr/bin/chromium`. Existing service
 secrets, provider-session encryption configuration, storage directory, and port
@@ -125,3 +141,28 @@ credential equality (without printing secrets), auth-volume attachment, and actu
 required database columns with zero learner rows requested. Configured provider
 storage readiness includes a private write/fsync/delete probe; unavailable storage
 makes the service unhealthy instead of silently losing logins at restart.
+
+### Workspace and browser replacement recovery
+
+The runtime checkpoints the trusted Admin repository into encrypted, authenticated
+objects in the existing Studio auth bucket. Manifest publication uses a Google
+object-generation precondition so overlapping revisions cannot overwrite each
+other's accepted checkpoint. Recovery refuses a nonempty workspace, corrupted
+archives, escaping links and unavailable storage; it does not replace existing
+user files. Dependency/cache directories are excluded. File bytes, internal
+links, executable permissions and Git metadata are supported. Running operating
+system processes and shell-local variables are not restored or replayed.
+
+General browser checkpoints are encrypted under the verified operator owner and
+retain supported cookies, local storage, tab URLs/order, selected tab and viewport.
+One-time authorization, logout, checkout and payment URLs are not replayed;
+forwarded Elevate session credentials are not persisted. This does not certify
+IndexedDB, unsaved DOM/form state or every third-party login mechanism. Terminal
+recovery remains bounded output/directory/status recovery with explicit new-shell
+action after interruption. Existing trusted Admin workspace access is preserved.
+
+Cloud deployment and whole-runtime reconnect acceptance remain required before
+traffic cutover or any reduction of minimum instances. Local Chromium recovery
+and object adapter tests are source evidence, not a production cutover certificate.
+
+Completed browser downloads are encrypted separately under the existing auth storage, scoped to the verified owner and download ID, and restored into a new private temporary directory. Metadata is included in the encrypted browser checkpoint. Integrity failure blocks session restoration without publishing partial files. Active downloads/uploads and interrupted media imports are not automatically replayed. Completed files are bounded to 200 per owner checkpoint and 2 GiB per file; no new bucket is created.

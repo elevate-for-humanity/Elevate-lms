@@ -173,6 +173,24 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
     };
   }
 
+  const reportedStatus = String(resultRecord?.status ?? '').toLowerCase();
+  const reportedOverall = String(resultRecord?.overall ?? '').toLowerCase();
+  if (['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'blocked'].includes(reportedStatus) ||
+      ['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'unhealthy'].includes(reportedOverall)) {
+    return {
+      status: 'FAIL_BLOCKING',
+      reasons: [`The tool reported ${reportedOverall || reportedStatus}; this is not verified success.`],
+      evidence: { tool: input.tool, status: reportedStatus, overall: reportedOverall },
+    };
+  }
+  if (['pending', 'queued', 'running', 'in_progress', 'awaiting_approval'].includes(reportedStatus)) {
+    return {
+      status: 'REQUIRES_HUMAN_REVIEW',
+      reasons: ['The operation has not returned terminal verification evidence.'],
+      evidence: { tool: input.tool, status: reportedStatus },
+    };
+  }
+
   if (!hasMeaningfulResult(input.result)) {
     reasons.push('The execution returned no verifiable result.');
     return {

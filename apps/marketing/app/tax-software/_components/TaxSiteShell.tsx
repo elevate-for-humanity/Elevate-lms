@@ -27,10 +27,10 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
       <div className="bg-[#082b66] px-5 py-2 text-center text-xs font-semibold !text-white sm:text-sm">
         Indianapolis tax preparation ·{' '}
         <a
-          href="tel:+13179999620"
+          href="tel:+14632401404"
           className="whitespace-nowrap !text-white underline underline-offset-4"
         >
-          (317) 999-9620
+          (463) 240-1404
         </a>
       </div>
       <header className="relative z-30 border-b border-slate-200 bg-white">
@@ -130,10 +130,10 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
                 step.
               </p>
               <a
-                href="tel:+13179999620"
+                href="tel:+14632401404"
                 className="mt-5 inline-block text-lg font-bold text-[#082b66]"
               >
-                (317) 999-9620
+                (463) 240-1404
               </a>
             </div>
             <nav aria-label="Tax service footer">

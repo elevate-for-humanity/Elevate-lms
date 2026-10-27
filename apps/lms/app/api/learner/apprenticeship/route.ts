@@ -9,10 +9,10 @@ import {
   getRegisteredProgramStandard,
   resolveRegisteredProgramContract,
 } from '@/lib/apprenticeship/registered-program-contract';
+import { isApprenticeshipSlug } from '@/lib/portal/apprenticeship-portal-paths';
 
 export const dynamic = 'force-dynamic';
 
-const BARBER_SLUG = 'barber-apprenticeship';
 const OJL_SOURCE_TYPES = ['ojl', 'host_shop', 'timeclock', 'manual'];
 
 export async function GET(request: NextRequest) {
@@ -22,25 +22,36 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
-    const base = getRegisteredProgramStandard(BARBER_SLUG);
-    if (!base) {
-      return NextResponse.json({ error: 'Registered program configuration unavailable' }, { status: 500 });
-    }
+    const { searchParams } = new URL(request.url);
+    const requestedProgram = searchParams.get('program') || searchParams.get('program_slug');
 
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const supabase = await createClient();
+
+    let enrollmentQuery = supabase
       .from('program_enrollments')
       .select('id, program_slug, status, rapids_status, rapids_id, host_shop_id, supervisor_id, transfer_hours, transfer_hours_verified')
       .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
-      .eq('program_slug', base.programSlug)
       .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .order('created_at', { ascending: false });
 
+    if (requestedProgram) {
+      enrollmentQuery = enrollmentQuery.eq('program_slug', requestedProgram);
+    }
+
+    const { data: enrollments, error: enrollmentError } = await enrollmentQuery.limit(10);
     if (enrollmentError) throw enrollmentError;
-    if (!enrollment) {
-      return NextResponse.json({ error: 'Not an active Barber apprenticeship enrollment' }, { status: 404 });
+
+    const enrollment = requestedProgram
+      ? enrollments?.[0]
+      : enrollments?.find((e: any) => isApprenticeshipSlug(e.program_slug)) || enrollments?.[0];
+
+    if (!enrollment || !enrollment.program_slug) {
+      return NextResponse.json({ error: 'No active apprenticeship enrollment found' }, { status: 404 });
+    }
+
+    const base = getRegisteredProgramStandard(enrollment.program_slug);
+    if (!base) {
+      return NextResponse.json({ error: 'Registered program configuration unavailable' }, { status: 500 });
     }
 
     const contract = await resolveRegisteredProgramContract(supabase, {

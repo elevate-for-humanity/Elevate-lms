@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ export default async function CareerCounselingPage() {
       {/* Hero — standard size, title below */}
       <section className="relative w-full">
         <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/pages/career-counseling-page-1.webp"
             alt="Career counseling and guidance"
             fill

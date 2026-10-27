@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import sharp from 'sharp';
-import { materializeInstructionalVisualAssets } from '@/lib/ultimate-course-builder/adapters/instructional-visual-assets';
+import { bindTeachingPhotoAssignments } from '@/lib/ultimate-course-builder/adapters/teaching-photo-assignments.mjs';
 import { prepareUltimateStoryboardInput } from '@/lib/ultimate-course-builder/adapters/platform-renderer';
 import { produceTeachingVisual } from '@/lib/ultimate-course-builder/instructional/teaching-visual';
 
@@ -32,46 +31,27 @@ function input() {
   };
 }
 
-describe('materialized instructional assets', () => {
-  it('uploads actual distinct PNGs and resolves saved assignments without inventing stock licenses', async () => {
-    const upload = vi.fn(async (buffer: Buffer, path: string, mime: string) => {
-      expect((await sharp(buffer).metadata()).width).toBe(1280);
-      expect(mime).toBe('image/png');
-      return `https://media.example.org/${path}`;
-    });
-    const actual = await materializeInstructionalVisualAssets(input(), upload);
-    expect(upload).toHaveBeenCalledTimes(13);
-    const assets = actual.artifacts.visual_assignment.media.readyAssets;
-    expect(new Set(assets.map((a: any) => a.public_url)).size).toBe(13);
-    expect(assets.every((a: any) => !a.entitlement_id && !a.license_evidence_url)).toBe(true);
-    const prepared = prepareUltimateStoryboardInput(actual);
-    expect(
-      (prepared.sceneData as any).scenes.every(
-        (s: any) =>
-          s.reference_image_url && s.resolved_model === 'script-bound-instructional-image',
-      ),
-    ).toBe(true);
+describe('photographic lesson assets without text-card generation', () => {
+  it('binds actual prepared photographs to saved scene requests', () => {
+    const original:any=input();
+    original.teachingPhotos=Object.fromEntries(original.artifacts.storyboard.storyboard.scenes.map((scene:any,i:number)=>[scene.id,[{
+      imageUrl:'https://media.example.org/photo-'+i+'.png',storagePath:'approved-teaching-photos/'+i+'.png',
+      sha256:i.toString(16).padStart(64,'0'),narrationQuote:scene.dialogue,provider:'google',illustration:true,
+    }]]));
+    const actual=bindTeachingPhotoAssignments(original);
+    const prepared=prepareUltimateStoryboardInput(actual);
+    expect((prepared.sceneData as any).scenes).toHaveLength(13);
+    expect((prepared.sceneData as any).scenes.every((s:any)=>s.reference_image_url && s.resolved_model==='generated-teaching-photograph')).toBe(true);
+    expect(actual.artifacts.visual_assignment.media.readyAssets.every((a:any)=>a.provider!=='remotion')).toBe(true);
+    expect(original.artifacts.visual_assignment.media.readyAssets).toEqual([]);
   });
-  it('rejects an instructional plan quoting a different lesson before upload', async () => {
-    const actual = input();
-    actual.artifacts.storyboard.storyboard.scenes[0].teachingVisual = produceTeachingVisual(
-      'A different lesson.',
-      'practice',
-    );
-    const upload = vi.fn();
-    await expect(materializeInstructionalVisualAssets(actual, upload)).rejects.toThrow(
-      'NOT_SCRIPT_BOUND',
-    );
-    expect(upload).not.toHaveBeenCalled();
+  it('does not turn old text-card requests into approved image assets',()=>{
+    const actual=bindTeachingPhotoAssignments(input());
+    expect(actual.artifacts.visual_assignment.media.readyAssets).toEqual([]);
+    expect(()=>prepareUltimateStoryboardInput(actual)).toThrow('ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED');
   });
-  it('rejects mismatched scene ownership before upload', async () => {
-    const actual = input();
-    actual.artifacts.visual_assignment.media.assignments[0].assetId = 'instructional:another-scene';
-    await expect(materializeInstructionalVisualAssets(actual, vi.fn())).rejects.toThrow(
-      'MAPPING_REQUIRED',
-    );
-  });
-  it('cannot approve a placeholder instructional ID without an uploaded image', () => {
-    expect(() => prepareUltimateStoryboardInput(input())).toThrow('ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED');
+  it('rejects missing photograph identity instead of fabricating a card',()=>{
+    const original:any=input();original.teachingPhotos={s0:[{imageUrl:'https://media.example.org/image.png'}]};
+    expect(()=>bindTeachingPhotoAssignments(original)).toThrow('TEACHING_PHOTO_EVIDENCE_REQUIRED');
   });
 });

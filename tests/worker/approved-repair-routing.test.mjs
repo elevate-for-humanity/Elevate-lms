@@ -6,7 +6,7 @@ const importTS=source=>import('data:text/javascript;base64,'+Buffer.from(stripTy
 const router=await importTS(readFileSync(new URL('../../lib/ultimate-course-builder/core/repair-router.ts',import.meta.url),'utf8').replace(/import type[^;]+;/g,''));
 const instruction=await importTS(readFileSync(new URL('../../lib/video/instructional-quality-gate.ts',import.meta.url),'utf8').replace(/import type[^;]+;/g,''));
 globalThis.__approvedRepetition=instruction.repeatedTeachingSegments;
-const recaps=await importTS('const repeatedTeachingSegments=globalThis.__approvedRepetition; const generateVertexLessonJson=()=>{throw Error("Unexpected generation")}; const contractHash=()=>"test";\n'+readFileSync(new URL('../../lib/ultimate-course-builder/instructional/teaching-recaps.ts',import.meta.url),'utf8').replace(/import[^;]+;/g,''));
+const recaps=await importTS('import {isCosmetologyRti,RTI_TEACHING_REQUIREMENTS,assertRtiSubjectTeaching} from '+JSON.stringify(new URL('../../lib/ultimate-course-builder/instructional/rti-teaching-policy.mjs',import.meta.url).href)+'; import {reportCourseProgress} from '+JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/progress-watch.mjs',import.meta.url).href)+'; const repeatedTeachingSegments=globalThis.__approvedRepetition; const generateVertexLessonJson=()=>{throw Error("Unexpected generation")}; const contractHash=()=>"test";\n'+readFileSync(new URL('../../lib/ultimate-course-builder/instructional/teaching-recaps.ts',import.meta.url),'utf8').replace(/import[^;]+;/g,''));
 delete globalThis.__approvedRepetition;
 test('repeated original instruction returns to authoring before recap generation',async()=>{
  let calls=0;
@@ -20,7 +20,7 @@ test('repeated generated recap is still rejected with bounded repair attempts',a
  assert.equal(calls,3);
 });
 test('repair routes rebuild the failed producer instead of repeating a downstream stage',()=>{
- for(const [code,step] of [['TEACHING_RECAP_SOURCE_REVIEW_REQUIRED','learning_objectives'],['NARRATION_DUPLICATION','learning_objectives'],['ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID','learning_objectives'],['ULTIMATE_CAPTION_NARRATION_COVERAGE_FAILED','natural_narration'],['APPROVED_AUDIO_PART_GAP_OR_OVERLAP','natural_narration'],['GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED','lesson_film_render'],['APPROVED_RECAP_PICTURE_REQUIRED','lesson_film_render']]){
+ for(const [code,step] of [['TEACHING_RECAP_SOURCE_REVIEW_REQUIRED','learning_objectives'],['NARRATION_DUPLICATION','learning_objectives'],['ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID','learning_objectives'],['APPROVED_AUDIO_PART_GAP_OR_OVERLAP','natural_narration'],['GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED','lesson_film_render'],['APPROVED_RECAP_PICTURE_REQUIRED','lesson_film_render']]){
   assert.equal(router.routeSelectiveRepairs([{code}])[0]?.step,step,code);
  }
  assert.deepEqual(router.routeSelectiveRepairs([{code:'LICENSE_APPROVAL_REQUIRED'}]),[]);

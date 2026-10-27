@@ -21,6 +21,62 @@ def operator_configured(output):
     return bool(output and re.search(r"^\s*'0'\s*=>\s*1\.\s*(?:Goto|Gosub|Dial)\(", output, re.M))
 
 
+def pwa_operator_configured(output):
+    """Verify generated operator routing, including the guarded live-contact form."""
+    if not output or not re.search(r"^\s*'0'\s*=>\s*1\.\s*Set\(PWA_CONTACTS=\)", output, re.M):
+        return False
+    if 'elevate-pwa-extensions' not in output or 'Return(' not in output:
+        return False
+    if 'Set(DIALSTATUS=CHANUNAVAIL)' in output and 'Dial(' not in output:
+        return True
+    # The provisioner uses ExecIf to guard every temporary device lease.
+    # Require both real SIP contact resolution and bounded dialing.
+    return bool(re.search(r'PJSIP_DIAL_CONTACTS\(pwa-[a-f0-9]{40}\)', output)
+                and re.search(r'Dial\(\$\{PWA_CONTACTS\},\d+\)', output)
+                and ('PWA_DEVICE_CONTACTS' in output or 'PWA_CONTACTS' in output))
+
+
+
+def operator_alias_extension(output):
+    """Extract only a concrete three-digit delegated operator route."""
+    match = re.search(r"^\s*'0'\s*=>\s*1\.\s*Gosub\(elevate-pwa-extensions,([1-9][0-9]{2}),1\)", output or '', re.M)
+    return match.group(1) if match else None
+
+
+def delegated_operator_configured(operator_output, target_output):
+    """Require an explicit operator alias AND a usable generated target route.
+
+    Asterisk's provisioner maps operator 0 to the administrator's assigned
+    extension when no dedicated 0 device exists. Merely seeing Gosub is not
+    sufficient: the destination must have guarded PJSIP dialing or an explicit
+    unavailable fallback. This is configuration evidence, not call acceptance.
+    """
+    if not operator_output or not target_output:
+        return False
+    extension = operator_alias_extension(operator_output)
+    if not extension or 'Return(' not in operator_output:
+        return False
+    expected = r"^\s*'" + extension + r"'\s*=>\s*1\.\s*Set\(PWA_CONTACTS=\)"
+    if not re.search(expected, target_output, re.M):
+        return False
+    normalized = re.sub(expected, "'0' => 1. Set(PWA_CONTACTS=)", target_output, count=1, flags=re.M)
+    return pwa_operator_configured(normalized)
+
+
+def operator_route_reason(operator_output, target_output):
+    """Return only fixed diagnostic labels; never emit dialplan or device details."""
+    if operator_output is None:
+        return 'operator_dialplan_unavailable'
+    if pwa_operator_configured(operator_output):
+        return 'direct_route_verified'
+    if operator_alias_extension(operator_output):
+        return ('delegated_route_verified' if delegated_operator_configured(operator_output, target_output)
+                else 'delegated_target_unverified')
+    if re.search(r"^\s*'0'\s*=>\s*1\.", operator_output, re.M):
+        return 'generated_route_invalid'
+    return 'generated_route_absent'
+
+
 def mailbox_count(output):
     # Asterisk 20 emits this sentence instead of a numeric summary when empty.
     if re.search(r'^There are no voicemail users currently defined\.?$', output or '', re.M):
@@ -120,7 +176,12 @@ def audit():
     plan = cli('dialplan show 0@internal')
     record('OPERATOR_CONFIGURATION', operator_configured(plan), 'explicit_extension_0_required; call acceptance separate')
     generated = cli('dialplan show 0@elevate-pwa-extensions')
-    record('PWA_OPERATOR_CONFIGURATION', operator_configured(generated), 'generated_operator_route_observed; fallback acceptance separate')
+    direct_operator = pwa_operator_configured(generated)
+    alias_extension = operator_alias_extension(generated) if not direct_operator else None
+    target = cli('dialplan show ' + alias_extension + '@elevate-pwa-extensions') if alias_extension else None
+    configured = direct_operator or delegated_operator_configured(generated, target)
+    record('PWA_OPERATOR_CONFIGURATION', configured, {'scope': 'configuration_only; live call acceptance separate',
+          'reason_code': operator_route_reason(generated, target)})
     count = mailbox_count(cli('voicemail show users'))
     checks['VOICEMAIL_CONFIGURATION'] = {
         'result': 'BLOCKED' if count is None else ('PASS' if count > 0 else 'FAIL'),
@@ -151,8 +212,15 @@ def audit():
         if all(re.search(pattern, details) for pattern in [r'media_encryption\s*:\s*dtls\s',
                 r'ice_support\s*:\s*true\s', r'rtcp_mux\s*:\s*true\s', r'use_avpf\s*:\s*true\s']):
             secure += 1
-    record('SECURE_PWA_ENDPOINTS', bool(pwa) and len(pwa) <= 100 and secure == len(pwa),
-           {'endpoint_count': len(pwa), 'secure_profiles': secure})
+    # Device credentials are leased for ten minutes and removed after expiry.
+    # An idle fleet with zero endpoints is not evidence that provisioned
+    # endpoints are insecure; it is also not evidence of registration success.
+    checks['SECURE_PWA_ENDPOINTS'] = {
+        'result': ('NOT TESTED' if len(pwa) == 0 and endpoints is not None else
+                   'PASS' if 0 < len(pwa) <= 100 and secure == len(pwa) else
+                   'BLOCKED' if endpoints is None else 'FAIL'),
+        'evidence': {'endpoint_count': len(pwa), 'secure_profiles': secure,
+                     'scope': 'ephemeral_lease_snapshot; provision_and_register_for_acceptance'}}
     channels = cli('core show channels count')
     active = re.search(r'(\d+) active calls?', channels or '')
     checks['ACTIVE_CALLS'] = {'result': 'PASS' if active else 'BLOCKED',

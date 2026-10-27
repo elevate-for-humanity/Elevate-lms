@@ -73,12 +73,14 @@ vi.mock('next/image', () => ({
     alt,
     fill: _fill,
     priority: _priority,
+    blurDataURL: _blurDataURL,
     ...props
   }: {
     src: string;
     alt: string;
     fill?: boolean;
     priority?: boolean;
+    blurDataURL?: string;
     [key: string]: unknown;
   }) => {
     return React.createElement('img', { src, alt, ...props });

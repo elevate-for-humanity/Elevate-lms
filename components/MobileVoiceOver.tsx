@@ -114,7 +114,7 @@ export function MobileVoiceOver() {
           {/* Info Text */}
           {!hasInteracted && (
             <p className="text-white/80 text-xs mt-2 text-center">
-              👆 Tap to hear about our free training programs
+              👆 Tap to hear about training and payment options
             </p>
           )}
         </div>
@@ -129,7 +129,7 @@ export function MobileVoiceOver() {
               </div>
               <div className="flex-1">
                 <p className="font-bold text-sm">🎧 Voice-Over Playing...</p>
-                <p className="text-xs text-white/90">Learn about our free training programs</p>
+                <p className="text-xs text-white/90">Learn about training and payment options</p>
               </div>
             </div>
           </div>

@@ -4,13 +4,14 @@ import {inspectRegionalCapacity} from './regional-capacity.mjs';
 import {dispatchQueuedCourseJob} from './dispatch-course-job.mjs';
 import {continueCourseQueue,courseReleasePending} from './continue-course-queue.mjs';
 import {pathToFileURL} from 'node:url';
-const builds=["d535e31f-10e6-43dd-b60a-e7e5538d764a","b400834e-15e3-4ef0-ae20-33cd9f82e950","572cca43-6bd6-4a91-b385-a8b576209c4e"];
+// The worker queue is shared across registered course builds. Do not silently
+// exclude newly started courses using a hard-coded build allowlist.
 export function regionalArguments(args) {
  return args.map(arg=>arg==='--region=us-central1'?'--region=us-east1':arg==='--job=elevate-course-builder'?'--job=elevate-course-builder-parallel':arg==='elevate-course-builder'?'elevate-course-builder-parallel':arg);
 }
 export function scopedCourseQueueUrl(value) {
  const url=new URL(value);
- if(url.pathname.endsWith('/ultimate_build_jobs'))url.searchParams.set('and','(or(build_id.in.('+builds.join(',')+'),payload->>requestedBy.not.is.null))');
+ // Preserve the dispatcher eligibility query, including available_at and lease state.
  return url;
 }
 export async function dispatchApprovedRegionalCourses({env=process.env}={}) {
@@ -22,7 +23,7 @@ export async function dispatchApprovedRegionalCourses({env=process.env}={}) {
  }
  let state;
  try { state=await dispatchQueuedCourseJob({
-  env:{...env,COURSE_WORKER_PARALLELISM:'3'},
+  env:{...env,COURSE_WORKER_PARALLELISM:env.COURSE_WORKER_PARALLELISM ?? '1'},
   run:(_command,args)=>google(regionalArguments(args)),
   capacityCheck:input=>inspectRegionalCapacity({...input,region:'us-east1'}),
   request:(url,options)=>fetch(scopedCourseQueueUrl(url),options),

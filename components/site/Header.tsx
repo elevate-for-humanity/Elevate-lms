@@ -9,8 +9,11 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
+import StoreHeader from '@/components/store/StoreHeader';
 
 export default function Header() {
+  if (getPublicRuntimeService() === 'store') return <StoreHeader />;
   return (
     <header
       className="relative z-[100] isolate h-14 overflow-visible border-b border-slate-200 bg-white shadow-sm sm:h-[60px]"

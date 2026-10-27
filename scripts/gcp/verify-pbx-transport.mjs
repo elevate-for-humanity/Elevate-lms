@@ -15,7 +15,8 @@ export function verifySipUpgrade() {
         'Sec-WebSocket-Version': '13', 'Sec-WebSocket-Key': key,
         'Sec-WebSocket-Protocol': 'sip', Origin: 'https://app.elevateforhumanity.org' } });
     const timer = setTimeout(() => request.destroy(new Error('timeout')), 10000);
-    const finish = result => { clearTimeout(timer); resolve(result); };
+    let finished = false;
+    const finish = result => { if (finished) return; finished = true; clearTimeout(timer); resolve(result); };
     request.once('upgrade', (response, socket) => {
       const passed = response.statusCode === 101 && response.headers['sec-websocket-accept'] === websocketAccept(key)
         && response.headers['sec-websocket-protocol'] === 'sip';
@@ -34,10 +35,14 @@ export async function main() {
   checks.TLS = { result: tls.passed ? 'PASS' : 'FAIL', evidence: tls };
   try {
     const response = await fetch(`https://${host}/healthz`, { redirect: 'error', signal: AbortSignal.timeout(10000), cache: 'no-store' });
-    checks.HEALTH_ENDPOINT = { result: response.ok ? 'PASS' : 'FAIL', evidence: { httpStatus: response.status, scope: 'gateway_only' } };
-    await response.body?.cancel();
+    const body = await response.text();
+    const passed = response.status === 200 && body.trim() === 'ok';
+    checks.HEALTH_ENDPOINT = { result: passed ? 'PASS' : 'FAIL', evidence: { httpStatus: response.status, expectedBody: 'ok', bodyMatched: body.trim() === 'ok', scope: 'gateway_only' } };
   } catch { checks.HEALTH_ENDPOINT = { result: 'BLOCKED', evidence: 'gateway_unreachable' }; }
   checks.SIP_WEBSOCKET = await verifySipUpgrade();
+  for (const name of ['SIP_REGISTRATION', 'EXTENSION_ZERO_RINGING', 'TWO_WAY_AUDIO', 'PARIS_ANSWERING', 'VOICEMAIL_TRANSCRIPTION', 'VOICEMAIL_DELIVERY']) {
+    checks[name] = { result: 'NOT TESTED', evidence: 'requires protected authenticated acceptance; public transport probe is not sufficient' };
+  }
   checks.PHONE_CALL = { result: 'NOT TESTED', evidence: 'transport evidence is insufficient for calling readiness' };
   await writeFile('pbx-transport-evidence.json', JSON.stringify({ checkedAt: new Date().toISOString(), checks }, null, 2));
   console.log(JSON.stringify({ checks }));

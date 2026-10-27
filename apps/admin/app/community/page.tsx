@@ -1,20 +1,29 @@
 import { Metadata } from 'next';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { AlertTriangle, CheckCircle2, Eye, MessageSquare, ShieldCheck, Trash2, Trophy, Users, XCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Community | Admin', robots: { index: false, follow: false } };
 
 async function requireOperator() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/community');
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!['admin', 'super_admin', 'staff'].includes(String(profile?.role || ''))) redirect('/dashboard');
-  return user;
+  return (await requireRole(['admin', 'super_admin', 'staff'])).user;
+}
+
+function CommunityUnavailable() {
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+      <h1 className="text-3xl font-black text-slate-900">Community</h1>
+      <section role="alert" className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-6">
+        <h2 className="font-bold text-slate-900">Community data is temporarily unavailable.</h2>
+        <p className="mt-2 text-sm text-slate-700">Reload the dashboard to try again.</p>
+        <form action="/community" method="get" className="mt-4">
+          <button className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">Try again</button>
+        </form>
+      </section>
+    </main>
+  );
 }
 
 async function deleteCommunityItem(formData: FormData) {
@@ -22,16 +31,17 @@ async function deleteCommunityItem(formData: FormData) {
   await requireOperator();
   const type = String(formData.get('type') || '');
   const id = String(formData.get('id') || '');
-  if (!id) return;
+  if (!id) throw new Error('COMMUNITY_ITEM_INPUT_INVALID');
   const table = type === 'post' ? 'community_posts'
     : type === 'comment' ? 'community_post_comments'
       : type === 'group' ? 'study_groups'
         : type === 'topic' ? 'forum_topics'
           : type === 'reply' ? 'forum_replies'
             : null;
-  if (!table) return;
+  if (!table) throw new Error('COMMUNITY_ITEM_INPUT_INVALID');
   const admin = await requireAdminClient();
-  await admin.from(table).delete().eq('id', id);
+  const { data: deleted, error } = await admin.from(table).delete().eq('id', id).select('id').maybeSingle();
+  if (error || !deleted) throw new Error('COMMUNITY_DELETE_FAILED');
   revalidatePath('/community');
 }
 
@@ -40,13 +50,14 @@ async function updateReport(formData: FormData) {
   const user = await requireOperator();
   const id = String(formData.get('id') || '');
   const status = String(formData.get('status') || '');
-  if (!id || !['reviewing', 'resolved', 'dismissed'].includes(status)) return;
+  if (!id || !['reviewing', 'resolved', 'dismissed'].includes(status)) throw new Error('COMMUNITY_REPORT_INPUT_INVALID');
   const admin = await requireAdminClient();
-  await admin.from('community_reports').update({
+  const { data: updated, error } = await admin.from('community_reports').update({
     status,
     reviewed_by: user.id,
     reviewed_at: new Date().toISOString(),
-  }).eq('id', id);
+  }).eq('id', id).select('id').maybeSingle();
+  if (error || !updated) throw new Error('COMMUNITY_REPORT_UPDATE_FAILED');
   revalidatePath('/community');
 }
 
@@ -64,6 +75,8 @@ export default async function CommunityAdminPage() {
     admin.from('community_reports').select('id,reporter_id,target_type,target_id,reason,details,status,created_at,reviewed_at').in('status', ['open', 'reviewing']).order('created_at', { ascending: false }).limit(100),
   ]);
 
+  if ([postsResult, groupsResult, topicsResult, commentsResult, likesResult, leadersResult, reportsResult].some(result => result.error)) return <CommunityUnavailable />;
+
   const posts = postsResult.data ?? [];
   const groups = groupsResult.data ?? [];
   const topics = topicsResult.data ?? [];
@@ -75,7 +88,8 @@ export default async function CommunityAdminPage() {
     ...leaders.map((row: any) => row.user_id),
     ...reports.map((row: any) => row.reporter_id),
   ].filter(Boolean))];
-  const { data: profiles } = userIds.length ? await admin.from('profiles').select('id,full_name').in('id', userIds) : { data: [] as any[] };
+  const { data: profiles, error: profilesError } = userIds.length ? await admin.from('profiles').select('id,full_name').in('id', userIds) : { data: [] as any[], error: null };
+  if (profilesError) return <CommunityUnavailable />;
   const profileMap = new Map((profiles ?? []).map((profile: any) => [profile.id, profile.full_name]));
 
   const metricCards = [

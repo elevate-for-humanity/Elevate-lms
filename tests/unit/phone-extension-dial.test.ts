@@ -14,14 +14,14 @@ function setup(extension:any,devices:any=[]){
 beforeEach(()=>vi.clearAllMocks());
 describe('scoped extension dialing',()=>{
  it('resolves only an enabled connected phone in the caller workspace',async()=>{
-  const filters=setup({id:'destination',webrtc_provider:'telnyx',ring_mode:'ring'},[{sip_username:'verified_phone'}]);
+  const filters=setup({id:'destination',webrtc_provider:'asterisk',ring_mode:'ring'},[{sip_username:'verified_phone'}]);
   const response=await POST(request());expect(response.status).toBe(200);
-  expect(await response.json()).toMatchObject({destination:'sip:verified_phone@sip.telnyx.com'});
+  expect(await response.json()).toMatchObject({destination:'sip:verified_phone@phone.elevateforhumanity.org'});
   expect(filters).toContainEqual({table:'communication_extensions',key:'workspace_id',value:'own-workspace'});
   expect(filters).toContainEqual({table:'phone_webrtc_devices',key:'extension_id',value:'destination'});
  });
  it('rejects a destination outside the workspace instead of guessing',async()=>{setup(null);expect((await POST(request())).status).toBe(404);});
- it('does not invent a SIP identity for an offline phone',async()=>{setup({id:'destination',webrtc_provider:'telnyx',ring_mode:'ring'});expect((await POST(request())).status).toBe(409);});
- it('rejects injected destinations',async()=>{setup({id:'destination',webrtc_provider:'telnyx',ring_mode:'ring'},[{sip_username:'other@untrusted.invalid'}]);expect((await POST(request())).status).toBe(409);});
+ it('does not invent a SIP identity for an offline phone',async()=>{setup({id:'destination',webrtc_provider:'asterisk',ring_mode:'ring'});expect((await POST(request())).status).toBe(409);});
+ it('rejects injected destinations',async()=>{setup({id:'destination',webrtc_provider:'asterisk',ring_mode:'ring'},[{sip_username:'other@untrusted.invalid'}]);expect((await POST(request())).status).toBe(409);});
  it('keeps administrator previews read-only',async()=>{mock.actor.mockResolvedValue({actor:{previewing:true},response:null});expect((await POST(request())).status).toBe(403);});
 });

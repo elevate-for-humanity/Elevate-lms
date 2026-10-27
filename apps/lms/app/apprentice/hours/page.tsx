@@ -52,20 +52,24 @@ export default async function ApprenticeHoursPage() {
     .order('work_date', { ascending: false });
 
   if (error) {
-    logger.error('Error fetching hours', normalizeError(error, 'Failed to fetch hours'), getErrorContext(error));
+    logger.error(
+      'Error fetching hours',
+      normalizeError(error, 'Failed to fetch hours'),
+      getErrorContext(error),
+    );
   }
 
   const allLogs = hoursData || [];
   // Transfer credit is displayed from the verified enrollment fields below.
   // Historical transfer rows remain auditable but are excluded from weekly OJL.
   const workLogs = allLogs.filter(
-    (log: any) => log.category !== 'transfer' && log.source_type !== 'transfer',
+    (log: any) => log.category !== 'transfer' && ['ojl', 'timeclock', 'manual', 'host_shop'].includes(log.source_type),
   );
   const logs = workLogs.slice(0, 20);
   const totalHours = workLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
   const approvedHours = workLogs
-    .filter((log: any) => log.status === 'approved' || log.approval_status === 'approved')
-    .reduce((sum, log: any) => sum + (Number(log.accepted_hours) || Number(log.hours_claimed) || 0), 0);
+    .filter((log: any) => ['approved', 'locked'].includes(log.status))
+    .reduce((sum, log: any) => sum + (Number(log.accepted_hours ?? log.hours_claimed) || 0), 0);
 
   // Resolve required hours from the learner's active enrollment
   const { data: activeEnrollment } = await db
@@ -148,7 +152,9 @@ export default async function ApprenticeHoursPage() {
             />
           </div>
           <p className="text-sm text-slate-700">
-            {requiredHours ? `${progressPercent}% complete` : 'Program hour target not configured yet'}
+            {requiredHours
+              ? `${progressPercent}% complete`
+              : 'Program hour target not configured yet'}
           </p>
         </div>
 
@@ -182,7 +188,9 @@ export default async function ApprenticeHoursPage() {
                 <Calendar className="w-5 h-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{transferHoursVerified ? transferHours : 'Pending'}</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {transferHoursVerified ? transferHours : 'Pending'}
+                </p>
                 <p className="text-sm text-slate-700">Transfer Hours</p>
               </div>
             </div>
@@ -227,9 +235,9 @@ export default async function ApprenticeHoursPage() {
                     <span className="font-semibold text-slate-900">{log.hours_claimed} hrs</span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        (log.status === 'approved' || log.approval_status === 'approved')
+                        ['approved', 'locked'].includes(log.status)
                           ? 'bg-brand-green-100 text-brand-green-700'
-                          : (log.status === 'rejected' || log.approval_status === 'rejected')
+                          : log.status === 'rejected' || log.approval_status === 'rejected'
                             ? 'bg-brand-red-100 text-brand-red-700'
                             : 'bg-yellow-100 text-yellow-700'
                       }`}

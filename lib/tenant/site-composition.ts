@@ -76,7 +76,22 @@ export function sanitizeSection(value: unknown, index = 0): TenantSiteSection | 
           for (const [entryKey, entryValue] of Object.entries(entry as Record<string, unknown>).slice(0, 24)) {
             if (typeof entryValue === 'string') out[entryKey] = entryValue.slice(0, 3000);
             else if (typeof entryValue === 'number' || typeof entryValue === 'boolean' || entryValue === null) out[entryKey] = entryValue;
-            else if (Array.isArray(entryValue)) out[entryKey] = safeStringArray(entryValue, 20);
+            else if (Array.isArray(entryValue)) {
+              // Assessment choices are objects with labels and numeric scores;
+              // custom-form choices are strings. Preserve both without allowing
+              // unbounded nesting or executable/non-JSON values.
+              out[entryKey] = entryValue.slice(0, 20).flatMap((choice) => {
+                if (typeof choice === 'string') return [choice.slice(0, 2000)];
+                if (!choice || typeof choice !== 'object' || Array.isArray(choice)) return [];
+                const fields = Object.entries(choice).slice(0, 24).flatMap(([key, value]) => {
+                  if (['__proto__', 'constructor', 'prototype'].includes(key)) return [];
+                  if (typeof value === 'string') return [[key, value.slice(0, 3000)]];
+                  if (typeof value === 'number' && Number.isFinite(value) || typeof value === 'boolean' || value === null) return [[key, value]];
+                  return [];
+                });
+                return [Object.fromEntries(fields)];
+              });
+            }
           }
           return out;
         }

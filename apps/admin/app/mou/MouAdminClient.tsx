@@ -255,7 +255,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
       {tab === 'templates' && (
         <div className="space-y-3">
           {templates.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-xl p-10 text-center text-slate-400">
+            <div className="bg-white border border-slate-200 rounded-xl p-10 text-center text-slate-600">
               No templates found.
             </div>
           ) : (

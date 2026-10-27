@@ -1,3 +1,4 @@
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import type { Metadata } from 'next';
 import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPhone';
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default function ProgramHolderPhonePage() {
+export default async function ProgramHolderPhonePage() {
+  await requireProgramHolder();
   return <ProgramHolderPhone />;
 }

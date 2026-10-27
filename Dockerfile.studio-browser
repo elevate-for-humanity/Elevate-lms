@@ -18,7 +18,15 @@ RUN apt-get update \
 COPY services/studio-browser/command-arguments.mjs ./command-arguments.mjs
 COPY services/studio-browser/server.mjs ./server.mjs
 COPY services/studio-browser/cdp-*.mjs ./
+COPY services/studio-browser/workspace-checkpoint.mjs ./workspace-checkpoint.mjs
+COPY services/studio-browser/repository-sync.mjs ./repository-sync.mjs
+COPY services/studio-browser/gcs-workspace-objects.mjs ./gcs-workspace-objects.mjs
+COPY services/studio-browser/browser-file-store.mjs ./browser-file-store.mjs
+COPY services/studio-browser/browser-workspace-store.mjs ./browser-workspace-store.mjs
 COPY services/studio-browser/provider-session-store.mjs ./provider-session-store.mjs
+COPY services/studio-browser/session-retirement.mjs ./session-retirement.mjs
+COPY services/studio-browser/terminal-sessions.mjs ./terminal-sessions.mjs
+COPY services/studio-browser/terminal-init.sh ./terminal-init.sh
 COPY services/studio-browser/provider-verification.mjs ./provider-verification.mjs
 COPY services/studio-browser/course-video-download.mjs ./course-video-download.mjs
 COPY services/studio-browser/learner-runthrough.mjs ./learner-runthrough.mjs

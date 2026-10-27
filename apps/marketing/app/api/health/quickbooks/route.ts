@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
+import { loadQuickBooksConfig, quickBooksRequest, quickBooksFailureReason } from '@/lib/integrations/quickbooks-client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
-  await hydrateProcessEnv();
   try {
+    await hydrateProcessEnv();
     const db = await requireAdminClient();
     const config = await loadQuickBooksConfig(db);
     const configured = Boolean(
@@ -19,7 +19,7 @@ export async function GET() {
       config.refreshToken &&
       config.realmId,
     );
-    const webhookVerifierConfigured = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN);
+    const webhookVerifierConfigured = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN || process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN);
     if (!configured) {
       return NextResponse.json(
         {
@@ -42,13 +42,8 @@ export async function GET() {
       { status: webhookVerifierConfigured ? 200 : 503, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
-    // Report non-sensitive failure categories for production diagnosis.
-    // Never expose OAuth tokens, account data or upstream response bodies.
-    const message = error instanceof Error ? error.message : '';
-    const reason = message.includes('authorization expired') ? 'oauth_refresh_failed'
-      : message.includes('not connected') ? 'oauth_not_connected'
-      : /^QuickBooks request failed \\([0-9]{3}\\)/.test(message) ? 'upstream_api_failure'
-      : 'configuration_or_dependency_failure';
+    const reason = quickBooksFailureReason(error);
+    console.warn('[quickbooks-health]', { reason });
     return NextResponse.json(
       {
         service: 'quickbooks',

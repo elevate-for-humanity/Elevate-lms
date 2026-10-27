@@ -103,38 +103,27 @@ export function quotaContactEmail(values) {
     !Array.from(v).some(ch=>ch.trim()==='') && v.split('@').length===2 &&
     Boolean(v.split('@')[0]) && v.split('@')[1].includes('.') && !v.endsWith('.'));
 }
-async function reportAndRequestQuota() {
-  const token=google(['auth','print-access-token']);
+// Runtime restoration must never request quota or infer financial authority
+// from an available contact email. Quota changes use a separate approved flow.
+export async function reportRegionalQuota({run=google,request=fetch,report=console.log}={}) {
+  const token=run(['auth','print-access-token']);
   const base='https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
-  const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
-  const admin=loadGoogleConfig('admin').runtimeEnvironment;
-  const contact=quotaContactEmail([process.env.QUOTA_CONTACT_EMAIL,admin.NEXT_PUBLIC_SUPPORT_EMAIL,admin.SUPPORT_EMAIL,admin.CONTACT_EMAIL]);
-  for(const [quotaId,desired] of [['MemAllocPerProjectRegion',48*2**30],['CpuAllocPerProjectRegion',24000]]) {
-    const response=await fetch(base+'/services/run.googleapis.com/quotaInfos/'+quotaId,{headers,signal:AbortSignal.timeout(30000)});
+  const headers={Authorization:'Bearer '+token};
+  const results=[];
+  for(const quotaId of ['MemAllocPerProjectRegion','CpuAllocPerProjectRegion']) {
+    const response=await request(base+'/services/run.googleapis.com/quotaInfos/'+quotaId,{headers,signal:AbortSignal.timeout(30000)});
+    if(!response.ok)throw Error('Unable to verify approved regional quota');
     const info=await response.json();
-    if(!response.ok){console.log(JSON.stringify({quotaId,readStatus:response.status,requestSubmitted:false}));continue;}
-    const granted=Number(info.dimensionsInfos?.find(d=>d.dimensions?.region==='us-central1')?.details?.value);
-    if(!Number.isFinite(granted))throw Error('Regional quota dimensions unavailable');
-    const report={quotaId,region:'us-central1',granted,desired,requestSubmitted:false};
-    if(granted===-1||granted>=desired){console.log(JSON.stringify(report));continue;}
-    if(!contact){console.log(JSON.stringify({...report,reason:'verified_contact_email_required'}));continue;}
-    const listed=await fetch(base+'/quotaPreferences?pageSize=100',{headers,signal:AbortSignal.timeout(30000)});
-    const list=await listed.json();
-    if(!listed.ok){console.log(JSON.stringify({...report,reason:'quota_request_permission_unavailable',httpStatus:listed.status}));continue;}
-    const current=list.quotaPreferences?.find(p=>p.service==='run.googleapis.com'&&p.quotaId===quotaId&&p.dimensions?.region==='us-central1');
-    if(current&&Number(current.quotaConfig?.preferredValue)>=desired&&current.reconciling===true){console.log(JSON.stringify({...report,existingRequest:true,pending:true,preferenceGranted:current.quotaConfig?.grantedValue}));continue;}
-    const payload={service:'run.googleapis.com',quotaId,dimensions:{region:'us-central1'},quotaConfig:{preferredValue:String(desired)},contactEmail:contact,
-      justification:'Restore migrated Elevate platform containers to their original Northflank 4 CPU and 8 GiB configuration, with bounded browser and course-worker capacity and safe revision overlap.'};
-    const url=current?'https://cloudquotas.googleapis.com/v1/'+current.name+'?updateMask=quotaConfig,justification,contactEmail':base+'/quotaPreferences';
-    const result=await fetch(url,{method:current?'PATCH':'POST',headers,body:JSON.stringify(payload),signal:AbortSignal.timeout(30000)});
-    const outcome=await result.json();
-    console.log(JSON.stringify({...report,previousPreferred:current?.quotaConfig?.preferredValue,requestSubmitted:result.ok,httpStatus:result.status,pending:result.ok?outcome.reconciling===true:undefined,preferenceGranted:outcome.quotaConfig?.grantedValue,stateDetail:outcome.quotaConfig?.stateDetail,
-      reason:result.ok?undefined:outcome.error?.status||'quota_request_failed'}));
+    const raw=info.dimensionsInfos?.find(d=>d.dimensions?.region==='us-central1')?.details?.value;
+    if(!/^(?:-1|\d+)$/.test(String(raw)))throw Error('Regional quota dimensions unavailable');
+    const result={quotaId,region:'us-central1',granted:Number(raw),requestSubmitted:false};
+    results.push(result);report(JSON.stringify(result));
   }
+  return results;
 }
 
 async function main() {
-  await reportAndRequestQuota();
+  await reportRegionalQuota();
   const components=(process.env.COMPONENTS||'marketing,lms,store,admin,studio-browser').split(',');
   if(components.some(c=>!profiles[c]))throw Error('Unsupported component');
   let failed=false;

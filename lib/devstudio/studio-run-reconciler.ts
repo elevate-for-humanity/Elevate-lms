@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { evaluateExecution } from '@/lib/platform/orchestration/evaluator';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type TaskState = {
@@ -30,13 +31,26 @@ export function deriveStudioRunState(steps: StudioStepState[]): {
   if (required.some((step) => step.status === 'blocked')) {
     return { status: 'blocked', failure: null };
   }
+  if (required.some((step) => step.status === 'skipped')) {
+    return {
+      status: 'blocked',
+      failure: { message: 'A required Studio step was skipped without verification' },
+    };
+  }
   if (
     required.length > 0 &&
-    required.every((step) => ['verified', 'skipped'].includes(step.status))
+    required.every((step) => step.status === 'verified')
   ) {
     return { status: 'completed', failure: null };
   }
   return { status: 'executing', failure: null };
+}
+
+export function evaluateCompletedStudioTask(task: TaskState) {
+  const envelope = task.result_json && typeof task.result_json === 'object'
+    ? task.result_json as Record<string, unknown> : null;
+  const result = task.tool_output ?? envelope?.payload ?? task.result_json;
+  return evaluateExecution({ tool: task.tool_name ?? 'advisory', result, error: task.error_message });
 }
 
 function evidenceForTask(task: TaskState) {
@@ -64,13 +78,15 @@ export async function reconcileStudioRunFromTask(db: SupabaseClient, task: TaskS
 
   const now = new Date().toISOString();
   if (task.status === 'completed') {
+    const evaluation = evaluateCompletedStudioTask(task);
+    const verified = evaluation.status === 'PASS';
     const { error } = await db
       .from('studio_run_steps')
       .update({
-        status: 'verified',
+        status: verified ? 'verified' : 'failed',
         output: task.result_json ?? {},
         evidence: evidenceForTask(task),
-        error: null,
+        error: verified ? null : { message: evaluation.reasons.join(' | ') },
         completed_at: now,
         updated_at: now,
       })

@@ -1,0 +1,56 @@
+name: Release tested Course Builder Admin image
+on:
+  workflow_dispatch:
+permissions: {contents: read, actions: read, id-token: write}
+concurrency: {group: google-course-runtime-operations, cancel-in-progress: false, queue: max}
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    concurrency: {group: google-runtime-us-central1, cancel-in-progress: false, queue: max}
+    env:
+      ADMIN_IMAGE_SHA: 0b225620acb55cf2248c353711c9715832caf6f8
+      EXPECTED_ADMIN_COMMIT: accd052e05ff0d66c6a9370da77085bf254fecd5
+      QA_BROWSER_REVISION: elevate-studio-browser-00045-wer
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify tested source and unchanged Admin interface
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$ADMIN_IMAGE_SHA" HEAD
+          git diff --quiet "$ADMIN_IMAGE_SHA" HEAD -- apps/admin components/studio components/admin lib/storage lib/ultimate-course-builder/media/admin-preview-url.mjs
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/jobs/117632713772 --jq '.steps[] | select(.name == "Build the Admin image") | .conclusion')" = success
+          node --test scripts/gcp/release-built-course-admin.test.mjs
+      - name: Require accepted CI for this release controller
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 48); do
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&event=push&per_page=20" --jq '.workflow_runs[0].id // empty')"
+            if test -n "$run_id"; then
+              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '.jobs[] | select(.name == "CI Required Gate") | .conclusion // empty')"
+              if test "$conclusion" = success; then exit 0; fi
+              if test -n "$conclusion"; then echo 'Required CI did not pass'; exit 1; fi
+            fi
+            sleep 10
+          done
+          echo 'Required CI did not finish'; exit 1
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Release immutable Admin while retaining owner Studio and every saved revision
+        run: node scripts/gcp/release-built-course-admin.mjs
+      - name: Verify exact live Admin and database health
+        run: |
+          export GITHUB_SHA="$ADMIN_IMAGE_SHA"
+          export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
+          node scripts/gcp/verify-admin-revision.mjs

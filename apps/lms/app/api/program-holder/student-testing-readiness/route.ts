@@ -1,9 +1,16 @@
 // pre-auth-registry: exempt - requireProgramHolder enforces holder-scoped access.
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+async function checkEpaProgram(db: any, programId: string) {
+  const { data: program, error } = await db.from('programs').select('slug').eq('id', programId).maybeSingle();
+  if (error) return NextResponse.json({ error: 'Program eligibility could not be verified.' }, { status: 503 });
+  if (!isEpaTestingProgram(program?.slug)) return NextResponse.json({ error: 'EPA testing readiness is only available for the approved HVAC pathway.' }, { status: 400 });
+  return null;
+}
 export async function POST(request: Request) {
   const ctx = await requireProgramHolder();
   if (ctx.mode !== 'holder') {
@@ -35,6 +42,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This student is not in your assigned roster.' }, { status: 403 });
     }
 
+    const eligibilityError = await checkEpaProgram(ctx.db, enrollment.program_id);
+    if (eligibilityError) return eligibilityError;
     studentName = enrollment.full_name || enrollment.email || 'Student';
     programId = enrollment.program_id;
     studentUserId = enrollment.user_id;
@@ -63,6 +72,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This student is not in your assigned roster.' }, { status: 403 });
     }
 
+    const eligibilityError = await checkEpaProgram(ctx.db, holderStudent.program_id);
+    if (eligibilityError) return eligibilityError;
     studentName = holderStudent.applicant_name || holderStudent.applicant_email || 'Student';
     programId = holderStudent.program_id;
     studentUserId = holderStudent.student_id || holderStudent.user_id;

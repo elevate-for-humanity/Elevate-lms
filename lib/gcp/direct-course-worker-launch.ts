@@ -39,23 +39,37 @@ export async function startDeployedCourseWorker({
     throw new Error('GOOGLE_COURSE_JOB_IDENTITY_MISMATCH');
 
   // No new execution if a prior execution is still active.
-  const executionsResponse = await request(`${API}/executions?pageSize=50`, {
-    headers, signal: AbortSignal.timeout(10000),
-  });
-  if (!executionsResponse.ok)
-    throw new Error(`GOOGLE_COURSE_EXECUTIONS_UNAVAILABLE_HTTP_${executionsResponse.status}`);
-  const executions = await executionsResponse.json();
-  if (!Array.isArray(executions.executions ?? [])) throw new Error('GOOGLE_EXECUTION_LIST_INVALID');
-  const running = (executions.executions ?? []).find((execution: any) =>
-    !execution.completionTime && !execution.cancelledCount &&
-    !execution.conditions?.some((condition: any) =>
-      condition.type === 'Completed' && condition.state === 'CONDITION_SUCCEEDED',
-    ),
-  );
-  if (running)
-    return { dispatched: true, alreadyExecuting: true, executionVerified: true,
-      launchMode: 'google-cloud-run', executionName: running.name ?? null,
-      message: 'Google Cloud Run course worker already has an active execution. Waiting for a fresh Supabase heartbeat.' };
+  const scanDeadline = Date.now() + 10_000;
+  const seenTokens = new Set<string>();
+  let pageToken = '';
+  do {
+    const remaining = scanDeadline - Date.now();
+    if (remaining <= 0) throw new Error('GOOGLE_EXECUTION_SCAN_TIMEOUT');
+    const executionsResponse = await request(`${API}/executions?pageSize=50${pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : ''}`, {
+      headers, signal: AbortSignal.timeout(remaining),
+    });
+    if (!executionsResponse.ok)
+      throw new Error(`GOOGLE_COURSE_EXECUTIONS_UNAVAILABLE_HTTP_${executionsResponse.status}`);
+    const executions = await executionsResponse.json();
+    if (!Array.isArray(executions.executions ?? [])) throw new Error('GOOGLE_EXECUTION_LIST_INVALID');
+    const running = (executions.executions ?? []).find((execution: any) =>
+      !execution.completionTime && !execution.cancelledCount &&
+      !execution.conditions?.some((condition: any) =>
+        condition.type === 'Completed' &&
+        ['CONDITION_SUCCEEDED', 'CONDITION_FAILED'].includes(condition.state),
+      ),
+    );
+    if (running)
+      return { dispatched: true, alreadyExecuting: true, executionVerified: true,
+        launchMode: 'google-cloud-run', executionName: running.name ?? null,
+        message: 'Google Cloud Run course worker already has an active execution. Waiting for a fresh Supabase heartbeat.' };
+    if (executions.nextPageToken != null && typeof executions.nextPageToken !== 'string')
+      throw new Error('GOOGLE_EXECUTION_LIST_INVALID');
+    pageToken = executions.nextPageToken || '';
+    if (pageToken && seenTokens.has(pageToken)) throw new Error('GOOGLE_EXECUTION_PAGE_CYCLE');
+    if (pageToken) seenTokens.add(pageToken);
+    if (seenTokens.size > 100) throw new Error('GOOGLE_EXECUTION_SCAN_LIMIT');
+  } while (pageToken);
 
   const runResponse = await request(`${API}:run`, {
     method: 'POST', headers, body: JSON.stringify({}), signal: AbortSignal.timeout(15000),

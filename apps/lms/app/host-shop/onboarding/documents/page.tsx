@@ -13,7 +13,7 @@ export const metadata = {
 
 async function loadContext() {
   try {
-    return await requireCurrentHostShopPartner();
+    return await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     if (code === 'HOST_SHOP_UNAUTHENTICATED') {
@@ -115,12 +115,14 @@ export default async function HostShopDocumentsPage({
         <div className="mt-6 grid gap-5">
           {board.documentStatuses.map((requirement: any) => {
             const status = String(requirement.status || 'missing');
-            const needsUpload = status !== 'accepted' && status !== 'pending';
+            // Permit a corrected replacement even while an earlier submission is under review.
+            const needsUpload = true;
+            const needsAttention = status !== 'accepted' && status !== 'pending';
             return (
               <section
                 key={requirement.document_type}
                 className={`rounded-2xl border p-6 ${
-                  needsUpload ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'
+                  needsAttention ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'
                 }`}
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

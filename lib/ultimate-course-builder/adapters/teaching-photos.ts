@@ -34,7 +34,6 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     if(!scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
     requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
-    const usedLicensedPhotos = new Set<string>();
     for (const [index, step] of requests.entries()) {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
@@ -55,7 +54,9 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(error) throw error;
         placedPhotos=data ?? [];
       }
-      const placed=placedPhotos.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
+      const eligiblePlaced=placedPhotos.filter(p=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && !usedPhotoHashes.has(p.metadata.sha256) && String(p.storage_path).startsWith('approved-teaching-photos/'));
+      const placed=eligiblePlaced.find(p=>p.metadata.sceneId===scene.id && p.metadata.cueIndex===index && p.metadata.narrationQuote===step.narrationQuote)
+        ?? eligiblePlaced.find(p=>p.metadata.sceneId===scene.id) ?? eligiblePlaced[0];
       if(placed){
         const downloaded=await db.storage.from('course_videos').download(placed.storage_path);
         if(downloaded.error||!downloaded.data) throw new Error('PLACED_TEACHING_PHOTO_READBACK_FAILED');
@@ -73,7 +74,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedLicensedPhotos, compatibleVisualTask);
+      const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedPhotoHashes, compatibleVisualTask, {allowRelatedCoursePhoto:true});
       if (licensed) {
         const downloaded = await db.storage.from('course_videos').download(licensed.storage_path);
         if(downloaded.error || !downloaded.data) throw new Error('LICENSED_TEACHING_PHOTO_READBACK_FAILED');
@@ -81,18 +82,24 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==licensed.content_sha256) throw new Error('LICENSED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        usedLicensedPhotos.add(sha256);
         if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url}))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      // Storage-first, generate only for missing inventory, never duplicate a hash.
-      const prompt=['Professional cosmetology educational photograph, realistic, no logos or text.',
-        String(input.courseTitle),String(scene.visualRequirement),String(step.narrationQuote),String(step.view)].join('\\n');
+      const prompt = [
+        'Generate a camera-realistic professional training photograph with natural skin texture, lifelike materials and photographic lighting. No cartoons, anime, drawings, vector art, clip art or 3D-rendered characters.',
+        'This synthetic photograph is an educational illustration, not evidence of a performed practical procedure.',
+        'Show complete hands, tools and relevant subject, uncropped, no printed text, no logos, no invented measurements.',
+        'Use a realistic professional training setting. No unsafe actions or invented numbered guards.',
+        String(input.courseTitle), String(scene.visualRequirement), String(step.narrationQuote), step.view,
+      ].join('\n');
       // Keep content-addressed images while recording a durable cue-to-image
       // index. A resumed worker must reuse the saved asset before paid inference.
       const requestHash=createHash('sha256').update(JSON.stringify({
         version:'storage-first-photo-cues-v3',lesson:input.lessonId,scene:scene.id,index,prompt,
+      })).digest('hex');
+      const legacyRequestHash=createHash('sha256').update(JSON.stringify({
+        version:'approved-picture-cues-photos-v2',lesson:input.lessonId,scene:scene.id,index,prompt,
       })).digest('hex');
       const indexPath='approved-teaching-photo-index/'+requestHash+'.json';
       const bucket=db.storage.from('course_videos');
@@ -103,8 +110,21 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(cached.data){
         try{saved=JSON.parse(await cached.data.text());}catch{throw new Error('TEACHING_PHOTO_INDEX_INVALID');}
         if(!/^[a-f0-9]{64}$/.test(saved.sha256??'') ||
-          !new RegExp('^approved-teaching-photos/'+saved.sha256+'\\.(png|jpg|webp)$').test(saved.storagePath??''))
+          !new RegExp('^approved-teaching-photos/(?:'+saved.sha256+'|'+legacyRequestHash+')\\.(png|jpg|webp)$').test(saved.storagePath??''))
           throw new Error('TEACHING_PHOTO_INDEX_INVALID');
+      }
+      if(!saved){
+        // Keep previously generated v2 cue assets reachable without new inference.
+        const variants=await Promise.all(['png','jpg','webp'].map(async extension=>{
+          const path='approved-teaching-photos/'+legacyRequestHash+'.'+extension;
+          const result=await bucket.download(path);
+          if(result.error && String((result.error as any).statusCode)!=='404' &&
+            !/not found|does not exist/i.test(result.error.message)) throw result.error;
+          return {path,data:result.data};
+        }));
+        const hit=variants.find(variant=>variant.data);
+        if(hit?.data) saved={storagePath:hit.path,sha256:createHash('sha256')
+          .update(Buffer.from(await hit.data.arrayBuffer())).digest('hex')};
       }
       if(!saved){
         const generated=await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,

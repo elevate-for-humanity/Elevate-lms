@@ -303,9 +303,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const enrollments = safeRows(enrollmentsRes, degradedSections, 'dashboard_data');
   const recentEnrollmentRows = safeRows(recentEnrollmentsRes, degradedSections, 'recent_students');
   const programRows = safeRows(programsRes, degradedSections, 'unpublished_programs');
-  const complianceRows = complianceRes.error ? [] : (complianceRes.data ?? []);
-  const leadRows = leadsRes.error ? [] : (leadsRes.data ?? []);
-  const submissionRows = submissionsRes.error ? [] : (submissionsRes.data ?? []);
+  const complianceRows = safeRows(complianceRes, degradedSections, 'dashboard_data');
+  const leadRows = safeRows(leadsRes, degradedSections, 'dashboard_data');
+  const submissionRows = safeRows(submissionsRes, degradedSections, 'dashboard_data');
 
   const pendingStatuses = new Set<string>(APPLICATION_REVIEW_STATUSES);
   const pendingApplications: RecentApplication[] = applications

@@ -40,12 +40,12 @@ const STATUS_COLORS: Record<string, string> = {
   A:  'text-brand-green-400',
   D:  'text-red-400',
   R:  'text-blue-400',
-  '?': 'text-slate-400',
+  '?': 'text-slate-600',
   '!': 'text-slate-500',
 };
 
 function StatusBadge({ s }: { s: string }) {
-  const color = STATUS_COLORS[s] ?? 'text-slate-400';
+  const color = STATUS_COLORS[s] ?? 'text-slate-600';
   return <span className={`text-[10px] font-bold font-mono w-4 shrink-0 ${color}`}>{s}</span>;
 }
 
@@ -134,7 +134,7 @@ export default function GitPanel() {
   // Render diff with basic syntax highlighting
   function renderDiff(raw: string) {
     return raw.split('\n').map((line, i) => {
-      let cls = 'text-slate-400';
+      let cls = 'text-slate-600';
       if (line.startsWith('+') && !line.startsWith('+++')) cls = 'text-brand-green-400 bg-brand-green-900/20';
       else if (line.startsWith('-') && !line.startsWith('---')) cls = 'text-red-400 bg-red-900/20';
       else if (line.startsWith('@@')) cls = 'text-blue-400';
@@ -153,7 +153,7 @@ export default function GitPanel() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
         <div className="flex items-center gap-2">
-          <GitBranch className="w-4 h-4 text-slate-400" />
+          <GitBranch className="w-4 h-4 text-slate-600" />
           <span className="text-sm font-semibold text-white font-mono">
             {status?.branch ?? '…'}
           </span>
@@ -171,7 +171,7 @@ export default function GitPanel() {
         <div className="flex items-center gap-1">
           <button
             onClick={() => setShowBranch(v => !v)}
-            className="p-1.5 rounded hover:bg-white/10 text-slate-400 hover:text-slate-900 transition-colors"
+            className="p-1.5 rounded hover:bg-white/10 text-slate-600 hover:text-slate-900 transition-colors"
             title="Switch branch"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -179,7 +179,7 @@ export default function GitPanel() {
           <button
             onClick={load}
             disabled={loading}
-            className="p-1.5 rounded hover:bg-white/10 text-slate-400 hover:text-slate-900 transition-colors disabled:opacity-40"
+            className="p-1.5 rounded hover:bg-white/10 text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-40"
             title="Refresh"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -285,7 +285,7 @@ export default function GitPanel() {
                       <StatusBadge s={f.status} />
                       <FileText className="w-3 h-3 text-slate-500 shrink-0" />
                       <span className="text-xs text-slate-300 truncate flex-1 font-mono">{f.file}</span>
-                      <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-slate-400 shrink-0" />
+                      <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-slate-600 shrink-0" />
                     </button>
                   ))}
                 </div>
@@ -351,7 +351,7 @@ export default function GitPanel() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-slate-200 truncate">{c.subject}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">
-                      <span className="font-mono text-slate-400">{c.hash}</span>
+                      <span className="font-mono text-slate-600">{c.hash}</span>
                       {' · '}{c.author}{' · '}{c.when}
                     </p>
                   </div>

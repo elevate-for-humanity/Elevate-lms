@@ -1,6 +1,7 @@
 import 'server-only';
 
-/** Stripe is retired. Historical callers fail closed instead of loading the SDK. */
-export async function getStripeServer(): Promise<never> {
-  throw new Error('STRIPE_RETIRED: use Elevate billing with QuickBooks or PayPal');
+// Compatibility boundary: old webhook handlers must fail closed. The retired
+// provider SDK is intentionally absent from production dependencies.
+export async function getStripeServer(): Promise<null> {
+  return null;
 }

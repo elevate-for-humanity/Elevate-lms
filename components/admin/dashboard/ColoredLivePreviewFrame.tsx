@@ -87,38 +87,38 @@ export function ColoredLivePreviewFrame({
 
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-2xl border border-slate-200 shadow-md ${className}`}
-      style={{ minHeight: workspaceTop ? `min(85vh, ${workspaceMinHeight + minHeight + 120}px)` : undefined }}
+      className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-xl ${className}`}
+      style={{ minHeight: workspaceTop ? `min(95dvh, ${workspaceMinHeight + minHeight + 120}px)` : undefined }}
     >
       {workspaceTop ? (
         <div
           className="flex min-h-0 shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white"
-          style={{ height: `min(${workspaceMinHeight}px, 42vh)`, minHeight: 280 }}
+          style={{ height: `max(${Math.max(workspaceMinHeight, 640)}px, calc(100dvh - 5rem))` }}
         >
           {workspaceTop}
         </div>
       ) : null}
 
-      <div className="shrink-0 bg-gradient-to-r from-brand-blue-700 via-brand-blue-600 to-brand-red-600 px-3 py-2.5">
+      <div className="shrink-0 border-b border-slate-700 bg-slate-900 px-3 py-3">
         <div className="mb-2 flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-red-400 shadow-sm" aria-hidden />
           <span className="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-sm" aria-hidden />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-sm" aria-hidden />
-          <span className="ml-2 text-[10px] font-semibold uppercase tracking-wider text-white/80">
+          <span className="ml-2 text-xs font-semibold uppercase tracking-wider text-slate-300">
             Live preview
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap">
           <button
             type="button"
             onClick={refresh}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white hover:bg-white/25"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-white hover:bg-slate-700"
             title="Refresh preview"
           >
             <RefreshCw className="h-4 w-4" />
           </button>
           <form
-            className="flex min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-white/95 px-2 shadow-sm"
+            className="order-first flex min-w-0 basis-full items-center gap-1.5 rounded-lg bg-white/95 px-2 shadow-sm sm:order-none sm:basis-auto sm:flex-1"
             onSubmit={(e) => {
               e.preventDefault();
               refresh();
@@ -126,15 +126,16 @@ export function ColoredLivePreviewFrame({
           >
             <Globe className="h-3.5 w-3.5 shrink-0 text-brand-blue-600" />
             <input
+              aria-label="Preview URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="h-8 min-w-0 flex-1 bg-transparent text-xs text-slate-800 outline-none"
+              className="h-11 min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none"
               spellCheck={false}
             />
           </form>
           {list.length > 3 && (
             <select
-              className="hidden h-8 max-w-[9rem] shrink-0 rounded-lg bg-white/95 px-1 text-[10px] text-slate-800 sm:block"
+              className="hidden h-11 max-w-[12rem] shrink-0 rounded-lg bg-white px-2 text-sm text-slate-900 sm:block"
               value=""
               onChange={(e) => {
                 const picked = list.find((t) => t.url === e.target.value);
@@ -155,7 +156,7 @@ export function ColoredLivePreviewFrame({
               ))}
             </select>
           )}
-          <div className="hidden items-center gap-0.5 rounded-lg bg-white/15 p-0.5 sm:flex">
+          <div className="flex items-center gap-1 rounded-lg bg-slate-800 p-1">
             {(
               [
                 { id: 'desktop' as const, Icon: Monitor, title: 'Desktop' },
@@ -167,8 +168,10 @@ export function ColoredLivePreviewFrame({
                 key={id}
                 type="button"
                 title={title}
+                aria-label={`${title} preview`}
+                aria-pressed={device === id}
                 onClick={() => setDevice(id)}
-                className={`inline-flex h-7 w-7 items-center justify-center rounded-md ${device === id ? 'bg-white text-brand-blue-700' : 'text-white/90 hover:bg-white/20'}`}
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-md ${device === id ? 'bg-white text-brand-blue-700' : 'text-white/90 hover:bg-white/20'}`}
               >
                 <Icon className="h-3.5 w-3.5" />
               </button>
@@ -178,7 +181,7 @@ export function ColoredLivePreviewFrame({
             href={liveUrl || url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white hover:bg-white/25"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-white hover:bg-slate-700"
             title="Open in new tab"
           >
             <ExternalLink className="h-4 w-4" />
@@ -189,13 +192,13 @@ export function ColoredLivePreviewFrame({
       {showSiteHealth && list.length > 0 && <SiteHealthStrip targets={list} />}
 
       {showChips && list.length > 0 && (
-        <div className="flex max-h-24 shrink-0 flex-wrap gap-1.5 overflow-y-auto border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-2 py-2">
+        <div className="flex max-h-24 min-w-0 shrink-0 flex-wrap gap-2 overflow-y-auto border-b border-slate-200 bg-white px-3 py-3">
           {list.map((target, i) => (
             <button
               key={`${target.url}-${i}`}
               type="button"
               onClick={() => selectTarget(target, i)}
-              className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 transition ${
+              className={`rounded-full px-3 py-2 text-xs font-semibold ring-1 transition ${
                 activeChip === i ? themeForIndex(i) : 'bg-white text-slate-600 ring-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -206,7 +209,7 @@ export function ColoredLivePreviewFrame({
       )}
 
       <div
-        className="relative min-h-0 flex-1 bg-gradient-to-b from-brand-blue-50/30 via-white to-brand-orange-50/20 p-2"
+        className="relative min-h-0 min-w-0 flex-1 bg-slate-100 p-2"
         style={{ minHeight }}
       >
         <div className="h-full overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-inner ring-1 ring-slate-100">

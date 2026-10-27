@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -34,6 +35,9 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
     const userId = enrollment.user_id || enrollment.student_id;
     const profile: any = learnerById.get(userId);
     if (!profile) continue;
+    // A privileged account can have an enrollment for testing or administration.
+    // Never address learner-completion reminders to staff/admin accounts.
+    if (!['student', 'learner', 'apprentice'].includes(String(profile.role || '').toLowerCase())) continue;
     const incomplete = !profile.onboarding_completed || !enrollment.orientation_completed_at ||
       !enrollment.documents_completed_at || enrollment.agreement_signed !== true || Boolean(enrollment.next_required_action);
     if (!incomplete) continue;
@@ -51,9 +55,9 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
   }
 
   const { data: partners } = await db.from('partners')
-    .select('id,shop_name,name,contact_email,contact_phone,phone,onboarding_completed,onboarding_step')
+    .select('id,shop_name,name,contact_email,contact_phone,phone,onboarding_completed,onboarding_step,documents_verified,mou_signed')
     .eq('status', 'active').eq('approval_status', 'approved').eq('is_active', true)
-    .or('onboarding_completed.is.null,onboarding_completed.eq.false');
+    .or('onboarding_completed.is.null,onboarding_completed.eq.false,documents_verified.is.null,documents_verified.eq.false,mou_signed.is.null,mou_signed.eq.false');
   const partnerIds = (partners || []).map((row: any) => row.id);
   const { data: memberships } = partnerIds.length
     ? await db.from('partner_users').select('partner_id,user_id,status').in('partner_id', partnerIds).in('status', ['active', 'approved'])
@@ -71,9 +75,15 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
       userId: membership?.user_id || null,
       role: 'host_shop',
       name: partner.shop_name || partner.name || profile?.full_name || 'Host Shop',
-      email: profile?.email || partner.contact_email || null,
+      // The approved partner contact is the authoritative organizational destination.
+      // A member profile may belong to a different individual or former shop contact.
+      email: partner.contact_email || null,
       phone: profile?.phone || partner.contact_phone || partner.phone || null,
-      action: String(partner.onboarding_step || 'complete host shop onboarding').replaceAll('_', ' '),
+      action: [
+        ...(partner.mou_signed !== true ? ['sign the host shop agreement'] : []),
+        ...(partner.documents_verified !== true ? ['submit documents for verification'] : []),
+        ...(partner.onboarding_completed !== true ? [String(partner.onboarding_step || 'complete host shop onboarding').replaceAll('_', ' ')] : []),
+      ].join('; '),
       portalUrl: `${APP_URL}/host-shop/dashboard`,
     });
   }
@@ -85,11 +95,11 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
   const { data: holderProfiles } = holderUserIds.length
     ? await db.from('profiles').select('id,role').in('id', holderUserIds)
     : { data: [] };
-  const holderRoleByUser = new Map((holderProfiles || []).map((row: any) => [row.id, String(row.role || '').toLowerCase()]));
+  const holderRoleByUser = new Map<string, string>((holderProfiles || []).map((row: any) => [String(row.id), String(row.role || '').toLowerCase()]));
   const privilegedRoles = new Set(['admin', 'super_admin', 'staff']);
   for (const holder of holders || []) {
     if (holder.welcome_email_sent === true) continue;
-    if (holder.user_id && privilegedRoles.has(holderRoleByUser.get(holder.user_id) || '')) continue;
+    if (holder.user_id && privilegedRoles.has(holderRoleByUser.get(String(holder.user_id)) || '')) continue;
     result.push({
       entityId: holder.id,
       userId: holder.user_id || null,
@@ -123,18 +133,32 @@ async function _GET(req: NextRequest) {
   for (const candidate of candidates) {
     const pref: any = candidate.userId ? prefByUser.get(candidate.userId) : null;
     const templateData = { name: candidate.name, next_action: candidate.action, portal_url: candidate.portalUrl, role: candidate.role };
-    if (candidate.email && pref?.email_deadlines !== false) {
-      const dedupe = `portal-completion:${candidate.role}:email:${slot}`;
-      const { data: prior } = await db.from('notification_outbox').select('id')
-        .eq('entity_id', candidate.entityId).eq('entity_type', dedupe).limit(1).maybeSingle();
-      if (!prior) {
-        const { error } = await db.from('notification_outbox').insert({
-          channel: 'email', to_email: candidate.email,
-          template_key: 'portal_completion_reminder', template_data: templateData,
-          status: 'queued', scheduled_for: new Date().toISOString(),
-          entity_type: dedupe, entity_id: candidate.entityId,
-        });
-        if (!error) emailQueued++;
+    if (candidate.action === 'QA E2E ONLY') continue;
+    if (candidate.email && (!candidate.userId || pref?.email_deadlines !== false)) {
+      // Fail closed on lookup errors; never generate repeated held reminders.
+      const { data: outstanding, error: outstandingError } = await db.from('notification_outbox')
+        .select('id').eq('entity_id', candidate.entityId)
+        .ilike('to_email', candidate.email)
+        .eq('template_key', 'portal_completion_reminder')
+        .contains('template_data', { role: candidate.role, next_action: candidate.action })
+        .in('status', ['queued', 'processing']).limit(1);
+      if (outstandingError) throw outstandingError;
+      if (!outstanding?.length) {
+        // Stable across cron runs. The database unique index resolves racing workers.
+        const key = 'portal-completion:' + createHash('sha256')
+          .update(JSON.stringify([candidate.entityId, candidate.role, 'email', candidate.email.trim().toLowerCase(), candidate.action.trim().toLowerCase()]))
+          .digest('hex');
+        const { data: inserted, error: insertError } = await db.from('notification_outbox')
+          .upsert({
+            channel: 'email', to_email: candidate.email,
+            template_key: 'portal_completion_reminder', template_data: templateData,
+            notification_key: key,
+            status: 'queued', scheduled_for: new Date().toISOString(),
+            entity_type: `portal-completion:${candidate.role}:email:${slot}`, entity_id: candidate.entityId,
+          }, { onConflict: 'notification_key', ignoreDuplicates: true })
+          .select('id');
+        if (insertError) throw insertError;
+        if (inserted?.length) emailQueued++;
       }
     }
     const smsPhone = pref?.sms_phone || candidate.phone;
@@ -153,7 +177,7 @@ async function _GET(req: NextRequest) {
       if (reserveError || !reservation) continue;
 
       const message = `Elevate reminder for ${candidate.name}: please ${candidate.action}. Continue securely at ${candidate.portalUrl}. Reply STOP to opt out.`;
-      const smsResult = await sendSMS(String(smsPhone), message);
+      const smsResult = await sendSMS(smsPhone, message);
       await db.from('notification_outbox').update({
         status: smsResult.success ? 'sent' : 'failed', sent_at: smsResult.success ? new Date().toISOString() : null,
         attempts: 1, last_error: smsResult.success ? null : 'SMS provider rejected this reminder',

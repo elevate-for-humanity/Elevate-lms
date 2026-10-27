@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { getRuntimeReadiness } from '@/lib/health/service-health';
 
 export const runtime = 'nodejs';
@@ -10,7 +11,7 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      service: 'marketing',
+      service: getPublicRuntimeService(),
       ready: readiness.ready,
       status: readiness.ready ? 'ready' : 'not_ready',
       commit: readiness.commit,

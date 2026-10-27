@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronDown, Bell, LogOut, Search, Settings, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, Bell, ClipboardCheck, LogOut, Search, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import LogoImage from '@/components/site/LogoImage';
 import { DEFAULT_NAV, type NavSection } from '@/lib/admin/nav-config';
+import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
 
 export interface AdminNavNotif {
   id: string;
@@ -27,25 +28,21 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + '/');
 }
 
-function isSectionActive(pathname: string, section: NavSection) {
-  return section.items.some((item) => isActive(pathname, item.href));
-}
-
 export default function AdminNav({ userName = 'Admin', notifs = [], navSections }: AdminNavProps) {
   const NAV = navSections ?? DEFAULT_NAV;
   const pathname = usePathname();
   const router = useRouter();
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [navExpanded, setNavExpanded] = useState(false);
-  const navRef = useRef<HTMLDivElement>(null);
+  const currentSection = NAV.find((section) => section.items.some((item) => item.href === pathname))
+    ?? NAV.find((section) => section.items.some((item) => isActive(pathname, item.href)));
+  const [selectedSection, setSelectedSection] = useState(currentSection?.label ?? NAV[0]?.label ?? '');
+  const section = NAV.find((item) => item.label === selectedSection) ?? currentSection ?? NAV[0];
   const notifRef = useRef<HTMLDivElement>(null);
   const unread = notifs.filter((n) => n.unread).length;
 
   useEffect(() => {
     function handle(e: MouseEvent) {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) setOpenDropdown(null);
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
     }
     document.addEventListener('mousedown', handle);
@@ -55,9 +52,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   useEffect(() => {
     function handle(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        setOpenDropdown(null);
         setNotifOpen(false);
-        setNavExpanded(false);
       }
     }
     document.addEventListener('keydown', handle);
@@ -65,9 +60,9 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   }, []);
 
   useEffect(() => {
-    setOpenDropdown(null);
     setNotifOpen(false);
-  }, [pathname]);
+    setSelectedSection(currentSection?.label ?? NAV[0]?.label ?? '');
+  }, [pathname, currentSection?.label, NAV]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -84,10 +79,18 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white pt-[env(safe-area-inset-top)] shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-1 px-2 py-1 sm:gap-2 sm:px-4 lg:px-6">
           {pathname !== '/dashboard' && (
-            <button type="button" onClick={() => router.back()} aria-label="Go back" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) router.back();
+                else router.push('/dashboard');
+              }}
+              aria-label="Go back"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+            >
               <ArrowLeft className="h-5 w-5" />
             </button>
           )}
@@ -98,53 +101,8 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
             </span>
           </Link>
 
-          {/* Desktop Navigation - Horizontal with dropdowns */}
-          <nav
-            ref={navRef}
-            aria-label="Admin section shortcuts"
-            className="hidden 2xl:flex items-center gap-0 flex-1 min-w-0"
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {NAV.map((section) => {
-              const active = isSectionActive(pathname, section);
-              const open = openDropdown === section.label;
-              return (
-                <div key={section.label} className="relative flex-shrink-0 flex items-center">
-                  <Link
-                    href={section.href}
-                    className={`px-3 py-2 rounded-l-lg text-xs font-semibold whitespace-nowrap transition-colors ${active ? 'text-brand-red-700 bg-brand-red-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
-                  >
-                    {section.label}
-                  </Link>
-                  <button
-                    onClick={() => setOpenDropdown(open ? null : section.label)}
-                    aria-label={`Open ${section.label} menu`}
-                    className={`px-1 py-2 rounded-r-lg text-xs transition-colors ${active ? 'text-brand-red-700 bg-brand-red-50' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
-                  >
-                    <ChevronDown
-                      className={`w-2.5 h-2.5 transition-transform ${open ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-                  {open && (
-                    <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-[75vh] overflow-y-auto">
-                      {section.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={`block px-4 py-2 text-sm transition-colors ${isActive(pathname, item.href) ? 'bg-brand-red-50 text-brand-red-700 font-semibold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'}`}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-
           <div className="ml-auto flex items-center gap-1">
-            {/* Core records stay visible at every breakpoint; the full catalog remains in All tools. */}
+            {/* Core records stay visible at every breakpoint; section navigation stays below. */}
             <div className="hidden items-center gap-1 min-[430px]:flex">
               <Link
                 href="/students"
@@ -168,6 +126,18 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </Link>
             </div>
 
+            <a
+              href={APPLICATION_CHECKER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Application Checker (opens private tool in a new tab)"
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-bold text-blue-700 hover:bg-blue-50 sm:px-3 sm:text-sm"
+            >
+              <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="md:hidden">App Checker</span>
+              <span className="hidden md:inline">Application Checker</span>
+            </a>
+
             {/* Search */}
             <form
               onSubmit={handleSearch}
@@ -188,7 +158,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               <button
                 onClick={() => setNotifOpen((v) => !v)}
                 aria-label="Notifications"
-                className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                className="relative w-11 h-11 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
               >
                 <Bell className="w-4 h-4" />
                 {unread > 0 && (
@@ -196,7 +166,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 )}
               </button>
               {notifOpen && (
-                <div className="fixed inset-x-2 top-14 mt-2 max-h-[calc(100dvh-4.5rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:w-80">
+                <div className="fixed inset-x-2 top-[calc(3.5rem+env(safe-area-inset-top))] mt-2 max-h-[calc(100dvh-4.5rem-env(safe-area-inset-top))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:w-80">
                   <div className="flex items-center justify-between px-4 py-3 border-b">
                     <p className="text-sm font-bold text-slate-900">Notifications</p>
                     <Link href="/notifications" className="text-xs font-semibold text-blue-600">
@@ -242,6 +212,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </Link>
               <span className="hidden px-1 text-sm text-slate-700 2xl:block">{userName}</span>
               <button
+                aria-label="Sign out"
                 onClick={signOut}
                 className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-600 hover:bg-red-50"
               >
@@ -249,57 +220,35 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </button>
             </div>
 
-            {/* Complete navigation catalog */}
-            <button
-              type="button"
-              onClick={() => setNavExpanded(!navExpanded)}
-              aria-expanded={navExpanded}
-              aria-controls="admin-all-tools-menu"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 sm:px-3 sm:text-sm 2xl:hidden"
-            >
-              {navExpanded ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              <span className="sm:hidden">Tools</span>
-              <span className="hidden sm:inline">All tools</span>
-            </button>
           </div>
         </div>
 
-        {/* Horizontal Mobile Nav - Scrollable */}
-        <div
-          id="admin-all-tools-menu"
-          className={`overflow-hidden border-t border-slate-200 transition-all duration-300 2xl:hidden ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}
-        >
-          <div className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain px-2 py-3 sm:px-4">
-            <div className="grid gap-2 sm:grid-cols-2">
-              {NAV.map((section) => (
-                <details
-                  key={section.label}
-                  className="rounded-lg border border-slate-200 bg-white"
-                  open={isSectionActive(pathname, section)}
-                >
-                  <summary
-                    className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-bold ${isSectionActive(pathname, section) ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-800'}`}
-                  >
-                    {section.label}
-                    <ChevronDown className="h-4 w-4" />
-                  </summary>
-                  <div className="border-t border-slate-100 p-1.5">
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setNavExpanded(false)}
-                        className={`block min-h-11 rounded-md px-3 py-2.5 text-sm ${isActive(pathname, item.href) ? 'bg-brand-red-50 font-semibold text-brand-red-700' : 'text-slate-700 hover:bg-slate-50'}`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </div>
+        <nav aria-label="Admin workspace" className="grid min-w-0 grid-cols-2 gap-2 border-t border-slate-200 bg-slate-50 px-2 py-2 sm:flex sm:items-center sm:px-4 lg:px-6">
+          <label className="min-w-0 sm:w-48">
+            <span className="sr-only">Admin section</span>
+            <select
+              aria-label="Admin section"
+              value={section?.label ?? ''}
+              onChange={(event) => setSelectedSection(event.target.value)}
+              className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
+            >
+              {NAV.map((item) => <option key={item.label} value={item.label}>{item.label}</option>)}
+            </select>
+          </label>
+          <label className="min-w-0 sm:w-80">
+            <span className="sr-only">Admin page</span>
+            <select
+              aria-label="Admin page"
+              value={section?.items.find((item) => item.href === pathname)?.href
+                ?? section?.items.find((item) => isActive(pathname, item.href))?.href ?? ''}
+              onChange={(event) => { if (event.target.value) router.push(event.target.value); }}
+              className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
+            >
+              <option value="" disabled>Choose a page</option>
+              {section?.items.map((item) => <option key={item.href} value={item.href}>{item.label}</option>)}
+            </select>
+          </label>
+        </nav>
       </header>
 
       <style jsx>{`

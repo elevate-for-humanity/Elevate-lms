@@ -10,6 +10,8 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin']);
+const MAX_SYLLABUS_BYTES = 10 * 1024 * 1024;
+const MAX_EXTRACTED_CHARS = 250_000;
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -60,6 +62,9 @@ export async function POST(req: NextRequest) {
       const prompt = form.get('prompt') as string | null;
 
       if (file) {
+        if (!(file instanceof File) || file.size === 0 || file.size > MAX_SYLLABUS_BYTES) {
+          return NextResponse.json({ error: 'Syllabus file must be nonempty and 10 MB or smaller' }, { status: 413 });
+        }
         const buffer = Buffer.from(await file.arrayBuffer());
         const name = file.name.toLowerCase();
         let rawText = '';
@@ -68,16 +73,22 @@ export async function POST(req: NextRequest) {
         if (name.endsWith('.pdf')) {
           rawText = await extractPdf(buffer);
           inputType = 'pdf';
-        } else if (name.endsWith('.docx') || name.endsWith('.doc')) {
+        } else if (name.endsWith('.docx')) {
           rawText = await extractDocx(buffer);
           inputType = 'docx';
+        } else if (name.endsWith('.txt')) {
+          rawText = new TextDecoder('utf-8', { fatal: true }).decode(buffer).trim();
+          inputType = 'txt';
         } else {
           return NextResponse.json(
-            { error: 'Unsupported file type. Upload a PDF or DOCX.' },
+            { error: 'Unsupported file type. Upload a PDF, DOCX, or TXT.' },
             { status: 400 },
           );
         }
 
+        if (rawText.length > MAX_EXTRACTED_CHARS) {
+          return NextResponse.json({ error: 'Extracted syllabus exceeds 250,000 characters' }, { status: 413 });
+        }
         if (!rawText) {
           return NextResponse.json(
             { error: 'Could not extract text from file. Try pasting the content instead.' },
@@ -91,7 +102,7 @@ export async function POST(req: NextRequest) {
           chars: rawText.length,
         });
 
-        return NextResponse.json({ raw_text: rawText, input_type: inputType });
+        return NextResponse.json({ raw_text: rawText, input_type: inputType, filename: file.name }, { headers: { 'Cache-Control': 'private, no-store' } });
       }
 
       if (text?.trim()) {

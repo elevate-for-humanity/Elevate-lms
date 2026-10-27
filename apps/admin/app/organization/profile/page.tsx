@@ -51,7 +51,7 @@ export default function OrganizationProfilePage() {
                 <Phone className="w-5 h-5 text-slate-400 mt-0.5" />
                 <div>
                   <dt className="text-sm text-slate-500">Phone</dt>
-                  <dd className="font-medium">(317) 314-3757</dd>
+                  <dd className="font-medium">(463) 240-1404</dd>
                 </div>
               </div>
               <div className="flex items-start gap-3">

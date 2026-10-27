@@ -1,2 +1,4 @@
-2026-09-27 production deploy checkpoint
-Amanda apprentice access + dashboard readiness follow-up; deploy current main
+Marketing deployment trigger
+Target: current main
+Reason: deploy responsive homepage media and hardened production verification
+Timestamp marker: 2026-10-02T17:17:00-04:00

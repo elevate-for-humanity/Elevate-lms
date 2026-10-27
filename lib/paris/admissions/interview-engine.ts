@@ -1,3 +1,4 @@
+import { apprenticeshipPaymentError } from '@/lib/programs/apprenticeship-payment-policy';
 export type ApplicationInterviewLocale = 'en' | 'es';
 
 export type ApplicationInterviewField =
@@ -16,6 +17,11 @@ export type ApplicationInterviewField =
   | 'fundingSource'
   | 'hasWorkOneReferral'
   | 'workoneCenter'
+  | 'workoneAppointmentStatus'
+  | 'workoneFundingStatus'
+  | 'workoneNextStep'
+  | 'workoneBarriers'
+  | 'selfPayPreference'
   | 'employmentStatus'
   | 'currentEmployer'
   | 'highestEducation'
@@ -67,20 +73,37 @@ const TEXT = {
     fundingSource: 'How are you planning to pay for training?',
     hasWorkOneReferral: 'Have you already started the WorkOne referral or intake process?',
     workoneCenter: 'Which WorkOne office or workforce center are you working with?',
+    workoneAppointmentStatus:
+      'Have you scheduled or attended a WorkOne appointment? Tell us the date, or say not started.',
+    workoneFundingStatus:
+      'Is your WorkOne funding approved, denied, pending, or not yet requested?',
+    workoneNextStep:
+      'What remains in your WorkOne process? If denied, what reason were you given? You can say none.',
+    workoneBarriers:
+      'What is stopping you from completing WorkOne—for example transportation, scheduling, missing documents, or reaching your navigator? You can say none.',
+    selfPayPreference:
+      'If funding is unavailable, could you pay in full, would you need payment arrangements, or are you unable to self-pay? Financing availability and approval must be confirmed before payment.',
     employmentStatus: 'What is your current employment status?',
-    currentEmployer: 'Who is your current employer? You can say “none” if you are not currently employed.',
+    currentEmployer:
+      'Who is your current employer? You can say “none” if you are not currently employed.',
     highestEducation: 'What is the highest level of education you completed?',
-    modalityPreference: 'Do you prefer in-person, virtual, or hybrid training when the program allows it?',
+    modalityPreference:
+      'Do you prefer in-person, virtual, or hybrid training when the program allows it?',
     hasHostShop: 'Do you already have a host shop or employer for this apprenticeship?',
     hostShopName: 'What is the name of the host shop or employer?',
-    transferHours: 'Are you requesting credit for prior apprenticeship hours? If yes, tell me how many hours you are claiming.',
+    transferHours:
+      'Are you requesting credit for prior apprenticeship hours? If yes, tell me how many hours you are claiming.',
     transportationNeeds: 'Would transportation support help you participate in training?',
     childcareNeeds: 'Would childcare support help you participate in training?',
     supportNeeds: 'Is there any other support you want the admissions team to know you may need?',
-    applicationCertification: 'Before submission, do you certify that the information you provided is true and complete to the best of your knowledge and understand that supporting information may be verified?',
-    fundingHelp: 'Submitting this application does not guarantee workforce funding. WorkOne or the responsible funding agency determines participant eligibility and authorization.',
-    transferHelp: 'Claimed transfer hours require supporting evidence and sponsor review before any hours are credited.',
-    certificationHelp: 'Your confirmation is recorded with this application. It is not reused as a signature for any separate agreement that requires its own review and signature.',
+    applicationCertification:
+      'Before submission, do you certify that the information you provided is true and complete to the best of your knowledge and understand that supporting information may be verified?',
+    fundingHelp:
+      'Submitting this application does not guarantee workforce funding. WorkOne or the responsible funding agency determines participant eligibility and authorization.',
+    transferHelp:
+      'Claimed transfer hours require supporting evidence and sponsor review before any hours are credited.',
+    certificationHelp:
+      'Your confirmation is recorded with this application. It is not reused as a signature for any separate agreement that requires its own review and signature.',
   },
   es: {
     firstName: '¿Cuál es su nombre legal?',
@@ -98,20 +121,38 @@ const TEXT = {
     fundingSource: '¿Cómo planea pagar la capacitación?',
     hasWorkOneReferral: '¿Ya comenzó el proceso de referido o admisión con WorkOne?',
     workoneCenter: '¿Con qué oficina de WorkOne o centro de fuerza laboral está trabajando?',
+    workoneAppointmentStatus:
+      '¿Programó o asistió a una cita de WorkOne? Indique la fecha o diga que no ha comenzado.',
+    workoneFundingStatus:
+      '¿Su financiamiento de WorkOne está aprobado, denegado, pendiente o aún no solicitado?',
+    workoneNextStep:
+      '¿Qué falta en su proceso de WorkOne? Si fue denegado, ¿qué motivo le dieron? Puede decir ninguno.',
+    workoneBarriers:
+      '¿Qué le impide completar WorkOne: transporte, horario, documentos o contactar a su asesor? Puede decir ninguno.',
+    selfPayPreference:
+      'Si no hay financiamiento, ¿podría pagar todo, necesita un plan de pagos o no puede pagar? La disponibilidad y aprobación deben confirmarse antes de pagar.',
     employmentStatus: '¿Cuál es su situación laboral actual?',
-    currentEmployer: '¿Quién es su empleador actual? Puede decir “ninguno” si no trabaja actualmente.',
+    currentEmployer:
+      '¿Quién es su empleador actual? Puede decir “ninguno” si no trabaja actualmente.',
     highestEducation: '¿Cuál es el nivel educativo más alto que completó?',
-    modalityPreference: '¿Prefiere capacitación presencial, virtual o híbrida cuando el programa lo permite?',
+    modalityPreference:
+      '¿Prefiere capacitación presencial, virtual o híbrida cuando el programa lo permite?',
     hasHostShop: '¿Ya tiene un salón anfitrión o empleador para este aprendizaje?',
     hostShopName: '¿Cuál es el nombre del salón anfitrión o empleador?',
-    transferHours: '¿Solicita crédito por horas previas de aprendizaje? Si es así, indique cuántas horas reclama.',
+    transferHours:
+      '¿Solicita crédito por horas previas de aprendizaje? Si es así, indique cuántas horas reclama.',
     transportationNeeds: '¿El apoyo de transporte le ayudaría a participar en la capacitación?',
     childcareNeeds: '¿El apoyo de cuidado infantil le ayudaría a participar en la capacitación?',
-    supportNeeds: '¿Hay algún otro apoyo que quiera que el equipo de admisiones sepa que podría necesitar?',
-    applicationCertification: 'Antes de enviar, ¿certifica que la información proporcionada es verdadera y completa según su leal saber y entender y comprende que la información de respaldo puede verificarse?',
-    fundingHelp: 'Enviar esta solicitud no garantiza financiamiento laboral. WorkOne o la agencia responsable determina la elegibilidad y autorización del participante.',
-    transferHelp: 'Las horas de transferencia reclamadas requieren evidencia y revisión del patrocinador antes de que se acrediten.',
-    certificationHelp: 'Su confirmación queda registrada con esta solicitud. No se reutiliza como firma para acuerdos separados que requieran su propia revisión y firma.',
+    supportNeeds:
+      '¿Hay algún otro apoyo que quiera que el equipo de admisiones sepa que podría necesitar?',
+    applicationCertification:
+      'Antes de enviar, ¿certifica que la información proporcionada es verdadera y completa según su leal saber y entender y comprende que la información de respaldo puede verificarse?',
+    fundingHelp:
+      'Enviar esta solicitud no garantiza financiamiento laboral. WorkOne o la agencia responsable determina la elegibilidad y autorización del participante.',
+    transferHelp:
+      'Las horas de transferencia reclamadas requieren evidencia y revisión del patrocinador antes de que se acrediten.',
+    certificationHelp:
+      'Su confirmación queda registrada con esta solicitud. No se reutiliza como firma para acuerdos separados que requieran su propia revisión y firma.',
   },
 } as const;
 
@@ -167,10 +208,23 @@ export function claimedTransferHours(value: string | undefined): number {
   return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
 }
 
-export function getRequiredInterviewFields(answers: ApplicationInterviewAnswers): ApplicationInterviewField[] {
+export function getRequiredInterviewFields(
+  answers: ApplicationInterviewAnswers,
+): ApplicationInterviewField[] {
   const fields = [...BASE_REQUIRED];
-  if (requiresWorkOne(answers.fundingSource)) {
+  if (!isApprenticeshipProgram(answers.program) && requiresWorkOne(answers.fundingSource)) {
     fields.push('hasWorkOneReferral');
+    if (normalized(answers.hasWorkOneReferral) === 'yes') fields.push('workoneCenter');
+  }
+  if (/cdl|truck/i.test(answers.program || '')) {
+    fields.push(
+      'hasWorkOneReferral',
+      'workoneAppointmentStatus',
+      'workoneFundingStatus',
+      'workoneNextStep',
+      'workoneBarriers',
+      'selfPayPreference',
+    );
     if (normalized(answers.hasWorkOneReferral) === 'yes') fields.push('workoneCenter');
   }
   if (isApprenticeshipProgram(answers.program)) {
@@ -184,14 +238,18 @@ export function calculateApplicationInterviewProgress(state: ApplicationIntervie
   const required = getRequiredInterviewFields(state.answers);
   const complete = required.filter((field) => {
     const value = state.answers[field];
-    return Boolean(value?.trim()) && (!CRITICAL_FIELDS.has(field) || state.confirmed.includes(field));
+    return (
+      Boolean(value?.trim()) &&
+      !(field === 'fundingSource' && apprenticeshipPaymentError(state.answers.program, value)) &&
+      (!CRITICAL_FIELDS.has(field) || state.confirmed.includes(field))
+    );
   });
   const missing = required.filter((field) => !complete.includes(field));
   const percent = required.length ? Math.round((complete.length / required.length) * 100) : 0;
   return { percent, required, complete, missing };
 }
 
-function questionOptions(field: ApplicationInterviewField, locale: ApplicationInterviewLocale) {
+function questionOptions(field: ApplicationInterviewField, locale: ApplicationInterviewLocale, answers: ApplicationInterviewAnswers) {
   const es = locale === 'es';
   switch (field) {
     case 'preferredContact':
@@ -201,6 +259,7 @@ function questionOptions(field: ApplicationInterviewField, locale: ApplicationIn
         { value: 'email', label: es ? 'Correo electrónico' : 'Email' },
       ];
     case 'fundingSource':
+      if (isApprenticeshipProgram(answers.program)) return [{ value: 'self_pay', label: es ? 'Pago personal solamente' : 'Self-pay only' }];
       return [
         { value: 'wioa', label: 'WIOA / WorkOne' },
         { value: 'wrg', label: 'Workforce Ready Grant' },
@@ -238,7 +297,9 @@ function questionOptions(field: ApplicationInterviewField, locale: ApplicationIn
   }
 }
 
-export function getNextApplicationInterviewQuestion(state: ApplicationInterviewState): ApplicationInterviewQuestion | null {
+export function getNextApplicationInterviewQuestion(
+  state: ApplicationInterviewState,
+): ApplicationInterviewQuestion | null {
   if (state.pendingConfirmation) {
     return {
       field: state.pendingConfirmation.field,
@@ -256,12 +317,17 @@ export function getNextApplicationInterviewQuestion(state: ApplicationInterviewS
   }
 
   const required = getRequiredInterviewFields(state.answers);
-  const next = required.find((field) => !state.answers[field]?.trim() || (CRITICAL_FIELDS.has(field) && !state.confirmed.includes(field)));
+  const next = required.find(
+    (field) =>
+      !state.answers[field]?.trim() ||
+      (field === 'fundingSource' && Boolean(apprenticeshipPaymentError(state.answers.program, state.answers.fundingSource))) ||
+      (CRITICAL_FIELDS.has(field) && !state.confirmed.includes(field)),
+  );
   if (!next) return null;
 
   const help =
     next === 'fundingSource'
-      ? TEXT[state.locale].fundingHelp
+      ? isApprenticeshipProgram(state.answers.program) ? state.locale === 'es' ? 'La matrícula del aprendizaje se paga por cuenta propia. Revise el precio y las condiciones de pago antes de inscribirse.' : 'Apprenticeship tuition is self-pay only. Review the published tuition and payment terms before enrollment.' : TEXT[state.locale].fundingHelp
       : next === 'transferHours'
         ? TEXT[state.locale].transferHelp
         : next === 'applicationCertification'
@@ -274,7 +340,7 @@ export function getNextApplicationInterviewQuestion(state: ApplicationInterviewS
     help,
     required: true,
     critical: CRITICAL_FIELDS.has(next),
-    options: questionOptions(next, state.locale),
+    options: questionOptions(next, state.locale, state.answers),
   };
 }
 
@@ -286,6 +352,7 @@ export function applyInterviewAnswer(
 ): ApplicationInterviewState {
   const value = rawValue.trim();
   if (!value) return state;
+  if (field === 'fundingSource' && apprenticeshipPaymentError(state.answers.program, value)) return { ...state, answers: { ...state.answers, fundingSource: '' }, confirmed: state.confirmed.filter((item) => item !== 'fundingSource'), pendingConfirmation: null, lastQuestionField: field };
 
   if (field === 'applicationCertification' && normalized(value) !== 'yes') {
     return {
@@ -316,18 +383,33 @@ export function applyInterviewAnswer(
   };
 }
 
-export function confirmPendingInterviewAnswer(state: ApplicationInterviewState): ApplicationInterviewState {
+export function confirmPendingInterviewAnswer(
+  state: ApplicationInterviewState,
+): ApplicationInterviewState {
   const pending = state.pendingConfirmation;
   if (!pending) return state;
-  return applyInterviewAnswer({ ...state, pendingConfirmation: null }, pending.field, pending.value, true);
+  return applyInterviewAnswer(
+    { ...state, pendingConfirmation: null },
+    pending.field,
+    pending.value,
+    true,
+  );
 }
 
-export function changePendingInterviewAnswer(state: ApplicationInterviewState): ApplicationInterviewState {
+export function changePendingInterviewAnswer(
+  state: ApplicationInterviewState,
+): ApplicationInterviewState {
   if (!state.pendingConfirmation) return state;
-  return { ...state, pendingConfirmation: null, lastQuestionField: state.pendingConfirmation.field };
+  return {
+    ...state,
+    pendingConfirmation: null,
+    lastQuestionField: state.pendingConfirmation.field,
+  };
 }
 
-export function createApplicationInterviewState(locale: ApplicationInterviewLocale = 'en'): ApplicationInterviewState {
+export function createApplicationInterviewState(
+  locale: ApplicationInterviewLocale = 'en',
+): ApplicationInterviewState {
   return { locale, answers: {}, confirmed: [], pendingConfirmation: null, lastQuestionField: null };
 }
 
@@ -344,7 +426,7 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
   const a = state.answers;
   const transferHours = claimedTransferHours(a.transferHours);
   const apprenticeship = isApprenticeshipProgram(a.program);
-  const workOne = requiresWorkOne(a.fundingSource);
+  const workOne = !apprenticeship && requiresWorkOne(a.fundingSource);
   const hasWorkOneReferral = normalized(a.hasWorkOneReferral);
   const needsWorkOneAppointment = workOne && hasWorkOneReferral === 'no';
   return {
@@ -362,12 +444,16 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
     program: a.program,
     programSlug: a.program,
     goals: a.goals,
-    fundingType: a.fundingSource,
-    funding: a.fundingSource,
+    fundingType: apprenticeship ? 'self_pay' : a.fundingSource,
+    funding: apprenticeship ? 'self_pay' : a.fundingSource,
     fundingEligibilityStatus: needsWorkOneAppointment ? 'needs_appointment' : undefined,
     hasWorkOneReferral: workOne ? a.hasWorkOneReferral : undefined,
     workoneCenter: workOne ? a.workoneCenter : undefined,
-    workoneIntakeCompleted: workOne ? (hasWorkOneReferral === 'yes' ? 'in_process' : 'not_started') : undefined,
+    workoneIntakeCompleted: workOne
+      ? hasWorkOneReferral === 'yes'
+        ? 'in_process'
+        : 'not_started'
+      : undefined,
     employmentStatus: a.employmentStatus,
     currentEmployer: a.currentEmployer,
     highestEducation: a.highestEducation,
@@ -377,7 +463,22 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
     transferHours: apprenticeship ? String(transferHours) : '0',
     transportationNeeds: a.transportationNeeds,
     childcareNeeds: a.childcareNeeds,
-    supportNeeds: a.supportNeeds,
+    supportNeeds: [
+      a.supportNeeds,
+      ...(
+        [
+          'workoneAppointmentStatus',
+          'workoneFundingStatus',
+          'workoneNextStep',
+          'workoneBarriers',
+          'selfPayPreference',
+        ] as const
+      )
+        .filter((field) => a[field])
+        .map((field) => `${field}: ${a[field]}`),
+    ]
+      .filter(Boolean)
+      .join('\n'),
     preferredLanguage: state.locale,
     source: 'paris-application-interview',
     applicationCertification: true,

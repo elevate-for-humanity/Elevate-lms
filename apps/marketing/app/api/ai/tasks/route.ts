@@ -5,11 +5,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { getTaskOrchestrator } from '@/lib/ai/task-orchestrator';
 import { AIAgent, TaskStatus, AgentIntent, TaskPriority } from '@/lib/ai/types';
 
 export async function GET(request: NextRequest) {
   try {
+    await apiRequireDevStudio(request);
     const { searchParams } = new URL(request.url);
     const orchestrator = getTaskOrchestrator();
 

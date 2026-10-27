@@ -1,7 +1,8 @@
 // pre-auth-registry: exempt - requireProgramHolder validates the sender and holder-scoped enrollment.
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { smsService } from '@/lib/notifications/sms';
 
 export async function POST(request: Request) {
   const ctx = await requireProgramHolder();
@@ -35,54 +36,36 @@ export async function POST(request: Request) {
       { status: 404 },
     );
 
-  await hydrateProcessEnv();
-  let response: Response;
+  let sent = false;
   if (channel === 'email') {
     if (!student.email)
       return NextResponse.json(
         { error: 'This student has no email address on file.' },
         { status: 400 },
       );
-    const key = process.env.SENDGRID_API_KEY;
-    if (!key)
-      return NextResponse.json({ error: 'Email delivery is not configured.' }, { status: 503 });
-    response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: student.email }] }],
-        from: { email: 'info@elevateforhumanity.org', name: 'Elevate for Humanity' },
-        reply_to: { email: ctx.profile.email || 'elevate4humanityedu@gmail.com' },
-        subject: subject || 'Message from your Program Holder',
-        content: [{ type: 'text/plain', value: message }],
-      }),
+    const result = await sendEmail({
+      to: student.email,
+      replyTo: ctx.profile.email || undefined,
+      subject: subject || 'Message from your Program Holder',
+      text: message,
+      html: `<p>${message.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('\n', '<br />')}</p>`,
     });
+    sent = result.success;
   } else {
     if (!student.phone)
       return NextResponse.json(
         { error: 'This student has no mobile number on file.' },
         { status: 400 },
       );
-    const sid = process.env.TWILIO_ACCOUNT_SID;
-    const token = process.env.TWILIO_AUTH_TOKEN;
-    const from = process.env.TWILIO_PHONE_NUMBER;
-    if (!sid || !token || !from)
-      return NextResponse.json(
-        { error: 'Text-message delivery is not configured.' },
-        { status: 503 },
-      );
-    const form = new URLSearchParams({ To: student.phone, From: from, Body: message });
-    response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString('base64')}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: form.toString(),
-    });
+    if (body.consentConfirmed !== true)
+      return NextResponse.json({ error: 'Confirm that this student consented to operational texts.' }, { status: 400 });
+    const result = await smsService.send({ to: student.phone, message, metadata: {
+      source: 'program_holder_student_communications', enrollment_id: enrollmentId,
+      sent_by_user_id: ctx.user.id, consent_confirmed: true,
+    } });
+    sent = result.success;
   }
 
-  const sent = response.ok;
   await ctx.db.from('communications').insert({
     sender_id: ctx.user.id,
     recipient_id: student.user_id,
@@ -90,11 +73,12 @@ export async function POST(request: Request) {
     body: message,
     type: channel,
     status: sent ? 'sent' : 'failed',
-    sent_at: sent ? new Date().toISOString() : null,
+    sent_at: sent && channel === 'email' ? new Date().toISOString() : null,
     metadata: {
       program_holder_id: ctx.holderId,
       enrollment_id: student.id,
       recipient_name: student.full_name,
+      delivery: channel === 'sms' && sent ? 'provider_accepted' : undefined,
     },
   });
   if (!sent)
@@ -102,5 +86,5 @@ export async function POST(request: Request) {
       { error: `${channel === 'email' ? 'Email' : 'Text message'} could not be delivered.` },
       { status: 502 },
     );
-  return NextResponse.json({ ok: true, channel, student: student.full_name });
+  return NextResponse.json({ ok: true, channel, student: student.full_name, delivery: channel === 'sms' ? 'queued' : 'sent' });
 }

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import CoursePracticalReviewQueue from '@/components/lms/CoursePracticalReviewQueue';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -82,7 +83,7 @@ export default async function InstructorSubmissionsPage({
   const filterCompetency = params.competency === '1';
 
   // Fetch submissions assigned to this instructor (or all, for admin)
-  const isAdmin = profile.role === 'admin' || profile.role === 'admin';
+  const isAdmin = ['admin', 'super_admin'].includes(profile.role);
 
   let query = supabase
     .from('step_submissions')
@@ -100,8 +101,7 @@ export default async function InstructorSubmissionsPage({
       reviewed_at,
       created_at,
       competency_key,
-      profiles!step_submissions_user_id_fkey ( full_name, email ),
-      course_lessons!step_submissions_course_lesson_id_fkey ( title, slug )
+      course_lessons!fk_step_submissions_course_lesson ( title, slug )
     `,
     )
     .order('created_at', { ascending: false })
@@ -116,11 +116,21 @@ export default async function InstructorSubmissionsPage({
   if (filterCourse) query = query.eq('course_id', filterCourse);
   if (filterCompetency) query = query.not('competency_key', 'is', null);
 
-  const { data: submissions, error } = await query;
+  const { data: submissionRows, error } = await query;
+  // user_id references auth.users, not profiles. Resolve display identities
+  // explicitly rather than asking PostgREST for a nonexistent relationship.
+  const userIds = [...new Set((submissionRows ?? []).map((row) => row.user_id))];
+  const { data: profiles, error: profilesError } = userIds.length
+    ? await supabase.from('profiles').select('id,full_name,email').in('id', userIds)
+    : { data: [], error: null };
+  const profilesById = new Map((profiles ?? []).map((row) => [row.id, row]));
+  const submissions = (submissionRows ?? []).map((row) => ({
+    ...row, profiles: profilesById.get(row.user_id) ?? null,
+  }));
 
-  if (error) {
+  if (error || profilesError) {
     return (
-      <div className="p-8 text-red-600 text-sm">Failed to load submissions. Please try again.</div>
+      <div className="p-8"><p role="alert" className="text-red-600 text-sm">Failed to load assignment submissions. Please try again.</p><CoursePracticalReviewQueue /></div>
     );
   }
 
@@ -190,6 +200,7 @@ export default async function InstructorSubmissionsPage({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <CoursePracticalReviewQueue />
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>

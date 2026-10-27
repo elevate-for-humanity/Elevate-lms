@@ -94,7 +94,7 @@ export default async function StaffPortalLanding() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 mx-auto flex w-full max-w-6xl flex-col justify-end px-6 pb-8">
+        <div className="absolute inset-0 mx-auto flex w-full max-w-6xl bg-white/95 flex-col justify-end px-6 pb-8">
           <h1 className="mb-1 text-3xl font-bold text-slate-900">
             {user && profile?.full_name
               ? `Welcome, ${profile.full_name.split(' ')[0]}`

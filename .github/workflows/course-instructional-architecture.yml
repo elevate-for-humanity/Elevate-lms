@@ -1,0 +1,70 @@
+name: Course instructional architecture acceptance
+on:
+  pull_request:
+    paths:
+      - 'lib/ultimate-course-builder/**'
+      - 'lib/storage/lesson-playback.ts'
+      - 'apps/lms/app/api/courses/**/playback/**'
+      - 'tests/integration/google-lesson-author.test.ts'
+      - 'Dockerfile.ultimate-worker'
+      - '.dockerignore'
+      - 'remotion-src/**'
+      - 'lib/video/remotion-render.ts'
+      - 'scripts/gcp/render-course-layout-acceptance.mjs'
+      - 'scripts/gcp/audit-course-storage.ts'
+      - '.github/workflows/course-instructional-architecture.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: course-architecture-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  standalone-worker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify worker control and delivery contracts
+        run: node --test workers/worker-loop.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs workers/ultimate-progress-lease.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
+      # Pull requests cannot safely receive credentials to pull a private
+      # Artifact Registry base image. PRs still run the independent source tests;
+      # the container acceptance runs only on trusted main dispatch.
+      - name: Authenticate private worker image on trusted main
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+      - name: Configure Artifact Registry Docker authentication
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+      - name: Build and test the exact standalone course image
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        run: docker build -f Dockerfile.ultimate-worker -t elevate-course-architecture:${{ github.sha }} .
+      - name: Verify storage recovery audit fails closed without exposing configuration
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        run: |
+          printf '%s' '{"runtimeEnvironment":{"ELEVATE_MEDIA_ACCESS_KEY_ID":"probe-id","ELEVATE_MEDIA_SECRET_ACCESS_KEY":"probe-secret"}}' | docker run --rm -i --entrypoint node -v "$PWD/scripts/gcp/audit-course-storage.ts:/app/scripts/gcp/audit-course-storage.ts:ro" elevate-course-architecture:${{ github.sha }} --import=tsx /app/scripts/gcp/audit-course-storage.ts > /tmp/storage-audit-smoke.json
+          node -e "const fs=require('node:fs');const text=fs.readFileSync('/tmp/storage-audit-smoke.json','utf8');const result=JSON.parse(text);if(result.status!=='target_connection_unavailable'||text.includes('probe-secret'))throw new Error('Storage audit safety contract failed')"
+      - name: Render desktop and mobile teaching states with the production compositor
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p layout-acceptance
+          docker run --rm --entrypoint node -v "$PWD/layout-acceptance:/tmp/render-acceptance" -v "$PWD/scripts/gcp/render-course-layout-acceptance.mjs:/app/render-course-layout-acceptance.mjs:ro" elevate-course-architecture:${{ github.sha }} /app/render-course-layout-acceptance.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: course-layout-regression
+          path: layout-acceptance/

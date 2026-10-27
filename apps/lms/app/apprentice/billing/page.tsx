@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import BillingCard, { type BillingSummary } from '@/components/learner/BillingCard';
+import { AffirmInvoiceButton } from '@/components/payments/AffirmInvoiceButton';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { APPRENTICE_PORTAL_CONFIGS } from '@/components/portal/ApprenticePortalShell';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
@@ -12,6 +13,11 @@ import {
   getApprenticeBillingAccess,
   type ApprenticeDashboardInvoice,
 } from '@/lib/billing/apprentice-invoice-batch';
+import {
+  loadLearnerBillingRequirement,
+  type LearnerBillingRequirement,
+} from '@/lib/billing/learner-billing-requirement';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
 export const metadata: Metadata = {
   title: 'Billing | Apprentice Portal',
@@ -71,7 +77,17 @@ function summary(
   };
 }
 
-function BillingFallback({ portalPath, message }: { portalPath: string; message: string }) {
+function BillingFallback({
+  portalPath,
+  message,
+  requirement,
+  readOnly,
+}: {
+  portalPath: string;
+  message: string;
+  requirement: LearnerBillingRequirement;
+  readOnly: boolean;
+}) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       <Link
@@ -80,6 +96,7 @@ function BillingFallback({ portalPath, message }: { portalPath: string; message:
       >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
+      <MandatoryBillingSetup requirement={requirement} readOnly={readOnly} />
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
         <div className="flex gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
@@ -94,7 +111,13 @@ function BillingFallback({ portalPath, message }: { portalPath: string; message:
   );
 }
 
-function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] }) {
+function InvoiceLedger({
+  invoices,
+  readOnly,
+}: {
+  invoices: ApprenticeDashboardInvoice[];
+  readOnly: boolean;
+}) {
   const openStatuses = new Set(['draft', 'open', 'past_due', 'unpaid', 'pending']);
   const open = invoices.filter((invoice) => openStatuses.has(invoice.status.toLowerCase()));
   if (!invoices.length) return null;
@@ -118,7 +141,7 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
                   Due {invoice.dueDate || 'now'} · {invoice.status.replace(/_/g, ' ')}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center justify-end gap-3">
                 <span className="text-lg font-black text-slate-950">
                   ${(invoice.amountCents / 100).toFixed(2)}
                 </span>
@@ -132,6 +155,11 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
                     Pay now
                   </a>
                 ) : null}
+                {['open', 'past_due'].includes(invoice.status.toLowerCase()) &&
+                invoice.amountCents >= 5_000 &&
+                invoice.amountCents <= 3_000_000 ? (
+                  <AffirmInvoiceButton billingInvoiceId={invoice.id} disabled={readOnly} />
+                ) : null}
               </div>
             </div>
           ))}
@@ -141,10 +169,15 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
       )}
       {open.length ? (
         <div className="m-5 rounded-lg border-2 border-red-300 bg-red-50 p-4 text-sm text-red-900">
-          <strong>Account access warning:</strong> If an invoice remains unpaid after its due date,
-          your course account will be suspended, active sessions will be signed out, and you will
-          not be able to sign in again until every past-due invoice is paid.
+          <strong>Payment reminder:</strong> Review each invoice due date and payment link. Your
+          apprentice portal remains available while billing is resolved.
         </div>
+      ) : null}
+      {open.length ? (
+        <p className="px-5 pb-5 text-xs leading-5 text-slate-600">
+          Affirm is a separate financing application. Eligibility, APR, and payment terms are
+          determined by Affirm; checking eligibility does not change the invoice amount.
+        </p>
       ) : null}
     </section>
   );
@@ -153,17 +186,15 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
 function SubscriptionBilling({
   billing,
   portalPath,
-  needsBillingAgreement,
-  billingApprovalUrl,
   previewing,
   invoices,
+  requirement,
 }: {
   billing: BillingSummary;
   portalPath: string;
-  needsBillingAgreement: boolean;
-  billingApprovalUrl?: string | null;
   previewing: boolean;
   invoices: ApprenticeDashboardInvoice[];
+  requirement: LearnerBillingRequirement;
 }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
@@ -173,39 +204,9 @@ function SubscriptionBilling({
       >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
-      {needsBillingAgreement ? (
-        <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-          <div className="text-sm text-red-800">
-            <p className="mb-1 font-semibold">PayPal approval required</p>
-            <p>
-              Complete the recurring-payment release and approve the PayPal billing agreement to
-              keep the tuition account current.
-            </p>
-            {billingApprovalUrl ? (
-              <a
-                href={billingApprovalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 inline-flex rounded-lg bg-[#0070ba] px-4 py-2 font-bold text-white"
-              >
-                Approve PayPal billing
-              </a>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
+      <MandatoryBillingSetup requirement={requirement} readOnly={previewing} />
       <BillingCard billing={billing} readOnly={previewing} />
-      <section className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
-        <h2 className="font-black text-slate-950">Affirm financing</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-700">If Affirm is offered on your QuickBooks invoice, select Affirm from the invoice payment screen to check eligibility and apply. Approval, available plans, and terms are determined by Affirm. Checking the invoice does not change the amount you owe Elevate.</p>
-        {invoices.some((invoice) => invoice.paymentUrl) ? (
-          <a href={invoices.find((invoice) => invoice.paymentUrl)?.paymentUrl || '#'} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 text-sm font-black text-white">Open invoice & check Affirm eligibility</a>
-        ) : (
-          <p className="mt-3 text-xs font-semibold text-slate-600">Your invoice payment link will appear here after QuickBooks synchronization.</p>
-        )}
-      </section>
-      <InvoiceLedger invoices={invoices} />
+      <InvoiceLedger invoices={invoices} readOnly={previewing} />
     </div>
   );
 }
@@ -219,6 +220,7 @@ export default async function ApprenticeBillingPage() {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice/billing');
   const billingAccess = await getApprenticeBillingAccess(db, subject.userId);
+  const billingRequirement = await loadLearnerBillingRequirement(db, subject.userId);
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const portalPath =
     (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
@@ -256,6 +258,8 @@ export default async function ApprenticeBillingPage() {
         <BillingFallback
           portalPath={portalPath}
           message="No barber tuition account was found. Contact support if you recently enrolled."
+          requirement={billingRequirement}
+          readOnly={subject.previewing}
         />
       );
     const billing = summary('barber', sub || {}, schedule);
@@ -263,10 +267,9 @@ export default async function ApprenticeBillingPage() {
       <SubscriptionBilling
         billing={billing}
         portalPath={portalPath}
-        needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription}
-        billingApprovalUrl={schedule?.provider_approval_url}
         previewing={subject.previewing}
         invoices={billingAccess.invoices}
+        requirement={billingRequirement}
       />
     );
   }
@@ -288,10 +291,9 @@ export default async function ApprenticeBillingPage() {
         <SubscriptionBilling
           billing={billing}
           portalPath={portalPath}
-          needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription}
-          billingApprovalUrl={schedule?.provider_approval_url}
           previewing={subject.previewing}
           invoices={billingAccess.invoices}
+          requirement={billingRequirement}
         />
       );
     }
@@ -305,6 +307,7 @@ export default async function ApprenticeBillingPage() {
       >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
+      <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
       <StudentPaymentCard />
     </div>
   );
@@ -322,13 +325,15 @@ function StudentPaymentCard() {
           Manage the recurring-payment release, PayPal agreement, and payment history.
         </p>
         <Link
-          href="/lms/documents"
+          href="/lms/documents#billing-authorization"
           className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"
         >
           <span className="flex items-center gap-3">
             <CreditCard className="h-5 w-5 text-brand-blue-700" />
             <span>
-              <span className="block font-medium text-slate-950">PayPal billing agreement</span>
+              <span className="block font-medium text-slate-950">
+                Payment authorization & PayPal setup
+              </span>
               <span className="text-xs text-slate-600">
                 Complete the signed release and provider approval steps
               </span>
@@ -350,7 +355,7 @@ function StudentPaymentCard() {
           <ChevronRight className="h-5 w-5 text-slate-400" />
         </Link>
         <Link
-          href="/lms/documents"
+          href="/lms/documents#required-documents"
           className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"
         >
           <span className="flex items-center gap-3">

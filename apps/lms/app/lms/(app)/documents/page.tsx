@@ -3,13 +3,17 @@ import { requireRole } from '@/lib/auth/require-role';
 import { loadLearnerWorkspace } from '@/lib/learner/workspace';
 import { createClient } from '@/lib/supabase/server';
 import { BillingAuthorizationUpload } from './BillingAuthorizationUpload';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 
 export const dynamic = 'force-dynamic';
 
 export default async function LearnerDocumentsPage() {
-  const { user } = await requireRole(['student', 'learner', 'admin']);
+  const { user } = await requireRole(['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice', 'admin']);
   const workspace = await loadLearnerWorkspace(user.id);
   const db = await createClient();
+  const admin = await requireAdminClient();
+  const billingRequirement = await loadLearnerBillingRequirement(admin, user.id);
   const { data: billingAuthorizations } = await db
     .from('billing_migration_authorizations')
     .select('id,billing_schedule_id,product_name,amount_cents,cadence,status,document_name,rejection_reason')
@@ -33,6 +37,12 @@ export default async function LearnerDocumentsPage() {
         Review required documents, submitted evidence, agreements, certificates, and permanent
         learner records.
       </p>
+      {workspace.warnings.length > 0 ? (
+        <div role="alert" className="mt-4 rounded-xl border border-amber-400 bg-amber-50 p-4">
+          <p className="font-bold">Some records could not be loaded. Refresh this page or contact learner support if the problem continues.</p>
+          <Link href="/lms/support" className="font-bold underline">Contact learner support</Link>
+        </div>
+      ) : null}
       <div className="mt-5 flex flex-wrap gap-3">
         <Link
           href="/lms/agreements"
@@ -47,56 +57,110 @@ export default async function LearnerDocumentsPage() {
           Certificates
         </Link>
       </div>
-      {(billingAuthorizations || []).map((authorization) => (
+      <section aria-labelledby="learner-agreements" className="mt-6 rounded-2xl border bg-white p-6">
+        <h2 id="learner-agreements" className="text-xl font-black">Your handbook, MOU & agreements</h2>
+        <p className="mt-2 text-sm text-slate-700">These documents stay available to read after you sign them. Your saved acknowledgement is shown below.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {workspace.agreements.map((agreement) => (
+            <article key={agreement.type} className="rounded-xl border p-4">
+              <Link href={agreement.documentUrl} className="font-black text-blue-800 underline">{agreement.title}</Link>
+              <p className="mt-2 text-sm">{agreement.description}</p>
+              <p className="mt-2 text-sm font-bold">{agreement.signed ? `Acknowledged${agreement.acceptedAt ? ` · ${new Date(agreement.acceptedAt).toLocaleDateString()}` : ''}` : 'Acknowledgement required'}</p>
+            </article>
+          ))}
+        </div>
+        <Link href="/lms/handbook" className="mt-4 inline-block font-black text-blue-800 underline">Open handbook & full policy manual</Link>
+      </section>
+      {!billingAuthorizations?.length && billingRequirement.required ? (
         <section
-          key={authorization.id}
-          className="mt-6 rounded-2xl border-2 border-red-400 bg-red-50 p-6"
+          id="billing-authorization"
+          role="alert"
+          className="mt-6 scroll-mt-24 rounded-2xl border-2 border-red-400 bg-red-50 p-6"
         >
           <h2 className="text-xl font-black text-red-950">
-            Action required: new subscription authorization
+            Mandatory to-do: recurring-payment release
           </h2>
-          <p className="mt-2 font-semibold text-red-900">
-            Upload the signed recurring-payment release for{' '}
-            {authorization.product_name}:{' '}
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-              Number(authorization.amount_cents) / 100,
-            )}{' '}
-            {authorization.cadence}. Once approved, connect the PayPal billing agreement once;
-            future payments run automatically and are recorded in QuickBooks.
+          <p className="mt-2 font-semibold leading-6 text-red-900">
+            This self-pay enrollment requires a signed recurring-payment release. Your payment
+            terms have not been issued yet, so Elevate billing must configure them before you can
+            upload the completed release. This item remains open until the release is approved.
           </p>
-          <p className="mt-2 text-sm font-bold capitalize text-red-950">
-            Status: {authorization.status.replace('_', ' ')}
-          </p>
-          {authorization.document_name ? (
-            <p className="mt-1 text-sm text-red-900">Uploaded: {authorization.document_name}</p>
-          ) : null}
-          {authorization.rejection_reason ? (
-            <p className="mt-2 font-bold text-red-800">
-              Correction needed: {authorization.rejection_reason}
-            </p>
-          ) : null}
-          {authorization.status === 'approved' &&
-          scheduleById.get(authorization.billing_schedule_id || '')?.provider_status === 'active' ? (
-            <p className="mt-3 text-sm font-bold text-emerald-800">
-              Automatic weekly payments are active. You do not need to pay individual invoices.
-            </p>
-          ) : authorization.status === 'approved' &&
-            scheduleById.get(authorization.billing_schedule_id || '')?.provider_approval_url ? (
-            <a
-              href={scheduleById.get(authorization.billing_schedule_id || '')?.provider_approval_url || '#'}
-              className="mt-4 inline-flex rounded-xl bg-blue-700 px-5 py-3 font-black text-white"
-            >
-              Approve automatic payments in PayPal
-            </a>
-          ) : authorization.status !== 'submitted' && authorization.status !== 'approved' ? (
-            <BillingAuthorizationUpload authorizationId={authorization.id} />
-          ) : (
-            <p className="mt-3 text-sm font-semibold text-red-900">
-              Your document is awaiting staff review.
-            </p>
-          )}
+          <Link
+            href="/lms/support?topic=billing-setup"
+            className="mt-4 inline-flex rounded-xl bg-red-800 px-5 py-3 font-black text-white"
+          >
+            Contact billing setup
+          </Link>
         </section>
-      ))}
+      ) : null}
+      {(billingAuthorizations || []).map((authorization) => {
+        const schedule = scheduleById.get(authorization.billing_schedule_id || '');
+        const releaseApproved = authorization.status === 'approved';
+        const automaticPaymentsActive =
+          releaseApproved && schedule?.provider_status === 'active';
+        const tone = automaticPaymentsActive
+          ? 'border-emerald-300 bg-emerald-50 text-emerald-950'
+          : releaseApproved
+            ? 'border-amber-300 bg-amber-50 text-amber-950'
+            : 'border-red-400 bg-red-50 text-red-950';
+        return (
+          <section
+            key={authorization.id}
+            id="billing-authorization"
+            role={releaseApproved ? undefined : 'alert'}
+            className={`mt-6 scroll-mt-24 rounded-2xl border-2 p-6 ${tone}`}
+          >
+            <h2 className="text-xl font-black">
+              {automaticPaymentsActive
+                ? 'Recurring-payment setup complete'
+                : releaseApproved
+                  ? 'Release approved — PayPal setup required'
+                  : 'Mandatory to-do: recurring-payment release'}
+            </h2>
+            <p className="mt-2 font-semibold">
+              The recurring-payment release for {authorization.product_name} covers{' '}
+              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                Number(authorization.amount_cents) / 100,
+              )}{' '}
+              {authorization.cadence}. After approval, connect the PayPal billing agreement once;
+              future payments run automatically and are recorded in QuickBooks.
+            </p>
+            <p className="mt-2 text-sm font-bold capitalize">
+              Status: {authorization.status.replace('_', ' ')}
+            </p>
+            {authorization.document_name ? (
+              <p className="mt-1 text-sm">Uploaded: {authorization.document_name}</p>
+            ) : null}
+            {authorization.rejection_reason ? (
+              <p className="mt-2 font-bold text-red-800">
+                Correction needed: {authorization.rejection_reason}
+              </p>
+            ) : null}
+            {automaticPaymentsActive ? (
+              <p className="mt-3 text-sm font-bold text-emerald-800">
+                Automatic weekly payments are active. You do not need to pay individual invoices.
+              </p>
+            ) : releaseApproved && schedule?.provider_approval_url ? (
+              <a
+                href={schedule.provider_approval_url}
+                className="mt-4 inline-flex rounded-xl bg-blue-700 px-5 py-3 font-black text-white"
+              >
+                Approve automatic payments in PayPal
+              </a>
+            ) : !releaseApproved && authorization.status !== 'submitted' ? (
+              <BillingAuthorizationUpload authorizationId={authorization.id} />
+            ) : releaseApproved ? (
+              <p className="mt-3 text-sm font-semibold">
+                Elevate billing is preparing your PayPal approval link.
+              </p>
+            ) : (
+              <p className="mt-3 text-sm font-semibold">
+                Your document is awaiting staff review.
+              </p>
+            )}
+          </section>
+        );
+      })}
       {workspace.requirements.length === 0 ? (
         <div role="alert" className="mt-6 rounded-2xl border-2 border-red-300 bg-red-50 p-6">
           <h2 className="font-black text-red-950">Document requirements are not configured</h2>
@@ -112,7 +176,7 @@ export default async function LearnerDocumentsPage() {
           </Link>
         </div>
       ) : (
-        <div className="mt-6 space-y-4">
+        <div id="required-documents" className="mt-6 scroll-mt-24 space-y-4">
           {workspace.requirements.map((requirement) => {
             const complete = ['verified', 'completed'].includes(requirement.status);
             const urgent =

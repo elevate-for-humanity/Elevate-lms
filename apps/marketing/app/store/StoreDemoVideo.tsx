@@ -43,8 +43,8 @@ export default function StoreDemoVideo() {
     >
       {/* Poster — shown before play */}
       <Image
-        src="/images/pages/admin-activity-hero.webp"
-        alt="HVAC Technician course — Module 1 preview"
+        src="/images/hvac-training-vibrant-2026.webp"
+        alt="Illustrative HVAC training scene"
         fill
         className="object-cover"
         sizes="100vw"
@@ -54,10 +54,10 @@ export default function StoreDemoVideo() {
       {!started && (
         <>
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
-              <Play className="w-11 h-11 text-brand-red-600 ml-1" />
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
+              <Play className="w-8 h-8 sm:w-11 sm:h-11 text-brand-red-600 ml-1" />
             </div>
-            <p className="text-white font-bold text-lg drop-shadow-lg">Watch: HVAC Course — Module 1, Lesson 1</p>
+            <p className="text-white font-bold text-sm sm:text-lg drop-shadow-lg">Watch: HVAC Course — Module 1, Lesson 1</p>
             <p className="text-white/80 text-sm mt-1 drop-shadow">Sample lesson from the licensable HVAC Technician course</p>
           </div>
         </>

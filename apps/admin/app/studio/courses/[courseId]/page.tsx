@@ -8,5 +8,5 @@ export default async function CourseStudioPage({
   params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
-  redirect(`/studio/courses?courseId=${encodeURIComponent(courseId)}&tab=workspace`);
+  redirect(`/studio/courses?courseId=${encodeURIComponent(courseId)}&tab=ultimate`);
 }

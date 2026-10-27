@@ -3,11 +3,10 @@
 ## ✅ Completed Fixes
 
 ### TypeScript Errors Fixed
-1. `lib/timeclock/sync-to-hour-entries.ts` - Fixed logger.error calls
-2. `lib/utils/siteUrl.ts` - Fixed Error constructor issue
-3. `lib/workflows/engine.ts` - Fixed aiChat() call and logger.error calls
-4. `lib/jobs/queue.ts` - Added 'workspace_provision' to JobType union
-5. `app/payment-error/metadata.ts` - Created metadata export
+1. `lib/utils/siteUrl.ts` - Fixed Error constructor issue
+2. `lib/workflows/engine.ts` - Fixed aiChat() call and logger.error calls
+3. `lib/jobs/queue.ts` - Added 'workspace_provision' to JobType union
+4. `app/payment-error/metadata.ts` - Created metadata export
 
 ### SEO Check Fixed
 - Deleted duplicate `/help/help` directory

@@ -104,8 +104,8 @@ export default async function EmployerOrientationPage() {
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="font-bold text-slate-950">Need help with employer onboarding?</h2>
           <div className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:gap-6">
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`} className="inline-flex items-center gap-2 font-semibold text-brand-blue-700 hover:underline">
-              <Phone className="h-4 w-4" /> {PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9+]/g, '')}`} className="inline-flex items-center gap-2 font-semibold text-brand-blue-700 hover:underline">
+              <Phone className="h-4 w-4" /> {PLATFORM_DEFAULTS.mainPhone}
             </a>
             <a href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`} className="inline-flex items-center gap-2 font-semibold text-brand-blue-700 hover:underline">
               <Mail className="h-4 w-4" /> {PLATFORM_DEFAULTS.supportEmail}

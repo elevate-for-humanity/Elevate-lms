@@ -20,7 +20,7 @@ function mouProgram(partner: Record<string, unknown>): HostShopMouProgram {
 
 async function loadContext() {
   try {
-    return await requireCurrentHostShopPartner();
+    return await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     if (code === 'HOST_SHOP_UNAUTHENTICATED') redirect('/host-shop/login?redirect=/host-shop/onboarding/mou');
@@ -36,9 +36,11 @@ async function signHostShopMou(formData: FormData) {
   const agreed = formData.get('agreed') === 'yes';
   if (!signerName || !agreed) redirect('/host-shop/onboarding/mou?error=signature_required');
 
-  const { user, db, partner, isPlatformAdmin } = await requireCurrentHostShopPartner();
+  const { user, db, partner, isPlatformAdmin } = await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
   if (isPlatformAdmin) redirect('/host-shop/onboarding/mou?error=admin_cannot_sign');
-  if (partner.approval_status !== 'approved' || partner.status !== 'active') redirect('/host-shop/dashboard');
+  // A verified partner membership may execute the MOU while approval is pending.
+  // This does not grant operational dashboard access or approve the worksite.
+  if (partner.status !== 'active' || !['approved', 'pending'].includes(partner.approval_status || '')) redirect('/unauthorized');
   if (partner.mou_signed) redirect('/host-shop/onboarding/profile');
 
   const program = mouProgram(partner as unknown as Record<string, unknown>);

@@ -254,7 +254,7 @@ function CheckoutForm({
                 </>
               ) : (
                 <>
-                  {paymentMethod === 'stripe' && <>Purchase Now — {priceLabel}</>}
+                  {paymentMethod === 'invoice' && <>Pay by Invoice — {priceLabel}</>}
                   {paymentMethod === 'affirm' && <>Pay with Affirm — {priceLabel}</>}
                   {paymentMethod === 'sezzle' && (
                     <>Pay with Sezzle — 4 × ${Math.round(price / 4).toLocaleString('en-US')}</>
@@ -265,7 +265,7 @@ function CheckoutForm({
             </button>
 
             <p className="text-xs text-slate-700 text-center mt-4">
-              {paymentMethod === 'stripe' && "You'll be redirected to Stripe for secure payment."}
+              {paymentMethod === 'invoice' && "You'll be redirected to your QuickBooks invoice for payment."}
               {paymentMethod === 'affirm' &&
                 "You'll be redirected to Affirm to complete financing."}
               {paymentMethod === 'sezzle' && "You'll be redirected to Sezzle to set up 4 payments."}

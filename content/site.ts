@@ -4,7 +4,7 @@ export const siteConfig = {
   url: 'https://www.elevateforhumanity.org',
   description: 'Career training, workforce pathways, and community-centered education programs.',
   phone: '' + PLATFORM_DEFAULTS.supportPhone + '',
-  email: 'info@elevateforhumanity.org',
+  email: 'elevate4humanityedu@gmail.com',
   address: 'Indianapolis, IN',
   hours: 'Mon–Fri 8am–6pm, Sat 9am–1pm EST',
   nav: [

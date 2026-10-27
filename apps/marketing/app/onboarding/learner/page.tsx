@@ -518,8 +518,8 @@ export default async function LearnerOnboardingPage({
             </Link>
             <p className="text-sm text-slate-400 mt-6">
               Questions? Call{' '}
-              <a href={`tel:+1${PLATFORM_DEFAULTS.supportPhone}`} className="underline">
-                {PLATFORM_DEFAULTS.supportPhone}
+              <a href={`tel:+1${PLATFORM_DEFAULTS.mainPhone}`} className="underline">
+                {PLATFORM_DEFAULTS.mainPhone}
               </a>
             </p>
           </div>
@@ -590,7 +590,7 @@ export default async function LearnerOnboardingPage({
                     <h2 className="text-xl font-black text-slate-900 mb-1">Onboarding Complete</h2>
                     <p className="text-slate-500 text-sm">
                       Your documents are under review. You'll receive an email once access is
-                      granted. Questions? Call {PLATFORM_DEFAULTS.supportPhone}.
+                      granted. Questions? Call {PLATFORM_DEFAULTS.mainPhone}.
                     </p>
                   </div>
                   <Link
@@ -720,11 +720,11 @@ export default async function LearnerOnboardingPage({
                         Contact Support
                       </Link>
                       <a
-                        href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                        href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                         className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 text-slate-900 rounded-xl hover:bg-white/20 font-semibold transition backdrop-blur-sm"
                       >
                         <Phone className="w-4 h-4" />
-                        {PLATFORM_DEFAULTS.supportPhone}
+                        {PLATFORM_DEFAULTS.mainPhone}
                       </a>
                       <Link
                         href="/support/help"

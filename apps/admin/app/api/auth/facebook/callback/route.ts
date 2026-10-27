@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
   const pagesPayload = await pagesResponse.json().catch(() => ({})) as { data?: MetaPage[] };
   if (!pagesResponse.ok || !Array.isArray(pagesPayload.data)) return settingsRedirect(request, 'error', 'page_lookup_failed');
 
-  const configuredPageId = process.env.FACEBOOK_PAGE_ID?.trim();
+  const configuredPageId = metaConfig.pageId.value;
   const page = configuredPageId
     ? pagesPayload.data.find((candidate) => candidate.id === configuredPageId)
     : pagesPayload.data.length === 1 ? pagesPayload.data[0] : undefined;

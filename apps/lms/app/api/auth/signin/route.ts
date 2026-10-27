@@ -17,7 +17,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emailService } from '@/lib/notifications/email';
 import { isQaE2EIdentity } from '@/lib/qa/is-qa-e2e-identity';
-import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
 
 const OWNER_ALERT_PROFILE_ID = '964dc85a-bce8-4e67-92eb-198ffafb2384';
 
@@ -66,29 +65,6 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
 
   if (!data.user || !data.session) {
     throw APIErrors.internal('Authentication failed');
-  }
-
-  // Past-due apprentice tuition is an account-level access hold. Check it
-  // after credential verification but before returning a usable session so a
-  // suspended learner cannot bypass the hold with a fresh login.
-  try {
-    const billingDb = await requireAdminClient();
-    const billingAccess = await getApprenticeBillingAccess(billingDb, data.user.id);
-    if (billingAccess.suspended) {
-      await supabase.auth.signOut();
-      return NextResponse.json(
-        {
-          error:
-            'Your course account is suspended because tuition is past due. Use the Pay Now links in your invoice email. Access is restored after every past-due invoice is paid.',
-          code: 'BILLING_PAST_DUE',
-        },
-        { status: 403, headers: { 'Cache-Control': 'no-store' } },
-      );
-    }
-  } catch {
-    // Do not turn a transient billing-ledger outage into a platform-wide login
-    // outage. Confirmed past-due accounts are blocked; unknown state is logged
-    // by the normal authentication audit path and retried on the next request.
   }
 
   // Notify the platform owner when a real apprentice or Host Shop user signs in.

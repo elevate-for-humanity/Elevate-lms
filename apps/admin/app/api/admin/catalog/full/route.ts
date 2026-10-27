@@ -32,12 +32,13 @@ async function _GET(request: NextRequest) {
 
   // Generate HTML content for the catalog
   const supabaseClient = await createClient();
-  const { data: programs = [] } = await supabaseClient
+  const { data: programs, error } = await supabaseClient
     .from('programs')
     .select('slug, title, name, description, short_description, credential, clock_hours, is_active')
     .eq('is_active', true)
     .order('title');
-  const catalogHtml = generateCatalogHtml(programs);
+  if (error) return NextResponse.json({ error: 'Catalog data unavailable' }, { status: 503 });
+  const catalogHtml = generateCatalogHtml(programs ?? []);
 
   if (format === 'pdf') {
     // Return HTML with print-friendly styles that can be printed to PDF

@@ -1,4 +1,5 @@
 import 'server-only';
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 
 import { getActiveProviderName } from '@/lib/ai/ai-service';
 import { getSecrets, hydrateProcessEnv } from '@/lib/secrets';
@@ -123,11 +124,13 @@ export async function resolveAIRuntimeState() {
       present('CLOUDFLARE_AI_MODEL'),
   };
   const activeProvider = getActiveProviderName();
+  const ownedModel = await probeOwnedModel();
 
   return {
     providers,
     activeProvider,
-    elevate: activeProvider === 'elevate',
+    ownedModel,
+    elevate: ownedModel.verified,
     anyConfigured: Object.values(providers).some(Boolean) || activeProvider === 'elevate',
   };
 }

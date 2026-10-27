@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -6,6 +8,15 @@ export const metadata: Metadata = {
   description:
     'Buyer-facing review of Elevate for Humanity platform architecture, security, compliance controls, licensing scope, and validation requirements.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/licenses/enterprise-review' },
+
+  ...publicArtworkMetadata({
+    path: '/licenses/enterprise-review',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative business team reviewing platform requirements',
+    title: 'Enterprise Platform Review | Elevate for Humanity',
+    description:
+      'Buyer-facing review of Elevate for Humanity platform architecture, security, compliance controls, licensing scope, and validation requirements.',
+  }),
 };
 
 const sections = [
@@ -38,12 +49,24 @@ const sections = [
 export default function EnterpriseReviewPage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative business team reviewing platform requirements"
+        actions={[
+          { href: '/contact', label: 'Discuss enterprise requirements' },
+          { href: '/store/plans', label: 'Compare plans' },
+        ]}
+      />
+
       <section className="bg-slate-950 px-4 py-16 text-white">
         <div className="mx-auto max-w-5xl">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-300">Enterprise due diligence</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-300">
+            Enterprise due diligence
+          </p>
           <h1 className="mt-3 text-4xl font-black md:text-5xl">Platform review and validation</h1>
           <p className="mt-5 max-w-3xl text-lg text-slate-300">
-            This review separates implemented platform capabilities from claims that require customer-specific, deployment-specific, or independent evidence.
+            This review separates implemented platform capabilities from claims that require
+            customer-specific, deployment-specific, or independent evidence.
           </p>
         </div>
       </section>
@@ -53,13 +76,19 @@ export default function EnterpriseReviewPage() {
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
             <h2 className="text-xl font-black">Evidence standard</h2>
             <p className="mt-2 text-slate-700">
-              Elevate does not treat a marketing statement as audit evidence. Certifications, approval status, performance statistics, security attestations, funding eligibility, and third-party relationships must be supported by current records before they are represented as verified facts.
+              Elevate does not treat a marketing statement as audit evidence. Certifications,
+              approval status, performance statistics, security attestations, funding eligibility,
+              and third-party relationships must be supported by current records before they are
+              represented as verified facts.
             </p>
           </div>
 
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {sections.map((section) => (
-              <article key={section.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <article
+                key={section.title}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
                 <h2 className="text-xl font-black">{section.title}</h2>
                 <p className="mt-3 leading-7 text-slate-700">{section.body}</p>
               </article>
@@ -82,14 +111,31 @@ export default function EnterpriseReviewPage() {
                 'Performance and deployment-health validation',
                 'Privacy, retention and incident-process review',
                 'Contractual SLA and support-scope review',
-              ].map((item) => <li key={item}>• {item}</li>)}
+              ].map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
             </ul>
           </section>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/licenses" className="rounded-xl bg-blue-700 px-6 py-3 font-bold text-white hover:bg-blue-800">Review licensing</Link>
-            <Link href="/security" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold hover:bg-slate-100">Security & data</Link>
-            <Link href="/contact" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold hover:bg-slate-100">Request technical review</Link>
+            <Link
+              href="/licenses"
+              className="rounded-xl bg-blue-700 px-6 py-3 font-bold text-white hover:bg-blue-800"
+            >
+              Review licensing
+            </Link>
+            <Link
+              href="/security"
+              className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold hover:bg-slate-100"
+            >
+              Security & data
+            </Link>
+            <Link
+              href="/contact"
+              className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold hover:bg-slate-100"
+            >
+              Request technical review
+            </Link>
           </div>
         </div>
       </section>

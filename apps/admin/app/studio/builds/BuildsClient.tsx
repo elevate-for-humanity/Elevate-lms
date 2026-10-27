@@ -19,7 +19,7 @@ export default function BuildsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [triggering, setTriggering] = useState(false);
-  const [northflankConfigured, setNorthflankConfigured] = useState(false);
+  const [googleConfigured, setGoogleConfigured] = useState(false);
 
   async function fetchBuilds() {
     setLoading(true);
@@ -28,7 +28,7 @@ export default function BuildsClient() {
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setBuilds(json.builds ?? []);
-      setNorthflankConfigured(json.northflankConfigured === true);
+      setGoogleConfigured(json.googleConfigured === true);
       setError(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load');
@@ -38,7 +38,7 @@ export default function BuildsClient() {
   }
 
   async function triggerBuild(service: string) {
-    if (!northflankConfigured) return;
+    if (!googleConfigured) return;
     if (!window.confirm(`Deploy ${service} to production?`)) return;
     setTriggering(true);
     try {
@@ -93,7 +93,7 @@ export default function BuildsClient() {
               Builds & Deploy
             </h1>
             <p className="text-amber-100 text-lg mt-2 max-w-2xl">
-              Trigger, monitor, and track Northflank deployments in real time.
+              Trigger, monitor, and track Google Cloud Run deployments in real time.
             </p>
           </div>
         </div>
@@ -102,20 +102,27 @@ export default function BuildsClient() {
       <div className="max-w-5xl mx-auto px-6 py-10">
         {/* Action bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => triggerBuild('admin')}
-              disabled={triggering || !northflankConfigured}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy Admin
             </button>
             <button
               onClick={() => triggerBuild('lms')}
-              disabled={triggering || !northflankConfigured}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy LMS
+            </button>
+            <button
+              onClick={() => triggerBuild('store')}
+              disabled={triggering || !googleConfigured}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-700 disabled:opacity-50 transition shadow-sm"
+            >
+              <Play className="h-4 w-4" /> Deploy Store
             </button>
           </div>
           <button
@@ -126,9 +133,9 @@ export default function BuildsClient() {
           </button>
         </div>
 
-        {!northflankConfigured && (
+        {!googleConfigured && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-700 mb-6">
-            Deployment is disabled until NORTHFLANK_API_TOKEN and NORTHFLANK_PROJECT_ID are configured.
+            Google deployment requires a valid GitHub Actions dispatch token.
           </div>
         )}
 

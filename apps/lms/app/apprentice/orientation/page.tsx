@@ -1,3 +1,4 @@
+import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CheckCircle2, ClipboardCheck, Clock3, FileText, GraduationCap, Scissors } from 'lucide-react';
@@ -103,6 +104,7 @@ export default async function ApprenticeOrientationPage({
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+      <VisualDashboardOrientation audience="apprentice" />
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 text-white shadow-sm">
         <div className="grid lg:grid-cols-[1.05fr_.95fr]">
           <div className="p-6 sm:p-8">

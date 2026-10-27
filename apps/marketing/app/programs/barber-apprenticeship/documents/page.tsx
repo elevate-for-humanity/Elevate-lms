@@ -151,14 +151,14 @@ export default function BarberDocumentsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setSubmitError(data.error || `Submission failed. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+        setSubmitError(data.error || `Submission failed. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`);
         setSubmitting(false);
         return;
       }
 
       router.push('https://app.elevateforhumanity.org/apprentice');
     } catch {
-      setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`);
       setSubmitting(false);
     }
   };
@@ -207,7 +207,7 @@ export default function BarberDocumentsPage() {
                       <span className="text-sm text-brand-blue-600">Uploading...</span>
                     )}
                     {governmentId.status === 'error' && (
-                      <span className="text-sm text-red-600">Upload failed. Please try again or call {PLATFORM_DEFAULTS.supportPhone}.</span>
+                      <span className="text-sm text-red-600">Upload failed. Please try again or call {PLATFORM_DEFAULTS.mainPhone}.</span>
                     )}
                     {governmentId.status === 'complete' && (
                       <button

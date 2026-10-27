@@ -1,0 +1,25 @@
+[Unit]
+Description=Elevate private PARIS speech turn processor
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=elevate-paris
+Group=elevate-paris
+EnvironmentFile=/etc/elevate-pbx/paris.conf
+ExecStart=/usr/bin/node /opt/elevate-pbx/paris/launch.mjs turn
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

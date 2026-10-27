@@ -15,6 +15,14 @@ export const dynamic = 'force-dynamic';
 // Paid Supabase projects support much larger objects. Keep this aligned with
 // the private course_videos bucket limit so 4K licensed masters are accepted.
 const MAX_BYTES = 1024 * 1024 * 1024;
+const LICENSED_MEDIA_TYPES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const COURSE_VIDEO_ROLES = new Set([
   'source_broll',
@@ -130,9 +138,9 @@ async function controlCourseUpload(
         { status: 400 },
       );
     }
-    if (!fileName || !fileType.startsWith('video/') || fileSize <= 0 || fileSize > MAX_BYTES) {
+    if (!fileName || !LICENSED_MEDIA_TYPES.has(fileType) || fileSize <= 0 || fileSize > MAX_BYTES) {
       return NextResponse.json(
-        { error: 'A valid licensed video file of 1 GB or less is required' },
+        { error: 'A valid licensed photo or video file of 1 GB or less is required' },
         { status: 400 },
       );
     }

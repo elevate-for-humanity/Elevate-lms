@@ -22,7 +22,7 @@ describe('apprentice invoice fallback batch', () => {
     expect(nextWeeklyInvoiceDateAfter('2026-09-14', '2026-09-22')).toBe('2026-09-28');
   });
 
-  it('emails every open invoice, its Pay Now link, and the access warning', () => {
+  it('emails every open invoice and its Pay Now link without threatening portal access', () => {
     const email = apprenticeInvoiceEmail({
       customerName: 'Learner & Family',
       productName: 'Apprenticeship Tuition',
@@ -53,30 +53,32 @@ describe('apprentice invoice fallback batch', () => {
     expect(email.html).toContain('https://pay.example/old');
     expect(email.html).toContain('INV-2');
     expect(email.html).toContain('https://pay.example/current');
-    expect(email.html).toContain('Account access warning');
-    expect(email.text).toContain('will not be able to sign in again');
+    expect(email.html).toContain('Payment reminder');
+    expect(email.text).toContain('Your apprentice portal remains available');
+    expect(email.text).not.toContain('suspended');
     expect(email.html).toContain('Learner &amp; Family');
   });
 
-  it('wires weekly generation, dashboard Pay Now links, and login enforcement', () => {
+  it('keeps weekly invoice generation separate from sign-in access', () => {
     const cron = source('apps/admin/app/api/cron/generate-apprentice-invoices/route.ts');
     const workflow = source('.github/workflows/cron-scheduler.yml');
     const dashboard = source('apps/lms/app/apprentice/billing/page.tsx');
     const signIn = source('apps/lms/app/api/auth/signin/route.ts');
     expect(cron).toContain('createManualInvoice');
     expect(cron).toContain('sendEmail');
-    expect(cron).toContain('db.auth.admin.signOut(userId)');
+    expect(cron).not.toContain('db.auth.admin.signOut(userId)');
     expect(workflow).toContain('/api/cron/generate-apprentice-invoices');
     expect(dashboard).toContain('Pay now');
-    expect(dashboard).toContain('Account access warning');
-    expect(signIn).toContain('BILLING_PAST_DUE');
+    expect(dashboard).toContain('Payment reminder');
+    expect(signIn).not.toContain('BILLING_PAST_DUE');
   });
 
-  it('uses an expiring database exemption instead of hardcoding a learner bypass', () => {
+  it('still lists overdue invoices while leaving learner access open', () => {
     const helper = source('lib/billing/apprentice-invoice-batch.ts');
     const migration = source('supabase/migrations/20260922194500_billing_access_exemptions.sql');
     expect(helper).toContain(".from('billing_access_exemptions')");
-    expect(helper).toContain('!exemption.data?.expires_at');
+    expect(helper).toContain('overdueInvoices');
+    expect(helper).toContain('suspended: false');
     expect(migration).toContain('2026-10-05 00:00:00-04');
     expect(migration).toContain('Invoices remain due and visible.');
   });

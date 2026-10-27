@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -56,8 +57,8 @@ export function BarberApprenticeshipDashboard({
   const ojlPercent = Math.min((totalOjl / requiredOjl) * 100, 100);
   const rtiPercent = Math.min((totalRti / requiredRti) * 100, 100);
 
-  const hasSubscription = !!enrollment?.stripe_subscription_id;
-  const subStatus = enrollment?.stripe_subscription_status ?? null;
+  const hasSubscription = !!enrollment?.quickbooks_subscription_id;
+  const subStatus = enrollment?.quickbooks_subscription_status ?? null;
   const needsPaymentMethod =
     hasSubscription &&
     ['pending_payment_method', 'past_due', 'incomplete', 'incomplete_expired'].includes(
@@ -140,7 +141,7 @@ export function BarberApprenticeshipDashboard({
               </p>
             </div>
             <div className="relative w-full lg:w-72 h-44 lg:h-auto min-h-[11rem] rounded-xl overflow-hidden border border-amber-500/20">
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 src="/images/heroes/hero-homepage.webp"
                 alt="Barber apprenticeship training"
                 fill

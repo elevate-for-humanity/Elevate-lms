@@ -87,31 +87,6 @@ const STYLE_AND_SCISSORS = {
   ],
 };
 
-const RAZORS_IMAGE = {
-  key: 'razors-image',
-  shopName: 'Razors Image Barbershop',
-  contactName: 'Aaron Brown',
-  email: 'razorsimage11@gmail.com',
-  userId: '17326f0e-4c74-45d9-b024-51fe0aeef19e',
-  phone: '317-000-0000',
-  shopLegalName: 'Razors Image Barbershop',
-  ownerName: 'Aaron Brown',
-  address: '155 S Kingston Dr',
-  city: 'Bloomington',
-  state: 'IN',
-  zip: '47403',
-  shopLicense: 'BS31100487',
-  supervisorLicense: 'BA11400162',
-  ein: '82-4312433',
-  programs: [
-    {
-      label: 'Barber Apprenticeship',
-      signPath: '/partners/barber-host-shop/sign-mou',
-      status: 'pending',
-    },
-  ],
-};
-
 async function loadSendGridKey() {
   if (process.env.SENDGRID_API_KEY) return process.env.SENDGRID_API_KEY;
   const { data } = await db
@@ -321,140 +296,9 @@ async function provisionStyleAndScissors() {
   }
 }
 
-async function provisionRazorsImage() {
-  console.log('\n=== Razors Image Barbershop ===');
-  const h = RAZORS_IMAGE;
-  let partnerId;
-
-  if (!EMAIL_ONLY) {
-    const { data: existingPartner } = await db
-      .from('partners')
-      .select('id')
-      .eq('contact_email', h.email)
-      .maybeSingle();
-
-    partnerId = existingPartner?.id;
-
-    const partnerPayload = {
-      name: h.shopLegalName,
-      legal_name: h.shopLegalName,
-      shop_name: h.shopLegalName,
-      owner_name: h.ownerName,
-      contact_name: h.contactName,
-      contact_email: h.email,
-      contact_phone: h.phone,
-      address_line1: h.address,
-      city: h.city,
-      state: h.state,
-      zip: h.zip,
-      license_number: h.shopLicense,
-      supervisor_name: h.contactName,
-      supervisor_license_number: h.supervisorLicense,
-      partner_type: 'barber',
-      program_type: 'barber',
-      approval_status: 'approved',
-      status: 'active',
-      approved_at: now,
-      onboarding_completed: false,
-      mou_signed: false,
-      can_supervise_and_verify: true,
-      compensation_model: 'hourly',
-      workers_comp_status: 'none',
-      programs: ['barber'],
-      notes: `EIN ${h.ein} — provisioned via provision-host-shops-send-mous.mjs`,
-      updated_at: now,
-    };
-
-    if (partnerId) {
-      if (DRY_RUN) {
-        console.log('  [DRY RUN] Would update partner', partnerId);
-      } else {
-        const { error } = await db.from('partners').update(partnerPayload).eq('id', partnerId);
-        if (error) throw new Error(`partner update: ${error.message}`);
-        console.log('  ✅ partner updated');
-      }
-    } else if (DRY_RUN) {
-      console.log('  [DRY RUN] Would insert barber partner');
-      partnerId = 'dry-run-partner-id';
-    } else {
-      const { data: inserted, error } = await db
-        .from('partners')
-        .insert({ ...partnerPayload, applied_at: now })
-        .select('id')
-        .single();
-      if (error) throw new Error(`partner insert: ${error.message}`);
-      partnerId = inserted.id;
-      console.log('  ✅ partner created', partnerId);
-    }
-
-    const { data: existingBarber } = await db
-      .from('barbershop_partner_applications')
-      .select('id')
-      .eq('contact_email', h.email)
-      .maybeSingle();
-
-    if (!existingBarber) {
-      const barberRow = {
-        shop_legal_name: h.shopLegalName,
-        owner_name: h.ownerName,
-        contact_name: h.contactName,
-        contact_email: h.email,
-        contact_phone: h.phone,
-        shop_address_line1: h.address,
-        shop_city: h.city,
-        shop_state: h.state,
-        shop_zip: h.zip,
-        indiana_shop_license_number: h.shopLicense,
-        supervisor_name: h.contactName,
-        supervisor_license_number: h.supervisorLicense,
-        ein: h.ein,
-        compensation_model: 'hourly',
-        employment_model: 'hourly',
-        has_workers_comp: false,
-        workers_comp_status: 'none',
-        can_supervise_and_verify: true,
-        mou_acknowledged: true,
-        consent_acknowledged: true,
-        status: 'approved',
-        notes: 'Provisioned via provision-host-shops-send-mous.mjs',
-      };
-      if (DRY_RUN) {
-        console.log('  [DRY RUN] Would insert barbershop_partner_applications');
-      } else {
-        const { error } = await db.from('barbershop_partner_applications').insert(barberRow);
-        if (error) throw new Error(`barber app: ${error.message}`);
-        console.log('  ✅ barbershop_partner_applications created');
-      }
-    } else {
-      if (!DRY_RUN) {
-        await db
-          .from('barbershop_partner_applications')
-          .update({ status: 'approved', updated_at: now })
-          .eq('id', existingBarber.id);
-      }
-      console.log('  ℹ barbershop application updated/exists');
-    }
-
-    await linkPartnerUser(partnerId, h.userId);
-    await setPartnerRole(h.userId);
-
-    if (!DRY_RUN) {
-      await db.auth.admin.updateUserById(h.userId, { email_confirm: true });
-    }
-  }
-
-  if (!PROVISION_ONLY) {
-    await sendEmail({
-      to: h.email,
-      subject: `Barber Host Shop MOU — ${h.shopName}`,
-      html: buildMouEmail(h),
-    });
-  }
-}
-
 async function verify() {
   console.log('\n=== Verification ===');
-  for (const email of [STYLE_AND_SCISSORS.email, RAZORS_IMAGE.email]) {
+  for (const email of [STYLE_AND_SCISSORS.email]) {
     const { data: profile } = await db.from('profiles').select('role').ilike('email', email).maybeSingle();
     const { data: pu } = await db
       .from('partner_users')
@@ -490,7 +334,6 @@ console.log(DRY_RUN ? 'DRY RUN' : PROVISION_ONLY ? 'PROVISION ONLY' : EMAIL_ONLY
 
 try {
   await provisionStyleAndScissors();
-  await provisionRazorsImage();
   if (!DRY_RUN) await verify();
   console.log('\nDone.');
 } catch (err) {

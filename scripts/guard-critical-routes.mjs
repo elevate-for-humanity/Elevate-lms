@@ -73,8 +73,8 @@ for (const relPath of PERSISTENCE_REQUIRED_ROUTES) {
     // An explicitly retired checkout is also fail-closed: the shared helper
     // always returns HTTP 410 and never performs a persistence write.
     const hasRetiredHardFailure =
-      /import\s*\{\s*retiredStripeCheckout\s*\}/.test(content) &&
-      /return\s+retiredStripeCheckout\s*\(/.test(content);
+      /import\s*\{\s*retiredLegacyCheckout\s*\}/.test(content) &&
+      /return\s+retiredLegacyCheckout\s*\(/.test(content);
     // Accept requireDbWrite, throw, failure(), a retired 410 response, or
     // proper try/catch with error responses.
     const hasHardFailure =

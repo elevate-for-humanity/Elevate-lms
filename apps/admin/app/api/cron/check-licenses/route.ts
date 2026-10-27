@@ -63,9 +63,60 @@ async function _GET(request: NextRequest) {
       results.checked++;
     }
 
-    // 2. Provider subscription checks are retired with Stripe.
-    // License expiry remains authoritative; QuickBooks/PayPal billing status is
-    // reconciled by the active Elevate billing system.
+    // 2. Enforce provider-neutral subscription periods.
+    // QuickBooks payment fulfillment advances the period. PayPal collection is
+    // reconciled into that ledger by the dedicated billing reconciliation job.
+    const { data: subscriptionLicenses } = await supabase
+      .from('licenses')
+      .select(
+        'id, tenant_id, billing_provider, provider_subscription_id, current_period_end, status, suspended_reason',
+      )
+      .not('provider_subscription_id', 'is', null);
+
+    const now = Date.now();
+    for (const license of subscriptionLicenses || []) {
+      try {
+        const periodEnd = license.current_period_end
+          ? Date.parse(license.current_period_end)
+          : Number.NaN;
+        if (!Number.isFinite(periodEnd)) {
+          results.errors.push(`Subscription license ${license.id} is missing current_period_end`);
+          results.checked++;
+          continue;
+        }
+
+        const shouldBeActive = periodEnd > now;
+        const isActive = license.status === 'active';
+        const provider = String(license.billing_provider || 'quickbooks');
+        const billingSuspension = String(license.suspended_reason || '').startsWith(
+          'Billing period ended',
+        );
+
+        if (shouldBeActive && !isActive && billingSuspension) {
+          await supabase
+            .from('licenses')
+            .update({ status: 'active', suspended_at: null, suspended_reason: null })
+            .eq('id', license.id);
+          await supabase.from('tenants').update({ active: true }).eq('id', license.tenant_id);
+          results.reactivated++;
+        } else if (!shouldBeActive && isActive) {
+          await supabase
+            .from('licenses')
+            .update({
+              status: 'suspended',
+              suspended_at: new Date().toISOString(),
+              suspended_reason: `Billing period ended (${provider})`,
+            })
+            .eq('id', license.id);
+          await supabase.from('tenants').update({ active: false }).eq('id', license.tenant_id);
+          results.suspended++;
+        }
+
+        results.checked++;
+      } catch (error) {
+        results.errors.push(`Failed to check subscription for license ${license.id}: ${error}`);
+      }
+    }
 
     // 3. Send warning emails for licenses expiring soon (7 days)
     const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();

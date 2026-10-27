@@ -118,6 +118,7 @@ if [[ "$UNFINISHED" -gt 0 ]]; then echo "FAIL: Unfinished content markers found:
 run "Link integrity" node scripts/integrity/links.mjs
 run "LMS integrity" node scripts/integrity/lms.mjs
 run "Store integrity" node scripts/integrity/store.mjs
+run "Store source-backed offer proof" pnpm exec tsx scripts/verify-store-proof-contract.ts
 
 section "SECTION 10: DEV STUDIO INTEGRATION"
 if [[ -f scripts/dev-studio-integration-gate.sh ]]; then

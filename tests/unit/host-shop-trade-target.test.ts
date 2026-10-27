@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { resolveTradeTarget } from '@/lib/partner/board';
 
 describe('host shop trade target resolution', () => {
-  it('configures cosmetology as a time-based apprenticeship', () => {
+  it('uses the documented cosmetology hybrid term', () => {
     expect(resolveTradeTarget('cosmetology-apprenticeship')).toMatchObject({
       programSlug: 'cosmetology-apprenticeship',
-      progressModel: 'time_based',
+      progressModel: 'hybrid',
       hours: 2000,
-      registered: false,
+      registered: true,
     });
   });
 
   it('normalizes the cosmetology shorthand', () => {
     expect(resolveTradeTarget('cosmetology')).toMatchObject({
       programSlug: 'cosmetology-apprenticeship',
-      progressModel: 'time_based',
+      progressModel: 'hybrid',
       hours: 2000,
     });
   });

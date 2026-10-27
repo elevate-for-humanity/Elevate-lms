@@ -8,7 +8,7 @@ import {
 } from '@/lib/programs/funding-registry';
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
 
-const EXPECTED = ['cdl-training'];
+const EXPECTED = ['cdl-training', 'hvac-technician'];
 
 describe('public funding registry', () => {
   it('contains only programs backed by current program-level evidence', () => {
@@ -37,12 +37,12 @@ describe('public funding registry', () => {
     }
   });
 
-  it('keeps WRG copy limited to the evidenced CDL record', () => {
+  it('keeps WRG copy limited to the evidenced CDL and HVAC records', () => {
     expect(getStaticProgram('business-administration')?.fundingStatement).not.toMatch(
       /Workforce Ready Grant|WRG/,
     );
     expect(getStaticProgram('cdl-training')?.fundingStatement).toMatch(/Workforce Ready Grant/);
-    expect(getStaticProgram('hvac-technician')?.fundingStatement).not.toMatch(/Workforce Ready Grant|WRG/);
+    expect(getStaticProgram('hvac-technician')?.fundingStatement).toMatch(/Workforce Ready Grant/);
   });
 
   it('removes unsupported public funding guarantees', () => {

@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   title: 'SAM.gov Manager | Elevate Store',
   description: 'Organize SAM.gov entity records, documents, compliance reminders, and registration preparation from an Elevate workspace. Final registration and federal approval remain on SAM.gov.',
   keywords: ['SAM.gov manager', 'SAM registration tracking', 'UEI', 'CAGE code', 'federal contractor records', 'government contracting'],
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/apps/sam-gov' },
-  openGraph: { title: 'SAM.gov Manager | Elevate Store', description: 'Organize entity records, supporting documents, and compliance reminders before working in the official SAM.gov system.', url: 'https://www.elevateforhumanity.org/store/apps/sam-gov', type: 'website' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/apps/sam-gov' },
+  openGraph: { title: 'SAM.gov Manager | Elevate Store', description: 'Organize entity records, supporting documents, and compliance reminders before working in the official SAM.gov system.', url: 'https://store.elevateforhumanity.org/store/apps/sam-gov', type: 'website' },
 };
 
 const catalog = INDIVIDUAL_APP_CATALOG['sam-gov'];
@@ -46,7 +46,7 @@ const jsonLd = {
   name: `Elevate ${catalog.displayName}`,
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
-  url: 'https://www.elevateforhumanity.org/store/apps/sam-gov',
+  url: 'https://store.elevateforhumanity.org/store/apps/sam-gov',
   description: 'Entity record, document, and compliance tracking workspace that supports preparation for official SAM.gov processes.',
   offers: catalog.plans.map((plan) => ({ '@type': 'Offer', price: String(plan.priceMonthly), priceCurrency: 'USD', category: `${plan.name} monthly subscription` })),
 };

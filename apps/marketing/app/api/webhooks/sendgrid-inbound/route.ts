@@ -1,3 +1,4 @@
+import { respondToParisMail } from '@/lib/email/paris-mail';
 // PUBLIC ROUTE: SendGrid inbound webhook
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -59,7 +60,9 @@ async function _POST(request: NextRequest) {
     }
 
     const workspaceDelivery = await storeInboundCommunicationEmail(parsed);
+    if(workspaceDelivery.filtered){await finalizeWebhookEvent('sendgrid-inbound',eventId,'processed');return NextResponse.json({ok:true,filtered:true});}
     if (workspaceDelivery.stored) {
+      await respondToParisMail(parsed);
       await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
       logger.info('[SendGrid Inbound] Stored in Elevate Email', {
         eventId,

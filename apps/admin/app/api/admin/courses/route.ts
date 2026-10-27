@@ -40,14 +40,32 @@ export const POST = withAuth(async (request: NextRequest) => {
     }
 
     const db = await requireAdminClient();
-    const { data, error } = await db.from('courses').insert({
+    let courseSlug = input.slug.trim();
+    if (input.programId) {
+      const { data: program, error: programError } = await db
+        .from('programs')
+        .select('slug')
+        .eq('id', input.programId)
+        .maybeSingle();
+      if (programError) return safeDbError(programError, 'Unable to resolve program');
+      if (!program) {
+        return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+      }
+      courseSlug = String(program.slug || courseSlug).trim();
+    }
+
+    const { data, error } = await db
+      .from('courses')
+      .insert({
         title: input.title,
-        slug: input.slug,
+        slug: courseSlug,
         description: input.description,
         program_id: input.programId || null,
         status: input.status ?? 'draft',
         updated_at: new Date().toISOString(),
-      }).select('*').single();
+      })
+      .select('*')
+      .single();
     if (error) return safeDbError(error, 'Unable to create course');
     return NextResponse.json(data, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {

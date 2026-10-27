@@ -1,20 +1,19 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
-/**
- * Legacy sponsor-license checkout compatibility route.
- * Active billing is handled by Elevate billing with QuickBooks/PayPal.
- */
 export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
-  title: 'Secure Checkout | Elevate',
+  title: 'Licensing | Elevate',
   robots: { index: false, follow: false },
 };
 
-export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
-  const { plan } = await searchParams;
-  const target = new URLSearchParams();
-  if (plan) target.set('plan', plan);
-  target.set('payment', 'invoice');
-  redirect(`/pricing/sponsor-licensing?${target.toString()}`);
+/**
+ * Compatibility route for the former generic subscription checkout.
+ * Starter/Pro price IDs do not map to the active QuickBooks offer catalog.
+ * Send visitors to the current licensing offer page so no unpriced invoice
+ * or unsupported subscription can be created from an old link.
+ */
+export default function CheckoutPage() {
+  redirect('https://www.elevateforhumanity.org/pricing/sponsor-licensing');
 }

@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   title: 'Grants Discovery & Management | Elevate Store',
   description: 'Review grant opportunities, saved grants, and application records from one Elevate workspace. Start with a 14-day individual trial.',
   keywords: ['grant management', 'grant discovery', 'grant opportunities', 'grant applications', 'workforce grants'],
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/apps/grants' },
-  openGraph: { title: 'Grants Discovery & Management | Elevate Store', description: 'A workspace for reviewing grant opportunities and grant application activity.', url: 'https://www.elevateforhumanity.org/store/apps/grants', type: 'website' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/apps/grants' },
+  openGraph: { title: 'Grants Discovery & Management | Elevate Store', description: 'A workspace for reviewing grant opportunities and grant application activity.', url: 'https://store.elevateforhumanity.org/store/apps/grants', type: 'website' },
 };
 
 const catalog = INDIVIDUAL_APP_CATALOG.grants;
@@ -41,7 +41,7 @@ const jsonLd = {
   name: `Elevate ${catalog.displayName}`,
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
-  url: 'https://www.elevateforhumanity.org/store/apps/grants',
+  url: 'https://store.elevateforhumanity.org/store/apps/grants',
   description: 'Grant opportunity and application tracking workspace for organizations and individual users.',
   offers: catalog.plans.map((plan) => ({ '@type': 'Offer', price: String(plan.priceMonthly), priceCurrency: 'USD', category: `${plan.name} monthly subscription` })),
 };

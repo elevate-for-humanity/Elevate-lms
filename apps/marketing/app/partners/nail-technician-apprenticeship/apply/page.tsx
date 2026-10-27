@@ -59,7 +59,7 @@ export default function Page() {
               <div className="border-t border-slate-200 pt-6">
                 <h4 className="font-semibold text-slate-900 mb-3">Questions?</h4>
                 <p className="text-slate-600 text-sm mb-2">Call or text our admissions team:</p>
-                <a href="tel:+13173143757" className="text-brand-blue-600 font-bold text-lg">(317) 314-3757</a>
+                <a href="tel:+14632401404" className="text-brand-blue-600 font-bold text-lg">(463) 240-1404</a>
               </div>
             </div>
           </div>

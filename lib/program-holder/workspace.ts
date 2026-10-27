@@ -377,8 +377,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .in('user_id', rosterUserIds).in('program_id', programIds)
     : { data: [], error: null };
   if (credentialError) throw new Error('Program Holder certification status could not load.');
+  const emailByUserId = new Map<string, string>((rosterProfiles ?? [])
+    .filter(row => typeof row.email === 'string' && row.email.trim())
+    .map(row => [row.id, String(row.email).trim()]));
   const trainingRecord = (row: any) => holderTrainingRecord({
-    ...row, ...holderCredentialStatus(row, credentialUploads ?? []),
+    ...row, ...(contactAccessGranted ? { email: row.email || emailByUserId.get(row.user_id || row.student_id) } : {}), ...holderCredentialStatus(row, credentialUploads ?? []),
   });
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])

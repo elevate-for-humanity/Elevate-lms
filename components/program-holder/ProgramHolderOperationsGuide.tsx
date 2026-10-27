@@ -7,7 +7,7 @@ export function ProgramHolderOperationsGuide({ holderName, programs, role }: { h
   const names = programs.map((p) => p.title || p.name || p.slug).filter(Boolean) as string[];
   return (
     <section className="space-y-5" aria-labelledby="program-holder-operations-guide">
-      <VisualDashboardOrientation audience={role?.toLowerCase().includes('coordinator') ? 'site-coordinator' : 'program-holder'} />
+      <VisualDashboardOrientation compact audience={role?.toLowerCase().includes('coordinator') ? 'site-coordinator' : 'program-holder'} />
       <details className="rounded-2xl border border-slate-200 bg-white p-4"><summary className="min-h-11 cursor-pointer font-bold">Detailed operations guide, communication templates, and office tools</summary>
       <div className="rounded-3xl border border-blue-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Program Holder Operations Center</p>

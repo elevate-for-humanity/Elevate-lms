@@ -1175,6 +1175,33 @@ export function EmailWorkspace({
               </button>
             </div>
             <div className="space-y-4 p-5">
+              {!compose.broadcast && (
+                <label className="block text-sm font-black text-slate-800">
+                  Choose a student or office contact
+                  <select
+                    aria-label="Choose a student or office contact"
+                    value=""
+                    className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3"
+                    onChange={(event) => {
+                      const address = event.target.value;
+                      if (!address) return;
+                      const current = compose.to
+                        .split(/[,;]+/)
+                        .map((value) => value.trim())
+                        .filter(Boolean);
+                      if (!current.some((value) => value.toLowerCase() === address.toLowerCase()))
+                        setCompose({ ...compose, to: [...current, address].join(', ') });
+                    }}
+                  >
+                    <option value="">Select a recipient to add</option>
+                    {(data.directory || []).map((person) => (
+                      <option key={person.id} value={person.address}>
+                        {person.display_name} — {person.address}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <label className="block text-sm font-black text-slate-800">
                 To
                 <input

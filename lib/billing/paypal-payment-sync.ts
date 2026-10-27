@@ -1,3 +1,5 @@
+import { hasVerifiedRecurringRelease } from './recurring-release';
+import { getPayPalSubscription } from './providers/paypal-subscriptions';
 import 'server-only';
 
 import { createQuickBooksBillingProvider, recordQuickBooksExternalPayment } from './providers/quickbooks';
@@ -33,25 +35,20 @@ export async function syncPayPalSubscriptionState(
   db: Database,
   input: { subscriptionId: string; status: string },
 ): Promise<{ scheduleId: string; status: string; activated: boolean } | null> {
-  const providerStatus = normalizePayPalSubscriptionStatus(input.status);
   const scheduleResult = await db
     .from('billing_schedules')
-    .select('id,status')
+    .select('*')
     .eq('collection_provider', 'paypal')
     .eq('provider_subscription_id', input.subscriptionId)
     .maybeSingle();
   if (scheduleResult.error) throw new Error(scheduleResult.error.message);
   if (!scheduleResult.data) return null;
 
-  const authorization = await db
-    .from('billing_migration_authorizations')
-    .select('id,status')
-    .eq('billing_schedule_id', scheduleResult.data.id)
-    .eq('authorization_scope', 'recurring_tuition')
-    .eq('status', 'approved')
-    .maybeSingle();
-  if (authorization.error) throw new Error(authorization.error.message);
-  const canActivate = providerStatus === 'active' && Boolean(authorization.data);
+  // Provider state is authoritative when events arrive out of order.
+  const actual = await getPayPalSubscription(input.subscriptionId);
+  const providerStatus = normalizePayPalSubscriptionStatus(actual.status);
+
+  const canActivate = providerStatus === 'active' && await hasVerifiedRecurringRelease(db, scheduleResult.data);
   const terminal = ['canceled', 'expired'].includes(providerStatus);
   const update = await db
     .from('billing_schedules')

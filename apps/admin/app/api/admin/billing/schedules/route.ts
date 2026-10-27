@@ -1,3 +1,4 @@
+import { changeBillingScheduleStatus } from '@/lib/billing/change-schedule-status';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -24,11 +25,12 @@ const ChangeSchema = z.object({ id: z.string().uuid(), status: z.enum(['active',
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, 'api'); if (limited) return limited;
   const auth = await apiRequireAdmin(request); if (auth.error) return auth.error;
+  if (![...(auth.effectiveRoles || []), auth.role].some(role => role === 'admin' || role === 'super_admin')) return NextResponse.json({ error: 'Billing administrator access required.' }, { status: 403 });
   const parsed = ScheduleSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'Invalid billing schedule.', issues: parsed.error.issues }, { status: 400 });
   const input = parsed.data;
   const db = await requireAdminClient();
-  const result = await db.from('billing_schedules').upsert({
+  const result = await db.from('billing_schedules').insert({
     customer_external_key: input.customerExternalKey, customer_name: input.customerName,
     customer_email: input.customerEmail.toLowerCase(), canonical_product_key: input.canonicalProductKey,
     product_name: input.productName, product_description: input.productDescription || null,
@@ -40,7 +42,8 @@ export async function POST(request: NextRequest) {
     status: input.collectionMode === 'automatic' ? 'paused' : 'active',
     legacy_stripe_subscription_id: input.legacyStripeSubscriptionId || null,
     updated_at: new Date().toISOString(),
-  }, { onConflict: 'provider,customer_external_key,canonical_product_key' }).select('id').single();
+  }).select('id').single();
+  if (result.error?.code === '23505') return NextResponse.json({ error: 'This customer already has a schedule for this product. Review the existing schedule; creating another must not reset an approved agreement.' }, { status: 409 });
   if (result.error) return NextResponse.json({ error: 'Billing schedule could not be saved.' }, { status: 500 });
   let authorizationLinked = input.collectionMode !== 'automatic';
   if (input.collectionMode === 'automatic') {
@@ -98,16 +101,13 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const limited = await applyRateLimit(request, 'api'); if (limited) return limited;
   const auth = await apiRequireAdmin(request); if (auth.error) return auth.error;
+  if (![...(auth.effectiveRoles || []), auth.role].some(role => role === 'admin' || role === 'super_admin')) return NextResponse.json({ error: 'Billing administrator access required.' }, { status: 403 });
   const parsed = ChangeSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'Invalid schedule update.' }, { status: 400 });
   const db = await requireAdminClient();
-  const result = await db.from('billing_schedules').update({ status: parsed.data.status, updated_at: new Date().toISOString() }).eq('id', parsed.data.id).eq('provider', 'quickbooks').select('id').maybeSingle();
-  if (result.error) {
-    if (/AUTOPAY_(PROVIDER_NOT_ACTIVE|AUTHORIZATION_NOT_APPROVED)/.test(result.error.message)) {
-      return NextResponse.json({ error: 'The signed release and active PayPal billing agreement are both required before automatic collection can resume.' }, { status: 409 });
-    }
-    return NextResponse.json({ error: 'Billing schedule could not be updated.' }, { status: 500 });
+  try {
+    return NextResponse.json(await changeBillingScheduleStatus(db, parsed.data.id, parsed.data.status));
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Billing collection could not be changed.' }, { status: 409 });
   }
-  if (!result.data) return NextResponse.json({ error: 'Billing schedule not found.' }, { status: 404 });
-  return NextResponse.json({ ok: true });
 }

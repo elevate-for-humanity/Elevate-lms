@@ -21,6 +21,7 @@ export function AuthorizationActions({
     if (action === 'reject' && !reason) return;
     setBusy(true);
     setError('');
+    try {
     const response = await fetch(`/api/admin/billing/authorizations/${id}`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
@@ -33,12 +34,14 @@ export function AuthorizationActions({
       return;
     }
     router.refresh();
+    } catch { setError('The review could not be saved. Please retry.'); }
+    finally { setBusy(false); }
   }
   if (!hasDocument || status === 'requested')
-    return <span className="text-xs font-semibold text-amber-700">Waiting on student</span>;
+    return <span className="text-xs font-semibold text-amber-700">Signed release required</span>;
   if (status === 'approved')
     return (
-      <span className="text-xs font-semibold text-emerald-700">Approved — ready for cutover</span>
+      <span className="text-xs font-semibold text-emerald-700">Release reviewed — provider approval still required</span>
     );
   return (
     <div className="space-y-1">

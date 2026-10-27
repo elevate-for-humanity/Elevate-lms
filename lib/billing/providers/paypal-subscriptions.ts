@@ -1,3 +1,4 @@
+import { hasVerifiedRecurringRelease } from '../recurring-release';
 import 'server-only';
 
 import { createHash } from 'node:crypto';
@@ -51,6 +52,7 @@ function safeStartTime(date: string): string {
 }
 
 export async function provisionPayPalSubscription(db: Database, schedule: Schedule) {
+  if (!await hasVerifiedRecurringRelease(db, schedule)) throw new Error('A signed recurring-payment release, reviewer, and matching billing terms are required before PayPal setup.');
   if (schedule.provider_status === 'active') {
     return {
       subscriptionId: schedule.provider_subscription_id,

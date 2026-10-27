@@ -16,12 +16,14 @@ export async function POST(
   if (limited) return limited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
+  if (![...(auth.effectiveRoles || []), auth.role].some(role => role === 'admin' || role === 'super_admin')) return NextResponse.json({ error: 'Billing administrator access required.' }, { status: 403 });
   const { id } = await params;
   const db = await requireAdminClient();
   const schedule = await db.from('billing_schedules').select('*').eq('id', id).maybeSingle();
   if (schedule.error || !schedule.data) {
     return NextResponse.json({ error: 'Billing schedule not found.' }, { status: 404 });
   }
+  if (['canceled', 'completed'].includes(schedule.data.status)) return NextResponse.json({ error: 'This schedule has ended. Review a new authorization before creating another agreement.' }, { status: 409 });
   if (schedule.data.collection_mode !== 'automatic' || schedule.data.collection_provider !== 'paypal') {
     return NextResponse.json({ error: 'This schedule is not configured for PayPal automatic collection.' }, { status: 409 });
   }

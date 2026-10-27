@@ -22,7 +22,7 @@ function nextMonthlyBillingDate(dayOfMonth: number) {
 export default async function AdminBillingSubscriptionsPage() {
   await requireRole(['admin', 'super_admin']);
   const db = await requireAdminClient();
-  const [{ data: schedules }, { data: authorizations }, { data: preferences }, { data: history }] = await Promise.all([
+  const [scheduleResult, authorizationResult, preferenceResult, historyResult, planResult] = await Promise.all([
     db
       .from('billing_schedules')
       .select(
@@ -46,13 +46,20 @@ export default async function AdminBillingSubscriptionsPage() {
     db
       .from('organization_subscriptions')
       .select(
-        'status,billing_interval,current_period_end,billing_provider,provider_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
+        'status,billing_interval,current_period_end,billing_provider,provider_subscription_id,plan_type,organizations(name,slug),subscription_plans(name,slug)',
       )
       .order('created_at', { ascending: false })
       .limit(100),
+    db.from('subscription_plans').select('id,name,monthly_price,annual_price').eq('active', true).order('sort_order'),
   ]);
+  const schedules = scheduleResult.data;
+  const authorizations = authorizationResult.data;
+  const preferences = preferenceResult.data;
+  const history = historyResult.data;
+  const loadFailed = [scheduleResult, authorizationResult, preferenceResult, historyResult, planResult].some(result => result.error);
   return (
     <div className="space-y-6">
+      {loadFailed && <p role="alert" className="rounded border border-red-300 bg-red-50 p-4 text-red-800">Some billing records could not load. Reload before changing any subscription.</p>}
       <div className="flex flex-wrap justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Billing schedules</h1>
@@ -62,6 +69,12 @@ export default async function AdminBillingSubscriptionsPage() {
         </div>
         <CreateSchedule />
       </div>
+      <section className="overflow-x-auto rounded-xl border bg-white">
+        <h2 className="border-b px-4 py-3 font-bold">Available subscription plans</h2>
+        <table className="w-full text-left text-sm"><thead><tr><th className="p-4">Plan</th><th className="p-4">Monthly</th><th className="p-4">Annual</th></tr></thead>
+          <tbody>{(planResult.data || []).map(plan => <tr key={plan.id} className="border-t"><td className="p-4">{plan.name}</td><td className="p-4">${Number(plan.monthly_price).toFixed(2)}</td><td className="p-4">${Number(plan.annual_price).toFixed(2)}</td></tr>)}</tbody>
+        </table>
+      </section>
       {preferences?.length ? (
         <section className="overflow-hidden rounded-xl border border-amber-300 bg-amber-50">
           <h2 className="border-b border-amber-200 px-4 py-3 font-bold">Account billing instructions</h2>
@@ -173,6 +186,7 @@ export default async function AdminBillingSubscriptionsPage() {
                   {s.collection_mode === 'automatic' ? (
                     <PayPalSetupAction
                       scheduleId={s.id}
+                      scheduleStatus={s.status}
                       providerStatus={s.provider_status}
                       approvalUrl={s.provider_approval_url}
                     />
@@ -201,13 +215,13 @@ export default async function AdminBillingSubscriptionsPage() {
             {(history || []).map((r: any, i) => (
               <tr key={i} className="border-t">
                 <td className="px-4 py-3">
-                  {(Array.isArray(r.tenants) ? r.tenants[0] : r.tenants)?.name || '—'}
+                  {(Array.isArray(r.organizations) ? r.organizations[0] : r.organizations)?.name || '—'}
                 </td>
                 <td className="px-4 py-3">
                   {(Array.isArray(r.subscription_plans)
                     ? r.subscription_plans[0]
                     : r.subscription_plans
-                  )?.name || '—'}
+                  )?.name || r.plan_type || '—'}
                 </td>
                 <td className="px-4 py-3">{r.status}</td>
                 <td className="px-4 py-3 capitalize">{r.billing_provider || 'quickbooks'}</td>

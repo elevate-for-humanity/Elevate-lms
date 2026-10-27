@@ -7,10 +7,12 @@ export function PayPalSetupAction({
   scheduleId,
   providerStatus,
   approvalUrl,
+  scheduleStatus,
 }: {
   scheduleId: string;
   providerStatus: string;
   approvalUrl?: string | null;
+  scheduleStatus?: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -18,15 +20,18 @@ export function PayPalSetupAction({
   async function setup() {
     setBusy(true);
     setError('');
+    try {
     const response = await fetch(`/api/admin/billing/schedules/${scheduleId}/paypal`, {
       method: 'POST',
     });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) setError(body.error || 'PayPal setup failed.');
     else router.refresh();
-    setBusy(false);
+    } catch { setError('PayPal setup could not be reached. Please retry.'); }
+    finally { setBusy(false); }
   }
-  if (providerStatus === 'active') {
+  if (['canceled', 'completed'].includes(scheduleStatus || '')) return <span className="text-xs">Collection ended</span>;
+  if (providerStatus === 'active' && scheduleStatus === 'active') {
     return <span className="text-xs font-bold text-emerald-700">PayPal automatic billing active</span>;
   }
   if (approvalUrl) {

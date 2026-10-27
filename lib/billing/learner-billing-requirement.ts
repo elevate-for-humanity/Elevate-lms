@@ -1,3 +1,4 @@
+import { hasRecurringReleaseEvidence } from './recurring-release';
 import { isAffirmInvoiceAmount } from './invoice-checkout';
 import {
   listApprenticeInvoices,
@@ -25,6 +26,8 @@ type AuthorizationRow = {
   billing_schedule_id?: string | null;
   status: string;
   rejection_reason?: string | null;
+  document_path?: string | null;
+  reviewed_by?: string | null;
 };
 
 type ScheduleRow = {
@@ -70,6 +73,11 @@ const NON_STUDENT_PAY_VALUES = new Set([
   'sponsored',
 ]);
 
+export function isNonStudentPaidFunding(value: unknown): boolean {
+  const funding = String(value || '').trim().toLowerCase();
+  return NON_STUDENT_PAY_VALUES.has(funding) || /^(wioa|wrg)(?:$|[\s_-])/.test(funding);
+}
+
 function normalized(value: unknown): string {
   return String(value || '').trim().toLowerCase();
 }
@@ -108,7 +116,7 @@ export function resolveLearnerBillingRequirement(input: {
     const state = normalized(row.enrollment_state || row.status);
     if (!ACTIVE_ENROLLMENT_STATES.has(state)) return false;
     const funding = normalized(row.funding_source || row.funding_pathway);
-    if (NON_STUDENT_PAY_VALUES.has(funding)) return false;
+    if (isNonStudentPaidFunding(funding)) return false;
     const apprentice = role === 'apprentice' || normalized(row.program_slug).includes('apprent');
     return apprentice || SELF_PAY_VALUES.has(funding);
   });
@@ -143,7 +151,9 @@ export function resolveLearnerBillingRequirement(input: {
   if (authorization?.status === 'submitted') status = 'release_submitted';
   else if (authorization?.status === 'requested' || authorization?.status === 'rejected') {
     status = 'release_required';
-  } else if (authorization?.status === 'approved') {
+  } else if (authorization?.status === 'approved' && !hasRecurringReleaseEvidence(authorization)) {
+    status = 'release_required';
+  } else if (hasRecurringReleaseEvidence(authorization)) {
     const paypalActive =
       schedule?.status === 'active' &&
       schedule.provider_status === 'active' &&
@@ -159,7 +169,7 @@ export function resolveLearnerBillingRequirement(input: {
     authorizationId: authorization?.id || null,
     authorizationStatus: authorization?.status || null,
     rejectionReason: authorization?.rejection_reason || null,
-    paypalApprovalUrl: schedule?.provider_approval_url || null,
+    paypalApprovalUrl: hasRecurringReleaseEvidence(authorization) ? schedule?.provider_approval_url || null : null,
     invoices,
     affirmInvoice,
   };
@@ -196,7 +206,7 @@ export async function loadLearnerBillingRequirement(
   const [authorizationResult, invoices] = await Promise.all([
     db
       .from('billing_migration_authorizations')
-      .select('id,billing_schedule_id,status,rejection_reason')
+      .select('id,billing_schedule_id,status,rejection_reason,document_path,reviewed_by')
       .eq('user_id', userId)
       .neq('status', 'superseded')
       .order('created_at', { ascending: false })

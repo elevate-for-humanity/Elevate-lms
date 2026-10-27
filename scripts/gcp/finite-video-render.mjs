@@ -117,7 +117,7 @@ export async function runFiniteVideoRender() {
     stage = 'runtime_start';
     server = spawn(process.execPath, ['apps/admin/server.js'], {
       env: { ...process.env, PORT: port, HOSTNAME: '0.0.0.0', ELEVATE_SERVICE: 'video-render',
-        DISABLE_ADMIN_VIDEO_WORKER: 'true', VIDEO_RENDER_GLOBAL_CONCURRENCY: '3' },
+        DISABLE_ADMIN_VIDEO_WORKER: 'true', VIDEO_RENDER_GLOBAL_CONCURRENCY: '1' },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     for (const stream of [server.stdout, server.stderr]) stream.on('data', chunk => { diagnostic = (diagnostic + chunk.toString()).slice(-16000); });

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -51,7 +52,7 @@ export default async function VolunteerPage() {
 
       {/* Hero */}
       <div className="relative h-[40vh] min-h-[300px] flex items-center overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/volunteer-page-1.webp"
           alt="Volunteer with Elevate"
           fill

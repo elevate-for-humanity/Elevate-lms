@@ -33,3 +33,26 @@ for (const options of [{ ready: false }, { database: false }, { failed: true }, 
 test('requires scoped runtime configuration and execution identity', async () => {
   await assert.rejects(runStoreSubscriptions({}));
 });
+
+test('Store billing remains operational without contacting Admin, Marketing or agentic workers', async () => {
+  const { STORE_URL } = await import('./run-store-subscriptions.mjs');
+  const storeEnv = { CRON_SECRET: 'store-only-cron', CLOUD_RUN_EXECUTION: 'current', BILLING_RUNTIME_COMPONENT: 'store', EXPECTED_STORE_COMMIT: 'c'.repeat(40) };
+  const writes = [];
+  const result = await runStoreSubscriptions(storeEnv, async (url, init) => {
+    if (url.startsWith('http://metadata.google.internal/')) {
+      if (url.endsWith('/token')) return Response.json({ access_token: 'access' });
+      assert.equal(new URL(url).searchParams.get('audience'), STORE_URL);
+      return new Response('store-identity');
+    }
+    if (url.startsWith('https://run.googleapis.com/')) return Response.json({ executions: [] });
+    assert.equal(new URL(url).origin, STORE_URL);
+    if (url.endsWith('/api/ready')) return Response.json({ service: 'store', commit: storeEnv.EXPECTED_STORE_COMMIT, ready: true });
+    if (url.endsWith('/api/health')) return Response.json({ service: 'store', commit: storeEnv.EXPECTED_STORE_COMMIT, ready: true, healthy: true, dependencies: { supabase: { ok: true } } });
+    assert.equal(init.method, 'POST');
+    assert.equal(init.headers.Authorization, 'Bearer store-only-cron');
+    writes.push(new URL(url).pathname);
+    return Response.json({ ok: true, completed: 1 });
+  });
+  assert.equal(result.skipped, false);
+  assert.deepEqual(writes, ['/api/store/internal/process-billing-fulfillment', '/api/store/internal/generate-billing-invoices']);
+});

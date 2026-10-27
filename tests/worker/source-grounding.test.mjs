@@ -12,3 +12,13 @@ for(const [name,patch] of [['fabricated quote',{excerpt:'An invented statement w
 test('missing and malformed grounding cannot pass',()=>{
  for(const citations of [undefined,[],[null]])assert.throws(()=>assertSourceGrounding(segments,sources,citations),/ULTIMATE_/);
 });
+
+test('authorized HTML and typographic formatting cannot cause a false citation failure',()=>{
+ const source={id:'authorized',text:'Authorized course content: {"html":"<p>Apprentices record <strong>2,000</strong> verified hours — never count lunch as training time.</p>"}'};
+ assertSourceGrounding(segments,[source],[{segmentId:'terms',sourceId:'authorized',excerpt:'Apprentices record 2000 verified hours; NEVER count lunch as training time.'}]);
+});
+test('format normalization cannot erase a safety negation or change the hours',()=>{
+ const source={id:'authorized',text:'Apprentices must not count lunch as training time during the 2000 hour program.'};
+ for(const excerpt of ['Apprentices must count lunch as training time during the 2000 hour program.','Apprentices must not count lunch as training time during the 2500 hour program.'])
+  assert.throws(()=>assertSourceGrounding(segments,[source],[{segmentId:'terms',sourceId:'authorized',excerpt}]),/ULTIMATE_SOURCE_CITATION_INVALID/);
+});

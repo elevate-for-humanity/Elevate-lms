@@ -4,6 +4,7 @@ import { contractHash } from '../core/lesson-contract';
 import { validateTeachingVisual, type TeachingVisual } from './teaching-visual';
 export interface LessonBlueprint {
   competencyId: string;
+  flashcards?: Array<{front: string; back: string}>;
   objectives: Array<{ id: string; text: string; sourceRequirementIds: string[] }>;
   prerequisites: {
     checks: Array<{ prompt: string; expectedAnswer: string }>;
@@ -146,15 +147,26 @@ export function validateLessonBlueprint(b: LessonBlueprint, c: UltimateCompetenc
     )
   )
     throw new Error('BLUEPRINT_REASSESSMENT_MUST_USE_NEW_QUESTIONS');
-  for (const id of ids)
+  for (const id of ids) {
     if (
       !b.segments.some((s) => s.objectiveIds.includes(id)) ||
       !b.assessment.questions.some((q) => q.objectiveIds.includes(id))
     )
       throw new Error(`BLUEPRINT_OBJECTIVE_UNCOVERED:${id}`);
+    // Release requires both kinds of practice for each objective. A lesson-wide
+    // activity of each type does not prove that every objective is practiced.
+    for (const type of ['guided_practice', 'independent_practice'])
+      if (!b.activities.some((activity) =>
+        activity.type === type && text(activity.id) && text(activity.prompt) &&
+        text(activity.feedback) && mapped(activity.objectiveIds) &&
+        activity.objectiveIds.includes(id),
+      ))
+        throw new Error(`BLUEPRINT_OBJECTIVE_PRACTICE_REQUIRED:${id}:${type}`);
+  }
   if (c.requiresPracticalEvidence && !b.assessment.practicalRubric)
     throw new Error('BLUEPRINT_PRACTICAL_RUBRIC_REQUIRED');
 }
 export function blueprintHash(b: LessonBlueprint) {
   return contractHash(b);
 }
+

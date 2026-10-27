@@ -45,7 +45,7 @@ export default function DevStudioPwaHint() {
             sessionStorage.setItem('dev-studio-pwa-hint-dismissed', '1');
             setDismissed(true);
           }}
-          className="shrink-0 rounded-lg p-1 text-slate-400 hover:bg-white hover:text-slate-600"
+          className="shrink-0 rounded-lg p-1 text-slate-600 hover:bg-white hover:text-slate-600"
           aria-label="Dismiss"
         >
           <X className="h-4 w-4" />

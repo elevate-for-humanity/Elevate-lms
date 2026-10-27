@@ -193,7 +193,7 @@ input.on('data', chunk => {
     let state;
     for (let attempt = 0; attempt < 100; attempt++) {
       try { state = (await readFile(`/proc/${rendererPid}/stat`, 'utf8')).split(') ')[1][0]; }
-      catch (error) { if (error.code === 'ENOENT') { state = 'gone'; break; } throw error; }
+      catch (error) { if (['ENOENT', 'ESRCH'].includes(error.code)) { state = 'gone'; break; } throw error; }
       if (state === 'Z') break;
       await new Promise(resolve => setTimeout(resolve, 10));
     }

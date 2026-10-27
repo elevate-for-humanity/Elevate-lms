@@ -39,7 +39,8 @@ describe('deployed portal middleware auth coverage', () => {
 
   it('validates the Supabase user before protected LMS rendering', () => {
     expect(lms).toContain('supabase.auth.getUser()');
-    expect(lms).toContain('if (error || !user) return redirectToLogin(req, pathname)');
+    expect(lms).toContain('if (error || !user) {');
+    expect(lms).toContain('redirect.cookies.set(cookie)');
     expect(lms).toContain("X-Robots-Tag', 'noindex, nofollow, noarchive'");
   });
 

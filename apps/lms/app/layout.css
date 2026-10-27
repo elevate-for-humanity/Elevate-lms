@@ -1,7 +1,7 @@
 /* Keep long organization names and dashboard headings readable in installed PWAs. */
 @media (max-width: 767px) {
   .program-holder-portal :is(h1, h2, h3) {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     line-height: 1.25;
   }
 
@@ -19,6 +19,6 @@
 
   .program-holder-portal :is(section, article, a, p, span, td, th) {
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 }

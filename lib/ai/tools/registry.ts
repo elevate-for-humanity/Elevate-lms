@@ -222,6 +222,14 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'courses.health',
+    description: 'Read Course Builder capability, database, and instructional integrity checks.',
+    method: 'GET', path: '/api/admin/courses/health',
+    classification: 'read', risk: 'low', scope: 'platform',
+    allowedAgents: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'], allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    approvalRequired: false, idempotent: true, timeoutMs: 30_000, retryAttempts: 1, audit: true,
+  },
+  {
     name: 'courses.status',
     description: 'Read canonical course worker, PARIS monitor, and checkpoint status. Never infer execution from a queue acknowledgment.',
     method: 'GET',
@@ -803,7 +811,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   {
     name: 'browser.execute',
     description:
-      'Execute an interactive command in an isolated Studio browser with durable task checkpoints.',
+      'Execute an interactive command in an authenticated Studio browser. Launch an owner-scoped session first; the browser task requires its session ID and token.',
     method: 'POST',
     path: '/api/admin/dev-studio/browser/agent',
     classification: 'write',
@@ -811,7 +819,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     scope: 'platform',
     allowedAgents: DEVSTUDIO_AGENTS,
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
-    requiredInput: ['task'],
+    requiredInput: ['task', 'sessionId', 'sessionToken'],
     approvalRequired: false,
     idempotent: false,
     timeoutMs: 120_000,

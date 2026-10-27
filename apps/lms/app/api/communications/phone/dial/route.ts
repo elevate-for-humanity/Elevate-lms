@@ -15,14 +15,14 @@ export async function POST(request:Request){
   .select('id,extension,webrtc_provider,ring_mode,presence_status').eq('workspace_id',workspaceId).eq('extension',number).eq('enabled',true).maybeSingle();
  if(error)return NextResponse.json({error:'The extension directory is temporarily unavailable.'},{status:503});
  if(!extension)return NextResponse.json({error:'That extension is not enabled in your phone workspace.'},{status:404});
- if(extension.webrtc_provider!=='telnyx')return NextResponse.json({error:'That extension uses a different phone service. Its carrier connection must be verified before calling.'},{status:409});
+ if(extension.webrtc_provider!=='asterisk')return NextResponse.json({error:'That extension has not been migrated to the independent PWA phone service.'},{status:409});
  if(['offline','do_not_disturb'].includes(extension.ring_mode)||extension.presence_status==='busy')
   return NextResponse.json({error:'That extension is not available for a live call.'},{status:409});
  const {data:devices,error:deviceError}=await ctx.db.from('phone_webrtc_devices').select('sip_username')
-  .eq('extension_id',extension.id).eq('provider','telnyx').eq('status','active').eq('connection_state','connected')
+  .eq('extension_id',extension.id).eq('provider','asterisk').eq('status','active').eq('connection_state','connected')
   .gte('last_seen_at',new Date(Date.now()-120000).toISOString()).order('last_seen_at',{ascending:false}).limit(1);
  if(deviceError)return NextResponse.json({error:'Phone reachability could not be verified.'},{status:503});
  const username=devices?.[0]?.sip_username;
  if(typeof username!=='string'||!/^[A-Za-z0-9._-]{1,128}$/.test(username))return NextResponse.json({error:'That person must open and connect their phone before receiving a call.'},{status:409});
- return NextResponse.json({destination:'sip:'+username+'@sip.telnyx.com',extension:number},{headers:{'Cache-Control':'no-store'}});
+ return NextResponse.json({destination:'sip:'+username+'@phone.elevateforhumanity.org',extension:number},{headers:{'Cache-Control':'no-store'}});
 }

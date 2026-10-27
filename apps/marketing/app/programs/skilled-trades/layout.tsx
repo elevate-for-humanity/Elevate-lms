@@ -3,14 +3,14 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Skilled Trades Training Programs',
   description:
-    'Free skilled trades training including HVAC, CDL, and Barber Apprenticeship. WIOA-funded programs with job placement support in Indianapolis.',
+    'Skilled trades training in Indianapolis with program-specific duration, credential, tuition, funding, and career-support disclosures.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs/skilled-trades',
   },
   openGraph: {
     title: 'Skilled Trades Training Programs',
     description:
-      'Start your trades career with training programs at no cost to eligible participants in Indianapolis.',
+      'Explore Indianapolis skilled-trades training with program-specific tuition and funding disclosures.',
     url: 'https://www.elevateforhumanity.org/programs/skilled-trades',
   },
 };

@@ -11,7 +11,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { apiRequireAdmin } from '@/lib/admin/guards';
+import { apiRequireRoles } from '@/lib/admin/guards';
+import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -23,7 +24,7 @@ export const dynamic = 'force-dynamic';
 
 // GET — read one or many keys
 export async function GET(req: NextRequest) {
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
 
   const keys = req.nextUrl.searchParams.get('keys')?.split(',').filter(Boolean);
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
 
   let body: { settings?: Record<string, string> };

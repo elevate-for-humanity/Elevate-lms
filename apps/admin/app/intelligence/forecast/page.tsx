@@ -323,7 +323,7 @@ export default async function ForecastPage() {
               16-week cohort trend · 30-day projection · per-program throughput
             </p>
           </div>
-          <span className="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+          <span className="text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-1.5">
             <Calendar className="w-3 h-3" />
             Last 16 weeks
           </span>

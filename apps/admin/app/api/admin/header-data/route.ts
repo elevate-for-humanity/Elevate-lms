@@ -60,6 +60,7 @@ export async function GET(req: NextRequest) {
           .not('status', 'in', '("closed_won","closed_lost","Closed Won","Closed Lost")'),
       ]);
 
+    const unavailableSources = ([['applications', appsRes], ['documents', docsRes], ['compliance', alertsRes], ['wioa', wioaDocsRes], ['leads', staleLeadsRes]] as const).filter(([, result]) => Boolean(result.error)).map(([name]) => name);
     const name =
       profileRes.data?.first_name ||
       profileRes.data?.full_name?.split(' ')[0] ||
@@ -114,11 +115,11 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { userName: name, notifs },
+      { userName: name, notifs, status: unavailableSources.length ? 'degraded' : 'ok', unavailableSources },
       { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' } },
     );
   } catch (err) {
     logger.warn('[header-data] fetch failed', err instanceof Error ? err.message : err);
-    return NextResponse.json({ userName: 'Admin', notifs: [] });
+    return NextResponse.json({ error: 'HEADER_DATA_UNAVAILABLE', status: 'unavailable', userName: 'Admin', notifs: [] }, { status: 503 });
   }
 }

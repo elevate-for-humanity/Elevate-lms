@@ -6,6 +6,7 @@ import { Phone, MessageSquare, ChevronDown, ChevronUp, Clock, Calendar, MapPin, 
 interface Applicant {
   id: string;
   applicant_name: string;
+  regional_application_id?: string;
   applicant_email: string;
   applicant_phone: string;
   application_status: string;
@@ -25,7 +26,7 @@ const OUTCOMES = [
   { value: 'scheduled',       label: 'Scheduled Start',   color: 'text-purple-600'},
   { value: 'enrolled',        label: 'Enrolled',          color: 'text-emerald-600'},
   { value: 'not_interested',  label: 'Not Interested',    color: 'text-red-600'   },
-  { value: 'wrong_number',    label: 'Wrong Number',      color: 'text-slate-400' },
+  { value: 'wrong_number',    label: 'Wrong Number',      color: 'text-slate-600' },
 ];
 
 function OutcomePill({ outcome }: { outcome: string | null }) {
@@ -70,6 +71,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           program_holder_student_id: applicant.id,
+          regional_application_id: applicant.regional_application_id,
           outcome: form.outcome,
           notes: form.notes,
           next_follow_up: form.next_follow_up || null,
@@ -157,7 +159,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
           return (
             <div key={applicant.id}>
               {/* Summary row */}
-              <div className="px-6 py-3 flex items-center gap-3">
+              <div className="flex flex-wrap items-start gap-3 px-3 py-3 sm:px-6">
                 {/* Avatar */}
                 <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                   <span className="text-amber-700 text-sm font-bold">
@@ -168,10 +170,21 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                 {/* Name + email */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-900 truncate">{applicant.applicant_name}</p>
-                  <p className="text-xs text-slate-400 truncate">{applicant.applicant_email}</p>
-                  {notes && (
-                    <p className="text-xs text-slate-500 italic truncate mt-0.5">"{notes}"</p>
+                  <p className="text-xs text-slate-600 truncate">{applicant.applicant_email}</p>
+                  {applicant.applicant_phone ? (
+                    <a href={`tel:${applicant.applicant_phone.replace(/[^+0-9]/g, '')}`} className="mt-1 block w-fit text-sm font-bold text-blue-800 underline" aria-label={`Call ${applicant.applicant_name} at ${applicant.applicant_phone}`}>
+                      {applicant.applicant_phone}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-xs font-semibold text-amber-800">Phone number not on file — request contact update</p>
                   )}
+                  {notes && (
+                    <div className="mt-2 max-w-xl rounded-lg border border-blue-100 bg-blue-50 px-3 py-2">
+                      <p className="text-xs font-black text-blue-900">Student follow-up notes</p>
+                      <p className="mt-1 whitespace-pre-wrap break-words text-xs text-slate-800">{notes}</p>
+                    </div>
+                  )}
+                  {outcome && <p className="mt-1 text-xs font-semibold text-slate-700">Last call outcome: {OUTCOMES.find((item) => item.value === outcome)?.label || outcome}</p>}
                   {workStart && (
                     <p className="text-xs text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Start: {new Date(workStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -181,7 +194,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                 </div>
 
                 {/* Right side */}
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-2">
                   {/* App status */}
                   <span className={`text-xs font-semibold rounded-full px-2 py-0.5 ${
                     applicant.application_status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
@@ -217,7 +230,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                   {/* Expand toggle */}
                   <button
                     onClick={() => setExpanded(isOpen ? null : applicant.id)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"
                   >
                     {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
@@ -318,7 +331,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                     </button>
                     <button
                       onClick={() => setExpanded(null)}
-                      className="text-sm text-slate-400 hover:text-slate-600"
+                      className="text-sm text-slate-600 hover:text-slate-600"
                     >
                       Cancel
                     </button>

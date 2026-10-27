@@ -26,9 +26,40 @@ beforeEach(()=>{
     return new Promise<Response>(resolve=>{laterHeartbeat=resolve;});
   }));
 });
-afterEach(()=>{cleanup();vi.unstubAllGlobals();});
+afterEach(()=>{cleanup();vi.useRealTimers();vi.unstubAllGlobals();});
 async function connected(){render(<ProgramHolderPhone/>);await screen.findByRole('button',{name:'Disconnect'});}
 describe('phone connection lifecycle',()=>{
+  function pendingProvider() {
+    const disconnect = vi.fn().mockResolvedValue(undefined);
+    mock.create.mockResolvedValue({on:(event:string,callback:any)=>{mock.handlers[event]=callback;},
+      newCall:mock.newCall,connect:()=>new Promise(()=>{}),disconnect});
+    return disconnect;
+  }
+  it('allows retry when the provider goes offline before registration finishes',async()=>{
+    pendingProvider();render(<ProgramHolderPhone/>);
+    await waitFor(()=>expect(mock.handlers.offline).toBeTypeOf('function'));
+    await act(async()=>mock.handlers.offline());
+    expect(screen.getByRole('button',{name:'Connect phone'})).toBeEnabled();
+    expect(screen.queryByRole('button',{name:'Connecting…'})).toBeNull();
+  });
+  it('allows retry and displays a provider error before registration finishes',async()=>{
+    pendingProvider();render(<ProgramHolderPhone/>);
+    await waitFor(()=>expect(mock.handlers.error).toBeTypeOf('function'));
+    await act(async()=>mock.handlers.error({message:'SIP registration rejected.'}));
+    expect(screen.getByText('SIP registration rejected.')).toBeTruthy();
+    expect(screen.getByRole('button',{name:'Connect phone'})).toBeEnabled();
+  });
+  it('expires a stuck startup, cancels its work and releases the provider for retry',async()=>{
+    vi.useFakeTimers();const disconnect=pendingProvider();render(<ProgramHolderPhone/>);
+    await vi.waitFor(()=>expect(mock.handlers.error).toBeTypeOf('function'));
+    const options=mock.create.mock.calls.at(-1)?.[2];
+    expect(options.signal.aborted).toBe(false);
+    await act(async()=>{await vi.advanceTimersByTimeAsync(45_000);});
+    expect(options.signal.aborted).toBe(true);
+    expect(disconnect).toHaveBeenCalled();
+    expect(screen.getByText('Phone connection timed out. Reconnect the phone and check microphone access.')).toBeTruthy();
+    expect(screen.getByRole('button',{name:'Connect phone'})).toBeEnabled();
+  });
   it('renders the actual voicemail audio returned by the API',async()=>{
     vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({...data,readOnly:true,voicemail:{items:[{id:'message',phone_number:null,created_at:'2026-10-12T12:00:00Z',transcription:'Saved voice message',summary:null,recordingUrl:'/api/program-holder/phone/voicemail/message/recording'}]}}));
     render(<ProgramHolderPhone/>);

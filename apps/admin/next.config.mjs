@@ -36,7 +36,7 @@ const adminConfig = {
 
   transpilePackages: ['edge-tts'],
 
-  webpack(config, { isServer, nextRuntime }) {
+  webpack(config, { dev, isServer, nextRuntime }) {
     config.resolve.alias['@'] = ROOT;
 
     config.resolve.alias[
@@ -59,7 +59,7 @@ const adminConfig = {
       config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
     }
     config.parallelism = 1;
-    if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
+    if (!dev || process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
 
     return config;
   },

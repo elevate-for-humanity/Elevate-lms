@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {approvedDeliveryFailures,generatedTeachingPhoto} from '../../lib/ultimate-course-builder/instructional/approved-delivery.mjs';
+import {approvedDeliveryFailures,generatedTeachingPhoto,narrationCoverageSeverity} from '../../lib/ultimate-course-builder/instructional/approved-delivery.mjs';
 const sha='a'.repeat(64);
 function fixture(){
  const text='Inspect the clean tools. Separate the used tools. Keep clean equipment protected until the next client.';
@@ -45,4 +45,13 @@ test('generated illustrations preserve OpenAI provenance without pretending to b
  assert.equal(generatedTeachingPhoto({...scene,physicalDemonstration:true}),false);
  assert.equal(generatedTeachingPhoto({...scene,pictureCues:[{...scene.pictureCues[0],sha256:'invalid'}]}),false);
  assert.equal(generatedTeachingPhoto({...scene,resolvedProvider:'untrusted'}),false);
+});
+
+test('approved audio keeps ASR lexical differences advisory without inventing a passing score',()=>{
+ assert.equal(narrationCoverageSeverity(0.895,true),'warning');
+ assert.equal(narrationCoverageSeverity(0.895,false),'error');
+ assert.equal(narrationCoverageSeverity(0.95,true),null);
+ for(const coverage of [0,0.5,0.749,NaN,Infinity]) assert.equal(narrationCoverageSeverity(coverage,true),'error');
+ const f=fixture(); f.narration.segments[0].parts[0].audioUrl='';
+ assert.ok(failures(f).some(code=>code.startsWith('APPROVED_AUDIO_PART_GAP_OR_OVERLAP')));
 });

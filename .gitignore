@@ -260,3 +260,6 @@ public/videos/**/*.mp4
 .netlify-quarantine/
 .railway-quarantine/
 exports/northflank-env.production.json
+
+# Small, versioned product-tour assets used by the public Store demo player.
+!public/videos/store-platform/*.mp4

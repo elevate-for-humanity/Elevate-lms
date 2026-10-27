@@ -51,17 +51,10 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 // first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
 // that same single authority. Course generation must repair a failed provider,
 // never produce divergent artifacts through a silent provider substitution.
-const PROVIDER_DISCOVERY_ORDER = [
-  'elevate',
-  'cloudflare',
-  'xai',
-  'groq',
-  'gemini',
-  'google',
-  'anthropic',
-  'azure',
-  'openai',
-];
+// An unset provider must not discover a billable external API by accident.
+// Self-hosted inference is the platform default; operators may explicitly
+// select another provider for a separately authorized workload.
+const PROVIDER_DISCOVERY_ORDER = ['elevate'];
 let discoveredProviderName: string | null = null;
 
 function configuredProviderName(): string {
@@ -222,7 +215,7 @@ async function executeConfiguredChat(options: ChatCompletionOptions): Promise<Ch
         label: `aiChat:${provider.name}`,
         shouldRetry: (err) => {
           const msg = err instanceof Error ? err.message : String(err);
-          return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+          return !/\b(400|401|403|404|429)\b/.test(msg) && !msg.includes('content_policy') && !msg.includes('insufficient_quota');
         },
       });
       return { ...result, provider: provider.name };

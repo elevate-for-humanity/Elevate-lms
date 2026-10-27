@@ -15,7 +15,7 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   await hydrateProcessEnv();
   const rawBody = await request.text();
-  const verifier = process.env.QB_WEBHOOK_VERIFIER_TOKEN || '';
+  const verifier = process.env.QB_WEBHOOK_VERIFIER_TOKEN || process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN || '';
   if (!verifyQuickBooksWebhook(rawBody, request.headers.get('intuit-signature'), verifier)) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
@@ -30,7 +31,7 @@ export function TaxHero({
           <div className="mt-8 flex flex-wrap gap-3">{children}</div>
         </div>
         <div className="relative min-h-[260px] sm:min-h-[340px] lg:min-h-full">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={image}
             alt={imageAlt}
             fill

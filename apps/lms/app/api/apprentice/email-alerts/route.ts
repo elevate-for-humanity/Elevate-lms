@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -18,10 +19,16 @@ async function _POST(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
-  const { type, apprenticeshipId, data } = await request.json();
+  const supabase = await requireAdminClient();
+  const payload = await request.json().catch(() => null);
+  if (!payload || typeof payload.apprenticeshipId !== 'string' ||
+      !['checkin_reminder', 'missed_checkin', 'hours_approved', 'payroll_ready', 'daily_summary'].includes(payload.type)) {
+    return NextResponse.json({ error: 'Valid alert type and apprenticeship required' }, { status: 400 });
+  }
+  const { type, apprenticeshipId } = payload;
+  const data = payload.data && typeof payload.data === 'object' ? payload.data : {};
 
-  const { data: apprenticeship } = await supabase
+  const { data: apprenticeship, error: lookupError } = await supabase
     .from('program_enrollments')
     .select(
       `
@@ -33,6 +40,7 @@ async function _POST(request: Request) {
     .eq('id', apprenticeshipId)
     .maybeSingle();
 
+  if (lookupError) return NextResponse.json({ error: 'Apprenticeship data unavailable' }, { status: 503 });
   if (!apprenticeship) {
     return NextResponse.json({ error: 'Apprenticeship not found' }, { status: 404 });
   }
@@ -47,14 +55,19 @@ async function _POST(request: Request) {
   }> = [];
 
   const now = new Date().toISOString();
+  const studentName = apprenticeship.student?.full_name || 'Learner';
+  const employerName = apprenticeship.employer_name || apprenticeship.employer?.contact_name || 'your host shop';
+  if (type === 'missed_checkin' && !apprenticeship.employer?.owner_user_id) {
+    return NextResponse.json({ error: 'Host notification recipient is not configured' }, { status: 409 });
+  }
 
   switch (type) {
     case 'checkin_reminder':
       notifications.push({
         user_id: apprenticeship.student_id,
         type: 'checkin_reminder',
-        title: '⏰ Time to Check In - ' + apprenticeship.employer_name,
-        body: `Hi ${apprenticeship.student.full_name},\n\nReminder to check in for your shift at ${apprenticeship.employer_name}.\n\nCheck in now: ${process.env.NEXT_PUBLIC_SITE_URL}/lms/apprenticeship-hours`,
+        title: '⏰ Time to Check In - ' + employerName,
+        body: `Hi ${studentName},\n\nReminder to check in for your shift at ${employerName}.\n\nCheck in now: ${process.env.NEXT_PUBLIC_SITE_URL}/lms/apprenticeship-hours`,
         status: 'sent',
         sent_at: now,
       });
@@ -62,10 +75,10 @@ async function _POST(request: Request) {
 
     case 'missed_checkin':
       notifications.push({
-        user_id: apprenticeship.employer_contact_id,
+        user_id: apprenticeship.employer.owner_user_id,
         type: 'missed_checkin_alert',
-        title: '⚠️ Apprentice Missed Check-In - ' + apprenticeship.student.full_name,
-        body: `${apprenticeship.student.full_name} has not checked in today.\n\nExpected check-in time: ${data.expectedTime}\nCurrent time: ${new Date().toLocaleTimeString()}`,
+        title: '⚠️ Apprentice Missed Check-In - ' + studentName,
+        body: `${studentName} has not checked in today.\n\nExpected check-in time: ${data.expectedTime || 'scheduled shift'}\nCurrent time: ${new Date().toLocaleTimeString()}`,
         status: 'sent',
         sent_at: now,
       });
@@ -76,7 +89,7 @@ async function _POST(request: Request) {
         user_id: apprenticeship.student_id,
         type: 'hours_approved',
         title: '✅ Your Hours Have Been Approved',
-        body: `Hi ${apprenticeship.student.full_name},\n\nYour ${data.hours} hours for ${data.date} have been approved!\n\nTotal hours: ${apprenticeship.total_hours_completed}/${apprenticeship.total_hours_required}\nProgress: ${((apprenticeship.total_hours_completed / apprenticeship.total_hours_required) * 100).toFixed(1)}%`,
+        body: `Hi ${studentName},\n\nYour ${data.hours} hours for ${data.date} have been approved!\n\nTotal hours: ${apprenticeship.total_hours_completed}/${apprenticeship.total_hours_required}\nProgress: ${((apprenticeship.total_hours_completed / apprenticeship.total_hours_required) * 100).toFixed(1)}%`,
         status: 'sent',
         sent_at: now,
       });
@@ -87,7 +100,7 @@ async function _POST(request: Request) {
         user_id: apprenticeship.student_id,
         type: 'payroll_ready',
         title: '💰 Payroll Ready - ' + data.periodEnd,
-        body: `Hi ${apprenticeship.student.full_name},\n\nYour payroll is ready:\n\nPeriod: ${data.periodStart} to ${data.periodEnd}\nHours: ${data.hours}\nRate: $${apprenticeship.wage_current}/hr\nGross Pay: $${data.grossPay}`,
+        body: `Hi ${studentName},\n\nYour payroll is ready:\n\nPeriod: ${data.periodStart} to ${data.periodEnd}\nHours: ${data.hours}\nRate: $${apprenticeship.wage_current}/hr\nGross Pay: $${data.grossPay}`,
         status: 'sent',
         sent_at: now,
       });
@@ -109,7 +122,8 @@ async function _POST(request: Request) {
 
   // Insert notifications into the canonical notification_logs table
   for (const notif of notifications) {
-    await supabase.from('notification_logs').insert(notif);
+    const { error } = await supabase.from('notification_logs').insert(notif);
+    if (error) return NextResponse.json({ error: 'Notification could not be saved' }, { status: 503 });
   }
 
   return NextResponse.json({ success: true, sent: notifications.length });
@@ -120,7 +134,7 @@ async function _GET(request: Request) {
   if (!isAuthorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();
 
@@ -169,5 +183,5 @@ async function _GET(request: Request) {
 
   return NextResponse.json({ alertsSent });
 }
-export const GET = withApiAudit('/api/apprentice/email-alerts', _GET);
-export const POST = withApiAudit('/api/apprentice/email-alerts', _POST);
+export const GET = withRuntime(withApiAudit('/api/apprentice/email-alerts', _GET));
+export const POST = withRuntime(withApiAudit('/api/apprentice/email-alerts', _POST));

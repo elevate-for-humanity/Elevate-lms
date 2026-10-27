@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,7 +27,7 @@ export default function AcademicIntegrityPage() {
 
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/heroes/student-catalog.webp"
           alt="Academic Integrity"
           fill

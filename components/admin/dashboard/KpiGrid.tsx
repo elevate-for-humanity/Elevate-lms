@@ -26,7 +26,7 @@ function iconKeyFor(label: string): string {
   const l = label.toLowerCase();
   if (l.includes('learner') || l.includes('student')) return 'activity';
   if (l.includes('application')) return 'fileclock';
-  if (l.includes('revenue')) return 'dollar';
+  if (l.includes('revenue') || l.includes('invoice')) return 'dollar';
   return 'award';
 }
 
@@ -59,7 +59,7 @@ function KpiCard({ card }: { card: KPICard }) {
       ? card.deltaLabel
       : '';
   const IconComponent = ICON_MAP[iconKeyFor(label)] ?? Award;
-  const isRevenue = label.toLowerCase().includes('revenue');
+  const isRevenue = (label.toLowerCase().includes('revenue') || label.toLowerCase().includes('invoices'));
   const animated = useCountUp(typeof card.value === 'number' ? card.value : 0);
 
   return (

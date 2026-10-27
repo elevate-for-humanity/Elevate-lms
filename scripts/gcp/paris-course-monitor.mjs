@@ -90,8 +90,8 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
         execution_generation:job.execution_generation+1,updated_at:now.toISOString()});
     }
     if(observation.action==='requeue'){
-      // No attempts reset and no live-lease override. The existing queue trigger
-      // synchronizes aggregate status when this fenced transition succeeds.
+      // No attempts reset and no live-lease override. Preserve the aggregate
+      // build profile and let the runtime resume its saved checkpoint.
       target.searchParams.set('or','(lease_expires_at.is.null,lease_expires_at.lt.'+now.toISOString()+')');
       Object.assign(body,{status:'queued',available_at:now.toISOString(),lease_owner:null,lease_expires_at:null,
         execution_generation:job.execution_generation+1,updated_at:now.toISOString()});

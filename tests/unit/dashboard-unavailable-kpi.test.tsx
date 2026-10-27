@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { StatsOverviewBar } from '@/components/admin/dashboard/StatsOverviewBar';
 import { SystemHealthPanel } from '@/components/admin/dashboard/SystemHealthPanel';
 import { KpiGrid } from '@/components/admin/dashboard/KpiGrid';
 import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
@@ -26,3 +27,5 @@ describe('failed dashboard metrics', () => {
    expect(html).not.toContain('Clear');
    expect(html).not.toContain('All systems operational');
  });
+
+it('does not reintroduce false zeroes through the overview stats bar',()=>{const html=renderToStaticMarkup(<StatsOverviewBar data={normalizeAdminDashboardData(null)}/>);expect(html).toContain('Unavailable');expect(html).not.toContain('$0');expect(html).not.toContain('>0<');});

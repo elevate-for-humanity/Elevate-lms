@@ -4,7 +4,9 @@ Source: https://chatgpt.com/share/6adff9fc-8118-83e9-a7c5-96bb8b3edf1e?ogimg=pla
 
 This preserves the original 95 findings in order. The later 55-item audit is a different register. Code/test repairs below are not production acceptance. Open items are deliberately not marked complete. Protective conditions require evidence and recovery, not removal.
 
-Validation: Admin typecheck and full repository lint passed before the latest reporting additions; later additions require revalidation. Google infrastructure tests: 674 passed. Worker tests: 229 passed. Focused dashboard/billing tests continue to run as changes land. Live Admin, LMS and Marketing health endpoints returned HTTP 200; this does not prove the new commit is deployed.
+Validation: 676 Google infrastructure tests, 237 worker tests, and 44 focused dashboard/publication tests pass. Full repository ESLint passes. Admin and Marketing production builds have passed; final LMS and refreshed Admin builds remain in progress. Live health responses from older revisions do not prove deployment of these repairs.
+
+Database migrations `20261027031413_atomic_ultimate_publication` and `20261027031415_documented_paid_invoice_totals` are applied to the primary Elevate project. Three rollback-only SQL regressions pass against the applied functions: publication failure/rollback/idempotency/fencing, enqueue/aggregate atomicity, and a 1,001-invoice aggregate. All synthetic fixtures were rolled back. New functions deny anonymous/authenticated execution and allow service_role. Security advisory counts remain unchanged (31 informational server-only RLS tables; one existing MFA warning).
 
 | ID | Original finding | Current disposition | Evidence / next requirement |
 |---|---|---|---|
@@ -14,13 +16,13 @@ Validation: Admin typecheck and full repository lint passed before the latest re
 | 4 | Navigation configuration API permits broader modification access than intended permissions suggest | Existing repair; acceptance open | Narrow platform-settings permission check already present; runtime validation pending. |
 | 5 | Secondary role lookup errors can be treated as missing permissions | Existing repair; acceptance open | Fail-closed role lookup repair already present; runtime validation pending. |
 | 6 | Dashboard header silently substitutes zero when count queries fail | Code repair / test evidence | Degraded and unavailable header responses now produce a visible warning and retry control; malformed responses fail closed. Frontend retry tests pass. |
-| 7 | Dashboard data loader uses capped queries that may omit records | Code repair / test evidence | Paginated aggregates including ITA vouchers; 1,001-row loader execution tests. Other bounded presentation lists still require review. |
+| 7 | Dashboard data loader uses capped queries that may omit records | Code repair / test evidence | Paginated enrollment aggregates and a single paid-invoice SQL snapshot; 1,001-row regressions. Other bounded presentation lists still require review. |
 | 8 | Completed-enrollment count is incorrectly calculated from active enrollments | Code repair / test evidence | Prior completion fix executed against 1,001 enrollments, including completed and inactive states. |
 | 9 | New-leads-today calculation uses update timestamps rather than creation timestamps | Code repair / test evidence | Uses created_at; editing an old lead cannot create a new-lead count. |
 | 10 | Inactive-learner reporting uses enrollment updates rather than actual learning activity | Code repair / test evidence | Uses lesson_progress timestamps and enrollment start; query failure suppresses false inactivity flags. |
 | 11 | Stale-lead reporting does not fully reflect contact history | Code repair / test evidence | Uses last_contact_at, falling back to lead creation. |
 | 12 | Missing-outcome enrollment collection is hardcoded as empty | Code repair / test evidence | Matches completed enrollments against recorded employment_outcomes by learner and program. |
-| 13 | Revenue reporting uses the maximum of multiple sources instead of reconciliation | Open | Requires implementation review and/or live acceptance evidence. |
+| 13 | Revenue reporting uses the maximum of multiple sources instead of reconciliation | Code and database repair / acceptance open | Removed maximum-of-overlapping-sources calculation. Explicit paid-invoice USD-cent snapshot replaces guessed revenue; 1,001-invoice and timezone tests pass. Live monthly completeness is false because payment dates need verified reconciliation; the card says Unavailable. |
 | 14 | Dashboard degradation can occur without a visible degraded-data warning | Code repair / test evidence | Failed count sources mark degradation; unavailable KPI and health rendering tested. |
 | 15 | Dashboard can display a Live Supabase Data indicator without independently establishing data freshness | Code repair / test evidence | Replaced unconditional live-data claim with snapshot/incomplete labels. |
 | 16 | Health monitor checks job_queue, not the Course Builder's ultimate_build_jobs | Code repair / test evidence | Checks ultimate_build_jobs alongside job_queue. |
@@ -80,8 +82,8 @@ Validation: Admin typecheck and full repository lint passed before the latest re
 | 70 | Missing passing media-quality evidence prevents release | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
 | 71 | Incomplete lesson artifacts prevent release | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
 | 72 | Duplicate or mismatched competency records prevent release | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
-| 73 | Publication performs multiple database writes without a demonstrated transaction covering the entire operation | Open | Requires implementation review and/or live acceptance evidence. |
-| 74 | Intermediate publication failure may leave partial changes | Open | Requires implementation review and/or live acceptance evidence. |
+| 73 | Publication performs multiple database writes without a demonstrated transaction covering the entire operation | Code and database repair / acceptance open | One invoker transaction commits canonical lessons/media, course/build state, and release history; injected late failure rolls everything back. |
+| 74 | Intermediate publication failure may leave partial changes | Code and database repair / acceptance open | Applied atomic RPC passes injected second-lesson failure, idempotent replay, historical rollback, and stale-worker rejection. Bare legacy writer retired. |
 | 75 | Canonical publication readback failure stops release | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
 | 76 | Missing or incorrectly positioned final assessments can block courses using the new-course assessment contract | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
 | 77 | Completed media production does not guarantee published LMS availability | Open | Requires implementation review and/or live acceptance evidence. |
@@ -99,11 +101,13 @@ Validation: Admin typecheck and full repository lint passed before the latest re
 | 89 | Internal executor requires matching lease owner, generation, and job status | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
 | 90 | Internal executor can return HTTP 202 when repair is requeued rather than completed | Open | Requires implementation review and/or live acceptance evidence. |
 | 91 | Internal executor can return HTTP 500 after a processing failure | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
-| 92 | The internal executor's lease checks require further validation during long-running operations | Open | Requires implementation review and/or live acceptance evidence. |
+| 92 | The internal executor's lease checks require further validation during long-running operations | Code and database repair / acceptance open | Publication checks locked job owner, generation, status, and live lease before writes and before commit. Stale-generation rollback regression passes; complete live execution remains open. |
 | 93 | Certain database tables are accessible only through privileged server-side paths | Protective condition retained | Verify the underlying condition and recovery behavior; do not bypass the guard. |
 | 94 | Dashboard fallback data can conceal underlying query failures | Code repair / test evidence | Failed sources retain unavailable state through normalization and rendering. |
 | 95 | Different dashboard roles may receive inconsistent access to operational data | Open | Requires implementation review and/or live acceptance evidence. |
 
-Financial-source and migration-unit reconciliation remains open under #13.
+The later 55-item register also identified enqueue/parent-state split writes. New enqueue RPC commits both atomically, preserves existing active checkpoints, and rolls back the inserted job if the parent update fails. Regression passes against the applied database.
+
+Financial reporting now explicitly covers paid invoices; it is not a consolidated ledger or a claim that enrollment balances equal cash receipts. Missing historical payment dates require verified accounting evidence before monthly reporting becomes available.
 
 Production acceptance still requires deployment SHA/image/revision evidence, role-specific dashboard checks, current regional image/quota inspection, checkpoint-to-published-course execution, and student playback validation.

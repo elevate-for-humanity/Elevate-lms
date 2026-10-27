@@ -173,6 +173,9 @@ export interface RecentPayment {
 }
 
 export interface AdminDashboardData {
+  paidInvoiceSummary?: {allTimeAvailable: boolean; monthAvailable: boolean; paidCount: number};
+  totalStudentsAvailable?: boolean;
+  newTodayAvailable?: boolean;
   counts: DashboardCounts;
   revenueAllTimeCents: number;
   totalStudents: number;

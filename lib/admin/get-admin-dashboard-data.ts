@@ -1,4 +1,5 @@
 import 'server-only';
+import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
 import { APPLICATION_REVIEW_STATUSES } from './application-filters';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -183,21 +184,11 @@ async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof require
   }
 }
 
-async function loadDashboardVouchers(db: Awaited<ReturnType<typeof requireAdminClient>>) {
-  const rows: any[] = [];
-  const pageSize = 500;
-  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
-  for (let offset = 0; ; offset += pageSize) {
-    const { data, error } = await db.from('ita_vouchers')
-      .select('id,payments_to_date')
-      .gt('payments_to_date', 0)
-      .order('id', { ascending: true })
-      .range(offset, offset + pageSize - 1)
-      .abortSignal(signal);
-    if (error) return { data: null, error };
-    rows.push(...(data ?? []));
-    if (!data || data.length < pageSize) return { data: rows, error: null };
-  }
+async function loadDashboardPaidInvoices(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const {data, error} = await db.rpc('get_admin_paid_invoice_totals');
+  if (error) return {data:null,error};
+  try { return {data:decodePaidInvoiceTotals(data),error:null}; }
+  catch (error) { return {data:null,error}; }
 }
 
 async function loadDashboardLearningActivity(db: Awaited<ReturnType<typeof requireAdminClient>>) {
@@ -344,9 +335,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     barberSubsRes,
     cosmetologySubsRes,
     barberPaymentsRes,
-    voucherPaymentsRes,
-    revenueAllTimeRes,
-    revenueThisMonthRes,
+    paidInvoicesRes,
     systemHealth,
   ] = await Promise.all([
     timeboxDashboardQuery(
@@ -421,9 +410,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     timeboxDashboardQuery(loadDashboardBarberSubscriptions(db), 'barber subscriptions'),
     timeboxDashboardQuery(loadDashboardCosmetologySubscriptions(db), 'cosmetology subscriptions'),
     timeboxDashboardQuery(loadDashboardBarberPayments(db), 'barber payments'),
-    timeboxDashboardQuery(loadDashboardVouchers(db), 'ITA vouchers'),
-    timeboxDashboardQuery(db.rpc('get_revenue_all_time'), 'all-time revenue'),
-    timeboxDashboardQuery(db.rpc('get_revenue_this_month'), 'monthly revenue'),
+    timeboxDashboardQuery(loadDashboardPaidInvoices(db), 'paid invoices'),
     timeboxDashboardHealth(getSystemHealth(db)),
   ]);
 
@@ -601,33 +588,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     (payment) => !isTestOrSuspiciousPayment(payment),
   );
 
-  if ([revenueAllTimeRes, revenueThisMonthRes, stripeSessionsRes, barberSubsRes, cosmetologySubsRes, barberPaymentsRes, voucherPaymentsRes].some(result => result.error)) {
+  const invoiceTotals = paidInvoicesRes.error
+    ? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false}
+    : paidInvoicesRes.data ?? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false};
+  if (!invoiceTotals.allTimeAvailable || !invoiceTotals.monthAvailable ||
+      [stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
-  // Use the same payment authorities shown on Funding and Recent Payments.
-  // RPC aggregates can lag, but the overview must never claim $0 while the
-  // underlying received-payment records are already visible to the admin.
-  const selfPayEnrollmentCents = activeEnrollments
-    .filter((row: any) => String(row.funding_source ?? '').toLowerCase() !== 'wioa')
-    .reduce((sum, row: any) => sum + n(row.amount_paid_cents), 0);
-  const wioaPaidCents = (voucherPaymentsRes.error ? [] : (voucherPaymentsRes.data ?? [])).reduce(
-    (sum, row: any) => sum + dollarsToCents(row.payments_to_date),
-    0,
-  );
-  const recentPaymentCents = verifiedRecentPayments.reduce(
-    (sum, payment) => sum + payment.amountCents,
-    0,
-  );
-  const currentMonth = monthKey(new Date().toISOString());
-  const recentThisMonthCents = verifiedRecentPayments
-    .filter((payment) => monthKey(payment.paidAt) === currentMonth)
-    .reduce((sum, payment) => sum + payment.amountCents, 0);
-  const revenueAllTimeCents = Math.max(
-    n(revenueAllTimeRes.data),
-    selfPayEnrollmentCents + wioaPaidCents,
-    recentPaymentCents,
-  );
-  const revenueThisMonthCents = Math.max(n(revenueThisMonthRes.data), recentThisMonthCents);
+  // Paid invoices have an explicit cents contract and one canonical identity.
+  // Enrollment balances and historical receipt snapshots overlap; never add
+  // them together or choose their maximum as an invented revenue total.
+  const revenueAllTimeCents = invoiceTotals.allTimeCents;
+  const revenueThisMonthCents = invoiceTotals.thisMonthCents;
 
   const complianceAlerts = complianceRows.map((row: any) => ({
     id: row.id,
@@ -815,18 +787,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       sub: `${inactiveLearners.length} inactive 7+ days`,
     },
     {
-      label: 'Revenue This Month',
-      unavailable: Boolean(revenueThisMonthRes.error),
+      label: 'Paid Invoices This Month',
+      unavailable: !invoiceTotals.monthAvailable,
       value: revenueThisMonthCents,
       delta: 0,
-      deltaLabel: 'Database aggregate',
+      deltaLabel: 'Paid invoice value (USD)',
       href: '/integrations/quickbooks',
       urgent: false,
-      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time`,
+      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} paid invoices all time`,
     },
     {
       label: 'Certificates Issued',
-      unavailable: Boolean(certificatesRes.error),
+      unavailable: Boolean(certificatesRes.error) || typeof certificatesRes.count !== 'number',
       value: counts.certificatesIssued,
       delta: 0,
       deltaLabel: 'Live certificate count',
@@ -835,7 +807,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Program Holders',
-      unavailable: Boolean(holdersRes.error),
+      unavailable: Boolean(holdersRes.error) || typeof holdersRes.count !== 'number',
       value: counts.pendingProgramHolders,
       delta: 0,
       deltaLabel: 'Awaiting approval',
@@ -844,7 +816,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Documents',
-      unavailable: Boolean(holderDocsRes.error),
+      unavailable: Boolean(holderDocsRes.error) || typeof holderDocsRes.count !== 'number',
       value: counts.pendingDocuments,
       delta: 0,
       deltaLabel: 'Awaiting review',
@@ -861,6 +833,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   return {
     counts,
     revenueAllTimeCents,
+    paidInvoiceSummary: {allTimeAvailable:invoiceTotals.allTimeAvailable,monthAvailable:invoiceTotals.monthAvailable,paidCount:invoiceTotals.paidCount},
+    totalStudentsAvailable: !studentsRes.error && typeof studentsRes.count === 'number',
+    newTodayAvailable: !applicationsRes.error && !enrollmentsRes.error && !leadsRes.error,
     totalStudents: studentsRes.error ? 0 : (studentsRes.count ?? 0),
     recentPayments: verifiedRecentPayments.slice(0, 10),
     operational: {

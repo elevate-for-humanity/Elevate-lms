@@ -33,7 +33,7 @@ export default function CosmetologyApprenticeshipAgreementPage() {
         <InstitutionalHeader
           documentType="Apprenticeship Agreement"
           title="Cosmetology Apprenticeship Agreement"
-          subtitle="Indiana DOL Registered Apprenticeship | Occupation: Cosmetologist (332.271-010)"
+          subtitle="DOL Registered Apprenticeship | Hair Stylist (Existing Title: Cosmetologist) | RAPIDS 0096HY V1"
         />
 
         <section className="mt-6 space-y-6 text-sm text-slate-800">
@@ -42,7 +42,8 @@ export default function CosmetologyApprenticeshipAgreementPage() {
           <div>
             <h2 className="font-bold text-base mb-2">1. Program Requirements</h2>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Total program length: <strong>2,000 hours</strong> (1,500 OJT + 500 RTI)</li>
+              <li>Registered hybrid term: <strong>2,000–2,500 hours</strong>, including <strong>154 RTI hours</strong></li>
+              <li>Probationary period: <strong>500 hours</strong> — this is not program completion</li>
               <li>Occupation: Cosmetologist — O*NET 39-5012.00</li>
               <li>RAPIDS Occupation Code: 332.271-010</li>
               <li>Wage progression: per Indiana prevailing wage schedule</li>

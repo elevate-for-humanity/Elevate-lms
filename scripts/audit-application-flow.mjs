@@ -57,10 +57,34 @@ function grepRecursive(dir, patterns) {
 
 // ── 1. Canonical student form ──────────────────────────────────
 const canonical = read(join(SRC, 'apply/student/page.tsx'));
-if (!canonical || !canonical.includes('StudentApplicationForm')) {
-  fail('/apply/student must include StudentApplicationForm');
+const standardFormPage = read(join(SRC, 'apply/student/form/page.tsx'));
+const standardForm = read(join(SRC, 'apply/student/StudentApplicationForm.tsx'));
+const routing = read(join(ROOT, 'lib/programs/application-config.ts'));
+const nextConfig = read(join(ROOT, 'apps/marketing/next.config.mjs'));
+if (!canonical?.includes("program === 'hvac-technician' ? '/apply/student/form'")) {
+  fail('HVAC must route directly to the standard form without requiring PARIS');
 } else {
-  pass('/apply/student is the canonical student form');
+  pass('HVAC uses the direct standard application route');
+}
+if (!standardFormPage?.includes('StudentApplicationForm') || !standardFormPage.includes('isHvacApplication')) {
+  fail('HVAC standard form must render the canonical application independently of PARIS');
+} else {
+  pass('HVAC standard form renders without PARIS');
+}
+if (!standardForm?.includes("fetch('/api/applications'") || !standardForm.includes("'X-Idempotency-Key': idempotencyKey")) {
+  fail('HVAC standard form must submit to canonical API with idempotency');
+} else {
+  pass('HVAC standard form retains canonical submission and idempotency');
+}
+if (!routing?.includes("'hvac-technician': canonicalProgram(")) {
+  fail('HVAC must use canonical application configuration');
+} else {
+  pass('HVAC canonical application configuration present');
+}
+if (!nextConfig?.includes("source: '/programs/hvac-technician/apply', destination: '/apply/student?program=hvac-technician'")) {
+  fail('Legacy HVAC application must redirect to canonical HVAC application');
+} else {
+  pass('Legacy HVAC application redirects to canonical HVAC application');
 }
 
 // ── 2. Canonical confirmation page ──────────────────────────────

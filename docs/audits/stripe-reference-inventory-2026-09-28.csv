@@ -1,0 +1,884 @@
+path,category,occurrences,signals
+.env.production.example,configuration or other,19,environment/config
+.env.required.example,configuration or other,5,environment/config
+ADMIN_AUDIT.md,documentation or tests,3,
+ADMIN_CONTROL_MATRIX.md,documentation or tests,1,
+ADMIN_DASHBOARD_AUDIT.json,configuration or other,1,
+ADMIN_DASHBOARD_AUDIT.md,documentation or tests,2,
+AGENTS.md,documentation or tests,7,
+API_AUDIT.md,documentation or tests,1,
+API_CONNECTIVITY_REPORT.md,documentation or tests,4,
+ARCHITECTURE_DOCUMENTATION.md,documentation or tests,4,
+AUDIT-TODO-LIST-2026-07-12.md,documentation or tests,5,runtime SDK call; environment/config
+AUDIT_APPRENTICESHIP_SYSTEM.md,documentation or tests,1,
+AUDIT_REPORT_2026-06-17.md,documentation or tests,2,environment/config
+AUDIT_REPORT_2026-07-05.md,documentation or tests,1,
+AUDIT_TEMPLATE.md,documentation or tests,1,environment/config
+AUDIT_TODO.md,documentation or tests,1,
+BARBER_APPRENTICE_AUDIT.md,documentation or tests,4,
+BLUEPRINT/31-DEV-STUDIO.md,documentation or tests,4,environment/config
+BLUEPRINT_COMPLIANCE.md,documentation or tests,1,
+BUSINESS_FUNCTION_VALIDATION.md,documentation or tests,5,
+CERTIFICATION_CHECKLIST.md,documentation or tests,49,environment/config
+CHATGPT_MARKETPLACE_GAP_AUDIT.md,documentation or tests,1,
+COCREATE_PITCH_CHECKLIST.md,documentation or tests,1,
+COMPLETE_DEPENDENCY_AUDIT_REPORT.md,documentation or tests,18,environment/config
+COMPREHENSIVE-AUDIT.md,documentation or tests,19,environment/config
+CROSS-REFERENCE-ANALYSIS.md,documentation or tests,2,historical data field
+DATABASE-AUDIT.md,documentation or tests,2,
+DATABASE_DEPENDENCY_AUDIT.csv,configuration or other,7,
+DATABASE_REVERSE_MAP.md,documentation or tests,28,
+DEMO_IMPLEMENTATION_ROADMAP.md,documentation or tests,1,
+DEMO_VIDEO_SCRIPT.md,documentation or tests,3,
+DEMO_VIDEO_SLIDES.html,configuration or other,2,
+DEPENDENCY_AUDIT_2026-07-05.md,documentation or tests,4,
+DEPENDENCY_AUDIT_REFINED.csv,configuration or other,2,
+DEPENDENCY_CLEANUP_LIST.md,documentation or tests,3,historical data field
+DEV_STUDIO_AUDIT.md,documentation or tests,4,
+DUPLICATES-LEGACY.md,documentation or tests,15,
+Dockerfile.ultimate-worker,configuration or other,1,
+ECS_NORTHFLANK_PARITY_AUDIT.md,documentation or tests,3,
+ELEVATE_PLATFORM_AUDIT.md,documentation or tests,1,
+ENTERPRISE-PRD.md,documentation or tests,13,
+ENTERPRISE-PRODUCTION-CERTIFICATION-AUDIT-2026-07-13.md,documentation or tests,1,environment/config
+EXISTING-CODE-AUDIT.md,documentation or tests,1,
+FAILED_WORKFLOWS.md,documentation or tests,1,
+INTELLIGENT-AUTOMATION-ENGINE.md,documentation or tests,1,
+KUBERNETES-LINE-BY-LINE-AUDIT.md,documentation or tests,2,environment/config
+LIB-AUDIT.md,documentation or tests,2,
+LINE-BY-LINE-AUDIT.md,documentation or tests,76,historical data field
+LIVE_TRANSACTION_AUDIT.md,documentation or tests,5,
+MICROSOFT_BUILD_SUBMISSION.html,configuration or other,2,
+MICROSOFT_BUILD_SUBMISSION.md,documentation or tests,3,
+MISSING-CODE-AUDIT.md,documentation or tests,4,historical data field
+NORTHFLANK_SECRETS.md,documentation or tests,6,environment/config
+PARTNER_PORTAL_AUDIT.md,documentation or tests,1,
+PRIORITIZED-ACTION-PLAN.md,documentation or tests,1,
+PRODUCTION-AUDIT.md,documentation or tests,4,
+PRODUCTION-CERTIFICATION-REPORT.md,documentation or tests,5,environment/config
+PRODUCTION-CERTIFICATION.md,documentation or tests,5,
+PRODUCTION-HEALTH-AUDIT.md,documentation or tests,11,environment/config
+PRODUCTION-READINESS.md,documentation or tests,2,
+PRODUCTION-SETUP.md,documentation or tests,21,environment/config
+PRODUCTION_AUDIT_2026-06-17.md,documentation or tests,8,environment/config
+PRODUCTION_AUDIT_REPORT.md,documentation or tests,5,
+PRODUCTION_CERTIFICATION_MATRIX.md,documentation or tests,19,
+PRODUCTION_CONTAINER_AUDIT_REPORT.md,documentation or tests,1,
+PRODUCTION_DEPLOYMENT_CHECKLIST.md,documentation or tests,9,environment/config
+PRODUCTION_READINESS_MANUAL.md,documentation or tests,4,
+PRODUCTION_READINESS_REPORT.md,documentation or tests,5,
+PRODUCTION_REMEDIATION_CHECKLIST.md,documentation or tests,13,environment/config
+PRODUCTION_VALIDATION_CHECKLIST.md,documentation or tests,3,
+PROJECT_OVERVIEW_ELIZABETH_GREENE.md,documentation or tests,3,
+PR_SIDE_BY_SIDE_AUDIT.md,documentation or tests,2,
+README.md,documentation or tests,6,environment/config
+REPOSITORY-TRUTH-AUDIT.md,documentation or tests,4,
+REVENUE_SYSTEM_AUDIT.md,documentation or tests,7,
+SENDGRID_SETUP.md,documentation or tests,4,
+SENIOR_DEV_PROMPT.md,documentation or tests,5,
+SIDE-BY-SIDE-AUDIT.md,documentation or tests,6,
+SIDE-BY-SIDE-DUPLICATE-AUDIT.md,documentation or tests,24,
+STABILIZATION-PLAN.md,documentation or tests,18,runtime SDK call
+STORE_MARKETPLACE_AUDIT.md,documentation or tests,17,
+STRIPE_DEEP_AUDIT_REPORT.md,documentation or tests,100,environment/config
+STRIPE_PAYMENT_REPORT.md,documentation or tests,23,environment/config
+STUDENT-LIFECYCLE-STANDARD.md,documentation or tests,4,
+SUBSCRIPTION_CONFIG_AUDIT.md,documentation or tests,25,
+TRANSACTION_AUDIT_REPORT.md,documentation or tests,21,
+TYPESCRIPT-ERROR-AUDIT.md,documentation or tests,10,
+TYPESCRIPT_ERROR_PATTERNS.md,documentation or tests,7,
+WORKFLOW_VALIDATION_REPORT.md,documentation or tests,2,
+apps/admin/app/api/admin/billing/schedules/route.ts,application source,3,historical data field
+apps/admin/app/api/admin/career-courses/route.ts,application source,12,runtime SDK call; SDK import
+apps/admin/app/api/admin/course-builder/live-feed/route.ts,application source,1,
+apps/admin/app/api/admin/dev-studio/container-env/route.ts,application source,1,
+apps/admin/app/api/admin/dev-studio/env/route.ts,application source,1,
+apps/admin/app/api/admin/dev-studio/execute/route.ts,application source,1,
+apps/admin/app/api/admin/dev-studio/platform-state/route.ts,application source,2,environment/config
+apps/admin/app/api/admin/dev-studio/platform-status/route.ts,application source,18,runtime SDK call; environment/config; SDK import
+apps/admin/app/api/admin/dev-studio/plugins/health/route.ts,application source,9,environment/config
+apps/admin/app/api/admin/dev-studio/qa-scan/route.ts,application source,1,environment/config
+apps/admin/app/api/admin/dev-studio/smoke-test/route.ts,application source,4,environment/config
+apps/admin/app/api/admin/external-courses/[id]/sync-stripe/route.ts,application source,38,runtime SDK call; SDK import
+apps/admin/app/api/admin/mission-control/live-ops/route.ts,application source,21,
+apps/admin/app/api/admin/monitoring/audit-health/route.ts,application source,1,
+apps/admin/app/api/admin/monitoring/status/route.ts,application source,7,environment/config
+apps/admin/app/api/admin/service-health/route.ts,application source,1,
+apps/admin/app/api/admin/settings/route.ts,application source,1,
+apps/admin/app/api/audit/launch/route.ts,application source,5,environment/config
+apps/admin/app/api/cron/barber-billing/route.ts,application source,4,historical data field
+apps/admin/app/api/cron/barber-reinstate/route.ts,application source,14,runtime SDK call; SDK import; historical data field
+apps/admin/app/api/cron/payment-monitoring/route.ts,application source,17,runtime SDK call; SDK import; historical data field
+apps/admin/app/api/cron/webhook-health-check/route.ts,application source,1,
+apps/admin/app/commerce/page.tsx,application source,5,historical data field
+apps/admin/app/external-courses/ExternalCourseStripeTable.tsx,application source,11,
+apps/admin/app/governance/operational-controls/page.tsx,application source,1,
+apps/admin/app/hr/payroll/PayrollClient.tsx,application source,3,
+apps/admin/app/integrations/env-manager/EnvManagerClient.tsx,application source,22,environment/config
+apps/admin/app/integrations/page.tsx,application source,9,environment/config
+apps/admin/app/integrations/stripe/page.tsx,application source,15,historical data field
+apps/admin/app/licenses/page.tsx,application source,1,historical data field
+apps/admin/app/marketplace/payouts/page.tsx,application source,2,environment/config
+apps/admin/app/settings/page.tsx,application source,2,
+apps/admin/app/staff-portal/booth-renters/page.tsx,application source,4,historical data field
+apps/admin/app/store/ProductCard.tsx,application source,1,
+apps/admin/app/store/catalog/page.tsx,application source,2,
+apps/admin/app/store/clones/PageClient.tsx,application source,1,
+apps/admin/app/system/webhooks/WebhookHealthDashboard.tsx,application source,2,
+apps/admin/next.config.mjs,application source,1,
+apps/lms/app/account/billing/page.tsx,application source,11,historical data field
+apps/lms/app/account/invoices/page.tsx,application source,1,
+apps/lms/app/ai/page.tsx,application source,1,
+apps/lms/app/api/billing/setup/complete/route.ts,application source,4,
+apps/lms/app/api/billing/setup/route.ts,application source,4,
+apps/lms/app/api/certificates/generate/route.ts,application source,3,historical data field
+apps/lms/app/api/checkout/career-courses/route.ts,application source,3,
+apps/lms/app/api/checkout/career/route.ts,application source,3,
+apps/lms/app/api/checkout/create-payment-intent/route.ts,application source,3,
+apps/lms/app/api/checkout/create-session/route.ts,application source,3,
+apps/lms/app/api/checkout/create/route.ts,application source,3,
+apps/lms/app/api/checkout/learner/route.ts,application source,3,
+apps/lms/app/api/checkout/marketplace/route.ts,application source,3,
+apps/lms/app/api/checkout/partner-course/route.ts,application source,3,
+apps/lms/app/api/checkout/phlebotomy/route.ts,application source,3,
+apps/lms/app/api/checkout/product/route.ts,application source,3,
+apps/lms/app/api/checkout/route.ts,application source,3,
+apps/lms/app/api/checkout/trial/route.ts,application source,4,
+apps/lms/app/api/courses/checkout/route.ts,application source,3,
+apps/lms/app/api/credentials/exam-checkout/route.ts,application source,3,
+apps/lms/app/api/credentials/funding-decision/route.ts,application source,1,
+apps/lms/app/api/enroll/payment/route.ts,application source,3,
+apps/lms/app/api/health/northflank/route.ts,application source,2,environment/config
+apps/lms/app/api/onboarding/provision-tenant/route.ts,application source,1,
+apps/lms/app/api/payments/create-intent/route.ts,application source,4,
+apps/lms/app/api/payments/create-session/route.ts,application source,3,
+apps/lms/app/api/payments/route.ts,application source,4,
+apps/lms/app/api/payments/split/route.ts,application source,3,
+apps/lms/app/api/stripe/checkout/route.ts,application source,3,
+apps/lms/app/api/stripe/connect/create/route.ts,application source,1,
+apps/lms/app/api/stripe/connect/onboard/route.ts,application source,1,
+apps/lms/app/api/stripe/create-checkout/route.ts,application source,3,
+apps/lms/app/api/stripe/invoice/create/route.ts,application source,1,
+apps/lms/app/api/stripe/trial-checkout/route.ts,application source,1,
+apps/lms/app/api/stripe/webhook/route.ts,application source,9,
+apps/lms/app/api/subscriptions/cancel/route.ts,application source,1,
+apps/lms/app/api/subscriptions/create/route.ts,application source,1,
+apps/lms/app/api/webhooks/[provider]/route.ts,application source,3,
+apps/lms/app/api/webhooks/stripe/career-courses/route.ts,application source,1,
+apps/lms/app/api/webhooks/stripe/route.ts,application source,2,
+apps/lms/app/checkout/career/page.tsx,application source,1,
+apps/lms/app/checkout/page.tsx,application source,10,runtime SDK call; environment/config; SDK import
+apps/lms/app/lms/(app)/dashboard/page.tsx,application source,1,
+apps/lms/app/payment/page.tsx,application source,1,
+apps/lms/tsconfig.json,application source,2,
+apps/marketing/app/(marketing)/paris-ai/page.tsx,application source,1,
+apps/marketing/app/ai/page.tsx,application source,1,
+apps/marketing/app/api/apps/website-builder/sites/[websiteId]/domains/buy/route.ts,application source,3,
+apps/marketing/app/api/checkout/program/route.ts,application source,3,
+apps/marketing/app/api/checkout/route.ts,application source,1,
+apps/marketing/app/api/health/northflank/route.ts,application source,2,environment/config
+apps/marketing/app/api/host-shop/checkout/route.ts,application source,1,
+apps/marketing/app/api/host-shop/subscription/checkout/route.ts,application source,6,historical data field
+apps/marketing/app/api/meri-gold-round/checkout/route.ts,application source,3,
+apps/marketing/app/api/platform/offers/route.ts,application source,5,
+apps/marketing/app/api/platform/payments/connect/route.ts,application source,23,runtime SDK call; SDK import
+apps/marketing/app/api/programs/[program]/external-courses/[courseId]/checkout/route.ts,application source,3,
+apps/marketing/app/api/programs/checkout/route.ts,application source,3,
+apps/marketing/app/api/programs/pricing/route.ts,application source,5,
+apps/marketing/app/api/store/cart-checkout/route.ts,application source,1,
+apps/marketing/app/api/stripe/checkout/route.ts,application source,3,
+apps/marketing/app/api/stripe/connect/create/route.ts,application source,1,
+apps/marketing/app/api/stripe/connect/onboard/route.ts,application source,1,
+apps/marketing/app/api/stripe/create-checkout/route.ts,application source,3,
+apps/marketing/app/api/stripe/invoice/create/route.ts,application source,1,
+apps/marketing/app/api/stripe/trial-checkout/route.ts,application source,4,
+apps/marketing/app/api/verification/stripe-session/route.ts,application source,14,runtime SDK call; SDK import
+apps/marketing/app/api/webhooks/[provider]/route.ts,application source,3,
+apps/marketing/app/api/webhooks/store/route.ts,application source,2,
+apps/marketing/app/apply/confirmation/page.tsx,application source,1,
+apps/marketing/app/booth-rental/page.tsx,application source,1,
+apps/marketing/app/data/store-products.ts,application source,1,
+apps/marketing/app/donate/page.tsx,application source,1,
+apps/marketing/app/donate/thank-you/page.tsx,application source,1,
+apps/marketing/app/host-shop/apply/success/page.tsx,application source,10,runtime SDK call; SDK import; historical data field
+apps/marketing/app/legal/creator-agreement/page.tsx,application source,1,
+apps/marketing/app/legal/governance/compliance/page.tsx,application source,1,
+apps/marketing/app/legal/governance/platform-overview/page.tsx,application source,1,
+apps/marketing/app/legal/governance/security/page.tsx,application source,2,
+apps/marketing/app/legal/governance/store-payments/page.tsx,application source,4,
+apps/marketing/app/legal/marketplace-terms/page.tsx,application source,3,
+apps/marketing/app/license/integrations/page.tsx,application source,2,
+apps/marketing/app/microcourses/page.tsx,application source,3,
+apps/marketing/app/microcourses/success/page.tsx,application source,1,
+apps/marketing/app/onboarding/learner/page.tsx,application source,1,
+apps/marketing/app/onboarding/learner/verify-identity/page.tsx,application source,3,
+apps/marketing/app/platform/architecture/page.tsx,application source,2,
+apps/marketing/app/platform/sponsors/page.tsx,application source,1,
+apps/marketing/app/programs/[program]/confirm/page.tsx,application source,2,
+apps/marketing/app/programs/[program]/eligibility/page.tsx,application source,2,
+apps/marketing/app/programs/barber-apprenticeship/apply/ApprenticeForm.tsx,application source,1,
+apps/marketing/app/programs/cna/enroll/page.tsx,application source,2,
+apps/marketing/app/programs/peer-recovery-specialist/apply/page.tsx,application source,3,SDK import
+apps/marketing/app/staff/booth-renters/page.tsx,application source,4,historical data field
+apps/marketing/app/store/deployment/page.tsx,application source,1,
+apps/marketing/app/store/guides/licensing/page.tsx,application source,1,
+apps/marketing/app/store/integrations/page.tsx,application source,1,
+apps/marketing/app/store/licenses/enterprise-license/page.tsx,application source,2,
+apps/marketing/app/store/licenses/pro-license/page.tsx,application source,2,
+apps/marketing/app/store/licenses/starter-license/trial/page.tsx,application source,1,
+apps/marketing/app/store/subscriptions/page.tsx,application source,2,
+apps/marketing/app/store/trial/page.tsx,application source,1,
+apps/marketing/app/support/page.tsx,application source,1,
+apps/marketing/app/tuition-fees/page.tsx,application source,1,
+apps/marketing/app/white-label/page.tsx,application source,2,
+apps/marketing/middleware.ts,application source,1,
+apps/marketing/tsconfig.json,application source,2,
+audit-packet/AUDIT_REPORT.md,documentation or tests,1,
+audit_out/migration-discipline.json,configuration or other,4,
+components/EnrollmentPaymentWidget.tsx,application source,2,
+components/ProgramPaymentOptions.tsx,application source,11,
+components/README.md,documentation or tests,1,
+components/StudentPortfolio.tsx,application source,1,
+components/admin/EmployerProposalPreview.tsx,application source,1,
+components/admin/dashboard/DashboardShell.tsx,application source,2,
+components/admin/dashboard/RecentPaymentsPanel.tsx,application source,2,
+components/admin/dashboard/ServiceHealthPanel.tsx,application source,1,
+components/admin/dashboard/SystemHealthPanel.tsx,application source,9,
+components/admin/dashboard/types.ts,application source,2,
+components/barber/BarberApprenticeshipDashboard.tsx,application source,2,historical data field
+components/billing/PaymentOptions.tsx,application source,2,
+components/checkout/BnplOptions.tsx,application source,4,
+components/checkout/PaymentMethodSelector.tsx,application source,5,
+components/checkout/PaymentPlanCheckout.tsx,application source,5,
+components/dev-studio/live-canvas/BeforePublishModal.tsx,application source,4,
+components/enrollment/PaymentDisclosure.tsx,application source,1,SDK import
+components/lms/ExternalCoursesPanel.tsx,application source,2,
+components/mobile/AppPricingScreen.tsx,application source,2,SDK import
+components/payments/BnplCheckoutWidget.tsx,application source,3,
+components/payments/StripePayNow.tsx,application source,4,
+components/payments/UnifiedPaymentFlow.tsx,application source,1,
+components/portal/ApprenticePortalShell.tsx,application source,12,historical data field
+components/program/ProgramFAQ.tsx,application source,1,
+components/programs/PayNowButton.tsx,application source,1,
+components/programs/ProgramApplyPage.tsx,application source,9,
+components/programs/ProgramDetailPage.tsx,application source,5,
+components/programs/ProgramDetails.tsx,application source,1,
+components/programs/ProgramPaymentButton.tsx,application source,1,
+components/store/InteractiveCommunityDemo.tsx,application source,2,
+components/store/StoreCartView.tsx,application source,1,
+components/studio/IntegrationsPanel.tsx,application source,14,
+components/studio/PlatformStatusPanels.tsx,application source,17,
+components/verification/StripeIdentityButton.tsx,application source,2,
+components/website-builder/BusinessCardsPanel.tsx,application source,9,
+consolidation/supervisor-tasks.json,configuration or other,1,
+data/programs/index.ts,configuration or other,2,
+docs/API_DOCUMENTATION.md,documentation or tests,10,environment/config
+docs/APPLICATION_FEE_POLICY.md,documentation or tests,3,
+docs/AUDIT_VALIDATION_REPORT.md,documentation or tests,6,
+docs/AUTH_INCIDENT_RESPONSE.md,documentation or tests,3,
+docs/COUPON_ENGINE_AUDIT.md,documentation or tests,24,runtime SDK call
+docs/DEMO_READINESS_SIDE_BY_SIDE_2026-08-16.md,documentation or tests,7,
+docs/DEPLOYMENT-OPTIONS.md,documentation or tests,3,environment/config
+docs/DEV_STUDIO_AUDIT.md,documentation or tests,3,
+docs/END_TO_END_JOURNEY_RESULTS.md,documentation or tests,3,
+docs/ENTERPRISE_PLATFORM_INTEGRATION_AUDIT.md,documentation or tests,11,
+docs/EXECUTIVE_PLATFORM_AUDIT.md,documentation or tests,2,
+docs/FAILED_WORKFLOW_MASTER_AUDIT.md,documentation or tests,6,environment/config
+docs/FEATURE_INVENTORY.md,documentation or tests,1,
+docs/GATE1-AUDIT.md,documentation or tests,1,
+docs/GATE2-CAPABILITIES.md,documentation or tests,2,
+docs/GATE3-WORKFLOWS.md,documentation or tests,1,
+docs/GATE4-INTEGRATIONS.md,documentation or tests,3,
+docs/GATE7-RELEASE.md,documentation or tests,2,
+docs/GLOBAL_ROUTE_MAP.md,documentation or tests,2,
+docs/GOVERNANCE.md,documentation or tests,3,
+docs/INFRASTRUCTURE_AUDIT_SUMMARY.md,documentation or tests,2,environment/config
+docs/LMS_FEATURE_AUDIT.md,documentation or tests,1,
+docs/LOCAL_DEVELOPMENT.md,documentation or tests,1,
+docs/MASTER_AUDIT_REPORT.md,documentation or tests,10,
+docs/MASTER_COMMERCE_FEATURE_INVENTORY.md,documentation or tests,7,
+docs/MIGRATION_AUDIT.md,documentation or tests,1,
+docs/NATALIA_ROA_BILLING_REPORT.md,documentation or tests,8,
+docs/PARIS-ZORA-SIDE-BY-SIDE.md,documentation or tests,1,
+docs/PLATFORM-AUDIT.md,documentation or tests,4,
+docs/PLATFORM_COMPLETION_ROADMAP.md,documentation or tests,5,
+docs/PLATFORM_HARDENING_AUDIT.md,documentation or tests,4,
+docs/PRODUCTION_BASELINE_AUDIT.md,documentation or tests,5,environment/config
+docs/PRODUCTION_HARDENING_LEDGER_2026-09-25.md,documentation or tests,2,
+docs/PRODUCTION_READINESS_CERTIFICATION.md,documentation or tests,10,environment/config
+docs/PRODUCTION_READINESS_TODO.md,documentation or tests,1,
+docs/REVENUE-VALIDATION-PLAN.md,documentation or tests,3,
+docs/RISK-REGISTER.md,documentation or tests,4,
+docs/ROUTE_AUDIT_REDUCTION.md,documentation or tests,1,
+docs/SECURITY.md,documentation or tests,5,
+docs/SETUP.md,documentation or tests,31,environment/config
+docs/STAGING-VERIFICATION.md,documentation or tests,9,environment/config
+docs/STORAGE_LMS_DASHBOARD_WIRING.md,documentation or tests,6,
+docs/STORE_AUDIT.md,documentation or tests,14,environment/config; historical data field
+docs/STRIPE_CONFIGURATION.md,documentation or tests,12,environment/config
+docs/STRIPE_LICENSE_AUDIT.md,documentation or tests,85,runtime SDK call; environment/config; SDK import; historical data field
+docs/SUBSCRIPTION_AUDIT.md,documentation or tests,9,runtime SDK call; historical data field
+docs/UNIFIED_WIRING_CHECKLIST.md,documentation or tests,1,
+docs/USER_JOURNEY_AUDIT.md,documentation or tests,2,
+docs/architecture-overview.md,documentation or tests,2,
+docs/architecture/ai-boundaries.md,documentation or tests,1,
+docs/audits/503-CONSOLE-AUDIT-2026-08-08.md,documentation or tests,1,
+docs/audits/FINAL-PRODUCTION-READINESS-VALIDATION-2026-05-11.md,documentation or tests,7,environment/config
+docs/audits/FULL-REPOSITORY-CENSUS-2026-08-08.md,documentation or tests,2,
+docs/audits/MASTER-IMPLEMENTATION-CHECKLIST.md,documentation or tests,3,
+docs/audits/NORTHFLANK-AUDIT.md,documentation or tests,3,environment/config
+docs/audits/PLATFORM-INTEGRATION-MATRIX.md,documentation or tests,4,environment/config
+docs/audits/PLATFORM-STATUS-DASHBOARD.md,documentation or tests,1,
+docs/audits/PLATFORM_MEDIA_DUPLICATES.json,documentation or tests,2,
+docs/audits/PRODUCTION-READINESS-CHECKLIST.md,documentation or tests,3,environment/config
+docs/audits/REPOSITORY-CONSOLIDATION-AUDIT.md,documentation or tests,1,
+docs/audits/apply-header-menu-audit-2026-05.md,documentation or tests,1,
+docs/audits/apply-pages-health-checklist.md,documentation or tests,7,environment/config
+docs/audits/documentation-code-reconciliation-2026-06-10.md,documentation or tests,15,environment/config
+docs/audits/node-20-bookworm-slim-runtime-audit.md,documentation or tests,1,
+docs/audits/production-followups-checklist-2026-06-05.md,documentation or tests,1,
+docs/audits/production-readiness-validation-2026-05-11.md,documentation or tests,10,environment/config
+docs/audits/rate-limit-missing-routes.txt,documentation or tests,5,
+docs/audits/root-archive-2026-05-14/ACTIVATION_FORENSIC_REPORT.md,documentation or tests,12,environment/config
+docs/audits/root-archive-2026-05-14/AUDIT_BARBER_PAYMENT_PLAN.md,documentation or tests,16,environment/config
+docs/audits/root-archive-2026-05-14/AUDIT_DUPLICATES_CATEGORIZED.md,documentation or tests,1,
+docs/audits/root-archive-2026-05-14/AUDIT_LMS_COURSE_GENERATOR_BARBER_DASHBOARD.md,documentation or tests,13,
+docs/audits/root-archive-2026-05-14/AUDIT_REPORT.md,documentation or tests,1,
+docs/audits/root-archive-2026-05-14/AUDIT_ROUTES.csv,documentation or tests,23,
+docs/audits/root-archive-2026-05-14/SITE_AUDIT_REPORT.md,documentation or tests,1,
+docs/audits/root-archive-2026-05-14/STRUCTURAL_AUDIT.md,documentation or tests,30,runtime SDK call
+docs/audits/root-archive-2026-05-14/quarantine-routes.json,documentation or tests,35,
+docs/audits/root-archive-2026-05-14/stub-audit-report.json,documentation or tests,12,environment/config
+docs/capability-statement.md,documentation or tests,1,
+docs/compliance-overview.md,documentation or tests,2,
+docs/deploy/manual-github-deploy-package.md,documentation or tests,1,
+docs/dev-studio-checklist.md,documentation or tests,5,
+docs/enrollment-funding-states.md,documentation or tests,3,
+docs/enrollment-state-policy.md,documentation or tests,11,
+docs/platform-e2e-audit-2026-05.md,documentation or tests,2,
+docs/platform-hardening-audit-2026-05-31.md,documentation or tests,23,environment/config
+docs/platform-owner-tenant-model.md,documentation or tests,2,
+docs/platform-readiness-completion-report.md,documentation or tests,3,
+docs/platform-readiness-implementation-plan.md,documentation or tests,1,
+docs/platform-saas-blueprint.md,documentation or tests,4,
+docs/production-activation-2026-05.md,documentation or tests,5,
+docs/production-ready-objective.md,documentation or tests,1,
+docs/repository-scope.md,documentation or tests,3,
+docs/store-14-day-trial.md,documentation or tests,2,
+docs/testing-db-map.md,documentation or tests,3,historical data field
+eslint-rules/no-toplevel-api-clients.cjs,configuration or other,2,
+eslint.config.mjs,configuration or other,1,
+internal-docs/internal/ARCHITECTURE-REPORT.md,documentation or tests,73,historical data field
+internal-docs/internal/ARCHITECTURE.md,documentation or tests,18,environment/config; historical data field
+internal-docs/internal/AUTOMATION_COMPLIANCE_CHECKLIST.md,documentation or tests,5,
+internal-docs/internal/BUYER_READINESS.md,documentation or tests,3,
+internal-docs/internal/COPYRIGHT-PROTECTION.md,documentation or tests,1,
+internal-docs/internal/DOCS-INDEX-OLD.md,documentation or tests,4,environment/config
+internal-docs/internal/ENROLLMENT_TABLES.md,documentation or tests,3,historical data field
+internal-docs/internal/ENTERPRISE_READINESS.md,documentation or tests,7,
+internal-docs/internal/FEATURE-INVENTORY-2025.md,documentation or tests,4,
+internal-docs/internal/LAUNCH-PROOF-EVIDENCE.md,documentation or tests,4,
+internal-docs/internal/LICENSING-CHECKLIST.md,documentation or tests,28,environment/config
+internal-docs/internal/LICENSING-PLAYBOOK.md,documentation or tests,1,
+internal-docs/internal/PLATFORM-TRANSPARENCY-INDEX.md,documentation or tests,1,
+internal-docs/internal/PLATFORM_PRICING.md,documentation or tests,2,
+internal-docs/internal/PRODUCTION-READINESS-REPORT.md,documentation or tests,2,
+internal-docs/internal/STORE-AUDIT.md,documentation or tests,9,
+internal-docs/internal/STRIPE_SETUP.md,documentation or tests,25,
+internal-docs/internal/TAKEDOWN-TEMPLATES.md,documentation or tests,2,
+internal-docs/internal/activation-audit.md,documentation or tests,7,environment/config
+internal-docs/internal/loc-readiness-audit.md,documentation or tests,1,
+internal-docs/internal/proof-pack.md,documentation or tests,8,
+lib/admin/dashboard/compute-tracked-revenue.ts,application source,11,
+lib/admin/dashboard/get-system-health.ts,application source,47,runtime SDK call; environment/config; SDK import
+lib/admin/degraded-dashboard-data.ts,application source,2,
+lib/admin/get-admin-dashboard-data.ts,application source,8,
+lib/admin/get-site-health.ts,application source,12,runtime SDK call; SDK import
+lib/admin/normalize-dashboard-data.ts,application source,6,
+lib/api/canonical-route-proxy.ts,application source,1,
+lib/api/env-groups.ts,application source,10,environment/config
+lib/api/error-codes.ts,application source,2,environment/config
+lib/api/stripe/shared-route-handlers.ts,application source,30,runtime SDK call; environment/config; SDK import; historical data field
+lib/api/validation-schemas.ts,application source,1,
+lib/api/withRuntime.ts,application source,3,environment/config
+lib/apprenticeship/access-control.ts,application source,1,
+lib/apprenticeship/billing-policy.ts,application source,9,historical data field
+lib/apps/sync-paid-app-subscription.ts,application source,1,
+lib/apps/sync-subscription.ts,application source,4,environment/config; historical data field
+lib/apps/website-builder-trial.ts,application source,1,
+lib/audit-context.ts,application source,1,
+lib/audit/api-audit.ts,application source,2,
+lib/audit/site-audit.ts,application source,1,
+lib/audit/withApiAudit.ts,application source,3,
+lib/autopilot/autopilot.ts,application source,2,environment/config
+lib/autopilot/copilot-autopilot.js,application source,15,environment/config
+lib/barber/apprentice-stripe-billing.ts,application source,56,runtime SDK call; environment/config; SDK import; historical data field
+lib/barber/create-weekly-subscription.ts,application source,5,SDK import
+lib/barber/pricing.ts,application source,1,
+lib/billing/config.ts,application source,3,
+lib/billing/fulfillment.ts,application source,3,historical data field
+lib/billing/retired-stripe-checkout.ts,application source,5,environment/config; historical data field
+lib/bnpl-config.ts,application source,21,runtime SDK call; environment/config
+lib/certificates/flag-on-refund.ts,application source,1,
+lib/config/application-fee-config.ts,application source,1,
+lib/dashboard/completion-tracker.ts,application source,3,
+lib/data/store-products.ts,application source,31,
+lib/devstudio/env.ts,application source,3,environment/config
+lib/domain/credentials.ts,application source,8,historical data field
+lib/domainee/finalize-paid-domain-purchase.ts,application source,15,SDK import
+lib/email/send-conference-submission.ts,application source,1,
+lib/enrollment-service.ts,application source,15,historical data field
+lib/enrollment/approve.ts,application source,5,
+lib/enrollment/barber-post-payment.ts,application source,9,historical data field
+lib/enrollment/cosmetology-post-payment.ts,application source,13,historical data field
+lib/enrollment/create-enrollment.ts,application source,2,
+lib/enrollment/create-weekly-subscription-after-checkout.ts,application source,16,runtime SDK call; SDK import; historical data field
+lib/entitlements/revoke.ts,application source,2,historical data field
+lib/env.ts,application source,10,environment/config
+lib/env/stripe-validation.ts,application source,48,runtime SDK call; environment/config; SDK import
+lib/errors.ts,application source,2,
+lib/integrations/lms.ts,application source,5,historical data field
+lib/jobs/enqueue.ts,application source,1,
+lib/jobs/handlers/license-provision.ts,application source,12,historical data field
+lib/jobs/queue.ts,application source,8,
+lib/learner/dashboard-loader.ts,application source,3,
+lib/license/access-control.ts,application source,1,
+lib/license/linkStripeToLicense.ts,application source,51,runtime SDK call; SDK import; historical data field
+lib/license/requireActiveLicense.ts,application source,8,historical data field
+lib/license/types.ts,application source,8,SDK import
+lib/licensing/billing-authority.ts,application source,35,runtime SDK call; historical data field
+lib/licensing/enforcement.ts,application source,10,historical data field
+lib/licensing/index.ts,application source,1,
+lib/licensing/middleware.ts,application source,5,historical data field
+lib/licensing/provisioning.ts,application source,7,historical data field
+lib/licensing/validate.ts,application source,6,historical data field
+lib/microcourses/pricing.ts,application source,2,
+lib/microcourses/stripe-webhook.ts,application source,40,SDK import; historical data field
+lib/middleware/withLicense.ts,application source,9,historical data field
+lib/observability/correlation.ts,application source,17,SDK import
+lib/observability/sentry.ts,application source,8,
+lib/paris/import-engine/github-analyzer.ts,application source,7,environment/config
+lib/paris/import-engine/smart-mapper.ts,application source,8,SDK import
+lib/paris/import-engine/types.ts,application source,3,
+lib/paris/index.ts,application source,1,
+lib/paris/voice-commands.tsx,application source,1,
+lib/paris/workforce/types.ts,application source,2,
+lib/partner-workflows/payments.ts,application source,13,runtime SDK call; SDK import
+lib/partners/link-based-integration.ts,application source,10,
+lib/payments.ts,application source,75,runtime SDK call; SDK import; historical data field
+lib/payments/program-promotion.ts,application source,10,SDK import
+lib/payments/quickbooks-program-promotion.ts,application source,1,
+lib/payments/stripe.ts,application source,54,runtime SDK call; environment/config; SDK import
+lib/payroll/calculator.ts,application source,1,
+lib/platform/features.ts,application source,1,
+lib/platform/handle-subscription-webhook.ts,application source,16,runtime SDK call; SDK import
+lib/platform/knowledge-graph.ts,application source,2,
+lib/platform/orchestration/commerce.ts,application source,1,
+lib/platform/orchestration/dispatcher.ts,application source,4,historical data field
+lib/platform/orchestration/host-shop-subscription.ts,application source,15,SDK import; historical data field
+lib/platform/organization-features.ts,application source,2,
+lib/platform/platform-health.ts,application source,1,
+lib/platform/process-subscription-event.ts,application source,1,
+lib/platform/subscription-lifecycle.ts,application source,29,SDK import; historical data field
+lib/portal/load-apprentice-portal.ts,application source,14,historical data field
+lib/pre-auth-tables.ts,application source,6,
+lib/pricing.ts,application source,1,
+lib/program-constants.ts,application source,1,
+lib/programs/application-config.ts,application source,6,
+lib/programs/beauty-programs.ts,application source,17,
+lib/programs/pricing.ts,application source,17,environment/config; SDK import
+lib/programs/program-schema.ts,application source,1,
+lib/resilience/index.ts,application source,6,
+lib/resilience/with-resilience.ts,application source,5,
+lib/services/credential-pipeline.ts,application source,7,historical data field
+lib/services/exam-authorization/index.ts,application source,26,runtime SDK call; SDK import; historical data field
+lib/services/exam-authorization/readiness.ts,application source,1,
+lib/services/exam-eligibility.ts,application source,1,
+lib/store-entitlements.ts,application source,2,
+lib/store/coupons.ts,application source,21,runtime SDK call; SDK import
+lib/store/db.ts,application source,8,
+lib/store/digital-products.ts,application source,13,
+lib/store/finalize-cart-purchase.ts,application source,20,SDK import; historical data field
+lib/store/finalize-implementation-purchase.ts,application source,21,SDK import; historical data field
+lib/store/idempotency.ts,application source,15,
+lib/store/implementation-packages.ts,application source,1,
+lib/store/platform-pricing.ts,application source,1,
+lib/store/products.ts,application source,2,
+lib/store/provision-tenant.ts,application source,5,
+lib/stripe-config.ts,application source,1,
+lib/stripe/app-store-products.ts,application source,9,
+lib/stripe/apprenticeship-products.ts,application source,4,environment/config
+lib/stripe/client.ts,application source,4,runtime SDK call
+lib/stripe/construct-webhook-event.ts,application source,28,environment/config; SDK import
+lib/stripe/customer-resolver.ts,application source,17,runtime SDK call; SDK import
+lib/stripe/forward-to-canonical-webhook.ts,application source,6,
+lib/stripe/get-stripe-server.ts,application source,1,runtime SDK call
+lib/stripe/handlers/checkout-session-completed-with-store.ts,application source,14,SDK import
+lib/stripe/handlers/checkout-session-completed.ts,application source,39,SDK import; historical data field
+lib/stripe/handlers/index.ts,application source,7,
+lib/stripe/handlers/testing-checkout-completed.ts,application source,14,runtime SDK call; SDK import
+lib/stripe/handlers/types.ts,application source,11,SDK import
+lib/stripe/idempotency.ts,application source,10,
+lib/stripe/licensing-products.ts,application source,1,
+lib/stripe/payment-method-portal.ts,application source,7,SDK import
+lib/stripe/price-map.ts,application source,39,environment/config
+lib/stripe/prices.ts,application source,53,runtime SDK call; environment/config
+lib/stripe/resolve-canonical-price.ts,application source,37,SDK import
+lib/stripe/runtime-key.ts,application source,6,runtime SDK call; environment/config
+lib/stripe/stripe-client.ts,application source,63,runtime SDK call; SDK import
+lib/stripe/subscription-guard.ts,application source,12,runtime SDK call; SDK import
+lib/stripe/tuition-checkout.ts,application source,18,runtime SDK call; SDK import; historical data field
+lib/stripe/tuition-config.ts,application source,7,environment/config
+lib/stripe/tuition-webhook-handler.ts,application source,47,runtime SDK call; SDK import; historical data field
+lib/stripe/webhook-schemas.ts,application source,7,
+lib/vendors/payout.ts,application source,33,runtime SDK call; environment/config; SDK import; historical data field
+lib/webhooks/event-tracker.ts,application source,1,
+lms-data/billingConfig.ts,configuration or other,18,
+lms-data/enrollmentMappings.ts,configuration or other,1,
+lms-data/funding.ts,configuration or other,1,
+lms-data/paymentPlans.ts,configuration or other,25,
+lms-data/programCatalog.ts,configuration or other,3,
+lms-data/siteHealth.ts,configuration or other,5,environment/config
+lms-data/tuition.ts,configuration or other,3,
+migration-duplicates-report.json,configuration or other,3,
+next.config.mjs,configuration or other,6,
+northflank/README.md,documentation or tests,9,environment/config
+northflank_marketing.json,configuration or other,2,environment/config
+package-lock.json,configuration or other,20,
+package.json,configuration or other,2,
+package.json.A,configuration or other,1,
+package.json.baseline,configuration or other,9,
+package.json.current,configuration or other,0,
+package.json.green,configuration or other,0,
+pending_migrations_2026-06-24.sql,configuration or other,26,historical data field
+pnpm-lock-good.yaml,configuration or other,18,
+public/data/barber-apprenticeship-blueprint.json,configuration or other,4,
+purge-inventory.txt,configuration or other,0,
+scripts/activate-all-features.ts,legacy or operational scripts,2,environment/config
+scripts/admin-route-inventory.json,legacy or operational scripts,3,historical data field
+scripts/api-audit.json,legacy or operational scripts,4,
+scripts/apply-license-tables.sql,legacy or operational scripts,20,historical data field
+scripts/archetypes.routes.json,legacy or operational scripts,1,
+scripts/audit-api-auth.mjs,legacy or operational scripts,1,
+scripts/audit-apply-content-health.mjs,legacy or operational scripts,7,
+scripts/audit-doc-code-reconciliation.mjs,legacy or operational scripts,2,
+scripts/audit-env-connections.mjs,legacy or operational scripts,15,environment/config; SDK import
+scripts/audit-license-integrity.sql,legacy or operational scripts,11,historical data field
+scripts/audit-platform-media-commerce.mjs,legacy or operational scripts,4,
+scripts/audit-readme-proof.sh,legacy or operational scripts,2,
+scripts/audit-route-auth-strategy.mjs,legacy or operational scripts,2,
+scripts/auto-setup-env.sh,legacy or operational scripts,7,environment/config
+scripts/autonomous-health-check.sh,legacy or operational scripts,1,
+scripts/autopilot_migrate.sh,legacy or operational scripts,7,
+scripts/billing/reportUsage.ts,legacy or operational scripts,11,environment/config; SDK import; historical data field
+scripts/bootstrap-clone.ts,legacy or operational scripts,1,historical data field
+scripts/check-autopilots.mjs,legacy or operational scripts,1,environment/config
+scripts/check-cross-app-write-authority.mjs,legacy or operational scripts,9,
+scripts/check-deployment-status.sh,legacy or operational scripts,3,environment/config
+scripts/check-enterprise-features.js,legacy or operational scripts,1,environment/config
+scripts/check-enterprise-features.ts,legacy or operational scripts,1,environment/config
+scripts/check-env-status.sh,legacy or operational scripts,2,environment/config
+scripts/check-env.mjs,legacy or operational scripts,2,environment/config
+scripts/check-pre-auth-registry.cjs,legacy or operational scripts,2,
+scripts/check-stripe-integrity.mjs,legacy or operational scripts,13,
+scripts/classify-dynamic-routes.json,legacy or operational scripts,9,
+scripts/complete-deployment.sh,legacy or operational scripts,2,environment/config
+scripts/complete-setup.sh,legacy or operational scripts,2,environment/config
+scripts/comprehensive-audit.cjs,legacy or operational scripts,2,environment/config
+scripts/create-demo-video.sh,legacy or operational scripts,1,
+scripts/create-stripe-products.mjs,legacy or operational scripts,15,environment/config; SDK import
+scripts/create-stripe-products.ts,legacy or operational scripts,17,environment/config; SDK import
+scripts/create-stripe-subscriptions.ts,legacy or operational scripts,24,runtime SDK call; environment/config; SDK import; historical data field
+scripts/create-subscriptions-v2.ts,legacy or operational scripts,18,runtime SDK call; environment/config; SDK import; historical data field
+scripts/db-audit.ts,legacy or operational scripts,1,
+scripts/deploy-production.sh,legacy or operational scripts,2,environment/config
+scripts/efh-create-licensed-repo.sh,legacy or operational scripts,1,
+scripts/enforce-api-protection.mjs,legacy or operational scripts,1,
+scripts/env-check.cjs,legacy or operational scripts,2,environment/config
+scripts/export-manual-deploy-patch.mjs,legacy or operational scripts,1,
+scripts/fix-consistency.sh,legacy or operational scripts,9,environment/config
+scripts/fix-database.sql,legacy or operational scripts,2,
+scripts/fix-everything.cjs,legacy or operational scripts,2,environment/config
+scripts/fix-typescript-today.sh,legacy or operational scripts,1,
+scripts/generate-complete-env.sh,legacy or operational scripts,1,
+scripts/governed-schema.json,legacy or operational scripts,3,historical data field
+scripts/government-comparison-audit.sh,legacy or operational scripts,1,
+scripts/guard-critical-routes.mjs,legacy or operational scripts,2,
+scripts/guard-no-fake-success.mjs,legacy or operational scripts,1,
+scripts/import-partner-programs.ts,legacy or operational scripts,3,
+scripts/inject-stripe-publishable-meta.js,legacy or operational scripts,11,environment/config
+scripts/insert-surface-matrix.md,documentation or tests,20,historical data field
+scripts/learnworlds_parity.sh,legacy or operational scripts,5,
+scripts/link-stripe-customers.ts,legacy or operational scripts,24,historical data field
+scripts/northflank-setup.sh,legacy or operational scripts,12,environment/config
+scripts/northflank/configure-store.ts,legacy or operational scripts,1,
+scripts/northflank/env-keys-manifest.txt,legacy or operational scripts,12,environment/config
+scripts/northflank/sync-builder-env.mjs,legacy or operational scripts,3,environment/config
+scripts/ops/complete-barber-dashboards.mjs,legacy or operational scripts,13,historical data field
+scripts/ops/reconcile-stripe-production-key.mjs,legacy or operational scripts,16,environment/config
+scripts/patch-barber-module1.ts,legacy or operational scripts,2,
+scripts/pending_migrations.sql,legacy or operational scripts,53,environment/config; historical data field
+scripts/platform-closure-smoke.sh,legacy or operational scripts,4,
+scripts/pre-launch-health-check.sh,legacy or operational scripts,5,environment/config
+scripts/pre-launch-tests.sh,legacy or operational scripts,5,environment/config
+scripts/production-readiness-gate.sh,legacy or operational scripts,3,
+scripts/pull-and-check-stripe.sh,legacy or operational scripts,18,environment/config
+scripts/quality-gates.sh,legacy or operational scripts,6,environment/config
+scripts/quarantine-audit.mjs,legacy or operational scripts,1,
+scripts/quarantine-build-manifest.mjs,legacy or operational scripts,1,
+scripts/reconcile-audit.mjs,legacy or operational scripts,37,runtime SDK call; environment/config; SDK import; historical data field
+scripts/refactor/stub-route-handlers.txt,legacy or operational scripts,1,
+scripts/route-certification-report.json,legacy or operational scripts,26,
+scripts/run-apprentice-stripe-billing.ts,legacy or operational scripts,28,environment/config; SDK import
+scripts/run-pending-migrations.sql,legacy or operational scripts,3,historical data field
+scripts/run-with-env.py,legacy or operational scripts,2,environment/config
+scripts/run-with-env.sh,legacy or operational scripts,1,
+scripts/safe-production-fix.sh,legacy or operational scripts,1,environment/config
+scripts/schema-drift-baseline.json,legacy or operational scripts,2,historical data field
+scripts/schema-drift-report.md,documentation or tests,1,
+scripts/security/credential-scan.mjs,legacy or operational scripts,2,
+scripts/send-barber-balance-payment-links.ts,legacy or operational scripts,13,environment/config; SDK import; historical data field
+scripts/send-conference-email.mjs,legacy or operational scripts,1,
+scripts/send-jordan-payment-email.ts,legacy or operational scripts,13,environment/config; SDK import
+scripts/send-payment-emails.ts,legacy or operational scripts,2,
+scripts/send-payment-setup-emails.ts,legacy or operational scripts,9,environment/config; SDK import
+scripts/send-submission-package.mjs,legacy or operational scripts,1,
+scripts/seo-analytics-check.sh,legacy or operational scripts,7,
+scripts/set-default-payment-methods.ts,legacy or operational scripts,12,runtime SDK call; environment/config; SDK import
+scripts/setup-all-partner-courses.ts,legacy or operational scripts,9,environment/config; SDK import
+scripts/setup-all-stripe-products.sh,legacy or operational scripts,18,environment/config
+scripts/setup-application-fee-webhook.sh,legacy or operational scripts,16,environment/config
+scripts/setup-deployment.sh,legacy or operational scripts,5,environment/config
+scripts/setup-drug-testing-products.ts,legacy or operational scripts,9,environment/config; SDK import
+scripts/setup-env-by-branch.sh,legacy or operational scripts,6,environment/config
+scripts/setup-env-from-template.sh,legacy or operational scripts,2,environment/config
+scripts/setup-env.sh,legacy or operational scripts,4,environment/config
+scripts/setup-license-products.ts,legacy or operational scripts,19,environment/config; SDK import
+scripts/setup-production-env.sh,legacy or operational scripts,7,environment/config
+scripts/setup-production.sh,legacy or operational scripts,2,environment/config
+scripts/setup-stripe-automation.js,legacy or operational scripts,7,environment/config
+scripts/setup-stripe-licensing.md,documentation or tests,9,environment/config
+scripts/setup-stripe-products.cjs,legacy or operational scripts,16,environment/config
+scripts/setup-stripe-products.mjs,legacy or operational scripts,11,environment/config; SDK import
+scripts/setup-stripe-products.ts,legacy or operational scripts,16,environment/config; SDK import
+scripts/setup.sh,legacy or operational scripts,3,environment/config
+scripts/showcase-readiness.mjs,legacy or operational scripts,1,
+scripts/step2-create-subscriptions.ts,legacy or operational scripts,14,runtime SDK call; environment/config; SDK import; historical data field
+scripts/supabase/ELEVATE_PENDING_MIGRATIONS.sql,legacy or operational scripts,12,
+scripts/supabase/build-dashboard-bundle.sh,legacy or operational scripts,1,
+scripts/sync-exam-fee-stripe-products.cjs,legacy or operational scripts,26,environment/config
+scripts/test-license-lockout.sh,legacy or operational scripts,10,
+scripts/test-payment-processing.mjs,legacy or operational scripts,13,environment/config; SDK import
+scripts/unaudited-write-paths.json,legacy or operational scripts,5,
+scripts/utilities/bnpl-webhook-handler.js,legacy or operational scripts,10,environment/config; historical data field
+scripts/utilities/deployment-health-check.js,legacy or operational scripts,2,
+scripts/utilities/enhanced-webhook.js,legacy or operational scripts,10,runtime SDK call; environment/config
+scripts/utilities/flash-sale-checkout.js,legacy or operational scripts,10,runtime SDK call; environment/config
+scripts/utilities/license-production-server.js,legacy or operational scripts,2,
+scripts/utilities/marketplace-automation.js,legacy or operational scripts,6,
+scripts/utilities/partner-programs-catalog.json,legacy or operational scripts,2,
+scripts/utilities/pay-backend-integration.js,legacy or operational scripts,16,environment/config; historical data field
+scripts/utilities/pay-bnpl-routes.js,legacy or operational scripts,18,runtime SDK call; environment/config
+scripts/utilities/pay-enhanced-checkout.js,legacy or operational scripts,21,runtime SDK call; environment/config; SDK import; historical data field
+scripts/utilities/payment-processing-with-splits.js,legacy or operational scripts,8,environment/config
+scripts/utilities/philanthropy-system.js,legacy or operational scripts,2,
+scripts/utilities/production-server.js,legacy or operational scripts,1,
+scripts/utilities/revenue-split-system.js,legacy or operational scripts,13,runtime SDK call; environment/config
+scripts/utilities/stripe-partner-products-setup.js,legacy or operational scripts,18,runtime SDK call; environment/config
+scripts/utilities/stripe-payment-system.js,legacy or operational scripts,31,runtime SDK call; environment/config
+scripts/utilities/stripe-products-creator.js,legacy or operational scripts,20,runtime SDK call; environment/config
+scripts/utilities/subscription-manager.js,legacy or operational scripts,24,runtime SDK call; environment/config; historical data field
+scripts/utilities/test-payment-system.js,legacy or operational scripts,9,environment/config
+scripts/utilities/webhook-handler.js,legacy or operational scripts,7,environment/config
+scripts/utilities/webhook-license-delivery.js,legacy or operational scripts,15,runtime SDK call; environment/config
+scripts/utilities/workflow-test.js,legacy or operational scripts,11,
+scripts/validate-env.ts,legacy or operational scripts,2,environment/config
+scripts/validate-production.sh,legacy or operational scripts,4,
+scripts/validate-schema-drift.ts,legacy or operational scripts,6,environment/config
+scripts/validate-stripe-version.cjs,legacy or operational scripts,12,
+scripts/validation/idempotency-test.ts,legacy or operational scripts,11,
+scripts/validation/refund-dispute-test.ts,legacy or operational scripts,1,historical data field
+scripts/validation/traceability-test.ts,legacy or operational scripts,13,
+scripts/verify-barber-onboarding-flow.ts,legacy or operational scripts,23,environment/config; SDK import; historical data field
+scripts/verify-bnpl-stripe.ts,legacy or operational scripts,52,runtime SDK call
+scripts/verify-env-vars.sh,legacy or operational scripts,6,environment/config
+scripts/verify-failure-paths.sh,legacy or operational scripts,2,
+scripts/verify-full-site.js,legacy or operational scripts,1,
+scripts/verify-production.mjs,legacy or operational scripts,2,
+scripts/verify-recovery-gate-hardening.mjs,legacy or operational scripts,14,
+scripts/verify-ultimate-worker-parity.ts,legacy or operational scripts,1,
+scripts/what-we-actually-have.sh,legacy or operational scripts,8,environment/config
+scripts/workers/get-supabase-credentials.sh,legacy or operational scripts,4,environment/config
+supabase/functions/autopilot-db-worker/index.ts,configuration or other,2,
+supabase/functions/autopilot-worker/index.ts,configuration or other,1,
+supabase/functions/stripe-webhook/index.ts,configuration or other,33,environment/config; historical data field
+supabase/migrations/20250617140000_coupon_engine.sql,historical schema,1,
+supabase/migrations/20260124000012_career_courses_products.sql,historical schema,4,historical data field
+supabase/migrations/20260125000001_license_lockout_hardening.sql,historical schema,17,historical data field
+supabase/migrations/20260127900000_license_events.sql,historical schema,1,
+supabase/migrations/20260131900000_barber_webhook_automation.sql,historical schema,8,historical data field
+supabase/migrations/20260201000002_nds_training_courses.sql,historical schema,24,historical data field
+supabase/migrations/20260201000003_stripe_price_enrollment_map.sql,historical schema,49,
+supabase/migrations/20260201000004_student_enrollments_canonical.sql,historical schema,11,historical data field
+supabase/migrations/20260201000005_training_programs_stripe.sql,historical schema,27,historical data field
+supabase/migrations/20260202000003_fix_security_issues.sql,historical schema,4,
+supabase/migrations/20260203000001_soft_holds_schema.sql,historical schema,7,historical data field
+supabase/migrations/20260203000003_enterprise_compliance_enforcement.sql,historical schema,1,
+supabase/migrations/20260209900000_checkout_contexts.sql,historical schema,1,
+supabase/migrations/20260211000002_student_enrollments_hardening.sql,historical schema,3,historical data field
+supabase/migrations/20260211000003_tax_prep_enrollment_map_final.sql,historical schema,5,
+supabase/migrations/20260216000002_drop_redundant_tables.sql,historical schema,2,
+supabase/migrations/20260216000011_managed_licenses_table.sql,historical schema,3,historical data field
+supabase/migrations/20260218000003_fix_security_definer_views.sql,historical schema,4,
+supabase/migrations/20260220100000_products_catalog_upgrade.sql,historical schema,5,
+supabase/migrations/20260220130004_rls_remaining_tenant_tables.sql,historical schema,1,historical data field
+supabase/migrations/20260224000002_add_missing_columns.sql,historical schema,2,historical data field
+supabase/migrations/20260225000001_add_missing_insert_columns.sql,historical schema,3,historical data field
+supabase/migrations/20260227000003_schema_governance_baseline.sql,historical schema,2,historical data field
+supabase/migrations/20260227000004_schema_governance_baseline_batch2.sql,historical schema,8,historical data field
+supabase/migrations/20260228000001_audit_actor_propagation.sql,historical schema,2,
+supabase/migrations/20260228000006_audited_mutation.sql,historical schema,1,
+supabase/migrations/20260302110000_vendor_payout_system.sql,historical schema,7,historical data field
+supabase/migrations/20260302140000_webhook_events_processed.sql,historical schema,2,
+supabase/migrations/20260306110000_program_enrollments_barber_columns.sql,historical schema,2,historical data field
+supabase/migrations/20260312000009_create_program_holder_verification.sql,historical schema,1,
+supabase/migrations/20260313000001_barber_schema_drift.sql,historical schema,16,historical data field
+supabase/migrations/20260313900002_partner_identity_audit_triggers.sql,historical schema,1,
+supabase/migrations/20260313900007_webhook_health_monitor.sql,historical schema,1,
+supabase/migrations/20260320000010_rls_optimization_enrollment_plan.sql,historical schema,2,
+supabase/migrations/20260321000001_exam_funding_authorizations.sql,historical schema,2,historical data field
+supabase/migrations/20260326000002_certification_pathways.sql,historical schema,1,
+supabase/migrations/20260326000003_certification_pipeline.sql,historical schema,9,historical data field
+supabase/migrations/20260329000001_lms_checkpoint_certification.sql,historical schema,3,historical data field
+supabase/migrations/20260401000009_external_course_stripe.sql,historical schema,5,
+supabase/migrations/20260401000013_exam_fee_stripe_products.sql,historical schema,15,
+supabase/migrations/20260408000005_testing_appointments.sql,historical schema,1,historical data field
+supabase/migrations/20260408000006_transfer_hours_authority.sql,historical schema,1,
+supabase/migrations/20260416000002_hardcoded_to_db_tables.sql,historical schema,3,
+supabase/migrations/20260420000001_payment_transactions.sql,historical schema,3,historical data field
+supabase/migrations/20260427000007_program_pricing.sql,historical schema,17,
+supabase/migrations/20260430000007_fix_failed_migrations.sql,historical schema,6,historical data field
+supabase/migrations/20260503000013_enroll_application_hardening.sql,historical schema,27,environment/config
+supabase/migrations/20260503000020_enrollment_lockdown.sql,historical schema,2,
+supabase/migrations/20260503000025_funding_verification_state.sql,historical schema,3,
+supabase/migrations/20260503000027_payment_integrity.sql,historical schema,8,historical data field
+supabase/migrations/20260503000030_stripe_sessions_staging.sql,historical schema,30,historical data field
+supabase/migrations/20260503000031_stripe_webhook_hardening.sql,historical schema,5,
+supabase/migrations/20260503000032_webhook_retry_log.sql,historical schema,3,
+supabase/migrations/20260515000001_cosmetology_subscriptions.sql,historical schema,7,historical data field
+supabase/migrations/20260526000013_program_enrollments_subscription_status.sql,historical schema,7,historical data field
+supabase/migrations/20260527000001_security_definer_search_path.sql,historical schema,3,
+supabase/migrations/20260527000013_tax_payments.sql,historical schema,6,historical data field
+supabase/migrations/20260601000005_baseline_untracked_tables.sql,historical schema,41,historical data field
+supabase/migrations/20260603000002_normalize_funding_source.sql,historical schema,1,
+supabase/migrations/20260603000006_stripe_event_log.sql,historical schema,18,
+supabase/migrations/20260604000002_barber_billing_schema.sql,historical schema,5,historical data field
+supabase/migrations/20260604000004_applications_payment_columns.sql,historical schema,3,
+supabase/migrations/20260606000002_stripe_webhook_secret_app_secrets.sql,historical schema,13,environment/config
+supabase/migrations/20260607000001_booth_rental_tables.sql,historical schema,9,historical data field
+supabase/migrations/20260608000001_exam_bookings_add_on.sql,historical schema,2,
+supabase/migrations/20260610000001_security_advisor_hardening.sql,historical schema,1,
+supabase/migrations/20260613000001_nha_training_programs.sql,historical schema,1,
+supabase/migrations/20260616000001_stripe_connect_vendors.sql,historical schema,6,historical data field
+supabase/migrations/20260616000002_phlebotomy_stripe_connect.sql,historical schema,18,historical data field
+supabase/migrations/20260619000001_micro_class_enrollments.sql,historical schema,3,
+supabase/migrations/20260625000007_store_missing_tables.sql,historical schema,2,
+supabase/migrations/20260626000011_rls_complete_sweep.sql,historical schema,1,historical data field
+supabase/migrations/20260627000010_fix_natalia_enrollment_state.sql,historical schema,3,historical data field
+supabase/migrations/20260702000003_store_products_stripe_id.sql,historical schema,11,
+supabase/migrations/20260702000015_individual_app_subscriptions.sql,historical schema,2,historical data field
+supabase/migrations/20260702000016_organization_addons.sql,historical schema,1,historical data field
+supabase/migrations/20260702000017_saas_subscription_foundation.sql,historical schema,4,historical data field
+supabase/migrations/20260703000002_sync_admin_nav.sql,historical schema,2,
+supabase/migrations/20260703000003_seed_platform_settings_defaults.sql,historical schema,1,
+supabase/migrations/20260704000001_elevate_core_operations.sql,historical schema,2,
+supabase/migrations/20260707000001_critical_missing_tables.sql,historical schema,1,historical data field
+supabase/migrations/20260707000003_create_missing_tables.sql,historical schema,2,historical data field
+supabase/migrations/20260713000001_host_shop_applications.sql,historical schema,5,historical data field
+supabase/migrations/20260713000002_application_payments.sql,historical schema,4,historical data field
+supabase/migrations/20260713000003_host_shop_partnerships.sql,historical schema,6,historical data field
+supabase/migrations/20260809101500_store_order_idempotency.sql,historical schema,4,
+supabase/migrations/20260809123000_website_domain_checkout.sql,historical schema,4,historical data field
+supabase/migrations/20260810000004_unified_control_plane.sql,historical schema,1,
+supabase/migrations/20260810000006_host_shop_subscriptions.sql,historical schema,2,historical data field
+supabase/migrations/20260810061000_install_domain_orchestration_event_triggers.sql,historical schema,2,
+supabase/migrations/20260810071500_route_individual_app_subscriptions_through_store_rpc.sql,historical schema,35,historical data field
+supabase/migrations/20260810074500_canonicalize_host_shop_subscription_identity.sql,historical schema,3,historical data field
+supabase/migrations/20260810084500_harden_host_shop_application_fee_contract.sql,historical schema,6,historical data field
+supabase/migrations/20260811110500_commercial_ai_runtime_hardening.sql,historical schema,7,historical data field
+supabase/migrations/20260811114000_canonical_platform_saas_store_subscription.sql,historical schema,57,historical data field
+supabase/migrations/20260811124500_demo_launch_foundation_tenant_commerce.sql,historical schema,7,historical data field
+supabase/migrations/20260811133000_community_hub_commercialization.sql,historical schema,3,historical data field
+supabase/migrations/20260812123000_restrict_privileged_security_definer_rpcs.sql,historical schema,4,
+supabase/migrations/20260816000001_prepare_canonical_program_enrollments.sql,historical schema,4,historical data field
+supabase/migrations/20260816000002_retire_student_enrollments.sql,historical schema,3,historical data field
+supabase/migrations/20260818193000_course_commerce_and_enrollment_idempotency.sql,historical schema,1,
+supabase/migrations/20260819133000_production_security_acceptance_hardening.sql,historical schema,1,
+supabase/migrations/20260820090000_apprentice_billing_policy.sql,historical schema,4,historical data field
+supabase/migrations/20260820090500_protect_apprentice_training_from_billing_events.sql,historical schema,1,
+supabase/migrations/20260822225600_guard_student_approval_consistency.sql,historical schema,1,
+supabase/migrations/20260822225900_repair_nonactive_approved_students.sql,historical schema,1,
+supabase/migrations/20260825124500_tenant_course_builder_credits.sql,historical schema,1,historical data field
+supabase/migrations/20260827110000_repair_runtime_contracts_20260827.sql,historical schema,1,
+supabase/migrations/20260829115259_implementation_order_fulfillment.sql,historical schema,7,historical data field
+supabase/migrations/20260829182500_apprenticeship_billing_authorizations.sql,historical schema,4,historical data field
+supabase/migrations/20260901224636_reconcile_physical_mutation_contracts.sql,historical schema,19,historical data field
+supabase/migrations/20260903203628_program_holder_stripe_connect_v2.sql,historical schema,4,
+supabase/migrations/20260904010000_program_holder_automatic_payouts.sql,historical schema,4,
+supabase/migrations/20260906120000_universal_user_billing_customers.sql,historical schema,3,historical data field
+supabase/migrations/20260906160000_microcourse_marketplace.sql,historical schema,17,historical data field
+supabase/migrations/20260906173000_public_microcourse_catalog_rpc.sql,historical schema,1,
+supabase/migrations/20260906201238_connect_learner_stripe_identity.sql,historical schema,6,
+supabase/migrations/20260911090000_provider_neutral_billing.sql,historical schema,24,historical data field
+supabase/migrations/20260912042534_provider_neutral_contractor_payouts.sql,historical schema,1,
+supabase/migrations/20260915020000_provider_payout_ledger_copy.sql,historical schema,2,
+supabase/migrations/20260922111420_paypal_apprentice_autopay.sql,historical schema,2,
+supabase/migrations/20260924010500_complete_provider_neutral_subscription_cutover.sql,historical schema,12,historical data field
+supabase/migrations/20260927121500_remove_stripe_active_billing_provider.sql,historical schema,4,
+supabase/run-pending-migrations.sql,configuration or other,3,historical data field
+supabase/seed/archive/001_demo_tenant_seed.sql,configuration or other,7,environment/config; historical data field
+supabase/seed/comprehensive_student_data.sql,configuration or other,1,historical data field
+supabase/seeds/barber_verify.sql,configuration or other,6,historical data field
+supabase/seeds/store_subscriptions_seed.sql,configuration or other,3,
+tests/5-payment-flow.test.ts,documentation or tests,11,environment/config
+tests/barber-webhook-db-check.sql,documentation or tests,1,
+tests/e2e/complete-platform.spec.ts,documentation or tests,2,
+tests/e2e/full-enrollment-journey.spec.ts,documentation or tests,2,
+tests/e2e/program-e2e-flows.spec.ts,documentation or tests,1,
+tests/integration/stripe-payment.test.ts,documentation or tests,29,runtime SDK call; environment/config
+tests/race-conditions.spec.ts,documentation or tests,11,
+tests/security/pentest-checklist.md,documentation or tests,3,
+tests/stripe-barber-webhook.sh,documentation or tests,4,
+tests/stripe-webhook.spec.ts,documentation or tests,12,
+tests/unit/apprentice-self-service-contract.test.ts,documentation or tests,5,historical data field
+tests/unit/billing-provider-config.test.ts,documentation or tests,8,
+tests/unit/billing-provider-cutover-contract.test.ts,documentation or tests,10,runtime SDK call; SDK import
+tests/unit/billing-setup-route.test.ts,documentation or tests,2,environment/config; historical data field
+tests/unit/bug-fixes-round2.test.ts,documentation or tests,20,
+tests/unit/bug-fixes.test.ts,documentation or tests,16,environment/config
+tests/unit/checkout/unified-checkout.test.ts,documentation or tests,4,
+tests/unit/course-factory/media-authority.test.ts,documentation or tests,3,historical data field
+tests/unit/dashboard-format-metrics.test.ts,documentation or tests,1,
+tests/unit/enrollment-payment.test.ts,documentation or tests,3,
+tests/unit/finalize-implementation-purchase.test.ts,documentation or tests,9,SDK import; historical data field
+tests/unit/jobs/async-safety.test.ts,documentation or tests,11,
+tests/unit/license/license-linking.test.ts,documentation or tests,9,historical data field
+tests/unit/license/managed-license-linking.test.ts,documentation or tests,23,historical data field
+tests/unit/license/webhook-routes-unified.test.ts,documentation or tests,3,
+tests/unit/licensing/billing-authority.test.ts,documentation or tests,29,historical data field
+tests/unit/northflank-runtime-env-sync-contract.test.ts,documentation or tests,1,environment/config
+tests/unit/payments-idor-protection.test.ts,documentation or tests,33,historical data field
+tests/unit/stripe-canonical-price.test.ts,documentation or tests,14,SDK import
+tests/unit/stripe-customer-resolver.test.ts,documentation or tests,19,runtime SDK call; SDK import
+tests/unit/stripe-identity-webhook-negative.test.ts,documentation or tests,4,
+tests/unit/stripe-runtime-key.test.ts,documentation or tests,13,runtime SDK call; environment/config; SDK import
+tests/unit/stripe-service.test.ts,documentation or tests,29,
+tests/unit/stripe-webhook-signature.test.ts,documentation or tests,21,SDK import
+tests/unit/subscription-guard.test.ts,documentation or tests,11,SDK import
+tests/unit/top-risk-auth-guards.test.ts,documentation or tests,3,
+tests/unit/universal-payment-method-complete.test.ts,documentation or tests,4,runtime SDK call; historical data field
+tests/unit/universal-payment-method-setup.test.ts,documentation or tests,1,environment/config; historical data field
+tsconfig.json,configuration or other,2,
+types/database.generated.ts,configuration or other,617,historical data field
+types/enrollment.ts,configuration or other,3,
+types/program.ts,configuration or other,4,

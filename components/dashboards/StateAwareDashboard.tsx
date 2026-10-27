@@ -41,7 +41,7 @@ interface StateAwareDashboardProps {
 
 function portalHeroImage(href: string): string {
   const value = href.toLowerCase();
-  if (value.includes('employer')) return '/images/pages/business-meeting.webp';
+  if (value.includes('employer')) return '/images/business-collaboration-vibrant-2026.webp';
   if (value.includes('case-manager') || value.includes('workforce')) return '/images/pages/admin-wioa-hero.webp';
   if (value.includes('provider') || value.includes('program-holder')) return '/images/pages/training-classroom.webp';
   if (value.includes('host-shop') || value.includes('apprentice')) return '/images/pages/barber-training.webp';

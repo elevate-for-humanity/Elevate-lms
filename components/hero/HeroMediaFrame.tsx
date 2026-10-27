@@ -6,7 +6,7 @@
  *
  * Usage:
  *   <HeroMediaFrame>
- *     <UltraVideoPlayer src="..." poster="..." className="absolute inset-0 w-full h-full object-cover" />
+ *     <UltraVideoPlayer src="..." poster="..." className="absolute inset-0 w-full h-full object-contain" />
  *   </HeroMediaFrame>
  */
 

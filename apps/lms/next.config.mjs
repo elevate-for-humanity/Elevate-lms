@@ -1,5 +1,6 @@
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
+import { withBuildMemoryDefaults } from '../../scripts/build-memory-policy.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,8 +17,10 @@ const nextConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
+  // Multipart overhead must fit above the validated 10 MB photo/document limit.
+  experimental: { serverActions: { bodySizeLimit: '12mb' } },
+
   images: { unoptimized: true },
-  typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
   // Keep observability instrumentation in Node's runtime boundary. Bundling
   // these packages makes webpack inspect intentional dynamic require calls.
@@ -36,6 +39,11 @@ const nextConfig = {
     // edge-tts ships TypeScript source in its package. Keep it outside the
     // Next/Webpack bundle so Node loads it through the server runtime path.
     'edge-tts',
+    // Kokoro loads platform-specific ONNX native bindings at runtime. These
+    // must be traced as server dependencies instead of parsed by webpack.
+    'kokoro-js',
+    '@huggingface/transformers',
+    'onnxruntime-node',
   ],
 
   async headers() {
@@ -68,6 +76,7 @@ const nextConfig = {
       { source: '/reset', destination: '/support/reset-browser', permanent: true },
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
       { source: '/partners/dashboard', destination: '/host-shop/dashboard', permanent: true },
+      { source: '/partner/dashboard', destination: '/host-shop/dashboard', permanent: false },
       { source: '/partners/workforce', destination: '/workforce', permanent: true },
       { source: '/host-shop/dashboard/apprentices/new', destination: '/host-shop/dashboard/match-requests', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
@@ -80,22 +89,13 @@ const nextConfig = {
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: true },
     ];
   },
-  webpack: (config, { isServer, webpack }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
     if (!isServer) {
       config.plugins = config.plugins || [];
       config.plugins.push(new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'], buffer: 'buffer' }));
     }
-    // Supabase's browser-compatible bundle contains guarded Node version
-    // checks. They are not executed in middleware, but Next reports them as
-    // Edge-runtime warnings while statically scanning the dependency.
-    config.ignoreWarnings = [
-      ...(config.ignoreWarnings ?? []),
-      {
-        module: /node_modules[\\/]@supabase[\\/](?:realtime-js|supabase-js)/,
-        message: /A Node\.js API is used .* not supported in the Edge Runtime/,
-      },
-    ];
+    if (!dev) config.cache = false;
     return config;
   },
 };
-export default nextConfig;
+export default withBuildMemoryDefaults(nextConfig);

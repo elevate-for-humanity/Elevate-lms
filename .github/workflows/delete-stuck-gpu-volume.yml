@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   delete-volume:
+    # Retired provider: preserve evidence; never delete source resources automatically.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 10

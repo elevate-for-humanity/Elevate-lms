@@ -1,2 +1,13 @@
-import {aiChat} from '@/lib/ai/ai-service';import type {UltimateAssessmentPort} from '../core/ports';
-export class UltimatePlatformAssessment implements UltimateAssessmentPort{async generate(input:any){const r=await aiChat({temperature:.2,maxTokens:6500,messages:[{role:'system',content:'Create original credential-aligned assessment items covering every supplied objective. Use multiple choice with exactly four plausible choices, scenarios, sequencing or application as appropriate. Include objectiveIds, correct answer, explanation and difficulty. Never reproduce proprietary exam questions. Return JSON only.'},{role:'user',content:JSON.stringify(input)}]});if(!r.content)throw new Error('ULTIMATE_ASSESSMENT_EMPTY');return JSON.parse(r.content);}}
+import type { UltimateAssessmentPort } from '../core/ports';
+export class UltimatePlatformAssessment implements UltimateAssessmentPort {
+  async generate(input: any) {
+    const assessment = input.script?.script?.assessment;
+    if (!assessment?.questions?.length || !assessment.reassessment?.length)
+      throw new Error('ULTIMATE_AUTHORED_ASSESSMENT_REQUIRED');
+    const ids = new Set((input.objectives?.objectives ?? []).map((o: any) => o.id));
+    for (const q of assessment.questions)
+      if (!q.objectiveIds?.length || q.objectiveIds.some((id: string) => !ids.has(id)))
+        throw new Error('ULTIMATE_ASSESSMENT_OBJECTIVE_MAPPING_INVALID');
+    return assessment;
+  }
+}

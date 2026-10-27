@@ -10,4 +10,21 @@ describe('licensed course-media upload entry', () => {
     expect(page).toContain('licensedLibrary={licensedLibrary}');
     expect(page).toContain('embedded={licensedLibrary}');
   });
+
+  it('accepts licensed Envato photos as well as clips in both UI and API validation', () => {
+    const client = readFileSync(
+      join(process.cwd(), 'apps/admin/app/videos/upload/VideoUploadClient.tsx'),
+      'utf8',
+    );
+    const route = readFileSync(
+      join(process.cwd(), 'apps/admin/app/api/admin/videos/upload/route.ts'),
+      'utf8',
+    );
+
+    expect(client).toContain("'image/jpeg'");
+    expect(client).toContain("'image/png'");
+    expect(client).toContain("'image/webp'");
+    expect(route).toContain("'image/jpeg'");
+    expect(route).toContain('LICENSED_MEDIA_TYPES.has(fileType)');
+  });
 });

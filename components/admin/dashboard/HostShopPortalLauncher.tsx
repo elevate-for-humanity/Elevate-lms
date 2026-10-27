@@ -57,11 +57,14 @@ export async function HostShopPortalLauncher() {
 
   const renderShop = (shop: ShopRow) => {
     const partner = shop.partner_id ? partners.get(shop.partner_id) : undefined;
+    // Admin portal access is a support/operations action. Do not create a
+    // dead-end where an administrator cannot open a connected shop to finish
+    // its pending onboarding or approval work. Compliance status is still
+    // displayed and remains enforced inside the Host Shop workspace.
     const canOpen =
       shop.active !== false &&
+      Boolean(shop.partner_id) &&
       Boolean(partner) &&
-      partner?.status === 'active' &&
-      partner?.approval_status === 'approved' &&
       partner?.is_active !== false;
     const status =
       shop.active === false
@@ -99,7 +102,7 @@ export async function HostShopPortalLauncher() {
             <OpenHostShopPortalButton shopId={shop.id} />
           ) : (
             <span className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-center text-sm font-bold text-slate-500">
-              Complete connection first
+              Open shop portal to complete connection
             </span>
           )}
         </div>

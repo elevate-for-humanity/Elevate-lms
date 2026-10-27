@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -23,12 +24,14 @@ export default async function WebsiteAnalyticsPage({ params }: Props) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
 
-  const { data: site } = await supabase
+  // Server-owned roles and exact organization membership remain mandatory.
+  const admin = await requireAdminClient();
+  const { data: site } = await admin
     .from('user_websites')
     .select('id, user_id, site_name')
     .eq('id', websiteId)
     .maybeSingle();
-  if (!site || site.user_id !== user.id) notFound();
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) notFound();
 
   const db = await requireAdminClient();
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();

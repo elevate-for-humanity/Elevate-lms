@@ -16,6 +16,8 @@ export type ApprenticeDashboardInvoice = {
   amountCents: number;
   status: string;
   dueDate: string | null;
+  paidAt?: string | null;
+  createdAt?: string | null;
   paymentUrl: string | null;
 };
 
@@ -26,21 +28,48 @@ export async function listApprenticeInvoices(
   userId: string,
   limit = 50,
 ): Promise<ApprenticeDashboardInvoice[]> {
-  const { data, error } = await db
+  const profile = await db.from('profiles').select('email').eq('id', userId).maybeSingle();
+  if (profile.error)
+    throw new Error(`Could not resolve apprentice billing identity: ${profile.error.message}`);
+
+  const select = 'id,invoice_number,total_cents,status,due_at,paid_at,payment_url,created_at';
+  const byUserKey = db
     .from('billing_invoices')
-    .select('id,invoice_number,total_cents,status,due_at,payment_url')
+    .select(select)
     .in('customer_external_key', [userId, `user:${userId}`])
     .order('created_at', { ascending: false })
     .limit(limit);
+  const byEmail = profile.data?.email
+    ? db
+        .from('billing_invoices')
+        .select(select)
+        .eq('customer_email', profile.data.email)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+    : Promise.resolve({ data: [], error: null });
+  const [keyResult, emailResult] = await Promise.all([byUserKey, byEmail]);
+  const error = keyResult.error || emailResult.error;
   if (error) throw new Error(`Could not load apprentice invoices: ${error.message}`);
-  return (data || []).map((row: any) => ({
-    id: row.id,
-    invoiceNumber: row.invoice_number || null,
-    amountCents: Number(row.total_cents || 0),
-    status: String(row.status || 'open'),
-    dueDate: row.due_at || null,
-    paymentUrl: row.payment_url || null,
-  }));
+
+  // QuickBooks uses its own customer ID while Elevate uses the profile UUID.
+  // Resolve both identities and de-duplicate by the canonical local invoice ID.
+  const rows = new Map<string, any>();
+  for (const row of [...(keyResult.data || []), ...(emailResult.data || [])]) rows.set(row.id, row);
+  return [...rows.values()]
+    .sort((left, right) =>
+      String(right.created_at || '').localeCompare(String(left.created_at || '')),
+    )
+    .slice(0, limit)
+    .map((row: any) => ({
+      id: row.id,
+      invoiceNumber: row.invoice_number || null,
+      amountCents: Number(row.total_cents || 0),
+      status: String(row.status || 'open'),
+      dueDate: row.due_at || null,
+      paidAt: row.paid_at || null,
+      createdAt: row.created_at || null,
+      paymentUrl: row.payment_url || null,
+    }));
 }
 
 export async function getApprenticeBillingAccess(
@@ -104,7 +133,8 @@ export async function getApprenticeBillingAccess(
     openInvoices,
     overdueInvoices,
     accessExemptUntil: exemption.data?.expires_at || null,
-    suspended: overdueInvoices.length > 0 && !exemption.data?.expires_at,
+    // Tuition remains payable, but an invoice cannot suspend portal access.
+    suspended: false,
   };
 }
 
@@ -194,10 +224,10 @@ export function apprenticeInvoiceEmail(input: ApprenticeInvoiceEmailInput): {
         <thead><tr><th style="padding:8px 6px;text-align:left">Invoice</th><th style="padding:8px 6px;text-align:left">Due</th><th style="padding:8px 6px;text-align:right">Amount</th><th style="padding:8px 6px;text-align:right">Payment</th></tr></thead>
         <tbody>${invoiceRows}</tbody>
       </table>
-      <div style="border:2px solid #dc2626;border-radius:8px;background:#fef2f2;padding:14px;color:#7f1d1d"><strong>Account access warning:</strong> If an invoice remains unpaid after its due date, your course account will be suspended, active sessions will be signed out, and you will not be able to sign in again until every past-due invoice is paid.</div>
+      <div style="border:2px solid #f59e0b;border-radius:8px;background:#fffbeb;padding:14px;color:#78350f"><strong>Payment reminder:</strong> Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.</div>
       <p style="font-size:13px;color:#475569">This invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.</p>
       <p style="font-size:13px;color:#475569">Questions? Reply to this email or contact billing@elevateforhumanity.org.</p>
     </div>`,
-    text: `Hi ${input.customerName},\n\nYour ${input.productName} invoice${invoiceLabel} for ${amount} is ready. Every invoice currently due is listed below:\n\n${textInvoices}\n\nACCOUNT ACCESS WARNING: If an invoice remains unpaid after its due date, your course account will be suspended, active sessions will be signed out, and you will not be able to sign in again until every past-due invoice is paid.\n\nThis invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.\n\nQuestions: billing@elevateforhumanity.org`,
+    text: `Hi ${input.customerName},\n\nYour ${input.productName} invoice${invoiceLabel} for ${amount} is ready. Every invoice currently due is listed below:\n\n${textInvoices}\n\nPAYMENT REMINDER: Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.\n\nThis invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.\n\nQuestions: billing@elevateforhumanity.org`,
   };
 }

@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
-import { resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
+import { isSharedPostLoginDestination, resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
@@ -106,7 +106,7 @@ export default function LoginPage() {
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.
   useEffect(() => {
-    if (reason !== 'idle' && reason !== 'billing_past_due') return;
+    if (reason !== 'idle') return;
     const supabase = createClient();
     void supabase.auth.signOut();
   }, [reason]);
@@ -163,16 +163,13 @@ export default function LoginPage() {
       const requestedDestination = safeRedirect
         ? resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles)
         : '';
-      const isStoreReturn = requestedDestination.startsWith(
-        'https://store.elevateforhumanity.org/store',
-      );
+      const isSharedReturn = isSharedPostLoginDestination(requestedDestination);
 
       let destination: string;
 
-      // Store checkout is a shared buyer surface, not a role-owned portal.
-      // Preserve this return for students and apprentices too; otherwise a
-      // successful checkout sign-in incorrectly strands them in their portal.
-      if (isStoreReturn) {
+      // Store checkout and Website Builder retain their deployed owner after login.
+      // Their routes enforce the actual subscription and website ownership.
+      if (isSharedReturn) {
         destination = requestedDestination;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
@@ -231,23 +228,6 @@ export default function LoginPage() {
           </div>
         ) : null}
 
-        {reason === 'billing_past_due' && !error ? (
-          <div
-            role="alert"
-            className="mb-5 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900"
-          >
-            <p className="font-bold">Course account suspended for past-due tuition.</p>
-            <p className="mt-1">
-              Use the Pay Now links in your invoice email. You will be able to sign in again after
-              every past-due invoice is paid. Contact{' '}
-              <a className="font-semibold underline" href="mailto:billing@elevateforhumanity.org">
-                billing@elevateforhumanity.org
-              </a>{' '}
-              if you need help.
-            </p>
-          </div>
-        ) : null}
-
         {error ? (
           <div
             role="alert"
@@ -294,7 +274,7 @@ export default function LoginPage() {
             <Link
               href={
                 isProgramHolderLogin
-                  ? '/reset-password?portal=program-holder&next=/program-holder/onboarding'
+                  ? '/reset-password?portal=program-holder'
                   : '/reset-password'
               }
               className="text-sm font-semibold text-blue-700 hover:underline"

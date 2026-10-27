@@ -41,7 +41,7 @@ export default async function InstructorAnnouncementsPage() {
         </div>
         <div className="space-y-3">
           {!announcements?.length ? (
-            <div className="bg-white rounded-xl border border-slate-200 px-6 py-12 text-center text-slate-400 text-sm">
+            <div className="bg-white rounded-xl border border-slate-200 px-6 py-12 text-center text-slate-600 text-sm">
               No announcements yet. Create one to notify your students.
             </div>
           ) : announcements.map((a) => (

@@ -17,6 +17,7 @@ export async function POST() {
     .from('program_enrollments')
     .select('id,user_id,full_name,email,status,enrollment_state')
     .eq('program_holder_id', ctx.holderId)
+    .is('revoked_at', null)
     .in('status', ['completed', 'graduated'])
     .eq('next_required_action', 'COMPLETE_ALUMNI_ONBOARDING_AND_CAREER_SERVICES');
 
@@ -29,15 +30,15 @@ export async function POST() {
       failed++;
       continue;
     }
-    const first = String(row.full_name || 'Graduate').trim().split(/\s+/)[0];
+    const first = String(row.full_name || 'Graduate').trim().split(/\s+/)[0].replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     const html = `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto">
       <h1 style="color:#047857">Your Elevate graduate dashboard is ready</h1>
       <p>Hi ${first},</p>
-      <p>Even though you have graduated from HVAC training, Elevate for Humanity still needs you to sign in and complete the missing items in your student dashboard.</p>
+      <p>Even though you have graduated from your training program, Elevate for Humanity still needs you to sign in and complete the missing items in your student dashboard.</p>
       <p>Please finish your profile, agreements, orientation, required documents, and other onboarding items. Your completed-program status will remain unchanged.</p>
       <p><a href="https://app.elevateforhumanity.org/login" style="display:inline-block;background:#1d4ed8;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Sign in to complete your dashboard</a></p>
       <p>After signing in, open <a href="https://app.elevateforhumanity.org/lms/career">Career Services</a> to view job and career-support opportunities.</p>
-      <p>If you need help signing in, reply to this email or call Elevate for Humanity at 317-314-3757.</p>
+      <p>If you need help signing in, reply to this email or call Elevate for Humanity at 463-240-1404.</p>
       <p>Thank you,<br>Elevate for Humanity</p>
     </div>`;
 

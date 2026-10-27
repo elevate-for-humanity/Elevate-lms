@@ -1,0 +1,76 @@
+name: Inspect isolated Google Batch renderer
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/inspect-batch-renderer.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/inspect-batch-renderer.yml/dispatches" -f ref=main
+  inspect:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Batch permissions and independent Compute Engine capacity
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const project='elegant-racer-299721';
+          const read=args=>JSON.parse(execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8'}).trim();
+          const permissions=['batch.jobs.create','batch.jobs.get','batch.jobs.list','batch.jobs.delete','serviceusage.services.enable','iam.serviceAccounts.create','iam.serviceAccounts.setIamPolicy','resourcemanager.projects.setIamPolicy','storage.buckets.create','storage.buckets.get','storage.buckets.setIamPolicy','compute.instances.create','compute.instances.list'];
+          const response=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+project+':testIamPermissions',{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({permissions}),signal:AbortSignal.timeout(30000)});
+          if(!response.ok)throw Error('Permission inspection failed: HTTP '+response.status);
+          const allowed=new Set((await response.json()).permissions||[]);
+          console.log(JSON.stringify({kind:'permissions',checks:Object.fromEntries(permissions.map(p=>[p,allowed.has(p)]))}));
+          const services=read(['services','list','--enabled']);
+          console.log(JSON.stringify({kind:'apis',batch:services.some(s=>s.config?.name==='batch.googleapis.com'),compute:services.some(s=>s.config?.name==='compute.googleapis.com'),storage:services.some(s=>s.config?.name==='storage.googleapis.com')}));
+          for(const region of ['us-central1','us-east1']){
+            const state=read(['compute','regions','describe',region]);
+            console.log(JSON.stringify({kind:'compute-quota',region,quotas:(state.quotas||[]).filter(q=>/CPU|DISKS_TOTAL_GB|IN_USE_ADDRESSES/.test(q.metric)).map(q=>({metric:q.metric,limit:q.limit,usage:q.usage}))}));
+          }
+          console.log(JSON.stringify({kind:'result',readOnly:true,productionChanged:false,renderStarted:false}));
+          NODE
+
+      - name: Enable Batch and verify private diagnostic storage
+        run: |
+          gcloud services enable batch.googleapis.com --project=elegant-racer-299721 --quiet
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8'}).trim();
+          const bucket='elevate-render-tests-484736877039-us-central1';
+          const headers={authorization:'Bearer '+token,'content-type':'application/json'};
+          let response=await fetch('https://storage.googleapis.com/storage/v1/b/'+bucket,{headers,signal:AbortSignal.timeout(30000)});
+          if(response.status===404){
+            response=await fetch('https://storage.googleapis.com/storage/v1/b?project=elegant-racer-299721',{method:'POST',headers,body:JSON.stringify({name:bucket,location:'US-CENTRAL1',storageClass:'STANDARD',iamConfiguration:{uniformBucketLevelAccess:{enabled:true},publicAccessPrevention:'enforced'},labels:{purpose:'isolated-render-test'}}),signal:AbortSignal.timeout(30000)});
+          }
+          if(!response.ok)throw Error('Private test bucket operation failed: HTTP '+response.status);
+          const state=await response.json();
+          if(String(state.projectNumber)!=='484736877039'||state.location!=='US-CENTRAL1'||state.iamConfiguration?.publicAccessPrevention!=='enforced'||!state.iamConfiguration?.uniformBucketLevelAccess?.enabled)throw Error('Private bucket ownership or protection did not verify');
+          const name='diagnostics/storage-proof-'+process.env.GITHUB_RUN_ID+'.json';
+          const payload=JSON.stringify({purpose:'isolated-render-storage-proof',run:process.env.GITHUB_RUN_ID});
+          const uploaded=await fetch('https://storage.googleapis.com/upload/storage/v1/b/'+bucket+'/o?uploadType=media&ifGenerationMatch=0&name='+encodeURIComponent(name),{method:'POST',headers,body:payload,signal:AbortSignal.timeout(30000)});
+          if(!uploaded.ok)throw Error('Private test object upload failed: HTTP '+uploaded.status);
+          const read=await fetch('https://storage.googleapis.com/storage/v1/b/'+bucket+'/o/'+encodeURIComponent(name)+'?alt=media',{headers,signal:AbortSignal.timeout(30000)});
+          if(!read.ok||await read.text()!==payload)throw Error('Private object readback did not match');
+          console.log(JSON.stringify({batchApiEnabled:true,bucket,privateStorageVerified:true,publicAccessPrevented:true,productionMediaMoved:false,renderStarted:false}));
+          NODE

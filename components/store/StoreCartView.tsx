@@ -15,7 +15,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useStoreCart } from '@/hooks/useStoreCart';
-import { addToCart, clearCart } from '@/lib/store/cart';
+import { storeSignInHref } from '@/lib/store/sign-in-return.mjs';
+import { addToCart } from '@/lib/store/cart';
 import {
   isIndividualAppCartProduct,
   parseIndividualAppCartProduct,
@@ -49,8 +50,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
   const checkout = async () => {
     if (!cart.items.length) return;
     const redirectToLogin = () => {
-      const returnUrl = `${window.location.origin}/store/cart`;
-      window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(returnUrl)}`;
+      window.location.href = storeSignInHref('/store/cart');
     };
     setCheckingOut(true);
     setMessage(null);
@@ -73,7 +73,6 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
         const data = await response.json();
         if (!response.ok || !data.checkoutUrl)
           throw new Error(data.error || 'Could not start app checkout');
-        clearCart();
         window.location.href = data.checkoutUrl;
         return;
       }
@@ -96,13 +95,6 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
         throw new Error(data.error || 'Could not start secure checkout');
       window.location.href = data.checkoutUrl;
     } catch (error) {
-      if (
-        error instanceof TypeError ||
-        (error instanceof Error && error.message === 'Failed to fetch')
-      ) {
-        redirectToLogin();
-        return;
-      }
       setMessage(error instanceof Error ? error.message : 'Checkout failed');
     } finally {
       setCheckingOut(false);
@@ -220,7 +212,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
               <span className="font-black text-slate-950">${cart.total.toFixed(2)}</span>
             </div>
             <p className="mt-3 text-xs leading-5 text-slate-500">
-              The server revalidates every item and price before creating Stripe Checkout. Shipping
+              The server revalidates every item and price before creating QuickBooks Checkout. Shipping
               details are requested for physical products.
             </p>
             <button

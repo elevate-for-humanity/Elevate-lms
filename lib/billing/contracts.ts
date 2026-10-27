@@ -1,6 +1,5 @@
-export const BILLING_PROVIDERS = ['quickbooks', 'paypal', 'stripe'] as const;
+export const BILLING_PROVIDERS = ['quickbooks', 'paypal'] as const;
 export type BillingProvider = (typeof BILLING_PROVIDERS)[number];
-export type BillingProviderMode = 'primary' | 'archive';
 
 export interface BillingCustomerInput {
   externalKey: string;

@@ -7,19 +7,14 @@ import { useEffect, useState } from 'react';
 
 const slides = [
   {
-    src: '/images/partners/kountry-kutz/interior-empty.webp',
+    src: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
     alt: 'Training stations inside Kountry Kutz Barbershop in New Palestine',
     label: 'Professional training stations',
   },
   {
-    src: '/images/partners/kountry-kutz/interior-active.webp',
+    src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
     alt: 'Barbers and clients inside Kountry Kutz Barbershop',
     label: 'A real working barbershop',
-  },
-  {
-    src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
-    alt: 'Kountry Kutz barber apprenticeship host-shop announcement',
-    label: 'An approved apprenticeship Host Shop',
   },
 ] as const;
 
@@ -47,8 +42,8 @@ export default function KountryKutzTourSlideshow() {
       data-narration-rate="0.95"
       data-narration-style="instructor"
     >
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-4">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
               Featured Host Shop
@@ -75,7 +70,7 @@ export default function KountryKutzTourSlideshow() {
           aria-roledescription="carousel"
           aria-label="Kountry Kutz photo tour"
         >
-          <div className="relative aspect-[4/3] min-h-[300px] sm:aspect-[16/9] sm:min-h-[420px]">
+          <div className="relative aspect-[16/10] max-h-[320px]">
             {slides.map((slide, index) => (
               <Image
                 key={slide.src}
@@ -93,7 +88,7 @@ export default function KountryKutzTourSlideshow() {
             <button
               type="button"
               onClick={() => select(active - 1)}
-              className="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/70 text-white"
+              className="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 p-0 place-items-center rounded-full bg-black/70 text-white"
               aria-label="Previous Kountry Kutz photo"
             >
               <ChevronLeft className="h-6 w-6" aria-hidden="true" />
@@ -101,7 +96,7 @@ export default function KountryKutzTourSlideshow() {
             <button
               type="button"
               onClick={() => select(active + 1)}
-              className="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/70 text-white"
+              className="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 p-0 place-items-center rounded-full bg-black/70 text-white"
               aria-label="Next Kountry Kutz photo"
             >
               <ChevronRight className="h-6 w-6" aria-hidden="true" />
@@ -117,19 +112,24 @@ export default function KountryKutzTourSlideshow() {
                     key={slide.src}
                     type="button"
                     onClick={() => select(index)}
-                    className={`h-3 rounded-full transition-all ${
-                      index === active ? 'w-9 bg-red-500' : 'w-3 bg-slate-500'
-                    }`}
+                    className="flex h-11 w-11 items-center justify-center rounded-full p-0"
                     aria-label={`Show photo ${index + 1}: ${slide.label}`}
                     aria-current={index === active ? 'true' : undefined}
-                  />
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`h-3 rounded-full transition-all ${index === active ? 'w-6 bg-red-500' : 'w-3 bg-slate-500'}`}
+                    />
+                  </button>
                 ))}
               </div>
               <button
                 type="button"
                 onClick={() => setPaused((value) => !value)}
                 className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 py-2 text-sm font-black"
-                aria-label={paused ? 'Resume Kountry Kutz slideshow' : 'Pause Kountry Kutz slideshow'}
+                aria-label={
+                  paused ? 'Resume Kountry Kutz slideshow' : 'Pause Kountry Kutz slideshow'
+                }
                 aria-pressed={paused}
               >
                 {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
@@ -139,7 +139,7 @@ export default function KountryKutzTourSlideshow() {
           </div>
         </div>
 
-        <p className="mx-auto mt-5 max-w-4xl text-center text-sm leading-6 text-slate-300">
+        <p className="mx-auto mt-2 max-w-4xl text-center lg:col-span-2 text-sm leading-6 text-slate-300">
           56 W Main St, Suite A, New Palestine, Indiana. Placement, employment, schedule,
           supervision, and enrollment approval are confirmed before training begins.
         </p>

@@ -18,11 +18,11 @@ describe('homepage platform introduction', () => {
   });
 
   it('describes Elevate as the connected hub for the complete workforce journey', () => {
-    expect(hero).toContain('One platform for training, apprenticeships, and workforce operations.');
-    expect(hero).toContain('Hands-on training');
-    expect(hero).toContain('Employer-connected pathways');
-    expect(hero).toContain('Funding guidance');
-    expect(pathways).toContain('Training may be free for people who qualify.');
+    expect(hero).toContain('Build a career. Build a workforce. Build a business.');
+    expect(hero).toContain('career training, state and workforce funding pathways');
+    expect(hero).toContain('Employers & Partners');
+    expect(hero).toContain('Check Funding Options');
+    expect(pathways).toContain('programs; eligibility and authorization are determined individually.');
     expect(funding).toContain('Not sure how you will pay? Start here.');
   });
 });

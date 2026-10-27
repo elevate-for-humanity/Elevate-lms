@@ -86,6 +86,8 @@ function tooManyRequests(result: {
 export async function applyRateLimit(
   request: Request,
   tier: Tier = 'contact',
+  // Trusted server-side scope only; callers must derive it from verified identity.
+  scope?: { key: string },
 ): Promise<NextResponse | null> {
   const pathname = (() => {
     try {
@@ -102,8 +104,8 @@ export async function applyRateLimit(
         ? 'auth'
         : tier;
 
-  const identifier = getIdentifier(request);
-  if (isInternalIP(identifier)) return null;
+  const identifier = scope ? scope.key : getIdentifier(request);
+  if (!scope && isInternalIP(identifier)) return null;
 
   const limiter = limiters[effectiveTier]?.get();
 

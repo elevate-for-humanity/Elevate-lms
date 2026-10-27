@@ -172,7 +172,7 @@ export function evaluateFundingEligibility(input: EligibilityInput): Eligibility
       reason: 'JRI funding is available for justice-involved individuals in qualifying programs.',
       instructions: [
         'JRI funding is coordinated through your case manager or reentry coordinator.',
-        'Contact Elevate directly at 317-314-3757 to confirm your program qualifies for JRI funding.',
+        'Contact Elevate directly at 463-240-1404 to confirm your program qualifies for JRI funding.',
         'You will need documentation of your justice-involved status.',
       ],
       requiresExternalConfirmation: false,
@@ -191,7 +191,7 @@ export function evaluateFundingEligibility(input: EligibilityInput): Eligibility
     reason:
       'Elevate partners with community organizations that may cover your tuition. Availability depends on your program and current funding.',
     instructions: [
-      'Contact Elevate at 317-314-3757 or info@elevateforhumanity.org to ask about partner-funded seats in your program.',
+      'Contact Elevate at 463-240-1404 or info@elevateforhumanity.org to ask about partner-funded seats in your program.',
       'Partner funding is limited and awarded on a first-come, first-served basis.',
       'If a partner-funded seat is available, Elevate will confirm and update your application.',
     ],
@@ -207,7 +207,7 @@ export function evaluateFundingEligibility(input: EligibilityInput): Eligibility
       status: 'likely_eligible',
       reason: 'Your employer has agreed to sponsor your training.',
       instructions: [
-        'Ask your employer to contact Elevate at 317-314-3757 to set up a sponsorship agreement.',
+        'Ask your employer to contact Elevate at 463-240-1404 to set up a sponsorship agreement.',
         'Your employer will receive an invoice directly.',
       ],
       requiresExternalConfirmation: false,
@@ -223,7 +223,7 @@ export function evaluateFundingEligibility(input: EligibilityInput): Eligibility
     reason: 'Pay tuition directly. Payment plans are available.',
     instructions: [
       'You will pay tuition directly to Elevate.',
-      'Payment plans are available — contact us at 317-314-3757 to discuss options.',
+      'Payment plans are available — contact us at 463-240-1404 to discuss options.',
     ],
     requiresExternalConfirmation: false,
     enrollmentFundingSource: 'self_pay',

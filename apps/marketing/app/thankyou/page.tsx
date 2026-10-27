@@ -119,7 +119,7 @@ export default async function ThankyouPage() {
               <Phone className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="font-semibold">Contact Us</div>
-                <div className="text-slate-700">{PLATFORM_DEFAULTS.supportPhone}</div>
+                <div className="text-slate-700">{PLATFORM_DEFAULTS.mainPhone}</div>
               </div>
             </a>
             <a

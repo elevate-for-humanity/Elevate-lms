@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { QUICK_STATS } from '../barber-program-data';
@@ -8,14 +9,13 @@ export function BarberHero() {
     <>
       {/* Hero — image only, no text or gradient overlay on the photo. */}
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden bg-slate-100">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/programs-barber-hero-new.webp"
           alt="Barber apprentice cutting hair in a licensed barbershop"
           fill
           sizes="100vw"
           className="object-cover"
           priority
-          placeholder="empty"
         />
       </section>
 
@@ -111,13 +111,12 @@ export function BarberHero() {
               </div>
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-lg">
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 src="/images/pages/barber-apprenticeship-hero.jpg"
                 alt="Barber apprentice training in licensed shop"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
-                placeholder="empty"
               />
             </div>
           </div>

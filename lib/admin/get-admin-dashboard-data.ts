@@ -1,4 +1,6 @@
 import 'server-only';
+import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
+import { APPLICATION_REVIEW_STATUSES } from './application-filters';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -20,6 +22,207 @@ import { requireRole } from '@/lib/auth/require-role';
 
 const DASHBOARD_SOURCE_TIMEOUT_MS = 8_000;
 
+async function loadDashboardApplications(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db
+      .from('applications')
+      .select(
+        'id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at',
+      )
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardEnrollments(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db
+      .from('program_enrollments')
+      .select('id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardLeads(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('crm_leads')
+      .select('id,full_name,email,status,created_at,updated_at,last_contact_at')
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardSubmissions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('step_submissions')
+      .select('id,user_id,course_lesson_id,step_type,status,created_at')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardPrograms(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('programs')
+      .select('id,title,slug,status,is_active,updated_at')
+      .order('title', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardStripeSessions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('stripe_sessions_staging')
+      .select('session_id,email,amount,program_slug,kind,payment_status,created_at')
+      .in('payment_status', ['paid', 'completed'])
+      .order('created_at', { ascending: false })
+      .order('session_id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardBarberSubscriptions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('barber_subscriptions')
+      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
+      .gt('amount_paid_at_checkout', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardCosmetologySubscriptions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('cosmetology_subscriptions')
+      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
+      .gt('amount_paid_at_checkout', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('barber_payments')
+      .select('id,amount_paid,payment_date,created_at')
+      .gt('amount_paid', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardPaidInvoices(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const {data, error} = await db.rpc('get_admin_paid_invoice_totals');
+  if (error) return {data:null,error};
+  try { return {data:decodePaidInvoiceTotals(data),error:null}; }
+  catch (error) { return {data:null,error}; }
+}
+
+async function loadDashboardLearningActivity(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('lesson_progress')
+      .select('id,user_id,enrollment_id,last_watched,updated_at')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardOutcomes(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('employment_outcomes')
+      .select('id,user_id,user_uuid,program_slug,outcome_type')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -34,9 +237,7 @@ function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promis
   });
 
   return Promise.race([
-    Promise.resolve(source).catch(
-      (error) => ({ data: null, error } as T),
-    ),
+    Promise.resolve(source).catch((error) => ({ data: null, error }) as T),
     timeout,
   ]).finally(() => {
     if (timer) clearTimeout(timer);
@@ -48,8 +249,8 @@ function timeboxDashboardHealth(
 ): Promise<DashboardSystemHealth> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const fallback: DashboardSystemHealth = {
-    stripeWebhookOk: false,
-    stripeIssuingOk: false,
+    quickBooksWebhookOk: false,
+    quickBooksBillingOk: false,
     buildEnvOk: false,
     staleJobs: 0,
     degraded: true,
@@ -118,6 +319,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     profileRes,
     applicationsRes,
     enrollmentsRes,
+    learningActivityRes,
+    outcomesRes,
     studentsRes,
     certificatesRes,
     holdersRes,
@@ -132,45 +335,27 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     barberSubsRes,
     cosmetologySubsRes,
     barberPaymentsRes,
-    voucherPaymentsRes,
-    revenueAllTimeRes,
-    revenueThisMonthRes,
+    paidInvoicesRes,
     systemHealth,
   ] = await Promise.all([
     timeboxDashboardQuery(
       userId
-      ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
+        ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
       'profile',
     ),
+    timeboxDashboardQuery(loadDashboardApplications(db), 'applications'),
+    timeboxDashboardQuery(loadDashboardEnrollments(db), 'enrollments'),
+    timeboxDashboardQuery(loadDashboardLearningActivity(db), 'learning activity'),
+    timeboxDashboardQuery(loadDashboardOutcomes(db), 'employment outcomes'),
     timeboxDashboardQuery(
       db
-      .from('applications')
-      .select(
-        'id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at',
-      )
-      .order('created_at', { ascending: false })
-      .limit(300),
-      'applications',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('program_enrollments')
-      .select(
-        'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at',
-      )
-      .order('created_at', { ascending: false })
-      .limit(1000),
-      'enrollments',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'student')
-      .like('email', '%@%')
-      .not('email', 'ilike', '%@qa.invalid')
-      .not('full_name', 'ilike', '[QA%'),
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'student')
+        .like('email', '%@%')
+        .not('email', 'ilike', '%@qa.invalid')
+        .not('full_name', 'ilike', '[QA%'),
       'student count',
     ),
     timeboxDashboardQuery(
@@ -179,118 +364,54 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     ),
     timeboxDashboardQuery(
       db
-      .from('program_holder_applications')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending'),
+        .from('program_holder_applications')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
       'program-holder applications',
     ),
     timeboxDashboardQuery(
       db
-      .from('program_holder_documents')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending'),
+        .from('program_holder_documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
       'program-holder documents',
     ),
     timeboxDashboardQuery(
       db
-      .from('program_enrollments')
-      .select(
-        'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at',
-      )
-      .order('created_at', { ascending: false })
-      .limit(25),
+        .from('program_enrollments')
+        .select(
+          'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at',
+        )
+        .order('created_at', { ascending: false })
+        .limit(25),
       'recent enrollments',
     ),
     timeboxDashboardQuery(
       db
-      .from('admin_alerts')
-      .select('id,alert_type,severity,message,created_at,resolved')
-      .eq('resolved', false)
-      .order('created_at', { ascending: false })
-      .limit(50),
+        .from('admin_alerts')
+        .select('id,alert_type,severity,message,created_at,resolved')
+        .eq('resolved', false)
+        .order('created_at', { ascending: false })
+        .limit(50),
       'compliance alerts',
     ),
+    timeboxDashboardQuery(loadDashboardLeads(db), 'CRM leads'),
     timeboxDashboardQuery(
       db
-      .from('crm_leads')
-      .select('id,full_name,email,status,updated_at')
-      .order('updated_at', { ascending: true })
-      .limit(100),
-      'CRM leads',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('documents')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending')
-      .ilike('document_type', '%wioa%'),
+        .from('documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .ilike('document_type', '%wioa%'),
       'WIOA documents',
     ),
-    timeboxDashboardQuery(
-      db
-      .from('step_submissions')
-      .select('id,user_id,course_lesson_id,step_type,status,created_at')
-      .eq('status', 'pending')
-      .limit(100),
-      'step submissions',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('programs')
-      .select('id,title,slug,status,is_active,updated_at')
-      .order('title')
-      .limit(300),
-      'programs',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('stripe_sessions_staging')
-      .select('session_id,email,amount,program_slug,kind,payment_status,created_at')
-      .in('payment_status', ['paid', 'completed'])
-      .order('created_at', { ascending: false })
-      .limit(100),
-      'historical payment sessions',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('barber_subscriptions')
-      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
-      .gt('amount_paid_at_checkout', 0)
-      .order('created_at', { ascending: false })
-      .limit(100),
-      'barber subscriptions',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('cosmetology_subscriptions')
-      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
-      .gt('amount_paid_at_checkout', 0)
-      .order('created_at', { ascending: false })
-      .limit(100),
-      'cosmetology subscriptions',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('barber_payments')
-      .select('id,amount_paid,payment_date,created_at')
-      .gt('amount_paid', 0)
-      .order('created_at', { ascending: false })
-      .limit(100),
-      'barber payments',
-    ),
-    timeboxDashboardQuery(
-      db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
-      'ITA vouchers',
-    ),
-    timeboxDashboardQuery(
-      db.rpc('get_revenue_all_time'),
-      'all-time revenue',
-    ),
-    timeboxDashboardQuery(
-      db.rpc('get_revenue_this_month'),
-      'monthly revenue',
-    ),
-    timeboxDashboardHealth(getSystemHealth(db))
+    timeboxDashboardQuery(loadDashboardSubmissions(db), 'step submissions'),
+    timeboxDashboardQuery(loadDashboardPrograms(db), 'programs'),
+    timeboxDashboardQuery(loadDashboardStripeSessions(db), 'historical payment sessions'),
+    timeboxDashboardQuery(loadDashboardBarberSubscriptions(db), 'barber subscriptions'),
+    timeboxDashboardQuery(loadDashboardCosmetologySubscriptions(db), 'cosmetology subscriptions'),
+    timeboxDashboardQuery(loadDashboardBarberPayments(db), 'barber payments'),
+    timeboxDashboardQuery(loadDashboardPaidInvoices(db), 'paid invoices'),
+    timeboxDashboardHealth(getSystemHealth(db)),
   ]);
 
   const applications = safeRows(applicationsRes, degradedSections, 'dashboard_data').filter(
@@ -299,17 +420,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const enrollments = safeRows(enrollmentsRes, degradedSections, 'dashboard_data');
   const recentEnrollmentRows = safeRows(recentEnrollmentsRes, degradedSections, 'recent_students');
   const programRows = safeRows(programsRes, degradedSections, 'unpublished_programs');
-  const complianceRows = complianceRes.error ? [] : (complianceRes.data ?? []);
-  const leadRows = leadsRes.error ? [] : (leadsRes.data ?? []);
-  const submissionRows = submissionsRes.error ? [] : (submissionsRes.data ?? []);
+  const complianceRows = safeRows(complianceRes, degradedSections, 'dashboard_data');
+  const leadRows = safeRows(leadsRes, degradedSections, 'dashboard_data');
+  const submissionRows = safeRows(submissionsRes, degradedSections, 'dashboard_data');
 
-  const pendingStatuses = new Set([
-    'pending',
-    'submitted',
-    'in_review',
-    'under_review',
-    'pending_admin_review',
-  ]);
+  const pendingStatuses = new Set<string>(APPLICATION_REVIEW_STATUSES);
   const pendingApplications: RecentApplication[] = applications
     .filter((row: any) => pendingStatuses.has(String(row.status ?? 'submitted')))
     .map((row: any) => {
@@ -351,6 +466,14 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     };
   });
 
+  const recordedOutcomes = new Set(safeRows(outcomesRes, degradedSections, 'dashboard_data')
+    .filter((row: any) => row.outcome_type && (row.user_id || row.user_uuid) && row.program_slug)
+    .map((row: any) => `${row.user_id || row.user_uuid}:${row.program_slug}`));
+  const programSlugById = new Map(programRows.map((row: any) => [row.id, row.slug]));
+  const noOutcomeEnrollments = outcomesRes.error ? [] : enrollments.filter((row: any) =>
+    !row.revoked_at && String(row.enrollment_state ?? row.status) === 'completed' &&
+    !recordedOutcomes.has(`${row.user_id}:${row.program_slug || programSlugById.get(row.program_id)}`));
+
   const activeEnrollments = enrollments.filter(
     (row: any) =>
       !row.revoked_at &&
@@ -372,7 +495,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     href: `/students/${row.user_id || row.id}`,
   }));
 
-  const statusCounts = activeEnrollments.reduce<Record<string, number>>((acc, row: any) => {
+  const statusCounts = enrollments.filter((row: any) => !row.revoked_at).reduce<Record<string, number>>((acc, row: any) => {
     const key = String(row.enrollment_state ?? row.status ?? 'unknown');
     acc[key] = (acc[key] ?? 0) + 1;
     return acc;
@@ -381,7 +504,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     .map(([name, value]) => ({ name: name.replaceAll('_', ' '), value }))
     .sort((a, b) => b.value - a.value);
 
-  const programCounts = activeEnrollments.reduce<
+  const programCounts = enrollments.filter((row: any) => !row.revoked_at).reduce<
     Record<string, { learners: number; completed: number; slug: string }>
   >((acc, row: any) => {
     const id = row.program_id || row.program_slug || 'unassigned';
@@ -465,33 +588,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     (payment) => !isTestOrSuspiciousPayment(payment),
   );
 
-  if (revenueAllTimeRes.error || revenueThisMonthRes.error) {
+  const invoiceTotals = paidInvoicesRes.error
+    ? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false}
+    : paidInvoicesRes.data ?? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false};
+  if (!invoiceTotals.allTimeAvailable || !invoiceTotals.monthAvailable ||
+      [stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
-  // Use the same payment authorities shown on Funding and Recent Payments.
-  // RPC aggregates can lag, but the overview must never claim $0 while the
-  // underlying received-payment records are already visible to the admin.
-  const selfPayEnrollmentCents = activeEnrollments
-    .filter((row: any) => String(row.funding_source ?? '').toLowerCase() !== 'wioa')
-    .reduce((sum, row: any) => sum + n(row.amount_paid_cents), 0);
-  const wioaPaidCents = (voucherPaymentsRes.error ? [] : (voucherPaymentsRes.data ?? [])).reduce(
-    (sum, row: any) => sum + dollarsToCents(row.payments_to_date),
-    0,
-  );
-  const recentPaymentCents = verifiedRecentPayments.reduce(
-    (sum, payment) => sum + payment.amountCents,
-    0,
-  );
-  const currentMonth = monthKey(new Date().toISOString());
-  const recentThisMonthCents = verifiedRecentPayments
-    .filter((payment) => monthKey(payment.paidAt) === currentMonth)
-    .reduce((sum, payment) => sum + payment.amountCents, 0);
-  const revenueAllTimeCents = Math.max(
-    n(revenueAllTimeRes.data),
-    selfPayEnrollmentCents + wioaPaidCents,
-    recentPaymentCents,
-  );
-  const revenueThisMonthCents = Math.max(n(revenueThisMonthRes.data), recentThisMonthCents);
+  // Paid invoices have an explicit cents contract and one canonical identity.
+  // Enrollment balances and historical receipt snapshots overlap; never add
+  // them together or choose their maximum as an invented revenue total.
+  const revenueAllTimeCents = invoiceTotals.allTimeCents;
+  const revenueThisMonthCents = invoiceTotals.thisMonthCents;
 
   const complianceAlerts = complianceRows.map((row: any) => ({
     id: row.id,
@@ -508,30 +616,44 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       id: row.id,
       name: row.full_name || row.email || null,
       status: row.status ?? null,
-      updated_at: row.updated_at ?? null,
-      days_stale: row.updated_at
-        ? Math.max(0, Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000))
+      updated_at: row.last_contact_at ?? row.created_at ?? null,
+      days_stale: (row.last_contact_at ?? row.created_at)
+        ? Math.max(0, Math.floor((now - new Date(row.last_contact_at ?? row.created_at).getTime()) / 86_400_000))
         : 0,
       href: `/crm/leads/${row.id}`,
     }))
     .filter((row) => row.days_stale >= 7);
 
+  const activityByEnrollment = new Map<string, number>();
+  const activityByUser = new Map<string, number>();
+  for (const progress of safeRows(learningActivityRes, degradedSections, 'dashboard_data')) {
+    const timestamp = Date.parse(progress.last_watched ?? progress.updated_at ?? '');
+    if (!Number.isFinite(timestamp) || timestamp > now) continue;
+    const activity = progress.enrollment_id ? activityByEnrollment : activityByUser;
+    const key = progress.enrollment_id || progress.user_id;
+    if (key) activity.set(key, Math.max(activity.get(key) ?? 0, timestamp));
+  }
+  const lastLearningAt = (row: any) => Math.max(
+    Date.parse(row.enrolled_at ?? row.created_at ?? '') || 0,
+    activityByEnrollment.get(row.id) ?? 0,
+    activityByUser.get(row.user_id) ?? 0,
+  );
   const inactiveLearners = activeEnrollments
-    .filter(
-      (row: any) => row.updated_at && now - new Date(row.updated_at).getTime() >= 7 * 86_400_000,
-    )
+    .filter((row: any) => !learningActivityRes.error && lastLearningAt(row) > 0 &&
+      now - lastLearningAt(row) >= 7 * 86_400_000)
     .map((row: any) => ({
       enrollmentId: row.id,
       userId: row.user_id,
       enrolledAt: row.enrolled_at ?? row.created_at ?? '',
       fullName: row.full_name ?? null,
       email: row.email ?? null,
-      daysInactive: Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000),
+      daysInactive: Math.floor((now - lastLearningAt(row)) / 86_400_000),
       programTitle: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
       href: `/students/${row.user_id}`,
     }));
 
   const blockedPrograms = programRows
+    .filter((row: any) => row.status !== 'archived' && !isTestRecord(row.title, row.slug))
     .filter((row: any) => row.status !== 'published' || row.is_active === false)
     .map((row: any) => ({
       id: row.id,
@@ -630,7 +752,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const newEnrollmentsToday = enrollments.filter(
     (row: any) => (row.created_at ?? '') >= todayIso,
   ).length;
-  const newLeadsToday = leadRows.filter((row: any) => (row.updated_at ?? '') >= todayIso).length;
+  const newLeadsToday = leadRows.filter((row: any) => (row.created_at ?? '') >= todayIso).length;
+  if ([studentsRes, certificatesRes, holdersRes, holderDocsRes, wioaDocsRes].some(result => result.error)) {
+    if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
+  }
   const counts = {
     pendingApplications: pendingApplications.length,
     activeEnrollments: activeEnrollments.length,
@@ -643,6 +768,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const kpis = [
     {
       label: 'Pending Applications',
+      unavailable: Boolean(applicationsRes.error),
       value: counts.pendingApplications,
       delta: 0,
       deltaLabel: 'Live pending count',
@@ -652,6 +778,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Active Enrollments',
+      unavailable: Boolean(enrollmentsRes.error),
       value: counts.activeEnrollments,
       delta: 0,
       deltaLabel: 'Live active count',
@@ -660,16 +787,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       sub: `${inactiveLearners.length} inactive 7+ days`,
     },
     {
-      label: 'Revenue This Month',
+      label: 'Paid Invoices This Month',
+      unavailable: !invoiceTotals.monthAvailable,
       value: revenueThisMonthCents,
       delta: 0,
-      deltaLabel: 'Database aggregate',
-      href: '/integrations/stripe',
+      deltaLabel: 'Paid invoice value (USD)',
+      href: '/integrations/quickbooks',
       urgent: false,
-      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time`,
+      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} paid invoices all time`,
     },
     {
       label: 'Certificates Issued',
+      unavailable: Boolean(certificatesRes.error) || typeof certificatesRes.count !== 'number',
       value: counts.certificatesIssued,
       delta: 0,
       deltaLabel: 'Live certificate count',
@@ -678,6 +807,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Program Holders',
+      unavailable: Boolean(holdersRes.error) || typeof holdersRes.count !== 'number',
       value: counts.pendingProgramHolders,
       delta: 0,
       deltaLabel: 'Awaiting approval',
@@ -686,6 +816,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Documents',
+      unavailable: Boolean(holderDocsRes.error) || typeof holderDocsRes.count !== 'number',
       value: counts.pendingDocuments,
       delta: 0,
       deltaLabel: 'Awaiting review',
@@ -702,6 +833,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   return {
     counts,
     revenueAllTimeCents,
+    paidInvoiceSummary: {allTimeAvailable:invoiceTotals.allTimeAvailable,monthAvailable:invoiceTotals.monthAvailable,paidCount:invoiceTotals.paidCount},
+    totalStudentsAvailable: !studentsRes.error && typeof studentsRes.count === 'number',
+    newTodayAvailable: !applicationsRes.error && !enrollmentsRes.error && !leadsRes.error,
     totalStudents: studentsRes.error ? 0 : (studentsRes.count ?? 0),
     recentPayments: verifiedRecentPayments.slice(0, 10),
     operational: {
@@ -735,7 +869,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     stalledApplications: pendingApplications.filter(
       (row) => row.age_days >= 7,
     ) as unknown as Record<string, unknown>[],
-    noOutcomeEnrollments: [],
+    noOutcomeEnrollments: noOutcomeEnrollments as Record<string, unknown>[],
     missingFundingEnrollments: enrollments.filter(
       (row: any) => !row.funding_source && n(row.amount_paid_cents) === 0,
     ) as Record<string, unknown>[],

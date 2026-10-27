@@ -1,0 +1,251 @@
+/* Legacy 83's repository-approved editorial direction, applied to editable sections. */
+.legacy83-premium .tenant-hero .tenant-veteran-note{display:flex;align-items:center;gap:10px;font-size:13px!important;color:#e3bf72!important;letter-spacing:.02em}
+.tenant-veteran-note svg{flex:none;width:24px;height:24px;stroke:currentColor;fill:none}
+.legacy83-premium .tenant-introduction{margin-top:20px;max-width:480px;font-size:13px}
+.legacy83-premium .tenant-introduction button{padding:8px 0;border-bottom:1px solid #d7b46a;color:#e3bf72}
+.legacy83-premium .tenant-introduction details{margin-top:10px;font-size:12px}
+.legacy83-premium .tenant-introduction details p{font-size:14px!important;line-height:1.7}
+.legacy83-premium .tenant-introduction audio{display:block;width:100%;max-width:320px;margin-top:8px}
+.legacy83-premium .tenant-cta[data-has-background=true]{position:relative;isolation:isolate;overflow:hidden;background:#123327!important}
+.legacy83-premium .tenant-cta-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.legacy83-premium .tenant-cta[data-has-background=true]:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#09291fe8,#09291fa8);z-index:-1}
+.legacy83-premium main .tenant-cta[data-has-background=true]>div{background:transparent!important;color:white!important}
+.legacy83-premium .tenant-cta[data-has-background=true] p{color:#f4eddc!important}
+.legacy83-premium{font-family:Arial,Helvetica,sans-serif;background:#faf7f0!important;color:#19372b!important;--legacy-gold:#d7b46a;--legacy-forest:#123327;--legacy-ivory:#faf7f0}
+.legacy83-premium h1,.legacy83-premium h2,.legacy83-premium h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.035em}
+.legacy83-premium p{line-height:1.85}
+.legacy83-premium header{background:rgba(250,247,240,.97)!important;border-color:#ded3bc!important}
+.legacy83-premium header>div{min-height:88px;flex-wrap:nowrap;gap:20px;max-width:1280px}
+.legacy83-premium header>div>a:first-child{min-width:0}
+.legacy83-premium header>div>a:first-child img{max-width:140px;max-height:56px}
+.legacy83-premium header>div>a:first-child span{font-family:Georgia,serif;font-weight:400;letter-spacing:-.025em}
+.legacy83-premium header nav{gap:clamp(10px,1.3vw,20px);white-space:nowrap}
+.legacy83-premium header nav a{font-size:13px;font-weight:600}
+.legacy83-premium main>section{padding-top:80px;padding-bottom:80px}
+.legacy83-premium main h2{font-size:clamp(2.1rem,3.7vw,3.2rem);line-height:1.18}
+.legacy83-premium main h3{font-size:1.55rem;line-height:1.3}
+.legacy83-premium .tenant-hero{max-width:none;padding:0;background:var(--legacy-forest);color:white;position:relative;overflow:hidden}
+.legacy83-premium .tenant-hero:before{content:"";position:absolute;width:650px;height:650px;right:-160px;top:-208px;border:1px solid #d7b46a33;border-radius:50%;pointer-events:none}
+.legacy83-premium .tenant-hero>div{position:relative;max-width:1280px;padding:88px 24px;gap:64px}
+.legacy83-premium .tenant-hero h1{font-size:clamp(3rem,5.1vw,4.7rem);line-height:1.07;letter-spacing:-.035em;max-width:640px}
+.legacy83-premium .tenant-hero .tenant-title-highlight{color:var(--legacy-gold)}
+.legacy83-premium .tenant-hero .tenant-title-prefix{display:block}
+.legacy83-premium .tenant-hero p{color:#eee8dc!important;font-size:18px}
+.legacy83-premium .tenant-hero p:first-child{color:var(--legacy-gold)!important;font-size:12px;letter-spacing:.27em;line-height:1.7}
+.legacy83-premium .tenant-hero .tenant-hero-actions a{border-radius:4px;background:var(--legacy-gold)!important;color:var(--legacy-forest)!important;font-size:14px;letter-spacing:0;padding:16px 26px;box-shadow:none;border:1px solid var(--legacy-gold)}
+.legacy83-premium .tenant-hero .tenant-hero-actions a+a{background:transparent!important;color:white!important}
+.legacy83-premium .tenant-hero-media{position:relative;width:100%;max-width:520px;margin:0 auto}
+.legacy83-premium .tenant-hero-image-frame{position:relative;border-radius:230px 230px 6px 6px;aspect-ratio:4/5;background:#e9e1d2;box-shadow:0 0 0 4px #d7b46a40;overflow:visible}
+.legacy83-premium .tenant-hero-image-frame:after{content:"";position:absolute;inset:20px -20px -20px 20px;border:1px solid #d7b46ab3;border-radius:230px 230px 6px 6px;z-index:0;pointer-events:none}
+.legacy83-premium .tenant-hero-image-frame img{position:relative;z-index:1;width:100%;height:100%;min-height:0;object-fit:cover;object-position:top center;border-radius:inherit}
+.legacy83-premium .tenant-hero figcaption{position:relative;color:#e8cf9a;letter-spacing:.025em;margin-top:32px}
+.legacy83-premium .tenant-hero[data-has-image=false]>div{padding:72px 24px;max-width:1120px}
+.legacy83-premium .tenant-hero[data-has-image=false] h1{margin-left:auto;margin-right:auto;max-width:940px;font-size:clamp(2.7rem,4.7vw,4rem)}
+.legacy83-premium .tenant-cards article{border-radius:8px;border:1px solid #ded3bc;background:#fffdf8;box-shadow:0 12px 40px #1630230f}
+.legacy83-premium .tenant-card-body{height:100%}
+.legacy83-premium .tenant-card-copy>p{color:#526158}
+.legacy83-premium .tenant-card-copy a{font-size:14px;border-radius:4px}
+.legacy83-premium .tenant-card-marker{display:block;font:32px Georgia,serif;color:#9a743d;margin-bottom:32px}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-section-intro{text-align:center;max-width:780px;margin:auto}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-section-intro>p{margin-left:auto;margin-right:auto}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-card-grid{gap:24px;margin-top:48px}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-card-body{padding:32px}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-card-copy a{background:transparent!important;color:#876331!important;padding:0;box-shadow:none}
+.legacy83-premium .tenant-cards[data-variant=framework]{max-width:none;background:#eae2d2;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:64px;padding-left:max(24px,calc((100% - 1232px)/2));padding-right:max(24px,calc((100% - 1232px)/2));align-items:center}
+.legacy83-premium .tenant-cards[data-variant=framework] .tenant-card-grid{display:grid;grid-template-columns:1fr;margin:0;gap:12px}
+.legacy83-premium .tenant-cards[data-variant=framework] article{box-shadow:none;border:0;background:var(--legacy-ivory);border-radius:6px}
+.legacy83-premium .tenant-cards[data-variant=framework] article:hover{transform:none}
+.legacy83-premium .tenant-cards[data-variant=framework] .tenant-card-body{display:flex;align-items:center;gap:20px;padding:16px 24px}
+.legacy83-premium .tenant-cards[data-variant=framework] .tenant-card-marker{display:flex;align-items:center;justify-content:center;width:56px;height:56px;flex-shrink:0;border-radius:50%;background:#173b2b;color:#e3c688;font-size:30px;margin:0}
+.legacy83-premium .tenant-cards[data-variant=framework] h3{font-size:21px;letter-spacing:0}
+.legacy83-premium .tenant-cards[data-variant=framework] .tenant-card-copy>p{font-size:14px;margin-top:4px;line-height:1.6}
+.legacy83-premium .tenant-section-intro>p:first-child,.legacy83-premium .tenant-cta-eyebrow{font-size:12px;letter-spacing:.27em}
+.legacy83-premium .tenant-cta[data-variant=academy],.legacy83-premium .tenant-cta[data-variant=final]{max-width:none;padding:80px 24px}
+.legacy83-premium .tenant-cta[data-variant=academy]>div,.legacy83-premium .tenant-cta[data-variant=final]>div{max-width:1000px;margin:auto;padding:0;border-radius:0;box-shadow:none}
+.legacy83-premium .tenant-cta[data-variant=academy]>div{background:transparent!important;color:#19372b}
+.legacy83-premium .tenant-cta[data-variant=academy] p{color:#526158}
+.legacy83-premium .tenant-cta[data-variant=academy] .tenant-cta-eyebrow{color:#987440}
+.legacy83-premium .tenant-cta[data-variant=academy] a{background:#173b2b!important;color:white}
+.legacy83-premium .tenant-cta[data-variant=final],.legacy83-premium .tenant-cta[data-variant=final]>div{background:var(--legacy-forest)!important}
+.legacy83-premium .tenant-cta[data-variant=final] h2{max-width:760px;margin-left:auto;margin-right:auto;font-size:clamp(2.7rem,4.7vw,3.8rem)}
+.legacy83-premium .tenant-cta[data-variant=final] .tenant-cta-eyebrow{color:var(--legacy-gold)}
+.legacy83-premium .tenant-cta[data-variant=final] a{background:var(--legacy-gold)!important;color:var(--legacy-forest)}
+.legacy83-premium .tenant-cta a{border-radius:4px;letter-spacing:0}
+.legacy83-premium footer{background:#112a20;color:#f4e9d7}
+.legacy83-premium footer p,.legacy83-premium footer a{color:#f4e9d7!important}
+.legacy83-mobile-menu{display:none}
+/* Match the recovered October 16 visual reference; customer copy stays editable. */
+.legacy83-premium header>div>a:first-child img{max-width:190px;max-height:64px}
+.legacy83-premium header>div>a:first-child span{display:none}
+.legacy83-premium header>div>a:last-child{font-size:13px;padding:14px 22px;white-space:nowrap}
+.legacy83-premium .tenant-hero[data-variant=reference]{background:radial-gradient(ellipse at 75% 38%,#33472a 0%,#062819 39%,#001a11 82%)}
+.legacy83-premium .tenant-hero[data-variant=reference]:before{width:500px;height:760px;top:0;right:25%;border-radius:50% 0 50% 0;transform:rotate(-28deg);border:0;background:repeating-radial-gradient(ellipse at 100% 50%,transparent 0 45px,#a2843520 46px 55px,transparent 56px 90px);opacity:.55}
+.legacy83-premium .tenant-hero[data-variant=reference]>div{grid-template-columns:1.05fr 1fr;gap:0;padding:0 32px;min-height:610px;max-width:1280px}
+.legacy83-premium .tenant-hero[data-variant=reference]>div>div:first-child{padding:46px 0 40px;z-index:2}
+.legacy83-premium .tenant-hero[data-variant=reference] h1{font-size:clamp(3rem,4.9vw,4.5rem);line-height:1.02;max-width:640px}
+.legacy83-premium .tenant-title-line{display:block;white-space:pre-line}
+.legacy83-premium .tenant-title-line em,.legacy83-premium .tenant-title-line:last-child{color:#e3bf72;font-weight:400}
+.legacy83-premium .tenant-hero[data-variant=reference] p{max-width:490px;font-size:17px;line-height:1.65}
+.legacy83-premium .tenant-hero[data-variant=reference] p:first-child{font-size:11px;letter-spacing:.21em}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-actions{gap:14px;margin-top:24px}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-actions a{padding:13px 20px;font-size:13px;background:linear-gradient(120deg,#c99d4e,#f0d699)!important;border-radius:2px}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-actions a+a{background:transparent!important}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-media{align-self:end;width:calc(100% + 55px);max-width:none;margin:0 0 0 -25px;padding:0}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-image-frame{aspect-ratio:1;background:none;border-radius:0;box-shadow:none;overflow:visible}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-image-frame:after{display:none}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-image-frame img{border-radius:0;box-shadow:none;object-fit:contain;min-height:0}
+.legacy83-premium .tenant-hero[data-variant=reference] figcaption{position:absolute;right:24px;bottom:18px;margin:0;padding:7px 12px;background:#062819da;font-size:11px;max-width:220px}
+.tenant-hero-highlights{display:flex;gap:26px;margin-top:30px;max-width:470px}
+.tenant-hero-highlights>div{display:flex;flex:1;flex-direction:column;gap:6px}
+.tenant-hero-highlights svg{width:36px;height:36px;stroke:#d7b46a;stroke-width:1.2;margin-bottom:4px}
+.tenant-hero-highlights strong{color:#e3c77f;font-size:11px;text-transform:uppercase;letter-spacing:.14em}
+.tenant-hero-highlights span{font-size:11px;color:#eee8dc;line-height:1.4}
+.tenant-card-image-strip{position:relative;aspect-ratio:16/9;overflow:hidden}
+.tenant-card-image-strip img{position:absolute;width:400%;max-width:none;height:auto;left:0;top:50%}
+.legacy83-premium .tenant-hero[data-variant=editorial]>div{padding:64px 32px;gap:65px}
+.legacy83-premium .tenant-hero[data-variant=editorial] h1{font-size:clamp(2.8rem,4.4vw,4.3rem)}
+.legacy83-premium .tenant-hero[data-variant=editorial] .tenant-hero-image-frame{aspect-ratio:5/4;border-radius:2px;overflow:hidden;box-shadow:none}
+.legacy83-premium .tenant-hero[data-variant=editorial] .tenant-hero-image-frame:after{display:none}
+.legacy83-premium .tenant-hero[data-variant=editorial] figcaption{color:#dbc58d;font-size:11px;margin-top:15px;text-align:left}
+.legacy83-premium[data-page="/journal"] .tenant-hero[data-variant=editorial] p{color:#526158!important}
+.legacy83-premium[data-page="/journal"] .tenant-hero[data-variant=editorial] p:first-child{color:#916a28!important}
+.legacy83-premium[data-page="/journal"] .tenant-hero[data-variant=editorial] figcaption{color:#916a28}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro{display:grid;grid-template-columns:1.1fr 1fr;column-gap:100px;align-items:end}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro>p:first-child{grid-column:1/-1;position:relative;padding-left:45px;margin-bottom:8px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro>p:first-child:before{content:'';position:absolute;left:0;top:50%;width:30px;border-top:1px solid #a17a37}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro h2{font-size:clamp(2rem,3.2vw,3rem);max-width:600px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro>p:not(:first-child){font-size:15px;margin:0;line-height:1.8}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-top:32px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] article{border-radius:2px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-body{padding:22px;height:auto}
+.legacy83-premium .tenant-cards[data-variant^=photographic] h3{font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.35}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-copy>p{font-size:14px;line-height:1.75}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-copy a{padding:0;background:none!important;color:#916a28!important;font-size:13px;box-shadow:none}
+.legacy83-premium .tenant-cards[data-variant=reference-framework]{max-width:none;background:radial-gradient(ellipse at right,#173b2a,#002315);color:#f7f1e5;display:grid;grid-template-columns:.8fr 1.2fr;gap:70px;padding:64px max(32px,calc((100% - 1216px)/2))}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-section-intro>p,.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-card-copy>p{color:#e4e6d9}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-section-intro>p:first-child{color:#e3c77f!important}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-card-grid{display:block;margin:0}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] article{border:0;border-bottom:1px solid #d7b46a45;background:none;box-shadow:none;border-radius:0;transform:none}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-card-body{display:flex;gap:20px;align-items:center;padding:15px 0}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-card-marker{margin:0;font-size:28px;width:35px;flex-shrink:0;color:#e3c77f}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] h3{font-size:20px;color:#f7f1e5}
+.legacy83-premium .tenant-cards[data-variant=reference-framework] .tenant-card-copy>p{font-size:13px;margin-top:3px}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false]>div{display:grid;grid-template-columns:1.1fr .9fr;padding:66px 32px;min-height:330px;max-width:1280px}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false]>div>div{display:contents;text-align:left}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] h1{grid-column:1;grid-row:2/4;margin:0;font-size:clamp(2.8rem,4.2vw,4.2rem);max-width:650px}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] p:first-child{grid-column:1/-1;margin:0 0 20px}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] p:not(:first-child){grid-column:2;grid-row:2;margin:0 0 0 60px;border-left:1px solid #d7b46a66;padding-left:30px;font-size:16px}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] .tenant-hero-actions{grid-column:2;grid-row:3;justify-content:flex-start;margin:22px 0 0 90px}
+.legacy83-premium[data-page="/services"] [data-section-id=services-grid] .tenant-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.legacy83-premium[data-page="/services"] [data-section-id=service-process] .tenant-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs]{display:grid;grid-template-columns:.85fr 1.15fr;gap:70px}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs] .tenant-card-grid{display:block;margin:0}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs] article{border:0;border-top:1px solid #cfc2a7;box-shadow:none;border-radius:0;background:none;transform:none}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs] .tenant-card-body{display:flex;gap:24px;padding:24px 0}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs] .tenant-card-marker{margin:0}
+.legacy83-premium[data-page="/contact"] main{display:grid;grid-template-columns:.85fr 1.15fr;max-width:1280px;margin:auto;padding:0 32px;gap:0 64px}
+.legacy83-premium[data-page="/contact"] main>.tenant-hero{grid-column:1/-1;margin:0 calc(-1 * max(32px,(100vw - 1216px)/2));padding:0 max(32px,calc((100vw - 1216px)/2))}
+.legacy83-premium[data-page="/contact"] [data-section-id=contact-info]{grid-column:1;padding-left:0;padding-right:0;width:100%;margin:0}
+.legacy83-premium[data-page="/contact"] [data-section-id=contact-form]{grid-column:2;padding-left:0;padding-right:0;width:100%;margin:0}
+.legacy83-premium[data-page="/contact"] [data-section-id=contact-steps]{grid-column:1/-1;width:100%;padding-left:0;padding-right:0}
+.legacy83-premium form{border-radius:4px;border-color:#ded3bc;box-shadow:0 14px 50px #17372908;padding:32px}
+.legacy83-premium form input,.legacy83-premium form textarea,.legacy83-premium form select{border-radius:3px;border-color:#cfc6b5;background:#fffefb}
+.legacy83-premium form button{border-radius:3px;background:#15382a!important}
+.legacy83-premium[data-page="/growth-iq"] fieldset{background:#fffdf8;border-color:#ded3bc;border-radius:4px;padding:24px;margin:0}
+.legacy83-premium[data-page="/growth-iq"] legend{font-family:Georgia,serif;font-size:19px;font-weight:400}
+.legacy83-premium[data-page="/growth-iq"] fieldset label{border-radius:3px;border-color:#ded3bc;align-items:center;cursor:pointer}
+.legacy83-premium[data-page="/growth-iq"] fieldset label:has(input:checked){background:#eef1e7;border-color:#526941}
+.legacy83-premium[data-page="/growth-iq"] input[type=radio]{accent-color:#173729}
+.legacy83-premium[data-page="/journal"] .tenant-hero{background:#eae2d2;color:#19372b}
+.legacy83-premium[data-page="/journal"] .tenant-hero p{color:#526158!important}
+.legacy83-premium[data-page="/journal"] .tenant-hero p:first-child{color:#916a28!important}
+.legacy83-premium[data-page="/journal"] [data-section-id=journal-topics] .tenant-card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.legacy83-premium[data-page="/journal"] [data-section-id=journal-topics] article{border-radius:0;border:0;border-right:1px solid #ded3bc;box-shadow:none;background:none}
+.legacy83-premium[data-page="/events"] .tenant-hero{background:linear-gradient(110deg,#15382a,#263e30)}
+.legacy83-premium footer{padding-top:50px;padding-bottom:42px}
+.legacy83-premium footer nav{border-top:1px solid #d7b46a40;padding-top:25px;margin-top:15px;gap:26px}
+.legacy83-premium .tenant-journal>div{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px}
+.legacy83-premium .tenant-journal article{border-radius:3px;border-color:#ded3bc;box-shadow:0 10px 30px #17372908}
+.legacy83-premium .tenant-journal article>div:last-child{padding:28px}
+.legacy83-premium .tenant-journal h3{font-size:28px;line-height:1.25}
+.legacy83-premium .tenant-preview-label{display:inline-block;border:1px solid #d7b46a;color:#785820;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;margin-bottom:15px}
+@media(max-width:900px){
+.legacy83-premium .tenant-hero[data-variant=reference]>div{grid-template-columns:1fr 1fr;min-height:500px;padding:0 24px}
+.legacy83-premium .tenant-hero[data-variant=reference] h1{font-size:3.2rem}
+.legacy83-premium .tenant-hero[data-variant=reference] p{font-size:15px}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-media{width:calc(100% + 30px);margin-left:-15px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro{column-gap:40px}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs]{gap:35px}
+.legacy83-premium[data-page="/journal"] [data-section-id=journal-topics] .tenant-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.legacy83-premium .tenant-cards[data-variant=process-steps] article{overflow:visible;border:0;border-top:1px solid #cbb58c;border-radius:0;background:transparent;box-shadow:none}
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-body{padding:24px 0}
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-marker{display:flex;width:36px;height:36px;align-items:center;justify-content:center;margin-top:-43px;margin-bottom:18px;border-radius:50%;background:#173b2b;color:#e7ce98;font-size:16px}
+@media(max-width:767px){
+.legacy83-premium .tenant-cards[data-variant=process-steps] .tenant-card-grid{grid-template-columns:1fr;gap:32px}
+.legacy83-premium .tenant-hero[data-variant=editorial]>div{padding:36px 24px;gap:30px;flex-direction:column}
+.legacy83-premium .tenant-hero[data-variant=editorial] .tenant-hero-media{max-width:none;padding:0}
+.legacy83-premium .tenant-hero[data-variant=reference]>div{display:flex;flex-direction:column;padding:0 24px;gap:0}
+.legacy83-premium .tenant-hero[data-variant=reference]>div>div:first-child{padding:34px 0 28px}
+.legacy83-premium .tenant-hero[data-variant=reference] h1{font-size:clamp(2.8rem,10vw,4rem)}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-media{width:100%;max-width:430px;margin:0 auto;align-self:center}
+.legacy83-premium .tenant-hero[data-variant=reference] .tenant-hero-actions a{padding:13px 12px;flex-grow:0;font-size:12px}
+.tenant-hero-highlights{gap:18px;margin-top:25px}
+.tenant-hero-highlights svg{width:30px;height:30px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro{display:block}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-section-intro>p:not(:first-child){margin-top:20px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-grid{gap:16px}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-body{padding:18px}
+.legacy83-premium .tenant-cards[data-variant=reference-framework]{grid-template-columns:1fr;gap:30px;padding:48px 24px}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false]>div{display:flex;flex-direction:column;align-items:stretch;padding:44px 24px;gap:0;min-height:0}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false]>div>div{display:contents}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] h1{font-size:2.8rem;margin:0}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] p:not(:first-child){padding:0;border:0;margin:22px 0 0}
+.legacy83-premium:not([data-page="/"]) .tenant-hero[data-has-image=false] .tenant-hero-actions{margin:24px 0 0}
+.legacy83-premium[data-page="/academy"] [data-section-id=academy-programs]{grid-template-columns:1fr;gap:24px}
+.legacy83-premium[data-page="/contact"] main{display:block;padding:0 24px}
+.legacy83-premium[data-page="/contact"] main>.tenant-hero{margin:0 -24px;padding:0}
+.legacy83-premium[data-page="/contact"] [data-section-id=contact-info]{padding-bottom:0}
+.legacy83-premium[data-page="/services"] [data-section-id=service-process] .tenant-card-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+.legacy83-premium .tenant-journal>div{grid-template-columns:1fr}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-grid,.legacy83-premium[data-page="/services"] [data-section-id=services-grid] .tenant-card-grid{grid-template-columns:1fr}
+.legacy83-premium .tenant-cards[data-variant^=photographic] .tenant-card-body{padding:24px}
+}
+@media(min-width:1024px){.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:1100px){
+.legacy83-premium header>div{min-height:76px;padding:12px 18px}
+.legacy83-premium header nav,.legacy83-premium header>div>a:last-child{display:none!important}
+.legacy83-premium header>div>a:first-child img{max-width:110px;max-height:52px}
+.legacy83-premium header>div>a:first-child span{font-size:17px;white-space:normal;line-height:1.15}
+.legacy83-mobile-menu{display:block;position:relative;z-index:25;background:#112a20;color:#f6ebd8}
+.legacy83-mobile-menu summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:15px 22px;font-weight:700}
+.legacy83-mobile-menu summary::-webkit-details-marker{display:none}
+.legacy83-mobile-menu nav{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:5px 16px 18px}
+.legacy83-mobile-menu nav a{padding:13px 10px;border-bottom:1px solid #ffffff26;font-size:14px}
+}
+@media(max-width:767px){
+.legacy83-premium main>section{padding-top:56px;padding-bottom:56px}
+.legacy83-premium .tenant-hero>div{display:flex;flex-direction:column-reverse;gap:44px;padding:44px 24px 64px}
+.legacy83-premium .tenant-hero-media{max-width:390px;padding-right:12px}
+.legacy83-premium .tenant-hero h1{font-size:clamp(2.8rem,8vw,3.8rem)}
+.legacy83-premium .tenant-hero p{font-size:16px}
+.legacy83-premium .tenant-hero-actions a{flex-grow:1;text-align:center;justify-content:center}
+.legacy83-premium .tenant-hero[data-has-image=false]>div{padding:52px 22px}
+.legacy83-premium .tenant-cards[data-variant=framework]{grid-template-columns:1fr;gap:36px;padding:56px 24px}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-card-body{padding:24px}
+.legacy83-premium .tenant-cards[data-variant=pathways] .tenant-card-grid{margin-top:32px}
+.legacy83-premium .tenant-card-marker{margin-bottom:20px}
+.legacy83-premium .tenant-cta[data-variant=academy],.legacy83-premium .tenant-cta[data-variant=final]{padding:64px 24px}
+}
+
+/* Photographs sit behind the program and service card copy, as requested. */
+.legacy83-premium .tenant-cards[data-variant=photographic-background] article{position:relative;isolation:isolate;min-height:360px;border:0;background:#123327;color:white;overflow:hidden}
+.legacy83-premium .tenant-cards[data-variant=photographic-background] article>.tenant-card-image-strip,.legacy83-premium .tenant-cards[data-variant=photographic-background] article>img{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:cover;z-index:-2}
+.legacy83-premium .tenant-cards[data-variant=photographic-background] article:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#08251b12,#08251beb 70%);z-index:-1}
+.legacy83-premium .tenant-cards[data-variant=photographic-background] .tenant-card-body{position:relative;display:flex;align-items:flex-end;min-height:360px;height:100%;padding:30px}
+.legacy83-premium .tenant-cards[data-variant=photographic-background] article h3,.legacy83-premium .tenant-cards[data-variant=photographic-background] article p{color:white!important}
+.legacy83-premium .tenant-cards[data-variant=photographic-background] .tenant-card-body a{background:#d7b46a!important;color:#123327!important}

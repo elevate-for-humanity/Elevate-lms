@@ -15,8 +15,6 @@
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { requireRole } from '@/lib/auth/require-role';
 import { logger } from '@/lib/logger';
 import {
   coursePackageFromSession,
@@ -193,11 +191,13 @@ export async function loadCourseSession(
 
   // Interactive Studio callers require role authorization. Internal Course
   // Builder workers use the service client and must not depend on request auth.
-  if (!options?.system) await requireRole(['admin', 'super_admin', 'staff']);
+  if (!options?.system) {
+    const { requireRole } = await import('@/lib/auth/require-role');
+    await requireRole(['admin', 'super_admin', 'staff']);
+  }
 
-  const db = await createClient();
   const adminDb = await requireAdminClient();
-  const queryDb = adminDb ?? db;
+  const queryDb = adminDb;
 
   // ── Required: course ──────────────────────────────────────────────────────
   const { data: course, error: courseErr } = await queryDb

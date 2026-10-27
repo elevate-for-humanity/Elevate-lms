@@ -1,0 +1,127 @@
+name: Verify Google public cutover prerequisites
+# Durable manages the authoritative DNS. Verify the Google load balancer,
+# public certificates and application routing without changing email records.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-google-cutover.yml'
+      - 'scripts/gcp/verify-google-cutover.mjs'
+      - 'scripts/gcp/verify-cutover-state.mjs'
+      - 'scripts/gcp/verify-production-dns.mjs'
+      - 'scripts/gcp/verify-migrated-domains.mjs'
+  workflow_run:
+    workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy LMS automatically on Google', 'Deploy repaired Google services', 'Deploy Google Store subscription delivery']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      expected_component:
+        description: Optional component whose new release must be verified
+        type: choice
+        options: ['', marketing, admin, lms, store]
+        default: ''
+      expected_commit:
+        description: Exact 40-character release commit for expected_component
+        type: string
+        default: ''
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+jobs:
+  dispatch:
+    # A successful dispatch-only push job is not a successful deployment.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_NAME: ${{ github.event.workflow_run.name }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          component=''
+          case "$SOURCE_NAME" in
+            'Deploy Admin') component=admin ;;
+            'Deploy Google Marketing on trigger') component=marketing ;;
+            'Deploy LMS automatically on Google') component=lms ;;
+          esac
+          if test -n "$component"; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-cutover.yml/dispatches" -f ref=main -f "inputs[expected_component]=$component" -f "inputs[expected_commit]=$SOURCE_SHA"
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-cutover.yml/dispatches" -f ref=main
+          fi
+  inspect:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [marketing, admin, lms, store]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check verifier regression cases
+        run: node --test scripts/gcp/verify-cutover-state.test.mjs
+      - uses: google-github-actions/auth@v3
+        id: auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify each mandatory production condition independently
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TOKEN: ${{ steps.auth.outputs.id_token }}
+          EXPECTED_COMPONENT: ${{ inputs.expected_component }}
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+        run: node scripts/gcp/verify-google-cutover.mjs
+      - name: Preserve sanitized live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-cutover-${{ matrix.component }}-${{ github.run_id }}
+          path: google-cutover-${{ matrix.component }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  migrated-domains:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify migrated hostnames and Program Holder redirect
+        run: node scripts/gcp/verify-migrated-domains.mjs
+      - name: Preserve public routing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migrated-domains-${{ github.run_id }}
+          path: migrated-domains-verification.json
+          if-no-files-found: warn
+          retention-days: 30

@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "prebuild": "node ../../scripts/sync-pwa-public.mjs admin",
-    "build": "node --require ../../scripts/next-fs-rm-retry.cjs ../../node_modules/next/dist/bin/next build",
+    "prebuild": "node ../../scripts/check-build-memory-policy.mjs && node ../../scripts/sync-pwa-public.mjs admin",
+    "build": "node ../../scripts/run-bounded-build.mjs -- node ../../scripts/build-next-app.mjs",
     "prestart": "node ../../scripts/sync-pwa-public.mjs admin",
     "start": "node server.js",
-    "lint": "next lint"
+    "lint": "node ../../scripts/run-bounded-build.mjs -- node ../../node_modules/eslint/bin/eslint.js . --ext .js,.jsx,.ts,.tsx --quiet",
+    "predev": "node ../../scripts/sync-development-public.mjs admin"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.80",
@@ -17,7 +18,7 @@
     "pdfkit": "^0.18.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "ws": "^8.18.0"
   },
   "devDependencies": {

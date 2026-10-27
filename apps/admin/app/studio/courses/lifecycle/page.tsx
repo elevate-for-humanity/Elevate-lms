@@ -8,7 +8,7 @@ export default async function CourseLifecyclePage({
   searchParams: Promise<{ course?: string }>;
 }) {
   const { course } = await searchParams;
-  const params = new URLSearchParams({ tab: 'governance' });
+  const params = new URLSearchParams({ tab: 'ultimate' });
   if (course?.trim()) params.set('courseId', course.trim());
   redirect(`/studio/courses?${params.toString()}`);
 }

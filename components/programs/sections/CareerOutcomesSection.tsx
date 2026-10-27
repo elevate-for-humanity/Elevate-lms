@@ -47,12 +47,12 @@ export function CareerOutcomesSection({
   return (
     <section className="py-12 lg:py-16 px-4 relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-      
+
+
       {/* Decorative elements */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-red-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl" />
-      
+
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 opacity-5" style={{
         backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
@@ -100,7 +100,7 @@ export function CareerOutcomesSection({
                   </span>
                 </div>
               )}
-              
+
               <div className="text-center pt-4">
                 <h3 className={`text-lg font-semibold mb-3 ${tier.popular ? 'text-white/80' : 'text-slate-400'}`}>
                   {tier.title}
@@ -208,7 +208,7 @@ export function CareerOutcomesSection({
                     ${grossAnnual.toLocaleString()}
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="bg-white/5 rounded-lg p-3">
                     <p className="text-slate-400 text-xs mb-1">Weekly</p>
@@ -223,7 +223,7 @@ export function CareerOutcomesSection({
                     <p className="font-bold text-lg text-amber-400">+${annualTips.toLocaleString()}</p>
                   </div>
                 </div>
-                
+
                 <p className="text-xs text-slate-500 mt-4 text-center">
                   *Before expenses. Actual income varies by location and clientele.
                 </p>
@@ -260,10 +260,10 @@ export function CareerOutcomesSection({
                 >
                   {career.image ? (
                     <>
-                      <img 
-                        src={career.image} 
+                      <img
+                        src={career.image}
                         alt={career.title}
-                        className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                        className="w-10 h-10 rounded-lg object-contain flex-shrink-0"
                       />
                       <span className="text-white text-sm font-medium group-hover:text-brand-red-300 transition-colors">
                         {career.title}

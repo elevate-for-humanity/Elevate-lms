@@ -1,3 +1,5 @@
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
@@ -28,21 +30,17 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
 
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="text-blue-200 font-semibold mb-3 tracking-wide uppercase text-sm">Get in Touch</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Let&apos;s Build Your Workforce Together
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed">
-              Whether you&apos;re an individual seeking training, an employer building a talent pipeline, 
-              or a workforce agency coordinating programs — we&apos;re here to help you succeed.
-            </p>
-          </div>
-        </div>
-      </section>
+      <HeroPicture
+        src="/images/pages/contact-page-1.webp"
+        alt="People collaborating around a table with notes and career planning materials"
+        analyticsName="contact"
+        belowHeroHeadline="Let’s plan your next step."
+        belowHeroSubheadline="Ask about training, payment plans, apprenticeships, or becoming a host shop. We’ll help you find where to start."
+        ctas={[
+          { label: 'Send a message', href: '#contact-form' },
+          { label: 'Call our team', href: siteConfig.phone.href, variant: 'secondary' },
+        ]}
+      />
 
       {/* Main Content */}
       <section className="py-16">
@@ -59,7 +57,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                   </div>
                 )}
                 
-                <form className="space-y-6" action="/api/contact" method="post">
+                <form id="contact-form" className="space-y-6 scroll-mt-24" action="/api/contact" method="post">
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -180,16 +178,21 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Contact</h3>
                 <div className="space-y-4">
-                  <a href="tel:+13173140199" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                  <a href={siteConfig.phone.href} className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Phone className="w-5 h-5 text-brand-blue-700" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Phone</p>
-                      <p className="font-semibold">(317) 314-3757</p>
+                      <p className="text-sm text-slate-500">Main Phone — Programs and Admissions</p>
+                      <p className="font-semibold">{siteConfig.phone.display}</p>
                     </div>
                   </a>
                   
+                  <a href={siteConfig.technicalSupport.href} className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center"><Phone className="w-5 h-5 text-brand-blue-700" /></div>
+                    <div><p className="text-sm text-slate-500">Technical Support — Login and Website Help</p><p className="font-semibold">{siteConfig.technicalSupport.display}</p></div>
+                  </a>
+
                   <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Mail className="w-5 h-5 text-brand-blue-700" />

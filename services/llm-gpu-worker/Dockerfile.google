@@ -1,0 +1,10 @@
+FROM vllm/vllm-openai:v0.10.1.1
+ENV PYTHONUNBUFFERED=1 HF_HOME=/models/huggingface VLLM_LOGGING_LEVEL=INFO \
+    LLM_MODEL=/models/elevate HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+    MAX_MODEL_LEN=8192 GPU_MEMORY_UTILIZATION=0.90
+COPY services/llm-gpu-worker/bake_model.py /tmp/bake_model.py
+RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python3 /tmp/bake_model.py && rm /tmp/bake_model.py
+COPY services/llm-gpu-worker/entrypoint.google.sh /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
+EXPOSE 8080
+ENTRYPOINT ["/entrypoint.sh"]

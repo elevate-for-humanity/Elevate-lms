@@ -240,7 +240,11 @@
       },
       {
         "title": "Contact David to schedule practical training",
-        "points": ["David Nazaire", "(215) 214-9355", "indyondemandservices@gmail.com"],
+        "points": [
+          "David Nazaire",
+          "(215) 214-9355",
+          "indyondemandservices@gmail.com"
+        ],
         "narration": "Contact David Nazaire to arrange the hands-on portion of your HVAC program. His saved program contact number is two one five, two one four, nine three five five. His email is indyondemandservices at gmail dot com. Tell him your full name, that you are an Elevate HVAC learner, your online-study progress, and the dates you are available. Ask him to confirm the training dates, times, location, required clothing, tools, and safety equipment. Wait for confirmation before attending.",
         "href": "mailto:indyondemandservices@gmail.com?subject=Elevate%20HVAC%20hands-on%20training%20schedule",
         "action": "Email David",
@@ -662,6 +666,78 @@
         "href": "/program-holder/how-to-use",
         "action": "Open the detailed office guide",
         "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Check student dates against the source record",
+        "points": [
+          "Open Students and find the learner",
+          "Compare start, scheduled end and actual completion",
+          "Report a mismatch with the uploaded source"
+        ],
+        "narration": "Open Students, find the learner by name, and compare the recorded training dates with the uploaded voucher or approved schedule. A voucher service window can differ from the actual training or completion date. Do not use the voucher expiration date as a completion date. Do not mark a learner complete to remove an overdue alert. Send Administration the learner name, field, source document and requested correction. Missing dates remain missing until the evidence is checked.",
+        "href": "/program-holder/students",
+        "action": "Check student records",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Email a student from your assigned roster",
+        "points": [
+          "Open Email → Compose",
+          "Choose a student or office contact",
+          "Review To, subject and message before Send"
+        ],
+        "narration": "Open Email and confirm that the From address is your assigned Elevate mailbox. Select Compose, then Choose a student or office contact. Your assigned students appear automatically when their email is recorded and contact access is authorized. Selecting a contact adds the address to To; confirm every recipient before writing or sending. Missing contacts require a record correction, not an invented email address. Read replies in the same conversation. A provider accepting an email does not guarantee delivery or that the student read it.",
+        "href": "/program-holder/email",
+        "action": "Open program email",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Record training and verify the saved result",
+        "points": [
+          "Open Hours and choose the correct student",
+          "Enter actual dates, activities and hours",
+          "Submit and check the review status"
+        ],
+        "narration": "Open Hours and select the assigned student and program. Enter the actual training date, hours, work completed and supporting details. Review before submitting and confirm the saved entry appears. Submitted records may still require verification. Do not copy another student’s hours or treat an empty history as proof that training did not occur. Report missing or incorrect entries with the actual date and supporting evidence.",
+        "href": "/program-holder/hours",
+        "action": "Record training",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Complete the weekly student progress report",
+        "points": [
+          "Open Reports and choose the student",
+          "Record progress, barriers and supporting evidence",
+          "Review and submit; check it appears in history"
+        ],
+        "narration": "Open Reports and choose an active student. Record this week’s lessons, skills practiced, attendance, hours, assignments, scores, barriers, contact and next-week goals using the evidence available. Do not enter an assessment result that has not been earned. Review the full report, submit it, and confirm it appears in submitted reports. Complete one report for each active student each Friday. PARIS can help prepare a draft; the Program Holder remains responsible for verifying the record.",
+        "href": "/program-holder/reports",
+        "action": "Open weekly reports",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Plan meetings and follow-ups",
+        "points": [
+          "Open Calendar and meetings",
+          "Check the date, time and attendee",
+          "Save the meeting and confirm the details"
+        ],
+        "narration": "Use Calendar and meetings for scheduled advising, progress checks and training meetings. Confirm the time zone, date, attendee and meeting link. Check the saved record before telling the student the meeting is confirmed. Keep the next follow-up with the student’s notes so another authorized team member can understand what happens next. If you need to reschedule, update the saved meeting and notify the attendee so that both calendars agree.",
+        "href": "/program-holder/meetings",
+        "action": "Open calendar",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Connect students with career and community support",
+        "points": [
+          "Open Career services or Community",
+          "Show students where to find opportunities",
+          "Use their learner account for personal submissions"
+        ],
+        "narration": "Show students their Career services area for opportunities and coaching, and explain how their own resume and credential tools support placement. Do not submit a resume or credential on a student’s behalf without the appropriate authority. Use Community for professional introductions, questions and portfolio work. Protect personal documents, grades, vouchers and funding information; those belong in protected records, not public posts.",
+        "href": "/program-holder/career",
+        "action": "Open career services",
+        "image": "/images/pages/community-page-2.webp"
       }
     ],
     "hero": "/images/pages/career-counseling.jpg"
@@ -753,6 +829,78 @@
         "href": "/program-holder/how-to-use",
         "action": "Open the detailed office guide",
         "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Check student dates against the source record",
+        "points": [
+          "Open Students and find the learner",
+          "Compare start, scheduled end and actual completion",
+          "Report a mismatch with the uploaded source"
+        ],
+        "narration": "Open Students, find the learner by name, and compare the recorded training dates with the uploaded voucher or approved schedule. A voucher service window can differ from the actual training or completion date. Do not use the voucher expiration date as a completion date. Do not mark a learner complete to remove an overdue alert. Send Administration the learner name, field, source document and requested correction. Missing dates remain missing until the evidence is checked.",
+        "href": "/program-holder/students",
+        "action": "Check student records",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Email a student from your assigned roster",
+        "points": [
+          "Open Email → Compose",
+          "Choose a student or office contact",
+          "Review To, subject and message before Send"
+        ],
+        "narration": "Open Email and confirm that the From address is your assigned Elevate mailbox. Select Compose, then Choose a student or office contact. Your assigned students appear automatically when their email is recorded and contact access is authorized. Selecting a contact adds the address to To; confirm every recipient before writing or sending. Missing contacts require a record correction, not an invented email address. Read replies in the same conversation. A provider accepting an email does not guarantee delivery or that the student read it.",
+        "href": "/program-holder/email",
+        "action": "Open program email",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Record training and verify the saved result",
+        "points": [
+          "Open Hours and choose the correct student",
+          "Enter actual dates, activities and hours",
+          "Submit and check the review status"
+        ],
+        "narration": "Open Hours and select the assigned student and program. Enter the actual training date, hours, work completed and supporting details. Review before submitting and confirm the saved entry appears. Submitted records may still require verification. Do not copy another student’s hours or treat an empty history as proof that training did not occur. Report missing or incorrect entries with the actual date and supporting evidence.",
+        "href": "/program-holder/hours",
+        "action": "Record training",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Complete the weekly student progress report",
+        "points": [
+          "Open Reports and choose the student",
+          "Record progress, barriers and supporting evidence",
+          "Review and submit; check it appears in history"
+        ],
+        "narration": "Open Reports and choose an active student. Record this week’s lessons, skills practiced, attendance, hours, assignments, scores, barriers, contact and next-week goals using the evidence available. Do not enter an assessment result that has not been earned. Review the full report, submit it, and confirm it appears in submitted reports. Complete one report for each active student each Friday. PARIS can help prepare a draft; the Program Holder remains responsible for verifying the record.",
+        "href": "/program-holder/reports",
+        "action": "Open weekly reports",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Plan meetings and follow-ups",
+        "points": [
+          "Open Calendar and meetings",
+          "Check the date, time and attendee",
+          "Save the meeting and confirm the details"
+        ],
+        "narration": "Use Calendar and meetings for scheduled advising, progress checks and training meetings. Confirm the time zone, date, attendee and meeting link. Check the saved record before telling the student the meeting is confirmed. Keep the next follow-up with the student’s notes so another authorized team member can understand what happens next. If you need to reschedule, update the saved meeting and notify the attendee so that both calendars agree.",
+        "href": "/program-holder/meetings",
+        "action": "Open calendar",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Connect students with career and community support",
+        "points": [
+          "Open Career services or Community",
+          "Show students where to find opportunities",
+          "Use their learner account for personal submissions"
+        ],
+        "narration": "Show students their Career services area for opportunities and coaching, and explain how their own resume and credential tools support placement. Do not submit a resume or credential on a student’s behalf without the appropriate authority. Use Community for professional introductions, questions and portfolio work. Protect personal documents, grades, vouchers and funding information; those belong in protected records, not public posts.",
+        "href": "/program-holder/career",
+        "action": "Open career services",
+        "image": "/images/pages/community-page-2.webp"
       }
     ],
     "hero": "/images/pages/career-counseling.jpg"

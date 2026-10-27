@@ -1,3 +1,4 @@
+import { ProgramHolderDashboardGuide } from './ProgramHolderDashboardGuide';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -78,6 +79,8 @@ export function GaryCoordinatorLaunchKit({ name, phone, email, agreementSigned, 
         </div>
       </section>
 
+      <ProgramHolderDashboardGuide audience="site-coordinator" />
+      <details className="rounded-2xl border bg-white p-5"><summary className="min-h-11 cursor-pointer text-lg font-bold">Regional contacts, outreach drafts and detailed launch reference</summary><div className="mt-5 space-y-6">
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-2xl border bg-white p-5 sm:p-7">
           <h2 className="text-xl font-black">What a site coordinator does</h2>
@@ -266,6 +269,7 @@ ${signature}`}</div>
         <p className="mt-2 text-sm leading-6">Lake County is included in Indiana’s August disaster declaration. People whose work or self-employment was directly interrupted by the storms may ask WorkOne about reemployment and training and DWD about Disaster Unemployment Assistance. DUA is an individual benefit, not an Elevate training grant. DWD’s published application deadline is October 27, 2026; applicants first file regular unemployment and follow DWD’s DUA instructions. Call 1-800-891-6499 for DUA help. Do not collect Social Security numbers or disaster claim documents in coordinator outreach.</p>
         <a className="mt-3 inline-block text-sm font-bold text-blue-800 underline" href="https://www.in.gov/dwd/indiana-unemployment/individuals/dua/" target="_blank" rel="noreferrer">Current DWD disaster assistance instructions</a>
       </section>
+      </div></details>
     </main>
   );
 }

@@ -165,6 +165,24 @@ async function loadDashboardCosmetologySubscriptions(db: Awaited<ReturnType<type
   }
 }
 
+async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('barber_payments')
+      .select('id,amount_paid,payment_date,created_at')
+      .gt('amount_paid', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -349,15 +367,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     timeboxDashboardQuery(loadDashboardStripeSessions(db), 'historical payment sessions'),
     timeboxDashboardQuery(loadDashboardBarberSubscriptions(db), 'barber subscriptions'),
     timeboxDashboardQuery(loadDashboardCosmetologySubscriptions(db), 'cosmetology subscriptions'),
-    timeboxDashboardQuery(
-      db
-        .from('barber_payments')
-        .select('id,amount_paid,payment_date,created_at')
-        .gt('amount_paid', 0)
-        .order('created_at', { ascending: false })
-        .limit(100),
-      'barber payments',
-    ),
+    timeboxDashboardQuery(loadDashboardBarberPayments(db), 'barber payments'),
     timeboxDashboardQuery(
       db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
       'ITA vouchers',

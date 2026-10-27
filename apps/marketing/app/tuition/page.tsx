@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -11,18 +13,40 @@ export const metadata: Metadata = {
   description:
     'Review Elevate tuition and payment guidance. Current tuition and program-specific funding information are published on each program record.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/tuition' },
+
+  ...publicArtworkMetadata({
+    path: '/tuition',
+    image: '/images/refresh-20261014/admissions.webp',
+    alt: 'Illustrative learner and advisor reviewing enrollment costs',
+    title: 'Tuition & Payment Guidance | Elevate for Humanity',
+    description:
+      'Review Elevate tuition and payment guidance. Current tuition and program-specific funding information are published on each program record.',
+  }),
 };
 
 export default function TuitionPage() {
   return (
     <main className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative learner and advisor reviewing enrollment costs"
+        actions={[
+          { href: '/programs', label: 'Review program tuition' },
+          { href: '/check-eligibility', label: 'Check funding options' },
+        ]}
+      />
+
       <div className="max-w-6xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Tuition & Payment Guidance' }]} />
+        <Breadcrumbs
+          items={[{ label: 'Funding', href: '/funding' }, { label: 'Tuition & Payment Guidance' }]}
+        />
       </div>
 
       <section className="bg-slate-950 text-white py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest">Enrollment finance</p>
+          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest">
+            Enrollment finance
+          </p>
           <h1 className="text-4xl md:text-5xl font-extrabold mt-3">Tuition & Payment Guidance</h1>
           <p className="text-lg text-slate-300 max-w-3xl mt-5 leading-relaxed">
             Tuition, fees, included materials, payment terms, and third-party funding status are
@@ -62,15 +86,21 @@ export default function TuitionPage() {
 
       <section className="py-14 px-6 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-slate-900">Programs with verified public workforce-funding records</h2>
+          <h2 className="text-2xl font-extrabold text-slate-900">
+            Programs with verified public workforce-funding records
+          </h2>
           <p className="text-slate-600 max-w-3xl mt-3 mb-7">
             These program records are currently permitted to display workforce-funding labels in
-            Elevate&apos;s canonical registry. This does not guarantee an individual participant&apos;s
-            eligibility, award amount, or covered costs.
+            Elevate&apos;s canonical registry. This does not guarantee an individual
+            participant&apos;s eligibility, award amount, or covered costs.
           </p>
           <div className="grid md:grid-cols-2 gap-5">
             {VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => (
-              <Link key={program.slug} href={`/programs/${program.slug}`} className="bg-white border border-slate-200 rounded-xl p-6 hover:border-brand-red-300 transition-colors">
+              <Link
+                key={program.slug}
+                href={`/programs/${program.slug}`}
+                className="bg-white border border-slate-200 rounded-xl p-6 hover:border-brand-red-300 transition-colors"
+              >
                 <h3 className="font-bold text-slate-900">{program.title}</h3>
                 <p className="text-sm text-slate-600 mt-2">{program.description}</p>
                 <span className="inline-flex items-center gap-1 text-sm font-bold text-brand-red-700 mt-4">
@@ -84,11 +114,26 @@ export default function TuitionPage() {
 
       <section className="py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-extrabold text-slate-900">Need the exact amount for a program?</h2>
-          <p className="text-slate-600 mt-3">Open the current program record first, then use the application to document the intended payment or funding pathway.</p>
+          <h2 className="text-2xl font-extrabold text-slate-900">
+            Need the exact amount for a program?
+          </h2>
+          <p className="text-slate-600 mt-3">
+            Open the current program record first, then use the application to document the intended
+            payment or funding pathway.
+          </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
-            <Link href="/programs" className="bg-slate-950 text-white px-6 py-3 rounded-lg font-bold">Browse Programs</Link>
-            <Link href="/apply" className="border border-slate-300 text-slate-900 px-6 py-3 rounded-lg font-bold">Start Application</Link>
+            <Link
+              href="/programs"
+              className="bg-slate-950 text-white px-6 py-3 rounded-lg font-bold"
+            >
+              Browse Programs
+            </Link>
+            <Link
+              href="/apply"
+              className="border border-slate-300 text-slate-900 px-6 py-3 rounded-lg font-bold"
+            >
+              Start Application
+            </Link>
           </div>
         </div>
       </section>

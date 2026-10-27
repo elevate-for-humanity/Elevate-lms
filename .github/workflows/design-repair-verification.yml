@@ -1,0 +1,63 @@
+name: Design Repair Verification
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'components/**'
+      - 'styles/**'
+      - 'scripts/visual/**'
+      - 'scripts/audit-visual-layout.mjs'
+      - 'scripts/audit-platform-media-duplicates.mjs'
+      - 'tests/e2e/platform-design-repair.spec.ts'
+      - 'tests/e2e/design-audit-public-pages.spec.ts'
+      - 'playwright.design-repair.config.ts'
+      - 'playwright.design-audit.config.ts'
+      - 'docs/audits/design-repair-20261016/finding-dispositions.json'
+      - '.github/workflows/design-repair-verification.yml'
+permissions:
+  contents: read
+concurrency:
+  group: design-repair-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  responsive-marketing:
+    # Playwright 1.57.0 cannot install Chromium dependencies on Ubuntu 26.04.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:36871
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
+      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - run: node --test scripts/visual/*.test.mjs
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test --config playwright.design-repair.config.ts
+      - name: Render original audit public pages at 320px
+        run: pnpm exec playwright test --config playwright.design-audit.config.ts --project=320px
+        env:
+          DESIGN_AUDIT_EVIDENCE_DIR: artifacts/design-repair/original-public-mobile
+      - name: Render original audit public pages at 1440px
+        run: pnpm exec playwright test --config playwright.design-audit.config.ts --project=1440px
+        env:
+          DESIGN_AUDIT_EVIDENCE_DIR: artifacts/design-repair/original-public-desktop
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-repair-responsive-evidence
+          path: |
+            artifacts/design-repair/
+            test-results/
+          retention-days: 14

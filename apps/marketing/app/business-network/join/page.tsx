@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function BusinessNetworkJoinPage() {
   redirect('/business-network#join');

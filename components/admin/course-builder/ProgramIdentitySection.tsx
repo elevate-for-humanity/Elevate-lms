@@ -61,7 +61,7 @@ export default function ProgramIdentitySection({ state, onChange }: Props) {
               URL Slug <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center rounded-lg border border-slate-300 overflow-hidden focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/20">
-              <span className="bg-slate-50 px-3 py-2 text-xs text-slate-400 border-r border-slate-300 select-none">
+              <span className="bg-slate-50 px-3 py-2 text-xs text-slate-600 border-r border-slate-300 select-none">
                 /programs/
               </span>
               <input

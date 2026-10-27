@@ -38,14 +38,16 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const [{ data: profile }, { data: actorProfile }] = await Promise.all([
     db
       .from('profiles')
-      .select('id, role, full_name, first_name, last_name, avatar_url')
+      .select('id, role, full_name, first_name, last_name, avatar_url, onboarding_completed')
       .eq('id', subject.userId)
       .maybeSingle(),
-    db
-      .from('profiles')
-      .select('id, role, full_name, first_name, last_name, avatar_url')
-      .eq('id', user!.id)
-      .maybeSingle(),
+    user
+      ? db
+          .from('profiles')
+          .select('id, role, full_name, first_name, last_name, avatar_url')
+          .eq('id', user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
@@ -63,7 +65,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   const actorIsAdmin = ['admin', 'super_admin'].includes(String(actorProfile?.role || ''));
   const isDashboard = pathname === '/apprentice' || pathname === '/apprentice/dashboard';
-  if (actorIsAdmin && !isDashboard) {
+  if (actorIsAdmin && !subject.previewing && !isDashboard) {
     const moduleName =
       pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'apprentice module';
     return (
@@ -85,8 +87,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </p>
           <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
           <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-            This Apprentice Portal module is operational. Learner hours, payments, competencies,
-            documents, and actions remain isolated from the administrator session.
+            Select an apprentice in Admin to view this page with their saved records. No apprentice
+            is selected in this session, so their hours, payments, and documents are not shown.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a
@@ -139,26 +141,28 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </a>
         </div>
       )}
-      <section
-        className="mb-4 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm"
-        role="status"
-        aria-label="Apprentice start notice"
-      >
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
-          Apprentice notice
-        </p>
-        <h2 className="mt-1 text-lg font-black">Theory coursework opens September 11, 2026.</h2>
-        <p className="mt-1 text-sm font-semibold leading-6">
-          You can sign in and use your apprentice portal now. Please complete and upload every
-          required document before theory begins.
-        </p>
-        <a
-          href="/apprentice/documents"
-          className="mt-3 inline-flex rounded-xl bg-amber-950 px-4 py-2 text-sm font-black text-white hover:bg-amber-900"
+      {!profile?.onboarding_completed && (
+        <section
+          className="mb-4 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm"
+          role="status"
+          aria-label="Apprentice start notice"
         >
-          Complete required documents
-        </a>
-      </section>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
+            Apprentice notice
+          </p>
+          <h2 className="mt-1 text-lg font-black">Complete your apprentice onboarding</h2>
+          <p className="mt-1 text-sm font-semibold leading-6">
+            Review your assigned courses, training schedule, and required documents. Course access
+            follows your actual enrollment and onboarding status.
+          </p>
+          <a
+            href="/apprentice/documents"
+            className="mt-3 inline-flex rounded-xl bg-amber-950 px-4 py-2 text-sm font-black text-white hover:bg-amber-900"
+          >
+            Complete required documents
+          </a>
+        </section>
+      )}
       <div className="mt-4">{children}</div>
     </PlatformShell>
   );

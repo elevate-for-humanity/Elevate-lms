@@ -205,7 +205,7 @@ function Section({
           {icon}
           <span className="font-medium text-slate-700">{title}</span>
           {count !== undefined && (
-            <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
               {count}
             </span>
           )}

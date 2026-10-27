@@ -6,8 +6,9 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
-import { getDecryptedPlatformSecret } from '@/lib/secrets';
-import { getAITool, type AIAgentId, type AIToolDefinition } from './registry';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { dispatchGoogleDeployment, type GoogleDeployTarget } from '@/lib/gcp/dispatch-production-workflow';
+import { canAgentUseTool, getAITool, type AIAgentId, type AIToolDefinition } from './registry';
 
 export type AIToolExecutionContext = {
   agent: AIAgentId;
@@ -60,7 +61,7 @@ function headerValue(headers: AIToolExecutionContext['requestHeaders'], name: st
 
 function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context: AIToolExecutionContext): string {
   const path = typeof tool.path === 'function' ? tool.path(input) : tool.path;
-  const isAdminControlPlane = path.startsWith('/api/admin/') || path.startsWith('/api/admin/dev-studio/');
+  const isAdminControlPlane = tool.name === 'paris.supervision' || path.startsWith('/api/admin/');
   const origin = isAdminControlPlane
     ? context.adminOrigin
     : context.appOrigin ?? context.adminOrigin;
@@ -68,10 +69,8 @@ function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context
 }
 
 async function githubToken(): Promise<string> {
-  const token =
-    process.env.GITHUB_TOKEN?.trim() ||
-    (await getDecryptedPlatformSecret('GITHUB_TOKEN').catch(() => undefined))?.trim();
-  if (!token) throw new Error('GITHUB_TOKEN is not configured for the internal GitHub Actions control plane.');
+  const token = await getGitHubToken();
+  if (!token) throw new Error('GitHub authentication is not configured for the internal Actions control plane.');
   return token;
 }
 
@@ -79,7 +78,7 @@ async function dispatchGithubWorkflow(
   workflow: string,
 ): Promise<Response> {
   const token = await githubToken();
-  const repository = process.env.GITHUB_REPOSITORY?.trim() || 'elevate-for-humanity/Elevate-lms';
+  const repository = 'elevate-for-humanity/Elevate-lms';
   const api = `https://api.github.com/repos/${repository}`;
   const headers = {
     Accept: 'application/vnd.github+json',
@@ -154,17 +153,30 @@ async function dispatchToolRequest(
     const request = new NextRequest(url, init);
     return tool.method === 'GET' ? route.GET(request) : route.POST(request);
   }
+  if (tool.name === 'browser.launch') {
+    const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/session/route');
+    return POST(new NextRequest(url, init));
+  }
   if (tool.name === 'workflows.runTests') {
     return dispatchGithubWorkflow('ci.yml');
   }
   if (tool.name === 'deployments.autopilot') {
-    return dispatchGithubWorkflow('deploy-production.yml');
+    const input = JSON.parse(typeof init.body === 'string' ? init.body : '{}');
+    const target = input.target ?? 'admin';
+    if (typeof target !== 'string' || !['admin','marketing','lms','store','course-builder'].includes(target)) {
+      return Response.json({error:'Unsupported Google deployment target'}, {status:400});
+    }
+    return Response.json(await dispatchGoogleDeployment(target as GoogleDeployTarget), {status:202});
   }
   if (tool.name === 'studio.engineering.execute') {
     const { POST } = await import(
       '@/apps/admin/app/api/admin/dev-studio/engineering/route'
     );
     return POST(new NextRequest(url, init));
+  }
+  if (tool.name === 'courses.status') {
+    const { GET } = await import('@/apps/admin/app/api/admin/ultimate-course-builder/route');
+    return GET(new NextRequest(url, init));
   }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(
@@ -292,7 +304,7 @@ export async function executeRegisteredAITool(
     };
   }
 
-  if (!tool.allowedAgents.includes(context.agent)) {
+  if (!canAgentUseTool(tool, context.agent)) {
     await emitAuditEvent(tool, context, input, 'blocked', { reason: 'agent_not_authorized' });
     return {
       ok: false,

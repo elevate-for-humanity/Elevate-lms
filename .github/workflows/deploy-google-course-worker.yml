@@ -1,0 +1,219 @@
+name: Deploy Google Course Builder on source changes
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/resilience/**'
+      - 'lib/industry/**'
+      - 'lib/onet/**'
+      - 'lib/apprenticeship/registered-program-contract.ts'
+      - 'lib/compliance/appendix-a-standards.ts'
+      - 'lib/curriculum/blueprints/**'
+      - 'lib/supabase/admin.ts'
+      - 'lib/supabase/timed-fetch.ts'
+      - 'lib/media/licensed-course-media.ts'
+      - 'lib/config/**'
+      - 'lib/cloudflare-r2.ts'
+      - 'lib/logger.ts'
+      - 'lib/secrets.ts'
+      - 'server/video-generator/visual-intelligence.ts'
+      - 'public/**'
+      - 'docs/ultimate-course-builder/lessons/**'
+      - '.dockerignore'
+      - 'scripts/gcp/dispatch-course-job.mjs'
+      - 'scripts/gcp/execute-course-job.mjs'
+      - 'tests/integration/google-lesson-author.test.ts'
+      - 'tests/unit/ultimate-registered-profile.test.ts'
+      - 'tests/unit/ultimate-renderer-assignments.test.mjs'
+      - 'tests/worker/**'
+      - 'workers/**'
+      - 'lib/ultimate-course-builder/**'
+      - 'lib/video/**'
+      - 'lib/ai/**'
+      - 'lib/storage/**'
+      - 'remotion-src/**'
+      - 'packages/ultimate-course-worker/**'
+      - 'scripts/gcp/preflight-billing.mjs'
+      - 'scripts/gcp/preflight-billing.test.mjs'
+      - 'Dockerfile.ultimate-worker'
+      - 'tsconfig.ultimate-worker.json'
+      - 'scripts/gcp/deploy-course-job.mjs'
+      - 'scripts/gcp/prepare-course-authoring-access.mjs'
+      - 'scripts/gcp/prepare-course-authoring-access.test.mjs'
+      - 'scripts/gcp/audit-course-production.mjs'
+      - 'scripts/gcp/audit-course-production.test.mjs'
+      - 'workers/admin-speech-cache.mjs'
+      # Workflow-only orchestration edits do not require rebuilding the worker image.
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  authoring-access:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Prepare minimal prediction access for the existing course identity
+        run: |
+          node --test scripts/gcp/prepare-course-authoring-access.test.mjs
+          node scripts/gcp/prepare-course-authoring-access.mjs
+      - name: Read existing worker authoring access
+        run: |
+          node --test scripts/gcp/audit-course-production.test.mjs
+          node scripts/gcp/audit-course-production.mjs
+
+      - name: Check generated-photo service identity without exposing credentials
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          const task=job.spec.template.spec.template.spec;
+          console.log(JSON.stringify({teachingPhotoProvider:'google',courseServiceIdentityConfigured:Boolean(task.serviceAccountName)}));
+          NODE
+  dispatch:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && false)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch Google-trusted workflow event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-course-worker.yml/dispatches" -f ref=main
+  build:
+    concurrency:
+      group: google-course-worker-image
+      cancel-in-progress: true
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # .dockerignore excludes federation credential files from the build context.
+      - name: Show federated identity claim context
+        run: |
+          echo "repository=$GITHUB_REPOSITORY"
+          echo "ref=$GITHUB_REF"
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "workflow_ref=$GITHUB_WORKFLOW_REF"
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Check billing before building worker image
+        run: node scripts/gcp/preflight-billing.mjs
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
+      - name: Build existing CPU Course Builder image
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker build -f Dockerfile.ultimate-worker -t "elevate-ultimate-worker:$GITHUB_SHA" .
+      - name: Verify worker boundaries inside the actual photo-capable image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint node \
+            -v "$PWD/tests:/app/tests:ro" \
+            -v "$PWD/workers:/app/workers:ro" \
+            -v "$PWD/scripts:/app/scripts:ro" \
+            -v "$PWD/docs:/app/docs:ro" \
+            -v "$PWD/.github:/app/.github:ro" \
+            -v "$PWD/packages:/app/packages:ro" \
+            -v "$PWD/Dockerfile.ultimate-worker:/app/Dockerfile.ultimate-worker:ro" \
+            -v "$PWD/.dockerignore:/app/.dockerignore:ro" \
+            "elevate-ultimate-worker:$GITHUB_SHA" --test tests/worker/continuous-course-execution.test.mjs lib/ultimate-course-builder/worker/continuous-course-lease.test.mjs tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/photo-cue-repair.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/renderer-fallback-source.test.mjs tests/worker/checkpoint-fallback.test.mjs tests/worker/progress-watch.test.mjs tests/worker/fresh-lesson-render-identity.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/worker/citation-repair.test.mjs tests/worker/source-grounding.test.mjs tests/worker/batch-write-deadline.test.mjs tests/worker/photo-format.test.mjs tests/worker/approved-frame-checks.test.mjs tests/worker/approved-repair-routing.test.mjs tests/worker/checkpoint-source-refresh.test.mjs tests/worker/approved-delivery.test.mjs lib/ultimate-course-builder/testing/source-path-precedence.test.mjs lib/ultimate-course-builder/testing/reviewed-photo-selection.test.mjs lib/ultimate-course-builder/instructional/vertex-response.test.mjs tests/worker/approved-motion-excerpt.test.mjs tests/worker/google-teaching-photo.test.mjs tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/worker/attach-lesson-media.test.mjs workers/course-publication-policy.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+      # Builds can outlive the federated token; refresh only after build acceptance.
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - name: Upload immutable worker image
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:$GITHUB_SHA"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag "elevate-ultimate-worker:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+      - name: Inspect existing target B2 media through the authorized runtime connection
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --test /app/scripts/gcp/inspect-course-media.test.mjs
+          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
+  deploy:
+    needs: build
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    concurrency:
+      group: google-course-runtime-operations
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      # Updating the job template does not cancel existing executions: their
+      # tasks retain their execution's image digest. Keep the launch overlap
+      # guard in the dispatcher, so deployment cannot launch a second worker.
+      - name: Deploy exact finite worker and verify configuration readback
+        env:
+          IMAGE_SHA: ${{ github.sha }}
+        run: node scripts/gcp/deploy-course-job.mjs
+      - name: Synchronize approved regional worker image and verify readback
+        run: node scripts/gcp/sync-course-worker-regions.mjs
+      - name: Dispatch course work in the approved secondary region
+        env:
+          COURSE_WORKER_PARALLELISM: '1'
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {dispatchApprovedRegionalCourses} from './scripts/gcp/continue-approved-regional-courses.mjs';
+          console.log(JSON.stringify(await dispatchApprovedRegionalCourses()));
+          NODE
+      - name: Record deployment boundary
+        run: |
+          echo 'Exact CPU worker image deployed and dispatcher invoked. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Read worker resource and failure evidence without exposing credentials
+        run: |
+          node --test scripts/gcp/audit-course-production.test.mjs
+          node scripts/gcp/audit-course-production.mjs
+

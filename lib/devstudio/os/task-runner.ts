@@ -124,7 +124,10 @@ export async function createAiTask(
   input: CreateTaskInput,
   runtime: TaskExecutionRuntimeContext = { actorRoles: [] },
 ) {
-  const command = `${input.title} ${input.description ?? ''} ${input.command ?? ''}`.trim();
+  // Plan metadata describes the overall goal, not this step's executable intent.
+  // Keep it on the task record without letting it select another operational tool.
+  const command = input.command?.trim() ||
+    `${input.title} ${input.description ?? ''}`.trim();
   const executionMode = input.executionMode ?? 'automatic';
   const plannedTool = planAIToolFromCommand(command, {
     toolName: input.toolName,
@@ -678,6 +681,11 @@ export async function runTaskExecution(
       /PAID_INFERENCE_AUTHORIZATION_REQUIRED|API[_\s-]?(?:KEY|TOKEN).*(?:MISSING|NOT CONFIGURED|REQUIRED)|NO CREDENTIALS|CAPABILITY.*NOT CONNECTED/i.test(
         message,
       );
+    // Keep the authorization gate intact, but present an actionable dashboard
+    // message instead of leaking an internal provider error code.
+    const displayMessage = /PAID_INFERENCE_AUTHORIZATION_REQUIRED/.test(message)
+      ? 'AI task requires an approved paid-inference request. Review the AI authorization and budget settings before retrying; no provider call was authorized.'
+      : message;
     const terminalStatus = capabilityBlocked ? 'blocked' : 'failed';
     if (executeStep) {
       await db
@@ -685,8 +693,8 @@ export async function runTaskExecution(
         .update({
           status: terminalStatus,
           completed_at: capabilityBlocked ? null : new Date().toISOString(),
-          error_message: message,
-          output: message,
+          error_message: displayMessage,
+          output: displayMessage,
         })
         .eq('id', executeStep.id);
     }
@@ -694,7 +702,7 @@ export async function runTaskExecution(
       .from('ai_tasks')
       .update({
         status: terminalStatus,
-        error_message: message,
+        error_message: displayMessage,
         completed_at: capabilityBlocked ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -704,8 +712,8 @@ export async function runTaskExecution(
       db,
       taskId,
       capabilityBlocked
-        ? `Task blocked because its required capability is unavailable: ${message}`
-        : `Task execution error: ${message}`,
+        ? `Task blocked because its required capability is unavailable: ${displayMessage}`
+        : `Task execution error: ${displayMessage}`,
       capabilityBlocked ? 'warn' : 'error',
       executeStep?.id,
       runtime.tenantId ?? task.tenant_id,
@@ -826,48 +834,4 @@ export async function recoverStaleAiTasks(
     recovered += 1;
   }
   return recovered;
-}
-
-export async function rollbackTask(
-  db: SupabaseClient,
-  taskId: string,
-  actorId: string,
-): Promise<void> {
-  const { data: task } = await db.from('ai_tasks').select('*').eq('id', taskId).single();
-  if (!task) throw new Error('Task not found');
-
-  const { data: snapshots } = await db
-    .from('ai_file_snapshots')
-    .select('id, repo_path, snapshot_type')
-    .eq('task_id', taskId)
-    .eq('snapshot_type', 'before');
-
-  await db
-    .from('ai_tasks')
-    .update({
-      status: 'rolled_back',
-      completed_at: new Date().toISOString(),
-      result_json: { rolled_back: true, snapshots: snapshots?.length ?? 0 },
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', taskId);
-
-  await setAgentStatus(db, task.agent_id, 'idle');
-  await appendTaskLog(
-    db,
-    taskId,
-    `Task marked rolled back (${snapshots?.length ?? 0} snapshots referenced)`,
-    'warn',
-    undefined,
-    task.tenant_id,
-    actorId,
-  );
-
-  await writeDevAuditLog(db, {
-    actorId,
-    action: 'task.rollback',
-    resourceType: 'ai_tasks',
-    resourceId: taskId,
-    traceId: task.trace_id,
-  });
 }

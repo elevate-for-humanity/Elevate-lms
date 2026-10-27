@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default function StudentSupportSchedulePage() {
-  const phoneHref = `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`;
+  const phoneHref = `tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`;
 
   return (
     <div className="min-h-screen bg-white">
@@ -22,7 +22,7 @@ export default function StudentSupportSchedulePage() {
         description="Need help with course content, study skills, exam preparation, or your learning plan? Contact student support and we will route the request to the appropriate instructor or staff member."
         actions={(
           <>
-            <a href={phoneHref} className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700"><Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.supportPhone}</a>
+            <a href={phoneHref} className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700"><Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.mainPhone}</a>
             <Link href="/support/contact" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Support Request</Link>
           </>
         )}
@@ -66,7 +66,7 @@ export default function StudentSupportSchedulePage() {
           <h2 className="mb-4 text-2xl font-bold text-slate-950">Need Support?</h2>
           <p className="mb-8 text-slate-700">Contact the Elevate team and include your program and the topic you need help with.</p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <a href={phoneHref} className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800"><Phone className="h-4 w-4" /> {PLATFORM_DEFAULTS.supportPhone}</a>
+            <a href={phoneHref} className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800"><Phone className="h-4 w-4" /> {PLATFORM_DEFAULTS.mainPhone}</a>
             <a href="mailto:support@elevateforhumanity.org" className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-slate-300 bg-white px-8 py-4 font-bold text-slate-800 transition-colors hover:border-slate-500"><Mail className="h-4 w-4" /> Email Support</a>
           </div>
         </div>

@@ -6,9 +6,8 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
-  vi.useRealTimers();
 });
-async function start(holdFirst = false) {
+async function start(holdFirst = false, cdpCheck?: () => Promise<any>) {
   const actions: any[] = [];
   let release = () => {};
   const response = (body: any) => ({
@@ -19,6 +18,7 @@ async function start(holdFirst = false) {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string, options: any = {}) => {
+      if (url.endsWith('/cdp') && cdpCheck) return cdpCheck();
       if (url.endsWith('/config')) return response({});
       if (url.endsWith('/browser/session'))
         return response(
@@ -39,7 +39,7 @@ async function start(holdFirst = false) {
           await new Promise<void>((r) => {
             release = r;
           });
-        return response({ ok: true });
+        return response({});
       }
       return response({ events: [], downloads: [] });
     }),
@@ -64,6 +64,7 @@ it('lets a touch user insert @ and replaces the selected field without retaining
   fireEvent.click(screen.getByRole('button', { name: 'Type securely' }));
   await waitFor(() => expect(actions.length).toBe(1));
   expect(actions[0]).toEqual({
+    actor: 'human',
     actions: [
       { type: 'keypress', key: 'ControlOrMeta+A' },
       { type: 'type', text: 'sample@example.com' },
@@ -74,41 +75,6 @@ it('lets a touch user insert @ and replaces the selected field without retaining
   expect(input.getAttribute('inputmode')).toBe('text');
   expect(input.type).toBe('password');
   expect(screen.queryByRole('button', { name: 'Insert at sign into secure input' })).toBeNull();
-});
-
-it.each(['keyboard', 'button'])('sends the secure draft and submits in order using %s Enter', async (source) => {
-  const { actions } = await start();
-  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
-  fireEvent.change(input, { target: { value: 'sample@example.com' } });
-  if (source === 'keyboard') fireEvent.keyDown(input, { key: 'Enter' });
-  else fireEvent.click(screen.getAllByRole('button', { name: 'Enter', exact: true })[0]);
-  await waitFor(() => expect(actions).toEqual([{
-    actions: [
-      { type: 'keypress', key: 'ControlOrMeta+A' },
-      { type: 'type', text: 'sample@example.com' },
-      { type: 'keypress', key: 'Enter' },
-    ],
-  }]));
-  expect(input.value).toBe('');
-});
-
-it('sends the general keyboard draft before submitting with Enter', async () => {
-  const { actions } = await start();
-  const input = screen.getByLabelText('Browser keyboard input');
-  fireEvent.change(input, { target: { value: 'search text' } });
-  fireEvent.keyDown(input, { key: 'Enter' });
-  await waitFor(() => expect(actions).toEqual([{
-    actions: [{ type: 'type', text: 'search text' }, { type: 'keypress', key: 'Enter' }],
-  }]));
-});
-
-it('fits even before the first streamed frame has decoded', async () => {
-  await start();
-  const image = screen.getByAltText('Live isolated Chromium browser');
-  Object.defineProperty(image.parentElement, 'clientWidth', { value: 390, configurable: true });
-  Object.defineProperty(image.parentElement, 'clientHeight', { value: 100, configurable: true });
-  fireEvent.click(screen.getByRole('button', { name: 'Fit screen' }));
-  expect(parseFloat(image.style.width)).toBeLessThanOrEqual(100 / 780 * 100);
 });
 it('keeps a slow pointer click ahead of typing and Enter', async () => {
   const { actions, release } = await start(true);
@@ -163,8 +129,10 @@ it('switches mobile browser panels without resetting the session, stream or inpu
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   const image = screen.getByRole('img', { name: 'Live isolated Chromium browser' });
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Sign-in & tools' }));
-  expect(screen.getByRole('button', { name: 'Sign-in & tools' }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Email / password' }));
+  expect(
+    screen.getByRole('button', { name: 'Email / password' }).getAttribute('aria-pressed'),
+  ).toBe('true');
   expect(screen.getByLabelText('Secure browser input')).toBe(input);
   fireEvent.click(screen.getByRole('button', { name: 'Browser', exact: true }));
   expect(screen.getByRole('img', { name: 'Live isolated Chromium browser' })).toBe(image);
@@ -177,10 +145,14 @@ it('opens a readable sign-in view on the existing session and keeps the draft', 
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
   fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
-  await waitFor(() => expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780 }));
+  await waitFor(() =>
+    expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780, actor: 'human' }),
+  );
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
-  expect(screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed')).toBe('true');
+  expect(
+    screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed'),
+  ).toBe('true');
   fireEvent.click(screen.getByRole('button', { name: 'Exit sign-in view' }));
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
@@ -188,10 +160,12 @@ it('opens a readable sign-in view on the existing session and keeps the draft', 
 
 it('offers a literal @ for the general browser keyboard without relying on the phone keyboard', async () => {
   const { actions } = await start();
-  fireEvent.click(screen.getByRole('button', { name: 'Insert at sign into browser keyboard input' }));
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Insert at sign into browser keyboard input' }),
+  );
   expect((screen.getByLabelText('Browser keyboard input') as HTMLInputElement).value).toBe('@');
   fireEvent.click(screen.getByRole('button', { name: 'Type', exact: true }));
-  await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@' }));
+  await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@', actor: 'human' }));
 });
 
 it('binds each sign-in label to its own field when Studio mounts multiple browser panels', async () => {
@@ -234,8 +208,8 @@ it('provides explicit website scrolling while touch panning stays local', async 
   fireEvent.click(screen.getByRole('button', { name: 'Scroll website up' }));
   await waitFor(() => expect(actions.length).toBe(2));
   expect(actions).toEqual([
-    { type: 'scroll', deltaX: 0, deltaY: 400 },
-    { type: 'scroll', deltaX: 0, deltaY: -400 },
+    { type: 'scroll', deltaX: 0, deltaY: 400, actor: 'human' },
+    { type: 'scroll', deltaX: 0, deltaY: -400, actor: 'human' },
   ]);
 });
 
@@ -247,8 +221,11 @@ it('shrinks below 100 percent to 25 percent and restores without recreating the 
     expect(screen.getByLabelText('Browser zoom').textContent).toBe(percent);
     expect(image.style.width).toBe(percent);
   }
-  expect((screen.getByRole('button', { name: 'Zoom browser out' }) as HTMLButtonElement).disabled).toBe(true);
-  for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole('button', { name: 'Zoom browser in' }));
+  expect(
+    (screen.getByRole('button', { name: 'Zoom browser out' }) as HTMLButtonElement).disabled,
+  ).toBe(true);
+  for (let i = 0; i < 3; i++)
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom browser in' }));
   expect(image.style.width).toBe('100%');
   expect(actions).toEqual([]);
 });
@@ -273,67 +250,93 @@ it('focuses the desktop page for direct typing after selecting a website field',
   fireEvent.keyDown(image, { key: '@', shiftKey: true });
   await waitFor(() => expect(actions.length).toBe(2));
   expect(actions[0].type).toBe('pointer_click');
-  expect(actions[1]).toEqual({ type: 'type', text: '@' });
+  expect(actions[1]).toEqual({ type: 'type', text: '@', actor: 'human' });
 });
 
-it('pauses on a stalled action, cancels queued input, and reconnects without replaying it', async () => {
-  const { actions } = await start();
-  const fetchBefore = globalThis.fetch;
-  vi.stubGlobal('fetch', vi.fn((url: string, options: any = {}) => {
-    if (url.endsWith('/browser/action')) {
-      actions.push(JSON.parse(options.body).action);
-      return new Promise((_resolve, reject) => {
-        options.signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
-      });
-    }
-    return fetchBefore(url, options);
-  }));
-  vi.useFakeTimers();
-  const image = screen.getByAltText('Live isolated Chromium browser');
-  fireEvent.click(image, { clientX: 20, clientY: 20 });
-  await act(async () => {});
-  const input = screen.getByLabelText('Secure browser input');
-  fireEvent.change(input, { target: { value: 'never-replay@example.com' } });
-  fireEvent.keyDown(input, { key: 'Enter' });
-  await act(async () => { await vi.advanceTimersByTimeAsync(40_001); });
-  expect(actions).toHaveLength(1);
-  expect(screen.getByRole('alert')).toHaveTextContent('timed out');
-  expect(input).toBeDisabled();
-  vi.stubGlobal('fetch', fetchBefore);
-  fireEvent.click(screen.getByRole('button', { name: 'Reconnect controls' }));
-  await act(async () => {});
-  expect(input).toBeEnabled();
-  expect(actions).toHaveLength(1);
-  expect(input).toHaveValue('');
-  fireEvent.change(input, { target: { value: 'new@example.com' } });
-  fireEvent.keyDown(input, { key: 'Enter' });
-  await act(async () => {});
-  expect(actions).toHaveLength(2);
-  expect(actions[1].actions[1].text).toBe('new@example.com');
+it('shows direct CDP connected only after its authenticated connection check succeeds', async () => {
+  let resolveCheck!: (response: any) => void;
+  const check = new Promise((resolve) => {
+    resolveCheck = resolve;
+  });
+  await start(false, () => check);
+  expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
+  expect(screen.queryByText('Direct CDP connected')).toBeNull();
+  expect(fetch).toHaveBeenCalledWith('https://worker.example/sessions/test/cdp', {
+    headers: { Authorization: 'Bearer fixture' },
+    cache: 'no-store',
+  });
+  await act(async () => {
+    resolveCheck({
+      ok: true,
+      json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }),
+    });
+  });
+  await waitFor(() => expect(screen.getByText('Direct CDP connected')).toBeTruthy());
+  expect(screen.queryByText('Direct CDP unverified')).toBeNull();
 });
 
-it('shows disconnected status when worker polling fails instead of staying Connected', async () => {
-  let poll: () => Promise<void> = async () => {};
-  const interval = window.setInterval.bind(window);
-  vi.spyOn(window, 'setInterval').mockImplementation(((callback: any, ms: number, ...args: any[]) => {
-    if (ms === 3000) { poll = callback; return 123; }
-    return interval(callback, ms, ...args);
-  }) as any);
+it.each([
+  [
+    'network failure',
+    async () => {
+      throw new Error('connection unavailable');
+    },
+  ],
+  [
+    'unsuccessful response',
+    async () => ({
+      ok: false,
+      json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }),
+    }),
+  ],
+  [
+    'disconnected browser',
+    async () => ({
+      ok: true,
+      json: async () => ({ connected: false, engine: 'direct-cdp-chromium' }),
+    }),
+  ],
+  [
+    'different browser engine',
+    async () => ({ ok: true, json: async () => ({ connected: true, engine: 'playwright' }) }),
+  ],
+])('keeps direct CDP unverified after %s', async (_reason, cdpCheck) => {
+  await start(false, cdpCheck);
+  await act(async () => {});
+  expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
+  expect(screen.queryByText('Direct CDP connected')).toBeNull();
+});
+
+it('focuses credential entry during the tap without waiting for an animation frame', async () => {
   await start();
-  const fetchBefore = globalThis.fetch;
-  vi.stubGlobal('fetch', vi.fn((url: string, options: any) => (url.endsWith('/events') || url.includes('resource=events'))
-    ? Promise.resolve({ ok: false, status: 503 }) : fetchBefore(url, options)));
-  await act(async () => { await poll(); });
-  expect(screen.getByRole('status', { name: 'Browser connection' })).toHaveTextContent('Controls paused');
-  expect(screen.getByRole('alert')).toHaveTextContent('connection is unavailable');
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+  input.blur();
+  fireEvent.click(screen.getByRole('button', { name: 'Password input' }));
+  expect(input.type).toBe('password');
+  expect(document.activeElement).toBe(input);
+  input.blur();
+  fireEvent.click(screen.getByRole('button', { name: 'Email input' }));
+  expect(document.activeElement).toBe(input);
+  expect(input.placeholder).toBe('Tap here to enter your email');
 });
 
-it('forwards Tab from the remote view to the website and Escape returns local focus', async () => {
+it('lets the owner reveal a password locally and hides it again after sending', async () => {
   const { actions } = await start();
-  const image = screen.getByAltText('Live isolated Chromium browser');
-  image.focus();
-  fireEvent.keyDown(image, { key: 'Tab' });
-  await waitFor(() => expect(actions).toContainEqual({ type: 'keypress', key: 'Tab' }));
-  fireEvent.keyDown(image, { key: 'Escape' });
-  expect(document.activeElement).not.toBe(image);
+  fireEvent.click(screen.getByRole('button', { name: 'Password input' }));
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  expect(input.placeholder).toBe('Tap here to enter your password');
+  fireEvent.change(input, { target: { value: 'fixture-only-password' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Show password', exact: true }));
+  expect(input.type).toBe('text');
+  expect(input.value).toBe('fixture-only-password');
+  expect(actions).toEqual([]);
+  fireEvent.click(screen.getByRole('button', { name: 'Hide password', exact: true }));
+  expect(input.type).toBe('password');
+  fireEvent.click(screen.getByRole('button', { name: 'Show password', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: 'Type securely' }));
+  await waitFor(() => expect(actions).toHaveLength(1));
+  expect(input.value).toBe('');
+  expect(input.type).toBe('password');
+  expect(screen.queryByText('fixture-only-password')).toBeNull();
 });

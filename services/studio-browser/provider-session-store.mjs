@@ -10,6 +10,32 @@ export class ProviderSessionStore {
     this.directory = directory;
     this.states = new Map();
   }
+  async checkReadiness() {
+    if (!this.directory) return { ready: true, persistent: false, mode: 'memory' };
+    if (!this.key) return { ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_encryption_unavailable' };
+    if (this.readinessInFlight) return this.readinessInFlight;
+    this.readinessInFlight = (async () => {
+      let probe, handle;
+      try {
+        await fs.mkdir(this.directory, { recursive: true, mode: 0o700 });
+        probe = path.join(this.directory, '.readiness-' + crypto.randomUUID());
+        handle = await fs.open(probe, 'wx', 0o600);
+        // Only fixed, nonsecret probe bytes. Exercise actual writes, not access()
+        // permissions, so read-only volumes and full disks cannot appear ready.
+        await handle.writeFile('studio-provider-storage-probe');
+        await handle.sync();
+        await handle.close(); handle = undefined;
+        await fs.unlink(probe); probe = undefined;
+        return { ready: true, persistent: true, mode: 'encrypted-disk' };
+      } catch {
+        return { ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_storage_unavailable' };
+      } finally {
+        await handle?.close().catch(() => undefined);
+        if (probe) await fs.unlink(probe).catch(() => undefined);
+      }
+    })().finally(() => { this.readinessInFlight = undefined; });
+    return this.readinessInFlight;
+  }
   scope(ownerId, target) {
     const host = new URL(target).hostname;
     return typeof ownerId === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(ownerId) &&
@@ -38,14 +64,19 @@ export class ProviderSessionStore {
   }
   async save(scope, context) {
     if (!scope) return;
-    const source = await context.storageState();
+    if (this.directory && !this.key) throw new Error('PROVIDER_SESSION_ENCRYPTION_UNAVAILABLE');
+    // Provider authentication can live in IndexedDB as well as cookies and
+    // localStorage. Preserve it in the same encrypted, account-scoped state.
+    const source = await context.storageState({ indexedDB: true });
     const isEnvato = host => host === 'envato.com' || host.endsWith('.envato.com');
     const state = {
       cookies: source.cookies.filter(cookie => isEnvato(cookie.domain.replace(/^\./, ''))),
       origins: source.origins.filter(origin => isEnvato(new URL(origin.origin).hostname)),
     };
-    this.states.set(scope, state);
-    if (!this.directory || !this.key) return;
+    if (!this.directory) {
+      this.states.set(scope, state);
+      return;
+    }
     await fs.mkdir(this.directory, { recursive: true, mode: 0o700 });
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv('aes-256-gcm', this.key, iv);
@@ -53,7 +84,13 @@ export class ProviderSessionStore {
     const data = Buffer.concat([cipher.update(JSON.stringify(state)), cipher.final()]);
     const target = this.file(scope);
     const temporary = target + '.' + crypto.randomUUID();
-    await fs.writeFile(temporary, JSON.stringify({ iv: iv.toString('base64'), tag: cipher.getAuthTag().toString('base64'), data: data.toString('base64') }), { mode: 0o600 });
-    await fs.rename(temporary, target);
+    try {
+      await fs.writeFile(temporary, JSON.stringify({ iv: iv.toString('base64'), tag: cipher.getAuthTag().toString('base64'), data: data.toString('base64') }), { mode: 0o600 });
+      await fs.rename(temporary, target);
+      // Only advertise a checkpoint after external persistence succeeds.
+      this.states.set(scope, state);
+    } finally {
+      await fs.unlink(temporary).catch(() => undefined);
+    }
   }
 }

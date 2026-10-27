@@ -14,7 +14,7 @@ export default async function MeetingRoomPage({ params }: { params: Promise<{ ro
   const db = await requireAdminClient();
   const { data: room } = await db
     .from('communication_rooms')
-    .select('id,title,status,communication_workspaces!inner(tenant_id)')
+    .select('id,title,status,allow_screen_share,communication_workspaces!inner(tenant_id)')
     .eq('id', roomId)
     .maybeSingle();
   const workspace = Array.isArray((room as any)?.communication_workspaces)
@@ -40,7 +40,7 @@ export default async function MeetingRoomPage({ params }: { params: Promise<{ ro
         </p>
         <h1 className="text-2xl font-black">{room.title}</h1>
       </div>
-      <MeetingRoom roomId={room.id} />
+      <MeetingRoom roomId={room.id} allowScreenShare={room.allow_screen_share} />
     </main>
   );
 }

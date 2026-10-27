@@ -33,6 +33,9 @@ describe('existing Studio media request',()=>{
     expect(second?.gapCount).toBe(2);
     expect(runs[0].command).toContain(input.gaps[0].visualRequirement);
     expect(runs[0].command).toContain('Do not purchase');
+    expect(runs[0].command).toContain('app.envato.com and elements.envato.com');
+    expect(runs[0].command).toContain('Envato Elements is the subscription library');
+    expect(runs[0].command).toContain('never use Envato Market');
   });
   it('does not create a browser request for a fully covered lesson',async()=>{
     const {db,runs}=database();

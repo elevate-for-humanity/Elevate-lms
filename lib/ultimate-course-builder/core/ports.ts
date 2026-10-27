@@ -12,6 +12,7 @@ export interface UltimatePersistencePort {
   }): Promise<{
     artifacts: Record<string, unknown>;
     passedSteps: string[];
+    recoveredSteps?: UltimateBuildStep[];
     findings: UltimateInstructionalFinding[];
   }>;
   recordStep(input: {
@@ -91,6 +92,7 @@ export interface UltimateLearnerRuntimeEvidence {
 }
 export interface UltimateLearnerRuntimePort {
   verify(input: {
+    lessonBuildId: string;
     courseId: string;
     lessonId: string;
     videoUrl: string;

@@ -13,6 +13,8 @@ export type ApprenticePolicyKey =
 export const APPRENTICE_TIMECLOCK_RULES = [
   'Clock in only after you arrive at your approved Host Shop or job site and your device confirms you are inside its geofence.',
   'Clock out before you leave the approved geofence. Do not wait until you are driving or already home.',
+  'An off-site clock-out is blocked. Without an accepted on-site clock-out, your day\'s hours are not automatically activated or credited; attendance must be reviewed before hours can be approved. Leaving the clock running while away does not earn training hours.',
+  'Use Start Lunch before a lunch break and End Lunch when training resumes. Record lunch before leaving and after returning if you go off-site. Lunch is excluded from training hours.',
   `If you remain outside the geofence for ${APPRENTICE_TIME_POLICY.outsideGeofenceGraceMinutes} continuous minutes, the system may automatically clock you out. No time after that clock-out is accepted.`,
   'If the app will not clock you out while you are still onsite, take a screenshot and contact Elevate and your supervisor immediately. Include the date, clock-in time, and actual clock-out time.',
   `OJL/hands-on work is limited to ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours} hours per week.`,

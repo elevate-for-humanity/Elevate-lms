@@ -109,7 +109,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               value={formData.phone}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-              placeholder="(317) 314-3757"
+              placeholder="(463) 240-1404"
             />
           </div>
           <div>

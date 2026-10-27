@@ -6,8 +6,6 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Status reads use the same Admin origin as input. A visible image alone does
-// not prove that a cross-origin authenticated fetch can reach the worker.
 export async function GET(req: NextRequest) {
   return proxySession(req, 'GET');
 }
@@ -29,7 +27,7 @@ async function proxySession(req: NextRequest, method: 'GET' | 'DELETE') {
     (method === 'GET' && resource !== 'events' && resource !== 'downloads')
   ) {
     return NextResponse.json(
-      { error: 'A valid browser session and status resource are required' },
+      { error: 'A valid browser session and resource are required' },
       { status: 400 },
     );
   }
@@ -48,8 +46,7 @@ async function proxySession(req: NextRequest, method: 'GET' | 'DELETE') {
       cache: 'no-store',
       signal: AbortSignal.timeout(6000),
     });
-    const payload = await response.json();
-    return NextResponse.json(payload, {
+    return NextResponse.json(await response.json(), {
       status: response.status,
       headers: { 'cache-control': 'no-store' },
     });

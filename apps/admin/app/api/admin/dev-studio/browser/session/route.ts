@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
+import { browserConfiguration } from '@/lib/devstudio/browser-configuration';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function configuration() {
-  const internalUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  const publicUrl = (
-    process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL ||
-    process.env.STUDIO_BROWSER_PUBLIC_URL ||
-    ''
-  ).replace(/\/$/, '');
-  const secret = process.env.STUDIO_BROWSER_SECRET || '';
-  return { internalUrl, publicUrl, secret, configured: !!(internalUrl && publicUrl && secret) };
+  return browserConfiguration(process.env);
 }
 
 export async function GET(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+  await hydrateProcessEnv();
   const config = configuration();
   if (!config.configured) return NextResponse.json({ configured: false, ready: false });
   try {
@@ -27,7 +23,7 @@ export async function GET(req: NextRequest) {
       signal: AbortSignal.timeout(5000),
     });
     const health = await response.json();
-    return NextResponse.json({ configured: true, ready: response.ok, health });
+    return NextResponse.json({ configured: true, ready: response.ok && health?.ready === true, health });
   } catch (error) {
     logger.warn('[studio-browser] Health check failed', {
       error: error instanceof Error ? error.message : String(error),
@@ -43,6 +39,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+  await hydrateProcessEnv();
   const config = configuration();
   if (!config.configured) {
     return NextResponse.json(
@@ -59,39 +56,12 @@ export async function POST(req: NextRequest) {
         cache: 'no-store',
         signal: AbortSignal.timeout(120000),
       });
-      const evidence = await response.json().catch(() => null);
-      if (!evidence || !Array.isArray(evidence.checks)) {
-        const reason =
-          evidence?.error === 'session_capacity_reached'
-            ? 'All browser slots are occupied. Close an unused Studio browser session and run the check again.'
-            : `The worker did not return browser test evidence (HTTP ${response.status}).`;
-        return NextResponse.json(
-          {
-            passed: false,
-            error: reason,
-            checks: [{ name: 'worker_verification', passed: false, reason }],
-          },
-          { status: response.ok ? 502 : response.status },
-        );
-      }
+      const evidence = await response.json();
       return NextResponse.json(evidence, { status: response.status });
-    } catch (error) {
-      const timeout =
-        !!error &&
-        typeof error === 'object' &&
-        'name' in error &&
-        ['TimeoutError', 'AbortError'].includes(String(error.name));
-      const reason = timeout
-        ? 'The worker verification exceeded two minutes. No passing result was recorded.'
-        : 'Admin could not reach the worker verification endpoint. Check the Studio browser connection.';
-      logger.warn('[studio-browser] Verification failed', { timeout });
+    } catch {
       return NextResponse.json(
-        {
-          passed: false,
-          error: reason,
-          checks: [{ name: 'worker_verification', passed: false, reason }],
-        },
-        { status: timeout ? 504 : 503 },
+        { error: 'Live browser acceptance could not finish' },
+        { status: 503 },
       );
     }
   }

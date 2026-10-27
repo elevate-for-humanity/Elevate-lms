@@ -63,8 +63,8 @@ export function PushNotificationSettings() {
       const registration = await navigator.serviceWorker.ready;
       await registration.showNotification('Test Notification', {
         body: `This is a test notification from ${PLATFORM_DEFAULTS.orgName}`,
-        icon: '/images/icon-192x192.png',
-        badge: '/images/icon-72.png',
+        icon: '/icon-192x192.png',
+        badge: '/icon-72.png',
         vibrate: [200, 100, 200],
         tag: 'test',
       });

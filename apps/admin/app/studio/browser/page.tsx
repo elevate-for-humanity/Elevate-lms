@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useStudioViewport } from '@/components/studio/useStudioViewport';
 import { useEffect, useState } from 'react';
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 
 const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), {
   ssr: false,
@@ -55,6 +56,10 @@ export default function StudioBrowserPage() {
       className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
     >
       <nav aria-label="Studio access" className="flex shrink-0 flex-wrap items-center border-b border-slate-200">
+        <details className="max-h-[25dvh] overflow-y-auto px-3">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">Messages and alerts</summary>
+          <CommunicationTodos inboxPath="/phone/email" />
+        </details>
         <Link href="/dashboard" className="flex min-h-11 items-center px-4 text-base font-semibold">Admin dashboard</Link>
         <Link href="/studio/courses" className="flex min-h-11 items-center px-4 text-base font-semibold">Course Builder</Link>
       <Link
@@ -86,7 +91,7 @@ export default function StudioBrowserPage() {
           autoStart={Boolean(request) || envatoSignIn}
           autoRunTask={Boolean(request)}
           acquisitionRunId={request?.id || ''}
-          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://app.envato.com' : '')}
+          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://account.envato.com/sign_in' : '')}
           initialSignIn={envatoSignIn}
           initialTask={request?.command || ''}
         />

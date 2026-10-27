@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -110,18 +110,25 @@ const ENTRY_POINTS = [
 ] as const;
 
 export default function HeaderMobileMenu({ items, programApplyLinks = {} }: HeaderMobileMenuProps) {
+  const [interactive, setInteractive] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const pathname = usePathname();
+  const previousPathnameRef = useRef(pathname);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const previousOpenRef = useRef(false);
 
-  const closeMenu = () => {
+  // The streamed header can be visible before React attaches its handlers.
+  // Keep its trigger disabled until hydration so an early tap is never lost.
+  useEffect(() => { setInteractive(true); }, []);
+
+  const closeMenu = useCallback(() => {
     setIsOpen(false);
     setExpandedSection(null);
     setExpandedCategory(null);
-  };
+  }, []);
 
   const toggleSection = (key: string) =>
     setExpandedSection((previous) => {
@@ -131,15 +138,31 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
     });
 
   useEffect(() => {
-    closeMenu();
-  }, [pathname]);
+    const previousPathname = previousPathnameRef.current;
+    previousPathnameRef.current = pathname;
+    if (previousPathname && previousPathname !== pathname) closeMenu();
+  }, [pathname, closeMenu]);
 
   useEffect(() => {
-    if (isOpen) {
-      requestAnimationFrame(() => firstFocusRef.current?.focus());
-    } else {
-      requestAnimationFrame(() => triggerRef.current?.focus());
-    }
+    if (!isOpen) return;
+    const closeAtDesktopWidth = () => {
+      if (window.innerWidth >= 1180) closeMenu();
+    };
+    window.addEventListener('resize', closeAtDesktopWidth);
+    closeAtDesktopWidth();
+    return () => window.removeEventListener('resize', closeAtDesktopWidth);
+  }, [isOpen, closeMenu]);
+
+  useEffect(() => {
+    const wasOpen = previousOpenRef.current;
+    previousOpenRef.current = isOpen;
+    // Restore focus after an actual dismissal, never on the initial page load.
+    if (!isOpen && !wasOpen) return;
+    const frame = requestAnimationFrame(() => {
+      if (isOpen) firstFocusRef.current?.focus();
+      else triggerRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [isOpen]);
 
   useEffect(() => {
@@ -162,11 +185,11 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       document.body.style.overflow = '';
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [isOpen]);
+  }, [isOpen, closeMenu]);
 
   const drawer = isOpen
     ? createPortal(
-        <div className="fixed inset-0 z-[10000] bg-slate-950/50 lg:hidden">
+        <div className="fixed inset-0 z-[10000] bg-slate-950/50 min-[1180px]:hidden">
           <button
             className="absolute inset-0 h-full w-full cursor-default"
             onClick={closeMenu}
@@ -400,6 +423,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       <button
         ref={triggerRef}
         type="button"
+        disabled={!interactive}
         onClick={() => setIsOpen((open) => !open)}
         className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}

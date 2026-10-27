@@ -18,7 +18,7 @@ describe('PARIS dashboard introduction', () => {
   });
 
   it('greets the authenticated program holder by name', () => {
-    expect(platformShell).toContain('personName={user.full_name || user.first_name || null}');
+    expect(platformShell).toContain('personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}');
     expect(chat).toContain("Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS");
   });
 
@@ -44,9 +44,9 @@ describe('PARIS dashboard introduction', () => {
     expect(chat).not.toContain('Check your device media volume');
   });
 
-  it('routes live PARIS narration through Cloudflare rather than OpenAI', () => {
+  it('routes live PARIS narration through the current Google speech adapter', () => {
     const route = fs.readFileSync(path.resolve('lib/ai/natural-voice-route.ts'), 'utf8');
-    expect(route).toContain('generateCloudflareNaturalVoice');
+    expect(route).toContain('generateGoogleNaturalVoice');
     expect(route).not.toContain('gpt-4o-mini-tts');
     expect(route).not.toContain('getOpenAIClient');
   });

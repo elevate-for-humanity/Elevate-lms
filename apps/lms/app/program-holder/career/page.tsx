@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import Image from 'next/image';
 import { BriefcaseBusiness, ClipboardCheck, GraduationCap } from 'lucide-react';
 import JobCard from '@/components/jobs/JobCard';
@@ -11,11 +12,12 @@ export const metadata = {
 };
 
 export default async function ProgramHolderCareerPage() {
-  const jobs = await getActiveJobs({ limit: 12 });
+  await requireProgramHolder();
+  const jobs = await getActiveJobs({ limit: 12, throwOnError: true });
   return (
     <main className="space-y-6 px-4 py-6 sm:px-6">
       <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
-        <Image src="/images/pages/community-page-2.webp" alt="" fill priority sizes="100vw" className="object-cover opacity-30" />
+        <Image src="/images/pages/career-services-page-11.webp" alt="Career planning meeting" fill priority sizes="100vw" className="object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/65" />
         <div className="relative p-6 sm:p-9">
         <BriefcaseBusiness className="h-9 w-9 text-blue-200" />
@@ -36,7 +38,7 @@ export default async function ProgramHolderCareerPage() {
       </section>
       {jobs.length ? (
         <section className="grid gap-4 lg:grid-cols-2">
-          {jobs.map((job) => <JobCard key={job.id} job={job} href="/program-holder/career" />)}
+          {jobs.map((job) => <JobCard key={job.id} job={job} href={`/program-holder/career/${job.id}`} />)}
         </section>
       ) : (
         <section className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-700 shadow-sm">

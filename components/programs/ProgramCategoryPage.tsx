@@ -87,7 +87,7 @@ export default function ProgramCategoryPage({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero — video frame only, no text overlay */}
-      <section className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
         <UltraVideoPlayer
           src={heroVideoSrc}
           autoPlayOnMount
@@ -97,7 +97,7 @@ export default function ProgramCategoryPage({
           enableProgressTracking={false}
           enableResume={false}
           aspectRatio="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </section>
 
@@ -187,7 +187,7 @@ export default function ProgramCategoryPage({
                     src={program.image}
                     alt={program.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain  transition-transform duration-500"
                     quality={85}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
                   />
@@ -221,8 +221,7 @@ export default function ProgramCategoryPage({
             Ready to Start Your {categoryName} Career?
           </h2>
           <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-            Most students qualify for free training through WIOA funding. Apply today and start your
-            new career path.
+            Funding varies by program and participant. Review the exact program record and rely on agency funding only after written authorization.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

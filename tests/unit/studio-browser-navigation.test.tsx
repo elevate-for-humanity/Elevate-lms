@@ -10,11 +10,19 @@ afterEach(() => {
 
 it('keeps a typed destination through event polling and navigates the worker to that destination', async () => {
   let poll: () => Promise<void> = async () => {};
-  const interval = window.setInterval.bind(window);
-  vi.spyOn(window, 'setInterval').mockImplementation((callback: any, ms: any, ...args: any[]) => {
-    if (ms === 3000) { poll = callback; return 123; }
-    return interval(callback, ms, ...args);
-  });
+  const originalInterval = window.setInterval.bind(window);
+  vi.spyOn(window, 'setInterval').mockImplementation(((
+    callback: any,
+    ms: number,
+    ...args: any[]
+  ) => {
+    // Capture only worker polling. Testing Library also uses setInterval to retry assertions.
+    if (ms === 3000) {
+      poll = callback;
+      return 123;
+    }
+    return originalInterval(callback, ms, ...args);
+  }) as typeof window.setInterval);
   const requested: any[] = [];
   let workerUrl = 'https://www.elevateforhumanity.org/';
   const response = (body: unknown) => ({
@@ -35,13 +43,15 @@ it('keeps a typed destination through event polling and navigates the worker to 
           viewport: { width: 1440, height: 900 },
         });
       if (url.endsWith('/browser/session')) return response({ configured: true, ready: true });
-      if ((url.endsWith('/events') || url.includes('resource=events'))) return response({ events: [], url: workerUrl });
-      if ((url.endsWith('/downloads') || url.includes('resource=downloads'))) return response({ downloads: [] });
+      if (url.endsWith('/events') || url.includes('resource=events'))
+        return response({ events: [], url: workerUrl });
+      if (url.endsWith('/downloads') || url.includes('resource=downloads'))
+        return response({ downloads: [] });
       if (url.endsWith('/browser/action')) {
         const body = JSON.parse(options.body);
         requested.push(body);
         workerUrl = body.action.url;
-        return response({ ok: true, url: workerUrl });
+        return response({ url: workerUrl });
       }
       return response({});
     }),
@@ -58,11 +68,13 @@ it('keeps a typed destination through event polling and navigates the worker to 
   expect(address).toHaveValue('https://app.envato.com/workspaces');
   fireEvent.click(screen.getByRole('button', { name: 'Go', exact: true }));
   await waitFor(() =>
-    expect(requested).toEqual([{
-      sessionId: 'session',
-      sessionToken: 'test-token',
-      action: { type: 'navigate', url: 'https://app.envato.com/workspaces' },
-    }]),
+    expect(requested).toEqual([
+      {
+        sessionId: 'session',
+        sessionToken: 'test-token',
+        action: { type: 'navigate', url: 'https://app.envato.com/workspaces', actor: 'human' },
+      },
+    ]),
   );
   await act(async () => {
     await poll();

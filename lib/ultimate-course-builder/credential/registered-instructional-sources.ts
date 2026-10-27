@@ -1,3 +1,4 @@
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { barberApprenticeshipBlueprint } from '@/lib/curriculum/blueprints/barber';
 
 const BARBER_SOURCE_LESSONS: Record<string, string[]> = {
@@ -50,7 +51,8 @@ export function registeredInstructionalSources(programSlug: string) {
       module.lessons.map((lesson) => [lesson.slug, { module: module.title, lesson }] as const),
     ),
   );
-  return Object.entries(BARBER_SOURCE_LESSONS).map(([competencyId, lessonSlugs]) => {
+  const order = getRegisteredProgramStandard(programSlug)!.standard.competencies.map(c => c.id);
+  return Object.entries(BARBER_SOURCE_LESSONS).sort(([a], [b]) => order.indexOf(a) - order.indexOf(b)).map(([competencyId, lessonSlugs]) => {
     const text = lessonSlugs
       .map((slug) => {
         const entry = lessons.get(slug);

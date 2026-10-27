@@ -1,0 +1,52 @@
+name: Activate the verified Studio browser replacement
+on:
+  workflow_dispatch:
+    inputs:
+      close_sessions:
+        description: Close the four owner-approved old browser sessions before cutover
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  activate:
+    if: github.ref == 'refs/heads/main' && vars.GOOGLE_RELEASE_HOLD != 'true'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    concurrency:
+      # This workflow only switches an existing revision's traffic. It does not
+      # build, deploy or allocate regional CPU/memory, like Admin activation.
+      group: google-studio-browser-runtime-operations
+      queue: max
+      cancel-in-progress: false
+    env:
+      STUDIO_CANDIDATE_REVISION: elevate-studio-browser-00045-wer
+      IMAGE_SHA: 711c558f9db9db1ed59d98972338f806584b1002
+      STUDIO_SOURCE_REVISION: elevate-studio-browser-00039-yuv
+      STUDIO_SOURCE_SHA: 23b4762710a6d5704205825fa51fd003434c430f
+      STUDIO_CLOSE_APPROVED_SESSIONS: ${{ inputs.close_sessions && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact main-branch candidate and cutover failure protections
+        run: |
+          git merge-base --is-ancestor "$IMAGE_SHA" HEAD
+          node --test scripts/gcp/activate-studio-browser-candidate.test.mjs scripts/gcp/inventory-studio-live-state.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify candidate, close approved sessions, and switch existing traffic
+        run: node scripts/gcp/activate-studio-browser-candidate.mjs

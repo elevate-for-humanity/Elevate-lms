@@ -1,8 +1,12 @@
 /** Shared server data for /programs — Supabase is the only publication source. */
 import type { Metadata } from 'next';
+import { getEnchantedHeartsProgram } from '@/lib/partners/enchanted-hearts';
 import { createPublicClient } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { loadPublishedProgramsListing, type ProgramsListingItem } from '@/lib/programs/load-program-catalog';
+import {
+  loadPublishedProgramsListing,
+  type ProgramsListingItem,
+} from '@/lib/programs/load-program-catalog';
 import {
   getProgramFundingTier,
   getPublicFundingLabels,
@@ -42,6 +46,8 @@ const CATEGORY_LABELS: Readonly<Record<string, string>> = {
 
 export type ProgramsPageRow = {
   slug: string;
+  detailHref?: string;
+  applicationHref?: string;
   title: string;
   description: string | null;
   category: string;
@@ -76,10 +82,20 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
   for (const program of listing) {
     const slug = getCanonicalPublicProgramSlug(program.slug);
     const verified = getVerifiedProgramFunding(slug);
+    const healthcare = getEnchantedHeartsProgram(slug);
     rows.set(slug, {
-      slug,
+      slug: healthcare?.publicSlug ?? slug,
+      ...(healthcare
+        ? {
+            detailHref: `/programs/healthcare-training/${healthcare.publicSlug}`,
+            applicationHref: `/enroll/${healthcare.programId}?partner=healthcare-training`,
+          }
+        : {}),
       title: verified?.title ?? program.title,
-      description: sanitizePublicFundingDescription(slug, verified?.description ?? program.description),
+      description: sanitizePublicFundingDescription(
+        slug,
+        verified?.description ?? program.description,
+      ),
       category: getPublicProgramCategoryLabel(verified?.category ?? program.sectionKey),
       duration: verified?.duration ?? program.duration,
       credential: verified?.credential ?? program.credential,
@@ -107,7 +123,9 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
     });
   }
 
-  return [...rows.values()].sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
+  return [...rows.values()].sort(
+    (a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title),
+  );
 }
 
 export async function getPublicProgramsPageData(): Promise<PublicProgramsPageData> {
@@ -129,8 +147,19 @@ export async function buildProgramsListingMetadata(): Promise<Metadata> {
     title: { absolute: 'Career Training Programs | Elevate for Humanity' },
     description,
     alternates: { canonical },
-    openGraph: { title: 'Career Training Programs | Elevate for Humanity', description, url: canonical, siteName: PLATFORM_DEFAULTS.orgName, type: 'website', locale: 'en_US' },
-    twitter: { card: 'summary_large_image', title: 'Career Training Programs | Elevate for Humanity', description },
+    openGraph: {
+      title: 'Career Training Programs | Elevate for Humanity',
+      description,
+      url: canonical,
+      siteName: PLATFORM_DEFAULTS.orgName,
+      type: 'website',
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Career Training Programs | Elevate for Humanity',
+      description,
+    },
   };
 }
 

@@ -100,7 +100,7 @@ export const estheticsConfig: ProgramConfig = {
     {
       name: 'Jennifer Chen',
       role: 'Medical Esthetician',
-      photo: '/images/beauty/esthetician-hero.webp',
+      photo: '/images/programs/esthetician-host-recruitment-2026.webp',
       bio: 'Former dermatology nurse now leading our esthetics program. Expert in clinical skincare treatments.',
       credentials: ['Licensed Esthetician', 'Certified Medical Esthetician', 'PCA Skin Certified'],
     },

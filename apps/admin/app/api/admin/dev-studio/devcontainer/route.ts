@@ -1,3 +1,4 @@
+import { studioRepository } from '@/lib/devstudio/repository';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import {
@@ -19,7 +20,7 @@ const DEVCONTAINER_PATH = '.devcontainer/devcontainer.json';
 const MAX_CONTENT_BYTES = 64 * 1024;
 
 function getRepo() {
-  return (process.env.GITHUB_REPO || DEFAULT_REPO).trim() || DEFAULT_REPO;
+  return studioRepository();
 }
 
 function getBranch() {

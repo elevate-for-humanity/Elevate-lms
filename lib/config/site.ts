@@ -19,9 +19,14 @@ export const siteConfig = {
 
   // Contact
   phone: {
+    display: PLATFORM_DEFAULTS.mainPhone,
+    href: 'tel:+14632401404',
+    e164: '+14632401404',
+  },
+  technicalSupport: {
     display: PLATFORM_DEFAULTS.supportPhone,
-    href: 'tel:+13173143757',
-    e164: '+13173143757',
+    href: 'tel:+14632401404',
+    e164: '+14632401404',
   },
   email: {
     general: 'elevate4humanityedu@gmail.com',

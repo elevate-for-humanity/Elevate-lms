@@ -1,41 +1,23 @@
-FROM node:22-bookworm-slim
+# The approved CPU narration/alignment runtime is immutable and already smoke-tested.
+# Source changes replace the complete builder; no lesson output/checkpoint is copied.
+FROM us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:c3ff77f903eeb1621312d295fa05cb380b60ccc513028955fa00f98ca4159d35
 WORKDIR /app
-ENV NODE_ENV=production REMOTION_BROWSER_EXECUTABLE=/usr/bin/chromium
-RUN apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg tesseract-ocr ca-certificates && rm -rf /var/lib/apt/lists/*
-# Standalone worker dependency contract: do not load the monorepo workspace/root manifest.
-COPY packages/ultimate-course-worker/package.json ./package.json
-RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
-COPY workers/ultimate-course-builder.ts ./workers/ultimate-course-builder.ts
+COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
-COPY lib/ai ./lib/ai
-COPY lib/resilience ./lib/resilience
-COPY lib/industry ./lib/industry
-COPY lib/onet/soc-map.ts lib/onet/client.ts ./lib/onet/
-COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
-COPY lib/compliance/appendix-a-standards.ts ./lib/compliance/appendix-a-standards.ts
-COPY lib/curriculum/blueprints/types.ts ./lib/curriculum/blueprints/types.ts
-COPY lib/curriculum/blueprints/barber ./lib/curriculum/blueprints/barber
-COPY lib/supabase/admin.ts lib/supabase/timed-fetch.ts ./lib/supabase/
-COPY tsconfig.ultimate-worker.json ./tsconfig.json
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
-COPY lib/config ./lib/config
 COPY lib/video ./lib/video
-COPY lib/cloudflare-r2.ts ./lib/cloudflare-r2.ts
-COPY lib/storage/file-storage.ts ./lib/storage/file-storage.ts
-COPY lib/logger.ts lib/secrets.ts ./lib/
-COPY server/video-generator/visual-intelligence.ts ./server/video-generator/visual-intelligence.ts
 COPY remotion-src ./remotion-src
-COPY public ./public
-# The standalone worker is a plain Node runtime, not a React Server Component.
-# Strip Next's compile-time-only marker inside this image so Remotion receives
-# the standard React export (including createContext).
-RUN find lib server -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
-RUN node -e "require.resolve('@supabase/supabase-js');require.resolve('@remotion/renderer');require.resolve('tsx')"  && test ! -d node_modules/stripe && test ! -d node_modules/next && test ! -d node_modules/@sentry
-# Cache the Apache-licensed neural narrator in the image so runtime does not depend on a TTS API or model download.
-RUN node --input-type=module -e "const {KokoroTTS}=await import('kokoro-js');await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'})"
-# Lazy media adapters are the worker's production boundary. Resolve them in the
-# image build so a missing shared renderer file cannot reach a live course job.
-RUN node --import=tsx -e "await Promise.all([import('./lib/ultimate-course-builder/adapters/platform-narration.ts'),import('./lib/ultimate-course-builder/adapters/platform-renderer.ts'),import('./lib/video/media-director.ts'),import('./lib/video/remotion-render.ts'),import('kokoro-js')])"
-# Verify the standalone image resolves every startup import before deployment.
-RUN (NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co SUPABASE_SERVICE_ROLE_KEY=probe timeout 5 node --import=tsx workers/ultimate-course-builder.ts > /tmp/ultimate-start.log 2>&1 || true) && (grep -q 'polling loop started' /tmp/ultimate-start.log || (cat /tmp/ultimate-start.log && exit 1))
+COPY lib/storage ./lib/storage
+COPY lib/ai ./lib/ai
+COPY docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json ./docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
+COPY tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts ./tests/integration/
+COPY tests/worker/narration-storage-reference.test.mjs ./tests/worker/
+RUN find lib -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
+RUN node --test lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs && node --import=tsx --test tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts
+RUN node --test tests/worker/narration-storage-reference.test.mjs
+# Compile the actual copied composition so an inherited renderer cannot silently
+# survive a source release. This is compilation, not learner/media approval.
+RUN node --input-type=module -e "import {bundle} from '@remotion/bundler'; import {rm} from 'node:fs/promises'; const output=await bundle({entryPoint:'/app/remotion-src/index.ts',publicDir:'/app/public'}); await rm(output,{recursive:true,force:true});"
+RUN node workers/local-speech-smoke.mjs
+RUN node --import=tsx -e "await Promise.all([import('./lib/ultimate-course-builder/adapters/platform-narration.ts'),import('./lib/ultimate-course-builder/adapters/platform-renderer.ts'),import('./lib/ultimate-course-builder/core/full-course-runner.ts'),import('./lib/ultimate-course-builder/worker/process-job.ts')])"
 CMD ["node","--import=tsx","workers/ultimate-course-builder.ts"]

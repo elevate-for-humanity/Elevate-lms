@@ -57,19 +57,23 @@ export async function resumeMediaDependency(
   if (!stored.length) return [];
   const { data: builds, error } = await db
     .from('ultimate_course_builds')
-    .select('id')
+    .select('id,status')
     .eq('course_id', courseId)
-    .neq('status', 'published');
+    // Historical builds share a course ID. A new import must resume the
+    // current build once, not render every superseded attempt again.
+    .order('created_at', { ascending: false })
+    .limit(1);
   if (error) throw error;
   const queue = new UltimateJobQueue(db);
   const jobs = [];
-  for (const build of builds ?? [])
-    jobs.push(
-      await queue.enqueue(build.id, {
+  for (const build of builds ?? []) {
+    if (build.status === 'published') continue;
+    const job = await queue.enqueue(build.id, {
         dependencyResume: 'licensed_media_attached',
         lessonIds: [...new Set(stored.flatMap((f) => f.lessonIds))],
         assetIds: stored.map((f) => f.id),
-      }),
-    );
+      });
+    if (job) jobs.push(job);
+  }
   return jobs;
 }

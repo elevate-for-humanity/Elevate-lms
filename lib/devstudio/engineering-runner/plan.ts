@@ -1,3 +1,5 @@
+import { affirmativeActionText } from '@/lib/ai/command-intent';
+
 export type EngineeringRunnerId =
   | 'studio-engineering'
   | 'openhands'
@@ -70,7 +72,7 @@ export function buildUnifiedEngineeringStages(goal: string): EngineeringStageSpe
     previous = 'browser-qa';
   }
 
-  if (DEPLOY_RE.test(goal)) {
+  if (DEPLOY_RE.test(affirmativeActionText(goal))) {
     stages.push({
       id: 'deploy',
       title: 'Deploy the verified build',

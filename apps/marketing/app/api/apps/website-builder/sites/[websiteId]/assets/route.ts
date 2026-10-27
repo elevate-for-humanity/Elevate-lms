@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -36,7 +37,7 @@ export async function POST(
     .select('id, user_id')
     .eq('id', websiteId)
     .maybeSingle();
-  if (!site || site.user_id !== user.id) {
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) {
     return NextResponse.json({ error: 'Website not found' }, { status: 404 });
   }
 

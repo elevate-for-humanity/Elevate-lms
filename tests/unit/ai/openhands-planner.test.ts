@@ -76,6 +76,18 @@ describe('engineering delegation', () => {
     expect(planned).toEqual({ name: 'openhands.status', input: { taskId: 'task-123' } });
   });
 
+  it('does not dispatch course generation for a read-only production audit', () => {
+    const command =
+      'Read-only audit: inspect Course Builder status, saved checkpoints, worker heartbeat, and Studio browser readiness for build 572cca43-6bd6-4a91-b385-a8b576209c4e. Do not modify jobs, reset attempts, generate assets, or publish content.';
+    const planned = planAIToolFromCommand(command, {
+      buildId: '572cca43-6bd6-4a91-b385-a8b576209c4e',
+    });
+    expect(planned).toEqual({
+      name: 'courses.status',
+      input: { buildId: '572cca43-6bd6-4a91-b385-a8b576209c4e' },
+    });
+  });
+
   it('keeps Course Builder generation on the canonical course tool', () => {
     const planned = planAIToolFromCommand('Build the Business Administration course');
     expect(planned?.name).toBe('courses.generate');

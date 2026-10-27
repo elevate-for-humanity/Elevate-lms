@@ -112,7 +112,7 @@ function AIAdvisorChat({ onClose }: { onClose: () => void }) {
         ...prev,
         {
           role: 'ai',
-          content: "Based on your question, I'd recommend exploring our Barbering or HVAC programs. Both offer paid apprenticeships with no upfront cost through WIOA funding. Would you like me to help you check your eligibility?",
+          content: "Explore our barber apprenticeship or HVAC training pages for the requirements that fit your goals. Apprenticeship tuition is self-pay only. Would you like to compare the program details?",
         },
       ]);
     }, 1000);
@@ -125,7 +125,7 @@ function AIAdvisorChat({ onClose }: { onClose: () => void }) {
         ...prev,
         {
           role: 'ai',
-          content: "Great question! We offer programs in healthcare, skilled trades, beauty, and technology. Each includes paid apprenticeships and funding options. Which field interests you most?",
+          content: "Great question! We offer programs in healthcare, skilled trades, beauty, and technology. Apprenticeship programs are self-pay only; tuition and payment terms are listed on each program page. Which field interests you most?",
         },
       ]);
     }, 1000);

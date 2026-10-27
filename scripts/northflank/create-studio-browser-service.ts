@@ -70,7 +70,7 @@ async function ensureAuthVolume(): Promise<string> {
 function servicePayload(volumeId: string) {
   return {
   name: serviceId,
-  description: 'Isolated Playwright Chromium runtime for canonical Admin Dev Studio',
+  description: 'Isolated direct CDP Chromium runtime for canonical Admin Dev Studio',
   billing: { deploymentPlan: 'nf-compute-200' },
   // Chromium runs with --disable-dev-shm-usage, so no /dev/shm reservation is
   // needed. Omitting it also keeps this service within the project allowance.

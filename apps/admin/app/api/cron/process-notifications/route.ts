@@ -1,6 +1,10 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { processNotificationQueue, getQueueStats } from '@/lib/notifications/processor';
+import {
+  processNotificationQueue,
+  getQueueStats,
+  NOTIFICATION_DELIVERY_CONTRACT,
+} from '@/lib/notifications/processor';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -27,13 +31,18 @@ async function _POST(request: NextRequest) {
   try {
     const result = await processNotificationQueue();
 
-    return NextResponse.json({
-      success: true,
-      ...result,
-      timestamp: new Date().toISOString(),
-    });
+    const success = result.errors.length === 0 && result.failed === 0;
+    return NextResponse.json(
+      {
+        success,
+        deliveryContract: NOTIFICATION_DELIVERY_CONTRACT,
+        ...result,
+        timestamp: new Date().toISOString(),
+      },
+      { status: success ? 200 : 503 },
+    );
   } catch (error: any) {
-    logger.error('Notification processing error:', error);
+    logger.error('Notification processing failed');
     return NextResponse.json(
       {
         success: false,
@@ -62,6 +71,7 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       stats,
+      deliveryContract: NOTIFICATION_DELIVERY_CONTRACT,
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {

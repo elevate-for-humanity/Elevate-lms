@@ -78,4 +78,29 @@ const failures = [
 ].filter(Boolean);
 
 if (failures.length) throw new Error(failures.join('; '));
-console.log(`Studio Browser linkage verified for ${adminServiceId} and ${browserServiceId}.`);
+console.info(`Studio Browser linkage verified for ${adminServiceId} and ${browserServiceId}.`);
+
+if (process.argv.includes('--ultimate')) {
+  const [lms, worker] = await Promise.all([
+    nfFetch<Service>(projectApiPath(projectId, '/services/elevate-lms')),
+    nfFetch<Service>(projectApiPath(projectId, '/services/elevate-ultimate-worker')),
+  ]);
+  const lmsEnv = lms.runtimeEnvironment ?? {};
+  const workerEnv = worker.runtimeEnvironment ?? {};
+  const learnerSecret = browserEnv.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;
+  const learnerEndpoint = `${String(expectedUrl).replace(/\/$/, '')}/learner/runthrough`;
+  const mismatches = [
+    !learnerSecret && 'Browser learner-test credential is missing',
+    learnerSecret !== lmsEnv.ULTIMATE_LEARNER_RUNTHROUGH_SECRET && 'LMS/Browser learner-test credentials do not match',
+    learnerSecret !== workerEnv.ULTIMATE_LEARNER_RUNTHROUGH_SECRET && 'Ultimate/Browser learner-test credentials do not match',
+    workerEnv.ULTIMATE_LEARNER_RUNTHROUGH_URL !== learnerEndpoint && 'Ultimate worker is not connected to the existing Browser learner endpoint',
+    browserEnv.STUDIO_LEARNER_LMS_URL !== 'https://app.elevateforhumanity.org' && 'Browser learner target is not the canonical LMS',
+  ].filter(Boolean);
+  if (mismatches.length) throw new Error(mismatches.join('; '));
+  // GET-only deployment inspection; never provision, restart, or alter credentials.
+  const health = await fetch(`${String(expectedUrl).replace(/\/$/, '')}/health`, {
+    signal: AbortSignal.timeout(20000),
+  });
+  if (!health.ok) throw new Error(`Existing Browser health failed: HTTP ${health.status}`);
+  console.info('Ultimate worker, LMS, Admin, and Browser connection configuration agrees; existing Browser is reachable.');
+}

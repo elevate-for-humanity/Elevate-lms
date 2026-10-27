@@ -251,9 +251,10 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification',
+    silent: data.silent === true,
     icon: `${CDN}/icons/student-192.png`,
     badge: `${CDN}/icons/student-192.png`,
-    vibrate: [100, 50, 100],
+    ...(data.silent === true ? {} : { vibrate: [100, 50, 100] }),
     tag: data.tag || 'elevate-lms',
     renotify: true,
     data: { url: data.url || '/', type: data.type },

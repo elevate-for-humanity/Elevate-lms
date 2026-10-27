@@ -1,5 +1,6 @@
 'use client';
 
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 import { offlineQueue } from '@/lib/pwa/offline-queue';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -361,7 +362,7 @@ export default function TimeclockPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Action failed');
+        setError(data.message || data.error || 'Action failed');
         setActionLoading(null);
         return;
       }
@@ -481,7 +482,7 @@ export default function TimeclockPage() {
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-md mx-auto px-4">
         {/* Nav strip */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/apprentice"
             className="inline-flex items-center text-slate-700 hover:text-slate-900"
@@ -489,7 +490,7 @@ export default function TimeclockPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Dashboard
           </Link>
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs">
             <Link
               href="/apprentice/timeclock/history"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg transition"
@@ -538,6 +539,8 @@ export default function TimeclockPage() {
             </div>
           </div>
 
+          <TimeclockAttendanceNotice />
+
           {/* Hours Progress */}
           <div className="mb-6 p-3 bg-brand-blue-50 rounded-lg">
             <div className="flex justify-between text-sm mb-1">
@@ -548,7 +551,7 @@ export default function TimeclockPage() {
             </div>
             <div className="w-full bg-brand-blue-200 rounded-full h-2">
               <div
-                className="bg-white h-2 rounded-full transition-all"
+                className="h-2 rounded-full bg-brand-blue-600 transition-all"
                 style={{
                   width: `${context.hoursRequired > 0 ? Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100) : 0}%`,
                 }}

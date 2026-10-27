@@ -3,8 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const CDL_TRAINING: ProgramSchema = {
   slug: 'cdl-training',
   title: 'CDL Training Program (Class A & Class B)',
-  subtitle:
-    'Get licensed. Get hired. Get on the road fast with job placement support.',
+  subtitle: 'Get licensed. Get hired. Get on the road fast with job placement support.',
   sector: 'skilled-trades',
   category: 'Transportation',
   programType: 'workforce',
@@ -14,7 +13,7 @@ export const CDL_TRAINING: ProgramSchema = {
   videoSrc: '/videos/cdl-hero.mp4',
 
   deliveryMode: 'hybrid',
-  deliveredBy: 'Elevate',
+  deliveredBy: 'Partner',
   durationWeeks: 6,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
@@ -24,7 +23,7 @@ export const CDL_TRAINING: ProgramSchema = {
     examPrep: 20,
     careerPlacement: 10,
   },
-  schedule: 'Mon–Fri, 30–40 hours per week (accelerated format)',
+  schedule: 'Full-time and part-time options; admissions confirms your training schedule',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
     'WIOA funding available for eligible Indiana residents. Covers tuition, DOT physical, drug screen, and CDL exam fees when approved. Eligibility not guaranteed. Self-pay: $5,000.',
@@ -315,7 +314,7 @@ export const CDL_TRAINING: ProgramSchema = {
       city: 'Indianapolis',
       state: 'IN',
       status: 'active' as const,
-      note: 'Primary training facility — behind-the-wheel range on site',
+      note: 'Class A partner: 5284 E 23rd St, Indianapolis, IN 46218; other tracks confirmed by Elevate admissions',
     },
     {
       city: 'Texas',
@@ -327,8 +326,7 @@ export const CDL_TRAINING: ProgramSchema = {
 
   jobPlacement: {
     headline: 'Job Placement Support',
-    description:
-      'Students are connected to employment opportunities starting during training.',
+    description: 'Students are connected to employment opportunities starting during training.',
     features: [
       'Resume and interview preparation',
       'Employer introductions',
@@ -340,7 +338,8 @@ export const CDL_TRAINING: ProgramSchema = {
     'Training vehicle provided. CDL exam fees, DOT physical, and drug screen included with funding.',
   modality:
     'Hybrid — Online theory via LMS, in-person behind-the-wheel training at Indianapolis facility',
-  facilityInfo: 'Elevate training center and driving range, Indianapolis',
+  facilityInfo:
+    'Partner training location: 5284 E 23rd St, Indianapolis, IN 46218. Coordinate your arrival through Elevate admissions.',
   employerPartners: [
     'Werner Enterprises',
     'Schneider National',
@@ -355,10 +354,10 @@ export const CDL_TRAINING: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA funding available for eligible Indiana residents. Self-pay: $4,500 with payment plans available. Eligibility is determined through WorkOne.',
+    'WIOA funding available for eligible Indiana residents. Self-pay: $5,000; admissions confirms available payment arrangements before enrollment. Eligibility is determined through WorkOne.',
 
   // ─── Content model ──────────────────────────────────────────────
-  deliveryModel: 'internal',
+  deliveryModel: 'partner',
   deliveryModelDetail: 'internal_lms',
   fundingOptions: ['wioa', 'impact', 'self_pay'],
   enrollmentType: 'internal',
@@ -393,14 +392,14 @@ export const CDL_TRAINING: ProgramSchema = {
   ],
   metaTitle: 'CDL Training Program (Class A & Class B) | Elevate for Humanity',
   metaDescription:
-    'Get your CDL Class A or Class B license in 1–6 weeks. Job placement support. WIOA funding available for eligible Indiana residents. Indianapolis training facility.',
-
+    'Prepare for your CDL Class A license with hands-on partner training. Job placement support. WIOA funding available for eligible Indiana residents. Indianapolis training facility.',
 
   funding: {
     wioa_eligible: true,
     fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available. CDL-A/B certification program.',
+    fundingNotes:
+      'Indiana ETPL-listed. WIOA Title I and WRG funding available. CDL-A/B certification program.',
   },
 };

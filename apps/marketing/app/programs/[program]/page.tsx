@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -76,29 +77,29 @@ export default async function PublicProgramPage({
     ? {
         pageKey: resolved.slug,
         posterImage: resolved.heroImage,
-        microLabel: '5-Week Funded Business Training',
+        microLabel: '5-Week Business Training',
         belowHeroHeadline: 'Business & Entrepreneurship — 5 Weeks',
         belowHeroSubheadline:
-          'Indiana INTraining Program #10005173. Build entrepreneurship, small-business, customer service, retail operations, sales, and practical business-finance skills while preparing for ESB and Business of Retail industry credentials. Workforce funding may cover approved training costs for eligible participants with agency authorization.',
+          'Build entrepreneurship, small-business, customer service, retail operations, sales, and practical business-finance skills while preparing for ESB and Business of Retail credential assessments. Review the program page for the current tuition and payment disclosure.',
         primaryCta: {
           label: 'Apply Now',
           href: resolved.cta.applyHref,
           variant: 'primary',
         },
         secondaryCta: {
-          label: 'Check Funding Eligibility',
-          href: '/check-eligibility',
+          label: 'Review Payment Options',
+          href: '/tuition',
           variant: 'secondary',
         },
         trustIndicators: [
           '5-Week Program',
-          'INTraining #10005173',
-          'Funding Available for Eligible Participants',
+          'Program-specific tuition',
+          'Payment options disclosed before enrollment',
           'ESB + Business of Retail Credential Preparation',
         ],
         analyticsName: `program-${resolved.slug}`,
         transcript:
-          'Business and Entrepreneurship is a five-week Indiana workforce training program. Learners build entrepreneurship, small-business, customer service, retail operations, sales, pricing, profit, cash-flow, and business-planning skills while preparing for Entrepreneurship and Small Business and Business of Retail credential assessments. Funding requires participant eligibility and written agency authorization.',
+          'Business and Entrepreneurship is a five-week career training program. Learners build entrepreneurship, small-business, customer service, retail operations, sales, pricing, profit, cash-flow, and business-planning skills while preparing for Entrepreneurship and Small Business and Business of Retail credential assessments. Review the exact program page for current tuition and payment options.',
       }
     : configuredBanner?.pageKey
       ? configuredBanner
@@ -162,7 +163,7 @@ export default async function PublicProgramPage({
             </Link>
           ) : isBookkeepingProgram ? (
             <div className="w-full overflow-hidden bg-white">
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 src="/images/heroes/bookkeeping-accounting-financial-empowerment.png"
                 alt="Accounting and Financial Empowerment Career Pathway Program led by Dr. Carlina A. Wilkes"
                 width={1536}

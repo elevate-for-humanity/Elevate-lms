@@ -83,7 +83,7 @@ export default async function TimeclockPage({
   // ── Admin alerts (geofence violations, overtime, etc.) ───────────────────
   const { data: alerts } = await db
     .from('admin_alerts')
-    .select('id, alert_type, severity, details, resolved, created_at')
+    .select('id, alert_type, severity, apprentice_id, site_id, message, metadata, details, resolved, created_at')
     .eq('resolved', false)
     .in('alert_type', ['geofence_violation', 'overtime_warning', 'missing_clock_out', 'timeclock'])
     .order('created_at', { ascending: false })
@@ -94,6 +94,7 @@ export default async function TimeclockPage({
     ...active.map((r: any) => r.apprentice_id),
     ...dayRows.map((r: any) => r.apprentice_id),
     ...pending.map((r: any) => r.apprentice_id),
+    ...(alerts ?? []).map((a: any) => a.apprentice_id || a.metadata?.apprentice_id || a.details?.apprentice_id),
   ].filter(Boolean))];
 
   const { data: apprentices } = allApprenticeIds.length
@@ -117,6 +118,7 @@ export default async function TimeclockPage({
   const allSiteIds = [...new Set([
     ...active.map((r: any) => r.site_id),
     ...dayRows.map((r: any) => r.site_id),
+    ...(alerts ?? []).map((a: any) => a.site_id || a.metadata?.site_id || a.details?.site_id),
   ].filter(Boolean))];
 
   const { data: sites } = allSiteIds.length
@@ -452,10 +454,15 @@ export default async function TimeclockPage({
                     <AlertTriangle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${a.severity === 'warning' ? 'text-amber-600' : 'text-red-600'}`} />
                     <div>
                       <p className="font-semibold text-slate-900 text-sm capitalize">
-                        {a.alert_type.replace(/_/g, ' ')}
+                        {a.metadata?.student_name || a.details?.student_name || apprenticeMap[a.apprentice_id || a.metadata?.apprentice_id || a.details?.apprentice_id] || 'Unidentified student'} — {a.alert_type.replace(/_/g, ' ')}
                       </p>
-                      {a.details?.distance_m != null && (
-                        <p className="text-xs text-slate-600 mt-0.5">{Math.round(a.details.distance_m)}m from geofence</p>
+                      <p className="text-xs text-slate-600 mt-1">
+                        {a.metadata?.site_name || a.details?.site_name || siteMap[a.site_id || a.metadata?.site_id || a.details?.site_id] || 'Unknown site'}
+                        {(a.metadata?.action || a.details?.action) && ` · ${a.metadata?.action || a.details?.action}`}
+                      </p>
+                      {a.message && <p className="text-xs text-slate-600 mt-1">{a.message}</p>}
+                      {(a.metadata?.distance_m ?? a.details?.distance_m) != null && (
+                        <p className="text-xs text-slate-600 mt-0.5">{Math.round(a.metadata?.distance_m ?? a.details?.distance_m)}m from geofence</p>
                       )}
                       {a.details?.hours_elapsed != null && (
                         <p className="text-xs text-slate-600 mt-0.5">{Math.round(a.details.hours_elapsed * 10) / 10}h elapsed</p>

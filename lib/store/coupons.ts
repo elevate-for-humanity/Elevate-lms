@@ -2,7 +2,6 @@
  * Coupon Engine - Validation, Application, and Redemption
  */
 import { createClient } from '@/lib/supabase/server';
-import { getStripe } from '@/lib/stripe/client';
 
 export interface Coupon {
   id: string;
@@ -119,57 +118,17 @@ export async function validateCoupon(
   };
 }
 
-/**
- * Apply coupon to checkout and create Stripe coupon
- */
+/** Apply a coupon to the provider-neutral checkout amount. */
 export async function applyCouponToCheckout(
   code: string,
-  customerId: string,
-  userId?: string
-): Promise<{ stripeCouponId?: string; discount_amount_cents: number; error?: string }> {
+  _customerId: string,
+  userId?: string,
+): Promise<{ discount_amount_cents: number; error?: string }> {
   const validation = await validateCoupon(code, userId);
-  
   if (!validation.valid || !validation.coupon) {
     return { discount_amount_cents: 0, error: validation.error };
   }
-
-  const coupon = validation.coupon;
-  const stripe = getStripe();
-
-  if (!stripe) {
-    return { discount_amount_cents: 0, error: 'Payment processing not available' };
-  }
-
-  // Create Stripe coupon
-  let stripeCouponId: string | undefined;
-  
-  try {
-    const stripeCoupon = await stripe.coupons.create({
-      duration: 'once',
-      percent_off: coupon.discount_type === 'percentage' ? coupon.discount_value : undefined,
-      amount_off: coupon.discount_type === 'fixed' ? Math.round(coupon.discount_value * 100) : undefined,
-      currency: 'usd',
-      max_redemptions: coupon.max_redemptions 
-        ? coupon.max_redemptions - coupon.current_redemptions 
-        : undefined,
-      redeem_by: coupon.valid_until 
-        ? Math.floor(new Date(coupon.valid_until).getTime() / 1000) 
-        : undefined,
-      metadata: {
-        platform_coupon_id: coupon.id,
-        code: coupon.code,
-      },
-    });
-    stripeCouponId = stripeCoupon.id;
-  } catch (stripeError) {
-    console.error('Failed to create Stripe coupon:', stripeError);
-    // Continue without Stripe coupon - we'll handle discount server-side
-  }
-
-  return {
-    stripeCouponId,
-    discount_amount_cents: validation.discount_amount_cents || 0
-  };
+  return { discount_amount_cents: validation.discount_amount_cents || 0 };
 }
 
 /**
@@ -181,7 +140,7 @@ export async function recordCouponRedemption(
   checkoutSessionId: string,
   originalAmountCents: number,
   discountAmountCents: number,
-  stripeCouponId?: string
+  _providerCouponId?: string
 ): Promise<CouponRedemptionResult> {
   const supabase = await createClient();
 
@@ -203,7 +162,7 @@ export async function recordCouponRedemption(
       coupon_id: coupon.id,
       user_id: userId,
       checkout_session_id: checkoutSessionId,
-      stripe_coupon_id: stripeCouponId,
+      provider_coupon_id: _providerCouponId,
       discount_amount_cents: discountAmountCents,
       original_amount_cents: originalAmountCents,
       final_amount_cents: originalAmountCents - discountAmountCents,

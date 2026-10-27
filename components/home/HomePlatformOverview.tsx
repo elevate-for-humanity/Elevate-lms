@@ -6,13 +6,13 @@ const FEATURES = [
   {
     title: 'Train & Learn',
     body: 'Courses, assignments, progress tracking, credentials, and learner dashboards in one connected learning environment.',
-    image: '/images/pages/comp-pathway-classroom.webp',
+    image: '/images/training-providers-hero.webp',
     href: '/programs',
   },
   {
     title: 'Run Apprenticeships',
     body: 'Apprentice, host-site, OJL, RTI, document, competency, and progress workflows built around real program operations.',
-    image: '/images/pages/apprenticeship-sponsor-page-1.webp',
+    image: '/images/pages/barber-styling-hair.webp',
     href: '/apprenticeships',
   },
   {
@@ -49,8 +49,8 @@ export function HomePlatformOverview() {
           {FEATURES.map((feature) => (
             <Link key={feature.title} href={feature.href} className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
               <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                <Image src={feature.image} alt={feature.title} fill className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" aria-hidden="true" />
+                <Image src={feature.image} alt={feature.title} fill className="object-contain transition-transform duration-500 motion-safe:" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+
               </div>
               <div className="p-6">
                 <h3 className="text-2xl font-black text-slate-950">{feature.title}</h3>

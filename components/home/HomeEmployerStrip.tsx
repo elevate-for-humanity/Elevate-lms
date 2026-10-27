@@ -100,7 +100,7 @@ export function HomeEmployerStrip() {
               src="/images/pages/for-employers-page-1.webp"
               alt={`Employer partner meeting with ${PLATFORM_DEFAULTS.orgName} team`}
               fill
-              className="object-cover object-top"
+              className="object-contain object-top"
               sizes="(max-width: 1024px) 100vw, 50vw"
               loading="lazy"
               placeholder="empty"
@@ -125,7 +125,7 @@ export function HomeEmployerStrip() {
                   src={path.img}
                   alt={path.imgAlt}
                   fill
-                  className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  className="object-contain object-top transition-transform duration-500 "
                   sizes="(max-width: 768px) 100vw, 33vw"
                   loading="lazy"
                   placeholder="empty"

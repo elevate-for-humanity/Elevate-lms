@@ -28,13 +28,24 @@ import {
   useVideoConfig,
   Sequence,
   staticFile,
+  cancelRender,
 } from 'remotion';
+import { useLayoutEffect, useRef } from 'react';
+import { BlueprintTeachingGraphic } from './BlueprintTeachingGraphic';
 import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
-import { teachingVisualStepIndex, type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
+import { type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
+import { FOOTAGE_TITLE_BOX } from '../footage-title-layout.mjs';
+import { PremiumTeachingScene } from './PremiumTeachingScene';
+import { presentationBookendFrames, assertNarratedScenes } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 
 // ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 export interface SceneData {
+  wordAlignment?: Array<{word:string;start:number;end:number}>;
+  motionCue?: {startSeconds:number;endSeconds:number;observedAction:string;contentSha256:string};
+  pictureCues?: Array<{imageUrl:string;startSeconds:number;endSeconds:number;sha256:string;stepIndex:number}>;
+  recapStartSeconds?: number;
+  recapText?: string;
   scene_number: number;
   title: string;
   bullets: string[];
@@ -44,6 +55,9 @@ export interface SceneData {
   clipUrl: string | null;
   /** Resolved Pexels/Pollinations image URL */
   imageUrl: string | null;
+  /** The live blueprint draws this instructional graphic once, over a clean background. */
+  imageIsInstructional?: boolean;
+  physicalDemonstration?: boolean;
   /** Absolute path to per-scene MP3 audio */
   audioSrc: string | null;
   /** Duration in frames at the SlideLesson composition frame rate. */
@@ -52,13 +66,17 @@ export interface SceneData {
   sceneType?: string;
   memoryAnchor?: string;
   strictBlueprint?: boolean;
+  /** Optional scene-specific title scale produced by a verified readability repair. */
+  titleFontSize?: number;
   teachingVisual?: TeachingVisual;
 }
 
 export interface SlideLessonProps {
+  lessonPresentation?: 'approved-premium-v1';
   courseTitle: string;
   lessonTitle: string;
   scenes: SceneData[];
+  visualStyle?: {cropMode?: 'contain' | 'cover-safe'; transition?: 'cut' | 'crossfade'};
   /** Absolute path to full-lesson MP3 (used when per-scene audio is absent) */
   fullAudioSrc?: string;
   // Brand
@@ -330,18 +348,6 @@ function CaptionBar({
   );
 }
 
-function BlueprintTeachingGraphic({plan,seconds,duration,color}: {plan:TeachingVisual;seconds:number;duration:number;color:string}) {
-  const index=teachingVisualStepIndex(seconds,duration,plan.steps.length);
-  const step=plan.steps[index];
-  return <div style={{background:'rgba(255,255,255,0.96)',borderRadius:18,padding:'28px 32px',
-    fontFamily:'sans-serif',color:'#0f172a',borderLeft:`8px solid ${color}`}}>
-    <div style={{fontSize:80,fontWeight:900,lineHeight:1.2,marginBottom:18}}>{step.label}</div>
-    <div style={{fontSize:80,lineHeight:1.3}}>{step.value}</div>
-    <div style={{marginTop:24,height:12,background:'#e2e8f0',borderRadius:8}}>
-      <div style={{height:'100%',width:`${((index+1)/plan.steps.length)*100}%`,background:color,borderRadius:8}} />
-    </div>
-  </div>;
-}
 
 function InstructionalGraphic({
   layout,
@@ -457,6 +463,32 @@ function InstructionalGraphic({
 
 // ââ Scene slide âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
+function FootageTitle({ title, bright, color }: { title: string; bright: boolean; color: string }) {
+  const text = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = text.current;
+    if (!element) return;
+    // Never clip an authored heading into a superficially readable partial title.
+    if (element.scrollWidth > element.clientWidth ||
+        element.getBoundingClientRect().height > FOOTAGE_TITLE_BOX.height - 2 * FOOTAGE_TITLE_BOX.paddingY) {
+      cancelRender(new Error('MEDIA_TITLE_LAYOUT_OVERFLOW'));
+    }
+  }, [title]);
+  return (
+    <div style={{
+      position: 'absolute', left: FOOTAGE_TITLE_BOX.left, top: FOOTAGE_TITLE_BOX.top,
+      width: FOOTAGE_TITLE_BOX.width, height: FOOTAGE_TITLE_BOX.height,
+      boxSizing: 'border-box', display: 'flex', alignItems: 'center',
+      padding: `${FOOTAGE_TITLE_BOX.paddingY}px ${FOOTAGE_TITLE_BOX.paddingX}px`,
+      borderLeft: `${FOOTAGE_TITLE_BOX.borderWidth}px solid ${color}`, background: bright ? '#f8fafc' : '#0f172a',
+      color: bright ? '#0f172a' : '#fff', fontSize: FOOTAGE_TITLE_BOX.fontSize,
+      fontWeight: 900, fontFamily: 'sans-serif', lineHeight: 1.2,
+    }}>
+      <div ref={text} style={{ width: '100%' }}>{title}</div>
+    </div>
+  );
+}
+
 function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProps }) {
   const { fps } = useVideoConfig();
   // useCurrentFrame() is local to the surrounding Sequence. Passing the
@@ -469,6 +501,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
     action: scene.narration,
     sceneType: scene.sceneType,
   });
+  const footageTitle = !scene.strictBlueprint && !scene.teachingVisual && !instructionalLayout;
   const instructionalBackgroundPosition = `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
   const sceneProgress = interpolate(frame, [0, Math.max(1, scene.durationFrames - 1)], [0, 1], {
     extrapolateLeft: 'clamp',
@@ -486,7 +519,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
   return (
     <AbsoluteFill
       style={{
-        background: instructionalLayout
+        background: instructionalLayout || ((scene.imageIsInstructional || scene.physicalDemonstration) && bright)
           ? 'linear-gradient(120deg, #eef2f7 0%, #dbeafe 45%, #f8fafc 100%)'
           : props.backgroundColor,
         backgroundSize: instructionalLayout ? '200% 200%' : undefined,
@@ -521,15 +554,16 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
             inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
+            objectFit: props.visualStyle?.cropMode === 'contain' ? 'contain' : 'cover',
             filter: bright ? 'brightness(1.1) saturate(1.06) contrast(1.02)' : undefined,
             transform: mediaTransform,
             transformOrigin: scene.scene_number % 2 ? '45% 52%' : '55% 48%',
             willChange: 'transform',
+            ...(scene.physicalDemonstration ? {inset:undefined,left:'50%',top:120,width:'50%',height:660,objectFit:'contain' as const,transform:undefined} : {}),
           }}
           muted
         />
-      ) : scene.imageUrl ? (
+      ) : scene.imageUrl && !scene.imageIsInstructional ? (
         <Img
           src={scene.imageUrl}
           style={{
@@ -589,14 +623,16 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         Scene {scene.scene_number}
       </div>
 
-      {/* Content panel */}
+      {footageTitle && <FootageTitle title={scene.title} bright={bright} color={props.primaryColor} />}
+
+      {/* Content panel. Footage headings have their own measured band above it. */}
       <div
         style={{
           position: 'absolute',
-          top: 80,
+          top: footageTitle ? FOOTAGE_TITLE_BOX.top + FOOTAGE_TITLE_BOX.height + FOOTAGE_TITLE_BOX.contentGap : 80,
           left: 60,
-          right: instructionalLayout || scene.teachingVisual ? 60 : '50%',
-          bottom: 100,
+          right: scene.physicalDemonstration ? '54%' : instructionalLayout || scene.teachingVisual ? 60 : '50%',
+          bottom: scene.strictBlueprint && scene.teachingVisual ? 300 : 100,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -604,11 +640,13 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         }}
       >
         {/* Scene title */}
-        <div
+        {!footageTitle && <div
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
-            fontSize: scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
+            fontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+              ? Math.min(160, Math.max(42, scene.titleFontSize))
+              : scene.physicalDemonstration ? 64 : scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
             fontWeight: 900,
             color: instructionalLayout || bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
@@ -619,7 +657,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           }}
         >
           {scene.title}
-        </div>
+        </div>}
 
         {scene.teachingVisual ? (
           <BlueprintTeachingGraphic plan={scene.teachingVisual} seconds={frame/fps}
@@ -779,6 +817,11 @@ function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number
 export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
   const { fps } = useVideoConfig();
   const frame = useCurrentFrame();
+  const premium = props.lessonPresentation === 'approved-premium-v1';
+  const bookends = presentationBookendFrames(premium);
+  if (premium) assertNarratedScenes(props.scenes);
+  if (props.fullAudioSrc && props.scenes.some(scene => scene.audioSrc))
+    throw new Error('LESSON_OVERLAPPING_NARRATION_TRACKS');
 
   // Build sequence offsets
   let offset = 0;
@@ -805,29 +848,29 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
       )}
 
       {/* Branded intro */}
-      <Sequence from={preRollFrames} durationInFrames={INTRO_FRAMES}>
+      {!premium && <Sequence from={preRollFrames} durationInFrames={bookends.intro}>
         <BrandedIntro props={props} frame={frame} />
-      </Sequence>
+      </Sequence>}
 
       {/* Scenes */}
       {props.scenes.map((scene, i) => (
         <Sequence
           key={scene.scene_number}
-          from={preRollFrames + INTRO_FRAMES + sceneOffsets[i]}
+          from={preRollFrames + bookends.intro + sceneOffsets[i]}
           durationInFrames={scene.durationFrames}
         >
-          <SceneSlide scene={scene} props={props} />
+          {premium ? <PremiumTeachingScene scene={scene} props={props}/> : <SceneSlide scene={scene} props={props} />}
         </Sequence>
       ))}
 
       {/* Branded outro */}
-      <Sequence from={preRollFrames + INTRO_FRAMES + offset} durationInFrames={OUTRO_FRAMES}>
+      {!premium && <Sequence from={preRollFrames + bookends.intro + offset} durationInFrames={bookends.outro}>
         <BrandedOutro props={props} frame={frame} />
-      </Sequence>
+      </Sequence>}
 
       {props.postRollUrl && (
         <Sequence
-          from={preRollFrames + INTRO_FRAMES + offset + OUTRO_FRAMES}
+          from={preRollFrames + bookends.intro + offset + bookends.outro}
           durationInFrames={postRollFrames}
         >
           <Video
@@ -847,12 +890,14 @@ export function calcSlideLessonFrames(
   scenes: Pick<SceneData, 'durationFrames'>[],
   preRollDurationFrames = 0,
   postRollDurationFrames = 0,
+  premium = false,
 ): number {
+  const bookends = presentationBookendFrames(premium);
   return (
     preRollDurationFrames +
-    INTRO_FRAMES +
+    bookends.intro +
     scenes.reduce((sum, s) => sum + s.durationFrames, 0) +
-    OUTRO_FRAMES +
+    bookends.outro +
     postRollDurationFrames
   );
 }

@@ -1,0 +1,1 @@
+create policy communication_sms_media_server_only on storage.objects as restrictive for all to anon,authenticated using (bucket_id <> 'communication-sms-media') with check (bucket_id <> 'communication-sms-media');

@@ -5,7 +5,9 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
+import { getStaticProgram } from '@/data/programs';
+import { isRAPIDSProgram, getPublicRegistrationDetails } from '@/lib/compliance/rapids-config';
+import { PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
@@ -20,15 +22,16 @@ const benefits = [
   'Earn wages during training — paid on-the-job learning',
   'Industry-recognized credentials upon completion',
   'Structured instructor support from experienced professionals',
-  'Funding may cover full tuition for eligible participants',
+  'Apprenticeship enrollment is self-pay only',
   'Direct pathway to full-time employment',
   'Portable, nationally recognized certification',
 ];
 
 export default async function DOLFundingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
-  const programs = (dbRows as any[]) || [];
+  const programs = Object.values(PROGRAM_SLUGS).filter(isRAPIDSProgram).flatMap((slug) => {
+    const program = getStaticProgram(slug);
+    return program ? [{ name: program.title, href: `/programs/${slug}`, duration: program.schedule }] : [];
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -36,7 +39,7 @@ export default async function DOLFundingPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Funding', href: '/funding' }, { label: 'DOL Apprenticeship' }]}
+            items={[{ label: 'Apprenticeships', href: '/apprenticeships' }, { label: 'DOL Apprenticeship' }]}
           />
         </div>
       </div>
@@ -68,12 +71,10 @@ export default async function DOLFundingPage() {
                 recognized credential.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
-                {PLATFORM_DEFAULTS.orgName} is a DOL Registered Apprenticeship Sponsor for select programs
-                (currently Barber Apprenticeship), meaning these programs meet federal standards for
-                quality, safety, and outcomes.
+                {getPublicRegistrationDetails().publicStatement} Apprenticeship enrollment is self-pay only; review the registered requirements on the occupation’s program page.
               </p>
               <Link
-                href="/start-trial"
+                href="/apply/student"
                 className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg"
               >
                 Apply Now <ArrowRight className="w-5 h-5" />
@@ -102,8 +103,7 @@ export default async function DOLFundingPage() {
               Registered Apprenticeships let you earn wages during training through paid on-the-job
               learning. You receive industry-recognized credentials upon completion that are
               portable and nationally recognized. Experienced professionals provide structured
-              instructor support throughout the program. Funding may cover full tuition for eligible
-              participants, and the apprenticeship creates a direct pathway to full-time employment
+              instructor support throughout the program. Apprenticeship tuition is self-pay only, and the apprenticeship creates a direct pathway to full-time employment
               with the training employer.
             </p>
           </div>
@@ -147,7 +147,7 @@ export default async function DOLFundingPage() {
               {
                 step: '2',
                 title: 'Meet with Advisor',
-                desc: 'Discuss program options and funding eligibility',
+                desc: 'Review apprenticeship requirements and self-pay tuition',
               },
               { step: '3', title: 'Start Training', desc: 'Begin earning while you learn' },
             ].map((s) => (
@@ -161,7 +161,7 @@ export default async function DOLFundingPage() {
             ))}
           </div>
           <Link
-            href="/start-trial"
+            href="/apply/student"
             className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition"
           >
             Apply Now

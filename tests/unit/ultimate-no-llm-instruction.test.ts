@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ULTIMATE_TEACHING_SEQUENCE } from '../../lib/ultimate-course-builder/instructional/teaching-sequence';
 import { UltimateAppendixAStandardsSource } from '../../lib/ultimate-course-builder/credential/appendix-a-source';
 import { UltimatePlatformInstructionalGenerator } from '../../lib/ultimate-course-builder/adapters/platform-instructional-generator';
 describe('source-grounded instruction', () => {
@@ -13,5 +14,12 @@ describe('source-grounded instruction', () => {
     expect(profile.instructionalSources).toHaveLength(profile.competencies.length);
     expect(profile.instructionalSources?.[0]?.text).toContain('Clipper Over Comb');
     expect(objectives[0]?.text).toBe(profile.competencies[0].description);
+    const generator = new UltimatePlatformInstructionalGenerator();
+    for (const competency of profile.competencies) {
+      const storyboard = await generator.storyboard({ profile, competency });
+      expect(storyboard.scenes.length).toBeGreaterThanOrEqual(ULTIMATE_TEACHING_SEQUENCE.length);
+      expect(new Set(storyboard.scenes.map(scene => scene.stage))).toEqual(new Set(ULTIMATE_TEACHING_SEQUENCE));
+      expect(storyboard.scenes.every((scene) => scene.teachingVisual.steps.length > 0)).toBe(true);
+    }
   });
 });

@@ -21,6 +21,7 @@ interface Props {
   depositAmount: string;
   depositHref: string;
   fullPayHref: string;
+  selfPayOnly?: boolean;
   onFundingSelected?: (path: FundingPath) => void;
 }
 
@@ -32,6 +33,7 @@ export default function ProgramFundingGate({
   depositHref: _depositHref,
   fullPayHref: _fullPayHref,
   onFundingSelected,
+  selfPayOnly = false,
 }: Props) {
   const [isResident, setIsResident] = useState<boolean | null>(null);
   const [fundingPath, setFundingPath] = useState<FundingPath | null>(null);
@@ -40,6 +42,8 @@ export default function ProgramFundingGate({
     setFundingPath(path);
     onFundingSelected?.(path);
   }
+
+  if (selfPayOnly) return <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h3 className="text-xl font-black">Self-pay enrollment only</h3><p className="mt-3 leading-7 text-slate-700">{programName} tuition is {selfPayCost}. Review current payment terms and complete your application before checkout.</p><Link href={applyHref} className="mt-5 inline-flex min-h-11 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white">Apply and review self-pay options</Link></div>;
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">

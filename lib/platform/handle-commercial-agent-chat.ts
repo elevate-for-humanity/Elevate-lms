@@ -1,3 +1,4 @@
+import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { executeAiTask } from '@/lib/ai/execute-ai-task';
@@ -20,7 +21,13 @@ export async function handleCommercialAgentChat(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const agent = getCommercialAgent(typeof body.agent === 'string' ? body.agent.toLowerCase() : '');
+  // Capability selection changes task context, never subscription or role grants.
+  const unified = body.unified === true;
+  const requestedText = typeof body.message === 'string' ? body.message : '';
+  const capability = /compliance|audit|wioa|credential/i.test(requestedText) ? 'zora'
+    : /lesson|learn|course|study|onboarding/i.test(requestedText) ? 'ellie'
+    : /operation|workflow|document|queue|admin/i.test(requestedText) ? 'lizzy' : 'paris';
+  const agent = getCommercialAgent(unified ? capability : typeof body.agent === 'string' ? body.agent.toLowerCase() : '');
   if (!agent) return NextResponse.json({ error: 'Unknown AI assistant' }, { status: 400 });
 
   const message = typeof body.message === 'string' ? body.message.trim().slice(0, 6000) : '';
@@ -72,18 +79,19 @@ export async function handleCommercialAgentChat(request: NextRequest) {
     ? body.organizationContext.trim().slice(0, 8000)
     : '';
 
-  const prompt = `${agent.role}\n\n${organizationContext ? `Organization context:\n${organizationContext}\n\n` : ''}User request:\n${message}`;
+  const prompt = `${unified ? PARIS_SYSTEM_IDENTITY : agent.role}\n\n${organizationContext ? `Organization context:\n${organizationContext}\n\n` : ''}User request:\n${message}`;
 
   try {
     const result = await executeAiTask({
       task: agent.task,
       prompt,
       context: {
+        commercialIdentity: !unified,
         history,
         userId: access.userId,
         sessionId: typeof body.sessionId === 'string' ? body.sessionId.slice(0, 160) : undefined,
-        instructorName: agent.name,
-        instructorPersona: agent.role,
+        instructorName: unified ? 'PARIS' : agent.name,
+        instructorPersona: unified ? PARIS_SYSTEM_IDENTITY : agent.role,
       },
       maxTokens: 1800,
       temperature: 0.35,
@@ -100,8 +108,8 @@ export async function handleCommercialAgentChat(request: NextRequest) {
     });
 
     return NextResponse.json({
-      agent: agent.id,
-      name: agent.name,
+      agent: unified ? 'paris' : agent.id,
+      name: unified ? 'PARIS' : agent.name,
       response: result.content,
       provider: result.provider,
       tokensUsed: result.tokensUsed ?? null,

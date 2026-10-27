@@ -76,6 +76,24 @@ async function loadDashboardLeads(db: Awaited<ReturnType<typeof requireAdminClie
   }
 }
 
+async function loadDashboardSubmissions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('step_submissions')
+      .select('id,user_id,course_lesson_id,step_type,status,created_at')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -255,14 +273,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
         .ilike('document_type', '%wioa%'),
       'WIOA documents',
     ),
-    timeboxDashboardQuery(
-      db
-        .from('step_submissions')
-        .select('id,user_id,course_lesson_id,step_type,status,created_at')
-        .eq('status', 'pending')
-        .limit(100),
-      'step submissions',
-    ),
+    timeboxDashboardQuery(loadDashboardSubmissions(db), 'step submissions'),
     timeboxDashboardQuery(
       db
         .from('programs')

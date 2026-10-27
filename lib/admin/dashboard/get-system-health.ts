@@ -34,7 +34,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
       message: `Missing env vars: ${missingEnv.join(', ')}`,
     });
 
-  const [billingConfig, staleJobs, missingDocs, missingCertifications, unresolvedFlags] =
+  const [billingConfig, staleJobs, courseJobs, missingDocs, missingCertifications, unresolvedFlags] =
     await Promise.all([
       Promise.all([loadQuickBooksConfig(db), loadBillingProviderConfig(db)])
         .then(
@@ -54,6 +54,11 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
         .select('id', { count: 'exact', head: true })
         .eq('status', 'processing')
         .lt('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()),
+      db
+        .from('ultimate_build_jobs')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'running')
+        .lt('heartbeat_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()),
       db
         .from('program_enrollments')
         .select('id', { count: 'exact', head: true })
@@ -85,6 +90,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
     });
   for (const [name, result] of [
     ['job_queue', staleJobs],
+    ['ultimate_build_jobs', courseJobs],
     ['documents', missingDocs],
     ['certifications', missingCertifications],
     ['compliance_flags', unresolvedFlags],
@@ -96,7 +102,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
         message: `Unable to verify ${name} health.`,
       });
   }
-  const staleJobCount = staleJobs.count ?? 0;
+  const staleJobCount = (staleJobs.count ?? 0) + (courseJobs.count ?? 0);
   if (staleJobCount > 0)
     alerts.push({
       code: 'stale_jobs',

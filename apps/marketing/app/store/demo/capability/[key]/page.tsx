@@ -34,7 +34,7 @@ function subscriptionSnapshot(key: string) {
     };
   }
 
-  const addon = ADD_ON_MARKETPLACE.find((item) => item.features.includes(key as never));
+  const addon = ADD_ON_MARKETPLACE.find((item) => !item.hiddenFromMarketplace && item.features.includes(key as never));
   if (addon) {
     return {
       priceLabel: `$${addon.priceMonthly}/month add-on`,

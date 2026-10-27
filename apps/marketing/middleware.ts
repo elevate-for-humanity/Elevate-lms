@@ -132,8 +132,11 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
   }
   // Provider callbacks must reach Store's verified handlers without a Marketing hop.
   const commerceCallbacks = ['/api/webhooks/paypal-billing', '/api/webhooks/quickbooks'];
+  // These handlers are called by Store's trial form and PARIS advisor. A
+  // cross-origin POST redirect loses the same-origin response/cookie boundary.
+  const storeExperienceEndpoints = ['/api/trial/start-managed', '/api/ai-chat', '/api/voice/natural'];
   // The cart uses this authenticated billing endpoint for individual apps.
-  if (commerceCallbacks.includes(pathname) || pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
+  if (commerceCallbacks.includes(pathname) || storeExperienceEndpoints.includes(pathname) || pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
   return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
 }
 

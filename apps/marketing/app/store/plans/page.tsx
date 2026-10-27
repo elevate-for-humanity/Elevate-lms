@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function StorePlansPage({
   searchParams,
 }: {
-  searchParams: Promise<{ vertical?: string; addon?: string }>;
+  searchParams: Promise<{ vertical?: string; addon?: string; addons?: string; interval?: string; plan?: string }>;
 }) {
   const params = await searchParams;
   const vertical = params.vertical;
@@ -42,7 +42,7 @@ export default async function StorePlansPage({
         </Link>
       </section>
 
-      <PlansPageClient vertical={vertical} initialAddon={initialAddon} />
+      <PlansPageClient vertical={vertical} initialAddon={initialAddon} initialAddons={params.addons} initialInterval={params.interval === 'annual' ? 'annual' : 'monthly'} />
     </div>
   );
 }

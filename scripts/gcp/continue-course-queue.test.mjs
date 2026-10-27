@@ -78,3 +78,13 @@ test('release inventory uses actual main worker runs and fails closed on an unre
  await assert.rejects(courseReleasePending({env,request:async()=>({ok:false,status:403})}),/HTTP_403/);
 });
 
+test('a release requests the serialized dispatcher instead of racing its capacity checks',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const release=await readFile(new URL('../../.github/workflows/deploy-google-course-worker.yml',import.meta.url),'utf8');
+ const dispatcher=await readFile(new URL('../../.github/workflows/dispatch-google-course-job.yml',import.meta.url),'utf8');
+ const deploy=release.split('\n  deploy:\n')[1];assert.ok(deploy);
+ assert.match(deploy,/group: google-course-worker-release/);
+ assert.doesNotMatch(deploy,/dispatchApprovedRegionalCourses/);
+ assert.match(deploy,/gh api --method POST .*actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
+ assert.match(dispatcher,/group: google-course-runtime-operations\n\s+cancel-in-progress: false/);
+});

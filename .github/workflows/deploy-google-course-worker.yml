@@ -222,15 +222,13 @@ jobs:
         run: |
           node --test scripts/gcp/resume-repaired-course-jobs.test.mjs
           node scripts/gcp/resume-repaired-course-jobs.mjs
-      - name: Dispatch course work in the approved secondary region
+      - name: Request serialized course and lesson-pool coordination
         env:
-          COURSE_WORKER_PARALLELISM: '1'
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          node --input-type=module <<'NODE'
-          import {dispatchApprovedRegionalCourses} from './scripts/gcp/continue-approved-regional-courses.mjs';
-          console.log(JSON.stringify(await dispatchApprovedRegionalCourses()));
-          NODE
+          # Image replacement has its own lane; every worker launch must use
+          # the dispatcher's shared capacity/launch lane, including releases.
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main
       - name: Record deployment boundary
         run: |
           echo 'Exact CPU worker image deployed and dispatcher invoked. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"

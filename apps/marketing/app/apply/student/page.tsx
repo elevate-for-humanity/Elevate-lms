@@ -45,5 +45,8 @@ export default async function StudentApplicationPage({
     query.set('funding', params.funding as string);
   }
   if (params?.session_id) query.set('session_id', params.session_id);
-  redirect(`/apply/student/interview${query.toString() ? `?${query.toString()}` : ''}`);
+  // HVAC uses the standard application independently of PARIS.
+  // Other programs retain the existing guided interview behavior.
+  const destination = program === 'hvac-technician' ? '/apply/student/form' : '/apply/student/interview';
+  redirect(`${destination}${query.toString() ? `?${query.toString()}` : ''}`);
 }

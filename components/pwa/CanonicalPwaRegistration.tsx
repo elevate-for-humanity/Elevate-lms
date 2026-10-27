@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { PwaUpdateNotice } from './PwaUpdateNotice';
 import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
 import {
   capturePwaInstallPrompt,
@@ -46,6 +47,8 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
     const config = PWA_APPLICATIONS[application];
     let cancelled = false;
+    let hadController = Boolean(navigator.serviceWorker.controller);
+    const cleanups: Array<() => void> = [];
 
     const announceControllerChange = () => {
       if (cancelled) return;
@@ -53,7 +56,8 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
       // while a user is typing a password, uploading a document, or signing a
       // form; reloading here destroys that work. The application-level update
       // notice lets the user refresh at a safe point.
-      window.dispatchEvent(new CustomEvent('elevate-pwa-controller-changed'));
+      if (hadController) window.dispatchEvent(new CustomEvent('elevate-pwa-controller-changed'));
+      hadController = Boolean(navigator.serviceWorker.controller);
     };
 
     navigator.serviceWorker.addEventListener('controllerchange', announceControllerChange);
@@ -86,15 +90,41 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
           updateViaCache: 'none',
         });
 
-        registration.addEventListener('updatefound', () => {
-          registration.installing?.addEventListener('statechange', () => {
-            if (registration.installing?.state === 'installed' && navigator.serviceWorker.controller) {
-              window.dispatchEvent(new CustomEvent('elevate-pwa-update-ready', { detail: registration }));
-            }
-          });
+        if (cancelled) return;
+        const announceUpdate = () => {
+          // An installing worker reaching "installed" is not sufficient evidence
+          // that an actionable update is waiting. Otherwise an unchanged PWA
+          // can repeatedly display an update button that only reloads the page.
+          if (!cancelled && registration.waiting && navigator.serviceWorker.controller) {
+            window.dispatchEvent(new CustomEvent('elevate-pwa-update-ready', { detail: registration }));
+          }
+        };
+        const observeInstalling = () => {
+          // Browsers clear registration.installing as the worker advances.
+          const worker = registration.installing;
+          if (!worker) return;
+          const onStateChange = () => {
+            if (worker.state === 'installed') announceUpdate();
+          };
+          worker.addEventListener('statechange', onStateChange);
+          cleanups.push(() => worker.removeEventListener('statechange', onStateChange));
+        };
+        registration.addEventListener('updatefound', observeInstalling);
+        cleanups.push(() => registration.removeEventListener('updatefound', observeInstalling));
+        observeInstalling();
+        if (registration.waiting) announceUpdate();
+
+        // A failed update check while offline must not unregister a healthy PWA.
+        const checkForUpdate = () => { void registration.update().catch(() => {}); };
+        const onVisible = () => { if (document.visibilityState === 'visible') checkForUpdate(); };
+        document.addEventListener('visibilitychange', onVisible);
+        window.addEventListener('online', checkForUpdate);
+        cleanups.push(() => {
+          document.removeEventListener('visibilitychange', onVisible);
+          window.removeEventListener('online', checkForUpdate);
         });
 
-        await registration.update();
+        checkForUpdate();
       } catch (error) {
         // A registration exception must not leave an obsolete worker controlling
         // the installed app. Reset PWA state so the next navigation uses network.
@@ -110,11 +140,14 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     void register();
     return () => {
       cancelled = true;
+      cleanups.forEach((cleanup) => cleanup());
       navigator.serviceWorker.removeEventListener('controllerchange', announceControllerChange);
       window.removeEventListener('beforeinstallprompt', capturePwaInstallPrompt);
       window.removeEventListener('appinstalled', clearPwaInstallPrompt);
     };
   }, [application]);
 
-  return null;
+  // Operational portals need the shared loaded-build check and an explicit,
+  // user-controlled update. Keep public marketing pages free of update banners.
+  return application === 'marketing' ? null : <PwaUpdateNotice />;
 }

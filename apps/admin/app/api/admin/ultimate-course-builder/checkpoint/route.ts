@@ -1,3 +1,4 @@
+import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -17,10 +18,10 @@ async function context(db: any, input: any) {
     db.from('ultimate_course_builds').select('id,status,profile').eq('id', input.buildId).single(),
     db.from('ultimate_lesson_builds').select('id,competency_id,status,artifacts').eq('id', input.lessonBuildId).eq('build_id', input.buildId).single(),
     db.from('ultimate_lesson_steps').select('step,state,findings,completed_at').eq('lesson_build_id', input.lessonBuildId),
-    db.from('ultimate_build_jobs').select('*').eq('build_id', input.buildId).eq('job_type', 'course_build').order('created_at', { ascending: false }).limit(1),
+    db.from('ultimate_build_jobs').select('*').eq('build_id', input.buildId).eq('job_type', 'course_build').order('created_at', { ascending: false }).limit(30),
   ]);
   for (const result of [build, lesson, steps, jobs]) if (result.error) throw result.error;
-  return { build: build.data, lesson: lesson.data, steps: steps.data ?? [], job: jobs.data?.[0] };
+  return { build: build.data, lesson: lesson.data, steps: steps.data ?? [], job: (jobs.data ?? []).find((job: any) => ['running', 'queued', 'waiting_for_dependency'].includes(job.status)) ?? jobs.data?.[0] };
 }
 export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req); if (auth.error) return auth.error;
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       state: step?.state ?? 'not_started', findings, missingEvidence: missing, prerequisites,
       awaitingPrerequisites: step?.state !== 'failed' && step?.state !== 'passed' && missing.length > 0,
       repairTargets: routeSelectiveRepairs(findings), completedAt: step?.completed_at ?? null,
-      videoUrl, historicalVersion,
+      videoUrl: videoUrl ? adminPreviewPlaybackUrl(input.buildId, c.lesson.id, videoUrl) : null, historicalVersion,
       mediaApproved: historicalVersion === null && c.lesson.artifacts?.finished_media_qa?.mediaQA?.pass === true,
       workerStatus: c.job?.status ?? 'not_started', heartbeatAt: c.job?.heartbeat_at ?? null,
     } });
@@ -72,6 +73,12 @@ export async function POST(req: NextRequest) {
     const index = c.build.profile.competencies?.findIndex((x: any) => x.id === c.lesson.competency_id);
     if (!(index >= 0)) return NextResponse.json({ error: 'This lesson is not in the saved course plan.' }, { status: 409 });
     const checkpoint = c.steps.find((s: any) => s.step === input.step);
+    if (checkpoint?.state === 'passed' && !(checkpoint.findings ?? []).length) {
+      return NextResponse.json({
+        error: 'This checkpoint has already passed. Choose the failed learner runthrough or another checkpoint with findings. No completed media was changed.',
+        checkpointState: 'passed',
+      }, { status: 409 });
+    }
     const targets = routeSelectiveRepairs(checkpoint?.findings ?? []);
     const ordered = [input.step, ...targets.map((x: any) => x.step)].sort((a, b) => ULTIMATE_BUILD_STEPS.indexOf(a) - ULTIMATE_BUILD_STEPS.indexOf(b));
     const fromStep = ordered[0];
@@ -87,6 +94,21 @@ export async function POST(req: NextRequest) {
       if (saved.data?.length !== 1) return NextResponse.json({ error: 'The worker advanced while saving. Refresh and request the repair again.' }, { status: 409 });
       return NextResponse.json({ queued: true, executionVerified: false, deferred: true,
         message: 'Repair request saved while the builder continues. It will be applied at a checkpoint boundary; active rendering is preserved.' }, { status: 202 });
+    }
+    if (c.job.status === 'queued' && c.job.attempts < c.job.max_attempts) {
+      const launch = await requestCourseWorker();
+      return NextResponse.json({
+        queued: true, jobId: c.job.id, ...launch,
+        message: launch.dispatched
+          ? 'Existing queued work was preserved and the worker start was requested. ' + launch.message
+          : 'Existing queued work was preserved. No new rendering or retry was created. ' + launch.message,
+      }, { status: launch.dispatched ? 202 : 503 });
+    }
+    if (c.job.status === 'failed' && c.job.attempts >= c.job.max_attempts) {
+      return NextResponse.json({
+        error: 'The existing build exhausted its repair attempts. Diagnose the failing learner runthrough and worker access before retrying. No new attempts were charged.',
+        jobId: c.job.id, lastError: c.job.last_error,
+      }, { status: 409 });
     }
     const counts = { ...c.job.payload?.lessonRepairCounts }; delete counts[c.lesson.competency_id];
     const now = new Date().toISOString();

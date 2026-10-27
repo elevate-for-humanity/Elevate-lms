@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
@@ -117,7 +118,7 @@ export default function CosmetologyVisualExperience() {
           </div>
           <div className="order-1 relative aspect-[16/10] max-h-[320px] bg-white lg:order-2">
             {slides.map((item, index) => (
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 key={item.src}
                 src={item.src}
                 alt={index === active ? item.alt : ''}

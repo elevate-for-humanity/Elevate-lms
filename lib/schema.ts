@@ -24,7 +24,7 @@ export const organizationSchema: WithContext<Organization> = {
   url: baseUrl,
   logo: `${baseUrl}/images/logo.png`,
   description:
-    'Free workforce training programs in high-demand careers. WIOA-funded training in barbering, healthcare, HVAC, and more.',
+    'Career training, registered apprenticeship support, credential preparation, and program-specific workforce funding pathways in Indiana.',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Indianapolis',
@@ -78,12 +78,19 @@ export function generateCourseSchema(course: {
       name: course.provider,
       url: baseUrl,
     },
-    offers: {
-      '@type': 'Offer',
-      price: course.cost === 'Free' ? '0' : course.cost,
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-    },
+    ...(() => {
+      const amount = Number(String(course.cost).replace(/[^0-9.]/g, ''));
+      return Number.isFinite(amount) && amount > 0
+        ? {
+            offers: {
+              '@type': 'Offer' as const,
+              price: String(amount),
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock' as const,
+            },
+          }
+        : {};
+    })(),
     hasCourseInstance: {
       '@type': 'CourseInstance',
       courseMode: 'Blended',

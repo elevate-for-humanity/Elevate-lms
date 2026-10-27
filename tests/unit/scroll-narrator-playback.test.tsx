@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
+import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 
 const voice = vi.hoisted(() => ({ play: vi.fn(), prepare: vi.fn(), stop: vi.fn() }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
@@ -29,7 +30,29 @@ async function advance(ms: number) { await act(async () => { vi.advanceTimersByT
 
 describe('automatic page narration', () => {
   beforeEach(() => { vi.useFakeTimers(); vi.clearAllMocks(); localStorage.clear(); visible = 'a'; voice.play.mockResolvedValue(true); voice.prepare.mockResolvedValue(true); });
-  afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.useRealTimers(); });
+  afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.restoreAllMocks(); vi.useRealTimers(); });
+  it('narrates the actual featured Host Shop section after the opening hero', async () => {
+    render(<main><HomeFeaturedHostShop /></main>);
+    const section = screen.getByRole('heading', { name: 'Real shops. Real experience.' }).closest('section')!;
+    section.getBoundingClientRect = () => ({ top: 0, bottom: 400, height: 400 } as DOMRect);
+    render(<ScrollNarrator />);
+    await advance(1400);
+    expect(voice.play).toHaveBeenCalledWith(expect.stringContaining('licensed supervision'), expect.objectContaining({ style: 'instructor' }));
+  });
+  it('keeps the page and stop/replay controls usable when browser storage is blocked', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError'); });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError'); });
+    setup(); await advance(1400);
+    expect(voice.play).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Stop page narration' }));
+    expect(screen.getByRole('button', { name: 'Play narration for this section' })).toHaveAttribute('aria-pressed', 'false');
+    const requests = voice.play.mock.calls.length;
+    visible = 'b'; fireEvent.scroll(window); await advance(3000);
+    expect(voice.play).toHaveBeenCalledTimes(requests);
+    fireEvent.click(screen.getByRole('button', { name: 'Play narration for this section' }));
+    await advance(1400);
+    expect(voice.play).toHaveBeenCalledTimes(requests + 1);
+  });
   it('discovers late streamed sections and does not restart for unrelated DOM changes', async () => {
     render(<ScrollNarrator />);
     expect(screen.queryByRole('button', { name: 'Stop page narration' })).not.toBeInTheDocument();

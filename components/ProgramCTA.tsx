@@ -16,11 +16,11 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
             <div className="text-white">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">Ready to Start Your Career?</h2>
               <p className="text-xl mb-8 text-white">
-                Enroll in {programName} and access training funded through WIOA, WRG, or JRI for eligible participants. No tuition for those who qualify — just training and a career.
+                Explore {programName} and review its published tuition, funding status, and enrollment requirements. Workforce funding is program-specific and requires written authorization from the responsible agency.
               </p>
               <div className="space-y-4 mb-8">
                 {[
-                  ['/images/pages/comp-cta-main.webp', 'Funded training', 'No-Cost Training Available', 'Funded through WIOA, WRG, and JRI for eligible participants'],
+                  ['/images/pages/comp-cta-main.webp', 'Training options', 'Program-Specific Funding', 'Funding, when available, depends on the exact program and written agency authorization'],
                   ['/images/pages/career-counseling.webp', 'Job placement', 'Job Placement Support', 'We help you find employment after graduation'],
                   ['/images/pages/workforce-training.webp', 'Hands-on training', 'Hands-On Training', 'Real-world experience with industry professionals'],
                 ].map(([src, alt, title, text]) => (
@@ -55,12 +55,12 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl sm:text-4xl font-bold mb-6">Start at Indiana Career Connect</h2>
-              <p className="text-xl mb-6 text-slate-300">All WIOA-funded training starts with Indiana Career Connect. Create your account, schedule an appointment, and get approved for funded training.</p>
+              <p className="text-xl mb-6 text-slate-300">For programs with verified WIOA eligibility, Indiana Career Connect and WorkOne may be part of the intake process. The responsible agency determines participant eligibility and written authorization.</p>
               <div className="space-y-4 mb-8">
                 {[
                   'Create account at IndianaCareerConnect.com',
                   'Schedule appointment with career advisor',
-                  'Get approved for WIOA funding',
+                  'Ask the responsible agency to verify program eligibility and authorization',
                   `Enroll with ${PLATFORM_DEFAULTS.orgName}`,
                 ].map((text, index) => (
                   <div key={text} className="flex items-center gap-3">

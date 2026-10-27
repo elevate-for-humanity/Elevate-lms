@@ -78,3 +78,18 @@ test('regional budget retains only remaining slots of an active execution',()=>{
  const executions=[{spec:{taskCount:3,parallelism:3,template:{spec:{containers:[container('4','8Gi')]}}},status:{succeededCount:1,runningCount:2}}];
  assert.deepEqual(requiredRegionalAllocation([], {containers:[container('4','8Gi'),container('4','8Gi')]}, [],executions),{cpu:16000,memory:32*2**30});
 });
+
+test('service-wide maximum bounds a larger revision maximum',()=>{
+ const s=structuredClone(service);s.metadata.annotations={'run.googleapis.com/maxScale':'1'};
+ const r=revision();r.metadata.annotations['autoscaling.knative.dev/maxScale']='2';
+ assert.deepEqual(requiredRegionalAllocation([s],task,[r]),{cpu:12000,memory:40*2**30});
+});
+test('a verified service-wide maximum bounds a revision without its own maximum',()=>{
+ const s=structuredClone(service);s.metadata.annotations={'run.googleapis.com/maxScale':'1'};
+ const r=revision();delete r.metadata.annotations;
+ assert.deepEqual(requiredRegionalAllocation([s],task,[r]),{cpu:12000,memory:40*2**30});
+});
+test('invalid service-wide maximum never permits a launch budget',()=>{
+ const s=structuredClone(service);s.metadata.annotations={'run.googleapis.com/maxScale':'invalid'};
+ assert.throws(()=>requiredRegionalAllocation([s],task,[revision()]),/service maximum/);
+});

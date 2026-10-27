@@ -3,6 +3,7 @@
  * Complete history of all submitted grants
  */
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -109,7 +110,7 @@ export default async function GrantSubmissionsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/pages/admin-grants-submissions-detail.webp"
             alt="Grant Submissions"
             fill

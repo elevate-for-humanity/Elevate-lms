@@ -306,3 +306,37 @@ it.each([
   expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
   expect(screen.queryByText('Direct CDP connected')).toBeNull();
 });
+
+it('focuses credential entry during the tap without waiting for an animation frame', async () => {
+  await start();
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+  input.blur();
+  fireEvent.click(screen.getByRole('button', { name: 'Password input' }));
+  expect(input.type).toBe('password');
+  expect(document.activeElement).toBe(input);
+  input.blur();
+  fireEvent.click(screen.getByRole('button', { name: 'Email input' }));
+  expect(document.activeElement).toBe(input);
+  expect(input.placeholder).toBe('Tap here to enter your email');
+});
+
+it('lets the owner reveal a password locally and hides it again after sending', async () => {
+  const { actions } = await start();
+  fireEvent.click(screen.getByRole('button', { name: 'Password input' }));
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  expect(input.placeholder).toBe('Tap here to enter your password');
+  fireEvent.change(input, { target: { value: 'fixture-only-password' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Show password', exact: true }));
+  expect(input.type).toBe('text');
+  expect(input.value).toBe('fixture-only-password');
+  expect(actions).toEqual([]);
+  fireEvent.click(screen.getByRole('button', { name: 'Hide password', exact: true }));
+  expect(input.type).toBe('password');
+  fireEvent.click(screen.getByRole('button', { name: 'Show password', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: 'Type securely' }));
+  await waitFor(() => expect(actions).toHaveLength(1));
+  expect(input.value).toBe('');
+  expect(input.type).toBe('password');
+  expect(screen.queryByText('fixture-only-password')).toBeNull();
+});

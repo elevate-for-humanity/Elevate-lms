@@ -2,7 +2,8 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { Upload, X, CheckCircle, Loader2, Film } from 'lucide-react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSignedUploadClient } from '@/lib/supabase/signed-upload-client';
+import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
 const MAX_FILE_SIZE = 1024 * 1024 * 1024;
 const ACCEPTED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
@@ -149,7 +150,9 @@ export default function VideoUploadClient({
             prepared.error || 'The secure media-library upload could not be prepared.',
           );
         }
-        const supabase = createBrowserClient();
+        const config = getBrowserPublicSupabaseConfig();
+        if (!config) throw new Error('Media storage configuration is unavailable.');
+        const supabase = createSignedUploadClient(config);
         const { error: uploadError } = await supabase.storage
           .from(prepared.bucket)
           .uploadToSignedUrl(prepared.storagePath, prepared.token, file, {
@@ -210,7 +213,9 @@ export default function VideoUploadClient({
         if (!prepareResponse.ok || !prepared.storagePath || !prepared.token || !prepared.bucket) {
           throw new Error(prepared.error || 'The course video upload could not be prepared.');
         }
-        const supabase = createBrowserClient();
+        const config = getBrowserPublicSupabaseConfig();
+        if (!config) throw new Error('Media storage configuration is unavailable.');
+        const supabase = createSignedUploadClient(config);
         const { error: uploadError } = await supabase.storage
           .from(prepared.bucket)
           .uploadToSignedUrl(prepared.storagePath, prepared.token, file, {

@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {adminPreviewPlaybackUrl} from '../../lib/ultimate-course-builder/media/admin-preview-url.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
@@ -23,10 +24,10 @@ function harness({live=false,published=false,race=false,dispatchFails=false,unau
   return query;
  }};
  const response=(body,options={})=>({status:options.status??200,body});
- const api=new Function('NextResponse','apiRequireAdmin','requireAdminClient','ULTIMATE_BUILD_STEPS','validateStepOutput','routeSelectiveRepairs','renderMediaUrl','renderPlaybackUrl','requestCourseWorker','safeInternalError','checkpointRepairPayload',source+'\nreturn {GET,POST};')(
+ const api=new Function('NextResponse','apiRequireAdmin','requireAdminClient','ULTIMATE_BUILD_STEPS','validateStepOutput','routeSelectiveRepairs','renderMediaUrl','renderPlaybackUrl','requestCourseWorker','safeInternalError','checkpointRepairPayload','adminPreviewPlaybackUrl',source+'\nreturn {GET,POST};')(
   {json:response},async()=>unauthorized?{error:response({error:'Unauthorized'},{status:401})}:{id:'owner'},async()=>db,
   ['standards_lock','lesson_film_render','finished_media_qa','credential_release'],()=>['MISSING_EVIDENCE'],()=>[{step:'lesson_film_render'}],render=>render?.videoUrl??null,()=>null,
-  async()=>{dispatched++;if(dispatchFails)throw Error('DISPATCH_FAILED');return{dispatched:true,executionVerified:false,message:'Launch requested.'};},(_e,_context,message)=>response({error:message},{status:500}),checkpointRepairPayload);
+  async()=>{dispatched++;if(dispatchFails)throw Error('DISPATCH_FAILED');return{dispatched:true,executionVerified:false,message:'Launch requested.'};},(_e,_context,message)=>response({error:message},{status:500}),checkpointRepairPayload,adminPreviewPlaybackUrl);
  const input={buildId,lessonBuildId:lessonId,step:'finished_media_qa'};
  return{api,writes,job,input,request:{json:async()=>input,nextUrl:{searchParams:new URLSearchParams(input)}},dispatched:()=>dispatched};
 }
@@ -56,5 +57,5 @@ test('dispatch failure tells the owner the repair is saved without claiming laun
 });
 
 test('a previous saved render remains previewable during repair without receiving current QA approval',async()=>{
- const h=harness({historical:true});const r=await h.api.GET(h.request);assert.equal(r.status,200);assert.equal(r.body.diagnostic.videoUrl,'https://media.example/previous.mp4');assert.equal(r.body.diagnostic.historicalVersion,4);assert.equal(r.body.diagnostic.mediaApproved,false);assert.equal(h.writes.length,0);
+ const h=harness({historical:true});const r=await h.api.GET(h.request);assert.equal(r.status,200);assert.equal(r.body.diagnostic.videoUrl,adminPreviewPlaybackUrl(buildId,lessonId,'https://media.example/previous.mp4'));assert.equal(r.body.diagnostic.historicalVersion,4);assert.equal(r.body.diagnostic.mediaApproved,false);assert.equal(h.writes.length,0);
 });

@@ -23,9 +23,10 @@ test('Admin verification preserves authorization, reviewed hours, ledger and aud
       CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS
         $$ SELECT nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
       GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
-      CREATE TABLE profiles(id uuid PRIMARY KEY, role text, email text);
+      CREATE TABLE profiles(id uuid PRIMARY KEY, role text, email text, is_active boolean DEFAULT true, suspended boolean DEFAULT false);
       CREATE TABLE programs(id uuid PRIMARY KEY, slug text);
-      CREATE TABLE apprentices(id uuid PRIMARY KEY, user_id uuid, program_id uuid);
+      CREATE TABLE apprentices(id uuid PRIMARY KEY, user_id uuid, program_id uuid, enrollment_id uuid, hours_completed numeric DEFAULT 0, ojl_hours numeric DEFAULT 0, updated_at timestamptz);
+      CREATE TABLE program_enrollments(id uuid PRIMARY KEY,user_id uuid,total_hours_completed numeric DEFAULT 0,practical_hours_completed numeric DEFAULT 0,updated_at timestamptz);
       CREATE TABLE apprentice_sites(id uuid PRIMARY KEY, shop_id uuid);
       CREATE TABLE progress_entries(
         id uuid PRIMARY KEY, apprentice_id uuid, partner_id uuid, program_id text,
@@ -51,7 +52,7 @@ test('Admin verification preserves authorization, reviewed hours, ledger and aud
       CREATE FUNCTION can_verify_progress_entry(uuid) RETURNS boolean LANGUAGE sql AS $$
         SELECT EXISTS(SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff'))
       $$;
-      INSERT INTO profiles VALUES
+      INSERT INTO profiles(id,role,email) VALUES
         ('${admin}', 'admin', 'admin@example.test'),
         ('${student}', 'student', 'student@example.test');
       INSERT INTO programs VALUES('cccccccc-cccc-4ccc-9ccc-cccccccccccc', 'example-apprenticeship');
@@ -124,6 +125,8 @@ test('Admin verification preserves authorization, reviewed hours, ledger and aud
       BEFORE UPDATE OF status, verified_by, verified_at ON progress_entries
       FOR EACH ROW EXECUTE FUNCTION lock_verification_fields()`);
     await db.exec(await fs.readFile(new URL('../../supabase/migrations/20261010104504_admin_hours_serialize_ledger_review.sql', import.meta.url), 'utf8'));
+
+    await db.exec(await fs.readFile(new URL('../../supabase/migrations/20261020000993_ojl_snapshot_buckets.sql', import.meta.url), 'utf8'));
 
     const snapshot = async (ids) => (await db.query(`
       SELECT jsonb_build_object('id',id,'apprentice_id',apprentice_id,'program_id',program_id,
@@ -227,6 +230,33 @@ test('Admin verification preserves authorization, reviewed hours, ledger and aud
       await transaction(() => rejects(approve(ids, reviewed), /Approval must preserve the reviewed entry/, '23514'));
       assert.deepEqual(await state(), original);
       assert.equal((await db.query('SELECT hours_worked FROM progress_entries WHERE id=$1', [changedByTrigger])).rows[0].hours_worked, '7.25');
+    });
+
+    await t.test('suspended administrator and missing work evidence cannot approve', async () => {
+      const reviewed = await snapshot([ready]);
+      await db.exec(`UPDATE profiles SET is_active=false,suspended=true WHERE id='${admin}'`);
+      await transaction(() => rejects(approve([ready],reviewed), /Authenticated admin approver required/, '42501'));
+      await db.exec(`UPDATE profiles SET is_active=true,suspended=false WHERE id='${admin}'`);
+      await db.exec(`UPDATE progress_entries SET notes=NULL,tasks_completed=NULL WHERE id='${ready}'`);
+      const undocumented = await snapshot([ready]);
+      await transaction(() => rejects(approve([ready],undocumented), /no longer ready for approval/, 'P0001'));
+      await db.exec(`UPDATE progress_entries SET notes='Reviewed shift' WHERE id='${ready}'`);
+    });
+
+    await t.test('student and host-shop OJL snapshots exclude classroom RTI credit', async () => {
+      const enrollment='ffffffff-ffff-4fff-9fff-fffffffffff1';
+      const apprenticeship='ffffffff-ffff-4fff-9fff-fffffffffff2';
+      await db.exec(`INSERT INTO program_enrollments(id,user_id) VALUES('${enrollment}','${student}');
+        INSERT INTO apprentices(id,user_id,program_id,enrollment_id) VALUES('${apprenticeship}','${student}','cccccccc-cccc-4ccc-9ccc-cccccccccccc','${enrollment}');
+        INSERT INTO hour_entries(user_id,program_slug,source_type,work_date,hours_claimed,accepted_hours,entered_by_email,status) VALUES('${student}','example-apprenticeship','rti','2026-09-01',20,20,'admin@example.test','approved');`);
+      const reviewed=await snapshot([ready]);
+      await transaction(async()=>{
+        assert.equal((await approve([ready],reviewed)).rows[0].count,1);
+        assert.deepEqual((await db.query('SELECT hours_completed,ojl_hours FROM apprentices')).rows,[{hours_completed:'7.25',ojl_hours:'7.25'}]);
+        assert.deepEqual((await db.query('SELECT total_hours_completed,practical_hours_completed FROM program_enrollments')).rows,[{total_hours_completed:'7.25',practical_hours_completed:'7.25'}]);
+        assert.equal((await db.query("SELECT count(*)::int n FROM audit_logs WHERE action='apprenticeship.hours_snapshot.synced'")).rows[0].n,1);
+      });
+      await db.exec(`DELETE FROM apprentices; DELETE FROM program_enrollments; DELETE FROM hour_entries WHERE source_type='rti'`);
     });
 
     await t.test('stale reviewed snapshots reject before any approval', async () => {

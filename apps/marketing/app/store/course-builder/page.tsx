@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description:
     'Create and manage structured training courses with lessons, media, assessments, publishing, and learner progress tools.',
   keywords: ['course builder', 'LMS', 'online courses', 'training platform', 'course creation'],
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/course-builder' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/course-builder' },
 };
 
 const blocks = [

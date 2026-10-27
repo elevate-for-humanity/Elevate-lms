@@ -1,3 +1,4 @@
+import { lessonInstructionalSources } from '../instructional/rti-teaching-policy.mjs';
 import {sceneRole} from '../core/repair-policy.mjs';
 import type { UltimateInstructionalGenerator } from '../instructional/generation-contract';
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
@@ -6,6 +7,7 @@ import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-c
 import { ULTIMATE_TEACHING_SEQUENCE } from '../instructional/teaching-sequence';
 import { produceTeachingVisual } from '../instructional/teaching-visual';
 import { addFreshTeachingRecaps } from '../instructional/teaching-recaps';
+import { repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { sourceTeaching, narrationChunks } from '../instructional/source-teaching';
 import { authorGoogleLesson, generateVertexLessonJson, validateGoogleAuthoringEvidence, GOOGLE_LESSON_AUTHOR_VERSION } from '../instructional/google-lesson-author';
 
@@ -54,9 +56,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     const e = value as Evidence;
     if (!e?.competency?.id || !e.profile?.authority)
       throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
-    const lessonSources = e.profile.instructionalSources?.filter(s =>
-      [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
-      e.competency.authorityRequirementIds.includes(s.id)) ?? [];
+    const lessonSources: Array<{id:string;text:string}> = lessonInstructionalSources(e.profile, e.competency);
     const approved = e.profile.lessonBlueprints?.[e.competency.id];
     if (approved && !e.repairDirective) {
       validateLessonBlueprint(approved, e.competency);
@@ -86,20 +86,31 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
   private async generate(e: Evidence): Promise<LessonBlueprint> {
     // Course-wide source arrays contain many different lessons. Never narrate
     // the first lesson's source for every competency in a course.
-    const sources = e.profile.instructionalSources?.filter(
-      (s) =>
-        [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(
-          s.id,
-        ) || e.competency.authorityRequirementIds.includes(s.id),
-    );
+    const sources: Array<{id:string;text:string}> = lessonInstructionalSources(e.profile, e.competency);
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
 
     if (e.profile.instructionalAuthoring?.provider === 'google') {
       const config = e.profile.instructionalAuthoring;
       if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
-      const authored = await authorGoogleLesson({ profile: e.profile, competency: e.competency, sources, repairDirective:e.repairDirective },
+      const author = (repairDirective: any) => authorGoogleLesson(
+        { profile: e.profile, competency: e.competency, sources, repairDirective },
         (system, input) => generateVertexLessonJson(config.model, system, input, config.location));
+      let authored = await author(e.repairDirective);
+      // Repair the authored source instead of clearing a duplicate-narration
+      // finding or regenerating narration from unchanged duplicate segments.
+      // Bound correction attempts and preserve the original source references.
+      for (let repair = 0; repair < 2 &&
+          repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')); repair++) {
+        authored = await author({
+          ...(e.repairDirective ?? {}),
+          reason: 'NARRATION_DUPLICATION',
+          instruction: 'Rewrite duplicated teaching segments with unique, source-grounded instructional content. Keep the required objectives, stages, standards and assessments; do not repeat sentences or invent facts.',
+          attempt: repair + 1,
+        });
+      }
+      if (repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')))
+        throw new Error('NARRATION_DUPLICATION');
       return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(authored,e.profile,sources) : authored;
     }
 
@@ -147,8 +158,14 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     ].map((type) => ({
       id: `${e.competency.id}:activity:${type}`,
       type,
-      prompt: `Complete ${type.replace(/_/g, ' ')} for ${e.competency.title} using the lesson procedure and evidence.`,
-      feedback: `Compare the response with the authorized lesson content, correct any mismatch, and repeat until the objective is demonstrated.`,
+      prompt: ['knowledge_check', 'reassessment'].includes(type)
+        ? teaching.questions[type === 'reassessment' ? 1 : 0]?.question ||
+          stageText[type === 'reassessment' ? 'assessment' : type]
+        : stageText[type],
+      feedback: ['guided_practice', 'independent_practice'].includes(type) && teaching.practiceFeedback
+        ? teaching.practiceFeedback
+        : teaching.questions[type === 'reassessment' ? 1 : 0]?.explanation ||
+          `Compare the response with the authorized lesson content, correct any mismatch, and repeat until the objective is demonstrated.`,
       objectiveIds: [objectiveId],
     }));
     const question = (suffix: string, alternate = false) => {
@@ -182,6 +199,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     };
     const blueprint: LessonBlueprint = {
       competencyId: e.competency.id,
+      flashcards: teaching.flashcards,
       objectives: [{ id: objectiveId, text: competencyText, sourceRequirementIds: requirementIds }],
       prerequisites: {
         checks: [],
@@ -236,6 +254,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       script: segments.map((s) => s.text).join('\n\n'),
       segments,
       activities: b.activities,
+      flashcards: b.flashcards ?? [],
       mistakes: b.mistakes,
       assessment: b.assessment,
       blueprintHash: contractHash(b),
@@ -256,7 +275,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         objectiveIds: s.objectiveIds,
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,
-        sceneType: sceneRole(s.stage,s.sceneType),
+        sceneType: sceneRole(s.stage,s.sceneType,s.id,s.text),
         teachingVisual: s.teachingVisual ?? produceTeachingVisual(s.text, s.stage),
       })),
     };

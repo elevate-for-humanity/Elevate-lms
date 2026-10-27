@@ -22,6 +22,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { createQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { assertQuickBooksProductionEnvironment, quickBooksFailureReason } from '@/lib/integrations/quickbooks-client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -148,6 +149,8 @@ export async function GET(request: NextRequest) {
 
   if (action === 'auth_url') {
     const config = await getQuickBooksConfig();
+    try { assertQuickBooksProductionEnvironment(); }
+    catch { return safeError('Verify production QuickBooks credentials before reconnecting.',503); }
     const { clientId, clientSecret, redirectUri } = config;
     if (!clientId || !clientSecret) {
       return safeError('QuickBooks OAuth credentials are not configured', 503);
@@ -168,6 +171,8 @@ export async function GET(request: NextRequest) {
 
   // status
   const config = await getQuickBooksConfig();
+  try { assertQuickBooksProductionEnvironment(); }
+  catch (error) { return NextResponse.json({ connected:false, credentials_configured:!!(config.clientId&&config.clientSecret), reason:quickBooksFailureReason(error), message:'QuickBooks production configuration requires verification.' }); }
   const connected = !!(config.accessToken && config.realmId);
   if (!connected) {
     return NextResponse.json({
@@ -244,6 +249,10 @@ export async function POST(request: NextRequest) {
     return safeError('QuickBooks not connected', 503);
   }
 
+  if(action!=='disconnect'){
+    try { assertQuickBooksProductionEnvironment(); }
+    catch { return safeError('Verify production QuickBooks credentials before syncing.',503); }
+  }
   const token = config.accessToken;
   const realmId = config.realmId;
 

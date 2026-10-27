@@ -7,7 +7,6 @@ import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/p
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import {hydrateProcessEnv} from '@/lib/secrets';
-import { telnyxClient } from '@/lib/phone/telnyx';
 
 export type PhoneActionState = { ok: boolean; message: string };
 
@@ -181,6 +180,13 @@ export async function savePhoneSettings(
     if (aiEnabled && aiInstructions.length < 20) {
       return { ok: false, message: 'Give the AI receptionist clear operating instructions.' };
     }
+    // Asterisk currently records unanswered-call voicemail regardless of this
+    // database setting. The ingest API rejects recordings when disabled, which
+    // would discard callers' messages. Do not permit that unsafe mismatch until
+    // Admin settings are applied and acknowledged by the PBX itself.
+    if (!checked(formData, 'voicemailEnabled')) {
+      return { ok: false, message: 'Voicemail cannot be disabled from Admin until the live PBX confirms the change. No settings were saved.' };
+    }
     const recordingEnabled = checked(formData, 'callRecordingEnabled');
     const recordingDisclosure = String(formData.get('recordingDisclosure') ?? '').trim();
     if (recordingEnabled && !recordingDisclosure) {
@@ -215,7 +221,7 @@ export async function savePhoneSettings(
       .eq('id', id);
     if (error) return { ok: false, message: error.message };
     revalidatePath('/phone');
-    return { ok: true, message: 'Phone routing, hours, voicemail, and AI settings saved.' };
+    return { ok: true, message: 'Phone preferences saved to the database only; live PBX greetings, hours, routing and voicemail have NOT been applied or verified. Existing live phone configuration remains unchanged.' };
   } catch (error) {
     return failure(error, 'Unable to save phone settings.');
   }
@@ -390,60 +396,12 @@ export async function removeDestination(formData: FormData): Promise<void> {
 }
 
 export async function testDestination(formData: FormData): Promise<void> {
-  await hydrateProcessEnv();
-  const { db, id } = await requireSystemId();
-  const destinationId = String(formData.get('destinationId') ?? '');
-  const [{ data: destination }, { data: number }] = await Promise.all([
-    db
-      .from('phone_destinations')
-      .select('destination,enabled,destination_type,extension_id')
-      .eq('id', destinationId)
-      .eq('phone_system_id', id)
-      .maybeSingle(),
-    db
-      .from('phone_numbers')
-      .select('e164')
-      .eq('phone_system_id', id)
-      .eq('source', 'provider')
-      .eq('status', 'active')
-      .eq('is_primary', true)
-      .maybeSingle(),
-  ]);
-  if (!destination?.enabled || !number?.e164) {
-    throw new Error('An active primary number and enabled PWA route are required for a test call.');
-  }
-  let target = destination.destination as string | null;
-  if (destination.destination_type === 'webrtc') {
-    if (!destination.extension_id) throw new Error('This PWA route has no assigned extension.');
-    const { data: device } = await db
-      .from('phone_webrtc_devices')
-      .select('sip_username,provider,connection_state')
-      .eq('extension_id', destination.extension_id)
-      .eq('status', 'active')
-      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
-      .order('last_seen_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (device?.provider === 'asterisk') throw new Error('This extension uses Elevate Phone. Open your dial pad to test it; carrier test calling is not connected to this PBX yet.');
-    if (!device?.sip_username || device.connection_state !== 'connected') {
-      throw new Error('That Program Holder must connect Phone in the PWA before a test call.');
-    }
-    target = `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`;
-  }
-  if (!target) throw new Error('This route has no callable PWA device.');
-  const connectionId = process.env.TELNYX_CONNECTION_ID;
-  if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  await (await telnyxClient()).calls.dial({
-    connection_id: connectionId,
-    from: number.e164,
-    to: target,
-    timeout_secs: 25,
-    answering_machine_detection: 'disabled',
-    client_state: Buffer.from(
-      JSON.stringify({ systemId: id, destinationId, purpose: 'admin_test' }),
-    ).toString('base64'),
-  });
-  revalidatePath('/phone');
+  // The retired carrier must never be used for a test call.
+  // Use the authenticated Elevate/Asterisk PWA dial pad for extension calls.
+  // Do not silently initiate a chargeable Twilio PSTN call from this action.
+  await requireSystemId();
+  void formData;
+  throw new Error('Carrier-originated test calling is retired. Use Elevate Phone in the PWA to test an extension; live Twilio/PBX test-call support is not yet verified.');
 }
 
 export async function removeMenuOption(formData: FormData): Promise<void> {

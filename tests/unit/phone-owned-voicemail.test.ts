@@ -57,4 +57,28 @@ describe('non-delivering voicemail acceptance',()=>{
   expect(await response.json()).toMatchObject({code:'speech_http_403'});
   expect(mock.notice).not.toHaveBeenCalled();
  });
+ it('logs a bounded identity failure without recording provider details or PBX credentials',async()=>{
+  database();
+  const log=vi.spyOn(console,'error').mockImplementation(()=>{});
+  vi.mocked(fetch).mockResolvedValueOnce(new Response('private provider details',{status:403}));
+  try{
+   const response=await POST(request());
+   expect(response.status).toBe(503);
+   expect(await response.json()).toMatchObject({code:'voicemail_processing_unavailable'});
+   expect(log).toHaveBeenCalledWith('phone_voicemail_processing_failed',{reason:'voice_identity_unavailable'});
+   expect(JSON.stringify(log.mock.calls)).not.toContain('private provider details');
+   expect(JSON.stringify(log.mock.calls)).not.toContain(secret);
+  }finally{log.mockRestore();}
+ });
+ it('redacts unexpected exception messages from voicemail diagnostics',async()=>{
+  database();
+  mock.admin.mockRejectedValueOnce(new Error('private database connection details'));
+  const log=vi.spyOn(console,'error').mockImplementation(()=>{});
+  try{
+   const response=await POST(request());
+   expect(response.status).toBe(503);
+   expect(log).toHaveBeenCalledWith('phone_voicemail_processing_failed',{reason:'unexpected_failure'});
+   expect(JSON.stringify(log.mock.calls)).not.toContain('private database connection details');
+  }finally{log.mockRestore();}
+ });
 });

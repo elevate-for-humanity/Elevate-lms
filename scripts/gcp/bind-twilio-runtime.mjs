@@ -65,6 +65,9 @@ export async function verifiedTwilioBindings(config, fetchImpl = fetch) {
   const number = await verifiedResponse.json();
   if (number.account_sid !== ACCOUNT || number.sid !== PHONE_SID || number.phone_number !== NUMBER)
     throw Error('The Twilio number does not belong to the approved account');
+  // API keys establish ownership but cannot validate webhook signatures.
+  // Never persist an Auth Token that Twilio explicitly rejected.
+  if (!response.ok) throw Error('Twilio Auth Token rejected; API key verified number ownership only');
   return {...values,TWILIO_PHONE_NUMBER:NUMBER};
 }
 
@@ -97,6 +100,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       'Required Twilio credential is not configured',
       'Twilio account or credential format does not match the approved account',
       'Twilio authentication or number verification failed',
+      'Twilio Auth Token rejected; API key verified number ownership only',
       'The Twilio number does not belong to the approved account',
       'Existing Twilio credential binding requires review',
       'Invalid Google runtime configuration',

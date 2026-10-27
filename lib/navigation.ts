@@ -27,7 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.programs,
     subItems: [
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
-      { name: 'Business & Financial', isHeader: true, href: '/programs/business' },
+      { name: 'Bookkeeping & Business', isHeader: true, href: '/programs/bookkeeping' },
       {
         name: 'Business Administration',
         href: '/programs/business-administration',
@@ -39,7 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
         isSectionLink: true,
       },
       {
-        name: 'Accounting & Financial Empowerment',
+        name: 'Bookkeeping & QuickBooks',
         href: '/programs/bookkeeping',
         isSectionLink: true,
       },
@@ -114,11 +114,33 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
       { name: 'Host Shop Directory', href: '/partners/host-shops', isSectionLink: true },
       { name: 'Job Board', href: '/jobs', isSectionLink: true },
-      { name: 'Join & Showcase Your Work', href: '/partners/host-shop/apply', isSectionLink: true },
+      { name: 'Join the Barber & Beauty Network', href: `${siteUrls.app}/signup`, isSectionLink: true },
+      { name: 'Apply as a Host Shop', href: '/partners/host-shop/apply', isSectionLink: true },
       { name: 'Barber Apprenticeship', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
       { name: 'Esthetics', href: ROUTES.programsEsthetician, isSectionLink: true },
       { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
+    ],
+  },
+  {
+    id: 'tax-services',
+    name: 'Get Your Taxes Prepared',
+    href: '/tax',
+    subItems: [
+      { name: 'Supersonic Fast Cash', href: '/tax', isSectionLink: true },
+      { name: 'Prepare My Taxes', href: '/tax-software/self-file', isSectionLink: true },
+      { name: 'Get Professional Tax Help', href: '/tax-software/contact', isSectionLink: true },
+    ],
+  },
+  {
+    id: 'community',
+    name: 'Community',
+    href: '/community',
+    subItems: [
+      { name: 'Explore the Community', href: '/community', isSectionLink: true },
+      { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
+      { name: 'Barber & Beauty Network', href: '/barber-beauty-network', isSectionLink: true },
+      { name: 'Employer Directory', href: '/employers/directory', isSectionLink: true },
     ],
   },
   {
@@ -151,6 +173,9 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Employers',
     href: ROUTES.employers,
     subItems: [
+      { name: 'Partner With Us', href: '/apply/employer', isSectionLink: true },
+      { name: 'Employer Directory', href: '/employers/directory', isSectionLink: true },
+      { name: 'Browse Jobs', href: '/jobs', isSectionLink: true },
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },

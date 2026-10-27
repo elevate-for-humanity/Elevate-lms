@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 import { chmod, chown, mkdir, readFile, readdir, readlink, rename, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { setTimeout as sleep } from 'node:timers/promises';
 
 const execFileAsync = promisify(execFile);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -112,11 +113,22 @@ export function renderConfiguration(records) {
       dialplan.push(`exten => 0,1,Gosub(elevate-pwa-extensions,${adminExtension},1)`, ' same => n,Return()');
     }
   }
+  // Operator zero remains a valid subroutine even when every device lease has
+  // expired. Return unavailable to the existing caller fallback, never a missing
+  // dialplan target or a stale/unregistered device.
+  if (!extensionOwners.has('0') && (!records.length || !extensionOwners.has(records[0].adminExtension))) {
+    dialplan.push('exten => 0,1,Set(PWA_CONTACTS=)', ' same => n,Set(DIALSTATUS=CHANUNAVAIL)', ' same => n,Return()');
+  }
   return { pjsip: `${pjsip.join('\n')}\n`, dialplan: `${dialplan.join('\n')}\n` };
 }
 
 export function parseContacts(output, endpointId) {
-  if (!ENDPOINT.test(endpointId) || !new RegExp(`Aor:\\s+${endpointId}\\s`).test(output)) {
+  // Asterisk 20's top-level AOR table prints at most 41 characters, while our
+  // identifiers contain 44. The CLI request uses the validated full identifier
+  // and Asterisk retrieves it by exact ID; only the display column is clipped.
+  const rows = [...output.matchAll(/^\s*Aor:\s+([A-Za-z0-9_-]+)\s+(\d+)\s*$/gm)];
+  if (!ENDPOINT.test(endpointId) || rows.length !== 1 ||
+      ![endpointId, endpointId.slice(0, 41)].includes(rows[0][1]) || rows[0][2] !== '1') {
     throw new ProvisioningError('asterisk_aor_unverified');
   }
   const contacts = output.split('\n').filter(line => line.trim().startsWith(`Contact:  ${endpointId}/`) ||
@@ -186,6 +198,7 @@ export function createProvisioner(config, dependencies = {}) {
       !path.isAbsolute(config.generatedRoot || '')) throw new Error('Invalid PBX provisioning configuration');
   const fetchImpl = dependencies.fetch || fetch;
   const now = dependencies.now || Date.now;
+  const wait = dependencies.wait || sleep;
   const command = dependencies.command || (value => defaultCommand(config.container, value));
   const owner = identity => supabaseOwner(identity, config, fetchImpl);
   let records = [];
@@ -222,14 +235,25 @@ export function createProvisioner(config, dependencies = {}) {
   }
 
   async function reloadAndVerify(next, removed = []) {
-    for (const operation of ['pjsip reload', 'dialplan reload']) {
+    for (const operation of ['module reload res_pjsip.so', 'dialplan reload']) {
       const output = await command(operation);
-      if (/no such command|unable to reload|failed to reload/i.test(output)) throw new ProvisioningError('asterisk_reload_failed');
+      if (/no such (?:command|module)|unable to reload|failed to reload|reported a reload failure|does not support reloads|not properly initialized/i.test(output)) throw new ProvisioningError('asterisk_reload_failed');
     }
-    for (const record of next) await inspect(record);
-    for (const record of removed) {
-      const endpoint = await command(`pjsip show endpoint ${record.endpointId}`);
-      if (!/unable to find object|not found|no such/i.test(endpoint)) throw new ProvisioningError('asterisk_revocation_unverified');
+    // Asterisk acknowledges the reload before its configuration workers finish.
+    // Verify actual objects, with a bounded settling period for apply AND rollback.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        for (const record of next) await inspect(record);
+        for (const record of removed) {
+          const endpoint = await command(`pjsip show endpoint ${record.endpointId}`);
+          if (!/unable to find object|not found|no such/i.test(endpoint)) throw new ProvisioningError('asterisk_revocation_unverified');
+        }
+        return;
+      } catch (error) {
+        if (attempt >= 11 || !['asterisk_endpoint_unverified', 'asterisk_aor_unverified',
+          'asterisk_dialplan_unverified', 'asterisk_revocation_unverified'].includes(error.code)) throw error;
+        await wait(250);
+      }
     }
   }
 
@@ -255,7 +279,7 @@ export function createProvisioner(config, dependencies = {}) {
     try {
       await reloadAndVerify(next, records.filter(record => !next.some(candidate => candidate.endpointId === record.endpointId)));
       records = next;
-    } catch {
+    } catch (error) {
       try {
         if (previous) { await symlink(previous, link); await rename(link, current); }
         else await rm(current);
@@ -265,7 +289,9 @@ export function createProvisioner(config, dependencies = {}) {
         throw new ProvisioningError('asterisk_rollback_failed');
       }
       await rm(directory, { recursive: true, force: true });
-      throw new ProvisioningError('asterisk_configuration_rejected');
+      // ProvisioningError codes are fixed constants; preserve the verified
+      // failure stage after rollback without reflecting CLI output or secrets.
+      throw error instanceof ProvisioningError ? error : new ProvisioningError('asterisk_configuration_rejected');
     }
     // Retain only the active and previous generations for rollback. These are
     // service-owned files; production call records and voicemail are untouched.
@@ -421,9 +447,9 @@ async function main() {
     const container = process.env.PBX_ASTERISK_CONTAINER;
     if (!path.isAbsolute(root || '') || !/^[A-Za-z0-9_.-]+$/.test(container || '')) throw new Error('Invalid cleanup configuration');
     await rm(path.join(root, 'current'), { force: true });
-    for (const cmd of ['pjsip reload', 'dialplan reload']) {
+    for (const cmd of ['module reload res_pjsip.so', 'dialplan reload']) {
       const output = await defaultCommand(container, cmd);
-      if (/no such command|unable to reload|failed to reload/i.test(output)) throw new Error('Cleanup reload failed');
+      if (/no such (?:command|module)|unable to reload|failed to reload|reported a reload failure|does not support reloads|not properly initialized/i.test(output)) throw new Error('Cleanup reload failed');
     }
     const endpoints = await defaultCommand(container, 'pjsip show endpoints');
     if (/Endpoint:\s+pwa-[0-9a-f]{40}/.test(endpoints)) throw new Error('Cleanup endpoint removal unverified');

@@ -152,16 +152,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     keys: ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET'],
   },
   {
-    label: 'Legacy Telnyx — migration history',
-    keys: [
-      'TELNYX_API_KEY',
-      'TELNYX_PUBLIC_KEY',
-      'TELNYX_PHONE_NUMBER',
-      'TELNYX_CONNECTION_ID',
-      'TELNYX_MESSAGING_PROFILE_ID',
-    ],
-  },
-  {
     label: 'Elevate Media Storage — Backblaze B2',
     keys: [
       'ELEVATE_MEDIA_PROVIDER',

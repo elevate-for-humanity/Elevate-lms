@@ -4,7 +4,8 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { apiRequireAdmin } from '@/lib/admin/guards';
+import { apiRequireRoles } from '@/lib/admin/guards';
+import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
@@ -55,7 +56,7 @@ async function auditWrite(userId: string, action: 'upsert' | 'delete', keys: str
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
   const db = await requireAdminClient();
   const [{ data, error }, { data: secrets, error: secretError }] = await Promise.all([
@@ -81,7 +82,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
 
   let body: { entries?: { key?: string; value?: string }[] } | null;
@@ -172,7 +173,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
   const key = new URL(req.url).searchParams.get('key')?.trim();
   if (!key) return safeError('key query param required', 400);

@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 
@@ -112,7 +113,7 @@ export default function AnalyticsPage() {
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/pages/admin-email-analytics-detail.webp"
             alt="Analytics"
             fill

@@ -1,8 +1,11 @@
+import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import { getKnowledgeGraphContext } from '@/lib/platform/knowledge-graph';
 import { getSystemRegistryContext } from '@/lib/platform/system-registry';
 
 export interface AdminAiPromptContext {
   agent?: 'ADMIN_AI';
+  contextProfile?: 'full' | 'owned-cpu' | 'conversation';
+  institutionalContext?: string;
   ragContext?: string;
   fileContext?: string;
   documentsContext?: string;
@@ -34,21 +37,56 @@ export function isOperationalDiagnosticRequest(message: string): boolean {
   return DIAGNOSTIC_TERMS.some((term) => normalized.includes(term));
 }
 
+const OWNED_PROMPT_MAX_CHARACTERS = 12_000;
+
+function relevantReferenceLines(context: string, query: string): string {
+  const ignored = new Set(['the', 'this', 'that', 'with', 'from', 'have', 'will', 'please', 'hello', 'there', 'what', 'when', 'where', 'about', 'could', 'would', 'should', 'your', 'does', 'using', 'them', 'then']);
+  const terms = [...new Set(query.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) ?? [])].filter(term => !ignored.has(term));
+  const lines = context.split('\n').filter(line => terms.some(term => line.toLowerCase().includes(term)));
+  return lines.length ? 'Matched canonical reference lines (partial):\n' + lines.join('\n') : 'Detailed catalog omitted. Retrieve relevant canonical evidence with the listed tools when needed.';
+}
+
+function contextExcerpt(value: string, limit: number): string {
+  if (value.length <= limit) return value;
+  if (limit <= 0) return '';
+  const marker = '\n[Partial context; middle omitted.]\n';
+  if (limit <= marker.length) return value.slice(0, limit);
+  const head = Math.ceil((limit - marker.length) / 2);
+  const tail = limit - marker.length - head;
+  return value.slice(0, head) + marker + (tail > 0 ? value.slice(-tail) : '');
+}
+
 export function buildAdminAiSystemPrompt({
-  agent = 'ADMIN_AI',
   ragContext,
+  institutionalContext,
   fileContext,
   documentsContext,
   toolInventory = [],
   automaticEvidence,
   lastUserMessage = '',
+  contextProfile = 'full',
 }: AdminAiPromptContext): string {
+  if (contextProfile === 'conversation') {
+    return `${PARIS_SYSTEM_IDENTITY}\n\nThis request is conversation only. Do not call tools, start workflows, or claim that any action was performed. Answer the user's message directly and follow the requested output format. Use the supplied conversation as context; do not invent live platform facts.`;
+  }
+
   const diagnosticMode = isOperationalDiagnosticRequest(lastUserMessage);
 
   const role =
     'unified platform orchestrator for architecture, development, debugging, QA, DevOps, websites, courses, workflows, business operations, administration, and compliance';
 
-  return `You are ${agent}, the ${role} inside Elevate LMS Dev Studio.
+  const compact = contextProfile === 'owned-cpu';
+  const graph = getKnowledgeGraphContext();
+  const registry = getSystemRegistryContext();
+  const context = {
+    graph: compact ? relevantReferenceLines(graph, lastUserMessage) : graph,
+    registry: compact ? relevantReferenceLines(registry, lastUserMessage) : registry,
+    rag: ragContext || 'No semantic RAG chunks were retrieved for this request.',
+    evidence: automaticEvidence || 'No automatic evidence was collected before this model call.',
+    file: fileContext || 'No file currently open.',
+    documents: documentsContext || 'No uploaded documents available.',
+  };
+  const render = (sections: typeof context) => `${PARIS_SYSTEM_IDENTITY}\n\nYou are the ${role} inside Elevate LMS Dev Studio.
 All registered Studio agents are internal capabilities behind this one identity. Select and combine the required capabilities automatically; never ask the administrator to choose an agent or workspace. Cite actual evidence and never pretend a tool ran.
 
 Platform stack: Next.js App Router, Supabase, TypeScript, Tailwind, Google Cloud Run.
@@ -88,23 +126,40 @@ Next debug step:
 ## Available read-only tools
 ${toolInventory.length ? toolInventory.map((tool) => `- ${tool}`).join('\n') : '- No tool inventory supplied'}
 
+${institutionalContext ? '## AI Studio Charter\n' + institutionalContext + '\n' : ''}
+
 ## Platform knowledge graph
-${getKnowledgeGraphContext()}
+${sections.graph}
 
 ## Program/system registry
-${getSystemRegistryContext()}
+${sections.registry}
 
 ## Retrieved RAG context
-${ragContext || 'No semantic RAG chunks were retrieved for this request.'}
+${sections.rag}
 
 ## Automatic evidence collected before model call
-${automaticEvidence || 'No automatic evidence was collected before this model call.'}
+${sections.evidence}
 
 ## Current file context
-${fileContext || 'No file currently open.'}
+${sections.file}
 
 ## Uploaded documents context
-${documentsContext || 'No uploaded documents available.'}
+${sections.documents}
 
+${compact ? 'Reference sections may be excerpted or omitted to fit the private model. Missing or partial context is not evidence of success. Retrieve complete evidence before making consequential claims or changes.' : ''}
 Be concise, technical, and explicit about evidence boundaries.`;
+
+  if (!compact) return render(context);
+  const bounded = { graph: '', registry: '', rag: '', evidence: '', file: '', documents: '' };
+  let remaining = Math.max(0, OWNED_PROMPT_MAX_CHARACTERS - render(bounded).length);
+  // Keep institutional and observed evidence context ahead of broad catalogs.
+  // The user request and conversation messages are never truncated here.
+  const priorities: Array<[keyof typeof context, number]> = [
+    ['rag', 4000], ['evidence', 2500], ['file', 1800], ['documents', 1800], ['graph', 1200], ['registry', 1200],
+  ];
+  for (const [key, cap] of priorities) {
+    bounded[key] = contextExcerpt(context[key], Math.min(cap, remaining));
+    remaining -= bounded[key].length;
+  }
+  return render(bounded);
 }

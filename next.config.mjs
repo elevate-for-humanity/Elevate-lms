@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -6,6 +6,7 @@ import {
   sharedStandaloneTraceExcludes,
 } from './scripts/next-standalone-trace-excludes.mjs';
 import { resolveCommitSha } from './scripts/build-identity.mjs';
+import { withBuildMemoryDefaults } from './scripts/build-memory-policy.mjs';
 
 const useStandaloneOutput =
   process.env.GITHUB_ACTIONS !== 'true' || process.env.NEXT_STANDALONE_OUTPUT === '1';
@@ -228,9 +229,6 @@ const nextConfig = {
     return config;
   },
 
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -524,16 +522,15 @@ const sentryWebpackPluginOptions = {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
-  autoInstrumentMiddleware: false,
   webpack: {
     autoInstrumentMiddleware: false,
+    treeshake: { removeDebugLogging: true },
   },
-  disableLogger: true,
   widenClientFileUpload: false,
 };
 
 const skipSentry = process.env.BUILD_SCOPE === '1';
 
 export default skipSentry
-  ? nextConfig
-  : withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+  ? withBuildMemoryDefaults(nextConfig)
+  : withSentryConfig(withBuildMemoryDefaults(nextConfig), sentryWebpackPluginOptions);

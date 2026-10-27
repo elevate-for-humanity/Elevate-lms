@@ -17,9 +17,18 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const cues=scene.pictureCues;
  const cue=cues?.length?activePictureCue(cues,seconds):null;
  const cueIndex=cue?cues!.indexOf(cue):-1,previous=cueIndex>0?cues![cueIndex-1]:null;
+ const pictureFade=(start:number)=>interpolate(seconds,[start,start+.1],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
  const whole={width:'100%',height:'100%',objectFit:'contain' as const};
  const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
- const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity}}/>;
+ // Keep the whole teaching photograph visible while the camera gently tracks
+ // it. A contained, slightly inset image preserves tools and hands at the edges.
+ // One continuous camera move per picture instead of oscillating sine/cosine
+ // motion. Repeated cycles were visually indistinguishable from timeline replay.
+ const pictureStart=cue?.startSeconds??0;
+ const pictureEnd=cue?.endSeconds??Math.max(1,scene.durationFrames/fps);
+ const pictureProgress=Math.max(0,Math.min(1,(seconds-pictureStart)/Math.max(0.1,pictureEnd-pictureStart)));
+ const photoMotion=`translate(${(-0.8+pictureProgress*1.6).toFixed(3)}%, ${(-0.35+pictureProgress*0.7).toFixed(3)}%) scale(${(0.975+pictureProgress*0.02).toFixed(4)})`;
+ const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity,transform:photoMotion}}/>;
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
   <div style={{position:'absolute',top:30,left:54,color:'#cdb795',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>
@@ -36,7 +45,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
    <div style={{position:'absolute',top:demonstration&&cue?465:0,left:0,right:0,height:demonstration&&cue?205:670}}>
     {cue?<>
      {previous&&photo(previous.imageUrl)}
-     {photo(cue.imageUrl,previous&&props.visualStyle?.transition!=='cut'?fade(cue.startSeconds):1)}
+     {photo(cue.imageUrl,previous&&props.visualStyle?.transition!=='cut'?pictureFade(cue.startSeconds):1)}
     </>:!demonstration&&scene.imageUrl?photo(scene.imageUrl):null}
    </div>
   </div>
@@ -45,7 +54,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
    <div style={{fontSize:recap?56:(step?.value?.length??0)>100?52:64,lineHeight:1.25}}>{recap?scene.recapText:step?.value}</div>
    <div style={{fontSize:22,color:'#cdb795'}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>
   </div>
-  <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',fontSize:56,lineHeight:1.25,textAlign:'center'}}>{caption}</div>
+  <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',color:'#ffffff',fontSize:60,fontWeight:700,lineHeight:1.25,textAlign:'center',textShadow:'0 2px 4px #000'}}>{caption}</div>
   {scene.audioSrc&&<Audio src={scene.audioSrc} volume={1}/>}
  </AbsoluteFill>;
 }

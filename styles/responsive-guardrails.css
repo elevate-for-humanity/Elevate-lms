@@ -26,6 +26,18 @@ body {
   overflow-x: clip;
 }
 
+/* Keep PWA controls above Admin's mobile dock and the device home indicator. */
+@media (max-width: 1023px) {
+  body.admin-portal:has([aria-label='Mobile admin navigation']) {
+    --elevate-pwa-bottom-offset: 5rem;
+  }
+}
+
+/* An update takes priority; two fixed banners must not cover each other. */
+body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
+  display: none;
+}
+
 :where(main, header, footer, nav, section, article, aside, form, fieldset, div) {
   min-width: 0;
 }
@@ -40,8 +52,18 @@ body {
 }
 
 :where(p, li, dd, dt, label, legend, h1, h2, h3, h4, h5, h6, a, button, th, td) {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
+}
+
+/* Preserve intrinsic column widths; arbitrary wrapping makes four-column
+ * directories appear to fit while turning every label into a vertical stack. */
+:where(th, td) {
+  overflow-wrap: normal;
+}
+
+:where(th) {
+  white-space: nowrap;
 }
 
 :where(pre, code) {
@@ -59,20 +81,9 @@ body {
     width: 100%;
   }
 
-  :where(main) h1 {
-    font-size: clamp(1.75rem, 8vw, 2.25rem);
-    line-height: 1.12;
-  }
-
-  :where(main) h2 {
-    font-size: clamp(1.4rem, 6.5vw, 1.875rem);
-    line-height: 1.2;
-  }
-
-  :where(main) h3 {
-    font-size: clamp(1.15rem, 5vw, 1.5rem);
-    line-height: 1.25;
-  }
+  /* Heading sizes belong to each application and its design tokens.
+   * Global h1/h2/h3 sizes turn compact PWA cards and dashboard labels
+   * into oversized headings on phones. Marketing has its own scoped rhythm. */
 
   :where(main) table {
     display: block;
@@ -93,20 +104,19 @@ body {
   :where(main) textarea {
     width: 100%;
     min-height: 44px;
+    font-size: 1rem;
   }
 
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-2'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-3'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-4'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
+  /* Do not rewrite Tailwind column utilities across the entire app:
+   * doing so collapses 12-column student rows into vertical character stacks.
+   * Responsive column counts belong to each component's sm:/md: variants. */
+  :where(.admin-portal, .lms-portal) main [data-mobile-stack='true'] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  :where(.admin-portal, .lms-portal) main [class*='min-w-['] {
-    min-width: 0;
+  /* A deliberate horizontal table viewport must retain its intrinsic width. */
+  :where(.admin-portal, .lms-portal) main [data-horizontal-table] > * {
+    min-width: max-content;
   }
 
   :where(.admin-portal, .lms-portal) main [class*='w-['] {
@@ -116,17 +126,17 @@ body {
   .admin-portal :where(main) {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
-}
 
-@media (min-width: 768px) and (max-width: 1100px) {
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Studio's composer owns its safe area. Document padding on each nested
+   * main would repeatedly reduce its viewport and clip the bottom controls. */
+  .admin-portal main.admin-studio-viewport,
+  .admin-portal .admin-studio-viewport main {
+    padding-bottom: 0;
   }
 }
 
+/* Grid utilities own their breakpoints. Substring matching also captures
+ * inactive xl:grid-cols-* utilities and destroys tablet layouts. */
 
 /* Public marketing mobile hardening.
  * Preserve deliberate horizontal scrollers, but prevent desktop-first grids,
@@ -141,17 +151,12 @@ body {
     max-width: 100%;
   }
 
-  main :where([class*='max-w-']) {
-    width: 100%;
-  }
+  /* Do not force every max-width component to width: 100%.
+   * That expands intentionally compact cards, controls, image frames and
+   * dialogs in installed PWAs. Components already own responsive widths. */
 
-  main :where([class*='grid-cols-2'], [class*='grid-cols-3'], [class*='grid-cols-4'], [class*='grid-cols-5'], [class*='grid-cols-6']) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  main :where([class*='w-['], [class*='min-w-[']) {
+  main :where([class*='w-[']):not(table) {
     max-width: 100%;
-    min-width: 0;
   }
 
   main :where(img, video, iframe, canvas):not([data-nimg='fill']):not(.absolute):not(.h-full) {

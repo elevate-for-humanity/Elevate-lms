@@ -37,8 +37,9 @@ test('unassigned customer cannot read or write claims through admin client', asy
   setup({ allowed: false });
   const result = await module.POST(request, { params: Promise.resolve({ websiteId: 'site-a' }) });
   assert.equal(result.status, 404);
-  assert.equal(fixture.adminLookups, 0);
+  assert.equal(fixture.adminLookups, 1);
   assert.equal(fixture.payload, undefined);
+  assert.deepEqual(fixture.authorization, {siteId: 'site-a', userId: 'hosting-admin'});
 });
 test('anonymous claims requests do not access privileged records', async () => {
   setup({ user: null });

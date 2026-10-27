@@ -51,7 +51,7 @@ function AdminModulePreview({ pathname, previewing }: { pathname: string; previe
       <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
         {previewing
           ? 'The learner dashboard preview is read-only. Detailed records and actions stay in secured Admin management so an administrator cannot accidentally act as the learner.'
-          : 'This Student Portal module is operational. No learner identity or record is attached to the administrator session.'}
+          : 'Select a learner in Admin to view their saved dashboard records. No learner is selected in this session.'}
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <a

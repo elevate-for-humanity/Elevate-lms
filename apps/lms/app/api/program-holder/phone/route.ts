@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { asteriskDeviceStatus, asteriskDeviceId } from '@/lib/phone/asterisk';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { ADMIN_FORWARDING_NUMBER, adminForwardingAllowed } from '@/lib/phone/forwarding-policy';
 import {
   DEFAULT_AVAILABILITY_SCHEDULE,
   type AvailabilitySchedule,
@@ -18,7 +19,9 @@ const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
-async function phoneContext(ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>) {
+async function phoneContext(
+  ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>,
+) {
   const { data: extension } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
@@ -30,7 +33,7 @@ async function phoneContext(ctx: NonNullable<Awaited<ReturnType<typeof phoneActo
     ? await Promise.all([
         ctx.db
           .from('phone_systems')
-          .select('id,name,timezone,status')
+          .select('id,name,timezone,status,tenant_id')
           .eq('id', systemId)
           .maybeSingle(),
         ctx.db
@@ -46,7 +49,7 @@ async function phoneContext(ctx: NonNullable<Awaited<ReturnType<typeof phoneActo
     ctx,
     extension,
     system,
-    phoneNumber: primaryNumber?.e164 || process.env.TELNYX_PHONE_NUMBER?.trim() || '',
+    phoneNumber: primaryNumber?.e164 || '',
   };
 }
 
@@ -89,7 +92,7 @@ export async function GET() {
     ctx.db
       .from('phone_callback_tasks')
       .select(
-        'id,source,caller_name,callback_number,reason,program_or_department,urgency,preferred_callback_time,transcript,summary,status,read_at,created_at,recording_url',
+        'id,call_id,source,caller_name,callback_number,reason,program_or_department,urgency,preferred_callback_time,transcript,summary,status,read_at,created_at,recording_url',
       )
       .eq('assigned_profile_id', ctx.user.id)
       .order('created_at', { ascending: false })
@@ -112,7 +115,7 @@ export async function GET() {
       .select('id', { count: 'exact', head: true })
       .eq('extension_id', extension.id)
       .eq('status', 'active')
-      .eq('provider', extension.webrtc_provider || 'telnyx')
+      .eq('provider', 'asterisk')
       .eq('connection_state', 'connected')
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
   ]);
@@ -151,10 +154,11 @@ export async function GET() {
       schedule: extension.availability_schedule || DEFAULT_AVAILABILITY_SCHEDULE,
       ringSeconds: extension.ring_seconds,
       voicemailGreeting: extension.voicemail_greeting || '',
-      externalFallbackEnabled: extension.admin_external_fallback === true,
-      externalFallbackNumber: extension.external_fallback_number || '',
+      externalFallbackAllowed: adminForwardingAllowed(system, extension, ctx.roles),
+      externalFallbackEnabled: adminForwardingAllowed(system, extension, ctx.roles) && extension.admin_external_fallback === true,
+      externalFallbackNumber: adminForwardingAllowed(system, extension, ctx.roles) ? ADMIN_FORWARDING_NUMBER : '',
       presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
-      provider: extension.webrtc_provider || 'telnyx',
+      provider: 'asterisk',
     },
     voicemail: {
       unreadCount: (voicemails || []).filter((item: any) => !item.is_read).length,
@@ -169,6 +173,10 @@ export async function GET() {
     },
     inbox: (inbox || []).map((item: any) => ({
       ...item,
+      transcript:
+        item.transcript ||
+        (voicemails || []).find((v: any) => v.call_id === item.call_id)?.transcription ||
+        null,
       hasRecording: Boolean(item.recording_url),
       recording_url: undefined,
       recordingUrl: item.recording_url
@@ -189,7 +197,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const { actor: ctx, response: actorError } = await phoneActorResponse();
   if (actorError) return actorError;
-  const { extension } = await phoneContext(ctx);
+  const { extension, system } = await phoneContext(ctx);
   if (ctx.previewing) {
     return NextResponse.json(
       {
@@ -228,7 +236,7 @@ export async function PATCH(request: Request) {
   }
   const body = await request.json().catch(() => ({}));
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  const provider = extension.webrtc_provider || 'telnyx';
+  const provider = 'asterisk';
   if (body.action === 'heartbeat') {
     const requestedDeviceId = String(body.deviceId || '');
     const deviceId =
@@ -362,7 +370,8 @@ export async function PATCH(request: Request) {
     patch.last_presence_at = new Date().toISOString();
   } else if (body.action === 'ring_mode') {
     const ringMode = String(body.ringMode || '') as RingMode;
-    if (!['ring','vibrate','silent'].includes(ringMode)) return NextResponse.json({error:'Choose ring, vibrate, or silent.'},{status:400});
+    if (!['ring', 'vibrate', 'silent'].includes(ringMode))
+      return NextResponse.json({ error: 'Choose ring, vibrate, or silent.' }, { status: 400 });
     // Quick alert controls change only ringing. Preserve schedules, forwarding,
     // voicemail, notifications and verified connection presence.
     patch.ring_mode = ringMode;
@@ -373,6 +382,9 @@ export async function PATCH(request: Request) {
     const ringSeconds = Number(body.ringSeconds);
     const voicemailGreeting = String(body.voicemailGreeting || '').trim();
     const externalFallbackEnabled = body.externalFallbackEnabled === true;
+    if (externalFallbackEnabled && !adminForwardingAllowed(system, extension, ctx.roles)) {
+      return NextResponse.json({ error: 'Cell-phone forwarding is disabled. Use your Elevate phone or PBX connection.' }, { status: 403 });
+    }
     const externalDigits = String(body.externalFallbackNumber || '').replace(/\D/g, '');
     const externalFallbackNumber =
       externalDigits.length === 10
@@ -389,9 +401,9 @@ export async function PATCH(request: Request) {
     if (!schedule || !Number.isInteger(ringSeconds) || ringSeconds < 5 || ringSeconds > 60) {
       return NextResponse.json({ error: 'Schedule or ring duration is invalid.' }, { status: 400 });
     }
-    if (externalFallbackEnabled && !externalFallbackNumber) {
+    if (externalFallbackEnabled && externalFallbackNumber !== ADMIN_FORWARDING_NUMBER) {
       return NextResponse.json(
-        { error: 'Enter a valid 10-digit fallback phone number.' },
+        { error: 'Only the approved administrator forwarding destination is allowed.' },
         { status: 400 },
       );
     }

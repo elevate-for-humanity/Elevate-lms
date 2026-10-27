@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowRight, BadgeDollarSign, CalendarDays } from 'lucide-react';
 
 const PROGRAMS = [
@@ -27,7 +27,7 @@ const PROGRAMS = [
   {
     title: 'Business & Entrepreneurship',
     href: '/programs/business-administration',
-    image: '/images/pages/business-meeting.webp',
+    image: '/images/business-collaboration-vibrant-2026.webp',
     alt: 'Business learners collaborating around a conference table',
     field: 'Business',
     summary:
@@ -36,7 +36,7 @@ const PROGRAMS = [
   {
     title: 'Bookkeeping',
     href: '/programs/bookkeeping',
-    image: '/images/pages/bookkeeping-ledger.webp',
+    image: '/images/bookkeeping-training-vibrant-2026.webp',
     alt: 'Bookkeeping learner reviewing financial records',
     field: 'Business & Finance',
     summary:
@@ -64,6 +64,8 @@ const PROGRAMS = [
 
 export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
   const [active, setActive] = useState(0);
+  const [interactive, setInteractive] = useState(false);
+  useEffect(() => setInteractive(true), []);
 
   const program = PROGRAMS[active];
   const Heading = asHero ? 'h1' : 'h2';
@@ -82,7 +84,7 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             id="program-showcase-heading"
             className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl"
           >
-            Train for an in-demand career. Funding may cover your cost.
+            Train for an in-demand career. Review the verified payment path for your program.
           </Heading>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
             Explore HVAC, CDL, business, bookkeeping, technology, healthcare, and more. Funding is
@@ -93,10 +95,9 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-blue-200 bg-white p-4">
               <BadgeDollarSign className="h-6 w-6 text-emerald-700" />
-              <p className="mt-2 font-black">Training may be no-cost if you qualify</p>
+              <p className="mt-2 font-black">Verified funding exists for selected programs</p>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Apply first, complete intake, and receive written approval before funded training
-                begins.
+                Open the exact program record first. Where workforce funding is verified, complete agency intake and receive written authorization before training begins.
               </p>
             </div>
             <div className="rounded-2xl border border-blue-200 bg-white p-4">
@@ -131,13 +132,13 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
               alt={program.alt}
               fill
               priority={active === 0}
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 1024px) 100vw, 55vw"
             />
           </div>
           <div className="border-t border-slate-200 p-4 sm:p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
+              <div className="min-w-0">
                 <p className="text-xs font-black uppercase tracking-wider text-brand-red-700">
                   {program.field}
                 </p>
@@ -149,16 +150,19 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-700">{program.summary}</p>
           </div>
-          <div className="flex justify-center gap-2 pb-4">
+          <div role="group" aria-label="Featured programs" className="flex flex-wrap justify-center gap-0 pb-4 sm:gap-1">
             {PROGRAMS.map((item, index) => (
               <button
                 key={item.href}
                 type="button"
+                disabled={!interactive}
                 aria-label={`Show ${item.title}`}
                 aria-current={index === active ? 'true' : undefined}
                 onClick={() => setActive(index)}
-                className={`h-3 rounded-full transition-all ${index === active ? 'w-8 bg-brand-red-700' : 'w-3 bg-slate-300'}`}
-              />
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700 disabled:cursor-wait disabled:opacity-50"
+              >
+                <span aria-hidden="true" className={`h-2 rounded-full transition-all ${index === active ? 'w-6 bg-brand-red-700' : 'w-2 bg-slate-400'}`} />
+              </button>
             ))}
           </div>
         </div>

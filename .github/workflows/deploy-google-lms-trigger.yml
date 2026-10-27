@@ -3,6 +3,12 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/gcp/production-acceptance.*'
+      - 'scripts/build-memory-policy.*'
+      - 'scripts/check-build-memory-policy.mjs'
+      - 'scripts/run-bounded-build.*'
+      - 'scripts/build-next-app.*'
+      - 'scripts/container-build-policy.mjs'
       - 'public/**'
       - 'content/**'
       - 'config/**'
@@ -16,6 +22,7 @@ on:
       - 'apps/lms/**'
       - 'lib/**'
       - 'components/**'
+      - 'styles/**'
       - 'packages/**'
       - 'Dockerfile.northflank-lms'
       - 'scripts/gcp/preflight-billing.mjs'
@@ -26,6 +33,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-google-lms-trigger.yml'
+      - 'scripts/gcp/resolve-main-release*'
   workflow_dispatch:
     inputs:
       requested_sha:
@@ -38,7 +46,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
       group: google-lms-dispatch-main
       cancel-in-progress: true
@@ -56,28 +64,51 @@ jobs:
   validate:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    outputs:
+      ready: ${{ steps.release.outputs.ready }}
     steps:
-      - name: Reject stale LMS release requests
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - name: Resolve current main or hand off superseded release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_SHA: ${{ inputs.requested_sha }}
+          RELEASE_WORKFLOW: deploy-google-lms-trigger.yml
         run: |
-          set -euo pipefail
-          if test -n "$REQUESTED_SHA" && ! [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ ]]; then exit 1; fi
-          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          test "$GITHUB_SHA" = "$latest"
-          if test -n "$REQUESTED_SHA"; then test "$REQUESTED_SHA" = "$GITHUB_SHA"; fi
+          node --test scripts/gcp/resolve-main-release.test.mjs
+          node scripts/gcp/resolve-main-release.mjs
   build:
     needs: validate
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
     uses: ./.github/workflows/build-google-migration-images.yml
     with:
       component: lms
     secrets: inherit
   deploy:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true'
     needs: build
     uses: ./.github/workflows/deploy-google-repaired.yml
     with:
       component: lms
       image_sha: ${{ github.sha }}
     secrets: inherit
+  acceptance:
+    needs: deploy
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Explicitly hand the verified LMS release to production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: lms
+          ACCEPTANCE_SHA: ${{ github.sha }}
+          ACCEPTANCE_RUN_ID: ${{ github.run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs dispatch

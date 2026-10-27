@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
       document_type: documentType,
       file_name: file.name,
       file_url: path,
+      storage_bucket: 'documents',
       file_size: file.size,
       mime_type: file.type,
       description:

@@ -67,7 +67,7 @@ function ServiceCard({ check }: { check: ServiceCheck }) {
         <p className="text-slate-400 text-xs mt-1">{check.latencyMs}ms</p>
       )}
       {check.message && (
-        <p className="text-slate-500 text-xs mt-1 truncate">{check.message}</p>
+        <p className="text-slate-400 text-xs mt-1 break-words">{check.message}</p>
       )}
       {!check.configured && (
         <p className="text-slate-500 text-xs mt-1">Not configured</p>
@@ -129,11 +129,11 @@ export default function SystemHealthClient({
   const services = Object.values(snap.services);
   const overallBg =
     snap.overall === 'healthy' ? 'bg-green-950/40 border-green-800' :
-    snap.overall === 'degraded' ? 'bg-amber-950/40 border-amber-800' :
+    snap.overall === 'degraded' || snap.overall === 'unknown' ? 'bg-amber-950/40 border-amber-800' :
       'bg-red-950/40 border-red-800';
   const OverallIcon =
     snap.overall === 'healthy' ? CheckCircle :
-    snap.overall === 'degraded' ? AlertTriangle : XCircle;
+    snap.overall === 'degraded' || snap.overall === 'unknown' ? AlertTriangle : XCircle;
 
   return (
     <div className="space-y-6">
@@ -159,7 +159,8 @@ export default function SystemHealthClient({
         <OverallIcon className={`w-5 h-5 flex-shrink-0 ${statusColor(snap.overall)}`} />
         <div>
           <p className={`font-semibold ${statusColor(snap.overall)}`}>
-            {snap.overall === 'healthy' ? 'All Systems Operational' :
+            {snap.overall === 'healthy' ? 'Monitored service checks passed' :
+             snap.overall === 'unknown' ? 'Some services remain unverified' :
              snap.overall === 'degraded' ? 'Platform Degraded' : 'Platform Down'}
           </p>
           <p className="text-slate-400 text-xs mt-0.5">

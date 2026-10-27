@@ -32,8 +32,9 @@ async function start(holdFirst = false, cdpCheck?: () => Promise<any>) {
               }
             : { configured: true, ready: true },
         );
-      if (url.endsWith('/actions')) {
-        actions.push(JSON.parse(options.body));
+      if (url.endsWith('/actions') || url.endsWith('/browser/action')) {
+        const body = JSON.parse(options.body);
+        actions.push(body.action || body);
         if (holdFirst && actions.length === 1)
           await new Promise<void>((r) => {
             release = r;
@@ -128,8 +129,10 @@ it('switches mobile browser panels without resetting the session, stream or inpu
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   const image = screen.getByRole('img', { name: 'Live isolated Chromium browser' });
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Sign-in & tools' }));
-  expect(screen.getByRole('button', { name: 'Sign-in & tools' }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Email / password' }));
+  expect(
+    screen.getByRole('button', { name: 'Email / password' }).getAttribute('aria-pressed'),
+  ).toBe('true');
   expect(screen.getByLabelText('Secure browser input')).toBe(input);
   fireEvent.click(screen.getByRole('button', { name: 'Browser', exact: true }));
   expect(screen.getByRole('img', { name: 'Live isolated Chromium browser' })).toBe(image);
@@ -142,10 +145,14 @@ it('opens a readable sign-in view on the existing session and keeps the draft', 
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
   fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
-  await waitFor(() => expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780, actor: 'human' }));
+  await waitFor(() =>
+    expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780, actor: 'human' }),
+  );
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
-  expect(screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed')).toBe('true');
+  expect(
+    screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed'),
+  ).toBe('true');
   fireEvent.click(screen.getByRole('button', { name: 'Exit sign-in view' }));
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
@@ -153,7 +160,9 @@ it('opens a readable sign-in view on the existing session and keeps the draft', 
 
 it('offers a literal @ for the general browser keyboard without relying on the phone keyboard', async () => {
   const { actions } = await start();
-  fireEvent.click(screen.getByRole('button', { name: 'Insert at sign into browser keyboard input' }));
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Insert at sign into browser keyboard input' }),
+  );
   expect((screen.getByLabelText('Browser keyboard input') as HTMLInputElement).value).toBe('@');
   fireEvent.click(screen.getByRole('button', { name: 'Type', exact: true }));
   await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@', actor: 'human' }));
@@ -212,8 +221,11 @@ it('shrinks below 100 percent to 25 percent and restores without recreating the 
     expect(screen.getByLabelText('Browser zoom').textContent).toBe(percent);
     expect(image.style.width).toBe(percent);
   }
-  expect((screen.getByRole('button', { name: 'Zoom browser out' }) as HTMLButtonElement).disabled).toBe(true);
-  for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole('button', { name: 'Zoom browser in' }));
+  expect(
+    (screen.getByRole('button', { name: 'Zoom browser out' }) as HTMLButtonElement).disabled,
+  ).toBe(true);
+  for (let i = 0; i < 3; i++)
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom browser in' }));
   expect(image.style.width).toBe('100%');
   expect(actions).toEqual([]);
 });
@@ -241,31 +253,90 @@ it('focuses the desktop page for direct typing after selecting a website field',
   expect(actions[1]).toEqual({ type: 'type', text: '@', actor: 'human' });
 });
 
-
 it('shows direct CDP connected only after its authenticated connection check succeeds', async () => {
   let resolveCheck!: (response: any) => void;
-  const check = new Promise((resolve) => { resolveCheck = resolve; });
+  const check = new Promise((resolve) => {
+    resolveCheck = resolve;
+  });
   await start(false, () => check);
   expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
   expect(screen.queryByText('Direct CDP connected')).toBeNull();
   expect(fetch).toHaveBeenCalledWith('https://worker.example/sessions/test/cdp', {
-    headers: { Authorization: 'Bearer fixture' }, cache: 'no-store',
+    headers: { Authorization: 'Bearer fixture' },
+    cache: 'no-store',
   });
   await act(async () => {
-    resolveCheck({ ok: true, json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }) });
+    resolveCheck({
+      ok: true,
+      json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }),
+    });
   });
   await waitFor(() => expect(screen.getByText('Direct CDP connected')).toBeTruthy());
   expect(screen.queryByText('Direct CDP unverified')).toBeNull();
 });
 
 it.each([
-  ['network failure', async () => { throw new Error('connection unavailable'); }],
-  ['unsuccessful response', async () => ({ ok: false, json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }) })],
-  ['disconnected browser', async () => ({ ok: true, json: async () => ({ connected: false, engine: 'direct-cdp-chromium' }) })],
-  ['different browser engine', async () => ({ ok: true, json: async () => ({ connected: true, engine: 'playwright' }) })],
+  [
+    'network failure',
+    async () => {
+      throw new Error('connection unavailable');
+    },
+  ],
+  [
+    'unsuccessful response',
+    async () => ({
+      ok: false,
+      json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }),
+    }),
+  ],
+  [
+    'disconnected browser',
+    async () => ({
+      ok: true,
+      json: async () => ({ connected: false, engine: 'direct-cdp-chromium' }),
+    }),
+  ],
+  [
+    'different browser engine',
+    async () => ({ ok: true, json: async () => ({ connected: true, engine: 'playwright' }) }),
+  ],
 ])('keeps direct CDP unverified after %s', async (_reason, cdpCheck) => {
   await start(false, cdpCheck);
   await act(async () => {});
   expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
   expect(screen.queryByText('Direct CDP connected')).toBeNull();
+});
+
+it('focuses credential entry during the tap without waiting for an animation frame', async () => {
+  await start();
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+  input.blur();
+  fireEvent.click(screen.getByRole('button', { name: 'Password input' }));
+  expect(input.type).toBe('password');
+  expect(document.activeElement).toBe(input);
+  input.blur();
+  fireEvent.click(screen.getByRole('button', { name: 'Email input' }));
+  expect(document.activeElement).toBe(input);
+  expect(input.placeholder).toBe('Tap here to enter your email');
+});
+
+it('lets the owner reveal a password locally and hides it again after sending', async () => {
+  const { actions } = await start();
+  fireEvent.click(screen.getByRole('button', { name: 'Password input' }));
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  expect(input.placeholder).toBe('Tap here to enter your password');
+  fireEvent.change(input, { target: { value: 'fixture-only-password' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Show password', exact: true }));
+  expect(input.type).toBe('text');
+  expect(input.value).toBe('fixture-only-password');
+  expect(actions).toEqual([]);
+  fireEvent.click(screen.getByRole('button', { name: 'Hide password', exact: true }));
+  expect(input.type).toBe('password');
+  fireEvent.click(screen.getByRole('button', { name: 'Show password', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: 'Type securely' }));
+  await waitFor(() => expect(actions).toHaveLength(1));
+  expect(input.value).toBe('');
+  expect(input.type).toBe('password');
+  expect(screen.queryByText('fixture-only-password')).toBeNull();
 });

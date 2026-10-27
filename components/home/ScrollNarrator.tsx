@@ -146,10 +146,14 @@ export function ScrollNarrator() {
   }, []);
 
   useEffect(() => {
-    const preference =
-      window.localStorage.getItem(NARRATION_PREFERENCE_KEY) ??
-      window.localStorage.getItem(LEGACY_NARRATION_PREFERENCE_KEY);
-    if (preference === 'off') setEnabled(false);
+    // Privacy modes may reject even reading Storage. Narration preferences
+    // must never crash the shared marketing layout or its streamed content.
+    try {
+      const preference =
+        window.localStorage.getItem(NARRATION_PREFERENCE_KEY) ??
+        window.localStorage.getItem(LEGACY_NARRATION_PREFERENCE_KEY);
+      if (preference === 'off') setEnabled(false);
+    } catch { /* Keep the in-memory preference when storage is unavailable. */ }
   }, []);
 
   useEffect(() => {
@@ -296,13 +300,13 @@ export function ScrollNarrator() {
     if (enabled) {
       setEnabled(false);
       setNotice(null);
-      window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off');
+      try { window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off'); } catch { /* Session-only preference. */ }
       stop();
       return;
     }
 
     setNotice(null);
-    window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on');
+    try { window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on'); } catch { /* Session-only preference. */ }
     setEnabled(true);
   };
 

@@ -49,6 +49,87 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const passed = (steps ?? []).filter((x: any) => x.state === 'passed' && currentEvidence(x.artifacts));
     const artifacts = { ...((lesson?.artifacts ?? {}) as Record<string, unknown>) };
     for (const step of passed) artifacts[String(step.step)] = step.artifacts ?? {};
+    // A legacy ASR finding was routed to a deterministic timeline producer.
+    // Recover its exact certified timeline and already encoded film; the new
+    // independent decoded-audio QA still has to pass before acceptance.
+    const narrationDirective = (artifacts.__repairState as any)?.directive;
+    const narrationInspectorRetry = narrationDirective?.failedStep === 'finished_media_qa' &&
+      narrationDirective?.target === 'synchronization' &&
+      Array.isArray(narrationDirective.requirements) && narrationDirective.requirements.length > 0 &&
+      narrationDirective.requirements.every((finding: any) => finding.code === 'MEDIA_SCENE_NARRATION_MISMATCH') &&
+      currentEvidence(narrationDirective.previous) && currentEvidence(artifacts.lesson_film_render as any);
+    if (narrationInspectorRetry) {
+      artifacts.synchronization = narrationDirective.previous;
+      if (!passed.some((step: any) => step.step === 'synchronization'))
+        passed.push({step:'synchronization',state:'passed',artifacts:narrationDirective.previous});
+      artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
+        directive:{...narrationDirective,target:'finished_media_qa'}};
+    }
+    // Recover a legacy picture-cue repair that was incorrectly routed
+    // to the deterministic synchronization producer.
+    //
+    // Cue quotations originate in the storyboard; repair their source.
+    // Preserve certified narration and timeline evidence, but do not
+    // certify rendering or downstream media QA.
+    const pictureCueDirective =
+      (artifacts.__repairState as any)?.directive;
+
+    const legacyPictureCueRetry =
+      pictureCueDirective?.target === 'synchronization' &&
+      pictureCueDirective?.failedStep === 'lesson_film_render' &&
+      Array.isArray(pictureCueDirective.requirements) &&
+      pictureCueDirective.requirements.length > 0 &&
+      pictureCueDirective.requirements.every((finding: any) =>
+        finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/
+          .test(String(finding.message ?? ''))
+      ) &&
+      currentEvidence(pictureCueDirective.previous);
+
+    if (legacyPictureCueRetry) {
+      artifacts.synchronization = pictureCueDirective.previous;
+
+      if (!passed.some((step: any) =>
+        step.step === 'synchronization')) {
+        passed.push({
+          step: 'synchronization',
+          state: 'passed',
+          artifacts: pictureCueDirective.previous,
+        });
+      }
+
+      // The next runner pass must reconsider the original storyboard
+      // cues rather than replaying the obsolete sync repair.
+      artifacts.__repairState = {
+        ...(artifacts.__repairState as any),
+        status: 'diagnosed',
+        directive: {
+          ...pictureCueDirective,
+          target: 'storyboard',
+          previous: artifacts.storyboard,
+        },
+      };
+    }
+
+    // The old full-frame premium OCR can reject a readable heading, then strand
+    // its unchanged scene producer. Retry that inspection using the previously
+    // certified producer and saved film. The runner still verifies every input
+    // hash and stage contract; media QA is never marked passed here.
+    const directive = (artifacts.__repairState as any)?.directive;
+    const legacyTitleRetry = directive?.failedStep === 'finished_media_qa' &&
+      directive?.target === 'scene_construction' &&
+      (artifacts.lesson_film_render as any)?.render?.presentationVersion === 'approved-moment-cues-v2' &&
+      currentEvidence(artifacts.lesson_film_render as any) &&
+      Array.isArray(directive.requirements) && directive.requirements.length > 0 &&
+      directive.requirements.every((finding: any) => finding.code === 'MEDIA_TEXT_UNREADABLE') &&
+      currentEvidence(directive.previous);
+    if (legacyTitleRetry) {
+      artifacts.scene_construction = directive.previous;
+      if (!passed.some((step: any) => step.step === 'scene_construction')) {
+        passed.push({ step: 'scene_construction', state: 'passed', artifacts: directive.previous });
+      }
+      delete artifacts.__repairState;
+    }
     // A repaired provider or renderer must rebuild downstream media instead of
     // replaying a failed QA result against the same cached audio/video. Keep
     // all earlier instructional work and licensed visual assignments.
@@ -56,7 +137,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const narrationNeedsRepair = narrationQA?.failures?.some((failure: string) =>
       ['PACE_OUT_OF_RANGE', 'CLIPPED_WORDS'].includes(failure));
     const render = (artifacts.lesson_film_render as any)?.render;
-    const oldLayout = render && render.layoutVersion !== 2;
+    const oldLayout = render && ![2, 4].includes(render.layoutVersion);
     const storyboard = (artifacts.storyboard as any)?.storyboard ?? artifacts.storyboard;
     const insufficientScenes = Array.isArray(storyboard?.scenes) &&
       storyboard.scenes.length < MIN_LESSON_VIDEO_SCENES;
@@ -75,6 +156,9 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     return {
       artifacts,
       passedSteps: reusable.map((x: any) => String(x.step)),
+      recoveredSteps: (narrationInspectorRetry || legacyPictureCueRetry) && reusable.some((step: any) => step.step === 'synchronization')
+        ? ['synchronization' as const] : legacyTitleRetry && reusable.some((step: any) => step.step === 'scene_construction')
+        ? ['scene_construction' as const] : [],
       findings: Array.isArray(lesson?.findings) ? lesson.findings : [],
     };
   }
@@ -111,9 +195,19 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       .single();
     if (error) throw error;
     const findings = Array.isArray(data?.findings) ? data.findings : [];
+    // Repeated repairs must not append the same unresolved finding on each pass.
+    // Keep distinct errors and their evidence; never mark a failed QA gate as passed.
+    const key = (finding: any) => JSON.stringify([
+      finding?.step ?? null,
+      finding?.code ?? null,
+      finding?.message ?? null,
+      finding?.severity ?? null,
+    ]);
+    const unique = [...new Map([...findings, input.finding].map((finding: any) => [key(finding), finding])).values()];
+    if (unique.length === findings.length && findings.some((finding: any) => key(finding) === key(input.finding))) return;
     const { error: e } = await this.db
       .from('ultimate_course_builds')
-      .update({ findings: [...findings, input.finding], updated_at: new Date().toISOString() })
+      .update({ findings: unique, updated_at: new Date().toISOString() })
       .eq('id', input.buildId);
     if (e) throw e;
   }

@@ -183,7 +183,7 @@ export default function ProgramIntegrityPage() {
                             </span>
                           ))}
                           {p.failing_checks.length > 3 && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-400">
+                            <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                               +{p.failing_checks.length - 3}
                             </span>
                           )}

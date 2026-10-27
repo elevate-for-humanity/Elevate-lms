@@ -13,6 +13,13 @@ export async function approveAdminHours(
   expected: HoursApprovalSnapshot[],
 ) {
   const db = await requireAdminClient();
+  const { data: source, error: sourceError } = await db
+    .from('apprenticeship_hours')
+    .select('id')
+    .in('id', ids);
+  if (sourceError) return safeDbError(sourceError, 'Read canonical apprenticeship hours');
+  if (source?.length !== ids.length)
+    return safeError('Canonical hour entry not found. Refresh the queue.', 404);
   const { data: count, error } = await db.rpc('admin_verify_apprenticeship_hours', {
     p_ids: ids,
     p_approver_id: actorId,
@@ -28,8 +35,8 @@ export async function approveAdminHours(
     return safeDbError(error, 'Approve apprenticeship hours');
   }
   const { data: verified, error: readError } = await db
-    .from('progress_entries')
-    .select('id,status,verified_by,verified_at')
+    .from('apprenticeship_hours')
+    .select('id,status,approved,approved_by,approved_at')
     .in('id', ids);
   if (readError)
     return safeDbError(
@@ -39,7 +46,7 @@ export async function approveAdminHours(
     );
   if (
     verified?.length !== ids.length ||
-    verified.some((e) => e.status !== 'verified' || !e.verified_by || !e.verified_at)
+    verified.some((e) => e.status !== 'verified' || !e.approved || !e.approved_by || !e.approved_at)
   )
     return safeError('Could not confirm every approval. Refresh the queue before retrying.', 409);
   return NextResponse.json({ ok: true, approvedCount: Number(count), entries: verified });

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: `Integrations & API | ${PLATFORM_DEFAULTS.orgName} Store`,
   description: 'Salesforce, Zapier, REST API, webhooks, and custom integrations. Connect your workforce platform to your existing systems.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/integrations',
+    canonical: 'https://store.elevateforhumanity.org/store/integrations',
   },
 };
 

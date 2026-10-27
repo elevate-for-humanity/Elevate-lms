@@ -1,4 +1,6 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
+import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { PRIVILEGED_MFA_ROLES, privilegedMfaEnforcementEnabled } from '@/lib/auth/privileged-mfa';
@@ -29,6 +31,8 @@ const PUBLIC_PATHS = [
   // Telnyx cannot present an admin browser session. The route handler verifies
   // every request with Telnyx's Ed25519 signature before processing an event.
   '/api/webhooks/telnyx',
+  // Twilio webhooks verify their account-bound HMAC signature in the handler.
+  '/api/webhooks/twilio/sms',
   // This internal worker authenticates with CRON_SECRET in its route handler.
   // It must bypass session middleware or cron/local worker calls are redirected
   // to /login before bearer authentication can run.
@@ -45,7 +49,9 @@ function isPublicPath(pathname: string): boolean {
     ) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
-    /[a-z0-9]+\.[a-z]+$/i.test(pathname)
+    // Public packaged images cannot carry a browser session into Next's optimizer.
+    /^\/images\/.+\.(?:png|jpe?g|webp|avif|gif|svg|ico)$/i.test(pathname) ||
+    /^\/[^/]+\.(?:png|jpe?g|webp|svg|ico|json|webmanifest|js|css|txt)$/i.test(pathname)
   );
 }
 
@@ -53,6 +59,15 @@ function hasCronBearer(req: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
   return Boolean(cronSecret && req.headers.get('authorization') === `Bearer ${cronSecret}`);
 }
+
+// These exact processors use scheduler credentials in their own handlers.
+// A valid scheduler request must reach them without an administrator cookie.
+const INTERNAL_WORKFLOW_CRON_PATHS = new Set([
+  '/api/internal/ai-operator',
+  '/api/internal/workflow-event-processor',
+  '/api/internal/workflow-schedule-processor',
+  '/api/internal/orchestration/process',
+]);
 
 function requiredRoles(pathname: string): readonly UserRole[] {
   const isStudio =
@@ -82,18 +97,26 @@ function requiredRoles(pathname: string): readonly UserRole[] {
   return ADMIN_ROLES;
 }
 
-function platformCookieOptions(options: Record<string, unknown> | undefined) {
-  return {
+function platformCookieOptions(options: Record<string, unknown> | undefined, hostname: string) {
+  return sessionCookieOptions({
     ...(options || {}),
     path: '/',
     sameSite: 'lax' as const,
-    ...(process.env.NODE_ENV === 'production'
-      ? { domain: '.elevateforhumanity.org', secure: true }
-      : {}),
-  };
+    ...(process.env.NODE_ENV === 'production' ? { secure: true } : {}),
+  }, hostname);
 }
 
 function unauthenticatedRedirect(req: NextRequest, pathname: string, search: string) {
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.json(
+      {
+        error: 'AUTH_REQUIRED',
+        message: 'Your session expired. Sign in to continue.',
+        loginUrl: '/login',
+      },
+      { status: 401, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } },
+    );
+  }
   const loginUrl = new URL('/login', req.url);
   loginUrl.searchParams.set('redirect', `${pathname}${search}`);
   const response = NextResponse.redirect(loginUrl);
@@ -132,6 +155,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(canonicalUrl, 308);
   }
 
+  // The PBX has a server token, not a browser session. The exact ingestion
+  // handler validates that token in constant time and scopes every write to
+  // the configured phone system. Do not admit other internal phone paths.
+  if (pathname === '/api/internal/phone/voicemail') return NextResponse.next();
+
+  // Only this exact route uses signed GitHub OIDC instead of a browser cookie.
+  // Middleware admits the request to the handler; authorizeParisWorkflow
+  // verifies issuer, audience, signature, repo, branch and workflow before work.
+  if (pathname === '/api/cron/paris-code-repair') return NextResponse.next();
+
   if (isPublicPath(pathname)) return NextResponse.next();
 
   // Scheduled jobs have no browser session. Admit every cron route only when
@@ -143,6 +176,10 @@ export async function middleware(req: NextRequest) {
   // Scheduled social publishing has no browser session. Admit only the exact
   // route with the scheduler secret; the route handler verifies it again.
   if (pathname === '/api/internal/social-media/process' && hasCronBearer(req)) {
+    return NextResponse.next();
+  }
+
+  if (req.method === 'POST' && INTERNAL_WORKFLOW_CRON_PATHS.has(pathname) && hasCronBearer(req)) {
     return NextResponse.next();
   }
 
@@ -166,8 +203,10 @@ export async function middleware(req: NextRequest) {
   });
 
   const withCookies = (response: NextResponse) => {
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('Vary', 'Cookie');
     for (const cookie of pendingCookies) {
-      response.cookies.set(cookie.name, cookie.value, platformCookieOptions(cookie.options) as any);
+      response.cookies.set(cookie.name, cookie.value, platformCookieOptions(cookie.options, req.nextUrl.hostname) as any);
     }
     response.cookies.set('__efh_pathname', `${pathname}${search}`, {
       httpOnly: false,
@@ -184,6 +223,19 @@ export async function middleware(req: NextRequest) {
     error,
   } = await supabase.auth.getUser();
 
+  if (error && isAuthRetryableFetchError(error)) {
+    const response = pathname.startsWith('/api/')
+      ? NextResponse.json(
+          { error: 'AUTH_PROVIDER_UNAVAILABLE', message: 'Authentication verification is temporarily unavailable. Retry shortly.' },
+          { status: 503 },
+        )
+      : new NextResponse('Authentication verification is temporarily unavailable. Refresh this page shortly to try again.', {
+          status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
+    response.headers.set('Retry-After', '30');
+    return withCookies(response);
+  }
+
   if (error || !user) {
     return withCookies(unauthenticatedRedirect(req, pathname, search));
   }
@@ -199,7 +251,14 @@ export async function middleware(req: NextRequest) {
   const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
 
   if (!hasAnyRole(effectiveRoles, requiredRoles(pathname), { adminOverride: false })) {
-    return withCookies(NextResponse.redirect(new URL('/unauthorized', req.url)));
+    return withCookies(
+      pathname.startsWith('/api/')
+        ? NextResponse.json(
+            { error: 'FORBIDDEN', message: 'Administrator access is required.' },
+            { status: 403 },
+          )
+        : NextResponse.redirect(new URL('/unauthorized', req.url)),
+    );
   }
 
   const privileged = effectiveRoles.some((role) => PRIVILEGED_MFA_ROLES.includes(role));
@@ -227,6 +286,9 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // getUser may rotate the session. Forward the mutated cookies to this
+  // request's server components as well as persisting them on the response.
+  requestHeaders.set('cookie', req.cookies.toString());
   return withCookies(NextResponse.next({ request: { headers: requestHeaders } }));
 }
 

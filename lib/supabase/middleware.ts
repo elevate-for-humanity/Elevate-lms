@@ -1,3 +1,4 @@
+import { createBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 import { createServerClient } from '@supabase/ssr';
 import type { NextRequest } from 'next/server';
 import { getServerPublicSupabaseConfig } from '@/lib/supabase/public-config';
@@ -56,7 +57,7 @@ export function createMiddlewareSupabaseClient(
   if (!config) throw new Error('Supabase public configuration is unavailable');
 
   return createServerClient(config.url, config.anonKey, {
-    global: { fetch: middlewareFetch },
+    global: { fetch: createBrowserAuthFetch(config.url, { fetchImpl: middlewareFetch }) },
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll,

@@ -278,8 +278,8 @@ export function createNotificationPayload(notification: AppNotification) {
   return {
     title: notification.title,
     body: notification.body,
-    icon: icons[notification.type] || '/images/icon-192.png',
-    badge: '/images/icon-192.png',
+    icon: icons[notification.type] || '/icon-192.png',
+    badge: '/icon-192.png',
     tag: notification.type,
     url: notification.url || '/',
     data: notification.data,

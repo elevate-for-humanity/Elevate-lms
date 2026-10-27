@@ -30,33 +30,16 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
-      # .dockerignore excludes federation credential files from the build context.
-      - uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
-      - name: Verify runner-supplied Google SDK compatibility
-        run: node scripts/gcp/verify-sdk.mjs
-      - name: Check billing before building an image
-        run: node scripts/gcp/preflight-billing.mjs
+      # Build before Google authentication; no federation credentials enter the build.
+      - name: Verify independent build boundary
+        run: node --test scripts/gcp/admin-build-boundary.test.mjs
+      - name: Verify shared memory defaults before any container build
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build existing Dockerfile without server secrets
         shell: bash
         run: |
           set -euo pipefail
-          case "$COMPONENT" in
-            marketing|store) FILE=Dockerfile.marketing ;;
-            admin) FILE=Dockerfile.northflank-admin ;;
-            lms) FILE=Dockerfile.northflank-lms ;;
-            ultimate-worker) FILE=Dockerfile.ultimate-worker ;;
-            studio-browser) FILE=Dockerfile.studio-browser ;;
-            llm-gpu-worker) FILE=services/llm-gpu-worker/Dockerfile ;;
-            media-gpu-worker) FILE=services/media-gpu-worker/Dockerfile ;;
-            *) exit 1 ;;
-          esac
+          FILE="$(node scripts/container-build-policy.mjs "$COMPONENT")"
           if [[ "$COMPONENT" != llm-gpu-worker && "$COMPONENT" != media-gpu-worker ]]; then
             test "$NEXT_PUBLIC_SUPABASE_URL" = "https://cuxzzpsyufcewtmicszk.supabase.co"
             test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
@@ -74,6 +57,13 @@ jobs:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Check Google billing before image upload
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Upload versioned image
         shell: bash
         run: |

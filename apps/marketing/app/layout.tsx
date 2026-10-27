@@ -13,6 +13,8 @@ import '../../../styles/responsive-guardrails.css';
 import { MarketingChromeBoundary } from '@/components/site/MarketingChromeBoundary';
 import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
+import StoreFooter from '@/components/store/StoreFooter';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { I18nProvider } from '@/lib/i18n/context';
 import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
@@ -94,7 +96,7 @@ const organizationJsonLd = {
   url: siteUrl,
   logo: { '@type': 'ImageObject', url: logoUrl, contentUrl: logoUrl, width: 256, height: 256 },
   image: logoUrl,
-  telephone: '+1-317-999-9620',
+  telephone: '+1-463-240-1404',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '120 East Market Street, Suite 930',
@@ -125,6 +127,7 @@ const organizationJsonLd = {
 // request-dependent pages retain their own dynamic rendering boundaries.
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const storeOnly = getPublicRuntimeService() === 'store';
   return (
     <html lang="en">
       <head>
@@ -147,8 +150,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <I18nProvider>
           <Suspense fallback={<div id="main-content" role="status" className="min-h-dvh p-6">Loading page…</div>}>
           <MarketingChromeBoundary
+            storeOnly={storeOnly}
             header={<Header />}
-            footer={<SiteFooter />}
+            footer={storeOnly ? <StoreFooter /> : <SiteFooter />}
             paris={<ParisFloatingWrapper surface="public" />}
           >
             {children}

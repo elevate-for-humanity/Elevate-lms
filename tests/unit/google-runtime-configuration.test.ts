@@ -107,6 +107,14 @@ function harness(
 }
 
 describe('Google scoped runtime configuration', () => {
+  it('permits Twilio credentials only in Admin and LMS and rejects malformed account credentials', () => {
+    const entries = [{key:'TWILIO_ACCOUNT_SID',value:'AC'+'a'.repeat(32)}, {key:'TWILIO_AUTH_TOKEN',value:'b'.repeat(32)}];
+    expect(()=>validateRuntimeEntries('admin',entries)).not.toThrow();
+    expect(()=>validateRuntimeEntries('lms',entries)).not.toThrow();
+    expect(()=>validateRuntimeEntries('marketing',entries)).toThrow(/key_not_allowed/);
+    expect(()=>validateRuntimeEntries('admin',[{key:'TWILIO_AUTH_TOKEN',value:'placeholder'}])).toThrow(/invalid_twilio_credential/);
+    expect(()=>validateRuntimeEntries('admin',[{key:'TWILIO_API_KEY_SID',value:entries[0].value}])).toThrow(/invalid_twilio_api_key_sid/);
+  });
   it('verifies numeric secret bindings on the serving revision and preserves unrelated settings', async () => {
     const h = harness();
     const result = await saveGoogleRuntimeConfiguration(
@@ -168,7 +176,59 @@ describe('Google scoped runtime configuration', () => {
       ]),
     ).toThrow(/invalid_or_masked/);
   });
+  it('validates tax runtime identifiers and encryption keys before storing them', () => {
+    expect(() =>
+      validateRuntimeEntries('marketing', [{ key: 'TAX_DATA_ENCRYPTION_KEY', value: 'short' }]),
+    ).toThrow('invalid_tax_encryption_key');
+    expect(() =>
+      validateRuntimeEntries('marketing', [{ key: 'IRS_SOFTWARE_ID', value: '00000000' }]),
+    ).toThrow('invalid_irs_software_id');
+    expect(() => validateRuntimeEntries('marketing', [{ key: 'IRS_EFIN', value: '123' }])).toThrow(
+      'invalid_irs_efin',
+    );
+    expect(() =>
+      validateRuntimeEntries('marketing', [
+        { key: 'TAX_DATA_ENCRYPTION_KEY', value: 'ab'.repeat(32) },
+        { key: 'IRS_SOFTWARE_ID', value: '12345678' },
+        { key: 'IRS_EFIN', value: '123456' },
+      ]),
+    ).not.toThrow();
+  });
   it('uses the known CRC32C vector for integrity checks', () => {
     expect(payloadChecksum(Buffer.from('123456789'))).toBe('3808858755');
+  });
+});
+
+// GitHub dispatch belongs only to the administrative runtime. Saving a token
+// must sync to its bound Google secret rather than silently updating only SQL.
+describe('administrative GitHub runtime binding', () => {
+  it('allows the Admin token and rejects learner and public bindings', () => {
+    expect(() => validateRuntimeEntries('admin', [{ key: 'GITHUB_TOKEN', value: 'test-github-credential' }])).not.toThrow();
+    for (const component of ['lms', 'marketing', 'store'] as const) {
+      expect(() => validateRuntimeEntries(component, [{ key: 'GITHUB_TOKEN', value: 'test-github-credential' }])).toThrow();
+    }
+  });
+});
+
+describe('phone runtime ownership', () => {
+  it('binds device provisioning and relay configuration to the two owning services', () => {
+    for (const key of ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET', 'TWILIO_PHONE_NUMBER']) {
+      for (const component of ['admin', 'lms'] as const) {
+        expect(policy.components[component].keys).toContain(key);
+      }
+      for (const component of ['marketing', 'store'] as const) {
+        expect(policy.components[component].keys).not.toContain(key);
+      }
+    }
+  });
+});
+
+describe('independent commerce configuration', () => {
+  it.each(['admin', 'lms', 'marketing', 'store'] as const)('allows %s to own the exact PayPal settings used by billing and webhook verification', component => {
+    expect(() => validateRuntimeEntries(component, [
+      { key: 'PAYPAL_ENVIRONMENT', value: 'production' },
+      { key: 'PAYPAL_BILLING_WEBHOOK_ID', value: 'billing-webhook-fixture' },
+      { key: 'PAYPAL_PAYOUT_WEBHOOK_ID', value: 'payout-webhook-fixture' },
+    ])).not.toThrow();
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign, TrendingUp, ArrowRight, Briefcase } from 'lucide-react';
@@ -41,7 +42,8 @@ export function ProgramPageVisual({ program }: Props) {
   return (
     <div className="min-h-screen bg-white">
       {/* HERO - Full width, visual-first */}
-      <section className="relative h-[clamp(260px,42svh,480px)] flex items-end">
+      <section className="bg-slate-950 text-white">
+        <div className="relative aspect-video w-full bg-white">
         {program.heroVideo ? (
           <UltraVideoPlayer
             src={program.heroVideo}
@@ -52,21 +54,22 @@ export function ProgramPageVisual({ program }: Props) {
             enableProgressTracking={false}
             enableResume={false}
             aspectRatio="auto"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain"
           />
         ) : (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={program.heroImage}
             alt={program.title}
             fill
-            className="object-cover"
+            className="object-contain"
             priority
             quality={90}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         )}
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12">
+        </div>
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-10">
           <Link
             href={program.categoryHref}
             className="inline-flex items-center text-slate-600 text-sm mb-4 hover:text-white"
@@ -136,7 +139,7 @@ export function ProgramPageVisual({ program }: Props) {
                   src={section.image}
                   alt={section.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   quality={85}
                   sizes="100vw" placeholder="empty"
                 />

@@ -1,0 +1,33 @@
+name: Authorize Admin to execute Course Builder job
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/allow-admin-course-worker-execution.mjs', '.github/workflows/authorize-admin-course-builder.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/authorize-admin-course-builder.yml/dispatches" -f ref=main
+  scoped-runtime-authorization:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Verify existing Admin service identity and grant job-scoped execution
+        run: node scripts/gcp/allow-admin-course-worker-execution.mjs

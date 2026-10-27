@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [main, work]
+    branches: [main, work, 'fix/unified-paris-acceptance-20261023']
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
   preflight:
     name: CI Preflight
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -30,23 +30,81 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Student funding and permission regression tests
+        run: >-
+          pnpm exec vitest run
+          tests/unit/student-document-validation.test.ts
+          tests/unit/student-training-privacy.test.ts
+          tests/unit/credential-document-preview.test.ts
+          tests/unit/career-onboarding-route.test.ts
+          tests/unit/program-holder-workspace-contract.test.ts
+          tests/unit/voucher-remittance-evidence.test.ts
+          tests/unit/student-enrollment-identity.test.ts
+          tests/unit/epa-testing-readiness-route.test.ts
+          --environment node
+      - name: Required CI completion policy
+        run: node --test scripts/test-ci-required-gate.mjs lib/phone/microphone.test.mjs
+      - name: Studio GitHub credential fallback regression tests
+        run: node --test scripts/test-devstudio-github-token.mjs scripts/test-github-app-token.mjs scripts/gcp/paris-github-app-binding.test.mjs scripts/test-paris-app-diagnostic.mjs scripts/test-paris-completion-audit.mjs scripts/test-studio-health-app-access.mjs
+      - name: Studio terminal, repository and PARIS voice regression tests
+        run: node --test services/studio-browser/terminal-sessions.test.mjs services/studio-browser/repository-sync.test.mjs infra/pbx/paris/*.test.mjs infra/pbx/provisioner/*.test.mjs
+      - name: Automatic container build-memory policy
+        run: |
+          node scripts/check-build-memory-policy.mjs
+          node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
+      - name: Ultimate course builder repair regression tests
+        run: node --test tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/objective-practice.test.mjs tests/worker/authored-practice.test.mjs tests/worker/studio-runtime-rate-limit.test.mjs
+      - name: Environment audit repair regression tests
+        run: |
+          pnpm exec vitest run tests/unit/admin-dashboard-data-execution.test.ts tests/unit/admin-header-degradation.test.tsx tests/unit/dashboard-system-health.test.ts tests/unit/normalize-dashboard-data.test.ts tests/unit/dashboard-unavailable-kpi.test.tsx tests/unit/course-production-review.test.ts tests/unit/course-production-resume-cursor.test.ts tests/unit/legacy-lms-publication.test.ts tests/unit/platform-settings-permissions.test.ts tests/unit/course-worker-direct-launch.test.ts tests/unit/ultimate-build-list-pagination.test.ts tests/unit/dashboard-role-routing.test.tsx
+          node --test scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/dispatch-course-job.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/paid-invoice-totals.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-release-media.test.mjs workers/process-job-state.test.mjs workers/ultimate-teaching-cache.test.mjs workers/ultimate-resume-route.test.mjs
+      - name: Authored cosmetology sample production adapter regression
+        run: pnpm exec vitest run tests/unit/ultimate-authored-sample.test.ts
+      - name: Course photographs and saved preview regression tests
+        run: |
+          pnpm exec vitest run tests/unit/teaching-photos.test.ts tests/unit/course-side-preview.test.tsx tests/unit/course-builder-preview-delivery.test.ts
+          node --test lib/ultimate-course-builder/testing/related-photo-selection.test.mjs tests/worker/photo-cue-repair.test.mjs lib/ultimate-course-builder/adapters/approved-reference-photos.test.mjs scripts/gcp/probe-course-photo-provider.test.mjs
       - name: Traffic scope and unavailable-data regression tests
         run: node --test tests/unit/traffic-report.test.mjs
       - name: Public narration lifecycle regression tests
-        run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts
+        run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts tests/unit/cookie-consent-navigation.test.tsx tests/unit/first-party-traffic-storage.test.tsx tests/unit/studio-chat-readiness.test.tsx tests/unit/header-mobile-focus.test.tsx
+      - name: Completed lesson media handoff regression tests
+        run: node --test tests/worker/attach-lesson-media.test.mjs workers/process-job-state.test.mjs tests/worker/complete-lesson-before-advance.test.mjs
+      - name: Course dispatch eligibility regression tests
+        run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/probe-course-dispatch-queue.test.mjs
+      - name: Course dispatch PostgREST projection (read-only)
+        if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request'
+        run: node scripts/gcp/probe-course-dispatch-queue.mjs
+      - name: Google Studio runtime topology regression tests
+        run: node --test scripts/gcp/verify-ai-runtime.test.mjs
       - name: Google runtime settings regression tests
-        run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts
+        run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
+      - name: Resizable Studio and Course Builder panels
+        run: pnpm exec vitest run tests/unit/resizable-workspace.test.tsx tests/unit/course-browser-panels.test.tsx tests/unit/studio-conversation-workspace.test.tsx tests/unit/studio-browser-navigation.test.tsx tests/unit/studio-browser-secure-input.test.tsx tests/unit/studio-viewport.test.tsx
+      - name: Daily maintenance cron HTTP contract regression
+        run: node --test tests/cron/daily-maintenance-contract.node.test.mjs
       - name: Google activation and dependency health regression tests
         run: |
-          node --test scripts/test-public-revision-activation.mjs
+          node --test scripts/gcp/serving-phone-credential.test.mjs tests/phone-runtime-authority.node.test.mjs scripts/gcp/voicemail-live-health.test.mjs
+          node --test scripts/gcp/phone-runtime-handoff.test.mjs
+          node --test scripts/test-public-revision-activation.mjs scripts/gcp/deploy-health-retry.node.test.mjs
+          node --test scripts/test-studio-workflow-inspection.mjs
+          node --test scripts/gcp/prune-web-release-requests.test.mjs
+          node --test scripts/validation/tenant-isolation-proof.test.mjs
+          node --test lib/ultimate-course-builder/media/progressive-segments.test.mjs
+          pnpm exec vitest run tests/unit/progressive-lesson-video.test.tsx tests/unit/course-progressive-preview-route.test.ts
           pnpm exec vitest run tests/unit/google-service-health.test.ts tests/unit/google-health-revision.test.ts tests/unit/google-runtime-configuration.test.ts tests/unit/admin-google-services.test.ts tests/unit/elevate-media-runtime-sync.test.ts tests/unit/platform-hosting.test.ts tests/unit/health-activation.test.ts tests/unit/course-integrity-checks.test.tsx tests/unit/course-builder-health-contract.test.ts
       - name: Block retired Admin UI routes
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Shared dashboard and Program Holder communication regressions
+        run: node --test tests/shared-holder-dashboard-repairs.node.test.mjs tests/program-holder-root-audit.node.test.mjs
       - name: Canonical student lifecycle contract
-        run: node scripts/verify-student-lifecycle-contract.mjs
+        run: |
+          node --test tests/admission-eligibility.node.test.mjs
+          node scripts/verify-student-lifecycle-contract.mjs
       - name: Canonical payment lifecycle contract
         run: node scripts/verify-payment-lifecycle-contract.mjs
       - name: Canonical Store commerce contract
@@ -79,7 +137,7 @@ jobs:
 
   typecheck:
     name: TypeScript — ${{ matrix.app }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     strategy:
       fail-fast: false
@@ -98,7 +156,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Restore incremental TypeScript cache
         uses: actions/cache@v4
         with:
@@ -113,7 +171,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       NODE_OPTIONS: --max-old-space-size=6144
@@ -128,7 +186,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Restore content-based ESLint cache
         uses: actions/cache@v4
         with:
@@ -140,8 +198,8 @@ jobs:
         run: pnpm lint
 
   diagnostics:
-    name: Advisory Tests & Repo Hygiene
-    runs-on: ubuntu-latest
+    name: Functional Tests & Repo Hygiene
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -154,10 +212,9 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Run Vitest suite (advisory baseline)
-        continue-on-error: true
-        run: pnpm test
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Run required Vitest suite
+        run: pnpm exec vitest run
       - name: Audit repository hygiene (non-destructive)
         if: always()
         run: node scripts/audit-repo-hygiene.mjs
@@ -166,10 +223,44 @@ jobs:
         continue-on-error: true
         run: node scripts/check-container-contract.mjs
 
+  enrollment-database:
+    name: Canonical Enrollment Database
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: elevate_enrollment_regression
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d elevate_enrollment_regression"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Test real enrollment and publication triggers in an isolated database
+        env:
+          ENROLLMENT_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/elevate_enrollment_regression
+        run: node --test tests/database/canonical-enrollment.node.test.mjs
+
+      - name: Test completed lesson attachment in an isolated database
+        env:
+          ATTACHMENT_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/postgres
+        run: node --test tests/database/ultimate-lesson-attachment.node.test.mjs
+
   ci-gate:
     name: CI Required Gate
-    runs-on: ubuntu-latest
-    needs: [preflight, typecheck, lint]
+    runs-on: ubuntu-24.04
+    needs: [preflight, typecheck, lint, enrollment-database, diagnostics]
     if: always()
     steps:
       - name: Require every CI diagnostic to pass
@@ -181,3 +272,5 @@ jobs:
           test "${{ needs.preflight.result }}" = "success"
           test "${{ needs.typecheck.result }}" = "success"
           test "${{ needs.lint.result }}" = "success"
+          test "${{ needs.enrollment-database.result }}" = "success"
+          test "${{ needs.diagnostics.result }}" = "success"

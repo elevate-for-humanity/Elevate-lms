@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 const PROJECT = 'elegant-racer-299721';
 const REGIONS = ['us-central1', 'us-east1'];
 export const PERMISSION_GROUPS = {
+  runtimeIdentityPreparation: ['iam.serviceAccounts.create', 'iam.serviceAccounts.get', 'iam.serviceAccounts.getIamPolicy', 'iam.serviceAccounts.setIamPolicy', 'iam.serviceAccounts.actAs'],
   vm: ['compute.instances.create', 'compute.instances.get', 'compute.instances.setMetadata', 'compute.instances.setServiceAccount', 'compute.disks.create', 'compute.disks.use', 'compute.subnetworks.use', 'compute.subnetworks.useExternalIp'],
   routing: ['compute.addresses.create', 'compute.addresses.use', 'compute.firewalls.create', 'compute.healthChecks.create', 'compute.backendServices.create', 'compute.backendServices.update', 'compute.urlMaps.update'],
   monitoring: ['monitoring.timeSeries.list', 'logging.logEntries.list'],

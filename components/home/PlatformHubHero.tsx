@@ -1,9 +1,9 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
+import Image from 'next/image';
+import ImageMetadata from '@/components/marketing/ImageMetadata';
 
-const HOME_VIDEO =
-  'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
+const HOME_IMAGE = '/images/refresh-20261014/home-signed-20261017.webp';
 
 export function PlatformHubHero() {
   return (
@@ -14,67 +14,69 @@ export function PlatformHubHero() {
       data-narration="Elevate for Humanity connects career training, workforce development, registered apprenticeship, employer partnerships, and business technology. Choose the path that fits what you came here to do."
       data-narration-style="instructor"
     >
-      <div className="absolute inset-0">
-      className="relative isolate w-full overflow-hidden bg-slate-950"
-      aria-label="Elevate for Humanity career training and apprenticeship hero"
-      data-scroll-narration
-      data-narration="Welcome to Elevate for Humanity. Earn while you learn through apprenticeships, explore career training, and see how to get started."
-      data-narration-style="instructor"
-    >
-      <div className="absolute inset-0 -z-10">
-        <SafeHeroVideo
-          src={HOME_VIDEO}
-          poster="/images/pages/hero-home-first-frame.webp"
+      <ImageMetadata
+        src={HOME_IMAGE}
+        description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
+      />
+      <div className="relative aspect-video sm:aspect-auto sm:h-[clamp(240px,38svh,480px)] w-full overflow-hidden bg-sky-100">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+          src={HOME_IMAGE}
+          alt="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
+          fill
           priority
-          loop
-          ariaLabel="Elevate for Humanity career training, apprenticeship, workforce, and business programs"
-          ariaLabel="Elevate for Humanity career training, apprenticeship, and workforce programs"
-          className="h-full w-full object-cover object-center"
+          sizes="100vw"
+          className="object-cover object-[center_74%]"
         />
-        <div className="absolute inset-0 bg-slate-950/65" />
       </div>
-      <div className="relative mx-auto flex min-h-[clamp(560px,78svh,820px)] max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-4xl">
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">Career training • Workforce development • Registered apprenticeship • Business growth</p>
-          <h1 id="home-hero-heading" className="mt-5 text-4xl font-black leading-[1.03] tracking-tight sm:text-6xl lg:text-7xl">
+      <div className="relative mx-auto flex max-w-6xl items-center px-5 py-6 sm:px-8 sm:py-8">
+        <div className="max-w-3xl">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">
+            Career training • Workforce development • Registered apprenticeship • Business growth
+          </p>
+          <h1
+            id="home-hero-heading"
+            className="mt-3 text-3xl font-black leading-[1.1] tracking-tight sm:text-5xl"
+          >
             Build a career. Build a workforce. Build a business.
           </h1>
-          <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-slate-100 sm:text-xl">
-            Elevate for Humanity connects individuals, employers, workforce partners, and businesses through career training, state and workforce funding pathways for eligible participants, Registered Apprenticeship, employer services, and practical business technology.
+          <p className="mt-4 max-w-3xl text-lg font-semibold leading-8 text-slate-100 sm:text-xl">
+            Elevate for Humanity connects individuals, employers, workforce partners, and businesses
+            through career training, state and workforce funding pathways for eligible participants,
+            Registered Apprenticeship, employer services, and practical business technology.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/programs" className="inline-flex min-h-12 items-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Explore Career Training</Link>
-            <Link href="/check-eligibility" className="inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100">Check Funding Options</Link>
-            <Link href="/employers" className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-200 px-6 py-3 font-black text-white hover:bg-slate-100 hover:text-slate-950">Employers & Partners</Link>
-            <Link href="/store/apps/website-builder" className="inline-flex min-h-12 items-center rounded-xl border-2 border-cyan-300 px-6 py-3 font-black text-cyan-100 hover:bg-cyan-50 hover:text-cyan-950">Business & Website Builder</Link>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/programs"
+              className="inline-flex min-h-12 items-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+            >
+              Explore Career Training
+            </Link>
+            <Link
+              href="/check-eligibility"
+              className="inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
+            >
+              Check Funding Options
+            </Link>
+            <Link
+              href="/employers"
+              className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-200 px-6 py-3 font-black text-white hover:bg-slate-100 hover:text-slate-950"
+            >
+              Employers & Partners
+            </Link>
+            <Link
+              href="/store/apps/website-builder"
+              className="inline-flex min-h-12 items-center rounded-xl border-2 border-cyan-300 px-6 py-3 font-black text-cyan-100 hover:bg-cyan-50 hover:text-cyan-950"
+            >
+              Business & Website Builder
+            </Link>
           </div>
-          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-200">
-            <span>Registered Apprenticeship</span><span>Workforce training</span><span>Employer partnerships</span><span>Industry credentials</span><span>Compliance & reporting</span>
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-200">
+            <span>Registered Apprenticeship</span>
+            <span>Workforce training</span>
+            <span>Employer partnerships</span>
+            <span>Industry credentials</span>
+            <span>Compliance & reporting</span>
           </div>
-        </div>
-      </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/25" aria-hidden="true" />
-      <div className="mx-auto flex min-h-[360px] max-w-6xl flex-col justify-center px-5 py-16 sm:min-h-[440px] sm:px-8 lg:min-h-[480px]">
-        <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-amber-300">Career training • Apprenticeships • Employer connections</p>
-        <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl">
-          Build a career. <span className="text-amber-300">Earn while you learn.</span>
-        </h2>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-white sm:text-xl">
-          Explore hands-on pathways in barbering, cosmetology, esthetics, nail technology, HVAC, CDL, bookkeeping and business. Compare programs, find a host shop, and take your next step.
-        </p>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-100">
-          Apprenticeship tuition is self-pay only. Wages depend on an eligible paid placement.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-300 px-6 py-3 font-bold text-slate-950 hover:bg-amber-200">
-            Explore programs <ArrowRight className="h-5 w-5" aria-hidden="true" />
-          </Link>
-          <Link href="/apprenticeships" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-white bg-slate-950/50 px-6 py-3 font-bold text-white hover:bg-slate-800">
-            Earn while you learn <ArrowRight className="h-5 w-5" aria-hidden="true" />
-          </Link>
-          <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/70 px-6 py-3 font-bold text-white hover:bg-white/15">
-            Find a host shop
-          </Link>
         </div>
       </div>
     </section>

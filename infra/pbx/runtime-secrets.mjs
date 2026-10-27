@@ -3,7 +3,9 @@ const ROLES={gateway:{PARIS_ARI_PASSWORD:'PARIS_ARI_PASSWORD_SECRET',PARIS_TURN_
   turn:{PARIS_TURN_TOKEN:'PARIS_TURN_TOKEN_SECRET'}};
 export async function loadRoleSecrets(role,{environment=process.env,request=fetch}={}){
   if(!Object.hasOwn(ROLES,role))throw Error('PBX_RUNTIME_ROLE_INVALID');
-  const required=ROLES[role];
+  const required={...ROLES[role]};
+  if(role==='turn' && environment.PARIS_PHONE_INFERENCE_PROVIDER==='owned')
+    required.PARIS_PHONE_LLM_SECRET='PARIS_PHONE_LLM_SECRET_REF';
   for(const ref of Object.values(required))if(!RESOURCE.test(environment[ref]||''))throw Error('PBX_SECRET_REFERENCE_INVALID');
   const response=await request('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',
     {headers:{'Metadata-Flavor':'Google'},redirect:'error',signal:AbortSignal.timeout(5000)});

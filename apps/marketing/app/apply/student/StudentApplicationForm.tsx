@@ -101,7 +101,7 @@ function createSubmissionKey(): string {
 
 async function postApplication(payload: Record<string, unknown>, idempotencyKey: string) {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 20000);
+  const timeout = window.setTimeout(() => controller.abort(), 65000);
 
   try {
     const res = await fetch('/api/applications', {
@@ -383,7 +383,7 @@ export default function StudentApplicationForm({
       }
 
       const { res, data } = await postApplication(payload, submissionKey);
-      if (res.ok && (data.ok ?? data.success ?? true)) {
+      if (res.ok && (data.ok === true || data.success === true) && (data.id || data.applicationId || data.referenceNumber)) {
         clearDraft();
         const duplicateWarning = data.duplicateWarning || undefined;
         setResult({
@@ -415,7 +415,7 @@ export default function StudentApplicationForm({
         error:
           error instanceof Error
             ? error.message
-            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (317) 999-9620.',
+            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (463) 240-1404.',
       });
     } finally {
       setSubmitting(false);
@@ -621,8 +621,8 @@ export default function StudentApplicationForm({
       {result?.error && <div role="alert" className="mt-6 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-950">{result.error}</div>}
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
-        {step > 1 ? <button type="button" onClick={previousStep} className="rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900">Back</button> : <span />}
-        {step < 5 ? <button type="button" onClick={nextStep} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700">Continue</button> : <button type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
+        {step > 1 ? <button type="button" onClick={previousStep} className="min-h-12 w-full rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900 sm:w-auto">Back</button> : <span />}
+        {step < 5 ? <button type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
       </div>
     </form>
   );

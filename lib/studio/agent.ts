@@ -5,6 +5,7 @@
  * It handles conversation management, tool execution, and skill activation.
  */
 
+import {PARIS_SYSTEM_IDENTITY} from '@/lib/ai/paris-identity';
 import { createClient } from '@/lib/supabase/client';
 
 export interface AgentMessage {
@@ -36,7 +37,9 @@ export interface ConversationSession {
   config: AgentConfig;
 }
 
-const DEFAULT_SYSTEM_PROMPT = `You are Ellie, an AI coding assistant for Elevate for Humanity's Open Studio.
+const DEFAULT_SYSTEM_PROMPT = `${PARIS_SYSTEM_IDENTITY}
+
+You provide the coding capabilities of Elevate Studio.
 
 You help users:
 - Write, debug, and refactor code
@@ -74,20 +77,23 @@ export class OpenStudioAgent {
    */
   async initialize(): Promise<void> {
     // Add system message
-    this.messages.push({
+    this.messages = [{
       id: crypto.randomUUID(),
       role: 'system',
       content: this.config.systemPrompt || DEFAULT_SYSTEM_PROMPT,
       timestamp: Date.now(),
-    });
+    }];
 
     // Try to load existing session from localStorage
-    const savedSession = localStorage.getItem('openstudio_session');
+    const savedSession = typeof window === 'undefined' ? null : window.localStorage.getItem('openstudio_session');
     if (savedSession) {
       try {
         const session = JSON.parse(savedSession) as ConversationSession;
         this.sessionId = session.id;
-        this.messages = session.messages;
+        if (Array.isArray(session.messages)) {
+          this.messages = [this.messages[0], ...session.messages.filter(message =>
+            message && ['user', 'assistant', 'tool'].includes(message.role) && typeof message.content === 'string')];
+        }
       } catch (e) {
         console.error('Failed to load session:', e);
       }
@@ -161,7 +167,7 @@ export class OpenStudioAgent {
       config: this.config,
     };
     this.sessionId = session.id;
-    localStorage.setItem('openstudio_session', JSON.stringify(session));
+    if (typeof window !== 'undefined') window.localStorage.setItem('openstudio_session', JSON.stringify(session));
   }
 
   /**
@@ -189,7 +195,7 @@ export class OpenStudioAgent {
   clearConversation(): void {
     this.messages = [];
     this.sessionId = null;
-    localStorage.removeItem('openstudio_session');
+    if (typeof window !== 'undefined') window.localStorage.removeItem('openstudio_session');
     this.initialize();
   }
 

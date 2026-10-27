@@ -9,6 +9,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { organization } from '@/lib/config/organization';
 import { scoreLead, updateLeadScore } from '@/lib/crm/lead-scoring';
+import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
@@ -87,41 +88,25 @@ async function _POST(req: Request) {
       // Continue with email even if DB fails
     }
 
-    // Programs on Indiana's ETPL — eligible for WIOA / Workforce Ready Grant (free to student)
-    const ETPL_PROGRAMS = new Set([
-      'building-maintenance-wrg',
-      'business-startup',
-      'cdl-training',
-      'cybersecurity-analyst',
-      'drug-alcohol-specimen-collector',
-      'electrical',
-      'health-safety',
-      'home-health-aide',
-      'hvac-technician',
-      'it-support-specialist',
-      'medical-assistant',
-      'peer-recovery-specialist-jri',
-      'phlebotomy-technician',
-      'plumbing',
-      'reentry-specialist',
-      'welding',
-    ]);
-
     const programSlug = (program || '').toLowerCase().replace(/\s+/g, '-');
-    const isEtpl = ETPL_PROGRAMS.has(programSlug);
+    const verifiedFunding = getVerifiedProgramFunding(programSlug);
+    const hasVerifiedPublicFunding = Boolean(
+      verifiedFunding?.etplListedFor2Exclusive &&
+      (verifiedFunding.wioaEligible || verifiedFunding.wrgEligible),
+    );
     const programLabel = (program || 'your selected program').replace(/-/g, ' ');
     const firstName = (name || '').split(' ')[0] || name;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
     const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
 
-    const fundingBlock = isEtpl
+    const fundingBlock = hasVerifiedPublicFunding
       ? `
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:24px 0">
-          <p style="margin:0 0 8px;font-size:15px;font-weight:bold;color:#15803d">✅ This program may be fully funded</p>
+          <p style="margin:0 0 8px;font-size:15px;font-weight:bold;color:#15803d">Program-level funding evidence is on file</p>
           <p style="margin:0;font-size:14px;color:#166534;line-height:1.7">
-            <strong>${programLabel}</strong> is listed on Indiana's Eligible Training Provider List (ETPL).
-            That means it can be covered at <strong>no cost to you</strong> through WIOA or the Workforce Ready Grant —
-            if you qualify.
+            <strong>${programLabel}</strong> has a verified program-level funding record.
+            This is not a funding award. The responsible agency must confirm your eligibility, covered costs,
+            available funds, and written authorization before funded training begins.
           </p>
         </div>
         <h3 style="font-size:16px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>
@@ -129,8 +114,9 @@ async function _POST(req: Request) {
           <li>Visit <a href="https://www.indianacareerconnect.com" style="color:#1a1a1a;font-weight:bold">IndianaCareerConnect.com</a> and create a free account</li>
           <li>Schedule an appointment at your nearest <strong>WorkOne</strong> office</li>
           <li>Tell them you want to enroll in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}</li>
-          <li>They will confirm your eligibility and issue a training voucher</li>
-          <li>Once your voucher is confirmed, <a href="${siteUrl}/apply/student?program=${programSlug}" style="color:#1a1a1a;font-weight:bold">complete your enrollment application</a></li>
+          <li>Ask the agency to verify this exact program and your individual eligibility</li>
+          <li>Do not rely on funding until written authorization identifies the approved program and covered costs</li>
+          <li>After authorization, <a href="${siteUrl}/apply/student?program=${programSlug}" style="color:#1a1a1a;font-weight:bold">complete your enrollment application</a></li>
         </ol>
         <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px">
           Not sure if you qualify? Our admissions team can walk you through the eligibility checklist.
@@ -140,21 +126,21 @@ async function _POST(req: Request) {
         <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:24px 0">
           <p style="margin:0 0 8px;font-size:15px;font-weight:bold;color:#92400e">ℹ️ Funding for this program</p>
           <p style="margin:0;font-size:14px;color:#78350f;line-height:1.7">
-            <strong>${programLabel}</strong> is not currently on the ETPL, so it is not covered by WIOA or the
-            Workforce Ready Grant. However, other funding options may be available — including employer sponsorship,
-            scholarships, and payment plans.
+            No public WIOA or Workforce Ready Grant claim is made for <strong>${programLabel}</strong> unless exact
+            program-level evidence is recorded in Elevate's canonical funding registry. Review the published self-pay
+            options and ask admissions about any separately documented employer, scholarship, or third-party support.
           </p>
         </div>
         <h3 style="font-size:16px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>
         <ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;line-height:1.9">
-          <li>Our admissions team will contact you within <strong>1–2 business days</strong> to discuss your options</li>
-          <li>We'll review available scholarships, employer sponsorship, and payment plans with you</li>
-          <li>Once funding is confirmed, <a href="${siteUrl}/apply/student?program=${programSlug}" style="color:#1a1a1a;font-weight:bold">complete your enrollment application</a></li>
-          <li>You'll receive your start date and orientation details by email</li>
+          <li>Review the exact program tuition and payment disclosure</li>
+          <li>Ask admissions about documented payment plans, employer sponsorship, scholarships, or other support</li>
+          <li><a href="${siteUrl}/apply/student?program=${programSlug}" style="color:#1a1a1a;font-weight:bold">Complete your enrollment application</a> when you are ready</li>
+          <li>Your start date and orientation details are confirmed separately after enrollment requirements are complete</li>
         </ol>
         <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px">
           Questions about cost or payment? Call us at <a href="tel:${PLATFORM_DEFAULTS.mainPhone}" style="color:#1a1a1a">${PLATFORM_DEFAULTS.mainPhone}</a>
-          or reply to this email — we'll find a path that works for you.
+          or reply to this email to review the currently documented options.
         </p>`;
 
     const confirmationHtml = `
@@ -229,7 +215,7 @@ async function _POST(req: Request) {
   } catch (error) {
     logger.error('Inquiry error:', error);
     return NextResponse.json(
-      { error: 'Failed to submit inquiry. Please call 317-999-9620.' },
+      { error: 'Failed to submit inquiry. Please call 463-240-1404.' },
       { status: 500 },
     );
   }

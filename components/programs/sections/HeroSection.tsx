@@ -34,11 +34,11 @@ export function HeroSection({
           <SafeHeroVideo
             src={heroVideo}
             poster={heroImage}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain"
             ariaLabel={`${title} program overview video`}
           />
         ) : (
-          <Image src={heroImage} alt={`${title} training`} fill className="object-cover" priority sizes="100vw" />
+          <Image src={heroImage} alt={`${title} training`} fill className="object-contain" priority sizes="100vw" />
         )}
       </div>
 

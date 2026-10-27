@@ -107,3 +107,15 @@ describe('independent phone credential boundary', () => {
     expect(servers[0].credential).toMatch(/^[A-Za-z0-9+/]+=*$/);
   });
 });
+
+
+it('requires explicit Google authority for production phone credentials', async () => {
+  const { db } = setup();
+  vi.stubEnv('NODE_ENV', 'production');
+  vi.stubEnv('ELEVATE_RUNTIME_CONFIG_PROVIDER', '');
+  vi.stubEnv('PBX_RUNTIME_CONFIG_PROVIDER', '');
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ok:true,json:async()=>credential}));
+  await expect(provisionAsteriskDevice(db,identity)).rejects.toThrow('Google Secret Manager');
+  vi.stubEnv('PBX_RUNTIME_CONFIG_PROVIDER', 'google-secret-manager');
+  expect((await provisionAsteriskDevice(db,identity)).provider).toBe('asterisk');
+});

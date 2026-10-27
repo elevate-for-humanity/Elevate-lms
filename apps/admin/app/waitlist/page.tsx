@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +20,7 @@ const statusColors: Record<string, string> = {
 
 export default async function AdminWaitlistPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   const { data: entries, error } = await supabase
     .from('waitlist')

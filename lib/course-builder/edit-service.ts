@@ -130,7 +130,7 @@ export async function saveCourseModule(input: unknown) {
     },
   };
   const query = body.id
-    ? db.from('course_modules').update(payload).eq('id', body.id)
+    ? db.from('course_modules').update(payload).eq('id', body.id).eq('course_id', body.courseId)
     : db.from('course_modules').insert(payload);
   const { data, error } = await query.select('*').single();
   if (error) throw error;
@@ -140,6 +140,15 @@ export async function saveCourseModule(input: unknown) {
 export async function saveCourseLesson(input: unknown) {
   const body = lessonSchema.parse(input);
   const db = await getServiceDb();
+  const { data: module, error: moduleError } = await db
+    .from('course_modules')
+    .select('course_id')
+    .eq('id', body.moduleId)
+    .maybeSingle();
+  if (moduleError) throw moduleError;
+  if (!module || module.course_id !== body.courseId) {
+    throw new Error('The selected module does not belong to this course.');
+  }
   const payload = {
     course_id: body.courseId,
     module_id: body.moduleId,
@@ -160,20 +169,18 @@ export async function saveCourseLesson(input: unknown) {
     practical_required: body.practicalRequired ?? false,
     activities: body.activities ?? [],
     is_required: body.isRequired ?? true,
-    metadata: {
-      requiredArtifacts: body.requiredArtifacts ?? [],
-      domainKey: body.domainKey ?? null,
-      hourCategory: body.hourCategory ?? null,
-      evidenceType: body.evidenceType ?? null,
-      deliveryMethod: body.deliveryMethod ?? null,
-      requiresInstructorSignoff: body.requiresInstructorSignoff ?? false,
-      instructorRequirement: body.instructorRequirement ?? null,
-      minimumSeatTimeMinutes: body.minimumSeatTimeMinutes ?? null,
-      fieldworkEligible: body.fieldworkEligible ?? false,
-    },
+    required_artifacts: body.requiredArtifacts ?? [],
+    domain_key: body.domainKey ?? null,
+    hour_category: body.hourCategory ?? null,
+    evidence_type: body.evidenceType ?? null,
+    delivery_method: body.deliveryMethod ?? null,
+    requires_instructor_signoff: body.requiresInstructorSignoff ?? false,
+    instructor_requirement: body.instructorRequirement ?? null,
+    minimum_seat_time_minutes: body.minimumSeatTimeMinutes ?? null,
+    fieldwork_eligible: body.fieldworkEligible ?? false,
   };
   const query = body.id
-    ? db.from('course_lessons').update(payload).eq('id', body.id)
+    ? db.from('course_lessons').update(payload).eq('id', body.id).eq('course_id', body.courseId)
     : db.from('course_lessons').insert(payload);
   const { data, error } = await query.select('*').single();
   if (error) throw error;

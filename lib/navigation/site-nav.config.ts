@@ -1,3 +1,5 @@
+import { ROUTES } from '@/lib/navigation/routes';
+
 /**
  * SITE NAVIGATION CONFIGURATION
  *
@@ -429,12 +431,12 @@ export const footerNavigation = {
   partners: {
     title: 'Partners & Employers',
     links: [
-      { label: 'Hire Talent', href: '/employer/dashboard' },
+      { label: 'Hire Talent', href: ROUTES.employerPortal },
       { label: 'Become a Program Holder', href: '/apply/program-holder' },
       { label: '⭐ License Platform', href: '/pricing/platform' },
       { label: 'Apprenticeship Licensing', href: '/pricing/sponsor-licensing' },
       { label: 'Apprenticeships', href: '/employer/apprenticeships' },
-      { label: 'Employer Login', href: '/employer/dashboard' },
+      { label: 'Employer Login', href: ROUTES.employerPortal },
       { label: 'Partner Login', href: '/program-holder/dashboard' },
     ],
   },

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-const HOST_SITE_APPLY_HREF = '/host-shop/apply';
+const HOST_SITE_APPLY_HREF = '/partners/host-shop/apply';
 
 const HOST_SHOP_HERO_ORDER = [
   'top-shelf-barber-lounge',
@@ -112,7 +112,7 @@ export default async function HostShopsPage() {
                 <div className="flex flex-1 flex-col p-4"><h3 className="text-lg font-black">{label.replace(' Apprenticeship', '')}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">{count ? `${count} participating ${count === 1 ? 'location' : 'locations'}. Explore the shops and start your journey.` : "We're looking for new Host Shops. Bring your licensed business into the network."}</p>
                   <Link href={`/programs/${slug}`} className="mt-4 inline-flex min-h-11 items-center font-bold text-red-700">Explore this pathway →</Link>
-                  <Link href="/host-shop/apply" className="mt-auto inline-flex min-h-11 items-center font-bold text-blue-800">Become a Host Shop →</Link>
+                  <Link href="/partners/host-shop/apply" className="mt-auto inline-flex min-h-11 items-center font-bold text-blue-800">Become a Host Shop →</Link>
                 </div>
               </article>;
             })}

@@ -5,6 +5,7 @@
 
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
 
@@ -58,7 +59,6 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Pro
 async function checkDatabase(): Promise<ServiceCheck> {
   const start = Date.now();
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
     const db = createAdminClient();
     const { error } = await db
       .from('profiles')
@@ -162,14 +162,14 @@ async function checkRedis(): Promise<ServiceCheck> {
 async function checkBilling(): Promise<ServiceCheck> {
   const start = Date.now();
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
-    const { data: rows } = await createAdminClient()
+    const { data: rows, error } = await createAdminClient()
       .from('app_settings')
       .select('key,value')
       .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']);
+    if (error) throw new Error('Billing configuration could not be read');
     const stored = Object.fromEntries((rows ?? []).map((row: any) => [row.key, row.value]));
     const has = (key: string) => Boolean(process.env[key] || stored[key]);
-    const quickBooksConnected =
+    const quickBooksConfigured =
       has('QB_CLIENT_ID') &&
       has('QB_CLIENT_SECRET') &&
       has('QB_REFRESH_TOKEN') &&
@@ -179,17 +179,18 @@ async function checkBilling(): Promise<ServiceCheck> {
         process.env.PAYPAL_CLIENT_SECRET &&
         process.env.PAYPAL_BILLING_WEBHOOK_ID,
     );
-    const configured = quickBooksConnected && payPalConfigured;
+    const configured = quickBooksConfigured && payPalConfigured;
     return {
       name: 'Billing (QuickBooks + PayPal)',
-      status: configured ? 'healthy' : quickBooksConnected || payPalConfigured ? 'degraded' : 'unknown',
+      // Presence cannot prove that OAuth is valid or payment collection works.
+      status: configured ? 'unknown' : quickBooksConfigured || payPalConfigured ? 'degraded' : 'unknown',
       latencyMs: Date.now() - start,
       configured,
       message: configured
-        ? 'Admin schedules, PayPal collection, and QuickBooks ledger are configured'
+        ? 'Configuration present. QuickBooks authorization, PayPal connectivity, and payment collection are not verified by this check.'
         : `Missing ${[
             !payPalConfigured ? 'PayPal billing' : null,
-            !quickBooksConnected ? 'QuickBooks connection' : null,
+            !quickBooksConfigured ? 'QuickBooks configuration' : null,
           ]
             .filter(Boolean)
             .join(' and ')}`,
@@ -258,7 +259,6 @@ async function checkStorage(): Promise<ServiceCheck> {
 
   const start = Date.now();
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
     const db = createAdminClient();
     const { error } = await db.storage.listBuckets();
     if (error) throw error;
@@ -376,7 +376,9 @@ function generateAlerts(
     } else if (service.status === 'down') {
       alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is unreachable` });
     } else if (service.status === 'degraded') {
-      alerts.push({ severity: 'warning', service: service.name, message: `High latency: ${service.latencyMs}ms` });
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `High latency: ${service.latencyMs}ms` });
+    } else if (service.status === 'unknown') {
+      alerts.push({ severity: 'info', service: service.name, message: service.message ?? 'Operational status has not been verified' });
     }
   }
 
@@ -394,6 +396,7 @@ function determineOverall(
   if (services.database.status === 'down') return 'down';
   if (alerts.some((alert) => alert.severity === 'critical')) return 'degraded';
   if (alerts.some((alert) => alert.severity === 'warning')) return 'degraded';
+  if (Object.values(services).some((service) => service.status === 'unknown')) return 'unknown';
   return 'healthy';
 }
 

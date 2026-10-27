@@ -47,7 +47,8 @@ describe('program-holder dashboard hero', () => {
 
   it('requires every roster row to belong to an assigned program and learner role', () => {
     expect(holderData).toContain(".in('program_id', programIds)");
-    expect(holderData).toContain("['student', 'learner', 'apprentice'].includes");
+    expect(holderData).toContain("import { isLearnerRosterProfile } from './roster-eligibility'");
+    expect(holderData).toContain('.filter(isLearnerRosterProfile)');
     expect(holderData).toContain('eligibleRosterUserIds.has(row.user_id)');
     expect(holderData).not.toContain("'pending',\n        'applied'");
   });

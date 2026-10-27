@@ -54,7 +54,7 @@ export default function AlumniPage() {
         },
         cta: {
           heading: 'Stay in Touch',
-          subtitle: 'Update your contact info, access career services, or explore what\'s next. Call (317) 999-9620.',
+          subtitle: 'Update your contact info, access career services, or explore what\'s next. Call (463) 240-1404.',
           primaryLabel: 'Contact Us',
           primaryHref: '/contact',
           secondaryLabel: 'Success Stories',

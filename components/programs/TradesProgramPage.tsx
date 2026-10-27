@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -73,14 +74,13 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
 
       {/* Hero — clean image, no text overlay */}
       <section className="relative h-[320px] sm:h-[420px]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={data.heroImage}
           alt={data.name}
           fill
           sizes="100vw"
-          className="object-cover"
-          priority placeholder="empty"
+          className="object-contain"
+          priority
         />
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
@@ -162,7 +162,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
                 alt={`${data.name} training`}
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover" placeholder="empty"
+                className="object-contain" placeholder="empty"
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
                     alt={mod.title}
                     fill
                     sizes="(max-width: 640px) 100vw, 25vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-contain" placeholder="empty"
                   />
                 </div>
               )}
@@ -332,7 +332,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
                 alt={`${data.name} career opportunities`}
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover" placeholder="empty"
+                className="object-contain" placeholder="empty"
               />
             </div>
           </div>

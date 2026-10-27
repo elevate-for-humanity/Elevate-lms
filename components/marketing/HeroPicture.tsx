@@ -10,7 +10,9 @@
  * - All primary messaging renders in the below-hero content slot.
  */
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
+import ImageMetadata from './ImageMetadata';
 import { useId, useState } from 'react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -61,10 +63,11 @@ export default function HeroPicture({
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[clamp(260px,42svh,480px)]';
+  const canonicalHeight = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]';
 
   return (
     <div className={`w-full ${className}`}>
+      <ImageMetadata src={src} description={alt} />
       <section
         className={`relative w-full overflow-hidden ${preserveAspectRatio ? 'bg-white' : 'bg-slate-900'} ${
           preserveAspectRatio ? '' : (heightStyle ?? canonicalHeight)
@@ -72,7 +75,7 @@ export default function HeroPicture({
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
         {preserveAspectRatio ? (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={src}
             alt={alt}
             width={1536}
@@ -80,22 +83,23 @@ export default function HeroPicture({
             sizes="100vw"
             className="h-auto w-full"
             priority={priority}
-            placeholder="empty"
           />
         ) : (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={src}
             alt={alt}
             fill
             sizes="100vw"
-            className={imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}
+            className={
+              imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'
+            }
             priority={priority}
-            placeholder="empty"
           />
         )}
 
         {showBrandBug && (
           <div className="absolute left-4 top-4 z-10">
+            {/* IMAGE-CONTRACT: allow raw img because this optional intrinsic-size brand bug preserves its source aspect ratio independently of the hero crop. */}
             <img
               src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}
@@ -114,7 +118,7 @@ export default function HeroPicture({
       </section>
 
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="border-b border-slate-100 py-10 sm:py-14">
+        <section className="border-b border-slate-100 py-6 sm:py-8">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             {children ? (
               children

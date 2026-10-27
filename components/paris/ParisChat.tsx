@@ -155,7 +155,7 @@ export default function ParisChat({
         ...previous,
         {
           role: 'assistant',
-          content: `${marker}. I’m here to help. The issue has been securely reported to the workflow repair queue. Tell me what you were trying to do, and I’ll guide you while the system checks the problem.`,
+          content: `${marker}. I’m here to help. Tell me what you were trying to do, and I’ll guide you through the next step. The reporting status appears above this conversation.`,
         },
       ];
     });

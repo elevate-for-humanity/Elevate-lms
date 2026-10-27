@@ -222,7 +222,7 @@ export function AIPanel() {
         <button
           onClick={handleClear}
           title="Clear conversation"
-          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition"
+          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-slate-600 transition"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -270,7 +270,7 @@ export function AIPanel() {
         <div className="px-4 pb-3 space-y-1.5 shrink-0">
           <button
             onClick={() => setShowSuggestions(false)}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 mb-1"
+            className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-600 mb-1"
           >
             <ChevronDown className="w-3 h-3" />
             Suggestions
@@ -311,7 +311,7 @@ export function AIPanel() {
             }
           </button>
         </div>
-        <p className="text-xs text-slate-400 mt-1.5 text-center">
+        <p className="text-xs text-slate-600 mt-1.5 text-center">
           Enter to send · Shift+Enter for new line
         </p>
       </div>

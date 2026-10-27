@@ -10,10 +10,24 @@ export function allocation(limits) {
 export const isTerminalExecution = execution => Boolean(execution.status?.completionTime ||
   ['True', 'False'].includes(execution.status?.conditions?.find(c => c.type === 'Completed')?.status));
 
+// Completed tasks cannot run again within this immutable execution. Include
+// pending tasks as well as running tasks; runningCount alone is not a safe bound.
+export function executionAllocationCount(execution) {
+  const total=Number(execution.spec?.taskCount ?? execution.spec?.parallelism ?? 1);
+  const parallel=Number(execution.spec?.parallelism ?? total);
+  const finished=['succeededCount','failedCount','cancelledCount'].map(key=>Number(execution.status?.[key]??0));
+  if(!Number.isInteger(total)||total<1||!Number.isInteger(parallel)||parallel<1||
+     finished.some(count=>!Number.isInteger(count)||count<0)||finished.reduce((a,b)=>a+b,0)>total)
+    throw Error('Execution task allocation is unavailable');
+  return Math.min(parallel,total-finished.reduce((a,b)=>a+b,0));
+}
+
 // A service template can describe an unsuccessful deployment. Only effective
 // revisions and nonterminal execution specs describe the resources still used.
 // This is a conservative allocation bound, not a utilization measurement.
-export function requiredRegionalAllocation(services, task, revisions, executions = []) {
+export function requiredRegionalAllocation(services, task, revisions, executions = [], taskCount = 1) {
+  if (!Number.isInteger(taskCount) || taskCount < 1 || taskCount > 4)
+    throw new Error('Requested task allocation must be between one and four');
   const required = { cpu: 0, memory: 0 };
   const add = (containers, count) => {
     if (!Array.isArray(containers) || !containers.length || !Number.isInteger(count) || count < 1)
@@ -23,10 +37,14 @@ export function requiredRegionalAllocation(services, task, revisions, executions
       required.cpu += size.cpu * count; required.memory += size.memory * count;
     }
   };
-  add(task.containers, 1);
+  add(task.containers, taskCount);
   for (const service of services) {
     if (service.metadata?.annotations?.['run.googleapis.com/scalingMode'] === 'manual')
       throw new Error('Manual service scaling requires explicit capacity review');
+    const serviceMaxValue = service.metadata?.annotations?.['run.googleapis.com/maxScale'];
+    const serviceMax = serviceMaxValue === undefined ? Infinity : Number(serviceMaxValue);
+    if (serviceMaxValue !== undefined && (!Number.isInteger(serviceMax) || serviceMax < 1))
+      throw new Error('Effective service maximum is unavailable');
     // Only revisions receiving traffic or retained by a live traffic tag can
     // scale to the configured maximum. Historical revisions can remain marked
     // Active after traffic has moved; counting all of them double-counts
@@ -39,24 +57,32 @@ export function requiredRegionalAllocation(services, task, revisions, executions
     for (const name of names) {
       const revision = revisions.find(r => r.metadata?.name === name);
       if (!revision) throw new Error('Service effective revision is unavailable');
-      const max = Number(revision.metadata?.annotations?.['autoscaling.knative.dev/maxScale']);
+      const revisionMaxValue = revision.metadata?.annotations?.['autoscaling.knative.dev/maxScale'];
+      const revisionMax = revisionMaxValue === undefined ? Infinity : Number(revisionMaxValue);
+      if (revisionMaxValue !== undefined && (!Number.isInteger(revisionMax) || revisionMax < 1))
+        throw new Error('Effective revision needs a bounded maximum');
+      const max = Math.min(revisionMax, serviceMax);
       if (!Number.isInteger(max) || max < 1) throw new Error('Effective revision needs a bounded maximum');
+      // Applying the service cap per revision remains conservative when multiple
+      // traffic tags exist: the actual cap is shared across those revisions.
       add(revision.spec?.containers, max);
     }
   }
-  for (const execution of executions.filter(e => !isTerminalExecution(e)))
-    add(execution.spec?.template?.spec?.containers, Number(execution.spec?.parallelism || execution.spec?.taskCount || 1));
+  for (const execution of executions.filter(e => !isTerminalExecution(e))) {
+    const count=executionAllocationCount(execution);
+    if(count>0)add(execution.spec?.template?.spec?.containers,count);
+  }
   return required;
 }
 
-export async function inspectRegionalCapacity({ region, task, run = google, request = fetch }) {
+export async function inspectRegionalCapacity({ region, task, taskCount = 1, run = google, request = fetch }) {
   if (!['us-central1', 'us-east1'].includes(region)) throw new Error('Unsupported capacity region');
   const read = args => JSON.parse(run([...args, '--project=' + PROJECT, '--region=' + region, '--format=json']));
   const services = read(['run', 'services', 'list']);
   const revisions = read(['run', 'revisions', 'list']);
   const jobs = read(['run', 'jobs', 'list']);
   const executions = jobs.flatMap(job => read(['run', 'jobs', 'executions', 'list', '--job=' + job.metadata.name]));
-  const required = requiredRegionalAllocation(services, task, revisions, executions);
+  const required = requiredRegionalAllocation(services, task, revisions, executions, taskCount);
   const token = run(['auth', 'print-access-token']);
   const granted = {};
   for (const [key, quotaId] of [['cpu', 'CpuAllocPerProjectRegion'], ['memory', 'MemAllocPerProjectRegion']]) {

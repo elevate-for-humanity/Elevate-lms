@@ -32,7 +32,7 @@ const paths = [
     title: 'Apprenticeship Hosts',
     eyebrow: 'Train & Mentor',
     text: 'Become a Host Site, train apprentices, document progress, and participate in supervised work-based learning.',
-    href: '/host-shop/apply',
+    href: '/partners/host-shop/apply',
     image: '/images/pages/barber-apprentice-learning.webp',
     imageAlt: 'Apprentice receiving hands-on instruction from a professional',
   },

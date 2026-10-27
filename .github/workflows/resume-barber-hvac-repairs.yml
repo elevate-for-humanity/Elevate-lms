@@ -1,5 +1,8 @@
 name: Resume barber and HVAC repairs
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/resume-barber-hvac-repairs.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
@@ -10,7 +13,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '3927868c1e27252017948994e5e0283dd3b6565c'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '3927868c1e27252017948994e5e0283dd3b6565c')
     runs-on: ubuntu-24.04
     steps:
       - env:
@@ -21,11 +24,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:
-      group: google-course-runtime-operations
+      group: google-course-regional-repair
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
-      - run: node --check scripts/gcp/start-barber-hvac-repair.mjs
+      - run: node --test scripts/gcp/regional-capacity.test.mjs scripts/gcp/start-barber-hvac-repair.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721

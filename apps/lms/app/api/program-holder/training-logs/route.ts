@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const ELIGIBLE = ['active', 'enrolled', 'completed', 'graduated'];
+const ELIGIBLE = ['active', 'enrolled', 'in_progress', 'completed', 'graduated'];
 
 export async function POST(request: Request) {
   const ctx = await requireProgramHolder();
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const work = String(body.work_completed || '').trim();
   const skills = String(body.skills_learned || '').trim();
   const progressPercent = Number(body.progress_percent);
-  if (!UUID.test(enrollmentId) || !/^\d{4}-\d{2}-\d{2}$/.test(workDate)) return NextResponse.json({ error: 'Select a student and valid training date.' }, { status: 400 });
+  if (!UUID.test(enrollmentId) || !UUID.test(hourEntryId) || !/^\d{4}-\d{2}-\d{2}$/.test(workDate)) return NextResponse.json({ error: 'Select a student and valid training date.' }, { status: 400 });
   if (workDate > new Date().toISOString().slice(0, 10)) return NextResponse.json({ error: 'Training cannot be logged for a future date.' }, { status: 400 });
   if (!Number.isInteger(progressPercent) || progressPercent < 0 || progressPercent > 100) return NextResponse.json({ error: 'Progress must be a whole number from 0 to 100.' }, { status: 400 });
   if (!milestone || work.length < 10 || skills.length < 10 || body.attested !== 'true') return NextResponse.json({ error: 'Milestone, work performed, skills learned, and attestation are required.' }, { status: 400 });
@@ -25,10 +25,11 @@ export async function POST(request: Request) {
   if (progressPercent < Number(enrollment.progress_percent || 0)) return NextResponse.json({ error: 'Progress cannot be lower than the current progress.' }, { status: 400 });
   const { data: verifiedClock } = await ctx.db.from('hour_entries').select('id,user_id,program_holder_id,program_slug,work_date,hours_claimed,accepted_hours,status,approval_status,notes').eq('id', hourEntryId).eq('user_id', enrollment.user_id).eq('program_holder_id', ctx.holderId).maybeSingle();
   if (!verifiedClock || !['approved','verified'].includes(String(verifiedClock.approval_status || verifiedClock.status).toLowerCase())) return NextResponse.json({ error: 'Daily progress can only be recorded after the clock hours are verified.' }, { status: 409 });
+  if (verifiedClock.program_slug !== enrollment.program_slug) return NextResponse.json({ error: 'Verified hours must belong to this enrollment program.' }, { status: 400 });
   if (verifiedClock.work_date !== workDate) return NextResponse.json({ error: 'Training date must match the verified clock entry.' }, { status: 400 });
   const hours = Number(verifiedClock.accepted_hours || verifiedClock.hours_claimed || 0);
   if (!Number.isFinite(hours) || hours <= 0) return NextResponse.json({ error: 'Verified clock entry has no accepted hours.' }, { status: 400 });
-  const totalHours = Math.min(48, Number(enrollment.total_hours_completed || 0));
+  const totalHours = Number(enrollment.total_hours_completed || 0);
   const notes = `Milestone: ${milestone}\nWork performed: ${work}\nSkills learned: ${skills}\nProgram Holder attestation: signed`;
   const { error: entryError } = await ctx.db.from('hour_entries').update({ source_entity_name: milestone, category: 'workone_48_hour_milestone', notes, approval_notes: 'Verified hours documented with daily Program Holder progress attestation.' }).eq('id', hourEntryId).eq('program_holder_id', ctx.holderId);
   if (entryError) return NextResponse.json({ error: 'The daily progress record could not be attached to the verified hours.' }, { status: 500 });

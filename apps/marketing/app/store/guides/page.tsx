@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Practical guides for workforce development organizations — capital readiness, compliance, licensing, and funding navigation.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/guides',
+    canonical: 'https://store.elevateforhumanity.org/store/guides',
   },
 };
 
@@ -89,9 +89,9 @@ export default function GuidesPage() {
 
       {/* Hero */}
       <section className="relative h-56 md:h-72 overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+        <Image
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/store-guides-hero.webp"
           alt="Workforce development guides and resources"
           fill
@@ -104,33 +104,29 @@ export default function GuidesPage() {
       {/* Headline — below the image */}
       <section className="pt-8 pb-4">
         <div className="max-w-6xl mx-auto px-6">
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Guides &amp; Resources</h1>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">
+            Guides &amp; Resources
+          </h1>
           <p className="text-slate-600 text-base max-w-xl">
-            Practical documentation for workforce organizations — written from the inside, not from a consulting firm.
+            Practical documentation for workforce organizations — written from the inside, not from
+            a consulting firm.
           </p>
         </div>
       </section>
 
-      {/* Category filter */}
-      <section className="py-6 border-b">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-full text-sm font-semibold">
-              All Guides
-            </button>
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.name}
-                className="px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2"
-              >
-                <cat.icon className="w-4 h-4" />
-                {cat.name}
-                <span className="text-slate-400">({cat.count})</span>
-              </button>
-            ))}
-          </div>
+      <nav aria-label="Available guides" className="border-b border-slate-200 px-4 py-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap gap-3">
+          {GUIDES.map((guide) => (
+            <a
+              key={guide.id}
+              href={`#guide-${guide.id}`}
+              className="inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-brand-blue-700 hover:bg-slate-50"
+            >
+              {guide.title}
+            </a>
+          ))}
         </div>
-      </section>
+      </nav>
 
       {/* Guides */}
       <section className="py-16 sm:py-20">
@@ -139,20 +135,28 @@ export default function GuidesPage() {
             {GUIDES.map((guide, index) => (
               <div
                 key={guide.id}
+                id={`guide-${guide.id}`}
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className={`grid lg:grid-cols-2 ${index % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}>
+                <div
+                  className={`grid lg:grid-cols-2 ${index % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}
+                >
                   {/* Image */}
-                  <div className={`relative min-h-[280px] lg:min-h-[380px] ${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
+                  <div
+                    className={`relative min-h-[280px] lg:min-h-[380px] ${index % 2 === 1 ? 'lg:col-start-2' : ''}`}
+                  >
                     <Image
                       src={guide.image}
                       alt={guide.imageAlt}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw" placeholder="empty"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      placeholder="empty"
                     />
                     <div className="absolute top-4 left-4">
-                      <span className={`inline-block px-3 py-1.5 rounded-full text-xs font-bold text-white ${guide.badgeColor}`}>
+                      <span
+                        className={`inline-block px-3 py-1.5 rounded-full text-xs font-bold text-white ${guide.badgeColor}`}
+                      >
                         {guide.badge}
                       </span>
                     </div>
@@ -162,11 +166,17 @@ export default function GuidesPage() {
                   <div className="p-8 lg:p-10 flex flex-col justify-between">
                     <div>
                       <div className="flex items-start justify-between mb-4">
-                        <p className="text-sm font-semibold text-brand-blue-600">{guide.subtitle}</p>
+                        <p className="text-sm font-semibold text-brand-blue-600">
+                          {guide.subtitle}
+                        </p>
                         <div className="text-right">
-                          <div className="text-2xl font-black text-brand-blue-600">{guide.price}</div>
+                          <div className="text-2xl font-black text-brand-blue-600">
+                            {guide.price}
+                          </div>
                           {guide.originalPrice && (
-                            <div className="text-sm text-slate-500 line-through">{guide.originalPrice}</div>
+                            <div className="text-sm text-slate-500 line-through">
+                              {guide.originalPrice}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -175,7 +185,9 @@ export default function GuidesPage() {
                       <p className="text-slate-600 leading-relaxed mb-6">{guide.description}</p>
 
                       <div className="mb-8">
-                        <h3 className="font-semibold text-slate-900 text-sm mb-3">What&apos;s included:</h3>
+                        <h3 className="font-semibold text-slate-900 text-sm mb-3">
+                          What&apos;s included:
+                        </h3>
                         <ul className="grid sm:grid-cols-2 gap-2">
                           {guide.features.map((f) => (
                             <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
@@ -214,9 +226,12 @@ export default function GuidesPage() {
       {/* CTA */}
       <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Need Custom Training Materials?</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            Need Custom Training Materials?
+          </h2>
           <p className="text-white mb-8">
-            We develop custom guides and compliance documentation for enterprise clients and licensing partners.
+            We develop custom guides and compliance documentation for enterprise clients and
+            licensing partners.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

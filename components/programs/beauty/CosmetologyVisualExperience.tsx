@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
@@ -117,7 +118,7 @@ export default function CosmetologyVisualExperience() {
           </div>
           <div className="order-1 relative aspect-[16/10] max-h-[320px] bg-white lg:order-2">
             {slides.map((item, index) => (
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 key={item.src}
                 src={item.src}
                 alt={index === active ? item.alt : ''}
@@ -187,7 +188,7 @@ export default function CosmetologyVisualExperience() {
                     alt={item.alt}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                    className="object-contain transition duration-700 group-hover:scale-[1.03]"
                   />
                 </div>
                 <figcaption className="px-5 py-4 text-lg font-black text-slate-950">

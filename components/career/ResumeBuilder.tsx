@@ -100,7 +100,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase.from('resumes').select('*').eq('user_id', user.id).single();
+      const { data } = await supabase.from('resumes').select('*').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(1).maybeSingle();
 
       if (data?.resume_data) {
         setResumeData(data.resume_data);
@@ -175,12 +175,12 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
         <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
           <FileText className="w-6 h-6 text-brand-orange-400" />
           Resume Builder
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setIsPreviewOpen(value => !value)} className="px-4 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-600 transition-colors flex items-center gap-2">
             <Eye className="w-4 h-4" />
             Preview

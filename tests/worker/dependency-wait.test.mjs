@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
-const source = stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'), { mode: 'transform' });
+const source = stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'), { mode: 'transform' }).replace("'./owner-preview-claim.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/owner-preview-claim.mjs', import.meta.url).href)).replace("'./dispatch-on-enqueue.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/dispatch-on-enqueue.mjs', import.meta.url).href));
 const { UltimateJobQueue } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
 function database(rows = [{ id: 'job' }]) {
@@ -44,4 +44,46 @@ test('a stale worker cannot report a successful dependency transition', async ()
   const db = database([]);
   await assert.rejects(new UltimateJobQueue(db).waitForDependency('job', 'stale', 'blocked', 8),
     /ULTIMATE_JOB_LEASE_LOST:job/);
+});
+
+test('repair requeue wakes dispatcher only after a fenced successful write', async () => {
+  const originalFetch=globalThis.fetch;
+  const originalToken=process.env.COURSE_DISPATCH_GITHUB_TOKEN;
+  let requests=0;
+  process.env.COURSE_DISPATCH_GITHUB_TOKEN='test-token';
+  globalThis.fetch=async()=>{requests++;return {status:204};};
+  try {
+    const db=database();
+    await new UltimateJobQueue(db).requeueForRepair('job','worker','repair',9);
+    assert.equal(db.writes[0].status,'queued');assert.equal(requests,1);
+    await assert.rejects(new UltimateJobQueue(database([])).requeueForRepair('job','old-worker','repair',8),/LEASE_LOST/);
+    assert.equal(requests,1);
+  } finally {
+    globalThis.fetch=originalFetch;
+    if(originalToken===undefined)delete process.env.COURSE_DISPATCH_GITHUB_TOKEN;
+    else process.env.COURSE_DISPATCH_GITHUB_TOKEN=originalToken;
+  }
+});
+
+test('retryable failures wake the dispatcher while terminal failures do not',async()=>{
+  const originalFetch=globalThis.fetch;
+  const originalToken=process.env.COURSE_DISPATCH_GITHUB_TOKEN;
+  let requests=0;
+  process.env.COURSE_DISPATCH_GITHUB_TOKEN='test-token';
+  globalThis.fetch=async()=>{requests++;return {status:204};};
+  const writes=[];
+  const query={eq(){return this;},gt(){return this;},update(v){writes.push(v);return this;},
+    select(){return this;},single:async()=>({data:{attempts:1,max_attempts:3},error:null}),
+    then(resolve){return Promise.resolve({data:[{id:'job'}],error:null}).then(resolve);}};
+  try{
+    const queue=new UltimateJobQueue({from:()=>query});
+    await queue.fail('job','worker','temporary',9,true);
+    assert.equal(writes[0].status,'queued');assert.equal(requests,1);
+    await queue.fail('job','worker','terminal',9,false);
+    assert.equal(writes[1].status,'failed');assert.equal(requests,1);
+  }finally{
+    globalThis.fetch=originalFetch;
+    if(originalToken===undefined)delete process.env.COURSE_DISPATCH_GITHUB_TOKEN;
+    else process.env.COURSE_DISPATCH_GITHUB_TOKEN=originalToken;
+  }
 });

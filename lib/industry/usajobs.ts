@@ -1,4 +1,5 @@
 /** Shared USAJOBS federal job feed for Admin and Ultimate workforce enrichment. */
+import { getSecrets, hydrateProcessEnv } from '@/lib/secrets';
 export type JobRow = {
   source: string;
   external_id: string;
@@ -33,8 +34,10 @@ function salaryRange(minimum: unknown, maximum: unknown): string | null {
 }
 
 export async function fetchUsaJobs(keyword: string, location: string, limit: number): Promise<JobRow[]> {
-  const apiKey = process.env.USAJOBS_API_KEY?.trim();
-  const userAgent = process.env.USAJOBS_USER_AGENT_EMAIL?.trim();
+  await hydrateProcessEnv();
+  const secrets = await getSecrets(['USAJOBS_API_KEY', 'USAJOBS_USER_AGENT_EMAIL']);
+  const apiKey = (secrets.USAJOBS_API_KEY || process.env.USAJOBS_API_KEY)?.trim();
+  const userAgent = (secrets.USAJOBS_USER_AGENT_EMAIL || process.env.USAJOBS_USER_AGENT_EMAIL)?.trim();
   if (!apiKey || !userAgent) return [];
 
   const url = new URL('https://data.usajobs.gov/api/search');

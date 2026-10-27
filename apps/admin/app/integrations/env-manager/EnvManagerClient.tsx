@@ -144,14 +144,12 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Telnyx phone and messaging',
-    keys: [
-      'TELNYX_API_KEY',
-      'TELNYX_PUBLIC_KEY',
-      'TELNYX_PHONE_NUMBER',
-      'TELNYX_CONNECTION_ID',
-      'TELNYX_MESSAGING_PROFILE_ID',
-    ],
+    label: 'Twilio phone and messaging',
+    keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_API_KEY_SID', 'TWILIO_API_KEY_SECRET', 'TWILIO_PHONE_NUMBER'],
+  },
+  {
+    label: 'Elevate PWA phone connection',
+    keys: ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET'],
   },
   {
     label: 'Elevate Media Storage — Backblaze B2',

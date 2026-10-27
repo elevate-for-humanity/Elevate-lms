@@ -33,13 +33,20 @@ export async function handleDevStudioHealth(req: NextRequest) {
   ]);
   const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
   const hasCloudflare = cloudflareProbe.reachable;
-  const githubToken = await getGitHubToken();
+  let githubAuthError: string | null = null;
+  const githubToken = await getGitHubToken().catch(() => {
+    githubAuthError = 'github_authentication_unavailable';
+    return null;
+  });
   const hasGitHub = Boolean(githubToken);
   let githubTokenValid = false;
   if (githubToken) {
     try {
-      const response = await fetch('https://api.github.com/user', {
+      // Installation credentials represent an App, not a user. Probe the
+      // repository PARIS actually needs rather than the user-only endpoint.
+      const response = await fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main', {
         headers: { Authorization: `Bearer ${githubToken}`, Accept: 'application/vnd.github+json' },
+        redirect: 'error',
         cache: 'no-store',
         signal: AbortSignal.timeout(5000),
       });
@@ -51,6 +58,10 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const activeProvider = ai.activeProvider;
   const hasElevate = ai.elevate;
   const aiConfigured = ai.anyConfigured;
+  // Configuration alone does not establish successful browser or workflow execution.
+  const executionPrerequisitesReady = githubTokenValid && isGoogleRuntimeReady() &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && hasElevate;
   let nextVersion = 'unknown';
   try {
     nextVersion = require('next/package.json').version;
@@ -65,11 +76,13 @@ export async function handleDevStudioHealth(req: NextRequest) {
     hasOpenAI,
     hasAnthropic,
     hasElevate,
+    ownedModel: 'ownedModel' in ai ? ai.ownedModel : { configured: false, verified: false, status: 'unavailable' },
     hasCloudflare,
     cloudflare: cloudflareProbe,
     activeProvider,
     hasGitHub,
     githubTokenValid,
+    githubAuthError,
     aiConfigured,
     supabaseUrlPresent: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL),
     supabaseServiceKeyPresent: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
@@ -93,7 +106,9 @@ export async function handleDevStudioHealth(req: NextRequest) {
     },
     execution: {
       mode: 'master-studio',
-      ready: true,
+      ready: executionPrerequisitesReady,
+      verifiedEndToEnd: false,
+      status: executionPrerequisitesReady ? 'prerequisites-configured-not-tested' : 'missing-prerequisites',
       repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,
     },

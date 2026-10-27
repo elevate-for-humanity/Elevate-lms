@@ -12,7 +12,7 @@ export function FundingBadge({ type, className = '' }: FundingBadgeProps) {
         className={`inline-flex items-center gap-2 px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium ${className}`}
       >
         <Award aria-label="award" className="w-4 h-4" />
-        <span>Funded: Tuition-free if eligible (WIOA/WRG/JRI)</span>
+        <span>Funding path listed — verify exact program eligibility and written authorization</span>
       </div>
     );
   }

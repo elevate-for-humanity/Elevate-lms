@@ -1,3 +1,4 @@
+import {processPwaAlerts} from './pwa-alert-delivery';
 import { randomUUID } from 'node:crypto';
 /**
  * Notification Queue Processor
@@ -25,6 +26,7 @@ interface QueuedNotification {
 }
 
 interface ProcessResult {
+  pwa?: Awaited<ReturnType<typeof processPwaAlerts>>;
   processed: number;
   sent: number;
   failed: number;
@@ -45,6 +47,8 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
   const supabase = await requireAdminClient();
   const result: ProcessResult = { processed: 0, sent: 0, failed: 0, errors: [] };
   if (!supabase) throw new Error('Notification database unavailable');
+  try { result.pwa=await processPwaAlerts(); if(result.pwa.review)result.errors.push({id:'pwa',error:'Some push deliveries require review'}); }
+  catch { result.errors.push({id:'pwa',error:'PWA alert processing unavailable'}); }
   const claimToken = randomUUID();
   const { data: claimed, error: claimError } = await supabase.rpc('claim_notification_outbox', {
     p_claim_token: claimToken,

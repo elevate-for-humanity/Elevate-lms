@@ -1,4 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import {claimExactOwnerPreview} from './owner-preview-claim.mjs';
+import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
 
 export class UltimateJobQueue {
   constructor(private db: SupabaseClient) {}
@@ -15,6 +17,7 @@ export class UltimateJobQueue {
         if (build?.status === 'published') return null;
         throw new Error('ULTIMATE_DEPENDENCY_WAKEUP_NOT_PERSISTED');
       }
+      await notifyCourseDispatcher({});
       return data[0];
     }
     const active = () =>
@@ -27,26 +30,58 @@ export class UltimateJobQueue {
         .maybeSingle();
     const { data: existing, error: readError } = await active();
     if (readError) throw readError;
-    if (existing) return existing;
-    const { data, error } = await this.db
-      .from('ultimate_build_jobs')
-      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload })
-      .select('*')
-      .single();
+    if (existing) {
+      if (existing.status === 'queued' && (!existing.available_at || Date.parse(existing.available_at) <= Date.now())) {
+        await notifyCourseDispatcher({});
+      }
+      return existing;
+    }
+    const { data: previous, error: previousError } = await this.db.from('ultimate_build_jobs')
+      .select('monitor,status,payload,pending_dependency_resume').eq('build_id', buildId).eq('job_type', 'course_build')
+      .order('created_at', {ascending: false}).limit(1).maybeSingle();
+    if (previousError) throw previousError;
+    // A failed dependency/paused attempt retains the exact lesson cursor and
+    // repair intent. A completed preview must not constrain a full-course run.
+    let checkpointPayload: Record<string, unknown> = previous?.payload &&
+      typeof previous.payload === 'object' && !Array.isArray(previous.payload) ? {...previous.payload} : {};
+    const pending = previous?.pending_dependency_resume;
+    if (pending && typeof pending === 'object' && !Array.isArray(pending))
+      checkpointPayload = {...checkpointPayload,...pending};
+    delete checkpointPayload.progress;
+    const nextPayload = previous?.status === 'failed' && payload &&
+      typeof payload === 'object' && !Array.isArray(payload) ? {...checkpointPayload,...payload} : payload;
+    const { data: queued, error } = await this.db.rpc('enqueue_ultimate_build_job', {
+      p_build: buildId, p_payload: nextPayload, p_monitor: previous?.monitor ?? null,
+    });
+    const data = queued?.[0] ?? null;
     if (error?.code === '23505') {
       const { data: concurrent, error: concurrentError } = await active();
       if (concurrentError) throw concurrentError;
-      if (concurrent) return concurrent;
+      if (concurrent) {
+        if (concurrent.status === 'queued' && (!concurrent.available_at || Date.parse(concurrent.available_at) <= Date.now())) {
+          await notifyCourseDispatcher({});
+        }
+        return concurrent;
+      }
     }
     if (error) throw error;
-    const { error: buildError } = await this.db.from('ultimate_course_builds')
-      .update({ status: 'queued', updated_at: new Date().toISOString() })
-      .eq('id', buildId);
-    if (buildError) throw buildError;
+    if (!data) throw new Error('ULTIMATE_JOB_NOT_PERSISTED');
+    if (data.status === 'queued') await notifyCourseDispatcher({});
     return data;
   }
 
   async claim(workerId: string, leaseSeconds = 300) {
+    if (process.env.EXTERNAL_COURSE_ATTEMPT_ID) {
+      if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
+        throw new Error('CONFLICTING_EXACT_WORKER_TARGETS');
+      const {data, error} = await this.db.rpc('claim_external_course_job', {
+        p_attempt: process.env.EXTERNAL_COURSE_ATTEMPT_ID, p_worker: workerId,
+      });
+      if (error) throw error;
+      return data?.[0] ?? null;
+    }
+    if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
+      return claimExactOwnerPreview(this.db,process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID,workerId,leaseSeconds);
     const { data, error } = await this.db.rpc('claim_ultimate_build_job', {
       p_worker: workerId,
       p_lease_seconds: leaseSeconds,
@@ -125,6 +160,7 @@ export class UltimateJobQueue {
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    await notifyCourseDispatcher({});
   }
 
   /** Yield between lessons. A successful checkpoint is progress, not a failed
@@ -145,6 +181,9 @@ export class UltimateJobQueue {
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    // Each saved lesson checkpoint requests a successor immediately; the
+    // durable queue and scheduled coordinator remain the recovery fallback.
+    await notifyCourseDispatcher({});
   }
 
   async fail(jobId: string, workerId: string, errorMessage: string, generation: number, retry = true) {
@@ -181,7 +220,8 @@ export class UltimateJobQueue {
       .select('id');
     if (updateError) throw updateError;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
-    // The database transition atomically blocks or requeues the build. A
-    // separate update here could overwrite a concurrently arriving media wakeup.
+    if (canRetry) await notifyCourseDispatcher({});
+    // The fenced job transition is durable. Runtime persistence owns aggregate
+    // build state; a separate update here could overwrite a media wakeup.
   }
 }

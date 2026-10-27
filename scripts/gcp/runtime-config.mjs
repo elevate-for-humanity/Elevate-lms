@@ -15,11 +15,18 @@ export function googleFailureCode(stderr = '') {
   return 'command_failed';
 }
 export function google(args, input) {
-  const result = spawnSync('gcloud', args, { input, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const result = spawnSync('gcloud', args, { input, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   // CLI errors may include credential values. Never emit stdout/stderr on failure.
   if (result.status !== 0) {
     const error = new Error(`Google operation failed: ${args.slice(0, 3).join(' ')}`);
-    error.code = googleFailureCode(result.stderr); throw error;
+    error.code = googleFailureCode(result.stderr);
+    // Preserve only allowlisted, non-secret quota identifiers. Never echo raw
+    // gcloud stderr: it can contain runtime environment and credentials.
+    const details = String(result.stderr || '');
+    const quotaIds = [...details.matchAll(/\b(?:CpuAllocPerProjectRegion|MemAllocPerProjectRegion|[A-Za-z][A-Za-z0-9_]{2,80}PerProjectRegion)\b/g)].map(match => match[0]);
+    if (quotaIds.length) error.quotaIds = [...new Set(quotaIds)].slice(0, 8);
+    if (result.error) error.processFailure = result.error.code === 'ETIMEDOUT' ? 'timeout' : 'spawn_failed';
+    throw error;
   }
   return result.stdout.trim();
 }

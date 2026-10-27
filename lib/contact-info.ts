@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const CONTACT_INFO = {
   phone: {
     display: PLATFORM_DEFAULTS.mainPhone,
-    tel: '+13179999620',
+    tel: '+14632401404',
   },
 
   email: {

@@ -5,6 +5,10 @@ on:
       component:
         type: string
         required: true
+      candidate_size:
+        type: string
+        default: preserve
+        required: false
       image_sha:
         type: string
         required: true
@@ -15,6 +19,11 @@ on:
         type: choice
         required: true
         options: [marketing, admin, lms, store, all]
+      candidate_size:
+        description: Admin candidate allocation; preserve keeps existing service resources
+        type: choice
+        default: preserve
+        options: [preserve, admin-2cpu-4gi]
       image_sha:
         description: Full commit SHA of the successfully uploaded image
         type: string
@@ -23,11 +32,12 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-runtime-operations
+  group: google-runtime-us-central1
   cancel-in-progress: false
+  queue: max
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
@@ -51,6 +61,7 @@ jobs:
         env:
           COMPONENT: ${{ matrix.component }}
           IMAGE_SHA: ${{ inputs.image_sha }}
+          CANDIDATE_SIZE: ${{ inputs.candidate_size || 'preserve' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -62,9 +73,20 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          # An image release preserves capacity, probes, identities and secret bindings.
-          # Cloud Run enforces actual regional quota during revision creation.
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --no-traffic --quiet
+          # The bounded Admin candidate fits verified rollout headroom; existing traffic stays healthy until acceptance.
+          resource_args=()
+          case "$CANDIDATE_SIZE" in
+            preserve) ;;
+            admin-2cpu-4gi)
+              test "$COMPONENT" = admin
+              export CANDIDATE_CPU=2 CANDIDATE_MEMORY=4Gi
+              resource_args=(--cpu=2 --memory=4Gi --no-cpu-throttling --update-env-vars=AI_NARRATION_PROVIDER=kokoro)
+              ;;
+            *) echo 'Unsupported candidate allocation'; exit 1 ;;
+          esac
+          CANDIDATE_SERVICE="$SERVICE" node scripts/gcp/cleanup-unused-candidate-tags.mjs
+          CANDIDATE_SERVICE="$SERVICE" node scripts/gcp/preflight-web-rollout.mjs
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --no-cpu-boost --no-traffic "${resource_args[@]}" --quiet
       - name: Verify and activate the exact candidate before moving public traffic
         env:
           COMPONENT: ${{ matrix.component }}
@@ -75,6 +97,16 @@ jobs:
           export CANDIDATE_REVISION="$(gcloud run services describe "$CANDIDATE_SERVICE" --project=elegant-racer-299721 --region=us-central1 --format='value(status.latestCreatedRevisionName)')"
           node --test scripts/test-public-revision-activation.mjs
           node scripts/gcp/activate-tested-public-revision.mjs
+      - name: Resolve the canonical service URL for health authentication
+        id: health_target
+        env:
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_URL="$(gcloud run services describe "elevate-$COMPONENT-migration" --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
+          [[ "$SERVICE_URL" =~ ^https://[a-z0-9.-]+\.run\.app$ ]]
+          echo "url=$SERVICE_URL" >> "$GITHUB_OUTPUT"
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -82,11 +114,12 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
           token_format: id_token
-          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_audience: ${{ steps.health_target.outputs.url }}
           id_token_include_email: true
       - name: Verify image version and Supabase health
         env:
           TOKEN: ${{ steps.health_auth.outputs.id_token }}
+          HEALTH_BASE_URL: ${{ steps.health_target.outputs.url }}
           COMPONENT: ${{ matrix.component }}
           IMAGE_SHA: ${{ inputs.image_sha }}
         shell: bash
@@ -95,19 +128,30 @@ jobs:
           node --input-type=module <<'NODE'
           import { appendFileSync } from 'node:fs';
           const component = process.env.COMPONENT;
+          const baseUrl = process.env.HEALTH_BASE_URL;
+          if (!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(baseUrl || '')) throw new Error('Canonical Cloud Run health URL required');
           const deadline=Date.now()+120000;
           let consecutive=0;
           for(let attempt=1; Date.now()<deadline; attempt++) {
             let response, body={};
             try {
-              response=await fetch('https://elevate-' + component + '-migration-aabnh2y32a-uc.a.run.app/api/health', {
+              response=await fetch(baseUrl + '/api/health', {
                 headers: {'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
                 redirect:'manual', signal:AbortSignal.timeout(Math.min(20000,deadline-Date.now()))
               });
               body=await response.json();
-            } catch {
-              console.log(JSON.stringify({component,attempt,error:'health_probe_failed'}));
-              throw new Error('Health endpoint did not return a valid bounded response');
+            } catch (error) {
+              // Only retry bounded transport failures; malformed JSON and all
+              // actual HTTP responses still fail their existing release gates.
+              const transient = ['TimeoutError', 'AbortError', 'TypeError'].includes(error?.name);
+              console.log(JSON.stringify({component,attempt,httpStatus:response?.status,contentType:response?.headers?.get('content-type'),error:transient
+                ? 'transient_health_transport' : 'health_probe_invalid_response'}));
+              if (!transient || Date.now() >= deadline) {
+                throw new Error('Health endpoint did not return a valid bounded response');
+              }
+              consecutive = 0;
+              await new Promise(resolve => setTimeout(resolve, 5000));
+              continue;
             }
             const dependency=body.dependencies?.supabase;
             const result={component,attempt,httpStatus:response.status,
@@ -133,7 +177,7 @@ jobs:
           }
           if(consecutive<3) throw new Error('Service did not establish stable dependency health within two minutes');
           // /health confirms dependency access; /ready enforces the application's own readiness contract.
-          const readinessResponse=await fetch('https://elevate-'+component+'-migration-aabnh2y32a-uc.a.run.app/api/ready',{
+          const readinessResponse=await fetch(baseUrl + '/api/ready',{
             headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
             redirect:'manual',signal:AbortSignal.timeout(20000)
           });
@@ -147,7 +191,7 @@ jobs:
               !readyResult.correctCommit || !readyResult.executorReady)
             throw new Error('Canonical application readiness failed');
           if(component==='marketing') {
-            const qbResponse=await fetch('https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app/api/health/quickbooks',{
+            const qbResponse=await fetch(baseUrl + '/api/health/quickbooks',{
               headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
               redirect:'manual',signal:AbortSignal.timeout(20000)
             });
@@ -161,21 +205,21 @@ jobs:
               throw new Error('QuickBooks runtime is not synchronized with the Google deployment');
           }
           if(component==='admin') {
-            const telnyxResponse=await fetch('https://elevate-admin-migration-aabnh2y32a-uc.a.run.app/api/health/telnyx',{
-              headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
-              redirect:'manual',signal:AbortSignal.timeout(20000)
-            });
-            const telnyx=await telnyxResponse.json().catch(()=>({}));
-            const telnyxResult={component:'admin',telnyxHttpStatus:telnyxResponse.status,
-              telnyxReady:telnyx.ready===true,telnyxConfigured:telnyx.configured===true,
-              carrierNumberActive:telnyx.carrierNumberActive===true,
-              primaryNumberActive:telnyx.primaryNumberActive===true,
-              webrtcConfigured:telnyx.webrtcConfigured===true};
-            console.log(JSON.stringify(telnyxResult));
-            if(telnyxResponse.status!==200 || !telnyxResult.telnyxReady || !telnyxResult.telnyxConfigured ||
-                !telnyxResult.carrierNumberActive || !telnyxResult.primaryNumberActive || !telnyxResult.webrtcConfigured)
-              throw new Error('Telnyx runtime is not synchronized with the Google Admin deployment');
+            // The legacy /api/health/telnyx endpoint checks a retired provider.
+            // Do not require it for Google Admin readiness or infer that the
+            // standalone Asterisk/Twilio/PARIS voice flow is production-ready.
+            console.log(JSON.stringify({component:'admin',phoneAcceptance:'NOT_TESTED',
+              carrier:'Twilio (reported; live cutover not verified)',
+              scope:'application readiness only; PBX acceptance is a separate gate'}));
+            appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+              'Admin: legacy Telnyx carrier gate retired. PBX/Twilio/PARIS calling NOT VERIFIED by this deployment.\\n');
           }
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
 
           NODE
+      - name: Check standalone PBX public transport (read-only, not call acceptance)
+        if: ${{ matrix.component == 'admin' }}
+        continue-on-error: true
+        run: |
+          node scripts/gcp/verify-pbx-transport.mjs
+          echo "Public DNS/TLS/SIP WebSocket transport does not prove Twilio carrier routing, SIP registration, audio, ASR, or PARIS."

@@ -105,7 +105,9 @@ requireText('.github/workflows/recovery-hardening-gate.yml', 'group: recovery-ha
 requireText('.github/workflows/compliance-gate.yml', 'pnpm audit --audit-level high', 'High-severity dependency vulnerabilities must remain blocking.');
 forbidText('.github/workflows/compliance-gate.yml', 'Security vulnerabilities found - review SECURITY_NOTES.md', 'Compliance security audit must not convert high vulnerabilities to success.');
 
-requireText('.github/workflows/consolidation-docker-northflank.yml', "'release/production-recovery-*'", 'Docker/Northflank gate must follow the canonical recovery branch.');
+// Google owns production delivery. Do not require retired Northflank workflows
+// to participate in recovery; production deployment safeguards are checked below.
+requireText('.github/workflows/deploy-admin.yml', 'node scripts/gcp/verify-admin-revision.mjs', 'Google Admin release must verify the exact serving revision.');
 requireText('.github/workflows/consolidation-gate.yml', 'push:', 'Consolidation gate must run for mainline pushes.');
 requireText('.github/workflows/consolidation-gate.yml', 'group: consolidation-gate-${{ github.event.pull_request.number || github.ref }}', 'Consolidation gate must serialize by PR or branch ref.');
 forbidText('.github/workflows/consolidation-gate.yml', "startsWith(github.head_ref, 'release/production-recovery-')", 'Mainline consolidation validation must not be restricted to temporary recovery branches.');

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ export default async function CareerCounselingPage() {
       {/* Hero — standard size, title below */}
       <section className="relative w-full">
         <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/pages/career-counseling-page-1.webp"
             alt="Career counseling and guidance"
             fill
@@ -68,7 +69,7 @@ export default async function CareerCounselingPage() {
               Start Free Counseling
             </a>
             <a
-              href="tel:3179999620"
+              href="tel:4632401404"
               className="border-2 border-black text-black font-bold px-8 py-4 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2"
             >
               <Phone className="w-4 h-4" /> Talk to a Person
@@ -146,10 +147,10 @@ export default async function CareerCounselingPage() {
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <a
-            href="tel:3179999620"
+            href="tel:4632401404"
             className="bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-2 text-lg"
           >
-            <Phone className="w-5 h-5" /> (317) 999-9620
+            <Phone className="w-5 h-5" /> (463) 240-1404
           </a>
           <Link
             href="/contact"

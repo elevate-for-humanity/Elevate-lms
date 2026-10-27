@@ -118,7 +118,16 @@ export default function UniversalHostSiteApplyPage() {
 
     setSubmitting(true);
     try {
-      const form = new FormData(event.currentTarget);
+      const formElement = event.currentTarget;
+      const firstInvalid = formElement.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(':invalid');
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalid.focus({ preventScroll: true });
+        firstInvalid.reportValidity();
+        setError('Please complete the highlighted required field before submitting.');
+        return;
+      }
+      const form = new FormData(formElement);
       form.delete('programs');
       programs.forEach((program) => form.append('programs', program));
 
@@ -218,7 +227,7 @@ export default function UniversalHostSiteApplyPage() {
           </div>
         ) : null}
 
-        <form ref={formRef} onSubmit={handleSubmit} className="min-w-0 space-y-5 sm:space-y-6">
+        <form ref={formRef} noValidate onSubmit={handleSubmit} className="min-w-0 space-y-5 sm:space-y-6">
           <section className={sectionClass}>
             <h2 className="text-xl font-black">1. Business identity</h2>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">

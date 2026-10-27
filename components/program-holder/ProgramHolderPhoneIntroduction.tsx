@@ -45,7 +45,7 @@ const guide = [
   },
   {
     title: 'Immediate administrator assistance',
-    body: 'Call Administration at (317) 999-9620 and use extension 0 for Elizabeth Greene. Confirm current routing in the live directory. If the administrator is unavailable, review the callback options shown in the phone workspace.',
+    body: 'Call Administration at (463) 240-1404 and use extension 0 for Elizabeth Greene. Confirm current routing in the live directory. If the administrator is unavailable, review the callback options shown in the phone workspace.',
   },
   {
     title: 'Privacy and emergencies',

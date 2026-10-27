@@ -1,14 +1,22 @@
-import {DestinationControls} from './DestinationControls';
+import { DestinationControls } from './DestinationControls';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Bot, Mail, MessageSquareText, Phone, PhoneForwarded, Radio, Video, Voicemail, Workflow } from 'lucide-react';
+import {
+  Bot,
+  Mail,
+  MessageSquareText,
+  Phone,
+  PhoneForwarded,
+  Radio,
+  Video,
+  Voicemail,
+  Workflow,
+} from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { telnyxClient } from '@/lib/phone/telnyx';
-import { resolveSendingNumber } from '@/lib/phone/sending-number';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -115,7 +123,10 @@ export default async function PhonePage() {
         { count: 0 },
       ] as any);
 
-  const numbers = numbersResult.data ?? [];
+  // Retired carrier inventory must not appear as a current dashboard number.
+  const numbers = (numbersResult.data ?? []).filter(
+    (number: any) => number.status === 'active' || number.source === 'external_forwarding',
+  );
   const destinations = destinationsResult.data ?? [];
   const menuOptions = menuResult.data ?? [];
   const programHolders = (programHoldersResult.data ?? []).filter(
@@ -124,7 +135,9 @@ export default async function PhonePage() {
   const extensions = extensionsResult.data ?? [];
   const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
-    greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity. This is PARIS. How may I help you today?',
+    greeting:
+      system?.greeting ??
+      'Thank you for calling Elevate for Humanity. This is PARIS. How may I help you today?',
     afterHours:
       system?.after_hours_message ??
       'Our office is currently closed. Please leave a message and we will return your call.',
@@ -161,27 +174,9 @@ export default async function PhonePage() {
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  let carrierRuntimeReady = false;
-  try {
-    const client = await telnyxClient();
-    const configuredNumber = await resolveSendingNumber(db);
-    if (configuredNumber) {
-      for await (const item of client.phoneNumbers.list({
-        filter: { phone_number: configuredNumber },
-        'page[size]': 20,
-      })) {
-        if (item.phone_number === configuredNumber) {
-          carrierRuntimeReady = true;
-          break;
-        }
-      }
-    }
-  } catch {
-    carrierRuntimeReady = false;
-  }
-  const carrierReady =
-    carrierRuntimeReady &&
-    numbers.some((number: any) => number.source === 'provider' && number.status === 'active');
+  // A database row or legacy Telnyx probe cannot certify live Twilio/PBX calling.
+  // Keep the dashboard fail-closed until independent carrier and audio acceptance.
+  const carrierReady = false;
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(
     (number: any) =>
@@ -222,7 +217,7 @@ export default async function PhonePage() {
             screen sharing, and communication history.
           </p>
         </div>
-        <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <Link
             href="/phone/email"
             className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"
@@ -245,20 +240,35 @@ export default async function PhonePage() {
         </div>
       </div>
       <section className="grid gap-3 sm:grid-cols-3">
-        <Link href="/phone/inbox" className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <Link
+          href="/phone/inbox"
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
           <MessageSquareText className="h-5 w-5 text-indigo-700" />
           <p className="mt-2 font-black text-slate-950">Phone inbox & texts</p>
-          <p className="mt-1 text-sm text-slate-600">Missed calls, voicemail, callback interviews, SMS conversations, and call notes.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Missed calls, voicemail, callback interviews, SMS conversations, and call notes.
+          </p>
         </Link>
-        <Link href="/phone/email" className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <Link
+          href="/phone/email"
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
           <Mail className="h-5 w-5 text-orange-600" />
           <p className="mt-2 font-black text-slate-950">Email</p>
-          <p className="mt-1 text-sm text-slate-600">Read, reply, compose, and manage Elevate office email from the Communications Hub.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Read, reply, compose, and manage Elevate office email from the Communications Hub.
+          </p>
         </Link>
-        <Link href="/phone/meetings" className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <Link
+          href="/phone/meetings"
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
           <Video className="h-5 w-5 text-cyan-700" />
           <p className="mt-2 font-black text-slate-950">Meetings</p>
-          <p className="mt-1 text-sm text-slate-600">Video meetings, microphone, chat, and screen sharing.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Video meetings, microphone, chat, and screen sharing.
+          </p>
         </Link>
       </section>
       {!onboarding?.announcement_seen_at ? (
@@ -308,7 +318,12 @@ export default async function PhonePage() {
           </p>
         </div>
       </div>
-      <Link href="https://app.elevateforhumanity.org/communications/phone" className="inline-flex min-h-12 items-center rounded-xl bg-blue-700 px-5 font-black text-white">Open my phone and dial pad</Link>
+      <Link
+        href="https://app.elevateforhumanity.org/communications/phone"
+        className="inline-flex min-h-12 items-center rounded-xl bg-blue-700 px-5 font-black text-white"
+      >
+        Open my phone and dial pad
+      </Link>
       <CapabilityGuide />
       <PhoneSetupForms
         settings={settings}
@@ -326,7 +341,10 @@ export default async function PhonePage() {
           {numbers.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {numbers.map((item: any) => (
-                <li key={item.id} className="grid min-w-0 gap-3 py-4 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                <li
+                  key={item.id}
+                  className="grid min-w-0 gap-3 py-4 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                >
                   <span>
                     <b>{item.label}</b>
                     <br />
@@ -391,7 +409,10 @@ export default async function PhonePage() {
           {destinations.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {destinations.map((item: any) => (
-                <li key={item.id} className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+                <li
+                  key={item.id}
+                  className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                >
                   <span>
                     <b>{item.name}</b>
                     {item.department ? (
@@ -407,7 +428,11 @@ export default async function PhonePage() {
                       · rings {item.ring_seconds}s
                     </span>
                   </span>
-                  <DestinationControls id={item.id} enabled={item.enabled} isDefault={system?.default_destination_id === item.id} />
+                  <DestinationControls
+                    id={item.id}
+                    enabled={item.enabled}
+                    isDefault={system?.default_destination_id === item.id}
+                  />
                 </li>
               ))}
             </ul>

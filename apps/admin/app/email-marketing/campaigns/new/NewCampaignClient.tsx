@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import toast from 'react-hot-toast';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
@@ -104,7 +105,7 @@ export default function NewCampaignPage() {
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/admin-email-campaigns-new-detail.webp"
           alt="New"
           fill

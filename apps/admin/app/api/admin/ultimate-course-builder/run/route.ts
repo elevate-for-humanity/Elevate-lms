@@ -1,8 +1,9 @@
+import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
-import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
 
@@ -10,29 +11,165 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  const limited = await applyRateLimit(req, 'strict');
-  if (limited) return limited;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   const body = await req.json().catch(() => null);
   if (typeof body?.buildId !== 'string' || !/^[a-f0-9-]{36}$/i.test(body.buildId))
     return NextResponse.json({ error: 'A valid buildId is required' }, { status: 400 });
+  // Unrelated Studio requests must not consume this administrator's resume quota.
+  // Keep the strict limit and derive its scope only from the authenticated actor.
+  const limited = await applyRateLimit(req, 'strict', { key: `course-resume:${auth.id}` });
+  if (limited) return limited;
   try {
     const db = await requireAdminClient();
-    const { data: build, error } = await db.from('ultimate_course_builds')
-      .select('id,status').eq('id', body.buildId).single();
-    if (error || !build) return NextResponse.json({ error: 'Ultimate build not found' }, { status: 404 });
-    if (['built', 'published'].includes(build.status))
-      return NextResponse.json({ error: 'This build has finished. Use the verified release action.' }, { status: 409 });
+    const { data: build, error } = await db
+      .from('ultimate_course_builds')
+      .select('id,status,profile,updated_at')
+      .eq('id', body.buildId)
+      .single();
+    if (error || !build)
+      return NextResponse.json({ error: 'Ultimate build not found' }, { status: 404 });
+    if (['built', 'published', 'archived'].includes(build.status))
+      return NextResponse.json(
+        { error: 'This build has finished. Use the verified release action.' },
+        { status: 409 },
+      );
+    // An explicit authenticated Resume must clear a saved production pause.
+    // Record the real authenticated actor; the legacy flag alone proves no actor.
+    if (typeof build.updated_at !== 'string')
+      return NextResponse.json({ error: 'The saved revision is unavailable. Refresh before changing the build.' }, { status: 409 });
+    const profile = build.profile as Record<string, unknown>;
+    if (profile?.ownerPaused === true) {
+      const now = new Date().toISOString();
+      const resumed = await db
+        .from('ultimate_course_builds')
+        .update({
+          profile: {
+            ...profile,
+            ownerPaused: false,
+            pauseResumeAudit: {
+              previousPauseFlag: true,
+              resumedBy: auth.id,
+              resumedAt: now,
+              action: 'explicit-admin-resume',
+            },
+          },
+          updated_at: now,
+        })
+        .eq('id', build.id)
+        .in('status', [
+          'initializing',
+          'queued',
+          'running',
+          'blocked',
+          'failed',
+          'built_with_findings',
+        ])
+        .eq('updated_at', build.updated_at)
+        .select('id');
+      if (resumed.error || resumed.data?.length !== 1)
+        return NextResponse.json(
+          { error: 'The saved build changed. Refresh before resuming; no worker was launched.' },
+          { status: 409 },
+        );
+    }
     // Enqueue is idempotent: keep the same checkpoints and any existing lease.
-    const job = await new UltimateJobQueue(db as any).enqueue(build.id, { requestedBy: auth.id });
-    if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
-    const dispatch = await dispatchGoogleDeployment('course-builder');
-    return NextResponse.json({
-      ok: true, queued: true, dispatched: true, buildId: build.id, jobId: job.id,
-      executionVerified: false, actionsUrl: dispatch.actionsUrl,
-    }, { status: 202 });
+    let job = await new UltimateJobQueue(db as any).enqueue(build.id, { requestedBy: auth.id });
+    if (!job)
+      return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
+    if (
+      job.status === 'running' &&
+      Boolean(job.lease_owner) &&
+      Date.parse(job.lease_expires_at ?? '') > Date.now() &&
+      Date.now() - Date.parse(job.heartbeat_at ?? '') >= 0 &&
+      Date.now() - Date.parse(job.heartbeat_at ?? '') < 90000
+    )
+      return NextResponse.json({
+        ok: true,
+        alreadyRunning: true,
+        executionVerified: true,
+        message: 'The existing worker is active. No duplicate execution was started.',
+      });
+    if (job.status === 'running' && Date.parse(job.lease_expires_at ?? '') > Date.now())
+      return NextResponse.json(
+        {
+          error:
+            'The existing worker still holds its lease. Refresh its heartbeat before requesting recovery.',
+        },
+        { status: 409 },
+      );
+    if (job.status === 'running' || job.attempts >= job.max_attempts) {
+      const now = new Date().toISOString();
+      const recovery = await db
+        .from('ultimate_build_jobs')
+        .update({
+          status: 'queued',
+          attempts: 0,
+          execution_generation: job.execution_generation + 1,
+          lease_owner: null,
+          lease_expires_at: null,
+          available_at: now,
+          last_error: null,
+          payload: { ...job.payload, requestedBy: auth.id },
+          updated_at: now,
+        })
+        .eq('id', job.id)
+        .eq('status', job.status)
+        .eq('execution_generation', job.execution_generation)
+        .or('lease_expires_at.is.null,lease_expires_at.lt.' + now)
+        .select('*')
+        .single();
+      if (recovery.error || !recovery.data)
+        return NextResponse.json(
+          { error: 'The worker state changed. Refresh before requesting recovery.' },
+          { status: 409 },
+        );
+      job = recovery.data;
+    }
+    const dispatch = await requestCourseWorker();
+    const dispatchEvidenceSaved = await recordCourseDispatch(db, job.id, dispatch, auth.id);
+    // A persisted queue request is not a live execution. Surface a retryable
+    // service error when both launch paths fail instead of a misleading 202.
+    if (!dispatch.dispatched) {
+      return NextResponse.json(
+        {
+          ok: false,
+          queued: true,
+          dispatched: false,
+          buildId: build.id,
+          jobId: job.id,
+          error:
+            'The build is safely queued, but Google worker launch failed. ' +
+            'Check the Admin Google service identity (run.jobs.run) and GitHub dispatch credentials.',
+          dispatchError:
+            'dispatchError' in dispatch
+              ? dispatch.dispatchError
+              : 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
+        },
+        { status: 503 },
+      );
+    }
+    return NextResponse.json(
+      {
+        ok: true,
+        queued: true,
+        buildId: build.id,
+        jobId: job.id,
+        ...dispatch, dispatchEvidenceSaved,
+      },
+      { status: 202 },
+    );
   } catch (error) {
-    return safeInternalError(error, 'Build could not be started on Google. Refresh to check the saved job.');
+    if (error instanceof Error && error.message === 'Google GitHub dispatch refused: HTTP 401')
+      return safeInternalError(
+        error,
+        'Course Builder worker dispatch authentication rejected',
+        'Worker launch authentication was rejected. Refresh the GitHub connection in Studio, then Resume. Your saved build is preserved.',
+      );
+    return safeInternalError(
+      error,
+      'Course Builder worker dispatch failed',
+      'The worker launch failed. Your saved build is preserved. Check deployment access and retry Resume.',
+    );
   }
 }

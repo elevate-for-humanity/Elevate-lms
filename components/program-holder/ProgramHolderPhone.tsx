@@ -1,4 +1,6 @@
 'use client';
+import { AudioOutputControl } from '@/components/communications/AudioOutputControl';
+import { TranscriptPanel } from '@/components/communications/TranscriptPanel';
 
 import {
   createPhoneClient,
@@ -60,12 +62,22 @@ type PhoneData = {
     ringSeconds: number;
     voicemailGreeting: string;
     externalFallbackEnabled: boolean;
+    externalFallbackAllowed?: boolean;
     externalFallbackNumber: string;
     presenceStatus: string;
-    provider: 'telnyx' | 'asterisk';
+    provider: 'asterisk';
   };
   inbox: InboxItem[];
-  voicemail?: { items: Array<{id: string; phone_number: string | null; transcription: string | null; summary: string | null; created_at: string; recordingUrl: string | null}> };
+  voicemail?: {
+    items: Array<{
+      id: string;
+      phone_number: string | null;
+      transcription: string | null;
+      summary: string | null;
+      created_at: string;
+      recordingUrl: string | null;
+    }>;
+  };
 };
 
 const DAYS = [
@@ -122,6 +134,7 @@ export function ProgramHolderPhone({
   const [returnNumber, setReturnNumber] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const clientRef = useRef<PhoneClient | null>(null);
+  const outboundClientRef = useRef<PhoneClient | null>(null);
   const callRef = useRef<BrowserPhoneCall | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -173,11 +186,18 @@ export function ProgramHolderPhone({
         inCall: Boolean(callRef.current),
       }),
     }).catch(() => undefined);
-    if (controller.signal.aborted || epoch !== registrationEpochRef.current || !registeredRef.current) return;
+    if (
+      controller.signal.aborted ||
+      epoch !== registrationEpochRef.current ||
+      !registeredRef.current
+    )
+      return;
     if (!response?.ok) {
       setConnected(false);
       setMessage('');
-      setError('Registration reachability is not yet verified. The phone will check again automatically.');
+      setError(
+        'Registration reachability is not yet verified. The phone will check again automatically.',
+      );
     } else {
       setConnected(true);
       setError('');
@@ -206,7 +226,8 @@ export function ProgramHolderPhone({
       body: JSON.stringify({ action: 'disconnect', deviceId: deviceId() }),
       keepalive: true,
     }).catch(() => undefined);
-    if (!response?.ok) setError('Phone disconnected locally. Server presence could not yet be confirmed.');
+    if (!response?.ok)
+      setError('Phone disconnected locally. Server presence could not yet be confirmed.');
     clientRef.current = null;
     callRef.current = null;
     setConnected(false);
@@ -220,6 +241,7 @@ export function ProgramHolderPhone({
       registeredRef.current = false;
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       void clientRef.current?.disconnect();
+      void outboundClientRef.current?.disconnect();
     };
   }, []);
 
@@ -230,6 +252,21 @@ export function ProgramHolderPhone({
     connectionAbortRef.current?.abort();
     const controller = new AbortController();
     connectionAbortRef.current = controller;
+    const deadline = setTimeout(() => {
+      if (controller.signal.aborted) return;
+      controller.abort();
+      registrationEpochRef.current += 1;
+      registeredRef.current = false;
+      setConnected(false);
+      setConnecting(false);
+      setMessage('');
+      setError('Phone connection timed out. Reconnect the phone and check microphone access.');
+      const expiredClient = clientRef.current;
+      clientRef.current = null;
+      void expiredClient?.disconnect().catch(() => undefined);
+    }, 45_000);
+    const clearDeadline = () => clearTimeout(deadline);
+    controller.signal.addEventListener('abort', clearDeadline, { once: true });
     try {
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       heartbeatRef.current = null;
@@ -244,8 +281,11 @@ export function ProgramHolderPhone({
       const tokenData = await tokenResponse.json().catch(() => ({}));
       if (!tokenResponse.ok) throw new Error(tokenData.error || 'The phone could not connect.');
       if (!remoteAudioRef.current) throw new Error('The call audio player is unavailable.');
-      const client = await createPhoneClient(tokenData, remoteAudioRef.current);
-      if (controller.signal.aborted) { await client.disconnect(); return; }
+      const client = await createPhoneClient(tokenData, remoteAudioRef.current, { signal: controller.signal });
+      if (controller.signal.aborted) {
+        await client.disconnect();
+        return;
+      }
       let ready = false;
       client.on('ready', () => {
         if (controller.signal.aborted) return;
@@ -262,6 +302,7 @@ export function ProgramHolderPhone({
         registeredRef.current = false;
         ready = false;
         setConnected(false);
+        setConnecting(false);
         setMessage('Phone is offline.');
       });
       client.on('error', (event: any) => {
@@ -270,6 +311,7 @@ export function ProgramHolderPhone({
         registeredRef.current = false;
         ready = false;
         setConnected(false);
+        setConnecting(false);
         setMessage('');
         setError(
           event?.error?.message || event?.message || 'The phone connection reported an error.',
@@ -312,7 +354,10 @@ export function ProgramHolderPhone({
       });
       clientRef.current = client;
       await client.connect();
-      if (controller.signal.aborted) { await client.disconnect(); return; }
+      if (controller.signal.aborted) {
+        await client.disconnect();
+        return;
+      }
       heartbeatRef.current = setInterval(() => {
         if (ready) void heartbeat();
       }, 45_000);
@@ -321,6 +366,9 @@ export function ProgramHolderPhone({
       setConnecting(false);
       await disconnect();
       setError(cause instanceof Error ? cause.message : 'The phone could not connect.');
+    } finally {
+      clearDeadline();
+      controller.signal.removeEventListener('abort', clearDeadline);
     }
   }, [connected, connecting, data, disconnect, heartbeat]);
 
@@ -374,18 +422,37 @@ export function ProgramHolderPhone({
     if (!data || data.readOnly || saving) return;
     setSaving(true);
     try {
-      const response = await fetch(apiBase, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'ring_mode',ringMode:mode})});
+      const response = await fetch(apiBase, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ring_mode', ringMode: mode }),
+      });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'The alert mode could not be saved.');
       ringModeRef.current = mode;
-      setData(current => current ? {...current, extension:{...current.extension, ringMode:mode}} : current);
+      setData((current) =>
+        current ? { ...current, extension: { ...current.extension, ringMode: mode } } : current,
+      );
       if (mode !== 'ring') callRef.current?.stopRingtone();
       if (mode !== 'vibrate') navigator.vibrate?.(0);
-      if (mode === 'vibrate' && !navigator.vibrate) setMessage('Vibrate selected. This browser does not support vibration; incoming calls still appear onscreen.');
-      else setMessage(mode === 'ring' ? 'Incoming call sound is on.' : mode === 'vibrate' ? 'Incoming calls will vibrate.' : 'Incoming call sound is muted.');
+      if (mode === 'vibrate' && !navigator.vibrate)
+        setMessage(
+          'Vibrate selected. This browser does not support vibration; incoming calls still appear onscreen.',
+        );
+      else
+        setMessage(
+          mode === 'ring'
+            ? 'Incoming call sound is on.'
+            : mode === 'vibrate'
+              ? 'Incoming calls will vibrate.'
+              : 'Incoming call sound is muted.',
+        );
       setError('');
-    } catch (cause) {setError(cause instanceof Error ? cause.message : 'The alert mode could not be saved.');}
-    finally {setSaving(false);}
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'The alert mode could not be saved.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function enableNotifications() {
@@ -421,6 +488,8 @@ export function ProgramHolderPhone({
     call.stopRingtone();
     navigator.vibrate?.(0);
     await call.hangup();
+    await outboundClientRef.current?.disconnect().catch(() => {});
+    outboundClientRef.current = null;
     callRef.current = null;
     setCallState('idle');
   }
@@ -445,27 +514,136 @@ export function ProgramHolderPhone({
     }
   }
 
-  async function pressDialDigit(digit:string) {
-    if(callState==='active' && callRef.current) {
-      if(!callRef.current.dtmf){setError('This phone connection cannot send menu choices.');return;}
-      try {await callRef.current.dtmf(digit);setError('');}
-      catch {setError('The menu choice could not be sent. Try again.');}
+  async function pressDialDigit(digit: string) {
+    if (callState === 'active' && callRef.current) {
+      if (!callRef.current.dtmf) {
+        setError('This phone connection cannot send menu choices.');
+        return;
+      }
+      try {
+        await callRef.current.dtmf(digit);
+        setError('');
+      } catch {
+        setError('The menu choice could not be sent. Try again.');
+      }
       return;
     }
-    setReturnNumber(current=>(current+digit).slice(0,20));
+    setReturnNumber((current) => (current + digit).slice(0, 20));
   }
 
   async function returnCall(number = returnNumber) {
-    if (data?.readOnly) return;
+    if (callState !== 'idle' || callRef.current || outboundClientRef.current) {
+      setError('Finish the current call before placing another.');
+      return;
+    }
+    if (data?.readOnly || callRef.current) return;
     let destination = phoneDestination(number, data?.extension.provider || 'telnyx');
-    if(data?.extension.provider!=='asterisk' && /^(0|[0-9]{3})$/.test(number.trim())) {
+    if (data?.extension.provider !== 'asterisk' && /^(0|[0-9]{3})$/.test(number.trim())) {
       try {
-        const response=await fetch('/api/communications/phone/dial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({extension:number.trim()})});
-        const target=await response.json();
-        if(!response.ok){setError(target.error || 'The extension is unavailable.');return;}
-        if(typeof target.destination!=='string' || !/^sip:[A-Za-z0-9._-]{1,128}@sip[.]telnyx[.]com$/.test(target.destination)){setError('The extension destination could not be verified.');return;}
-        destination=target.destination;
-      } catch {setError('The extension could not be reached. Try again.');return;}
+        const response = await fetch('/api/communications/phone/dial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ extension: number.trim() }),
+        });
+        const target = await response.json();
+        if (!response.ok) {
+          setError(target.error || 'The extension is unavailable.');
+          return;
+        }
+        if (
+          typeof target.destination !== 'string' ||
+          !/^sip:[A-Za-z0-9._-]{1,128}@sip[.]telnyx[.]com$/.test(target.destination)
+        ) {
+          setError('The extension destination could not be verified.');
+          return;
+        }
+        destination = target.destination;
+      } catch {
+        setError('The extension could not be reached. Try again.');
+        return;
+      }
+    }
+    const externalDestination = /^(?:1)?[0-9]{10}$/.test(number.replace(/[^0-9]/g, ''))
+      ? phoneDestination(number, 'telnyx')
+      : null;
+    if (data?.extension.provider === 'asterisk' && externalDestination) {
+      if (!remoteAudioRef.current) return;
+      try {
+        setCallState('calling');
+        setIncomingNumber(number);
+        setError('');
+        const response = await fetch('/api/program-holder/phone/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceId: `${deviceId()}_outbound`, purpose: 'external' }),
+        });
+        const token = await response.json();
+        if (!response.ok) throw Error(token.error || 'Outbound carrier is unavailable.');
+        const client = await createPhoneClient(token, remoteAudioRef.current);
+        outboundClientRef.current = client;
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(
+            () => reject(Error('Outbound phone registration timed out.')),
+            25000,
+          );
+          client.on('ready', () => {
+            clearTimeout(timeout);
+            resolve();
+          });
+          client.on('error', () => {
+            clearTimeout(timeout);
+            reject(Error('Outbound carrier connection failed.'));
+          });
+          void client.connect().catch(reject);
+        });
+        client.on('call', (event: any) => {
+          const call = event?.call;
+          if (!call) return;
+          if (call.state === 'active') {
+            callRef.current = call;
+            setCallState('active');
+          }
+          if (['hangup', 'destroy', 'purge'].includes(call.state)) {
+            callRef.current = null;
+            setCallState('idle');
+            void client.disconnect();
+            outboundClientRef.current = null;
+          }
+        });
+        callRef.current = await client.newCall({
+          destinationNumber: externalDestination,
+          callerNumber: token.callerId,
+          callerName: data.extension.displayName,
+          audio: true,
+          remoteElement: remoteAudioRef.current,
+        });
+      } catch (e) {
+        setCallState('idle');
+        await outboundClientRef.current?.disconnect().catch(() => {});
+        outboundClientRef.current = null;
+        setError(e instanceof Error ? e.message : 'Outbound call failed.');
+      }
+      return;
+    }
+    if (!registeredRef.current) {
+      await connect();
+      if (!registeredRef.current && clientRef.current) {
+        await new Promise<void>((resolve) => {
+          const timeout = setTimeout(resolve, 15000);
+          clientRef.current!.on('ready', () => {
+            clearTimeout(timeout);
+            resolve();
+          });
+          clientRef.current!.on('error', () => {
+            clearTimeout(timeout);
+            resolve();
+          });
+        });
+      }
+      if (!registeredRef.current) {
+        setError('The phone could not register. Check the connection and try Return call again.');
+        return;
+      }
     }
     if (!destination || !clientRef.current || !remoteAudioRef.current) {
       setError(
@@ -475,7 +653,11 @@ export function ProgramHolderPhone({
       );
       return;
     }
+    if (callRef.current) return;
     try {
+      setIncomingNumber(number);
+      setCallState('calling');
+      setError('');
       const call = await clientRef.current.newCall({
         destinationNumber: destination,
         callerNumber: data?.phoneNumber,
@@ -484,10 +666,8 @@ export function ProgramHolderPhone({
         remoteElement: remoteAudioRef.current,
       });
       callRef.current = call;
-      setIncomingNumber(number);
-      setCallState('calling');
-      setError('');
     } catch {
+      if (!callRef.current) setCallState('idle');
       setError('The call could not be placed. Check microphone permission and try again.');
     }
   }
@@ -534,6 +714,27 @@ export function ProgramHolderPhone({
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
+      <AudioOutputControl audio={remoteAudioRef} />
+      <nav aria-label="Phone communication tools" className="flex gap-2 overflow-x-auto">
+        <a
+          href="/communications/texts"
+          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
+        >
+          Text messages
+        </a>
+        <a
+          href="/communications/email"
+          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
+        >
+          Interoffice email
+        </a>
+        <a
+          href="/lms/calendar"
+          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
+        >
+          Calendar
+        </a>
+      </nav>
       {data.readOnly && (
         <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
           Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are
@@ -596,85 +797,92 @@ export function ProgramHolderPhone({
         </p>
       )}
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-xl font-black text-slate-950">
-            Dial pad
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            {data.extension.provider === 'asterisk'
-              ? 'Enter a three-digit extension or 0 for the administrator.'
-              : 'The caller sees the Elevate business number, not your personal number.'}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="text-xl font-black text-slate-950">Dial pad</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          {data.extension.provider === 'asterisk'
+            ? 'Enter an extension, 0 for admin, or a phone number for an outbound carrier call.'
+            : 'The caller sees the Elevate business number, not your personal number.'}
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
+            <button
+              key={digit}
+              type="button"
+              onClick={() => void pressDialDigit(digit)}
+              className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
+            >
+              {digit}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex gap-2">
+          <input
+            value={returnNumber}
+            onChange={(event) => setReturnNumber(event.target.value)}
+            type="tel"
+            aria-label="Phone number or extension"
+            inputMode="tel"
+            placeholder={'Phone number or extension'}
+            className="min-h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-3"
+          />
+          <button
+            onClick={() => returnCall()}
+            disabled={data.readOnly || connecting || callState !== 'idle'}
+            className="min-h-12 rounded-xl bg-emerald-700 px-4 font-black text-white"
+          >
+            <PhoneCall className="h-5 w-5" />
+            <span className="sr-only">Call</span>
+          </button>
+        </div>
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setReturnNumber((current) => current.slice(0, -1))}
+            className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            onClick={() => setReturnNumber('')}
+            className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+          >
+            Clear
+          </button>
+        </div>
+        <div className="mt-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
+          <h3 className="flex items-center gap-2 font-black text-violet-950">
+            <BellRing className="h-5 w-5" />
+            What happens when you miss a call
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-violet-900">
+            PARIS tells the caller you are unavailable, asks their name, callback number, reason,
+            program, urgency, and preferred callback time, then puts the interview in your inbox
+            below.
           </p>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
-              <button
-                key={digit}
-                type="button"
-                onClick={() => void pressDialDigit(digit)}
-                className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
-              >
-                {digit}
-              </button>
-            ))}
-          </div>
-          <div className="mt-3 flex gap-2">
-            <input
-              value={returnNumber}
-              onChange={(event) => setReturnNumber(event.target.value)}
-              type="tel"
-              aria-label="Phone number or extension"
-              inputMode="tel"
-              placeholder={
-                data.extension.provider === 'asterisk' ? 'Extension or 0' : 'Phone number or extension'
-              }
-              className="min-h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-3"
-            />
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2" aria-label="Incoming call alert mode">
+          {(
+            [
+              ['ring', 'Ring on'],
+              ['vibrate', 'Vibrate'],
+              ['silent', 'Ring muted'],
+            ] as const
+          ).map(([mode, label]) => (
             <button
-              onClick={() => returnCall()}
-              disabled={data.readOnly}
-              className="min-h-12 rounded-xl bg-emerald-700 px-4 font-black text-white"
-            >
-              <PhoneCall className="h-5 w-5" />
-              <span className="sr-only">Call</span>
-            </button>
-          </div>
-          <div className="mt-2 flex gap-2">
-            <button
+              key={mode}
               type="button"
-              onClick={() => setReturnNumber((current) => current.slice(0, -1))}
-              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+              disabled={saving || data.readOnly}
+              aria-pressed={data.extension.ringMode === mode}
+              onClick={() => void applyRingMode(mode)}
+              className={`min-h-12 rounded-xl border px-3 font-bold ${data.extension.ringMode === mode ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'} disabled:opacity-50`}
             >
-              Delete
+              {label}
             </button>
-            <button
-              type="button"
-              onClick={() => setReturnNumber('')}
-              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
-            >
-              Clear
-            </button>
-          </div>
-          <div className="mt-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
-            <h3 className="flex items-center gap-2 font-black text-violet-950">
-              <BellRing className="h-5 w-5" />
-              What happens when you miss a call
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-violet-900">
-              PARIS tells the caller you are unavailable, asks their name, callback number, reason,
-              program, urgency, and preferred callback time, then puts the interview in your inbox
-              below.
-            </p>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2" aria-label="Incoming call alert mode">
-            {([['ring','Ring on'],['vibrate','Vibrate'],['silent','Ring muted']] as const).map(([mode,label]) => (
-              <button key={mode} type="button" disabled={saving || data.readOnly} aria-pressed={data.extension.ringMode === mode}
-                onClick={() => void applyRingMode(mode)}
-                className={`min-h-12 rounded-xl border px-3 font-bold ${data.extension.ringMode === mode ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'} disabled:opacity-50`}>
-                {label}
-              </button>
-            ))}
-          </div>
-        </section>
+          ))}
+        </div>
+      </section>
 
       {callState !== 'idle' && (
         <section className="rounded-3xl border-2 border-cyan-300 bg-slate-950 p-7 text-center text-white shadow-2xl">
@@ -738,10 +946,9 @@ export function ProgramHolderPhone({
             Availability and ringing
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">
-            Your extension rings in the PWA first. You may also add your own phone number as a
-            fallback for your extension.
+            Your extension rings in your Elevate phone. Unanswered calls go to PARIS or voicemail.
           </p>
-          <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
+          {data.extension.externalFallbackAllowed && <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
             <label className="flex items-center gap-3 text-sm font-bold text-blue-950">
               <input
                 type="checkbox"
@@ -752,18 +959,16 @@ export function ProgramHolderPhone({
                 disabled={data.readOnly}
                 className="h-5 w-5 accent-blue-700"
               />
-              Ring my own phone number as an extension fallback
+              Use the approved administrator forwarding destination
             </label>
             {data.extension.externalFallbackEnabled && (
               <label className="mt-3 block text-sm font-bold text-slate-800">
-                My phone number
+                Administrator forwarding destination
                 <input
                   type="tel"
                   inputMode="tel"
                   value={data.extension.externalFallbackNumber}
-                  onChange={(event) =>
-                    updateExtension({ externalFallbackNumber: event.target.value })
-                  }
+                  readOnly
                   placeholder="(317) 555-0123"
                   disabled={data.readOnly}
                   className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 font-normal"
@@ -771,10 +976,9 @@ export function ProgramHolderPhone({
               </label>
             )}
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              This does not change your extension or business caller ID. It gives the phone system a
-              verified fallback destination when your PWA cannot take the call.
+              This destination is reserved for the administrator. Other extensions cannot forward to cell phones.
             </p>
-          </div>
+          </div>}
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-bold text-slate-800">
               Phone mode
@@ -974,20 +1178,30 @@ export function ProgramHolderPhone({
             and sends a secure missed-call alert.
           </p>
         </section>
-
-
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black">Voicemail</h2>
-        {data.voicemail?.items?.length ? data.voicemail.items.map(item => (
-          <article key={item.id} className="mt-3 rounded-xl border p-4">
-            <p className="font-bold">{friendlyNumber(item.phone_number)}</p>
-            <p className="text-sm text-slate-600">{formatDate(item.created_at)}</p>
-            <p className="mt-2">{item.transcription || item.summary || 'Voice message'}</p>
-            {item.recordingUrl ? <PhoneRecordingPlayer url={item.recordingUrl} /> : <p className="mt-2 text-sm">Audio is not available for this message.</p>}
-          </article>
-        )) : <p className="mt-3 text-sm text-slate-600">No voicemail messages.</p>}
+        {data.voicemail?.items?.length ? (
+          data.voicemail.items.map((item) => (
+            <article key={item.id} className="mt-3 rounded-xl border p-4">
+              <p className="font-bold">{friendlyNumber(item.phone_number)}</p>
+              <p className="text-sm text-slate-600">{formatDate(item.created_at)}</p>
+              <TranscriptPanel
+                text={item.transcription}
+                summary={item.summary}
+                transcribeUrl={`/api/communications/transcripts/voicemail/${item.id}`}
+              />
+              {item.recordingUrl ? (
+                <PhoneRecordingPlayer url={item.recordingUrl} />
+              ) : (
+                <p className="mt-2 text-sm">Audio is not available for this message.</p>
+              )}
+            </article>
+          ))
+        ) : (
+          <p className="mt-3 text-sm text-slate-600">No voicemail messages.</p>
+        )}
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -1060,19 +1274,15 @@ export function ProgramHolderPhone({
                   Preferred time: {item.preferred_callback_time}
                 </p>
               )}
-              {item.transcript && (
-                <details className="mt-3 rounded-xl bg-slate-50 p-3 text-sm">
-                  <summary className="cursor-pointer font-black">Read transcript</summary>
-                  <p className="mt-2 whitespace-pre-wrap leading-6 text-slate-700">
-                    {item.transcript}
-                  </p>
-                </details>
-              )}
-              {item.recordingUrl && (
-                <PhoneRecordingPlayer url={item.recordingUrl} />
-              )}
+              <TranscriptPanel
+                text={item.transcript}
+                summary={item.summary}
+                transcribeUrl={`/api/communications/transcripts/callback/${item.id}`}
+              />
+              {item.recordingUrl && <PhoneRecordingPlayer url={item.recordingUrl} />}
               {item.callback_number && (
                 <button
+                  disabled={data.readOnly || connecting || callState !== 'idle'}
                   onClick={() => {
                     setReturnNumber(item.callback_number || '');
                     returnCall(item.callback_number || '');

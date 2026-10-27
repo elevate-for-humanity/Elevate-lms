@@ -1,6 +1,7 @@
 // Server component. Operational Admin dashboard using canonical routes and live data only.
 
 import Link from 'next/link';
+import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
 import LogoImage from '@/components/site/LogoImage';
 import Image from 'next/image';
 import type { DashboardHeroAsset } from '@/lib/admin/dashboard/get-hero-assets';
@@ -73,6 +74,11 @@ function OperationalShortcuts() {
       href: '/applications',
     },
     {
+      title: 'Application Checker',
+      description: 'Check public application steps and record broken Continue buttons or routing. Opens your private tool in a new tab; ChatGPT sign-in is required.',
+      href: APPLICATION_CHECKER_URL,
+    },
+    {
       title: 'Students',
       description: 'Open learner records, enrollments, documents, and progress.',
       href: '/students',
@@ -119,7 +125,8 @@ function OperationalShortcuts() {
     },
     {
       title: 'Website Traffic',
-      description: 'View most visited pages, traffic sources, Google Analytics, and visitor locations.',
+      description:
+        'View most visited pages, traffic sources, Google Analytics, and visitor locations.',
       href: '/analytics/traffic',
     },
     {
@@ -161,6 +168,9 @@ function OperationalShortcuts() {
           <Link
             key={item.href}
             href={item.href}
+            target={item.href === APPLICATION_CHECKER_URL ? '_blank' : undefined}
+            rel={item.href === APPLICATION_CHECKER_URL ? 'noopener noreferrer' : undefined}
+            aria-label={item.href === APPLICATION_CHECKER_URL ? 'Application Checker (opens private tool in a new tab)' : undefined}
             className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
           >
             <div className="flex items-center justify-between gap-3">
@@ -269,16 +279,21 @@ export function AdminDashboardContent({
   return (
     <div className="w-full max-w-none min-w-0 px-3 pb-16 pt-4 sm:px-5 lg:px-6">
       <section
-        className={`mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${heroAssets.length ? 'grid lg:grid-cols-[1.1fr_1fr]' : ''}`}
+        className={`mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${heroAssets.length ? 'grid lg:grid-cols-[1.1fr_1fr]' : ''}`}
       >
-        <div className="p-5 sm:p-8">
-          <LogoImage alt="Elevate for Humanity" width={180} height={100} className="mb-5 h-24 max-w-full object-contain" />
+        <div className="p-4 sm:p-5">
+          <LogoImage
+            alt="Elevate for Humanity"
+            width={144}
+            height={48}
+            className="mb-3 h-12 max-w-full object-contain"
+          />
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-900">
               <ShieldCheck className="h-4 w-4" /> Admin session protected
             </span>
             <span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-black text-blue-900">
-              Live Supabase data
+              {data.degradedSections.length ? 'Dashboard data incomplete' : 'Dashboard data snapshot'}
             </span>
           </div>
           <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">

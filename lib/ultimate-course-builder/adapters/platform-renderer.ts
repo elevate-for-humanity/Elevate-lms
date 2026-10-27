@@ -1,7 +1,8 @@
+import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contract.mjs';
 import type { UltimateRenderPort } from '../core/ports';
 import { storedLicensedMediaMetadata } from '@/lib/media/licensed-course-media';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
+import { bindTeachingPhotoAssignments } from './teaching-photo-assignments.mjs';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
 type RecordLike = Record<string, any>;
@@ -52,7 +53,7 @@ export async function refreshLicensedVisualUrls(input: any, db: SupabaseClient):
   if (!Array.isArray(assignment.readyAssets)) return input;
   const readyAssets = await Promise.all(
     assignment.readyAssets.map(async (value: unknown) => {
-      const asset = record(value);
+      const asset = { ...record(value) };
       if(asset.entitlement_id) {
         const {data:entitlement,error:lookupError}=await db.from('licensed_media_entitlements')
           .select('metadata').eq('id',asset.entitlement_id).single();
@@ -99,31 +100,17 @@ function visualCandidates(input: any): VisualCandidate[] {
     const row = record(asset);
     const url = publicCourseMediaUrl(row.public_url);
     const kind = url ? mediaKind(url, row.mime_type) : null;
-    const ownedAssignment = assignment.assignments?.find(
-      (a: any) =>
-        a.sceneId === row.instructional_scene_id &&
-        a.assetId === row.id &&
-        a.assetId === `instructional:${a.sceneId}` &&
-        a.assignmentMethod === 'instructional-render' &&
-        a.generatedInstructionalVisual === true,
-    );
-    if (
-      !url ||
-      !kind ||
-      (!row.entitlement_id &&
-        !(
-          row.owned_instructional_visual === true &&
-          row.provider === 'remotion' &&
-          ownedAssignment
-        ))
-    )
-      continue;
+    const ownedPhoto = row.teaching_photo === true &&
+      /^[a-f0-9]{64}$/i.test(row.content_sha256 ?? '') &&
+      assignment.assignments?.some((a:any) => a.assetId === row.id &&
+        a.sceneId === row.instructional_scene_id && a.assignmentMethod === 'teaching-photograph');
+    if (!url || !kind || (!row.entitlement_id && !ownedPhoto)) continue;
     candidates.push({
-      ownedInstructional: row.owned_instructional_visual === true && Boolean(ownedAssignment),
+      ownedInstructional: ownedPhoto,
       assetId: String(row.id ?? ''),
       url,
       kind,
-      provider: String(row.provider ?? 'envato'),
+      provider: String(row.provider ?? (ownedPhoto ? 'google' : 'envato')),
       providerItemId: row.provider_item_id ? String(row.provider_item_id) : undefined,
       licenseEvidenceUrl: row.license_evidence_url ? String(row.license_evidence_url) : undefined,
     });
@@ -146,9 +133,9 @@ function visualCandidates(input: any): VisualCandidate[] {
 
 function rawStoryboard(input: any): RecordLike {
   const raw =
-    input.artifacts?.storyboard?.storyboard ??
-    input.artifacts?.synchronization?.timeline?.scenes?.storyboard?.storyboard ??
     input.artifacts?.scene_construction?.scenes?.storyboard?.storyboard ??
+    input.artifacts?.synchronization?.timeline?.scenes?.storyboard?.storyboard ??
+    input.artifacts?.storyboard?.storyboard ??
     input.storyboard;
   const board = Array.isArray(raw) ? { scenes: raw } : record(raw);
   if (!Array.isArray(board.scenes) || board.scenes.length < 2) {
@@ -256,7 +243,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
         ? {
             resolved_provider: resolvedCandidate.provider,
             resolved_model: resolvedCandidate.ownedInstructional
-              ? 'script-bound-instructional-image'
+              ? 'generated-teaching-photograph'
               : resolvedCandidate.kind === 'video'
                 ? 'licensed-video'
                 : 'licensed-image',
@@ -271,13 +258,16 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     .filter(Boolean)
     .join('\n\n');
   return {
-    title: String(board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
+    title: String(input.lessonTitle ?? board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
     script,
     defaultDurationSeconds: 8,
-    requiredSceneCount: 13,
+    requiredSceneCount: scenes.length,
     sceneData: {
       ...board,
+      // The canonical competency title is authoritative; a restored storyboard
+      // can carry the previous lesson's stale heading.
+      title: String(input.lessonTitle ?? board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
       version: '1.0',
       width: Number(board.width ?? 1920),
       height: Number(board.height ?? 1080),
@@ -301,13 +291,9 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
         (!input.presentationContract?.approvedReferenceVideo?.assetId ||
          !/^[a-f0-9]{64}$/i.test(input.presentationContract?.approvedReferenceVideo?.sha256 ?? '')))
       throw new Error('ULTIMATE_APPROVED_REFERENCE_REQUIRED');
-    const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
     const { prepareTeachingPhotos } = await import('./teaching-photos');
     const photographed = this.db ? await prepareTeachingPhotos(input,this.db) : input;
-    const materialized = await materializeInstructionalVisualAssets(
-      photographed,
-      uploadCourseVideosObject,
-    );
+    const materialized = bindTeachingPhotoAssignments(photographed);
     const prepared = prepareUltimateStoryboardInput(
       this.db ? await refreshLicensedVisualUrls(materialized, this.db) : materialized,
     );
@@ -325,11 +311,18 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     });
     if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
       if(!scene.physicalDemonstration) {
-        scene.sourceVideoUrl=undefined;
-        scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
         const photo=teachingPhotos[index]?.[0];
+        // The premium renderer replaces the storyboard visual with the teaching
+        // photograph. Fail before encoding rather than silently discarding an
+        // assigned opening image and rendering a blank branded background.
+        if (typeof photo?.imageUrl !== 'string' || !/^https?:\/\//i.test(photo.imageUrl)) {
+          throw new Error(`ULTIMATE_PREMIUM_SCENE_PHOTO_MISSING:${scene.id ?? index}`);
+        }
+        scene.sourceVideoUrl=undefined;
+        scene.referenceImageUrl=photo.imageUrl;
         scene.resolvedProvider=photo?.provider??'google';
-        scene.resolvedModel=photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        scene.resolvedModel=photo?.ownerReferenceArtifactId?'owner-approved-reference-photograph':photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        if(photo?.ownerReferenceArtifactId)scene.ownerApprovedPhotoReference={artifactId:photo.ownerReferenceArtifactId,videoSha256:photo.ownerReferenceVideoSha256,sourceSceneId:photo.referenceSceneId};
         scene.sourceProviderItemId=photo?.providerItemId;
         scene.sourceLicenseEvidenceUrl=photo?.licenseEvidenceUrl;
       }
@@ -353,6 +346,8 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       storyboard,
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
+      renderRevision: input.renderRevision,
+      ownerPreview: input.ownerPreview === true,
       lessonPresentation: input.lessonPresentation,
       visualStyle,
       teachingPhotos,
@@ -368,6 +363,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       ...result,
       layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 4 : 2,
       ...(input.lessonPresentation === 'approved-premium-v1' ? {presentationVersion:'approved-moment-cues-v2'} : {}),
+      renderProducer: STORYBOARD_RENDER_PRODUCER,
       provider: 'remotion',
       providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,

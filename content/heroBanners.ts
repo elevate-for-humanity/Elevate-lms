@@ -58,22 +58,38 @@ export type ProgramHeroBannerConfig = HeroBannerConfig & {
   trustIndicators: string[];
   transcript: string;
 } & (
-  | { salaryExempt?: false; salaryRangeLabel: string }
-  | { salaryExempt: true; salaryNote: string; salaryRangeLabel?: string }
-);
+    | { salaryExempt?: false; salaryRangeLabel: string }
+    | { salaryExempt: true; salaryNote: string; salaryRangeLabel?: string }
+  );
 
 const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
-  home: '/images/heroes/hero-homepage.webp',
+  home: '/images/refresh-20261014/home.webp',
   about: '/images/pages/about-hero.webp',
   platform: '/images/hero/admin-hero.webp',
-  healthcare: '/images/pages/healthcare-hero.webp',
-  programs: '/images/hero/hero-hands-on-training.webp',
+  healthcare: '/images/refresh-20261014/healthcare.webp',
+  programs: '/images/refresh-20261014/business.webp',
   'building-services-technician': '/images/building-maintenance.webp',
   'federal-funded': '/images/heroes/hero-federal-funding.webp',
   'micro-programs': '/images/micro-classes-hero.webp',
-  'skilled-trades': '/images/hero/hero-skilled-trades.webp',
+  'skilled-trades': '/images/refresh-20261014/trades.webp',
   'home-health-aide': '/images/healthcare/hero-program-patient-care.webp',
   store: '/images/pages/store-licensing-hero.webp',
+};
+
+const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
+  'cpr-first-aid': '/images/pages/comp-pathway-classroom.webp',
+  'bookkeeping': '/images/pages/finance-accounting.webp',
+  'finance-bookkeeping-accounting': '/images/bookkeeping-training-vibrant-2026.webp',
+  'hvac-technician': '/images/hvac-hero.webp',
+  'nha-medical-assistant': '/images/pages/medical-assistant-hero.webp',
+  'nha-patient-care-technician': '/images/pages/cna-vitals.webp',
+  'qma': '/images/pages/cna-patient-care.jpg',
+  'nha-pharmacy-technician': '/images/pages/medical-assistant-real.webp',
+  'nha-phlebotomy': '/images/pexels/phlebotomy.webp',
+  'youth-culinary-apprenticeship': '/images/pages/entrepreneurship.webp',
+  'network-administration': '/images/pages/technology-sector.webp',
+  'network-support-technician': '/hero-images/technology-cat-new.jpg',
+  'guest-service-gold': '/images/pages/about-employer-partners.webp',
 };
 
 const SHARED_GENERIC_VIDEO_FILES = new Set([
@@ -139,9 +155,7 @@ function escapeSvgText(value: string): string {
 }
 
 function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string {
-  const fallbackTitle = key
-    .replace(/[-_]+/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const fallbackTitle = key.replace(/[-_]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
   const title = sanitizeHeroText(
     banner.belowHeroHeadline ?? banner.headline ?? banner.microLabel ?? fallbackTitle,
     key,
@@ -159,6 +173,13 @@ function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string 
 }
 
 function posterFor(key: string, banner: RawHeroBannerConfig): string {
+  // No distinct verified hospitality photograph is available for this page.
+  // Use its unique accessible branded poster rather than a misleading office image.
+  if (key === 'start-hospitality') return semanticInlinePoster(key, banner);
+  if (DISTINCT_PROGRAM_POSTERS[key]) return DISTINCT_PROGRAM_POSTERS[key];
+  if (PROGRAM_IMAGES[key]?.hero.includes('/refresh-20261014/')) return getProgramHeroImage(key);
+  if (PAGE_PICTURE_OVERRIDES[key]?.includes('/refresh-20261014/'))
+    return PAGE_PICTURE_OVERRIDES[key];
   const dedicated = getHeroVideoForPageKey(key);
   if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
   if (banner.posterImage) return banner.posterImage;
@@ -195,7 +216,8 @@ function normalizeBanner(
       key,
       'Review the current program requirements, cost, credential pathway, and any applicable funding process before enrollment.',
     ),
-    primaryCta: banner.primaryCta ?? banner.ctaPrimary ?? { label: 'View Programs', href: '/programs' },
+    primaryCta: banner.primaryCta ??
+      banner.ctaPrimary ?? { label: 'View Programs', href: '/programs' },
     secondaryCta: banner.secondaryCta ?? banner.ctaSecondary,
     trustIndicators: sanitizeHeroTrustIndicators(banner.trustIndicators, key),
     transcript: sanitizeHeroText(
@@ -211,7 +233,11 @@ function normalizeBanner(
   }
 
   const picture = normalized.posterImage;
-  const desktopShared = !dedicated && isSharedGenericVideo(normalized.videoSrcDesktop);
+  // Refreshed hero artwork is the reviewed visual. Existing films remain in
+  // the video registry for course and demo playback, not as an older banner layer.
+  const refreshedPicture = picture?.includes('/refresh-20261014/');
+  const desktopShared =
+    refreshedPicture || (!dedicated && isSharedGenericVideo(normalized.videoSrcDesktop));
   if (desktopShared && picture) {
     normalized = {
       ...normalized,
@@ -231,7 +257,11 @@ function normalizeBanner(
       belowHeroSubheadline:
         'Explore hands-on career programs, registered apprenticeships, and employer-connected training in Indiana. Start with the path that fits you, then we will help you understand enrollment and possible funding options.',
       primaryCta: { label: 'Explore Programs', href: '/programs' },
-      secondaryCta: { label: 'Explore Apprenticeships', href: '/apprenticeships', variant: 'secondary' },
+      secondaryCta: {
+        label: 'Explore Apprenticeships',
+        href: '/apprenticeships',
+        variant: 'secondary',
+      },
       trustIndicators: [
         'Hands-on career training',
         'Earn-while-you-learn apprenticeships',
@@ -252,7 +282,11 @@ function normalizeBanner(
       belowHeroHeadline: 'Indiana Barber registered-apprenticeship pathway.',
       belowHeroSubheadline: `Complete the approved competency-based registered-apprenticeship standard, including ${barber.competencyCount} verified occupational competencies and ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing requirements and approval are controlled separately by the applicable state authority.`,
       primaryCta: { label: 'Enroll Now', href: '/programs/barber-apprenticeship/apply' },
-      secondaryCta: { label: 'Request Information', href: '/programs/barber-apprenticeship/request-info', variant: 'secondary' },
+      secondaryCta: {
+        label: 'Request Information',
+        href: '/programs/barber-apprenticeship/request-info',
+        variant: 'secondary',
+      },
       // Keep the audited JSON transcript as the single content authority. This
       // normalization layer may govern labels and CTAs, but must not silently
       // replace the page-specific story with duplicate generic copy.
@@ -284,29 +318,33 @@ function getData(): Record<string, HeroBannerConfig> {
       const dedicated = getHeroVideoForPageKey(key);
       const candidate = dedicated?.video_url || banner.videoSrcDesktop || banner.videoSrcMobile;
       const candidateKey = mediaKey(candidate);
-      const allowJsonVideo = Boolean(dedicated) || !candidateKey || (effectiveVideoCounts.get(candidateKey) ?? 0) <= 1;
+      const allowJsonVideo =
+        Boolean(dedicated) || !candidateKey || (effectiveVideoCounts.get(candidateKey) ?? 0) <= 1;
       return [key, normalizeBanner(key, banner, allowJsonVideo)];
     }),
   );
   return normalizedData;
 }
 
-const heroBanners: Record<string, HeroBannerConfig> = new Proxy({} as Record<string, HeroBannerConfig>, {
-  get(_target, key: string) {
-    return getData()[key];
+const heroBanners: Record<string, HeroBannerConfig> = new Proxy(
+  {} as Record<string, HeroBannerConfig>,
+  {
+    get(_target, key: string) {
+      return getData()[key];
+    },
+    ownKeys() {
+      return Object.keys(getData());
+    },
+    has(_target, key: string) {
+      return key in getData();
+    },
+    getOwnPropertyDescriptor(_target, key: string) {
+      const data = getData();
+      if (key in data) return { configurable: true, enumerable: true, value: data[key] };
+      return undefined;
+    },
   },
-  ownKeys() {
-    return Object.keys(getData());
-  },
-  has(_target, key: string) {
-    return key in getData();
-  },
-  getOwnPropertyDescriptor(_target, key: string) {
-    const data = getData();
-    if (key in data) return { configurable: true, enumerable: true, value: data[key] };
-    return undefined;
-  },
-});
+);
 
 export default heroBanners;
 

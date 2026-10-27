@@ -15,7 +15,7 @@ const next={NextResponse:{json:(body,options)=>({body,status:options?.status||20
 
 test('new and legacy holder links resolve without granting approval or causing redirect loops',async()=>{
  for(const pending of [true,false]){
-  const db=dbFor(({table,columns})=>({data:table==='program_holder_programs'?[]:columns==='id'?{id:'owned-holder'}:{status:pending?'approved_pending_mou':'active',approved_at:pending?null:'2026-10-01',features:{}},error:null}));
+  const db=dbFor(({table,columns})=>({data:table==='program_holder_programs'?[]:columns==='id'?{id:'owned-holder'}:{user_id:'user',status:pending?'approved_pending_mou':'active',approved_at:pending?null:'2026-10-01',features:{}},error:null}));
   const api=load('lib/auth/require-program-holder.ts',{'@/lib/supabase/admin':{requireAdminClient:async()=>db},'next/navigation':{redirect:url=>{throw Error(url)}},'@/lib/auth/portal-access':{requirePortalAccess:async()=>({user:{id:'user'},profile:{id:'user',role:'program_holder'},isPlatformAdmin:false})},'@/lib/admin/portal-preview':{resolvePortalPreviewSubject:async()=>({previewing:false})}});
   assert.equal((await api.requireProgramHolder({allowPendingApproval:true})).holderId,'owned-holder');
   if(pending)await assert.rejects(api.requireProgramHolder(),/onboarding\?status=pending-approval/);else assert.equal((await api.requireProgramHolder()).holderId,'owned-holder');
@@ -98,4 +98,38 @@ test('provider activation racing with setup cannot be overwritten', async () => 
  await assert.rejects(api.configureProgramHolderPayoutAccount({user:{id:'u'},holderId:'h',db},'branch'),/changed during setup/);
  assert.equal(holderWrites,0);
  for(const [key,value] of [['payouts_enabled',false],['transfers_enabled',false],['payout_provider','paypal']])assert.ok(updateFilters.some(([k,v])=>k===key&&v===value));
+});
+
+
+test('a profile backlink cannot authorize another holder owner', async () => {
+ for(const owner of ['user','someone-else',null]){
+  const db=dbFor(({table})=>({data:table==='program_holder_programs'?[]:{user_id:owner,status:'active',approved_at:'2026-10-01',features:{}},error:null}));
+  const api=load('lib/auth/require-program-holder.ts',{
+   '@/lib/supabase/admin':{requireAdminClient:async()=>db},
+   'next/navigation':{redirect:url=>{throw Error(url)}},
+   '@/lib/auth/portal-access':{requirePortalAccess:async()=>({user:{id:'user'},profile:{id:'user',role:'program_holder',program_holder_id:'linked'},isPlatformAdmin:false})},
+   '@/lib/admin/portal-preview':{resolvePortalPreviewSubject:async()=>({previewing:false})},
+  });
+  if(owner==='user')assert.equal((await api.requireProgramHolder()).holderId,'linked');
+  else await assert.rejects(api.requireProgramHolder(),/unauthorized/);
+ }
+});
+
+test('communications reject suspended, inactive and missing profiles before loading phone credentials', async () => {
+ for(const state of ['active','suspended','inactive','missing','profile-error','roles-error','holder-pending','holder-terminated','holder-error']){
+  let phoneReads=0;
+  const db=dbFor(({table})=>{
+   if(table==='communication_extensions')phoneReads++;
+   return {data:table==='profiles'?(state==='missing'?null:{id:'user',role:'program_holder',is_active:state!=='inactive',suspended:state==='suspended'}):table==='user_roles'?[]:table==='program_holders'?{status:'active',approved_at:state==='holder-pending'?null:'2026-10-01',terminated_at:state==='holder-terminated'?'2026-10-27':null}:null,error:(state==='profile-error'&&table==='profiles')||(state==='roles-error'&&table==='user_roles')||(state==='holder-error'&&table==='program_holders')?{message:'Unavailable'}:null};
+  });
+  const api=load('lib/communications/actor.ts',{
+   'server-only':{},
+   '@/lib/supabase/admin':{requireAdminClient:async()=>db},
+   '@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user:{id:'user'}}})}})},
+   '@/lib/admin/portal-preview':{resolvePortalPreviewSubject:async()=>({previewing:false})},
+   '@/lib/rbac/role-matrix':{normalizeRoles:values=>values.filter(Boolean)},
+  });
+  if(state==='active'){assert.equal((await api.requireCommunicationActor()).user.id,'user');assert.equal(phoneReads,1);}
+  else {await assert.rejects(api.requireCommunicationActor(),/COMMUNICATIONS_(FORBIDDEN|LOOKUP_UNAVAILABLE)/);assert.equal(phoneReads,0);}
+ }
 });

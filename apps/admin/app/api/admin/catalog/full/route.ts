@@ -16,7 +16,7 @@ async function guardAdmin() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   return null;
@@ -34,7 +34,7 @@ async function _GET(request: NextRequest) {
   const supabaseClient = await createClient();
   const { data: programs, error } = await supabaseClient
     .from('programs')
-    .select('slug, title, name, description, short_description, credential, clock_hours, is_active')
+    .select('slug, title, name, description, short_description, credential, training_hours, is_active')
     .eq('is_active', true)
     .order('title');
   if (error) return NextResponse.json({ error: 'Catalog data unavailable' }, { status: 503 });
@@ -55,6 +55,10 @@ async function _GET(request: NextRequest) {
       'Content-Type': 'text/html',
     },
   });
+}
+
+function escapeCatalogText(value: unknown): string {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!);
 }
 
 function generateCatalogHtml(programList: any[]) {
@@ -183,7 +187,7 @@ function generateCatalogHtml(programList: any[]) {
         ${programList
           .map(
             (p, i) => `
-          <li><a href="#program-${i}">${p.name}</a></li>
+          <li><a href="#program-${i}">${escapeCatalogText(p.name || p.title)}</a></li>
         `,
           )
           .join('')}
@@ -196,24 +200,24 @@ function generateCatalogHtml(programList: any[]) {
       .map(
         (program, i) => `
       <div class="program" id="program-${i}">
-        <h2>${program.title || program.name || ''}</h2>
+        <h2>${escapeCatalogText(program.title || program.name)}</h2>
         <div class="program-meta">
           ${
-            program.clock_hours
+            program.training_hours
               ? `
           <div class="meta-item">
             <div class="meta-label">Clock Hours</div>
-            <div class="meta-value highlight">${program.clock_hours} hours</div>
+            <div class="meta-value highlight">${escapeCatalogText(program.training_hours)} hours</div>
           </div>`
               : ''
           }
           <div class="meta-item">
             <div class="meta-label">Credential</div>
-            <div class="meta-value">${program.credential || 'Certificate of Completion'}</div>
+            <div class="meta-value">${escapeCatalogText(program.credential || 'Certificate of Completion')}</div>
           </div>
         </div>
         <div class="program-description">
-          <p>${program.short_description || program.description || ''}</p>
+          <p>${escapeCatalogText(program.short_description || program.description)}</p>
         </div>
       </div>
       ${(i + 1) % 2 === 0 ? '<div class="page-break"></div>' : ''}

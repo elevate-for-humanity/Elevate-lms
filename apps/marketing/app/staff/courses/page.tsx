@@ -20,14 +20,14 @@ export default async function StaffCoursesPage() {
   // Fetch courses from programs table
   const { data: courses } = await supabase
     .from('programs')
-    .select('id, name, slug, category, tuition_cost, duration_weeks, is_active')
+    .select('id, name, slug, category, tuition_cost:tuition, duration_weeks, is_active')
     .order('name');
 
   // Get enrollment counts per program
   const { data: enrollmentCounts } = await supabase
     .from('program_enrollments')
     .select('program_id')
-    .eq('status', 'ACTIVE');
+    .in('status', ['active', 'enrolled', 'in_progress']);
 
   const enrollmentMap = (enrollmentCounts || []).reduce((acc: Record<string, number>, e: any) => {
     acc[e.program_id] = (acc[e.program_id] || 0) + 1;

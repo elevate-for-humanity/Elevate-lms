@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import ProgramHolderForm from './ProgramHolderForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getActivePrograms } from '@/lib/program-registry';
@@ -43,7 +42,6 @@ export default async function ProgramHolderApplicationPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const supabase = await createClient();
   const query = await searchParams;
   const value = (key: string) => typeof query[key] === 'string' ? String(query[key]).trim() : '';
   const requestedProgram = value('program');
@@ -51,12 +49,6 @@ export default async function ProgramHolderApplicationPage({
   const initialProgram = programOptions.some((program) => program.slug === requestedProgram)
     ? requestedProgram
     : '';
-
-  await supabase
-    .from('site_settings')
-    .select('*')
-    .eq('key', 'program_holder_applications')
-    .maybeSingle();
 
   return (
     <div className="min-h-screen bg-white">

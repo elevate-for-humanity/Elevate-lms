@@ -1,4 +1,3 @@
-import { createPublicClient } from '@/lib/supabase/public';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,14 +25,6 @@ export const metadata = {
 };
 
 export default async function SponsorLicensingPage() {
-  const supabase = createPublicClient();
-  
-  // Fetch sponsor licensing info
-  const { data: licensing } = await supabase
-    .from('pricing_plans')
-    .select('*')
-    .eq('type', 'sponsor');
-
   return (
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

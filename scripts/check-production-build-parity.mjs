@@ -1,7 +1,8 @@
+import { productionBuildParity } from './production-build-parity-policy.mjs';
 /**
  * scripts/check-production-build-parity.mjs
  *
- * Verifies all three production services share the same commit SHA and build ID.
+ * Verifies all three production services share the same commit SHA with valid per-service build IDs.
  * Fails if services are deployed from different commits.
  *
  * Usage:
@@ -60,7 +61,7 @@ for (const service of services) {
         name: service.name,
         commitSha: health.commit ?? 'unknown',
         buildId: health.buildId ?? 'unknown',
-        builtAt: health.builtAt ?? 'unknown',
+        builtAt: health.builtAt ?? health.buildTime ?? 'unknown',
         source: 'health',
       });
     } else {
@@ -95,45 +96,6 @@ console.table(
   })),
 );
 
-const commitShas = new Set(
-  results.map((r) => r.commitSha).filter((s) => s !== 'unreachable'),
-);
-const buildIds = new Set(
-  results.map((r) => r.buildId).filter((s) => s !== 'unreachable'),
-);
-const unreachable = results.filter((r) => r.commitSha === 'unreachable');
-
-if (unreachable.length > 0) {
-  console.error(
-    `\nPARTIAL: ${unreachable.length} service(s) unreachable — cannot verify parity.`,
-  );
-  process.exit(1);
-}
-
-if (commitShas.has('unknown')) {
-  console.error('\nFAIL: At least one deployment reports unknown commit SHA.');
-  process.exit(1);
-}
-
-if (buildIds.has('unknown')) {
-  console.error('\nFAIL: At least one deployment reports unknown build ID.');
-  process.exit(1);
-}
-
-if (commitShas.size !== 1) {
-  console.error(
-    `\nFAIL: Production services are deployed from ${commitShas.size} different commits: ${[...commitShas].join(', ')}`,
-  );
-  process.exit(1);
-}
-
-if (buildIds.size !== 1) {
-  console.error(
-    `\nFAIL: Production services report ${buildIds.size} different build IDs: ${[...buildIds].join(', ')}`,
-  );
-  process.exit(1);
-}
-
-const sha = [...commitShas][0];
-const bid = [...buildIds][0];
-console.log(`\nPASS: All production services share one commit (${sha}) and build ID (${bid}).`);
+const parity = productionBuildParity(results);
+console.log(`\n${parity.ok ? 'PASS' : 'FAIL'}: ${parity.message}`);
+process.exitCode = parity.ok ? 0 : 1;

@@ -54,7 +54,7 @@ export default async function StoreSuccessPage({
         .select(`
           id,
           quantity,
-          price,
+          price:product_price,
           product:products(id, name, type, download_url)
         `)
         .eq('order_id', orderId);

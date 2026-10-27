@@ -72,9 +72,8 @@ export default async function CertificationPage() {
 
     supabase
       .from('lms_courses')
-      .select('id, title, certification_name, certification_body')
-      .not('certification_name', 'is', null)
-      .eq('is_active', true)
+      .select('id, title, program_id, governing_body')
+            .eq('is_active', true)
       .limit(6),
   ]);
 
@@ -85,7 +84,16 @@ export default async function CertificationPage() {
   }));
   const attempts = attemptsRes.data ?? [];
   const inProgress = inProgressRes.data ?? [];
-  const availableCerts = availableRes.data ?? [];
+  if (availableRes.error) throw new Error('Credential course catalog unavailable');
+  const candidateCourses = availableRes.data ?? [];
+  const programIds = [...new Set(candidateCourses.map(course => course.program_id).filter(Boolean))];
+  const { data: credentialPrograms, error: programError } = programIds.length
+    ? await supabase.from('programs').select('id,credential_name').in('id', programIds)
+    : { data: [], error: null };
+  if (programError) throw new Error('Program credential catalog unavailable');
+  const credentialNames = new Map((credentialPrograms ?? []).map(program => [program.id, program.credential_name]));
+  const availableCerts = candidateCourses.filter(course => course.program_id && credentialNames.get(course.program_id))
+    .map(course => ({ ...course, certification_name: credentialNames.get(course.program_id!), certification_body: course.governing_body || '' }));
 
   // Resolve lifecycle state for each attempt
   const attemptLifecycles = await Promise.all(

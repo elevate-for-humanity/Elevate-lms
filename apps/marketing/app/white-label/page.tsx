@@ -1,4 +1,3 @@
-import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Check, Code, Users, Shield, Zap, Globe } from 'lucide-react';
 
@@ -14,30 +13,6 @@ export const metadata = {
 };
 
 export default async function WhiteLabelPage() {
-  if (!isSupabaseConfigured()) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
-          <p className="text-slate-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const supabase = await createClient();
-
-  // Fetch white label info
-  let whiteLabel: unknown[] = [];
-  try {
-    const { data } = await supabase
-      .from('pricing_plans')
-      .select('*')
-      .eq('type', 'white_label');
-    whiteLabel = data ?? [];
-  } catch {
-    whiteLabel = [];
-  }
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -48,13 +23,13 @@ export default async function WhiteLabelPage() {
             White-Label Platform Available
           </div>
 
-          <h1 className="text-5xl sm:text-6xl font-black text-zinc-900 tracking-tight">
+          <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight">
             Clone Our Platform.
             <br />
             <span className="text-brand-green-600">Run Your Own Training Business.</span>
           </h1>
 
-          <p className="mt-6 text-xl text-zinc-700 leading-relaxed max-w-3xl mx-auto">
+          <p className="mt-6 text-xl text-slate-200 leading-relaxed max-w-3xl mx-auto">
             Get the complete Elevate for Humanity platform with your branding. Multi-tenant SaaS,
             WIOA compliance, apprenticeship tracking, mobile apps, and AI tutoring—all ready to
             deploy.

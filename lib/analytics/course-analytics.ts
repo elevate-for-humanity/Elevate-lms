@@ -84,9 +84,9 @@ export async function getCourseAnalytics(courseId: string): Promise<CourseAnalyt
   // Get lesson data
   const { data: lessons } = await supabase
     .from('lms_lessons')
-    .select('id, title, order_number')
+    .select('id, title, order_index')
     .eq('course_id', courseId)
-    .order('order_number');
+    .order('order_index');
 
   // Get lesson progress
   const { data: lessonProgress } = await supabase

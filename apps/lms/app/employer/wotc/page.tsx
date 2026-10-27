@@ -1,3 +1,5 @@
+import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
@@ -17,11 +19,13 @@ const MAX_WOTC_PER_HIRE = 2400;
 export default async function EmployerWotcPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
+  const employer = await getEmployerRecord(supabase, user.id);
+  if (!employer) redirect('/employer/onboarding');
 
   const { data: jobs } = await supabase
     .from('job_postings')
     .select('id, title')
-    .eq('employer_id', user.id);
+    .eq('employer_id', employer.id);
 
   const jobIds = (jobs ?? []).map((j: any) => j.id);
   const jobMap = Object.fromEntries((jobs ?? []).map((j: any) => [j.id, j.title]));
@@ -29,7 +33,7 @@ export default async function EmployerWotcPage() {
   const { data: hires } = jobIds.length
     ? await supabase
         .from('job_applications')
-        .select('id, job_posting_id, applicant_name, status, updated_at')
+        .select('id, job_posting_id, applicant:profiles!job_applications_user_id_fkey(full_name), status, updated_at')
         .in('job_posting_id', jobIds)
         .eq('status', 'hired')
         .order('updated_at', { ascending: false })
@@ -117,7 +121,7 @@ export default async function EmployerWotcPage() {
                 <tbody className="divide-y divide-slate-100">
                   {hiredRows.map((row: any) => (
                     <tr key={row.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-3 font-medium text-slate-900">{row.applicant_name || 'Candidate'}</td>
+                      <td className="px-5 py-3 font-medium text-slate-900">{(row.applicant as any)?.full_name || 'Candidate'}</td>
                       <td className="px-5 py-3 text-slate-700">{jobMap[row.job_posting_id] || 'Role unavailable'}</td>
                       <td className="px-5 py-3 text-slate-700">
                         {row.updated_at ? new Date(row.updated_at).toLocaleDateString() : 'Unknown'}

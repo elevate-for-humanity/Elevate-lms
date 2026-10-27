@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error: jobsError } = await supabase
     .from('jobs')
-    .select('id, title, description, required_skills, location, employer_name')
+    .select('id, title, description, required_skills:requirements, location, employer_name:company')
     .eq('status', 'active')
     .limit(30);
 

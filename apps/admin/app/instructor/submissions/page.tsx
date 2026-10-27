@@ -154,7 +154,7 @@ export default async function InstructorSubmissionsPage({
     } else {
       const { data: legacyCourses } = await supabase
         .from('lms_courses')
-        .select('id, course_name')
+        .select('id, course_name:title')
         .in('id', courseIds);
       courseNameMap = new Map((legacyCourses ?? []).map((c: any) => [c.id, c.course_name]));
     }

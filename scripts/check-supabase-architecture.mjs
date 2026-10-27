@@ -53,11 +53,17 @@ const requiredSharedConsumers = [
   ['apps/admin/middleware.ts', 'createMiddlewareSupabaseClient'],
   ['apps/lms/middleware.ts', 'createMiddlewareSupabaseClient'],
   ['apps/marketing/middleware.ts', 'createMiddlewareSupabaseClient'],
-  ['apps/lms/app/auth/callback/route.ts', 'handleOAuthCallback'],
+  ['apps/lms/app/auth/callback/page.tsx', 'exchangeCodeForSession'],
   ['apps/marketing/app/auth/callback/route.ts', 'handleOAuthCallback'],
   ['apps/lms/app/api/auth/landing/route.ts', 'getAuthLanding'],
   ['apps/marketing/app/api/auth/landing/route.ts', 'getAuthLanding'],
 ];
+
+const learnerCallback = fs.readFileSync(path.join(ROOT, 'apps/lms/app/auth/callback/page.tsx'), 'utf8');
+for (const marker of ['validateRedirect', 'setSession', '@/lib/supabase/client']) {
+  if (!learnerCallback.includes(marker)) failures.push(`Learner callback lost ${marker}`);
+}
+if (fs.existsSync(path.join(ROOT, 'apps/lms/app/auth/callback/route.ts'))) failures.push('Learner auth callback page conflicts with a route handler');
 
 for (const [relative, requiredSymbol] of requiredSharedConsumers) {
   const source = fs.readFileSync(path.join(ROOT, relative), 'utf8');

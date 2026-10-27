@@ -52,7 +52,7 @@ export default function ProgramDiscussionsPage() {
       setIsEnrolled(false);
     }
 
-    const { data: threadRows, error } = await supabase.from('forum_threads').select('id, title, created_at, pinned, views, author_id').order('pinned', { ascending: false }).order('created_at', { ascending: false }).limit(20);
+    const { data: threadRows, error } = await supabase.from('forum_threads').select('id, title, created_at, pinned, views:view_count, author_id').order('pinned', { ascending: false }).order('created_at', { ascending: false }).limit(20);
     if (error) {
       setThreads([]);
       setLoading(false);

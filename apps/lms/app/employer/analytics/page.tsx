@@ -1,3 +1,5 @@
+import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -15,12 +17,14 @@ export const metadata: Metadata = {
 export default async function EmployerAnalyticsPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
+  const employer = await getEmployerRecord(supabase, user.id);
+  if (!employer) redirect('/employer/onboarding');
 
   // Fetch this employer's job postings
   const { data: jobPostings } = await supabase
     .from('job_postings')
     .select('id, status')
-    .eq('employer_id', user.id);
+    .eq('employer_id', employer.id);
 
   const jobIds = (jobPostings ?? []).map((j: any) => j.id);
   const openPositions = (jobPostings ?? []).filter((j: any) => j.status === 'active').length;

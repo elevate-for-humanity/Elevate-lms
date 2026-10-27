@@ -61,7 +61,7 @@ async function fetchWioaData(filters: Filters): Promise<{ summary: WioaSummary |
 
   let query = db
     .from('participant_report')
-    .select('enrollment_id,full_name,email,program_title,program_category,enrollment_status,funding_source,modality_preference,workone_case_number,applied_at,completed_at,outcome_type,employer_name,job_title,hourly_wage,credential_received')
+    .select('enrollment_id,full_name,email,program_title,program_category,enrollment_status,funding_source,applied_at,completed_at,outcome_type,employer_name,job_title,hourly_wage,credential_received')
     .not('program_slug', 'in', excludeSlugs)
     .order('applied_at', { ascending: false })
     .limit(500);
@@ -75,19 +75,21 @@ async function fetchWioaData(filters: Filters): Promise<{ summary: WioaSummary |
   let viewMissing = false;
 
   if (!viewError) {
-    participants = (rows ?? []) as unknown as ParticipantRow[];
+    participants = (rows ?? []).map(row => ({ ...row, modality_preference: null, workone_case_number: null })) as unknown as ParticipantRow[];
   } else {
     viewMissing = true;
     let fallbackQuery = db
       .from('program_enrollments')
-      .select('id,created_at,completed_at,enrollment_state,status,program_slug,funding_source,modality_preference,workone_case_number,profiles!inner(full_name,email),programs(title,category)')
+      .select('id,created_at,completed_at,enrollment_state,status,program_slug,funding_source,profiles!inner(full_name,email),programs(title,category)')
       .not('program_slug', 'in', excludeSlugs)
       .order('created_at', { ascending: false })
       .limit(500);
     if (filters.status) fallbackQuery = fallbackQuery.eq('enrollment_state', filters.status);
     if (filters.start_date) fallbackQuery = fallbackQuery.gte('created_at', filters.start_date);
     if (filters.end_date) fallbackQuery = fallbackQuery.lte('created_at', filters.end_date);
-    const { data: fallback } = await fallbackQuery;
+    if (filters.funding) fallbackQuery = fallbackQuery.ilike('funding_source', `${filters.funding}%`);
+    const { data: fallback, error: fallbackError } = await fallbackQuery;
+    if (fallbackError) throw new Error('Unable to load WIOA participant report');
     participants = (fallback ?? []).map((row: any) => {
       const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
       const program = Array.isArray(row.programs) ? row.programs[0] : row.programs;
@@ -99,8 +101,8 @@ async function fetchWioaData(filters: Filters): Promise<{ summary: WioaSummary |
         program_category: program?.category ?? '—',
         enrollment_status: row.enrollment_state ?? row.status ?? '—',
         funding_source: row.funding_source ?? null,
-        modality_preference: row.modality_preference ?? null,
-        workone_case_number: row.workone_case_number ?? null,
+        modality_preference: null,
+        workone_case_number: null,
         applied_at: row.created_at ?? null,
         completed_at: row.completed_at ?? null,
         outcome_type: 'none',

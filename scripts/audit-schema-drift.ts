@@ -31,6 +31,7 @@ const failOnDrift = args.includes('--fail-on-drift');
 const failOnNewDrift = args.includes('--fail-on-new-drift');
 const baselinePathArg = args.find((a, i) => args[i - 1] === '--baseline') ?? null;
 const writeBaselinePathArg = args.find((a, i) => args[i - 1] === '--write-baseline') ?? null;
+const schemaJsonPath = args.find((a, i) => args[i - 1] === '--schema-json') ?? null;
 const forceMigrations = args.includes('--source') && args[args.indexOf('--source') + 1] === 'migrations';
 
 type DriftBaseline = { schemaSource?: string; entries?: string[] };
@@ -421,7 +422,15 @@ async function main() {
   let schema: TableSchema;
   let schemaSource: string;
 
-  if (!forceMigrations && !baselineUsesMigrations && supabaseUrl && serviceKey) {
+  if (schemaJsonPath) {
+    const snapshot: unknown = JSON.parse(fs.readFileSync(path.resolve(schemaJsonPath), 'utf8'));
+    if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) throw new Error('Schema snapshot must map relation names to column arrays');
+    schema = new Map(Object.entries(snapshot).map(([table, columns]) => {
+      if (!Array.isArray(columns) || !columns.every(column => typeof column === 'string')) throw new Error(`Invalid schema columns: ${table}`);
+      return [table.toLowerCase(), new Set(columns.map(column => column.toLowerCase()))];
+    }));
+    schemaSource = `provided live schema (${schema.size} relations)`;
+  } else if (!forceMigrations && !baselineUsesMigrations && supabaseUrl && serviceKey) {
     process.stdout.write('Fetching live schema from Supabase...');
     const live = await fetchLiveSchema(supabaseUrl, serviceKey);
     if (live) {

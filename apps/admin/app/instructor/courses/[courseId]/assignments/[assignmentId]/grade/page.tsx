@@ -1,3 +1,4 @@
+import { isAssignedCourseInstructor } from '@/lib/lms/instructor-course-access';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -32,9 +33,11 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'staff', 'instructor'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin', 'staff', 'instructor'].includes(profile.role)) {
     redirect('/learner/dashboard');
   }
+
+  if (profile.role === 'instructor' && !(await isAssignedCourseInstructor(supabase, user.id, courseId))) redirect('/unauthorized');
 
   // Fetch assignment
   const { data: assignment, error: assignmentError } = await supabase
@@ -58,13 +61,13 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   // Fetch submissions
   const { data: rawGradeSubmissions } = await supabase
     .from('assignment_submissions')
-    .select(`id, student_id, content, file_urls, submitted_at, is_late`)
+    .select(`id, student_id, user_id, content:submission_text, file_urls:file_paths, submitted_at`)
     .eq('assignment_id', assignmentId)
     .order('submitted_at', { ascending: true });
 
   // Hydrate profiles separately (assignment_submissions has no FK to profiles)
   const gradeStudentIds = [
-    ...new Set((rawGradeSubmissions ?? []).map((s: any) => s.student_id).filter(Boolean)),
+    ...new Set((rawGradeSubmissions ?? []).map((s: any) => s.student_id || s.user_id).filter(Boolean)),
   ];
   const { data: gradeStudentProfiles } = gradeStudentIds.length
     ? await supabase.from('profiles').select('id, full_name, email').in('id', gradeStudentIds)
@@ -74,7 +77,9 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   );
   const submissions = (rawGradeSubmissions ?? []).map((s: any) => ({
     ...s,
-    profiles: gradeStudentMap[s.student_id] ?? null,
+    student_id: s.student_id || s.user_id,
+    profiles: gradeStudentMap[s.student_id || s.user_id] ?? null,
+    is_late: Boolean(assignment.due_date && s.submitted_at && Date.parse(s.submitted_at) > Date.parse(assignment.due_date)),
   }));
 
   // Fetch existing grades for these submissions

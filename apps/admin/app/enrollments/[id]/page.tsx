@@ -37,7 +37,7 @@ export default async function EnrollmentDetailPage({ params }: { params: Promise
       id, user_id, program_id, program_slug, full_name, email, phone,
       status, payment_status, amount_paid_cents, funding_source, funding_status,
       enrolled_at, created_at, completed_at, progress_percent,
-      docs_verified, agreement_signed, cohort_id, source, notes
+      docs_verified, agreement_signed, cohort_id, source
     `)
     .eq('id', id)
     .maybeSingle();

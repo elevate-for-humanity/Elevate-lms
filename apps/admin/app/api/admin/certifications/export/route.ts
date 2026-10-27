@@ -54,7 +54,6 @@ export async function GET(request: NextRequest) {
         certification_type,
         status,
         earned_date,
-        expires_at,
         created_at,
         profiles:user_id ( email, full_name )
       `)

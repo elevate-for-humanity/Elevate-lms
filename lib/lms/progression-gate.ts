@@ -51,7 +51,7 @@ async function evalPassAssessment(
   if (!data) {
     return { unlocked: false, reason: 'Assessment not yet attempted', ruleType: 'pass_assessment' };
   }
-  if (data.score < rule.minimumScore) {
+  if (data.passed !== true || data.score < rule.minimumScore) {
     return {
       unlocked: false,
       reason: `Assessment score ${data.score} is below required ${rule.minimumScore}`,
@@ -95,7 +95,7 @@ async function evalCompletePreviousModule(
   // Find the module this lesson belongs to, then find the previous module
   const { data: lesson, error: lessonErr } = await db
     .from('course_lessons')
-    .select('course_module_id, order_index, course_id')
+    .select('module_id, order_index, course_id')
     .eq('id', lessonId)
     .maybeSingle();
 
@@ -107,36 +107,31 @@ async function evalCompletePreviousModule(
   const { data: currentMod, error: modErr } = await db
     .from('course_modules')
     .select('order_index, course_id')
-    .eq('id', lesson.course_module_id)
+    .eq('id', lesson.module_id)
     .maybeSingle();
 
   if (modErr || !currentMod) {
     throw new Error(`progression-gate: module lookup failed: ${modErr?.message}`);
   }
 
-  if (currentMod.order_index <= 1) {
-    // First module — no previous module to complete
-    return { unlocked: true, ruleType: 'complete_previous_module' };
-  }
-
-  // Find the previous module
+  // Module positions may start at zero or contain gaps. Resolve the actual predecessor.
   const { data: prevMod, error: prevErr } = await db
     .from('course_modules')
     .select('id')
     .eq('course_id', currentMod.course_id)
-    .eq('order_index', currentMod.order_index - 1)
+    .lt('order_index', currentMod.order_index)
+    .order('order_index', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
-  if (prevErr || !prevMod) {
-    // No previous module found — allow access
-    return { unlocked: true, ruleType: 'complete_previous_module' };
-  }
+  if (prevErr) throw new Error(`progression-gate: previous module lookup failed: ${prevErr.message}`);
+  if (!prevMod) return { unlocked: true, ruleType: 'complete_previous_module' };
 
   // Check all required lessons in the previous module are complete
   const { data: prevLessons, error: prevLessonsErr } = await db
     .from('course_lessons')
     .select('id, is_required')
-    .eq('course_module_id', prevMod.id)
+    .eq('module_id', prevMod.id)
     .eq('is_required', true);
 
   if (prevLessonsErr) {
@@ -253,7 +248,7 @@ export async function evaluateUnlockRule(
         return evalAchieveCompetency(db, userId, lessonId, rule);
       default:
         logger.warn('[progression-gate] Unknown rule type', { rule, lessonId });
-        return { unlocked: true };
+        return { unlocked: false, reason: 'Unknown progression rule' };
     }
   } catch (err) {
     logger.error('[progression-gate] Rule evaluation error', err instanceof Error ? err : new Error(String(err)), { lessonId, userId });

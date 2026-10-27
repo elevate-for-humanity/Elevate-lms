@@ -19,7 +19,7 @@ export default async function ImpersonatePage() {
 
   const { data: recentSessions } = await supabase
     .from('admin_audit_events')
-    .select('id, actor_user_id, entity_id, after_state, created_at')
+    .select('id, actor_user_id, entity_id, new_data, created_at')
     .eq('entity', 'impersonation_session')
     .eq('action', 'create')
     .order('created_at', { ascending: false })
@@ -40,7 +40,7 @@ export default async function ImpersonatePage() {
         <ImpersonateForm />
         <div className="rounded-xl border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-4"><h2 className="text-sm font-bold text-slate-900">Recent Impersonation Sessions</h2></div>
-          {!recentSessions?.length ? <p className="px-5 py-6 text-sm text-slate-500">No recent sessions.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-slate-100 bg-slate-50"><th className="px-5 py-3 text-left font-semibold text-slate-600">Target User</th><th className="px-5 py-3 text-left font-semibold text-slate-600">Reason</th><th className="px-5 py-3 text-left font-semibold text-slate-600">Started</th></tr></thead><tbody className="divide-y divide-slate-100">{recentSessions.map((session: any) => { const after = session.after_state ?? {}; return <tr key={session.id}><td className="px-5 py-3"><p className="font-medium text-slate-900">{after.target_user_name ?? '—'}</p><p className="text-xs text-slate-500">{after.target_user_email ?? session.entity_id}</p></td><td className="px-5 py-3 text-xs text-slate-600">{after.reason ?? '—'}</td><td className="px-5 py-3 text-xs text-slate-500">{session.created_at ? new Date(session.created_at).toLocaleString() : '—'}</td></tr>; })}</tbody></table></div>}
+          {!recentSessions?.length ? <p className="px-5 py-6 text-sm text-slate-500">No recent sessions.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-slate-100 bg-slate-50"><th className="px-5 py-3 text-left font-semibold text-slate-600">Target User</th><th className="px-5 py-3 text-left font-semibold text-slate-600">Reason</th><th className="px-5 py-3 text-left font-semibold text-slate-600">Started</th></tr></thead><tbody className="divide-y divide-slate-100">{recentSessions.map((session: any) => { const after = session.new_data ?? {}; return <tr key={session.id}><td className="px-5 py-3"><p className="font-medium text-slate-900">{after.target_user_name ?? '—'}</p><p className="text-xs text-slate-500">{after.target_user_email ?? session.entity_id}</p></td><td className="px-5 py-3 text-xs text-slate-600">{after.reason ?? '—'}</td><td className="px-5 py-3 text-xs text-slate-500">{session.created_at ? new Date(session.created_at).toLocaleString() : '—'}</td></tr>; })}</tbody></table></div>}
         </div>
       </div>
     </div>

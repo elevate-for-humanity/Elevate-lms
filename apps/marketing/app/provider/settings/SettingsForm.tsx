@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { saveProviderOrganization } from './actions';
 
 type InitialValues = {
   name: string;
@@ -55,30 +55,7 @@ export default function SettingsForm({ tenantId, orgId, initial }: Props) {
     }
 
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Authentication required.');
-
-      let dbError: { message?: string } | null = null;
-      if (orgId) {
-        const result = await supabase
-          .from('organizations')
-          .update(values)
-          .eq('id', orgId)
-          .eq('tenant_id', tenantId);
-        dbError = result.error;
-      } else {
-        const slug = values.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
-        const result = await supabase.from('organizations').insert({
-          ...values,
-          tenant_id: tenantId,
-          slug: slug || `provider-${tenantId.slice(0, 8)}`,
-          status: 'active',
-          type: 'training_provider',
-        });
-        dbError = result.error;
-      }
-      if (dbError) throw new Error(dbError.message || 'Unable to update organization.');
+      await saveProviderOrganization(tenantId, orgId, values);
 
       setMessage('Organization profile updated.');
       router.refresh();

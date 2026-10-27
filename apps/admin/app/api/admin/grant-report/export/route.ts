@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         .order('created_at', { ascending: false }),
 
       db.from('certificates')
-        .select('id, issued_at, user_id, program_id, credential_name')
+        .select('id, issued_at, user_id, program_id')
         .gte('issued_at', from)
         .lte('issued_at', to + 'T23:59:59Z'),
 
@@ -49,6 +49,9 @@ export async function GET(req: NextRequest) {
         .select('id, name, slug')
         .eq('is_active', true),
     ]);
+
+    const failedRead = [enrollmentsRes, certsRes, pccRes, hoursRes, programsRes].find(result => result.error);
+    if (failedRead?.error) return safeInternalError(failedRead.error, 'Unable to load complete grant report data');
 
     const enrollments = enrollmentsRes.data ?? [];
     const certs = [...(certsRes.data ?? []), ...(pccRes.data ?? [])];

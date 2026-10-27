@@ -1,3 +1,5 @@
+import { updateEmployerPosting } from './actions';
+import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -16,12 +18,14 @@ export default async function EmployerPostingEditPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
+  const employer = await getEmployerRecord(supabase, user.id);
+  if (!employer) redirect('/employer/onboarding');
 
   const { data: posting } = await supabase
     .from('job_postings')
     .select('*')
     .eq('id', id)
-    .eq('employer_id', user.id)
+    .eq('employer_id', employer.id)
     .maybeSingle();
 
   if (!posting) notFound();
@@ -45,7 +49,7 @@ export default async function EmployerPostingEditPage({ params }: Props) {
             <li>/</li>
             <li>
               <Link href={`/employer/postings/${id}`} className="hover:text-slate-900">
-                {posting.job_title}
+                {(posting.title || posting.job_title)}
               </Link>
             </li>
             <li>/</li>
@@ -55,13 +59,13 @@ export default async function EmployerPostingEditPage({ params }: Props) {
 
         <h1 className="text-3xl font-bold text-slate-900">Edit Job Posting</h1>
 
-        <form action={`/api/employer/postings/${id}`} method="POST" className="space-y-6">
+        <form action={updateEmployerPosting.bind(null, id)} className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-1">Job Title</label>
             <input
               type="text"
-              name="job_title"
-              defaultValue={posting.job_title ?? ''}
+              name="title"
+              defaultValue={(posting.title || posting.job_title) ?? ''}
               className="w-full px-4 py-3 border rounded-lg text-slate-900"
               required
             />
@@ -82,8 +86,8 @@ export default async function EmployerPostingEditPage({ params }: Props) {
               Job Description
             </label>
             <textarea
-              name="job_description"
-              defaultValue={posting.job_description ?? ''}
+              name="description"
+              defaultValue={(posting.description || posting.job_description) ?? ''}
               rows={10}
               className="w-full px-4 py-3 border rounded-lg text-slate-900"
             />
@@ -93,10 +97,10 @@ export default async function EmployerPostingEditPage({ params }: Props) {
             <label className="block text-sm font-semibold text-slate-900 mb-1">Status</label>
             <select
               name="status"
-              defaultValue={posting.status ?? 'active'}
+              defaultValue={['paused', 'closed'].includes(posting.status) ? posting.status : 'pending'}
               className="w-full px-4 py-3 border rounded-lg text-slate-900"
             >
-              <option value="active">Active</option>
+              <option value="pending">Submit for review</option>
               <option value="paused">Paused</option>
               <option value="closed">Closed</option>
             </select>

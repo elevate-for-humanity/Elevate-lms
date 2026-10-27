@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   // Verify the apprentice record exists and has no user_id
   const { data: existing, error: fetchErr } = await db
     .from('apprentices')
-    .select('id, user_id, email')
+    .select('id, user_id')
     .eq('id', apprenticeId)
     .maybeSingle();
 
@@ -49,15 +49,20 @@ export async function POST(req: Request) {
   if (authErr || !authUser?.user) return safeError('Auth user not found', 404);
 
   // Write the link
-  const { error: updateErr } = await db
+  const { data: linked, error: updateErr } = await db
     .from('apprentices')
     .update({ user_id: userId })
-    .eq('id', apprenticeId);
+    .eq('id', apprenticeId)
+    .is('user_id', null)
+    .select('id')
+    .maybeSingle();
 
   if (updateErr) {
     logger.error('Failed to link apprentice account', updateErr);
     return safeInternalError(updateErr, 'Failed to update apprentice record');
   }
+
+  if (!linked) return safeError('Apprentice account was linked by another request. Reload before retrying.', 409);
 
   logger.info(`Linked apprentice ${apprenticeId} to user ${userId} (${authUser.user.email})`);
 

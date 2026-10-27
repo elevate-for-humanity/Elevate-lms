@@ -63,6 +63,7 @@ describe('PARIS dashboard introduction', () => {
     expect(
       workspace.match(/<h2 className="font-black">Compliance Score<\/h2>/g) || [],
     ).toHaveLength(0);
-    expect(workspace).toContain('Program readiness');
+    expect(workspace).toContain('Compliance {complianceScore}%');
+    expect(workspace).not.toContain('title="Program readiness"');
   });
 });

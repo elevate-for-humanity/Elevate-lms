@@ -51,9 +51,9 @@ async function _GET(request: Request) {
         // Quiz attempts with scores
         supabase
           .from('quiz_attempts')
-          .select('id, score, passed_at')
+          .select('id, score, passed_at:completed_at')
           .eq('user_id', user.id)
-          .not('passed_at', 'is', null),
+          .eq('passed', true),
 
         // Certificates
         supabase

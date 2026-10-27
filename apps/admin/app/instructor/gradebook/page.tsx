@@ -22,8 +22,8 @@ export default async function InstructorGradebookPage() {
 
   const { data: submissions } = await supabase
     .from('step_submissions')
-    .select('id, status, submitted_at, lesson_id, user_id, profiles(full_name), curriculum_lessons(title)')
-    .order('submitted_at', { ascending: false })
+    .select('id, status, created_at, lesson_id, user_id, profiles(full_name), curriculum_lessons(title)')
+    .order('created_at', { ascending: false })
     .limit(50);
 
   return (
@@ -62,7 +62,7 @@ export default async function InstructorGradebookPage() {
                         'bg-amber-100 text-amber-800'
                       }`}>{s.status}</span>
                     </td>
-                    <td className="px-6 py-3 text-slate-500">{s.submitted_at ? new Date(s.submitted_at).toLocaleDateString() : '—'}</td>
+                    <td className="px-6 py-3 text-slate-500">{s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</td>
                   </tr>
                 ))}
               </tbody>

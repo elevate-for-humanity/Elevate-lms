@@ -15,7 +15,7 @@ export function getPortalAccessRoles(portalKey: PortalKey): readonly UserRole[] 
 
 export async function requirePortalAccess(portalKey: PortalKey): Promise<PortalAccessContext> {
   const auth = await requireRole(getPortalAccessRoles(portalKey));
-  const isPlatformAdmin = auth.effectiveRoles.includes('admin');
+  const isPlatformAdmin = auth.effectiveRoles.some(role => role === 'admin' || role === 'super_admin');
   const isStaffOperator = isPlatformAdmin || auth.effectiveRoles.includes('staff');
 
   return {

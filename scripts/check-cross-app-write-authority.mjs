@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 
 const adapters = [
-  ['apps/lms/app/api/webhooks/stripe/route.ts', 'marketing', '/api/webhooks/stripe'],
   ['apps/lms/app/api/webhooks/store/route.ts', 'marketing', '/api/webhooks/store'],
   ['apps/lms/app/api/webhooks/jotform/route.ts', 'marketing', '/api/webhooks/jotform'],
   ['apps/lms/app/api/webhooks/partners/[partner]/route.ts', 'marketing', '/api/webhooks/partners/'],
-  ['apps/lms/app/api/stripe/trial-checkout/route.ts', 'marketing', '/api/stripe/trial-checkout'],
   ['apps/lms/app/api/checkout/program/route.ts', 'marketing', '/api/checkout/program'],
   ['apps/lms/app/api/courses/[courseId]/announcements/route.ts', 'admin', '/announcements'],
   ['apps/lms/app/api/documents/upload/route.ts', 'admin', '/api/documents/upload'],
@@ -24,6 +22,13 @@ const forbiddenAdapterLogic = [
 ];
 
 const failures = [];
+// Stripe payment writes were retired; do not restore them to satisfy this gate.
+for (const app of ['marketing', 'lms']) {
+  for (const route of ['api/webhooks/stripe', 'api/stripe/trial-checkout']) {
+    const file = `apps/${app}/app/${route}/route.ts`;
+    if (existsSync(file)) failures.push(`${file} restores a retired payment authority`);
+  }
+}
 for (const [file, service, routeMarker] of adapters) {
   const source = readFileSync(file, 'utf8');
   if (!source.includes('proxyCanonicalRoute')) failures.push(`${file} is not a canonical adapter`);
@@ -48,14 +53,14 @@ for (const marker of [
 }
 
 const canonicalRequirements = [
-  ['apps/marketing/app/api/webhooks/stripe/route.ts', 'constructStripeEventWithAnySecret'],
-  ['apps/marketing/app/api/webhooks/store/route.ts', 'webhook_events_processed'],
+  ['apps/marketing/app/api/webhooks/quickbooks/route.ts', 'verifyQuickBooksWebhook'],
+  ['apps/marketing/app/api/webhooks/paypal-billing/route.ts', 'verifyPayPalBillingWebhook'],
+  ['apps/marketing/app/api/webhooks/store/route.ts', "replacement: '/api/webhooks/quickbooks'"],
   ['apps/marketing/app/api/webhooks/jotform/route.ts', 'safeSecretEqual'],
   ['apps/marketing/app/api/webhooks/partners/[partner]/route.ts', 'safeSecretEqual'],
   // QuickBooks is now the billing authority. These historical Stripe URLs must
   // stay present only as fail-closed canonical retirement responses so an old
   // client cannot silently recreate a second payment-write path.
-  ['apps/marketing/app/api/stripe/trial-checkout/route.ts', "destination: '/store/plans'"],
   ['apps/marketing/app/api/checkout/program/route.ts', "destination: '/programs'"],
   ['apps/admin/app/api/courses/[courseId]/announcements/route.ts', 'course_announcements'],
   ['apps/admin/app/api/documents/upload/route.ts', 'ALLOWED_MIME_TYPES'],
@@ -70,5 +75,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  'Cross-app write authority valid: 8 canonical handlers, 8 mutation-free compatibility adapters.',
+  `Cross-app write authority valid: ${canonicalRequirements.length} canonical handlers, ${adapters.length} mutation-free compatibility adapters.`,
 );

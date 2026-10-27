@@ -10,11 +10,11 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-runtime-operations
+  group: google-course-runtime-operations
   cancel-in-progress: false
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15

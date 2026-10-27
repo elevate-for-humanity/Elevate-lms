@@ -27,13 +27,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const markupCents = Math.max(0, Number(process.env.DOMAIN_RETAIL_MARKUP_CENTS ?? 1000) || 1000);
   const retailCents = quote.pricing.totalCents + markupCents;
   const db = await requireAdminClient();
-  const { data: profile } = await db.from('profiles').select('full_name,email').eq('id', resolved.user.id).maybeSingle();
+  const { data: profile } = await db.from('profiles').select('full_name,email').eq('id', resolved.ownerUserId).maybeSingle();
   const email = profile?.email || resolved.user.email;
   if (!email) return NextResponse.json({ error: 'A billing email is required.' }, { status: 400 });
 
   const { data: domain, error } = await db.from('website_domains').insert({
     website_id: websiteId,
-    user_id: resolved.user.id,
+    user_id: resolved.ownerUserId,
     hostname,
     mode: 'purchase',
     status: 'awaiting_payment',
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     provider_cost_cents: quote.pricing.totalCents,
     retail_cents: retailCents,
     origin_url: resolved.originUrl,
-    customer_reference: `elevate-${resolved.user.id}-${websiteId}`,
+    customer_reference: `elevate-${resolved.ownerUserId}-${websiteId}`,
     billing_provider: 'quickbooks',
     metadata: { registrant, years: 1 },
   }).select('id').single();
@@ -50,11 +50,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     const invoice = await createQuickBooksBillingProvider(db).createManualInvoice({
       idempotencyKey: `website-domain:${domain.id}`,
-      customer: { externalKey: `user:${resolved.user.id}`, displayName: profile?.full_name || email, email },
+      customer: { externalKey: `user:${resolved.ownerUserId}`, displayName: profile?.full_name || email, email },
       lines: [{ canonicalKey: `domain:${hostname}`, name: `Domain registration — ${hostname}`, description: 'One-year domain registration', quantity: 1, unitAmountCents: retailCents }],
       dueDate: new Date().toISOString().slice(0, 10),
       memo: `Website Builder domain ${hostname}`,
-      fulfillment: { type: 'website_domain_purchase', payload: { domain_record_id: domain.id, user_id: resolved.user.id, amount_cents: retailCents } },
+      fulfillment: { type: 'website_domain_purchase', payload: { domain_record_id: domain.id, user_id: resolved.ownerUserId, amount_cents: retailCents } },
     });
     await db.from('website_domains').update({ provider_invoice_id: invoice.providerInvoiceId, updated_at: new Date().toISOString() }).eq('id', domain.id);
     if (!invoice.paymentUrl) throw new Error('Online invoice payment is not enabled.');

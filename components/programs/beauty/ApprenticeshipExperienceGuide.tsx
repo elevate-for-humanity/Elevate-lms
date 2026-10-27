@@ -4,7 +4,7 @@ import { ResponsiveDetails } from '@/components/ui/ResponsiveDetails';
 const STEPS = [
   ['1', 'Apply', 'Submit the apprenticeship application and select the occupation you want to pursue.'],
   ['2', 'Eligibility & documents', 'Complete required identity, eligibility, enrollment, and program documents.'],
-  ['3', 'Funding or tuition plan', 'Confirm how Related Technical Instruction and other training costs will be paid before enrollment is finalized.'],
+  ['3', 'Self-pay tuition plan', 'Confirm how Related Technical Instruction and other training costs will be paid before enrollment is finalized.'],
   ['4', 'Host Shop placement', 'Use an approved Host Shop, bring a qualifying employer for review, or join the placement waitlist.'],
   ['5', 'Employment & agreements', 'The employment, supervision, wage arrangement, and apprenticeship agreements must be confirmed before approved OJL begins.'],
   ['6', 'Begin RTI + paid OJL', 'Complete Related Technical Instruction while building skills through supervised on-the-job learning with the employer.'],
@@ -21,10 +21,12 @@ const RESPONSIBILITIES = [
 ] as const;
 
 const FAQ = [
+  ['What is the difference between an inquiry and enrollment?', 'An inquiry is free: ask questions and get program information. It does not enroll you or reserve a Host Shop. An enrollment application is a request for admission and requires the verified payment steps shown for your program. Enrollment is complete only after Elevate confirms approval, required documents and agreements, the payment arrangement, and any required Host Shop placement.'],
+  ['What payment choices can I use?', 'Apprenticeship tuition is self-pay only. Review the exact published total, deposit, required supplies, and what is due now. You may pay in full or use a payment plan when your program offers one. BNPL is third-party financing when displayed at checkout: approval, repayment terms, and any interest are determined by the provider. It is not a grant or free tuition.'],
   ['Do I need a Host Shop before I apply?', 'No. You can apply first. If you already know a qualifying shop, you can suggest it for review. If no approved shop is available near you, you can join the placement waitlist.'],
   ['Does a public Host Shop listing guarantee an opening?', 'No. A listing shows that the business participates in the network. Placement and current capacity must be confirmed during enrollment.'],
   ['Who pays my wages?', 'The employing Host Shop is responsible for the apprentice compensation arrangement. Elevate administers the apprenticeship and training components; it is not automatically the apprentice employer.'],
-  ['Why is there tuition if this is earn-while-you-learn?', 'Wages and training costs are separate. Apprentices may earn wages from their employer while tuition or RTI costs are paid through self-pay, an approved funding source, or another authorized arrangement.'],
+  ['Why is there tuition if this is earn-while-you-learn?', 'Wages and training costs are separate. Apprentices may earn wages from their employer while tuition or RTI costs are paid by the apprentice through self-pay.'],
   ['Can I bring my own shop?', 'Yes, but the business must complete the Host Shop review and meet the applicable licensing, supervision, employment, documentation, safety, and program requirements before apprenticeship hours are approved there.'],
   ['What are OJL and RTI?', 'OJL means supervised on-the-job learning. RTI means Related Technical Instruction: the structured technical instruction that supports the occupation.'],
   ['Do my hours count as soon as I start working?', 'Only approved apprenticeship hours count. The Host Shop, employment relationship, supervision, program enrollment, and required agreements must be in place.'],
@@ -38,6 +40,14 @@ export default function ApprenticeshipExperienceGuide({ programTitle = 'Apprenti
       <div className="mx-auto max-w-6xl">
         <h2 id="apprenticeship-journey-heading" className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">How the {programTitle} works</h2>
         <p className="mt-3 max-w-3xl text-base leading-6 text-slate-700">Combine approved employment, supervised practice and technical instruction. Track your progress toward completion.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[
+            ['1 · Free inquiry', 'Ask questions. No payment, enrollment, or reserved shop placement.'],
+            ['2 · Enrollment application', 'Review your exact tuition and payment choices, complete the required verified payment step, and submit documents for review.'],
+            ['3 · Confirmed enrollment', 'Elevate confirms approval, agreements, payment arrangements, and required placement before your training begins.'],
+          ].map(([title, text]) => <article key={title} className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="font-black text-slate-950">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{text}</p></article>)}
+        </div>
+        <p className="mt-4 text-sm font-semibold leading-6 text-slate-700">Self-pay choices: pay in full, a program payment plan when offered, or third-party BNPL when displayed. Compare the total cost, what is due now, remaining payments, and any financing terms. Approval is not guaranteed.</p>
         <ResponsiveDetails title="Your 10 enrollment and completion steps" className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <ol className="grid gap-4 md:grid-cols-2">
             {STEPS.map(([number, title, body]) => (
@@ -59,7 +69,7 @@ export default function ApprenticeshipExperienceGuide({ programTitle = 'Apprenti
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <article className="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="text-lg font-bold text-slate-950">Wages and tuition are separate.</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-700">The employing Host Shop pays your compensation. Tuition and related instruction costs are separate; self-pay or approved funding arrangements must be confirmed. Paid apprenticeship does not mean all training is free.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">The employing Host Shop pays your compensation. Tuition and related instruction costs are separate; self-pay tuition and payment terms must be confirmed. Paid apprenticeship does not mean all training is free.</p>
           </article>
           <article className="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="text-lg font-bold text-slate-950">Placement must be confirmed.</h3>

@@ -9,7 +9,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Community Hub Preview | Groups, Discussions & Engagement | Elevate',
   description: 'Preview Elevate Community Hub capabilities for posts, discussions, groups, engagement and gamification. Managed activation is available while tenant-level paid access enforcement is finalized.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/add-ons/community-hub' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/add-ons/community-hub' },
 };
 
 const capabilities = [

@@ -280,7 +280,7 @@ export default function OjtCompletionPanel({ lessonId, courseId, lessonTitle, on
             )}
           </button>
         ) : (
-          <div className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-400 py-3.5 rounded-xl font-semibold cursor-not-allowed text-sm">
+          <div className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-semibold cursor-not-allowed text-sm">
             <Clock className="w-5 h-5" />
             Complete {Math.max(0, status.requiredReps - status.verifiedReps)} more verified rep
             {status.requiredReps - status.verifiedReps !== 1 ? 's' : ''} to unlock

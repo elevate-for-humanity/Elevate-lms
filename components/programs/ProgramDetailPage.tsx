@@ -1,4 +1,5 @@
 'use client';
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { logger } from '@/lib/logger';
 
 /**
@@ -14,9 +15,11 @@ import ProgramCohortFlyer from '@/components/programs/ProgramCohortFlyer';
 import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide';
 
 import Image from 'next/image';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import HeroPicture from '@/components/marketing/HeroPicture';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
@@ -66,6 +69,8 @@ interface Props {
   heroOverride?: React.ReactNode;
   /** Route-specific content rendered after the complete hero and program summary. */
   afterHero?: React.ReactNode;
+  /** Photography or demonstrations shown before the detailed program text. */
+  visualContent?: React.ReactNode;
   /** Route-specific proof shown immediately after the decision panel. */
   featuredContent?: React.ReactNode;
   /** Supplemental compliance, instructor, or authority content shown after the core template. */
@@ -77,6 +82,7 @@ export default function ProgramDetailPage({
   banner: bannerProp,
   heroOverride,
   afterHero,
+  visualContent,
   featuredContent,
   children,
 }: Props) {
@@ -110,9 +116,17 @@ export default function ProgramDetailPage({
     : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.';
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   const isApprenticeship = p.programType === 'apprenticeship';
-  const octoberCouponCode = '50OFFOCT';
+  const registeredProgram = isApprenticeship ? getRegisteredProgramStandard(p.slug) : null;
+  const instructionHours = registeredProgram?.completion.requiredRtiHours ?? totalHours;
+  const octoberCouponCode = 'OCT300';
+  // The shared media hero renders no title; the program content owns its main heading.
+  const ProgramTitle = 'h1';
+  const weeklyHoursLabel =
+    p.hoursPerWeekMin === p.hoursPerWeekMax
+      ? `${p.hoursPerWeekMin} hrs/week`
+      : `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`;
   const bnplDepositStart = isApprenticeship
-    ? 300
+    ? null
     : p.depositAmount
       ? Number(p.depositAmount.replace(/[^0-9.]/g, ''))
       : null;
@@ -138,7 +152,7 @@ export default function ProgramDetailPage({
       intent: 'enrollment',
       funding: 'self_pay',
       payment: mode,
-      ...(isApprenticeship ? { coupon: octoberCouponCode } : {}),
+      ...(isApprenticeship ? { coupon: mode === 'full' ? 'PAYFULL600' : octoberCouponCode } : {}),
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
@@ -152,7 +166,7 @@ export default function ProgramDetailPage({
     .map((credential) => credential.name)
     .join(', ');
   const programHeroNarration = isApprenticeship
-    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours each week. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
+    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace('hrs/week', 'hours each week')}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and self-pay tuition before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
     : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
 
   const pathwaySteps = [
@@ -226,8 +240,23 @@ export default function ProgramDetailPage({
               const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
                 (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
               );
-              // Program pages use a clear picture-first hero. Primary copy and
-              // actions render below the image so no dark overlay obscures the media.
+              // Keep configured motion on every shared program route. A real
+              // photograph stays beneath the video if delivery or autoplay fails.
+              if (banner.videoSrcDesktop || banner.videoSrcMobile) {
+                return (
+                  <HeroVideo
+                    videoSrcDesktop={banner.videoSrcDesktop}
+                    videoSrcMobile={banner.videoSrcMobile}
+                    posterImage={heroPosterSrc}
+                    microLabel={banner.microLabel}
+                    analyticsName={banner.analyticsName}
+                    heightClassName="h-[clamp(260px,42svh,480px)]"
+                    overlayMode="none"
+                    narrateTranscript={false}
+                    preloadTranscriptVoice={false}
+                  />
+                );
+              }
               return (
                 <HeroPicture
                   src={heroPosterSrc}
@@ -241,15 +270,13 @@ export default function ProgramDetailPage({
             // Fallback: plain image hero for programs without a banner entry
             return (
               <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-                {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
+                        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                   src={heroPosterSrc}
                   alt={heroAlt}
                   fill
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                   priority
                   sizes="100vw"
-                  placeholder="empty"
                 />
               </div>
             );
@@ -301,7 +328,7 @@ export default function ProgramDetailPage({
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
                   Apply first. Elevate confirms program requirements, Host Site or employer
-                  placement, schedule, related instruction, wages, and any available funding before
+                  placement, schedule, related instruction, wages, and self-pay tuition before
                   training begins.
                 </p>
               </div>
@@ -315,34 +342,16 @@ export default function ProgramDetailPage({
           </section>
         ) : null}
 
-        {isApprenticeship && !afterHero ? (
-          <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">
-            <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-100">
-                  October enrollment special
-                </p>
-                <p className="mt-1 text-lg font-black">
-                  50% off the standard startup deposit — start for $300.
-                </p>
-              </div>
-              <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">
-                Coupon: <span className="font-mono">50OFFOCT</span>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
         {/* Hero content panel — below image, no overlay */}
         <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-slate-600 mb-5">
               {(p.breadcrumbs ?? [])
                 .filter((b) => Boolean(b?.label))
                 .map((b, i) => (
-                  <span key={i} className="flex items-center gap-1.5">
-                    {i > 0 && <ChevronRight className="w-3 h-3" />}
+                  <span key={i} className="flex min-w-0 items-center gap-1.5">
+                    {i > 0 && <ChevronRight aria-hidden="true" className="w-3 h-3 shrink-0" />}
                     {b.href ? (
                       <Link href={b.href} className="hover:text-slate-600 transition-colors">
                         {b.label}
@@ -375,9 +384,9 @@ export default function ProgramDetailPage({
                   )}
                   {p.deliveryModelDetail && <DeliveryBadge model={p.deliveryModelDetail} />}
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+                <ProgramTitle className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
-                </h2>
+                </ProgramTitle>
                 <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
                   {p.subtitle}
                 </p>
@@ -391,7 +400,7 @@ export default function ProgramDetailPage({
                     },
                     {
                       icon: <BookOpen className="w-3.5 h-3.5" />,
-                      val: `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`,
+                      val: weeklyHoursLabel,
                     },
                     {
                       icon: <Award aria-label="award" className="w-3.5 h-3.5" />,
@@ -428,13 +437,18 @@ export default function ProgramDetailPage({
               {/* CTA card */}
               <div className="lg:w-64 flex-shrink-0">
                 <div className="bg-white rounded-2xl shadow-xl p-5">
-                  {/* Cost */}
-                  <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
-
-                  {/* Funding — only verified options, no fallback text */}
-                  <div className="mb-4 mt-2">
-                    <FundingSection fundingOptions={publicFundingOptions} />
-                  </div>
+                  <p className="text-lg font-extrabold text-slate-900">
+                    Your next step starts here
+                  </p>
+                  <p className="mb-4 mt-2 text-sm leading-6 text-slate-600">
+                    Explore the training, then apply or ask admissions a question.
+                  </p>
+                  <Link
+                    href="#enrollment-options"
+                    className="mb-4 inline-flex min-h-11 items-center text-sm font-bold text-brand-blue-700"
+                  >
+                    {isApprenticeship ? 'Review self-pay tuition ↓' : 'Review funding and costs ↓'}
+                  </Link>
 
                   {primaryCTA && (
                     <>
@@ -487,7 +501,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {afterHero ? <div>{afterHero}</div> : null}
+      {visualContent ? <div>{visualContent}</div> : null}
 
       <section
         id="program-overview"
@@ -521,7 +535,7 @@ export default function ProgramDetailPage({
                 <div>
                   <dt className="font-bold text-slate-500">Weekly schedule</dt>
                   <dd className="mt-1 font-black text-slate-950">
-                    {p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}
+                    {p.schedule || weeklyHoursLabel.replace('hrs/week', 'hours per week')}
                   </dd>
                 </div>
                 <div>
@@ -548,7 +562,7 @@ export default function ProgramDetailPage({
               <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 <li>
                   <strong className="text-slate-950">1. Apply:</strong> Select this program and
-                  submit your contact, readiness, and funding information.
+                  submit your contact, readiness, and enrollment information.
                 </li>
                 <li>
                   <strong className="text-slate-950">2. Complete intake:</strong> Admissions
@@ -569,7 +583,11 @@ export default function ProgramDetailPage({
               id="payment-options"
               className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm"
             >
-              <h3 className="text-xl font-black text-slate-950">Funding and payment options</h3>
+              <h3 className="text-xl font-black text-slate-950">
+                {isApprenticeship
+                  ? 'Self-pay tuition and payment options'
+                  : 'Funding and payment options'}
+              </h3>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 {isWorkforceFunded ? (
                   <li>
@@ -587,14 +605,15 @@ export default function ProgramDetailPage({
                   into installments; deposit and terms are shown before acceptance.
                 </li>
                 <li>
-                  <strong className="text-slate-950">Buy Now Pay Later:</strong> If workforce
-                  funding is not approved, this is one optional payment alternative. It is not free
-                  training, is not funding, and requires separate provider approval.
+                  <strong className="text-slate-950">Buy Now Pay Later:</strong> This is an optional
+                  self-pay financing method with separate provider approval and repayment terms.
                 </li>
-                <li>
-                  <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
-                  pay eligible costs when an arrangement is approved.
-                </li>
+                {!isApprenticeship ? (
+                  <li>
+                    <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
+                    pay eligible costs when an arrangement is approved.
+                  </li>
+                ) : null}
               </ul>
             </div>
           </div>
@@ -707,6 +726,8 @@ export default function ProgramDetailPage({
 
       <ProgramExperienceGuide program={p} />
 
+      {afterHero ? <div>{afterHero}</div> : null}
+
       {/* DECISION PANEL — answers the questions visitors need before applying */}
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
@@ -731,15 +752,12 @@ export default function ProgramDetailPage({
                 </div>
               ))}
             </div>
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-6 grid grid-cols-1 min-[390px]:grid-cols-2 gap-3 sm:grid-cols-4">
               <DecisionFact label="Length" value={durationLabel} />
+              <DecisionFact label="Schedule" value={weeklyHoursLabel} />
               <DecisionFact
-                label="Schedule"
-                value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`}
-              />
-              <DecisionFact
-                label="Training"
-                value={totalHours > 0 ? `${totalHours} hours` : hoursRange}
+                label={registeredProgram ? 'Related instruction' : 'Training'}
+                value={instructionHours > 0 ? `${instructionHours} hours` : hoursRange}
               />
               <DecisionFact label="Credential" value={`${p.credentials.length} included`} />
             </div>
@@ -756,9 +774,7 @@ export default function ProgramDetailPage({
             </p>
             {bnplDepositStart && (
               <p className="mt-2 text-sm font-semibold text-slate-200">
-                {isApprenticeship
-                  ? `October coupon ${octoberCouponCode} lowers the startup deposit to ${bnplDepositStart.toLocaleString()}.`
-                  : `Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.`}
+                {`Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.`}
               </p>
             )}
             {estimatedWeeklyAfterDeposit && (
@@ -833,7 +849,7 @@ export default function ProgramDetailPage({
       {/* CREDIBILITY STRIP */}
       <section className="py-8 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-1 min-[390px]:grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
                 {p.laborMarket?.salaryRange ?? '—'}
@@ -842,9 +858,15 @@ export default function ProgramDetailPage({
             </div>
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
-                {totalHours > 0 ? `${totalHours} hrs` : hoursRange}
+                {instructionHours > 0 ? `${instructionHours} hrs` : hoursRange}
               </div>
-              <div className="text-xs text-slate-500 mt-0.5">Total training hours</div>
+              <div className="text-xs text-slate-500 mt-0.5">
+                {registeredProgram
+                  ? 'Related instruction hours; workplace training is separate'
+                  : isApprenticeship
+                    ? 'Listed course hours; review workplace requirements separately'
+                    : 'Total training hours'}
+              </div>
             </div>
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
@@ -865,7 +887,7 @@ export default function ProgramDetailPage({
           </div>
           {(p.complianceAlignment?.length ?? 0) > 0 && (
             <div className="mt-6 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-2 justify-center">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">
                 Aligned with:
               </span>
               {(p.complianceAlignment ?? []).map((a) => (
@@ -1033,7 +1055,7 @@ export default function ProgramDetailPage({
               {/* Internal LMS training */}
               {p.lmsCourseSlug && (
                 <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  <p className="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-3">
                     Elevate Internal Training
                   </p>
                   <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-start gap-4">
@@ -1145,7 +1167,7 @@ export default function ProgramDetailPage({
       <section id="enrollment-options" className="py-14 border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-green-600 mb-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-green-800 mb-3">
               How You Can Start
             </p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">
@@ -1337,7 +1359,7 @@ export default function ProgramDetailPage({
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">
-                Named Employer Partners
+                Employer and Host Site Context
               </p>
               <ul className="space-y-2">
                 {employerPartners.length > 0 ? (
@@ -1389,8 +1411,9 @@ export default function ProgramDetailPage({
               Start Your {p.title} Journey
             </h2>
             <p className="text-slate-500 text-base">
-              Free to apply · No payment required · An advisor will contact you within 1 business
-              day
+              {isApprenticeship
+                ? 'An inquiry is free. Your enrollment application includes tuition and payment review. Approval, agreements and Host Shop placement are confirmed separately.'
+                : 'Free to apply · No payment required · An advisor will contact you within 1 business day'}
             </p>
           </div>
           <ProgramApplyForm
@@ -1403,66 +1426,82 @@ export default function ProgramDetailPage({
 
       {/* CTA */}
       <section className="py-16 bg-slate-900">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-            Ready to Start Your {p.title} Career?
-          </h2>
-          <p className="text-slate-300 text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            {p.fundingStatement}
-          </p>
-
-          {/* Enrollment pipeline */}
-          <EnrollmentPipeline
-            applyHref={p.cta.applyHref || `/apply?program=${p.slug}`}
-            showCta={false}
-            className="mb-8 text-left"
-          />
-
-          {/* Two distinct paths — applicant vs enrolled */}
-          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
-            {/* Primary CTA — driven by enrollmentType */}
-            {primaryCTA && (
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
-                </span>
-                <Link
-                  href={primaryCTA.href}
-                  target={primaryCTA.external ? '_blank' : '_self'}
-                  rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
-                  className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-                >
-                  {primaryCTA.external ? primaryCTA.label : 'Apply to This Program'}
-                </Link>
-                {!primaryCTA.external && (
-                  <span className="text-slate-400 text-xs">Free to apply · takes 5 min</span>
-                )}
-              </div>
-            )}
-
-            {/* Already enrolled — only render when an LMS course exists for this program */}
-            {p.cta.enrollHref && (
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Already Enrolled
-                </span>
-                <Link
-                  href={p.cta.enrollHref}
-                  className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-                >
-                  Go to My Courses
-                </Link>
-                <span className="text-slate-400 text-xs">Log in to access your training</span>
-              </div>
-            )}
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 lg:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-800">
+            <Image
+              src={heroPosterSrc}
+              alt={heroAlt}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              loading="lazy"
+              className="object-contain"
+            />
           </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+              Ready to Start Your {p.title} Career?
+            </h2>
+            <p className="text-slate-300 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+              {p.fundingStatement}
+            </p>
 
-          <Link
-            href={p.cta.advisorHref || '/contact'}
-            className="inline-block border-2 border-slate-600 hover:border-slate-400 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors mt-2"
-          >
-            Questions? Talk to an Advisor
-          </Link>
+            {/* Enrollment pipeline */}
+            <EnrollmentPipeline
+              applyHref={p.cta.applyHref || `/apply?program=${p.slug}`}
+              showCta={false}
+              className="mb-8 text-left"
+            />
+
+            {/* Two distinct paths — applicant vs enrolled */}
+            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
+              {/* Primary CTA — driven by enrollmentType */}
+              {primaryCTA && (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
+                  </span>
+                  <Link
+                    href={primaryCTA.href}
+                    target={primaryCTA.external ? '_blank' : '_self'}
+                    rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
+                    className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+                  >
+                    {primaryCTA.external ? primaryCTA.label : 'Apply to This Program'}
+                  </Link>
+                  {!primaryCTA.external && (
+                    <span className="text-slate-400 text-xs">
+                      {isApprenticeship
+                        ? 'Review tuition and enrollment requirements before applying'
+                        : 'Free to apply · takes 5 min'}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Already enrolled — only render when an LMS course exists for this program */}
+              {p.cta.enrollHref && (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Already Enrolled
+                  </span>
+                  <Link
+                    href={p.cta.enrollHref}
+                    className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+                  >
+                    Go to My Courses
+                  </Link>
+                  <span className="text-slate-400 text-xs">Log in to access your training</span>
+                </div>
+              )}
+            </div>
+
+            <Link
+              href={p.cta.advisorHref || '/contact'}
+              className="inline-block border-2 border-slate-600 hover:border-slate-400 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors mt-2"
+            >
+              Questions? Talk to an Advisor
+            </Link>
+          </div>
         </div>
       </section>
 

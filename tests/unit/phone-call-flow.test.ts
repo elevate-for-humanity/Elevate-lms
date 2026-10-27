@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { directoryPages, intakeCompleted, MENU_INPUT, programDestination } from '@/lib/phone/call-flow';
+import { directoryPages, intakeCompleted, MENU_INPUT, PARIS_MENU_DESCRIPTION, PHONE_VOICE, programDestination } from '@/lib/phone/call-flow';
 
 describe('phone call flow', () => {
+  it('explains Paris and reads shop type, city and state without spacing extension digits', () => {
+    expect(PARIS_MENU_DESCRIPTION).toContain('Press 9');
+    expect(PARIS_MENU_DESCRIPTION).toContain('answer questions');
+    expect(PHONE_VOICE).toMatch(/-Neural$/);
+    const pages = directoryPages([{extension:'201', display_name:'Shop contact', department:'Example shop, barber host shop in Indianapolis, Indiana'}]);
+    expect(pages.join(' ')).toContain('barber host shop in Indianapolis, Indiana, extension 201.');
+    expect(pages.join(' ')).not.toContain('extension 2 0 1');
+  });
   it('accepts single-key selections without waiting for extension digits', () => {
     expect(MENU_INPUT.maximum_digits).toBe(1);
     expect(MENU_INPUT.minimum_digits).toBe(1);
@@ -14,12 +22,12 @@ describe('phone call flow', () => {
     const pages = directoryPages(entries);
     expect(pages.length).toBeGreaterThan(1);
     expect(pages.every((p) => p.length <= 500)).toBe(true);
-    for (const e of entries) expect(pages.join(' ')).toContain(`${e.display_name}, ${e.department}. Extension ${e.extension.split('').join(' ')}.`);
+    for (const e of entries) expect(pages.join(' ')).toContain(`${e.display_name}, ${e.department}, extension ${e.extension}.`);
   });
   it('announces one extension per person without a competing menu shortcut', () => {
     const legacyEntry = { extension: '103', display_name: 'Doreen Hawkins', menu_digit: 3 };
     const speech = directoryPages([legacyEntry]).join(' ');
-    expect(speech).toContain('Extension 1 0 3.');
+    expect(speech).toContain('extension 103.');
     expect(speech).not.toMatch(/or press|press 3/i);
   });
   it('never treats timeout, provider failure, or unconfirmed intake as completed', () => {

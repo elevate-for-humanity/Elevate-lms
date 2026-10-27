@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { approveSocialPost, enableApprovedPublishing } from './actions';
 import {
   ArrowRight,
   CalendarClock,
@@ -26,7 +27,12 @@ const platformLabel = (platform: string) =>
       ? 'YouTube'
       : platform.charAt(0).toUpperCase() + platform.slice(1);
 
-export default async function SocialMediaPage() {
+export default async function SocialMediaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
   await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
@@ -34,7 +40,7 @@ export default async function SocialMediaPage() {
     db
       .from('social_media_posts')
       .select(
-        'id,title,platform,destination_type,post_type,status,approval_state,scheduled_at,created_at,media_url,thumbnail_url,error_message',
+        'id,title,caption,content,platform,destination_type,post_type,status,approval_state,scheduled_at,created_at,updated_at,media_url,thumbnail_url,video_url,error_message',
       )
       .order('created_at', { ascending: false })
       .limit(18),
@@ -174,6 +180,11 @@ export default async function SocialMediaPage() {
       </section>
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+        {params.error && (
+          <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
+            {params.error}
+          </p>
+        )}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map(({ label, value, icon: Icon, accent }) => (
             <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -285,6 +296,45 @@ export default async function SocialMediaPage() {
                         {post.status.replaceAll('_', ' ')}
                       </span>
                     </div>
+                    {['draft', 'pending_approval', 'configuration_required'].includes(
+                      post.status,
+                    ) && (
+                      <form action={approveSocialPost} className="mt-3 space-y-2">
+                        <input type="hidden" name="id" value={post.id} />
+                        <input type="hidden" name="updated_at" value={post.updated_at} />
+                        <label className="block text-xs font-bold" htmlFor={`caption-${post.id}`}>
+                          Review the final caption
+                        </label>
+                        <textarea
+                          id={`caption-${post.id}`}
+                          name="caption"
+                          required
+                          maxLength={2200}
+                          defaultValue={post.caption || post.content || ''}
+                          rows={5}
+                          className="w-full rounded-lg border border-slate-300 p-2 text-sm"
+                        />
+                        {(post.video_url || post.media_url || post.thumbnail_url) && (
+                          <a
+                            href={post.video_url || post.media_url || post.thumbnail_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block text-xs text-blue-700"
+                          >
+                            Review attached media
+                          </a>
+                        )}
+                        <button
+                          type="submit"
+                          className="rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white"
+                        >
+                          Approve and queue publication
+                        </button>
+                      </form>
+                    )}
+                    {post.error_message && (
+                      <p className="mt-2 text-xs text-red-700">{post.error_message}</p>
+                    )}
                   </div>
                 ))}
                 {!posts.length && (
@@ -328,7 +378,17 @@ export default async function SocialMediaPage() {
                         </p>
                       </div>
                       {isConnected ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        account?.dry_run !== false &&
+                        ['facebook', 'instagram'].includes(platform) ? (
+                          <form action={enableApprovedPublishing}>
+                            <input type="hidden" name="platform" value={platform} />
+                            <button className="rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white">
+                              Enable approved publishing
+                            </button>
+                          </form>
+                        ) : (
+                          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        )
                       ) : (
                         <XCircle className="h-5 w-5 text-slate-300" />
                       )}

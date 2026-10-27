@@ -198,7 +198,7 @@ export function RemotionRoot() {
         height={1080}
         defaultProps={slideLessonDefaultProps as SlideLessonProps & Record<string, unknown>}
         calculateMetadata={({ props }) => ({
-          durationInFrames: calcSlideLessonFrames(props.scenes),
+          durationInFrames: calcSlideLessonFrames(props.scenes, props.preRollDurationFrames ?? 0, props.postRollDurationFrames ?? 0, props.lessonPresentation === 'approved-premium-v1'),
         })}
       />
     </>

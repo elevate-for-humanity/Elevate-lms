@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ auth: vi.fn(), rate: vi.fn(), secret: vi.fn(), fetch: vi.fn() }));
-vi.mock('next/server', () => ({ NextResponse: { json: (body: unknown, init?: ResponseInit) => new Response(JSON.stringify(body), { ...init, headers: { 'Content-Type': 'application/json' } }) } }));
+vi.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init?: ResponseInit) =>
+      new Response(JSON.stringify(body), {
+        ...init,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+  },
+}));
 vi.mock('@/lib/devstudio/api-auth', () => ({ apiRequireDevStudio: mocks.auth }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: mocks.rate }));
 vi.mock('@/lib/secrets', () => ({ getDecryptedPlatformSecret: mocks.secret }));
@@ -10,7 +18,10 @@ vi.mock('@/lib/api/safe-error', () => ({
   safeInternalError: () => new Response('{}', { status: 500 }),
 }));
 vi.mock('@/lib/security/require-confirmation', () => ({
-  requireTypedConfirmation: (value: string) => ({ ok: value === 'CONFIRM DEPLOY', required: 'CONFIRM DEPLOY' }),
+  requireTypedConfirmation: (value: string) => ({
+    ok: value === 'CONFIRM DEPLOY',
+    required: 'CONFIRM DEPLOY',
+  }),
 }));
 vi.mock('@/lib/routing/portal-map', () => ({
   MARKETING_HOST: 'https://www.elevateforhumanity.org',
@@ -35,31 +46,64 @@ describe('Google Admin service operations', () => {
     expect(mocks.secret).not.toHaveBeenCalled();
   });
   it('does not accept a healthy response from the wrong service', async () => {
-    mocks.fetch.mockResolvedValue(new Response(JSON.stringify({
-      service: 'marketing', healthy: true, ready: true,
-      configuration: { ok: true }, dependencies: { supabase: { ok: true } }, commit: 'a'.repeat(40),
-    }), { status: 200 }));
+    mocks.fetch.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          service: 'marketing',
+          healthy: true,
+          ready: true,
+          configuration: { ok: true },
+          dependencies: { supabase: { ok: true } },
+          commit: 'a'.repeat(40),
+        }),
+        { status: 200 },
+      ),
+    );
     const body = await (await GET(request())).json();
-    expect(body.services.map((s: any) => s.healthy)).toEqual([true, false, false]);
+    expect(body.services.map((s: any) => s.healthy)).toEqual([true, false, false, false]);
     expect(body.services.every((s: any) => s.provider === 'google-cloud-run')).toBe(true);
   });
   it('requires a real confirmation and full image revision before accessing secrets', async () => {
     expect((await POST(request({ service: 'lms', action: 'deploy' }))).status).toBe(409);
-    expect((await POST(request({ service: 'lms', action: 'deploy', confirmation: 'CONFIRM DEPLOY', image_sha: 'latest' }))).status).toBe(400);
+    expect(
+      (
+        await POST(
+          request({
+            service: 'lms',
+            action: 'deploy',
+            confirmation: 'CONFIRM DEPLOY',
+            image_sha: 'latest',
+          }),
+        )
+      ).status,
+    ).toBe(400);
     expect(mocks.secret).not.toHaveBeenCalled();
   });
   it('queues only the selected Google deployment and never returns credentials', async () => {
     mocks.fetch.mockResolvedValue(new Response(null, { status: 204 }));
-    const response = await POST(request({ service: 'lms', action: 'deploy', confirmation: 'CONFIRM DEPLOY', image_sha: 'a'.repeat(40) }));
+    const response = await POST(
+      request({
+        service: 'lms',
+        action: 'deploy',
+        confirmation: 'CONFIRM DEPLOY',
+        image_sha: 'a'.repeat(40),
+      }),
+    );
     expect(response.status).toBe(202);
     const [url, options] = mocks.fetch.mock.calls[0];
     expect(url).toContain('/deploy-google-repaired.yml/dispatches');
-    expect(JSON.parse(options.body)).toEqual({ ref: 'main', inputs: { component: 'lms', image_sha: 'a'.repeat(40) } });
+    expect(JSON.parse(options.body)).toEqual({
+      ref: 'main',
+      inputs: { component: 'lms', image_sha: 'a'.repeat(40) },
+    });
     expect(await response.text()).not.toContain('private-test-token');
   });
   it('reports workflow rejection as failure and never falls back to Northflank', async () => {
     mocks.fetch.mockResolvedValue(new Response('{}', { status: 403 }));
-    expect((await POST(request({ service: 'admin', action: 'build', confirmation: 'CONFIRM DEPLOY' }))).status).toBe(502);
+    expect(
+      (await POST(request({ service: 'admin', action: 'build', confirmation: 'CONFIRM DEPLOY' })))
+        .status,
+    ).toBe(502);
     expect(mocks.fetch).toHaveBeenCalledTimes(1);
     expect(mocks.fetch.mock.calls[0][0]).toContain('/build-google-migration-images.yml/dispatches');
   });

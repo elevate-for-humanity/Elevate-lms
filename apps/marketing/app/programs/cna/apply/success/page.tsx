@@ -65,7 +65,7 @@ export default function CNAApplySuccessPage() {
             Call Now &mdash; {PLATFORM_DEFAULTS.mainPhone}
           </a>
           <a
-            href="sms:3179999620"
+            href="sms:4632401404"
             className="rounded-xl border-2 border-brand-blue-700 px-6 py-3.5 font-semibold text-brand-blue-700 hover:bg-brand-blue-50 transition-colors"
           >
             Text Us &mdash; {PLATFORM_DEFAULTS.mainPhone}

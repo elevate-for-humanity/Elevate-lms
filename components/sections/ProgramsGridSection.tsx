@@ -23,16 +23,16 @@ export function ProgramsGridSection({ title, programs }: ProgramsGridSectionProp
     <section className="py-16">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-3xl font-bold text-black mb-8">{title}</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid auto-rows-fr items-stretch md:grid-cols-2 lg:grid-cols-3 gap-8">
           {programs.map((program) => (
             <Link
               key={program.slug}
               href={`/programs/${program.slug}`}
-              className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-slate-200"
+              className="group flex h-full flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-slate-200"
             >
               {/* Image */}
               {program.heroImage && (
-                <div className="relative h-48 w-full overflow-hidden">
+                <div className="relative aspect-[4/3] w-full overflow-hidden shrink-0">
                   <Image
                     alt="Training program"
                     loading="lazy"
@@ -46,14 +46,14 @@ export function ProgramsGridSection({ title, programs }: ProgramsGridSectionProp
               )}
 
               {/* Content */}
-              <div className="p-6">
+              <div className="flex flex-1 flex-col p-6">
                 <h3 className="text-xl font-bold text-black mb-2 group-hover:text-brand-blue-600 transition-colors">
                   {program.name}
                 </h3>
                 <p className="text-black mb-4 line-clamp-2">{program.shortDescription}</p>
 
                 {/* Meta */}
-                <div className="flex items-center gap-4 text-sm text-slate-700">
+                <div className="mt-auto flex items-center gap-4 text-sm text-slate-700">
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     <span>{program.duration}</span>

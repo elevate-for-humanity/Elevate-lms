@@ -53,7 +53,7 @@ export default function CnaWaitlistPage() {
             Apply Now <ArrowRight className="w-4 h-4" />
           </Link>
           <div className="mt-4 text-sm text-slate-500">
-            Questions? <Link href="/contact" className="text-brand-blue-600 hover:underline">Contact us</Link> or call <a href="tel:+13179999620" className="text-brand-blue-600 hover:underline">(317) 999-9620</a>.
+            Questions? <Link href="/contact" className="text-brand-blue-600 hover:underline">Contact us</Link> or call <a href="tel:+14632401404" className="text-brand-blue-600 hover:underline">(463) 240-1404</a>.
           </div>
         </div>
       </section>

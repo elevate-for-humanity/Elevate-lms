@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
       'List open ports','Show loaded secret names only','Open AI course builder','Run platform stabilize check',
     ],
     workflowButtons: [
-      { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy LMS plus Admin on Northflank from main' },
-      { key: 'deploy-lms', label: 'Deploy LMS', description: 'Build and deploy the LMS service on Northflank' },
-      { key: 'deploy-admin', label: 'Deploy Admin', description: 'Build and deploy the Admin service on Northflank' },
+      { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy LMS plus Admin on Google Cloud from main' },
+      { key: 'deploy-lms', label: 'Deploy LMS', description: 'Build and deploy the LMS service on Google Cloud' },
+      { key: 'deploy-admin', label: 'Deploy Admin', description: 'Build and deploy the Admin service on Google Cloud' },
       { key: 'ci', label: 'Run CI', description: 'Run the full validation pipeline' },
       { key: 'lint', label: 'Lint', description: 'Run the lint check' },
     ],

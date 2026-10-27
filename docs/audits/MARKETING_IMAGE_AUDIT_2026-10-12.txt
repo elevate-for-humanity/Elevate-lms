@@ -1,0 +1,521 @@
+
+Marketing image audit
+
+Image references: 425
+Missing local images: 0
+Corrupt or truncated images: 0
+Images used in 3+ files: 61
+Duplicate image binaries under different paths: 30
+
+Duplicate image files (same pixels, different paths):
+
+- 25 copies
+  /images/clear-path-main-image.jpg
+  /images/healthcare/healthcare-professional-portrait-1.jpg
+  /images/healthcare/healthcare-professional-portrait-2.jpg
+  /images/healthcare/program-cna-training.jpg
+  /images/healthcare/program-healthcare-overview.jpg
+  /images/healthcare/program-medical-assistant.jpg
+  /images/healthcare/video-thumbnail-dental-assistant.jpg
+  /images/healthcare/video-thumbnail-phlebotomy.jpg
+  /images/instructors/angela-thompson.jpg
+  /images/instructors/lisa-martinez.jpg
+  /images/logo-small.png
+  /images/logo.jpg
+  /images/pages/barber-hero-main.jpg
+  /images/partners/microsoft-logo.png
+  /images/testimonials-hq/person-1.jpg
+  /images/testimonials-hq/person-2.jpg
+  /images/testimonials-hq/person-3.jpg
+  /images/testimonials-hq/person-4.jpg
+  /images/testimonials/derek.jpg
+  /images/testimonials/james.jpg
+  /images/testimonials/marcus.jpg
+  /images/testimonials/michael.jpg
+  /images/testimonials/sarah.jpg
+  /images/testimonials/tamika.jpg
+  /images/trades/hero-program-hvac.jpg
+- 9 copies
+  /images/pages/about-career-training.webp
+  /images/pages/admin-campaigns-hero.webp
+  /images/pages/admin-compliance-exports-detail.webp
+  /images/pages/bookkeeping-ledger.webp
+  /images/pages/comp-home-highlight-health.webp
+  /images/pages/cpr-first-aid.webp
+  /images/pages/features-hero.webp
+  /images/pages/programs-catalog-hero.webp
+  /images/pages/skilled-trades-sector.webp
+- 7 copies
+  /images/barber-hero.webp
+  /images/beauty/cosmetology-hero.webp
+  /images/beauty/cosmetology.webp
+  /images/beauty/esthetician.webp
+  /images/beauty/esthetics-hero.webp
+  /images/beauty/nails-hero.webp
+  /images/beauty/program-beauty-training.webp
+- 6 copies
+  /images/pages/admin-email-analytics-detail.webp
+  /images/pages/admin-ferpa-training-hero.webp
+  /images/pages/admin-wioa-hero.webp
+  /images/pages/calendar-page-1.webp
+  /images/pages/comp-photo-cta-2.webp
+  /images/pages/how-it-works-hero.webp
+- 6 copies
+  /images/pages/admin-business-hero.webp
+  /images/pages/admin-compliance-deletions-detail.webp
+  /images/pages/admin/staff-portal-page-1.webp
+  /images/pages/contact-page-1.webp
+  /images/pages/events-page-1.webp
+  /images/pages/shop-hero.webp
+- 6 copies
+  /images/pages/admin-cafeteria-hero.webp
+  /images/pages/comp-home-highlight-biz.webp
+  /images/pages/cpr-aed.webp
+  /images/pages/cpr-training-real.webp
+  /images/pages/it-helpdesk-desk.webp
+  /images/pages/technology-sector.webp
+- 5 copies
+  /images/pages/admin-analytics-hero.webp
+  /images/pages/banking-page-1.webp
+  /images/pages/certificates-page-1.webp
+  /images/pages/compliance-page-1.webp
+  /images/pages/store-recommendations.webp
+- 5 copies
+  /images/pages/admin-analytics-learning-hero.webp
+  /images/pages/admin-compliance-agreements-hero.webp
+  /images/pages/comp-home-hero-programs.jpg
+  /images/pages/comp-home-hero.webp
+  /images/pages/compliance-page-2.webp
+- 4 copies
+  /images/pages/admin-compliance-audit-hero.jpg
+  /images/pages/admin-compliance-audit-hero.webp
+  /images/pages/comp-highlights-team.jpg
+  /images/pages/contact-hero.jpg
+- 3 copies
+  /images/pages/about-hero.webp
+  /images/pages/business-meeting.webp
+  /images/pages/team-collaboration.webp
+- 3 copies
+  /images/pages/apply-employer-hero.jpg
+  /images/pages/apply-employer-hero.webp
+  /images/pages/apprenticeships-page-1.webp
+- 3 copies
+  /images/pages/about-partners-hero.webp
+  /images/pages/partners-hero.webp
+  /images/pages/workone-partners.webp
+- 3 copies
+  /images/pages/admin-audit-logs-hero.webp
+  /images/pages/comp-program-template.webp
+  /images/pages/government-2.webp
+- 3 copies
+  /images/pages/business-sector.webp
+  /images/pages/comp-layout-hero.webp
+  /images/pages/store-guide-1.webp
+- 3 copies
+  /images/og-default.jpg
+  /images/og-image.jpg
+  /images/team-vibrant.jpg
+- 3 copies
+  /images/pages/bookkeeping.webp
+  /images/pages/cpr-mannequin.webp
+  /images/pages/verify-page-1.webp
+- 2 copies
+  /images/jozanna-george.jpg
+  /images/testimonials/student-david.jpg
+- 2 copies
+  /images/pages/comp-universal-hero.webp
+  /images/pages/government-3.webp
+- 2 copies
+  /images/pages/barber-apprentice-learning.webp
+  /images/pages/barber-gallery-1.webp
+- 2 copies
+  /images/pages/funding-hero.webp
+  /images/pages/funding-page-1.webp
+- 2 copies
+  /images/pages/admin-employers-hero.webp
+  /images/pages/for-employers-page-1.webp
+- 2 copies
+  /images/pages/career-counseling-page-1.webp
+  /images/pages/career-counseling.webp
+- 2 copies
+  /images/pages/about-career-pathways.webp
+  /images/pages/career-coaching.webp
+- 2 copies
+  /images/pages/credential-partners-hero.webp
+  /images/pages/partner.webp
+- 2 copies
+  /images/alina-smith.jpg
+  /images/testimonials/testimonial-medical-assistant.jpg
+- 2 copies
+  /images/pages/plumbing-pipes.webp
+  /images/pages/plumbing.jpg
+- 2 copies
+  /images/beauty/program-barber-training.webp
+  /images/pages/barber-apprenticeship.webp
+- 2 copies
+  /images/pages/comp-photo-cta-1.webp
+  /images/pages/homepage-why-elevate.webp
+- 2 copies
+  /images/pages/store-success-hero.webp
+  /images/pages/training-page-2.webp
+- 2 copies
+  /images/partners/act-workkeys.svg
+  /images/partners/certiport.svg
+
+Frequently reused images:
+
+- /images/pages/hvac-technician.webp: 16 files
+  apps/marketing/app/employment-support/page.tsx
+  apps/marketing/app/programs/hvac-technician/curriculum/page.tsx
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+  components/ProgramHighlights.tsx
+  components/home/ProgramOutcomes.tsx
+  components/quiz/ProgramFinderQuiz.tsx
+  components/testing/TestingCenter.tsx
+  lib/content/archetype-content.ts
+  lib/content/archetypes.ts
+  lib/pageVisuals.ts
+  lib/partners/program-config.ts
+  lib/programs-data-complete.ts
+  lib/programs/catalog-sectors.ts
+  lib/programs/programs.data.ts
+  lib/trades-program-data.ts
+- /images/pages/training-classroom.webp: 14 files
+  apps/marketing/app/call-now/page.tsx
+  components/EnrollmentProcess.tsx
+  components/quiz/ProgramFinderQuiz.tsx
+  lib/content/archetype-content.ts
+  lib/content/archetypes.ts
+  lib/hero-config.ts
+  lib/pageVisuals.ts
+  lib/partners/program-config.ts
+  lib/programs-data-complete.ts
+  lib/programs/programs.data.ts
+  lib/search/search-index.ts
+  lib/store/cards.ts
+  lib/store/recommendations.ts
+  lib/trades-program-data.ts
+- /images/pages/store-recommendations.webp: 11 files
+  apps/marketing/app/services/page.tsx
+  apps/marketing/app/store/compliance/ferpa/page.tsx
+  apps/marketing/app/store/compliance/grant-reporting/page.tsx
+  apps/marketing/app/store/compliance/wcag/page.tsx
+  components/store/ProductRecommendations.tsx
+  components/store/SalesAvatar.tsx
+  components/store/UnifiedSalesMarketplace.tsx
+  lib/guide/page-guides.ts
+  lib/search/search-index.ts
+  lib/store/cards.ts
+  lib/store/recommendations.ts
+- /images/pages/career-counseling.jpg: 9 files
+  apps/marketing/app/call-now/page.tsx
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+  lib/content/archetype-content.ts
+  lib/pageVisuals.ts
+  lib/programs-data-complete.ts
+  lib/search/search-index.ts
+  lib/store/cards.ts
+  lib/store/recommendations.ts
+- /images/heroes/hero-homepage.webp: 9 files
+  apps/marketing/app/certificates/verify/[certificateId]/page.tsx
+  components/InstitutionalAuthority.tsx
+  components/barber/BarberApprenticeshipDashboard.tsx
+  components/beauty/ApprenticeshipHub.tsx
+  components/home/HomeWhyChoose.tsx
+  components/home/Intro.tsx
+  components/marketing/PartnerLogos.tsx
+  components/programs/ProgramPageLayout.tsx
+  components/templates/StateCommunityServicesPage.tsx
+- /images/pages/healthcare-grad.jpg: 9 files
+  apps/marketing/app/how-it-works/page.tsx
+  apps/marketing/app/services/page.tsx
+  apps/marketing/app/transparency/page.tsx
+  components/EnrollmentProcess.tsx
+  components/ProgramHighlights.tsx
+  components/marketing/SuccessStoryCards.tsx
+  lib/content/archetype-content.ts
+  lib/hero-config.ts
+  lib/programs-data-complete.ts
+- /images/pages/cna-clinical.jpg: 8 files
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+  components/ProgramHighlights.tsx
+  components/home/ProgramOutcomes.tsx
+  components/quiz/ProgramFinderQuiz.tsx
+  lib/content/archetypes.ts
+  lib/hero-config.ts
+  lib/programs/programs.data.ts
+- /images/pages/cdl-truck-highway.webp: 8 files
+  components/ProgramHighlights.tsx
+  components/home/ProgramOutcomes.tsx
+  components/quiz/ProgramFinderQuiz.tsx
+  lib/content/archetype-content.ts
+  lib/content/archetypes.ts
+  lib/hero-config.ts
+  lib/programs/catalog-sectors.ts
+  lib/programs/programs.data.ts
+- /images/pages/about-career-training.webp: 7 files
+  apps/marketing/app/call-now/page.tsx
+  apps/marketing/app/email/page.tsx
+  apps/marketing/app/onboarding/page.tsx
+  apps/marketing/app/transparency/page.tsx
+  apps/marketing/app/workforce-partners/page.tsx
+  apps/marketing/app/writing-center/page.tsx
+  components/home/HomeProgramShowcase.tsx
+- /images/pages/workforce-training.webp: 7 files
+  apps/marketing/app/call-now/page.tsx
+  apps/marketing/app/federal-compliance/layout.tsx
+  apps/marketing/app/store/compliance/grant-reporting/page.tsx
+  components/ProgramCTA.tsx
+  components/home/HomePlatformOverview.tsx
+  lib/content/archetype-content.ts
+  lib/pageVisuals.ts
+- /images/pages/career-services-page-1.webp: 7 files
+  apps/marketing/app/career-services/page.tsx
+  apps/marketing/app/employment-support/page.tsx
+  apps/marketing/app/how-it-works/page.tsx
+  apps/marketing/app/onboarding/learner/agreements/page.tsx
+  apps/marketing/app/onboarding/learner/page.tsx
+  apps/marketing/app/services/page.tsx
+  apps/marketing/app/student-support/page.tsx
+- /images/pages/adult-learner.webp: 7 files
+  apps/marketing/app/onboarding/learner/agreements/page.tsx
+  apps/marketing/app/onboarding/learner/page.tsx
+  apps/marketing/app/store/compliance/ferpa/page.tsx
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+  components/home/AudienceRouter.tsx
+  components/programs/HomepageProgramsTeaser.tsx
+- /images/pages/about-employer-partners.webp: 6 files
+  apps/marketing/app/about/page.tsx
+  apps/marketing/app/employment-support/page.tsx
+  apps/marketing/app/how-it-works/page.tsx
+  apps/marketing/app/platform/partner-portal/page.tsx
+  apps/marketing/app/workforce-partners/page.tsx
+  components/apprenticeships/ApprenticeshipInfraSection.tsx
+- /images/pages/community-page-2.webp: 6 files
+  apps/marketing/app/alumni/page.tsx
+  apps/marketing/app/business-network/page.tsx
+  apps/marketing/app/community-services/page.tsx
+  apps/marketing/app/philanthropy/page.tsx
+  components/program-holder/GaryCoordinatorLaunchKit.tsx
+  components/program-holder/ProgramHolderWorkspaceView.tsx
+- /images/pages/barber-gallery-1.webp: 6 files
+  apps/marketing/app/apprenticeships/page.tsx
+  apps/marketing/app/programs/barber-apprenticeship/sections/BarberDeliveryModel.tsx
+  components/quiz/ProgramFinderQuiz.tsx
+  lib/pageVisuals.ts
+  lib/programs-data-complete.ts
+  lib/store/cards.ts
+- /images/pages/business-meeting.webp: 5 files
+  apps/marketing/app/(marketing)/employers/layout.tsx
+  apps/marketing/app/about/partners/page.tsx
+  apps/marketing/app/call-now/page.tsx
+  components/home/HomeProgramShowcase.tsx
+  components/program-holder/ProgramHolderOfficeTools.tsx
+- /images/pages/community-page-1.webp: 5 files
+  apps/marketing/app/alumni/page.tsx
+  apps/marketing/app/business-network/business-owners/page.tsx
+  apps/marketing/app/business-network/page.tsx
+  apps/marketing/app/community-services/page.tsx
+  apps/marketing/app/philanthropy/page.tsx
+- /images/pages/business-sector.webp: 5 files
+  apps/marketing/app/business-network/business-owners/page.tsx
+  apps/marketing/app/business-network/page.tsx
+  lib/content/archetype-content.ts
+  lib/content/archetypes.ts
+  lib/programs/programs.data.ts
+- /images/pages/barber-apprentice-learning.webp: 5 files
+  apps/marketing/app/business-network/page.tsx
+  apps/marketing/app/programs/barber-apprenticeship/BarberApprenticeshipClient.tsx
+  apps/marketing/app/programs/barber-apprenticeship/apply/page.tsx
+  apps/marketing/app/programs/barber-apprenticeship/sections/BarberDeliveryModel.tsx
+  lib/hero-config.ts
+- /images/partners/salon-saloon/team-sign.webp: 5 files
+  apps/marketing/app/community/page.tsx
+  apps/marketing/app/partners/host-shops/page.tsx
+  components/home/HomeApprenticeshipInfra.tsx
+  components/programs/beauty/HostShopShowcase.tsx
+  lib/apprenticeship-programs/host-partners.ts
+- /images/pages/about-supportive-services.webp: 5 files
+  apps/marketing/app/email/page.tsx
+  apps/marketing/app/employment-support/page.tsx
+  apps/marketing/app/platform/partner-portal/page.tsx
+  apps/marketing/app/wioa-eligibility/page.tsx
+  components/apprenticeships/ApprenticeshipInfraSection.tsx
+- /images/pages/for-employers-page-1.webp: 5 files
+  apps/marketing/app/ojt-and-funding/page.tsx
+  components/home/AudienceRouter.tsx
+  components/home/HomeEmployerStrip.tsx
+  lib/content/archetype-content.ts
+  lib/content/archetypes.ts
+- /images/pages/training-cohort.webp: 5 files
+  apps/marketing/app/wioa-eligibility/page.tsx
+  components/ProgramCTA.tsx
+  lib/content/archetype-content.ts
+  lib/hero-config.ts
+  lib/programs/programs.data.ts
+- /images/pages/it-helpdesk-desk.webp: 5 files
+  components/EnrollmentProcess.tsx
+  components/ProgramHighlights.tsx
+  components/home/ProgramOutcomes.tsx
+  lib/content/archetypes.ts
+  lib/hero-config.ts
+- /images/pages/about-funding-nav.webp: 4 files
+  apps/marketing/app/about/page.tsx
+  apps/marketing/app/onboarding/learner/agreements/page.tsx
+  apps/marketing/app/transparency/page.tsx
+  apps/marketing/app/writing-center/page.tsx
+- /images/jozanna-george.jpg: 4 files
+  apps/marketing/app/about/team/jozanna-george/page.tsx
+  components/TeamSection.tsx
+  components/programs/beauty/JozannaIndustryInstructor.tsx
+  lib/apprenticeship-programs/host-partners.ts
+- /images/pages/career-services-page-10.webp: 4 files
+  apps/marketing/app/career-services/contact/page.tsx
+  apps/marketing/app/onboarding/learner/page.tsx
+  apps/marketing/app/services/page.tsx
+  apps/marketing/app/writing-center/page.tsx
+- /images/partners/kountry-kutz/interior-active.webp: 4 files
+  apps/marketing/app/partners/host-shops/page.tsx
+  components/home/HomeBeautyPriority.tsx
+  components/programs/beauty/KountryKutzTourSlideshow.tsx
+  components/ui/HomeHeroVideo.tsx
+- /images/partners/generations-hair/premium-curls.jpg: 4 files
+  apps/marketing/app/partners/host-shops/page.tsx
+  components/programs/beauty/CosmetologyVisualExperience.tsx
+  components/programs/beauty/FeaturedHostPartners.tsx
+  lib/apprenticeship-programs/host-partners.ts
+- /images/pages/barber-shop-interior.webp: 4 files
+  apps/marketing/app/programs/barber-apprenticeship/apply/page.tsx
+  apps/marketing/app/programs/barber-apprenticeship/sections/BarberPartnership.tsx
+  components/BeautyAboutSection.tsx
+  lib/apprenticeship-programs/host-partners.ts
+- /images/beauty/esthetics-hero.webp: 4 files
+  apps/marketing/app/programs/healthcare/page.tsx
+  components/beauty/ApprenticeshipHub.tsx
+  components/home/HomeBeautyPriority.tsx
+  components/programs/config/esthetics-config.ts
+- /images/pages/comp-home-pathways-support.webp: 4 files
+  apps/marketing/app/services/page.tsx
+  apps/marketing/app/transparency/page.tsx
+  components/home/Pathways.tsx
+  lib/programs-data-complete.ts
+- /images/pages/welding-sparks.webp: 4 files
+  apps/marketing/app/testimonials/page.tsx
+  components/ProgramHighlights.tsx
+  components/home/ProgramOutcomes.tsx
+  lib/content/archetypes.ts
+- /images/pages/employer-page-1.webp: 3 files
+  apps/marketing/app/(marketing)/employers/page.tsx
+  apps/marketing/app/business-network/page.tsx
+  apps/marketing/app/platform/employer-portal/page.tsx
+- /images/pages/cna-nursing-real.webp: 3 files
+  apps/marketing/app/about/page.tsx
+  components/home/HomeProgramShowcase.tsx
+  lib/programs/programs.data.ts
+- /images/team/elizabeth-greene-headshot.webp: 3 files
+  apps/marketing/app/about/team/carl-brown/page.tsx
+  components/TeamSection.tsx
+  components/student/AIInstructorCard.tsx
+- /images/pages/apprenticeship-sponsor-page-1.webp: 3 files
+  apps/marketing/app/apprenticeship-sponsor/page.tsx
+  apps/marketing/app/apprenticeships/page.tsx
+  components/home/HomePlatformOverview.tsx
+- /images/pexels/esthetician.webp: 3 files
+  apps/marketing/app/apprenticeships/page.tsx
+  apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx
+  components/home/HomeFeaturedHostShop.tsx
+- /images/pexels/nail-tech.webp: 3 files
+  apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx
+  components/home/HomeBeautyPriority.tsx
+  components/home/HomeFeaturedHostShop.tsx
+- /images/pages/calendar-page-1.webp: 3 files
+  apps/marketing/app/calendar/page.tsx
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+- /images/pages/career-counseling-page-1.webp: 3 files
+  apps/marketing/app/career-counseling/page.tsx
+  apps/marketing/app/how-it-works/page.tsx
+  apps/marketing/app/student-support/page.tsx
+- /images/pages/certificates-page-1.webp: 3 files
+  apps/marketing/app/certificates/page.tsx
+  apps/marketing/app/certificates/verify/[certificateId]/page.tsx
+  apps/marketing/app/wioa-eligibility/page.tsx
+- /images/pages/courses-page-1.webp: 3 files
+  apps/marketing/app/data/courses.ts
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+- /images/pages/career-services-page-2.jpg: 3 files
+  apps/marketing/app/employment-support/page.tsx
+  apps/marketing/app/onboarding/learner/agreements/page.tsx
+  apps/marketing/app/onboarding/learner/page.tsx
+- /images/pages/barber-hero-main.webp: 3 files
+  apps/marketing/app/programs/barber-apprenticeship/page.tsx
+  components/ProgramHighlights.tsx
+  components/home/ProgramOutcomes.tsx
+- /images/pages/barber-apprenticeship.webp: 3 files
+  apps/marketing/app/programs/barber-apprenticeship/sections/BarberDeliveryModel.tsx
+  lib/programs/catalog-sectors.ts
+  lib/programs/programs.data.ts
+- /images/healthcare/program-cna-training.jpg: 3 files
+  apps/marketing/app/programs/healthcare-training/[slug]/page.tsx
+  apps/marketing/app/programs/healthcare-training/page.tsx
+  lib/program-data.ts
+- /images/beauty/barber-hero.webp: 3 files
+  apps/marketing/app/security/page.tsx
+  components/beauty/ApprenticeshipHub.tsx
+  components/home/HomeFeaturedPrograms.tsx
+- /images/pages/store-checkout-cancel-hero.webp: 3 files
+  apps/marketing/app/store/checkout/cancel/page.tsx
+  apps/marketing/app/store/licenses/source-use/page.tsx
+  components/store/UnifiedSalesMarketplace.tsx
+- /images/pages/wioa-meeting.webp: 3 files
+  apps/marketing/app/store/compliance/wioa/page.tsx
+  apps/marketing/app/wioa-eligibility/page.tsx
+  components/EnrollmentProcess.tsx
+- /images/pages/store-digital-detail1.webp: 3 files
+  apps/marketing/app/store/digital/page.tsx
+  apps/marketing/app/store/page.tsx
+  components/store/UnifiedSalesMarketplace.tsx
+- /images/pages/about-career-pathways.webp: 3 files
+  apps/marketing/app/store/licenses/school-license/page.tsx
+  apps/marketing/app/transparency/page.tsx
+  apps/marketing/app/writing-center/page.tsx
+- /images/pages/testing-page-1.webp: 3 files
+  apps/marketing/app/store/testing/page.tsx
+  components/testing/TestingCart.tsx
+  components/testing/TestingCenter.tsx
+- /images/pages/graduation-ceremony.webp: 3 files
+  apps/marketing/app/testimonials/page.tsx
+  components/InstitutionalAuthority.tsx
+  components/ProgramHighlights.tsx
+- /images/pages/cybersecurity.webp: 3 files
+  apps/marketing/app/tutoring/TutoringClient.tsx
+  apps/marketing/app/tutoring/page.tsx
+  lib/programs/catalog-sectors.ts
+- /images/pages/comp-pathway-classroom.webp: 3 files
+  components/PathwayBlock.tsx
+  components/home/HomePlatformOverview.tsx
+  lib/pageVisuals.ts
+- /images/partners/generations-hair/stylist-at-work-enhanced-2026.webp: 3 files
+  components/home/HomeFeaturedHostShop.tsx
+  components/programs/beauty/CosmetologyVisualExperience.tsx
+  lib/apprenticeship-programs/host-partners.ts
+- /images/hero/hero-skilled-trades.webp: 3 files
+  components/home/Programs.tsx
+  lib/programs-data-complete.ts
+  lib/programs-data.ts
+- /images/pages/comp-home-hero-programs.jpg: 3 files
+  components/programs/HomepageProgramsTeaser.tsx
+  lib/content/archetype-content.ts
+  lib/pageVisuals.ts
+  components/programs/beauty/FeaturedHostPartners.tsx
+  components/programs/beauty/HostShopShowcase.tsx
+  lib/apprenticeship-programs/host-partners.ts
+- /hero-images/business-hero.webp: 3 files
+  lib/programs-data-complete.ts
+  lib/programs-data.ts
+  lib/programs/catalog-sectors.ts

@@ -1,6 +1,8 @@
 import 'server-only';
 
 import Telnyx from 'telnyx';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveSendingNumber } from './sending-number';
 
 export type TelnyxCallEvent = {
   data: {
@@ -30,20 +32,22 @@ export type TelnyxCallEvent = {
   };
 };
 
-export function telnyxClient() {
+export async function telnyxClient() {
+  await hydrateProcessEnv();
   const apiKey = process.env.TELNYX_API_KEY;
   if (!apiKey) throw new Error('TELNYX_API_KEY is not configured.');
   return new Telnyx({ apiKey, publicKey: process.env.TELNYX_PUBLIC_KEY });
 }
 
 export async function verifyTelnyxWebhook(body: string, headers: Headers) {
+  await hydrateProcessEnv();
   const publicKey = process.env.TELNYX_PUBLIC_KEY;
   if (!publicKey) throw new Error('TELNYX_PUBLIC_KEY is not configured.');
 
   // The SDK reads the public key from the client configuration. The exact raw
   // request body and Telnyx signature/timestamp headers must be passed through
   // unchanged or ED25519 verification will fail.
-  const client = telnyxClient();
+  const client = await telnyxClient();
   return client.webhooks.unwrap(body, {
     headers: Object.fromEntries(headers.entries()),
   }) as unknown as TelnyxCallEvent;
@@ -62,9 +66,11 @@ export function decodeCallState(value?: string): Record<string, string> {
   }
 }
 
-export function publicPhoneNumber() {
-  const number = process.env.TELNYX_PHONE_NUMBER?.trim();
-  if (!number) throw new Error('TELNYX_PHONE_NUMBER is not configured');
+export async function publicPhoneNumber() {
+  await hydrateProcessEnv();
+  const { requireAdminClient } = await import('@/lib/supabase/admin');
+  const number = await resolveSendingNumber(await requireAdminClient());
+  if (!number) throw new Error('An active primary Telnyx number is not configured');
   return number;
 }
 

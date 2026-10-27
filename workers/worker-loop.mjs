@@ -12,7 +12,14 @@ export async function runWorkerLoop({ processJob, delay, isStopping, once = fals
     }
     onResult(result);
     if (once) {
-      if (result.claimed && !result.completed && !result.continuing) {
+      // A durable cursor can advance after a failed lesson. That continuation
+      // must not turn a failed instructional run into a successful Cloud task.
+      if (result.result?.findings?.some(finding => finding.severity === 'error')) {
+        throw new Error('ULTIMATE_TASK_REPAIR_REQUIRED');
+      }
+      // An explicitly persisted external dependency is a terminal task outcome,
+      // not a render success. The database remains blocked until its wake-up RPC.
+      if (result.claimed && !result.completed && !result.continuing && !result.awaitingDependency && !result.previewReady) {
         throw new Error('ULTIMATE_TASK_INCOMPLETE');
       }
       return result;

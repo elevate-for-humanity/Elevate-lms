@@ -21,6 +21,8 @@ export interface EmailOptions {
   replyTo?: string;
   bcc?: string | string[];
   attachments?: EmailAttachment[];
+  /** Durable outbox owns retry policy; ambiguous sends must never auto-retry. */
+  singleAttempt?: boolean;
 }
 
 type EmailSendResult = {
@@ -129,6 +131,7 @@ export async function sendEmail(options: EmailOptions): Promise<EmailSendResult>
 
   const trackingIds = toArr.map(() => randomUUID());
   const result = await sendViaSendGrid(sendgridKey, {
+    singleAttempt: options.singleAttempt,
     from,
     replyTo,
     to: toArr,
@@ -155,6 +158,7 @@ async function sendViaSendGrid(
     replyTo: string;
     bcc?: string[];
     attachments?: EmailAttachment[];
+    singleAttempt?: boolean;
   },
 ): Promise<EmailSendResult> {
   try {
@@ -192,10 +196,11 @@ async function sendViaSendGrid(
           method: 'POST',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           body,
+          signal: AbortSignal.timeout(10_000),
         }),
       {
         circuitBreaker: breakers.sendgrid,
-        attempts: 3,
+        attempts: opts.singleAttempt ? 1 : 3,
         baseDelayMs: 1000,
         label: 'sendgrid',
         // Don't retry 4xx — those are permanent failures (bad key, invalid address, etc.)
@@ -207,11 +212,10 @@ async function sendViaSendGrid(
     );
 
     if (!resp.ok) {
-      const data = await resp.json().catch(() => ({}));
-      logger.error(`[Email] SendGrid ${resp.status}:`, data);
+      logger.error('[Email] SendGrid rejected request', { status: resp.status });
       return {
         success: false,
-        error: `SendGrid error ${resp.status}: ${JSON.stringify(data)}`,
+        error: `SendGrid rejected request (${resp.status})`,
         from: opts.from,
       };
     }
@@ -225,7 +229,7 @@ async function sendViaSendGrid(
       },
     };
   } catch (error) {
-    logger.error('[Email] SendGrid send error:', error);
+    logger.error('[Email] SendGrid send outcome unavailable');
     return { success: false, error: 'Operation failed' };
   }
 }

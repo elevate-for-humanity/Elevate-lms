@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
+import {loadGoogleConfig} from './runtime-config.mjs';
+import {isDeepStrictEqual} from 'node:util';
 
 const project = 'elegant-racer-299721';
 const region = 'us-central1';
@@ -15,7 +17,7 @@ export const targets = {
 };
 
 // Values stay in memory. Reports contain names and comparison results only.
-export function compareEnvironments(source, target, kind) {
+export function compareEnvironments(source, target, kind, {component} = {}) {
   if (!source || typeof source !== 'object' || Array.isArray(source))
     throw new Error('Resolved source environment unavailable');
   const actual = new Map((target ?? []).map(row => [row.name, row]));
@@ -32,6 +34,12 @@ export function compareEnvironments(source, target, kind) {
     if (key === 'HOSTNAME' && row.value === '0.0.0.0') { result.adapted.push(key); continue; }
     const workerOverrides = { AI_PROVIDER: 'none', AI_NARRATION_PROVIDER: 'kokoro', AI_TRANSCRIPTION_PROVIDER: 'local_whisper' };
     if (kind === 'job' && workerOverrides[key] === row.value) { result.adapted.push(key); continue; }
+    const adapted = component === 'admin' && (
+      key === 'AI_NARRATION_PROVIDER' && row.value === 'kokoro' ||
+      ['STUDIO_BROWSER_URL','STUDIO_BROWSER_PUBLIC_URL'].includes(key) && ['https://browser.elevateforhumanity.org','https://elevate-studio-browser-aabnh2y32a-uc.a.run.app'].includes(row.value)
+    ) || component === 'ultimate-worker' && key === 'ULTIMATE_LEARNER_RUNTHROUGH_URL' &&
+      row.value === 'https://browser.elevateforhumanity.org/learner/runthrough';
+    if(adapted) {result.adapted.push(key);continue;}
     result.different.push(key);
   }
   result.passed = ![result.missing, result.different, result.secretReferences, result.unresolved].some(x => x.length);
@@ -94,9 +102,33 @@ export async function main() {
       const { spec, container } = runtimeContainer(resource, kind);
       const service = await northflank(`/services/${item.id}`);
       const environment = await northflank(`/services/${item.id}/runtime-environment?show=all&replaceTemplatedValues=true`);
-      entry.environment = compareEnvironments(environment.runtimeEnvironment, container.env, kind);
+      entry.environment = compareEnvironments(environment.runtimeEnvironment, container.env, kind, {component:item.id.replace(/^elevate-/,'')});
+      entry.sourceInstances = service.deployment?.instances ?? service.instances ?? null;
+      if(item.id==='elevate-studio-browser') {
+        try {
+          const inventory=await northflank('/services/'+item.id+'/containers');
+          const containers=Array.isArray(inventory)?inventory:inventory.containers;
+          entry.sourceContainerCount=Array.isArray(containers)?containers.length:null;
+          entry.sourceFilesystemExportAvailable=Number(entry.sourceInstances)>0&&Array.isArray(containers)&&containers.length>0;
+        } catch {entry.sourceFilesystemExportAvailable=false;entry.sourceContainerInventory='unavailable';}
+      }
       entry.sourceHealth = (service.healthChecks ?? []).map(x => ({ type: x.type, path: x.path, port: x.port }));
-      entry.googleHealth = { startup: Boolean(container.startupProbe), liveness: Boolean(container.livenessProbe) };
+      entry.googleHealth = { startup: Boolean(container.startupProbe), liveness: Boolean(container.livenessProbe),
+        probes: [container.startupProbe, container.livenessProbe].filter(Boolean).map(p => ({
+          type: p === container.startupProbe ? 'startup' : 'liveness',
+          path: p.httpGet?.path, port: p.httpGet?.port, timeoutSeconds: p.timeoutSeconds,
+          periodSeconds: p.periodSeconds, failureThreshold: p.failureThreshold
+        })) };
+      entry.sourceComputePlan = service.billing?.deploymentPlan ?? null;
+      entry.sourceBuildPlan = service.billing?.buildPlan ?? null;
+      entry.sourceBuildEngine = service.buildSettings?.buildEngine ?? service.buildEngine ?? null;
+      entry.sourceDockerfile = service.buildSettings?.dockerfile?.dockerFilePath ?? service.buildSettings?.dockerfile?.dockerfilePath ?? null;
+      entry.googleContainer = { image: container.image, ports: container.ports, identity: spec.serviceAccountName,
+        commandOverride: Boolean(container.command?.length), argumentOverride: Boolean(container.args?.length),
+        mounts: (container.volumeMounts ?? []).map(m => ({name:m.name,path:m.mountPath})),
+        volumes: (spec.volumes ?? []).map(v => ({name:v.name,kind:v.csi?'csi':v.cloudStorage?'cloudStorage':v.secret?'secret':v.emptyDir?'emptyDir':'other'})),
+        annotations: resource.spec?.template?.metadata?.annotations ?? {}
+      };
       entry.volumeCounts = { source: (service.deployment?.volumes ?? service.volumes ?? []).length, google: (spec.volumes ?? []).length };
       entry.runtimeFileCount = Object.keys(environment.runtimeFiles ?? {}).length;
       entry.commandOverride = Boolean(service.deployment?.command || service.runtime?.command || service.config?.command);
@@ -124,9 +156,38 @@ export async function main() {
       const items = Array.isArray(body) ? body : body[resource];
       if (!Array.isArray(items)) throw new Error('Unknown resource response');
       report.sourceResources[resource] = items.map(x => ({ id: x.id, name: x.name }));
-      if (items.length) report.failures.push({ resource, error: 'resource_contents_and_target_mapping_not_verified', count: items.length });
+      if (resource === 'secrets' && items.length) {
+        const archive=loadGoogleConfig('admin').sourceSecretGroupArchive;
+        const verified=[];
+        for(const item of items) {
+          const saved=archive?.groups?.find(group=>group.project===decodeURIComponent(sourceProject)&&group.sourceGroup===item.id);
+          const current=await northflank('/secrets/'+encodeURIComponent(item.id)+'/details');
+          if(saved && isDeepStrictEqual(saved.secrets,current.secrets)) verified.push(item.id);
+        }
+        report.sourceSecretArchive={googleSecret:'elevate-admin-runtime-config',verifiedGroups:verified,total:items.length,
+          passed:verified.length===items.length};
+        if(verified.length!==items.length)report.failures.push({resource,error:'source_secret_archive_mismatch',count:items.length-verified.length});
+      } else if (items.length) report.failures.push({ resource, error: 'resource_contents_and_target_mapping_not_verified', count: items.length });
     } catch { report.failures.push({ resource, error: 'resource_inventory_unavailable' }); }
   }
+  try {
+    const gpuResponse = await fetch('https://api.northflank.com/v1/projects/elevate-media-gpu/services', {
+      headers: {Authorization: 'Bearer ' + token}, signal: AbortSignal.timeout(30000)
+    });
+    if (!gpuResponse.ok) throw Error('source_gpu_read_failed');
+    const raw = await gpuResponse.json(); const data = raw.data ?? raw;
+    report.sourceGpuServices = (Array.isArray(data) ? data : data.services).map(s => ({
+      id:s.id,name:s.name,buildSource:s.buildSource,computePlan:s.billing?.deploymentPlan,
+      instances:s.deployment?.instances,status:s.status?.deployment?.status
+    }));
+    report.googleGpuServices = googleServices.filter(s => /gpu|llm/.test(s.metadata?.name ?? '')).map(s => ({
+      name:s.metadata.name,readyRevision:s.status?.latestReadyRevisionName,
+      resources:s.spec?.template?.spec?.containers?.[0]?.resources?.limits
+    }));
+    const archive = JSON.parse(gcloud(['secrets','versions','access','latest','--secret','elevate-gpu-archive-config']));
+    report.gpuArchive = {transferComplete:archive.transferComplete,computeEnabled:archive.profile?.computeEnabled,
+      volumes:(archive.sourcePersistence ?? []).map(v=>({id:v.id,bytesVerified:v.bytesVerified,deletionAllowed:v.deletionAllowed}))};
+  } catch { report.gpuInventoryRead = 'unavailable'; }
   report.passed = report.services.every(x => x.passed) && report.failures.length === 0;
   writeFileSync('google-runtime-parity.json', JSON.stringify(report, null, 2), { mode: 0o600 });
   console.log(JSON.stringify(report));

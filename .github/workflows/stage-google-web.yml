@@ -38,7 +38,27 @@ jobs:
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
       - name: Transfer runtime configuration and deploy private service
+        id: stage
         env:
           COMPONENT: ${{ inputs.component }}
           IMAGE_SHA: ${{ inputs.image_sha }}
         run: node scripts/gcp/stage-web.mjs
+      - uses: google-github-actions/auth@v3
+        id: readiness_auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: ${{ steps.stage.outputs.url }}
+          id_token_include_email: true
+      - name: Verify authenticated service and database readiness
+        env:
+          COMPONENT: ${{ inputs.component }}
+          GOOGLE_RUNTIME_URL: ${{ steps.stage.outputs.url }}
+          GOOGLE_RUNTIME_TOKEN: ${{ steps.readiness_auth.outputs.id_token }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { verifyRuntimeReadiness } from './scripts/gcp/verify-runtime-readiness.mjs';
+          console.log(JSON.stringify(await verifyRuntimeReadiness(process.env.COMPONENT, process.env.GOOGLE_RUNTIME_URL, process.env.GOOGLE_RUNTIME_TOKEN)));
+          NODE

@@ -69,7 +69,7 @@ export function licensedMediaBelongsToCourse(value: unknown, courseId: string): 
   if (!value || typeof value !== 'object' || !courseId) return false;
   const metadata = value as Record<string, unknown>;
   const owner = String(metadata.courseId ?? metadata.course_id ?? '').trim();
-  return owner === courseId;
+  return owner === courseId || (Array.isArray(metadata.referenceCourseIds) && metadata.referenceCourseIds.includes(courseId));
 }
 
 export function scoreLicensedMediaMatch(lessonText: string, assetTitle: string) {

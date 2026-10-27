@@ -65,8 +65,12 @@ export class PipeConnection extends EventEmitter {
       if (message.id !== undefined) {
         const item = this.pending.get(message.id);
         if (!item) continue; // Late replies never resurrect timed-out requests.
-        if ((message.sessionId || undefined) !== item.sessionId) {
-          this.close(new Error('CDP response session mismatch'));
+        // Chromium may report protocol errors from the browser scope even when the
+        // request was sent to a flattened target session. Preserve a genuine
+        // session mismatch on successful replies; reject scoped errors without
+        // terminating unrelated contexts or their pending requests.
+        if (!message.error && (message.sessionId || undefined) !== item.sessionId) {
+          this.close(new Error(`CDP response session mismatch (${item.method}; error ${message.error?.code ?? 'none'}; response scope ${message.sessionId ? 'target' : 'browser'})`));
           return;
         }
         clearTimeout(item.timer);
@@ -107,7 +111,7 @@ export class PipeConnection extends EventEmitter {
         this.pending.delete(id);
         reject(new Error(`CDP command timed out: ${method}`));
       }, timeoutMs);
-      this.pending.set(id, { resolve, reject, timer, sessionId: sessionId || undefined });
+      this.pending.set(id, { resolve, reject, timer, method, sessionId: sessionId || undefined });
       try {
         this.writable.write(frame, (error) => {
           if (error) this.disconnect(new Error('CDP write pipe failed'));

@@ -4,6 +4,7 @@
  * approved records with promotional media, website, and source-verified public contact data.
  */
 
+import { getFeaturedHostPartnerBySlug } from '@/lib/apprenticeship-programs/host-partners';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export type HostShopMedia = { url: string; alt?: string; source?: string };
@@ -19,6 +20,7 @@ export type HostShop = {
   email: string;
   supervisor: string;
   programs: string[];
+  primaryProgram?: string;
   badge: string;
   publicSlug?: string;
   description?: string;
@@ -30,39 +32,8 @@ export type HostShop = {
   mediaGallery?: HostShopMedia[];
 };
 
-export const PROGRAM_SLUGS = {
-  barber: 'barber-apprenticeship',
-  cosmetology: 'cosmetology-apprenticeship',
-  esthetician: 'esthetician-apprenticeship',
-  nail: 'nail-technician-apprenticeship',
-} as const;
-
-export type ProgramKey = keyof typeof PROGRAM_SLUGS;
-
-export const PROGRAM_LABELS: Record<string, string> = {
-  [PROGRAM_SLUGS.barber]: 'Barber Apprenticeship',
-  [PROGRAM_SLUGS.cosmetology]: 'Cosmetology Apprenticeship',
-  [PROGRAM_SLUGS.esthetician]: 'Esthetician Apprenticeship',
-  [PROGRAM_SLUGS.nail]: 'Nail Technician Apprenticeship',
-};
-
-const PROGRAM_ALIASES: Record<string, string> = {
-  barber: PROGRAM_SLUGS.barber,
-  cosmetology: PROGRAM_SLUGS.cosmetology,
-  esthetician: PROGRAM_SLUGS.esthetician,
-  esthetics: PROGRAM_SLUGS.esthetician,
-  nail: PROGRAM_SLUGS.nail,
-  nails: PROGRAM_SLUGS.nail,
-  'nail-technician': PROGRAM_SLUGS.nail,
-  ...Object.fromEntries(Object.values(PROGRAM_SLUGS).map((slug) => [slug, slug])),
-};
-
-function normalizeProgram(value: unknown): string | null {
-  const normalized = String(value ?? '')
-    .trim()
-    .toLowerCase();
-  return PROGRAM_ALIASES[normalized] ?? null;
-}
+import { PROGRAM_SLUGS, PROGRAM_LABELS, matchesHostShopProgram, normalizeHostShopProgram, type ProgramKey } from '@/lib/programs/host-shop-programs';
+export { PROGRAM_SLUGS, PROGRAM_LABELS, normalizeHostShopProgram, type ProgramKey } from '@/lib/programs/host-shop-programs';
 
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
   const parts = raw
@@ -123,8 +94,13 @@ function parseMedia(value: unknown): HostShopMedia[] {
     .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
+/** Fail closed for synthetic records and retired partner identities on every public surface. */
 function isPubliclyListedHostShop(shop: HostShop): boolean {
-  return !shop.name.toLowerCase().includes('prestige');
+  const identity = [shop.name, shop.email, shop.publicSlug, shop.address].filter(Boolean).join(' ').toLowerCase();
+  if (!shop.name.trim()) return false;
+  if (/\\[qa(?:\\s+e2e)?\\]|qa[ -]?e2e|qa test|100 qa test way|@qa\\.invalid|@example\\.(?:com|org|net)|@test\\.|\\.invalid\\b/.test(identity)) return false;
+  if (/razor[’'\\s-]*s?\\s+image|razorsimage/.test(identity)) return false;
+  return true;
 }
 
 function approvedAddress(shop: HostShop) {
@@ -146,14 +122,9 @@ function approvedDescription(shop: HostShop) {
 }
 
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
-  let db: Awaited<ReturnType<typeof requireAdminClient>>;
-  try {
-    db = await requireAdminClient();
-  } catch {
-    return [];
-  }
+  const db = await requireAdminClient();
 
-  const [{ data: barberRows }, { data: hostRows }, { data: publicRows }] = await Promise.all([
+  const [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult] = await Promise.all([
     db
       .from('barbershop_partner_applications')
       .select(
@@ -165,14 +136,25 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .from('host_shop_applications')
       .select('id, shop_name, address, phone, email, intake, approved_by')
       .eq('status', 'approved')
-      .neq('approved_by', 'system_verification')
+      .or('approved_by.is.null,approved_by.neq.system_verification')
       .order('shop_name'),
     db
       .from('public_host_shops')
       .select(
         'id, public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, address_line2, city, state, zip, programs, media_gallery, video_url, source_url',
       ),
+    db.from('host_shops')
+      .select('id,name,address,city,state,zip_code,phone,website,image_url,description,services,specializations')
+      .eq('is_approved', true).eq('shop_status', 'active').order('name'),
+    db.from('partners').select('name,shop_name,dba').or('status.in.(archived,inactive),account_status.eq.archived'),
   ]);
+
+  for (const result of [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult]) {
+    if (result.error) throw new Error(`HOST_SHOP_DIRECTORY_QUERY_FAILED:${result.error.message}`);
+  }
+  const barberRows = barberResult.data;
+  const hostRows = hostResult.data;
+  const publicRows = publicResult.data;
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
     id: shop.id,
@@ -191,8 +173,10 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const hostShops: HostShop[] = (hostRows ?? []).map((shop) => {
     const parsed = parseAddress(shop.address ?? '');
     const rawPrograms: unknown[] = Array.isArray(shop.intake?.programs) ? shop.intake.programs : [];
-    const programs = rawPrograms
-      .map(normalizeProgram)
+    const profile = (publicRows ?? []).find((row) => businessKey(row.display_name) === businessKey(shop.shop_name));
+    const profilePrograms = Array.isArray(profile?.programs) ? profile.programs : [];
+    const programs = [...rawPrograms, ...profilePrograms]
+      .map(normalizeHostShopProgram)
       .filter((value): value is string => typeof value === 'string');
     return {
       id: shop.id,
@@ -201,7 +185,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       phone: shop.phone ?? '',
       email: shop.email ?? '',
       supervisor: '',
-      programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.cosmetology],
+      programs: [...new Set(programs)],
       badge: 'partner',
     };
   });
@@ -237,6 +221,10 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
           : shop.phone;
       const enriched: HostShop = {
         ...shop,
+        programs: [...new Set([...shop.programs, ...(Array.isArray(profile?.programs) ? profile.programs : [])
+          .map(normalizeHostShopProgram).filter((value): value is string => Boolean(value))])],
+        primaryProgram: (Array.isArray(profile?.programs) ? profile.programs : [])
+          .map(normalizeHostShopProgram).find((value): value is string => Boolean(value)) ?? shop.programs[0],
         phone: sourceVerifiedPublicPhone || shop.phone,
         // Every approved operational Host Site needs a stable public destination,
         // even before optional promotional media is added to public_host_shops.
@@ -264,7 +252,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     .filter((row) => !matchedProfileIds.has(row.id))
     .map((row) => {
       const programs = (Array.isArray(row.programs) ? row.programs : [])
-        .map(normalizeProgram)
+        .map(normalizeHostShopProgram)
         .filter((value): value is string => typeof value === 'string');
       return {
         id: row.id,
@@ -276,7 +264,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         phone: row.phone ?? '',
         email: '',
         supervisor: '',
-        programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.barber],
+        programs: [...new Set(programs)],
+        primaryProgram: programs[0],
         badge: 'partner',
         publicSlug: row.public_slug,
         description: row.description ?? undefined,
@@ -302,11 +291,25 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     })
     .filter(isPubliclyListedHostShop);
 
-  const all = [...applicationBacked, ...directoryBacked];
+  const existing = [...applicationBacked, ...directoryBacked];
+  const activeShopBacked: HostShop[] = (activeShopResult.data ?? [])
+    .filter((row) => !existing.some((shop) => businessKey(shop.name) === businessKey(row.name)))
+    .map((row) => {
+      const slug = publicSlug(row.name, row.id);
+      const featured = getFeaturedHostPartnerBySlug(slug);
+      const programs = [...new Set([...(Array.isArray(row.specializations) ? row.specializations : []), ...(Array.isArray(row.services) ? row.services : []), ...(featured?.programs ?? [])]
+        .map(normalizeHostShopProgram).filter((value): value is string => Boolean(value)))];
+      return { id: row.id, name: row.name, address: row.address ?? '', city: row.city ?? '', state: row.state === 'Indiana' ? 'IN' : row.state || 'IN', zip: row.zip_code ?? '', phone: row.phone ?? '', email: '', supervisor: '', programs, primaryProgram: programs[0], badge: 'partner', publicSlug: featured?.slug ?? slug, website: row.website || featured?.websiteUrl, description: row.description || featured?.marketingBlurb || `${row.name} participates in Elevate’s approved Host Shop network. Occupation and placement availability are confirmed by Elevate.`, mediaGallery: row.image_url ? [{url: row.image_url, alt: `${row.name} shop photo`}] : undefined };
+    });
+  const archivedNames = new Set((archivedPartnerResult.data ?? []).flatMap((row) => [row.name, row.shop_name, row.dba]).filter(Boolean).map(businessKey));
+  const all = [...existing, ...activeShopBacked].filter((shop) =>
+    isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)),
+  );
+
 
   if (program) {
     const slug = PROGRAM_SLUGS[program];
-    return all.filter((shop) => shop.programs.includes(slug));
+    return all.filter((shop) => matchesHostShopProgram(shop, slug));
   }
   return all;
 }
@@ -314,5 +317,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
 /** Resolve an individual public profile back to the operationally approved Host Site. */
 export async function getApprovedShopByPublicSlug(publicSlug: string): Promise<HostShop | null> {
   const shops = await getApprovedShops();
-  return shops.find((shop) => shop.publicSlug === publicSlug) ?? null;
+  const featured = getFeaturedHostPartnerBySlug(publicSlug);
+  return shops.find((shop) => shop.publicSlug === publicSlug ||
+    (featured && (getFeaturedHostPartnerBySlug(shop.publicSlug ?? '')?.slug === featured.slug ||
+      businessKey(shop.name) === businessKey(featured.name) ||
+      (featured.dba && businessKey(shop.name) === businessKey(featured.dba))))) ?? null;
 }

@@ -1,3 +1,4 @@
+import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import Link from 'next/link';
 import { createHash } from 'node:crypto';
 import { headers } from 'next/headers';
@@ -151,6 +152,7 @@ export default async function HostShopOrientationPage({ searchParams }: { search
     : null;
 
   return <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <VisualDashboardOrientation audience="host-shop" />
     <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Required Host Shop Training · Version {HOST_SHOP_ORIENTATION_VERSION}</p>
     <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop Registered Apprenticeship Orientation</h1>
     <p className="mt-3 max-w-3xl text-slate-700">{board.partner?.name || 'Your shop'} must complete the current orientation for every registered occupation it hosts before operational dashboard access unlocks.</p>

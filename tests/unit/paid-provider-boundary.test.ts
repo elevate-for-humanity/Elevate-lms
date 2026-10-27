@@ -31,11 +31,13 @@ describe('paid provider boundary', () => {
       'utf8',
     );
     const media = readFileSync('lib/video/process-video-job.ts', 'utf8');
-    for (const source of [generation, canonicalGeneration, blueprintGeneration, media]) {
+    for (const source of [generation, canonicalGeneration, blueprintGeneration]) {
       expect(source).toContain('reservePaidInference');
       expect(source).toContain('executePaidInference');
     }
 
+    expect(media).toContain('Course Builder narration is self-hosted Kokoro.');
+    expect(media).toContain('applyLockedCourseBuilderMediaPolicy(job)');
     const studioBrowser = readFileSync(
       'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',
       'utf8',
@@ -48,6 +50,6 @@ describe('paid provider boundary', () => {
 
   it('does not require paid authorization for Elevate-owned chat inference', () => {
     const service = readFileSync('lib/ai/ai-service.ts', 'utf8');
-    expect(service).toContain("if (options.providerPolicy !== 'owned-only') requirePaidInferenceContext('ai-chat')");
+    expect(service).toContain("if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat')");
   });
 });

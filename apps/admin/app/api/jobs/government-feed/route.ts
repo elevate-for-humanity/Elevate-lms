@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { searchOnetOccupations } from '@/lib/onet/client';
+import { getSecrets, hydrateProcessEnv } from '@/lib/secrets';
 import { fetchUsaJobs, type JobRow } from '@/lib/industry/usajobs';
 
 export const runtime = 'nodejs';
@@ -11,11 +12,10 @@ export const dynamic = 'force-dynamic';
 function text(value: unknown): string { return typeof value === 'string' ? value.trim() : ''; }
 
 async function fetchCareerOneStop(keyword: string, location: string, limit: number): Promise<JobRow[]> {
-  const userId = process.env.CAREERONESTOP_USER_ID?.trim();
-  const token = (
-    process.env.CAREERONESTOP_API_KEY ||
-    process.env.CAREERONESTOP_TOKEN
-  )?.trim();
+  await hydrateProcessEnv();
+  const secrets = await getSecrets(['CAREERONESTOP_USER_ID','CAREERONESTOP_API_KEY','CAREERONESTOP_TOKEN']);
+  const userId = (secrets.CAREERONESTOP_USER_ID || process.env.CAREERONESTOP_USER_ID)?.trim();
+  const token = (secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN || process.env.CAREERONESTOP_API_KEY || process.env.CAREERONESTOP_TOKEN)?.trim();
   if (!userId || !token) return [];
 
   const path = [
@@ -93,6 +93,8 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
+  await hydrateProcessEnv();
+  const secretState = await getSecrets(['USAJOBS_API_KEY','USAJOBS_USER_AGENT_EMAIL','CAREERONESTOP_USER_ID','CAREERONESTOP_API_KEY','CAREERONESTOP_TOKEN','ONET_API_KEY']);
   const db = await requireAdminClient();
   const limitRaw = Number(new URL(request.url).searchParams.get('limit') ?? '50');
   const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(100, Math.trunc(limitRaw))) : 50;
@@ -107,12 +109,12 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     configured: {
-      usajobs: Boolean(process.env.USAJOBS_API_KEY && process.env.USAJOBS_USER_AGENT_EMAIL),
+      usajobs: Boolean(secretState.USAJOBS_API_KEY && secretState.USAJOBS_USER_AGENT_EMAIL),
       careerOneStop: Boolean(
-        process.env.CAREERONESTOP_USER_ID &&
-        (process.env.CAREERONESTOP_API_KEY || process.env.CAREERONESTOP_TOKEN),
+        secretState.CAREERONESTOP_USER_ID &&
+        (secretState.CAREERONESTOP_API_KEY || secretState.CAREERONESTOP_TOKEN),
       ),
-      onet: Boolean(process.env.ONET_API_KEY),
+      onet: Boolean(secretState.ONET_API_KEY),
     },
     sources: await sourceCounts(),
     jobs: data ?? [],

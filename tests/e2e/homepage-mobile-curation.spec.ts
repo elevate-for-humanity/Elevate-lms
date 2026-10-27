@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 // Read-only public tests. Point PLAYWRIGHT_BASE_URL at the candidate deployment.
-const SHOPS = ['Salon Saloon', 'Kountry Kutz Barbershop'];
-const SHOP_LINKS = ['/host-shops/salon-saloon', '/host-shops/kountry-kutz-barbershop'];
+const SHOPS = ['Cal’s Kutz Studio', 'Kountry Kutz Barbershop', 'Salon Saloon', 'Top Shelf Barber Lounge'];
+const SHOP_LINKS = ['/host-shops/cals-kutz-studio', '/host-shops/kountry-kutz-barbershop', '/host-shops/salon-saloon', '/host-shops/top-shelf-barber-lounge'];
 
 for (const width of [320, 390, 768, 1440]) {
   test(`curated homepage at ${width}px`, async ({ page }, testInfo) => {
@@ -11,18 +11,17 @@ for (const width of [320, 390, 768, 1440]) {
     const home = page.locator('main[data-homepage-curation="20261004"]');
     await expect(home).toBeVisible();
     const cards = home.locator('[data-featured-shop]');
-    await expect(cards).toHaveCount(2);
+    await expect(cards).toHaveCount(4);
     expect(await cards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-featured-shop')))).toEqual(SHOPS);
     expect(await cards.locator('a').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href')))).toEqual(SHOP_LINKS);
-    await expect(home.locator('a[href="/host-shops/cals-kutz-studio"], a[href="/host-shops/razors-image-barbershop"]')).toHaveCount(0);
     for (const image of await cards.locator('img').all()) {
       await image.scrollIntoViewIfNeeded();
       await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
     }
     const grid = home.locator('[data-featured-shops]');
     const columns = await grid.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
-    expect(columns).toBe(2);
-    expect((await grid.boundingBox())!.width).toBeLessThanOrEqual(768);
+    expect(columns).toBe(width >= 1024 ? 4 : 2);
+    expect((await grid.boundingBox())!.width).toBeLessThanOrEqual(1152);
     const boxes = await cards.evaluateAll((nodes) => nodes.map((node) => {
       const box = node.querySelector('img')!.getBoundingClientRect();
       return { width: box.width, height: box.height, left: box.left, right: box.right };
@@ -34,8 +33,8 @@ for (const width of [320, 390, 768, 1440]) {
     }
     const nav = page.getByRole('navigation', { name: 'Footer programs' });
     if (width < 768) {
-      const button = page.locator('footer').getByRole('button', { name: 'Programs', exact: true });
-      await expect(button).toHaveAttribute('aria-expanded', 'false');
+      const button = page.locator('footer summary').filter({ hasText: /^Programs$/ });
+      await expect(page.locator('footer details').filter({ has: button })).not.toHaveAttribute('open');
       await expect(nav).toBeHidden();
       await button.click();
       await expect(nav).toBeVisible();

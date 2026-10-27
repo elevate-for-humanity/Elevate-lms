@@ -6,6 +6,7 @@
  * Elevate-lms repo checkout when available, or the configured GitHub repo/branch.
  */
 
+import { studioRepository } from '@/lib/devstudio/repository';
 import { execFileSync } from 'child_process';
 import { existsSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
@@ -100,8 +101,7 @@ const REPO_DIR = (() => {
 const HAS_GIT = REPO_DIR !== null;
 
 function getRepo(): string {
-  const repo = (process.env.GITHUB_REPO ?? DEFAULT_REPO).trim();
-  return repo || DEFAULT_REPO;
+  return studioRepository();
 }
 
 function getBranch(): string {

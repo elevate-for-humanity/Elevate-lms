@@ -1,3 +1,4 @@
+import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 /**
  * Canonical PARIS API.
  *
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
 
     try {
       const result = await aiChat({
-        messages: [{ role: 'system', content: systemPrompt(context) }, ...messages],
+        messages: [{ role: 'system', content: PARIS_SYSTEM_IDENTITY + '\n\n' + systemPrompt(context) }, ...messages],
         temperature: context.surface === 'store' ? 0.45 : 0.25,
         maxTokens: 700,
       });

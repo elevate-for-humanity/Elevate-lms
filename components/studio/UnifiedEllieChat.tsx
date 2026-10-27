@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { getAdminUrl } from '@/lib/config/admin-url';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import { getStudioVoiceMode, setStudioVoiceMode } from '@/lib/devstudio/studio-voice-preferences';
 import {
   studioUserFacingError,
   studioUserFacingToolName,
@@ -35,7 +36,6 @@ import {
   type BrowserSpeechRecognition,
 } from '@/lib/browser/speech-recognition';
 import {
-  ELLIE_ROUTE_LABEL,
   fetchAiHealth,
   routeEllieMessage,
   selectStudioAgent,
@@ -84,10 +84,17 @@ interface ChatMessage {
 }
 
 type StudioProvider =
-  'auto' | 'elevate' | 'cloudflare' | 'xai' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+  | 'auto'
+  | 'elevate'
+  | 'cloudflare'
+  | 'xai'
+  | 'openai'
+  | 'anthropic'
+  | 'gemini'
+  | 'groq';
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
-  auto: 'Best available',
+  auto: 'Paris · Private model',
   elevate: 'Elevate AI',
   cloudflare: 'Cloudflare AI',
   xai: 'Grok / xAI',
@@ -669,13 +676,16 @@ export default function UnifiedEllieChat({
   const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
   const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
   const [showActivity, setShowActivity] = useState(false);
-  const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const messagesViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
-  const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(true);
+  const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(false);
+
+  useEffect(() => {
+    setVoiceOutputEnabled(getStudioVoiceMode() === 'voice');
+  }, []);
   const [attachment, setAttachment] = useState<{
     id: string;
     name: string;
@@ -759,7 +769,7 @@ export default function UnifiedEllieChat({
           nextMessages.find((message) => message.role === 'user')?.content.slice(0, 100) ||
           'Studio conversation',
         messages: nextMessages,
-        config: { agent: 'LIZZY', surface: 'unified-studio' },
+        config: { agent: 'PARIS', surface: 'unified-studio' },
       }),
     });
     const payload = await response.json().catch(() => ({}));
@@ -836,8 +846,8 @@ export default function UnifiedEllieChat({
 
   useEffect(() => {
     const saved = window.localStorage.getItem('elevate:studio:provider') as StudioProvider | null;
-    // The self-hosted Elevate GPU is intentionally archived. Migrate stale
-    // selections back to auto, which currently resolves to the low-cost OpenAI lane.
+    // Auto selects the owned CPU model. Keep legacy owned selections on that
+    // same path; external inference always requires an explicit selection.
     if (saved === 'elevate' || !saved) {
       setSelectedProvider('auto');
       return;
@@ -1031,7 +1041,6 @@ export default function UnifiedEllieChat({
     setLoading(true);
     const route = attachment ? 'platform' : routeEllieMessage(text);
     const agent = selectStudioAgent(text);
-    setLastRoute(route);
     const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
     const assistantIdx = messages.length + 1;
@@ -1084,6 +1093,7 @@ export default function UnifiedEllieChat({
             [...messages.map(({ role, content }) => ({ role, content })), userMsg],
             {
               agent: 'ADMIN_AI',
+              conversationId: canonicalConversationId,
               fileContext,
               documentsContext: attachment?.context,
               provider: selectedProvider === 'auto' ? undefined : selectedProvider,
@@ -1165,10 +1175,9 @@ export default function UnifiedEllieChat({
         >
           <Sparkles className="h-4 w-4 shrink-0 text-blue-500" aria-hidden="true" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">Admin AI</p>
+            <p className="truncate text-sm font-semibold">PARIS</p>
             <p className={`truncate text-[11px] ${mutedTextClass}`}>
               Platform tools · {health}
-              {lastRoute ? ` · last: ${ELLIE_ROUTE_LABEL[lastRoute]}` : ''}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -1196,16 +1205,16 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      {aiOk === false && (
+      {aiOk === false && (selectedProvider === 'auto' || selectedProvider === 'elevate') && (
         <div className="flex shrink-0 items-start gap-2 border-b border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
-            No AI provider is currently healthy. Review the{' '}
+            Paris private inference is unavailable. Review{' '}
             <Link
-              href={getAdminUrl('/integrations/env-manager')}
+              href={getAdminUrl('/studio/health')}
               className="font-semibold underline underline-offset-2"
             >
-              Environment Manager
+              System Health
             </Link>{' '}
             and deployment configuration.
           </p>
@@ -1215,7 +1224,7 @@ export default function UnifiedEllieChat({
       <div className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
         <div className="mx-auto flex max-w-3xl items-center gap-2">
           <label className="sr-only" htmlFor="studio-ai-provider">
-            Choose AI
+            Choose inference provider
           </label>
           <select
             id="studio-ai-provider"
@@ -1272,7 +1281,7 @@ export default function UnifiedEllieChat({
         </div>
       ) : null}
       {showActivity ? (
-        <div className="max-h-[42vh] shrink-0 overflow-y-auto border-b border-slate-200">
+        <div className="max-h-[24dvh] shrink-0 overflow-y-auto border-b border-slate-200">
           <CanonicalRunActivity runId={canonicalRunId} />
           <CourseBuildRuns />
           <ConversationActivity conversationId={conversationId} />
@@ -1313,7 +1322,7 @@ export default function UnifiedEllieChat({
 
       <div
         ref={messagesViewportRef}
-        className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-white px-3 py-4 sm:px-8 sm:py-8"
+        className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 px-3 py-5 sm:px-8 sm:py-8"
       >
         {messages.length === 0 ? (
           <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-8 text-center sm:py-20">
@@ -1324,8 +1333,8 @@ export default function UnifiedEllieChat({
               What are we building today?
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-              Ask in plain language. Admin AI routes the request to the correct internal tool,
-              database contract, workflow, builder, or deployment capability.
+              Ask in plain language. Paris routes the request to the correct internal tool, database
+              contract, workflow, builder, or deployment capability.
             </p>
             <p className="mt-1 text-xs text-gray-500">
               AI configuration:{' '}
@@ -1353,7 +1362,7 @@ export default function UnifiedEllieChat({
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
+          <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -1373,19 +1382,14 @@ export default function UnifiedEllieChat({
                     }`}
                   >
                     {message.role === 'assistant' && (
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                        {message.agent ?? 'LIZZY'}
-                        {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-600">
+                        PARIS
                       </p>
                     )}
                     <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                       {message.content}
                     </p>
-                    {message.role === 'assistant' && message.capabilitiesUsed?.length ? (
-                      <p className="mt-2 text-[11px] text-gray-500">
-                        Capabilities used: {message.capabilitiesUsed.join(', ')}
-                      </p>
-                    ) : null}
+
                     {message.role === 'assistant' && message.toolCalls?.length ? (
                       <ToolActivity toolCalls={message.toolCalls} />
                     ) : null}
@@ -1438,9 +1442,9 @@ export default function UnifiedEllieChat({
       </div>
 
       <div
-        className={`min-w-0 shrink-0 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4 ${inputAreaClass}`}
+        className={`min-w-0 shrink-0 border-t p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:p-3 ${inputAreaClass}`}
       >
-        <div className="mx-auto w-full min-w-0 max-w-3xl">
+        <div className="mx-auto w-full min-w-0 max-w-4xl">
           {attachment ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
               <span className="min-w-0 truncate font-semibold">Attached: {attachment.name}</span>
@@ -1515,7 +1519,7 @@ export default function UnifiedEllieChat({
             </button>
             <textarea
               ref={inputRef}
-              aria-label="Tell Admin AI what you need done..."
+              aria-label="Tell Paris what you need done..."
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
@@ -1524,9 +1528,9 @@ export default function UnifiedEllieChat({
                   void send();
                 }
               }}
-              rows={3}
-              placeholder="Tell Admin AI what you need done..."
-              className={`order-first min-h-[104px] max-h-[30dvh] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-3 text-xl leading-8 outline-none ${inputClass}`}
+              rows={1}
+              placeholder="Tell Paris what you need done..."
+              className={`order-first min-h-[60px] max-h-[20dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
             />
             <button
               type="button"
@@ -1545,7 +1549,7 @@ export default function UnifiedEllieChat({
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
               <span className="hidden sm:inline">
-                {listening ? 'Stop listening' : 'Talk to Lizzy'}
+                {listening ? 'Stop listening' : 'Talk to Paris'}
               </span>
             </button>
             <button
@@ -1555,6 +1559,7 @@ export default function UnifiedEllieChat({
               onClick={() => {
                 setVoiceOutputEnabled((enabled) => {
                   if (enabled) naturalVoice.stop();
+                  setStudioVoiceMode(enabled ? 'text' : 'voice');
                   return !enabled;
                 });
               }}
@@ -1591,7 +1596,7 @@ export default function UnifiedEllieChat({
               Listening… tap the microphone again to stop.
             </p>
           ) : null}
-          <p className="mt-2 text-center text-[11px] text-gray-500">
+          <p className="mt-2 text-center text-xs text-gray-600">
             Governed actions use configured rules and are written to the audit trail.
           </p>
         </div>

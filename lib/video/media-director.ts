@@ -71,6 +71,8 @@ export interface MediaScene {
   transition: Transition;
   referenceImageUrl?: string;
   sourceVideoUrl?: string;
+  /** Optional render-resolved clip: a footage scene must never be accepted as a static slide. */
+  clipUrl?: string | null;
   characterIds: string[];
   negativePrompt?: string;
   seed?: number;
@@ -85,6 +87,11 @@ export interface MediaScene {
   sceneType?: InstructionalSceneType;
   memoryAnchor?: string;
   teachingVisual?: import('../ultimate-course-builder/instructional/teaching-visual').TeachingVisual;
+  physicalDemonstration?: boolean;
+  /** Written by the renderer only when the encoded scene uses this measured title box. */
+  titleLayout?: 'footage-title-v1';
+  /** Scene-specific title scale for verified encoded-text readability repairs. */
+  titleFontSize?: number;
   mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
   overlayTemplate: string;
   contentHash: string;
@@ -113,8 +120,8 @@ export interface MediaDirectorInput {
   sceneData?: Record<string, unknown>;
   characters?: MediaCharacterReference[];
   defaultDurationSeconds?: number;
-  /** Ultimate's authored thirteen-stage film must never be compacted to ten. */
-  requiredSceneCount?: 13;
+  /** Preserve the accepted authored storyboard, including expanded teaching scenes. */
+  requiredSceneCount?: number;
 }
 
 export const MIN_LESSON_VIDEO_SCENES = 6;
@@ -486,6 +493,10 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
             stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
           ) || undefined,
         teachingVisual: scene.teachingVisual as MediaScene['teachingVisual'],
+        titleFontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+          ? scene.titleFontSize
+          : undefined,
+        physicalDemonstration: scene.physical_demonstration === true || scene.physicalDemonstration === true,
         mediaSource,
         overlayTemplate,
         contentHash: stringValue(scene.content_hash ?? scene.contentHash, contentHash),

@@ -150,8 +150,8 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
               <div className="text-sm text-black">Programs</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-orange-600">100%</div>
-              <div className="text-sm text-black">Free</div>
+              <div className="text-xl font-bold text-brand-orange-600">Verified</div>
+              <div className="text-sm text-black">Program-specific funding</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-brand-orange-600">85%</div>

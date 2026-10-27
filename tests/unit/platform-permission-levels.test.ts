@@ -13,6 +13,11 @@ describe('platform permission levels', () => {
     ).toBe('platform_owner');
   });
 
+  it('recognizes super_admin as platform_owner with no separate Studio membership', () => {
+    expect(resolvePermissionLevel({ profileRole: 'super_admin', isPlatformOwnerTenant: true })).toBe('platform_owner');
+    expect(canAccessDevStudio('platform_owner')).toBe(true);
+  });
+
   it('maps admin to platform_owner regardless of tenant membership', () => {
     expect(
       resolvePermissionLevel({ profileRole: 'admin', isPlatformOwnerTenant: false }),

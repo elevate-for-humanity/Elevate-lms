@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { enqueueJob } from '@/lib/jobs/queue';
 import { normalizeWorkspaceTier } from '@/lib/workspace/tier-limits';
 import { executeWorkflow } from '@/lib/workflows/engine';
+import { executeScheduledWorkflowEvent, SCHEDULE_DUE_EVENT } from '@/lib/workflows/scheduler';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
 
@@ -39,6 +40,9 @@ export interface OrchestrationProcessResult {
   failed: number;
   workflowRuns: number;
   eventIds: string[];
+  blocked?: 'historical_backlog_review_required';
+  backlogCount?: number;
+  cutoff?: string;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -313,7 +317,7 @@ async function runMatchingWorkflows(
 
   const activeIds = new Set(
     (workflows ?? [])
-      .filter((workflow) => workflow.status === 'active' && (!workflow.tenant_id || !event.tenant_id || workflow.tenant_id === event.tenant_id))
+      .filter((workflow) => workflow.status === 'active' && (!workflow.tenant_id || workflow.tenant_id === event.tenant_id))
       .map((workflow) => workflow.id),
   );
 
@@ -321,13 +325,17 @@ async function runMatchingWorkflows(
   for (const trigger of matching) {
     if (!activeIds.has(trigger.workflow_id)) continue;
 
-    const { data: existingRun } = await db
+    const { data: existingRun, error: existingError } = await db
       .from('workflow_runs')
       .select('id,status')
       .eq('platform_event_id', event.id)
       .eq('workflow_id', trigger.workflow_id)
       .maybeSingle();
-    if (existingRun) continue;
+    if (existingError) throw existingError;
+    if (existingRun?.status === 'success') continue;
+    // A previous run may have completed external side effects before failing.
+    // Preserve it for review rather than declaring success or repeating actions.
+    if (existingRun) throw new Error('WORKFLOW_EVENT_PRIOR_RUN_REQUIRES_REVIEW');
 
     const result = await executeWorkflow(
       trigger.workflow_id,
@@ -336,20 +344,19 @@ async function runMatchingWorkflows(
       trigger.id,
       event.correlation_id ?? event.id,
       event.tenant_id ?? undefined,
+      undefined,
+      { platformEventId: event.id },
     );
 
-    if (result.runId) {
-      const { error: updateError } = await db
-        .from('workflow_runs')
-        .update({ platform_event_id: event.id })
-        .eq('id', result.runId);
-      if (updateError) throw updateError;
-      runs++;
-    }
-
-    if (result.status === 'failed') {
+    if (result.status !== 'success' || !result.runId) {
       throw new Error(result.error || `Workflow ${trigger.workflow_id} failed`);
     }
+    const verified = await db.from('workflow_runs').select('id,status')
+      .eq('id', result.runId).eq('platform_event_id', event.id)
+      .eq('workflow_id', trigger.workflow_id).maybeSingle();
+    if (verified.error) throw verified.error;
+    if (verified.data?.status !== 'success') throw new Error('WORKFLOW_EVENT_RESULT_NOT_PERSISTED');
+    runs++;
   }
 
   return runs;
@@ -381,6 +388,29 @@ async function markFailed(
 export async function processPendingPlatformEvents(limit = 20): Promise<OrchestrationProcessResult> {
   const db = await requireAdminClient();
   const boundedLimit = Math.max(1, Math.min(limit, 100));
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - 24 * 60 * 60_000).toISOString();
+  const staleLease = new Date(now.getTime() - 10 * 60_000).toISOString();
+  // Restoring a missing worker must not silently replay historical business
+  // actions. Inspect eligible old work before taking any lease or changing rows.
+  // There is deliberately no request parameter or secret-based bypass.
+  const [waiting, stale] = await Promise.all([
+    db.from('platform_events').select('id', { count: 'exact', head: true })
+      .in('processing_status', ['pending', 'failed']).lt('attempts', 5)
+      .lte('available_at', now.toISOString()).lt('created_at', cutoff),
+    db.from('platform_events').select('id', { count: 'exact', head: true })
+      .eq('processing_status', 'processing').lt('attempts', 5)
+      .lt('locked_at', staleLease).lt('created_at', cutoff),
+  ]);
+  if (waiting.error) throw waiting.error;
+  if (stale.error) throw stale.error;
+  if (waiting.count === null || stale.count === null) throw new Error('WORKFLOW_EVENT_BACKLOG_CHECK_UNCONFIRMED');
+  const backlogCount = Number(waiting.count) + Number(stale.count);
+  if (!Number.isFinite(backlogCount)) throw new Error('WORKFLOW_EVENT_BACKLOG_CHECK_UNCONFIRMED');
+  if (backlogCount > 0) {
+    return { claimed: 0, processed: 0, failed: 0, workflowRuns: 0, eventIds: [],
+      blocked: 'historical_backlog_review_required', backlogCount, cutoff };
+  }
   const { data: claimed, error } = await db.rpc('claim_platform_events_v1', { p_limit: boundedLimit });
   if (error) throw error;
 
@@ -395,9 +425,19 @@ export async function processPendingPlatformEvents(limit = 20): Promise<Orchestr
 
   for (const event of events) {
     try {
-      const context = await hydrateEventContext(db, event);
-      await runCoreOrchestration(db, event, context);
-      result.workflowRuns += await runMatchingWorkflows(db, event, context);
+      // An event can become due between the preflight and claim. It remains
+      // unprocessed if it crosses the historical replay boundary in that race.
+      const createdAt = Date.parse(event.created_at ?? '');
+      if (!Number.isFinite(createdAt) || createdAt < Date.parse(cutoff)) {
+        throw new Error('HISTORICAL_BACKLOG_REVIEW_REQUIRED');
+      }
+      if (event.event_type === SCHEDULE_DUE_EVENT) {
+        result.workflowRuns += await executeScheduledWorkflowEvent(db, event);
+      } else {
+        const context = await hydrateEventContext(db, event);
+        await runCoreOrchestration(db, event, context);
+        result.workflowRuns += await runMatchingWorkflows(db, event, context);
+      }
       await markProcessed(db, event.id);
       result.processed++;
     } catch (error) {

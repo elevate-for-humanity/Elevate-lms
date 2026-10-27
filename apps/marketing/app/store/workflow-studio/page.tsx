@@ -10,7 +10,7 @@ import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 export const metadata: Metadata = {
   title: 'Workflow Studio',
   description: 'Visual workflow automation for enrollment pipelines, compliance tasks, notifications, and business processes.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/workflow-studio' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/workflow-studio' },
 };
 
 const triggers = [

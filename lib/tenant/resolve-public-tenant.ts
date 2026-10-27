@@ -2,6 +2,11 @@ import type { NextRequest } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { tenantSlugFromAppHost } from '@/lib/tenant/middleware-tenant-routing';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { createClient } from '@/lib/supabase/server';
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
+import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
+import { loadPublishedOfferings } from '@/lib/tenant/published-offerings';
+import type { PublishedTenantSite, TenantSiteConfig } from '@/lib/tenant/site-types';
 
 const RESERVED_ELEVATE_HOSTS = new Set([
   'elevateforhumanity.org',
@@ -12,6 +17,17 @@ const RESERVED_ELEVATE_HOSTS = new Set([
   'store.elevateforhumanity.org',
   'testing.elevateforhumanity.org',
 ]);
+
+/** Public path previews must resolve to the same published site as its custom host. */
+export function tenantSlugFromSiteReferrer(host: string, referrer: string | null): string | null {
+  if (!RESERVED_ELEVATE_HOSTS.has(host) || !referrer) return null;
+  try {
+    const url = new URL(referrer);
+    if (url.protocol !== 'https:' || url.hostname.toLowerCase() !== host) return null;
+    const match = url.pathname.match(/^\/sites\/([a-z0-9][a-z0-9-]{0,62})(?:\/|$)/i);
+    return match ? match[1].toLowerCase() : null;
+  } catch { return null; }
+}
 
 function requestHost(request: NextRequest) {
   const forwarded = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
@@ -24,6 +40,7 @@ export type ResolvedPublicTenant = {
   subdomain: string | null;
   host: string;
   externalBackend: { url: string; publishableKey: string } | null;
+  previewSite?: PublishedTenantSite;
 };
 
 function externalBackendFromConfig(config: unknown): ResolvedPublicTenant['externalBackend'] {
@@ -55,7 +72,29 @@ export async function resolvePublishedTenantFromRequest(
   if (!host) return null;
   const db = await requireAdminClient();
 
-  const slug = tenantSlugFromAppHost(host);
+  const previewId = request.headers.get('x-website-preview-id');
+  if (previewId) {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(previewId)) return null;
+    const origin = request.headers.get('origin');
+    if (origin && origin !== new URL(request.url).origin) return null;
+    const session = await createClient();
+    const { data: { user }, error: authError } = await session.auth.getUser();
+    if (authError || !user) return null;
+    if (!(await canManageHostedWebsite(db, previewId, user.id))) return null;
+    if (!(await getWebsiteBuilderAccess(user.id, session)).allowed) return null;
+    const { data: row, error } = await db.from('user_websites')
+      .select('id,user_id,subdomain,site_name,organization_id,site_config').eq('id', previewId).maybeSingle();
+    if (error || !row) return null;
+    const config = row.site_config as TenantSiteConfig | null;
+    if (!config?.homepage?.heroTitle || !config.branding?.primaryColor) return null;
+    return {
+      websiteId: row.id, ownerUserId: row.user_id, subdomain: row.subdomain, host,
+      externalBackend: externalBackendFromConfig(config),
+      previewSite: { id: row.id, subdomain: row.subdomain || '', siteName: row.site_name || '', organizationId: row.organization_id, config: await loadPublishedOfferings(ensureComposableSiteConfig(config)) },
+    };
+  }
+
+  const slug = tenantSlugFromAppHost(host) || tenantSlugFromSiteReferrer(host, request.headers.get('referer'));
   if (slug) {
     const { data } = await db
       .from('user_websites')

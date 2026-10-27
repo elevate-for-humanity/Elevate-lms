@@ -241,9 +241,14 @@ describe('Ultimate builder recovery', () => {
         },
       },
     };
-    const db = { storage: { from: vi.fn().mockReturnValue({ createSignedUrl }) } } as any;
+    const db = {
+      from: vi.fn(() => ({ select: () => ({ eq: () => ({ single: async () => ({ data: { metadata: { storage_bucket: 'course_videos', storage_path: 'licensed-library/envato/current.mp4' } }, error: null }) }) }) })),
+      storage: { from: vi.fn().mockReturnValue({ createSignedUrl }) },
+    } as any;
     const refreshed = await refreshLicensedVisualUrls(input, db);
-    expect(createSignedUrl).toHaveBeenCalledWith('licensed-library/envato/asset-1.mp4', 3600);
+    expect(db.from).toHaveBeenCalledWith('licensed_media_entitlements');
+    expect(createSignedUrl).toHaveBeenCalledWith('licensed-library/envato/current.mp4', 3600);
+    expect(input.artifacts.visual_assignment.media.readyAssets[0].storage_path).toBe('licensed-library/envato/asset-1.mp4');
     expect(refreshed.artifacts.visual_assignment.media.readyAssets[0].public_url).toBe(
       'https://storage.example.com/fresh.mp4',
     );
@@ -331,7 +336,7 @@ describe('Ultimate builder recovery', () => {
           },
         },
       }),
-    ).toThrow('ULTIMATE_ENVATO_VISUALS_REQUIRED:1:6');
+    ).toThrow('ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:scene-1');
   });
 
   it('blocks narration before synthesis when Envato visuals do not cover the storyboard', async () => {
@@ -376,7 +381,13 @@ describe('Ultimate builder recovery', () => {
               artifacts: { mediaQA: { pass: false } },
             };
           }
-          return { artifacts: fixtureArtifact(step) };
+          const artifacts = fixtureArtifact(step);
+          if (step === 'visual_assignment' && qaAttempts > 0) {
+            artifacts.media.assignments = artifacts.media.assignments.map((assignment: any, index: number) => ({
+              ...assignment, assetId: `replacement-shot-${index}`,
+            }));
+          }
+          return { artifacts };
         },
       ]),
     );

@@ -1,15 +1,30 @@
 name: Audit complete Google migration parity
+# Compare the saved Northflank topology with the current Google production setup.
+# 2026-10-22: Revalidate Google parity before retiring any legacy services or bound volumes.
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/audit-google-runtime-parity.yml', 'scripts/gcp/audit-runtime-parity.mjs']
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
-  group: google-runtime-operations
+  group: google-runtime-parity-read
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch Google-trusted workflow event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-runtime-parity.yml/dispatches" -f ref=main
   audit:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15
@@ -29,7 +44,7 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Compare all source services and inherited environments without exporting credentials
+      - name: Verify source container export availability and Google migration evidence
         env:
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
           NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}

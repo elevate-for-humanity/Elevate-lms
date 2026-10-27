@@ -69,7 +69,7 @@ export default function ApprenticeshipsPage() {
         data-scroll-narration
         data-narration-rate="0.82"
         data-narration-style="instructor"
-        data-narration="Welcome to Elevate's apprenticeship programs. An apprenticeship is not a regular classroom course. You learn the occupation through structured related instruction and paid, supervised work at an approved employer or Host Site. Start by choosing barbering, cosmetology, esthetics, or nail technology. Each page explains the skills, required hours, workplace training, progress records, licensing preparation, costs, and application steps. Apply first. Elevate then confirms enrollment, the training site, supervision, wages, schedule, and any approved funding before training begins."
+        data-narration="Welcome to Elevate's apprenticeship programs. An apprenticeship is not a regular classroom course. You learn the occupation through structured related instruction and paid, supervised work at an approved employer or Host Site. Start by choosing barbering, cosmetology, esthetics, or nail technology. Each page explains the skills, required hours, workplace training, progress records, licensing preparation, costs, and application steps. Apply first. Elevate then confirms enrollment, the training site, supervision, wages, schedule, and self-pay tuition before training begins."
       >
         <HeroPicture
           src="/images/pages/apprenticeships-hero.webp"
@@ -104,7 +104,7 @@ export default function ApprenticeshipsPage() {
             <p className="mt-4 text-base font-medium leading-7 text-slate-700 sm:text-lg">Each pathway has its own requirements, tuition, licensing objective, and enrollment record. Open the program that fits what you want to do.</p>
           </div>
 
-          <div className="mt-9 grid gap-6 md:grid-cols-2">
+          <div data-mobile-grid="2" className="mt-6 grid grid-cols-2 gap-3 sm:gap-5">
             {PATHWAYS.map((pathway) => (
               <article key={pathway.href} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
                 <Link href={pathway.href} className="block">
@@ -113,8 +113,8 @@ export default function ApprenticeshipsPage() {
                     <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-xs font-black uppercase tracking-wide text-slate-950 shadow">{pathway.badge}</span>
                   </div>
                 </Link>
-                <div className="p-6">
-                  <h3 className="text-2xl font-black text-slate-950 sm:text-3xl">{pathway.title}</h3>
+                <div className="p-3 sm:p-5">
+                  <h3 className="text-lg font-black text-slate-950 sm:text-2xl">{pathway.title}</h3>
                   <p className="mt-3 text-sm font-medium leading-6 text-slate-700 sm:text-base">{pathway.description}</p>
                   <div className="mt-5 grid grid-cols-2 gap-3">
                     <Link href={pathway.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white hover:bg-slate-800">Program</Link>
@@ -130,7 +130,7 @@ export default function ApprenticeshipsPage() {
       <section className="border-y border-orange-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-14 text-slate-950 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <div className="relative min-h-[340px] overflow-hidden rounded-3xl sm:min-h-[440px]">
+            <div className="relative aspect-[16/10] max-h-[320px] overflow-hidden rounded-2xl">
               <Image src="/images/pages/apprenticeship-sponsor-page-1.webp" alt="Apprentice working with an on-site supervisor" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
             <div>
@@ -139,7 +139,7 @@ export default function ApprenticeshipsPage() {
               <div className="mt-7 space-y-5">
                 {[
                   ['01', 'Choose and apply', 'Select the occupation, review the full program record, and submit the required application and documents.'],
-                  ['02', 'Confirm the training site', 'Host-site placement and any third-party funding are confirmed for the individual participant before they are treated as approved.'],
+                  ['02', 'Confirm the training site', 'Host-site placement, supervision, wages, and self-pay tuition are confirmed before training begins.'],
                   ['03', 'Train and learn', 'Complete supervised on-the-job learning together with the required instruction and competencies.'],
                   ['04', 'Track the record', 'Hours, skills, documents, and program milestones remain visible in the apprenticeship workflow.'],
                 ].map(([n, title, body]) => (
@@ -160,10 +160,10 @@ export default function ApprenticeshipsPage() {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-5 md:grid-cols-3">
             <Link href="/partners/host-shops" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">Host sites</p><h2 className="mt-2 text-xl font-black">Need a place to train?</h2><p className="mt-2 text-sm leading-6 text-slate-700">Review the participating host-site process and current placement information.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">Host-site information <ArrowRight className="h-4 w-4" /></span></Link>
-            <Link href="/funding/wioa" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">Funding</p><h2 className="mt-2 text-xl font-black">Using workforce funding?</h2><p className="mt-2 text-sm leading-6 text-slate-700">Funding is participant- and program-specific and requires authorization from the responsible agency.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">Review funding steps <ArrowRight className="h-4 w-4" /></span></Link>
+            <Link href="/apply/student" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">Self-pay enrollment</p><h2 className="mt-2 text-xl font-black">Plan your apprenticeship tuition.</h2><p className="mt-2 text-sm leading-6 text-slate-700">Apprenticeship programs are self-pay only. Review the published tuition and payment terms on your program page.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">Start your application <ArrowRight className="h-4 w-4" /></span></Link>
             <Link href="/programs" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">More programs</p><h2 className="mt-2 text-xl font-black">Explore the full catalog.</h2><p className="mt-2 text-sm leading-6 text-slate-700">Compare apprenticeship with healthcare, skilled trades, business, technology, and other pathways.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">All programs <ArrowRight className="h-4 w-4" /></span></Link>
           </div>
-          <p className="mx-auto mt-8 max-w-4xl text-center text-xs font-medium leading-5 text-slate-600">Apprenticeship or program status does not automatically provide WIOA, ETPL, Workforce Ready Grant, employer, or other third-party funding. Funding and placement require the applicable authorization and current capacity.</p>
+          <p className="mx-auto mt-8 max-w-4xl text-center text-xs font-medium leading-5 text-slate-600">Apprenticeship programs are self-pay only. Placement depends on an approved Host Site and current capacity.</p>
         </div>
       </section>
     
@@ -174,16 +174,12 @@ export default function ApprenticeshipsPage() {
           <p className="mt-4 text-base font-medium leading-7 text-slate-700">
             It is free to apply to join Elevate’s Host Shop network. Approved employers can grow service capacity by hiring and training apprentices, developing future licensed talent, and earning revenue from the apprentice’s supervised work in accordance with wage, licensing, supervision, and program requirements.
           </p>
-          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
-            Eligible employers may also qualify for workforce reimbursement or training-cost support through WorkOne, WIOA, on-the-job training, or another workforce partner. Reimbursement is not automatic or guaranteed; the employer, apprentice, occupation, costs, and funding authorization must be approved by the responsible workforce agency before costs are incurred.
-          </p>
+
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800">
               Become a Host Shop — Free
             </Link>
-            <Link href="/funding/wioa" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50">
-              Review workforce funding
-            </Link>
+
           </div>
         </div>
       </section>

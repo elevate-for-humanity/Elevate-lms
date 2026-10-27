@@ -41,7 +41,7 @@ export interface ProgramData {
 }
 
 export const ADMINISTRATOR_STATEMENT =
-  'Elevate for Humanity coordinates training, employer participation, and funding access for its workforce and apprenticeship pathways. Registered status is stated only when a verified RAPIDS occupation record or approved Appendix A standard is represented in the canonical registry.';
+  'Elevate for Humanity coordinates training, employer participation, and enrollment for its workforce and apprenticeship pathways. Apprenticeship tuition is self-pay only. Registered status is stated only when a verified RAPIDS occupation record or approved Appendix A standard is represented in the canonical registry.';
 
 export const STATE_VARIATION_DISCLAIMER =
   'State licensing requirements and DOL registered-apprenticeship standards are separate controls. The applicable approved program and jurisdiction rules govern.';
@@ -82,7 +82,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     credentialFull: 'Indiana Barber License following registered-program completion and applicable state licensing requirements',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA where authorized', 'WorkOne OJT where authorized', 'Employer Sponsorship', 'Self-Pay'],
+    fundingOptions: ['Self-Pay'],
     careerOutcomeRange: 'Varies by employer, experience, location, clientele, commission structure, and business model',
     stateRequirements:
       'DOL completion follows the approved competency-based registered standard. Indiana licensing-hour/exam requirements are tracked separately and do not replace registered RTI, competencies, wage, ratio, or probation requirements.',
@@ -103,7 +103,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     credentialFull: 'Indiana Cosmetologist License following registered-program completion and applicable state licensing requirements',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship', 'Self-Pay'],
+    fundingOptions: ['Self-Pay'],
     startingWage: 'Employer and legal wage requirements apply; use the current employer-specific registered wage schedule when applicable',
     wageRange: 'Employer/market dependent',
     careerOutcomeRange: 'Employer/market dependent',
@@ -129,7 +129,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     credentialFull: 'Indiana Esthetician License following registered-program completion and applicable state requirements',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship', 'Self-Pay'],
+    fundingOptions: ['Self-Pay'],
     careerOutcomeRange: 'Employer/market dependent',
     stateRequirements: 'State licensing/training requirements are tracked separately from the approved competency-based registered standard.',
     category: 'apprenticeship',
@@ -156,7 +156,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     credentialFull: 'EPA 608 and other credentials as specifically assigned/earned',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship'],
+    fundingOptions: ['Self-Pay'],
     startingWage: 'Employer and legal wage requirements apply',
     wageRange: 'Employer/market dependent',
     careerOutcomeRange: 'Employer/market dependent',
@@ -178,7 +178,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     credentialFull: 'Credential or license depends on the applicable jurisdiction and approved program',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship'],
+    fundingOptions: ['Self-Pay'],
     startingWage: 'Employer and legal wage requirements apply',
     wageRange: 'Employer/market dependent',
     careerOutcomeRange: 'Employer/market dependent',

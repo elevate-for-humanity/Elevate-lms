@@ -39,9 +39,14 @@ const guideSteps = [
     'Approve accurate OJL entries and return incorrect entries with a correction note.',
   ],
   [
-    'Verify competencies',
+    'Record practical services',
+    '/host-shop/dashboard/practical-log',
+    'Record haircuts, styles, colors, facials, and nail services. These are practice counts, not official Appendix A sign-offs.',
+  ],
+  [
+    'Review training progress',
     '/host-shop/dashboard/competencies',
-    'Record skills only after they are demonstrated under qualified supervision.',
+    'Review registered skill progress. Only Elevate sponsor administration performs formal Appendix A approvals.',
   ],
   [
     'Check wages and reports',
@@ -62,6 +67,22 @@ const handbookSections = [
   {
     title: 'Wages and payroll evidence',
     text: 'Apprentices are paid workers. Follow the applicable registered wage schedule and any higher wage required by law. Keep payroll evidence current and do not treat estimated or unpaid time as verified OJL.',
+  },
+  {
+    title: 'What your Host Shop must do every day',
+    text: 'Provide a qualified licensed supervisor and safe, hands-on instruction. Have each apprentice clock in at the approved shop, clock out when leaving or taking unpaid meal breaks, and clock back in on return. Review actual OJL work and report geofence errors for documented correction. Pay apprentices under their approved wage schedule and applicable wage laws.',
+  },
+  {
+    title: 'What your Host Shop must do every week and month',
+    text: 'Weekly: review and verify actual workplace hours, record cuts, styles, colors or other supervised services in Practical Service Log, check attendance and payroll, and notify Elevate of problems. Monthly: review each apprentice’s progress, training coverage, mentor assignment, wage progression and upcoming practical assessments. Preserve records and never invent training or service counts.',
+  },
+  {
+    title: 'RTI is handled by Elevate — not the Host Shop',
+    text: 'Elevate coordinates and delivers Related Technical Instruction (theory), assignments, assessments and verified RTI hours. Host Shops do not create theory lessons, award RTI hours, or sign off on official Appendix A completion. Continue eligible supervised hands-on training while Elevate rolls out RTI; allow apprentices to attend required instruction and follow any required prerequisite safety training.',
+  },
+  {
+    title: 'New and continuing apprentices',
+    text: 'Existing apprentices continue from verified progress; do not restart hours. New apprentices must have authorized placement, required supervision and employment arrangements before hands-on training. Follow the approved individual schedule, shop licensing rules and sponsor instructions. Report departures, mentor changes, safety incidents, missed hours and wage problems promptly.',
   },
   {
     title: 'RTI and competency progress',

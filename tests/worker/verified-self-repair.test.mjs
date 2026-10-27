@@ -119,6 +119,23 @@ test('incidental safety words do not invent a safety scene',()=>{
  const view=instructionView({scenes:[{id:'color-wheel',stage:'concept_explanation',text:'Gloves protect the stylist.'},{id:'safety',stage:'concept_explanation',text:'Color theory explains hues.'},{id:'warning',stage:'concept_explanation',sceneType:'safety_warning',text:'Wear protective gloves.'}]});
  assert.equal(view.scenes[0].sceneType,'mental_model');assert.equal(view.scenes[1].sceneType,'mental_model');assert.equal(view.scenes[2].sceneType,'safety_warning');
 });
+test('a dedicated hygiene scene with real protective instructions survives stage normalization',()=>{
+ const text='Cross-contamination in cosmetic services is a severe health risk. Use single-use applicators where required, especially for shared sample products.';
+ const view=instructionView({scenes:[{id:'scene:seg-05-concept-hygiene',stage:'concept_explanation',sceneType:'mental_model',teachingPoint:text}]});
+ assert.equal(view.scenes[0].sceneType,'safety_warning');assert.equal(view.scenes[0].dialogue,text);
+ assert.equal(view.scenes[0].referenceImageUrl,undefined);
+ const qualitySource=stripTypeScriptTypes(readFileSync(new URL('../../lib/video/instructional-quality-gate.ts',import.meta.url),'utf8'),{mode:'transform'}).replaceAll('export ','');
+ const gate=new Function(qualitySource+';return instructionalQualityFailures;')();
+ const check=board=>gate({courseTitle:'Cosmetology RTI',lessonTitle:'Makeup Application and Color Selection',lessonType:'practical_skill',script:text,instructor:{id:'ultimate',title:'Instructor',specialty:'Cosmetology'},storyboard:board});
+ const result=check(view);assert.equal(result.evidence.hasSafetyScene,true);
+ assert.ok(!result.failures.some(f=>f.includes('explicit safety or sanitation scene')));
+ const missing=check(instructionView({scenes:[{id:'concept-hygiene',stage:'concept_explanation',text:'Compare warm and cool colors.'}]}));
+ assert.equal(missing.evidence.hasSafetyScene,false);assert.ok(missing.failures.some(f=>f.includes('explicit safety or sanitation scene')));
+});
+test('hygiene labels alone cannot satisfy the safety-scene requirement',()=>{
+ const view=instructionView({scenes:[{id:'concept-hygiene',stage:'concept_explanation',text:'Compare warm and cool colors.'},{id:'hygienic-dispensing',stage:'concept_explanation',text:'Appearance is the overall visual result.'}]});
+ assert.ok(view.scenes.every(scene=>scene.sceneType!=='safety_warning'));
+});
 
 
 test('errors crossing worker realms retain their message and external-blocker classification', async () => {

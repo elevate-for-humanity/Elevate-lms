@@ -79,7 +79,7 @@ async function githubJson(path: string, init: RequestInit = {}) {
   const payload = text ? JSON.parse(text) : {};
   if (!response.ok) {
     throw new Error(
-      `${githubApiErrorMessage(response.status)}; GitHub endpoint: ${path}; provider message: ${String(payload?.message ?? '').slice(0, 140)}`,
+      `GitHub API ${response.status} for ${path}: ${githubApiErrorMessage(response.status)}; provider message: ${String(payload?.message ?? '').slice(0, 140)}`,
     );
   }
   return payload;

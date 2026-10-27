@@ -31,6 +31,30 @@ describe('executed admin dashboard data loader',()=>{
   expect(data.revenueAllTimeCents).toBe(100100);
   expect(state.ranges).toContain('ita_vouchers:1000');
  });
+ it('uses lead creation for new leads and last contact for stale leads',async()=>{
+  const today=new Date().toISOString();
+  state.rows.crm_leads=[{id:'edited-old',created_at:'2020-01-01T00:00:00Z',updated_at:today},{id:'contacted',created_at:'2020-01-01T00:00:00Z',last_contact_at:today},{id:'new',created_at:today,updated_at:today}];
+  const data=await getAdminDashboardData();
+  expect(data.operational.newLeadsToday).toBe(1);
+  expect(data.staleLeads.map(l=>l.id)).toEqual(['edited-old']);
+ });
+ it('uses actual lesson activity instead of enrollment record edits for inactivity',async()=>{
+  const today=new Date().toISOString();
+  state.rows.program_enrollments=[{id:'active-lesson',user_id:'learner-1',status:'active',created_at:'2020-01-01T00:00:00Z',updated_at:'2020-01-01T00:00:00Z'},{id:'only-admin-edit',user_id:'learner-2',status:'active',created_at:'2020-01-01T00:00:00Z',updated_at:today}];
+  state.rows.lesson_progress=[{id:'progress',user_id:'learner-1',enrollment_id:'active-lesson',last_watched:today}];
+  const data=await getAdminDashboardData();
+  expect(data.inactiveLearners.map(l=>l.enrollmentId)).toEqual(['only-admin-edit']);
+  state.fail.add('lesson_progress');
+  const failed=await getAdminDashboardData();
+  expect(failed.inactiveLearners).toEqual([]);
+  expect(failed.degradedSections).toContain('dashboard_data');
+ });
+ it('reports completed enrollments missing a matching recorded employment outcome',async()=>{
+  state.rows.program_enrollments=[{id:'tracked',user_id:'learner',program_slug:'hvac',status:'completed'},{id:'missing',user_id:'learner',program_slug:'barber',status:'completed'},{id:'not-complete',user_id:'other',status:'active'}];
+  state.rows.employment_outcomes=[{id:'outcome',user_uuid:'learner',program_slug:'hvac',outcome_type:'employment'}];
+  const data=await getAdminDashboardData();
+  expect(data.noOutcomeEnrollments.map(row=>row.id)).toEqual(['missing']);
+ });
  it('marks failed certificate and document counts unavailable',async()=>{
   state.fail.add('certificates');state.fail.add('program_holder_documents');
   const data=await getAdminDashboardData();

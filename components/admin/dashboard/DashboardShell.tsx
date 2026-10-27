@@ -293,7 +293,7 @@ export function AdminDashboardContent({
               <ShieldCheck className="h-4 w-4" /> Admin session protected
             </span>
             <span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-black text-blue-900">
-              Live Supabase data
+              {data.degradedSections.length ? 'Dashboard data incomplete' : 'Dashboard data snapshot'}
             </span>
           </div>
           <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">

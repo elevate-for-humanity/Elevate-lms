@@ -51,13 +51,16 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     // can be correlated with the request without crediting ordinary leases.
     const recoveryRequested = ['dispatch','requeue'].includes(observation.action);
     const priorRequest = job.monitor?.recoveryRequest;
+    const requestAge = now.getTime() - Date.parse(priorRequest?.requestedAt ?? '');
+    const recoveryClosed = ['published','archived','paused','checkpoint_complete','attention_required'].includes(observation.state);
+    const activeRequest = !recoveryClosed && Number.isFinite(requestAge) && requestAge >= 0 && requestAge <= 15 * 60_000 ? priorRequest : null;
     const confirmedRecovery = confirmedAssignment &&
-      priorRequest?.executionGeneration != null &&
+      activeRequest?.executionGeneration != null &&
       Number(job.execution_generation) >= Number(priorRequest.executionGeneration) &&
       Date.parse(job.heartbeat_at) > Date.parse(priorRequest.requestedAt) &&
       (job.lease_owner !== priorRequest.previousLeaseOwner ||
        Number(job.execution_generation) > Number(priorRequest.previousExecutionGeneration ?? priorRequest.executionGeneration));
-    const recoveryRequest = confirmedRecovery ? null : priorRequest ?? (recoveryRequested
+    const recoveryRequest = confirmedRecovery || recoveryClosed ? null : activeRequest ?? (recoveryRequested
       ? {requestedAt:now.toISOString(),executionGeneration:Number(job.execution_generation) +
           (observation.action==='requeue'?1:0),previousExecutionGeneration:Number(job.execution_generation),previousLeaseOwner:job.lease_owner ?? job.monitor?.lastConfirmedLeaseOwner ?? null}
       : null);

@@ -149,3 +149,18 @@ test('monitor pagination uses an immutable ID cursor rather than mutable updated
  }});
  assert.deepEqual(ids,['gt.099']);assert.equal(result.length,101);
 });
+
+test('expired recovery intent cannot credit a later unrelated worker assignment',async()=>{
+ const row=job({status:'running',lease_owner:'worker-new',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,recoveries:0,recoveryRequest:{requestedAt:'2026-10-14T16:00:00Z',executionGeneration:1,previousLeaseOwner:'worker-old'}}});
+ let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+ request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.recoveries,0);assert.equal(body.monitor.recoveryRequest,null);
+});
+
+test('owner pause closes an outstanding recovery intent without dispatching or requeueing',async()=>{
+ const row=job({ultimate_course_builds:{ownerPaused:true},monitor:{enabled:true,recoveryRequest:{requestedAt:'2026-10-14T17:59:00Z',executionGeneration:2}}});let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+ request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.recoveryRequest,null);assert.equal(body.status,undefined);
+});

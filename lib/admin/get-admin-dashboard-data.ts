@@ -65,7 +65,7 @@ async function loadDashboardLeads(db: Awaited<ReturnType<typeof requireAdminClie
   const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await db.from('crm_leads')
-      .select('id,full_name,email,status,updated_at')
+      .select('id,full_name,email,status,created_at,updated_at,last_contact_at')
       .order('updated_at', { ascending: true })
       .order('id', { ascending: true })
       .range(offset, offset + pageSize - 1)
@@ -200,6 +200,38 @@ async function loadDashboardVouchers(db: Awaited<ReturnType<typeof requireAdminC
   }
 }
 
+async function loadDashboardLearningActivity(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('lesson_progress')
+      .select('id,user_id,enrollment_id,last_watched,updated_at')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardOutcomes(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('employment_outcomes')
+      .select('id,user_id,user_uuid,program_slug,outcome_type')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -296,6 +328,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     profileRes,
     applicationsRes,
     enrollmentsRes,
+    learningActivityRes,
+    outcomesRes,
     studentsRes,
     certificatesRes,
     holdersRes,
@@ -323,6 +357,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     ),
     timeboxDashboardQuery(loadDashboardApplications(db), 'applications'),
     timeboxDashboardQuery(loadDashboardEnrollments(db), 'enrollments'),
+    timeboxDashboardQuery(loadDashboardLearningActivity(db), 'learning activity'),
+    timeboxDashboardQuery(loadDashboardOutcomes(db), 'employment outcomes'),
     timeboxDashboardQuery(
       db
         .from('profiles')
@@ -442,6 +478,14 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       href: `/applications/review/${row.id}`,
     };
   });
+
+  const recordedOutcomes = new Set(safeRows(outcomesRes, degradedSections, 'dashboard_data')
+    .filter((row: any) => row.outcome_type && (row.user_id || row.user_uuid) && row.program_slug)
+    .map((row: any) => `${row.user_id || row.user_uuid}:${row.program_slug}`));
+  const programSlugById = new Map(programRows.map((row: any) => [row.id, row.slug]));
+  const noOutcomeEnrollments = outcomesRes.error ? [] : enrollments.filter((row: any) =>
+    !row.revoked_at && String(row.enrollment_state ?? row.status) === 'completed' &&
+    !recordedOutcomes.has(`${row.user_id}:${row.program_slug || programSlugById.get(row.program_id)}`));
 
   const activeEnrollments = enrollments.filter(
     (row: any) =>
@@ -600,25 +644,38 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       id: row.id,
       name: row.full_name || row.email || null,
       status: row.status ?? null,
-      updated_at: row.updated_at ?? null,
-      days_stale: row.updated_at
-        ? Math.max(0, Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000))
+      updated_at: row.last_contact_at ?? row.created_at ?? null,
+      days_stale: (row.last_contact_at ?? row.created_at)
+        ? Math.max(0, Math.floor((now - new Date(row.last_contact_at ?? row.created_at).getTime()) / 86_400_000))
         : 0,
       href: `/crm/leads/${row.id}`,
     }))
     .filter((row) => row.days_stale >= 7);
 
+  const activityByEnrollment = new Map<string, number>();
+  const activityByUser = new Map<string, number>();
+  for (const progress of safeRows(learningActivityRes, degradedSections, 'dashboard_data')) {
+    const timestamp = Date.parse(progress.last_watched ?? progress.updated_at ?? '');
+    if (!Number.isFinite(timestamp) || timestamp > now) continue;
+    const activity = progress.enrollment_id ? activityByEnrollment : activityByUser;
+    const key = progress.enrollment_id || progress.user_id;
+    if (key) activity.set(key, Math.max(activity.get(key) ?? 0, timestamp));
+  }
+  const lastLearningAt = (row: any) => Math.max(
+    Date.parse(row.enrolled_at ?? row.created_at ?? '') || 0,
+    activityByEnrollment.get(row.id) ?? 0,
+    activityByUser.get(row.user_id) ?? 0,
+  );
   const inactiveLearners = activeEnrollments
-    .filter(
-      (row: any) => row.updated_at && now - new Date(row.updated_at).getTime() >= 7 * 86_400_000,
-    )
+    .filter((row: any) => !learningActivityRes.error && lastLearningAt(row) > 0 &&
+      now - lastLearningAt(row) >= 7 * 86_400_000)
     .map((row: any) => ({
       enrollmentId: row.id,
       userId: row.user_id,
       enrolledAt: row.enrolled_at ?? row.created_at ?? '',
       fullName: row.full_name ?? null,
       email: row.email ?? null,
-      daysInactive: Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000),
+      daysInactive: Math.floor((now - lastLearningAt(row)) / 86_400_000),
       programTitle: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
       href: `/students/${row.user_id}`,
     }));
@@ -723,7 +780,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const newEnrollmentsToday = enrollments.filter(
     (row: any) => (row.created_at ?? '') >= todayIso,
   ).length;
-  const newLeadsToday = leadRows.filter((row: any) => (row.updated_at ?? '') >= todayIso).length;
+  const newLeadsToday = leadRows.filter((row: any) => (row.created_at ?? '') >= todayIso).length;
   if ([studentsRes, certificatesRes, holdersRes, holderDocsRes, wioaDocsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
@@ -837,7 +894,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     stalledApplications: pendingApplications.filter(
       (row) => row.age_days >= 7,
     ) as unknown as Record<string, unknown>[],
-    noOutcomeEnrollments: [],
+    noOutcomeEnrollments: noOutcomeEnrollments as Record<string, unknown>[],
     missingFundingEnrollments: enrollments.filter(
       (row: any) => !row.funding_source && n(row.amount_paid_cents) === 0,
     ) as Record<string, unknown>[],

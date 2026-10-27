@@ -83,7 +83,8 @@ export async function releaseProgramHolderPayment(
       error: 'The Program Holder must finish payout-provider verification first.',
     };
   }
-  if(payoutAccount.payout_provider!=='paypal')return{released:false,error:'Branch payouts are awaiting direct provider activation.'};
+  if(payoutAccount.payout_provider==='quickbooks')return{released:false,error:'Submit the approved contractor payment inside QuickBooks. This accounting connection does not initiate direct deposits.'};
+  if(payoutAccount.payout_provider!=='paypal')return{released:false,error:'Select and complete QuickBooks or PayPal payout setup.'};
   if(!(await isPayPalPayoutConfigured()))return{released:false,error:'PayPal payouts are not configured.'};
 
   const amountCents = Number(schedule.increment_1_cents || schedule.total_payout_cents || 0);

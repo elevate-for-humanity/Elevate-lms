@@ -5,6 +5,7 @@ import { Building2, Mail, Phone, ShieldCheck, Users, BookOpen, ArrowLeft } from 
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ProgramHolderBankingReview } from './ProgramHolderBankingReview';
 import { ProgramHolderAdminDocumentUpload } from './ProgramHolderAdminDocumentUpload';
 import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
 
@@ -368,6 +369,7 @@ export default async function ProgramHolderDetailPage({
           )}
         </section>
 
+        {canDecide && <ProgramHolderBankingReview holderId={id} />}
         {canDecide && <ProgramHolderAdminDocumentUpload holderId={id} />}
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-black text-slate-950">Protected onboarding records</h2>

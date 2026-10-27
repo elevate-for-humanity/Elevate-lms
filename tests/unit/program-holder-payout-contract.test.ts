@@ -21,22 +21,24 @@ describe('Program Holder payout contract', () => {
     expect(route).toContain("ctx.mode === 'holder'");
   });
 
-  it('supports secure ACH and optional PayPal without treating QuickBooks as a processor', () => {
-    expect(service).toContain("export type PayoutProvider = 'paypal' | 'branch'");
-    expect(service).toContain('BRANCH_ONBOARDING_URL');
+  it('supports personal QuickBooks contractor setup and optional PayPal', () => {
+    expect(service).toContain("export type PayoutProvider = 'paypal' | 'quickbooks' | 'branch'");
+    expect(service).toContain('quickBooksInvitationUrl');
+    expect(service).toContain("select('notes').eq('user_id', ctx.user.id)");
     expect(service).not.toContain('QUICKBOOKS_CONTRACTOR_ONBOARDING_URL');
   });
 
   it('keeps sensitive payout destination data at the selected provider', () => {
-    expect(panel).toContain('Elevate never receives or');
-    expect(panel).toContain('stores the full account or debit-card number.');
+    expect(panel).toContain('Elevate does not store bank account, routing, or debit-card numbers.');
+    expect(panel).not.toContain('name="routing_number"');
     expect(migration).toContain('never a raw bank or card number');
   });
 
-  it('requires transfer and payout readiness before funds access', () => {
-    expect(panel).toContain('status.transfersEnabled');
-    expect(panel).toContain('status.payoutsEnabled');
-    expect(panel).toContain('status.providerConfigured');
+  it('separates verified setup from compliance-gated payment release', () => {
+    expect(panel).toContain('status?.transfersEnabled');
+    expect(panel).toContain('status?.payoutsEnabled');
+    expect(panel).toContain("status?.verificationStatus === 'active'");
+    expect(panel).toContain('!status.onboardingReady');
   });
 
   it('blocks release until holder and student requirements are complete', () => {

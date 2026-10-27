@@ -9,10 +9,20 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   const url=new URL(root);
   url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,ownerPaused:profile->ownerPaused)');
   url.searchParams.set('monitor->>enabled','eq.true');
-  url.searchParams.set('order','updated_at.desc');url.searchParams.set('limit','100');
-  const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});
-  if(!response.ok)throw Error('PARIS_MONITOR_READ_HTTP_'+response.status);
-  const rows=await response.json(); if(!Array.isArray(rows))throw Error('PARIS_MONITOR_RESPONSE_INVALID');
+  url.searchParams.set('order','updated_at.desc,id.desc');
+  const rows=[];
+  const pageSize=100;
+  for(let offset=0;;offset+=pageSize){
+    const pageUrl=new URL(url);
+    pageUrl.searchParams.set('offset',String(offset));
+    pageUrl.searchParams.set('limit',String(pageSize));
+    const response=await request(pageUrl,{headers,signal:AbortSignal.timeout(15000)});
+    if(!response.ok)throw Error('PARIS_MONITOR_READ_HTTP_'+response.status);
+    const page=await response.json();
+    if(!Array.isArray(page))throw Error('PARIS_MONITOR_RESPONSE_INVALID');
+    rows.push(...page);
+    if(page.length<pageSize)break;
+  }
   const observations=[];
   for(const job of rows){
     let observation=inspectCourseAutopilot(job,job.ultimate_course_builds,now.getTime());
@@ -40,10 +50,10 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
       Number(job.execution_generation) >= Number(priorRequest.executionGeneration) &&
       Date.parse(job.heartbeat_at) > Date.parse(priorRequest.requestedAt) &&
       job.lease_owner !== priorRequest.previousLeaseOwner;
-    const recoveryRequest = recoveryRequested
+    const recoveryRequest = confirmedRecovery ? null : priorRequest ?? (recoveryRequested
       ? {requestedAt:now.toISOString(),executionGeneration:Number(job.execution_generation) +
           (observation.action==='requeue'?1:0),previousLeaseOwner:job.lease_owner ?? job.monitor?.lastConfirmedLeaseOwner ?? null}
-      : confirmedRecovery ? null : priorRequest ?? null;
+      : null);
     const monitor={...job.monitor,...observation,
       recoveryRequest,
       ...(confirmedRecovery ? {lastConfirmedRecoveryAt:now.toISOString(),

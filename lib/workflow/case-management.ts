@@ -286,7 +286,7 @@ export async function completeTask(
       evidence_metadata: evidenceMetadata || {},
     })
     .eq('id', taskId)
-    .select('case_id, task_type, title, assigned_to_role')
+    .select('id, title:name')
     .maybeSingle();
 
   if (error || !task) {
@@ -296,13 +296,10 @@ export async function completeTask(
 
   await auditLog({
     actorId: completedBy,
-    actorRole: task.assigned_to_role,
     action: AuditAction.TASK_COMPLETED,
     entity: AuditEntity.TASK,
     entityId: taskId,
     metadata: {
-      case_id: task.case_id,
-      task_type: task.task_type,
       title: task.title,
     },
   });

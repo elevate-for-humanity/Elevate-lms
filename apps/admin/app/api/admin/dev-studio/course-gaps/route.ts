@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { detectCourseGaps, createGapDraftJobs } from '@/lib/studio/course-gap-detection';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const includeResolved = searchParams.get('include_resolved') === 'true';
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
     const result = await detectCourseGaps(supabase, {
       programId,
       severity,
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
     
     // First detect gaps
     const result = await detectCourseGaps(supabase);

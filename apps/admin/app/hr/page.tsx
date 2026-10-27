@@ -25,41 +25,45 @@ export default async function HRPage() {
   await requireRole(['admin']);
   const supabase = await createClient();
 
-  const [
-    { data: employees, count: employeeCount },
-    { data: pendingLeave, count: pendingLeaveCount },
-    { data: pendingTimeOff, count: pendingTimeOffCount },
-    { data: recentPayroll },
-    { data: recentReviews },
-  ] = await Promise.all([
+  const results = await Promise.all([
     supabase
       .from('employees')
-      .select('id, first_name, last_name, department, role, status, created_at', { count: 'exact' })
+      .select('id, first_name, last_name, department_id, role:job_title, status, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
       .limit(8),
     supabase
       .from('leave_requests')
-      .select('id, employee_id, leave_type, start_date, end_date, status', { count: 'exact' })
-      .eq('status', 'pending')
-      .limit(5),
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending'),
     supabase
       .from('time_off_requests')
-      .select('id, employee_id, start_date, end_date, status', { count: 'exact' })
-      .eq('status', 'pending')
-      .limit(5),
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending'),
     supabase
       .from('payroll_runs')
-      .select('id, period_start, period_end, total_amount, status')
-      .order('period_start', { ascending: false })
+      .select('id, period_start:pay_period_start, period_end:pay_period_end, total_amount:total_net, status')
+      .order('pay_period_start', { ascending: false })
       .limit(5),
-    supabase
-      .from('performance_reviews')
-      .select('id, employee_id, review_date, rating, status')
-      .order('review_date', { ascending: false })
-      .limit(5),
+    supabase.from('employees').select('id', { count: 'exact', head: true }).eq('status', 'active'),
   ]);
 
-  const activeEmployees = (employees || []).filter((e: any) => e.status === 'active').length;
+  if (results.some(result => result.error)) throw new Error('Unable to load HR dashboard');
+  const [
+    { data: employeeRows, count: employeeCount },
+    { data: pendingLeave, count: pendingLeaveCount },
+    { data: pendingTimeOff, count: pendingTimeOffCount },
+    { data: recentPayroll },
+    { count: activeEmployeeCount },
+  ] = results;
+
+  const departmentIds = [...new Set((employeeRows ?? []).map(row => row.department_id).filter(Boolean))];
+  const { data: departments, error: departmentError } = departmentIds.length
+    ? await supabase.from('departments').select('id,name').in('id', departmentIds)
+    : { data: [], error: null };
+  if (departmentError) throw new Error('Unable to load employee departments');
+  const departmentNames = new Map((departments ?? []).map(row => [row.id, row.name]));
+  const employees = (employeeRows ?? []).map(row => ({ ...row, department: departmentNames.get(row.department_id) ?? null }));
+  const activeEmployees = activeEmployeeCount ?? 0;
   const totalPending = (pendingLeaveCount || 0) + (pendingTimeOffCount || 0);
 
   const deptCounts: Record<string, number> = {};
@@ -257,7 +261,7 @@ export default async function HRPage() {
                         {run.period_end ? new Date(run.period_end).toLocaleDateString() : '—'}
                       </p>
                       <p className="text-xs text-slate-700 mt-0.5">
-                        ${Number(run.total_amount || 0).toLocaleString()} total
+                        ${Number(run.total_amount || 0).toLocaleString()} net pay
                       </p>
                     </div>
                     <span
@@ -277,7 +281,7 @@ export default async function HRPage() {
         {/* Department Breakdown */}
         {Object.keys(deptCounts).length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border p-5">
-            <h2 className="text-base font-semibold text-slate-900 mb-4">Headcount by Department</h2>
+            <h2 className="text-base font-semibold text-slate-900 mb-4">Departments of Recent Employees</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {Object.entries(deptCounts).map(([dept, count]) => (
                 <div key={dept} className="bg-slate-50 rounded-lg p-4 text-center">

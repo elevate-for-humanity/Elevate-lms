@@ -5,20 +5,10 @@ import { createClient } from '@/lib/supabase/client';
 import { Briefcase, Building2, Clock, DollarSign, Loader2, TrendingUp, Users } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
-interface Placement {
-  id: string;
-  studentName: string;
-  programName: string;
-  employerName: string;
-  position: string;
-  salary: number;
-  startDate: string | null;
-  status: string;
-  createdAt: string;
-}
+import { loadRecordedPlacements, type RecordedPlacement } from '@/lib/analytics/placement-records';
 
 export function JobPlacementTracking({ programId }: { programId?: string; showPipeline?: boolean }) {
-  const [placements, setPlacements] = useState<Placement[]>([]);
+  const [placements, setPlacements] = useState<RecordedPlacement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,35 +17,7 @@ export function JobPlacementTracking({ programId }: { programId?: string; showPi
     setError(null);
     try {
       const supabase = createClient();
-      let query = supabase
-        .from('job_placements')
-        .select(`
-          id, program_id, position, salary, start_date, status, created_at,
-          profiles!job_placements_student_id_fkey(full_name),
-          training_programs(name),
-          employer_profiles(company_name)
-        `)
-        .order('created_at', { ascending: false });
-      if (programId) query = query.eq('program_id', programId);
-      const { data, error: queryError } = await query;
-      if (queryError) throw queryError;
-
-      setPlacements((data ?? []).map((row: any) => {
-        const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-        const program = Array.isArray(row.training_programs) ? row.training_programs[0] : row.training_programs;
-        const employer = Array.isArray(row.employer_profiles) ? row.employer_profiles[0] : row.employer_profiles;
-        return {
-          id: row.id,
-          studentName: profile?.full_name || 'Student',
-          programName: program?.name || 'Program',
-          employerName: employer?.company_name || 'Employer',
-          position: row.position || 'Position not recorded',
-          salary: Number(row.salary || 0),
-          startDate: row.start_date || null,
-          status: row.status || 'job_ready',
-          createdAt: row.created_at,
-        };
-      }));
+      setPlacements(await loadRecordedPlacements(supabase, programId));
     } catch (loadError) {
       logger.error('[job-placement] failed to load placement data', loadError instanceof Error ? loadError : new Error(String(loadError)));
       setPlacements([]);
@@ -68,7 +30,7 @@ export function JobPlacementTracking({ programId }: { programId?: string; showPi
   useEffect(() => { void load(); }, [load]);
 
   const metrics = useMemo(() => {
-    const placed = placements.filter((item) => item.status === 'placed');
+    const placed = placements.filter((item) => item.status === 'verified');
     const paid = placed.filter((item) => item.salary > 0);
     const avgSalary = paid.length ? Math.round(paid.reduce((sum, item) => sum + item.salary, 0) / paid.length) : 0;
     const employers = new Set(placed.map((item) => item.employerName).filter(Boolean));
@@ -93,7 +55,7 @@ export function JobPlacementTracking({ programId }: { programId?: string; showPi
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {[
           { label: 'Pipeline', value: metrics.total, icon: Users },
-          { label: 'Placed', value: metrics.placed, icon: Briefcase },
+          { label: 'Verified placements', value: metrics.placed, icon: Briefcase },
           { label: 'Placement rate', value: `${metrics.placementRate}%`, icon: TrendingUp },
           { label: 'Avg. salary', value: metrics.avgSalary ? `$${metrics.avgSalary.toLocaleString()}` : '—', icon: DollarSign },
           { label: 'Hiring employers', value: metrics.employers, icon: Building2 },

@@ -60,12 +60,12 @@ async function _GET(request: Request) {
   // Check critical route coverage — sample recent critical events
   const { data: recentCritical } = await db
     .from('audit_logs')
-    .select('endpoint, created_at')
-    .in('endpoint', [
+    .select('endpoint:metadata->>endpoint, created_at')
+    .in('metadata->>endpoint', [
       '/api/rapids/update',
       '/api/ojt/hours',
       '/api/enroll/approve',
-      '/api/webhooks/stripe',
+      '/api/webhooks/quickbooks',
     ])
     .gte('created_at', oneDayAgo.toISOString())
     .order('created_at', { ascending: false })

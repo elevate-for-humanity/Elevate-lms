@@ -1,3 +1,4 @@
+import { getTemplate as getNotificationTemplate } from '@/lib/notifications/templates';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { ProvisioningJob } from '../queue';
@@ -14,6 +15,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  */
 
 export type EmailType =
+  | 'employer_activated'
   | 'license_activated'
   | 'license_suspended'
   | 'license_expiring'
@@ -140,7 +142,9 @@ function getEmailTemplate(
   emailType: EmailType,
   data: Record<string, unknown>,
 ): { subject: string; html: string } {
+  const escape = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!);
   const templates: Record<EmailType, { subject: string; html: string }> = {
+    employer_activated: getNotificationTemplate('employer_activated', { contact_name: escape(data.contact_name), business_name: escape(data.business_name) }),
     license_activated: {
       subject: 'Your Elevate LMS License is Active',
       html: `

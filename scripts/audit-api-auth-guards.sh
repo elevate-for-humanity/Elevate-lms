@@ -8,7 +8,7 @@ shopt -s globstar nullglob
 missing=0
 
 while IFS= read -r f; do
-  if ! grep -qE '(auth|admin|authResult|gate)\.error' "$f"; then
+  if ! grep -qE '(auth|admin|authResult|gate|actor)\.error' "$f"; then
     echo "$f"
     missing=$((missing + 1))
   fi

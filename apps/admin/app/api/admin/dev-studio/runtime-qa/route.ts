@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -50,23 +51,17 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    const { data: storedErrors } = await supabase
-      .from('runtime_errors')
-      .select('*')
-      .order('timestamp', { ascending: false })
-      .limit(100);
-
-    const errors: RuntimeError[] = (storedErrors || []).map((e) => ({
-      id: e.id,
-      timestamp: e.timestamp,
-      level: e.level,
-      source: e.source,
-      message: e.message,
-      source_file: e.source_file,
-      line_number: e.line_number,
-      stack: e.stack,
-      resolved: e.resolved,
-      auto_fixable: e.auto_fixable,
+    const historyDb = await requireAdminClient();
+    const { data: storedErrors, error: historyError } = await historyDb
+      .from('system_errors')
+      .select('id,created_at,error_type,error_message,error_stack,status,context')
+      .order('created_at', { ascending: false }).limit(100);
+    if (historyError) return NextResponse.json({ error: 'Runtime error history unavailable' }, { status: 503 });
+    const errors: RuntimeError[] = (storedErrors ?? []).map(error => ({
+      id: error.id, timestamp: error.created_at, level: 'error', source: 'api',
+      message: error.error_message || error.error_type || 'Recorded server error',
+      stack: error.error_stack ?? undefined,
+      resolved: error.status === 'resolved', auto_fixable: false,
     }));
 
     const apiStart = Date.now();
@@ -77,7 +72,8 @@ export async function GET(request: NextRequest) {
       failures: 0,
     };
     try {
-      await supabase.from('profiles').select('id').limit(1);
+      const result = await supabase.from('profiles').select('id').limit(1);
+      if (result.error) throw result.error;
       apiHealth.latency_ms = Date.now() - apiStart;
       apiHealth.endpoints_tested = 1;
     } catch {
@@ -88,25 +84,25 @@ export async function GET(request: NextRequest) {
     const supabaseStart = Date.now();
     const supabaseHealth: SupabaseHealth = { status: 'connected', latency_ms: 0 };
     try {
-      await supabase.auth.getSession();
+      const result = await supabase.auth.getUser();
+      if (result.error || !result.data.user) throw result.error || new Error('Session validation failed');
       supabaseHealth.latency_ms = Date.now() - supabaseStart;
     } catch {
       supabaseHealth.status = 'error';
     }
 
-    const build_checks: BuildCheck[] = [
-      { type: 'lint', status: 'passed', errors: 0, warnings: 0, last_run: new Date().toISOString() },
-      { type: 'typecheck', status: 'passed', errors: 0, warnings: 0, last_run: new Date().toISOString() },
-      { type: 'build', status: 'passed', errors: 0, warnings: 0, last_run: new Date().toISOString() },
-    ];
-
-    const cloudflareHealth = { status: 'ok' as const, assets_tested: 0, failures: 0 };
+    const build_checks: BuildCheck[] = (['lint', 'typecheck', 'build'] as const).map(type => ({
+      type, status: 'skipped', errors: 0, warnings: 0,
+      details: ['This runtime probe does not execute repository validation.'],
+    }));
+    const cloudflareHealth = { status: 'not_tested', assets_tested: 0, failures: 0 };
 
     const summary = {
       total_errors: errors.filter((e) => !e.resolved).length,
       critical_errors: errors.filter((e) => e.level === 'error' && !e.resolved).length,
       auto_fixable_count: errors.filter((e) => e.auto_fixable && !e.resolved).length,
-      score: calculateScore(errors),
+      score: null,
+      scope: 'recent_recorded_server_errors',
     };
 
     return NextResponse.json({
@@ -121,13 +117,4 @@ export async function GET(request: NextRequest) {
     console.error('Runtime QA error:', err);
     return NextResponse.json({ error: 'QA check failed' }, { status: 500 });
   }
-}
-
-function calculateScore(errors: RuntimeError[]): number {
-  if (errors.length === 0) return 100;
-
-  const critical = errors.filter((e) => e.level === 'error').length;
-  const warnings = errors.filter((e) => e.level === 'warning').length;
-  const score = 100 - critical * 10 - warnings * 2;
-  return Math.max(0, Math.min(100, score));
 }

@@ -161,6 +161,10 @@ Rules:
 - The user must confirm — the action is staged for approval, not executed immediately.
 - targetCount should reflect how many records will be affected.`;
 
+function metricCount(result: { count: number | null; error: unknown }): string {
+  return result.error || result.count == null ? 'unavailable' : String(result.count);
+}
+
 async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -211,7 +215,7 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     // Program holders & employers
     db.from('program_holders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('program_holders').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('employer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('employers').select('id', { count: 'exact', head: true }).eq('approved', true),
     // Delivery logs
     db.from('delivery_logs').select('id', { count: 'exact', head: true }).eq('channel', 'email').eq('status', 'sent').gte('created_at', today.toISOString()),
     db.from('delivery_logs').select('id', { count: 'exact', head: true }).eq('channel', 'email').eq('status', 'failed').gte('created_at', monthStart),
@@ -236,21 +240,21 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     const name = (row.programs as any)?.name ?? 'Unknown';
     programCounts[name] = (programCounts[name] ?? 0) + 1;
   }
-  const topPrograms = Object.entries(programCounts)
+  const topPrograms = programBreakdown.error ? '  Unavailable' : Object.entries(programCounts)
     .sort((a, b) => b[1] - a[1]).slice(0, 8)
     .map(([name, count]) => `  ${name}: ${count} active`).join('\n') || '  (none)';
 
-  const atRiskNames = (atRiskDetail.data ?? []).slice(0, 5).map((r: any) =>
+  const atRiskNames = atRiskDetail.error ? '  Unavailable' : (atRiskDetail.data ?? []).slice(0, 5).map((r: any) =>
     `  ${(r.profiles as any)?.full_name ?? 'Unknown'} — ${(r.programs as any)?.name ?? 'Unknown'} (last active: ${r.last_accessed ? new Date(r.last_accessed).toLocaleDateString() : 'never'})`
   ).join('\n') || '  None';
 
   return `LIVE DATA (${now.toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET):
 
 STUDENTS & ENROLLMENT
-- Total students: ${totalStudents.count ?? 0}
-- Active enrollments: ${activeEnrollments.count ?? 0}
-- At-risk learners (inactive 7d+): ${atRisk.count ?? 0}
-- Certificates issued: ${certs.count ?? 0}
+- Total students: ${metricCount(totalStudents)}
+- Active enrollments: ${metricCount(activeEnrollments)}
+- At-risk learners (inactive 7d+): ${metricCount(atRisk)}
+- Certificates issued: ${metricCount(certs)}
 
 AT-RISK LEARNERS (top 5):
 ${atRiskNames}
@@ -259,48 +263,48 @@ TOP ACTIVE PROGRAMS
 ${topPrograms}
 
 APPLICATIONS
-- Pending review: ${pendingApps.count ?? 0}
-- Total applications: ${totalApps.count ?? 0}
+- Pending review: ${metricCount(pendingApps)}
+- Total applications: ${metricCount(totalApps)}
 
 REVENUE
-- This month: $${(monthCents / 100).toLocaleString('en-US')}
-- All time: $${(allCents / 100).toLocaleString('en-US')}
+- This month: ${revenueMonth.error ? 'unavailable' : '$' + (monthCents / 100).toLocaleString('en-US')}
+- All time: ${revenueAll.error ? 'unavailable' : '$' + (allCents / 100).toLocaleString('en-US')}
 
 TESTING CENTER
-- Exam bookings today: ${examBookingsToday.count ?? 0}
-- Pending bookings: ${examBookingsPending.count ?? 0}
-- Paid bookings: ${examBookingsPaid.count ?? 0}
+- Exam bookings today: ${metricCount(examBookingsToday)}
+- Pending bookings: ${metricCount(examBookingsPending)}
+- Paid bookings: ${metricCount(examBookingsPaid)}
 
 PROGRAM HOLDERS & EMPLOYERS
-- Pending program holder approvals: ${pendingProgramHolders.count ?? 0}
-- Active program holders: ${activeProgramHolders.count ?? 0}
-- Active employers: ${activeEmployers.count ?? 0}
+- Pending program holder approvals: ${metricCount(pendingProgramHolders)}
+- Active program holders: ${metricCount(activeProgramHolders)}
+- Approved employers: ${metricCount(activeEmployers)}
 
 COMPLIANCE & DOCUMENTS
-- Open compliance alerts: ${complianceAlerts.count ?? 0}
-- Pending WIOA documents: ${pendingWioa.count ?? 0}
-- Pending signatures: ${pendingSignatures.count ?? 0}
+- Open compliance alerts: ${metricCount(complianceAlerts)}
+- Pending WIOA documents: ${metricCount(pendingWioa)}
+- Pending signatures: ${metricCount(pendingSignatures)}
 
 CONTRACTS & GRANTS
-- Active contracts/MOUs: ${openContracts.count ?? 0}
-- Active/in-progress grants: ${activeGrants.count ?? 0}
+- Active contracts/MOUs: ${metricCount(openContracts)}
+- Active/in-progress grants: ${metricCount(activeGrants)}
 
 CRM & MARKETING
-- Hot leads: ${hotLeads.count ?? 0}
-- New leads today: ${newLeadsToday.count ?? 0}
-- Stale leads (7d+ no contact): ${staleLeads.count ?? 0}
+- Hot leads: ${metricCount(hotLeads)}
+- New leads today: ${metricCount(newLeadsToday)}
+- Stale leads (7d+ no contact): ${metricCount(staleLeads)}
 
 AUTOMATION & DELIVERY
-- Emails sent today: ${emailsSentToday.count ?? 0}
-- Email failures this month: ${emailsFailed.count ?? 0}
-- Active workflows: ${pendingWorkflows.count ?? 0}
+- Emails sent today: ${metricCount(emailsSentToday)}
+- Email failures this month: ${metricCount(emailsFailed)}
+- Active workflows: ${metricCount(pendingWorkflows)}
 
 PLACEMENTS & SPECIAL PROGRAMS
-- Active job placements: ${activePlacements.count ?? 0}
-- Active SNAP E&T participants: ${activeSnapParticipants.count ?? 0}
+- Active job placements: ${metricCount(activePlacements)}
+- Active SNAP E&T participants: ${metricCount(activeSnapParticipants)}
 
 CURRICULUM
-- Published lessons: ${publishedLessons.count ?? 0}`;
+- Published lessons: ${metricCount(publishedLessons)}`;
 }
 
 interface IntentResult {
@@ -427,10 +431,10 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   if (lower.includes('at-risk') || lower.includes('at risk') || lower.includes('inactive') || lower.includes('falling behind') || lower.includes('not logging in')) {
     const { data } = await db
       .from('program_enrollments')
-      .select('id, user_id, profiles(full_name, email), programs(name), last_activity_at, progress_percent')
+      .select('id, user_id, profiles(full_name, email), programs(name), last_activity_at:last_accessed, progress_percent')
       .eq('status', 'active')
-      .or(`last_activity_at.lt.${cutoff7d},last_activity_at.is.null`)
-      .order('last_activity_at', { ascending: true, nullsFirst: true })
+      .or(`last_accessed.lt.${cutoff7d},last_accessed.is.null`)
+      .order('last_accessed', { ascending: true, nullsFirst: true })
       .limit(20);
     if (data?.length) {
       const text = `AT-RISK LEARNERS (${data.length} inactive 7d+):\n${data.map((r: any) =>
@@ -496,14 +500,14 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   // Employers
   if (lower.includes('employer') || lower.includes('company') || lower.includes('hire') || lower.includes('job placement')) {
     const { data } = await db
-      .from('employer_profiles')
-      .select('id, company_name, contact_name, email, status, industry, created_at')
+      .from('employers')
+      .select('id, company_name, business_name, contact_name, email, contact_email, status, industry, created_at')
       .order('created_at', { ascending: false })
       .limit(20);
     if (data?.length) {
       return {
         text: `EMPLOYERS (${data.length}):\n${data.map((e: any) =>
-          `• ${e.company_name} — ${e.contact_name} (${e.email}) — ${e.industry ?? 'unknown industry'} — status: ${e.status}`
+          `• ${e.company_name || e.business_name} — ${e.contact_name || 'Contact not recorded'} (${e.contact_email || e.email || 'Email not recorded'}) — ${e.industry ?? 'unknown industry'} — status: ${e.status}`
         ).join('\n')}`,
       };
     }
@@ -513,14 +517,14 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   // WIOA / grants / funding
   if (lower.includes('wioa') || lower.includes('grant') || lower.includes('funding') || lower.includes('jri') || lower.includes('dislocated') || lower.includes('snap')) {
     const [{ data: wioa }, { data: grants }, { data: snap }] = await Promise.all([
-      db.from('wioa_documents').select('participant_name, status, program_name, created_at').order('created_at', { ascending: false }).limit(15),
-      db.from('grants').select('title, status, amount_requested, deadline, created_at').order('created_at', { ascending: false }).limit(10),
+      db.from('wioa_documents').select('id, user_id, document_type, status, created_at').order('created_at', { ascending: false }).limit(15),
+      db.from('grants').select('id, agency, status, deadline:due_date, created_at').order('created_at', { ascending: false }).limit(10),
       db.from('wioa_participants').select('participant_name, status, program, created_at').eq('receives_snap', true).order('created_at', { ascending: false }).limit(10),
     ]);
     const parts: string[] = [];
-    if (wioa?.length) parts.push(`WIOA DOCUMENTS (${wioa.length}):\n${wioa.map((w: any) => `• ${w.participant_name} — ${w.program_name ?? 'Unknown'} — ${w.status}`).join('\n')}`);
+    if (wioa?.length) parts.push(`WIOA DOCUMENTS (${wioa.length}):\n${wioa.map((w: any) => `• Document ${w.id}: ${w.document_type} — ${w.status}`).join('\n')}`);
     if (snap?.length) parts.push(`SNAP E&T PARTICIPANTS (${snap.length}):\n${snap.map((s: any) => `• ${s.participant_name} — ${s.program ?? 'Unknown'} — ${s.status}`).join('\n')}`);
-    if (grants?.length) parts.push(`GRANTS (${grants.length}):\n${grants.map((g: any) => `• ${g.title} — ${g.status} — $${((g.amount_requested ?? 0) / 100).toLocaleString()} — deadline: ${g.deadline ?? 'none'}`).join('\n')}`);
+    if (grants?.length) parts.push(`GRANTS (${grants.length}):\n${grants.map((g: any) => `• ${g.agency || 'Grant record'} — ${g.status} — deadline: ${g.deadline ?? 'not recorded'}`).join('\n')}`);
     if (parts.length) return { text: parts.join('\n\n') };
     return { text: 'No WIOA, SNAP, or grant records found.' };
   }
@@ -547,7 +551,7 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   if (lower.includes('lead') || lower.includes('crm') || lower.includes('prospect') || lower.includes('pipeline')) {
     const { data } = await db
       .from('crm_leads')
-      .select('id, full_name, email, status, program_interest, last_contact_at, created_at')
+      .select('id, full_name, email, status, program_interest:program_slug, last_contact_at, created_at')
       .order('created_at', { ascending: false })
       .limit(20);
     if (data?.length) {
@@ -626,7 +630,7 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   if (lower.includes('lesson') || lower.includes('course') || lower.includes('curriculum') || lower.includes('module') || lower.includes('content')) {
     const { data } = await db
       .from('curriculum_lessons')
-      .select('title, step_type, status, module_order, lesson_order')
+      .select('title:lesson_title, step_type, status, module_order, lesson_order')
       .eq('status', 'published')
       .order('module_order', { ascending: true })
       .limit(30);

@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     // Stripe failures: barber_subscriptions past_due or suspended
     db
       .from('barber_subscriptions')
-      .select('id, user_id, payment_status, failed_payment_at, suspension_deadline, plan_type')
+      .select('id, user_id, payment_status, failed_payment_at, suspension_deadline')
       .in('payment_status', ['past_due', 'suspended'])
       .order('failed_payment_at', { ascending: false })
       .limit(20),

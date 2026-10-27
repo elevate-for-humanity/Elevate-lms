@@ -28,21 +28,24 @@ export default async function CareerCoursesPage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!['admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const [{ data: courses, count: total }, { count: published }, { count: draft }] =
+  const results =
     await Promise.all([
       db
         .from('career_courses')
-        .select('id, title, slug, status, created_at, updated_at', { count: 'exact' })
+        .select('id, title, slug, is_active, created_at, updated_at', { count: 'exact' })
         .order('created_at', { ascending: false })
         .limit(50),
       db
         .from('career_courses')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'published'),
-      db.from('career_courses').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+        .eq('is_active', true),
+      db.from('career_courses').select('*', { count: 'exact', head: true }).eq('is_active', false),
     ]);
+
+  if (results.some(result => result.error)) throw new Error('Unable to load career courses');
+  const [{ data: courses, count: total }, { count: published }, { count: draft }] = results;
 
   return (
     <AdminPageShell
@@ -52,7 +55,7 @@ export default async function CareerCoursesPage() {
       stats={[
         { label: 'Total', value: total ?? 0, icon: BookOpen, color: 'slate' },
         { label: 'Published', value: published ?? 0, icon: CheckCircle, color: 'green' },
-        { label: 'Draft', value: draft ?? 0, icon: Clock, color: 'amber' },
+        { label: 'Inactive', value: draft ?? 0, icon: Clock, color: 'amber' },
       ]}
       actions={
         <Link
@@ -90,12 +93,12 @@ export default async function CareerCoursesPage() {
                 <div className="col-span-2">
                   <span
                     className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
-                      course.status === 'published'
+                      course.is_active
                         ? 'bg-emerald-100 text-emerald-700'
                         : 'bg-amber-100 text-amber-700'
                     }`}
                   >
-                    {course.status ?? 'draft'}
+                    {course.is_active ? 'published' : 'inactive'}
                   </span>
                 </div>
                 <div className="col-span-1">

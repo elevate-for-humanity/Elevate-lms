@@ -102,9 +102,9 @@ export async function sendInactivityReminders() {
   // Covers learners with no learning_activities entry in 14+ days.
   const { data: inactiveStudents } = await supabase
     .from('at_risk_learners')
-    .select('user_id, enrollment_id, full_name, email, program_name, inactive_days')
-    .lte('inactive_days', 30) // cap at 30 days — beyond that, stale-applications cron handles it
-    .order('inactive_days', { ascending: false })
+    .select('user_id, enrollment_id, full_name, email, program_name:program_slug, inactive_days:days_inactive')
+    .lte('days_inactive', 30) // cap at 30 days — beyond that, stale-applications cron handles it
+    .order('days_inactive', { ascending: false })
     .limit(100);
 
   if (!inactiveStudents || inactiveStudents.length === 0) {

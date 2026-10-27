@@ -10,6 +10,7 @@
  * - All primary messaging renders in the below-hero content slot.
  */
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import ImageMetadata from './ImageMetadata';
 import { useId, useState } from 'react';
@@ -74,7 +75,7 @@ export default function HeroPicture({
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
         {preserveAspectRatio ? (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={src}
             alt={alt}
             width={1536}
@@ -82,10 +83,9 @@ export default function HeroPicture({
             sizes="100vw"
             className="h-auto w-full"
             priority={priority}
-            placeholder="empty"
           />
         ) : (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={src}
             alt={alt}
             fill
@@ -94,12 +94,12 @@ export default function HeroPicture({
               imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'
             }
             priority={priority}
-            placeholder="empty"
           />
         )}
 
         {showBrandBug && (
           <div className="absolute left-4 top-4 z-10">
+            {/* IMAGE-CONTRACT: allow raw img because this optional intrinsic-size brand bug preserves its source aspect ratio independently of the hero crop. */}
             <img
               src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}

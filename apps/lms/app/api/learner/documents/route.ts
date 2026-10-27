@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { autoExtract } from '@/lib/ocr/tesseract-ocr';
+import { setAuditContext } from '@/lib/audit-context';
 
 const ALLOWED = new Set(['application/pdf','image/jpeg','image/png','image/webp']);
 export async function POST(req: NextRequest) {
@@ -14,17 +16,63 @@ export async function POST(req: NextRequest) {
   const file = form.get('file');
   if (!requirementId || !(file instanceof File)) return NextResponse.json({ error: 'Requirement and file are required' }, { status: 400 });
   if (!ALLOWED.has(file.type) || file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'Use a PDF, JPG, PNG, or WebP file up to 10 MB' }, { status: 400 });
-  const { data: requirement } = await supabase.from('enrollment_requirements').select('id,enrollment_id').eq('id', requirementId).maybeSingle();
+  const { data: requirement } = await supabase.from('enrollment_requirements').select('id,enrollment_id,status,requirement_type,title').eq('id', requirementId).maybeSingle();
   if (!requirement) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   const { data: ownedEnrollment } = await supabase.from('program_enrollments').select('id').eq('id', requirement.enrollment_id).or(`user_id.eq.${user.id},student_id.eq.${user.id}`).maybeSingle();
   if (!ownedEnrollment) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
+  if (requirement.status === 'verified') return NextResponse.json({ error: 'This requirement is already verified. Contact staff to replace it.' }, { status: 409 });
+  if (!new Set(['government_id','high_school_diploma','identity','proof_of_address','proof_of_age','social_security_card','eligibility','funding','program']).has(requirement.requirement_type)) return NextResponse.json({ error: 'This requirement does not accept document uploads' }, { status: 400 });
   const admin = await requireAdminClient();
   if (!admin) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
+  await setAuditContext(admin, { systemActor: 'learner_document_upload' });
+  // OCR assists reviewers; a failed extraction must not block scanned PDFs or IDs.
+  // Do not treat readable text as proof of identity or eligibility.
+  const extracted = await autoExtract(Buffer.from(await file.arrayBuffer()), file.type);
   const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
   const path = `${user.id}/${requirementId}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await admin.storage.from('documents').upload(path, file, { contentType: file.type, upsert: false });
   if (uploadError) return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
-  const { error: updateError } = await admin.from('enrollment_requirements').update({ evidence_url: path, status: 'completed', updated_at: new Date().toISOString() }).eq('id', requirementId).eq('enrollment_id', requirement.enrollment_id);
-  if (updateError) { await admin.storage.from('documents').remove([path]); return NextResponse.json({ error: 'Document record could not be saved' }, { status: 500 }); }
-  return NextResponse.json({ success: true });
+  const { data: savedRequirement, error: updateError } = await admin.from('enrollment_requirements').update({ evidence_url: path, status: 'completed', verified_by: null, updated_at: new Date().toISOString() }).eq('id', requirementId).eq('enrollment_id', requirement.enrollment_id).neq('status', 'verified').select('id').maybeSingle();
+  if (updateError || !savedRequirement) { await admin.storage.from('documents').remove([path]); return NextResponse.json({ error: 'Document record could not be saved or has already been verified' }, { status: updateError ? 500 : 409 }); }
+  // The existing enrollment workspace treats 'completed' as submitted/pending
+  // verification and only 'verified' as approved. Keep that distinction intact.
+  // Record review evidence in the existing audit trail; never auto-verify IDs,
+  // eligibility, or funding documents from OCR readability alone.
+  const { error: auditError } = await admin.from('audit_logs').insert({
+    action: 'learner_document_submitted_for_verification',
+    target_type: 'enrollment_requirement',
+    target_id: requirementId,
+    actor_id: user.id,
+    metadata: { enrollment_id: requirement.enrollment_id, requirement_title: requirement.title,
+      storage_path: path, ocr_source: extracted.source,
+      ocr_confidence: extracted.confidence, ocr_readable: Boolean(extracted.text.trim()) },
+    created_at: new Date().toISOString(),
+  });
+  if (auditError) console.error('[learner/documents] audit log failed', auditError.message);
+  // Create a reviewer work item for every submission. OCR cannot establish
+  // authenticity or eligibility, so activation must wait for verified status.
+  const { error: reviewError } = await admin.from('review_queue').insert({
+    queue_type: 'document_review',
+    subject_type: 'enrollment_requirement',
+    subject_id: requirementId,
+    reasons: [extracted.text.trim() ? 'authenticity_requires_verification' : 'ocr_unreadable_requires_review'],
+    entity_type: 'enrollment_requirement',
+    entity_id: requirementId,
+    review_type: 'document_verification',
+    priority: 5,
+    status: 'open',
+    extracted_data: { text: extracted.text.slice(0, 12000), source: extracted.source },
+    confidence_score: Math.max(0, Math.min(1, extracted.confidence / 100)),
+    failed_rules: extracted.text.trim() ? 'authenticity_requires_verification' : 'ocr_unreadable_requires_review',
+    system_recommendation: 'manual_review_required',
+    context: { enrollment_id: requirement.enrollment_id, requirement_id: requirementId, storage_path: path },
+    created_at: new Date().toISOString(),
+  });
+  if (reviewError) {
+    console.error('[learner/documents] review queue insert failed', reviewError.message);
+    // Do not acknowledge a submission that reviewers cannot see. Keep the
+    // evidence in private storage for recovery; fail closed and surface error.
+    return NextResponse.json({ error: 'Document saved but verification queue unavailable. Contact staff; do not upload sensitive documents again.' }, { status: 503 });
+  }
+  return NextResponse.json({ success: true, verification_status: 'pending_review', ocr_readable: Boolean(extracted.text.trim()) });
 }

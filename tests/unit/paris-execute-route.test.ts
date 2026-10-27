@@ -29,7 +29,7 @@ function request(body: unknown) {
   } as any;
 }
 
-function setup() {
+function setup(options: {insertError?: unknown; missingReceipt?: boolean; updateError?: unknown; insertThrows?: boolean} = {}) {
   const inserted: any[] = [];
   const updated: any[] = [];
   mocks.auth.mockResolvedValue({ id: 'operator-1', effectiveRoles: ['admin'] });
@@ -38,11 +38,17 @@ function setup() {
   mocks.from.mockImplementation(() => ({
     insert: (row: unknown) => {
       inserted.push(row);
-      return { select: () => ({ maybeSingle: async () => ({ data: { id: 'task-1' }, error: null }) }) };
+      return { select: () => ({ maybeSingle: async () => {
+        if (options.insertThrows) throw new Error('task storage unreachable');
+        return {
+          data: options.missingReceipt || options.insertError ? null : { id: 'task-1' },
+          error: options.insertError ?? null,
+        };
+      } }) };
     },
     update: (row: unknown) => {
       updated.push(row);
-      return { eq: async () => ({ error: null }) };
+      return { eq: async () => ({ error: options.updateError ?? null }) };
     },
   }));
   return { inserted, updated };
@@ -54,6 +60,40 @@ beforeEach(() => {
 });
 
 describe('PARIS execution audit boundary', () => {
+  it('does not execute a command when its durable task cannot be inserted', async () => {
+    setup({insertError: {message: 'write unavailable'}});
+    const response = await POST(request({command: 'fix the workflow code'}));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({success: false, executed: false, taskId: null});
+    expect(mocks.execute).not.toHaveBeenCalled();
+  });
+
+  it('requires a confirmed task receipt even when the database returns no error', async () => {
+    setup({missingReceipt: true});
+    const response = await POST(request({command: 'fix the workflow code'}));
+    expect(response.status).toBe(503);
+    expect(mocks.execute).not.toHaveBeenCalled();
+  });
+
+  it('returns a safe unavailable response when task persistence throws', async () => {
+    setup({insertThrows: true});
+    const response = await POST(request({command: 'fix the workflow code'}));
+    expect(response.status).toBe(503);
+    expect(mocks.execute).not.toHaveBeenCalled();
+    expect(await response.text()).not.toContain('task storage unreachable');
+  });
+
+  it('reports a persistence failure after dispatch without pretending the command was not executed', async () => {
+    setup({updateError: {message: 'update unavailable'}});
+    mocks.execute.mockResolvedValue({ok: true, executed: true, status: 'running', message: 'queued', payload: {repairId: 'repair-1'}});
+    const response = await POST(request({command: 'fix the workflow code'}));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      success: false, executed: true, status: 'running', taskId: 'task-1', data: {repairId: 'repair-1'},
+    });
+    expect(mocks.execute).toHaveBeenCalledTimes(1);
+  });
+
   it('binds audit and command context to the authenticated tenant, ignoring request tenant IDs', async () => {
     const { inserted } = setup();
     mocks.execute.mockResolvedValue({

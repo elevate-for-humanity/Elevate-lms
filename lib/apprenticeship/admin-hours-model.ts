@@ -46,6 +46,7 @@ export interface AdminHoursEntry extends ProgressHoursEntry {
   required_hours: number | null;
   hours_worked: number;
   approval_blocker: string | null;
+  review_ledger?: HoursLedgerEntry[];
 }
 const normalized = (value: string) => value.trim().toLowerCase();
 export const roundHours = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -90,6 +91,14 @@ export function hydrateAdminHours(
     if (row.status !== 'submitted')
       blocker = row.status === 'draft' ? 'Draft — submit before approval' : 'Not submitted';
     else if (!Number.isFinite(hours) || hours <= 0) blocker = 'No completed hours';
+    else if (!row.work_date || row.work_date > new Date().toISOString().slice(0, 10))
+      blocker = 'Missing or future work date';
+    else if (
+      !row.notes?.trim() &&
+      !row.tasks_completed?.trim() &&
+      !(row.clock_in_at && row.clock_out_at)
+    )
+      blocker = 'Missing supporting work evidence';
     else if (row.clock_in_at && !row.clock_out_at) blocker = 'Shift has not been clocked out';
     else if (!profile || !program) blocker = 'Student or program needs to be linked';
     return {
@@ -209,6 +218,21 @@ export interface HoursLedgerEntry {
   source_type: string;
 }
 
+export function sameDayHoursLedger(
+  entry: AdminHoursEntry,
+  ledger: HoursLedgerEntry[],
+  programs: HoursProgram[],
+) {
+  const slug = programs.find((program) => program.id === entry.program_key)?.slug;
+  if (!slug) return [];
+  return ledger.filter(
+    (row) =>
+      row.user_id === entry.student_id &&
+      row.program_slug?.toLowerCase() === slug.toLowerCase() &&
+      row.work_date === entry.work_date,
+  );
+}
+
 export function applyLedgerReview(
   entries: AdminHoursEntry[],
   ledger: HoursLedgerEntry[],
@@ -249,12 +273,7 @@ export function summarizeHoursLedger(
     approved: roundHours(
       rows
         .filter((h) => ['approved', 'locked'].includes(h.status))
-        .reduce(
-          (sum, h) =>
-            sum +
-            (Number(h.accepted_hours) > 0 ? Number(h.accepted_hours) : Number(h.hours_claimed)),
-          0,
-        ),
+        .reduce((sum, h) => sum + (Number(h.accepted_hours ?? h.hours_claimed) || 0), 0),
     ),
     pending: roundHours(
       rows

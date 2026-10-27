@@ -13,10 +13,16 @@ function date(value?: string) {
     ? new Date(value).toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })
     : 'Not recorded';
 }
+function carrierLabel(item: any) {
+  const provider = String(item.provider || '').toLowerCase();
+  if (provider === 'telnyx') return 'Historical call · Telnyx (retired carrier)';
+  if (provider === 'twilio') return 'Twilio call';
+  return 'Carrier not identified';
+}
 function owner(item: any) {
   return item.extension
     ? `${item.extension.display_name || 'Assigned holder'} · extension ${item.extension.extension}`
-    : 'Unassigned';
+    : 'No direct extension (general/legacy call)';
 }
 function Recording({ kind, id, available }: { kind: string; id: string; available: boolean }) {
   return available ? (
@@ -37,8 +43,8 @@ export default async function PhoneInboxPage({
   const { calls, callbacks, voicemails, texts, hasMore } = await loadPhoneInbox(db, scope, page);
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 bg-slate-50 p-4 sm:p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <main className="mx-auto max-w-6xl min-w-0 space-y-6 overflow-x-hidden bg-slate-50 p-3 sm:p-6">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase tracking-widest text-orange-600">
             Elevate Communications
@@ -50,8 +56,8 @@ export default async function PhoneInboxPage({
               : 'Your calls, voicemail, and callback follow-up.'}
           </p>
         </div>
-        <nav aria-label="Communications" className="flex flex-wrap gap-2">
-          <Link href="/phone" className="rounded-xl border bg-white px-4 py-2 text-sm font-black">
+        <nav aria-label="Communications" className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+          <Link href="/phone" className="min-w-0 rounded-xl border bg-white px-3 py-2 text-center text-sm font-black">
             Phone
           </Link>
           <Link
@@ -68,7 +74,7 @@ export default async function PhoneInboxPage({
           </Link>
           <Link
             href={`/phone/inbox?page=${page}`}
-            className="rounded-xl bg-indigo-700 px-4 py-2 text-sm font-black text-white"
+            className="min-w-0 rounded-xl bg-indigo-700 px-3 py-2 text-center text-sm font-black text-white"
           >
             Refresh status
           </Link>
@@ -89,15 +95,16 @@ export default async function PhoneInboxPage({
                 key={item.id}
                 className="rounded-xl border bg-slate-50 p-3 text-sm"
               >
-                <p className="font-bold">
+                <p className="break-all font-bold">
                   {item.from_number || 'Unknown caller'} → {item.to_number || 'Elevate'}
                 </p>
                 <p>
                   {date(item.started_at || item.created_at)} ET · {item.direction} ·{' '}
                   {holderCallOutcome(item)}
                 </p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{carrierLabel(item)}</p>
                 <p className="mt-1 font-semibold">Assigned: {owner(item)}</p>
-                <p className="text-slate-600">Call reference: {item.id}</p>
+                <p className="break-all text-slate-600">Call reference: {item.id}</p>
                 <p>Voicemail: {item.voicemails?.length ? 'Message saved' : 'No voicemail saved'}</p>
                 {item.duration_seconds != null && <p>Duration: {item.duration_seconds} seconds</p>}
                 {(item.callbacks ?? []).map((task: any) => (

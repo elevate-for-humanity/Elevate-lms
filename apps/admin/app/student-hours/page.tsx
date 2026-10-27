@@ -35,7 +35,7 @@ function statusBadge(status: string) {
 }
 
 export default async function StudentHoursPage() {
-  await requireRole(['admin', 'staff']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await requireAdminClient();
 
   const { entries: rows, summaries: students, ledger, programs } = await loadAdminHours(db);
@@ -221,6 +221,9 @@ export default async function StudentHoursPage() {
                             </td>
                             <td className="px-5 py-2.5 text-xs text-slate-400">
                               {entry.verified_at ? formatHoursDate(entry.verified_at) : '—'}
+                              {entry.status === 'verified' && !entry.verified_by && (
+                                <span className="mt-1 block text-amber-800">Approver not recorded — audit review required</span>
+                              )}
                             </td>
                           </tr>
                         ))}

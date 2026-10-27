@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 // Keep the homepage focused on training, the featured shops, and enrollment.
 // Detailed platform operations remain on the dedicated platform pages.
 import type { Metadata } from 'next';
@@ -110,6 +111,7 @@ export default function HomePage() {
         <HomeInstitutionalGateway />
         <HomeWebsiteBuilderSales />
         <HomePlatformOverview />
+        <div className="mx-auto max-w-6xl px-5"><ProgramGuideResources /></div>
         <section
           className="border-y border-slate-200 bg-white px-5 py-12 sm:py-16"
           aria-labelledby="workforce-platform-heading"

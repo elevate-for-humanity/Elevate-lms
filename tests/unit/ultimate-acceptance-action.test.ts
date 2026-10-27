@@ -1,6 +1,7 @@
 import {beforeEach,it,expect,vi} from 'vitest';
 import {NextRequest} from 'next/server';
 const state=vi.hoisted(()=>({db:null as any,legacy:{id:'legacy',profile:{},status:'running'},acceptance:null as any,inserted:vi.fn(),queued:vi.fn(),filter:vi.fn(),courseUpdates:vi.fn()}));
+vi.mock('@/lib/ultimate-course-builder/worker/dispatch-evidence',()=>({recordCourseDispatch:vi.fn().mockResolvedValue(true)}));
 vi.mock('@/lib/admin/guards',()=>({apiRequireAdmin:vi.fn().mockResolvedValue({id:'admin',error:null})}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:()=>state.db}));
 vi.mock('@/lib/ultimate-course-builder/core/course-profile',()=>({buildUltimateProfile:vi.fn().mockResolvedValue({id:'profile',competencies:[],sourceDocuments:[],title:'Barber'})}));

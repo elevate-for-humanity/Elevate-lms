@@ -1,3 +1,7 @@
+import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
+import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
+import { applySyllabusPlan, validateSyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
+import { renderReview } from '@/lib/ultimate-course-builder/authoring/render-review';
 import { logger } from '@/lib/logger';
 import { ULTIMATE_LESSON_CONTRACT_VERSION } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { validateLessonBlueprint } from '@/lib/ultimate-course-builder/instructional/lesson-blueprint';
@@ -9,7 +13,10 @@ import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
+import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
+import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
+import { checkpointPreviewArtifacts } from '@/lib/ultimate-course-builder/core/checkpoint-preview.mjs';
 import {
   renderMediaUrl,
   renderPlaybackUrl,
@@ -52,7 +59,7 @@ export async function GET(req: NextRequest) {
       ? await db
           .from('ultimate_course_builds')
           .select(
-            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))',
+            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,preview_objectives:artifacts->learning_objectives->objectives,preview_assessment:artifacts->assessment_alignment->assessment,preview_script:artifacts->instructor_script->script,preview_scenes:artifacts->storyboard->storyboard->scenes,preview_media_url:artifacts->lesson_film_render->render->mediaUrl,preview_video_url:artifacts->lesson_film_render->render->videoUrl,preview_playback_url:artifacts->lesson_film_render->render->playbackUrl,preview_media_approved:artifacts->finished_media_qa->mediaQA->pass,ultimate_lesson_steps(step,state,findings,completed_at))',
           )
           .eq('id', buildId)
           .single()
@@ -65,7 +72,9 @@ export async function GET(req: NextRequest) {
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
       const lessons = await Promise.all(
         (data.ultimate_lesson_builds ?? []).map(async (lesson: any) => {
-          const { artifacts, ...saved } = lesson;
+          const {preview_objectives,preview_assessment,preview_script,preview_scenes,
+            preview_media_url,preview_video_url,preview_playback_url,preview_media_approved,...saved} = lesson;
+          const artifacts = checkpointPreviewArtifacts(lesson);
           const preview = {
             ...lessonPreview(artifacts),
             historicalVersion: null as number | null,
@@ -107,7 +116,13 @@ export async function GET(req: NextRequest) {
               }
             }
           }
-          return { ...saved, preview };
+          const review = preview.videoUrl ? await renderReview(db, buildId, lesson.id, preview.videoUrl) : null;
+          const approved = await ownerApprovedPreview(db,data,lesson);
+          if (preview.videoUrl) preview.videoUrl = adminPreviewPlaybackUrl(buildId, lesson.id, preview.videoUrl) + (review ? '&artifactVersionId=' + encodeURIComponent(review.artifactVersionId) : '');
+          return { ...saved, preview: {...preview,review,...(approved?{
+            approvedVideoUrl:adminPreviewPlaybackUrl(buildId,lesson.id,approved.videoUrl)+'&kind=approved',
+            approvedVersion:approved.version,
+          }:{})} };
         }),
       ).catch((error) => {
         logger.error('Saved lesson preview recovery failed', error);
@@ -119,15 +134,9 @@ export async function GET(req: NextRequest) {
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
-  let query = db
-    .from('ultimate_course_builds')
-    .select(
-      'id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at,payload,monitor)',
-    )
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if (courseId) query = query.eq('course_id', courseId);
-  const { data, error } = await query;
+  const page = parseBuildListPage(req.nextUrl.searchParams.get('page'));
+  if (page === null) return NextResponse.json({ error: 'page must be an integer from 1 to 10000' }, { status: 400 });
+  const { data, error, pagination } = await loadUltimateBuildPage(db, courseId, page);
   if (error) return databaseFailure(error);
   let acquisitions: Array<{ id: string; goal: string | null }> = [];
   if (courseId) {
@@ -142,7 +151,7 @@ export async function GET(req: NextRequest) {
     if (requests.error) return databaseFailure(requests.error);
     acquisitions = requests.data ?? [];
   }
-  return NextResponse.json({ builds: data ?? [], acquisitions });
+  return NextResponse.json({ builds: data ?? [], acquisitions, pagination });
 }
 
 export async function POST(req: NextRequest) {
@@ -205,7 +214,7 @@ export async function POST(req: NextRequest) {
           { error: 'Each instructional source needs its source ID and complete authorized text' },
           { status: 400 },
         );
-      profile.instructionalSources = body.instructionalSources;
+      profile.instructionalSources = [...new Map([...(profile.instructionalSources ?? []), ...body.instructionalSources].map(source => [source.id, source])).values()];
     }
     profile.lessonContractVersion = ULTIMATE_LESSON_CONTRACT_VERSION;
     const saved = await db
@@ -213,6 +222,7 @@ export async function POST(req: NextRequest) {
       .update({ profile, updated_at: new Date().toISOString() })
       .eq('id', build.id)
       .eq('status', build.status)
+      .eq('profile', JSON.stringify(build.profile))
       .select('id')
       .single();
     if (saved.error) return databaseFailure(saved.error, 409);
@@ -281,7 +291,9 @@ export async function POST(req: NextRequest) {
     if (!programSlug) {
       return NextResponse.json({ error: 'programSlug is required' }, { status: 400 });
     }
-    const generatedProfile = await buildUltimateProfile(db, {
+    if (body.syllabusPlan && !validateSyllabusPlan(body.syllabusPlan))
+      return NextResponse.json({error:'Review a valid syllabus curriculum before starting.'},{status:400});
+    let generatedProfile = await buildUltimateProfile(db, {
       courseId: course.id,
       programSlug,
       title: String(body.title || course.title),
@@ -289,6 +301,7 @@ export async function POST(req: NextRequest) {
       audience: String(body.audience || ''),
       state: String(body.state || ''),
     });
+    if (body.syllabusPlan) generatedProfile = applySyllabusPlan(generatedProfile,body.syllabusPlan);
     const authoring = body.instructionalAuthoring;
     if (
       authoring &&
@@ -303,6 +316,7 @@ export async function POST(req: NextRequest) {
     const profile = {
       ...generatedProfile,
       mediaAcquisitionOwnerId: auth.id,
+      publicationPolicy: 'automatic-quality-verified',
       ...(authoring
         ? {
             instructionalAuthoring: {
@@ -331,6 +345,7 @@ export async function POST(req: NextRequest) {
       activeQuery.contains('profile', { instructionalAuthoring: profile.instructionalAuthoring });
     const { data: activeBuild, error: activeError } = await activeQuery.maybeSingle();
     if (activeError) throw activeError;
+    if (activeBuild && body.syllabusPlan) return NextResponse.json({error:'This course already has an active build. Attach sources in its production workspace.'},{status:409});
     if (
       activeBuild &&
       authoring &&
@@ -370,6 +385,7 @@ export async function POST(req: NextRequest) {
     if (!job)
       return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
     const dispatch = await requestCourseWorker();
+    const dispatchEvidenceSaved = await recordCourseDispatch(db,job.id,dispatch,auth.id);
     if (!dispatch.dispatched) {
       return NextResponse.json({
         ok: false, queued: true, dispatched: false,
@@ -383,7 +399,7 @@ export async function POST(req: NextRequest) {
       {
         ok: true,
         queued: true,
-        ...dispatch,
+        ...dispatch, dispatchEvidenceSaved,
         reused: Boolean(activeBuild),
         build,
         buildId: build.id,

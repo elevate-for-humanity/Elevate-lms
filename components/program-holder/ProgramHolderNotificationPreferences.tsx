@@ -11,15 +11,21 @@ export function ProgramHolderNotificationPreferences({ initial, phone }: { initi
   async function submit(formData: FormData) {
     setSaving(true);
     setMessage('');
+    try {
     const response = await fetch('/api/program-holder/notification-preferences', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(Object.fromEntries(formData)),
     });
+    if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Your session or connection changed. Reload the page and try again.');
     const result = await response.json().catch(() => ({}));
-    setSaving(false);
     setMessage(response.ok ? 'Notification choices saved.' : result.error || 'Preferences could not be saved.');
     if (response.ok) router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'The request could not be completed. Please retry.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

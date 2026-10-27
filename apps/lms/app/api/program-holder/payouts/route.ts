@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     provider?: 'paypal' | 'branch';
   };
 
+  if (body.provider && !['paypal', 'branch'].includes(body.provider)) return NextResponse.json({ error: 'Unsupported payout provider.' }, { status: 400 });
   try {
     if (body.action === 'configure') {
       return NextResponse.json(

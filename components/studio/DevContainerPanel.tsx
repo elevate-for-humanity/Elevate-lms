@@ -261,7 +261,7 @@ export default function DevContainerPanel() {
   }
 
   return (
-    <section className="flex h-full min-h-0 min-w-0 flex-col overflow-y-auto bg-white text-slate-900">
+    <section className="flex h-full min-h-0 min-w-0 flex-col overflow-y-auto bg-slate-50 font-sans text-slate-900">
       <header className="shrink-0 border-b border-slate-200 bg-white px-4 py-4 text-slate-950">
         <div className="flex flex-wrap items-center gap-3">
           <div className="mr-auto">
@@ -273,7 +273,7 @@ export default function DevContainerPanel() {
           <button
             type="button"
             onClick={() => void Promise.all([loadConfig(), loadEnvironment()])}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <RefreshCw className="h-4 w-4" /> Refresh
           </button>
@@ -341,7 +341,7 @@ export default function DevContainerPanel() {
                 value={editedRaw}
                 onChange={(event) => setEditedRaw(event.target.value)}
                 spellCheck={false}
-                className="min-h-72 w-full min-w-0 flex-1 resize-y rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-xs leading-5 text-slate-900 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 sm:min-h-[520px]"
+                className="min-h-72 w-full min-w-0 flex-1 resize-y rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-sm leading-6 text-slate-900 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 sm:min-h-[520px]"
                 aria-label="devcontainer.json editor"
               />
 
@@ -431,11 +431,11 @@ export default function DevContainerPanel() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <code className="break-all font-semibold text-slate-900">{entry.key}</code>
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold uppercase text-slate-600">
                           {entry.scope}
                         </span>
                         {entry.category ? (
-                          <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[10px] font-bold uppercase text-cyan-700">
+                          <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-xs font-bold uppercase text-cyan-700">
                             {entry.category}
                           </span>
                         ) : null}

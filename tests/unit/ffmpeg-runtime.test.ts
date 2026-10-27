@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const { execFileSync } = vi.hoisted(() => ({ execFileSync: vi.fn() }));
-vi.mock('child_process', async (importOriginal) => ({
+vi.mock('node:child_process', async (importOriginal) => ({
   ...(await importOriginal<typeof import('child_process')>()),
   execFileSync,
 }));
@@ -26,13 +26,14 @@ describe('FFmpeg runtime selection', () => {
     const source = readFileSync(resolve('lib/video/ffmpeg-runtime.ts'), 'utf8');
     expect(source).toContain("'-c:v',");
     expect(source).toContain("'h264_nvenc'");
+    expect(source).toContain("'color=size=1280x720:rate=1'");
     expect(source).toContain("'-f',");
     expect(source).toContain("'null'");
     expect(source).toContain('timeout: 10_000');
   });
 
   it('falls back to libx264 when NVENC is unavailable', () => {
-    execFileSync.mockReturnValue(' V....D libx264 H.264 encoder');
+    execFileSync.mockImplementation(() => { throw new Error('NVENC session unavailable'); });
     expect(selectVideoEncoder()).toMatchObject({
       encoder: 'libx264',
       hardwareAccelerated: false,

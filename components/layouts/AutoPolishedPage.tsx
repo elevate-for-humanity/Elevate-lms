@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Flame } from 'lucide-react';
@@ -453,7 +454,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
                 <Flame className="w-4 h-4 mr-1" /> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
-                Free Career Training - 100% Government Funded • Start in 2 Weeks
+                Career training enrollment open • Review program tuition, funding status, and start dates
               </p>
             </div>
             <Link
@@ -468,8 +469,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
 
       {/* HERO */}
       <section className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={getHeroImage()}
           alt={label}
           fill
@@ -477,7 +477,6 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           className="object-cover object-top"
           priority
           quality={85}
-          placeholder="empty"
         />
 
         <div className="relative h-full flex items-center">

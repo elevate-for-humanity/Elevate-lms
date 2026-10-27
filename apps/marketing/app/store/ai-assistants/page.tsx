@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   description:
     'Explore Elevate role-based AI assistants for admissions, student support, operations, compliance, career placement, and intent routing.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/ai-assistants',
+    canonical: 'https://store.elevateforhumanity.org/store/ai-assistants',
   },
   openGraph: {
     title: 'AI Assistants | Elevate Store',
     description: 'Role-based AI assistance across admissions, student support, operations, compliance, and routing.',
-    url: 'https://www.elevateforhumanity.org/store/ai-assistants',
+    url: 'https://store.elevateforhumanity.org/store/ai-assistants',
     type: 'website',
   },
 };
@@ -56,7 +56,7 @@ const jsonLd = {
   name: 'Elevate AI Assistants',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
-  url: 'https://www.elevateforhumanity.org/store/ai-assistants',
+  url: 'https://store.elevateforhumanity.org/store/ai-assistants',
   description:
     'Role-based AI assistance for admissions, student support, operations, compliance, career placement, and workflow routing.',
   publisher: {

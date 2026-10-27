@@ -140,3 +140,9 @@ jobs:
             } catch(e) {report({component,sample,probeError:allowedErrors.has(e.name)?e.name:'probe_failed'});}
           }
           NODE
+
+      - name: Read serving probes and payment-provider diagnostics without mutation
+        if: matrix.component == 'marketing'
+        run: |
+          node --test scripts/gcp/audit-stabilization.test.mjs
+          node scripts/gcp/audit-stabilization.mjs

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Monitor, RefreshCw, Smartphone, Tablet } from 'lucide-react';
+import { resolveStudioPreviewUrl } from '@/lib/devstudio/preview-target-url';
 
 type Viewport = 'desktop' | 'tablet' | 'mobile';
 
@@ -51,7 +52,7 @@ function inferTarget(filePath: string): PreviewTarget | null {
     const pathname = segments.length ? `/${segments.join('/')}` : '/';
     return {
       origin: definition.origin,
-      url: dynamic ? null : `${definition.origin}${pathname === '/' ? '' : pathname}`,
+      url: dynamic ? null : definition.label === 'Admin' ? pathname : `${definition.origin}${pathname === '/' ? '' : pathname}`,
       label: definition.label,
       dynamic,
     };
@@ -104,13 +105,13 @@ export default function RepositoryLivePreview({
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    setManualUrl(target?.url ?? target?.origin ?? initialUrl);
+    setManualUrl(resolveStudioPreviewUrl(target?.url ?? (target?.label === 'Admin' ? '/' : target?.origin) ?? initialUrl, window.location.origin));
   }, [target?.url, target?.origin, initialUrl]);
 
   const previewUrl = manualUrl.trim();
   const canOpen = /^https?:\/\//i.test(previewUrl);
   let platformPreview=false;
-  try {platformPreview=['https://www.elevateforhumanity.org','https://elevateforhumanity.org','https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org'].includes(new URL(previewUrl).origin);}catch{platformPreview=false;}
+  try {platformPreview=['https://www.elevateforhumanity.org','https://elevateforhumanity.org','https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org',window.location.origin].includes(new URL(previewUrl).origin);}catch{platformPreview=false;}
   const interactivePreview=trustedInteractive||platformPreview;
   const modeLabel = sourcePreview
     ? 'Unsaved source preview'

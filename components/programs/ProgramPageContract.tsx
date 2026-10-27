@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -161,13 +162,13 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             className="absolute inset-0 w-full h-full object-contain"
           />
         ) : config.heroImage ? (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={config.heroImage}
             alt={config.title}
             fill
             className="object-contain"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw"
           />
         ) : null}
 

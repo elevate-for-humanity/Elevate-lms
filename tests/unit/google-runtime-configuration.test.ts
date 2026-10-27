@@ -222,3 +222,13 @@ describe('phone runtime ownership', () => {
     }
   });
 });
+
+describe('independent commerce configuration', () => {
+  it.each(['admin', 'lms', 'marketing', 'store'] as const)('allows %s to own the exact PayPal settings used by billing and webhook verification', component => {
+    expect(() => validateRuntimeEntries(component, [
+      { key: 'PAYPAL_ENVIRONMENT', value: 'production' },
+      { key: 'PAYPAL_BILLING_WEBHOOK_ID', value: 'billing-webhook-fixture' },
+      { key: 'PAYPAL_PAYOUT_WEBHOOK_ID', value: 'payout-webhook-fixture' },
+    ])).not.toThrow();
+  });
+});

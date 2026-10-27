@@ -1,8 +1,8 @@
 import { google } from './runtime-config.mjs';
-import { inspectRegionalCapacity } from './regional-capacity.mjs';
+import { inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 
-export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60} = {}) {
+export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60, clock = () => Date.now()} = {}) {
   const scope = ['--project=elegant-racer-299721', '--region=us-central1'];
   // An active Cloud Run execution must not block unrelated queued builds.
   // Atomic database leases prevent two tasks from claiming the same job.
@@ -15,17 +15,40 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  url.searchParams.set('select','id,heartbeat_at,attempts,max_attempts');
+  url.searchParams.set('select','id,heartbeat_at,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
   // A stopped execution leaves an expired running lease. Claim RPC performs
   // recovery, but it cannot run unless the dispatcher launches a worker.
   url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + now.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
+  // Filter the joined build before the queue limit so paused rows cannot
+  // hide eligible work. Missing pause flags retain their existing eligibility.
+  url.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
   url.searchParams.set('limit','50');
-  const response = await request(url, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
-  if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);
-  const candidates = await response.json();
-  if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
-  const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
+  const candidates = [];
+  // Exhausted and storage-blocked rows may fill an entire page. Continue the
+  // scan so those rows cannot starve runnable work later in queue order.
+  for(let offset=0;;offset+=50){
+    const pageUrl=new URL(url);
+    pageUrl.searchParams.set('offset',String(offset));
+    const response = await request(pageUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
+    if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);
+    const page = await response.json();
+    if (!Array.isArray(page)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
+    candidates.push(...page);
+    if(page.length<50)break;
+  }
+  // Storage capacity failures require a successful capacity/upload preflight.
+  // Never dispatch another expensive render merely because its lease expired.
+  const blockedByStorage = job => /storage cap exceeded|COURSE_OBJECT_STORAGE_UPLOAD_FAILED|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED/i.test(job.last_error ?? '');
+  // Respect explicit owner pauses before launching paid Cloud Run work.
+  // The worker independently enforces this pause if it changes after dispatch.
+  const ownerPaused = job => job.build?.owner_paused === true || job.build?.owner_paused === 'true';
+  const queued = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job) && !ownerPaused(job));
+  // Never claim an empty queue merely because an earlier failed job exists.
+  // Emit durable, actionable diagnostics without exposing Supabase credentials.
+  console.info(JSON.stringify({event:'course_dispatch_queue_scan',candidateCount:candidates.length,
+    runnableCount:queued.length,activeExecutions:active.length,
+    candidateIds:queued.map(job=>job.id)}));
   // A leased task can enqueue its next lesson only after finishing the current
   // one. Keep the coordinator alive across that handoff without launching more tasks.
   // An already-running Cloud Run execution owns its task independently.
@@ -41,8 +64,8 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const configured = Number(env.COURSE_WORKER_PARALLELISM ?? 2);
   const limit = Number.isSafeInteger(configured) ? Math.min(4, Math.max(1, configured)) : 2;
   // Bound new tasks to configured concurrency, including existing executions.
-  const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + Math.max(1, Number(execution.spec?.taskCount ?? execution.status?.taskCount ?? 1)), 0));
-  if (!slots) return {status:'busy',activeExecutions:active.length};
+  const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + executionAllocationCount(execution), 0));
+  if (!slots) { console.warn(JSON.stringify({event:'course_dispatch_no_slots',activeExecutions:active.length,limit})); return {status:'busy',activeExecutions:active.length}; }
   const parallelism = Number(job.spec?.template?.spec?.parallelism);
   if (!Number.isSafeInteger(parallelism) || parallelism < 1) throw new Error('COURSE_JOB_PARALLELISM_UNAVAILABLE');
   let tasks = Math.min(slots, queued.length, parallelism);
@@ -55,12 +78,12 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
     if (capacity.fits) break;
     tasks--;
   } while (tasks > 0);
-  if (!tasks) return {status:'capacity_wait', ...capacity};
+  if (!tasks) { console.warn(JSON.stringify({event:'course_dispatch_capacity_wait',capacity})); return {status:'capacity_wait', ...capacity}; }
   run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require fresh durable claims for every task.
   const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));
   const assignmentUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  assignmentUrl.searchParams.set('select', 'id,status,lease_owner,heartbeat_at,last_error');
+  assignmentUrl.searchParams.set('select', 'id,status,lease_owner,lease_expires_at,heartbeat_at,last_error');
   assignmentUrl.searchParams.set('id', 'in.(' + [...pending.keys()].join(',') + ')');
   for (let attempt = 0; attempt < assignmentAttempts; attempt++) {
     const check = await request(assignmentUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
@@ -69,7 +92,8 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
     for (const job of rows ?? []) {
       if (!pending.has(job.id)) continue;
       if (job.status === 'failed') throw new Error('COURSE_WORKER_FAILED_AFTER_ASSIGNMENT:' + job.id);
-      if (job.lease_owner && job.heartbeat_at && job.heartbeat_at > pending.get(job.id) && job.heartbeat_at >= now.toISOString()) pending.delete(job.id);
+      if (job.status === 'running' && job.lease_owner && Date.parse(job.lease_expires_at ?? '') > clock() &&
+          job.heartbeat_at && job.heartbeat_at > pending.get(job.id) && job.heartbeat_at >= now.toISOString()) pending.delete(job.id);
     }
     if (!pending.size) return {status:'assigned',tasks,jobIds:queued.slice(0,tasks).map(item=>item.id)};
     if (attempt + 1 < assignmentAttempts) await delay(5000);

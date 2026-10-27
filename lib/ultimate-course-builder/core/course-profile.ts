@@ -1,11 +1,9 @@
-import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateAppendixAStandardsSource } from '../credential/appendix-a-source';
 import { registeredInstructionalSources } from '../credential/registered-instructional-sources';
 import { getRegisteredProgramStandardByProfileId } from '@/lib/apprenticeship/registered-program-contract';
 import type { UltimateCredentialProfile } from './types';
 import { classifyCompetency } from '../instructional/competency-classification.mjs';
-import { approvedPresentationForCourse } from '../instructional/approved-presentation.mjs';
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -29,40 +27,8 @@ export async function hydrateUltimateProfileSources(
   courseId: string,
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
-  const presentation = profile.lessonPresentation ?? approvedPresentationForCourse(courseId);
-  if (presentation === 'approved-premium-v1') {
-    const assetId = '9ae74de2-2fd2-45df-9c54-59c9e3c5c07c';
-    const storagePath = '2c723bfa-8c40-4acc-b961-98d917710ffc/1791848294710-Barber_LMS_Sample.mp4';
-    const { data: reference, error: referenceError } = await db.from('course_videos')
-      .select('id,status,asset_role,storage_path').eq('id', assetId).single();
-    if (referenceError || reference?.status !== 'ready' || reference?.asset_role !== 'reference' ||
-        reference?.storage_path !== storagePath) throw new Error('APPROVED_REFERENCE_VIDEO_REQUIRED');
-    const { data: video, error: downloadError } = await db.storage.from('course_videos').download(storagePath);
-    if (downloadError || !video || video.size === 0) throw new Error('APPROVED_REFERENCE_VIDEO_UNREADABLE');
-    const sha256 = createHash('sha256').update(Buffer.from(await video.arrayBuffer())).digest('hex');
-    const previous = (profile as any).presentationContract?.approvedReferenceVideo;
-    if (previous?.assetId === assetId && previous.sha256 && previous.sha256 !== sha256)
-      throw new Error('APPROVED_REFERENCE_VIDEO_CHANGED');
-    profile = { ...profile, lessonPresentation: presentation, presentationContract: {
-      version: 'owner-approved-video-2026-10-13.3',
-      approvedReferenceVideo: { assetId, storagePath, sha256, approvedAt: '2026-10-12', permittedUses: ['presentation-reference'] },
-      visualStyle: { cropMode: 'contain', transition: 'crossfade' },
-      instructions: [
-        'Use the owner-approved reference as the presentation standard, never as reusable lesson footage.',
-        'Use charcoal backgrounds, crisp white text and warm champagne accents; no blue screens.',
-        'Show whole large photos with concise explanations; preserve hands, tools, and heads without cropping.',
-        'Use multiple changing generated photographs within EVERY teaching moment, bound to specific spoken instructions. Generated photographs are illustrations; inspected licensed Envato footage demonstrates actual motion.',
-        'Use numbered side instructions with independent fades and finish EVERY teaching moment with a separately recorded, freshly worded source-reviewed recap.',
-        'Include tools and source-verified manufacturer-specific numbered guard lengths, consultation, hand hygiene, neck strip, draping, cutting, blending, finishing and cleanup where applicable.',
-        'Use restrained transitions inside the speech timeline and unique task-relevant visuals; no generic filler or repeated photo loops.',
-        'Narration is the timing master: synchronize visuals, teaching text and persistent captions.',
-        'No duplicate or overlapping narration, silent blank delays, or audible source-clip speech.',
-        'Teach prerequisites and tools, preparation, step-by-step demonstration, finished-result inspection and sanitation.',
-        'Include feedback and retry assessment plus mentor practical checkoff where the standard requires it.',
-        'Never release until delivered-media, instructional, narration and learner QA pass.',
-      ],
-    } };
-  }
+  // An explicitly selected owner reference is durable course data. Loading or
+  // resuming a course must never silently discard its approved presentation.
   const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
   // Teaching modality does not waive the registered mentor performance requirement.
   if (registeredContract) {

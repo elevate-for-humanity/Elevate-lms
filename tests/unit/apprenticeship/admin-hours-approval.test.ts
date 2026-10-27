@@ -11,6 +11,10 @@ vi.mock('@/lib/admin/guards', () => ({ apiRequireAdmin: mocks.auth }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: mocks.rate }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.admin }));
 import { POST } from '@/apps/admin/app/api/admin/apprenticeships/hours/approve/route';
+import {
+  POST as legacyPost,
+  PUT as canonicalBulk,
+} from '@/apps/lms/app/api/apprenticeship/hours/approve/route';
 
 const id = '12345678-1234-4234-9234-123456789012';
 const expected = [
@@ -35,15 +39,57 @@ beforeEach(() => {
   mocks.auth.mockResolvedValue({ id: actor });
   mocks.admin.mockResolvedValue({
     rpc: mocks.rpc,
-    from: () => ({ select: () => ({ in: mocks.read }) }),
+    from: (table: string) => {
+      expect(table).toBe('apprenticeship_hours');
+      return { select: () => ({ in: mocks.read }) };
+    },
   });
   mocks.rpc.mockResolvedValue({ data: 1, error: null });
   mocks.read.mockResolvedValue({
-    data: [{ id, status: 'verified', verified_by: actor, verified_at: '2026-10-10T12:00:00Z' }],
+    data: [
+      {
+        id,
+        status: 'verified',
+        approved: true,
+        approved_by: actor,
+        approved_at: '2026-10-10T12:00:00Z',
+      },
+    ],
     error: null,
   });
 });
 describe('guarded hours approval', () => {
+  it('routes individual and bulk LMS requests through canonical reviewed approvals', async () => {
+    const single = new NextRequest('https://app.example.test/api/apprenticeship/hours/approve', {
+      method: 'POST',
+      body: JSON.stringify({ hour_id: id, expected }),
+    });
+    expect((await legacyPost(single)).status).toBe(200);
+    const bulk = new NextRequest('https://app.example.test/api/apprenticeship/hours/approve', {
+      method: 'PUT',
+      body: JSON.stringify({ hour_ids: [id], expected }),
+    });
+    expect((await canonicalBulk(bulk)).status).toBe(200);
+  });
+  it('rejects a legacy ID-only approval instead of approving unreviewed evidence', async () => {
+    expect(
+      (
+        await legacyPost(
+          new NextRequest('https://app.example.test/api/apprenticeship/hours/approve', {
+            method: 'POST',
+            body: JSON.stringify({ hour_id: id }),
+          }),
+        )
+      ).status,
+    ).toBe(400);
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+  it('does not approve a ledger-only ID missing from canonical apprenticeship hours', async () => {
+    mocks.read.mockResolvedValueOnce({ data: [], error: null });
+    expect((await POST(request({ ids: [id] }))).status).toBe(404);
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+
   it('requires an authenticated admin before accessing the database', async () => {
     mocks.auth.mockResolvedValue({
       error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }),
@@ -75,7 +121,7 @@ describe('guarded hours approval', () => {
   it('reports a database eligibility conflict without a fake success', async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: { code: 'P0001' } });
     expect((await POST(request({ ids: [id] }))).status).toBe(409);
-    expect(mocks.read).not.toHaveBeenCalled();
+    expect(mocks.read).toHaveBeenCalledTimes(1);
   });
   it('requires persisted status and attribution in the readback', async () => {
     mocks.read.mockResolvedValue({ data: [{ id, status: 'submitted' }], error: null });

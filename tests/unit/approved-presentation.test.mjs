@@ -2,10 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {measuredTeachingStep} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import {approvedPresentationForCourse,narrationSceneSeconds,presentationBookendFrames,assertNarratedScenes,assertPremiumSpeechSignal} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
-test('approved format is limited to the two existing course IDs',()=>{
-  assert.equal(approvedPresentationForCourse('2c723bfa-8c40-4acc-b961-98d917710ffc'),'approved-premium-v1');
-  assert.equal(approvedPresentationForCourse('9ca9fb50-7119-46ea-ab81-9b0193c29c31'),'approved-premium-v1');
-  assert.equal(approvedPresentationForCourse('unrelated'),undefined);
+test('course identity alone never substitutes for an explicit owner presentation selection',()=>{
+  for(const id of ['2c723bfa-8c40-4acc-b961-98d917710ffc','9ca9fb50-7119-46ea-ab81-9b0193c29c31','unrelated'])
+    assert.equal(approvedPresentationForCourse(id),undefined);
 });
 test('short and fractional speech receives only frame quantization, no added dead time',()=>{
   for(const seconds of [.2,3.2,10.051,60.01]) {
@@ -37,4 +36,23 @@ test('instructions follow spoken cue timing rather than equal divisions of the s
   assert.equal(measuredTeachingStep(steps,cues,7),0);
   assert.equal(measuredTeachingStep(steps,cues,8),1);
   assert.throws(()=>measuredTeachingStep([{narrationQuote:'Cut without a guard'}],cues,2),/NOT_ALIGNED/);
+});
+
+test('the premium scene and picture timeline use the same measured speech alignment', async () => {
+  const {quoteStartSeconds}=await import('../../lib/ultimate-course-builder/instructional/picture-timeline.mjs');
+  const steps=[{narrationQuote:'Prepare the station safely'},{narrationQuote:'Current platform limits are 40 OJL hours and 50 combined OJL/RTI hours weekly'}];
+  const cues=[{text:'Prepare the station safely',startSeconds:0,endSeconds:5},{text:'Current platform limits are 40 OJL hours and 50 combined OJL slash RTI hours weekly',startSeconds:5,endSeconds:14}];
+  assert.equal(quoteStartSeconds(steps[1].narrationQuote,cues),5);
+  assert.equal(measuredTeachingStep(steps,cues,4.9),0);
+  assert.equal(measuredTeachingStep(steps,cues,5),1);
+});
+
+test('frame playback reuses alignment while retaining accurate transitions and safeguards',()=>{
+  const steps=[{narrationQuote:'Inspect the blade'},{narrationQuote:'Attach the guard'}];
+  const cues=[{text:'Inspect the blade',startSeconds:0},{text:'Attach the guard',startSeconds:8}];
+  for(let frame=0;frame<1800;frame++) {
+    const seconds=frame/30;
+    assert.equal(measuredTeachingStep(steps,cues,seconds),seconds>=8?1:0);
+  }
+  assert.throws(()=>measuredTeachingStep([{narrationQuote:'Unspoken instruction'}],cues,1),/NOT_ALIGNED/);
 });

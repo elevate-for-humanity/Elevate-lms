@@ -22,8 +22,8 @@ export default function Contact() {
             need help with.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="tel:+13179999620" className={taxButton + ' bg-[#c8102e] text-white'}>
-              Call (317) 999-9620
+            <a href="tel:+14632401404" className={taxButton + ' bg-[#c8102e] text-white'}>
+              Call (463) 240-1404
             </a>
             <Link
               href="/contact?product=supersonic-fast-cash-tax-preparation#contact-form"

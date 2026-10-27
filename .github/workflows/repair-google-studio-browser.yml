@@ -11,13 +11,18 @@ on:
       - 'scripts/gcp/preflight-studio-browser-permissions.mjs'
       - 'scripts/test-studio-browser-cutover.mjs'
   workflow_dispatch:
+    inputs:
+      candidate_only:
+        description: Verify a candidate without switching existing traffic or Admin
+        type: boolean
+        default: true
 permissions:
   contents: read
   actions: write
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch through trusted Google workflow identity
@@ -25,12 +30,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches" -f ref=main
   repair:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (vars.GOOGLE_RELEASE_HOLD != 'true' || inputs.candidate_only == true)
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 45
     concurrency:
-      group: google-studio-browser
+      group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +45,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Require CI acceptance on this exact commit before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&event=push&per_page=20" --jq '.workflow_runs[0].id // empty')"
+            if test -n "$run_id"; then
+              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '.jobs[] | select(.name == "CI Required Gate") | .conclusion // empty')"
+              if test "$conclusion" = success; then exit 0; fi
+              if test -n "$conclusion"; then echo "Required CI did not pass"; exit 1; fi
+            fi
+            sleep 10
+          done
+          echo "Required CI did not finish"; exit 1
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -48,9 +69,15 @@ jobs:
         with:
           skip_install: true
       - name: Verify cutover, encryption-key preservation and exact revision diagnostics
-        run: node --test scripts/test-studio-browser-cutover.mjs
-      - name: Check provisioning permissions before building
+        run: node --test scripts/test-studio-browser-cutover.mjs scripts/gcp/verify-studio-runtime-replacement.test.mjs
+      - name: Verify the existing Studio target and prepared boundary before building
         run: node scripts/gcp/preflight-studio-browser-permissions.mjs
+      - name: Verify the owner-prepared dedicated Studio runtime identity
+        run: |
+          node --test scripts/gcp/verify-studio-service-identity.test.mjs
+          node scripts/gcp/verify-studio-service-identity.mjs
+      - name: Verify registry upload admission before building
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build actual immutable Studio browser container
@@ -61,7 +88,7 @@ jobs:
           -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
           -v "$PWD/services/studio-browser:/tests:ro"
           --entrypoint sh "studio-browser:$GITHUB_SHA"
-          -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs && for attempt in 1 2; do node --test /app/cdp-browser.integration.test.mjs; done'
+          -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs && for attempt in 1 2; do node --test /app/cdp-browser.integration.test.mjs || exit $?; done'
       - name: Prove actual server startup, persistent storage and authorization
         run: |
           set -euo pipefail
@@ -87,6 +114,11 @@ jobs:
           if(!authorized.ok)throw Error('Authenticated workspace must respond');
           console.log(JSON.stringify({commit:state.commit,ready:state.ready,persistent:true,anonymousDenied:true,authorized:true}));
           NODE
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Publish tested browser image
         run: |
           set -euo pipefail
@@ -97,7 +129,15 @@ jobs:
       - name: Restore browser and persistent encrypted provider storage before Admin cutover
         env:
           IMAGE_SHA: ${{ github.sha }}
-        run: node scripts/gcp/repair-studio-browser-cloud-run.mjs
+          STUDIO_CANDIDATE_ONLY: ${{ inputs.candidate_only && 'true' || 'false' }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {inspectRegionalCapacity} from "./scripts/gcp/regional-capacity.mjs";
+          const capacity=await inspectRegionalCapacity({region:"us-central1",task:{containers:[{resources:{limits:{cpu:"2",memory:"4Gi"}}}]}});
+          if(!capacity.fits)throw Error("STUDIO_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE");
+          console.log(JSON.stringify(capacity));
+          NODE
+          node scripts/gcp/repair-studio-browser-cloud-run.mjs
       - name: Preserve exact failed browser revision diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

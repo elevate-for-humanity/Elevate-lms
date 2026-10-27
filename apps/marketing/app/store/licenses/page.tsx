@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: `Platform Licenses | ${PLATFORM_DEFAULTS.orgName} Store`,
   description: `Review managed ${PLATFORM_DEFAULTS.orgName} platform license options and contact sales for implementation scope.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/licenses' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/licenses' },
 };
 
 function priceLabel(price: number, billingType: 'one_time' | 'subscription') {

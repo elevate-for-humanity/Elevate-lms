@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -140,7 +141,7 @@ export function BarberApprenticeshipDashboard({
               </p>
             </div>
             <div className="relative w-full lg:w-72 h-44 lg:h-auto min-h-[11rem] rounded-xl overflow-hidden border border-amber-500/20">
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 src="/images/heroes/hero-homepage.webp"
                 alt="Barber apprenticeship training"
                 fill

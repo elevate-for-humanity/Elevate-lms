@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import TenantsClient from './TenantsClient';
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function TenantsPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   const { data: tenants, count } = await supabase
     .from('tenants')

@@ -46,7 +46,7 @@ const PACKAGING_CONTRACTS = [
   },
   {
     service: 'admin',
-    dockerfile: 'Dockerfile.northflank-admin',
+    dockerfile: 'Dockerfile.admin',
     requiredSource: '/workspace/public',
     runtimeTarget: 'apps/admin/public',
   },

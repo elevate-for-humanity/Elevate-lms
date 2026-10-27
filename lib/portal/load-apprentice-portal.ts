@@ -7,6 +7,7 @@ import { remainingHoursDisplay } from '@/lib/barber/pricing';
 
 export type ApprenticePortalEnrollment = {
   id: string;
+  course_id?: string | null;
   program_id?: string | null;
   program_slug?: string | null;
   enrollment_state: string;
@@ -58,9 +59,9 @@ export async function loadApprenticePortalData(programSlug: string) {
     supabase
       .from('program_enrollments')
       .select(
-        'id, program_id, program_slug, enrollment_state, orientation_completed_at',
+        'id, course_id, program_id, program_slug, enrollment_state, orientation_completed_at',
       )
-      .eq('user_id', user.id)
+      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
       .eq('program_slug', programSlug)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -68,7 +69,7 @@ export async function loadApprenticePortalData(programSlug: string) {
     supabase
       .from('apprentices')
       .select('id, shop_id, employer_id, start_date, status, rapids_id')
-      .eq('user_id', user.id)
+      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
       .eq('status', 'active')
       .maybeSingle(),
   ]);

@@ -1,7 +1,7 @@
+import { loadPublishedLessonProgress } from './published-lesson-progress';
 import 'server-only';
 
 import { createClient } from '@/lib/supabase/server';
-import { getAdminClient } from '@/lib/supabase/admin';
 import { loadApprenticePortalData } from '@/lib/portal/load-apprentice-portal';
 import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
 import {
@@ -9,7 +9,6 @@ import {
   getProgramDashboardExtras,
   type ProgramDashboardExtras,
 } from '@/lib/apprenticeship/program-dashboard-extras';
-import { ensureApprenticeshipLmsEnrollment } from '@/lib/apprenticeship/ensure-lms-enrollment';
 import { resolveCourseEntryLinks } from '@/lib/lms/resolve-course-entry-links';
 
 export interface RtiTrainingSummary {
@@ -54,17 +53,10 @@ export async function loadApprenticeshipDashboard(
     return { ...base, extras, complianceLinks, rti: null };
   }
 
-  if (base.enrollment) {
-    const adminDb = await getAdminClient();
-    await ensureApprenticeshipLmsEnrollment(adminDb ?? supabase, {
-      userId: user.id,
-      programSlug,
-      courseId,
-      grantAccess: Boolean(base.enrollment.orientation_completed_at),
-    });
-  }
+  // Rendering a dashboard must not grant access, reactivate enrollments,
+  // or overwrite completed LMS progress. Onboarding owns those transitions.
 
-  const [{ data: course }, { data: lmsProgress }, lessonCountRes, completedRes, entryLinks] =
+  const [courseResult, lmsProgressResult, lessonProgress, entryLinks] =
     await Promise.all([
     supabase.from('lms_courses').select('id, title').eq('id', courseId).maybeSingle(),
     supabase
@@ -73,25 +65,16 @@ export async function loadApprenticeshipDashboard(
       .eq('user_id', user.id)
       .eq('course_id', courseId)
       .maybeSingle(),
-    supabase
-      .from('course_lessons')
-      .select('id', { count: 'exact', head: true })
-      .eq('course_id', courseId),
-    supabase
-      .from('lesson_progress')
-      .select('lesson_id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .eq('completed', true),
+    loadPublishedLessonProgress(supabase, courseId, user.id),
     resolveCourseEntryLinks(supabase, courseId, user.id),
   ]);
 
-  const publishedLessonCount = lessonCountRes.count ?? 0;
-  const completedLessonCount = completedRes.count ?? 0;
-  const progressFromRows =
-    publishedLessonCount > 0
-      ? Math.round((completedLessonCount / publishedLessonCount) * 100)
-      : 0;
+  if (courseResult.error) throw courseResult.error;
+  if (lmsProgressResult.error) throw lmsProgressResult.error;
+  const course = courseResult.data;
+  const lmsProgress = lmsProgressResult.data;
+  const publishedLessonCount = lessonProgress.totalLessons;
+  const completedLessonCount = lessonProgress.completedLessons;
 
   const rti: RtiTrainingSummary = {
     courseId,
@@ -99,7 +82,7 @@ export async function loadApprenticeshipDashboard(
     courseHref: entryLinks.courseHref,
     workbookHref: entryLinks.workbookHref,
     continueHref: entryLinks.continueHref,
-    progressPercent: lmsProgress?.progress_percent ?? progressFromRows,
+    progressPercent: lessonProgress.percent,
     status: lmsProgress?.status ?? (completedLessonCount > 0 ? 'in_progress' : null),
     publishedLessonCount,
     completedLessonCount,

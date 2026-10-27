@@ -1,3 +1,4 @@
+import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
 import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
@@ -171,17 +172,7 @@ export default async function ApprenticePortalPage() {
   const beautyProgram = getBeautyApprenticeshipConfig(programSlug);
   const registeredStandard = getRegisteredProgramStandard(programSlug);
 
-  const [
-    { data: profile },
-    { data: docs },
-    certsRes,
-    { data: documentRequirements },
-    { data: handbookAcceptance },
-    { data: cosmetologyBilling },
-    { data: billingAuthorization },
-    { data: theorySchedule },
-    { data: policyAcceptances },
-  ] = await Promise.all([
+  const dashboardResults = await Promise.all([
     db
       .from('profiles')
       .select('full_name,first_name,last_name')
@@ -244,6 +235,20 @@ export default async function ApprenticePortalPage() {
       .eq('subject_id', subject.userId)
       .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
+  for (const result of dashboardResults) {
+    if ('error' in result && result.error) throw result.error;
+  }
+  const [
+    { data: profile },
+    { data: docs },
+    certsRes,
+    { data: documentRequirements },
+    { data: handbookAcceptance },
+    { data: cosmetologyBilling },
+    { data: billingAuthorization },
+    { data: theorySchedule },
+    { data: policyAcceptances },
+  ] = dashboardResults;
   const { data: automaticBillingSchedule } = billingAuthorization?.billing_schedule_id
     ? await db
         .from('billing_schedules')
@@ -281,24 +286,15 @@ export default async function ApprenticePortalPage() {
   let totalLessons = 0;
   let completedLessons = 0;
   if (runtime.enrollment.course_id) {
-    const [courseRes, lessonCountRes, progressCountRes] = await Promise.all([
+    const [courseRes, lessonProgress] = await Promise.all([
       db.from('courses').select('title,slug').eq('id', runtime.enrollment.course_id).maybeSingle(),
-      db
-        .from('course_lessons')
-        .select('id', { count: 'exact', head: true })
-        .eq('course_id', runtime.enrollment.course_id)
-        .eq('is_published', true),
-      db
-        .from('lesson_progress')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', subject.userId)
-        .eq('course_id', runtime.enrollment.course_id)
-        .eq('completed', true),
+      loadPublishedLessonProgress(db, runtime.enrollment.course_id, subject.userId),
     ]);
+    if (courseRes.error) throw courseRes.error;
     courseTitle = courseRes.data?.title || courseTitle;
     courseHref = courseOverviewPath(runtime.enrollment.course_id);
-    totalLessons = lessonCountRes.count ?? 0;
-    completedLessons = progressCountRes.count ?? 0;
+    totalLessons = lessonProgress.totalLessons;
+    completedLessons = lessonProgress.completedLessons;
   }
   // Display recorded OJL progress without inventing a theory-unlock threshold.
   // Access remains controlled by the existing server-side enrollment policy.
@@ -810,7 +806,7 @@ export default async function ApprenticePortalPage() {
           icon={BookOpen}
         />
         <Metric
-          label="Approved weekly OJL"
+          label="Approved OJL to date"
           value={progress.ojl.approvedHours.toLocaleString()}
           detail={`${progress.ojl.pendingEntries} pending work entries · approved supervised hours only`}
           icon={Clock3}

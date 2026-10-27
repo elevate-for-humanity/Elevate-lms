@@ -81,11 +81,11 @@ async function _POST(req: Request) {
     return NextResponse.json({ error: 'Enrollment ID required' }, { status: 400 });
   }
 
-  if (!hours_requested || hours_requested <= 0 || hours_requested > 2000) {
+  if (typeof hours_requested !== 'number' || !Number.isFinite(hours_requested) || hours_requested < 1 || hours_requested > 2000) {
     return NextResponse.json({ error: 'Hours must be between 1 and 2000' }, { status: 400 });
   }
 
-  if (!previous_school_name) {
+  if (typeof previous_school_name !== 'string' || !previous_school_name.trim() || previous_school_name.length > 200) {
     return NextResponse.json({ error: 'Previous school name required' }, { status: 400 });
   }
 
@@ -94,7 +94,8 @@ async function _POST(req: Request) {
     .from('program_enrollments')
     .select('id, student_id, transfer_hours')
     .eq('id', enrollment_id)
-    .eq('student_id', user.id)
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
     .maybeSingle();
 
   if (enrollmentError || !enrollment) {
@@ -102,13 +103,14 @@ async function _POST(req: Request) {
   }
 
   // Check for existing pending request
-  const { data: existingRequest } = await supabase
+  const { data: existingRequest, error: pendingError } = await supabase
     .from('transfer_hour_requests')
     .select('id')
     .eq('enrollment_id', enrollment_id)
     .eq('status', 'pending')
     .maybeSingle();
 
+  if (pendingError) return NextResponse.json({ error: 'Request status unavailable' }, { status: 503 });
   if (existingRequest) {
     return NextResponse.json(
       { error: 'You already have a pending transfer request for this enrollment' },

@@ -1,3 +1,5 @@
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
+import { recordedHours } from '@/lib/apprenticeship/recorded-hours';
 import type { SupabaseClient } from '@/lib/supabase';
 
 /**
@@ -41,27 +43,20 @@ export async function getApprovedHoursByType(
   // hour_entries is the canonical source — includes both student-logged
   // and admin-entered hours. apprenticeship_hours is a legacy/parallel
   // table that may contain duplicates; do NOT sum both.
-  let query = db
-    .from('hour_entries')
-    .select('hours_claimed, accepted_hours, source_type, category')
-    .eq('user_id', userId)
-    .in('status', ['approved', 'verified', 'accepted', 'complete', 'completed', 'locked']);
-
-  if (programSlug) {
-    query = query.eq('program_slug', programSlug);
-  }
-
-  const { data, error } = await query;
-
-  if (error || !data) {
-    return { ojl: 0, rti: 0, transferredOjl: 0, transferredRti: 0 };
-  }
+  const data = await readHoursPages<any>((from, to) => {
+    let query = db.from('hour_entries')
+      .select('id,hours_claimed,accepted_hours,source_type,category')
+      .eq('user_id', userId)
+      .in('status', ['approved', 'verified', 'accepted', 'complete', 'completed', 'locked']);
+    if (programSlug) query = query.eq('program_slug', programSlug);
+    return query.order('id').range(from, to);
+  });
 
   let ojl = 0;
   let rti = 0;
 
   for (const row of data) {
-    const hrs = Number(row.accepted_hours) || Number(row.hours_claimed) || 0;
+    const hrs = recordedHours(row);
 
     if (OJL_SOURCE_TYPES.has(row.source_type)) {
       ojl += hrs;
@@ -81,24 +76,27 @@ export async function getApprovedHoursByType(
 
   // Query approved transfer requests
   // First get the apprentice_id for this user
-  const { data: apprenticeData } = await db
+  const { data: apprenticeData, error: apprenticeError } = await db
     .from('apprentices')
     .select('id')
     .eq('user_id', userId)
     .eq('status', 'active')
     .maybeSingle();
 
+  if (apprenticeError) throw apprenticeError;
+
   let transferredOjl = 0;
   let transferredRti = 0;
 
   if (apprenticeData?.id) {
     // Get approved/evaluated transfer requests
-    const { data: transferData } = await db
+    const { data: transferData, error: transferError } = await db
       .from('hour_transfer_requests')
       .select('hours_accepted, source_type, status')
       .eq('apprentice_id', apprenticeData.id)
       .in('status', ['approved', 'partial', 'evaluated']);
 
+    if (transferError) throw transferError;
     if (transferData) {
       for (const transfer of transferData) {
         // Use hours_accepted if available, otherwise skip

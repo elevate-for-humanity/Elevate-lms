@@ -21,6 +21,8 @@ import {
 } from '@/lib/compliance/apprenticeship';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { recordedHours, isOjlEntry } from '@/lib/apprenticeship/recorded-hours';
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 export const dynamic = 'force-dynamic';
@@ -40,15 +42,17 @@ export default async function StateBoardExamPage() {
   if (!subject.userId) redirect('/login?redirect=/apprentice/state-board');
 
   // Canonical enrollment source
-  const { data: programEnrollment } = await db
+  const { data: programEnrollment, error: enrollmentError } = await db
     .from('program_enrollments')
-    .select('program_slug, enrolled_at, status, required_hours, transfer_hours, lms_completed, practical_skills_verified')
-    .eq('user_id', subject.userId)
+    .select('program_slug, enrolled_at, status, required_hours, transfer_hours, transfer_hours_verified, lms_completed, practical_skills_verified')
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .in('program_slug', Object.keys(APPRENTICESHIP_REQUIRED_HOURS))
-    .eq('status', 'active')
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  if (enrollmentError) throw enrollmentError;
 
   const programSlug = programEnrollment?.program_slug ?? null;
 
@@ -60,21 +64,22 @@ export default async function StateBoardExamPage() {
 
   const requiredHours = programEnrollment?.required_hours ?? configuredRequiredHours;
 
-  // Hours from apprentice_hours (canonical PWA source) — approved only
-  const { data: approvedRows } = await db
+  const approvedRows = await readHoursPages<any>((from, to) => db
     .from('hour_entries')
-    .select('accepted_hours,hours_claimed')
+    .select('id,accepted_hours,hours_claimed,source_type,category')
     .eq('user_id', subject.userId)
-    .eq('status', 'approved');
-
-  const pwaHours = (approvedRows ?? []).reduce((sum, r) => sum + Number(r.accepted_hours || r.hours_claimed || 0), 0);
-  const transferHours = programEnrollment?.transfer_hours ?? 0;
+    .eq('program_slug', programSlug)
+    .in('status', ['approved', 'locked'])
+    .order('id').range(from, to));
+  const pwaHours = approvedRows.filter(isOjlEntry).reduce((sum, row) => sum + recordedHours(row), 0);
+  const transferHours = programEnrollment?.transfer_hours_verified === true
+    ? Math.max(0, Number(programEnrollment.transfer_hours) || 0) : 0;
   const totalHours = pwaHours + transferHours;
 
   const hoursComplete = totalHours >= requiredHours;
   const lmsComplete = programEnrollment?.lms_completed ?? false;
   const skillsVerified = programEnrollment?.practical_skills_verified ?? false;
-  const isReady = hoursComplete && lmsComplete;
+  const isReady = hoursComplete && lmsComplete && skillsVerified;
 
   let examInfo = null as (typeof IPLA_EXAM_INFO)[keyof typeof IPLA_EXAM_INFO] | null;
   if (programSlug.includes('barber')) examInfo = IPLA_EXAM_INFO.barber;
@@ -117,9 +122,9 @@ export default async function StateBoardExamPage() {
               <span className="w-8 h-8 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">You&apos;re eligible to test</h2>
+              <h2 className="text-xl font-bold">Recorded training checklist complete</h2>
               <p className="text-emerald-100 text-sm mt-0.5">
-                All requirements complete. Schedule your exam below.
+                Your recorded hours, coursework, and practical skills are complete. Confirm final examination eligibility with your program administrator and licensing agency.
               </p>
             </div>
           </div>

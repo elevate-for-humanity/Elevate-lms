@@ -76,7 +76,10 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   for(let slot=0;slot<slots;slot++){
    const capacity=await capacityCheck({region:LESSON_ROLE_REGION,task,taskCount:1,run,request});
    const next=reserveCapacity(capacity,task,reserved);
-   if(!next){capacityWait=true;break;}
+   if(!next){
+    console.info(JSON.stringify({event:'lesson_pool_capacity_wait',role,required:capacity.required,granted:capacity.granted,reserved}));
+    capacityWait=true;break;
+   }
    const prefix='autopilot-'+role+'-'+randomUUID();
    run(['run','jobs','execute',config.name,...scope,'--tasks=1','--update-env-vars=ULTIMATE_WORKER_ID='+prefix,'--async','--quiet']);
    reserved=next;launches.push({role,prefix,candidates:new Map(candidates.map(j=>[j.id,j]))});activeCount++;

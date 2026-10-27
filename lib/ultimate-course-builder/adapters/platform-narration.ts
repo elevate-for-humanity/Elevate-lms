@@ -40,15 +40,27 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      // Numeral scripts retain the existing measured recognizer until their intended
      // pronunciation is explicitly supplied. Never guess guard lengths.
      let measured;
+     const recognize=()=>measureNarrationCaptions(bytes,recording.text,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
      if (/\d/.test(recording.text)) {
-      measured=await measureNarrationCaptions(bytes,recording.text,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
+      measured=await recognize();
      } else {
-      const words=await alignRecordedNarration(pcm,recording.text);
-      wordAlignment.push(...words.map((w:any)=>({...w,start:cursor+w.start,end:cursor+w.end})));
-      measured=[];
-      for(let i=0;i<words.length;i+=8) {
-       const group=words.slice(i,i+8);
-       measured.push({text:group.map((w:any)=>w.word).join(' '),startSeconds:group[0].start,endSeconds:group.at(-1).end});
+      let words;
+      try {words=await alignRecordedNarration(pcm,recording.text);}
+      catch(error) {
+       // A finite grammar can have no path through valid recorded speech.
+       // Independently measure that same PCM with the existing recognizer;
+       // never interpolate timestamps or hide a failed measurement.
+       const detail=error instanceof Error?error.message+' '+String((error as any).stderr??''):String(error);
+       if(!detail.includes('FORCED_ALIGNMENT_NO_PATH'))throw error;
+       measured=await recognize();
+      }
+      if(words) {
+       wordAlignment.push(...words.map((w:any)=>({...w,start:cursor+w.start,end:cursor+w.end})));
+       measured=[];
+       for(let i=0;i<words.length;i+=8) {
+        const group=words.slice(i,i+8);
+        measured.push({text:group.map((w:any)=>w.word).join(' '),startSeconds:group[0].start,endSeconds:group.at(-1).end});
+       }
       }
      }
      captions.push(...measured.map((c:any)=>({...c,startSeconds:cursor+c.startSeconds,endSeconds:cursor+c.endSeconds})));

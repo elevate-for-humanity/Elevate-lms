@@ -94,6 +94,23 @@ async function loadDashboardSubmissions(db: Awaited<ReturnType<typeof requireAdm
   }
 }
 
+async function loadDashboardPrograms(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('programs')
+      .select('id,title,slug,status,is_active,updated_at')
+      .order('title', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -274,14 +291,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       'WIOA documents',
     ),
     timeboxDashboardQuery(loadDashboardSubmissions(db), 'step submissions'),
-    timeboxDashboardQuery(
-      db
-        .from('programs')
-        .select('id,title,slug,status,is_active,updated_at')
-        .order('title')
-        .limit(300),
-      'programs',
-    ),
+    timeboxDashboardQuery(loadDashboardPrograms(db), 'programs'),
     timeboxDashboardQuery(
       db
         .from('stripe_sessions_staging')

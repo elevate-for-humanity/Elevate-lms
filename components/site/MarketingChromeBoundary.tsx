@@ -30,15 +30,18 @@ export function MarketingChromeBoundary({
   header,
   footer,
   paris,
+  storeOnly = false,
 }: {
   children: React.ReactNode;
   header: React.ReactNode;
   footer: React.ReactNode;
   paris: React.ReactNode;
+  storeOnly?: boolean;
 }) {
   const pathname = usePathname() || '/';
   const operational = matchesPrefix(pathname, OPERATIONAL_PREFIXES);
-  const standaloneBrand = matchesPrefix(pathname, STANDALONE_BRAND_PREFIXES);
+  const standaloneBrand = matchesPrefix(pathname, STANDALONE_BRAND_PREFIXES)
+    || /^\/apps\/website-builder\/edit\/[^/]+\/preview(?:\/|$)/.test(pathname);
 
   if (operational || standaloneBrand) {
     return (
@@ -54,11 +57,11 @@ export function MarketingChromeBoundary({
       <div id="main-content" tabIndex={-1} className="site-main focus:outline-none">
         <RouteTransition>
           {children}
-          <PublicPathwayLinks />
+          {!storeOnly ? <PublicPathwayLinks /> : null}
         </RouteTransition>
       </div>
       {footer}
-      {!pathname.startsWith('/store') ? paris : null}
+      {!storeOnly && !pathname.startsWith('/store') ? paris : null}
     </>
   );
 }

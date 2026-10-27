@@ -5,6 +5,7 @@ import { getAvailableWorkspaces } from '@/lib/devstudio/workspace-registry';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const metadata = { manifest: '/manifest-dev-studio.json', title: 'Dev Studio | Elevate Admin' };
 
 export default async function StudioPage({
   searchParams,

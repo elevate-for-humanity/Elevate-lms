@@ -4,10 +4,13 @@ import {
   contractHash,
   currentEvidence,
   stepInputHash,
+  stepInputHashes,
   validateStepOutput,
   practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
+  nonblockingManualReview,
+  optionalManualReviewStage,
 } from './lesson-contract';
 import { isDurableExternalBlocker, routeSelectiveRepairs } from './repair-router';
 import {
@@ -47,20 +50,31 @@ export interface UltimateRunContext {
   assertActive?: () => void;
   repairDirective?: any;
   beforeCheckpoint?: (step: UltimateBuildStep) => Promise<UltimateBuildStep | null>;
+  /** Owner preview stops after encoding; it never certifies QA or publication. */
+  renderPreviewOnly?: boolean;
 }
 
 export class UltimateBuildRunner {
   constructor(private handlers: Partial<Record<UltimateBuildStep, StepHandler>>) {}
 
   async run(ctx: UltimateRunContext) {
+    // Keep recovery payloads until a replacement passes validation and is saved.
+    // Invalidating a certificate must not destroy the previously saved lesson.
+    const retainedCheckpoints = new Map<UltimateBuildStep, Record<string, unknown>>();
+    for (const step of ULTIMATE_BUILD_STEPS) {
+      const checkpoint = ctx.artifacts[step];
+      if (checkpoint) retainedCheckpoints.set(step, structuredClone(checkpoint));
+    }
     const attempts: Array<{
       failedStep: UltimateBuildStep;
       target: UltimateBuildStep;
       codes: string[];
     }> = [];
-    ctx.repairDirective=(ctx.artifacts as any).__repairState?.directive;
+    const savedRepair = (ctx.artifacts as any).__repairState;
+    ctx.repairDirective = savedRepair?.status === 'producer-validated' ? undefined : savedRepair?.directive;
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
+      if (ctx.renderPreviewOnly && index > ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render')) break;
       ctx.assertActive?.();
       const requestedRepair = await ctx.beforeCheckpoint?.(ULTIMATE_BUILD_STEPS[index]);
       if (requestedRepair) {
@@ -75,9 +89,12 @@ export class UltimateBuildRunner {
         }
       }
       const step = ULTIMATE_BUILD_STEPS[index];
+      // Review/browser acceptance is advisory for this specific manual course.
+      // Do not fabricate QA artifacts, certificates or browser evidence.
+      if (optionalManualReviewStage(step, ctx.profile)) { index++; continue; }
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
-      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
+      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], stepInputHashes(step, ctx.profile, ctx.artifacts)) &&
           !validateStepOutput(step, ctx.artifacts[step] ?? {}).length &&
           (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;
@@ -111,7 +128,12 @@ export class UltimateBuildRunner {
             },
           };
         const findings = result.findings ?? [];
-        failures = findings.filter((f) => f.severity === 'error');
+        failures = findings.filter((f) => f.severity === 'error' &&
+          !(nonblockingManualReview(ctx.profile) && f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED'));
+        // Retain the review finding as a warning, without blocking authoring.
+        if (nonblockingManualReview(ctx.profile)) for (const f of findings) {
+          if (f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED') f.severity = 'warning';
+        }
         const contractFailures = failures.length ? [] : validateStepOutput(step, artifacts);
         if (step === 'visual_assignment') contractFailures.push(...practicalVisualFailures({...ctx.artifacts, visual_assignment: artifacts}, competency));
         for (const code of contractFailures)
@@ -121,7 +143,8 @@ export class UltimateBuildRunner {
             code,
             message: `${step} is missing required contract evidence: ${code}`,
           });
-        if (result.passed === false && !failures.length)
+        if (result.passed === false && !failures.length &&
+          !(nonblockingManualReview(ctx.profile) && findings.some(f => f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED')))
           failures.push({
             step,
             severity: 'error',
@@ -145,12 +168,25 @@ export class UltimateBuildRunner {
         // A failed repair candidate must not replace a known-good artifact or
         // create a new accepted artifact version. Keep the previous checkpoint
         // available for recovery and record the failed state separately.
+        // Do not spend another render on a producer that returned the same
+        // defective evidence. Preserve the prior certified artifact, and surface
+        // a genuine repair blocker for PARIS rather than marking it corrected.
+        // Media QA itself is an inspector, not a producer.
+        if (producerRepair && failures.length === 0 &&
+            ['synchronization', 'visual_assignment', 'scene_construction', 'natural_narration'].includes(step) &&
+            contractHash(Object.fromEntries(Object.entries(artifacts).filter(([key]) => key !== 'contractEvidence'))) ===
+            contractHash(Object.fromEntries(Object.entries(previous).filter(([key]) => key !== 'contractEvidence')))) {
+          throw new Error('REPAIR_PRODUCER_UNCHANGED:' + step);
+        }
         if (producerRepair && failures.length) {
           artifacts = previous;
           ctx.artifacts[step] = previous;
         } else {
           ctx.artifacts[step] = artifacts;
-          await ctx.persistArtifact?.({ step, artifacts });
+          if (!failures.length) {
+            await ctx.persistArtifact?.({ step, artifacts });
+            retainedCheckpoints.set(step, structuredClone(artifacts));
+          }
         }
         if (!failures.length) {
           if(isRepairTarget){
@@ -184,6 +220,14 @@ export class UltimateBuildRunner {
             : message.split(':')[0];
         failures = [{ step, severity: 'error', code, message }];
       }
+      // A thrown handler, rejected candidate, or failed save leaves the last
+      // durable payload available. Cleared passedSteps stay cleared: recovered
+      // media is history, not permission to publish against changed inputs.
+      for (const [savedStep, checkpoint] of retainedCheckpoints) {
+        if (savedStep === step || ctx.artifacts[savedStep] === undefined)
+          ctx.artifacts[savedStep] = structuredClone(checkpoint);
+      }
+      artifacts = ctx.artifacts[step] ?? artifacts;
       ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'failed', artifacts, findings: failures });
       for (const finding of failures) await ctx.persistFinding?.(finding);
@@ -194,7 +238,20 @@ export class UltimateBuildRunner {
         /HTTP (429|5\d\d)|timeout|timed out|ECONNRESET|fetch failed/i.test(f.message),
       );
       const durableBlocker = failures.some((f) => isDurableExternalBlocker(f));
-      const target = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
+      const proposedTarget = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
+      // A previously validated producer checkpoint must not be invalidated
+      // indefinitely for the same downstream finding. A genuine new source
+      // revision or explicit checkpoint repair can authorize a fresh attempt;
+      // until then, retain the evidence and expose the unresolved QA failure.
+      const validatedRepair = (ctx.artifacts as any).__repairState;
+      const repeatedValidatedFailure = proposedTarget &&
+        validatedRepair?.status === 'producer-validated' &&
+        validatedRepair?.directive?.target === proposedTarget &&
+        Array.isArray(validatedRepair?.directive?.requirements) &&
+        failures.every(f => validatedRepair.directive.requirements.some(
+          (previous: any) => previous.code === f.code && previous.message === f.message,
+        ));
+      const target = repeatedValidatedFailure ? undefined : proposedTarget;
       if (target && attempts.length < MAX_TARGETED_REPAIRS) {
         const previous=ctx.artifacts[target];
         const directive=repairDirective(failures,step,target,previous,attempts.length+1);

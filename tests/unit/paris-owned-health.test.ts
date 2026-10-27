@@ -6,9 +6,11 @@ describe('PARIS owned-runtime readiness', () => {
   it('requires an authenticated model readback rather than mistaking vendor API keys for readiness', () => {
     expect(source).toContain("name: 'paris-owned-inference'");
     expect(source).toContain("ownedReady");
-    expect(source).toContain("response.ok");
-    expect(source).toContain("model.id === 'elevate-local'");
-    expect(source).toContain("Authorization:");
+    expect(source).toContain("ownedModel.verified");
+    const probe = readFileSync('lib/ai/providers/owned-model-health.mjs', 'utf8');
+    expect(probe).toContain("response.ok");
+    expect(probe).toContain("model?.id==='elevate-local'");
+    expect(probe).toContain("headersFor(base, token");
   });
   it('does not enable or create GPU resources from the health endpoint', () => {
     expect(source).not.toContain('gcloud run deploy');

@@ -19,16 +19,22 @@ export function FirstPartyTraffic() {
 
   useEffect(() => {
     if (/^\/tax-software\/(office|self-file|login|careers)(\/|$)/.test(pathname || '')) return;
+    // Optional analytics must not bring down the shared marketing layout when
+    // privacy settings deny browser storage. Do not invent a tracking identity.
+    let sessionId: string;
+    let landing: string;
+    try {
+      sessionId = getSessionId();
+      landing = window.sessionStorage.getItem(LANDING_KEY) || `${pathname}${window.location.search}`;
+      if (!window.sessionStorage.getItem(LANDING_KEY))
+        window.sessionStorage.setItem(LANDING_KEY, landing);
+    } catch { return; }
     const search = new URLSearchParams(window.location.search);
-    const landing =
-      window.sessionStorage.getItem(LANDING_KEY) || `${pathname}${window.location.search}`;
-    if (!window.sessionStorage.getItem(LANDING_KEY))
-      window.sessionStorage.setItem(LANDING_KEY, landing);
 
     const payload = JSON.stringify({
       path: pathname,
       page: `${pathname}${window.location.search}`,
-      session_id: getSessionId(),
+      session_id: sessionId,
       referrer: document.referrer || null,
       landing_path: landing,
       utm_source: search.get('utm_source'),
@@ -38,7 +44,7 @@ export function FirstPartyTraffic() {
 
     if (navigator.sendBeacon) {
       const blob = new Blob([payload], { type: 'application/json' });
-      navigator.sendBeacon('/api/analytics/track', blob);
+      try { navigator.sendBeacon('/api/analytics/track', blob); } catch { /* Optional telemetry. */ }
       return;
     }
 
@@ -48,7 +54,7 @@ export function FirstPartyTraffic() {
       body: payload,
       keepalive: true,
       credentials: 'omit',
-    });
+    }).catch(() => { /* Optional telemetry cannot create an unhandled rejection. */ });
   }, [pathname]);
 
   return null;

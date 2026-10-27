@@ -77,3 +77,16 @@ describe('platform execution evidence', () => {
     ).toBe('PASS');
   });
 });
+
+
+describe('semantic execution failures', () => {
+  it.each([{overall: 'unknown'}, {overall: 'unhealthy'}, {status: 'failed'}, {status: 'unavailable'}, {status: 'degraded'}])('rejects %j as verified success', result => {
+    expect(evaluateExecution({tool: 'system.health', result}).status).toBe('FAIL_BLOCKING');
+  });
+  it.each(['pending', 'queued', 'running', 'awaiting_approval'])('does not verify an unfinished %s operation', status => {
+    expect(evaluateExecution({tool: 'advisory', result: {status}}).status).toBe('REQUIRES_HUMAN_REVIEW');
+  });
+  it('still accepts a healthy observed result', () => {
+    expect(evaluateExecution({tool: 'system.health', result: {overall: 'healthy', timestamp: new Date().toISOString()}}).status).toBe('PASS');
+  });
+});

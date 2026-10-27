@@ -88,12 +88,12 @@ export function ColoredLivePreviewFrame({
   return (
     <div
       className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-xl ${className}`}
-      style={{ minHeight: workspaceTop ? `min(95vh, ${workspaceMinHeight + minHeight + 120}px)` : undefined }}
+      style={{ minHeight: workspaceTop ? `min(95dvh, ${workspaceMinHeight + minHeight + 120}px)` : undefined }}
     >
       {workspaceTop ? (
         <div
           className="flex min-h-0 shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white"
-          style={{ height: `clamp(340px, 52vh, ${Math.max(workspaceMinHeight, 480)}px)` }}
+          style={{ height: `max(${Math.max(workspaceMinHeight, 640)}px, calc(100dvh - 5rem))` }}
         >
           {workspaceTop}
         </div>
@@ -108,7 +108,7 @@ export function ColoredLivePreviewFrame({
             Live preview
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap">
           <button
             type="button"
             onClick={refresh}
@@ -118,7 +118,7 @@ export function ColoredLivePreviewFrame({
             <RefreshCw className="h-4 w-4" />
           </button>
           <form
-            className="flex min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-white/95 px-2 shadow-sm"
+            className="order-first flex min-w-0 basis-full items-center gap-1.5 rounded-lg bg-white/95 px-2 shadow-sm sm:order-none sm:basis-auto sm:flex-1"
             onSubmit={(e) => {
               e.preventDefault();
               refresh();
@@ -126,6 +126,7 @@ export function ColoredLivePreviewFrame({
           >
             <Globe className="h-3.5 w-3.5 shrink-0 text-brand-blue-600" />
             <input
+              aria-label="Preview URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               className="h-11 min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none"
@@ -167,6 +168,8 @@ export function ColoredLivePreviewFrame({
                 key={id}
                 type="button"
                 title={title}
+                aria-label={`${title} preview`}
+                aria-pressed={device === id}
                 onClick={() => setDevice(id)}
                 className={`inline-flex h-10 w-10 items-center justify-center rounded-md ${device === id ? 'bg-white text-brand-blue-700' : 'text-white/90 hover:bg-white/20'}`}
               >
@@ -178,7 +181,7 @@ export function ColoredLivePreviewFrame({
             href={liveUrl || url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white hover:bg-white/25"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-white hover:bg-slate-700"
             title="Open in new tab"
           >
             <ExternalLink className="h-4 w-4" />
@@ -189,7 +192,7 @@ export function ColoredLivePreviewFrame({
       {showSiteHealth && list.length > 0 && <SiteHealthStrip targets={list} />}
 
       {showChips && list.length > 0 && (
-        <div className="flex max-h-24 shrink-0 flex-wrap gap-1.5 overflow-y-auto border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-2 py-2">
+        <div className="flex max-h-24 min-w-0 shrink-0 flex-wrap gap-2 overflow-y-auto border-b border-slate-200 bg-white px-3 py-3">
           {list.map((target, i) => (
             <button
               key={`${target.url}-${i}`}

@@ -210,15 +210,15 @@ export async function POST(req: NextRequest) {
     } catch {
       return NextResponse.json({ error: 'INVALID_ASSESSMENT' }, { status: 400, headers });
     }
-    const module = await db
+    const trainingModule = await db
       .from('staff_training_modules')
       .select('id')
       .eq('id', parsed.data.moduleId)
       .eq('category', TRAINING_CATEGORY)
       .eq('is_active', true)
       .maybeSingle();
-    if (module.error) throw Error('MODULE_READ_FAILED');
-    if (!module.data)
+    if (trainingModule.error) throw Error('MODULE_READ_FAILED');
+    if (!trainingModule.data)
       return NextResponse.json({ error: 'MODULE_UNAVAILABLE' }, { status: 404, headers });
     if (!result.passed) return NextResponse.json(result, { headers });
     const old = await db

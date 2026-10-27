@@ -1,30 +1,20 @@
 name: Activate already-tested Google Marketing revision
 # Recovery retry: candidate tags now fit Google's 46-character combined limit.
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/activate-tested-google-marketing.yml']
   workflow_dispatch:
 permissions:
   contents: read
   actions: write
   id-token: write
 jobs:
-  dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Dispatch trusted main recovery
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/activate-tested-google-marketing.yml/dispatches" -f ref=main
   activate:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10
     concurrency:
-      group: google-marketing-runtime-operations
+      group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     env:
       IMAGE_SHA: 97a6397dbed488354f7f3f8aa8e63353281f57c5

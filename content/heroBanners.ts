@@ -79,18 +79,17 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
 const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
   'cpr-first-aid': '/images/pages/comp-pathway-classroom.webp',
   'bookkeeping': '/images/pages/finance-accounting.webp',
-  'finance-bookkeeping-accounting': '/images/pages/business-meeting.webp',
-  'hvac-technician': '/images/programs/efh-building-tech-card.jpg',
+  'finance-bookkeeping-accounting': '/images/bookkeeping-training-vibrant-2026.webp',
+  'hvac-technician': '/images/hvac-hero.webp',
   'nha-medical-assistant': '/images/pages/medical-assistant-hero.webp',
   'nha-patient-care-technician': '/images/pages/cna-vitals.webp',
   'qma': '/images/pages/cna-patient-care.jpg',
   'nha-pharmacy-technician': '/images/pages/medical-assistant-real.webp',
-  'nha-phlebotomy': '/images/pages/drug-testing-page-4.webp',
+  'nha-phlebotomy': '/images/pexels/phlebotomy.webp',
   'youth-culinary-apprenticeship': '/images/pages/entrepreneurship.webp',
   'network-administration': '/images/pages/technology-sector.webp',
   'network-support-technician': '/hero-images/technology-cat-new.jpg',
   'guest-service-gold': '/images/pages/about-employer-partners.webp',
-  'start-hospitality': '/images/pages/suboffice-onboarding-page-1.webp',
 };
 
 const SHARED_GENERIC_VIDEO_FILES = new Set([
@@ -174,6 +173,9 @@ function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string 
 }
 
 function posterFor(key: string, banner: RawHeroBannerConfig): string {
+  // No distinct verified hospitality photograph is available for this page.
+  // Use its unique accessible branded poster rather than a misleading office image.
+  if (key === 'start-hospitality') return semanticInlinePoster(key, banner);
   if (DISTINCT_PROGRAM_POSTERS[key]) return DISTINCT_PROGRAM_POSTERS[key];
   if (PROGRAM_IMAGES[key]?.hero.includes('/refresh-20261014/')) return getProgramHeroImage(key);
   if (PAGE_PICTURE_OVERRIDES[key]?.includes('/refresh-20261014/'))

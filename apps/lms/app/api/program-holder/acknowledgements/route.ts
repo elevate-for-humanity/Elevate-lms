@@ -9,20 +9,21 @@ export async function POST(request: Request) {
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   const body = await request.json().catch(() => ({}));
-  const allowedTypes = ['handbook', 'rights', 'non_compete', 'enchanted_hearts_referral_terms'];
+  const allowedTypes = ['handbook', 'rights', 'nda', 'non_compete', 'enchanted_hearts_referral_terms'];
   const types = allowedTypes.filter((type) => body[type] === true);
   if (!types.length)
     return NextResponse.json({ error: 'Select at least one agreement to sign.' }, { status: 400 });
   const requestHeaders = await headers();
   for (const documentType of types) {
-    const { data: existing } = await ctx.db
+    const { data: existing, error: lookupError } = await ctx.db
       .from('program_holder_acknowledgements')
       .select('id')
       .eq('user_id', ctx.user.id)
       .eq('document_type', documentType)
       .maybeSingle();
-    if (!existing)
-      await ctx.db.from('program_holder_acknowledgements').insert({
+    if (lookupError) return NextResponse.json({ error: 'Acknowledgements could not be checked.' }, { status: 503 });
+    if (!existing) {
+      const { error: insertError } = await ctx.db.from('program_holder_acknowledgements').insert({
         user_id: ctx.user.id,
         document_type: documentType,
         full_name: ctx.profile.full_name,
@@ -30,6 +31,8 @@ export async function POST(request: Request) {
         ip_address: requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || '0.0.0.0',
         user_agent: requestHeaders.get('user-agent') || 'unknown',
       });
+      if (insertError) return NextResponse.json({ error: 'Acknowledgement could not be saved. Please retry.' }, { status: 500 });
+    }
   }
   await checkAndSendOnboardingCompleteEmail(ctx.db, ctx.user.id);
   return NextResponse.json({ ok: true });

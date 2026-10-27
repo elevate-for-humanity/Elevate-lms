@@ -17,6 +17,9 @@ const nextConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
+  // Multipart overhead must fit above the validated 10 MB photo/document limit.
+  experimental: { serverActions: { bodySizeLimit: '12mb' } },
+
   images: { unoptimized: true },
   eslint: { ignoreDuringBuilds: true },
   // Keep observability instrumentation in Node's runtime boundary. Bundling
@@ -86,21 +89,12 @@ const nextConfig = {
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: true },
     ];
   },
-  webpack: (config, { isServer, webpack }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
     if (!isServer) {
       config.plugins = config.plugins || [];
       config.plugins.push(new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'], buffer: 'buffer' }));
     }
-    // Supabase's browser-compatible bundle contains guarded Node version
-    // checks. They are not executed in middleware, but Next reports them as
-    // Edge-runtime warnings while statically scanning the dependency.
-    config.ignoreWarnings = [
-      ...(config.ignoreWarnings ?? []),
-      {
-        module: /node_modules[\\/]@supabase[\\/](?:realtime-js|supabase-js)/,
-        message: /A Node\.js API is used .* not supported in the Edge Runtime/,
-      },
-    ];
+    if (!dev) config.cache = false;
     return config;
   },
 };

@@ -50,10 +50,11 @@ export function canonicalMediaIdentityKey(
 }
 
 export function isCourseMediaFailureRetryable(message: string | null): boolean {
-  if (!message) return true;
-  return !['configuration', 'authorization', 'not_found', 'content'].includes(
-    classifyVideoFailure(message),
-  );
+  // Only transport/runtime failures may be retried without a source repair.
+  // Quality, storage, unknown and configuration failures require investigation;
+  // repeated rendering cannot resolve missing capacity or bad narration.
+  if (!message) return false;
+  return ['transient', 'renderer'].includes(classifyVideoFailure(message));
 }
 
 export function courseMediaRetryDelayMs(retryCount: number): number {

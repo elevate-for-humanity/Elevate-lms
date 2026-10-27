@@ -1,3 +1,4 @@
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
 /**
  * POST /api/admin/dev-studio/plan
  *
@@ -24,6 +25,7 @@ import { logger } from '@/lib/logger';
 import {
   bindCanonicalTask,
   ensureCanonicalStudioRun,
+  failCanonicalStudioStep,
   startCanonicalStudioStep,
   syncCanonicalStudioRunCheckpoint,
   verifyCanonicalStudioStep,
@@ -186,6 +188,10 @@ export async function POST(req: NextRequest) {
     return new Response('data: [DONE]\n\n', { headers: { 'Content-Type': 'text/event-stream' } });
   }
 
+  if (prohibitsToolUse(goal)) {
+    return Response.json({ error: 'Tool execution is disabled by this request. Use conversational chat.' }, { status: 422 });
+  }
+
   const db = await requireAdminClient();
   let durableDocumentContext = '';
   if (documentIds.length) {
@@ -228,8 +234,15 @@ export async function POST(req: NextRequest) {
         }
       };
 
+      let plan: Plan | null = null;
+      let canonicalRun: Awaited<ReturnType<typeof ensureCanonicalStudioRun>> | null = null;
       try {
-        let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
+        plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
+        if (plan && prohibitsToolUse(plan.goal)) {
+          write('This saved plan cannot run because its request prohibits tool execution. Start a conversational reply or a new explicitly authorized task.');
+          write('', { checkpoint: { planId: plan.id, taskId: '', status: 'failed' } });
+          return;
+        }
         if (!plan) {
           plan = prepareMasterStudioPlan(effectiveGoal, params);
           const shared = await loadSharedContext({
@@ -316,7 +329,7 @@ export async function POST(req: NextRequest) {
           await persistPlan(db, plan, auth.id, tenantId);
         }
 
-        const canonicalRun = await ensureCanonicalStudioRun(db, {
+        canonicalRun = await ensureCanonicalStudioRun(db, {
           actorId: auth.id,
           conversationId,
           organizationId: tenantId,
@@ -546,6 +559,7 @@ export async function POST(req: NextRequest) {
               } else {
                 step.status = 'failed';
                 step.error = evaluation.reasons.join(' | ');
+                await failCanonicalStudioStep(db, canonicalRun, step, step.error);
                 failedSteps += 1;
                 write(`${FAIL} Step ${step.order} failed verification: ${step.title}`);
                 for (const dependent of plan.steps) {
@@ -561,9 +575,13 @@ export async function POST(req: NextRequest) {
                 planId: plan.id,
                 stepId: step.id,
               });
+              // A checkpoint failure after verification must not be relabeled as
+              // failed tool execution, or encourage retrying a completed write.
+              if (step.status === 'done') throw error;
               step.status = 'failed';
               step.evaluation = 'FAIL_BLOCKING';
               step.error = 'Plan step execution failed';
+              await failCanonicalStudioStep(db, canonicalRun, step, step.error);
               failedSteps += 1;
               write(`${FAIL} Step ${step.order} failed: ${step.title}`);
               for (const dependent of plan.steps) {
@@ -590,8 +608,8 @@ export async function POST(req: NextRequest) {
         else if (plan.steps.every((step) => step.status === 'done' || step.status === 'skipped'))
           plan.status = 'done';
 
-        await persistPlan(db, plan, auth.id, tenantId);
         await syncCanonicalStudioRunCheckpoint(db, canonicalRun, plan);
+        await persistPlan(db, plan, auth.id, tenantId);
 
         write('\x1b[1m── Plan Summary ─────────────────────────\x1b[0m');
         write(`${PASS} Completed and verified: ${doneCount}/${plan.steps.length}`);
@@ -634,7 +652,18 @@ export async function POST(req: NextRequest) {
         });
       } catch (error) {
         logger.error('[dev-studio/plan] planner execution failed', error);
-        write(`${FAIL} Planner execution failed`);
+        if (canonicalRun) {
+          // Task completion triggers may have projected 100% before the plan
+          // evaluator or durable checkpoint failed. Never leave that as success.
+          const { error: statusError } = await db.from('studio_runs').update({
+            status: 'failed', active_step_id: null,
+            completed_at: null,
+            failure: { message: 'Planner execution or checkpoint persistence failed. Review saved task evidence before retrying.' },
+          }).eq('id', canonicalRun.id);
+          if (statusError) logger.error('[dev-studio/plan] failure checkpoint could not be saved', statusError);
+          write('', { checkpoint: { planId: plan?.id ?? '', runId: canonicalRun.id, status: 'failed' } });
+        }
+        write(`${FAIL} Planner execution or checkpoint save failed. Review saved task evidence before retrying.`);
       } finally {
         try {
           controller.enqueue(done());

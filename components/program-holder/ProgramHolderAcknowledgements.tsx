@@ -12,24 +12,31 @@ export function ProgramHolderAcknowledgements({
   async function submit(formData: FormData) {
     setBusy(true);
     setMessage('');
+    try {
     const response = await fetch('/api/program-holder/acknowledgements', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         handbook: formData.get('handbook') === 'yes',
         rights: formData.get('rights') === 'yes',
+        nda: formData.get('nda') === 'yes',
         non_compete: formData.get('non_compete') === 'yes',
         enchanted_hearts_referral_terms: formData.get('enchanted_hearts_referral_terms') === 'yes',
       }),
     });
-    const result = await response.json();
-    setBusy(false);
+    if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Your session or connection changed. Reload the page and try again.');
+    const result = await response.json().catch(() => ({}));
     setMessage(
       response.ok
         ? 'Acknowledgements recorded.'
         : result.error || 'Unable to save acknowledgements.',
     );
     if (response.ok) window.setTimeout(() => window.location.reload(), 500);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'The request could not be completed. Please retry.');
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <form action={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -65,6 +72,7 @@ export function ProgramHolderAcknowledgements({
           <input name="rights" value="yes" type="checkbox" required className="mt-1" /> I reviewed
           and accept the rights and responsibilities.
         </label>
+        <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold"><input name="nda" value="yes" type="checkbox" required className="mt-1" /> I reviewed and accept the confidentiality and student privacy obligations in the full Program Holder agreement linked above.</label>
         <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
           <input name="non_compete" value="yes" type="checkbox" required className="mt-1" /> I
           reviewed and agree to the Program Holder non-compete and non-solicitation terms.

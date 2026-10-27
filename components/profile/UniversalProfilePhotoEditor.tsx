@@ -106,22 +106,26 @@ export function UniversalProfilePhotoEditor({
     if (!selectedFile) return;
     setBusy(true);
     setMessage('');
-    let uploadFile = selectedFile;
-    if (canvas && source) {
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, 'image/jpeg', 0.88),
-      );
-      if (!blob) {
-        setBusy(false);
-        setMessage('Could not prepare that image.');
-        return;
+    try {
+      let uploadFile = selectedFile;
+      if (canvas && source) {
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, 'image/jpeg', 0.88),
+        );
+        if (!blob) {
+          setMessage('Could not prepare that image.');
+          return;
+        }
+        uploadFile = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' });
       }
-      uploadFile = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' });
+      const result = await uploadProfileAvatar(uploadFile);
+      setMessage(result.error || 'Profile photo saved.');
+      if (result.success) window.location.reload();
+    } catch {
+      setMessage('Photo upload could not finish. Check your connection and try again. If your session expired, sign in again.');
+    } finally {
+      setBusy(false);
     }
-    const result = await uploadProfileAvatar(uploadFile);
-    setMessage(result.error || 'Profile photo saved.');
-    setBusy(false);
-    if (result.success) window.location.reload();
   }
 
   async function signRelease() {

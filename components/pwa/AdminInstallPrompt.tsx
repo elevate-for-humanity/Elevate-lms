@@ -45,7 +45,7 @@ export function AdminInstallPrompt() {
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="rounded p-1 text-slate-600 hover:bg-slate-100 hover:text-slate-600"
           aria-label="Dismiss"
         >
           ✕

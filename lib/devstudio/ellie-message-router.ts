@@ -7,6 +7,8 @@
  * available for direct inspection; users do not choose one before asking.
  */
 
+import { affirmativeActionText, prohibitsToolUse } from '@/lib/ai/command-intent';
+
 export type EllieMessageRoute = 'command' | 'ops' | 'platform';
 export type StudioSpecialist = 'ELLIE' | 'LIZZY' | 'PARIS' | 'ZORA';
 
@@ -57,6 +59,8 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
  * evidence-producing operational checks enter plan â execute â evaluate.
  */
 export function shouldOrchestrateMessage(message: string): boolean {
+  if (prohibitsToolUse(message)) return false;
+  message = affirmativeActionText(message);
   if (OUTCOME_REQUEST_RE.test(message) || DETERMINISTIC_COMMAND_RE.test(message)) return true;
   if (EXECUTION_VERB_RE.test(message)) return true;
   return VERIFIED_OPERATION_RE.test(message) && EXECUTABLE_TARGET_RE.test(message);

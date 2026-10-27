@@ -6,6 +6,7 @@ import {
   cloudflareTranscriptionChunkSeconds,
   MEDIA_QUALITY_GATE_VERSION,
   mediaQualityFailures,
+  parseFreezeIntervals,
   resolveCloudflareTranscriptionModel,
   type MediaQualityEvidence,
 } from '@/lib/video/media-quality-gate';
@@ -162,5 +163,30 @@ describe('canonical media completion quality gate', () => {
         'photographic opening still is missing',
       ]),
     );
+  });
+});
+
+describe('FFmpeg freeze parser — narrated-slide regression cases', () => {
+  it('parses normal and multiple intervals in chronological order', () => {
+    const logs = '[freezedetect] freeze_start: 12.10\\n[freezedetect] freeze_end: 17.47 | freeze_duration: 5.37\\n[freezedetect] freeze_start: 28\\n[freezedetect] freeze_end: 29';
+    expect(parseFreezeIntervals(logs, 40)).toEqual([{start:12.1,end:17.47},{start:28,end:29}]);
+  });
+  it('retains freezes ending at EOF instead of silently passing', () => {
+    expect(parseFreezeIntervals('freeze_start: 12.1', 20)).toEqual([{start:12.1,end:20}]);
+  });
+  it('rejects overlapping starts and orphan ends', () => {
+    expect(() => parseFreezeIntervals('freeze_start: 2\\nfreeze_start: 3\\nfreeze_end: 6',10))
+      .toThrow('MEDIA_FREEZE_OVERLAPPING_STARTS');
+    expect(() => parseFreezeIntervals('freeze_end: 3',10)).toThrow('MEDIA_FREEZE_END_WITHOUT_START');
+  });
+  it('rejects malformed durations and impossible timestamps', () => {
+    expect(() => parseFreezeIntervals('freeze_start: 20', 10)).toThrow('MEDIA_FREEZE_TIMESTAMP_INVALID');
+  });
+  it('preserves a strict failure for unexplained motion freezes', () => {
+    expect(mediaQualityFailures({...validEvidence,longestFreezeSeconds:5.37})).toContain('frozen interval 5.37s exceeds 4s');
+  });
+  it('allows a measured intentional slide hold when no unexplained freeze remains', () => {
+    expect(parseFreezeIntervals('freeze_start: 12.1\\nfreeze_end: 17.47',20)).toEqual([{start:12.1,end:17.47}]);
+    expect(mediaQualityFailures({...validEvidence,longestFreezeSeconds:0})).toEqual([]);
   });
 });

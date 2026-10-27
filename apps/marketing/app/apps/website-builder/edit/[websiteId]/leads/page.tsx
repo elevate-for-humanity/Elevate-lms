@@ -1,3 +1,4 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -5,6 +6,9 @@ import { createClient } from '@/lib/supabase/server';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const dynamic = 'force-dynamic';
+export const metadata = {
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ websiteId: string }> };
 
@@ -17,14 +21,16 @@ export default async function WebsiteLeadsPage({ params }: Props) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
 
-  const { data: site } = await supabase
+  // Server-owned roles and exact organization membership remain mandatory.
+  const admin = await requireAdminClient();
+  const { data: site } = await admin
     .from('user_websites')
     .select('id, user_id, site_name')
     .eq('id', websiteId)
     .maybeSingle();
-  if (!site || !(await canManageHostedWebsite(supabase, websiteId, user.id))) notFound();
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) notFound();
 
-  const { data: leads } = await supabase
+  const { data: leads } = await admin
     .from('tenant_site_leads')
     .select('id, name, email, phone, message, source_path, status, created_at')
     .eq('website_id', websiteId)

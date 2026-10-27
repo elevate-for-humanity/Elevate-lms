@@ -22,6 +22,18 @@ async function resolveProgramId(
   db: SupabaseClient,
   programSlug: string,
 ): Promise<{ id: string | null; error?: string }> {
+  if (!programSlug) return { id: null };
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(programSlug);
+  if (isUuid) {
+    const { data: byId } = await db
+      .from('programs')
+      .select('id')
+      .eq('id', programSlug)
+      .maybeSingle();
+    if (byId?.id) return { id: byId.id };
+  }
+
   const { data, error } = await db
     .from('programs')
     .select('id')
@@ -29,13 +41,26 @@ async function resolveProgramId(
     .maybeSingle();
 
   if (error) return { id: null, error: error.message };
-  return { id: data?.id ?? null };
+  if (data?.id) return { id: data.id };
+
+  // Fallback to apprenticeship_programs
+  const { data: apData } = await db
+    .from('apprenticeship_programs')
+    .select('id')
+    .eq('slug', programSlug)
+    .maybeSingle();
+
+  return { id: apData?.id ?? null };
 }
 
 export async function resolveCourseIdFromDb(
   db: SupabaseClient,
   programSlug: string,
 ): Promise<string | null> {
+  if (programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting') {
+    return '566e2ef7-6861-4736-9807-b4ff868fc908';
+  }
+
   const program = await resolveProgramId(db, programSlug);
   if (program.error) {
     logger.error('[program-resolver] failed to resolve program', undefined, {
@@ -64,7 +89,32 @@ export async function resolveCourseIdFromDb(
     return null;
   }
 
-  return data?.course_id ?? null;
+  if (data?.course_id) {
+    return data.course_id;
+  }
+
+  // Fallback: check direct program_id or slug association on courses table
+  const { data: directCourse } = await db
+    .from('courses')
+    .select('id')
+    .or(`program_id.eq.${program.id},slug.eq.${programSlug}`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (directCourse?.id) {
+    return directCourse.id;
+  }
+
+  // Fallback: check direct program_id or slug association on lms_courses view
+  const { data: lmsCourse } = await db
+    .from('lms_courses')
+    .select('id')
+    .or(`program_id.eq.${program.id},slug.eq.${programSlug}`)
+    .limit(1)
+    .maybeSingle();
+
+  return lmsCourse?.id ?? null;
 }
 
 export async function listProgramCourseMappings(

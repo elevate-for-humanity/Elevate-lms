@@ -142,6 +142,10 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
     ...program,
     slug: canonicalSlug,
     title: normalizedTitle,
+    category:
+      apprenticeshipLike && !registered
+        ? replaceUnverifiedRegisteredLanguage(program.category, canonicalSlug) || 'Work-Based Training'
+        : program.category,
     programType:
       apprenticeshipLike && !registered && program.programType === 'apprenticeship'
         ? 'workforce'
@@ -155,6 +159,42 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
         .filter(Boolean),
       ...(registrationDisclosure ? [registrationDisclosure] : []),
     ],
+    curriculum: program.curriculum.map((module) => ({
+      ...module,
+      title: replaceUnverifiedRegisteredLanguage(module.title, canonicalSlug),
+      topics: module.topics.map((topic) => normalizeCopy(topic)).filter(Boolean),
+    })),
+    outcomes: program.outcomes.map((outcome) => ({
+      ...outcome,
+      statement: normalizeCopy(outcome.statement),
+    })),
+    weeklySchedule: program.weeklySchedule.map((entry) => ({
+      ...entry,
+      title: replaceUnverifiedRegisteredLanguage(entry.title, canonicalSlug),
+      competencyMilestone: normalizeCopy(entry.competencyMilestone),
+    })),
+    careerPathway: program.careerPathway.map((step) => ({
+      ...step,
+      title: replaceUnverifiedRegisteredLanguage(step.title, canonicalSlug),
+      requirements: normalizeCopy(step.requirements),
+    })),
+    credentials: program.credentials.map((credential) => ({
+      ...credential,
+      name: replaceUnverifiedRegisteredLanguage(credential.name, canonicalSlug),
+      description: normalizeCopy(credential.description),
+    })),
+    trainingPhases: program.trainingPhases?.map((phase) => ({
+      ...phase,
+      title: replaceUnverifiedRegisteredLanguage(phase.title, canonicalSlug),
+      focus: normalizeCopy(phase.focus),
+      labCompetencies: phase.labCompetencies.map((item) => normalizeCopy(item)).filter(Boolean),
+    })),
+    credentialPipeline: program.credentialPipeline?.map((item) => ({
+      ...item,
+      training: normalizeCopy(item.training),
+      certification: replaceUnverifiedRegisteredLanguage(item.certification, canonicalSlug),
+      jobRole: replaceUnverifiedRegisteredLanguage(item.jobRole, canonicalSlug),
+    })),
     faqs: program.faqs.map((faq) => ({
       ...faq,
       question: replaceUnverifiedRegisteredLanguage(faq.question, canonicalSlug),
@@ -168,6 +208,14 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
       .filter((item) => item.standard && item.description),
     metaTitle: replaceUnverifiedRegisteredLanguage(program.metaTitle, canonicalSlug),
     metaDescription: normalizeCopy(program.metaDescription, copyFallback),
+    schedule: normalizeCopy(program.schedule, program.schedule),
+    eveningSchedule: program.eveningSchedule ? normalizeCopy(program.eveningSchedule) : undefined,
+    equipmentIncluded: program.equipmentIncluded ? normalizeCopy(program.equipmentIncluded) : undefined,
+    modality: program.modality ? normalizeCopy(program.modality) : undefined,
+    facilityInfo: program.facilityInfo ? normalizeCopy(program.facilityInfo) : undefined,
+    paymentTerms: program.paymentTerms ? normalizeCopy(program.paymentTerms) : undefined,
+    pricingIncludes: program.pricingIncludes?.map((item) => normalizeCopy(item)).filter(Boolean),
+    admissionRequirements: program.admissionRequirements?.map((item) => normalizeCopy(item)).filter(Boolean),
     isSelfPay: !workforceFunded,
     fundingOptions,
     fundingStatement: workforceFunded

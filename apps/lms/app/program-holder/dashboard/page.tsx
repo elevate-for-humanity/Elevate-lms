@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ProgramHolderWorkspaceView } from '@/components/program-holder/ProgramHolderWorkspaceView';
@@ -74,6 +75,7 @@ export default async function Page() {
           accountName={`Elevate for Humanity — ${context.profile.full_name || 'Program Holder'}`}
         />
       </div>
+      <div className="px-4 sm:px-6"><ProgramGuideResources /></div>
       <ProgramHolderWorkspaceView
         section="dashboard"
         payoutPanel={context.mode === 'holder' ? <PayoutAccessPanel /> : undefined}

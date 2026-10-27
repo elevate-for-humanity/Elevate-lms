@@ -78,7 +78,7 @@ export async function getActiveJobs(opts: { limit?: number; remote?: boolean; jo
   return ((data ?? []) as unknown as Array<Record<string, unknown>>).map(normalizeJob);
 }
 
-export async function getJobById(id: string): Promise<JobPosting | null> {
+export async function getJobById(id: string, opts: { throwOnError?: boolean } = {}): Promise<JobPosting | null> {
   const { data, error } = await createPublicClient()
     .from('job_postings')
     .select(SELECT_COLS)
@@ -88,6 +88,7 @@ export async function getJobById(id: string): Promise<JobPosting | null> {
 
   if (error) {
     logger.error('[jobs] getJobById error:', error.message);
+    if (opts.throwOnError) throw new Error('Job details are temporarily unavailable');
     return null;
   }
   return data ? normalizeJob(data as unknown as Record<string, unknown>) : null;

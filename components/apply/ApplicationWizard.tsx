@@ -45,7 +45,7 @@ const PROGRAMS = [
 // Funding options
 const FUNDING_OPTIONS = [
   { id: 'wioa', name: 'WIOA Funding', desc: 'Workforce Innovation & Opportunity Act', icon: '💼' },
-  { id: 'wrg', name: 'Workforce Ready Grant', desc: 'Indiana free training program', icon: '🎓' },
+  { id: 'wrg', name: 'Workforce Ready Grant', desc: 'Indiana program-specific workforce grant', icon: '🎓' },
   { id: 'fssa', name: 'FSSA IMPACT', desc: 'Health and Human Services programs' },
   { id: 'vr', name: 'Vocational Rehabilitation', desc: 'Individualized support', icon: '♿' },
   { id: 'self', name: 'Self-Pay', desc: 'Payment plan available', icon: '💳' },
@@ -338,7 +338,7 @@ function FundingStep({ data, onUpdate }: { data: FormData; onUpdate: (d: Partial
   return (
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
       <h2 className="text-2xl font-bold text-slate-900 mb-2">Funding Options</h2>
-      <p className="text-slate-600 mb-8">Select all funding sources you might qualify for. Most students qualify for at least one.</p>
+      <p className="text-slate-600 mb-8">Select funding sources you want to ask about. This application does not determine eligibility or verify that your selected program is fundable.</p>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {FUNDING_OPTIONS.map((option) => (
@@ -373,14 +373,14 @@ function FundingStep({ data, onUpdate }: { data: FormData; onUpdate: (d: Partial
           <h3 className="font-bold text-slate-900">Not sure which funding to select?</h3>
         </div>
         <p className="text-slate-600 mb-4">
-          Don't worry! Our team will review your application and help identify all funding options you qualify for. 
+          Our team can explain the documented payment and funding options for your selected program. 
           You can also check your eligibility now with our free tool.
         </p>
         <Link
           href="/eligibility"
           className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:text-brand-blue-700"
         >
-          Check Eligibility Now - Free
+          Open Eligibility Screening
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

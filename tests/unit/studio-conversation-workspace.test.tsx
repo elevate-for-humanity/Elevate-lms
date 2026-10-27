@@ -71,6 +71,10 @@ describe('One Studio conversation workspace', () => {
         ]}
       />,
     );
+    expect(screen.queryByTestId('studio-browser-panel')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Work', exact: true }));
+    expect(screen.getAllByTestId('studio-browser-panel')).toHaveLength(1);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Chat', exact: true })[0]);
     expect(screen.getAllByTestId('studio-browser-panel')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Open Studio sidebar' }));
     expect(screen.queryByRole('button', { name: /PARIS|ELLIE|ZORA/ })).toBeNull();

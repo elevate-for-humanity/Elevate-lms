@@ -1,10 +1,51 @@
 import { writeFileSync } from 'node:fs';
 import { google, PROJECT } from './runtime-config.mjs';
+import { runtimeBoundary } from './runtime-boundary.mjs';
 
-const report = { project: PROJECT, observedAt: new Date().toISOString(), resources: {}, failures: [] };
+const report = { project: PROJECT, observedAt: new Date().toISOString(), scope: {cloudRun:'all regions',scheduler:'us-central1'}, resources: {}, failures: [] };
 function read(name, args, select) {
   try { report.resources[name] = select(JSON.parse(google([...args, '--project', PROJECT, '--format=json']))); }
   catch (error) { report.failures.push({ resource: name, reason: error.code ?? 'inventory_unavailable' }); }
+}
+// Enumerate the project rather than maintaining a hand-picked service list.
+// Do not include container environment variables or secret values in evidence.
+read('projectAssets', ['asset','search-all-resources','--scope=projects/'+PROJECT,'--read-mask=name,assetType,location,state'], rows => rows.map(r=>({name:r.name,type:r.assetType,location:r.location,state:r.state})));
+read('cloudRunServices', ['run', 'services', 'list'], rows => rows.map(s => ({
+  name: s.metadata?.name, region: s.metadata?.labels?.['cloud.googleapis.com/location'], uri: s.status?.url,
+  latestReadyRevision: s.status?.latestReadyRevisionName,
+  latestCreatedRevision: s.status?.latestCreatedRevisionName,
+  conditions: (s.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+  traffic: (s.status?.traffic ?? []).map(t => ({ revision: t.revisionName, percent: t.percent, tag: t.tag })),
+  limits: (s.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
+})));
+// Inspect effective revisions rather than assuming the latest template serves.
+for (const service of report.resources.cloudRunServices ?? []) {
+  const names = new Set(service.traffic.filter(t => t.percent > 0 || t.tag).map(t => t.revision));
+  for (const revision of names) {
+    const resource = 'servingBoundary:' + service.region + ':' + revision;
+    if (!service.region || !revision) { report.failures.push({resource,reason:'serving_revision_unknown'}); continue; }
+    read(resource, ['run','revisions','describe',revision,'--region='+service.region], runtimeBoundary);
+  }
+}
+read('cloudRunJobs', ['run', 'jobs', 'list'], rows => rows.map(j => ({
+  name: j.metadata?.name, region: j.metadata?.labels?.['cloud.googleapis.com/location'],
+  conditions: (j.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+  latestCreatedExecution: j.status?.latestCreatedExecution,
+  limits: (j.spec?.template?.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
+})));
+// Some installed SDK/API combinations cannot list executions across regions.
+// Enumerate each discovered job explicitly, including older active executions.
+for(const job of report.resources.cloudRunJobs??[]){
+  const resource='executions:'+job.region+':'+job.name;
+  if(!job.region){report.failures.push({resource,reason:'job_region_unknown'});continue;}
+  read(resource,['run','jobs','executions','list','--job='+job.name,'--region='+job.region],rows=>rows
+    .sort((a,b)=>Date.parse(b.metadata?.creationTimestamp??b.status?.startTime??0)-Date.parse(a.metadata?.creationTimestamp??a.status?.startTime??0))
+    .filter((e,index)=>index<5||(!e.status?.completionTime&&!['True','False'].includes(e.status?.conditions?.find(c=>c.type==='Completed')?.status)))
+    .map(e=>({name:e.metadata?.name,region:job.region,job:job.name,
+      startedAt:e.status?.startTime,completedAt:e.status?.completionTime,
+      running:e.status?.runningCount,succeeded:e.status?.succeededCount,failed:e.status?.failedCount,
+      conditions:(e.status?.conditions??[]).map(c=>({type:c.type,status:c.status,reason:c.reason})),
+    })));
 }
 read('instances', ['compute', 'instances', 'list'], rows => rows.map(v => ({
   name: v.name, zone: v.zone, status: v.status, machineType: v.machineType,
@@ -21,6 +62,11 @@ read('deploymentRoles', ['projects', 'get-iam-policy', PROJECT], policy => (poli
 read('scheduler', ['scheduler', 'jobs', 'list', '--location=us-central1'], rows => rows.map(j => ({ name: j.name, schedule: j.schedule, state: j.state, target: j.httpTarget?.uri, serviceAccount: j.httpTarget?.oauthToken?.serviceAccountEmail ?? j.httpTarget?.oidcToken?.serviceAccountEmail })));
 read('buckets', ['storage', 'buckets', 'list'], rows => rows.map(b => ({ name: b.name, location: b.location, versioning: b.versioning?.enabled, uniformAccess: b.iamConfiguration?.uniformBucketLevelAccess?.enabled })));
 read('courseExecutions', ['run', 'jobs', 'executions', 'list', '--job=elevate-course-builder', '--region=us-central1', '--limit=5'], rows => rows.map(e => ({
+  name: e.metadata?.name, startedAt: e.status?.startTime, completedAt: e.status?.completionTime,
+  running: e.status?.runningCount, succeeded: e.status?.succeededCount, failed: e.status?.failedCount,
+  conditions: (e.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+})));
+read('videoExecutions', ['run', 'jobs', 'executions', 'list', '--job=elevate-video-render', '--region=us-central1', '--limit=5'], rows => rows.map(e => ({
   name: e.metadata?.name, startedAt: e.status?.startTime, completedAt: e.status?.completionTime,
   running: e.status?.runningCount, succeeded: e.status?.succeededCount, failed: e.status?.failedCount,
   conditions: (e.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),

@@ -106,7 +106,7 @@ export default function EligibilityScreener({ program }: { program?: string }) {
         </div>
       </div>
 
-      <div className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+      <div className="mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">
         Step {step} of {TOTAL_STEPS}
       </div>
       <ProgressBar step={step} />

@@ -47,7 +47,7 @@ for (const path of forbiddenRepoPaths) {
 const required = [
   '.github/workflows/deploy-admin.yml',
   '.github/workflows/deploy-google-marketing-trigger.yml',
-  'Dockerfile.northflank-admin',
+  'Dockerfile.admin',
 ];
 for (const path of required) {
   if (!existsSync(path)) {

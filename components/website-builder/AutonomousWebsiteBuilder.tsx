@@ -6,6 +6,7 @@ import { ExternalLink, Loader2, Mic, MicOff, Monitor, Save, Send, Smartphone, Sp
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComposableSite';
+import { TenantDraftViewport } from '@/components/website-builder/TenantDraftViewport';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type Message = { role: 'user' | 'assistant'; content: string };
@@ -59,7 +60,7 @@ export function AutonomousWebsiteBuilder({
 
   const pages = config.pages || [];
   const page = pages.find((item) => item.slug === selectedPage) || pages[0];
-  const publicUrl = subdomain && published ? `https://${subdomain}.app.elevateforhumanity.org` : '';
+  const publicUrl = subdomain && published ? `/sites/${subdomain}` : '';
   const site = useMemo(() => ({ id: websiteId, subdomain: subdomain || '', siteName, organizationId: null, config }), [websiteId, subdomain, siteName, config]);
 
   async function persist(publish?: boolean) {
@@ -232,9 +233,9 @@ export function AutonomousWebsiteBuilder({
               </div>
             </div>
             <div className="max-h-[820px] overflow-auto bg-slate-100 p-2 sm:p-4">
-              <div className="mx-auto overflow-hidden bg-white shadow-sm transition-[width] duration-200" style={{ width: `min(100%, ${PREVIEW_WIDTHS[device]}px)` }}>
-                <PublicTenantComposableSite site={site} pathname={page?.slug || '/'} />
-              </div>
+              <TenantDraftViewport width={PREVIEW_WIDTHS[device]} title={`${siteName} ${device} draft preview`}>
+                <PublicTenantComposableSite site={site} pathname={page?.slug || '/'} basePath={publicUrl} onNavigate={(slug) => { setSelectedPage(slug); setSelectedSectionId(null); }} />
+              </TenantDraftViewport>
             </div>
           </section>
 

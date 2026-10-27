@@ -7,7 +7,9 @@ const source = fs.readFileSync(path.resolve('components/ui/HomeHeroVideo.tsx'), 
 describe('homepage hero slideshow rendering', () => {
   it('loads the current static hero with bounded responsive sizing and direct navigation', () => {
     const hero = fs.readFileSync(path.resolve('components/home/PlatformHubHero.tsx'), 'utf8');
-    expect(hero).toContain('/images/refresh-20261014/home.webp');
+    const image = hero.match(/const HOME_IMAGE = '([^']+)'/)?.[1];
+    expect(image).toMatch(/^\/images\/.+\.webp$/);
+    expect(fs.existsSync(path.resolve('public', image!.slice(1)))).toBe(true);
     expect(hero).toContain('priority');
     expect(hero).toContain('aspect-video');
     expect(hero).toContain('38svh,480px');

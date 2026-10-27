@@ -46,6 +46,15 @@ interface Props {
 
 export function SystemHealthPanel({ health }: Props) {
   const alerts = health.alerts ?? [];
+  const unavailableCodes: Record<string, string[]> = {
+    'Stale Jobs': ['job_queue_health_unavailable', 'ultimate_build_jobs_health_unavailable'],
+    'Missing Docs': ['documents_health_unavailable'],
+    'Certifications': ['certifications_health_unavailable'],
+    'Compliance Flags': ['compliance_flags_health_unavailable'],
+  };
+  const unavailable = (label: string) => alerts.some(alert =>
+    ['system_health_unavailable', 'dashboard_health_timeout'].includes(alert.code) ||
+    unavailableCodes[label]?.includes(alert.code));
   const isOk = !health.degraded && alerts.length === 0;
 
   return (
@@ -55,7 +64,7 @@ export function SystemHealthPanel({ health }: Props) {
         <div className="flex items-center gap-2">
           {isOk ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">
-              <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> All systems operational
+              <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> Dashboard checks passed
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-rose-100 text-rose-700">
@@ -75,18 +84,18 @@ export function SystemHealthPanel({ health }: Props) {
         <div className="mb-4 grid grid-cols-[repeat(2,minmax(0,1fr))] gap-3 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
           {[
             {
-              label: "QuickBooks Webhook",
+              label: "QuickBooks Webhook Config",
               ok: health.quickBooksWebhookOk,
               href: "/integrations/quickbooks",
             },
             {
               label: "QuickBooks Billing",
               ok: health.quickBooksBillingOk,
-              value: health.quickBooksBillingOk ? undefined : "Not approved",
+              value: health.quickBooksBillingOk ? undefined : "Connection unavailable",
               href: "/integrations/quickbooks",
             },
             {
-              label: "Build Env",
+              label: "Runtime Configuration",
               ok: health.buildEnvOk,
               href: "/integrations/env-manager",
             },
@@ -114,7 +123,10 @@ export function SystemHealthPanel({ health }: Props) {
               value: health.unresolvedFlags > 0 ? `${health.unresolvedFlags} open` : "Clear",
               href: "/compliance",
             },
-          ].map(({ label, ok, value, href }) => (
+          ].map((item) => ({...item,
+            ok: unavailable(item.label) ? false : item.ok,
+            value: unavailable(item.label) ? 'Unavailable' : item.value,
+          })).map(({ label, ok, value, href }) => (
             <Link
               key={label}
               href={href}

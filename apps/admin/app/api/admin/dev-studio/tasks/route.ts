@@ -17,7 +17,11 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  const limit = Math.min(parseInt(request.nextUrl.searchParams.get('limit') ?? '30', 10), 100);
+  const requestedLimit = Number(request.nextUrl.searchParams.get('limit') ?? 30);
+  if (!Number.isSafeInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 100) {
+    return safeError('Limit must be an integer between 1 and 100', 400);
+  }
+  const limit = requestedLimit;
   const status = request.nextUrl.searchParams.get('status');
   const conversationId = request.nextUrl.searchParams.get('conversationId')?.trim() || null;
 

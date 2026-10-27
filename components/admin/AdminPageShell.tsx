@@ -102,7 +102,7 @@ export function AdminCard({
   className?: string;
 }) {
   return (
-    <div className={`bg-white rounded-xl border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-xl border border-slate-200 min-w-0 overflow-x-auto ${className}`}>
       {children}
     </div>
   );

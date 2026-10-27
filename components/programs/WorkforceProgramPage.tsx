@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -184,14 +185,13 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
 
       {/* Hero */}
       <section className="relative h-[clamp(260px,42svh,480px)]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={program.heroImage}
           alt={`${program.title} training program`}
           fill
           sizes="100vw"
           className="object-contain"
-          priority placeholder="empty"
+          priority
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">

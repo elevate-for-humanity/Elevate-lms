@@ -2,6 +2,11 @@ import type { NextRequest } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { tenantSlugFromAppHost } from '@/lib/tenant/middleware-tenant-routing';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { createClient } from '@/lib/supabase/server';
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
+import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
+import { loadPublishedOfferings } from '@/lib/tenant/published-offerings';
+import type { PublishedTenantSite, TenantSiteConfig } from '@/lib/tenant/site-types';
 
 const RESERVED_ELEVATE_HOSTS = new Set([
   'elevateforhumanity.org',
@@ -35,6 +40,7 @@ export type ResolvedPublicTenant = {
   subdomain: string | null;
   host: string;
   externalBackend: { url: string; publishableKey: string } | null;
+  previewSite?: PublishedTenantSite;
 };
 
 function externalBackendFromConfig(config: unknown): ResolvedPublicTenant['externalBackend'] {
@@ -65,6 +71,28 @@ export async function resolvePublishedTenantFromRequest(
   const host = requestHost(request);
   if (!host) return null;
   const db = await requireAdminClient();
+
+  const previewId = request.headers.get('x-website-preview-id');
+  if (previewId) {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(previewId)) return null;
+    const origin = request.headers.get('origin');
+    if (origin && origin !== new URL(request.url).origin) return null;
+    const session = await createClient();
+    const { data: { user }, error: authError } = await session.auth.getUser();
+    if (authError || !user) return null;
+    if (!(await canManageHostedWebsite(db, previewId, user.id))) return null;
+    if (!(await getWebsiteBuilderAccess(user.id, session)).allowed) return null;
+    const { data: row, error } = await db.from('user_websites')
+      .select('id,user_id,subdomain,site_name,organization_id,site_config').eq('id', previewId).maybeSingle();
+    if (error || !row) return null;
+    const config = row.site_config as TenantSiteConfig | null;
+    if (!config?.homepage?.heroTitle || !config.branding?.primaryColor) return null;
+    return {
+      websiteId: row.id, ownerUserId: row.user_id, subdomain: row.subdomain, host,
+      externalBackend: externalBackendFromConfig(config),
+      previewSite: { id: row.id, subdomain: row.subdomain || '', siteName: row.site_name || '', organizationId: row.organization_id, config: await loadPublishedOfferings(ensureComposableSiteConfig(config)) },
+    };
+  }
 
   const slug = tenantSlugFromAppHost(host) || tenantSlugFromSiteReferrer(host, request.headers.get('referer'));
   if (slug) {

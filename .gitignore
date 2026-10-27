@@ -263,3 +263,7 @@ exports/northflank-env.production.json
 
 # Small, versioned product-tour assets used by the public Store demo player.
 !public/videos/store-platform/*.mp4
+
+# Runtime artifact stores are application source, not generated build artifacts.
+!lib/ultimate-course-builder/artifacts/
+!lib/ultimate-course-builder/artifacts/*.ts

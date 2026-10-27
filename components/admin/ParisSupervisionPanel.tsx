@@ -4,7 +4,7 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 type Snapshot = {
   observedAt:string;
   events:Array<{id:string;operation:string;status:string;created_at:string;next_action:string|null}>;
-  codeRepair?:{available:boolean;policy:{enabled:boolean;max_daily_repairs:number}|null;repairs:Array<{id:string;status:string;workflow_run_id:number|null;release_sha:string|null;error_code:string|null;verification?:{symptom?:string;resumedJobId?:string;courseExecution?:{state:string;reason:string}}}>};
+  codeRepair?:{available:boolean;policy:{enabled:boolean;max_daily_repairs:number|'Infinity'}|null;repairs:Array<{id:string;status:string;workflow_run_id:number|null;release_sha:string|null;error_code:string|null;verification?:{symptom?:string;resumedJobId?:string;courseExecution?:{state:string;reason:string}}}>};
   courses:Array<{id:string;status:string;heartbeat_at:string|null;lease_owner:string|null;lease_expires_at:string|null;monitor:{state?:string}}>;
 };
 
@@ -73,7 +73,7 @@ export default function ParisSupervisionPanel({buildId,active=true}:{buildId?:st
       <p className="mt-1 text-slate-700">{snapshot.events.length} recent execution observations; {failures.length} failure or approval observations. These are historical records, not a claim of current service health.</p>
       {snapshot.codeRepair && <div className="mt-3 rounded-lg border border-slate-300 p-3">
         <h2 className="font-bold">Code repair autopilot</h2>
-        <p>{!snapshot.codeRepair.available ? 'Repair records unavailable.' : snapshot.codeRepair.policy?.enabled ? `Enabled · up to ${snapshot.codeRepair.policy.max_daily_repairs} repairs per day.` : 'Paused.'}</p>
+        <p>{!snapshot.codeRepair.available ? 'Repair records unavailable.' : snapshot.codeRepair.policy?.enabled ? 'Enabled · Unlimited automatic repairs. One repair at a time.' : 'Paused.'}</p>
         <p>Diagnose → patch → independent tests → main → deployment verification. Course repairs remain in verification until the correlated course execution passes quality checks and publication.</p>
         {snapshot.codeRepair.repairs.slice(0,5).map(repair=><p key={repair.id} className="mt-2"><strong>{repair.status}</strong>{repair.error_code ? ` · ${repair.error_code}` : ''}{repair.verification?.symptom && <span className="block text-slate-700">{repair.verification.symptom}</span>}{repair.workflow_run_id && <> · <a className="underline" href={`https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/${repair.workflow_run_id}`} target="_blank" rel="noreferrer">Execution log</a></>}</p>)}
       </div>}

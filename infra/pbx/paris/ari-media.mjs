@@ -75,6 +75,13 @@ export async function routeOperator(callId,route,request=ari){
     context:'internal',extension:'0',priority:1,
   });
 }
+export async function routeApprovedExtension(callId,route,request=ari,allowed=process.env.PARIS_ALLOWED_EXTENSIONS || ''){
+  const permitted=new Set(String(allowed).split(',').map(v=>v.trim()).filter(v=>/^[1-9]\d{2}$/.test(v)));
+  if(!UUIDISH.test(callId||'') || route?.type!=='extension' || !permitted.has(route.extension))throw Error('ROUTE_NOT_ALLOWED');
+  await request('/channels/'+encode(callId)+'/continue','POST',{
+    context:'elevate-pwa-extensions',extension:route.extension,priority:1,
+  });
+}
 export async function handleDtmf(event,active=sessions,{route=routeOperator,finish=end}={}){
   if(event?.type!=='ChannelDtmfReceived' || event.digit!=='0')return;
   const session=active.get(event.channel?.id);
@@ -165,28 +172,29 @@ export async function greet(session,{request=privateTurn,play=speak,finish=end}=
     if(!session.closed && !session.transferring)await finish(session,'continue');
   }finally{session.busy=false;}
 }
-async function turn(session){
+export async function turn(session,{request=privateTurn,play=speak,finish=end}={}){
   if(session.closed || session.transferring || session.busy || session.playing)return;
-  const voice=Buffer.concat(session.frames);session.frames=[];session.quiet=0;
+  const voice=Buffer.concat(session.frames);session.frames=[];session.quiet=0;session.heard=false;
   if(voice.length<config.minFrames*FRAME)return;
   session.busy=true;
   try{
-    const body=await privateTurn(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
+    const body=await request(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
     if(session.closed || session.transferring)return;
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
-    await speak(session,body.replyAudioUlawBase64);
+    await play(session,body.replyAudioUlawBase64);
     if(session.closed || session.transferring)return;
-    if(body.requestedRoute?.type==='operator') {
+    if(body.requestedRoute?.type==='operator' || body.requestedRoute?.type==='extension') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
       // Resume the allowlisted dialplan route without changing channel technology.
-      await routeOperator(session.callId,body.requestedRoute);
-      await end(session);
-    } else if(body.endCall===true) await end(session,'hangup');
+      if(body.requestedRoute.type==='operator')await routeOperator(session.callId,body.requestedRoute);
+      else await routeApprovedExtension(session.callId,body.requestedRoute);
+      await finish(session);
+    } else if(body.endCall===true) await finish(session,'hangup');
   }catch(e){
     if(session.closed || session.transferring)return;
     // Fail closed: do not claim the caller was served when the AI is unavailable.
     process.stderr.write('PARIS_TURN_FAILED\n');
-    await end(session,'continue');
+    await finish(session,'continue');
   }finally{session.busy=false;}
 }
 async function cleanupMedia(s){

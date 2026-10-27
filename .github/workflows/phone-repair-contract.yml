@@ -2,7 +2,7 @@ name: Phone repair contract
 on:
   push:
     branches: [main]
-    paths: ['lib/secrets.ts', 'lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', 'apps/admin/app/phone/**', 'components/communications/**', 'components/program-holder/ProgramHolderPhone.tsx', 'lib/communications/meeting-calendar*', '.github/workflows/phone-repair-contract.yml']
+    paths: ['lib/secrets.ts', 'lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', 'apps/admin/app/phone/**', 'components/communications/**', 'components/program-holder/ProgramHolderPhone*.tsx', 'apps/lms/app/api/program-holder/phone/**', 'lib/communications/meeting-calendar*', '.github/workflows/phone-repair-contract.yml']
   pull_request:
     paths:
       - 'lib/phone/**'

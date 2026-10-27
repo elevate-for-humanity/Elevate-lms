@@ -1,4 +1,4 @@
-import { isCosmetologyRti, RTI_TEACHING_REQUIREMENTS, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
+import { isCosmetologyRti, RTI_TEACHING_REQUIREMENTS, optionalCosmetologyRtiEnhancement, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
 import {reportCourseProgress, courseProgressSignal} from '../worker/progress-watch.mjs';
 import { assertGeneratedLessonAssessment } from './generated-lesson-assessment.mjs';
 import { parseVertexLessonResponse, vertexLessonGenerationConfig } from './vertex-response.mjs';
@@ -68,7 +68,7 @@ Output only a complete JSON object with double-quoted property names and strings
   const presentationRequirements = input.profile.lessonPresentation === 'approved-premium-v1'
     ? 'Use focused PowerPoint-style teaching moments. Explain the required tools and exact numbered guard lengths when supported by the source. Within each teaching moment include a fresh brief recap or practice question, never repeat its spoken passage. Change the visual for the next technique. Whole pictures stay visible beside concise demonstration instructions, with word-aligned bottom captions. Use unique task-relevant images; do not reuse a photo or loop as filler. Do not invent technical measurements or substitute illustrative photos for an actual required physical demonstration.'
     : undefined;
-  const rtiRequirements = isCosmetologyRti(input.profile) ? RTI_TEACHING_REQUIREMENTS : undefined;
+  const rtiRequirements = isCosmetologyRti(input.profile) ? RTI_TEACHING_REQUIREMENTS + '\n' + optionalCosmetologyRtiEnhancement(input.profile) : undefined;
   const authorSystem = rtiRequirements ? system + '\n' + rtiRequirements : system;
   const authorRequest = { ...(rtiRequirements ? {rtiRequirements} : {}), ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
   let result = bindBlueprintRequirements(await generate(authorSystem, authorRequest), input.competency);
@@ -145,7 +145,22 @@ export async function generateVertexLessonJson(model: string, system: string, in
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: vertexLessonGenerationConfig(model,maxOutputTokens) }),
     signal: courseProgressSignal() ? AbortSignal.any([courseProgressSignal(), AbortSignal.timeout(180000)]) : AbortSignal.timeout(180000),
   });
-  if ([429,500,502,503,504].includes(response.status)&&attempt<2) {await new Promise(r=>setTimeout(r,15000*2**attempt));continue;}
+  if ([429,500,502,503,504].includes(response.status)&&attempt<2) {
+    const retryAfterRaw=response.headers.get('retry-after');
+    const retrySeconds=Number(retryAfterRaw);
+    const retryDate=Date.parse(retryAfterRaw||'');
+    const serverDelay=Number.isFinite(retrySeconds)&&retrySeconds>=0?retrySeconds*1000:Number.isFinite(retryDate)?Math.max(0,retryDate-Date.now()):0;
+    const backoff=Math.min(120000,Math.max(15000*2**attempt,serverDelay));
+    reportCourseProgress('authoring:google-backoff:'+response.status,attempt+1,3);
+    await new Promise((resolve,reject)=>{
+      const signal=courseProgressSignal();
+      if(signal?.aborted){reject(signal.reason);return;}
+      const timer=setTimeout(()=>{signal?.removeEventListener('abort',onAbort);resolve(undefined);},backoff);
+      function onAbort(){clearTimeout(timer);reject(signal?.reason??new Error('COURSE_WORK_CANCELLED'));}
+      signal?.addEventListener('abort',onAbort,{once:true});
+    });
+    continue;
+  }
   if (!response.ok) throw new Error(`ULTIMATE_GOOGLE_AUTHORING_HTTP_${response.status}`);
   const output = await response.json();
   try {return parseVertexLessonResponse(output);}

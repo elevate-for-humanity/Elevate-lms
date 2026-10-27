@@ -17,6 +17,10 @@ export async function syncWorkspaceRepository({ root, repoUrl, branch = 'main' }
     if ((await fs.readdir(root)).length) throw new Error('workspace_not_empty');
     await run(['clone', '--filter=blob:none', '--depth', '1', '--branch', branch, repoUrl, '.']);
   } else {
+    // A restored workspace may belong to another project. Never certify or
+    // update that checkout as the requested repository, or rewrite its remote.
+    const { stdout: origin } = await run(['remote', 'get-url', 'origin']);
+    if (origin.trim() !== repoUrl) throw new Error('repository_origin_mismatch');
     // An unchanged remote is a read-only operation. Rewriting Git config and
     // FETCH_HEAD on every reconnect forces a full durable workspace upload.
     const { stdout: advertised } = await run(['ls-remote', '--exit-code', '--heads', 'origin', 'refs/heads/' + branch]);

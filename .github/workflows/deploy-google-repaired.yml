@@ -97,6 +97,16 @@ jobs:
           export CANDIDATE_REVISION="$(gcloud run services describe "$CANDIDATE_SERVICE" --project=elegant-racer-299721 --region=us-central1 --format='value(status.latestCreatedRevisionName)')"
           node --test scripts/test-public-revision-activation.mjs
           node scripts/gcp/activate-tested-public-revision.mjs
+      - name: Resolve the canonical service URL for health authentication
+        id: health_target
+        env:
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_URL="$(gcloud run services describe "elevate-$COMPONENT-migration" --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
+          [[ "$SERVICE_URL" =~ ^https://[a-z0-9.-]+\.run\.app$ ]]
+          echo "url=$SERVICE_URL" >> "$GITHUB_OUTPUT"
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -104,11 +114,12 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
           token_format: id_token
-          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_audience: ${{ steps.health_target.outputs.url }}
           id_token_include_email: true
       - name: Verify image version and Supabase health
         env:
           TOKEN: ${{ steps.health_auth.outputs.id_token }}
+          HEALTH_BASE_URL: ${{ steps.health_target.outputs.url }}
           COMPONENT: ${{ matrix.component }}
           IMAGE_SHA: ${{ inputs.image_sha }}
         shell: bash
@@ -117,12 +128,14 @@ jobs:
           node --input-type=module <<'NODE'
           import { appendFileSync } from 'node:fs';
           const component = process.env.COMPONENT;
+          const baseUrl = process.env.HEALTH_BASE_URL;
+          if (!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(baseUrl || '')) throw new Error('Canonical Cloud Run health URL required');
           const deadline=Date.now()+120000;
           let consecutive=0;
           for(let attempt=1; Date.now()<deadline; attempt++) {
             let response, body={};
             try {
-              response=await fetch('https://elevate-' + component + '-migration-aabnh2y32a-uc.a.run.app/api/health', {
+              response=await fetch(baseUrl + '/api/health', {
                 headers: {'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
                 redirect:'manual', signal:AbortSignal.timeout(Math.min(20000,deadline-Date.now()))
               });
@@ -131,7 +144,7 @@ jobs:
               // Only retry bounded transport failures; malformed JSON and all
               // actual HTTP responses still fail their existing release gates.
               const transient = ['TimeoutError', 'AbortError', 'TypeError'].includes(error?.name);
-              console.log(JSON.stringify({component,attempt,error:transient
+              console.log(JSON.stringify({component,attempt,httpStatus:response?.status,contentType:response?.headers?.get('content-type'),error:transient
                 ? 'transient_health_transport' : 'health_probe_invalid_response'}));
               if (!transient || Date.now() >= deadline) {
                 throw new Error('Health endpoint did not return a valid bounded response');
@@ -164,7 +177,7 @@ jobs:
           }
           if(consecutive<3) throw new Error('Service did not establish stable dependency health within two minutes');
           // /health confirms dependency access; /ready enforces the application's own readiness contract.
-          const readinessResponse=await fetch('https://elevate-'+component+'-migration-aabnh2y32a-uc.a.run.app/api/ready',{
+          const readinessResponse=await fetch(baseUrl + '/api/ready',{
             headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
             redirect:'manual',signal:AbortSignal.timeout(20000)
           });
@@ -178,7 +191,7 @@ jobs:
               !readyResult.correctCommit || !readyResult.executorReady)
             throw new Error('Canonical application readiness failed');
           if(component==='marketing') {
-            const qbResponse=await fetch('https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app/api/health/quickbooks',{
+            const qbResponse=await fetch(baseUrl + '/api/health/quickbooks',{
               headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
               redirect:'manual',signal:AbortSignal.timeout(20000)
             });

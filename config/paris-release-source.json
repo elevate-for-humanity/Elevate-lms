@@ -5,7 +5,9 @@
     {
       "source": "app/tax/page.tsx",
       "target": "apps/marketing/app/tax/page.tsx",
-      "sha256": "822b3f5d64b755432f21a1b691dc5eb5f76fdfb1f3ab123dca70df8a1655880b"
+      "sha256": "973ae7b53ef5748a69e9e8a80adbc4f28a021857051d266596f895d441d1cd9d",
+      "sourceSha256": "822b3f5d64b755432f21a1b691dc5eb5f76fdfb1f3ab123dca70df8a1655880b",
+      "localRevisionReason": "Reviewed PR #2159 adds only the Supersonic PWA manifest metadata to the canonical tax page; preserve the immutable upstream source digest."
     },
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",

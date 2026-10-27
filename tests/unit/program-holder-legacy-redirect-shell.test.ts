@@ -7,7 +7,7 @@ const source = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf
 describe('program-holder legacy redirect layout', () => {
   it('retains authorization in the parent layout', () => {
     const parent = source('apps/lms/app/program-holder/layout.tsx');
-    expect(parent).toContain('requireProgramHolder()');
+    expect(parent).toContain('requireProgramHolder({ allowPendingApproval: true })');
   });
 
   it('does not mount a second dashboard frame before redirecting', () => {

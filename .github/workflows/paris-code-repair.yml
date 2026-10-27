@@ -148,7 +148,7 @@ jobs:
           for line in changes:
             status,path=line.split('\t',1)
             if status not in ['A','M'] or not re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path): raise SystemExit('Repair outside application scope')
-            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|paris-code-engineer|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
+            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
             if path.startswith('tests/'):
               if status!='A': raise SystemExit('Existing tests must remain unchanged')
               if re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)

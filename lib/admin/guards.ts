@@ -142,6 +142,16 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
       );
     }
 
+    if (roleResult.error) {
+      return guardedIdentity(
+        user.id,
+        user.email ?? null,
+        null,
+        [],
+        serverError('SECONDARY_ROLE_LOOKUP_FAILED'),
+      );
+    }
+
     const secondaryRoles = (roleResult.data ?? [])
       .map((row: any) => row?.roles?.name)
       .filter((value: unknown): value is string => typeof value === 'string');

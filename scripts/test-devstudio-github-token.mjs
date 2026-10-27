@@ -3,19 +3,20 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 
-async function resolver({deployed, canonical, statuses = [], storeError, workflow, canonicalReads}) {
+async function resolver({deployed, canonical, statuses = [], storeError, workflow, canonicalReads, app, appError}) {
   const source = await readFile(new URL('../lib/devstudio/github-token.ts', import.meta.url), 'utf8');
   const calls = [];
   let storeReads = 0;
   const injected = source
     .replace("import { getDecryptedPlatformSecret } from '@/lib/secrets';", '')
     .replace("import { currentWorkflowGitHubToken } from './workflow-github-context';", '')
+    .replace("import { getGitHubAppToken } from './github-app-token';", '')
     .replaceAll('process.env.GITHUB_TOKEN', 'environment.GITHUB_TOKEN');
-  const factory = new Function('getDecryptedPlatformSecret', 'fetch', 'environment', 'currentWorkflowGitHubToken',
-    stripTypeScriptTypes(injected).replaceAll('export ', '') + '\nreturn {getGitHubToken, getGitHubHeaders};');
+  const factory = new Function('getDecryptedPlatformSecret', 'fetch', 'environment', 'currentWorkflowGitHubToken', 'getGitHubAppToken',
+    stripTypeScriptTypes(injected).replaceAll('export ', '') + '\nreturn {getGitHubToken, getGitHubHeaders, getGitHubTokenCandidates};');
   const api = factory(async () => { storeReads++; if (storeError) throw storeError; return canonicalReads ? canonicalReads.shift() : canonical; },
     async (url, init) => { calls.push({url, init}); return new Response(null, {status: statuses.shift() ?? 200}); },
-    {GITHUB_TOKEN: deployed}, () => workflow);
+    {GITHUB_TOKEN: deployed}, () => workflow, async () => { if (appError) throw appError; return app ?? null; });
   return {...api, calls, storeReads: () => storeReads};
 }
 
@@ -73,4 +74,22 @@ test('canonical store failure fails closed instead of silently selecting a stale
   const r = await resolver({deployed:'old-deployment-token', storeError:new Error('store unavailable')});
   await assert.rejects(r.getGitHubToken(), /store unavailable/);
   assert.equal(r.calls.length, 0);
+});
+
+test('App credentials precede legacy credentials for requests and dispatch', async () => {
+  const r = await resolver({app:'installation-token-fixture', storeError:new Error('must not read')});
+  assert.equal(await r.getGitHubToken(), 'installation-token-fixture');
+  assert.deepEqual(await r.getGitHubTokenCandidates(), ['installation-token-fixture']);
+  assert.equal(r.storeReads(), 0);
+});
+test('App failure never silently falls back to a personal credential', async () => {
+  const r = await resolver({appError:new Error('GITHUB_APP_CONFIGURATION_INVALID'), canonical:'legacy-personal-token'});
+  await assert.rejects(r.getGitHubToken(), /GITHUB_APP_CONFIGURATION_INVALID/);
+  await assert.rejects(r.getGitHubTokenCandidates(), /GITHUB_APP_CONFIGURATION_INVALID/);
+  assert.equal(r.storeReads(), 0);
+});
+test('workflow token remains authoritative even when App configuration fails', async () => {
+  const r = await resolver({workflow:'workflow-token-fixture', appError:new Error('must not mint')});
+  assert.equal(await r.getGitHubToken(), 'workflow-token-fixture');
+  assert.deepEqual(await r.getGitHubTokenCandidates(), ['workflow-token-fixture']);
 });

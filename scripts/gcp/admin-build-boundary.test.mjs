@@ -28,7 +28,8 @@ test('ordinary Admin releases retain the current browser workspace binding until
  const s=workflow();
  assert.ok(!s.includes('STUDIO_BROWSER_ENV='));
  const update=s.slice(s.indexOf('gcloud run services update elevate-admin-migration'),s.indexOf('      - name: Health-check and activate'));
- assert.ok(update.includes('--update-env-vars="AI_NARRATION_PROVIDER=kokoro"'));
+ assert.ok(s.includes('PARIS_APP_FLAGS[0]="${PARIS_APP_FLAGS[0]},AI_NARRATION_PROVIDER=kokoro"'));
+ assert.ok(update.includes('"${PARIS_APP_FLAGS[@]}"'));
  assert.ok(!update.includes('STUDIO_BROWSER_URL='));
  assert.ok(!update.includes('STUDIO_BROWSER_PUBLIC_URL='));
 });

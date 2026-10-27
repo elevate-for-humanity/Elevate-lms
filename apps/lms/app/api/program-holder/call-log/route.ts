@@ -1,5 +1,6 @@
 // pre-auth-registry: exempt - requireProgramHolder and holder-scoped row filters authorize every mutation.
 import { NextResponse } from 'next/server';
+import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 const OUTCOMES = new Set([
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const studentId = String(body.program_holder_student_id || '');
+  let studentId = String(body.program_holder_student_id || '');
   const outcome = String(body.outcome || '');
   const notes = String(body.notes || '').trim().slice(0, 4000);
   const workStartDate = body.work_start_date ? String(body.work_start_date) : null;
@@ -31,12 +32,29 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: applicant } = await ctx.db
+  const { data: initialApplicant, error: applicantError } = await ctx.db
     .from('program_holder_students')
     .select('id,user_id,enrollment_id,program_holder_id,status')
     .eq('id', studentId)
     .eq('program_holder_id', ctx.holderId)
     .maybeSingle();
+  let applicant = initialApplicant;
+  if (applicantError) return NextResponse.json({ error: 'Applicant lookup unavailable.' }, { status: 503 });
+  if (!applicant && body.regional_application_id) {
+    // Verify territory and local-holder ownership server-side before linking.
+    const workspace = await getProgramHolderWorkspace();
+    const candidate = workspace.applicants.find(row => row.regional_application_id === body.regional_application_id);
+    if (candidate && candidate.program_id && ctx.programIds.includes(candidate.program_id)) {
+      const claimed = await ctx.db.from('program_holder_students').insert({ program_holder_id: ctx.holderId, application_id: candidate.application_id, user_id: candidate.user_id || null, program_id: candidate.program_id, applicant_name: candidate.applicant_name, applicant_email: candidate.applicant_email || null, applicant_phone: candidate.applicant_phone || null, status: 'applied', application_status: candidate.application_status }).select('id,user_id,enrollment_id,program_holder_id,status').single();
+      if (claimed.error?.code === '23505') {
+        const existing = await ctx.db.from('program_holder_students').select('id,user_id,enrollment_id,program_holder_id,status').eq('program_holder_id', ctx.holderId).eq('application_id', candidate.application_id).maybeSingle();
+        if (existing.error) return NextResponse.json({ error: 'Regional call record unavailable.' }, { status: 503 });
+        applicant = existing.data;
+      } else if (claimed.error) return NextResponse.json({ error: 'Regional applicant could not be linked.' }, { status: 503 });
+      else applicant = claimed.data;
+      if (applicant) studentId = applicant.id;
+    }
+  }
   if (!applicant) {
     return NextResponse.json({ error: 'Applicant is not assigned to this Program Holder.' }, { status: 404 });
   }

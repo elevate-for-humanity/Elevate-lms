@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { verifyLocalSource } from './verify-paris-release-source.mjs';
 const digest = value => createHash('sha256').update(value).digest('hex');
 const fixture = () => ({ repository: 'elevate-for-humanity/next-platform-starter', commit: 'a'.repeat(40), files: [
@@ -21,4 +22,14 @@ test('reports every stale local file and never accepts changed content automatic
 test('missing local files are reported alongside stale files', () => {
   assert.throws(() => verifyLocalSource(fixture(), path => { if (path === 'local-a') throw Error('missing'); return 'unreviewed'; }), error =>
     error instanceof AggregateError && error.errors.length === 2);
+});
+test('reviewed tax-page revision adds only the Supersonic install manifest and retains upstream identity', () => {
+  const manifest = JSON.parse(readFileSync(new URL('../config/paris-release-source.json', import.meta.url), 'utf8'));
+  const entry = manifest.files.find(file => file.target === 'apps/marketing/app/tax/page.tsx');
+  const local = readFileSync(new URL('../apps/marketing/app/tax/page.tsx', import.meta.url), 'utf8');
+  const original = local.replace("  manifest: '/manifest-supersonic-fast-cash.json',\n", '');
+  assert.notEqual(local, original);
+  assert.equal(digest(local), entry.sha256);
+  assert.equal(digest(original), entry.sourceSha256);
+  assert.match(entry.localRevisionReason, /#2159/);
 });

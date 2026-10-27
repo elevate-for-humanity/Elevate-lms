@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+import { apiRequireRoles } from '@/lib/admin/guards';
+import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -11,21 +12,9 @@ export const dynamic = 'force-dynamic';
 async function _GET(_req: NextRequest) {
   const rateLimited = await applyRateLimit(_req, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+  const auth = await apiRequireRoles(_req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
+  if (auth.error) return auth.error;
   const db = await requireAdminClient();
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!['admin'].includes(profile?.role)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
 
   const { data, error } = await db.from('platform_settings').select('key, value');
   if (error) {
@@ -40,21 +29,9 @@ async function _GET(_req: NextRequest) {
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
+  if (auth.error) return auth.error;
   const db = await requireAdminClient();
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!['admin'].includes(profile?.role)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
 
   const body = await req.json();
 
@@ -84,7 +61,7 @@ async function _POST(req: NextRequest) {
       key: key.trim(),
       value,
       updated_at: new Date().toISOString(),
-      updated_by: user.id,
+      updated_by: auth.id,
     }));
 
   if (updates.length === 0) {
@@ -99,7 +76,7 @@ async function _POST(req: NextRequest) {
   }
 
   logger.info('[settings] Updated', {
-    userId: user.id,
+    userId: auth.id,
     keys: updates.map((u) => u.key),
   });
   return NextResponse.json({ success: true });

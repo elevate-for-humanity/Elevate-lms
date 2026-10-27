@@ -3,6 +3,7 @@ import CourseSyllabus, { type CourseSyllabusRecord } from '@/components/learner/
 import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
 import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
 import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
+import HvacStartHere from '@/components/learner/HvacStartHere';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -597,6 +598,7 @@ export default async function StudentDashboard() {
           </section>
         )}
 
+        {workspace.enrollments.some((row) => row.program_slug === 'hvac-technician') ? <HvacStartHere /> : null}
         <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Documents and agreements">
           <h2 className="text-xl font-black">Your documents & agreements</h2>
           <p className="mt-2 text-sm text-slate-700">Read your handbook, MOU, and enrollment documents anytime, including after signing.</p>

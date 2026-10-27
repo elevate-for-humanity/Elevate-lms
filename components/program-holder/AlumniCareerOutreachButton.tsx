@@ -9,14 +9,15 @@ export function AlumniCareerOutreachButton({ count }: { count: number }) {
   async function send() {
     setBusy(true);
     setMessage('');
+    try {
     const response = await fetch('/api/program-holder/alumni-career-outreach', { method: 'POST' });
     const result = await response.json().catch(() => ({}));
-    setBusy(false);
     setMessage(
       response.ok
         ? `${result.sent} graduate portal emails sent.`
         : result.error || 'Graduate emails could not be sent.',
     );
+    } catch { setMessage('The send result could not be confirmed. Check outreach records before retrying.'); } finally { setBusy(false); }
   }
 
   return (

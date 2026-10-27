@@ -107,3 +107,13 @@ test('restart preserves a validated repair producer but still executes an unfini
   assert.equal(ctx.artifacts.lesson_film_render.video,status==='producer-validated'?'saved.mp4':'repaired.mp4');
  }
 });
+
+test('explicitly named safety teaching survives concept stage normalization',()=>{
+ const view=instructionView({scenes:[{id:'scene:seg-06-concept-safety-sanitation',stage:'concept_explanation',sceneType:'worked_example',text:'Use clean tools, protective draping and suitable gloves.'}]});
+ assert.equal(view.scenes[0].sceneType,'safety_warning');
+ assert.equal(view.scenes[0].dialogue,'Use clean tools, protective draping and suitable gloves.');
+});
+test('incidental safety words do not invent a safety scene',()=>{
+ const view=instructionView({scenes:[{id:'color-wheel',stage:'concept_explanation',text:'Gloves protect the stylist.'},{id:'safety',stage:'concept_explanation',text:'Color theory explains hues.'},{id:'warning',stage:'concept_explanation',sceneType:'safety_warning',text:'Wear protective gloves.'}]});
+ assert.equal(view.scenes[0].sceneType,'mental_model');assert.equal(view.scenes[1].sceneType,'mental_model');assert.equal(view.scenes[2].sceneType,'safety_warning');
+});

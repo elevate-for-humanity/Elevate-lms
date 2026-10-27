@@ -1,3 +1,4 @@
+import { describeWorkerError } from './worker-error.mjs';
 import {repairDirective} from './repair-policy.mjs';
 import {
   artifactPayload,
@@ -202,18 +203,7 @@ export class UltimateBuildRunner {
           continue;
         }
       } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : typeof error === 'string'
-              ? error
-              : (() => {
-                  try {
-                    return JSON.stringify(error);
-                  } catch {
-                    return String(error);
-                  }
-                })();
+        const message = describeWorkerError(error);
         const code =
           error && typeof error === 'object' && 'code' in error && typeof (error as any).code === 'string'
             ? (error as any).code

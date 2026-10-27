@@ -78,6 +78,7 @@ export async function configureProgramHolderPayoutAccount(
   if (existing?.payouts_enabled || existing?.transfers_enabled) throw new Error('Contact Elevate to change a verified payout provider.');
   const payoutState = {
     payout_provider: provider,
+    provider_recipient_id: null,
     transfers_enabled: false,
     payouts_enabled: false,
     charges_enabled: false,
@@ -89,13 +90,19 @@ export async function configureProgramHolderPayoutAccount(
 
   const payoutQuery = existing
     ? ctx.db.from('program_holder_payouts').update(payoutState).eq('user_id', ctx.user.id)
+        .eq('payouts_enabled', false).eq('transfers_enabled', false)
     : ctx.db.from('program_holder_payouts').insert({
         user_id: ctx.user.id,
         ...payoutState,
       });
 
-  const { error } = await payoutQuery;
+  if (existing) {
+    if (existing.payout_provider == null) payoutQuery.is('payout_provider', null);
+    else payoutQuery.eq('payout_provider', existing.payout_provider);
+  }
+  const { data: saved, error } = await payoutQuery.select('user_id').maybeSingle();
 
+  if (!error && !saved) throw new Error('Payout account changed during setup. Reload before trying again.');
   if (error) throw new Error('Unable to save the payout account.');
 
   const { error: holderError } = await ctx.db

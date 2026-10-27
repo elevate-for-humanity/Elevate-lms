@@ -17,7 +17,7 @@ Scope: shared Program Holder dashboard pages, APIs and components; existing and 
 - Displayed hours combined program totals and mirrored clock rows. Verified aggregation now isolates program/student and de-duplicates linked clock records.
 - The workspace relied solely on holder-specific course overrides although canonical program/course mappings already existed. It now resolves canonical course metadata without publishing courses or granting learner access.
 - Gary regional rows used application IDs against an endpoint expecting roster IDs. Logging now rechecks server-computed territory/ownership, creates a unique scoped roster link when eligible, and uses the actual roster ID. Local-holder-controlled and revoked applicants are excluded.
-- Banking configuration could reset verified payout flags. Same-provider setup is idempotent; changing a verified provider requires administrator handling. Unsafe/non-HTTPS setup links and unsupported providers are rejected. Missing provider URLs remain unavailable rather than being reported as connected.
+- Banking configuration could reset verified payout flags. Same-provider setup is idempotent; changing a verified provider requires administrator handling. Unsafe/non-HTTPS setup links and unsupported providers are rejected. Missing provider URLs remain unavailable rather than being reported as connected. Conditional writes also prevent a concurrent provider activation from being overwritten, and switching an unverified provider clears its stale recipient mapping.
 - Account-specific insurance exemption now governs both visible upload/checklist requirements and payment readiness. Other accounts keep their existing requirements.
 - Welcome-email delivery markers no longer silently discard save errors, and dashboard links use the LMS origin.
 
@@ -27,7 +27,7 @@ Scope: shared Program Holder dashboard pages, APIs and components; existing and 
 
 ## Validation evidence and limits
 
-The restored candidate passes the shared behavioral regression suite plus thirteen root-level behavioral tests (21 Node tests total), 87 related Vitest tests, scoped ESLint, and the portal routing contract audit. Full LMS typechecking and the production compilation passed for commit 2b02e25865a588c2e1097d8995718a089f72d178. The additional career/phone and role-alias repairs require fresh typecheck/build and protected CI evidence; an earlier/local test result is not proof that production serves it.
+The restored candidate passes the shared behavioral regression suite plus fourteen root-level behavioral tests (22 Node tests total), 87 related Vitest tests, scoped ESLint, and the portal routing contract audit. Full LMS typechecking and the production compilation passed for commit 2b02e25865a588c2e1097d8995718a089f72d178. The additional career/phone and role-alias repairs require fresh typecheck/build and protected CI evidence; an earlier/local test result is not proof that production serves it.
 
 Live database checks covered all 14 non-test holder records and confirmed all 24 holder document objects exist. Existing signed/approval flags were not fabricated. A missing profile backlink was repaired with an ownership-constrained update. No bank credentials were collected or stored.
 

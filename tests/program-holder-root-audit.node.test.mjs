@@ -85,3 +85,17 @@ test('career detail distinguishes unavailable records from database failures', a
   else assert.equal(await api.getJobById('id',{throwOnError:true}),null);
  }
 });
+
+
+test('provider activation racing with setup cannot be overwritten', async () => {
+ let holderWrites=0, updateFilters=[];
+ const db=dbFor(({table,operation,filters})=>{
+  if(table==='program_holders')holderWrites++;
+  if(operation==='update'){updateFilters=filters;return {data:null,error:null};}
+  return {data:{user_id:'u',payout_provider:'paypal',payouts_enabled:false,transfers_enabled:false},error:null};
+ });
+ const api=load('lib/program-holder/payout-account.ts',{'server-only':{},'@/lib/secrets':{hydrateProcessEnv:async()=>{}}});
+ await assert.rejects(api.configureProgramHolderPayoutAccount({user:{id:'u'},holderId:'h',db},'branch'),/changed during setup/);
+ assert.equal(holderWrites,0);
+ for(const [key,value] of [['payouts_enabled',false],['transfers_enabled',false],['payout_provider','paypal']])assert.ok(updateFilters.some(([k,v])=>k===key&&v===value));
+});

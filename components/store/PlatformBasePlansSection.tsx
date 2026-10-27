@@ -14,14 +14,16 @@ interface Props {
   selectedAddonSlugs?: string[];
   headline?: string;
   subheadline?: string;
+  initialInterval?: BillingInterval;
 }
 
 export function PlatformBasePlansSection({
   selectedAddonSlugs = [],
+  initialInterval = 'monthly',
   headline = 'Base plans',
   subheadline = 'Start simple. Add workforce, LMS, and apprenticeship modules when you are ready.',
 }: Props) {
-  const [interval, setBillingInterval] = useState<BillingInterval>('monthly');
+  const [interval, setBillingInterval] = useState<BillingInterval>(initialInterval);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,18 +38,23 @@ export function PlatformBasePlansSection({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ planId, interval, addonSlugs: selectedAddonSlugs }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = storeSignInHref('/store/plans');
+          window.location.href = storeSignInHref(`/store/plans?plan=${encodeURIComponent(planId)}&interval=${interval}&addons=${encodeURIComponent(selectedAddonSlugs.join(','))}`);
           return;
         }
         if (res.status === 409 && data.trialUrl) {
-          window.location.href = data.trialUrl;
+          const trial = new URL(data.trialUrl, window.location.origin);
+          trial.searchParams.set('purchase', '1');
+          trial.searchParams.set('plan', planId);
+          trial.searchParams.set('interval', interval);
+          trial.searchParams.set('addons', selectedAddonSlugs.join(','));
+          window.location.href = trial.pathname + trial.search;
           return;
         }
-        throw new Error(data.error || 'Checkout failed');
+        throw new Error(data.error || 'Checkout is temporarily unavailable. Please try again.');
       }
 
       if (!data.checkoutUrl) throw new Error('No checkout URL returned');

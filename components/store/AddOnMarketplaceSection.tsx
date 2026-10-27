@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, Plus, ArrowRight } from 'lucide-react';
+import { CAPABILITY_CATALOG } from '@/lib/platform/capability-catalog';
 import { ADD_ON_MARKETPLACE } from '@/lib/store/platform-pricing';
 
 interface Props {
@@ -24,6 +25,7 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {PUBLIC_SUBSCRIPTION_ADDONS.map((addon) => {
+            const capability = CAPABILITY_CATALOG.find((item) => addon.features.includes(item.key) && item.status !== 'internal');
             const selected = selectedSlugs.includes(addon.slug);
             return (
               <div
@@ -62,6 +64,7 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
                   <Plus className="w-4 h-4" />
                   {selected ? 'Included at checkout' : 'Add to checkout'}
                 </button>
+                {capability && <Link href={`/store/demo/capability/${capability.key}`} className="mt-3 min-h-11 rounded-lg border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-900">Watch {addon.name} walkthrough</Link>}
                 <Link href={`/store/proof#offer-${addon.slug}`} className="mt-3 text-center text-sm font-black text-emerald-800 underline underline-offset-4">
                   Verify claims and source
                 </Link>

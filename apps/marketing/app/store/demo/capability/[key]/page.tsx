@@ -86,6 +86,7 @@ export default async function CapabilityDemoPage({ params }: { params: Promise<{
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
       <CapabilitySubscriptionDemo
+        capabilityKey={String(capability.key)}
         name={capability.name}
         description={capability.description}
         categoryLabel={CATEGORY_LABELS[capability.category] || 'Elevate'}

@@ -67,7 +67,7 @@ export interface ProgramCatalogEntry {
 
 // Standard administrator statement
 export const ADMINISTRATOR_STATEMENT =
-  'Elevate for Humanity serves as the Program Administrator for registered apprenticeship pathways, coordinating training, employer participation, and funding access.';
+  'Elevate for Humanity serves as the Program Administrator for registered apprenticeship pathways, coordinating training, employer participation, and self-pay enrollment.';
 
 /**
  * BARBER APPRENTICESHIP - Canonical Values (Non-Negotiable)
@@ -115,7 +115,7 @@ export const BARBER_PROGRAM: ProgramCatalogEntry = {
   states_active: ['Indiana'],
 
   // Funding
-  funding_options: ['WIOA', 'Workforce Ready Grant', 'JRI', 'Employer Sponsorship', 'Self-Pay'],
+  funding_options: ['Self-Pay'],
 
   // Wages
   starting_wage: '$10-12/hour + tips',

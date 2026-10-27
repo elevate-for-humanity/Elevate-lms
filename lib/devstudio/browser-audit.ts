@@ -124,7 +124,7 @@ export async function runStudioBrowserAudit(input?: { url?: string; includeMobil
     });
   }
   return {
-    evidenceType: 'live-playwright-browser-audit',
+    evidenceType: 'live-cdp-browser-audit',
     target,
     results,
     checked: [

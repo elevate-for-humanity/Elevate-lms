@@ -12,9 +12,7 @@ function median(values: number[]): number | null {
   if (!values.length) return null;
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? (sorted[middle - 1] + sorted[middle]) / 2
-    : sorted[middle];
+  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
 }
 
 async function benchmarkSummary(db: Awaited<ReturnType<typeof requireAdminClient>>) {
@@ -68,7 +66,8 @@ export async function POST(req: NextRequest) {
         status: verified ? 'verified' : 'draft',
         value_numeric: DEV_STUDIO_LANGUAGE_COUNT,
         value_text: `${DEV_STUDIO_LANGUAGE_COUNT} maintained editor language modes`,
-        evidence_summary: 'Verified from lib/devstudio/language-registry.ts and enforced by scripts/check-dev-studio-claims.mjs.',
+        evidence_summary:
+          'Verified from lib/devstudio/language-registry.ts and enforced by scripts/check-dev-studio-claims.mjs.',
         source: 'repository-ci',
         verified_at: verified ? new Date().toISOString() : null,
         verified_by: verified ? auth.id : null,
@@ -84,7 +83,10 @@ export async function POST(req: NextRequest) {
     const studioSeconds = Number(body.studio_seconds);
     const scenario = String(body.scenario ?? '').trim();
     if (!scenario || !(baselineSeconds > 0) || !(studioSeconds > 0)) {
-      return safeError('scenario, baseline_seconds, and studio_seconds must be positive values', 400);
+      return safeError(
+        'scenario, baseline_seconds, and studio_seconds must be positive values',
+        400,
+      );
     }
 
     const { error: insertError } = await db.from('dev_studio_benchmarks').insert({
@@ -104,7 +106,9 @@ export async function POST(req: NextRequest) {
       .update({
         status: verified ? 'verified' : 'draft',
         value_numeric: summary.medianSpeedup,
-        value_text: summary.medianSpeedup ? `${summary.medianSpeedup.toFixed(2)}x median measured speedup` : null,
+        value_text: summary.medianSpeedup
+          ? `${summary.medianSpeedup.toFixed(2)}x median measured speedup`
+          : null,
         evidence_summary: `${summary.sampleCount} benchmark sample(s); 10x claim requires at least 10 samples and median speedup >= 10x.`,
         source: 'dev_studio_benchmarks',
         verified_at: verified ? new Date().toISOString() : null,
@@ -119,7 +123,10 @@ export async function POST(req: NextRequest) {
   if (action === 'verify_external_evidence') {
     const claimKey = String(body.claim_key ?? '');
     if (!['soc2_certified', 'zero_downtime'].includes(claimKey)) {
-      return safeError('Only external/runtime evidence claims may be verified with this action', 400);
+      return safeError(
+        'Only external/runtime evidence claims may be verified with this action',
+        400,
+      );
     }
     const evidenceUrl = String(body.evidence_url ?? '').trim();
     const evidenceSummary = String(body.evidence_summary ?? '').trim();
@@ -133,7 +140,7 @@ export async function POST(req: NextRequest) {
         evidence_url: evidenceUrl,
         evidence_summary: evidenceSummary,
         value_text: body.value_text ? String(body.value_text) : null,
-        source: claimKey === 'soc2_certified' ? 'external-auditor' : 'northflank-runtime',
+        source: claimKey === 'soc2_certified' ? 'external-auditor' : 'google-cloud-run',
         verified_at: new Date().toISOString(),
         verified_by: auth.id,
         expires_at: body.expires_at ? String(body.expires_at) : null,

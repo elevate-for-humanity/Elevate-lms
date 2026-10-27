@@ -24,7 +24,11 @@ describe('Learner calendar page', () => {
     const src = fs.readFileSync(pagePath, 'utf-8');
     expect(src).toContain("from('course_enrollments')");
     expect(src).toContain(".eq('student_id', user.id)");
-    expect(src).toContain('<CalendarWidget userId={user.id} />');
+    expect(src.match(/<CalendarWidget\b/g)).toHaveLength(1);
+    expect(src).toContain('userId={user.id}');
+    expect(src).toContain('additionalEvents={meetingEvents}');
+    expect(src).toContain('Request an appointment');
+    expect(src).toContain(".eq('user_id', user.id)");
     expect(src).not.toContain('CalendarIntegration');
     expect(src).not.toContain("from('program_enrollments')");
   });

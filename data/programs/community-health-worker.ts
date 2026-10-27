@@ -25,10 +25,10 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   schedule: 'Monthly cohort start — hybrid (online + community practicum)',
   cohortSize: '10–15 participants per cohort',
   fundingStatement:
-    'Self-pay enrollment is available. Any workforce funding requires current program-level verification and written participant authorization.',
+    'WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay available.',
   selfPayCost: '$3,800',
-  fundingOptions: ['self_pay'],
-  badge: 'Community Health Training',
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
+  badge: 'ETPL Listed',
   badgeColor: 'green',
   credentials: [
     {
@@ -74,13 +74,13 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   faqs: [],
   metaTitle: 'Community Health Worker (CHW) Certification | Elevate for Humanity',
   metaDescription:
-    'Prepare for community health worker credentialing in 8–10 weeks through hybrid training and community practicum.',
+    'Earn Indiana CHW certification in 8–10 weeks. WIOA and WRG funding available for eligible residents.',
   funding: {
     fssa_eligible: false,
-    wioa_eligible: false,
-    wrg_eligible: false,
-    etpl_approved: false,
-    fundingNotes: 'No public workforce-funding claim is currently authorized for this program. Any third-party funding requires current program-level verification and written participant authorization.',
+    wioa_eligible: true,
+    wrg_eligible: true,
+    etpl_approved: true,
+    fundingNotes: 'Indiana ETPL-listed community health worker pathway.',
   },
   enrollmentType: 'internal',
   deliveryModel: 'internal',

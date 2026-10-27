@@ -33,7 +33,7 @@ export function DashboardVoiceAssistant() {
       </button>
       {open ? (
         <div id="dashboard-voice-assistant" className="h-[620px] border-t border-blue-100">
-          <UnifiedEllieChat embedded preferredAgent="LIZZY" />
+          <UnifiedEllieChat embedded />
         </div>
       ) : null}
     </div>

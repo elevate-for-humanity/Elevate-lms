@@ -1,0 +1,61 @@
+{
+  "generatedWith": "Built-in image generation; photograph-style illustrations labeled illustrative in alt text. Existing source images inspected before generation.",
+  "newAssets": 8,
+  "newAssetBytesMaximum": 106168,
+  "assignments": {
+    "customer-service-pro": [
+      "/images/pages/community-page-4.webp",
+      "Customer service and community support"
+    ],
+    "start-hospitality": [
+      "/images/program-media-20261016/start-hospitality.webp",
+      "Illustrative hotel supervisor guiding a learner through reception procedures"
+    ],
+    "hospitality": [
+      "/images/program-media-20261016/hospitality.webp",
+      "Illustrative hospitality instructor and learner preparing dining-room service"
+    ],
+    "nha-patient-care-technician": [
+      "/images/program-media-20261016/patient-care.webp",
+      "Illustrative supervised patient-mobility skills practice in a training lab"
+    ],
+    "nha-medical-assistant": [
+      "/images/program-media-20261016/medical-assistant.webp",
+      "Illustrative medical assistant instructor supervising blood-pressure measurement"
+    ],
+    "culinary-apprenticeship": [
+      "/images/pages/culinary-apprenticeship-hero.webp",
+      "Chef demonstrating cooking techniques in a professional kitchen"
+    ],
+    "nha-phlebotomy": [
+      "/images/pages/phlebotomy-real.webp",
+      "Gloved healthcare professional performing a blood collection"
+    ],
+    "qma": [
+      "/images/program-media-20261016/qma.webp",
+      "Illustrative medication aide learner reviewing a practice medication record with an instructor"
+    ],
+    "nha-pharmacy-technician": [
+      "/images/program-media-20261016/pharmacy-technician.webp",
+      "Illustrative pharmacy learner and supervisor reviewing a practice prescription package"
+    ],
+    "network-administration": [
+      "/images/program-media-20261016/network-administration.webp",
+      "Illustrative instructor guiding a learner through network-switch connections"
+    ],
+    "network-support-technician": [
+      "/images/program-media-20261016/network-support.webp",
+      "Illustrative network-support training using a cable tester and router"
+    ],
+    "finance-bookkeeping-accounting": [
+      "/images/pexels/bookkeeping.webp",
+      "Bookkeeping ledger showing financial entries"
+    ],
+    "jri-introduction": [
+      "/images/pages/career-services-page-10.webp",
+      "Learner studying and preparing for a career pathway"
+    ]
+  },
+  "homepagePreservation": "Original approved photographs remain in primary placements. Only repeated secondary uses in HomePlatformOverview and HomeFeaturedHostShop changed; hero and featured shop photographs untouched.",
+  "validation": "Existing replacement photographs were visually inspected; no new image generation for suitable unused assets. New assets use unique files and optimized WebP encoding."
+}

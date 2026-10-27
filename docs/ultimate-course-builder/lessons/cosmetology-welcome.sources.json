@@ -1,0 +1,20 @@
+{
+  "reviewedAt": "2026-10-01",
+  "scope": "Course-defined introductory knowledge; no state licensing eligibility or practical competence approval.",
+  "sources": [
+    {
+      "id": "federal-training-components",
+      "url": "https://www.apprenticeship.gov/career-seekers",
+      "facts": "Registered apprenticeship combines paid work experience with mentorship, related instruction, progressive wages and a portable credential. No program-specific wage is inferred."
+    },
+    {
+      "id": "indiana-current-authority",
+      "url": "https://www.in.gov/pla/professions/cosmetology-and-barber-home/",
+      "facts": "Indiana PLA provides cosmetology and barber licensing information, statutes, rules and sanitation resources. Its current announcement identifies administrative-rule changes effective July 22, 2026."
+    },
+    {
+      "id": "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8",
+      "facts": "The client requests, fictional observation records, professional response routine and exercises are original course-defined instructional examples. They are not real learner events or claims of state-approved procedures."
+    }
+  ]
+}

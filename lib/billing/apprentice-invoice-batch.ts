@@ -16,6 +16,8 @@ export type ApprenticeDashboardInvoice = {
   amountCents: number;
   status: string;
   dueDate: string | null;
+  paidAt?: string | null;
+  createdAt?: string | null;
   paymentUrl: string | null;
 };
 
@@ -26,21 +28,48 @@ export async function listApprenticeInvoices(
   userId: string,
   limit = 50,
 ): Promise<ApprenticeDashboardInvoice[]> {
-  const { data, error } = await db
+  const profile = await db.from('profiles').select('email').eq('id', userId).maybeSingle();
+  if (profile.error)
+    throw new Error(`Could not resolve apprentice billing identity: ${profile.error.message}`);
+
+  const select = 'id,invoice_number,total_cents,status,due_at,paid_at,payment_url,created_at';
+  const byUserKey = db
     .from('billing_invoices')
-    .select('id,invoice_number,total_cents,status,due_at,payment_url')
+    .select(select)
     .in('customer_external_key', [userId, `user:${userId}`])
     .order('created_at', { ascending: false })
     .limit(limit);
+  const byEmail = profile.data?.email
+    ? db
+        .from('billing_invoices')
+        .select(select)
+        .eq('customer_email', profile.data.email)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+    : Promise.resolve({ data: [], error: null });
+  const [keyResult, emailResult] = await Promise.all([byUserKey, byEmail]);
+  const error = keyResult.error || emailResult.error;
   if (error) throw new Error(`Could not load apprentice invoices: ${error.message}`);
-  return (data || []).map((row: any) => ({
-    id: row.id,
-    invoiceNumber: row.invoice_number || null,
-    amountCents: Number(row.total_cents || 0),
-    status: String(row.status || 'open'),
-    dueDate: row.due_at || null,
-    paymentUrl: row.payment_url || null,
-  }));
+
+  // QuickBooks uses its own customer ID while Elevate uses the profile UUID.
+  // Resolve both identities and de-duplicate by the canonical local invoice ID.
+  const rows = new Map<string, any>();
+  for (const row of [...(keyResult.data || []), ...(emailResult.data || [])]) rows.set(row.id, row);
+  return [...rows.values()]
+    .sort((left, right) =>
+      String(right.created_at || '').localeCompare(String(left.created_at || '')),
+    )
+    .slice(0, limit)
+    .map((row: any) => ({
+      id: row.id,
+      invoiceNumber: row.invoice_number || null,
+      amountCents: Number(row.total_cents || 0),
+      status: String(row.status || 'open'),
+      dueDate: row.due_at || null,
+      paidAt: row.paid_at || null,
+      createdAt: row.created_at || null,
+      paymentUrl: row.payment_url || null,
+    }));
 }
 
 export async function getApprenticeBillingAccess(

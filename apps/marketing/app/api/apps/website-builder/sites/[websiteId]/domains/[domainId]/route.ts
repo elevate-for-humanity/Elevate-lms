@@ -1,7 +1,7 @@
 /** Live domain status and disconnect endpoint. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { createClient } from '@/lib/supabase/server';
+import { resolveOwnedSite } from '@/lib/domainee/site-resolver';
 import { deleteDomain, getDomain, isDomaineeConfigured } from '@/lib/domainee/client';
 import { logger } from '@/lib/logger';
 
@@ -14,16 +14,15 @@ export async function GET(
 ) {
   await hydrateProcessEnv().catch(() => undefined);
   const { websiteId, domainId } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const resolved = await resolveOwnedSite(websiteId);
+  if ('error' in resolved) return resolved.error;
+  const { supabase } = resolved;
 
   const { data: row, error } = await supabase
     .from('website_domains')
     .select('*')
     .eq('id', domainId)
     .eq('website_id', websiteId)
-    .eq('user_id', user.id)
     .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!row) return NextResponse.json({ error: 'Domain not found' }, { status: 404 });
@@ -52,16 +51,15 @@ export async function DELETE(
 ) {
   await hydrateProcessEnv().catch(() => undefined);
   const { websiteId, domainId } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const resolved = await resolveOwnedSite(websiteId);
+  if ('error' in resolved) return resolved.error;
+  const { supabase } = resolved;
 
   const { data: row, error } = await supabase
     .from('website_domains')
     .select('id, user_id, domainee_domain_id, status')
     .eq('id', domainId)
     .eq('website_id', websiteId)
-    .eq('user_id', user.id)
     .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!row) return NextResponse.json({ error: 'Domain not found' }, { status: 404 });

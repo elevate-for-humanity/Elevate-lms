@@ -7,6 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { MINIMUM_BOOKING_NOTICE_HOURS } from '@/lib/testing/booking-validation';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
 import type { BillingLineInput } from '@/lib/billing/contracts';
+import { validTestingReference } from '@/lib/testing/booking-calendar';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
     slotId?: string | null;
     email?: string;
     name?: string;
+    requestId?: string;
   };
 
   try {
@@ -71,6 +73,10 @@ export async function POST(request: NextRequest) {
   const examName = body.examName?.trim() || '';
   const customerEmail = body.email?.trim().toLowerCase() || '';
   const customerName = body.name?.trim() || '';
+  const requestId = body.requestId?.trim() || '';
+  if (!validTestingReference(requestId)) {
+    return NextResponse.json({ error: 'Refresh checkout and try again.' }, { status: 400 });
+  }
   if (!customerEmail || !customerName) {
     return NextResponse.json(
       { error: 'Name and email are required for the QuickBooks invoice and receipt.' },
@@ -150,8 +156,22 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const idempotencyKey = `testing:${customerEmail}:${requestId}`;
+    const prior = await admin.from('billing_invoices')
+      .select('id,fulfillment_payload,total_cents')
+      .eq('idempotency_key', idempotencyKey).maybeSingle();
+    if (prior.error) throw new Error('Could not verify the existing checkout.');
+    const amountCents = pricing.amountCents * participantCount +
+      (addOnSelected ? provider.addOn?.amountCents || 0 : 0);
+    if (prior.data && (
+      prior.data.fulfillment_payload?.slot_id !== slot.id ||
+      prior.data.fulfillment_payload?.exam_name !== pricing.displayName ||
+      prior.data.total_cents !== amountCents
+    )) {
+      return NextResponse.json({ error: 'Your checkout selection changed. Refresh and try again.' }, { status: 409 });
+    }
     const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
-      idempotencyKey: `testing:${slot.id}:${customerEmail}:${crypto.randomUUID()}`,
+      idempotencyKey,
       customer: {
         externalKey: `email:${customerEmail}`,
         displayName: customerName,
@@ -171,6 +191,7 @@ export async function POST(request: NextRequest) {
           slot_id: slot.id,
           customer_email: customerEmail,
           customer_name: customerName,
+          booking_token: requestId,
           amount_cents:
             pricing.amountCents * participantCount +
             (addOnSelected ? provider.addOn?.amountCents || 0 : 0),
@@ -180,9 +201,14 @@ export async function POST(request: NextRequest) {
     if (!invoice.paymentUrl)
       throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
 
+    const tracked = await admin.from('billing_invoices').select('id')
+      .eq('idempotency_key', idempotencyKey).single();
+    if (tracked.error || !tracked.data) throw new Error('Could not retrieve the checkout reference.');
+
     return NextResponse.json({
       url: invoice.paymentUrl,
-      invoiceId: invoice.providerInvoiceId,
+      invoiceId: tracked.data.id,
+      bookingToken: requestId,
       examAmountCents: pricing.amountCents,
       addOnAmountCents: addOnSelected ? (provider.addOn?.amountCents ?? 0) : 0,
     });

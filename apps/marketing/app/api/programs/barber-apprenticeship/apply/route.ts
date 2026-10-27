@@ -89,7 +89,7 @@ export async function POST(req: Request) {
         {
           error:
             canonical.error ||
-            `Failed to submit application. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
+            `Failed to submit application. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
         },
         { status: canonicalResponse.status || 500 },
       );

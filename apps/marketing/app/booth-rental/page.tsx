@@ -16,7 +16,7 @@ import { organization } from '@/lib/config/organization';
 export const metadata: Metadata = {
   title: 'Booth & Suite Rentals in Indianapolis, Indiana',
   description:
-    'Rent a booth or suite at Elevate for Humanity in Indianapolis. Barber, cosmetology, esthetician, and nail tech spaces available. Weekly billing through the current Elevate billing system. No long-term lease.',
+    'Rent a booth or suite at Elevate for Humanity in Indianapolis. Barber, cosmetology, esthetician, and nail tech spaces available. Weekly billing via Stripe. No long-term lease.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/booth-rental' },
 };
 
@@ -95,8 +95,8 @@ export default function BoothRentalLandingPage() {
           </div>
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-brand-blue-600" />
-            <a href="tel:3173143757" className="font-semibold text-brand-blue-600 hover:underline">
-              (317) 314-3757
+            <a href="tel:4632401404" className="font-semibold text-brand-blue-600 hover:underline">
+              (463) 240-1404
             </a>
           </div>
         </div>

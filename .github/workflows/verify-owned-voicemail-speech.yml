@@ -1,0 +1,62 @@
+name: Verify live voicemail speech processing
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Admin']
+    types: [completed]
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  verify:
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - name: Require successful real Admin deployment for automatic acceptance
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_RUN_ID: ${{ github.event.workflow_run.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          count="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$DEPLOY_RUN_ID/jobs" --paginate --jq '[.jobs[] | select(.name == "Build and deploy Admin on Google" and .conclusion == "success")] | length' | awk '{sum+=$1} END{print sum+0}')"
+          test "$count" -ge 1 || { echo '::error::Successful dispatcher is not a successful Admin deployment'; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Install audio decoder from the runner's official Ubuntu repository
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Prepare public narration sample as telephone WAV
+        run: ffmpeg -v error -y -i public/audio/narration/salon-saloon-host-tour.mp3 -t 10 -ar 8000 -ac 1 -c:a pcm_s16le /tmp/voicemail-speech-probe.wav
+      - name: Prove live speech without storing calls or sending messages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {randomUUID} from 'node:crypto';
+          import {servingPhoneCredential} from './scripts/gcp/serving-phone-credential.mjs';
+          import {readVoicemailAdminHealth} from './scripts/gcp/voicemail-live-health.mjs';
+          const base='https://admin.elevateforhumanity.org';
+          const health=await readVoicemailAdminHealth(base);
+          if(!/^[a-f0-9]{40}$/.test(health.commit||''))throw Error('Live Admin version is not verified');
+          const source=JSON.parse(execFileSync('gh',['api','repos/'+process.env.GITHUB_REPOSITORY+'/contents/apps/admin/app/api/internal/phone/voicemail/route.ts?ref='+health.commit],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          if(!Buffer.from(source.content,'base64').toString('utf8').includes('body.validateOnly===true'))throw Error('Non-delivering voice acceptance mode is not deployed yet');
+          const token=servingPhoneCredential(health);
+          const response=await fetch(base+'/api/internal/phone/voicemail',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:randomUUID(),extension:'0',caller:'unknown',durationSeconds:10,createdAt:new Date().toISOString(),audioBase64:readFileSync('/tmp/voicemail-speech-probe.wav').toString('base64'),validateOnly:true}),signal:AbortSignal.timeout(60000),redirect:'error'});
+          const result=await response.json();
+          console.log(JSON.stringify({httpStatus:response.status,validated:result.validated===true,transcriptAvailable:result.transcriptAvailable===true,code:result.code,deliversMessages:false,storesTestCalls:false,commit:health.commit}));
+          if(!response.ok||!result.validated||!result.transcriptAvailable)throw Error('Live voicemail speech acceptance failed');
+          NODE

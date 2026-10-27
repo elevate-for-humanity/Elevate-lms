@@ -19,10 +19,10 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 6, careerPlacement: 4 },
   schedule: 'Day or evening options — monthly cohort start dates',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: 'Self-pay: $2,500. Any workforce or third-party funding requires current program-level verification and written participant authorization.',
+  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $2,500.',
   selfPayCost: '$2,500',
-  fundingOptions: ['self_pay'],
-  badge: 'Healthcare Training',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  badge: 'ETPL Approved',
   badgeColor: 'green',
 
   credentials: [
@@ -178,13 +178,17 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
 
   complianceAlignment: [
     {
-      standard: 'Program Funding Review',
-      description: 'No public ETPL or WIOA claim is made unless current program-level evidence permits it and the participant is authorized in writing.'
+      standard: 'ETPL Program ID #10004626',
+      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
     },
     {
       standard: 'Indiana HHA Certification Standards',
       description:
         'Curriculum meets Indiana State Department of Health HHA competency requirements.',
+    },
+    {
+      standard: 'WIOA Title I',
+      description: 'Program meets WIOA eligibility requirements for workforce funding.',
     },
   ],
 
@@ -227,11 +231,11 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     {
       courseId: 'hsi-bloodborne-pathogens',
       label: 'Bloodborne Pathogens Training',
-      partnerName: 'Approved safety-training provider',
+      partnerName: 'Health & Safety Institute',
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,
-      enrollmentUrl: '/contact',
+      enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
     },
   ],
   microCourses: [
@@ -242,7 +246,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
       credentialIssued: 'AHA BLS CPR/AED Certificate',
       duration: '4 hours',
       required: true,
-      enrollmentUrl: '/contact',
+      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
     },
     {
       courseId: 'careersafe-infection-control',
@@ -277,7 +281,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'Self-pay: $2,500 with payment plans available. Third-party funding is shown only after current program-level verification and participant authorization.',
+    'WIOA and Workforce Ready Grant accepted. Self-pay: $2,500 with payment plans available.',
 
   faqs: [
     {
@@ -288,7 +292,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     {
       question: 'Is this program WIOA-funded?',
       answer:
-        'No public WIOA or ETPL claim is made for this program unless current program-level evidence is verified. WorkOne or the responsible agency must authorize any funded enrollment in writing.',
+        'Yes. This program is ETPL-approved (Program ID #10004626) and eligible for WIOA Individual Training Accounts in certain areas. Contact your local WorkOne office to verify eligibility.',
     },
     {
       question: 'How quickly can I find work after completing this program?',
@@ -304,14 +308,14 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   ],
   metaTitle: 'Home Health Aide Certification | HHA + CCHW | Indianapolis',
   metaDescription:
-    'Earn HHA and CCHW-related training in 4 weeks through a Home Health Aide program in Indianapolis with career-support services.',
+    'Earn your HHA and CCHW certifications in 4 weeks. WIOA-funded Home Health Aide program in Indianapolis with direct employer placement.',
 
 
   funding: {
-    wioa_eligible: false,
-    fssa_eligible: false,
+    wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: false,
-    jobReadyIndyEligible: false,
-    fundingNotes: 'No public workforce-funding claim is currently authorized for this program. Any third-party funding requires current program-level verification and written participant authorization.',
+    jobReadyIndyEligible: true,
+    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT and WIOA Title I funding available. WRG eligibility determined by Indiana DWD.',
   },
 };

@@ -32,12 +32,9 @@ describe('Top-risk routes have auth guards', () => {
     expect(fs.existsSync(path.resolve('apps/marketing/app/api/store/create-payment-intent/route.ts'))).toBe(false);
   });
 
-  it('/api/stripe/connect/create requires apiRequireAdmin', () => {
-    const route = readRoute('apps/lms/app/api/stripe/connect/create/route.ts');
-    const handler = readRoute('lib/api/stripe/shared-route-handlers.ts');
-    expect(route).toContain('postConnectCreate as POST');
-    expect(handler).toContain("import { apiRequireAdmin } from '@/lib/admin/guards'");
-    expect(handler).toContain('await apiRequireAdmin(');
+  it('retires the former Stripe Connect account creation endpoint', () => {
+    expect(fs.existsSync(path.resolve('apps/lms/app/api/stripe/connect/create/route.ts'))).toBe(false);
+    expect(fs.existsSync(path.resolve('lib/api/stripe/shared-route-handlers.ts'))).toBe(false);
   });
 
   it('/api/store/licenses/create-payment-intent requires apiAuthGuard', () => {

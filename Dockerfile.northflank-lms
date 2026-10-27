@@ -27,6 +27,7 @@ RUN echo "nf-cache-invalidate-lms-2026-09-20-runtime-recovery"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
+    util-linux \
     build-essential \
     ca-certificates \
     ffmpeg \
@@ -58,7 +59,6 @@ COPY packages/ui/package.json packages/ui/package.json
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=LMS
 ENV CI=true
@@ -67,7 +67,9 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 # Production containers must be reproducible. Never mutate dependency resolution
 # during an image build.
-RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
+COPY packages/bounded-braces ./packages/bounded-braces
+COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
+RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 # Reassert the pinned pnpm executable after repository lifecycle hooks.
 RUN corepack disable || true \
@@ -146,7 +148,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
-ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NODE_OPTIONS="--max-old-space-size=6144"
 ENV FFMPEG_BIN=/usr/bin/ffmpeg
 ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA

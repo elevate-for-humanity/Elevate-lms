@@ -3,7 +3,7 @@
     "pageKey": "home",
     "microLabel": "Career Training & Workforce Development",
     "belowHeroHeadline": "Career Training, Registered Apprenticeships & Workforce Technology in Indiana",
-    "belowHeroSubheadline": "CDL, HVAC, Business Administration, and Financial Literacy are the four confirmed workforce-fundable pathways. WorkOne or the responsible agency determines eligibility and authorization.",
+    "belowHeroSubheadline": "Explore career training, verified registered-apprenticeship occupations, and program-specific workforce funding pathways. Funding and registration claims are verified at the exact program level.",
     "primaryCta": {
       "label": "Get Started",
       "href": "/apply"
@@ -15,10 +15,10 @@
     },
     "trustIndicators": [
       "DOL Registered Apprenticeship Sponsor",
-      "Four Confirmed Fundable Pathways",
+      "Program-Specific Funding Evidence",
       "Agency Authorization Required"
     ],
-    "transcript": "Elevate for Humanity provides career training, registered-apprenticeship support, credential documentation, and employer connections. CDL, HVAC, Business Administration, and Financial Literacy are the four confirmed workforce-fundable pathways. Funding is not guaranteed and requires agency authorization.",
+    "transcript": "Elevate for Humanity provides career training, registered-apprenticeship support, credential preparation, and employer connections. Registered status and workforce funding are stated only for exact programs with current supporting records. Participant funding requires agency authorization.",
     "analyticsName": "home",
     "posterImage": "/images/pages/workforce-training.webp",
     "eyebrow": "Career Training & Workforce Development"
@@ -86,20 +86,20 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WIOA Title I funding",
-      "Next Level Jobs eligible",
-      "DOL Registered Apprenticeship",
-      "Job Ready Indy (JRI)"
+      "Program-specific funding",
+      "Agency eligibility review",
+      "Written authorization required"
     ],
-    "transcript": "Funding should not be confusing. We help eligible participants navigate workforce programs, complete the steps, and move into training without unnecessary friction.",
+    "transcript": "Funding is program-specific. Review the exact program record, complete the responsible agency intake, and rely on funding only after written authorization identifies the participant, program, and covered costs.",
     "analyticsName": "funding-how-it-works",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
+    "subheadline": "Understand program-specific workforce funding, agency eligibility review, and written authorization before training."
   },
   "healthcare": {
     "pageKey": "healthcare",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "posterImage": "/images/pages/healthcare-hero.webp",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Healthcare Programs",
@@ -165,21 +165,21 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WIOA & state funding available",
+      "Program-specific funding evidence",
       "DOL Registered Apprenticeship Sponsor",
-      "ETPL approved training provider",
-      "Job placement assistance included"
+      "Agency authorization required",
+      "Career support available"
     ],
-    "transcript": "At Elevate for Humanity, we train adults for real jobs — in weeks, not years.\n\nEvery program we offer ends with a nationally recognized credential and a direct introduction to hiring employers. Not a participation certificate. A credential that verifies your skills and opens doors.\n\nHere is what we offer.\n\nIn healthcare, we train Certified Nursing Assistants, Medical Assistants, Pharmacy Technicians, and Phlebotomy Technicians. CNA training runs six weeks. Medical Assistant runs twelve. Every program includes hands-on clinical practice and a proctored certification exam on-site at Elevate.\n\nIn skilled trades, we offer HVAC Technician training leading to EPA Section 608 certification, CDL Class A training for commercial driving careers, Electrical Technician, Welding Technology, Plumbing, and Construction Trades. Most trades programs run eight to twelve weeks. Starting wages range from twenty to thirty-five dollars per hour.\n\nIn technology, we offer IT Help Desk Technician leading to CompTIA A Plus, Cybersecurity Analyst leading to CompTIA Security Plus, Network Support, Web Development, and Software Development. Tech programs run six to twelve weeks.\n\nIn business, we offer Bookkeeping and QuickBooks, Office Administration, Tax Preparation, and Entrepreneurship. These programs run five to eight weeks and are designed for people who want to work in professional environments or start their own business.\n\nWe also offer registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts — earn-while-you-learn programs where you work in a licensed shop and get paid from day one.\n\nMost programs are available at no cost to eligible Indiana residents. Funding comes through WIOA Title One, the Indiana Workforce Ready Grant, Job Ready Indy, and other state and federal workforce programs. If you qualify, tuition, books, tools, and your certification exam fee are all covered.\n\nThe process is straightforward. Register at Indiana Career Connect. Meet with a WorkOne case manager. They determine your funding eligibility — usually within a week. Once funding is confirmed, you join a scheduled cohort. We provide all tools, materials, and safety gear. You focus on training.\n\nAfter you complete your program, our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many of our students have job offers before their last day of class.\n\nApply online in minutes. No cost to apply. No obligation. Just the first step toward a career that pays.",
+    "transcript": "Elevate for Humanity offers career training across healthcare, skilled trades, transportation, technology, business, and personal services.\\n\\nProgram duration, credentials, clinical or hands-on requirements, tuition, and testing vary by program. Review the exact program record before enrolling.\\n\\nRegistered Apprenticeship status is published only for occupations supported by the canonical RAPIDS registry. Other work-based programs are presented as training pathways.\\n\\nSelected programs have documented workforce-funding pathways. Funding is never guaranteed and requires program-level eligibility plus written authorization from the responsible agency.\\n\\nCareer services may include resume support, interview preparation, job-search assistance, and employer connections. Employment outcomes are not guaranteed.",
     "analyticsName": "programs",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "building-services-technician": {
     "pageKey": "building-services-technician",
-    "microLabel": "DOL Apprenticeship",
-    "belowHeroHeadline": "Building Services Technician Apprenticeship",
-    "belowHeroSubheadline": "Earn while you learn with paid on-the-job training and a DOL Registered pathway.",
+    "microLabel": "Work-Based Training",
+    "belowHeroHeadline": "Building Services Technician Training Pathway",
+    "belowHeroSubheadline": "Structured building-services training with supervised practical experience. No federal Registered Apprenticeship claim is made unless the occupation is added to the canonical RAPIDS registry.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply?program=building-services-technician"
@@ -190,11 +190,11 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered",
-      "Paid OJT",
-      "Employer-connected"
+      "Work-based training",
+      "Employer-connected",
+      "Registration status disclosed by program"
     ],
-    "transcript": "Building Services Technician apprenticeship combines paid work experience with structured training and a nationally recognized pathway.",
+    "transcript": "Building Services Technician is presented as a work-based training pathway. Review the program page for current duration, credential, tuition, placement, and registration disclosures.",
     "analyticsName": "building-services-technician",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4"
@@ -301,7 +301,7 @@
   },
   "hvac-technician": {
     "pageKey": "hvac-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4",
     "voiceoverSrc": "/audio/heroes/skilled-trades.mp3",
     "microLabel": "EPA 608 Universal",
     "credentialLabel": "EPA 608 Universal",
@@ -327,7 +327,7 @@
     ],
     "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
     "analyticsName": "hvac-technician",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4"
   },
   "cdl-training": {
     "pageKey": "cdl-training",
@@ -356,7 +356,7 @@
     ],
     "transcript": "Train for CDL Class A licensure in 3 to 6 weeks at Elevate for Humanity in Indianapolis, with behind-the-wheel instruction, pre-trip inspection, and on-site skills testing. CDL drivers commonly earn $50,000 to $65,000. WIOA covers tuition, DOT physical, drug screen, and exam fees for eligible Indiana residents.",
     "analyticsName": "cdl-training",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cdl.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "electrical": {
@@ -539,8 +539,8 @@
   },
   "cna": {
     "pageKey": "cna",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "posterImage": "/images/pages/cna-hero.jpg",
     "microLabel": "Indiana CNA Certification",
     "credentialLabel": "Indiana CNA certification",
@@ -568,7 +568,7 @@
   },
   "medical-assistant": {
     "pageKey": "medical-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4",
     "voiceoverSrc": "/audio/heroes/medical-assistant.mp3",
     "microLabel": "NHA CCMA Certification",
     "credentialLabel": "NHA CCMA",
@@ -593,12 +593,12 @@
     ],
     "transcript": "Train for NHA CCMA and CPT certification in 20 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "medical-assistant",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4",
     "_pexelsVideoId": 6130025
   },
   "pharmacy-technician": {
     "pageKey": "pharmacy-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "PTCB CPhT Prep",
     "credentialLabel": "PTCB CPhT",
@@ -624,12 +624,12 @@
     ],
     "transcript": "Train for PTCB CPhT certification in 10 weeks, building skills in medication dispensing, pharmacy law, sterile compounding, and inventory management. Pharmacy technicians commonly earn $34,000 to $46,000. Free with WIOA funding for eligible Indiana residents. Self-pay is $4,200 with payment plans available.",
     "analyticsName": "pharmacy-technician",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 8657331
   },
   "phlebotomy": {
     "pageKey": "phlebotomy",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-phlebotomy.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "NHA CPT Certification",
     "credentialLabel": "NHA CPT",
@@ -654,12 +654,12 @@
     ],
     "transcript": "Train for NHA CPT certification in 4 weeks, completing 120 hours of classroom and clinical training in venipuncture, specimen processing, and patient interaction. Phlebotomy technicians commonly earn $30,000 to $40,000. The NHA CPT is the employer-accepted standard in Indiana. Self-pay is $1,500 with payment plans available.",
     "analyticsName": "phlebotomy",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-phlebotomy.mp4",
     "_pexelsVideoId": 6290542
   },
   "home-health-aide": {
     "pageKey": "home-health-aide",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Indiana HHA Certification",
     "credentialLabel": "Indiana HHA certification",
@@ -684,7 +684,7 @@
     ],
     "transcript": "Earn Indiana HHA certification and the CCHW credential in 4 weeks, preparing for in-home and community care work with licensed agencies. Home health aides commonly earn $26,000 to $36,000. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.",
     "analyticsName": "home-health-aide",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 7517699
   },
   "emergency-health-safety": {
@@ -712,13 +712,13 @@
     ],
     "transcript": "Earn NREMT Emergency Medical Responder, CPR/AED, First Aid, and OSHA 10 credentials in 4 weeks. Training covers scene safety, patient assessment, emergency communication, and response documentation. Emergency health and safety roles commonly earn $32,000 to $45,000. Free with WIOA or Workforce Ready Grant for eligible Indiana residents. Self-pay is $4,950.",
     "analyticsName": "emergency-health-safety",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 3981771
   },
   "cpr-first-aid": {
     "pageKey": "cpr-first-aid",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/cpr.mp3",
     "microLabel": "HSI Certified",
     "credentialLabel": "HSI-certified CPR, AED, and First Aid",
@@ -744,12 +744,12 @@
     ],
     "transcript": "Earn HSI-certified CPR, AED, and First Aid certification in 1 day from home — a mannequin ships to your door and a live instructor guides the skills session. Accepted for healthcare, education, childcare, and licensed professions. $130 self-pay. Included free with any Elevate training program.",
     "analyticsName": "cpr-first-aid",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 3981738
   },
   "sanitation-infection-control": {
     "pageKey": "sanitation-infection-control",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "ServSafe + Bloodborne",
     "credentialLabel": "ServSafe Food Handler",
@@ -775,7 +775,7 @@
     ],
     "transcript": "Earn ServSafe Food Handler and OSHA-compliant Bloodborne Pathogens certifications in 2 weeks. Both credentials are required for healthcare, food service, and personal services work. Included free with any Elevate training program. Self-pay is $400.",
     "analyticsName": "sanitation-infection-control",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 6151285
   },
   "barber-apprenticeship": {
@@ -786,25 +786,25 @@
     "credentialLabel": "Indiana Barber License",
     "durationLabel": "260 RTI hours + 14 competencies",
     "salaryRangeLabel": "$28,000 to $52,000",
-    "belowHeroHeadline": "Earn your Indiana Barber License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised host-shop practice toward the Indiana Barber License.",
+    "belowHeroHeadline": "Build your future in barbering.",
+    "belowHeroSubheadline": "Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised Host Shop practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/barber-apprenticeship/apply",
       "variant": "primary"
     },
     "secondaryCta": {
-      "label": "Request Information",
-      "href": "/programs/barber-apprenticeship/request-info",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Barber License",
-      "Barbershop Business Certificate"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "14 competencies · 260 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Elevate's registered, competency-based Barber Apprenticeship leads toward the Indiana Barber License through 260 RTI hours + 14 competencies, plus supervised host-shop practice. Kountry Kutz in New Palestine is a participating host shop. Eligible funding may help after written approval; payment-plan options are subject to provider terms.",
+    "transcript": "Prepare for the Indiana Barber License through 260 RTI hours + 14 competencies and supervised Host Shop practice. Kountry Kutz is a participating Host Shop. Tuition is self-pay only. Employment and placement are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "barber-apprenticeship",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
   },
@@ -813,27 +813,27 @@
     "voiceoverSrc": "/audio/heroes/cosmetology.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Cosmetology License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "2,000–2,500-hour term + 154 RTI hours",
     "salaryRangeLabel": "$26,000 to $48,000",
-    "belowHeroHeadline": "Earn your Indiana Cosmetology License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 hours of supervised salon training under a licensed cosmetologist. Earn wages from day one.",
+    "belowHeroHeadline": "Build your future in cosmetology.",
+    "belowHeroSubheadline": "Follow the registered hybrid 2,000–2,500-hour term with 154 hours of related instruction and supervised salon practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/apply?program=cosmetology-apprenticeship",
       "variant": "primary"
     },
     "secondaryCta": {
-      "label": "Request Information",
-      "href": "/programs/cosmetology-apprenticeship/request-info",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Cosmetology License",
-      "Salon-based training"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "Hybrid term · 154 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Earn Indiana Cosmetology License through a DOL Registered Apprenticeship of 2,000 hours of supervised training in a licensed salon. Cosmetologists commonly earn $26,000 to $48,000 depending on clientele and setting. Wages begin on day one. The Indiana Cosmetology License is required to work in any Indiana salon.",
+    "transcript": "Prepare for the Indiana Cosmetology License through a hybrid 2,000–2,500-hour term + 154 RTI hours and supervised hair care, cutting, coloring and styling practice. Tuition is self-pay only. Placement and wages are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "cosmetology-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
@@ -844,26 +844,26 @@
     "voiceoverSrc": "/audio/heroes/nail-tech.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Nail Technician License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "210 RTI hours + 19 competencies",
     "salaryRangeLabel": "$24,000 to $42,000",
-    "belowHeroHeadline": "Earn your Indiana Nail Technician License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 OJL hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails. Earn wages from day one.",
+    "belowHeroHeadline": "Build your future in nail technology.",
+    "belowHeroSubheadline": "Complete 19 verified Manicurist competencies and 210 hours of related instruction, with supervised salon practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/programs/nail-technician-apprenticeship/apply"
     },
     "secondaryCta": {
-      "label": "Find a Host Salon",
-      "href": "/partners/nail-technician-apprenticeship/apply",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Nail Technician License",
-      "2,000 OJL hours — registered apprenticeship pathway"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "19 competencies · 210 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Earn an Indiana Nail Technician License through a DOL Registered Apprenticeship requiring 2,000 hours of on-the-job learning. Training covers manicures, pedicures, acrylics, gel nails, sanitation, client service, and professional salon practice at an approved licensed salon.",
+    "transcript": "Prepare for the Indiana Nail Technician License through 210 RTI hours + 19 competencies and supervised nail services, sanitation and client care. Tuition is self-pay only. Placement and employment are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "nail-technician-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
@@ -871,12 +871,12 @@
   },
   "culinary-apprenticeship": {
     "pageKey": "culinary-apprenticeship",
-    "microLabel": "DOL Registered Apprenticeship",
+    "microLabel": "Culinary Training Pathway",
     "credentialLabel": "ServSafe Manager",
     "durationLabel": "2,000 hours",
     "salaryRangeLabel": "$28,000 to $45,000",
-    "belowHeroHeadline": "Culinary Apprenticeship — earn while you train.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Hands-on training in a professional kitchen. Earn ServSafe Manager certification and culinary credentials. Wages from day one.",
+    "belowHeroHeadline": "Culinary training with supervised kitchen practice.",
+    "belowHeroSubheadline": "Hands-on culinary training and ServSafe preparation. This page does not make a federal Registered Apprenticeship claim.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply?program=culinary-apprenticeship"
@@ -887,12 +887,11 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "ServSafe Manager cert",
-      "Professional kitchen training"
+      "ServSafe preparation",
+      "Supervised kitchen practice",
+      "Registration status disclosed by program"
     ],
-    "transcript": "Earn ServSafe Manager certification through a DOL Registered Culinary Apprenticeship of 2,000 hours in a professional kitchen, building skills in food preparation, kitchen operations, and food safety. Culinary professionals commonly earn $28,000 to $45,000. Wages begin on day one.",
+    "transcript": "Build food preparation, kitchen operations, sanitation, and food-safety skills through 2,000 hours of culinary training with supervised practice and ServSafe Manager preparation. Review the program page for credential requirements, tuition, employment, and placement details.",
     "analyticsName": "culinary-apprenticeship",
     "_pexelsVideoId": 8627105,
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/graduation-success.mp4",
@@ -933,7 +932,7 @@
     "voiceoverSrc": "/audio/heroes/barber.mp3",
     "microLabel": "Earn While You Learn",
     "belowHeroHeadline": "Apprenticeships — get paid to train.",
-    "belowHeroSubheadline": "DOL-registered apprenticeships in Barber, Cosmetology, Nail Technician, and Culinary. Earn wages from day one while working toward your license.",
+    "belowHeroSubheadline": "Registered occupations currently published in the canonical registry include Barber, Hair Stylist/Cosmetology, Esthetician, and Manicurist/Nail Technician. Employment and wages depend on a confirmed employer or Host Site.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply"
@@ -945,11 +944,11 @@
     },
     "trustIndicators": [
       "DOL Registered Apprenticeship Sponsor",
-      "Earn while you train",
-      "Indiana state licenses",
-      "Job placement assistance"
+      "Verified occupations disclosed individually",
+      "Employment required for paid OJL",
+      "Self-pay tuition unless otherwise documented"
     ],
-    "transcript": "DOL-registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts. Earn while you learn — work in a licensed shop and get paid from day one. Apply at Elevate for Humanity.",
+    "transcript": "Elevate supports registered apprenticeship occupations that are individually identified in the canonical RAPIDS registry. Apprenticeship combines related instruction with paid, supervised employment after an approved employer or Host Site placement is confirmed.",
     "analyticsName": "apprenticeships",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1217,8 +1216,8 @@
     ],
     "transcript": "Train for IRS PTIN and AFSP credentials in 8 weeks, building skills in individual and small business tax preparation using real tax software. Tax preparers commonly earn $35,000 to $55,000. Enrolled Agent exam preparation included. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "tax-preparation",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4"
   },
   "bookkeeping": {
     "pageKey": "bookkeeping",
@@ -1388,14 +1387,14 @@
       "QuickBooks Certified User",
       "Enrolled Agent exam prep"
     ],
-    "transcript": "Earn IRS PTIN, QuickBooks Certified User, and Enrolled Agent exam preparation through a tiered credential pathway completed in 12 weeks, covering tax preparation, bookkeeping, payroll, and accounting. Finance professionals commonly earn $42,000 to $62,000. WIOA funding available for eligible Indiana residents.",
+    "transcript": "Earn IRS PTIN, QuickBooks Certified User, and Enrolled Agent exam preparation through a tiered credential pathway completed in 12 weeks, covering tax preparation, bookkeeping, payroll, and accounting. Career outcomes and wages vary by role, experience, employer, and labor market. Review the exact program page for current tuition and any verified funding options.",
     "analyticsName": "finance-bookkeeping-accounting",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/partner-business.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "peer-recovery-specialist": {
     "pageKey": "peer-recovery-specialist",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "microLabel": "Indiana CPRS Credential",
     "credentialLabel": "Indiana CPRS",
     "durationLabel": "8 weeks",
@@ -1419,7 +1418,7 @@
     ],
     "transcript": "Train for Indiana CPRS certification in 8 weeks, building skills in substance use recovery support, motivational interviewing, and crisis response. Peer recovery specialists commonly earn $32,000 to $45,000. WIOA, FSSA IMPACT, and JRI funding available for eligible Indiana residents.",
     "analyticsName": "peer-recovery-specialist",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 5713016
   },
   "technology": {
@@ -1490,10 +1489,11 @@
       "Indianapolis, Indiana",
       "DOL Registered Apprenticeship Sponsor"
     ],
-    "transcript": "Elevate for Humanity exists to close the gap between people who need work and employers who need workers. Free training. Real credentials. A direct path to employment.",
+    "transcript": "Elevate for Humanity connects training, credential preparation, support resources, and employer pathways. Tuition and funding vary by program and are disclosed before enrollment.",
     "analyticsName": "mission",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "subheadline": "Career training and workforce pathways for adults facing barriers to employment, with program-specific payment and funding disclosures."
   },
   "partners": {
     "pageKey": "partners",
@@ -1511,10 +1511,10 @@
     },
     "trustIndicators": [
       "DOL Registered Apprenticeship Sponsor",
-      "ETPL approved",
-      "WIOA partner"
+      "Program-specific regulatory evidence",
+      "Workforce partnerships"
     ],
-    "transcript": "Elevate partners with workforce agencies, employers, and community organizations to build training pathways that work. Join us.",
+    "transcript": "Elevate partners with workforce agencies, employers, and community organizations. Registration, funding, and regulatory claims remain specific to the applicable program and agreement.",
     "analyticsName": "partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1559,14 +1559,15 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WIOA & state funding available",
-      "ETPL approved",
-      "DOL Registered Apprenticeship Sponsor"
+      "Program-specific funding evidence",
+      "DOL Registered Apprenticeship Sponsor",
+      "Credential preparation"
     ],
-    "transcript": "Elevate offers career training in healthcare, skilled trades, CDL, technology, and more. Most programs are available at no cost through WIOA and state funding.",
+    "transcript": "Elevate offers career training across multiple sectors. Review the exact program page for current tuition, duration, credentials, funding status, and enrollment requirements.",
     "analyticsName": "training",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
+    "subheadline": "Healthcare, skilled trades, CDL, technology, barbering, and business pathways with program-specific tuition and funding disclosures."
   },
   "jri": {
     "pageKey": "jri",
@@ -1609,7 +1610,7 @@
     "trustIndicators": [
       "Indiana-based",
       "Community-driven",
-      "ETPL Certified"
+      "Program-specific compliance"
     ],
     "transcript": "Meet the team behind Elevate for Humanity — workforce professionals and educators committed to expanding access to career training.",
     "analyticsName": "about-team",
@@ -1728,8 +1729,8 @@
     ],
     "transcript": "Indiana CNA certification training is opening soon at Elevate for Humanity. Join the waitlist to be notified when enrollment opens.",
     "analyticsName": "cna-waitlist",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4"
   },
   "contact": {
     "pageKey": "contact",
@@ -1818,11 +1819,11 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WIOA Compliant",
-      "RAPIDS Tracked",
-      "ETPL Certified"
+      "Program-specific compliance",
+      "RAPIDS occupations verified individually",
+      "Funding claims require evidence"
     ],
-    "transcript": "Partner with Elevate for Humanity to connect your clients to real career training. We are WIOA compliant, RAPIDS tracked, and ETPL certified.",
+    "transcript": "Partner with Elevate for Humanity to connect clients to career training. Registered Apprenticeship and workforce-funding claims are published only when supported by the exact program record.",
     "analyticsName": "for-partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1868,7 +1869,7 @@
     "trustIndicators": [
       "Indiana-based",
       "Community-driven",
-      "ETPL Certified"
+      "Program-specific compliance"
     ],
     "transcript": "Learn about the vision and values behind Elevate for Humanity and the founder's commitment to workforce equity in Indiana.",
     "analyticsName": "founder",
@@ -2029,14 +2030,15 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "ETPL Certified",
-      "DOL Registered",
-      "RAPIDS Tracked"
+      "Program-specific funding evidence",
+      "Verified RAPIDS occupations",
+      "Credential preparation"
     ],
-    "transcript": "Elevate for Humanity provides credential-bearing career training, employer connections, and funding navigation for Indiana residents.",
+    "transcript": "Elevate for Humanity provides career training, employer connections, and funding navigation. Program-level records control tuition, funding, registration, and credential claims.",
     "analyticsName": "what-we-do",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "subheadline": "Elevate for Humanity provides career training, employer connections, and funding navigation with program-specific compliance disclosures."
   },
   "workforce-partners": {
     "pageKey": "workforce-partners",
@@ -2053,20 +2055,21 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WIOA Compliant",
-      "RAPIDS Tracked",
-      "ETPL Certified"
+      "Program-specific compliance",
+      "Agency authorization",
+      "Outcome reporting by agreement"
     ],
-    "transcript": "Elevate for Humanity partners with WorkOne, FSSA, employers, and community organizations to deliver WIOA-compliant workforce training at scale.",
+    "transcript": "Elevate partners with workforce agencies, employers, and community organizations. Funding eligibility, covered costs, and reporting obligations depend on the exact program and agreement.",
     "analyticsName": "workforce-partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/employer-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "subheadline": "Elevate for Humanity works with workforce agencies, employers, and community organizations on program-specific training and referral pathways."
   },
   "impact": {
     "pageKey": "impact",
     "microLabel": "Impact & Outcomes",
-    "belowHeroHeadline": "Real results for learners, employers, and communities.",
-    "belowHeroSubheadline": "Elevate for Humanity tracks every outcome — credentials earned, jobs placed, wages increased. See the data.",
+    "belowHeroHeadline": "Training and outcome reporting for learners, employers, and communities.",
+    "belowHeroSubheadline": "Review documented program activity and outcome evidence without assuming placement, wage, or credential results.",
     "primaryCta": {
       "label": "Our Programs",
       "href": "/programs"
@@ -2077,11 +2080,11 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "ETPL Certified",
-      "DOL Registered",
-      "RAPIDS Tracked"
+      "Program-level records",
+      "Credential evidence",
+      "Outcome reporting"
     ],
-    "transcript": "Elevate for Humanity measures every outcome — credentials earned, jobs placed, and wages increased. Our programs are ETPL certified, DOL registered, and RAPIDS tracked.",
+    "transcript": "Elevate tracks program activity and documented outcomes where records are available. Employment, wages, and credentials are reported only from verified participant and program records.",
     "analyticsName": "impact",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/graduation-success.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2189,7 +2192,7 @@
     "voiceoverSrc": "/audio/heroes/career-services.mp3",
     "microLabel": "For Employers",
     "belowHeroHeadline": "Hire credentialed graduates. Access tax credits and apprenticeship support.",
-    "belowHeroSubheadline": "Elevate graduates arrive trained, tested, and credentialed. Access WOTC tax credits, OJT wage reimbursement, and DOL Registered Apprenticeship sponsorship.",
+    "belowHeroSubheadline": "Connect with trained candidates and apprenticeship support. Tax-credit and OJT reimbursement eligibility is determined by the responsible program or agency.",
     "primaryCta": {
       "label": "Partner With Us",
       "href": "/testing/book?type=group-testing"
@@ -2200,12 +2203,12 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WOTC tax credits up to $9,600",
-      "OJT wage reimbursement",
+      "Employer partnerships",
+      "Program-specific OJT eligibility",
       "DOL Registered Apprenticeship Sponsor",
-      "No placement fees"
+      "No placement-fee claim only where documented"
     ],
-    "transcript": "Elevate graduates are credential-ready and pre-screened. Access WOTC tax credits, OJT wage reimbursement, and Registered Apprenticeship sponsorship — all through one partner.",
+    "transcript": "Elevate connects employers with training candidates and apprenticeship support. Any tax credit, wage reimbursement, registration, or placement claim depends on the applicable employer, participant, program, and agency approval.",
     "analyticsName": "employer",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/employer-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2213,8 +2216,8 @@
   "credentials": {
     "pageKey": "credentials",
     "microLabel": "Compliance Infrastructure",
-    "belowHeroHeadline": "Credentials and compliance — active, verifiable, and integrated.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship Sponsor. Indiana ETPL Certified. WIOA compliant. Every credential is operationally integrated, not decorative.",
+    "belowHeroHeadline": "Credentials and compliance — documented at the program level.",
+    "belowHeroSubheadline": "DOL Registered Apprenticeship sponsor status, program-specific RAPIDS records, testing authorizations, and workforce-funding evidence are kept distinct.",
     "primaryCta": {
       "label": "View Programs",
       "href": "/programs"
@@ -2226,11 +2229,11 @@
     },
     "trustIndicators": [
       "DOL Registered Apprenticeship Sponsor",
-      "Indiana ETPL Certified",
-      "WIOA Title I Compliant",
-      "Certiport Authorized Testing Center"
+      "Program-specific RAPIDS records",
+      "Testing authorizations",
+      "Funding evidence by program"
     ],
-    "transcript": "Every Elevate credential is active, verifiable, and operationally integrated. DOL Registered Apprenticeship Sponsor, Indiana ETPL Certified, and WIOA compliant — four compliance tiers, three credential layers.",
+    "transcript": "Elevate maintains separate records for sponsor status, registered occupations, testing authorizations, credentials, and workforce-funding evidence. Organization-level status is not used to imply every program has the same approval.",
     "analyticsName": "credentials",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
@@ -2255,7 +2258,7 @@
       "Financial aid navigation",
       "Counseling services"
     ],
-    "transcript": "Elevate provides academic support, financial aid navigation, career placement, and counseling services — all included for enrolled students at no additional cost.",
+    "transcript": "Elevate provides academic support, funding navigation, career services, and referrals to counseling and wellness resources. Availability, eligibility, and any third-party costs depend on the specific service.",
     "analyticsName": "student-support",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/student-portal-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/student-portal-hero.mp4"
@@ -2389,7 +2392,7 @@
     "voiceoverSrc": "/audio/heroes/apprenticeship-sponsor.mp3",
     "microLabel": "DOL Apprenticeship Sponsor",
     "belowHeroHeadline": "Registered Apprenticeship — the earn-while-you-learn path.",
-    "belowHeroSubheadline": "Elevate is a DOL Registered Apprenticeship Sponsor. Apprentices earn wages while completing structured on-the-job training and related instruction.",
+    "belowHeroSubheadline": "Elevate is a DOL Registered Apprenticeship Sponsor. Paid on-the-job learning begins only after an approved employer placement and wage arrangement are confirmed.",
     "primaryCta": {
       "label": "Apply as Apprentice",
       "href": "/apply?program=apprenticeship"
@@ -2400,12 +2403,12 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered",
-      "Earn while you learn",
-      "RAPIDS tracked",
-      "Employer-sponsored"
+      "DOL Registered Sponsor",
+      "Verified occupations disclosed individually",
+      "Employer placement required",
+      "Wage schedule confirmed by placement"
     ],
-    "transcript": "As a DOL Registered Apprenticeship Sponsor, Elevate connects apprentices with employers who pay wages during training. Earn while you learn.",
+    "transcript": "As a DOL Registered Apprenticeship Sponsor, Elevate supports individually registered occupations. Apprentices earn wages through a confirmed employing sponsor or Host Site under the applicable approved arrangement.",
     "analyticsName": "apprenticeship-sponsor",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
@@ -2415,7 +2418,7 @@
     "voiceoverSrc": "/audio/heroes/program-holder.mp3",
     "microLabel": "Program Holders",
     "belowHeroHeadline": "Deliver training under the Elevate umbrella.",
-    "belowHeroSubheadline": "Program holders access our ETPL approval, DOL sponsorship, and student funding infrastructure to deliver workforce training.",
+    "belowHeroSubheadline": "Program holders use Elevate systems and agreements for approved training activities. Funding, ETPL, and apprenticeship status remain specific to the exact program and authorization.",
     "primaryCta": {
       "label": "Apply as Program Holder",
       "href": "/apply?type=program-holder"
@@ -2426,11 +2429,11 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "ETPL approved",
-      "DOL Registered Apprenticeship Sponsor",
-      "Funding infrastructure included"
+      "Program-level approvals",
+      "DOL sponsor support where applicable",
+      "Funding requires exact authorization"
     ],
-    "transcript": "Program holders partner with Elevate to deliver workforce training using our ETPL approval, DOL sponsorship, and student funding infrastructure.",
+    "transcript": "Program holders partner with Elevate under defined agreements. They may not generalize Elevate sponsor, ETPL, or workforce-funding status to a program that lacks its own supporting record.",
     "analyticsName": "program-holder",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/employer-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2487,26 +2490,26 @@
     "pageKey": "esthetician-apprenticeship",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Esthetician License",
-    "durationLabel": "1,500 hours",
+    "durationLabel": "300 RTI hours + 20 competencies",
     "salaryRangeLabel": "$32,000 to $52,000",
-    "belowHeroHeadline": "Esthetician Apprenticeship — earn while you train.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Hands-on training at a licensed salon. Graduate with your Indiana Esthetician License and a paying clientele.",
+    "belowHeroHeadline": "Start your future in esthetics.",
+    "belowHeroSubheadline": "Complete 20 verified occupational competencies and 300 hours of related instruction, with supervised skincare practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply?program=esthetician-apprenticeship"
     },
     "secondaryCta": {
-      "label": "Check Eligibility",
-      "href": "/check-eligibility",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Esthetician License",
-      "Licensed salon training"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "20 competencies · 300 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Train for the Indiana Esthetician License through a DOL Registered Apprenticeship of 1,500 hours at a licensed salon. Apprentices earn wages while completing supervised skin care, sanitation, client service, and exam preparation. Licensed estheticians commonly earn $32,000 to $52,000.",
+    "transcript": "Prepare for the Indiana Esthetician License through 300 RTI hours + 20 competencies and supervised skincare, sanitation and client care. Tuition is self-pay only. We are recruiting new esthetics Host Shops; placement and Indiana licensing approval are confirmed separately.",
     "analyticsName": "esthetician-apprenticeship",
     "_pexelsVideoId": 7423537,
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4",
@@ -2538,8 +2541,8 @@
     ],
     "transcript": "Prepare for CompTIA Security+ and CySA+ in 12 weeks through hands-on security labs, threat analysis practice, and career coaching. Eligible Indiana residents may use WIOA or Workforce Ready Grant funding. Cybersecurity analyst roles commonly pay $55,000 to $85,000.",
     "analyticsName": "cybersecurity",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cybersecurity.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cybersecurity.mp4"
   },
   "hospitality": {
     "pageKey": "hospitality",
@@ -2570,17 +2573,17 @@
     "microLabel": "Elevate for Humanity",
     "analyticsName": "direct-support-professional",
     "trustIndicators": [],
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "belowHeroHeadline": "Direct Support Professional — Indiana DSP credential in 6 weeks.",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 8400789
   },
   "career-training-indiana": {
     "pageKey": "career-training-indiana",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "microLabel": "Indianapolis, Indiana",
-    "belowHeroHeadline": "Career Training in Indiana — Funded Programs for Adults.",
-    "belowHeroSubheadline": "Healthcare, skilled trades, technology, and business programs. Most available at no cost through WIOA and state funding for eligible Indiana residents.",
+    "belowHeroHeadline": "Career Training in Indiana — Program-Specific Funding and Payment Options.",
+    "belowHeroSubheadline": "Healthcare, skilled trades, technology, and business programs with tuition and funding status disclosed by program.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply?program=indiana-workforce"
@@ -2591,18 +2594,18 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "WIOA & state funding available",
+      "Program-specific funding evidence",
       "DOL Registered Apprenticeship Sponsor",
-      "ETPL approved training provider",
+      "Agency authorization required",
       "Indianapolis, Indiana"
     ],
-    "transcript": "Elevate for Humanity offers workforce training programs in Indianapolis, Indiana — in healthcare, skilled trades, technology, and business. Most programs are available at no cost to eligible Indiana residents through WIOA, the Workforce Ready Grant, and Job Ready Indy.",
+    "transcript": "Elevate for Humanity offers workforce training programs in Indianapolis, Indiana. Review the exact program page for tuition, duration, credential, and any verified workforce-funding pathway. Funding requires agency authorization.",
     "analyticsName": "career-training-indiana",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "qma": {
     "pageKey": "qma",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Indiana QMA Certification",
     "credentialLabel": "Indiana QMA Certificate",
@@ -2627,7 +2630,7 @@
     ],
     "transcript": "Train for the Indiana QMA Certificate in 4 weeks, learning medication administration, documentation, and resident safety under nurse supervision. QMAs in Indiana commonly earn $30,000 to $42,000. WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay is $1,200.",
     "analyticsName": "qma",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 6130024
   },
   "drug-collector": {
@@ -2635,16 +2638,16 @@
     "microLabel": "Elevate for Humanity",
     "analyticsName": "drug-collector",
     "trustIndicators": [],
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "belowHeroHeadline": "Drug & Alcohol Collector — DOT-compliant certification in 2 weeks.",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 7230300
   },
   "beauty": {
     "pageKey": "beauty",
     "microLabel": "DOL Registered Apprenticeships",
     "belowHeroHeadline": "Beauty Industry Apprenticeships",
-    "belowHeroSubheadline": "Cosmetology · Esthetics · Nails — earn while you learn with flat-fee pricing and DOL-registered programs.",
+    "belowHeroSubheadline": "Registered occupations include Hair Stylist/Cosmetology, Esthetician, and Manicurist/Nail Technician where shown in the canonical RAPIDS registry. Paid employment depends on confirmed Host Site placement.",
     "primaryCta": {
       "label": "View Programs",
       "href": "#programs",
@@ -2656,13 +2659,13 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered",
-      "ETPL Approved",
-      "Earn wages from day one",
-      "Flat-fee pricing"
+      "Verified registered occupations",
+      "Self-pay tuition unless otherwise documented",
+      "Host Site placement required",
+      "Indiana licensing is separate"
     ],
     "analyticsName": "beauty-programs",
-    "transcript": "Elevate for Humanity offers DOL-registered beauty apprenticeships in cosmetology, esthetics, and nail technology. Earn while you learn.",
+    "transcript": "Elevate supports registered beauty occupations identified in the canonical RAPIDS registry. Apprenticeship combines related instruction with supervised paid employment after Host Site placement is confirmed.",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/beauty-overview.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/beauty-overview.mp4",
     "_pexelsVideoId": 8225738
@@ -2861,8 +2864,8 @@
   },
   "cna-cert": {
     "pageKey": "cna-cert",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "CNA Certification",
     "subheadline": "Earn your Certified Nursing Assistant credential.",
     "microLabel": "CNA Certification",
@@ -2877,8 +2880,8 @@
   },
   "cna-training": {
     "pageKey": "cna-training",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "CNA Training",
     "subheadline": "Hands-on clinical training for aspiring CNAs.",
     "microLabel": "CNA Training",
@@ -2974,8 +2977,8 @@
   },
   "dental-assistant": {
     "pageKey": "dental-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "Dental Assistant",
     "subheadline": "Launch your dental career with clinical training.",
     "microLabel": "Dental Assistant",
@@ -3070,8 +3073,8 @@
   },
   "insurance-billing-coding": {
     "pageKey": "insurance-billing-coding",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "Insurance Billing & Coding",
     "subheadline": "Master medical billing and coding for healthcare careers.",
     "microLabel": "Insurance Billing & Coding",
@@ -3231,8 +3234,8 @@
   },
   "nha-medical-assistant": {
     "pageKey": "nha-medical-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Medical Assistant",
     "subheadline": "Earn your NHA-certified Medical Assistant credential.",
     "microLabel": "NHA Medical Assistant",
@@ -3247,8 +3250,8 @@
   },
   "nha-phlebotomy": {
     "pageKey": "nha-phlebotomy",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Phlebotomy",
     "subheadline": "Earn your NHA phlebotomy certification.",
     "microLabel": "NHA Phlebotomy",
@@ -3743,8 +3746,8 @@
   },
   "nha-billing-coding": {
     "pageKey": "nha-billing-coding",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Billing & Coding",
     "subheadline": "Earn your NHA medical billing and coding credential.",
     "microLabel": "NHA Billing & Coding",
@@ -3775,8 +3778,8 @@
   },
   "nha-ekg-technician": {
     "pageKey": "nha-ekg-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA EKG Technician",
     "subheadline": "Earn your NHA EKG technician certification.",
     "microLabel": "NHA EKG Technician",
@@ -3791,8 +3794,8 @@
   },
   "nha-medical-admin-assistant": {
     "pageKey": "nha-medical-admin-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Medical Admin Assistant",
     "subheadline": "Earn your NHA medical administrative assistant credential.",
     "microLabel": "NHA Medical Admin Assistant",
@@ -3803,12 +3806,13 @@
     "ctaSecondary": {
       "label": "Learn More",
       "href": "/programs/nha-medical-admin-assistant"
-    }
+    },
+    "posterImage": "/images/pages/medical-assistant-desk.webp"
   },
   "nha-patient-care-technician": {
     "pageKey": "nha-patient-care-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Patient Care Technician",
     "subheadline": "Earn your NHA patient care technician certification.",
     "microLabel": "NHA Patient Care Technician",
@@ -3887,8 +3891,8 @@
   },
   "phlebotomy-technician": {
     "pageKey": "phlebotomy-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "Phlebotomy Technician",
     "subheadline": "Earn your phlebotomy technician certification.",
     "microLabel": "Phlebotomy Technician",

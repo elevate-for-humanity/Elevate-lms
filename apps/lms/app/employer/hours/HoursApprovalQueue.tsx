@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, User, Calendar, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle, User, Calendar, AlertCircle } from 'lucide-react';
 
 interface HourEntry {
   id: string;
@@ -21,7 +21,6 @@ interface HourEntry {
 export function HoursApprovalQueue() {
   const [entries, setEntries] = useState<HourEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -55,69 +54,6 @@ export function HoursApprovalQueue() {
     }
   };
 
-  const handleAction = async (entryId: string, action: 'approve' | 'reject') => {
-    if (action === 'reject') {
-      const reason = prompt('Reason for rejection:');
-      if (!reason) return;
-    }
-
-    setProcessing(entryId);
-    setMessage(null);
-
-    try {
-      const endpoint =
-        action === 'approve' ? '/api/employer/hours/approve' : '/api/apprenticeship/hours/reject';
-
-      const body =
-        action === 'approve'
-          ? { hour_id: entryId }
-          : { hour_id: entryId, reason: 'Rejected by employer' };
-
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || `Failed to ${action}`);
-      }
-
-      setEntries((prev) => prev.filter((e) => e.id !== entryId));
-      setMessage({ type: 'success', text: `Hours ${action}d` });
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Action failed' });
-    } finally {
-      setProcessing(null);
-    }
-  };
-
-  const handleBulkApprove = async () => {
-    if (entries.length === 0) return;
-    if (!confirm(`Approve all ${entries.length} pending entries?`)) return;
-
-    setProcessing('bulk');
-    setMessage(null);
-
-    try {
-      const res = await fetch('/api/apprenticeship/hours/approve', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hour_ids: entries.map((e) => e.id) }),
-      });
-
-      if (!res.ok) throw new Error('Bulk approve failed');
-
-      setEntries([]);
-      setMessage({ type: 'success', text: `${entries.length} entries approved` });
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Bulk approve failed' });
-    } finally {
-      setProcessing(null);
-    }
-  };
-
   if (loading) {
     return (
       <div className="bg-white rounded-xl border p-12 text-center">
@@ -146,24 +82,28 @@ export function HoursApprovalQueue() {
         </div>
       )}
 
-      {entries.length > 1 && (
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={handleBulkApprove}
-            disabled={processing === 'bulk'}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
-          >
-            <CheckCircle className="w-4 h-4" />
-            {processing === 'bulk' ? 'Processing...' : `Approve All (${entries.length})`}
-          </button>
-        </div>
-      )}
+      <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
+        <p className="text-sm text-slate-800">
+          These are pending ledger records. Final apprenticeship approval requires an authorized
+          sponsor administrator to review the canonical submission and supporting evidence.
+        </p>
+        <a
+          href="https://admin.elevateforhumanity.org/apprenticeships"
+          className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white"
+        >
+          Open canonical apprenticeship review
+        </a>
+        <p className="mt-2 text-xs text-slate-700">
+          The Admin portal verifies your approval permissions. Ledger-only records and disputes
+          need reconciliation before they can receive credit.
+        </p>
+      </div>
 
       {entries.length === 0 ? (
         <div className="bg-white rounded-xl border p-12 text-center">
           <CheckCircle className="w-16 h-16 text-brand-green-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">All caught up</h2>
-          <p className="text-slate-700">No pending hours to review.</p>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Pending ledger records</h2>
+          <p className="text-slate-700">No pending ledger records were returned. Check canonical apprenticeship review for submitted hours.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -226,24 +166,7 @@ export function HoursApprovalQueue() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
-                  <button
-                    onClick={() => handleAction(entry.id, 'reject')}
-                    disabled={processing === entry.id}
-                    className="inline-flex items-center gap-1 px-3 py-2 text-brand-red-600 hover:bg-brand-red-50 rounded-lg disabled:opacity-50"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    Reject
-                  </button>
-                  <button
-                    onClick={() => handleAction(entry.id, 'approve')}
-                    disabled={processing === entry.id}
-                    className="inline-flex items-center gap-1 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
-                  >
-                    <CheckCircle className="w-4 h-4" />
-                    {processing === entry.id ? 'Processing...' : 'Approve'}
-                  </button>
-                </div>
+
               </div>
             </div>
           ))}

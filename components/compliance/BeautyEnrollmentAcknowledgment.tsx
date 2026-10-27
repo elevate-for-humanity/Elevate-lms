@@ -20,10 +20,17 @@ interface BeautyEnrollmentAcknowledgmentProps {
 }
 
 const PROGRAM_NAMES: Record<ProgramType, string> = {
-  barber: 'barber school',
-  'nail-technician': 'nail technician school',
-  esthetician: 'esthetician school',
-  cosmetology: 'cosmetology school',
+  barber: 'Barber Apprenticeship',
+  'nail-technician': 'Manicurist / Nail Technician Apprenticeship',
+  esthetician: 'Esthetician Apprenticeship',
+  cosmetology: 'Hair Stylist / Cosmetology Apprenticeship',
+};
+
+const REGISTERED_REQUIREMENTS: Record<ProgramType, string> = {
+  barber: 'RAPIDS 0030CB V1 — competency-based: 14 verified Appendix A competencies plus 260 RTI hours; 500-hour probation.',
+  'nail-technician': 'RAPIDS 2090CB V1 — competency-based: 19 verified Appendix A competencies plus 210 RTI hours; 500-hour probation.',
+  esthetician: 'RAPIDS 2089CB V1 — competency-based: 20 verified Appendix A competencies plus 300 RTI hours; 500-hour probation.',
+  cosmetology: 'RAPIDS 0096HY V1 — Hair Stylist (existing title: Cosmetologist), hybrid 2,000–2,500-hour term plus 154 RTI hours; 500-hour probation.',
 };
 
 const PROGRAM_FEES: Record<ProgramType, number> = {
@@ -31,13 +38,6 @@ const PROGRAM_FEES: Record<ProgramType, number> = {
   'nail-technician': 2980,
   esthetician: 6000,
   cosmetology: 6000,
-};
-
-const PROGRAM_HOURS: Record<ProgramType, number> = {
-  barber: 2000,
-  'nail-technician': 2000,
-  esthetician: 0,
-  cosmetology: 2000,
 };
 
 export function BeautyEnrollmentAcknowledgment({
@@ -48,9 +48,9 @@ export function BeautyEnrollmentAcknowledgment({
 }: BeautyEnrollmentAcknowledgmentProps) {
   const [isChecked, setIsChecked] = useState(acknowledged);
 
-  const schoolName = PROGRAM_NAMES[programType];
+  const programName = PROGRAM_NAMES[programType];
   const fee = PROGRAM_FEES[programType];
-  const hours = PROGRAM_HOURS[programType];
+  const registeredRequirement = REGISTERED_REQUIREMENTS[programType];
 
   const handleToggle = () => {
     const newValue = !isChecked;
@@ -72,22 +72,19 @@ export function BeautyEnrollmentAcknowledgment({
 
       <div className="bg-white border border-amber-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-slate-700 leading-relaxed">
-          <strong>Program Scope:</strong> This program provides apprenticeship sponsorship,
-          oversight, and related instruction only. It includes DOL Registered Apprenticeship
-          sponsorship, compliance and RAPIDS reporting, employer coordination, program monitoring,
-          and Elevate LMS theory curriculum.
+          <strong>Program Scope:</strong> {programName} is a Registered Apprenticeship pathway.
+          Related Technical Instruction (RTI), supervised workplace training, sponsor oversight,
+          RAPIDS/compliance records, and required occupational progress documentation work together
+          as parts of the registered program.
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
-          <strong>What This Program Does NOT Provide:</strong> This program does not replace{' '}
-          {schoolName}, does not provide practical hands-on training, and does not grant state
-          licensure hours. Enrollment requires concurrent or subsequent participation in a licensed{' '}
-          {schoolName} for state licensure eligibility.
+          <strong>Licensing:</strong> Completion of the apprenticeship is not itself an Indiana
+          professional license. After registered-program completion, the apprentice must follow the
+          applicable Indiana examination and licensing process. Do not substitute traditional
+          beauty-school hour requirements for this registered apprenticeship standard.
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
-          <strong>{programType === 'esthetician' ? 'Registered-program requirements' : 'Indiana requirements'}:</strong>{' '}
-          {programType === 'esthetician'
-            ? 'The approved Appendix A standard is competency-based: 20 verified occupational competencies plus 300 related-instruction hours. Work hours are retained as auditable evidence, not used as a fixed apprenticeship completion denominator.'
-            : `Indiana requires ${hours.toLocaleString('en-US')} hours of training for licensure.`}
+          <strong>Registered-program requirements:</strong> {registeredRequirement}
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
           <strong>Program Fee:</strong> The program fee of ${fee.toLocaleString('en-US')} is a flat
@@ -113,10 +110,11 @@ export function BeautyEnrollmentAcknowledgment({
         <span
           className={`text-left text-sm ${isChecked ? 'text-brand-green-800' : 'text-slate-700'}`}
         >
-          <strong>I understand</strong> this program provides apprenticeship sponsorship, oversight,
-          and related instruction only and does not replace {schoolName} or grant state licensure
-          hours. I acknowledge that the program fee of ${fee.toLocaleString('en-US')}
-          applies regardless of any transferred hours.
+          <strong>I understand</strong> the registered apprenticeship requirements shown above,
+          including that 500 hours is a probationary period rather than graduation, and that
+          Indiana examination/licensing is a separate step after registered-program completion. I
+          acknowledge that the program fee of ${fee.toLocaleString('en-US')} applies regardless
+          of any transferred hours.
         </span>
       </button>
 

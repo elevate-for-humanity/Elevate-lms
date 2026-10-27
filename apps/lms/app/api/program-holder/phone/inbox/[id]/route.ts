@@ -1,6 +1,6 @@
-// pre-auth-registry: exempt - requireProgramHolder and assigned_profile_id scope every write.
+// pre-auth-registry: exempt - phoneActorResponse (requireCommunicationActor) and assigned_profile_id scope every write.
 import { NextResponse } from 'next/server';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
 
 const STATUSES = new Set(['new', 'acknowledged', 'contacted', 'resolved']);
 
@@ -8,9 +8,10 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const ctx = await requireProgramHolder();
-  if (ctx.mode !== 'holder') {
-    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
+  if (ctx.previewing) {
+    return NextResponse.json({ error: 'Administrator portal previews are read-only.' }, { status: 403 });
   }
   const { id } = await params;
   const body = await request.json().catch(() => ({}));

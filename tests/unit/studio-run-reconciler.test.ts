@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { deriveStudioRunState } from '@/lib/devstudio/studio-run-reconciler';
+import { deriveStudioRunState, evaluateCompletedStudioTask } from '@/lib/devstudio/studio-run-reconciler';
 
 describe('canonical Studio run reconciliation', () => {
+  it('does not verify a completed health task whose actual tool payload failed', () => {
+    const result = evaluateCompletedStudioTask({ id: 'health', status: 'completed', tool_name: 'devstudio.health', result_json: { ok: true }, tool_output: { ok: false, message: 'Owned AI is unavailable' } });
+    expect(result.status).toBe('FAIL_BLOCKING');
+    expect(result.reasons).toContain('Owned AI is unavailable');
+  });
+  it('does not mistake an outer execution acknowledgment for successful tool evidence', () => {
+    expect(evaluateCompletedStudioTask({ id: 'health', status: 'completed', tool_name: 'devstudio.health', result_json: { ok: true, payload: { ok: false } } }).status).toBe('FAIL_BLOCKING');
+  });
+  it('verifies a successful tool result', () => {
+    expect(evaluateCompletedStudioTask({ id: 'health', status: 'completed', tool_name: 'devstudio.health', tool_output: { ok: true, checks: [] } }).status).toBe('PASS');
+  });
   it('does not report completion while a required step is still active', () => {
     expect(
       deriveStudioRunState([
@@ -20,14 +31,25 @@ describe('canonical Studio run reconciliation', () => {
     ).toEqual({ status: 'blocked', failure: null });
   });
 
-  it('requires every required step to be verified or intentionally skipped', () => {
+  it('blocks completion when a required step is skipped', () => {
     expect(
       deriveStudioRunState([
         { status: 'verified', required: true },
         { status: 'skipped', required: true },
         { status: 'failed', required: false },
       ]),
-    ).toEqual({ status: 'completed', failure: null });
+    ).toEqual({ status: 'blocked', failure: { message: 'A required Studio step was skipped without verification' } });
+  });
+
+  it('completes verified required work while allowing optional steps to be skipped', () => {
+    expect(deriveStudioRunState([
+      { status: 'verified', required: true },
+      { status: 'skipped', required: false },
+    ])).toEqual({ status: 'completed', failure: null });
+  });
+
+  it('does not complete an empty run', () => {
+    expect(deriveStudioRunState([])).toEqual({ status: 'executing', failure: null });
   });
 
   it('makes a required failure authoritative', () => {

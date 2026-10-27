@@ -13,7 +13,11 @@ import {
   Terminal,
   Upload,
 } from 'lucide-react';
-import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
+
+
+const terminalStorageKey='elevate.studio.terminal.v1';
+function savedTerminalId(){try{return window.sessionStorage.getItem(terminalStorageKey)||'';}catch{return '';}}
+function rememberTerminal(id:string){try{if(id)window.sessionStorage.setItem(terminalStorageKey,id);else window.sessionStorage.removeItem(terminalStorageKey);}catch{/* Reconnection still works within this mounted view. */}}
 
 type TreeNode = {
   name: string;
@@ -42,6 +46,7 @@ export default function RealRepoWorkspace({
   className = '',
 }: RealRepoWorkspaceProps) {
   const [tree, setTree] = useState<TreeNode[]>([]);
+  const [expanded,setExpanded]=useState<Set<string>>(new Set());
   const [repo, setRepo] = useState('Elevate-lms');
   const [branch, setBranch] = useState('main');
   const [activePath, setActivePath] = useState('');
@@ -50,16 +55,35 @@ export default function RealRepoWorkspace({
   const [sha, setSha] = useState('');
   const [status, setStatus] = useState('Connecting repository…');
   const [saving, setSaving] = useState(false);
+  const [confirmation,setConfirmation]=useState('');
   const [runtimeReady, setRuntimeReady] = useState(false);
+  const [repositoryConnected, setRepositoryConnected] = useState(false);
+  const [signInRequired, setSignInRequired] = useState(false);
+  const [terminalInterrupted,setTerminalInterrupted]=useState(false);
+  const [reconnect,setReconnect]=useState(0);
   const [running, setRunning] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
   const terminalRef = useRef<HTMLDivElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
-  const webcontainerRef = useRef<WebContainer | null>(null);
-  const processRef = useRef<WebContainerProcess | null>(null);
+  const terminalSessionRef = useRef('');
+  const cursorRef = useRef(0);
+  const terminalStateRef=useRef('');
 
   const dirty = content !== savedContent;
+
+  // Never replay a write after a rejected session. Keep the editor and saved
+  // terminal mounted while the operator signs in in a separate tab.
+  const studioFetch = useCallback(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const response = await fetch(input, { ...init, credentials: 'same-origin' });
+    if (response.status === 401) {
+      setSignInRequired(true);
+      setRuntimeReady(false);
+      setRepositoryConnected(false);
+      setStatus('Sign in to reconnect');
+    }
+    return response;
+  }, []);
 
   const output = useCallback((line: string) => {
     setTerminalOutput((previous) => [...previous, line]);
@@ -68,7 +92,7 @@ export default function RealRepoWorkspace({
 
   const refreshTree = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/dev-studio/files', { cache: 'no-store' });
+      const response = await studioFetch('/api/admin/dev-studio/files?source=container', { cache: 'no-store',signal:AbortSignal.timeout(30000) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
       const nextTree = Array.isArray(data.tree) ? data.tree : [];
@@ -82,46 +106,70 @@ export default function RealRepoWorkspace({
       setStatus(message);
       output(`Repository error: ${message}`);
     }
-  }, [onFileChange, output]);
+  }, [onFileChange, output, studioFetch]);
+
+  // Sync and terminal recovery own initialization. Listing files before the
+  // runtime is ready races the initial durable repository checkpoint.
+  useEffect(() => {
+    if (repositoryConnected) void refreshTree();
+  }, [repositoryConnected, refreshTree]);
 
   useEffect(() => {
-    void refreshTree();
-  }, [refreshTree]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const { WebContainer } = await import('@webcontainer/api');
-        const instance = await WebContainer.boot();
-        if (cancelled) {
-          instance.teardown();
-          return;
-        }
-        webcontainerRef.current = instance;
-        setRuntimeReady(true);
-        output('Runtime ready — Node/npm/npx execute in the isolated browser workspace.');
-      } catch (error) {
-        output(`Runtime unavailable: ${error instanceof Error ? error.message : 'WebContainer failed to boot'}`);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      processRef.current?.kill();
-      webcontainerRef.current?.teardown();
-      webcontainerRef.current = null;
+    let cancelled=false,polling=false,disconnected=false,authRejected=false;
+    setRepositoryConnected(false);
+    const request=async(body:Record<string,unknown>)=>{
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
+      const result=await response.json();if(!response.ok)throw new Error(result.error||`HTTP ${response.status}`);return result;
     };
-  }, [output]);
+    const read=async(sessionId:string)=>{
+      const response=await studioFetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+      const result=await response.json();
+      if(!response.ok){
+        if(response.status===404){rememberTerminal('');terminalSessionRef.current='';}
+        if(response.status===401||response.status===403){authRejected=true;setRepositoryConnected(false);}
+        throw new Error(result.error||`HTTP ${response.status}`);
+      }
+      if(cancelled)return;
+      if(result.recovery?.truncated)output('Earlier terminal output exceeded the saved history limit.');
+      for(const entry of result.output??[])output(String(entry.data));
+      cursorRef.current=result.cursor??cursorRef.current;
+      const state=String(result.state||(result.exitCode==null?'running':'exited'));
+      const interrupted=state==='interrupted'||(state==='exited'&&Boolean(result.state));
+      setTerminalInterrupted(interrupted);setRuntimeReady(state==='running');
+      if(interrupted&&terminalStateRef.current!==state)output('Previous terminal process ended. Saved output is restored; start a new shell to continue. Commands have not been repeated.');
+      terminalStateRef.current=state;
+      if(state==='closed'||(state==='exited'&&!result.state)){rememberTerminal('');terminalSessionRef.current='';}
+      disconnected=false;
+    };
+    void(async()=>{
+      const saved=savedTerminalId();
+      try{
+        if(saved){terminalSessionRef.current=saved;await read(saved);if(!cancelled)setRepositoryConnected(true);return;}
+        await request({operation:'repository-sync',repoUrl:'https://github.com/elevate-for-humanity/Elevate-lms.git',branch:'main'});
+        if(!cancelled)setRepositoryConnected(true);
+        const session=await request({operation:'terminal-create'});
+        if(!session.id)throw new Error('Studio terminal session missing');
+        if(cancelled){await request({operation:'terminal-stop',sessionId:session.id});return;}
+        terminalSessionRef.current=session.id;rememberTerminal(session.id);cursorRef.current=0;terminalStateRef.current='running';
+        setTerminalInterrupted(false);setRuntimeReady(true);output('Existing Studio container connected to Elevate-lms.');
+      }catch(error){if(!cancelled){setRuntimeReady(false);disconnected=true;output(`Runtime unavailable: ${error instanceof Error?error.message:'Connection failed'}`);}}
+    })();
+    const timer=window.setInterval(async()=>{
+      const id=terminalSessionRef.current;if(cancelled||polling||authRejected||!id)return;polling=true;
+      try{await read(id);}catch(error){if(!cancelled){setRuntimeReady(false);if(!disconnected)output(`Terminal disconnected; reconnecting to the same session: ${error instanceof Error?error.message:'Unknown error'}`);disconnected=true;}}finally{polling=false;}
+    },1500);
+    return()=>{cancelled=true;window.clearInterval(timer);terminalSessionRef.current='';};
+  },[output,reconnect,studioFetch]);
 
   useEffect(() => {
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
   }, [terminalOutput]);
 
   async function openFile(path: string) {
+    setConfirmation('');
     setStatus(`Opening ${path}…`);
     try {
-      const response = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`, {
+      const response = await studioFetch(`/api/admin/dev-studio/files?source=container&path=${encodeURIComponent(path)}`, {
         cache: 'no-store',
       });
       const data = await response.json();
@@ -145,12 +193,13 @@ export default function RealRepoWorkspace({
     setStatus(`Committing ${activePath}…`);
     try {
       const updating = Boolean(sha);
-      const response = await fetch('/api/admin/dev-studio/files', {
+      const response = await studioFetch('/api/admin/dev-studio/files', {
         method: updating ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           path: activePath,
           content,
+          ...(branch==='main'?{confirmation}:{}),
           ...(updating ? { sha } : {}),
           message: `${updating ? 'chore: update' : 'chore: create'} ${activePath} via Dev Studio`,
         }),
@@ -158,7 +207,7 @@ export default function RealRepoWorkspace({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
       setSha(data.sha || sha);
-      setSavedContent(content);
+      setSavedContent(content);setConfirmation('');
       setStatus(`Committed ${activePath}`);
       output(`✓ committed ${activePath}`);
       await refreshTree();
@@ -197,50 +246,26 @@ export default function RealRepoWorkspace({
   }
 
   async function stageActiveFileInRuntime() {
-    const runtime = webcontainerRef.current;
-    if (!runtime) throw new Error('Runtime is not ready');
-    if (!activePath) throw new Error('Select a file first');
-    const runtimePath = activePath.replace(/^\/+/, '');
-    const slash = runtimePath.lastIndexOf('/');
-    if (slash > 0) await runtime.fs.mkdir(runtimePath.slice(0, slash), { recursive: true });
-    await runtime.fs.writeFile(runtimePath, content);
-    return runtimePath;
-  }
-
-  async function streamProcess(process: WebContainerProcess) {
-    const reader = process.output.getReader();
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        String(value).split(/\r?\n/).filter(Boolean).forEach(output);
-      }
-    } finally {
-      reader.releaseLock();
-    }
+    if(!runtimeReady || !activePath)throw new Error('Connect the runtime and select a file first');
+    const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',
+      headers:{'content-type':'application/json'},body:JSON.stringify({operation:'file-write',path:activePath,content})});
+    const result=await response.json();
+    if(!response.ok || !result.ok)throw new Error(result.error || 'Runtime file staging failed');
+    return activePath;
   }
 
   async function runCommand(commandLine: string) {
-    const runtime = webcontainerRef.current;
-    const trimmed = commandLine.trim();
-    if (!runtime || !trimmed || running) return;
-
-    const [command, ...args] = trimmed.split(/\s+/);
-    setRunning(true);
-    output(`$ ${trimmed}`);
+    const sessionId=terminalSessionRef.current;
+    const trimmed=commandLine.trim();
+    if(!sessionId || !trimmed || running)return;
+    setRunning(true);output(`$ ${trimmed}`);
     try {
-      const process = await runtime.spawn(command, args);
-      processRef.current = process;
-      const stream = streamProcess(process);
-      const exitCode = await process.exit;
-      await stream;
-      output(`Process exited with code ${exitCode}`);
-    } catch (error) {
-      output(`Command failed: ${error instanceof Error ? error.message : 'unknown error'}`);
-    } finally {
-      processRef.current = null;
-      setRunning(false);
-    }
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',
+        headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-input',sessionId,data:trimmed+'\n'})});
+      const result=await response.json();
+      if(!response.ok || !result.ok)throw new Error(result.error || 'Command delivery failed');
+    }catch(error){output(`Command failed: ${error instanceof Error?error.message:'Unknown error'}`);}
+    finally{setRunning(false);}
   }
 
   async function runActiveFile() {
@@ -248,9 +273,9 @@ export default function RealRepoWorkspace({
       const runtimePath = await stageActiveFileInRuntime();
       const extension = runtimePath.split('.').pop()?.toLowerCase();
       if (['js', 'mjs', 'cjs'].includes(extension || '')) {
-        await runCommand(`node ${runtimePath}`);
+        await runCommand(`node ${JSON.stringify(runtimePath)}`);
       } else if (['ts', 'tsx'].includes(extension || '')) {
-        await runCommand(`npx tsx ${runtimePath}`);
+        await runCommand(`npx tsx ${JSON.stringify(runtimePath)}`);
       } else {
         output(`No automatic runner for .${extension || 'unknown'}; use the terminal.`);
       }
@@ -259,11 +284,25 @@ export default function RealRepoWorkspace({
     }
   }
 
-  function stopProcess() {
-    processRef.current?.kill();
-    processRef.current = null;
-    setRunning(false);
-    output('Process stopped.');
+  async function resumeTerminal(){
+    const sessionId=terminalSessionRef.current||savedTerminalId();if(!sessionId)return;
+    try{
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-resume',sessionId})});
+      const result=await response.json();if(!response.ok)throw new Error(result.error||'Terminal recovery failed');
+      terminalSessionRef.current=sessionId;rememberTerminal(sessionId);terminalStateRef.current='running';setTerminalInterrupted(false);setRuntimeReady(true);
+      output('New shell started from the saved directory. Previous commands were not repeated.');
+    }catch(error){output(error instanceof Error?error.message:'Terminal recovery failed');}
+  }
+
+  async function stopProcess() {
+    const sessionId=terminalSessionRef.current;
+    if(!sessionId)return;
+    try {
+      const response=await studioFetch('/api/admin/dev-studio/runtime',{method:'POST',
+        headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-stop',sessionId})});
+      if(!response.ok)throw new Error('Terminal stop failed');
+      terminalSessionRef.current='';rememberTerminal('');setTerminalInterrupted(false);setRuntimeReady(false);setRunning(false);output('Studio terminal stopped.');
+    }catch(error){output(error instanceof Error?error.message:'Terminal stop failed');}
   }
 
   function renderTree(nodes: TreeNode[], depth = 0) {
@@ -271,8 +310,8 @@ export default function RealRepoWorkspace({
       <div key={node.path}>
         <button
           type="button"
-          disabled={node.type === 'directory'}
-          onClick={() => node.type === 'file' && void openFile(node.path)}
+          aria-expanded={node.type==='directory'?expanded.has(node.path):undefined}
+          onClick={() => node.type === 'file' ? void openFile(node.path) : setExpanded(previous=>{const next=new Set(previous);if(next.has(node.path))next.delete(node.path);else next.add(node.path);return next;})}
           className={`flex w-full items-center gap-1.5 truncate px-2 py-1 text-left text-[11px] hover:bg-[#2a2d2e] ${
             activePath === node.path ? 'bg-[#094771] text-white' : 'text-[#cccccc]'
           } ${node.type === 'directory' ? 'cursor-default text-[#9ca3af]' : ''}`}
@@ -286,7 +325,7 @@ export default function RealRepoWorkspace({
           )}
           <span className="truncate">{node.name}</span>
         </button>
-        {node.type === 'directory' && node.children?.length ? renderTree(node.children, depth + 1) : null}
+        {node.type === 'directory' && expanded.has(node.path) && node.children?.length ? renderTree(node.children, depth + 1) : null}
       </div>
     ));
   }
@@ -318,13 +357,14 @@ export default function RealRepoWorkspace({
         </button>
         <button
           type="button"
-          disabled={!dirty || !activePath || saving}
+          disabled={!dirty || !activePath || saving || (branch==='main'&&confirmation!=='CONFIRM PUSH')}
           onClick={() => void saveFile()}
           className="inline-flex h-7 items-center gap-1 rounded bg-[#0078d4] px-2 text-[11px] text-white disabled:opacity-40"
         >
           {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
           Commit
         </button>
+        <button type="button" disabled={!runtimeReady||!activePath||saving} onClick={()=>void stageActiveFileInRuntime().then(()=>setStatus('Saved in the Studio container; commit separately to deploy.')).catch(e=>setStatus(e.message))} className="rounded border border-slate-500 px-2 py-1 text-xs disabled:opacity-40">Save in container</button>
         <button
           type="button"
           disabled={!runtimeReady || !activePath || running}
@@ -333,11 +373,17 @@ export default function RealRepoWorkspace({
         >
           <Play className="h-3.5 w-3.5" /> Run
         </button>
-        <button type="button" disabled={!running} onClick={stopProcess} className="rounded bg-red-700 p-1.5 disabled:opacity-40" title="Stop">
+        <button type="button" disabled={!runtimeReady} onClick={() => void stopProcess()} className="rounded bg-red-700 p-1.5 disabled:opacity-40" title="Stop">
           <Square className="h-3.5 w-3.5" />
         </button>
       </div>
 
+      {signInRequired && <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-amber-700 bg-amber-950 px-3 py-3 text-sm text-amber-100">
+        <span>Your Admin session needs sign-in. Your editor and saved terminal are kept here.</span>
+        <a href="/login?redirect=%2Fstudio%2Frepository" target="_blank" rel="noopener noreferrer" className="underline">Sign in to Admin</a>
+        <button type="button" onClick={() => { setSignInRequired(false); setReconnect(value => value + 1); }} className="rounded border border-amber-300 px-3 py-1">Reconnect after sign-in</button>
+      </div>}
+      {dirty&&branch==='main'&&<label className="flex items-center gap-2 bg-slate-900 px-3 py-2 text-xs text-white">To commit to main, type CONFIRM PUSH<input aria-label="Main commit confirmation" value={confirmation} onChange={e=>setConfirmation(e.target.value)} className="rounded border border-slate-500 bg-slate-950 p-2 text-white" /></label>}
       <div className="flex min-h-0 flex-1">
         <aside className="w-64 shrink-0 overflow-y-auto border-r border-[#3c3c3c] bg-[#252526] py-1">
           {tree.length ? renderTree(tree) : <div className="px-3 py-4 text-[11px] text-[#858585]">Repository tree unavailable.</div>}
@@ -346,11 +392,11 @@ export default function RealRepoWorkspace({
           {activePath ? (
             <div className="flex h-full flex-col">
               <div className="shrink-0 border-b border-[#3c3c3c] px-3 py-1 text-[10px] text-[#9ca3af]">
-                {activePath}{dirty ? ' • unsaved' : ''}
+                {activePath}{dirty ? ' • uncommitted' : ''}
               </div>
               <textarea
                 value={content}
-                onChange={(event) => setContent(event.target.value)}
+                onChange={(event) => {setContent(event.target.value);setConfirmation('');}}
                 spellCheck={false}
                 className="min-h-0 flex-1 resize-none bg-[#1e1e1e] p-3 font-mono text-[12px] leading-5 text-[#d4d4d4] outline-none"
                 placeholder="// Edit the real Elevate-lms repository here"
@@ -366,7 +412,9 @@ export default function RealRepoWorkspace({
         <div className="flex items-center gap-2 border-b border-[#333] bg-[#171717] px-3 py-1 text-[10px] text-[#9ca3af]">
           <Terminal className="h-3.5 w-3.5" />
           Isolated Terminal
-          <span className="text-[#666]">{runtimeReady ? 'runtime ready' : 'runtime starting'}</span>
+          {terminalInterrupted&&<button type="button" onClick={()=>void resumeTerminal()} className="rounded border border-slate-500 px-2 py-1 text-white">Start new shell</button>}
+          {!runtimeReady&&!terminalInterrupted&&<button type="button" onClick={()=>setReconnect(value=>value+1)} className="rounded border border-slate-500 px-2 py-1 text-white">Reconnect terminal</button>}
+          <span className="text-[#666]">{runtimeReady ? 'runtime ready' : terminalInterrupted ? 'saved terminal recovered' : 'runtime disconnected'}</span>
           <button type="button" onClick={() => setTerminalOutput([])} className="ml-auto rounded p-1 hover:bg-[#333]" title="Clear">
             <RefreshCw className="h-3 w-3" />
           </button>
@@ -398,3 +446,4 @@ export default function RealRepoWorkspace({
     </div>
   );
 }
+

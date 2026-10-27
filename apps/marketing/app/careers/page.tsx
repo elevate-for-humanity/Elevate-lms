@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, MapPin, ArrowRight } from 'lucide-react';
@@ -8,6 +10,15 @@ export const metadata: Metadata = {
   description:
     'Review current job postings at Elevate for Humanity. Compensation, location, schedule, benefits, and employment terms are controlled by each active posting and written offer.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/careers' },
+
+  ...publicArtworkMetadata({
+    path: '/careers',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative team collaborating in a professional education setting',
+    title: 'Careers at Elevate for Humanity',
+    description:
+      'Review current job postings at Elevate for Humanity. Compensation, location, schedule, benefits, and employment terms are controlled by each active posting and written offer.',
+  }),
 };
 
 export const revalidate = 0;
@@ -17,14 +28,28 @@ export default async function CareersPage() {
 
   return (
     <main className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative team collaborating in a professional education setting"
+        actions={[
+          { href: '/apply/staff', label: 'Apply for an opportunity' },
+          { href: '/contact', label: 'Ask about openings' },
+        ]}
+      />
+
       <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400">Employment</p>
-          <h1 className="mt-3 text-4xl font-extrabold sm:text-5xl">Careers at Elevate for Humanity</h1>
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400">
+            Employment
+          </p>
+          <h1 className="mt-3 text-4xl font-extrabold sm:text-5xl">
+            Careers at Elevate for Humanity
+          </h1>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
             Current employment opportunities are listed below when available. Job duties,
             compensation, work location, schedule, benefits, eligibility, and other employment terms
-            are controlled by the applicable posting and any written offer—not by generic website copy.
+            are controlled by the applicable posting and any written offer—not by generic website
+            copy.
           </p>
         </div>
       </section>
@@ -33,9 +58,10 @@ export default async function CareersPage() {
         <div className="mx-auto max-w-5xl">
           <h2 className="text-xl font-bold text-slate-900">Employment disclosure</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Elevate does not publish universal benefit promises or employee-outcome statistics on this
-            page. An active role may have different employment, contractor, part-time, full-time,
-            on-site, hybrid, or remote terms. Review the specific posting before applying.
+            Elevate does not publish universal benefit promises or employee-outcome statistics on
+            this page. An active role may have different employment, contractor, part-time,
+            full-time, on-site, hybrid, or remote terms. Review the specific posting before
+            applying.
           </p>
         </div>
       </section>
@@ -44,7 +70,9 @@ export default async function CareersPage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-brand-red-700">Open roles</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-red-700">
+                Open roles
+              </p>
               <h2 className="mt-2 text-3xl font-extrabold text-slate-950">Current postings</h2>
             </div>
           </div>
@@ -88,8 +116,8 @@ export default async function CareersPage() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-8">
               <h3 className="font-bold text-slate-900">No current posting is published</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                This page does not create a standing employment offer. Check again when an active role
-                is posted or use the contact page for general organizational inquiries.
+                This page does not create a standing employment offer. Check again when an active
+                role is posted or use the contact page for general organizational inquiries.
               </p>
             </div>
           )}
@@ -99,10 +127,13 @@ export default async function CareersPage() {
       <section className="border-t border-slate-200 bg-slate-50 px-6 py-12 text-center">
         <h2 className="text-xl font-bold text-slate-900">Questions about a published role?</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
-          Reference the exact job title or posting when contacting the organization so the response can
-          be tied to the correct employment terms.
+          Reference the exact job title or posting when contacting the organization so the response
+          can be tied to the correct employment terms.
         </p>
-        <Link href="/contact" className="mt-5 inline-flex rounded-lg bg-brand-red-700 px-6 py-3 font-bold text-white hover:bg-brand-red-800">
+        <Link
+          href="/contact"
+          className="mt-5 inline-flex rounded-lg bg-brand-red-700 px-6 py-3 font-bold text-white hover:bg-brand-red-800"
+        >
           Contact Us
         </Link>
       </section>

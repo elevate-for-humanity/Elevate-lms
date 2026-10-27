@@ -50,7 +50,7 @@ export class PushNotificationService {
     }
     try {
       const payload = JSON.stringify(notification);
-      await webpush.sendNotification(subscription, payload);
+      await webpush.sendNotification(subscription, payload, { timeout: 10000 });
       return true;
     } catch (error) {
       /* Error handled silently */
@@ -182,10 +182,7 @@ export class PushNotificationService {
       const supabase = await createClient();
       await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint);
     } catch (error) {
-      logger.error('[PushService] Failed to remove expired subscription', {
-        endpoint,
-        error: String(error),
-      });
+      logger.error('[PushService] Failed to remove expired subscription');
     }
   }
   /**

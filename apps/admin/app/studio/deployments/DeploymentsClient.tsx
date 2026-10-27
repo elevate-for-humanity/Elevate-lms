@@ -81,7 +81,7 @@ export default function DeploymentsClient() {
               Deployments
             </h1>
             <p className="text-cyan-100 text-lg mt-2 max-w-2xl">
-              Production deployment history — track every release to Northflank.
+              Production deployment history — track every release to Google Cloud Run.
             </p>
           </div>
         </div>

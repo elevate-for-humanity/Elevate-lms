@@ -5,10 +5,12 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
-import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { getStaticProgram } from '@/data/programs';
+import { isRAPIDSProgram, getPublicRegistrationDetails } from '@/lib/compliance/rapids-config';
+import { PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs',
   description:
@@ -20,28 +22,16 @@ const benefits = [
   'Earn wages during training — paid on-the-job learning',
   'Industry-recognized credentials upon completion',
   'Structured instructor support from experienced professionals',
-  'Funding, when available, requires separate program-level and participant authorization',
+  'Apprenticeship enrollment is self-pay only',
   'Direct pathway to full-time employment',
   'Portable, nationally recognized certification',
 ];
 
-const REGISTERED_PROGRAMS = [
-  { slug: 'barber-apprenticeship', label: 'Barber Apprenticeship' },
-  { slug: 'esthetician-apprenticeship', label: 'Esthetician Apprenticeship' },
-  { slug: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship' },
-]
-  .map((program) => {
-    const contract = getRegisteredProgramStandard(program.slug);
-    if (!contract) return null;
-    return {
-      name: program.label,
-      href: `/programs/${program.slug}`,
-      detail: `${contract.completion.competencyCount} competencies · ${contract.completion.requiredRtiHours} RTI hours · RAPIDS ${contract.standard.rapidsCode}`,
-    };
-  })
-  .filter((program): program is NonNullable<typeof program> => Boolean(program));
-
-export default function DOLFundingPage() {
+export default async function DOLFundingPage() {
+  const programs = Object.values(PROGRAM_SLUGS).filter(isRAPIDSProgram).flatMap((slug) => {
+    const program = getStaticProgram(slug);
+    return program ? [{ name: program.title, href: `/programs/${slug}`, duration: program.schedule }] : [];
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -49,7 +39,7 @@ export default function DOLFundingPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Funding', href: '/funding' }, { label: 'DOL Apprenticeship' }]}
+            items={[{ label: 'Apprenticeships', href: '/apprenticeships' }, { label: 'DOL Apprenticeship' }]}
           />
         </div>
       </div>
@@ -81,11 +71,10 @@ export default function DOLFundingPage() {
                 recognized credential.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
-                {PLATFORM_DEFAULTS.orgName} is a DOL Registered Apprenticeship Sponsor. Public occupation
-                claims on this page are generated only from the canonical approved Appendix A registry.
+                {getPublicRegistrationDetails().publicStatement} Apprenticeship enrollment is self-pay only; review the registered requirements on the occupation’s program page.
               </p>
               <Link
-                href="/start-trial"
+                href="/apply/student"
                 className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg"
               >
                 Apply Now <ArrowRight className="w-5 h-5" />
@@ -111,10 +100,11 @@ export default function DOLFundingPage() {
           </h2>
           <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 border border-slate-200">
             <p className="text-slate-700 leading-relaxed">
-              Registered Apprenticeships combine paid on-the-job learning with related instruction
-              and documented competency progression. Funding is separate from registered status and
-              is never assumed: any workforce-funded enrollment requires current program-level evidence,
-              participant eligibility, available funds, and written authorization from the responsible agency.
+              Registered Apprenticeships let you earn wages during training through paid on-the-job
+              learning. You receive industry-recognized credentials upon completion that are
+              portable and nationally recognized. Experienced professionals provide structured
+              instructor support throughout the program. Apprenticeship tuition is self-pay only, and the apprenticeship creates a direct pathway to full-time employment
+              with the training employer.
             </p>
           </div>
         </div>
@@ -129,7 +119,7 @@ export default function DOLFundingPage() {
             Programs registered with the U.S. Department of Labor.
           </p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-            {REGISTERED_PROGRAMS.map((p) => (
+            {programs.map((p) => (
               <Link
                 key={p.name}
                 href={p.href}
@@ -139,7 +129,7 @@ export default function DOLFundingPage() {
                   <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors">
                     {p.name}
                   </h3>
-                  <p className="text-sm text-black">{p.detail}</p>
+                  <p className="text-sm text-black">{p.duration}</p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-black group-hover:text-brand-blue-600 transition-colors" />
               </Link>
@@ -157,7 +147,7 @@ export default function DOLFundingPage() {
               {
                 step: '2',
                 title: 'Meet with Advisor',
-                desc: 'Discuss program options and funding eligibility',
+                desc: 'Review apprenticeship requirements and self-pay tuition',
               },
               { step: '3', title: 'Start Training', desc: 'Begin earning while you learn' },
             ].map((s) => (
@@ -171,7 +161,7 @@ export default function DOLFundingPage() {
             ))}
           </div>
           <Link
-            href="/start-trial"
+            href="/apply/student"
             className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition"
           >
             Apply Now

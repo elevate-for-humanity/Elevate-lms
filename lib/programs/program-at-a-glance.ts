@@ -48,6 +48,7 @@ function enrollmentStartLabel(program: ProgramSchema): string {
 }
 
 function fundingSummary(program: ProgramSchema): string {
+  if (program.programType === 'apprenticeship' || /apprenticeship/i.test(program.slug)) return 'Self-pay only. Review the published tuition and payment terms.';
   const verified = getVerifiedProgramFunding(program.slug);
   if (!verified) {
     return 'Self-pay program. No public WIOA or Workforce Ready Grant claim is made.';
@@ -98,7 +99,7 @@ export function buildProgramAtAGlance(program: ProgramSchema): ProgramAtAGlanceR
       detail: costDetail,
     },
     {
-      question: 'Is funding available?',
+      question: program.programType === 'apprenticeship' ? 'How do I pay?' : 'Is funding available?',
       answer: fundingSummary(program),
     },
   ];

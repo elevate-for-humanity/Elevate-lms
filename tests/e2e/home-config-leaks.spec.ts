@@ -9,11 +9,10 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
     expect(html).not.toContain('${PLATFORM_DEFAULTS.orgName}');
   });
 
-  test('homepage pathway image alt is human-readable', async ({ page }) => {
+  test('homepage featured shop image alt is human-readable', async ({ page }) => {
     await page.goto('/');
-    // aria-labelledby takes precedence over aria-label, so use the visible
-    // heading that actually names this region in the accessibility tree.
-    const pathwaySection = page.getByRole('region', { name: 'Training may be free for people who qualify.' });
+    // Career pathways now use decorative icons; verify the featured shop photographs.
+    const pathwaySection = page.getByRole('region', { name: 'Real shops. Real experience.' });
     await expect(pathwaySection).toBeVisible();
     const img = pathwaySection.getByRole('img').first();
     const alt = await img.getAttribute('alt');

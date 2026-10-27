@@ -268,7 +268,7 @@ export default function StudentHandbookPage() {
             <br />
             6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
             <br />
-            Email: elevate4humanityedu@gmail.com · Phone: {PLATFORM_DEFAULTS.supportPhone}
+            Email: elevate4humanityedu@gmail.com · Phone: {PLATFORM_DEFAULTS.mainPhone}
           </p>
         </DocumentSection>
 

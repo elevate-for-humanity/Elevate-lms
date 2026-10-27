@@ -4,6 +4,7 @@ import {
   isStaffMailboxRole,
   normalizeEmailSubject,
   parseEmailList,
+  programHolderMailboxDisplayName,
   selectPrimaryMailbox,
 } from '@/lib/email/communication-email';
 
@@ -51,6 +52,18 @@ describe('communication email helpers', () => {
       'one@example.com',
       'two@example.org',
     ]);
+  });
+
+  it('brands Program Holder senders with Elevate and the holder name', () => {
+    expect(programHolderMailboxDisplayName('Amir Naseen')).toBe(
+      'Elevate for Humanity — Amir Naseen',
+    );
+    expect(programHolderMailboxDisplayName('')).toBe(
+      'Elevate for Humanity — Program Holder',
+    );
+    expect(programHolderMailboxDisplayName('Bad <Name>\n')).toBe(
+      'Elevate for Humanity — Bad Name',
+    );
   });
 
   it('prefers organization mailboxes over personal and shared mailboxes', () => {

@@ -107,14 +107,15 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
     { href: '/lms/chat', label: 'Chat', desc: 'Peer chat', icon: MessageSquare },
     { href: '/lms/adaptive', label: 'Adaptive', desc: 'Personalized learning', icon: TrendingUp },
     { href: '/lms/integrations', label: 'Integrations', desc: 'Connected tools', icon: Settings },
-    { href: '/lms/payments', label: 'Payments', desc: 'Billing & invoices', icon: Award },
     { href: '/lms/settings', label: 'Settings', desc: 'Account settings', icon: Settings },
   ];
 
   // Resources available to learners inside the LMS — not surfaced on the marketing site.
   const resourceItems = [
     { href: '/lms/orientation', label: 'Orientation' },
-    { href: '/student-handbook', label: 'Student Handbook' },
+    { href: '/lms/handbook', label: 'Student Handbook' },
+    { href: '/lms/documents', label: 'Documents & Records' },
+    { href: '/lms/agreements', label: 'MOUs & Agreements' },
     { href: '/academic-calendar', label: 'Academic Calendar' },
     { href: '/resources', label: 'Learning Resources' },
     { href: '/career-services', label: 'Career Services' },

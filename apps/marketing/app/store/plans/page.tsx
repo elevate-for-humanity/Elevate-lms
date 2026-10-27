@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Plans & Add-Ons',
   description:
     'Solo, Business, and Professional plans from $29/month. Add AI assistants, LMS, course building, workforce, apprenticeship, testing, and business modules à la carte.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/plans' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/plans' },
 };
 
 export default async function StorePlansPage({

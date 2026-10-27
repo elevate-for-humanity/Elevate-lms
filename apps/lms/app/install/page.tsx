@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import { getProgramCardImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { BookOpen, Building2, Clock3, Download, GraduationCap, MonitorSmartphone, Store } from 'lucide-react';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 
@@ -8,6 +10,13 @@ export const metadata: Metadata = {
   description: 'Install the Elevate LMS dashboard for student, apprentice, and employer access.',
   robots: { index: false, follow: false },
 };
+
+const PROGRAM_COVERS = [
+  ['barber-apprenticeship', 'Barber'], ['cosmetology-apprenticeship', 'Cosmetology'],
+  ['nail-technician-apprenticeship', 'Nail Technician'], ['esthetician-apprenticeship', 'Esthetics'],
+  ['hvac-technician', 'HVAC'], ['cdl-training', 'CDL'],
+  ['bookkeeping', 'Bookkeeping'], ['business-administration', 'Business'],
+] as const;
 
 export default function LmsInstallPage() {
   return (
@@ -56,6 +65,13 @@ export default function LmsInstallPage() {
             </Link>
           </div>
 
+          <section className="mt-10" aria-labelledby="program-install-covers">
+            <h2 id="program-install-covers" className="text-2xl font-black">Choose your program cover</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Open your program’s install page. Your account determines course access and enrollment.</p>
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {PROGRAM_COVERS.map(([slug, title]) => <Link key={slug} href={`/install/learner?program=${slug}`} className="overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-500"><div className="relative aspect-[4/3]"><Image src={getProgramCardImage(slug)} alt={getProgramImageAlt(slug, title)} fill sizes="(min-width: 640px) 220px, 50vw" className="object-cover" /></div><div className="p-3"><h3 className="font-bold">{title}</h3><span className="mt-2 inline-block text-sm font-bold text-blue-800">Open install page →</span></div></Link>)}
+            </div>
+          </section>
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <Download className="h-5 w-5 text-slate-800" aria-hidden />
             <h2 className="mt-3 text-lg font-extrabold">iPhone and iPad</h2>

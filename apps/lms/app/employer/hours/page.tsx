@@ -7,8 +7,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { HoursApprovalQueue } from './HoursApprovalQueue';
 
 export const metadata: Metadata = {
-  title: 'Hours Approval | Employer Portal',
-  description: 'Review and approve apprentice training hours.',
+  title: 'Hours Review | Employer Portal',
+  description: 'Review apprentice hours and open the canonical sponsor approval workflow.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -60,15 +60,15 @@ export default async function EmployerHoursPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Employer', href: '/employer' }, { label: 'Hours Approval' }]}
+            items={[{ label: 'Employer', href: '/employer' }, { label: 'Hours Review' }]}
           />
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Hours Approval</h1>
-          <p className="text-slate-700 mt-1">Review and approve apprentice training hours</p>
+          <h1 className="text-3xl font-bold text-slate-900">Hours Review</h1>
+          <p className="text-slate-700 mt-1">Review pending ledger records and open canonical sponsor approval</p>
         </div>
 
         {/* Stats */}

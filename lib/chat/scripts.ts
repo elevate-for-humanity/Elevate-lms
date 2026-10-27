@@ -64,7 +64,7 @@ export const ASSISTANT_SCRIPTS: Record<string, AssistantScript> = {
     updated_at: '2025-01-01T00:00:00Z',
 
     greeting:
-      "Hi! 👋 I'm your Elevate assistant. I can help you find free career training programs, check your funding eligibility, or answer questions about our services. How can I help you today?",
+      "Hi! 👋 I'm your Elevate assistant. I can help you find career training programs, understand program-specific funding and payment options, or answer questions about our services. How can I help you today?",
 
     role: 'Career Training Assistant',
     purpose:
@@ -105,13 +105,14 @@ Would you like more details about any of these programs?`,
 
 You can also check your eligibility online at /wioa-eligibility`,
 
-      funding_info: `We offer several funding options:
+      funding_info: `Funding and payment options vary by program.
 
-**WIOA Funding** - 100% free training for eligible individuals
-**JRI Programs** - For justice-involved individuals
-**Self-Pay** - Payment plans available
+**WIOA / WorkOne** - Only for programs with verified program-level eligibility and written agency authorization
+**Workforce Ready Grant** - Program-specific and subject to agency eligibility and authorization
+**Other support** - Employer sponsorship, scholarships, or community resources only where separately documented
+**Self-Pay** - Published tuition and payment options apply
 
-Would you like to check if you qualify for free training?`,
+Would you like to review the funding disclosure for a specific program?`,
 
       application_help: `Starting your application is easy:
 

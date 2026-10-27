@@ -12,6 +12,7 @@ type Message = { role: 'user' | 'assistant'; content: string };
 type Props = {
   initialAgent?: CommercialAgentId;
   title?: string;
+  unified?: boolean;
 };
 
 const AGENT_IMAGES: Record<CommercialAgentId, string> = {
@@ -28,7 +29,7 @@ const AGENT_VOICES: Record<CommercialAgentId, string> = {
   zora: 'nova',
 };
 
-export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI Business Team' }: Props) {
+export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI Business Team', unified = false }: Props) {
   const [agentId, setAgentId] = useState<CommercialAgentId>(initialAgent);
   const [messages, setMessages] = useState<Record<CommercialAgentId, Message[]>>({ paris: [], ellie: [], lizzy: [], zora: [] });
   const [input, setInput] = useState('');
@@ -40,7 +41,10 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
   const naturalVoice = useNaturalVoice();
 
   const agent = COMMERCIAL_AI_AGENTS[agentId];
-  const currentMessages = messages[agentId];
+  const conversationKey = unified ? 'paris' : agentId;
+  const currentMessages = messages[conversationKey];
+  const displayName = unified ? 'PARIS' : agent.name;
+  const description = unified ? 'One AI combining admissions, learning support, operations, and compliance.' : agent.description;
   const canVoice = useMemo(() => typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition), []);
 
   const speakText = (text: string) => {
@@ -56,7 +60,7 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
     const message = (override ?? input).trim();
     if (!message || busy) return;
     const history = [...currentMessages, { role: 'user' as const, content: message }];
-    setMessages((current) => ({ ...current, [agentId]: history }));
+    setMessages((current) => ({ ...current, [conversationKey]: history }));
     setInput('');
     setError('');
     setUpgradeUrl('');
@@ -66,15 +70,15 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
       const response = await fetch('/api/platform/agent-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ agent: agentId, message, history: currentMessages }),
+        body: JSON.stringify({ agent: agentId, unified, message, history: currentMessages }),
       });
       const data = await response.json();
       if (!response.ok) {
         setUpgradeUrl(data.upgradeUrl || 'https://www.elevateforhumanity.org/store');
-        throw new Error(data.error || `${agent.name} is unavailable`);
+        throw new Error(data.error || `${displayName} is unavailable`);
       }
       const assistantMessage: Message = { role: 'assistant', content: data.response || 'No response returned.' };
-      setMessages((current) => ({ ...current, [agentId]: [...history, assistantMessage] }));
+      setMessages((current) => ({ ...current, [conversationKey]: [...history, assistantMessage] }));
       speakText(assistantMessage.content);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Assistant request failed');
@@ -108,9 +112,9 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
       <div className="border-b border-slate-200 p-6 md:p-8">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">AI Team</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">{unified ? 'PARIS' : 'AI Team'}</p>
             <h1 className="mt-2 text-3xl font-black text-slate-950">{title}</h1>
-            <p className="mt-2 max-w-2xl font-medium text-slate-700">Choose a specialist. Each assistant has a different business role and is unlocked through your subscription or add-ons.</p>
+            <p className="mt-2 max-w-2xl font-medium text-slate-700">{unified ? 'Talk to PARIS in one conversation. Learning, operations, admissions, and compliance capabilities work together within your authorized access.' : 'Choose a specialist. Each assistant has a different business role and is unlocked through your subscription or add-ons.'}</p>
           </div>
           <button type="button" onClick={() => { setSpokenReplies((value) => !value); naturalVoice.stop(); }} className="inline-flex items-center gap-2 rounded-xl border border-slate-400 px-4 py-2 text-sm font-bold text-slate-800">
             {spokenReplies ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -118,7 +122,7 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
           </button>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {!unified && <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Object.values(COMMERCIAL_AI_AGENTS).map((item) => (
             <button
               key={item.id}
@@ -135,18 +139,18 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
               </div>
             </button>
           ))}
-        </div>
+        </div>}
       </div>
 
       <div className="p-6 md:p-8">
         <div className="mb-5 overflow-hidden rounded-2xl bg-slate-950 text-white">
           <div className="grid sm:grid-cols-[180px_1fr]">
             <div className="relative min-h-40 sm:min-h-full">
-              <Image src={AGENT_IMAGES[agentId]} alt={`${agent.name} assistant`} fill sizes="180px" className="object-cover" />
+              <Image src={AGENT_IMAGES[agentId]} alt={`${displayName} assistant`} fill sizes="180px" className="object-cover" />
             </div>
             <div className="p-5">
-              <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-cyan-300" /><h2 className="font-black text-white">{agent.name}</h2></div>
-              <p className="mt-2 text-sm font-medium text-slate-100">{agent.description}</p>
+              <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-cyan-300" /><h2 className="font-black text-white">{displayName}</h2></div>
+              <p className="mt-2 text-sm font-medium text-slate-100">{description}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {agent.starterPrompts.map((prompt) => (
                   <button key={prompt} type="button" onClick={() => send(prompt)} className="rounded-full bg-white/15 px-3 py-2 text-xs font-bold text-white hover:bg-white/25">{prompt}</button>
@@ -157,13 +161,13 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
         </div>
 
         <div className="min-h-[260px] space-y-3 rounded-2xl border border-slate-300 bg-slate-50 p-4">
-          {!currentMessages.length && <p className="py-16 text-center text-sm font-medium text-slate-700">Ask {agent.name} a question or choose one of the guided prompts above.</p>}
+          {!currentMessages.length && <p className="py-16 text-center text-sm font-medium text-slate-700">Ask {displayName} a question or choose one of the guided prompts above.</p>}
           {currentMessages.map((message, index) => (
             <div key={`${message.role}-${index}`} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm font-medium leading-6 ${message.role === 'user' ? 'bg-slate-950 text-white' : 'border border-slate-300 bg-white text-slate-900'}`}>{message.content}</div>
             </div>
           ))}
-          {busy && <div className="text-sm font-semibold text-slate-700">{agent.name} is working…</div>}
+          {busy && <div className="text-sm font-semibold text-slate-700">{displayName} is working…</div>}
         </div>
 
         {error && (
@@ -176,7 +180,7 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
 
         <div className="mt-4 flex gap-2">
           <button type="button" onClick={startVoice} className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-xl border border-slate-400 bg-white" aria-label="Speak"><Mic className="h-5 w-5" /></button>
-          <textarea value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder={`Ask ${agent.name}…`} className="min-h-12 flex-1 resize-none rounded-xl border border-slate-400 px-4 py-3 font-medium text-slate-950 outline-none placeholder:text-slate-600 focus:border-slate-600" />
+          <textarea value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder={`Ask ${displayName}…`} className="min-h-12 flex-1 resize-none rounded-xl border border-slate-400 px-4 py-3 font-medium text-slate-950 outline-none placeholder:text-slate-600 focus:border-slate-600" />
           <button type="button" onClick={() => send()} disabled={busy || !input.trim()} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 font-black text-white disabled:opacity-50"><Send className="h-4 w-4" /><span className="hidden sm:inline">Send</span></button>
         </div>
       </div>

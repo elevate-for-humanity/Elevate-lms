@@ -99,19 +99,14 @@ export function isRegisteredProgramSlug(programSlug: string | null | undefined) 
   return Boolean(programSlug && findStandard(programSlug));
 }
 
-export function listRegisteredProgramStandards() {
-  return Object.entries(APPENDIX_A_STANDARDS).map(([standardKey, standard]) => ({
-    sponsor: APPENDIX_A_REGISTRATION,
-    standardKey: standardKey as RegisteredProgramKey,
-    canonicalProgramSlug: standard.programSlugs[0],
-    standard,
-    completion: {
-      basis: 'competency' as const,
-      competencyCount: standard.competencyCount,
-      requiredRtiHours: standard.relatedInstructionHours,
-      fixedOjlCompletionHours: null,
-    },
-  }));
+export function getRegisteredProgramStandardByProfileId(profileId: string) {
+  const normalized = profileId.toLowerCase();
+  const entry = Object.entries(APPENDIX_A_STANDARDS).find(
+    ([standardKey, standard]) =>
+      normalized.includes(standard.rapidsCode.toLowerCase()) ||
+      normalized.includes(`:${standardKey.toLowerCase()}:`),
+  );
+  return entry ? getRegisteredProgramStandard(entry[1].programSlugs[0]) : null;
 }
 
 async function resolvePartnerId(

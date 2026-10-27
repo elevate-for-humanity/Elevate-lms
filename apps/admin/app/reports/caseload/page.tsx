@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { excludeQaProfiles } from '@/lib/admin/operational-profile-query';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -16,43 +17,50 @@ export default async function CaseloadReportsPage() {
   const db = await requireAdminClient();
 
   // Total active caseload = active program enrollments
-  const { count: totalCaseload } = await db
+  const { count: totalCaseload, error: caseloadError } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Staff members = profiles with role staff, admin, admin, instructor
-  const { count: staffCount } = await db
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .in('role', ['staff', 'admin', 'instructor']);
+  const { count: staffCount, error: staffError } = await excludeQaProfiles(
+    db
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .in('role', ['staff', 'admin', 'instructor']),
+  );
 
-  const avgPerStaff = staffCount && staffCount > 0
-    ? Math.round((totalCaseload || 0) / staffCount)
-    : 0;
+  const avgPerStaff =
+    caseloadError || staffError || totalCaseload == null || staffCount == null
+      ? 'Unavailable'
+      : staffCount > 0
+        ? Math.round((totalCaseload || 0) / staffCount)
+        : 0;
 
   // Per-staff breakdown: enrollments assigned via program_enrollments.assigned_staff_id if it exists,
   // otherwise show staff list with enrollment counts by program
-  const { data: staffMembers } = await db
-    .from('profiles')
-    .select('id, full_name, email, role')
-    .in('role', ['staff', 'admin', 'instructor'])
-    .order('full_name');
+  const { data: staffMembers, error: membersError } = await excludeQaProfiles(
+    db
+      .from('profiles')
+      .select('id, full_name, email, role')
+      .in('role', ['staff', 'admin', 'instructor'])
+      .order('full_name'),
+  );
 
   // Count active enrollments per staff member via assigned_staff_id (if column exists)
   const staffWithCounts = await Promise.all(
     (staffMembers || []).map(async (s: any) => {
-      const { count } = await db
+      const { count, error } = await db
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('assigned_staff_id', s.id)
         .eq('status', 'active');
-      return { ...s, caseload: count || 0 };
-    })
+      return { ...s, caseload: error ? null : count };
+    }),
   );
 
   // Sort by caseload desc
-  staffWithCounts.sort((a, b) => b.caseload - a.caseload);
+  staffWithCounts.sort((a, b) => (b.caseload ?? -1) - (a.caseload ?? -1));
 
   return (
     <div className="min-h-screen bg-white">
@@ -60,9 +68,17 @@ export default async function CaseloadReportsPage() {
         <div className="mb-8">
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li><Link href="/" className="hover:text-primary">Admin</Link></li>
+              <li>
+                <Link href="/" className="hover:text-primary">
+                  Admin
+                </Link>
+              </li>
               <li>/</li>
-              <li><Link href="/reports" className="hover:text-primary">Reports</Link></li>
+              <li>
+                <Link href="/reports" className="hover:text-primary">
+                  Reports
+                </Link>
+              </li>
               <li>/</li>
               <li className="text-slate-900 font-medium">Caseload</li>
             </ol>
@@ -78,7 +94,9 @@ export default async function CaseloadReportsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-sm font-medium text-slate-700">Total Active Caseload</h3>
-            <p className="text-3xl font-bold text-slate-900 mt-2">{totalCaseload ?? 0}</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">
+              {caseloadError ? 'Unavailable' : (totalCaseload ?? 'Unavailable')}
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-sm font-medium text-slate-700">Avg per Staff</h3>
@@ -86,7 +104,9 @@ export default async function CaseloadReportsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-sm font-medium text-slate-700">Staff Members</h3>
-            <p className="text-3xl font-bold text-brand-green-600 mt-2">{staffCount ?? 0}</p>
+            <p className="text-3xl font-bold text-brand-green-600 mt-2">
+              {staffError ? 'Unavailable' : (staffCount ?? 'Unavailable')}
+            </p>
           </div>
         </div>
 
@@ -110,13 +130,17 @@ export default async function CaseloadReportsPage() {
                     <td className="px-4 py-3 font-medium text-slate-900">{s.full_name || '—'}</td>
                     <td className="px-4 py-3 text-slate-700 capitalize">{s.role}</td>
                     <td className="px-4 py-3 text-slate-700">{s.email}</td>
-                    <td className="px-4 py-3 text-right font-semibold">{s.caseload}</td>
+                    <td className="px-4 py-3 text-right font-semibold">
+                      {s.caseload ?? 'Unavailable'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <p className="p-8 text-center text-slate-700">No staff members found.</p>
+            <p className="p-8 text-center text-slate-700">
+              {membersError ? 'Staff records are unavailable.' : 'No staff members found.'}
+            </p>
           )}
         </div>
       </div>

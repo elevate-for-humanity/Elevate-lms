@@ -7,6 +7,8 @@
  * available for direct inspection; users do not choose one before asking.
  */
 
+import { affirmativeActionText, prohibitsToolUse } from '@/lib/ai/command-intent';
+
 export type EllieMessageRoute = 'command' | 'ops' | 'platform';
 export type StudioSpecialist = 'ELLIE' | 'LIZZY' | 'PARIS' | 'ZORA';
 
@@ -57,6 +59,8 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
  * evidence-producing operational checks enter plan â execute â evaluate.
  */
 export function shouldOrchestrateMessage(message: string): boolean {
+  if (prohibitsToolUse(message)) return false;
+  message = affirmativeActionText(message);
   if (OUTCOME_REQUEST_RE.test(message) || DETERMINISTIC_COMMAND_RE.test(message)) return true;
   if (EXECUTION_VERB_RE.test(message)) return true;
   return VERIFIED_OPERATION_RE.test(message) && EXECUTABLE_TARGET_RE.test(message);
@@ -66,10 +70,10 @@ export function shouldOrchestrateMessage(message: string): boolean {
  * specialist from intent while the durable plan may hand work to every agent.
  * Users never need to choose a persona or move between separate products. */
 export function selectStudioAgent(_message: string): StudioSpecialist {
-  // LIZZY is the single user-facing coordinator. Specialist capabilities are
+  // PARIS is the single user-facing coordinator. Specialist capabilities are
   // assigned inside the durable plan instead of making the conversation jump
   // personas as the user moves between course, compliance, and website work.
-  return 'LIZZY';
+  return 'PARIS';
 }
 
 export const ELLIE_ROUTE_LABEL: Record<EllieMessageRoute, string> = {

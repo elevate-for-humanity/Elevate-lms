@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,7 +17,7 @@ export default function LicensesPage() {
     <div className="min-h-screen bg-white">
       {/* Hero - Clean, no overlay */}
       <section className="relative h-[40vh] min-h-[300px]">
-        <Image sizes="100vw"
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} sizes="100vw"
           src="/images/pages/employer-hero.webp"
           alt="Platform Licensing"
           fill

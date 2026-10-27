@@ -1,3 +1,4 @@
+import { consumeStudioChatStream } from '@/lib/devstudio/chat-stream';
 import {
   ELLIE_ROUTE_LABEL,
   routeEllieMessage,
@@ -106,7 +107,10 @@ export async function fetchAiHealth(): Promise<{
   providers: Record<string, boolean>;
 }> {
   try {
-    const res = await fetch('/api/admin/dev-studio/health');
+    const res = await fetch('/api/admin/dev-studio/health', {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
+    });
     const data = await res.json().catch(() => ({}));
     const providers = {
       elevate: Boolean(data.hasElevate || data.availableProviders?.elevate),
@@ -117,19 +121,9 @@ export async function fetchAiHealth(): Promise<{
       anthropic: Boolean(data.hasAnthropic),
       gemini: Boolean(data.hasGemini),
     };
-    const ok = res.ok && Boolean(data.aiConfigured);
-    const label = [
-      providers.elevate && 'Elevate AI',
-      providers.cloudflare && 'Cloudflare AI',
-      providers.xai && 'Grok / xAI',
-      providers.groq && 'Groq',
-      providers.openai && 'OpenAI',
-      providers.anthropic && 'Claude',
-      providers.gemini && 'Gemini',
-    ]
-      .filter(Boolean)
-      .join(' / ');
-    return { ok, label: label || 'no keys', providers };
+    const ok = res.ok && providers.elevate;
+    const label = ok ? 'Private model verified reachable' : 'Private model unavailable';
+    return { ok, label, providers };
   } catch {
     return { ok: false, label: 'offline', providers: {} };
   }
@@ -161,6 +155,7 @@ export async function streamPlatformChat(
   messages: { role: string; content: string }[],
   opts: {
     agent?: 'ADMIN_AI';
+    conversationId?: string;
     fileContext?: string;
     documentsContext?: string;
     provider?: string;
@@ -180,6 +175,7 @@ export async function streamPlatformChat(
     body: JSON.stringify({
       messages,
       agent: opts.agent,
+      conversationId: opts.conversationId,
       fileContext: opts.fileContext,
       documentsContext: opts.documentsContext,
       provider: opts.provider,
@@ -190,45 +186,24 @@ export async function streamPlatformChat(
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error ?? `HTTP ${res.status}`);
   }
-  const reader = res.body?.getReader();
-  if (!reader) {
-    const data = await res.json();
-    opts.onToken(data.message ?? data.reply ?? '');
-    opts.onDone({ toolCalls: data.toolCalls, provider: data.provider, model: data.model });
-    return;
+  if (!res.body || !res.headers.get('content-type')?.includes('text/event-stream')) {
+    throw new Error('Studio did not return an event stream');
   }
-  const decoder = new TextDecoder();
-  let buffer = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n\n');
-    buffer = lines.pop() ?? '';
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue;
-      try {
-        const chunk = JSON.parse(line.slice(6));
-        if (chunk.token !== undefined) opts.onToken(chunk.token);
-        if (chunk.done) {
-          opts.onDone({
-            toolCalls: chunk.toolCalls,
-            provider: chunk.provider,
-            model: chunk.model,
-            capabilitiesUsed: chunk.capabilitiesUsed,
-          });
-        }
-      } catch {
-        /* skip */
-      }
-    }
-  }
+  await consumeStudioChatStream(res.body, (chunk) => {
+    if (chunk.token !== undefined) opts.onToken(chunk.token);
+    if (chunk.done === true) opts.onDone({
+      toolCalls: chunk.toolCalls,
+      provider: chunk.provider,
+      model: chunk.model,
+      capabilitiesUsed: chunk.capabilitiesUsed,
+    });
+  });
 }
 
 export async function streamExecuteCommand(
   command: string,
   onLine: (text: string) => void,
-  agent: StudioSpecialist = 'LIZZY',
+  agent: StudioSpecialist = 'PARIS',
 ): Promise<void> {
   const isSmoke = /smoke.?test|health.?check|check.*platform/i.test(command);
   const res = await fetch(

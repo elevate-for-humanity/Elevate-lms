@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 import { useTimeclock } from '@/lib/timeclock/useTimeclock';
 
 interface StudentTimeclockCardProps {
@@ -197,6 +198,8 @@ export function StudentTimeclockCard({
           </div>
         </div>
       )}
+
+      <TimeclockAttendanceNotice />
 
       {/* Action Buttons */}
       <div className="space-y-3">

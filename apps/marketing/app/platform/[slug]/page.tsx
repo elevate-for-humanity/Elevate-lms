@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 type Props = { params: Promise<{ slug: string }> };
 
 const CHECKOUT_ERROR_MESSAGES: Record<string, string> = {
-  'payment-unavailable': `Checkout is temporarily unavailable. Please try again later or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+  'payment-unavailable': `Checkout is temporarily unavailable. Please try again later or call ${PLATFORM_DEFAULTS.mainPhone}.`,
   'checkout-failed':     'We could not start your checkout session. Please try again.',
   'invalid-product':     'This product is not available for purchase. Please contact support.',
   'rate-limited':        'Too many requests. Please wait a moment and try again.',
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getCatalogProduct(slug).catch(() => null);
   if (!product) return { title: 'Product Not Found' };
   return {
-    title: product.name,
+    title: `${product.name} | Elevate For Humanity`,
     description: product.description,
     alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}/platform/${product.slug}` },
   };

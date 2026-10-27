@@ -1,5 +1,5 @@
 const HOST_SHOP_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin']);
-const PROGRAM_HOLDER_ROLES = new Set(['program_holder', 'programholder']);
+const PROGRAM_HOLDER_ROLES = new Set(['program_holder', 'programholder', 'site_coordinator']);
 const APPRENTICE_ROLES = new Set(['apprentice', 'barber_apprentice', 'cosmetology_apprentice']);
 
 export function portalPreviewDestination(role: unknown) {

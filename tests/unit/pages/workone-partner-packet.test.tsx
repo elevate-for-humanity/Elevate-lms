@@ -20,8 +20,8 @@ describe('WorkOnePartnerPacketPage', () => {
     render(<WorkOnePartnerPacketPage />);
     expect(screen.getByRole('heading', { name: 'Verified workforce-funded program records' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'CDL Training' })).toBeInTheDocument();
-    expect(screen.getByText('Indiana ETPL')).toBeInTheDocument();
-    expect(screen.getByText('Workforce Ready Grant')).toBeInTheDocument();
+    expect(screen.getAllByText('Indiana ETPL').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Workforce Ready Grant').length).toBeGreaterThan(0);
     expect(screen.queryByText('WIOA Title I (Adult)')).not.toBeInTheDocument();
   });
 

@@ -5,7 +5,7 @@ export default function EmployersLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <HeroPicture
-        src="/images/pages/business-meeting.webp"
+        src="/images/business-collaboration-vibrant-2026.webp"
         alt="Employer partnership and workforce planning meeting"
         microLabel="For Employers"
         analyticsName="employers"

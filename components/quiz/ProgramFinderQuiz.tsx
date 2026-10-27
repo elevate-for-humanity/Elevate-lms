@@ -108,9 +108,9 @@ const steps: QuizStep[] = [
     options: [
       {
         id: 'free',
-        label: 'Yes — I need free training',
+        label: 'Yes — I need help with training costs',
         icon: <DollarSign className="w-6 h-6" />,
-        description: 'WIOA, WRG, and JRI cover everything',
+        description: 'Funding varies by program and requires agency authorization',
       },
       {
         id: 'self',
@@ -241,8 +241,8 @@ const programResults: Record<string, ProgramResult[]> = {
   ],
   safety: [
     {
-      title: 'CPR & First Aid',
-      description: 'Same-day CPR, AED, and First Aid training through an approved credential provider.',
+      title: 'CPR & First Aid (HSI)',
+      description: 'Same-day certification. American Heart Association equivalent through HSI.',
       href: '/programs/cpr-first-aid',
       duration: '1 day',
       salary: 'Required for many jobs',

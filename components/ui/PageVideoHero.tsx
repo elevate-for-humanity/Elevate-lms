@@ -21,10 +21,10 @@ export interface PageVideoHeroProps {
 }
 
 const HEIGHT_BY_SIZE: Record<HeroSize, string> = {
-  compact: 'h-[clamp(460px,64svh,700px)]',
-  marketing: 'h-[clamp(500px,72svh,820px)]',
-  primary: 'h-[clamp(500px,72svh,820px)]',
-  full: 'h-[clamp(540px,78svh,900px)]',
+  compact: 'h-[clamp(260px,42svh,480px)]',
+  marketing: 'h-[clamp(260px,42svh,480px)]',
+  primary: 'h-[clamp(260px,42svh,480px)]',
+  full: 'h-[clamp(260px,42svh,480px)]',
 };
 
 export default function PageVideoHero({

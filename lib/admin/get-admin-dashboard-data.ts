@@ -379,7 +379,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     .map(([name, value]) => ({ name: name.replaceAll('_', ' '), value }))
     .sort((a, b) => b.value - a.value);
 
-  const programCounts = activeEnrollments.reduce<
+  const programCounts = enrollments.filter((row: any) => !row.revoked_at).reduce<
     Record<string, { learners: number; completed: number; slug: string }>
   >((acc, row: any) => {
     const id = row.program_id || row.program_slug || 'unassigned';

@@ -6,6 +6,7 @@ import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watc
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
 import { createHash } from 'node:crypto';
+import { describeWorkerError } from '../core/worker-error.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /** Private, reusable photographs tied to exact spoken teaching points.
@@ -36,6 +37,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
     for (const [index, step] of requests.entries()) {
+     try {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
         try {
@@ -165,6 +167,11 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'google-generated'}))
         throw new Error('COURSE_PHOTO_ALREADY_USED');
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+     } catch (error) {
+       const detail = describeWorkerError(error);
+       const code = detail.match(/^[A-Z][A-Z0-9_]+(?=:|$)/)?.[0] ?? 'TEACHING_PHOTO_PREPARATION_FAILED';
+       throw new Error(code+':scene='+scene.id+':cue='+index+':'+detail, {cause:error});
+     }
     }
     if(new Set(photos[scene.id].map(p=>p.sha256)).size<2) throw new Error('TEACHING_PHOTOS_MUST_BE_DISTINCT');
   }

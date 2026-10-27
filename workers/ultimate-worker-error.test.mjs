@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+import {stripTypeScriptTypes} from 'node:module';
 import {describeWorkerError} from '../lib/ultimate-course-builder/core/worker-error.mjs';
 test('provider errors retain hidden messages across realms',()=>{
  const error=vm.runInNewContext('new Error("render provider timeout")');
@@ -15,4 +17,25 @@ test('empty and circular errors remain diagnosable',()=>{
  assert.notEqual(describeWorkerError({}),'{}');
  const error={};error.cause=error;
  assert.match(describeWorkerError(error),/CIRCULAR_WORKER_ERROR/);
+});
+test('Supabase storage errors retain the nested HTTP failure behind an empty JSON message',()=>{
+ const error = vm.runInNewContext('Object.assign(new Error("{}"), {originalError:{status:503,statusCode:503}})');
+ assert.match(describeWorkerError(error),/originalError=status=503:statusCode=503/);
+});
+test('photo preparation records the failing scene and cue while retaining licensing error codes',async()=>{
+ const source=stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/adapters/teaching-photos.ts',import.meta.url),'utf8'),{mode:'transform'})
+  .replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
+ for(const licensing of [false,true]) {
+  const original=licensing?new Error('LICENSE_APPROVAL_REQUIRED'):Object.assign(new Error('{}'),{originalError:{status:503}});
+  const prepare=new Function('approvedReferencePhotoPicker','courseProgressSignal','courseSelectedStill','describeWorkerError',source+';return prepareTeachingPhotos;')(
+   async()=>null,()=>null,async()=>{throw original;},describeWorkerError);
+  const q={select(){return this;},eq(){return this;},limit:async()=>({data:[],error:null})};
+  await assert.rejects(prepare({lessonPresentation:'approved-premium-v1',artifacts:{storyboard:{storyboard:{scenes:[{
+   id:'scene-19',recapText:'Fresh recap',teachingVisual:{steps:[{narrationQuote:'Use clean tools'}]},
+  }]}}}},{from:()=>q}),error=>{
+   assert.match(error.message,/scene=scene-19:cue=0/);
+   assert.match(error.message,licensing?/^LICENSE_APPROVAL_REQUIRED:/:/originalError=status=503/);
+   assert.equal(error.cause,original);return true;
+  });
+ }
 });

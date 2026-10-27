@@ -49,6 +49,15 @@ describe('approved teaching slide', () => {
     expect(html).toContain('Check the teeth.');
     expect((html.match(/<audio /g) || []).length).toBe(1);
   });
+  it('keeps photographs still rather than simulating demonstration footage', () => {
+    const host = document.createElement('div');
+    host.innerHTML = renderToStaticMarkup(<PremiumTeachingScene scene={scene} props={props} />);
+    const photo = host.querySelector('img');
+    expect(photo?.style.transform).toBe('');
+    expect(photo?.style.objectFit).toBe('contain');
+    expect(photo?.style.opacity).toBe('1');
+    expect(host.querySelector('video')).toBeNull();
+  });
   it('mutes demo speech and replaces the photo instead of duplicating it', () => {
     const html = renderToStaticMarkup(
       <PremiumTeachingScene

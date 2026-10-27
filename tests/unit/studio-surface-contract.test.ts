@@ -361,7 +361,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
   it('validates GitHub credentials before declaring repository writes ready', () => {
     const health = source('lib/devstudio/health-handler.ts');
-    expect(health).toContain("fetch('https://api.github.com/user'");
+    expect(health).toContain("fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main'");
+    expect(health).toContain("redirect: 'error'");
     expect(health).toContain('repositoryWritesReady: githubTokenValid');
   });
 });

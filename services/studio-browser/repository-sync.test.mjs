@@ -36,3 +36,14 @@ test('sync avoids historical media blobs and preserves tracked and untracked wor
  await assert.rejects(syncWorkspaceRepository({root,repoUrl}));
  assert.equal(await fs.readFile(path.join(root,'notes.txt'),'utf8'),'user draft');assert.equal(await fs.readFile(path.join(root,'untracked.txt'),'utf8'),'keep me');
 });
+test('sync refuses a restored checkout belonging to a different requested repository',async t=>{
+ const base=await fs.mkdtemp(path.join(os.tmpdir(),'studio-origin-'));t.after(()=>fs.rm(base,{recursive:true,force:true}));
+ const root=path.join(base,'workspace'),origin=path.join(base,'origin');await fs.mkdir(origin);
+ git(origin,'init','-b','main');git(origin,'config','user.name','Fixture');git(origin,'config','user.email','fixture@example.test');
+ await fs.writeFile(path.join(origin,'app.txt'),'other project');git(origin,'add','.');git(origin,'commit','-m','initial');
+ await syncWorkspaceRepository({root,repoUrl:pathToFileURL(origin).href});
+ const head=git(root,'rev-parse','HEAD');
+ await assert.rejects(syncWorkspaceRepository({root,repoUrl:pathToFileURL(path.join(base,'intended-repository')).href}),/repository_origin_mismatch/);
+ assert.equal(git(root,'rev-parse','HEAD'),head);
+ assert.equal(await fs.readFile(path.join(root,'app.txt'),'utf8'),'other project');
+});

@@ -49,3 +49,16 @@ test('photo recovery retry window fits within ten-minute output deadline',async(
   assert.ok(worstCase<600000);return {bytes:Buffer.from('saved')};
  }});
 });
+
+test('missing exact photo can recover with one course-related photograph',async()=>{
+ const calls=[];const result=await recoverTeachingPhoto({...request,courseTitle:'Cosmetology',generate:async(prompt,options)=>{
+  calls.push({prompt,options});if(calls.length===1)throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');
+  return {bytes:Buffer.from('related-photo'),mimeType:'image/jpeg'};
+ }});
+ assert.equal(calls.length,2);assert.match(calls[1].prompt,/Cosmetology/);assert.equal(calls[1].options.maxAttempts,1);
+ assert.equal(result.repair.method,'course-related-photo-v1');
+});
+test('provider safety block never invokes course-related generation',async()=>{
+ let calls=0;await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
+ assert.equal(calls,1);
+});

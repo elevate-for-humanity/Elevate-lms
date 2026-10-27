@@ -154,3 +154,11 @@ test('approved PWA extension transfer requires exact allowlist and dialplan',asy
  await assert.rejects(routeApprovedExtension('call-1',{type:'extension',extension:'999'},async()=>assert.fail('must not route'),'123'),/ROUTE_NOT_ALLOWED/);
  await assert.rejects(routeApprovedExtension('call-1',{type:'extension',extension:'123'},async()=>assert.fail('must not route'),''),/ROUTE_NOT_ALLOWED/);
 });
+
+test('a completed caller utterance resets speech detection before listening again',async()=>{
+ const {turn}=await import('./ari-media.mjs');
+ const session={callId:'speech-reset',id:'b'.repeat(24),turn:1,frames:Array(35).fill(Buffer.alloc(160,0xff)),quiet:45,heard:true};
+ let requested=false;
+ await turn(session,{request:async()=>{requested=true;assert.equal(session.heard,false);return {replyAudioUlawBase64:Buffer.alloc(160,0xff).toString('base64')};},play:async()=>{},finish:async()=>{}});
+ assert.equal(requested,true);assert.equal(session.heard,false);assert.equal(session.frames.length,0);assert.equal(session.busy,false);
+});

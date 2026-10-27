@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import {inspectCourseAutopilot} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
 import {monitorCourseQueue} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
+test('waiting role prerequisites do not dispatch or inherit another lesson’s storage failure',()=>{
+ const observation=inspectCourseAutopilot({status:'queued',available_at:'infinity',monitor:{enabled:true},payload:{autopilot:{role:'quality'}}},
+  {status:'running',findings:[{message:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'}]},now.getTime());
+ assert.equal(observation.state,'prerequisite_wait');assert.equal(observation.action,'observe');
+});
 const job=(extra={})=>({id:'job',status:'queued',attempts:1,max_attempts:5,execution_generation:2,monitor:{enabled:true},...extra});
 test('saved pause never attributes an actor and finished revisions have distinct states',()=>{
  const paused=inspectCourseAutopilot(job(),{profile:{ownerPaused:true}},+now);

@@ -7,24 +7,28 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  const headers={apikey:token,Authorization:'Bearer '+token};
  const url=new URL(ROOT);
  url.searchParams.set('select','id,build_id,payload,status,execution_generation,lease_expires_at,last_error,monitor,build:ultimate_course_builds!inner(course_id,status,profile)');
- url.searchParams.set('status','eq.failed');url.searchParams.set('build.course_id','eq.'+COURSE);
+ url.searchParams.set('status','eq.failed');
  const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw Error('REPAIR_RESUME_READ_HTTP_'+response.status);
  const jobs=await response.json();if(!Array.isArray(jobs))throw Error('REPAIR_RESUME_INVENTORY_INVALID');
- const activeUrl=new URL(ROOT);activeUrl.searchParams.set('select','build_id');
+ const activeUrl=new URL(ROOT);activeUrl.searchParams.set('select','build_id,payload,status,available_at,lease_expires_at');
  activeUrl.searchParams.set('status','in.(queued,running)');
  const activeResponse=await request(activeUrl,{headers,signal:AbortSignal.timeout(15000)});
  if(!activeResponse.ok)throw Error('REPAIR_ACTIVE_READ_HTTP_'+activeResponse.status);
  const active=await activeResponse.json();if(!Array.isArray(active))throw Error('REPAIR_ACTIVE_INVENTORY_INVALID');
  const seenBuilds=new Set(active.map(row=>row.build_id));
+ const seenLessons=new Set(active.filter(row=>row.payload?.autopilot && row.available_at!=='infinity')
+  .map(row=>row.build_id+':'+row.payload.autopilot.competencyId));
  // Historical attempts remain evidence. Recover the furthest saved cursor
  // once per build, never an older attempt alongside an active continuation.
  jobs.sort((a,b)=>Number(b.payload?.nextCompetencyIndex??0)-Number(a.payload?.nextCompetencyIndex??0));
  const resumed=[];
  for(const job of jobs){
-  if(!job.build_id||seenBuilds.has(job.build_id))continue;
-  seenBuilds.add(job.build_id);
-  if(job.status!=='failed'||job.build?.course_id!==COURSE||job.build?.profile?.ownerPaused===true||
+  const pool=job.payload?.autopilot?.version==='three-role-v1';
+  const key=job.build_id+':'+job.payload?.autopilot?.competencyId;
+  if(!job.build_id||(pool?seenLessons.has(key):seenBuilds.has(job.build_id)))continue;
+  if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
+  if(job.status!=='failed'||(!pool&&job.build?.course_id!==COURSE)||job.build?.profile?.ownerPaused===true||
    ['published','archived','cancelled'].includes(job.build?.status)||job.monitor?.enabled!==true||
    job.monitor?.lastRepairDeployment?.imageSha===imageSha||
    (job.lease_expires_at && !(Date.parse(job.lease_expires_at)<=now.getTime()))||
@@ -62,7 +66,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('VERIFIED_REPAIR_IMAGE_REQUIRED');
  const image='us-central1-docker.pkg.dev/'+PROJECT+'/elevate/ultimate-worker';
  const digest=google(['artifacts','docker','images','describe',image+':'+sha,'--project='+PROJECT,'--format=value(image_summary.digest)']).trim();
- for(const [name,region]of [['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1']]){
+ for(const [name,region]of [['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1'],
+  ['elevate-course-instruction','us-east1'],['elevate-course-media','us-east1'],['elevate-course-quality','us-east1']]){
   const job=JSON.parse(google(['run','jobs','describe',name,'--project='+PROJECT,'--region='+region,'--format=json']));
   if(job.spec?.template?.spec?.template?.spec?.containers?.[0]?.image!==image+'@'+digest)throw Error('REPAIR_IMAGE_READBACK_MISMATCH');
  }

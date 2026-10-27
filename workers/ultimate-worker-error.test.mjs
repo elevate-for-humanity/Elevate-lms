@@ -22,6 +22,10 @@ test('Supabase storage errors retain the nested HTTP failure behind an empty JSO
  const error = vm.runInNewContext('Object.assign(new Error("{}"), {originalError:{status:503,statusCode:503}})');
  assert.match(describeWorkerError(error),/originalError=status=503:statusCode=503/);
 });
+test('the original HTTP Response retains its status text without serializing headers',()=>{
+ const detail=describeWorkerError({originalError:new Response('',{status:503,statusText:'Service Unavailable',headers:{Authorization:'private-fixture'}})});
+ assert.match(detail,/status=503:statusText=Service Unavailable/);assert.doesNotMatch(detail,/private-fixture|Authorization/);
+});
 test('photo preparation records the failing scene and cue while retaining licensing error codes',async()=>{
  const source=stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/adapters/teaching-photos.ts',import.meta.url),'utf8'),{mode:'transform'})
   .replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');

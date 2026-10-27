@@ -17,6 +17,7 @@ import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
 /** Called only by the course coordinator after its prior lesson was published
  * and its old lease yielded. One immutable profile feeds every role. */
 export async function coordinateLessonAutopilots({db,job,workerId,generation,build,assertActive}:any) {
+  if (build.profile?.ownerPaused === true) throw Error('OWNER_PAUSED_REFERENCE_BUILD');
   const existing = await db.from('ultimate_autopilot_pools').select('id,state').eq('build_id',build.id).maybeSingle();
   if (existing.error) throw existing.error;
   if (existing.data?.state === 'finalizing') return null;

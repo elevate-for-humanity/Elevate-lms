@@ -87,3 +87,16 @@ test('inactive checkpoints can leave the memory cache without losing durable his
  for(let i=0;i<5;i++){const session=await m.create('owner');ids.push(session.id);await m.stop('owner',session.id);await until(()=>m.get('owner',session.id),s=>!s.shell);await m.flush(await m.get('owner',session.id));}
  assert.ok(m.sessions.size<=2);assert.equal((await m.output('owner',ids[0])).state,'closed');
 });
+
+test('closing a terminal while resume awaits persistence cannot launch a replacement shell',async t=>{
+ const f=await fixture(t),m=f.manager(),session=await m.create('owner');await m.shutdown();
+ let spawned=0;const recovered=f.manager({spawnShell:()=>{spawned++;throw Error('closed terminal must not spawn');}});
+ const s=await recovered.get('owner',session.id),flush=recovered.flush.bind(recovered);
+ let release,entered;const ready=new Promise(resolve=>{entered=resolve;});
+ recovered.flush=async current=>{if(current.state==='starting'){entered();await new Promise(resolve=>{release=resolve;});}return flush(current);};
+ const resumed=recovered.resume('owner',session.id);await ready;
+ await recovered.stop('owner',session.id);release();
+ await assert.rejects(resumed,/terminal_session_closed/);
+ assert.equal(spawned,0);assert.equal(s.state,'closed');
+ assert.equal((await f.manager().output('owner',session.id)).state,'closed');
+});

@@ -177,7 +177,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:
-      group: google-course-runtime-operations
+      group: google-course-worker-release
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

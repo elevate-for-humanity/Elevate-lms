@@ -64,12 +64,12 @@ test('queue outage fails closed rather than launching blind work',async()=>{
   assert.equal(s.calls.length,1);
 });
 
-test('container launch without a durable claim fails instead of reporting started',async()=>{
+test('slow container startup remains pending instead of failing or reporting assigned',async()=>{
   const s=setup([], [{id:'queued'}]);
   s.options.request=async()=>({ok:true,status:200,json:async()=>[{id:'queued',status:'queued',heartbeat_at:null}]});
   s.options.assignmentAttempts=2;
   s.options.delay=async()=>{};
-  await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
+  assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
   assert.equal(s.calls.length,3);
 });
 
@@ -151,7 +151,7 @@ test('a fresh heartbeat with an expired lease is not a confirmed assignment',asy
  s.options.request=async url=>({ok:true,json:async()=>url.searchParams.has('id')
   ? [{id:'queued',status:'running',lease_owner:'old-worker',heartbeat_at:'2026-10-06T10:00:01Z',lease_expires_at:'2026-10-06T09:59:00Z'}]
   : [{id:'queued'}]});
- await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
+ assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
 });
 
 
@@ -221,10 +221,10 @@ for(const graphExists of [true,false])test('a fast parked pool coordinator requi
   return base(url);
  };
  if(graphExists)assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');
- else await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
+ else assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
 });
 for(const generation of [4,undefined])test('a stale or missing generation cannot impersonate a fast completed claim: '+generation,async()=>{
  const s=setup([],[{id:'queued',execution_generation:4}]);const base=s.options.request;s.options.assignmentAttempts=1;
  s.options.request=async url=>url.searchParams.has('id')?{ok:true,json:async()=>[{id:'queued',status:'completed',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:generation}]}:base(url);
- await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
+ assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
 });

@@ -123,7 +123,9 @@ test('a leased worker with no eligible successor keeps coordination alive',async
 
 for(const control of ['noClaim','unrelatedHistory','alienOwner'])test('launch needs its own live durable claim: '+control,async()=>{
  const s=fixture([waiting('instruction')]);s.controls[control]=true;
- await assert.rejects(dispatchLessonAutopilots(s.options),/ASSIGNMENT_TIMEOUT/);
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.status,'busy');assert.equal(result.reason,'awaiting_worker_assignment');
+ assert.equal(result.unconfirmedExecutions,1);assert.equal(result.assignments.length,0);
 });
 
 test('quick cached completion is proved by this execution claim history and new generation',async()=>{
@@ -134,7 +136,9 @@ test('quick cached completion is proved by this execution claim history and new 
 
 test('stale generation and unavailable claim history cannot prove assignment',async()=>{
  const s=fixture([waiting('instruction')]);s.controls.generationAdvance=0;
- await assert.rejects(dispatchLessonAutopilots(s.options),/ASSIGNMENT_TIMEOUT/);
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.status,'busy');assert.equal(result.reason,'awaiting_worker_assignment');
+ assert.equal(result.unconfirmedExecutions,1);assert.equal(result.assignments.length,0);
  const unavailable=fixture([waiting('instruction')]);unavailable.controls.historyUnavailable=true;
  await assert.rejects(dispatchLessonAutopilots(unavailable.options),/CLAIM_HISTORY_HTTP_503/);
 });
@@ -173,3 +177,13 @@ test('capacity and immutable-image checks remain mandatory for every worker',asy
  const result=await dispatchLessonAutopilots(s.options);
  assert.deepEqual(result.assignments.map(a=>a.jobId),['ready']);
  });
+
+test('slow startup returns immediately and rechecks never launch duplicate workers',async()=>{
+ const s=fixture([waiting('media')]);s.controls.noClaim=true;
+ delete s.options.assignmentAttempts;
+ s.options.delay=async()=>{throw Error('startup must not hold the coordinator for five minutes');};
+ const first=await dispatchLessonAutopilots(s.options);
+ assert.equal(first.reason,'awaiting_worker_assignment');assert.equal(first.assignments.length,0);
+ const next=await dispatchLessonAutopilots(s.options);
+ assert.equal(next.status,'busy');assert.equal(launches(s).length,1);
+});

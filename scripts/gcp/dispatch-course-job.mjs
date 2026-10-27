@@ -2,7 +2,7 @@ import { google } from './runtime-config.mjs';
 import { inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 
-export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60, clock = () => Date.now()} = {}) {
+export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 1, clock = () => Date.now()} = {}) {
   const scope = ['--project=elegant-racer-299721', '--region=us-central1'];
   // An active Cloud Run execution must not block unrelated queued builds.
   // Atomic database leases prevent two tasks from claiming the same job.
@@ -133,7 +133,10 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
     if (!pending.size) return {status:'assigned',tasks,jobIds:queued.slice(0,tasks).map(item=>item.id)};
     if (attempt + 1 < assignmentAttempts) await delay(5000);
   }
-  throw new Error('COURSE_WORKER_ASSIGNMENT_TIMEOUT:' + [...pending.keys()].join(','));
+  // Let the coordinator observe slow startup without failing or calling it assigned.
+  // Active Cloud Run inventory prevents a duplicate launch on the next pass.
+  return {status:'busy',reason:'awaiting_worker_assignment',
+    activeExecutions:active.length+1,unconfirmedTasks:pending.size,jobIds:[...pending.keys()]};
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

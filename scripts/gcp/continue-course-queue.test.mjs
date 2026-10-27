@@ -88,3 +88,12 @@ test('a release requests the serialized dispatcher instead of racing its capacit
  assert.match(deploy,/gh api --method POST .*actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
  assert.match(dispatcher,/group: google-course-runtime-operations\n\s+cancel-in-progress: false/);
 });
+
+test('startup pending beyond five minutes keeps coordination alive and can later finish',async()=>{
+ let clock=0,calls=0;
+ const result=await continueCourseQueue({dispatch:async()=>{
+  calls++;return clock<360000?{status:'busy',reason:'awaiting_worker_assignment',activeExecutions:1}:
+   calls===13?{status:'assigned'}:{status:'empty'};
+ },now:()=>clock,delay:async ms=>{clock+=ms;},onState:()=>{}});
+ assert.equal(result.status,'empty');assert.equal(calls,14);assert.ok(clock>300000);
+});

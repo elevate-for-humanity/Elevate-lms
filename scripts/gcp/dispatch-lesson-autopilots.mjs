@@ -35,7 +35,7 @@ function reserveCapacity(capacity,task,reserved){
 /** All callers share the runtime-operation lane. Claims and prerequisites are
  * rechecked by Postgres; launch/readback is not counted as a completed lesson. */
 export async function dispatchLessonAutopilots({run=google,request=fetch,env=process.env,now=new Date(),
- delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),assignmentAttempts=60,capacityCheck=inspectRegionalCapacity,clock=Date.now}={}){
+ delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),assignmentAttempts=1,capacityCheck=inspectRegionalCapacity,clock=Date.now}={}){
  const token=env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
  const headers={apikey:token,Authorization:'Bearer '+token};
  const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
@@ -141,7 +141,10 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   }
   if(pending.size&&attempt+1<assignmentAttempts)await delay(5000);
  }
- if(pending.size)throw Error('ULTIMATE_AUTOPILOT_ASSIGNMENT_TIMEOUT:'+pending.size);
+ // A slow claim is pending work, not a failed lesson or dispatcher crash.
+ // The coordinator rechecks cloud inventory before admitting another execution.
+ if(pending.size)return {status:'busy',reason:'awaiting_worker_assignment',
+  activeExecutions:activeCount,unconfirmedExecutions:pending.size,assignments:assigned};
  if(assigned.length)return {status:'assigned',activeExecutions:activeCount,assignments:assigned};
  if(activeCount)return {status:'busy',activeExecutions:activeCount};
  if(eligible.some(j=>Date.parse(j.available_at)>now.getTime()))return {status:'retry_wait',activeExecutions:0};

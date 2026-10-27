@@ -1,4 +1,5 @@
-import React, { type CSSProperties } from 'react';
+import React, {type CSSProperties,useLayoutEffect,useRef} from 'react';
+import {cancelRender} from 'remotion';
 import type { TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
 import { teachingPresentation } from '../../lib/ultimate-course-builder/instructional/teaching-presentation';
 
@@ -8,33 +9,48 @@ export function BlueprintTeachingGraphic({ plan, seconds, duration, color }: {
   plan: TeachingVisual; seconds: number; duration: number; color: string;
 }) {
   const state = teachingPresentation(plan, seconds, duration);
+  const cardRef=useRef<HTMLDivElement>(null);
+  useLayoutEffect(()=>{
+    const element=cardRef.current;
+    if(!element) return;
+    const parent=element.parentElement;
+    const bounds=parent?.getBoundingClientRect();
+    // Remotion mounts a zero-sized offscreen composition to collect metadata.
+    // Only the initialized delivery canvas establishes layout evidence.
+    if(!bounds || bounds.width<=0 || bounds.height<=0 || bounds.y<0) return;
+    if(element.scrollHeight>element.clientHeight+2 || element.getBoundingClientRect().bottom>bounds.bottom+2)
+      cancelRender(new Error('ULTIMATE_TEACHING_GRAPHIC_OVERFLOW:'+JSON.stringify({scrollHeight:element.scrollHeight,clientHeight:element.clientHeight,
+        card:element.getBoundingClientRect().toJSON(),parent:parent?.getBoundingClientRect().toJSON()})));
+  },[seconds,state.activeIndex]);
   const card: CSSProperties = {
-    background: 'rgba(255,255,255,0.97)', borderRadius: 18, padding: '24px 28px',
+    background: 'rgba(255,255,255,0.97)', borderRadius: 18, padding: '12px 16px',
+    width: '100%', maxHeight: '100%', minWidth: 0, boxSizing: 'border-box',
+    overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center',
     fontFamily: 'sans-serif', color: '#0f172a', border: `4px solid ${color}`,
     overflowWrap: 'anywhere',
   };
   const rowStyle = (active: boolean): CSSProperties => ({
     border: `4px solid ${active ? color : '#cbd5e1'}`, borderRadius: 12,
-    padding: '18px 22px', background: active ? '#f1f5f9' : '#fff',
+    padding: '10px 12px', minWidth: 0, overflowWrap: 'anywhere', background: active ? '#f1f5f9' : '#fff',
   });
-  const label: CSSProperties = { fontSize: 64, fontWeight: 900, lineHeight: 1.15 };
-  const value: CSSProperties = { fontSize: 64, lineHeight: 1.2, marginTop: 10 };
+  const label: CSSProperties = { fontSize: 64, fontWeight: 900, lineHeight: 1.12 };
+  const value: CSSProperties = { fontSize: 60, lineHeight: 1.14, marginTop: 6 };
   const rows = state.rows;
-  return <div style={card} data-teaching-kind={state.kind} data-teaching-step={state.activeIndex}>
+  return <div ref={cardRef} style={card} data-teaching-kind={state.kind} data-teaching-step={state.activeIndex}>
     {state.kind === 'record' ? (
-      <dl style={{ display: 'grid', gap: 14, margin: 0 }}>
-        {rows.map(row => <div key={row.index} style={{ ...rowStyle(row.active), display: 'grid', gridTemplateColumns: '35% 1fr', gap: 24 }}>
+      <dl style={{ display: 'grid', gap: 8, margin: 0 }}>
+        {rows.map(row => <div key={row.index} style={{ ...rowStyle(row.active), display: 'grid', gridTemplateColumns: '35% minmax(0,1fr)', gap: 12 }}>
           <dt style={label}>{row.label}</dt><dd style={{ ...value, margin: 0 }}>{row.value}</dd>
         </div>)}
       </dl>
     ) : state.kind === 'choices' ? (
-      <ul style={{ display: 'grid', gap: 14, margin: 0, padding: 0, listStyle: 'none' }}>
+      <ul style={{ display: 'grid', gap: 8, margin: 0, padding: 0, listStyle: 'none' }}>
         {rows.map(row => <li key={row.index} style={rowStyle(row.active)}>
           <div style={label}>{row.label}</div><div style={value}>{row.value}</div>
         </li>)}
       </ul>
     ) : state.kind === 'comparison' ? (
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${rows.length}, 1fr)`, gap: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${rows.length}, 1fr)`, gap: 10 }}>
         {rows.map(row => <section key={row.index} style={rowStyle(row.active)}>
           <div style={label}>{row.label}</div><div style={value}>{row.value}</div>
         </section>)}

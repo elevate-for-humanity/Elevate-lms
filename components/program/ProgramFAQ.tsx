@@ -8,8 +8,8 @@ export default function ProgramFAQ() {
       a: 'Apply first. After you submit, we confirm your goals, eligibility, and program fit. Then we guide you into the next step: funding approval, enrollment, or apprenticeship placement (depending on the program).',
     },
     {
-      q: 'Is training really free?',
-      a: "Many students qualify for workforce funding (WIOA/WRG/JRI) or employer sponsorship, which can cover all or most costs. If you don't qualify, you can still enroll using self-pay or payment plans (if available at checkout).",
+      q: 'Can workforce funding help with tuition?',
+      a: "Some programs have verified workforce-funding pathways, but eligibility, covered costs, available funds, and written authorization are determined by the responsible agency. Programs without verified funding use their published self-pay or other documented payment terms.",
     },
     {
       q: 'What funding options do you accept?',
@@ -17,7 +17,7 @@ export default function ProgramFAQ() {
     },
     {
       q: `Why don't I always see ${BNPL_PROVIDER_SUMMARY} at checkout?`,
-      a: "Those options appear automatically only when supported for your total, eligibility, and Stripe settings. If you don't see them, it usually means that option isn't available for that purchase.",
+      a: "Those options appear automatically only when supported for your total, eligibility, and QuickBooks settings. If you don't see them, it usually means that option isn't available for that purchase.",
     },
     {
       q: 'How long does the program take?',

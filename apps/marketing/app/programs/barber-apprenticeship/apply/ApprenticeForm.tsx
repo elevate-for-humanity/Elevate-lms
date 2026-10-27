@@ -64,7 +64,7 @@ type TransferHoursChoice = 'undecided' | 'yes' | 'no';
 
 export default function ApprenticeForm({
   initialPayment,
-  initialFunding,
+  initialFunding: _initialFunding,
   initialEmail,
   initialName,
   initialApplicationId,
@@ -116,7 +116,7 @@ export default function ApprenticeForm({
       phone: '',
       hasHostShop: '',
       hostShopName: '',
-      fundingInterest: initialFunding ?? 'self-pay',
+      fundingInterest: 'self-pay',
     };
   });
   const [smsConsent, setSmsConsent] = useState(false);
@@ -594,7 +594,7 @@ export default function ApprenticeForm({
                   ) : (
                     <>
                       <div className="text-2xl font-black">May be covered</div>
-                      <p className="text-xs text-white/80 mt-2">WIOA, WRG, and FSSA may cover tuition for eligible Indiana residents.</p>
+                      <p className="text-xs text-white/80 mt-2">Apprenticeship tuition is self-pay only.</p>
                     </>
                   )}
                 </div>
@@ -850,10 +850,6 @@ export default function ApprenticeForm({
                     <div className="space-y-2">
                       {[
                         { value: 'self-pay', label: 'Self-pay', sub: 'Card, BNPL, or weekly payment plan — pay at checkout' },
-                        { value: 'wioa', label: 'WIOA Funding — prior approval required', sub: 'Select only if approved or instructed by Elevate' },
-                        { value: 'wrg', label: 'Workforce Ready Grant — prior approval required', sub: 'Select only if approved or instructed by Elevate' },
-                        { value: 'fssa', label: 'FSSA IMPACT — prior approval required', sub: 'Select only if approved or instructed by Elevate' },
-                        { value: 'employer', label: 'Employer-sponsored — prior approval required', sub: 'Select only if your employer has approved payment' },
                       ].map((opt) => (
                         <label
                           key={opt.value}

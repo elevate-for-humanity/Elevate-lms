@@ -13,7 +13,8 @@ describe('Ultimate Course Builder production cutover', () => {
     const coursesRoute = read('apps/admin/app/api/admin/courses/route.ts');
     const productionHandlers = read('lib/ultimate-course-builder/core/production-handlers.ts');
 
-    expect(page).toContain('Ultimate Course Builder');
+    expect(page).toContain('CourseProductionWorkspace');
+    expect(read('components/admin/course-builder/CourseProductionWorkspace.tsx')).toContain('<UnifiedCourseBuilder');
     expect(page).not.toContain('Course Factory');
     expect(builder).toContain("label: 'Ultimate Build'");
     expect(builder).toContain("action: 'queue-course'");
@@ -29,14 +30,14 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(read('lib/ultimate-course-builder/core/course-profile.ts')).toContain('UltimateAppendixAStandardsSource');
     expect(productionHandlers).toContain("ctx.profile.authority === 'course-defined'");
     expect(productionHandlers).toContain("ctx.profile.id.startsWith('course:')");
-    expect(productionHandlers).toContain("status: 'course-defined', verified: true");
+    expect(productionHandlers).toMatch(/status: 'course-defined',\s+verified: true/);
     expect(coursesRoute).toContain(".from('programs')");
     expect(coursesRoute).toContain('slug: courseSlug');
   });
 
   it('keeps standard React available to the standalone Remotion worker', () => {
     const docker = read('Dockerfile.ultimate-worker');
-    expect(docker).toContain("find lib server -type f -name '*.ts'");
+    expect(docker).toContain("find lib -type f -name '*.ts'");
     expect(docker).toContain('CMD ["node","--import=tsx"');
     expect(docker).not.toContain('--conditions=react-server');
   });

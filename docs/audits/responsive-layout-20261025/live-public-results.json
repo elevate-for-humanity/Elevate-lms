@@ -1,0 +1,255 @@
+[
+  {
+    "path": "/",
+    "width": 320,
+    "url": "https://www.elevateforhumanity.org/",
+    "status": 200,
+    "scroll": 320,
+    "h1": "Build a career. Build a workforce. Build a business.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs",
+    "width": 320,
+    "url": "https://www.elevateforhumanity.org/programs",
+    "status": 200,
+    "scroll": 320,
+    "h1": "Train for an in-demand career. Review the verified payment path for your program.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs/hvac-technician",
+    "width": 320,
+    "url": "https://www.elevateforhumanity.org/programs/hvac-technician",
+    "status": 200,
+    "scroll": 330,
+    "h1": "HVAC Certification",
+    "clippedControls": []
+  },
+  {
+    "path": "/funding",
+    "width": 320,
+    "url": "https://www.elevateforhumanity.org/funding",
+    "status": 200,
+    "scroll": 320,
+    "h1": "Explore support for your next career step.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apply/student",
+    "width": 320,
+    "url": "https://www.elevateforhumanity.org/apply/student/interview",
+    "status": 200,
+    "scroll": 320,
+    "h1": "Talk with PARIS while your application builds beside you.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apprenticeships",
+    "width": 320,
+    "url": "https://www.elevateforhumanity.org/apprenticeships",
+    "status": 200,
+    "scroll": 320,
+    "h1": "Earn while you learn in a real workplace.",
+    "clippedControls": [
+      {
+        "tag": "BUTTON",
+        "label": "Show B-52s Barbershop — AI-enhanced interior crop derived from B-52s Barbershop published portfolio",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Show Style and Scissor Salon & Barber — Style and Scissor Salon business logo",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Show Generations Hair / Cat Eye Collective — Generations Hair highlighted curls portfolio",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Show Salon Saloon — Salon Saloon team in front of the salon sign",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      }
+    ]
+  },
+  {
+    "path": "/",
+    "width": 390,
+    "url": "https://www.elevateforhumanity.org/",
+    "status": 200,
+    "scroll": 390,
+    "h1": "Build a career. Build a workforce. Build a business.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs",
+    "width": 390,
+    "url": "https://www.elevateforhumanity.org/programs",
+    "status": 200,
+    "scroll": 390,
+    "h1": "Train for an in-demand career. Review the verified payment path for your program.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs/hvac-technician",
+    "width": 390,
+    "url": "https://www.elevateforhumanity.org/programs/hvac-technician",
+    "status": 200,
+    "scroll": 390,
+    "h1": "HVAC Certification",
+    "clippedControls": []
+  },
+  {
+    "path": "/funding",
+    "width": 390,
+    "url": "https://www.elevateforhumanity.org/funding",
+    "status": 200,
+    "scroll": 390,
+    "h1": "Explore support for your next career step.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apply/student",
+    "width": 390,
+    "url": "https://www.elevateforhumanity.org/apply/student/interview",
+    "status": 200,
+    "scroll": 390,
+    "h1": "Talk with PARIS while your application builds beside you.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apprenticeships",
+    "width": 390,
+    "url": "https://www.elevateforhumanity.org/apprenticeships",
+    "status": 200,
+    "scroll": 390,
+    "h1": "Earn while you learn in a real workplace.",
+    "clippedControls": [
+      {
+        "tag": "BUTTON",
+        "label": "Show Style and Scissor Salon & Barber — Style and Scissor Salon business logo",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Show Generations Hair / Cat Eye Collective — Generations Hair highlighted curls portfolio",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Show Salon Saloon — Salon Saloon team in front of the salon sign",
+        "class": "jsx-c37fe96428afd366 h-2.5 rounded-full transition-all w-2.5 bg-slate-300 hover:bg-slate-400"
+      }
+    ]
+  },
+  {
+    "path": "/",
+    "width": 768,
+    "url": "https://www.elevateforhumanity.org/",
+    "status": 200,
+    "scroll": 768,
+    "h1": "Build a career. Build a workforce. Build a business.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs",
+    "width": 768,
+    "url": "https://www.elevateforhumanity.org/programs",
+    "status": 200,
+    "scroll": 768,
+    "h1": "Train for an in-demand career. Review the verified payment path for your program.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs/hvac-technician",
+    "width": 768,
+    "url": "https://www.elevateforhumanity.org/programs/hvac-technician",
+    "status": 200,
+    "scroll": 768,
+    "h1": "HVAC Certification",
+    "clippedControls": []
+  },
+  {
+    "path": "/funding",
+    "width": 768,
+    "url": "https://www.elevateforhumanity.org/funding",
+    "status": 200,
+    "scroll": 768,
+    "h1": "Explore support for your next career step.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apply/student",
+    "width": 768,
+    "url": "https://www.elevateforhumanity.org/apply/student/interview",
+    "status": 200,
+    "scroll": 768,
+    "h1": "Talk with PARIS while your application builds beside you.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apprenticeships",
+    "width": 768,
+    "url": "https://www.elevateforhumanity.org/apprenticeships",
+    "status": 200,
+    "scroll": 768,
+    "h1": "Earn while you learn in a real workplace.",
+    "clippedControls": []
+  },
+  {
+    "path": "/",
+    "width": 1440,
+    "url": "https://www.elevateforhumanity.org/",
+    "status": 200,
+    "scroll": 1440,
+    "h1": "Build a career. Build a workforce. Build a business.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs",
+    "width": 1440,
+    "url": "https://www.elevateforhumanity.org/programs",
+    "status": 200,
+    "scroll": 1440,
+    "h1": "Train for an in-demand career. Review the verified payment path for your program.",
+    "clippedControls": []
+  },
+  {
+    "path": "/programs/hvac-technician",
+    "width": 1440,
+    "url": "https://www.elevateforhumanity.org/programs/hvac-technician",
+    "status": 200,
+    "scroll": 1440,
+    "h1": "HVAC Certification",
+    "clippedControls": []
+  },
+  {
+    "path": "/funding",
+    "width": 1440,
+    "url": "https://www.elevateforhumanity.org/funding",
+    "status": 200,
+    "scroll": 1440,
+    "h1": "Explore support for your next career step.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apply/student",
+    "width": 1440,
+    "url": "https://www.elevateforhumanity.org/apply/student/interview",
+    "status": 200,
+    "scroll": 1440,
+    "h1": "Talk with PARIS while your application builds beside you.",
+    "clippedControls": []
+  },
+  {
+    "path": "/apprenticeships",
+    "width": 1440,
+    "url": "https://www.elevateforhumanity.org/apprenticeships",
+    "status": 200,
+    "scroll": 1440,
+    "h1": "Earn while you learn in a real workplace.",
+    "clippedControls": []
+  }
+]

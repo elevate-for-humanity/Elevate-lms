@@ -1,24 +1,18 @@
 /**
  * Admin Environment Manager API. Credentials are encrypted in platform_secrets.
- * Elevate Media changes also require verified Northflank configuration sync.
+ * Runtime credentials are bound and verified through Google Secret Manager.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { apiRequireAdmin } from '@/lib/admin/guards';
+import { apiRequireRoles } from '@/lib/admin/guards';
+import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { refreshSecrets } from '@/lib/secrets';
-import {
-  getNorthflankProjectId,
-  isNorthflankReady,
-  upsertNorthflankServiceSecretVariable,
-} from '@/lib/northflank/runtime';
-import {
-  isElevateMediaRuntimeKey,
-  syncElevateMediaToNorthflank,
-  validateElevateMediaUpdates,
-} from '@/lib/northflank/elevate-media-sync';
+import { saveGoogleRuntimeConfiguration, validateRuntimeEntries, GoogleConfigurationError } from '@/lib/google/runtime-configuration';
+import googlePolicy from '@/config/google-runtime-policy.json';
+import { isElevateMediaRuntimeKey, validateElevateMediaUpdates } from '@/lib/google/elevate-media-settings';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,7 +23,7 @@ const SECRET_PATTERNS = [
 ];
 
 function isSecret(key: string): boolean {
-  return key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
+  return key.startsWith('IRS_') || key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
     SECRET_PATTERNS.some((pattern) => pattern.test(key));
 }
 
@@ -62,7 +56,7 @@ async function auditWrite(userId: string, action: 'upsert' | 'delete', keys: str
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
   const db = await requireAdminClient();
   const [{ data, error }, { data: secrets, error: secretError }] = await Promise.all([
@@ -88,7 +82,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
 
   let body: { entries?: { key?: string; value?: string }[] } | null;
@@ -124,6 +118,17 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return safeError(error instanceof Error ? error.message : 'Invalid Elevate Media settings', 400);
   }
+  const runtimeEntries = entries.filter(entry => googlePolicy.components.admin.keys.includes(entry.key));
+  const lmsEntries = runtimeEntries.filter(entry =>
+    (isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_') || entry.key.startsWith('PBX_')) &&
+    googlePolicy.components.lms.keys.includes(entry.key));
+  try {
+    if (runtimeEntries.length) validateRuntimeEntries('admin', runtimeEntries);
+    if (lmsEntries.length) validateRuntimeEntries('lms', lmsEntries);
+    if (entries.some(entry => entry.key.startsWith('AGENT_MEMORY_') && !googlePolicy.components.admin.keys.includes(entry.key))) {
+      return safeError('Unsupported agent memory runtime key', 400);
+    }
+  } catch { return safeError('Invalid or unsupported Google runtime settings', 400); }
   const settingRows = entries.filter((entry) => !isSecret(entry.key)).map((entry) => ({
     ...entry, updated_at: new Date().toISOString(), updated_by: auth.id,
   }));
@@ -148,51 +153,27 @@ export async function POST(req: NextRequest) {
   // Persistence must remain auditable even when the external sync fails.
   await auditWrite(auth.id, 'upsert', keys);
 
-  const agentMemoryEntries = entries.filter((entry) => entry.key.startsWith('AGENT_MEMORY_'));
-  let runtimeSync: 'not-requested' | 'admin' | 'admin+lms' = 'not-requested';
-  if (agentMemoryEntries.length) {
-    const projectId = getNorthflankProjectId();
-    if (!projectId || !isNorthflankReady()) {
-      return NextResponse.json({
-        error: 'Iris settings were encrypted in Supabase Vault, but Northflank control-plane access is not configured.',
-        vaultSaved: true, runtimeSynced: false,
-      }, { status: 503 });
-    }
-    for (const entry of agentMemoryEntries) {
-      await upsertNorthflankServiceSecretVariable(projectId, 'admin', entry.key, entry.value);
-    }
-    runtimeSync = 'admin';
+  const verified = [];
+  try {
+    if (runtimeEntries.length) verified.push(await saveGoogleRuntimeConfiguration('admin', runtimeEntries));
+    if (lmsEntries.length) verified.push(await saveGoogleRuntimeConfiguration('lms', lmsEntries));
+    return NextResponse.json({ saved: keys.length, encrypted: secretEntries.length,
+      runtimeSync: verified.length ? 'google-secret-manager' : 'not-requested',
+      runtimeSynced: verified.length > 0, configurationVerified: verified.length > 0,
+      verifiedServices: verified, bucketConnectionTested: false,
+      message: verified.length ? 'Settings saved and verified on Google Cloud. Bucket access and video playback were not tested.' : 'Settings saved successfully.' });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof GoogleConfigurationError ? error.message : 'Google runtime synchronization failed',
+      settingsSaved: true, saved: keys.length, runtimeSynced: false, configurationVerified: false,
+      verifiedServices: verified.map(result => ({ component: result.component, revision: result.revision })),
+    }, { status: 503 });
   }
-
-  let mediaRuntimeSync: Awaited<ReturnType<typeof syncElevateMediaToNorthflank>> | null = null;
-  if (Object.keys(mediaUpdates).length) {
-    try {
-      mediaRuntimeSync = await syncElevateMediaToNorthflank(mediaUpdates);
-      runtimeSync = 'admin+lms';
-    } catch {
-      // A saved credential is not proof of a working Northflank/B2 connection.
-      // Do not log provider response bodies or the credential-bearing request.
-      logger.warn('[admin/env-vars] Elevate Media Northflank verification failed', { keys });
-      return NextResponse.json({
-        error: 'Settings were saved, but Elevate Media synchronization to Northflank could not be verified. Check Northflank access and overriding service variables before retrying. No bucket connection was tested and no restart was triggered.',
-        settingsSaved: true, saved: keys.length, encrypted: secretEntries.length,
-        runtimeSynced: false, configurationVerified: false,
-        bucketConnectionTested: false,
-      }, { status: 503 });
-    }
-  }
-  return NextResponse.json({
-    saved: keys.length, encrypted: secretEntries.length, runtimeSync, mediaRuntimeSync,
-    message: mediaRuntimeSync
-      ? 'Settings saved and Northflank configuration verified for Admin and LMS. A workload restart is still required; Backblaze access and video playback have not been tested.'
-      : 'Settings saved successfully.',
-  });
 }
 
 export async function DELETE(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
   const key = new URL(req.url).searchParams.get('key')?.trim();
   if (!key) return safeError('key query param required', 400);

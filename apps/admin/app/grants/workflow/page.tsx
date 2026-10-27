@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -66,7 +67,7 @@ export default async function GrantWorkflowPage() {
       {/* Hero Image */}
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/admin-grants-workflow-detail.webp"
           alt="Grant Workflow"
           fill

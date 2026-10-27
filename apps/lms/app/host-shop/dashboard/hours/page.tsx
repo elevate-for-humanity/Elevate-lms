@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ApprenticeWorkForms } from './ApprenticeWorkForms.client';
 import { CheckCircle2, Clock, ShieldCheck, Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
@@ -99,6 +100,7 @@ export default async function HostShopHoursPage() {
         </section>
       ) : null}
 
+      <ApprenticeWorkForms apprentices={board.apprentices.map(apprentice => ({id:apprentice.id,name:apprentice.name,program_slug:apprentice.program_slug}))} />
       <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5 text-blue-950">
         <h2 className="font-black">Weekly Host Shop verification</h2>
         <p className="mt-1 text-sm font-semibold leading-6">Review apprentice work records every week. Confirm the dates, supervised work time, clock-in/clock-out and available location or evidence before approving. Return inaccurate entries for correction rather than approving them. Approved OJL is retained in the apprenticeship record; RTI is tracked separately.</p>

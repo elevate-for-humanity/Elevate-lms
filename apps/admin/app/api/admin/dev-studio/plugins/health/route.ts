@@ -1,3 +1,4 @@
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 import { NextRequest } from 'next/server';
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
@@ -20,10 +21,7 @@ export async function GET(request: NextRequest) {
       probeCloudflareWorkersAI(),
     ]);
     const aiConfigured = aiRuntime.anyConfigured;
-    const northflankConfigured = Boolean(
-      (process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY) &&
-      process.env.NORTHFLANK_PROJECT_ID,
-    );
+    const googleConfigured = await isGoogleDeploymentConfigured();
     const browserConfigured = Boolean(
       process.env.STUDIO_BROWSER_URL &&
       (process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
@@ -64,12 +62,12 @@ export async function GET(request: NextRequest) {
           : 'No governed AI provider is configured.',
       },
       {
-        name: 'northflank',
-        passed: northflankConfigured,
+        name: 'google-deployment',
+        passed: googleConfigured,
         required: false,
-        message: northflankConfigured
-          ? 'Northflank deployment control is configured.'
-          : 'Northflank deployment control is not configured.',
+        message: googleConfigured
+          ? 'Google deployment workflow dispatch is configured.'
+          : 'Google deployment workflow dispatch is not configured.',
       },
       {
         name: 'cloud-browser',

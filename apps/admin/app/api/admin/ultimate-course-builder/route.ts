@@ -1,3 +1,7 @@
+import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
+import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
+import { applySyllabusPlan, validateSyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
+import { renderReview } from '@/lib/ultimate-course-builder/authoring/render-review';
 import { logger } from '@/lib/logger';
 import { ULTIMATE_LESSON_CONTRACT_VERSION } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { validateLessonBlueprint } from '@/lib/ultimate-course-builder/instructional/lesson-blueprint';
@@ -5,7 +9,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
+import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
+import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
+import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
+import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
+import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
+import { checkpointPreviewArtifacts } from '@/lib/ultimate-course-builder/core/checkpoint-preview.mjs';
+import {
+  renderMediaUrl,
+  renderPlaybackUrl,
+} from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,21 +53,90 @@ export async function GET(req: NextRequest) {
   const courseId = req.nextUrl.searchParams.get('courseId')?.trim();
 
   if (buildId) {
-    const { data, error } = await db
-      .from('ultimate_course_builds')
-      .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
-      .eq('id', buildId)
-      .single();
+    const checkpoints = req.nextUrl.searchParams.get('view') === 'checkpoints';
+    // Keep each selection literal so the Supabase parser infers its actual shape.
+    const result = checkpoints
+      ? await db
+          .from('ultimate_course_builds')
+          .select(
+            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,preview_objectives:artifacts->learning_objectives->objectives,preview_assessment:artifacts->assessment_alignment->assessment,preview_script:artifacts->instructor_script->script,preview_scenes:artifacts->storyboard->storyboard->scenes,preview_media_url:artifacts->lesson_film_render->render->mediaUrl,preview_video_url:artifacts->lesson_film_render->render->videoUrl,preview_playback_url:artifacts->lesson_film_render->render->playbackUrl,preview_media_approved:artifacts->finished_media_qa->mediaQA->pass,ultimate_lesson_steps(step,state,findings,completed_at))',
+          )
+          .eq('id', buildId)
+          .single()
+      : await db
+          .from('ultimate_course_builds')
+          .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
+          .eq('id', buildId)
+          .single();
+    const { data, error } = result;
+    if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
+      const lessons = await Promise.all(
+        (data.ultimate_lesson_builds ?? []).map(async (lesson: any) => {
+          const {preview_objectives,preview_assessment,preview_script,preview_scenes,
+            preview_media_url,preview_video_url,preview_playback_url,preview_media_approved,...saved} = lesson;
+          const artifacts = checkpointPreviewArtifacts(lesson);
+          const preview = {
+            ...lessonPreview(artifacts),
+            historicalVersion: null as number | null,
+            previousRender: false,
+          };
+          // Repairs invalidate dependent checkpoints, not the saved film. Recover its
+          // immutable version on initial load as well as on explicit diagnostics.
+          if (!preview.videoUrl) {
+            const artifact = await db
+              .from('ultimate_artifacts')
+              .select('id')
+              .eq('build_id', buildId)
+              .eq('lesson_build_id', lesson.id)
+              .eq('stage', 'lesson_film_render')
+              .eq('artifact_type', 'stage_output')
+              .maybeSingle();
+            if (artifact.error) throw artifact.error;
+            if (artifact.data?.id) {
+              const versions = await db
+                .from('ultimate_artifact_versions')
+                .select('version,content')
+                .eq('artifact_id', artifact.data.id)
+                .order('version', { ascending: false })
+                .limit(20);
+              if (versions.error) throw versions.error;
+              for (const version of versions.data ?? []) {
+                const videoUrl =
+                  renderMediaUrl(version.content?.render) ??
+                  renderPlaybackUrl(version.content?.render);
+                if (videoUrl) {
+                  Object.assign(preview, {
+                    videoUrl,
+                    historicalVersion: version.version,
+                    previousRender: true,
+                    mediaApproved: false,
+                  });
+                  break;
+                }
+              }
+            }
+          }
+          const review = preview.videoUrl ? await renderReview(db, buildId, lesson.id, preview.videoUrl) : null;
+          const approved = await ownerApprovedPreview(db,data,lesson);
+          if (preview.videoUrl) preview.videoUrl = adminPreviewPlaybackUrl(buildId, lesson.id, preview.videoUrl) + (review ? '&artifactVersionId=' + encodeURIComponent(review.artifactVersionId) : '');
+          return { ...saved, preview: {...preview,review,...(approved?{
+            approvedVideoUrl:adminPreviewPlaybackUrl(buildId,lesson.id,approved.videoUrl)+'&kind=approved',
+            approvedVersion:approved.version,
+          }:{})} };
+        }),
+      ).catch((error) => {
+        logger.error('Saved lesson preview recovery failed', error);
+        return null;
+      });
+      if (!lessons) return databaseFailure(new Error('Saved preview recovery failed'));
+      return NextResponse.json({ build: { ...data, ultimate_lesson_builds: lessons } });
+    }
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
-  let query = db
-    .from('ultimate_course_builds')
-    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at)')
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if (courseId) query = query.eq('course_id', courseId);
-  const { data, error } = await query;
+  const page = parseBuildListPage(req.nextUrl.searchParams.get('page'));
+  if (page === null) return NextResponse.json({ error: 'page must be an integer from 1 to 10000' }, { status: 400 });
+  const { data, error, pagination } = await loadUltimateBuildPage(db, courseId, page);
   if (error) return databaseFailure(error);
   let acquisitions: Array<{ id: string; goal: string | null }> = [];
   if (courseId) {
@@ -67,7 +151,7 @@ export async function GET(req: NextRequest) {
     if (requests.error) return databaseFailure(requests.error);
     acquisitions = requests.data ?? [];
   }
-  return NextResponse.json({ builds: data ?? [], acquisitions });
+  return NextResponse.json({ builds: data ?? [], acquisitions, pagination });
 }
 
 export async function POST(req: NextRequest) {
@@ -130,7 +214,7 @@ export async function POST(req: NextRequest) {
           { error: 'Each instructional source needs its source ID and complete authorized text' },
           { status: 400 },
         );
-      profile.instructionalSources = body.instructionalSources;
+      profile.instructionalSources = [...new Map([...(profile.instructionalSources ?? []), ...body.instructionalSources].map(source => [source.id, source])).values()];
     }
     profile.lessonContractVersion = ULTIMATE_LESSON_CONTRACT_VERSION;
     const saved = await db
@@ -138,6 +222,7 @@ export async function POST(req: NextRequest) {
       .update({ profile, updated_at: new Date().toISOString() })
       .eq('id', build.id)
       .eq('status', build.status)
+      .eq('profile', JSON.stringify(build.profile))
       .select('id')
       .single();
     if (saved.error) return databaseFailure(saved.error, 409);
@@ -175,7 +260,8 @@ export async function POST(req: NextRequest) {
     return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
-  if (body.action === 'queue-course') {
+  // Keep the legacy action as a compatibility alias; both actions start a worker.
+  if (body.action === 'start-course' || body.action === 'queue-course') {
     const courseId = String(body.courseId || '').trim();
     if (!courseId) {
       return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
@@ -205,7 +291,9 @@ export async function POST(req: NextRequest) {
     if (!programSlug) {
       return NextResponse.json({ error: 'programSlug is required' }, { status: 400 });
     }
-    const generatedProfile = await buildUltimateProfile(db, {
+    if (body.syllabusPlan && !validateSyllabusPlan(body.syllabusPlan))
+      return NextResponse.json({error:'Review a valid syllabus curriculum before starting.'},{status:400});
+    let generatedProfile = await buildUltimateProfile(db, {
       courseId: course.id,
       programSlug,
       title: String(body.title || course.title),
@@ -213,17 +301,64 @@ export async function POST(req: NextRequest) {
       audience: String(body.audience || ''),
       state: String(body.state || ''),
     });
-    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id };
+    if (body.syllabusPlan) generatedProfile = applySyllabusPlan(generatedProfile,body.syllabusPlan);
+    const authoring = body.instructionalAuthoring;
+    if (
+      authoring &&
+      (authoring.provider !== 'google' ||
+        !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '') ||
+        (authoring.location && !['us', 'eu', 'global', 'us-central1'].includes(authoring.location)))
+    )
+      return NextResponse.json(
+        { error: 'Google authoring requires an explicitly selected Gemini model' },
+        { status: 400 },
+      );
+    const profile = {
+      ...generatedProfile,
+      mediaAcquisitionOwnerId: auth.id,
+      publicationPolicy: 'automatic-quality-verified',
+      ...(authoring
+        ? {
+            instructionalAuthoring: {
+              provider: 'google' as const,
+              model: authoring.model,
+              ...(authoring.location ? { location: authoring.location } : {}),
+              version: GOOGLE_LESSON_AUTHOR_VERSION,
+            },
+          }
+        : {}),
+    };
 
-    const { data: activeBuild, error: activeError } = await db
+    if (body.acceptanceBuild === true && !authoring)
+      return NextResponse.json(
+        { error: 'A separate teaching acceptance build requires an explicit Google model' },
+        { status: 400 },
+      );
+    const activeQuery = db
       .from('ultimate_course_builds')
       .select('id,course_id,status,current_step,profile,created_at,updated_at')
       .eq('course_id', course.id)
       .in('status', ['initializing', 'queued', 'running'])
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (body.acceptanceBuild === true)
+      activeQuery.contains('profile', { instructionalAuthoring: profile.instructionalAuthoring });
+    const { data: activeBuild, error: activeError } = await activeQuery.maybeSingle();
     if (activeError) throw activeError;
+    if (activeBuild && body.syllabusPlan) return NextResponse.json({error:'This course already has an active build. Attach sources in its production workspace.'},{status:409});
+    if (
+      activeBuild &&
+      authoring &&
+      JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !==
+        JSON.stringify(profile.instructionalAuthoring)
+    )
+      return NextResponse.json(
+        {
+          error:
+            'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.',
+        },
+        { status: 409 },
+      );
 
     let build = activeBuild;
     if (!build) {
@@ -247,10 +382,24 @@ export async function POST(req: NextRequest) {
     const job = await new UltimateJobQueue(db as any).enqueue(build.id, {
       requestedBy: auth.id,
     });
+    if (!job)
+      return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
+    const dispatch = await requestCourseWorker();
+    const dispatchEvidenceSaved = await recordCourseDispatch(db,job.id,dispatch,auth.id);
+    if (!dispatch.dispatched) {
+      return NextResponse.json({
+        ok: false, queued: true, dispatched: false,
+        buildId: build.id, jobId: job?.id ?? null, courseId: course.id,
+        error: 'Course saved but the Google worker did not start. ' +
+          'Verify the Admin Google service identity and GitHub dispatch permissions.',
+        dispatchError: 'dispatchError' in dispatch ? dispatch.dispatchError : 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
+      }, { status: 503 });
+    }
     return NextResponse.json(
       {
         ok: true,
         queued: true,
+        ...dispatch, dispatchEvidenceSaved,
         reused: Boolean(activeBuild),
         build,
         buildId: build.id,

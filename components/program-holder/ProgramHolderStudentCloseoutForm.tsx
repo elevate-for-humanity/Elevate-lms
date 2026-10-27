@@ -12,13 +12,14 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
   async function submit(formData: FormData) {
     setSaving(true);
     setMessage('');
+    try {
     const response = await fetch('/api/program-holder/student-closeouts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(Object.fromEntries(formData)),
     });
-    const result = await response.json();
-    setSaving(false);
+    if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Your session or connection changed. Reload the page and try again.');
+    const result = await response.json().catch(() => ({}));
     if (!response.ok) return setMessage(result.error || 'Closeout could not be saved.');
     setMessage(
       result.emailSent
@@ -26,6 +27,11 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
         : 'Student marked complete and ready for testing. Elevate was alerted in the Admin dashboard.',
     );
     router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'The request could not be completed. Please retry.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

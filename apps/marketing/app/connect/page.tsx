@@ -1,7 +1,7 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import {
@@ -75,6 +75,9 @@ const FEATURES = [
 ];
 
 export default function ConnectPage() {
+  const [interactive, setInteractive] = useState(false);
+  useEffect(() => setInteractive(true), []);
+
   const [step, setStep] = useState<Step>('platform');
   const [platform, setPlatform] = useState('');
   const [url, setUrl] = useState('');
@@ -129,17 +132,17 @@ export default function ConnectPage() {
         <Breadcrumbs items={[{ label: 'Connect' }]} />
       </div>
       {/* Header */}
-      <header className="border-b border-white/10">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-slate-800 bg-slate-950">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-white">
             <Plug className="w-6 h-6 text-cyan-400" />
             <span className="font-bold text-lg">Connect Your Site</span>
           </div>
           <div className="flex gap-4 text-sm">
-            <Link href="/import" className="text-slate-400 hover:text-white">
+            <Link href="/import" className="text-slate-300 hover:text-white">
               Import & Migrate →
             </Link>
-            <Link href="/programs" className="text-slate-400 hover:text-white">
+            <Link href="/programs" className="text-slate-300 hover:text-white">
               Build New →
             </Link>
           </div>
@@ -159,22 +162,24 @@ export default function ConnectPage() {
               </p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur rounded-2xl p-8">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-8">
               <h2 className="text-slate-900 font-bold mb-6">What platform is your site on?</h2>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {PLATFORMS.filter((p) => p.popular).map((p) => (
                   <button
                     key={p.id}
+                    disabled={!interactive}
+                    aria-pressed={platform === p.id}
                     onClick={() => setPlatform(p.id)}
-                    className={`p-4 rounded-xl border-2 text-center transition-all ${
+                    className={`min-w-0 px-2 py-4 sm:p-4 rounded-xl border-2 text-center transition-all ${
                       platform === p.id
-                        ? 'border-cyan-500 bg-cyan-500/20'
-                        : 'border-white/20 hover:border-white/40'
+                        ? 'border-cyan-700 bg-cyan-50'
+                        : 'border-slate-300 bg-white hover:border-cyan-700'
                     }`}
                   >
                     <span className="text-3xl">{p.icon}</span>
-                    <p className="text-slate-900 text-sm mt-2">{p.name}</p>
+                    <p className="text-slate-900 text-sm mt-2 whitespace-nowrap">{p.name}</p>
                   </button>
                 ))}
               </div>
@@ -183,15 +188,17 @@ export default function ConnectPage() {
                 {PLATFORMS.filter((p) => !p.popular).map((p) => (
                   <button
                     key={p.id}
+                    disabled={!interactive}
+                    aria-pressed={platform === p.id}
                     onClick={() => setPlatform(p.id)}
-                    className={`p-4 rounded-xl border-2 text-center transition-all ${
+                    className={`min-w-0 px-2 py-4 sm:p-4 rounded-xl border-2 text-center transition-all ${
                       platform === p.id
-                        ? 'border-cyan-500 bg-cyan-500/20'
-                        : 'border-white/10 hover:border-white/30'
+                        ? 'border-cyan-700 bg-cyan-50'
+                        : 'border-slate-300 bg-white hover:border-cyan-700'
                     }`}
                   >
                     <span className="text-2xl">{p.icon}</span>
-                    <p className="text-slate-600 text-sm mt-2">{p.name}</p>
+                    <p className="text-slate-600 text-sm mt-2 whitespace-nowrap">{p.name}</p>
                   </button>
                 ))}
               </div>
@@ -199,7 +206,7 @@ export default function ConnectPage() {
               <button
                 onClick={() => platform && setStep('url')}
                 disabled={!platform}
-                className="w-full mt-8 py-4 bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="w-full mt-8 py-4 bg-cyan-700 hover:bg-cyan-800 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 Continue
                 <ArrowRight className="w-5 h-5" />
@@ -218,31 +225,32 @@ export default function ConnectPage() {
               </p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur rounded-2xl p-8 space-y-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-8 space-y-6">
               <div>
-                <label className="block text-white font-medium mb-2">
+                <label htmlFor="connect-site-url" className="block text-slate-900 font-medium mb-2">
                   Your {PLATFORMS.find((p) => p.id === platform)?.name} Site URL
                 </label>
                 <input
+                  id="connect-site-url"
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://www.yoursite.com"
-                  className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full px-4 py-4 bg-white border border-slate-500 rounded-lg text-slate-900 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
 
               <div className="flex gap-4">
                 <button
                   onClick={() => setStep('platform')}
-                  className="px-6 py-4 border border-white/20 hover:bg-white/10 text-white font-medium rounded-lg"
+                  className="px-6 py-4 border border-slate-300 hover:bg-slate-100 text-slate-900 font-medium rounded-lg"
                 >
                   Back
                 </button>
                 <button
                   onClick={() => url && setStep('features')}
                   disabled={!url}
-                  className="flex-1 py-4 bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-600 text-white font-bold rounded-lg flex items-center justify-center gap-2"
+                  className="flex-1 py-4 bg-cyan-700 hover:bg-cyan-800 disabled:bg-slate-600 text-white font-bold rounded-lg flex items-center justify-center gap-2"
                 >
                   Continue
                   <ArrowRight className="w-5 h-5" />
@@ -260,26 +268,27 @@ export default function ConnectPage() {
               <p className="text-slate-600">Select the features you want on your site.</p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur rounded-2xl p-8 space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-8 space-y-4">
               {FEATURES.map((feature) => {
                 const Icon = feature.icon;
                 const selected = selectedFeatures.includes(feature.id);
                 return (
                   <button
                     key={feature.id}
+                    aria-pressed={selected}
                     onClick={() => toggleFeature(feature.id)}
                     className={`w-full p-4 rounded-xl border-2 text-left flex items-center gap-4 transition-all ${
                       selected
-                        ? 'border-cyan-500 bg-cyan-500/20'
-                        : 'border-white/20 hover:border-white/40'
+                        ? 'border-cyan-700 bg-cyan-50'
+                        : 'border-slate-300 bg-white hover:border-cyan-700'
                     }`}
                   >
                     <div
                       className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                        selected ? 'bg-cyan-500' : 'bg-white/10'
+                        selected ? 'bg-cyan-700' : 'bg-slate-200'
                       }`}
                     >
-                      <Icon className={`w-6 h-6 ${selected ? 'text-white' : 'text-slate-400'}`} />
+                      <Icon className={`w-6 h-6 ${selected ? 'text-white' : 'text-slate-600'}`} />
                     </div>
                     <div className="flex-1">
                       <p className="text-slate-900 font-bold">{feature.name}</p>
@@ -287,7 +296,7 @@ export default function ConnectPage() {
                     </div>
                     <div
                       className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        selected ? 'border-cyan-500 bg-cyan-500' : 'border-white/30'
+                        selected ? 'border-cyan-700 bg-cyan-700' : 'border-slate-500'
                       }`}
                     >
                       {selected && <Check className="w-4 h-4 text-white" />}
@@ -299,14 +308,14 @@ export default function ConnectPage() {
               <div className="flex gap-4 pt-4">
                 <button
                   onClick={() => setStep('url')}
-                  className="px-6 py-4 border border-white/20 hover:bg-white/10 text-white font-medium rounded-lg"
+                  className="px-6 py-4 border border-slate-300 hover:bg-slate-100 text-slate-900 font-medium rounded-lg"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleGenerate}
                   disabled={selectedFeatures.length === 0}
-                  className="flex-1 py-4 bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-600 text-white font-bold rounded-lg flex items-center justify-center gap-2"
+                  className="flex-1 py-4 bg-cyan-700 hover:bg-cyan-800 disabled:bg-slate-600 text-white font-bold rounded-lg flex items-center justify-center gap-2"
                 >
                   <Zap className="w-5 h-5" />
                   Generate Integration
@@ -320,7 +329,7 @@ export default function ConnectPage() {
         {step === 'generating' && (
           <div className="text-center py-20">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6">
-              <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
+              <Loader2 className="w-10 h-10 text-cyan-700 animate-spin" />
             </div>
             <h2 className="text-3xl font-black text-slate-900 mb-4">
               Generating Your Integration...
@@ -335,7 +344,7 @@ export default function ConnectPage() {
         {step === 'setup' && integration && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-800 rounded-full text-sm font-medium mb-4">
                 <span className="text-slate-500 flex-shrink-0">•</span>
                 Integration Ready!
               </div>
@@ -345,7 +354,7 @@ export default function ConnectPage() {
             </div>
 
             {/* API Credentials */}
-            <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h3 className="text-slate-900 font-bold mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-cyan-400" />
                 Your API Credentials
@@ -359,10 +368,10 @@ export default function ConnectPage() {
                     </code>
                     <button
                       onClick={() => copyToClipboard(integration.siteId, 'siteId')}
-                      className="px-3 bg-white/10 rounded-r-lg hover:bg-white/20"
+                      className="px-3 bg-slate-200 rounded-r-lg hover:bg-slate-300 text-slate-700"
                     >
                       {copied === 'siteId' ? (
-                        <Check className="w-4 h-4 text-brand-green-400" />
+                        <Check className="w-4 h-4 text-emerald-700" />
                       ) : (
                         <Copy className="w-4 h-4 text-slate-400" />
                       )}
@@ -377,10 +386,10 @@ export default function ConnectPage() {
                     </code>
                     <button
                       onClick={() => copyToClipboard(integration.apiKey, 'apiKey')}
-                      className="px-3 bg-white/10 rounded-r-lg hover:bg-white/20"
+                      className="px-3 bg-slate-200 rounded-r-lg hover:bg-slate-300 text-slate-700"
                     >
                       {copied === 'apiKey' ? (
-                        <Check className="w-4 h-4 text-brand-green-400" />
+                        <Check className="w-4 h-4 text-emerald-700" />
                       ) : (
                         <Copy className="w-4 h-4 text-slate-400" />
                       )}
@@ -391,7 +400,7 @@ export default function ConnectPage() {
             </div>
 
             {/* Embed Script */}
-            <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-slate-900 font-bold flex items-center gap-2">
                   <Code className="w-5 h-5 text-cyan-400" />
@@ -399,10 +408,10 @@ export default function ConnectPage() {
                 </h3>
                 <button
                   onClick={() => copyToClipboard(integration.embedScript, 'embed')}
-                  className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20"
+                  className="flex min-h-11 items-center gap-2 rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
                 >
                   {copied === 'embed' ? (
-                    <Check className="w-4 h-4 text-brand-green-400" />
+                    <Check className="w-4 h-4 text-emerald-700" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
@@ -416,10 +425,10 @@ export default function ConnectPage() {
               </pre>
 
               <div className="mt-4 p-4 bg-white/10 rounded-lg">
-                <p className="text-brand-blue-300 text-sm font-medium mb-2">
+                <p className="text-brand-blue-800 text-sm font-medium mb-2">
                   {integration.platform} Instructions:
                 </p>
-                <ol className="list-decimal list-inside space-y-1 text-slate-300 text-sm">
+                <ol className="list-decimal list-inside space-y-1 text-slate-700 text-sm">
                   {integration.setupSteps.map((step, idx) => (
                     <li key={idx}>{step}</li>
                   ))}
@@ -428,7 +437,7 @@ export default function ConnectPage() {
             </div>
 
             {/* Components */}
-            <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h3 className="text-slate-900 font-bold mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-cyan-400" />
                 Step 2: Add Components Where You Want Them
@@ -440,10 +449,10 @@ export default function ConnectPage() {
                       <p className="text-slate-900 font-medium">{comp.name}</p>
                       <button
                         onClick={() => copyToClipboard(comp.embedCode, `comp-${idx}`)}
-                        className="text-slate-400 hover:text-white"
+                        className="text-slate-600 hover:text-slate-900"
                       >
                         {copied === `comp-${idx}` ? (
-                          <Check className="w-4 h-4 text-brand-green-400" />
+                          <Check className="w-4 h-4 text-emerald-700" />
                         ) : (
                           <Copy className="w-4 h-4" />
                         )}
@@ -460,12 +469,12 @@ export default function ConnectPage() {
 
             {/* Platform Specific */}
             {integration.platformSpecific.shortcodes && (
-              <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
                 <h3 className="text-slate-900 font-bold mb-4">WordPress Shortcodes</h3>
                 <div className="grid md:grid-cols-2 gap-3">
                   {integration.platformSpecific.shortcodes.map((sc: any, idx: number) => (
                     <div key={idx} className="p-3 bg-white rounded-lg">
-                      <code className="text-cyan-400 font-mono text-sm">{sc.code}</code>
+                      <code className="text-cyan-800 font-mono text-sm">{sc.code}</code>
                       <p className="text-slate-500 text-xs mt-1">{sc.description}</p>
                     </div>
                   ))}

@@ -56,6 +56,27 @@ describe('authentic learner evidence', () => {
     expect(query.eq).toHaveBeenCalledWith('ultimate_course_builds.course_id', 'course');
   });
 
+  it('retries a rejected browser capacity admission without inventing test evidence', async () => {
+    configured();
+    vi.useFakeTimers();
+    try {
+      const accepted = response({
+        ...report(),
+        checkedAt: new Date().toISOString(),
+      });
+      const browser = vi.fn()
+        .mockResolvedValueOnce({ status: 429, ok: false, body: { cancel: vi.fn() } })
+        .mockResolvedValueOnce(accepted);
+      vi.stubGlobal('fetch', browser);
+      const pending = new UltimatePlatformLearnerRuntime(db).verify(input);
+      await vi.advanceTimersByTimeAsync(15000);
+      const result = await pending;
+      expect(browser).toHaveBeenCalledTimes(2);
+      expect(result.completion).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('rejects a lesson changed while its browser test was running', async () => {
     configured();
     vi.stubGlobal('fetch', vi.fn(async () => {

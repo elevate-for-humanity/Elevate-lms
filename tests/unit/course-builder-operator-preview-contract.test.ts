@@ -11,8 +11,8 @@ describe('Course Builder operator preview contract', () => {
     const courseLayout = read('apps/lms/app/lms/courses/layout.tsx');
 
     expect(learnerLayout).toContain('showLearnerNotices = true');
-    expect(learnerLayout).toContain('showLearnerNotices && !photoProfile?.avatar_url');
-    expect(learnerLayout).toContain('{showLearnerNotices ? (');
+    expect(learnerLayout).toContain('showLearnerNotices && !isAdmin && !photoProfile?.avatar_url');
+    expect(learnerLayout).not.toContain('/apprentice/billing');
     expect(courseLayout).toContain('isAdminCoursePreview = isAdmin && coursePreview.active');
     expect(courseLayout).toContain('showLearnerNotices={!isAdminCoursePreview}');
   });
@@ -26,14 +26,13 @@ describe('Course Builder operator preview contract', () => {
     expect(route).toContain('dispatch: runFactory');
   });
 
-  it('routes canonical programs through their non-uniform credential blueprints', () => {
+  it('routes canonical programs through the Ultimate profile authority', () => {
     const workspace = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
-    const pipeline = read('components/admin/course-builder/runCourseFactoryPipeline.ts');
-
-    expect(workspace).toContain("blueprint.slug === selectedProgram.slug");
-    expect(workspace).toContain("action: 'generate-from-blueprint'");
-    expect(workspace).toContain("contentSource: 'blueprint'");
-    expect(workspace).toContain("videoMode: 'queue'");
-    expect(pipeline).toContain('body.error || body.message');
+    const profile = read('lib/ultimate-course-builder/core/course-profile.ts');
+    expect(workspace).toContain("action: 'queue-course'");
+    expect(workspace).toContain('programSlug: input.programSlug');
+    expect(workspace).not.toContain('runCourseFactoryPipeline');
+    expect(profile).toContain('registeredSource.supports({ programSlug: input.programSlug })');
+    expect(profile).toContain('UltimateAppendixAStandardsSource');
   });
 });

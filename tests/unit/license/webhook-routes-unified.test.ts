@@ -9,23 +9,14 @@ const retiredSingular = path.join(root, 'app/api/license/webhook/route.ts');
 const retiredPlural = path.join(root, 'app/api/licenses/webhook/route.ts');
 
 describe('Canonical Stripe webhook ownership', () => {
-  it('keeps one canonical Marketing writer and a mutation-free LMS adapter', () => {
-    const canonical = fs.readFileSync(canonicalPath, 'utf-8');
-    const adapter = fs.readFileSync(lmsAdapterPath, 'utf-8');
-
-    for (const event of [
-      'checkout.session.completed',
-      'customer.subscription.updated',
-      'customer.subscription.deleted',
-      'invoice.payment_succeeded',
-      'invoice.payment_failed',
-      'charge.refunded',
-    ])
-      expect(canonical).toContain(event);
-
-    expect(adapter).toContain('proxyCanonicalRoute');
-    expect(adapter).toContain("'marketing'");
-    expect(adapter).not.toMatch(/\.from\s*\(|\.insert\s*\(|\.update\s*\(|\.delete\s*\(/);
+  it('does not retain Stripe writers or forward Stripe through the generic provider adapter', () => {
+    expect(fs.existsSync(canonicalPath)).toBe(false);
+    expect(fs.existsSync(lmsAdapterPath)).toBe(false);
+    for (const app of ['marketing', 'lms']) {
+      const generic = fs.readFileSync(path.join(root, `apps/${app}/app/api/webhooks/[provider]/route.ts`), 'utf8');
+      const targets = generic.slice(generic.indexOf('const PROVIDER_TARGETS'), generic.indexOf('const FORWARDED'));
+      expect(targets).not.toMatch(/stripe/i);
+    }
   });
 
   it('does not retain retired license webhook aliases', () => {

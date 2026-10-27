@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { DEMO_PROGRAM_ROWS } from '@/lib/store/demo-preview-data';
 import { Award, BarChart3, CheckCircle2, FileBarChart, LayoutGrid, Users } from 'lucide-react';
 
 const views = [
@@ -10,11 +11,7 @@ const views = [
     icon: LayoutGrid,
     title: 'Program operations',
     description: 'Compare enrollment, attendance, and document readiness across sample programs.',
-    rows: [
-      ['Barber Apprenticeship', '28 participants', '94% attendance'],
-      ['Cosmetology Apprenticeship', '17 participants', '91% attendance'],
-      ['HVAC Technician', '22 participants', '88% attendance'],
-    ],
+    rows: DEMO_PROGRAM_ROWS,
   },
   {
     id: 'roster',

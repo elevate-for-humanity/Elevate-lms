@@ -6,6 +6,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import {
   auditPage,
+  browserReadiness,
   createSessionCapacityGuard,
   attachBrowserTabs,
   receiveBrowserUpload,
@@ -386,4 +387,13 @@ test('session admission reserves in-flight capacity and releases failed creation
   active = 0;
   await assert.rejects(admit(async () => { throw new Error('launch failed'); }), /launch failed/);
   assert.equal(await admit(async () => 'recovered'), 'recovered');
+});
+
+ test('full session capacity remains healthy for existing owners without admitting new sessions', async () => {
+  const lifecycle = {browserState:'ready',browserConnected:true};
+  assert.deepEqual(browserReadiness(lifecycle,{ready:true},4,4),{ready:true,admissionAvailable:false});
+  assert.deepEqual(browserReadiness(lifecycle,{ready:true},3,4),{ready:true,admissionAvailable:true});
+  assert.equal(browserReadiness({...lifecycle,browserConnected:false},{ready:true},0,4).ready,false);
+  assert.equal(browserReadiness(lifecycle,{ready:false},0,4).ready,false);
+  await assert.rejects(createSessionCapacityGuard(4,()=>4)(async()=>({})), /session_capacity_reached/);
 });

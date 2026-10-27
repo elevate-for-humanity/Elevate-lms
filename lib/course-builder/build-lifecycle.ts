@@ -64,8 +64,8 @@ export async function markCourseMediaPendingWithClient(input: {
 }
 
 /**
- * Finalizes one unified build without publishing it. Human review remains the
- * only publication authority after every required video is attached and valid.
+ * Verifies a complete unified build and publishes through the canonical
+ * automated acceptance gate as soon as every required video is valid.
  */
 export async function finalizeUnifiedCourseBuildWithClient(input: {
   db: SupabaseClient;
@@ -129,5 +129,12 @@ export async function finalizeUnifiedCourseBuildWithClient(input: {
     .neq('status', 'published');
   if (error) throw error;
 
-  return { ok: true as const, state: 'ready_for_review' as const, media };
+  const { publishPersistedCourseWithClient } = await import('./persisted-publish-service');
+  const publication = await publishPersistedCourseWithClient({
+    db: input.db,
+    courseId: input.courseId,
+    actorId: null,
+    label: 'Automatic publication after complete verified course rendering',
+  });
+  return { ...publication, media };
 }

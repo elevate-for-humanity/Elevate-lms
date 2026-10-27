@@ -43,7 +43,7 @@ for (const retiredFile of [
 requireText('apps/marketing/app/apply/student/page.tsx', '/apply/student/interview', 'PARIS-first canonical redirect');
 requireText('apps/marketing/app/apply/student/form/page.tsx', 'StudentApplicationForm', 'standard form fallback');
 requireText('apps/marketing/app/apply/student/interview/page.tsx', 'ParisApplicationWorkspace', 'PARIS interview workspace');
-requireText('apps/marketing/app/apply/student/interview/page.tsx', 'ApplicationDocumentsPanel', 'document review panel');
+requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'ApplicationDocumentsPanel', 'document review panel after interview session initialization');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'SpeechRecognition', 'voice input support');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "'/api/applications'", 'canonical application submission');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "'X-Idempotency-Key'", 'application idempotency');

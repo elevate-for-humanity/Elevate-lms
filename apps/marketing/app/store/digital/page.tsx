@@ -1,5 +1,6 @@
 export const dynamic = 'force-static';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   title: 'Digital Resources',
   description: 'AI tools, toolkits, guides, templates, and courses for training providers. SAM.gov assistant, grants navigator, AI studio, and more.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/digital',
+    canonical: 'https://store.elevateforhumanity.org/store/digital',
   },
 };
 
@@ -65,7 +66,7 @@ export default function StoreDigitalPage() {
 {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-          <Image src="/images/pages/hvac-tools.webp" alt="Elevate digital tools and resources" fill priority className="object-cover" sizes="100vw" />
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src="/images/pages/hvac-tools.webp" alt="Elevate digital tools and resources" fill priority className="object-cover" sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

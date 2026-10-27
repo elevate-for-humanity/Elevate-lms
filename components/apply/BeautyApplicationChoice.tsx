@@ -28,7 +28,7 @@ export default function BeautyApplicationChoice({
         <h1 className="mt-3 break-words text-3xl font-black sm:text-5xl">{programTitle}</h1>
         <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700">
           An inquiry is free and does not enroll you. The enrollment application requires verified
-          payment before it can be submitted.
+          payment before it can be submitted. Submission is a request for admission. Elevate must confirm your documents, agreements, payment arrangement, and required placement before you begin.
         </p>
         <div className="mt-6">
           <ApprenticeshipFundingNotice />

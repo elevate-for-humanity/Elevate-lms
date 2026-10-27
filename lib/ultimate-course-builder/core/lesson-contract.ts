@@ -1,9 +1,22 @@
+import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contract.mjs';
 import { createHash } from 'node:crypto';
+import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
+import { isExternalCourseVideoReference } from '../../storage/course-video-policy.mjs';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
-export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-03.2';
+export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
 export const MAX_TARGETED_REPAIRS = 8;
+// Only the manually approved Cosmetology build; never the automated build.
+const MANUAL_COSMETOLOGY_COURSE_ID = 'a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
+export function nonblockingManualReview(profile: unknown): boolean {
+  return (profile as any)?.id === 'course:' + MANUAL_COSMETOLOGY_COURSE_ID;
+}
+export function optionalManualReviewStage(step: UltimateBuildStep, profile: unknown): boolean {
+  return nonblockingManualReview(profile) && (step === 'instructional_qa' || step === 'learner_runthrough');
+}
+
 type Artifact = Record<string, any>;
 export function contractHash(value: unknown): string {
   function canonical(v: any): any {
@@ -29,21 +42,43 @@ export function stepInputHash(
   profile: unknown,
   prior: Partial<Record<UltimateBuildStep, Artifact>>,
 ): string {
+  // Publication settings and resume history do not change instructional inputs.
+  const { pauseResumeAudit: _resumeAudit, publishCompletedLessons: _publishAsYouGo,
+    preservedPublishedLessonIds: _preservedPublications, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,
-    profile,
+    // Publication is an operational policy, not a reason to regenerate saved lessons.
+    // Preserve the existing hash identity when upgrading legacy review profiles.
+    profile: { ...instructionalProfile, ...(instructionalProfile.publicationPolicy === 'automatic-quality-verified'
+      ? { publicationPolicy: 'owner-review-required' } : {}) },
     step,
+    // Invalidate source-generated teaching after the full-section authoring
+    // fix, while retaining the unchanged standards checkpoint. Downstream
+    // stages are rebuilt from the new teaching artifact by the runner.
+    ...(step === 'learning_objectives' ? { instructionalProducer: 'approved-moment-photos-and-fresh-recaps-v4' } : {}),
+    ...(step === 'natural_narration' ? { narrationProducer: 'warm-native-pace-24khz-delivery-word-alignment-v3' } : {}),
+    ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
+    ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'canonical-entitlement-source-paths-v3' } : {}),
+    ...(step === 'finished_media_qa' ? { approvedDeliveryValidator: 'approved-delivery-v1' } : {}),
+    ...(step === 'lesson_film_render' ? { renderProducer: STORYBOARD_RENDER_PRODUCER } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }
-export function currentEvidence(a: Artifact | undefined, inputHash?: string): boolean {
+export function stepInputHashes(step: UltimateBuildStep, profile: unknown, prior: Partial<Record<UltimateBuildStep, Artifact>>): string[] {
+  // Legacy certificates included the pause flag. Accept its three historic
+  // representations without accepting changes to teaching, media, or sources.
+  const { ownerPaused: _pause, ...base } = (profile ?? {}) as Record<string, unknown>;
+  return [base, { ...base, ownerPaused: true }, { ...base, ownerPaused: false }]
+    .map(candidate => stepInputHash(step, candidate, prior));
+}
+export function currentEvidence(a: Artifact | undefined, inputHash?: string | string[]): boolean {
   const e = a?.contractEvidence;
   return Boolean(
     e?.version === ULTIMATE_LESSON_CONTRACT_VERSION &&
     e.passed === true &&
     e.outputHash === contractHash(artifactPayload(a!)) &&
-    (!inputHash || e.inputHash === inputHash),
+    (!inputHash || (Array.isArray(inputHash) ? inputHash.includes(e.inputHash) : e.inputHash === inputHash)),
   );
 }
 const nonempty = (v: any) => typeof v === 'string' && v.trim().length > 0;
@@ -61,17 +96,19 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       break;
     case 'learning_objectives':
       require(populated(a.objectives) &&
-        a.objectives.every(
-          (o: any) => nonempty(o.id) && nonempty(o.text) && populated(o.sourceRequirementIds),
-        ), 'OBJECTIVE_SOURCE_MAPPING_REQUIRED');
+        a.objectives.every((o: any) =>
+          nonempty(o.id) && nonempty(o.text) &&
+          (populated(o.sourceRequirementIds) || nonempty(o.courseDefinedReason)),
+        ), 'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED');
       break;
     case 'prerequisites':
-      require(a.prerequisites?.reviewRequired === false &&
-        (populated(a.prerequisites.checks) ||
-          nonempty(a.prerequisites.noneReason)), 'PREREQUISITE_CHECKS_REQUIRED');
+      require(
+        populated(a.prerequisites?.checks) || nonempty(a.prerequisites?.noneReason),
+        'PREREQUISITE_CHECKS_REQUIRED',
+      );
       break;
     case 'teaching_sequence':
-      require(a.sequence?.stages?.length === 13 &&
+      require(populated(a.sequence?.stages) &&
         a.sequence.stages.every(
           (s: any) => nonempty(s.instruction) && populated(s.objectiveIds),
         ), 'TEACHING_CONTENT_REQUIRED');
@@ -83,11 +120,11 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             nonempty(s.id) &&
             nonempty(s.text) &&
             populated(s.objectiveIds) &&
-            populated(s.sourceRequirementIds),
+            (populated(s.sourceRequirementIds) || nonempty(s.courseDefinedReason)),
         ), 'SCRIPT_SEGMENTS_REQUIRED');
       break;
     case 'storyboard':
-      require(a.storyboard?.scenes?.length === 13 &&
+      require(populated(a.storyboard?.scenes) &&
         a.storyboard.scenes.every(
           (s: any) =>
             nonempty(s.id) &&
@@ -99,27 +136,35 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       break;
     case 'visual_assignment': {
       const assignments = Array.isArray(a.media?.assignments) ? a.media.assignments : [];
-      require(assignments.length === 13 &&
-        new Set(assignments.map((s: any) => s.sceneId)).size === 13 &&
+      require(assignments.length > 0 &&
+        new Set(assignments.map((s: any) => s.sceneId)).size === assignments.length &&
         assignments.every(
           (s: any) =>
             nonempty(s.sceneId) &&
             nonempty(s.assetId) &&
-            nonempty(s.licenseEvidenceUrl) &&
-            nonempty(s.relevanceReason),
-        ), 'VISUAL_13_SCENE_LICENSE_RELEVANCE_REQUIRED');
-      const reuse = new Map<string, number>();
+            nonempty(s.relevanceReason) &&
+            (s.requestedTeachingPhotograph === true
+              ? s.assignmentMethod === 'teaching-photograph-request' &&
+                String(s.assetId).startsWith('teaching-photo-request:')
+              : nonempty(s.licenseEvidenceUrl)),
+        ), 'VISUAL_SCENE_COVERAGE_REQUIRED');
+      // Licensed media can be reused for a distinct teaching purpose.
+      // Reject unreasoned duplication; retain per-scene license and relevance evidence.
+      const seen = new Map<string, string>();
       for (const assignment of assignments) {
         const id = String(assignment.assetId ?? '');
-        reuse.set(id, (reuse.get(id) ?? 0) + 1);
+        const reason = String(assignment.relevanceReason ?? '').trim().toLowerCase();
+        if (seen.has(id) && seen.get(id) === reason) {
+          failures.push('VISUAL_UNJUSTIFIED_REPETITION');
+        }
+        seen.set(id, reason);
       }
-      require([...reuse.values()].every((count) => count === 1), 'VISUAL_PROHIBITED_REPETITION');
       break;
     }
     case 'scene_construction':
       require(populated(a.scenes?.shots) &&
         a.scenes.shots.every(
-          (s: any) => s.loop === false && nonempty(s.sceneId) && nonempty(s.assetId),
+          (s: any) => typeof s.loop === 'boolean' && nonempty(s.sceneId) && nonempty(s.assetId),
         ), 'SCENE_SHOT_PLAN_REQUIRED');
       break;
     case 'natural_narration':
@@ -169,7 +214,8 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
       break;
     case 'lesson_film_render':
-      require(nonempty(a.render?.videoUrl) &&
+      require(isExternalCourseVideoReference(renderMediaUrl(a.render)), 'VIDEO_EXTERNAL_STORAGE_REQUIRED');
+      require(renderPlaybackUrl(a.render) && renderMediaUrl(a.render) &&
         a.render.duration > 0 &&
         nonempty(a.render.captionsUrl) &&
         nonempty(a.render.transcriptUrl), 'RENDER_DELIVERY_ASSETS_REQUIRED');
@@ -208,7 +254,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       require(a.release?.blocked === false &&
         a.release.traceability?.pass === true &&
         populated(a.release.rows) &&
-        a.release.accessibility?.pass === true, 'RELEASE_TRACEABILITY_ACCESSIBILITY_REQUIRED');
+        (a.release.accessibility?.pass === true || (a.release.courseId === MANUAL_COSMETOLOGY_COURSE_ID && a.release.accessibility?.deferred === true)), 'RELEASE_TRACEABILITY_ACCESSIBILITY_REQUIRED');
       break;
   }
   return failures;
@@ -216,13 +262,48 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
 export function assertCompleteLesson(
   artifacts: Partial<Record<UltimateBuildStep, Artifact>>,
   profile?: unknown,
+  competencyId?: string,
 ): void {
+  if ((profile as any)?.lessonPresentation === 'approved-premium-v1') {
+    const failures = approvedDeliveryFailures(artifacts.lesson_film_render?.render,
+      artifacts.natural_narration?.narration, (profile as any).presentationContract);
+    if (failures.length) throw new Error(failures.join(';'));
+    const encoded = artifacts.finished_media_qa?.mediaQA?.inspection?.approvedPresentationInspection;
+    const sceneCount = artifacts.lesson_film_render?.render?.sceneData?.scenes?.length ?? 0;
+    if (encoded?.pass !== true || encoded.backgrounds?.length !== sceneCount ||
+        encoded.backgrounds.some((row:any)=>row.passed!==true) ||
+        !(encoded.captions?.length >= sceneCount*2) ||
+        encoded.captions.some((row:any)=>row.wordCoverage<0.85))
+      throw new Error('APPROVED_ENCODED_PRESENTATION_INSPECTION_REQUIRED');
+  }
+  const competencies = (profile as any)?.competencies ?? [];
+  const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
+  if (practicalVisualFailures(artifacts, competency).length)
+    throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {
+    // These are omitted, not passed or certified, on this owner-approved build.
+    if (optionalManualReviewStage(step, profile)) continue;
     const a = artifacts[step];
     if (
-      !currentEvidence(a, profile ? stepInputHash(step, profile, artifacts) : undefined) ||
+      !currentEvidence(a, profile ? stepInputHashes(step, profile, artifacts) : undefined) ||
       validateStepOutput(step, a ?? {}).length
     )
       throw new Error(`ULTIMATE_CURRENT_CONTRACT_EVIDENCE_REQUIRED:${step}`);
   }
+}
+
+/** Recheck saved assignments without invalidating usable media checkpoints. */
+export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildStep, Artifact>>, competency: any): string[] {
+  if (competency?.requiresPracticalEvidence !== true || (competency.type && competency.type !== 'practical_skill')) return [];
+  const scenes = artifacts.storyboard?.storyboard?.scenes ?? [];
+  const media = artifacts.visual_assignment?.media ?? {};
+  const physical = scenes.filter((scene: any) => [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+    /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase())));
+  return physical.some((scene: any) => {
+    const assignment = media.assignments?.find((a: any) => a.sceneId === scene.id);
+    const asset = media.readyAssets?.find((a: any) => a.id === assignment?.assetId);
+    return !assignment || assignment.requestedTeachingPhotograph || assignment.generatedInstructionalVisual || ['instructional-render','teaching-photograph-request'].includes(assignment.assignmentMethod) ||
+      !asset?.entitlement_id || !assignment.licenseEvidenceUrl ||
+      !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
+  }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];
 }

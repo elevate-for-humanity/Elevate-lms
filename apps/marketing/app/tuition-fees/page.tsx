@@ -55,7 +55,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'See enrollment disclosure for current licensing/exam charges and inclusions',
       materials: 0,
-      fundingType: 'Registered Apprenticeship — funding eligibility varies; self-pay and payment options available',
+      fundingType: 'Registered Apprenticeship — self-pay only',
     }),
     withTotal({
       name: 'Bookkeeping / Accounting Clerk',

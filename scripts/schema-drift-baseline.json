@@ -328,8 +328,6 @@
     "lib/studio/orchestration.ts|studio_tasks|TABLE_NOT_IN_SCHEMA",
     "lib/studio/orchestration.ts|workforce_agents|TABLE_NOT_IN_SCHEMA",
     "lib/timeclock/queries.ts|progress_entries|work_date",
-    "lib/timeclock/sync-to-hour-entries.ts|apprentices|employer_id",
-    "lib/timeclock/sync-to-hour-entries.ts|progress_entries|work_date",
     "lib/video/auto-video-generator.ts|course_lessons|module_name",
     "lib/video/auto-video-generator.ts|courses|category",
     "lib/video/job-queue.ts|course_lessons|content_json",

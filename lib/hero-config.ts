@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Video hero sources - used across the site
 // Rules: No gradient overlays, text in solid container, calm motion only
-// All URLs point to R2 CDN — confirmed 206 on all files listed below.
+// Hero video sources may use verified legacy CDN media or canonical Supabase public previews.
 const R2 = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos';
 export const VIDEO_HEROES = {
   // Main/Marketing
@@ -23,7 +23,7 @@ export const VIDEO_HEROES = {
   // Program Categories
   barber: `${R2}/barber-hero-final.mp4`,
   barberApprenticeship: `${R2}/barber-hero-final.mp4`,
-  healthcare: `${R2}/cna-hero.mp4`,
+  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4',
   skilledTrades: `${R2}/hvac-hero-final.mp4`,
   technology: `${R2}/hero-home-fast.mp4`,
 
@@ -142,9 +142,9 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
   // PRIORITY 1: Homepage (VIDEO)
   // ============================================
   '/': {
-    title: 'Free Career Training That Changes Lives',
+    title: 'Career Training That Builds Opportunity',
     subtitle:
-      'WIOA-funded workforce programs in healthcare, skilled trades, and technology. No cost if you qualify.',
+      'Career training across healthcare, skilled trades, technology, business, and registered apprenticeship occupations. Funding and tuition are disclosed by program.',
     videoSrc: VIDEO_HEROES.homepage,
     videoPoster: '/images/pages/workforce-training.webp',
     variant: 'video',
@@ -159,7 +159,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
   '/programs': {
     title: 'Career Training Programs',
     subtitle:
-      'Industry-recognized certifications in high-demand fields. Free for eligible participants.',
+      'Career-training pathways with program-specific duration, credential, tuition, and funding disclosures.',
     image: '/images/pages/training-classroom.webp',
     variant: 'split',
     height: 'medium',
@@ -184,7 +184,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     metadata: [
       { label: 'Duration', value: '2,000 hours' },
       { label: 'Format', value: 'In-Shop Training' },
-      { label: 'Cost', value: 'Free if eligible' },
+      { label: 'Cost', value: 'Self-pay; review published tuition' },
     ],
     ctaPrimary: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
     ctaSecondary: { label: 'Find a Host Shop', href: '/partners/host-shops?program=barber' },
@@ -218,7 +218,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     metadata: [
       { label: 'Duration', value: '700 hours' },
       { label: 'Format', value: 'In-Salon Training' },
-      { label: 'Cost', value: 'Free if eligible' },
+      { label: 'Cost', value: 'Self-pay; review published tuition' },
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=esthetician' },
     ctaSecondary: { label: 'Learn More', href: '#program-details' },
@@ -235,7 +235,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     metadata: [
       { label: 'Duration', value: '3-4 weeks' },
       { label: 'Format', value: 'In-Person' },
-      { label: 'Cost', value: 'Free if eligible' },
+      { label: 'Cost', value: 'Review WRG eligibility and self-pay price' },
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=cdl' },
     ctaSecondary: { label: 'Check Eligibility', href: '/wioa-eligibility' },
@@ -268,7 +268,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     image: '/images/pages/healthcare-classroom.webp',
     variant: 'split',
     height: 'medium',
-    badge: 'Free Training Available',
+    badge: 'Program-Specific Payment Options',
     ctaPrimary: { label: 'Begin Application', href: '#application-form' },
   },
 
@@ -304,7 +304,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
   // About
   '/about': {
     title: 'About ' + PLATFORM_DEFAULTS.orgName + '',
-    subtitle: 'Breaking the cycle of poverty through free workforce training since 2020.',
+    subtitle: 'Expanding access to career training, registered apprenticeship support, and workforce pathways.',
     image: '/images/pages/about-hero.webp',
     variant: 'split',
     height: 'medium',
@@ -319,7 +319,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     image: '/images/pages/contact-hero.jpg',
     variant: 'split',
     height: 'medium',
-    ctaPrimary: { label: 'Call Now', href: 'tel:3173143757' },
+    ctaPrimary: { label: 'Call Now', href: 'tel:4632401404' },
   },
 
   // Testimonials

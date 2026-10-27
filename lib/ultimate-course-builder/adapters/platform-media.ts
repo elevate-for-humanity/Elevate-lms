@@ -160,11 +160,15 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       courseScopedData.map(async (asset: RecordLike) => {
         const entitlement = firstRecord(asset.licensed_media_entitlements);
         const metadata = firstRecord(entitlement.metadata);
-        let publicUrl = typeof asset.video_url === 'string' ? asset.video_url : '';
-        if (!publicUrl && asset.storage_path) {
+        // The entitlement owns the current private source. A historical lesson
+        // URL must not override a replacement uploaded under the same item.
+        const stored = storedLicensedMediaMetadata(metadata);
+        const storagePath = stored?.storage_path ?? asset.storage_path;
+        let publicUrl = stored ? '' : (typeof asset.video_url === 'string' ? asset.video_url : '');
+        if (!publicUrl && storagePath) {
           const { data: signed, error: signedError } = await this.db.storage
             .from('course_videos')
-            .createSignedUrl(String(asset.storage_path), 60 * 60 * 24);
+            .createSignedUrl(String(storagePath), 60 * 60 * 24);
           if (signedError) throw signedError;
           publicUrl = signed?.signedUrl ?? '';
         }
@@ -174,6 +178,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
         return {
           ...asset,
           id: String(asset.id),
+          storage_path: storagePath,
           public_url: publicUrl,
           mime_type: metadata.mime_type,
           provider: entitlement.provider ?? 'envato',
@@ -202,10 +207,18 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     );
 
     const scenes = input.storyboard?.storyboard?.scenes ?? [];
+    const inspectedAssets = input.profile?.lessonPresentation === 'approved-premium-v1' ? readyAssets.filter((asset:any)=>{
+      const observation=asset.visual_observation;
+      return observation?.method === 'sampled-frame-inspection' &&
+        /^[a-f0-9]{64}$/i.test(String(asset.content_sha256??'')) && observation.contentSha256===asset.content_sha256 &&
+        Number.isFinite(Date.parse(observation.reviewedAt)) && Array.isArray(observation.sampleFractions) && observation.sampleFractions.length>0 &&
+        observation.sampleFractions.every((fraction:any)=>typeof fraction==='number'&&fraction>=0&&fraction<=1);
+    }) : readyAssets;
     const { assignments, gaps } = buildSceneAssignments(
       scenes,
-      readyAssets,
+      inspectedAssets,
       input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
+      {requiresPracticalEvidence: input.competency?.requiresPracticalEvidence === true, competencyType:input.competency?.type,allowInspectedMotionExcerpts:input.profile?.presentationContract?.version==='owner-approved-video-2026-10-13.3'},
     );
     if (gaps.length) {
       const workspaceId = firstRecord(

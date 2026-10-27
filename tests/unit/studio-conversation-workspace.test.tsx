@@ -3,7 +3,12 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import StudioCommandWorkspace from '@/components/studio/StudioCommandWorkspace';
 
-vi.mock('next/dynamic', () => ({ default: () => () => <div>Existing tool workspace</div> }));
+vi.mock('next/dynamic', () => ({
+  default: (loader: () => unknown) =>
+    String(loader).includes('CloudBrowserWorkspace')
+      ? () => <div data-testid="studio-browser-panel">Existing browser workspace</div>
+      : () => <div>Existing tool workspace</div>,
+}));
 vi.mock('@/components/studio/RepositoryLivePreview', () => ({
   default: () => <div>Existing preview</div>,
 }));
@@ -66,6 +71,11 @@ describe('One Studio conversation workspace', () => {
         ]}
       />,
     );
+    expect(screen.queryByTestId('studio-browser-panel')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Work', exact: true }));
+    expect(screen.getAllByTestId('studio-browser-panel')).toHaveLength(1);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Chat', exact: true })[0]);
+    expect(screen.getAllByTestId('studio-browser-panel')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Open Studio sidebar' }));
     expect(screen.queryByRole('button', { name: /PARIS|ELLIE|ZORA/ })).toBeNull();
     fireEvent.click(await screen.findByRole('button', { name: 'Reviewed course sample' }));

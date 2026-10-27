@@ -88,7 +88,7 @@ export function ProgramPaymentButton({
         <div className="text-sm text-black space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-brand-green-600">•</span>
-            <span>Secure payment via Stripe</span>
+            <span>Secure payment via QuickBooks</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-brand-green-600">•</span>

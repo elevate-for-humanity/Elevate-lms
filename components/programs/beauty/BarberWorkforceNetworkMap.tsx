@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import {
   BARBER_WORKFORCE_NETWORK_PINS,
   type NetworkMapPin,
@@ -29,26 +31,15 @@ const KIND_LABEL: Record<DisplayPin['kind'], string> = {
   satellite: 'Satellite / partner site',
 };
 
-const HOST_SHOP_PINS: DisplayPin[] = FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => ({
-  id: `host-${shop.slug}`,
-  kind: 'host_shop',
-  name: shop.dba ?? shop.name,
-  address: shop.address,
-  city: shop.city,
-  state: shop.state,
-  zip: shop.zip,
-  phone: shop.phone,
-  href: `/host-shops/${shop.slug}`,
-}));
-
 const SUPPORT_PINS: DisplayPin[] = BARBER_WORKFORCE_NETWORK_PINS
   .filter((pin) => pin.kind !== 'host_shop')
   .map((pin) => ({ ...pin }));
 
-const MAP_PINS: DisplayPin[] = [...HOST_SHOP_PINS, ...SUPPORT_PINS];
+
 
 function fullAddress(pin: DisplayPin) {
-  return `${pin.address}, ${pin.city}, ${pin.state} ${pin.zip}`;
+  if (pin.city && pin.address.toLowerCase().includes(pin.city.toLowerCase())) return pin.address;
+  return [pin.address, pin.city, pin.state, pin.zip].filter(Boolean).join(', ');
 }
 
 function directionsUrl(pin: DisplayPin) {
@@ -60,11 +51,12 @@ function embedUrl(pin: DisplayPin) {
   return `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=14&output=embed`;
 }
 
-export default function BarberWorkforceNetworkMap() {
+export default function BarberWorkforceNetworkMap({ shops }: { shops?: HostShopNetworkEntry[] } = {}) {
+  const MAP_PINS: DisplayPin[] = useMemo(() => [...(shops ?? FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => ({ ...shop, id: shop.slug }))).filter((shop) => matchesHostShopProgram(shop, 'barber-apprenticeship')).map((shop): DisplayPin => ({ id: `host-${shop.id}`, kind: 'host_shop', name: shop.name, address: shop.address, city: shop.city, state: shop.state, zip: '', phone: shop.phone, href: `/host-shops/${shop.slug}` })), ...SUPPORT_PINS], [shops]);
   const [selectedId, setSelectedId] = useState(MAP_PINS[0]?.id ?? '');
   const selected = useMemo(
     () => MAP_PINS.find((pin) => pin.id === selectedId) ?? MAP_PINS[0],
-    [selectedId],
+    [selectedId, MAP_PINS],
   );
 
   return (
@@ -74,10 +66,10 @@ export default function BarberWorkforceNetworkMap() {
           Find support near you
         </p>
         <h2 className="mb-3 text-2xl font-bold text-slate-950">
-          Barber program map — every host shop plus workforce support
+          Barber Host Shop map and community support
         </h2>
         <p className="mb-8 max-w-3xl font-medium leading-relaxed text-slate-800">
-          Select any approved host shop to see its exact public address, phone number when verified,
+          Select a participating barber host shop to see its exact public address, phone number when verified,
           map, and directions. WorkOne and Elevate support locations remain available in the same map.
         </p>
 

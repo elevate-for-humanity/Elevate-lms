@@ -46,7 +46,7 @@ export function HomePlatformPreview() {
           {PLATFORM_CAPABILITIES.map((cap) => (
             <Link key={cap.label} href={cap.href} className="group flex flex-col rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-slate-600 transition-all hover:-translate-y-0.5">
               <div className="relative w-full aspect-[16/9] max-h-48 overflow-hidden bg-slate-800">
-                <Image src={cap.img} alt={`${cap.label} platform preview`} fill className="object-cover object-top transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" placeholder="empty" />
+                <Image src={cap.img} alt={`${cap.label} platform preview`} fill className="object-contain object-top transition-transform duration-500 " sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" placeholder="empty" />
               </div>
               <div className="p-4">
                 <p className="text-sm font-extrabold text-white mb-1">{cap.label}</p>

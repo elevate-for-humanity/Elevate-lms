@@ -127,6 +127,7 @@ export default async function AdminEnrollmentsPage({
         },
       ]}
     >
+      <Link href="/enrollments/school-invoices" className="mb-4 inline-block text-blue-700 underline">School invoice orders</Link>
       <AdminFilterBar>
         <form method="GET" className="flex flex-wrap gap-3 items-end">
           <div>

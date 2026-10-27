@@ -9,14 +9,15 @@ const slug = (key: string) => key.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 /** Media recommendation needs canonical lesson rows before publication. Seed
  * them from the approved blueprint, without granting review/release status. */
 export async function materializeUltimateDraft(db: SupabaseClient, courseId: string,
-  profile: UltimateCredentialProfile): Promise<UltimateCredentialProfile> {
+  profile: UltimateCredentialProfile, competencyIds?: string[]): Promise<UltimateCredentialProfile> {
   const { data: lessons, error } = await db.from('course_lessons')
     .select('id,slug').eq('course_id', courseId);
   if (error) throw error;
-  const canonicalLessonIds: Record<string, string> = {};
+  const canonicalLessonIds: Record<string, string> = { ...(profile.canonicalLessonIds ?? {}) };
   const instructional = new UltimatePlatformInstructionalGenerator();
   let moduleId: string | undefined;
   for (const [index, competency] of profile.competencies.entries()) {
+    if (competencyIds && !competencyIds.includes(competency.id)) continue;
     const lessonSlug = slug(competency.id);
     const existing = (lessons ?? []).find(l => l.id === competency.id || l.slug === lessonSlug);
     if (existing) { canonicalLessonIds[competency.id] = existing.id; continue; }
@@ -41,7 +42,7 @@ export async function materializeUltimateDraft(db: SupabaseClient, courseId: str
       }
     }
     const { data: lesson, error: lessonError } = await db.from('course_lessons')
-      .upsert({ course_id: courseId, module_id: moduleId, slug: lessonSlug,
+      .upsert({ id: canonicalLessonIds[competency.id], course_id: courseId, module_id: moduleId, slug: lessonSlug,
         title: competency.title, order_index: index + 1, lesson_type: 'lesson',
         status: 'draft', is_published: false, approved: false, is_required: true,
         generation_status: 'generating', practical_required: competency.requiresPracticalEvidence,

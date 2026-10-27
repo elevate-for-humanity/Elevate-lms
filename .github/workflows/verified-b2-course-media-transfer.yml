@@ -1,0 +1,62 @@
+name: Verified B2 Course Media Transfer
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Number of objects in this batch (1-25)"
+        required: true
+        default: "1"
+      skip:
+        description: "Number of source objects already examined"
+        required: true
+        default: "0"
+permissions:
+  contents: read
+concurrency:
+  group: course-media-b2-transfer
+  cancel-in-progress: false
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enable pnpm from packageManager
+        run: corepack enable
+      - name: Install workspace dependencies using pnpm lockfile
+        run: corepack pnpm install --frozen-lockfile --ignore-scripts
+      - name: Validate migration inputs and credentials
+        env:
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_SKIP: ${{ inputs.skip }}
+          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
+          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
+          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
+          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
+          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
+          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
+        run: |
+          node --input-type=module -e '
+            const n=Number(process.env.INPUT_LIMIT),s=Number(process.env.INPUT_SKIP);
+            if(!Number.isInteger(n)||n<1||n>25||!Number.isSafeInteger(s)||s<0)throw Error("Invalid batch inputs");
+            for(const key of ["SUPABASE_URL","SUPABASE_SERVICE_ROLE_KEY","ELEVATE_MEDIA_ENDPOINT","ELEVATE_MEDIA_REGION","ELEVATE_MEDIA_BUCKET","ELEVATE_MEDIA_ACCESS_KEY_ID","ELEVATE_MEDIA_SECRET_ACCESS_KEY"]){if(!process.env[key])throw Error("Required migration credential unavailable: "+key)}
+            const u=new URL(process.env.ELEVATE_MEDIA_ENDPOINT);
+            if(u.protocol!=="https:"||!u.hostname.endsWith(".backblazeb2.com"))throw Error("Destination must be Backblaze B2");
+          '
+      - name: Copy and SHA256-verify a bounded batch (never delete)
+        env:
+          MIGRATION_LIMIT: ${{ inputs.limit }}
+          MIGRATION_SKIP: ${{ inputs.skip }}
+          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
+          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
+          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
+          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
+          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
+          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
+        run: node scripts/gcp/migrate-course-media-to-b2.mjs

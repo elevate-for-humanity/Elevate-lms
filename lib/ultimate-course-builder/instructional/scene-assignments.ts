@@ -1,13 +1,12 @@
 import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
-import { reviewedSceneEvidence } from './reviewed-scene-evidence';
-import { visualRequirementCompatibility } from './visual-compatibility';
+import { compatibleVisualTask, reviewedSceneEvidence } from './reviewed-scene-evidence';
 
 /** Assign distinct licensed source files to storyboard scenes using persisted
  * lesson-match evidence plus deterministic scene/asset semantic overlap.
  * Automatic assignment never treats a title alone as proof: the asset must
  * have entitlement/license evidence and either explicit reviewed coverage or
  * a persisted lesson match with positive semantic overlap to the scene. */
-export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = []) {
+export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean; competencyType?: string; allowInspectedMotionExcerpts?: boolean} = {}) {
   const assignments: any[] = [];
   const gaps: any[] = [];
 
@@ -49,14 +48,25 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   const candidates = assets.filter(
     (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
   );
-  // Distinct ready course-video assets may represent different inspected shots
-  // from the same licensed source item. Treat the actual attached asset as the
-  // assignment identity so valid segments can cover separate scenes. Exact
-  // duplicate bytes remain the same identity when a content hash is available.
-  const identity = (asset: any) =>
-    asset.content_sha256
-      ? `hash:${asset.content_sha256}`
-      : `asset:${asset.id}`;
+  // Separate records do not establish separate shots. Prefer verified bytes,
+  // then the stored object, then the file URL without its expiring signature.
+  // Truly distinct attached segments retain their own object paths/hashes.
+  const parents = candidates.map((_, index) => index);
+  const root = (index: number): number => parents[index] === index ? index : (parents[index] = root(parents[index]));
+  const keys = new Map<string, number>();
+  candidates.forEach((asset, index) => {
+    for (const key of [asset.provider_item_id && `item:${asset.provider_item_id}`,
+      asset.content_sha256 && `hash:${asset.content_sha256}`, asset.storage_path && `object:${asset.storage_path}`,
+      `url:${String(asset.public_url).split(/[?#]/)[0]}`].filter(Boolean) as string[]) {
+      const existing = keys.get(key);
+      if (existing !== undefined) parents[root(index)] = root(existing);
+      else keys.set(key, index);
+    }
+  });
+  const identity = (asset: any) => `source:${root(candidates.indexOf(asset))}`;
+  const physicalScene = (scene: any) => (options.competencyType ? options.competencyType === 'practical_skill' : options.requiresPracticalEvidence !== false) &&
+    [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+      /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
   const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '')
@@ -76,19 +86,25 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           method = 'verified-coverage';
         } else if (
           asset.visual_coverage_verified === true &&
-          Array.isArray(asset.visual_requirements) &&
-          asset.visual_requirements.some((r: unknown) => typeof r === 'string' &&
-            visualRequirementCompatibility(requirement, r).compatible)
+          asset.visual_requirements?.some((r: string) =>
+            typeof r === 'string' && compatibleVisualTask(requirement, r))
         ) {
           reason =
             asset.relevance_reason ??
-            `Verified visual coverage matches the scene requirement: ${scene.visualRequirement}`;
+            `Verified visual coverage is compatible with the scene requirement: ${scene.visualRequirement}`;
           method = 'verified-coverage';
+        } else if (physicalScene(scene) && options.allowInspectedMotionExcerpts &&
+          String(asset.mime_type??'').startsWith('video/') &&
+          asset.visual_observation?.method === 'sampled-frame-inspection' &&
+          asset.visual_observation.contentSha256 === asset.content_sha256) {
+          const quotes=scene.teachingVisual?.steps?.map((step:any)=>step.narrationQuote)??[];
+          const supported=quotes.find((quote:string)=>(asset.visual_observation.visibleActions??[]).some((action:string)=>compatibleVisualTask(quote,action)));
+          if(supported){reason='Inspected motion excerpt supports the spoken action: '+supported;method='inspected-motion-excerpt';}
         } else if ((visualEvidence = reviewedSceneEvidence(scene, asset))) {
           reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
-            `This is compatible with the scene's contextual visual requirement. ${visualEvidence.scope}`;
+            `This supports the scene's contextual visual task through compatible action coverage. ${visualEvidence.scope}`;
           method = 'reviewed-action-coverage';
-        } else if (asset.lesson_match_verified === true && !asset.visual_observation) {
+        } else if (asset.lesson_match_verified === true && !asset.visual_observation && !physicalScene(scene)) {
           // A failed inspected-action comparison must not fall back to a weaker
           // lesson keyword match (including a demonstration or stale hash).
           const evidence = overlapEvidence(scene, asset);
@@ -102,7 +118,9 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       .sort((a, b) => {
         const rank = (m: string) => (m === 'lesson-scoped' ? 0 : m === 'verified-coverage' ? 1 : 2);
         return (
-          rank(a.method) - rank(b.method) || String(a.asset.id).localeCompare(String(b.asset.id))
+          rank(a.method) - rank(b.method) ||
+          (b.visualEvidence?.requirementCoverage ?? 0) - (a.visualEvidence?.requirementCoverage ?? 0) ||
+          String(a.asset.id).localeCompare(String(b.asset.id))
         );
       });
   });
@@ -131,13 +149,20 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   for (const [index, scene] of scenes.entries()) {
     const choice = selected.get(index);
     if (!choice) {
-      gaps.push({
+      if (physicalScene(scene) || !scene.teachingVisual?.steps?.length) {
+        gaps.push({sceneId:scene.id, visualRequirement:scene.visualRequirement,
+          reason: 'No distinct licensed asset has verified lesson/scene relevance evidence', licensedAssetCount:candidates.length});
+        continue;
+      }
+      // Photographic requests support conceptual teaching. They cannot stand
+      // in for required observable physical techniques.
+      assignments.push({
         sceneId: scene.id,
+        assetId: `teaching-photo-request:${scene.id}`,
+        relevanceReason: `Photograph illustrating: ${scene.visualRequirement}`,
+        assignmentMethod: 'teaching-photograph-request',
+        requestedTeachingPhotograph: true,
         visualRequirement: scene.visualRequirement,
-        reason: configured.some((a) => a.sceneId === scene.id)
-          ? 'Configured asset is unavailable, unlicensed, repeated, or missing relevance evidence'
-          : 'No distinct licensed asset has verified lesson/scene relevance evidence',
-        licensedAssetCount: candidates.length,
       });
       continue;
     }

@@ -1,5 +1,6 @@
 'use client';
 
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import React from 'react';
 // app/advising/page.tsx
 
@@ -47,6 +48,15 @@ export default function AdvisingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative student and admissions advisor planning training"
+        actions={[
+          { href: '/apply/student', label: 'Start my application' },
+          { href: '/programs', label: 'Compare career programs' },
+        ]}
+      />
+
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

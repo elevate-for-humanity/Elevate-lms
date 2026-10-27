@@ -1,6 +1,16 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+const storageMocks = vi.hoisted(() => ({ uploadFile: vi.fn(), uploadBuffer: vi.fn() }));
+vi.mock('@/lib/storage/elevate-media-storage', async (original) => ({
+  ...await original<typeof import('@/lib/storage/elevate-media-storage')>(),
+  uploadFileToElevateMedia: storageMocks.uploadFile,
+  uploadToElevateMedia: storageMocks.uploadBuffer,
+}));
 import {
   SUPABASE_SAFE_VIDEO_BYTES,
+  uploadLessonFileFromDisk,
   resolveCourseVideoStorageBackend,
   shouldUploadCourseMediaToElevateMedia,
 } from '@/lib/video/upload-lesson-media';
@@ -58,6 +68,11 @@ describe('upload-lesson-media routing', () => {
     expect(resolveCourseVideoStorageBackend()).toBe('auto');
   });
 
+  it('rejects misspelled explicit storage backend instead of silently routing to Supabase', () => {
+    process.env.COURSE_VIDEO_STORAGE_BACKEND = 'elevate-medai';
+    expect(() => resolveCourseVideoStorageBackend()).toThrow('COURSE_VIDEO_STORAGE_BACKEND_INVALID');
+  });
+
   it('maps legacy r2 backend selection to the Elevate Media backend', () => {
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'r2';
     expect(resolveCourseVideoStorageBackend()).toBe('elevate-media');
@@ -67,15 +82,35 @@ describe('upload-lesson-media routing', () => {
     expect(SUPABASE_SAFE_VIDEO_BYTES).toBe(45 * 1024 * 1024);
   });
 
-  it('auto keeps large video on Supabase when Elevate Media Storage is unset', () => {
+  it('rejects video when external storage is unset', () => {
     const buf = Buffer.alloc(6 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
+    expect(() => shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
   });
 
-  it('does not send course media to Elevate Media Storage without a browser delivery URL', () => {
+  it('supports private Backblaze storage without a public URL', () => {
     configureB2(false);
     const buf = Buffer.alloc(6 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
+  });
+
+  it('permits explicitly selected private B2 while keeping Supabase fallback disabled', () => {
+    configureB2(false);
+    process.env.COURSE_VIDEO_STORAGE_BACKEND = 'elevate-media';
+    expect(shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
+      .toBe(true);
+  });
+
+  it('routes private Backblaze B2 video without a public delivery URL', () => {
+    configureB2(false);
+    expect(shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
+      .toBe(true);
+  });
+
+  it('fails closed if selected Backblaze credentials are missing', () => {
+    configureB2(false);
+    delete process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY;
+    expect(() => shouldUploadCourseMediaToElevateMedia(Buffer.alloc(6 * 1024 * 1024), 'video/mp4'))
+      .toThrow('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
   });
 
   it('auto sends large mp4 to Backblaze B2 when configured for public delivery', () => {
@@ -84,10 +119,10 @@ describe('upload-lesson-media routing', () => {
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
 
-  it('auto keeps small mp4 on Supabase even when B2 is available', () => {
+  it('routes small MP4s to external storage too', () => {
     configureB2(true);
     const buf = Buffer.alloc(1 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
 
   it('never routes mp3 to Elevate Media Storage in auto mode', () => {
@@ -96,11 +131,11 @@ describe('upload-lesson-media routing', () => {
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'audio/mpeg')).toBe(false);
   });
 
-  it('force supabase backend overrides configured Elevate Media Storage', () => {
+  it('rejects Supabase as a video backend even when explicitly selected', () => {
     configureB2(true);
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'supabase';
     const buf = Buffer.alloc(20 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
+    expect(() => shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toThrow('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
   });
 
   it('force Elevate Media backend routes video even below the automatic size threshold', () => {
@@ -118,5 +153,63 @@ describe('upload-lesson-media routing', () => {
     process.env.CLOUDFLARE_R2_PUBLIC_URL = 'https://legacy-media.example.com';
     const buf = Buffer.alloc(6 * 1024 * 1024);
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
+  });
+});
+
+describe('completed MP4 external upload', () => {
+  const previous = process.env;
+  beforeEach(() => {
+    process.env = { ...previous, COURSE_VIDEO_STORAGE_BACKEND: 'auto',
+      ELEVATE_MEDIA_PROVIDER: 'backblaze-b2',
+      ELEVATE_MEDIA_ENDPOINT: 'https://s3.us-east-005.backblazeb2.com',
+      ELEVATE_MEDIA_ACCESS_KEY_ID: 'fixture-key', ELEVATE_MEDIA_SECRET_ACCESS_KEY: 'fixture-secret',
+      ELEVATE_MEDIA_BUCKET: 'fixture-media' };
+    delete process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID;
+    storageMocks.uploadFile.mockReset();
+    storageMocks.uploadBuffer.mockReset();
+    vi.stubGlobal('fetch', vi.fn(() => { throw new Error('Unexpected Supabase upload'); }));
+  });
+  afterEach(() => { process.env = previous; vi.unstubAllGlobals(); });
+  it('uploads completed bytes externally and removes the temporary file only on success', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'external-lesson-upload-'));
+    const file = path.join(directory, 'lesson.mp4');
+    const bytes = Buffer.alloc(46 * 1024 * 1024, 7);
+    try {
+      await writeFile(file, bytes);
+      storageMocks.uploadFile.mockImplementation(async (savedFile: string, key: string, mime: string) => {
+        expect(savedFile).toBe(file);
+        expect((await readFile(savedFile)).equals(bytes)).toBe(true);
+        expect(mime).toBe('video/mp4');
+        return { success: true, key, url: 'https://external-media.example/lesson.mp4' };
+      });
+      expect(await uploadLessonFileFromDisk(file, 'lesson-test', 'mp4'))
+        .toBe('https://external-media.example/lesson.mp4');
+      expect(storageMocks.uploadFile).toHaveBeenCalledOnce();
+      expect(fetch).not.toHaveBeenCalled();
+      await expect(readFile(file)).rejects.toThrow();
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  });
+  it('retains completed render bytes and never sends them to Supabase after external failure', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'external-lesson-upload-'));
+    const file = path.join(directory, 'lesson.mp4'), bytes = Buffer.from('completed film');
+    try {
+      await writeFile(file, bytes);
+      storageMocks.uploadFile.mockResolvedValue({ success: false, error: 'external unavailable' });
+      await expect(uploadLessonFileFromDisk(file, 'lesson-test', 'mp4')).rejects.toThrow('COURSE_OBJECT_STORAGE_UPLOAD_FAILED');
+      expect((await readFile(file)).equals(bytes)).toBe(true);
+      expect(fetch).not.toHaveBeenCalled();
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  });
+  it('rejects the former forced Supabase path before writing or deleting render bytes', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'external-lesson-upload-'));
+    const file = path.join(directory, 'lesson.mp4'), bytes = Buffer.from('keep this film');
+    try {
+      await writeFile(file, bytes);
+      await expect(uploadLessonFileFromDisk(file, 'lesson-test', 'mp4', { forceSupabase: true }))
+        .rejects.toThrow('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
+      expect((await readFile(file)).equals(bytes)).toBe(true);
+      expect(storageMocks.uploadFile).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
+    } finally { await rm(directory, { recursive: true, force: true }); }
   });
 });

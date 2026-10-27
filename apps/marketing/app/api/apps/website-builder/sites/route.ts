@@ -85,13 +85,16 @@ export async function POST(request: NextRequest) {
 
   const admin = await requireAdminClient();
   const { data: ownedSites } = await admin.from('user_websites').select('id, site_config').eq('user_id', user.id).order('updated_at', { ascending: false });
-  const reusable = (ownedSites || []).find((site) => interviewPending(site.site_config));
+  const body = await request.json().catch(() => ({}));
+  const existingSiteId = typeof body.existingSiteId === 'string' && /^[0-9a-f-]{36}$/i.test(body.existingSiteId) ? body.existingSiteId : null;
+  const existing = existingSiteId ? (ownedSites || []).find((site) => site.id === existingSiteId) : null;
+  if (existingSiteId && !existing) return NextResponse.json({ error: 'Existing website not found or not owned by you' }, { status: 404 });
+  const reusable = existing || (ownedSites || []).find((site) => interviewPending(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !interviewPending(site.site_config)).length;
   const plan = access.plan || 'starter';
   const limit = PLAN_SITE_LIMITS[plan] ?? 1;
   if (!reusable && limit !== null && completedCount >= limit) return NextResponse.json({ error: `${plan} plan allows ${limit} website${limit === 1 ? '' : 's'}`, upgradeUrl: '/store/apps/website-builder' }, { status: 409 });
 
-  const body = await request.json().catch(() => ({}));
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';
   const fallback = buildDefaultSiteConfig({ organizationName: siteName, contactEmail: user.email || undefined });
   const normalizedConfig = normalizeProvidedConfig(body.siteConfig, fallback);
@@ -104,6 +107,12 @@ export async function POST(request: NextRequest) {
   });
   const payload = { user_id: user.id, site_name: siteName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
 
+  if (existing && !interviewPending(existing.site_config)) {
+    const { data: current, error: currentError } = await admin.from('user_websites').select('id,user_id,site_name,subdomain,site_config,is_published').eq('id', existing.id).eq('user_id', user.id).single();
+    if (currentError || !current) return NextResponse.json({ error: 'Unable to preserve existing website revision' }, { status: 503 });
+    const { error: revisionError } = await admin.from('website_revisions').insert({ website_id: current.id, user_id: current.user_id, site_name: current.site_name, subdomain: current.subdomain, site_config: current.site_config, is_published: current.is_published, reason: 'Before importing updated website content' });
+    if (revisionError) return NextResponse.json({ error: 'Unable to create backup revision; original site unchanged' }, { status: 503 });
+  }
   const query = reusable?.id
     ? admin.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
     : admin.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });

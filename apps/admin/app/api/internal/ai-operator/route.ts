@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { loadBillingProviderConfig } from '@/lib/billing/config';
@@ -8,6 +9,11 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 55;
+
+async function persist(write: PromiseLike<{ error: unknown }>, code: string) {
+  const { error } = await write;
+  if (error) throw new Error(code);
+}
 
 async function repairBillingSetup(db: any, userId: string | null) {
   if (!userId) return { repaired: false, reason: 'A user is required for billing setup.' };
@@ -44,8 +50,9 @@ async function repairBillingSetup(db: any, userId: string | null) {
 }
 
 async function _POST(req: NextRequest) {
-  const auth = req.headers.get('authorization');
-  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  const supplied = Buffer.from(req.headers.get('authorization') || '');
+  const expected = Buffer.from(`Bearer ${process.env.CRON_SECRET || ''}`);
+  if (!process.env.CRON_SECRET || supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   await hydrateProcessEnv();
@@ -62,31 +69,34 @@ async function _POST(req: NextRequest) {
   for (const job of jobs || []) {
     const args = (job.tool_args || {}) as { incident_id?: string; workflow?: string };
     try {
+      if (!args.incident_id) throw new Error('DIAGNOSTIC_INCIDENT_REQUIRED');
+      const { data: incident, error: incidentError } = await db.from('platform_incidents')
+        .select('tenant_id').eq('id', args.incident_id).maybeSingle();
+      if (incidentError || !incident) throw new Error('DIAGNOSTIC_INCIDENT_UNAVAILABLE');
       if (args.workflow === 'billing_setup') {
         const result = await repairBillingSetup(db, job.user_id);
-        await db.from('platform_incidents').update({
+        await persist(db.from('platform_incidents').update({
           status: result.repaired ? 'resolved' : 'identified',
           identified_at: new Date().toISOString(),
           resolved_at: result.repaired ? new Date().toISOString() : null,
           root_cause: 'Current billing setup needs a provider customer or user authorization.',
           remediation: result.reason,
-        }).eq('id', args.incident_id);
-        await db.from('devstudio_jobs').update({
+        }).eq('id', args.incident_id), 'DIAGNOSTIC_INCIDENT_UPDATE_FAILED');
+        await persist(db.from('devstudio_jobs').update({
           status: 'completed',
           finished_at: new Date().toISOString(),
           log_lines: ['PARIS captured the authenticated workflow failure.', `Billing setup result: ${result.reason}`],
-        }).eq('id', job.id);
+        }).eq('id', job.id), 'DIAGNOSTIC_COMPLETION_UPDATE_FAILED');
         results.push({ id: job.id, status: result.repaired ? 'completed' : 'review_required' });
         continue;
       }
 
-      const { data: incident } = await db.from('platform_incidents').select('tenant_id').eq('id', args.incident_id).maybeSingle();
-      await db.from('platform_incidents').update({
+      await persist(db.from('platform_incidents').update({
         status: 'identified',
         identified_at: new Date().toISOString(),
         remediation: 'Dev Studio diagnostic created. A privileged change requires administrator review.',
-      }).eq('id', args.incident_id);
-      await db.from('platform_control_actions').insert({
+      }).eq('id', args.incident_id), 'DIAGNOSTIC_INCIDENT_UPDATE_FAILED');
+      await persist(db.from('platform_control_actions').insert({
         tenant_id: incident?.tenant_id || null,
         action_type: 'workflow_repair',
         target_service: args.workflow || 'portal',
@@ -95,23 +105,27 @@ async function _POST(req: NextRequest) {
         triggered_by: job.user_id,
         requires_approval: true,
         approval_status: 'pending',
-      });
-      await db.from('devstudio_jobs').update({
+      }), 'DIAGNOSTIC_REPAIR_HANDOFF_FAILED');
+      await persist(db.from('devstudio_jobs').update({
         status: 'completed',
         finished_at: new Date().toISOString(),
         log_lines: ['PARIS captured the authenticated workflow failure.', 'Dev Studio diagnosed the workflow and opened an approval-gated repair action.'],
-      }).eq('id', job.id);
+      }).eq('id', job.id), 'DIAGNOSTIC_COMPLETION_UPDATE_FAILED');
       results.push({ id: job.id, status: 'review_required' });
     } catch (jobError) {
-      await db.from('devstudio_jobs').update({
+      await persist(db.from('devstudio_jobs').update({
         status: 'failed',
         finished_at: new Date().toISOString(),
         log_lines: ['PARIS captured the authenticated workflow failure.', `Diagnostic failed: ${jobError instanceof Error ? jobError.message : 'unknown error'}`],
-      }).eq('id', job.id);
+      }).eq('id', job.id), 'DIAGNOSTIC_FAILURE_UPDATE_FAILED');
       results.push({ id: job.id, status: 'failed' });
     }
   }
-  return NextResponse.json({ ok: true, processed: results.length, results });
+  const failed = results.filter((result) => result.status === 'failed').length;
+  return NextResponse.json({ ok: failed === 0, processed: results.length, failed, results }, {
+    status: failed ? 500 : 200,
+    headers: { 'Cache-Control': 'no-store' },
+  });
 }
 
-export const POST = withApiAudit('/api/internal/ai-operator', _POST);
+export const POST = withApiAudit('/api/internal/ai-operator', _POST, { actor_type: 'cron', skip_body: true });

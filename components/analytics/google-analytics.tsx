@@ -1,6 +1,10 @@
 'use client';
 
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
+
+const privateTaxPath = (path: string) =>
+  /^\/tax-software\/(office|self-file|login|careers)(\/|$)/.test(path);
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-16712632425';
@@ -9,16 +13,21 @@ type GtagFunction = (...args: unknown[]) => void;
 type WindowWithGtag = Window & { gtag?: GtagFunction };
 
 function getGtag(): GtagFunction | undefined {
-  if (typeof window === 'undefined') return undefined;
+  if (typeof window === 'undefined' || privateTaxPath(window.location.pathname)) return undefined;
   return (window as WindowWithGtag).gtag;
 }
 
 export function GoogleAnalytics() {
+  const pathname = usePathname();
+  if (privateTaxPath(pathname || '')) return null;
   if (!GA_MEASUREMENT_ID) return null;
 
   return (
     <>
-      <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="lazyOnload" />
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="lazyOnload"
+      />
       <Script id="google-analytics" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];

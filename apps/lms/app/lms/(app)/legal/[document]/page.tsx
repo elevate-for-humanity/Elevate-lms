@@ -24,7 +24,7 @@ const DOCUMENTS: Record<string, { title: string; sections: Array<[string,string]
 };
 
 export default async function LegalDocumentPage({ params }: { params: Promise<{ document: string }> }) {
-  const { user, profile } = await requireRole(['student','learner','admin']);
+  const { user, profile } = await requireRole(['student','learner','apprentice','barber_apprentice','cosmetology_apprentice','admin']);
   const slug = (await params).document;
   const document = DOCUMENTS[slug];
   if (!document) notFound();

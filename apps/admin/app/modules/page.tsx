@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ModulesTable } from './modules-table';
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function ModulesPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   // modules has a programs FK, but there is no direct modules -> scorm_packages
   // relationship in the live schema. Do not request a phantom nested relation.

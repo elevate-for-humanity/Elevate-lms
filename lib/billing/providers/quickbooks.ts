@@ -1,4 +1,5 @@
 import 'server-only';
+import { resolveQuickBooksInvoiceLink } from '../quickbooks-invoice-link';
 import { createHash } from 'node:crypto';
 
 import type {
@@ -217,14 +218,30 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
         .maybeSingle();
       if (existing.error)
         throw new Error(`Could not check invoice idempotency: ${existing.error.message}`);
-      if (existing.data?.provider_invoice_id)
+      if (existing.data?.provider_invoice_id) {
+        let paymentUrl = existing.data.payment_url || undefined;
+        if (!paymentUrl && ['open', 'past_due'].includes(existing.data.status)) {
+          const config = await loadQuickBooksConfig(db);
+          paymentUrl = await resolveQuickBooksInvoiceLink(
+            { Id: existing.data.provider_invoice_id },
+            (path) => quickBooksRequest(db, config, path),
+          );
+          if (paymentUrl) {
+            const saved = await db
+              .from('billing_invoices')
+              .update({ payment_url: paymentUrl, updated_at: new Date().toISOString() })
+              .eq('idempotency_key', input.idempotencyKey);
+            if (saved.error) throw new Error('Could not save the QuickBooks payment link.');
+          }
+        }
         return {
           provider: 'quickbooks',
           providerInvoiceId: existing.data.provider_invoice_id,
           invoiceNumber: existing.data.invoice_number || undefined,
-          paymentUrl: existing.data.payment_url || undefined,
+          paymentUrl,
           totalCents: existing.data.total_cents,
         };
+      }
 
       const totalCents = input.lines.reduce(
         (sum, line) => sum + line.quantity * line.unitAmountCents,
@@ -307,7 +324,7 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
           }),
         });
         const invoice = result.Invoice;
-        const paymentUrl = invoice.InvoiceLink || null;
+        let paymentUrl = invoice.InvoiceLink || undefined;
         const inserted = await db
           .from('billing_invoices')
           .update({
@@ -324,6 +341,19 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
           throw new Error(
             `Invoice created in QuickBooks but local tracking failed: ${inserted.error.message}`,
           );
+        // Save the created invoice ID before reading its link so a retry cannot create another invoice.
+        if (!paymentUrl) {
+          paymentUrl = await resolveQuickBooksInvoiceLink(invoice, (path) =>
+            quickBooksRequest(db, config, path),
+          );
+          if (paymentUrl) {
+            const saved = await db
+              .from('billing_invoices')
+              .update({ payment_url: paymentUrl, updated_at: new Date().toISOString() })
+              .eq('idempotency_key', input.idempotencyKey);
+            if (saved.error) throw new Error('Could not save the QuickBooks payment link.');
+          }
+        }
         return {
           provider: 'quickbooks',
           providerInvoiceId: invoice.Id,

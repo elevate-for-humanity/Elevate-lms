@@ -17,7 +17,7 @@ export default function Logo({
 }: LogoProps) {
   return (
     <Image
-      src="/images/logo.jpg"
+      src="/images/logo.png"
       alt={alt}
       quality={85}
       priority={priority}

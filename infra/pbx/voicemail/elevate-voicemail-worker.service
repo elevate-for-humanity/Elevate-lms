@@ -1,0 +1,20 @@
+[Unit]
+Description=Elevate owned voicemail ingestion and transcript delivery
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/etc/elevate-pbx/provisioner.conf
+ExecStart=/usr/bin/node /opt/elevate-pbx/voicemail/worker.mjs
+Restart=on-failure
+RestartSec=15
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/lib/elevate-pbx/voicemail
+MemoryMax=256M
+[Install]
+WantedBy=multi-user.target

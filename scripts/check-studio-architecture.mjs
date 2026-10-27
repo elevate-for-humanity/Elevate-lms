@@ -54,24 +54,22 @@ for (const invariant of [
   }
 }
 
-const browserDeployWorkflow = read('.github/workflows/deploy-studio-browser.yml');
+// Google Cloud Run owns Studio Browser deployment. Do not resurrect the retired
+// Northflank workflow to satisfy an obsolete source-level integrity check.
+const browserDeployWorkflow = read('.github/workflows/deploy-google-studio-browser.yml');
 for (const invariant of [
-  'resolve-studio-browser-secret.ts',
-  'verify-studio-browser-link.ts',
-  'verify-build.ts',
-  'trigger-deployment.ts',
-  '--build-id "${{ steps.trigger_browser_build.outputs.build_id }}" --sha "${{ github.sha }}"',
+  'google-github-actions/auth@v3',
+  'elegant-racer-299721',
+  'scripts/gcp/deploy-studio-browser.mjs',
+  'environment: production',
+  'cancel-in-progress: false',
 ]) {
   if (!browserDeployWorkflow.includes(invariant)) {
-    fail(`Studio Browser deployment is missing credit-safe invariant: ${invariant}`);
+    fail(`Google Studio Browser deployment is missing required invariant: ${invariant}`);
   }
 }
-
-// New pushes may supersede obsolete browser releases. Manual recovery runs
-// remain serialized, and both paths must verify/deploy the exact build above.
-const browserCancellation = browserDeployWorkflow.match(/^\s*cancel-in-progress:\s*(.+)$/m)?.[1].trim();
-if (!['false', "${{ github.event_name == 'push' }}"].includes(browserCancellation)) {
-  fail('Studio Browser cancellation must preserve manual recovery deployments');
+if (browserDeployWorkflow.includes('api.northflank.com')) {
+  fail('Studio Browser deployment must not call the legacy deployment API');
 }
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
@@ -171,13 +169,23 @@ if (!privilegedNavigationSurfaces.some((surface) => adminLayout.includes(surface
   );
 }
 for (const sharedSurface of [
-  'BuildVersionSync',
   'AdminPwaRegister',
-  'AdminUpdateNotice',
   'SupabaseConfigBootstrap',
 ]) {
   if (!adminLayout.includes(sharedSurface))
     fail(`Admin layout is missing privileged shared surface: ${sharedSurface}`);
+}
+// Updates are shared by Marketing, LMS and Admin through canonical registration.
+// Require the complete mounted path, while preventing duplicate update pollers/UI.
+const adminPwa = read('components/pwa/AdminPwaRegister.tsx');
+const canonicalPwa = read('components/pwa/CanonicalPwaRegistration.tsx');
+const updateNotice = read('components/pwa/PwaUpdateNotice.tsx');
+if (!adminPwa.includes('<CanonicalPwaRegistration application="admin"') ||
+    !canonicalPwa.includes('<PwaUpdateNotice') || !updateNotice.includes('useBuildVersion()')) {
+  fail('Admin PWA is missing the shared update notice or loaded-build version check');
+}
+if (adminLayout.includes('<BuildVersionSync') || adminLayout.includes('<AdminUpdateNotice')) {
+  fail('Admin layout mounts duplicate PWA update/version surfaces outside canonical registration');
 }
 for (const publicSurface of ['AdminFooter', 'LiveChatWidget']) {
   if (adminLayout.includes(publicSurface))

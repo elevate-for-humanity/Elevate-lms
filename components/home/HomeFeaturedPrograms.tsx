@@ -188,9 +188,9 @@ function FeaturedProgramCard({ program, index }: { program: FeaturedProgram; ind
           src={program.image}
           alt={program.title}
           fill
-          className="object-cover" sizes="100vw"
+          className="object-contain" sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-xl font-bold text-white mb-1">{program.title}</h3>
         </div>

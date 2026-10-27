@@ -11,13 +11,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  const limited = await applyRateLimit(req, 'strict');
-  if (limited) return limited;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   const body = await req.json().catch(() => null);
   if (typeof body?.buildId !== 'string' || !/^[a-f0-9-]{36}$/i.test(body.buildId))
     return NextResponse.json({ error: 'A valid buildId is required' }, { status: 400 });
+  // Unrelated Studio requests must not consume this administrator's resume quota.
+  // Keep the strict limit and derive its scope only from the authenticated actor.
+  const limited = await applyRateLimit(req, 'strict', { key: `course-resume:${auth.id}` });
+  if (limited) return limited;
   try {
     const db = await requireAdminClient();
     const { data: build, error } = await db

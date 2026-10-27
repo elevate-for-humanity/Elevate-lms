@@ -537,7 +537,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   });
 
   const schoolApplicants = await loadApprovedSchoolApplicants(
-    db, holderRes.data?.features, programsRes.data || [], contactAccessGranted,
+    db, holderRes.data?.features, programsRes.data || [], contactAccessGranted, true,
   );
 
   return {

@@ -26,7 +26,7 @@ export const runtime = 'nodejs';
 const PARTNER_ID = '8420fefa-3228-4ec7-9ea7-265b045aa93d';
 const SCHOOL_EMAIL = 'mesmerizedbybeautyl@yahoo.com';
 const ELEVATE_CC = 'info@elevateforhumanity.org';
-const ADMIN_REVIEW = `${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/admin/applications`;
+const SCHOOL_REVIEW = 'https://app.elevateforhumanity.org/program-holder/students/pending';
 
 const PROGRAM_LABELS: Record<string, string> = {
   'barber-apprenticeship': 'Barber Apprenticeship',
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
     </table>
 
     <div style="text-align:center;margin-bottom:24px">
-      <a href="${ADMIN_REVIEW}" style="display:inline-block;background:#7c3aed;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Review in Admin Dashboard →</a>
+      <a href="${SCHOOL_REVIEW}" style="display:inline-block;background:#7c3aed;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open your applications →</a>
     </div>
 
     <p style="color:#94a3b8;font-size:12px;text-align:center;margin:0">

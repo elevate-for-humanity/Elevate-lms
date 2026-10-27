@@ -17,3 +17,12 @@ it('does not display a failed school lookup as no students',async()=>{
  const q:any={select:()=>q,in:()=>q,order:()=>q,range:async()=>({data:null,error:new Error('offline')})};
  await expect(loadApprovedSchoolApplicants({from:()=>q},{school_partner_ids:[partner]},[{slug:'barber-apprenticeship'}],true)).rejects.toThrow('offline');
 });
+
+it('includes new school applications only when requested and keeps the same school scope', async () => {
+ const filters: [string, unknown][] = [];
+ const query = {select:()=>query,in:(key:string,value:unknown)=>{filters.push([key,value]);return query;},order:()=>query,range:async()=>({data:[],error:null})};
+ await loadApprovedSchoolApplicants({from:()=>query},{school_partner_ids:[partner]},[{slug:'cosmetology-apprenticeship'}],true,true);
+ expect(filters).toContainEqual(['partner_id',[partner]]);
+ expect(filters).toContainEqual(['program_interest',['cosmetology-apprenticeship']]);
+ expect(filters).toContainEqual(['status',['submitted','pending','under_review','applied','accepted','enrolled']]);
+});

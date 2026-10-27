@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -20,16 +21,20 @@ export const metadata: Metadata = {
  * explicit second boundary so this page cannot render if middleware routing is
  * ever changed or bypassed by a future refactor.
  *
- * This page and its privileged aggregate loader require platform administrators.
- * Operational roles must not acquire global financial and student data through
- * a broader page guard. Keep the two authorization boundaries aligned.
+ * The canonical entry remains reachable for operational roles. Route those
+ * callers to the existing RLS-backed staff portal before loading any privileged
+ * platform aggregates. Only platform administrators receive global reporting.
  */
 export default async function AdminDashboardPage() {
   const { effectiveRoles } = await requireRole([
     'super_admin',
     'admin',
+    'org_admin',
+    'advisor',
+    'staff',
   ]);
   const canAccessDevStudio = effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role));
+  if (!canAccessDevStudio) redirect('/staff-portal');
 
   const [rawData, heroAssets] = await Promise.all([
     getAdminDashboardData(),

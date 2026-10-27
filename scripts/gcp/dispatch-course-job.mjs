@@ -17,7 +17,7 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
   // Role jobs use separate resource profiles and role-filtered claims.
   url.searchParams.set('job_type','not.like.lesson_autopilot:*');
-  url.searchParams.set('select','id,status,available_at,heartbeat_at,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
+  url.searchParams.set('select','id,status,available_at,heartbeat_at,execution_generation,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
   // A stopped execution leaves an expired running lease. Claim RPC performs
   // recovery, but it cannot run unless the dispatcher launches a worker.
@@ -98,9 +98,9 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   if (!tasks) { console.warn(JSON.stringify({event:'course_dispatch_capacity_wait',capacity})); return {status:'capacity_wait', ...capacity}; }
   run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require fresh durable claims for every task.
-  const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));
+  const pending = new Map(queued.slice(0,tasks).map(item => [item.id, {heartbeat:item.heartbeat_at || '',generation:item.execution_generation}]));
   const assignmentUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  assignmentUrl.searchParams.set('select', 'id,status,lease_owner,lease_expires_at,heartbeat_at,last_error');
+  assignmentUrl.searchParams.set('select', 'id,status,lease_owner,lease_expires_at,heartbeat_at,execution_generation,available_at,last_error');
   assignmentUrl.searchParams.set('id', 'in.(' + [...pending.keys()].join(',') + ')');
   for (let attempt = 0; attempt < assignmentAttempts; attempt++) {
     const check = await request(assignmentUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
@@ -109,8 +109,26 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
     for (const job of rows ?? []) {
       if (!pending.has(job.id)) continue;
       if (job.status === 'failed') throw new Error('COURSE_WORKER_FAILED_AFTER_ASSIGNMENT:' + job.id);
-      if (job.status === 'running' && job.lease_owner && Date.parse(job.lease_expires_at ?? '') > clock() &&
-          job.heartbeat_at && job.heartbeat_at > pending.get(job.id) && job.heartbeat_at >= now.toISOString()) pending.delete(job.id);
+      const before=pending.get(job.id);
+      const fresh=job.heartbeat_at && job.heartbeat_at > before.heartbeat && job.heartbeat_at >= now.toISOString();
+      if (!fresh) continue;
+      if (job.status === 'running' && job.lease_owner && Date.parse(job.lease_expires_at ?? '') > clock()) {
+        pending.delete(job.id);continue;
+      }
+      // A cached job or pool coordinator can finish between five-second polls.
+      // Prove its new claim generation; a parked coordinator also requires the
+      // real task graph, not a launch response or a mutable monitor label.
+      if (!Number.isSafeInteger(before.generation) || !Number.isSafeInteger(Number(job.execution_generation)) ||
+          Number(job.execution_generation)<=before.generation) continue;
+      if (job.status==='completed') {pending.delete(job.id);continue;}
+      if (job.status==='queued' && job.available_at==='infinity') {
+        const graphUrl=new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_autopilot_pools');
+        graphUrl.searchParams.set('select','id,state');graphUrl.searchParams.set('coordinator_job_id','eq.'+job.id);
+        const graph=await request(graphUrl,{headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
+        if(!graph.ok)throw Error('COURSE_POOL_ASSIGNMENT_READ_HTTP_'+graph.status);
+        const pools=await graph.json();
+        if(Array.isArray(pools) && pools.length===1 && pools[0]?.id && ['active','finalizing'].includes(pools[0].state))pending.delete(job.id);
+      }
     }
     if (!pending.size) return {status:'assigned',tasks,jobIds:queued.slice(0,tasks).map(item=>item.id)};
     if (attempt + 1 < assignmentAttempts) await delay(5000);

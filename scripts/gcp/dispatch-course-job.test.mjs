@@ -204,3 +204,27 @@ test('a full page of storage-blocked jobs cannot hide runnable work',async()=>{
  assert.deepEqual(offsets,[0,50]);assert.equal(result.status,'assigned');assert.deepEqual(result.jobIds,['queued']);
 });
 
+test('a cached completion between polls proves its new claim generation',async()=>{
+ const s=setup([],[{id:'queued',execution_generation:4}]);const base=s.options.request;
+ s.options.assignmentAttempts=1;
+ s.options.request=async url=>url.searchParams.has('id')?{ok:true,json:async()=>[{id:'queued',status:'completed',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:5}]}:base(url);
+ assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');
+});
+for(const graphExists of [true,false])test('a fast parked pool coordinator requires a real graph: '+graphExists,async()=>{
+ const s=setup([],[{id:'queued',execution_generation:4}]);const base=s.options.request;s.options.assignmentAttempts=1;
+ s.options.request=async url=>{
+  if(url.pathname.endsWith('/ultimate_autopilot_pools')){
+   assert.equal(url.searchParams.get('coordinator_job_id'),'eq.queued');
+   return {ok:true,json:async()=>graphExists?[{id:'real-pool',state:'active'}]:[]};
+  }
+  if(url.searchParams.has('id'))return {ok:true,json:async()=>[{id:'queued',status:'queued',available_at:'infinity',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:5}]};
+  return base(url);
+ };
+ if(graphExists)assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');
+ else await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
+});
+for(const generation of [4,undefined])test('a stale or missing generation cannot impersonate a fast completed claim: '+generation,async()=>{
+ const s=setup([],[{id:'queued',execution_generation:4}]);const base=s.options.request;s.options.assignmentAttempts=1;
+ s.options.request=async url=>url.searchParams.has('id')?{ok:true,json:async()=>[{id:'queued',status:'completed',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:generation}]}:base(url);
+ await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
+});

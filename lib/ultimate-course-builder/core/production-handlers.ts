@@ -1,4 +1,4 @@
-import {instructionView, applySceneTitleReadabilityRepair} from './repair-policy.mjs';
+import {instructionView, applySceneTitleReadabilityRepair, orderSceneTeachingStates} from './repair-policy.mjs';
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
 import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
@@ -190,7 +190,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const storyboardArtifact: any = ctx.artifacts.storyboard ?? {};
       const sourceStoryboard = storyboardArtifact.storyboard ?? storyboardArtifact;
       const repairedStoryboard = applySceneTitleReadabilityRepair(
-        sourceStoryboard,
+        orderSceneTeachingStates(sourceStoryboard),
         ctx.repairDirective,
       );
       const storyboard = storyboardArtifact.storyboard
@@ -573,5 +573,6 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     },
   };
 }
+
 
 

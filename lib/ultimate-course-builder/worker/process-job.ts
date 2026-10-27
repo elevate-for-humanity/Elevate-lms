@@ -156,6 +156,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
     const runtime = await createUltimateRuntime(db, fence);
     console.info('[UltimateWorker] runtime ready', { jobId: job.id });
+    const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance || payload.ownerPreview);
+    const publishAsYouGo = profile.publishCompletedLessons === true && !targeted;
+    const lessonReleases = publishAsYouGo ? new UltimateReleaseService(db) : null;
+    const lessonReleaseActor = publishAsYouGo
+      ? await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId) : null;
+    if (lessonReleases && lessonReleaseActor) {
+      assertActive();
+      await ensureNotPaused();
+      await lessonReleases.publishReadyLessons(build.id, lessonReleaseActor);
+    }
     const originalHandlers = createProductionHandlers(runtime);
     const handlers = Object.fromEntries(Object.entries(originalHandlers).map(([step,handler])=>[step,async(ctx:any)=>{
       reportCourseProgress('stage:'+step);
@@ -163,7 +173,6 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       reportCourseProgress('finished:'+step,1,1);
       return result;
     }]));
-    const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
     console.info('[UltimateWorker] lesson processing started', { jobId: job.id, targeted, competencyId: payload.competencyId ?? null });
     const result = await runUltimateCourse(
       {
@@ -203,6 +212,12 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     }
     await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
       validate:assertCompleteLesson,assertActive});
+    if (lessonReleases && lessonReleaseActor && result.completed && !result.previewReady) {
+      assertActive();
+      await ensureNotPaused();
+      await lessonReleases.publishReadyLessons(build.id, lessonReleaseActor);
+      assertActive();
+    }
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
@@ -263,6 +278,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         .select('competency_id,status,artifacts').eq('build_id', build.id);
       if (lessonError) throw lessonError;
       for (const competency of profile.competencies) {
+        // The release service rechecks these existing publications without
+        // replacing their films or claiming the new contract was run on them.
+        if (profile.publishCompletedLessons === true && profile.preservedPublishedLessonIds?.includes(
+          profile.canonicalLessonIds?.[competency.id] ?? '')) continue;
         const lesson = lessons?.find(l => l.competency_id === competency.id);
         if (!lesson || lesson.status !== 'built') throw new Error(`ULTIMATE_COMPETENCY_NOT_COMPLETE:${competency.id}`);
         assertCompleteLesson(lesson.artifacts, profile);

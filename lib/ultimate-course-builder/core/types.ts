@@ -30,6 +30,8 @@ export interface UltimateCredentialProfile {
     instructions: string[];
   };
   lessonPresentation?: 'approved-premium-v1';
+  publishCompletedLessons?: boolean;
+  preservedPublishedLessonIds?: string[];
   /** Opt-in, immutable authoring configuration for new acceptance builds. */
   instructionalAuthoring?: { provider: 'google'; model: string; location?: string; version: string };
   id: string;

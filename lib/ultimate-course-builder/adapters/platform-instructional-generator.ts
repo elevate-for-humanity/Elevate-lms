@@ -275,7 +275,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         objectiveIds: s.objectiveIds,
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,
-        sceneType: sceneRole(s.stage,s.sceneType),
+        sceneType: sceneRole(s.stage,s.sceneType,s.id,s.text),
         teachingVisual: s.teachingVisual ?? produceTeachingVisual(s.text, s.stage),
       })),
     };

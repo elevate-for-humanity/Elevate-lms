@@ -115,3 +115,12 @@ test('duplicate generated content cannot satisfy another cue', async () => {
   await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('COURSE_PHOTO_ALREADY_USED');
   expect(generateTeachingPhoto).toHaveBeenCalledTimes(2);
 });
+
+test('malformed or empty provider bytes cannot create stored photo inventory', async () => {
+  for (const bytes of [Buffer.alloc(0), 'not-image-bytes']) {
+    vi.mocked(generateTeachingPhoto).mockReset().mockResolvedValue({ bytes, mimeType: 'image/png', provider: 'google' } as never);
+    const { db, files } = storage();
+    await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('TEACHING_PHOTO_BYTES_REQUIRED');
+    expect(files.size).toBe(0);
+  }
+});

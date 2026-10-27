@@ -133,13 +133,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
               Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
             if(result.error)throw new Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);
           }});
-        if(!generated?.bytes)throw new Error('TEACHING_PHOTO_BYTES_REQUIRED');
+        if(!generated?.bytes || !Buffer.isBuffer(generated.bytes) || !generated.bytes.length)throw new Error('TEACHING_PHOTO_BYTES_REQUIRED');
         const sha256=createHash('sha256').update(generated.bytes).digest('hex');
         if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');
         const mimeType=generated.mimeType;
         if(!['image/png','image/jpeg','image/webp'].includes(mimeType))throw new Error('TEACHING_PHOTO_MIME_INVALID');
         const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
-        saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256};
+        saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256,repair:generated.repair};
         const uploaded=await bucket.upload(saved.storagePath,generated.bytes,{contentType:mimeType,upsert:false});
         if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
       }
@@ -149,6 +149,12 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const verified=createHash('sha256').update(Buffer.from(await downloaded.data.arrayBuffer())).digest('hex');
       if(verified!==sha256)throw new Error('TEACHING_PHOTO_HASH_MISMATCH');
       if(!cached.data){
+        if(saved.repair){
+          const proof=await bucket.upload('approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',
+            Buffer.from(JSON.stringify({status:'ready',sceneId:scene.id,cueIndex:index,narrationQuote:step.narrationQuote,
+              storagePath,sha256,repair:saved.repair,verifiedAt:new Date().toISOString()})),{contentType:'application/json',upsert:true});
+          if(proof.error)throw new Error('TEACHING_PHOTO_REPAIR_PROOF_SAVE_FAILED:'+scene.id);
+        }
         const indexed=await bucket.upload(indexPath,Buffer.from(JSON.stringify(saved)),{contentType:'application/json',upsert:true});
         if(indexed.error)throw new Error('TEACHING_PHOTO_INDEX_SAVE_FAILED');
       }

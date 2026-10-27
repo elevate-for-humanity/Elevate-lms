@@ -80,16 +80,6 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/b52s-official.webp',
-    alt: "B-52's Barbershop participating apprenticeship host shop",
-    label: 'Learn inside established neighborhood businesses',
-    description:
-      'Connect structured instruction with supervised workplace learning in a participating local shop.',
-    exposureClass: 'brightness-[1.10]',
-    focalClass: 'object-center',
-  },
-  {
-    type: 'image',
     src: '/images/partners/generations-hair/highlighted-curls-home.webp',
     alt: 'Dimensional curls created by Generations Hair Co',
     label: 'See the professional standard apprentices work toward',

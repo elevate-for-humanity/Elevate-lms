@@ -34,7 +34,6 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     if(!scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
     requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
-    const usedLicensedPhotos = new Set<string>();
     for (const [index, step] of requests.entries()) {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
@@ -55,7 +54,9 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(error) throw error;
         placedPhotos=data ?? [];
       }
-      const placed=placedPhotos.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
+      const eligiblePlaced=placedPhotos.filter(p=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && !usedPhotoHashes.has(p.metadata.sha256) && String(p.storage_path).startsWith('approved-teaching-photos/'));
+      const placed=eligiblePlaced.find(p=>p.metadata.sceneId===scene.id && p.metadata.cueIndex===index && p.metadata.narrationQuote===step.narrationQuote)
+        ?? eligiblePlaced.find(p=>p.metadata.sceneId===scene.id) ?? eligiblePlaced[0];
       if(placed){
         const downloaded=await db.storage.from('course_videos').download(placed.storage_path);
         if(downloaded.error||!downloaded.data) throw new Error('PLACED_TEACHING_PHOTO_READBACK_FAILED');
@@ -73,7 +74,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedLicensedPhotos, compatibleVisualTask);
+      const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedPhotoHashes, compatibleVisualTask, {allowRelatedCoursePhoto:true});
       if (licensed) {
         const downloaded = await db.storage.from('course_videos').download(licensed.storage_path);
         if(downloaded.error || !downloaded.data) throw new Error('LICENSED_TEACHING_PHOTO_READBACK_FAILED');
@@ -81,7 +82,6 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==licensed.content_sha256) throw new Error('LICENSED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        usedLicensedPhotos.add(sha256);
         if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url}))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;

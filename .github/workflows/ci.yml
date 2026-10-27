@@ -60,7 +60,7 @@ jobs:
       - name: Course photographs and saved preview regression tests
         run: |
           pnpm exec vitest run tests/unit/teaching-photos.test.ts tests/unit/course-side-preview.test.tsx tests/unit/course-builder-preview-delivery.test.ts
-          node --test tests/worker/photo-cue-repair.test.mjs lib/ultimate-course-builder/adapters/approved-reference-photos.test.mjs scripts/gcp/probe-course-photo-provider.test.mjs
+          node --test lib/ultimate-course-builder/testing/related-photo-selection.test.mjs tests/worker/photo-cue-repair.test.mjs lib/ultimate-course-builder/adapters/approved-reference-photos.test.mjs scripts/gcp/probe-course-photo-provider.test.mjs
       - name: Traffic scope and unavailable-data regression tests
         run: node --test tests/unit/traffic-report.test.mjs
       - name: Public narration lifecycle regression tests

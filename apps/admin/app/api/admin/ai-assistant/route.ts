@@ -8,11 +8,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { aiChat } from '@/lib/ai/ai-service';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ELLIE_ACTION_REGISTRY, type EllieActionType } from '@/lib/ellie/actions';
 
-const SYSTEM_PROMPT = `You are Ellie — the AI operations assistant for ${PLATFORM_DEFAULTS.orgName}, a DOL-registered apprenticeship sponsor and Indiana ETPL/WIOA/WRG/JRI-approved workforce development organization based in Indianapolis, Indiana.
+const SYSTEM_PROMPT = `You are Ellie — the AI operations assistant for ${PLATFORM_DEFAULTS.orgName}, an apprenticeship sponsor and workforce development organization with program-specific registration and funding approvals based in Indianapolis, Indiana.
 
 You are NOT a generic chatbot. You are deeply embedded in this organization. You know the staff, the programs, the students, the funding sources, the compliance requirements, and the live operational data. You speak like a knowledgeable colleague — direct, warm, and specific. Never say "I don't have access to that" when the live data is provided to you.
 
@@ -24,7 +24,7 @@ Website: ${PLATFORM_DEFAULTS.canonicalDomain}
 Admin portal: admin.${PLATFORM_DEFAULTS.canonicalDomain}
 Phone: ${PLATFORM_DEFAULTS.supportPhone}
 Address: Indianapolis, Indiana
-Approvals: Indiana ETPL, WIOA Title I, Workforce Ready Grant (WRG), Job Ready Indy (JRI), DOL Registered Apprenticeship Sponsor, FSSA IMPACT, EmployIndy partner
+Approvals: program-specific Indiana ETPL/workforce-funding approvals and DOL Registered Apprenticeship sponsor status. Do not infer occupation-level RAPIDS registration or funding from organization-level status; use the canonical registries.
 Tax entity: Also operates Selfish Inc. (501(c)(3)) for VITA free tax prep
 Testing: Certiport Authorized Testing Center (CATC), EPA 608 Certified Proctor (ESCO #358010 and Mainstream Engineering)
 
@@ -72,16 +72,16 @@ SKILLED TRADES
 - Manufacturing Technician — $4,200 — 12 weeks
 - Automotive Technician — $9,500 — 32 weeks
 - Diesel Mechanic — $9,500 — 32 weeks
-- Electrical Apprenticeship — DOL registered
-- Plumbing Apprenticeship — DOL registered
+- Electrical training pathway — registration must be verified in the canonical RAPIDS registry before any DOL claim
+- Plumbing training pathway — registration must be verified in the canonical RAPIDS registry before any DOL claim
 
-APPRENTICESHIPS (DOL Registered)
+APPRENTICESHIP / WORK-BASED PATHWAYS — verify each occupation in the canonical RAPIDS registry
 - Barber Apprenticeship — $4,980 — 52 weeks — Indiana State Barber License
 - Cosmetology Apprenticeship — $4,950 — 52 weeks — Indiana State Cosmetology License
 - Esthetician Apprenticeship — State license
 - Nail Technician Apprenticeship — State license
-- Culinary Apprenticeship — 40 weeks
-- EMT Apprenticeship — 12 weeks
+- Culinary pathway — do not claim DOL registration unless present in the canonical RAPIDS registry
+- EMT pathway — do not claim DOL registration unless present in the canonical RAPIDS registry
 
 TECHNOLOGY (Director: Ameco Martin)
 - IT Help Desk / CompTIA A+ — Certification
@@ -94,7 +94,7 @@ TECHNOLOGY (Director: Ameco Martin)
 - CAD/Drafting — Certification
 
 BUSINESS & FINANCE
-- Bookkeeping — $2,800 — 16 weeks
+- Bookkeeping & QuickBooks — $1,500 — 8 weeks
 - Administrative Assistant — $4,200 — 12 weeks
 - Business Start-Up — $5,200
 - Real Estate Agent — $4,200 — 12 weeks
@@ -110,8 +110,8 @@ SPECIAL PROGRAMS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FUNDING SOURCES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- WIOA Title I (WorkOne) — covers most programs for eligible adults/dislocated workers/youth
-- Workforce Ready Grant (WRG) — Indiana state grant for high-demand occupations
+- WIOA Title I (WorkOne) — may apply only to programs with exact program-level evidence; participant authorization is required
+- Workforce Ready Grant (WRG) — program-specific Indiana funding; do not infer eligibility from provider status
 - Job Ready Indy (JRI) — Marion County workforce grant
 - FSSA IMPACT — Indiana welfare-to-work funding
 - EmployIndy — Indianapolis workforce board, WIOA In-School Youth contracts
@@ -194,7 +194,7 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     db.from('program_enrollments').select('amount_paid_cents').eq('payment_status', 'paid').gte('created_at', monthStart),
     db.from('program_enrollments').select('amount_paid_cents').eq('payment_status', 'paid'),
     db.from('program_completion_certificates').select('id', { count: 'exact', head: true }),
-    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active').or(`last_activity_at.lt.${cutoff7d},last_activity_at.is.null`),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active').or(`last_accessed.lt.${cutoff7d},last_accessed.is.null`),
     db.from('compliance_alerts').select('id', { count: 'exact', head: true }).neq('status', 'resolved'),
     db.from('wioa_documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('document_signatures').select('id', { count: 'exact', head: true }).is('signed_at', null),
@@ -209,8 +209,8 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     db.from('exam_bookings').select('id', { count: 'exact', head: true }).in('status', ['pending', 'submitted']),
     db.from('exam_bookings').select('id', { count: 'exact', head: true }).eq('payment_status', 'paid'),
     // Program holders & employers
-    db.from('program_holder_profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    db.from('program_holder_profiles').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('program_holders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('program_holders').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('employer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     // Delivery logs
     db.from('delivery_logs').select('id', { count: 'exact', head: true }).eq('channel', 'email').eq('status', 'sent').gte('created_at', today.toISOString()),
@@ -219,11 +219,11 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     db.from('crm_leads').select('id', { count: 'exact', head: true }).eq('status', 'hot'),
     db.from('crm_leads').select('id', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
     // At-risk names
-    db.from('program_enrollments').select('profiles(full_name), programs(name), last_activity_at').eq('status', 'active').or(`last_activity_at.lt.${cutoff7d},last_activity_at.is.null`).limit(5),
+    db.from('program_enrollments').select('profiles!program_enrollments_user_id_profiles_fkey(full_name), programs!fk_program_enrollments_program(name), last_accessed').eq('status', 'active').or(`last_accessed.lt.${cutoff7d},last_accessed.is.null`).limit(5),
     // Placements
     db.from('job_placements').select('id', { count: 'exact', head: true }).eq('status', 'placed'),
     // SNAP E&T / FSSA
-    db.from('snap_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('wioa_participants').select('id', { count: 'exact', head: true }).eq('receives_snap', true).eq('status', 'active'),
   ]);
 
   const sum = (rows: Record<string, unknown>[]) =>
@@ -241,7 +241,7 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     .map(([name, count]) => `  ${name}: ${count} active`).join('\n') || '  (none)';
 
   const atRiskNames = (atRiskDetail.data ?? []).slice(0, 5).map((r: any) =>
-    `  ${(r.profiles as any)?.full_name ?? 'Unknown'} — ${(r.programs as any)?.name ?? 'Unknown'} (last active: ${r.last_activity_at ? new Date(r.last_activity_at).toLocaleDateString() : 'never'})`
+    `  ${(r.profiles as any)?.full_name ?? 'Unknown'} — ${(r.programs as any)?.name ?? 'Unknown'} (last active: ${r.last_accessed ? new Date(r.last_accessed).toLocaleDateString() : 'never'})`
   ).join('\n') || '  None';
 
   return `LIVE DATA (${now.toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET):
@@ -472,20 +472,20 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   // Program holders
   if (lower.includes('program holder') || lower.includes('partner') || lower.includes('franchise') || lower.includes('mou')) {
     const { data } = await db
-      .from('program_holder_profiles')
-      .select('id, org_name, contact_name, email, status, created_at')
+      .from('program_holders')
+      .select('id, organization_name, contact_name, contact_email, status, created_at')
       .order('created_at', { ascending: false })
       .limit(20);
     if (data?.length) {
       const pending = data.filter((p: any) => p.status === 'pending');
       return {
         text: `PROGRAM HOLDERS (${data.length}):\n${data.map((p: any) =>
-          `• ${p.org_name} — ${p.contact_name} (${p.email}) — status: ${p.status}`
+          `• ${p.organization_name} — ${p.contact_name} (${p.contact_email}) — status: ${p.status}`
         ).join('\n')}`,
         actionHint: pending.length ? {
           type: 'approve_program_holder' as EllieActionType,
-          label: `Approve ${pending[0].org_name}`,
-          params: { programHolderId: pending[0].id, orgName: pending[0].org_name },
+          label: `Approve ${pending[0].organization_name}`,
+          params: { programHolderId: pending[0].id, orgName: pending[0].organization_name },
           targetCount: 1,
         } : undefined,
       };
@@ -515,11 +515,11 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
     const [{ data: wioa }, { data: grants }, { data: snap }] = await Promise.all([
       db.from('wioa_documents').select('participant_name, status, program_name, created_at').order('created_at', { ascending: false }).limit(15),
       db.from('grants').select('title, status, amount_requested, deadline, created_at').order('created_at', { ascending: false }).limit(10),
-      db.from('snap_participants').select('full_name, status, program_name, created_at').order('created_at', { ascending: false }).limit(10),
+      db.from('wioa_participants').select('participant_name, status, program, created_at').eq('receives_snap', true).order('created_at', { ascending: false }).limit(10),
     ]);
     const parts: string[] = [];
     if (wioa?.length) parts.push(`WIOA DOCUMENTS (${wioa.length}):\n${wioa.map((w: any) => `• ${w.participant_name} — ${w.program_name ?? 'Unknown'} — ${w.status}`).join('\n')}`);
-    if (snap?.length) parts.push(`SNAP E&T PARTICIPANTS (${snap.length}):\n${snap.map((s: any) => `• ${s.full_name} — ${s.program_name ?? 'Unknown'} — ${s.status}`).join('\n')}`);
+    if (snap?.length) parts.push(`SNAP E&T PARTICIPANTS (${snap.length}):\n${snap.map((s: any) => `• ${s.participant_name} — ${s.program ?? 'Unknown'} — ${s.status}`).join('\n')}`);
     if (grants?.length) parts.push(`GRANTS (${grants.length}):\n${grants.map((g: any) => `• ${g.title} — ${g.status} — $${((g.amount_requested ?? 0) / 100).toLocaleString()} — deadline: ${g.deadline ?? 'none'}`).join('\n')}`);
     if (parts.length) return { text: parts.join('\n\n') };
     return { text: 'No WIOA, SNAP, or grant records found.' };
@@ -592,13 +592,13 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   if (lower.includes('workflow') || lower.includes('automation') || lower.includes('cron')) {
     const { data } = await db
       .from('workflows')
-      .select('id, name, status, last_run_at, next_run_at, trigger_type')
+      .select('id, name, status, last_run_at, metadata')
       .order('last_run_at', { ascending: false, nullsFirst: false })
       .limit(20);
     if (data?.length) {
       return {
         text: `WORKFLOWS (${data.length}):\n${data.map((w: any) =>
-          `• ${w.name} — ${w.status} — trigger: ${w.trigger_type ?? 'manual'} — last run: ${w.last_run_at ? new Date(w.last_run_at).toLocaleDateString() : 'never'}`
+          `• ${w.name} — ${w.status} — trigger: ${w.metadata?.trigger_type ?? 'manual'} — last run: ${w.last_run_at ? new Date(w.last_run_at).toLocaleDateString() : 'never'}`
         ).join('\n')}`,
       };
     }
@@ -689,12 +689,36 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  // Load AI keys from platform_secrets / app_secrets into process.env.
-  // Must run before any provider resolution so DB-stored keys are visible.
-  await hydrateProcessEnv();
-
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
+
+  // Resolve only the provider credentials this endpoint is allowed to use.
+  // Never hydrate the complete encrypted platform_secrets table into env.
+  const providerKeys = [
+    'ELEVATE_LLM_SECRET',
+    'ELEVATE_LLM_URL',
+    'ELEVATE_LLM_CPU_SECRET',
+    'ELEVATE_LLM_CPU_URL',
+    'ELEVATE_LLM_GPU_SECRET',
+    'ELEVATE_LLM_GPU_URL',
+    'ELEVATE_LLM_GOOGLE_IAM',
+    'PARIS_GPU_ENABLED',
+    'PARIS_INFERENCE_TIER',
+    'GROQ_API_KEY',
+    'GEMINI_API_KEY',
+    'GOOGLE_CLOUD_API_KEY',
+    'ANTHROPIC_API_KEY',
+    'OPENAI_API_KEY',
+    'OPENROUTER_API_KEY',
+    'DEEPSEEK_API_KEY',
+    'CLOUDFLARE_API_TOKEN',
+    'CLOUDFLARE_ACCOUNT_ID',
+    'AZURE_OPENAI_API_KEY',
+  ] as const;
+  await Promise.all(providerKeys.map(async (key) => {
+    const value = await getDecryptedPlatformSecret(key).catch(() => undefined);
+    if (value) process.env[key] = value;
+  }));
 
   const body = await request.json().catch(() => ({}));
   const userMessage: string = body.message ?? '';

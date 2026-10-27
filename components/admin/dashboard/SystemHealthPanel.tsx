@@ -32,8 +32,8 @@ const SEVERITY_STYLES = {
 
 const CODE_ICONS: Record<string, React.ElementType> = {
   missing_env_vars:              Key,
-  stripe_webhook_secret_missing: Wifi,
-  stripe_issuing_not_enabled:    CreditCard,
+  quickbooks_webhook_config_missing: Wifi,
+  quickbooks_billing_not_ready:    CreditCard,
   stale_jobs:                    Clock,
   missing_documents:             FileText,
   missing_certifications:        Award,
@@ -46,6 +46,15 @@ interface Props {
 
 export function SystemHealthPanel({ health }: Props) {
   const alerts = health.alerts ?? [];
+  const unavailableCodes: Record<string, string[]> = {
+    'Stale Jobs': ['job_queue_health_unavailable', 'ultimate_build_jobs_health_unavailable'],
+    'Missing Docs': ['documents_health_unavailable'],
+    'Certifications': ['certifications_health_unavailable'],
+    'Compliance Flags': ['compliance_flags_health_unavailable'],
+  };
+  const unavailable = (label: string) => alerts.some(alert =>
+    ['system_health_unavailable', 'dashboard_health_timeout'].includes(alert.code) ||
+    unavailableCodes[label]?.includes(alert.code));
   const isOk = !health.degraded && alerts.length === 0;
 
   return (
@@ -55,7 +64,7 @@ export function SystemHealthPanel({ health }: Props) {
         <div className="flex items-center gap-2">
           {isOk ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">
-              <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> All systems operational
+              <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> Dashboard checks passed
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-rose-100 text-rose-700">
@@ -72,21 +81,21 @@ export function SystemHealthPanel({ health }: Props) {
       </div>
 
       <div className="px-6 py-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+        <div className="mb-4 grid grid-cols-[repeat(2,minmax(0,1fr))] gap-3 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
           {[
             {
-              label: "Stripe Webhook",
-              ok: health.stripeWebhookOk,
-              href: "/integrations/stripe",
+              label: "QuickBooks Webhook Config",
+              ok: health.quickBooksWebhookOk,
+              href: "/integrations/quickbooks",
             },
             {
-              label: "Stripe Issuing",
-              ok: health.stripeIssuingOk,
-              value: health.stripeIssuingOk ? undefined : "Not approved",
-              href: "https://dashboard.stripe.com/issuing",
+              label: "QuickBooks Billing",
+              ok: health.quickBooksBillingOk,
+              value: health.quickBooksBillingOk ? undefined : "Connection unavailable",
+              href: "/integrations/quickbooks",
             },
             {
-              label: "Build Env",
+              label: "Runtime Configuration",
               ok: health.buildEnvOk,
               href: "/integrations/env-manager",
             },
@@ -114,11 +123,14 @@ export function SystemHealthPanel({ health }: Props) {
               value: health.unresolvedFlags > 0 ? `${health.unresolvedFlags} open` : "Clear",
               href: "/compliance",
             },
-          ].map(({ label, ok, value, href }) => (
+          ].map((item) => ({...item,
+            ok: unavailable(item.label) ? false : item.ok,
+            value: unavailable(item.label) ? 'Unavailable' : item.value,
+          })).map(({ label, ok, value, href }) => (
             <Link
               key={label}
               href={href}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-colors hover:shadow-sm ${
+              className={`flex min-w-0 flex-wrap items-center gap-2 overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-colors hover:shadow-sm ${
                 ok
                   ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                   : "bg-rose-50 border-rose-200 text-rose-700"
@@ -129,9 +141,9 @@ export function SystemHealthPanel({ health }: Props) {
               ) : (
                 <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
               )}
-              <span className="truncate">{label}</span>
+              <span className="min-w-0 flex-1 truncate">{label}</span>
               {!ok && value && (
-                <span className="ml-auto font-bold flex-shrink-0">{value}</span>
+                <span className="w-full min-w-0 truncate pl-5 font-bold">{value}</span>
               )}
             </Link>
           ))}

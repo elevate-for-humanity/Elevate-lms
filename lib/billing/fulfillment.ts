@@ -1,0 +1,637 @@
+import 'server-only';
+import { randomBytes } from 'node:crypto';
+import { getOrganizationFeatures } from '@/lib/platform/organization-features';
+import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
+import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { testingAppointmentLabel, testingCalendarUrl } from '@/lib/testing/booking-calendar';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { notifyAdminOfStudentPayment } from '@/lib/billing/notify-student-payment';
+import { recordSchoolInvoiceOrder } from '@/lib/billing/school-invoice-order';
+
+type Database = any;
+
+function confirmationCode(): string {
+  return randomBytes(6).toString('base64url').toUpperCase().slice(0, 8);
+}
+
+export async function fulfillPaidBillingInvoice(
+  db: Database,
+  job: { billing_invoice_id: string; fulfillment_type: string; payload: any },
+) {
+  const payload = job.payload || {};
+  if (job.fulfillment_type === 'tuition_payment') {
+    const payment = await db.from('payment_logs').upsert(
+      {
+        user_id: payload.user_id,
+        student_id: payload.user_id,
+        amount: Number(payload.amount_cents),
+        currency: 'usd',
+        status: 'completed',
+        payment_option: 'quickbooks_invoice',
+        payment_type: 'tuition_installment',
+        program_slug: payload.program_slug,
+        billing_provider: 'quickbooks',
+        billing_invoice_id: job.billing_invoice_id,
+        completed_at: new Date().toISOString(),
+        metadata: {
+          program_enrollment_id: payload.enrollment_id,
+        },
+      },
+      { onConflict: 'billing_invoice_id' },
+    );
+    if (payment.error) throw new Error(payment.error.message);
+    const enrollment = await db
+      .from('program_enrollments')
+      .update({
+        billing_provider: 'quickbooks',
+        provider_subscription_id: payload.schedule_reference,
+        payment_status: 'paid',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', payload.enrollment_id);
+    if (enrollment.error) throw new Error(enrollment.error.message);
+    await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
+    return;
+  }
+  if (job.fulfillment_type === 'tenant_offer') {
+    const { data: order, error: orderError } = await db
+      .from('tenant_orders')
+      .select('id,status,amount_total,currency,tenant_id,offer_id')
+      .eq('id', payload.tenant_order_id)
+      .maybeSingle();
+    if (orderError || !order)
+      throw new Error(orderError?.message || 'Tenant marketplace order was not found.');
+    if (
+      Number(order.amount_total) !== Number(payload.amount_cents) ||
+      order.offer_id !== payload.offer_id
+    )
+      throw new Error('Tenant marketplace payment does not match its order snapshot.');
+    const feeCents = Math.floor(
+      (Number(order.amount_total) * Number(payload.platform_fee_bps || 0)) / 10_000,
+    );
+    const payable = await db.from('provider_payables').upsert(
+      {
+        billing_invoice_id: job.billing_invoice_id,
+        source_type: 'tenant_offer',
+        source_order_id: order.id,
+        source_item_id: '00000000-0000-0000-0000-000000000000',
+        provider_id: payload.provider_id,
+        gross_amount_cents: Number(order.amount_total),
+        platform_fee_cents: feeCents,
+        payable_amount_cents: Number(order.amount_total) - feeCents,
+        currency: String(order.currency || 'usd').toLowerCase(),
+        status: 'pending',
+        metadata: { tenant_id: order.tenant_id, offer_id: order.offer_id },
+      },
+      { onConflict: 'billing_invoice_id,source_type,source_order_id,source_item_id' },
+    );
+    if (payable.error) throw new Error(payable.error.message);
+    await db
+      .from('tenant_orders')
+      .update({ status: 'paid', updated_at: new Date().toISOString() })
+      .eq('id', order.id)
+      .in('status', ['pending', 'open', 'failed']);
+    const { data: offer } = await db
+      .from('tenant_offers')
+      .select('access_config')
+      .eq('id', order.offer_id)
+      .maybeSingle();
+    const accessConfig =
+      offer?.access_config && typeof offer.access_config === 'object'
+        ? (offer.access_config as Record<string, unknown>)
+        : {};
+    const planId =
+      typeof accessConfig.community_plan_id === 'string' ? accessConfig.community_plan_id : null;
+    if (planId && payload.customer_email) {
+      const { data: user } = await db
+        .from('profiles')
+        .select('id')
+        .ilike('email', payload.customer_email)
+        .maybeSingle();
+      if (user?.id) {
+        let memberId: string | null = null;
+        const existingMember = await db
+          .from('community_members')
+          .select('id')
+          .eq('tenant_id', order.tenant_id)
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (existingMember.error) throw new Error(existingMember.error.message);
+        if (existingMember.data?.id) memberId = existingMember.data.id;
+        else {
+          const createdMember = await db
+            .from('community_members')
+            .insert({
+              tenant_id: order.tenant_id,
+              user_id: user.id,
+              role: 'member',
+              status: 'active',
+            })
+            .select('id')
+            .single();
+          if (createdMember.error) throw new Error(createdMember.error.message);
+          memberId = createdMember.data.id;
+        }
+        const accessRow = {
+          tenant_id: order.tenant_id,
+          member_id: memberId,
+          user_id: user.id,
+          plan_id: planId,
+          status: 'active',
+          metadata: {
+            billing_provider: 'quickbooks',
+            billing_invoice_id: job.billing_invoice_id,
+            customer_email: payload.customer_email,
+          },
+          updated_at: new Date().toISOString(),
+        };
+        const priorAccess = await db
+          .from('community_member_access')
+          .select('id')
+          .eq('tenant_id', order.tenant_id)
+          .eq('user_id', user.id)
+          .eq('plan_id', planId)
+          .maybeSingle();
+        if (priorAccess.error) throw new Error(priorAccess.error.message);
+        const access = priorAccess.data?.id
+          ? await db.from('community_member_access').update(accessRow).eq('id', priorAccess.data.id)
+          : await db.from('community_member_access').insert(accessRow);
+        if (access.error) throw new Error(access.error.message);
+      }
+    }
+    return;
+  }
+
+  if (job.fulfillment_type === 'microcourse_purchase') {
+    const { data: order, error: orderError } = await db
+      .from('microcourse_orders')
+      .select('*')
+      .eq('id', payload.microcourse_order_id)
+      .maybeSingle();
+    if (orderError || !order)
+      throw new Error(orderError?.message || 'Microcourse order was not found.');
+    if (
+      Number(order.retail_total_cents) !== Number(payload.amount_cents) ||
+      order.user_id !== payload.user_id
+    )
+      throw new Error('Microcourse payment does not match its order snapshot.');
+    const { data: items, error: itemsError } = await db
+      .from('microcourse_order_items')
+      .select('*')
+      .eq('order_id', order.id);
+    if (itemsError || !items?.length)
+      throw new Error(itemsError?.message || 'Microcourse order items were not found.');
+    for (const item of items) {
+      const payable = await db.from('provider_payables').upsert(
+        {
+          billing_invoice_id: job.billing_invoice_id,
+          source_type: 'microcourse',
+          source_order_id: order.id,
+          source_item_id: item.id,
+          provider_id: item.provider_id,
+          gross_amount_cents: Number(item.retail_price_cents),
+          platform_fee_cents: Number(item.retail_price_cents) - Number(item.provider_cost_cents),
+          payable_amount_cents: Number(item.provider_cost_cents),
+          currency: String(order.currency || 'usd').toLowerCase(),
+          status: 'pending',
+          metadata: { microcourse_id: item.microcourse_id },
+        },
+        { onConflict: 'billing_invoice_id,source_type,source_order_id,source_item_id' },
+      );
+      if (payable.error) throw new Error(payable.error.message);
+      const updated = await db
+        .from('microcourse_order_items')
+        .update({ transfer_status: 'pending', access_status: 'ready' })
+        .eq('id', item.id);
+      if (updated.error) throw new Error(updated.error.message);
+    }
+    const paid = await db
+      .from('microcourse_orders')
+      .update({
+        status: 'access_ready',
+        access_status: 'ready',
+        paid_at: order.paid_at || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', order.id)
+      .in('status', ['awaiting_payment', 'paid', 'provider_transfer_pending', 'failed']);
+    if (paid.error) throw new Error(paid.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'donation_receipt') {
+    const result = await db.from('donations').insert({
+      donor_name: payload.donor_name,
+      donor_email: payload.donor_email,
+      amount: Number(payload.amount_cents || 0) / 100,
+      currency: 'usd',
+      payment_status: 'paid',
+      is_recurring: Boolean(payload.recurring),
+      recurring_frequency: payload.recurring ? 'monthly' : null,
+      metadata: {
+        billing_invoice_id: job.billing_invoice_id,
+        provider: 'quickbooks',
+        dedication: payload.dedication,
+        in_honor_of: payload.in_honor_of,
+      },
+    });
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'testing_enforcement') {
+    const result = await db.from('testing_enforcement').update({
+      fee_paid: true,
+      paid_at: new Date().toISOString(),
+      billing_provider: 'quickbooks',
+      billing_invoice_id: job.billing_invoice_id,
+    }).eq('id', payload.enforcement_id).eq('email', payload.email).eq('fee_paid', false);
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'testing_booking') {
+    const reserved = await db.rpc('fulfill_paid_testing_booking', { p_invoice_id: job.billing_invoice_id });
+    if (reserved.error) throw new Error(reserved.error.message);
+    const booking = reserved.data?.booking;
+    if (!booking) throw new Error('Testing reservation was not returned.');
+    if (!reserved.data.created) return;
+    const slot = await db.from('testing_slots').select('start_time,end_time,location').eq('id', booking.slot_id).single();
+    if (slot.error) throw new Error(slot.error.message);
+    const appointment = testingAppointmentLabel(slot.data.start_time);
+    const calendar = testingCalendarUrl({
+      examName: booking.exam_name, confirmationCode: booking.confirmation_code,
+      start: slot.data.start_time, end: slot.data.end_time,
+      location: slot.data.location || TESTING_CENTER.address,
+    });
+    const confirmation = new URL('/testing/book', PLATFORM_DEFAULTS.siteUrl);
+    confirmation.searchParams.set('invoice_id', job.billing_invoice_id);
+    confirmation.searchParams.set('booking_token', String(payload.booking_token || ''));
+    const escape = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
+    if (booking.email) {
+      await sendEmail({
+        to: booking.email,
+        from: 'Elevate Testing Center <testing@elevateforhumanity.org>',
+        subject: `Exam Booking Confirmed — ${booking.confirmation_code} | Elevate Testing Center`,
+        html: `<p>Hi ${escape(booking.first_name)}, your paid testing appointment for <strong>${escape(booking.exam_name)}</strong> is reserved.</p><p><strong>${escape(appointment)}</strong></p><p>Confirmation code: <strong>${escape(booking.confirmation_code)}</strong></p><p>Testing Center: ${escape(slot.data.location || TESTING_CENTER.address)}</p><p><a href="${escape(confirmation.href)}">View your private booking confirmation</a></p><p><a href="${escape(calendar)}">Add your reserved appointment to Google Calendar</a></p><p>Questions: ${escape(TESTING_CENTER.phone)}</p>`,
+      });
+    }
+    return;
+  }
+
+  if (job.fulfillment_type === 'apprenticeship_deposit') {
+    const email = String(payload.customer_email || '').toLowerCase().trim();
+    const programSlug = String(payload.program_slug || '');
+    if (!email || !programSlug) throw new Error('Apprenticeship deposit requires customer_email and program_slug.');
+
+    const profile = await db.from('profiles').select('id,full_name').ilike('email', email).maybeSingle();
+    if (profile.error || !profile.data?.id) throw new Error(profile.error?.message || 'Apprentice profile was not found.');
+
+    const program = await db.from('programs').select('id,organization_id,tenant_id,title').eq('slug', programSlug).maybeSingle();
+    if (program.error || !program.data?.id) throw new Error(program.error?.message || 'Apprenticeship program was not found.');
+
+    const existing = await db.from('program_enrollments').select('id').eq('user_id', profile.data.id).eq('program_id', program.data.id).maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+
+    const enrollmentValues = {
+      user_id: profile.data.id,
+      student_id: profile.data.id,
+      program_id: program.data.id,
+      program_slug: programSlug,
+      email,
+      full_name: profile.data.full_name || payload.customer_name || email,
+      status: 'active',
+      enrollment_state: 'enrolled',
+      payment_status: 'paid',
+      funding_source: 'self_pay',
+      amount_paid_cents: Number(payload.amount_cents || 0),
+      billing_provider: 'quickbooks',
+      organization_id: program.data.organization_id,
+      tenant_id: program.data.tenant_id,
+      enrolled_at: new Date().toISOString(),
+      access_granted_at: new Date().toISOString(),
+      next_required_action: 'ONBOARDING',
+      updated_at: new Date().toISOString(),
+    };
+
+    let enrollmentId = existing.data?.id as string | undefined;
+    if (enrollmentId) {
+      const updated = await db.from('program_enrollments').update(enrollmentValues).eq('id', enrollmentId);
+      if (updated.error) throw new Error(updated.error.message);
+    } else {
+      const created = await db.from('program_enrollments').insert(enrollmentValues).select('id').single();
+      if (created.error || !created.data?.id) throw new Error(created.error?.message || 'Enrollment was not created.');
+      enrollmentId = created.data.id;
+    }
+
+    const app = await db.from('applications').update({
+      status: 'approved',
+      payment_status: 'paid',
+      payment_provider: 'quickbooks',
+      payment_amount_cents: Number(payload.amount_cents || 0),
+      payment_received_at: new Date().toISOString(),
+      enrollment_id: enrollmentId,
+      user_id: profile.data.id,
+      updated_at: new Date().toISOString(),
+    }).ilike('email', email).eq('program_slug', programSlug);
+    if (app.error) throw new Error(app.error.message);
+
+    const portal = await db.from('profiles').update({
+      enrollment_status: 'active',
+      portal_type: 'apprentice',
+      updated_at: new Date().toISOString(),
+    }).eq('id', profile.data.id);
+    if (portal.error) throw new Error(portal.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'program_enrollment') {
+    const schoolOrder = await recordSchoolInvoiceOrder(db, job.billing_invoice_id, payload);
+    const result = await db
+      .from('program_enrollments')
+      .update({
+        status: schoolOrder ? 'pending' : 'active',
+        payment_status: 'paid',
+        enrollment_state: schoolOrder ? 'onboarding' : 'active',
+        next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : 'ONBOARDING',
+        amount_paid_cents: payload.amount_cents,
+        billing_provider: 'quickbooks',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', payload.enrollment_id)
+      .eq('payment_status', 'pending');
+    if (result.error) throw new Error(result.error.message);
+    await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
+    if (schoolOrder) {
+      const { sendSchoolRegistrationEmail } = await import('@/lib/billing/school-registration-email');
+      await sendSchoolRegistrationEmail(db, job.billing_invoice_id, payload);
+    }
+    return;
+  }
+
+  if (job.fulfillment_type === 'store_order') {
+    const { data: order, error: orderError } = await db
+      .from('store_orders')
+      .select('id,user_id,status,total_cents,items')
+      .eq('id', payload.store_order_id)
+      .maybeSingle();
+    if (orderError || !order) throw new Error(orderError?.message || 'Store order was not found.');
+    if (order.status === 'paid') return;
+    if (
+      order.status !== 'pending' ||
+      order.user_id !== payload.user_id ||
+      Number(order.total_cents) !== Number(payload.amount_cents)
+    )
+      throw new Error('Store order payment does not match its pending snapshot.');
+    const now = new Date().toISOString();
+    const items = Array.isArray(order.items) ? order.items : [];
+    for (const item of items.filter((row: any) => !row.requires_shipping)) {
+      const values = {
+        name: item.name,
+        description: `Store purchase: ${item.name}`,
+        status: 'active',
+        entitlement_type: item.type || 'store_product',
+        granted_at: now,
+        billing_provider: 'quickbooks',
+        provider_payment_id: job.billing_invoice_id,
+        updated_at: now,
+      };
+      const existing = await db
+        .from('user_entitlements')
+        .select('id')
+        .eq('user_id', order.user_id)
+        .eq('product_id', item.product_id)
+        .maybeSingle();
+      const entitlement = existing.data?.id
+        ? await db.from('user_entitlements').update(values).eq('id', existing.data.id)
+        : await db
+            .from('user_entitlements')
+            .insert({ user_id: order.user_id, product_id: item.product_id, ...values });
+      if (entitlement.error) throw new Error(entitlement.error.message);
+    }
+    const paid = await db
+      .from('store_orders')
+      .update({
+        status: 'paid',
+        shipping_address: payload.shipping_address || {},
+        notes: `QuickBooks payment confirmed ${now}`,
+        updated_at: now,
+      })
+      .eq('id', order.id)
+      .eq('status', 'pending')
+      .select('id')
+      .maybeSingle();
+    if (paid.error || !paid.data)
+      throw new Error(paid.error?.message || 'Store order was already changed.');
+    await db
+      .from('cart_items')
+      .delete()
+      .eq('user_id', order.user_id)
+      .in(
+        'product_id',
+        items.map((item: any) => item.product_id),
+      );
+    for (const item of items.filter((row: any) => row.track_inventory)) {
+      const product = await db
+        .from('products')
+        .select('inventory_quantity')
+        .eq('id', item.product_id)
+        .maybeSingle();
+      if (product.data?.inventory_quantity != null)
+        await db
+          .from('products')
+          .update({
+            inventory_quantity: Math.max(
+              0,
+              Number(product.data.inventory_quantity) - Number(item.quantity || 0),
+            ),
+          })
+          .eq('id', item.product_id)
+          .eq('inventory_quantity', product.data.inventory_quantity);
+    }
+    return;
+  }
+
+  if (job.fulfillment_type === 'website_domain_purchase') {
+    const { checkDomainPurchase, buyDomain } = await import('@/lib/domainee/client');
+    const { data: row, error } = await db.from('website_domains')
+      .select('id,website_id,user_id,hostname,status,retail_cents,origin_url,customer_reference,metadata')
+      .eq('id', payload.domain_record_id).eq('user_id', payload.user_id).maybeSingle();
+    if (error || !row) throw new Error(error?.message || 'Domain purchase record was not found.');
+    if (row.status === 'active' || row.status === 'processing') return;
+    if (Number(row.retail_cents) !== Number(payload.amount_cents)) throw new Error('Domain invoice does not match the order amount.');
+    const quote = await checkDomainPurchase(row.hostname);
+    if (!quote.available) {
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', error: 'Domain became unavailable after payment.' }).eq('id', row.id);
+      throw new Error('Domain became unavailable after payment; refund review is required.');
+    }
+    if (quote.pricing.totalCents > Number(row.retail_cents)) {
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', provider_cost_cents: quote.pricing.totalCents, error: 'Registrar cost exceeds collected amount.' }).eq('id', row.id);
+      throw new Error('Registrar cost changed after payment; refund review is required.');
+    }
+    const registrant = row.metadata?.registrant;
+    const years = Number(row.metadata?.years || 1);
+    if (!registrant || !row.origin_url) throw new Error('Domain registrant or origin data is missing.');
+    await db.from('website_domains').update({ status: 'processing', payment_status: 'paid', provider_cost_cents: quote.pricing.totalCents }).eq('id', row.id);
+    const result = await buyDomain(row.hostname, years, registrant, {
+      originUrl: row.origin_url,
+      customerReference: row.customer_reference || `elevate-${row.user_id}-${row.website_id}`,
+      idempotencyKey: `billing-invoice-${job.billing_invoice_id}`,
+    });
+    const purchase = result.purchase;
+    const saved = await db.from('website_domains').update({
+      domainee_domain_id: purchase.connectedDomainId || null,
+      domainee_purchase_id: purchase.id,
+      status: purchase.status === 'completed' ? 'active' : 'processing',
+      payment_status: 'paid',
+      provider_cost_cents: purchase.totalCents,
+      updated_at: new Date().toISOString(),
+    }).eq('id', row.id);
+    if (saved.error) throw new Error(saved.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'individual_app_subscription') {
+    const now = new Date();
+    const periodEnd = new Date(now);
+    periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+    const result = await db.from('user_app_subscriptions').upsert(
+      {
+        user_id: payload.user_id,
+        app_slug: payload.app_slug,
+        plan: payload.plan_id,
+        status: 'active',
+        trial_ends_at: null,
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        billing_provider: 'quickbooks',
+        provider_subscription_id: `schedule:user:${payload.user_id}:individual-app-${payload.app_slug}`,
+        updated_at: now.toISOString(),
+      },
+      { onConflict: 'user_id,app_slug' },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'platform_subscription') {
+    const now = new Date();
+    const interval = payload.billing_interval as BillingInterval;
+    const periodEnd = new Date(now);
+    if (interval === 'annual') periodEnd.setUTCFullYear(periodEnd.getUTCFullYear() + 1);
+    else periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+    const plan = await db
+      .from('subscription_plans')
+      .select('id,slug')
+      .eq('slug', payload.plan_id)
+      .eq('active', true)
+      .maybeSingle();
+    if (!plan.data?.id) throw new Error('The platform subscription plan is not active.');
+    const subscription = await db.from('organization_subscriptions').upsert(
+      {
+        organization_id: payload.organization_id,
+        plan_id: plan.data.id,
+        plan_type: payload.plan_id,
+        billing_interval: interval,
+        status: 'active',
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        billing_provider: 'quickbooks',
+        provider_subscription_id: `schedule:${payload.organization_id}:platform-subscription`,
+        metadata: {
+          tenant_id: payload.tenant_id,
+          addon_codes: payload.addon_codes || [],
+          billing_access: true,
+        },
+        updated_at: now.toISOString(),
+      },
+      { onConflict: 'organization_id' },
+    );
+    if (subscription.error) throw new Error(subscription.error.message);
+    await db
+      .from('addon_subscriptions')
+      .update({ active: false, canceled_at: now.toISOString(), updated_at: now.toISOString() })
+      .eq('organization_id', payload.organization_id);
+    for (const code of payload.addon_codes || []) {
+      const addon = await db
+        .from('saas_addon_catalog')
+        .select('monthly_price')
+        .eq('code', code)
+        .eq('active', true)
+        .maybeSingle();
+      if (!addon.data) throw new Error(`Unknown platform add-on: ${code}`);
+      const saved = await db.from('addon_subscriptions').upsert(
+        {
+          organization_id: payload.organization_id,
+          addon_code: code,
+          monthly_price: addon.data.monthly_price,
+          active: true,
+          activated_at: now.toISOString(),
+          canceled_at: null,
+          updated_at: now.toISOString(),
+          metadata: { billing_provider: 'quickbooks' },
+        },
+        { onConflict: 'organization_id,addon_code' },
+      );
+      if (saved.error) throw new Error(saved.error.message);
+    }
+    const entitlements = await getOrganizationFeatures(payload.organization_id, db);
+    await syncLicenseFromSaasEntitlements(db, payload.organization_id, entitlements, {
+      planSlug: payload.plan_id as BasePlanId,
+      billingInterval: interval,
+      active: true,
+    });
+    await db
+      .from('licenses')
+      .update({
+        billing_provider: 'quickbooks',
+        provider_subscription_id: `schedule:${payload.organization_id}:platform-subscription`,
+      })
+      .eq('tenant_id', payload.organization_id);
+    return;
+  }
+
+  if (job.fulfillment_type === 'host_shop_subscription') {
+    const now = new Date().toISOString();
+    const result = await db
+      .from('host_shop_partnerships')
+      .update({
+        partner_tier: payload.tier,
+        subscription_status: 'active',
+        status: 'active',
+        portal_access_enabled: true,
+        billing_provider: 'quickbooks',
+        provider_subscription_id: `schedule:partner:${payload.partner_id}:host-shop-subscription`,
+        updated_at: now,
+      })
+      .eq('id', payload.partnership_id);
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'implementation_package') {
+    const paidCents = Number(payload.amount_cents || 0);
+    const packageTotal = Number(payload.package_total_cents || 0);
+    const status = payload.payment_choice === 'full' ? 'paid_in_full' : 'deposit_paid';
+    const result = await db
+      .from('implementation_orders')
+      .update({
+        status,
+        amount_paid_cents: paidCents,
+        balance_due_cents: Math.max(0, packageTotal - paidCents),
+        customer_name: payload.buyer_name,
+        customer_email: payload.buyer_email,
+        billing_provider: 'quickbooks',
+        paid_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', payload.implementation_order_id)
+      .in('status', ['pending', 'payment_failed']);
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
+  throw new Error(`Unsupported billing fulfillment type: ${job.fulfillment_type}`);
+}

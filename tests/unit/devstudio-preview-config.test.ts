@@ -60,7 +60,7 @@ describe('buildDevStudioPreviewTargets', () => {
     // Admin targets are always included
     expect(targets.some((t) => t.url.endsWith('/dashboard'))).toBe(true);
     expect(targets.some((t) => t.url.endsWith('/studio'))).toBe(true);
-    expect(targets.some((t) => t.url.endsWith('/course-builder'))).toBe(true);
+    expect(targets.some((t) => t.url.endsWith('/studio/courses'))).toBe(true);
     // Public targets are included
     expect(targets.some((t) => t.url.includes('elevateforhumanity.org/programs'))).toBe(true);
   });

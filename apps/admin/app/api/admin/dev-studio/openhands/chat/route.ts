@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import {
-  getOpenHandsConfig,
+  getHydratedOpenHandsConfig,
   getOpenHandsLifecycle,
   sendOpenHandsMessage,
   startOpenHandsTask,
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
     }
 
-    const config = getOpenHandsConfig();
+    const config = await getHydratedOpenHandsConfig();
     if (!config.configured) {
       return NextResponse.json({ error: 'OpenHands not configured' }, { status: 503 });
     }
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  const config = getOpenHandsConfig();
+  const config = await getHydratedOpenHandsConfig();
   const url = new URL(request.url);
   const startTaskId = url.searchParams.get('startTaskId');
   const conversationId = url.searchParams.get('conversationId');

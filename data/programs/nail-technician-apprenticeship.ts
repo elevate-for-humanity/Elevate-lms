@@ -1,10 +1,12 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { APPENDIX_A_STANDARDS } from '@/lib/compliance/appendix-a-standards';
+const NAIL_STANDARD = APPENDIX_A_STANDARDS.manicurist;
 export const NAIL_TECH: ProgramSchema = {
   slug: 'nail-technician-apprenticeship',
   title: 'Nail Technician Apprenticeship',
   subtitle:
-    'Earn your Indiana nail technician license through a registered apprenticeship. 600 hours of supervised training.',
+    `Registered Indiana Manicurist apprenticeship: complete ${NAIL_STANDARD.competencyCount} verified occupational competencies and ${NAIL_STANDARD.relatedInstructionHours} RTI hours through supervised host-site training. Work hours are maintained as auditable training evidence under the competency-based standard.`,
   sector: 'personal-services',
   category: 'Nail Technology',
   programType: 'apprenticeship',
@@ -12,16 +14,15 @@ export const NAIL_TECH: ProgramSchema = {
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
-  durationWeeks: 20,
-  hoursPerWeekMin: 25,
-  hoursPerWeekMax: 30,
-  hoursBreakdown: { onlineInstruction: 60, handsOnLab: 450, examPrep: 40, careerPlacement: 50 },
-  schedule: 'Mon–Fri, varies by salon (25–30 hrs/week)',
+  durationWeeks: 50,
+  hoursPerWeekMin: 30,
+  hoursPerWeekMax: 40,
+  hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
+  schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.',
   cohortSize: '1–3 apprentices per salon',
-  fundingStatement:
-    'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
-  selfPayCost: '$5,000',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
+  selfPayCost: '$6,000',
+  fundingOptions: ['self_pay'],
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [
@@ -49,10 +50,10 @@ export const NAIL_TECH: ProgramSchema = {
       statement: 'Perform manicures, pedicures, and nail enhancements on live clients',
       assessedAt: 'Month 3',
     },
-    { statement: 'Complete 600 hours of supervised salon training', assessedAt: 'Month 5' },
+    { statement: 'Complete 19 verified Appendix A competencies and 210 RTI hours with required sponsor documentation', assessedAt: 'Program completion' },
     {
-      statement: 'Pass Indiana nail technician theory and practical exams',
-      assessedAt: 'After 600 hours',
+      statement: 'Demonstrate readiness for the current Indiana manicurist licensing process',
+      assessedAt: 'After registered-program completion',
     },
     { statement: 'Maintain sanitation and infection control standards', assessedAt: 'Ongoing' },
     { statement: 'Apply gel, acrylic, and nail art techniques', assessedAt: 'Month 4' },
@@ -145,11 +146,11 @@ export const NAIL_TECH: ProgramSchema = {
   complianceAlignment: [
     {
       standard: 'Indiana IPLA Nail Technology Standards',
-      description: 'Apprenticeship meets Indiana 600-hour nail technology training requirements.',
+      description: 'State licensing requirements are tracked separately from registered-program completion requirements.',
     },
     {
       standard: 'DOL Registered Apprenticeship',
-      description: 'Program registered with U.S. Department of Labor.',
+      description: 'Registered Manicurist occupation 2090CB: 19 verified competencies plus 210 required RTI hours.',
     },
   ],
   trainingPhases: [
@@ -189,7 +190,7 @@ export const NAIL_TECH: ProgramSchema = {
   ],
   credentialPipeline: [
     {
-      training: 'Nail Tech Apprenticeship (5 months)',
+      training: 'Competency-based Nail Technician Apprenticeship',
       certification: 'Indiana Nail Technician License',
       certBody: 'Indiana Professional Licensing Agency',
       jobRole: 'Licensed Nail Technician',
@@ -221,23 +222,24 @@ export const NAIL_TECH: ProgramSchema = {
     'High school diploma or GED (or actively pursuing)',
     'Interest in nail technology career',
   ],
-  equipmentIncluded: 'Basic tool kit provided. Salon supplies provided by host salon.',
+  equipmentIncluded: 'Students provide personal tools and supplies unless their written enrollment terms expressly include them.',
   modality: 'In-person — supervised training in a licensed salon',
   facilityInfo: 'Partner salons in Indianapolis area',
   employerPartners: ['Licensed nail salons in Indianapolis area'],
   pricingIncludes: [
-    '600 hours supervised training',
+    '19 verified occupational competencies',
+    '210 required related-instruction hours',
     'Related instruction',
     'Infection control certification',
     'CPR/First Aid',
     'Licensing exam prep',
   ],
   paymentTerms:
-    'Paid apprenticeship track remains available. For self-pay enrollment, start with a $600 deposit, then weekly payments or BNPL. All options available at checkout.',
+    'Tuition is self-pay only. Review the current published total, initial invoice, remaining installments, and any separately approved financing before payment.',
   faqs: [
     {
       question: 'How long does it take?',
-      answer: 'Approximately 5 months at 25–30 hours/week to complete the required 600 hours.',
+      answer: 'Progress is competency-based. Completion requires 19 verified occupational competencies and 210 related-instruction hours; calendar time varies by apprentice and host site.',
     },
     {
       question: 'Do I get paid?',
@@ -251,14 +253,14 @@ export const NAIL_TECH: ProgramSchema = {
   ],
   metaTitle: 'Nail Technician Apprenticeship | Indiana Licensed | Indianapolis',
   metaDescription:
-    'Earn your Indiana nail technician license through a paid apprenticeship. 600 hours of supervised training. Earn while you learn. Indianapolis.',
+    'Registered competency-based Manicurist apprenticeship with 19 verified competencies, 210 related-instruction hours, supervised host-site practice, and Indiana licensing preparation.',
 
 
   funding: {
     wioa_eligible: false,
-    fssa_eligible: true,
+    fssa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
+    fundingNotes: 'Apprenticeship enrollment is self-pay only.',
   },
 };

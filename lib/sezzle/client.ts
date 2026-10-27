@@ -425,10 +425,4 @@ import { getSezzleConfig } from './env';
 const _cfg = getSezzleConfig();
 if (_cfg.configured) {
   sezzle.configure({ publicKey: _cfg.publicKey, privateKey: _cfg.privateKey, environment: _cfg.environment });
-} else {
-  const missing = [
-    !_cfg.publicKey && 'SEZZLE_PUBLIC_KEY / NEXT_PUBLIC_SEZZLE_PUBLIC_KEY',
-    !_cfg.privateKey && 'SEZZLE_PRIVATE_KEY',
-  ].filter(Boolean);
-  logger.warn(`[Sezzle] Not configured - missing: ${missing.join(', ')}`);
 }

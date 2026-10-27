@@ -390,7 +390,7 @@ export function PricingConfigurator({
           </button>
 
           <p className="text-xs text-slate-500 text-center mt-3">
-            Secure checkout powered by Stripe
+            Secure invoice payment through QuickBooks
           </p>
         </div>
       </div>

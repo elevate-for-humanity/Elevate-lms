@@ -20,7 +20,7 @@ const NAV_LINKS = [
 export function EmployerNav() {
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-40">
-      <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-6 h-14 overflow-x-auto">
+      <div className="mx-auto flex max-w-screen-xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 lg:h-14 lg:flex-nowrap lg:gap-6 lg:py-0">
         <Link
           href="/employer/dashboard"
           className="font-black text-brand-blue-700 whitespace-nowrap shrink-0"
@@ -31,7 +31,7 @@ export function EmployerNav() {
           <Link
             key={l.href}
             href={l.href}
-            className="text-sm text-slate-700 hover:text-brand-blue-700 whitespace-nowrap transition-colors"
+            className="min-w-0 rounded-md px-2 py-1 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700"
           >
             {l.label}
           </Link>

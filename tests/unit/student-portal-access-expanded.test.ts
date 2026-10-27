@@ -48,12 +48,12 @@ describe('hasLmsAccess — program_enrollments', () => {
     expect(hasLmsAccess(makeEnrollment({ accessGrantedAt: '2025-01-01T00:00:00Z' }))).toBe(true);
   });
 
-  it('grants access when enrollment_state is active (backfill fallback)', () => {
-    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'active' }))).toBe(true);
+  it('denies access when active state lacks an explicit access grant', () => {
+    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'active' }))).toBe(false);
   });
 
-  it('grants access when enrollment_state is enrolled (backfill fallback)', () => {
-    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(true);
+  it('denies access when enrolled state lacks an explicit access grant', () => {
+    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(false);
   });
 
   it('denies access when enrollment is null', () => {
@@ -105,11 +105,11 @@ describe('hasLmsAccess — training_enrollments (legacy)', () => {
     }))).toBe(true);
   });
 
-  it('grants access when status is active', () => {
+  it('denies legacy active status without an explicit access grant', () => {
     expect(hasLmsAccess(makeEnrollment({
       source: 'training_enrollments',
       status: 'active',
-    }))).toBe(true);
+    }))).toBe(false);
   });
 
   it('denies access when status is pending and no access_granted_at', () => {
@@ -228,20 +228,19 @@ describe('full student LMS access path contract', () => {
     expect(enrollmentSrc).toMatch(/LMS_ACCESS_STATES.*=.*\['active'\]/);
   });
 
-  it('LMS layout uses hasLmsAccess for access determination', () => {
-    const layoutSrc = read('app/lms/(app)/layout.tsx');
-    expect(layoutSrc).toContain('hasLmsAccess');
+  it('LMS layout delegates access to the canonical learner boundary', () => {
+    const layoutSrc = read('apps/lms/app/lms/(app)/layout.tsx');
+    expect(layoutSrc).toContain('CanonicalLearnerWorkspaceLayout');
+    expect(layoutSrc).not.toContain('autoProvision');
   });
 
-  it('hasLmsAccess passes enrolled state without access_granted_at', () => {
-    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(true);
+  it('hasLmsAccess rejects enrolled state without access_granted_at', () => {
+    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(false);
   });
 
-  it('submit-documents sets access_granted_at so hasLmsAccess passes via primary gate', () => {
-    const submitSrc = read('app/api/enrollment/submit-documents/route.ts');
-    expect(submitSrc).toContain('access_granted_at: now');
-    // After this fix, new enrollments will have access_granted_at set,
-    // so the fallback state check is only needed for pre-fix rows.
-    expect(hasLmsAccess(makeEnrollment({ accessGrantedAt: new Date().toISOString() }))).toBe(true);
+  it('enforced enrollment validates eligibility before creating access records', () => {
+    const routeSrc = read('apps/lms/app/api/enrollments/create-enforced/route.ts');
+    expect(routeSrc).toContain('validateEnrollmentEligibility');
+    expect(routeSrc).toContain(".eq('status', 'completed')");
   });
 });

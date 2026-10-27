@@ -6,5 +6,5 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /** Compatibility entry only. Dev Studio owns course lifecycle governance. */
 export default function LegacyCourseLifecyclePage() {
-  redirect('/studio/courses/lifecycle');
+  redirect('/studio/courses?tab=governance');
 }

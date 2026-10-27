@@ -50,16 +50,16 @@ export default function MonitoringClient() {
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-slate-800">Audit Log Schema Health</h2>
-          <button onClick={load} className="p-1.5 rounded hover:bg-slate-100 text-slate-400">
+          <button onClick={load} className="p-1.5 rounded hover:bg-slate-100 text-slate-600">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
         {loading ? (
-          <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <div className="flex items-center gap-2 text-slate-600 text-sm">
             <Loader2 className="w-4 h-4 animate-spin" /> Checking…
           </div>
         ) : !schema ? (
-          <p className="text-sm text-slate-400">Could not load schema status</p>
+          <p className="text-sm text-slate-600">Could not load schema status</p>
         ) : (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function MonitoringClient() {
           <h2 className="font-semibold text-slate-800">Recent API Errors</h2>
         </div>
         {loading ? (
-          <div className="flex items-center gap-2 text-slate-400 text-sm px-5 py-6">
+          <div className="flex items-center gap-2 text-slate-600 text-sm px-5 py-6">
             <Loader2 className="w-4 h-4 animate-spin" /> Loading…
           </div>
         ) : errors.length === 0 ? (
@@ -118,7 +118,7 @@ export default function MonitoringClient() {
             <tbody className="divide-y divide-slate-100">
               {errors.map(e => (
                 <tr key={e.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+                  <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">
                     {new Date(e.timestamp).toLocaleString()}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-slate-600 max-w-xs truncate">{e.endpoint}</td>

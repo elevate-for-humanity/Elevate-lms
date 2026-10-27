@@ -34,7 +34,7 @@ export default async function BulkOperationsPage() {
           </div>
           <Link href="/studio/courses" className="text-sm text-slate-600 hover:underline">← Back to Course Builder</Link>
         </div>
-        <div className="mb-6 grid grid-cols-3 gap-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[{ label: 'Published', value: published, cls: 'text-green-700' }, { label: 'Drafts', value: drafts, cls: 'text-amber-700' }, { label: 'Archived', value: archived, cls: 'text-slate-500' }].map(({ label, value, cls }) => (
             <div key={label} className="rounded-xl border border-slate-200 bg-white p-4 text-center">
               <p className={`text-2xl font-extrabold ${cls}`}>{value}</p>

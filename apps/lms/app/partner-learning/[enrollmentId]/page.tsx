@@ -13,7 +13,7 @@ export default async function PartnerLearningPage({ params }: { params: Promise<
   const { data: enrollment, error } = await supabase
     .from('partner_lms_enrollments')
     .select(`id,student_id,course_id,status,progress_percentage,external_account_id,metadata,
-      partner_lms_courses(id,course_name,course_description,description,duration_hours),
+      partner_lms_courses(id,course_name,course_description,description,duration_hours,scorm_package_url),
       partner_lms_providers(id,provider_name,website_url,support_email,metadata)`)
     .eq('id', enrollmentId)
     .eq('student_id', user.id)
@@ -28,7 +28,7 @@ export default async function PartnerLearningPage({ params }: { params: Promise<
     : { data: null };
   const title = course?.course_name || internalCourse?.title || record.metadata?.credential || 'Partner training';
   const description = course?.course_description || course?.description || internalCourse?.description || 'Your training is delivered and tracked by the approved external provider.';
-  const providerUrl = provider?.website_url;
+  const providerUrl = record.metadata?.launch_url || course?.scorm_package_url || provider?.website_url;
   const instructions = provider?.metadata?.instructions || 'Use your provider account to open training, testing, or scheduling.';
 
   return <main className="min-h-screen bg-slate-50 px-4 py-8"><div className="mx-auto max-w-4xl space-y-6">

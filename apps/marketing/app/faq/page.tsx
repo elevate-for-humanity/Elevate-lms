@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FAQSearch } from '@/components/faq/FAQSearch';
@@ -8,6 +10,15 @@ export const metadata: Metadata = {
   description:
     'Frequently asked questions about Elevate career training, enrollment, funding review, apprenticeships, credentials, and career services.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/faq' },
+
+  ...publicArtworkMetadata({
+    path: '/faq',
+    image: '/images/refresh-20261014/admissions.webp',
+    alt: 'Illustrative student asking an advisor about enrollment',
+    title: 'FAQ | Elevate for Humanity',
+    description:
+      'Frequently asked questions about Elevate career training, enrollment, funding review, apprenticeships, credentials, and career services.',
+  }),
 };
 
 interface FAQ {
@@ -130,9 +141,20 @@ export default function FAQPage() {
 
   return (
     <main className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative student asking an advisor about enrollment"
+        actions={[
+          { href: '/advising', label: 'Ask an advisor' },
+          { href: '/programs', label: 'Find my program' },
+        ]}
+      />
+
       <section className="bg-slate-950 text-white py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest">Current guidance</p>
+          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest">
+            Current guidance
+          </p>
           <h1 className="text-4xl md:text-5xl font-extrabold mt-3">Frequently Asked Questions</h1>
           <p className="text-slate-300 max-w-3xl mt-5 leading-relaxed">
             General answers do not override the exact program record, enrollment agreement,
@@ -145,7 +167,11 @@ export default function FAQPage() {
       <div className="max-w-5xl mx-auto px-4 py-14">
         <div className="flex flex-wrap gap-2 mb-8">
           {categories.map((category) => (
-            <a key={category} href={`#${category}`} className="px-4 py-2 bg-slate-100 rounded-full text-sm font-medium text-slate-700 hover:bg-slate-200">
+            <a
+              key={category}
+              href={`#${category}`}
+              className="px-4 py-2 bg-slate-100 rounded-full text-sm font-medium text-slate-700 hover:bg-slate-200"
+            >
               {category}
             </a>
           ))}
@@ -155,14 +181,32 @@ export default function FAQPage() {
 
         <div className="mt-12 bg-slate-50 border border-slate-200 rounded-xl p-8 text-center">
           <MessageSquare className="w-10 h-10 text-brand-red-600 mx-auto mb-3" />
-          <h2 className="text-xl font-bold text-slate-900">Need an answer for your exact record?</h2>
+          <h2 className="text-xl font-bold text-slate-900">
+            Need an answer for your exact record?
+          </h2>
           <p className="text-slate-600 mt-2 mb-5">
-            Identify the program, funding source, enrollment status, or apprenticeship occupation so the controlling record can be reviewed.
+            Identify the program, funding source, enrollment status, or apprenticeship occupation so
+            the controlling record can be reviewed.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/programs" className="bg-slate-950 text-white px-6 py-3 rounded-lg font-bold">Programs</Link>
-            <Link href="/funding" className="border border-slate-300 px-6 py-3 rounded-lg font-bold text-slate-900">Funding</Link>
-            <Link href="/contact" className="border border-slate-300 px-6 py-3 rounded-lg font-bold text-slate-900">Contact</Link>
+            <Link
+              href="/programs"
+              className="bg-slate-950 text-white px-6 py-3 rounded-lg font-bold"
+            >
+              Programs
+            </Link>
+            <Link
+              href="/funding"
+              className="border border-slate-300 px-6 py-3 rounded-lg font-bold text-slate-900"
+            >
+              Funding
+            </Link>
+            <Link
+              href="/contact"
+              className="border border-slate-300 px-6 py-3 rounded-lg font-bold text-slate-900"
+            >
+              Contact
+            </Link>
           </div>
         </div>
       </div>

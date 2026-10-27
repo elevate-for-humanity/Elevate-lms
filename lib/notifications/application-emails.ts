@@ -5,6 +5,7 @@
 
 import { sendEmail } from '@/lib/email';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
@@ -193,7 +194,7 @@ export async function sendAdminApplicationNotification(application: ApplicationD
 
   <!-- CTA -->
   <div style="background:#f0fdf4;border:2px solid #86efac;padding:20px 32px;text-align:center;">
-    <a href="${SITE_URL}/admin/applications/review/${application.id}"
+    <a href="${adminUrl(`/applications/review/${application.id}`)}"
        style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:700;font-size:15px;">
       Review &amp; Enroll →
     </a>
@@ -252,7 +253,7 @@ export async function sendAdminApplicationNotification(application: ApplicationD
 
   <!-- Footer -->
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;padding:16px 32px;text-align:center;">
-    <a href="${SITE_URL}/admin/applications" style="color:#6b7280;font-size:12px;text-decoration:none;">View All Applications</a>
+    <a href="${adminUrl('/applications')}" style="color:#6b7280;font-size:12px;text-decoration:none;">View All Applications</a>
     <span style="color:#d1d5db;margin:0 8px;">|</span>
     <span style="color:#6b7280;font-size:12px;">${PLATFORM_DEFAULTS.orgName} Admin</span>
   </div>

@@ -1,0 +1,26 @@
+[Unit]
+Description=Elevate private Asterisk PARIS media gateway
+After=docker.service network-online.target elevate-paris-turn.service
+Wants=network-online.target elevate-paris-turn.service
+Requires=docker.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=elevate-paris
+Group=elevate-paris
+EnvironmentFile=/etc/elevate-pbx/paris.conf
+ExecStart=/usr/bin/node /opt/elevate-pbx/paris/launch.mjs gateway
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

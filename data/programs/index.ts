@@ -12,7 +12,7 @@ import {
   isStrictWorkforceFundedProgram,
 } from '@/lib/programs/funding-registry';
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import { BOOKKEEPING } from './bookkeeping';
 import { BUSINESS_ADMIN } from './business-administration';
 import { CAD_DRAFTING } from './cad-drafting';
@@ -91,10 +91,6 @@ export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(
   STATIC_PROGRAMS.map((program) => [program.slug, program]),
 );
 
-const VERIFIED_RAPIDS_SLUGS = new Set<string>(
-  Object.values(RAPIDS_CONFIG.programs).map((program) => program.slug),
-);
-
 function hasNumericSelfPayPrice(program: ProgramSchema): boolean {
   const amount = Number(String(program.selfPayCost || '').replace(/[^0-9.]/g, ''));
   return Number.isFinite(amount) && amount > 0;
@@ -105,7 +101,7 @@ function looksLikeApprenticeship(program: ProgramSchema): boolean {
 }
 
 function replaceUnverifiedRegisteredLanguage(text: string | undefined, slug: string): string {
-  if (!text || VERIFIED_RAPIDS_SLUGS.has(slug)) return text || '';
+  if (!text || isRAPIDSProgram(slug)) return text || '';
   return text
     .replace(/DOL[-\s]?registered/gi, 'work-based training')
     .replace(/U\.S\. Department of Labor Registered Apprenticeship/gi, 'work-based training pathway')
@@ -116,7 +112,7 @@ function replaceUnverifiedRegisteredLanguage(text: string | undefined, slug: str
 }
 
 function publicTitle(program: ProgramSchema): string {
-  if (!looksLikeApprenticeship(program) || VERIFIED_RAPIDS_SLUGS.has(program.slug)) return program.title;
+  if (!looksLikeApprenticeship(program) || isRAPIDSProgram(program.slug)) return program.title;
   return program.title.replace(/\s*Apprenticeship\b/gi, ' Training Pathway').replace(/\s+/g, ' ').trim();
 }
 
@@ -124,7 +120,7 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
   const verifiedFunding = getVerifiedProgramFunding(program.slug);
   const workforceFunded = isStrictWorkforceFundedProgram(program.slug);
   const canonicalSlug = verifiedFunding?.slug ?? program.slug;
-  const registered = VERIFIED_RAPIDS_SLUGS.has(canonicalSlug);
+  const registered = isRAPIDSProgram(canonicalSlug);
   const apprenticeshipLike = looksLikeApprenticeship(program);
   const copyFallback = verifiedFunding?.description ?? `${publicTitle(program)} career training.`;
   const fundingOptions: FundingType[] = ['self_pay'];
@@ -146,6 +142,10 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
     ...program,
     slug: canonicalSlug,
     title: normalizedTitle,
+    category:
+      apprenticeshipLike && !registered
+        ? replaceUnverifiedRegisteredLanguage(program.category, canonicalSlug) || 'Work-Based Training'
+        : program.category,
     programType:
       apprenticeshipLike && !registered && program.programType === 'apprenticeship'
         ? 'workforce'
@@ -159,6 +159,42 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
         .filter(Boolean),
       ...(registrationDisclosure ? [registrationDisclosure] : []),
     ],
+    curriculum: program.curriculum.map((module) => ({
+      ...module,
+      title: replaceUnverifiedRegisteredLanguage(module.title, canonicalSlug),
+      topics: module.topics.map((topic) => normalizeCopy(topic)).filter(Boolean),
+    })),
+    outcomes: program.outcomes.map((outcome) => ({
+      ...outcome,
+      statement: normalizeCopy(outcome.statement),
+    })),
+    weeklySchedule: program.weeklySchedule.map((entry) => ({
+      ...entry,
+      title: replaceUnverifiedRegisteredLanguage(entry.title, canonicalSlug),
+      competencyMilestone: normalizeCopy(entry.competencyMilestone),
+    })),
+    careerPathway: program.careerPathway.map((step) => ({
+      ...step,
+      title: replaceUnverifiedRegisteredLanguage(step.title, canonicalSlug),
+      requirements: normalizeCopy(step.requirements),
+    })),
+    credentials: program.credentials.map((credential) => ({
+      ...credential,
+      name: replaceUnverifiedRegisteredLanguage(credential.name, canonicalSlug),
+      description: normalizeCopy(credential.description),
+    })),
+    trainingPhases: program.trainingPhases?.map((phase) => ({
+      ...phase,
+      title: replaceUnverifiedRegisteredLanguage(phase.title, canonicalSlug),
+      focus: normalizeCopy(phase.focus),
+      labCompetencies: phase.labCompetencies.map((item) => normalizeCopy(item)).filter(Boolean),
+    })),
+    credentialPipeline: program.credentialPipeline?.map((item) => ({
+      ...item,
+      training: normalizeCopy(item.training),
+      certification: replaceUnverifiedRegisteredLanguage(item.certification, canonicalSlug),
+      jobRole: replaceUnverifiedRegisteredLanguage(item.jobRole, canonicalSlug),
+    })),
     faqs: program.faqs.map((faq) => ({
       ...faq,
       question: replaceUnverifiedRegisteredLanguage(faq.question, canonicalSlug),
@@ -172,13 +208,21 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
       .filter((item) => item.standard && item.description),
     metaTitle: replaceUnverifiedRegisteredLanguage(program.metaTitle, canonicalSlug),
     metaDescription: normalizeCopy(program.metaDescription, copyFallback),
+    schedule: normalizeCopy(program.schedule, program.schedule),
+    eveningSchedule: program.eveningSchedule ? normalizeCopy(program.eveningSchedule) : undefined,
+    equipmentIncluded: program.equipmentIncluded ? normalizeCopy(program.equipmentIncluded) : undefined,
+    modality: program.modality ? normalizeCopy(program.modality) : undefined,
+    facilityInfo: program.facilityInfo ? normalizeCopy(program.facilityInfo) : undefined,
+    paymentTerms: program.paymentTerms ? normalizeCopy(program.paymentTerms) : undefined,
+    pricingIncludes: program.pricingIncludes?.map((item) => normalizeCopy(item)).filter(Boolean),
+    admissionRequirements: program.admissionRequirements?.map((item) => normalizeCopy(item)).filter(Boolean),
     isSelfPay: !workforceFunded,
     fundingOptions,
     fundingStatement: workforceFunded
       ? verifiedFunding?.wrgEligible
         ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
         : 'WIOA may be considered. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
-      : 'Regular self-pay program. Review the published price and payment options before applying.',
+      : apprenticeshipLike ? 'Apprenticeship enrollment is self-pay only. Review the published tuition and payment options before applying.' : 'Regular self-pay program. Review the published price and payment options before applying.',
     badge: registered
       ? 'Registered Apprenticeship'
       : workforceFunded
@@ -197,14 +241,14 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
       etpl_approved: Boolean(verifiedFunding?.etplListedFor2Exclusive),
       jobReadyIndyEligible: false,
       fundingNotes:
-        verifiedFunding?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
+        apprenticeshipLike ? 'Apprenticeship enrollment is self-pay only.' : verifiedFunding?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
     },
     enrollmentTracks: undefined,
     cta: {
       ...program.cta,
-      stripeCheckoutHref: hasNumericSelfPayPrice(program)
-        ? '/api/checkout/program'
-        : program.cta.stripeCheckoutHref,
+      quickbooksCheckoutHref: hasNumericSelfPayPrice(program)
+        ? `/programs/${encodeURIComponent(program.slug)}/apply`
+        : program.cta.quickbooksCheckoutHref,
     },
   };
 }

@@ -22,6 +22,7 @@ export const CourseUpdateSchema = z.object({
   description: z.string().optional().nullable(),
   program_id: z.string().uuid().optional().nullable(),
   duration_hours: z.number().int().min(0).optional().nullable(),
+  thumbnail_url: z.string().url().optional().nullable(),
   is_published: z.boolean().optional(),
   status: z.enum(['draft', 'review', 'published', 'archived']).optional(),
   skill_level: z.enum(['beginner', 'intermediate', 'advanced']).optional().nullable(),

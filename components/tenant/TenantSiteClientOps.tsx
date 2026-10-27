@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode } from 'react';
+import { useTenantRequestHeaders } from './TenantPreviewContext';
 
 function sessionKey() {
   if (typeof window === 'undefined') return '';
@@ -38,10 +39,11 @@ export function TenantTrackedLink({ href, eventName, children, className, style,
   style?: CSSProperties;
   external?: boolean;
 }) {
+  const previewHeaders = useTenantRequestHeaders();
   function track() {
     void fetch('/api/tenant-sites/event', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...previewHeaders },
       body: JSON.stringify({ eventName, path: window.location.pathname, sessionKey: sessionKey(), metadata: { href } }),
       keepalive: true,
     }).catch(() => undefined);
@@ -50,10 +52,10 @@ export function TenantTrackedLink({ href, eventName, children, className, style,
   return <a href={href} onClick={track} className={className} style={style} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>{children}</a>;
 }
 
-async function submitLead(payload: { name: string; email: string; phone?: string; message: string }) {
+async function submitLead(payload: { name: string; email: string; phone?: string; message: string }, previewHeaders: Record<string, string>) {
   const response = await fetch('/api/tenant-sites/lead', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...previewHeaders },
     body: JSON.stringify({ ...payload, path: window.location.pathname }),
   });
   const data = await response.json();
@@ -61,6 +63,7 @@ async function submitLead(payload: { name: string; email: string; phone?: string
 }
 
 export function TenantLeadForm({ accent }: { accent: string }) {
+  const previewHeaders = useTenantRequestHeaders();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -75,7 +78,7 @@ export function TenantLeadForm({ accent }: { accent: string }) {
     if (!canSubmit || busy) return;
     setBusy(true); setStatus('idle'); setError('');
     try {
-      await submitLead({ name, email, phone, message });
+      await submitLead({ name, email, phone, message }, previewHeaders);
       setName(''); setEmail(''); setPhone(''); setMessage(''); setStatus('success');
     } catch (err) {
       setStatus('error'); setError(err instanceof Error ? err.message : 'Could not send your message');
@@ -107,6 +110,7 @@ export type TenantCustomFormField = {
 };
 
 export function TenantCustomLeadForm({ accent, title = 'Send a message', fields }: { accent: string; title?: string; fields: TenantCustomFormField[] }) {
+  const previewHeaders = useTenantRequestHeaders();
   const normalized = fields.slice(0, 20).filter((field) => field.name && field.label);
   const [values, setValues] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -133,7 +137,7 @@ export function TenantCustomLeadForm({ accent, title = 'Send a message', fields 
         .map((field) => `${field.label}: ${value(field.name).trim()}`);
       const primaryMessage = value('message') || value('notes') || value('details');
       const message = [primaryMessage, details.length ? `Additional answers:\n${details.join('\n')}` : ''].filter(Boolean).join('\n\n') || `Submission from ${title}`;
-      await submitLead({ name, email, phone, message });
+      await submitLead({ name, email, phone, message }, previewHeaders);
       setValues({}); setStatus('success');
     } catch (err) {
       setStatus('error'); setError(err instanceof Error ? err.message : 'Could not submit form');

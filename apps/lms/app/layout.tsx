@@ -1,12 +1,15 @@
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 // Production recovery deploy marker: 2026-08-13.
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
 import '../../../styles/contrast-guardrails.css';
+import '../../../styles/responsive-guardrails.css';
 import { LmsPwaRegistration } from '@/components/pwa/LmsPwaRegistration';
 import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
+import { ClientProviders } from '@/components/ClientProviders';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,13 +40,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <SupabasePublicConfigScript />
       </head>
-      <body className="efh-contrast">
+      <body className="lms-portal efh-contrast">
         <SupabaseConfigBootstrap />
+        <CommunicationTodos />
         <LmsPwaRegistration />
-        {children}
+        <ClientProviders>{children}</ClientProviders>
         <PwaInstallBanner
-          message="Install the Elevate dashboard for faster access to courses, hours, documents, and progress."
-          storageKey="lms-pwa-install-banner-dismissed"
+          message="Install the Elevate dashboard for quick access to your courses, hours, messages, and documents."
+          storageKey="lms-pwa-phone-install-banner-v1"
         />
       </body>
     </html>

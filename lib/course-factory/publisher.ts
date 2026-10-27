@@ -4,11 +4,15 @@
  * Course Factory owns generation, validation and package assembly. This module
  * persists an already-validated package through one PostgreSQL transaction.
  */
+import { createHash } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getInstructorForCourse } from '@/lib/ai-instructors';
+import { getInstructorForBlueprint } from '@/lib/ai-instructors';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
+import { buildLearningExperience } from '@/lib/curriculum/learning-experience';
 import type { BlueprintModule, BuildMode, ValidationResult } from './types';
+import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
 import { inferStepType } from './validator';
+import { buildLessonLearningObjects } from './learning-objects';
 
 export interface PublishInput {
   programId?: string | null;
@@ -91,11 +95,15 @@ function normalizeLessonType(lesson: Record<string, any>, slug: string): string 
   return inferStepType(slug);
 }
 
-function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
-  const instructor = getInstructorForCourse(courseTitle);
+export function buildAtomicPayload(
+  modules: BlueprintModule[],
+  courseTitle: string,
+  videoConfig?: CredentialBlueprint['videoConfig'],
+) {
+  const instructor = getInstructorForBlueprint(courseTitle, videoConfig);
   return [...modules]
     .sort((a, b) => a.orderIndex - b.orderIndex)
-    .map((courseModule, modulePosition) => {
+    .map((courseModule) => {
       const moduleExtra = courseModule as typeof courseModule & Record<string, any>;
       return {
         slug: courseModule.slug,
@@ -107,7 +115,7 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
         is_required: moduleExtra.isRequired ?? true,
         lessons: [...(courseModule.lessons ?? [])]
           .sort((a, b) => a.order - b.order)
-          .map((lesson, lessonPosition) => {
+          .map((lesson) => {
             const extra = lesson as typeof lesson & Record<string, any>;
             const stepType = normalizeLessonType(extra, lesson.slug);
             const content = normalizeLessonContent(lesson.content, lesson.objective);
@@ -117,11 +125,79 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               !Array.isArray(content.experience)
                 ? (content.experience as Record<string, any>)
                 : null;
+            const governedPractical =
+              extra.practicalRequired ??
+              (Boolean(experience?.practicalTask || experience?.practical_task) ||
+                stepType === 'lab');
+            // This is the final shared persistence boundary for every Course
+            // Builder entry point. Generate the universal experience here so
+            // dedicated, AI, blueprint, recovery, and Admin builds cannot
+            // bypass the publication contract.
+            const learningExperience =
+              extra.learningExperience && typeof extra.learningExperience === 'object'
+                ? extra.learningExperience
+                : buildLearningExperience({
+                    lessonType: stepType,
+                    practicalRequired: governedPractical,
+                  });
             const learningPoints = Array.isArray(content?.learning_points)
               ? content.learning_points.filter(
                   (point): point is string => typeof point === 'string' && point.trim().length > 0,
                 )
               : [];
+            const learningObjectives = Array.from(
+              new Set(
+                [
+                  ...(Array.isArray(lesson.learningObjectives) ? lesson.learningObjectives : []),
+                  lesson.objective,
+                  ...learningPoints,
+                ]
+                  .filter(
+                    (objective): objective is string =>
+                      typeof objective === 'string' && objective.trim().length > 0,
+                  )
+                  .map((objective) => objective.trim()),
+              ),
+            );
+            const narration =
+              typeof experience?.narrationScript === 'string' ? experience.narrationScript : null;
+            const sourceFingerprint = experience
+              ? createHash('sha256')
+                  .update(
+                    JSON.stringify({
+                      narration,
+                      objective: lesson.objective ?? null,
+                      learningPoints,
+                      visualPrompt: experience.visualPrompt ?? null,
+                    }),
+                  )
+                  .digest('hex')
+              : null;
+            if (
+              experience &&
+              !LearningIntelligenceSchema.safeParse(experience.intelligence).success
+            ) {
+              const competencyKeys =
+                Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+                  ? lesson.competencyKeys
+                  : (courseModule.competencies ?? []).map((competency) => competency.competencyKey);
+              const critical = (courseModule.competencies ?? []).some(
+                (competency) =>
+                  competency.isCritical && competencyKeys.includes(competency.competencyKey),
+              );
+              experience.intelligence = compileLearningIntelligence({
+                lessonSlug: lesson.slug,
+                lessonTitle: lesson.title,
+                domainKey: lesson.domainKey ?? courseModule.domainKey ?? courseModule.slug,
+                competencyKeys,
+                objectives: learningObjectives,
+                masteryThreshold: lesson.passingScore,
+                assessment: ['checkpoint', 'quiz', 'exam'].includes(stepType),
+                practical: governedPractical,
+                critical,
+                criticalMasteryThreshold: 100,
+              });
+            }
             const practicalTask =
               experience?.practicalTask && typeof experience.practicalTask === 'object'
                 ? experience.practicalTask
@@ -152,19 +228,27 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
             const instructorNotes = Array.isArray(lesson.instructorNotes)
               ? lesson.instructorNotes.join('\n\n')
               : (lesson.instructorNotes ?? null);
-            const governedPractical = extra.practicalRequired ?? stepType === 'lab';
-
+            const canonicalLessonOrder = courseModule.orderIndex * 1000 + lesson.order;
+            const learningObjects = buildLessonLearningObjects({
+              slug: lesson.slug,
+              videoUrl: extra.videoUrl ?? lesson.videoFile ?? null,
+              quizQuestions: lesson.quizQuestions ?? [],
+              experience,
+            });
             return {
               slug: lesson.slug,
               title: lesson.title,
               lesson_type: stepType,
-              // The live schema enforces UNIQUE(course_id, order_index). Blueprint
-              // order fields are descriptive and may be duplicated or zero-based, so
-              // derive the persisted global index from normalized array positions.
-              order_index: (modulePosition + 1) * 1000 + (lessonPosition + 1),
+              // Module and lesson order are canonicalized before publication. Their
+              // composite keeps lesson ordering unique across the complete course.
+              order_index: canonicalLessonOrder,
               objective: lesson.objective ?? null,
               content,
-              content_json: experience ? { experience } : {},
+              content_json: {
+                ...(experience ? { experience } : {}),
+                ...(learningExperience ? { learning_experience: learningExperience } : {}),
+                learning_objects: learningObjects,
+              },
               rendered_html: renderedHtml,
               quiz_questions:
                 lesson.quizQuestions?.map((question, index) => ({
@@ -183,23 +267,46 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               resources: generatedResources.length ? generatedResources : (extra.resources ?? null),
               duration_minutes: lesson.durationMinutes ?? null,
               video_url: extra.videoUrl ?? lesson.videoFile ?? null,
-              video_config:
-                extra.videoConfig ??
-                (experience
-                  ? {
-                      enabled: true,
-                      instructor: instructor.name,
-                      instructor_id: instructor.id,
-                      instructor_avatar: instructor.avatar,
-                      narration: experience.narrationScript ?? null,
-                      visual_prompt: experience.visualPrompt ?? null,
-                      quick_clips: generatedQuickClips,
-                      captions: true,
-                      transcript: experience.narrationScript ?? null,
-                    }
-                  : null),
-              learning_objectives: lesson.learningObjectives ?? null,
-              competency_checks: lesson.competencyChecks ?? experience?.knowledgeChecks ?? null,
+              video_config: experience
+                ? {
+                    ...(extra.videoConfig && typeof extra.videoConfig === 'object'
+                      ? extra.videoConfig
+                      : {}),
+                    enabled: true,
+                    source_fingerprint: sourceFingerprint,
+                    source_contract_version: 1,
+                    narration_locked: true,
+                    allow_paid_narration: true,
+                    instructor: instructor.name,
+                    instructor_id: instructor.id,
+                    instructor_avatar: instructor.avatar,
+                    narration: experience.narrationScript ?? null,
+                    visual_prompt: experience.visualPrompt ?? null,
+                    quick_clips: generatedQuickClips,
+                    captions: true,
+                    transcript: experience.narrationScript ?? null,
+                  }
+                : (extra.videoConfig ?? null),
+              learning_objectives: learningObjectives.length ? learningObjectives : null,
+              competency_checks:
+                Array.isArray(lesson.competencyChecks) && lesson.competencyChecks.length
+                  ? lesson.competencyChecks
+                  : Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+                    ? lesson.competencyKeys.map((competencyKey) => ({
+                        id: competencyKey,
+                        domainKey: lesson.domainKey ?? courseModule.domainKey ?? courseModule.slug,
+                        objective:
+                          learningObjectives[0] ??
+                          `Demonstrate ${lesson.title} according to the mapped credential standard.`,
+                        requiredKnowledge: learningObjectives.length
+                          ? learningObjectives
+                          : [`Explain and perform ${lesson.title}.`],
+                        assessmentStandard:
+                          governedPractical
+                            ? 'Demonstrate the mapped competency through observed practical evidence and required instructor sign-off.'
+                            : 'Demonstrate mastery through the configured lesson assessment.',
+                      }))
+                    : null,
               instructor_notes: instructorNotes,
               practical_required: governedPractical,
               required_artifacts: Array.isArray(extra.requiredArtifacts)
@@ -213,12 +320,12 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               hour_category:
                 extra.hourCategory ??
                 (stepType === 'lab' ? 'practical' : stepType === 'exam' ? 'exam' : 'didactic'),
-              evidence_type: extra.evidenceType ?? (stepType === 'lab' ? 'observation' : null),
+              evidence_type: extra.evidenceType ?? (governedPractical ? 'observation' : null),
               delivery_method: extra.deliveryMethod ?? 'online_async',
-              requires_instructor_signoff:
-                extra.requiresInstructorSignoff ?? Boolean(governedPractical && stepType === 'lab'),
+              requires_instructor_signoff: extra.requiresInstructorSignoff ?? governedPractical,
               instructor_requirement: extra.instructorRequirement ?? null,
-              minimum_seat_time_minutes: extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,
+              minimum_seat_time_minutes:
+                extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,
               fieldwork_eligible: extra.fieldworkEligible ?? false,
               is_required: extra.isRequired ?? true,
               ai_generated: extra.aiGenerated ?? Boolean(experience),
@@ -227,22 +334,84 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               script_text: extra.scriptText ?? experience?.narrationScript ?? null,
               script: extra.script ?? experience?.narrationScript ?? null,
               bullet_points: extra.bulletPoints ?? learningPoints,
-              scene_data:
-                extra.sceneData ??
-                (experience
-                  ? {
-                      visual_prompt: experience.visualPrompt ?? null,
-                      scenario: experience.scenario ?? null,
-                      case_study: experience.caseStudy ?? null,
-                      quick_clips: generatedQuickClips,
-                      reading_guide: experience.readingGuide ?? null,
-                      glossary: experience.glossary ?? null,
-                      readiness: experience.readiness ?? null,
-                    }
-                  : null),
+              scene_data: experience
+                ? {
+                    ...(extra.sceneData && typeof extra.sceneData === 'object'
+                      ? extra.sceneData
+                      : {}),
+                    source_contract: {
+                      version: 1,
+                      fingerprint: sourceFingerprint,
+                      narration_locked: true,
+                    },
+                    // Lesson instruction and lesson media are one version-locked
+                    // package. Persist the authored timeline in the exact scene
+                    // contract consumed by directMedia().
+                    scenes: Array.isArray(experience.instructionalTimeline?.scenes)
+                      ? experience.instructionalTimeline.scenes.map(
+                          (scene: Record<string, any>, sceneIndex: number) => {
+                            const sceneTypeByPurpose: Record<string, string> = {
+                              introduction: 'problem_hook',
+                              explanation: 'mental_model',
+                              diagram: 'system_diagram',
+                              demonstration: 'worked_example',
+                              practice: 'knowledge_check',
+                              summary: 'memory_recap',
+                            };
+                            const onScreenText = Array.isArray(scene.onScreenText)
+                              ? scene.onScreenText.slice(0, 3).map(String)
+                              : [];
+                            const purpose = String(scene.purpose);
+                            const alignedEvidence =
+                              purpose === 'practice' || purpose === 'summary'
+                                ? onScreenText.slice(1)
+                                : onScreenText.slice(0, 1);
+                            const teachingAction = `Display the lesson evidence: ${alignedEvidence.join(' | ')}`;
+                            const dialogue =
+                              purpose === 'practice' && alignedEvidence.length > 0
+                                ? `${scene.narration} ${alignedEvidence.join(' ')}`
+                                : scene.narration;
+                            return {
+                              id: scene.id ?? `${lesson.slug}-scene-${sceneIndex + 1}`,
+                              subject: lesson.title,
+                              action: teachingAction,
+                              dialogue,
+                              duration_seconds:
+                                Number(scene.endTime) > Number(scene.startTime)
+                                  ? Number(scene.endTime) - Number(scene.startTime)
+                                  : undefined,
+                              procedure_phase: scene.purpose,
+                              required_visual_evidence: teachingAction,
+                              shot_size: purpose === 'demonstration' ? 'close-up' : 'medium',
+                              scene_type:
+                                sceneTypeByPurpose[String(scene.purpose)] ?? 'mental_model',
+                              visual_style: `${scene.visualDirection ?? ''} Lesson-specific instructional demonstration with concise captions`,
+                              overlay_template: 'caption-only-v1',
+                              on_screen_text: onScreenText,
+                              source_references: Array.isArray(scene.sourceReferences)
+                                ? scene.sourceReferences
+                                : [],
+                            };
+                          },
+                        )
+                      : [],
+                    captions: experience.instructionalTimeline?.captions ?? [],
+                    timeline_events: experience.instructionalTimeline?.events ?? [],
+                    visual_prompt: experience.visualPrompt ?? null,
+                    scenario: experience.scenario ?? null,
+                    case_study: experience.caseStudy ?? null,
+                    quick_clips: generatedQuickClips,
+                    reading_guide: experience.readingGuide ?? null,
+                    glossary: experience.glossary ?? null,
+                    readiness: experience.readiness ?? null,
+                    intelligence: experience.intelligence ?? null,
+                  }
+                : (extra.sceneData ?? null),
               // course_lessons_generation_status_check accepts queued/generating/generated/approved.
               // Blueprint-only shells are durable work waiting for enrichment, so queued is canonical.
-              generation_status: experience ? 'generated' : 'queued',
+              // A lesson with authored content is still incomplete until the
+              // matching version-locked media is rendered and verified.
+              generation_status: experience ? 'generating' : 'queued',
               last_generated_at: experience ? new Date().toISOString() : null,
             };
           }),
@@ -254,7 +423,10 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
   const db = await requireAdminClient();
   try {
     const sourceModules = modulesFrom(input);
-    const modules = buildAtomicPayload(sourceModules, input.courseTitle);
+    const governedVideoConfig = Array.isArray(input.blueprint)
+      ? undefined
+      : input.blueprint.videoConfig;
+    const modules = buildAtomicPayload(sourceModules, input.courseTitle, governedVideoConfig);
     const courseSlug = slugFrom(input);
     const { data, error } = await (db as any).rpc('publish_course_package_atomic', {
       p_program_id: input.programId ?? null,
@@ -304,7 +476,10 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
     const metadata: Record<string, unknown> = {
       duration_hours: totalDurationMinutes / 60,
       passing_score: passingScore,
-      generation_progress: 100,
+      // Content persistence is not course completion. The unified lifecycle
+      // advances to 95 while media renders and to 100 only after every required
+      // lesson video passes the canonical quality gate.
+      generation_progress: 70,
       total_lessons: sourceModules.reduce(
         (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
         0,

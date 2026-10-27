@@ -2,10 +2,9 @@
 // AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getStripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { safeError } from '@/lib/api/safe-error';
 export const maxDuration = 60;
 
 async function _POST(request: NextRequest) {
@@ -13,44 +12,29 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const { amount } = await request.json();
+    const body = await request.json();
+    const { amount, donor_email, donor_name, checkoutAttemptId } = body;
 
     if (!amount || amount < 1) {
       return NextResponse.json({ error: 'Invalid donation amount' }, { status: 400 });
     }
 
-    const stripe = getStripe();
-    if (!stripe) {
-      return NextResponse.json({ error: 'Payment processing is not configured' }, { status: 503 });
-    }
-
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Donation to ' + PLATFORM_DEFAULTS.orgName + '',
-              description: 'Support free career training for underserved communities',
-              images: ['https://www.elevateforhumanity.org/logo.jpg'],
-            },
-            unit_amount: Math.round(amount * 100), // Convert to cents
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL}/donate/success?amount=${amount}`,
-      cancel_url: `${request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL}/donate?canceled=true`,
-      metadata: {
-        type: 'donation',
-        amount: amount.toString(),
+    if (!donor_email) return safeError('Email is required for a QuickBooks donation invoice.', 400);
+    const response = await fetch(new URL('/api/donate', request.nextUrl.origin), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': request.headers.get('x-forwarded-for') || '',
       },
+      body: JSON.stringify({
+        amount,
+        recurring: false,
+        donor_email,
+        donor_name,
+        checkoutAttemptId,
+      }),
     });
-
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+    return NextResponse.json(await response.json(), { status: response.status });
   } catch (err: any) {
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }

@@ -32,10 +32,10 @@ const ADMIN_URL = clean(process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elev
 const CANONICAL_DOMAIN = canonicalDomain(
   process.env.NEXT_PUBLIC_CANONICAL_DOMAIN || 'elevateforhumanity.org',
 );
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@elevateforhumanity.org';
-const INFO_EMAIL = process.env.NEXT_PUBLIC_INFO_EMAIL || 'info@elevateforhumanity.org';
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'elevate4humanityedu@gmail.com';
+const INFO_EMAIL = process.env.NEXT_PUBLIC_INFO_EMAIL || 'elevate4humanityedu@gmail.com';
 const FROM_EMAIL = process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS || 'noreply@elevateforhumanity.org';
-const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(317) 314-3757';
+const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(463) 240-1404';
 
 export const siteUrls = {
   site: SITE_URL,
@@ -46,6 +46,7 @@ export const siteUrls = {
 
   apply: `${SITE_URL}/apply`,
   enroll: `${SITE_URL}/enroll`,
+  contact: `${SITE_URL}/contact`,
   login: `${APP_URL}/login`,
   dashboard: `${APP_URL}/lms/dashboard`,
   employerPortal: `${APP_URL}/employer/dashboard`,

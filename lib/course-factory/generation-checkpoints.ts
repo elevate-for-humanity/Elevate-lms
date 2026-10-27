@@ -1,9 +1,15 @@
 import 'server-only';
 
+import { createHash } from 'node:crypto';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { QuizQuestion } from './types';
-import { generatedAssessmentSchema, generatedLessonContentSchema } from './ai-contracts';
+import { generatedAssessmentSchema, generatedLessonContentSchema, quizQuestionSchema } from './ai-contracts';
+import {
+  loadDurableGenerationCheckpoint,
+  persistDurableGenerationCheckpoint,
+} from './durable-generation-journal';
 
 export type LessonGenerationCheckpoint = {
   objective: string;
@@ -21,17 +27,20 @@ type LessonTarget = {
 async function resolveLessonTarget(
   courseTitle: string,
   lessonSlug: string,
+  requestedCourseId?: string,
 ): Promise<LessonTarget | null> {
   try {
     const db = await requireAdminClient();
-    const { data: courses, error: courseError } = await db
-      .from('courses')
-      .select('id')
-      .eq('title', courseTitle)
-      .limit(2);
-    if (courseError || !courses || courses.length !== 1) return null;
-
-    const courseId = String(courses[0].id);
+    let courseId = requestedCourseId?.trim() ?? '';
+    if (!courseId) {
+      const { data: courses, error: courseError } = await db
+        .from('courses')
+        .select('id')
+        .eq('title', courseTitle)
+        .limit(2);
+      if (courseError || !courses || courses.length !== 1) return null;
+      courseId = String(courses[0].id);
+    }
     const { data: lessons, error: lessonError } = await db
       .from('course_lessons')
       .select('id')
@@ -61,10 +70,93 @@ function textArray(value: unknown): string[] {
     : [];
 }
 
+export function normalizePersistedLessonObjectives(input: {
+  objective?: unknown;
+  learningObjectives?: unknown;
+  content?: unknown;
+}): string[] {
+  const content = record(input.content);
+  const experience = record(content?.experience);
+  const readingGuide = record(experience?.readingGuide);
+  const remediation = record(experience?.remediation);
+  return Array.from(
+    new Set(
+      [
+        ...textArray(input.learningObjectives),
+        typeof input.objective === 'string' ? input.objective : '',
+        ...textArray(content?.learning_points),
+        ...textArray(readingGuide?.keyTakeaways),
+        ...textArray(remediation?.objectiveMap),
+      ]
+        .map((value) => value.trim())
+        .filter(Boolean),
+    ),
+  ).slice(0, 5);
+}
+
+/**
+ * Repairs objective arrays lost by older publishers so completed database
+ * lessons remain valid generation checkpoints. This never invents content:
+ * it only normalizes the persisted objective and generated learning points.
+ */
+export async function repairPersistedLessonObjectives(courseId: string): Promise<number> {
+  const db = await requireAdminClient();
+  const { data: lessons, error } = await db
+    .from('course_lessons')
+    .select('id,content,learning_objectives,generation_status')
+    .eq('course_id', courseId)
+    .eq('generation_status', 'generated');
+  if (error) throw new Error(`Persisted checkpoint repair lookup failed: ${error.message}`);
+
+  let repaired = 0;
+  for (const lesson of lessons ?? []) {
+    const existing = textArray(lesson.learning_objectives);
+    if (existing.length >= 3) continue;
+    const objectives = normalizePersistedLessonObjectives({
+      learningObjectives: lesson.learning_objectives,
+      content: lesson.content,
+    });
+    if (objectives.length < 3) continue;
+    const { error: updateError } = await db
+      .from('course_lessons')
+      .update({ learning_objectives: objectives, updated_at: new Date().toISOString() })
+      .eq('id', lesson.id)
+      .eq('generation_status', 'generated');
+    if (updateError) {
+      throw new Error(`Persisted checkpoint repair failed for ${lesson.id}: ${updateError.message}`);
+    }
+    repaired += 1;
+  }
+  return repaired;
+}
+
 export async function loadLessonGenerationCheckpoint(
   courseTitle: string,
   lessonSlug: string,
 ): Promise<LessonGenerationCheckpoint | null> {
+  const journaled = await loadDurableGenerationCheckpoint<LessonGenerationCheckpoint>({
+    courseTitle,
+    lessonSlug,
+    kind: 'lesson',
+  });
+  if (journaled) {
+    let parsedContent: Record<string, any> | null = null;
+    try {
+      parsedContent = record(JSON.parse(journaled.content));
+    } catch {
+      parsedContent = null;
+    }
+    const strictJournal = generatedLessonContentSchema.safeParse({
+      objective: journaled.objective,
+      content: parsedContent?.html,
+      learning_points: journaled.learning_points,
+      scenario: journaled.scenario,
+      quiz_questions: journaled.quiz_questions,
+      experience: parsedContent?.experience,
+    });
+    if (strictJournal.success) return journaled;
+  }
+
   const target = await resolveLessonTarget(courseTitle, lessonSlug);
   if (!target) return null;
 
@@ -75,7 +167,11 @@ export async function loadLessonGenerationCheckpoint(
       .select('content,content_json,learning_objectives,quiz_questions,generation_status,script,script_text')
       .eq('id', target.id)
       .maybeSingle();
-    if (error || !data || data.generation_status !== 'generated') return null;
+    if (
+      error ||
+      !data ||
+      !['generating', 'generated'].includes(String(data.generation_status ?? ''))
+    ) return null;
 
     const content = record(data.content);
     const contentJson = record(data.content_json);
@@ -115,7 +211,7 @@ export async function loadLessonGenerationCheckpoint(
     });
     if (!strictCheckpoint.success) return null;
 
-    return {
+    const checkpoint = {
       objective: strictCheckpoint.data.objective,
       content: JSON.stringify({
         html: strictCheckpoint.data.content,
@@ -127,6 +223,13 @@ export async function loadLessonGenerationCheckpoint(
       scenario: strictCheckpoint.data.scenario,
       quiz_questions: strictCheckpoint.data.quiz_questions,
     };
+    await persistDurableGenerationCheckpoint({
+      courseTitle,
+      lessonSlug,
+      kind: 'lesson',
+      payload: checkpoint,
+    });
+    return checkpoint;
   } catch (error) {
     logger.warn('[course-factory/checkpoint] cached lesson read skipped', {
       courseTitle,
@@ -138,7 +241,10 @@ export async function loadLessonGenerationCheckpoint(
 }
 
 export async function persistLessonGenerationCheckpoint(input: {
+  courseId?: string;
   courseTitle: string;
+  /** Durable journals may be versioned; database lesson identity is not. */
+  canonicalLessonSlug?: string;
   lessonSlug: string;
   objective: string;
   html: string;
@@ -147,7 +253,27 @@ export async function persistLessonGenerationCheckpoint(input: {
   quizQuestions: QuizQuestion[];
   experience: Record<string, any>;
 }): Promise<void> {
-  const target = await resolveLessonTarget(input.courseTitle, input.lessonSlug);
+  const durableCheckpoint: LessonGenerationCheckpoint = {
+    objective: input.objective,
+    content: JSON.stringify({
+      html: input.html,
+      learning_points: input.learningPoints,
+      scenario: input.scenario,
+      experience: input.experience,
+    }),
+    learning_points: input.learningPoints,
+    scenario: input.scenario,
+    quiz_questions: input.quizQuestions,
+  };
+  await persistDurableGenerationCheckpoint({
+    courseTitle: input.courseTitle,
+    lessonSlug: input.lessonSlug,
+    kind: 'lesson',
+    payload: durableCheckpoint,
+  });
+
+  const canonicalLessonSlug = input.canonicalLessonSlug ?? input.lessonSlug;
+  const target = await resolveLessonTarget(input.courseTitle, canonicalLessonSlug, input.courseId);
   if (!target) return;
 
   try {
@@ -158,6 +284,23 @@ export async function persistLessonGenerationCheckpoint(input: {
     const resources = Array.isArray(input.experience.resources) ? input.experience.resources : null;
     const quickClips = Array.isArray(input.experience.quickClips) ? input.experience.quickClips : [];
     const now = new Date().toISOString();
+    const sourceFingerprint = createHash('sha256')
+      .update(JSON.stringify({
+        narration,
+        objective: input.objective,
+        learningPoints: input.learningPoints,
+        visualPrompt: input.experience.visualPrompt ?? null,
+      }))
+      .digest('hex');
+
+    const { data: persistedLesson } = await db
+      .from('course_lessons')
+      .select('content_json')
+      .eq('id', target.id)
+      .maybeSingle();
+    const existingContentJson = persistedLesson?.content_json && typeof persistedLesson.content_json === 'object'
+      ? persistedLesson.content_json as Record<string, unknown>
+      : {};
 
     const { error } = await db
       .from('course_lessons')
@@ -168,7 +311,7 @@ export async function persistLessonGenerationCheckpoint(input: {
           scenario: input.scenario,
           experience: input.experience,
         },
-        content_json: { experience: input.experience },
+        content_json: { ...existingContentJson, experience: input.experience },
         rendered_html: input.html,
         learning_objectives: [input.objective, ...input.learningPoints].slice(0, 5),
         quiz_questions: input.quizQuestions,
@@ -177,6 +320,11 @@ export async function persistLessonGenerationCheckpoint(input: {
         bullet_points: input.learningPoints,
         resources,
         scene_data: {
+          source_contract: {
+            version: 1,
+            fingerprint: sourceFingerprint,
+            narration_locked: true,
+          },
           visual_prompt: input.experience.visualPrompt ?? null,
           scenario: input.experience.scenario ?? null,
           case_study: input.experience.caseStudy ?? null,
@@ -187,6 +335,10 @@ export async function persistLessonGenerationCheckpoint(input: {
         },
         video_config: {
           enabled: true,
+          source_fingerprint: sourceFingerprint,
+          source_contract_version: 1,
+          narration_locked: true,
+          allow_paid_narration: true,
           narration,
           visual_prompt: input.experience.visualPrompt ?? null,
           quick_clips: quickClips,
@@ -195,7 +347,9 @@ export async function persistLessonGenerationCheckpoint(input: {
         },
         ai_generated: true,
         approved: false,
-        generation_status: 'generated',
+        // Text, narration, and the visual plan are one incomplete lesson
+        // package until the matching rendered media passes verification.
+        generation_status: 'generating',
         last_generated_at: now,
         updated_at: now,
       })
@@ -203,10 +357,22 @@ export async function persistLessonGenerationCheckpoint(input: {
     if (error) {
       logger.warn('[course-factory/checkpoint] lesson checkpoint write skipped', {
         courseTitle: input.courseTitle,
-        lessonSlug: input.lessonSlug,
+        lessonSlug: canonicalLessonSlug,
         error: error.message,
       });
       return;
+    }
+
+    // Persisting the locked narration is the handoff boundary for one unified
+    // lesson. Its primary video can render while the next lesson is generated.
+    const { queueCourseLessonVideos } = await import('./media-service');
+    const media = await queueCourseLessonVideos({
+      courseId: target.courseId,
+      lessonId: target.id,
+      onlyMissing: true,
+    });
+    if (media.lessonVideosReady !== 1) {
+      throw new Error(`Lesson media handoff failed for ${canonicalLessonSlug}`);
     }
 
     const [{ count: generated }, { count: total }] = await Promise.all([
@@ -214,7 +380,7 @@ export async function persistLessonGenerationCheckpoint(input: {
         .from('course_lessons')
         .select('id', { count: 'exact', head: true })
         .eq('course_id', target.courseId)
-        .eq('generation_status', 'generated'),
+        .in('generation_status', ['generating', 'generated']),
       db
         .from('course_lessons')
         .select('id', { count: 'exact', head: true })
@@ -226,7 +392,7 @@ export async function persistLessonGenerationCheckpoint(input: {
     await db
       .from('courses')
       .update({
-        generation_status: 'content_generating',
+        generation_status: 'generating',
         generation_progress: progress,
         updated_at: now,
       })
@@ -234,7 +400,7 @@ export async function persistLessonGenerationCheckpoint(input: {
   } catch (error) {
     logger.warn('[course-factory/checkpoint] lesson checkpoint failed safely', {
       courseTitle: input.courseTitle,
-      lessonSlug: input.lessonSlug,
+      lessonSlug: canonicalLessonSlug,
       error: error instanceof Error ? error.message : String(error),
     });
   }
@@ -245,6 +411,16 @@ export async function loadAssessmentCheckpoint(
   lessonSlug: string,
   count: number,
 ): Promise<QuizQuestion[] | null> {
+  const journaled = await loadDurableGenerationCheckpoint<QuizQuestion[]>({
+    courseTitle,
+    lessonSlug,
+    kind: 'assessment',
+  });
+  if (journaled?.length >= count) {
+    const strictJournal = generatedAssessmentSchema.safeParse({ questions: journaled.slice(0, count) });
+    if (strictJournal.success) return strictJournal.data.questions;
+  }
+
   const target = await resolveLessonTarget(courseTitle, lessonSlug);
   if (!target) return null;
   try {
@@ -258,7 +434,58 @@ export async function loadAssessmentCheckpoint(
     const strictCheckpoint = generatedAssessmentSchema.safeParse({
       questions: data.quiz_questions.slice(0, count),
     });
-    return strictCheckpoint.success ? strictCheckpoint.data.questions : null;
+    if (!strictCheckpoint.success) return null;
+    await persistDurableGenerationCheckpoint({
+      courseTitle,
+      lessonSlug,
+      kind: 'assessment',
+      payload: strictCheckpoint.data.questions,
+    });
+    return strictCheckpoint.data.questions;
+  } catch {
+    return null;
+  }
+}
+
+export async function loadPartialAssessmentCheckpoint(
+  courseTitle: string,
+  lessonSlug: string,
+): Promise<QuizQuestion[] | null> {
+  const journaled = await loadDurableGenerationCheckpoint<QuizQuestion[]>({
+    courseTitle,
+    lessonSlug,
+    kind: 'assessment',
+  });
+  if (journaled?.length) {
+    const validJournal = journaled.flatMap((candidate) => {
+      const parsed = quizQuestionSchema.safeParse(candidate);
+      return parsed.success ? [parsed.data] : [];
+    });
+    if (validJournal.length) return validJournal;
+  }
+
+  const target = await resolveLessonTarget(courseTitle, lessonSlug);
+  if (!target) return null;
+  try {
+    const db = await requireAdminClient();
+    const { data, error } = await db
+      .from('course_lessons')
+      .select('quiz_questions')
+      .eq('id', target.id)
+      .maybeSingle();
+    if (error || !Array.isArray(data?.quiz_questions)) return null;
+    const valid = data.quiz_questions.flatMap((candidate) => {
+      const parsed = quizQuestionSchema.safeParse(candidate);
+      return parsed.success ? [parsed.data] : [];
+    });
+    if (!valid.length) return null;
+    await persistDurableGenerationCheckpoint({
+      courseTitle,
+      lessonSlug,
+      kind: 'assessment',
+      payload: valid,
+    });
+    return valid;
   } catch {
     return null;
   }
@@ -269,6 +496,13 @@ export async function persistAssessmentCheckpoint(input: {
   lessonSlug: string;
   questions: QuizQuestion[];
 }): Promise<void> {
+  await persistDurableGenerationCheckpoint({
+    courseTitle: input.courseTitle,
+    lessonSlug: input.lessonSlug,
+    kind: 'assessment',
+    payload: input.questions,
+  });
+
   const target = await resolveLessonTarget(input.courseTitle, input.lessonSlug);
   if (!target) return;
   try {

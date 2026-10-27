@@ -11,4 +11,10 @@ describe('schema drift baseline source', () => {
     expect(audit).toContain("baseline?.schemaSource?.startsWith('migrations')");
     expect(audit).toContain('!baselineUsesMigrations && supabaseUrl && serviceKey');
   });
+
+  it('recognizes quoted public table names in ALTER TABLE migrations', () => {
+    const audit = source('scripts/audit-schema-drift.ts');
+
+    expect(audit).toContain('(?:public\\.)?"?(\\w+)"?');
+  });
 });

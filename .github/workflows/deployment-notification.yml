@@ -11,17 +11,17 @@ jobs:
     outputs:
       should_notify: ${{ steps.check.outputs.should_notify }}
     steps:
+      - uses: actions/checkout@v4
       - name: Check deployment state
         id: check
         run: |
-          STATE="${{ github.event.deployment_status.state }}"
-          if [ "$STATE" = "success" ] || [ "$STATE" = "failure" ]; then
-            echo "should_notify=true" >> $GITHUB_OUTPUT
-            echo "Deployment state is $STATE - will send notification"
-          else
-            echo "should_notify=false" >> $GITHUB_OUTPUT
-            echo "Deployment state is $STATE - skipping notification"
-          fi
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          import { classifyDeploymentEvent } from './scripts/deployment-notification-event.mjs';
+          const result = classifyDeploymentEvent(JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')));
+          appendFileSync(process.env.GITHUB_OUTPUT, `should_notify=${result.notify}\n`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, result.reason + '\n');
+          NODE
 
   notify:
     runs-on: ubuntu-latest
@@ -35,10 +35,17 @@ jobs:
       - name: Get deployment info
         id: deployment
         run: |
-          echo "environment=${{ github.event.deployment.environment }}" >> $GITHUB_OUTPUT
-          echo "url=${{ github.event.deployment_status.target_url }}" >> $GITHUB_OUTPUT
-          echo "state=${{ github.event.deployment_status.state }}" >> $GITHUB_OUTPUT
-          echo "commit=${{ github.event.deployment.sha }}" >> $GITHUB_OUTPUT
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          import { classifyDeploymentEvent } from './scripts/deployment-notification-event.mjs';
+          const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+          const result = classifyDeploymentEvent(event);
+          for (const [key, value] of Object.entries({environment: event.deployment.environment,
+            url: result.origin, state: event.deployment_status.state, commit: event.deployment.sha})) {
+            if (/[\r\n]/.test(String(value))) throw new Error('Invalid deployment metadata');
+            appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
+          }
+          NODE
 
       - name: Run health check
         if: github.event.deployment_status.state == 'success'
@@ -47,15 +54,16 @@ jobs:
           HEALTH_URL="${{ steps.deployment.outputs.url }}/api/health"
           echo "Checking: $HEALTH_URL"
 
-          response=$(curl -s -w "\n%{http_code}" "$HEALTH_URL" || echo "000")
-          status_code=$(echo "$response" | tail -n1)
+          status_code=$(curl --fail-with-body --silent --show-error --max-time 20 \
+            --output /tmp/deployment-health.json --write-out "%{http_code}" "$HEALTH_URL" || true)
+          echo "status=${status_code:-000}" >> $GITHUB_OUTPUT
 
-          echo "status=$status_code" >> $GITHUB_OUTPUT
-
-          if [ "$status_code" = "200" ] || [ "$status_code" = "503" ]; then
+          if [ "$status_code" = "200" ] && grep -Eq '"(healthy|ready|ok)"[[:space:]]*:[[:space:]]*true' /tmp/deployment-health.json; then
             echo "result=✅ HEALTHY" >> $GITHUB_OUTPUT
           else
             echo "result=❌ UNHEALTHY" >> $GITHUB_OUTPUT
+            cat /tmp/deployment-health.json 2>/dev/null || true
+            exit 1
           fi
 
       - name: Create deployment summary

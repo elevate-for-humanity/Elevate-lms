@@ -56,10 +56,11 @@ interface AIChatProps {
   ellieMode?: boolean;
 }
 
-type ProviderId = 'auto' | 'groq' | 'openai' | 'anthropic' | 'gemini';
+type ProviderId = 'auto' | 'xai' | 'groq' | 'openai' | 'anthropic' | 'gemini';
 
 const MODEL_OPTIONS: Record<ProviderId, string[]> = {
   auto: ['auto'],
+  xai: ['grok-4.6'],
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
   openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
   anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
@@ -68,6 +69,7 @@ const MODEL_OPTIONS: Record<ProviderId, string[]> = {
 
 const PROVIDER_LABELS: Record<ProviderId, string> = {
   auto: 'Auto',
+  xai: 'Grok / xAI',
   groq: 'Groq',
   openai: 'ChatGPT / OpenAI',
   anthropic: 'Claude / Anthropic',
@@ -82,6 +84,7 @@ export const TOOL_META: Record<
   list_enrollments: { label: 'Enrollments', color: 'text-brand-green-700', icon: Database },
   get_dashboard_stats: { label: 'Stats', color: 'text-amber-700', icon: Zap },
   get_recent_applications: { label: 'Applications', color: 'text-orange-700', icon: Database },
+  scan_live_page: { label: 'Live Browser', color: 'text-cyan-700', icon: ExternalLink },
   inspect_platform_registry: {
     label: 'Platform Registry',
     color: 'text-brand-blue-700',
@@ -98,7 +101,6 @@ export const TOOL_META: Record<
   design_page_template: { label: 'Page Template', color: 'text-indigo-700', icon: Sparkles },
   run_safe_command: { label: 'Shell', color: 'text-slate-700', icon: Terminal },
   build_course: { label: 'Build Course', color: 'text-purple-700', icon: BookOpen },
-  save_course: { label: 'Save Course', color: 'text-brand-green-700', icon: BookOpen },
   generate_videos: { label: 'Generate Videos', color: 'text-rose-700', icon: Video },
   analyze_document: { label: 'Analyze Document', color: 'text-amber-700', icon: FileText },
   apply_document_to_application: {
@@ -424,7 +426,7 @@ function EllieApprovalCard({
 
 // Picks the right rich card for a tool result, falls back to null (use default collapsible)
 function RichToolResult({ tool, result }: { tool: string; result: string }) {
-  if (tool === 'build_course' || tool === 'save_course') return <CourseCard result={result} />;
+  if (tool === 'build_course') return <CourseCard result={result} />;
   if (tool === 'generate_videos') return <VideoProgressCard result={result} />;
   if (tool === 'analyze_document' || tool === 'apply_document_to_application')
     return <DocumentAnalysisCard result={result} />;
@@ -493,6 +495,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
   const [aiProvider, setAiProvider] = useState<string>('');
   const [availableProviders, setAvailableProviders] = useState<Record<ProviderId, boolean>>({
     auto: true,
+    xai: false,
     groq: false,
     openai: false,
     anthropic: false,
@@ -514,6 +517,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
         const data = await res.json();
         const providers = {
           auto: true,
+          xai: Boolean(data?.hasXAI ?? data?.availableProviders?.xai),
           groq: Boolean(data?.hasGroq ?? data?.availableProviders?.groq),
           openai: Boolean(data?.hasOpenAI ?? data?.availableProviders?.openai),
           anthropic: Boolean(data?.hasAnthropic ?? data?.availableProviders?.anthropic),
@@ -522,6 +526,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
         setAvailableProviders((prev) => ({ ...prev, ...providers }));
         const configured =
           data?.aiConfigured === true ||
+          providers.xai ||
           providers.groq ||
           providers.openai ||
           providers.anthropic ||
@@ -529,6 +534,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
         if (configured) {
           setAiStatus('ready');
           const names = [
+            providers.xai && 'Grok',
             providers.groq && 'Groq',
             providers.openai && 'OpenAI',
             providers.anthropic && 'Anthropic',

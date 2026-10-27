@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,7 +27,7 @@ export default function AcademicIntegrityPage() {
 
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/heroes/student-catalog.webp"
           alt="Academic Integrity"
           fill
@@ -348,7 +349,7 @@ export default function AcademicIntegrityPage() {
               <li>• Contact the Dean of Students</li>
               <li>• Submit an anonymous report through the student portal</li>
               <li>• Email: our contact form</li>
-              <li>• Phone: 317-314-3757</li>
+              <li>• Phone: 463-240-1404</li>
             </ul>
             <p className="text-brand-blue-900 text-sm mt-4">
               <strong>Protection:</strong> Students who report violations in good faith will not

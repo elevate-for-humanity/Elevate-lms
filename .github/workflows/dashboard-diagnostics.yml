@@ -1,13 +1,11 @@
 name: Dashboard Diagnostics
 
-# Runs comprehensive diagnostics on every push to any branch.
+# Comprehensive diagnostics are intentionally manual to avoid duplicating the blocking CI gates.
 # Required repository secrets:
 #   NEXT_PUBLIC_SUPABASE_URL      — Supabase project URL (used by schema check)
 #   SUPABASE_SERVICE_ROLE_KEY     — Supabase service-role key (used by schema check)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:

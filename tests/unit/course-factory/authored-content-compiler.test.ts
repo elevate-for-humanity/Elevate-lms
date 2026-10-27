@@ -4,6 +4,7 @@ import {
   compileAuthoredLessonExperience,
 } from '@/lib/course-factory/authored-content-compiler';
 import { barberApprenticeshipBlueprint } from '@/lib/curriculum/blueprints/barber';
+import { validateBlueprint } from '@/lib/course-factory/validator';
 
 const questions = [
   {
@@ -72,7 +73,21 @@ describe('authored content compiler', () => {
       expect(content.experience.quickClips).toHaveLength(2);
       expect(content.experience.knowledgeChecks).toHaveLength(3);
       expect(content.experience.narrationScript.length).toBeGreaterThan(200);
+      expect(content.experience.instructionalTimeline.scenes).toHaveLength(6);
+      expect(content.experience.instructionalTimeline.captions).toHaveLength(6);
     }
+
+    const audit = validateBlueprint(result, {
+      requireGeneratedContent: true,
+      preserveAuthoredAssessmentGaps: true,
+    });
+    expect(audit.errors).toEqual([]);
+    expect(audit.warnings).toHaveLength(7);
+    expect(audit.warnings.every((warning) => warning.field === 'quizQuestions')).toBe(true);
+
+    const generatedAudit = validateBlueprint(result, { requireGeneratedContent: true });
+    expect(generatedAudit.errors).toHaveLength(7);
+    expect(generatedAudit.errors.every((error) => error.field === 'quizQuestions')).toBe(true);
   });
 
   it('builds the complete interactive contract from substantive authored lesson evidence', () => {
@@ -111,9 +126,43 @@ describe('authored content compiler', () => {
     expect(result.experience.quickClips).toHaveLength(2);
     expect(result.experience.knowledgeChecks).toHaveLength(3);
     expect(result.experience.narrationScript.length).toBeGreaterThan(200);
+    expect(result.experience.instructionalTimeline?.scenes).toHaveLength(6);
+    expect(result.experience.instructionalTimeline?.scenes[3]?.purpose).toBe('demonstration');
     expect(JSON.stringify(result.experience)).not.toMatch(
       /deterministic baseline|intentionally general/i,
     );
+  });
+
+  it('reuses stored authored reading evidence when raw checkpoint HTML is short', () => {
+    const baseline = compileAuthoredLessonExperience({
+      courseTitle: 'Indiana Cosmetology License',
+      moduleTitle: 'Professional Standards',
+      lessonTitle: 'Professional Standards Checkpoint',
+      lessonSlug: 'professional-standards-checkpoint',
+      domainKey: 'professional_standards',
+      html,
+      learningObjectives: [
+        'Identify professional standards.',
+        'Apply infection-control expectations.',
+        'Document a compliant decision.',
+      ],
+      quizQuestions: questions,
+    });
+    const { instructionalTimeline: _timeline, ...existingWithoutTimeline } = baseline.experience;
+    const repaired = compileAuthoredLessonExperience({
+      courseTitle: 'Indiana Cosmetology License',
+      moduleTitle: 'Professional Standards',
+      lessonTitle: 'Professional Standards Checkpoint',
+      lessonSlug: 'professional-standards-checkpoint',
+      domainKey: 'professional_standards',
+      html: '<p>Complete the checkpoint.</p>',
+      learningObjectives: baseline.objectives,
+      quizQuestions: questions,
+      existingExperience: existingWithoutTimeline,
+    });
+
+    expect(repaired.experience.instructionalTimeline?.scenes).toHaveLength(6);
+    expect(repaired.experience.readingGuide.sections.length).toBeGreaterThanOrEqual(3);
   });
 
   it('blocks generic fallback content instead of publishing it', () => {

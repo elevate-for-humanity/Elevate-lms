@@ -7,8 +7,10 @@ import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
   uploadTransferHoursEvidence,
 } from '@/lib/applications/upload-transfer-hours-evidence';
+import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
-const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
+const WORKONE_INTAKE_URL = WORKONE_INDY_BOOKING_URL;
 
 interface StudentApplicationFormProps {
   initialProgram?: string;
@@ -66,6 +68,7 @@ type StudentForm = {
 type DraftData = {
   form: StudentForm;
   workOneAcknowledged: boolean;
+  apprenticeshipFundingConfirmed?: boolean;
 };
 
 const PROGRAMS = [
@@ -76,6 +79,7 @@ const PROGRAMS = [
   { value: 'barber-apprenticeship', label: 'Barber Apprenticeship' },
   { value: 'cosmetology-apprenticeship', label: 'Cosmetology Apprenticeship' },
   { value: 'esthetician-apprenticeship', label: 'Esthetician Apprenticeship' },
+  { value: 'financial-literacy', label: 'Financial Literacy' },
   { value: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship' },
   { value: 'phlebotomy', label: 'Phlebotomy Technician' },
   { value: 'qma', label: 'Qualified Medication Aide (QMA)' },
@@ -97,7 +101,7 @@ function createSubmissionKey(): string {
 
 async function postApplication(payload: Record<string, unknown>, idempotencyKey: string) {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 20000);
+  const timeout = window.setTimeout(() => controller.abort(), 65000);
 
   try {
     const res = await fetch('/api/applications', {
@@ -137,7 +141,7 @@ function createEmptyForm(initialProgram: string): StudentForm {
     hasHostShop: '',
     hostShopName: '',
     transferHours: '',
-    fundingSource: '',
+    fundingSource: initialProgram.includes('apprenticeship') ? 'self_pay' : '',
     fundingEligibilityStatus: '',
     hasWorkOneReferral: '',
     workoneCenter: '',
@@ -170,6 +174,7 @@ export default function StudentApplicationForm({
   const [step, setStep] = useState(1);
   const [showResume, setShowResume] = useState(false);
   const [workOneAcknowledged, setWorkOneAcknowledged] = useState(false);
+  const [apprenticeshipFundingConfirmed, setApprenticeshipFundingConfirmed] = useState(false);
   const [consentAcknowledged, setConsentAcknowledged] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SubmissionResult | null>(null);
@@ -184,17 +189,26 @@ export default function StudentApplicationForm({
 
   const requiresWorkOne = form.fundingSource === 'wioa' || form.fundingSource === 'wrg';
   const isApprenticeship = form.program.includes('apprenticeship');
+  const apprenticeshipFundingSelected =
+    isApprenticeship && Boolean(form.fundingSource) && form.fundingSource !== 'self_pay';
   const transferHoursClaimed = Math.max(0, Number.parseInt(form.transferHours || '0', 10) || 0);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
     setResult(null);
+    if (name === 'program' && value.includes('apprenticeship')) {
+      setForm((prev) => ({ ...prev, program: value, fundingSource: 'self_pay' }));
+      setWorkOneAcknowledged(false);
+      setApprenticeshipFundingConfirmed(false);
+      return;
+    }
+    setForm((prev) => ({ ...prev, [name]: value }));
     if (name === 'fundingSource' && value !== 'wioa' && value !== 'wrg') {
       setWorkOneAcknowledged(false);
     }
+    if (name === 'fundingSource') setApprenticeshipFundingConfirmed(false);
     if (name === 'program' && !value.includes('apprenticeship')) {
       setTransferHoursDocument(null);
     }
@@ -204,13 +218,14 @@ export default function StudentApplicationForm({
   }
 
   function persist(nextStep = step) {
-    saveDraft({ form, workOneAcknowledged }, nextStep);
+    saveDraft({ form, workOneAcknowledged, apprenticeshipFundingConfirmed }, nextStep);
   }
 
   function resumeDraft() {
     if (!savedData) return;
-    setForm(savedData.form);
+    setForm(savedData.form.program.includes('apprenticeship') ? { ...savedData.form, fundingSource: 'self_pay' } : savedData.form);
     setWorkOneAcknowledged(savedData.workOneAcknowledged);
+    setApprenticeshipFundingConfirmed(Boolean(savedData.apprenticeshipFundingConfirmed));
     setTransferHoursDocument(null);
     setStep(Math.min(Math.max(savedStep || 1, 1), 5));
     setShowResume(false);
@@ -236,6 +251,7 @@ export default function StudentApplicationForm({
     }
     if (current === 3) {
       if (!form.fundingSource) return 'Select a funding/payment option or choose Not sure yet.';
+      if (apprenticeshipFundingSelected) return 'Apprenticeship enrollment is self-pay only. Choose self-pay.';
       if (requiresWorkOne && !workOneAcknowledged) {
         return 'For WIOA or Workforce Ready Grant, confirm that you scheduled or started the WorkOne intake process.';
       }
@@ -344,6 +360,9 @@ export default function StudentApplicationForm({
       applicationCertification: true,
       applicationIntent,
       paymentSessionId: paymentSessionId || undefined,
+      apprenticeshipFundingApprovalAcknowledged: apprenticeshipFundingSelected
+        ? apprenticeshipFundingConfirmed
+        : undefined,
     };
 
     try {
@@ -364,7 +383,7 @@ export default function StudentApplicationForm({
       }
 
       const { res, data } = await postApplication(payload, submissionKey);
-      if (res.ok && (data.ok ?? data.success ?? true)) {
+      if (res.ok && (data.ok === true || data.success === true) && (data.id || data.applicationId || data.referenceNumber)) {
         clearDraft();
         const duplicateWarning = data.duplicateWarning || undefined;
         setResult({
@@ -378,7 +397,11 @@ export default function StudentApplicationForm({
         if (ref) q.set('ref', ref);
         if (prog) q.set('program', prog);
         const suffix = q.toString() ? `?${q.toString()}` : '';
-        setTimeout(() => router.push(`/apply/success${suffix}`), 1200);
+        const nextStepUrl =
+          typeof data.nextStepUrl === 'string' && data.nextStepUrl.startsWith('/')
+            ? data.nextStepUrl
+            : `/apply/success${suffix}`;
+        setTimeout(() => router.push(nextStepUrl), 1200);
       } else {
         setResult({
           success: false,
@@ -392,7 +415,7 @@ export default function StudentApplicationForm({
         error:
           error instanceof Error
             ? error.message
-            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (317) 314-3757.',
+            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (463) 240-1404.',
       });
     } finally {
       setSubmitting(false);
@@ -420,6 +443,7 @@ export default function StudentApplicationForm({
 
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-slate-300 bg-white p-6 sm:p-8">
+      <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Enrollment application — request for admission' : 'Free inquiry — request information'}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{applicationIntent === 'enrollment' ? 'Complete the verified payment step and required documents. Submission does not automatically enroll you. Elevate confirms admission, agreements, payment arrangements, and any required placement before training starts.' : 'Ask questions and let admissions help you compare programs. No payment is required for this inquiry. It does not enroll you or reserve a Host Shop placement.'}</p></div>
       {showResume && savedData && (
         <div className="mb-6 rounded-xl border border-blue-300 bg-blue-50 p-4 text-slate-950">
           <p className="font-black">You have a saved application</p>
@@ -529,8 +553,10 @@ export default function StudentApplicationForm({
 
       {step === 3 && (
         <section className="space-y-5">
-          <div><h3 className="text-xl font-black text-slate-950">Funding and eligibility</h3><p className="mt-1 text-sm text-slate-700">Funding eligibility is determined by the applicable workforce agency, not by submitting this form.</p></div>
-          <div><label className={labelClass}>How do you plan to pay? *</label><select name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option><option value="self_pay">Self-pay / Payment plan</option><option value="not_sure">Not sure yet</option></select></div>
+          <div><h3 className="text-xl font-black text-slate-950">{isApprenticeship ? "Self-pay enrollment" : "Funding and eligibility"}</h3><p className="mt-1 text-sm text-slate-700">{isApprenticeship ? "Apprenticeship tuition is self-pay only. Review your program’s published tuition and payment terms." : "Funding eligibility is determined by the applicable workforce agency, not by submitting this form."}</p></div>
+          {isApprenticeship ? <ApprenticeshipFundingNotice /> : null}
+          <div><label className={labelClass}>How do you plan to pay? *</label><select name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option>{!isApprenticeship ? <><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option></> : null}{!isApprenticeship ? <option value="not_sure">Not sure yet</option> : null}</select></div>
+
           {requiresWorkOne && (
             <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-5 text-amber-950">
               <h4 className="font-black">WorkOne intake required for this funding path</h4>
@@ -581,7 +607,7 @@ export default function StudentApplicationForm({
             <p><strong>Email:</strong> {form.email}</p>
             <p><strong>Phone:</strong> {form.phone}</p>
             <p><strong>Location:</strong> {form.city}, {form.state} {form.zipCode}</p>
-            <p><strong>Funding:</strong> {form.fundingSource || 'Not selected'}</p>
+            <p><strong>{isApprenticeship ? "Payment:" : "Funding:"}</strong> {form.fundingSource || 'Not selected'}</p>
             {isApprenticeship && <p><strong>Host Shop:</strong> {form.hasHostShop === 'yes' ? form.hostShopName || 'Yes' : form.hasHostShop || 'Not provided'}</p>}
             {isApprenticeship && transferHoursClaimed > 0 && <p><strong>Transfer Hours:</strong> {transferHoursClaimed.toLocaleString()} claimed — evidence: {transferHoursDocument?.name || 'required'}</p>}
           </div>
@@ -595,8 +621,8 @@ export default function StudentApplicationForm({
       {result?.error && <div role="alert" className="mt-6 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-950">{result.error}</div>}
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
-        {step > 1 ? <button type="button" onClick={previousStep} className="rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900">Back</button> : <span />}
-        {step < 5 ? <button type="button" onClick={nextStep} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700">Continue</button> : <button type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
+        {step > 1 ? <button type="button" onClick={previousStep} className="min-h-12 w-full rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900 sm:w-auto">Back</button> : <span />}
+        {step < 5 ? <button type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
       </div>
     </form>
   );

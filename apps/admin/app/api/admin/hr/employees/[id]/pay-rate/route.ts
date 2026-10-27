@@ -14,7 +14,7 @@ export async function GET(
   const { id } = await params;
   const db = await requireAdminClient();
   const { data, error } = await db
-    .from('hr_employees')
+    .from('employees')
     .select('id, pay_rate_cents, pay_type, effective_date')
     .eq('id', id)
     .maybeSingle();
@@ -37,7 +37,7 @@ export async function POST(
 
   const db = await requireAdminClient();
   const { error } = await db
-    .from('hr_employees')
+    .from('employees')
     .update({
       pay_rate_cents,
       pay_type: pay_type ?? 'hourly',

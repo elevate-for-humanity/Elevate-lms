@@ -2,7 +2,8 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { auditCourseTemplate } from '@/lib/course-builder/audit';
-import { runPersistedCourseProcurementHealthCheck } from '@/lib/course-builder/persisted-publish-service';
+import { runPersistedCourseProcurementHealthCheckWithClient } from '@/lib/course-builder/persisted-publish-service';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import type { ProgramBuilderTemplate } from '@/lib/course-builder/schema';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -19,7 +20,10 @@ export async function GET(req: NextRequest) {
   if (!courseId) return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
 
   try {
-    const result = await runPersistedCourseProcurementHealthCheck(courseId);
+    const result = await runPersistedCourseProcurementHealthCheckWithClient(
+      await requireAdminClient(),
+      courseId,
+    );
     return NextResponse.json({ ok: true, result });
   } catch (error) {
     logger.error('[course-builder/audit] persisted audit failed', error);

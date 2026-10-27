@@ -220,7 +220,7 @@ export default function BrowseHostShopsClient() {
               </p>
             </div>
             <Link
-              href="/host-shop/apply"
+              href="/partners/host-shop/apply"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-semibold text-white hover:bg-slate-800"
             >
               <Building2 className="h-5 w-5" />

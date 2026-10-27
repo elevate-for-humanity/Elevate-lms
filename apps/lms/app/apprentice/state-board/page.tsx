@@ -19,6 +19,9 @@ import {
   APPRENTICESHIP_REQUIRED_HOURS,
   getApprenticeshipRequiredHours,
 } from '@/lib/compliance/apprenticeship';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,29 +35,22 @@ export default async function StateBoardExamPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/state-board');
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/state-board');
 
   // Canonical enrollment source
-  const { data: programEnrollment } = await supabase
+  const { data: programEnrollment } = await db
     .from('program_enrollments')
-    .select('program_slug, enrolled_at, status')
-    .eq('user_id', user.id)
+    .select('program_slug, enrolled_at, status, required_hours, transfer_hours, lms_completed, practical_skills_verified')
+    .eq('user_id', subject.userId)
     .in('program_slug', Object.keys(APPRENTICESHIP_REQUIRED_HOURS))
     .eq('status', 'active')
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  // Canonical enrollment fields used for state-board readiness.
-  const { data: legacyEnrollment } = await supabase
-    .from('program_enrollments')
-    .select(
-      'program_slug, required_hours, transfer_hours, lms_completed, practical_skills_verified',
-    )
-    .eq('student_id', user.id)
-    .maybeSingle();
-
-  const programSlug = programEnrollment?.program_slug ?? legacyEnrollment?.program_slug ?? null;
+  const programSlug = programEnrollment?.program_slug ?? null;
 
   const configuredRequiredHours = getApprenticeshipRequiredHours(programSlug);
 
@@ -62,22 +58,22 @@ export default async function StateBoardExamPage() {
     redirect('/programs');
   }
 
-  const requiredHours = legacyEnrollment?.required_hours ?? configuredRequiredHours;
+  const requiredHours = programEnrollment?.required_hours ?? configuredRequiredHours;
 
   // Hours from apprentice_hours (canonical PWA source) — approved only
-  const { data: approvedRows } = await supabase
-    .from('apprenticeship_hours')
-    .select('hours')
-    .eq('user_id', user.id)
+  const { data: approvedRows } = await db
+    .from('hour_entries')
+    .select('accepted_hours,hours_claimed')
+    .eq('user_id', subject.userId)
     .eq('status', 'approved');
 
-  const pwaHours = (approvedRows ?? []).reduce((sum, r) => sum + (r.hours ?? 0), 0);
-  const transferHours = legacyEnrollment?.transfer_hours ?? 0;
+  const pwaHours = (approvedRows ?? []).reduce((sum, r) => sum + Number(r.accepted_hours || r.hours_claimed || 0), 0);
+  const transferHours = programEnrollment?.transfer_hours ?? 0;
   const totalHours = pwaHours + transferHours;
 
   const hoursComplete = totalHours >= requiredHours;
-  const lmsComplete = legacyEnrollment?.lms_completed ?? false;
-  const skillsVerified = legacyEnrollment?.practical_skills_verified ?? false;
+  const lmsComplete = programEnrollment?.lms_completed ?? false;
+  const skillsVerified = programEnrollment?.practical_skills_verified ?? false;
   const isReady = hoursComplete && lmsComplete;
 
   let examInfo = null as (typeof IPLA_EXAM_INFO)[keyof typeof IPLA_EXAM_INFO] | null;
@@ -343,7 +339,7 @@ export default async function StateBoardExamPage() {
               Complete all requirements above to unlock.
             </p>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-2 bg-purple-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-purple-700 transition-colors"
             >
               Log hours <ArrowRight className="w-4 h-4" />
@@ -383,7 +379,7 @@ export default async function StateBoardExamPage() {
               Call {PLATFORM_DEFAULTS.supportPhone}
             </a>
             <a
-              href="/contact"
+              href="/lms/support"
               className="text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors"
             >
               Email support

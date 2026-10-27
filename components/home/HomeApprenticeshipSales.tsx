@@ -11,7 +11,7 @@ const PROGRAMS = [
 
 export function HomeApprenticeshipSales() {
   return (
-    <section className="overflow-hidden bg-slate-950 px-4 py-14 text-white sm:py-20" aria-labelledby="apprenticeship-sales-heading">
+    <section className="overflow-hidden bg-slate-950 px-4 py-10 text-white sm:py-12" aria-labelledby="apprenticeship-sales-heading">
       <div className="mx-auto grid max-w-6xl gap-9 lg:grid-cols-[1.02fr_.98fr] lg:items-center">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.16em] text-orange-300">Earn While You Learn</p>
@@ -30,15 +30,15 @@ export function HomeApprenticeshipSales() {
 
           <div className="mt-7 flex flex-wrap gap-2">
             {PROGRAMS.map((program) => (
-              <Link key={program.href} href={program.href} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-white hover:text-slate-950">
+              <Link key={program.href} href={program.href} className="rounded-full border border-white/25 bg-slate-800/80 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-slate-50 hover:text-slate-950">
                 {program.label}
               </Link>
             ))}
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/barber-and-beauty-apprenticeships" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
-              Compare Apprenticeships <ArrowRight className="h-4 w-4" />
+            <Link href="/apprenticeships" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
+              Explore Apprenticeships <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/apply/student" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white bg-white px-7 py-3.5 font-black text-slate-950 hover:bg-slate-100">
               Start My Application
@@ -51,7 +51,7 @@ export function HomeApprenticeshipSales() {
             src="/images/pages/barber-hands-on-bright.webp"
             alt="Barber apprentice building hands-on skills with professional supervision"
             fill
-            className="object-cover brightness-110 contrast-105 saturate-110"
+            className="object-contain brightness-110 contrast-105 saturate-110"
             sizes="(max-width: 1024px) 100vw, 46vw"
           />
         </div>

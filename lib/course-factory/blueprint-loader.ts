@@ -35,13 +35,19 @@ function sanitizeElevateAuthoredBlueprint(source: CredentialBlueprint): Credenti
   blueprint.credentialSlug = 'entrepreneurship-small-business-v2-us';
   blueprint.credentialTitle = 'Entrepreneurship and Small Business (ESB) U.S. v.2';
   blueprint.credentialCode = 'ESB-V2-US';
+  // Elevate owns the instruction; Certiport remains the external assessment
+  // alignment authority. Preserve non-content alignment metadata so the
+  // Practice Center and audits can prove ESB v.2 coverage without implying
+  // that Certiport authored or endorsed Elevate courseware.
   blueprint.sourceAuthority = 'Elevate for Humanity';
   blueprint.sourceReference =
-    'Original Elevate entrepreneurship and small-business competency framework for U.S. workforce training.';
-  blueprint.certificationPathway = undefined;
-  blueprint.externalCourses = undefined;
-  delete blueprint.certiportExamCodes;
-  delete blueprint.trackVariants;
+    'Original Elevate entrepreneurship and small-business instruction aligned to the published Certiport ESB U.S. v.2 objective domains.';
+  blueprint.alignmentAuthority = source.sourceAuthority;
+  blueprint.alignmentReference = source.sourceReference;
+  blueprint.contentAuthorship = 'Elevate for Humanity';
+  blueprint.externalAssessment = source.certificationPathway
+    ? { ...source.certificationPathway, relationship: 'alignment-only' }
+    : undefined;
 
   blueprint.modules = blueprint.modules.map((courseModule) => ({
     ...courseModule,

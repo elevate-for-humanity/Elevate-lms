@@ -18,6 +18,63 @@ import { auditCourseTemplate } from './audit';
 import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
+import { assertCourseBuilderGenerationEnabled } from './generation-control';
+import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
+import { REQUIRED_COURSE_GATES, type CourseGate } from '../course-package/readiness';
+import { instructionalLessonSteps, assertInstructionalLessonPipeline, type InstructionalLessonStep } from './instructional-lesson-pipeline';
+
+export const COURSE_BUILDER_GATE_REPAIR_POLICY: Record<CourseGate, {
+  phase: 'authoring' | 'media' | 'review';
+  automatic: boolean;
+  repairScope: readonly string[];
+}> = {
+  standards: { phase: 'authoring', automatic: false, repairScope: ['credential_metadata','competency_mapping','standards'] },
+  learning_objectives: { phase: 'authoring', automatic: true, repairScope: ['objectives','competency_mapping'] },
+  prerequisites: { phase: 'authoring', automatic: true, repairScope: ['prerequisites'] },
+  teaching_sequence: { phase: 'authoring', automatic: true, repairScope: ['instructional_sequence','reading_guide'] },
+  instructional_script: { phase: 'authoring', automatic: true, repairScope: ['narration','instructional_script'] },
+  storyboard: { phase: 'authoring', automatic: true, repairScope: ['instructional_timeline','storyboard'] },
+  visual_assignment: { phase: 'media', automatic: true, repairScope: ['visuals','licensed_media','media_provenance'] },
+  scene_build: { phase: 'media', automatic: true, repairScope: ['scenes','captions','transitions'] },
+  natural_narration: { phase: 'media', automatic: true, repairScope: ['narration','voice','prosody'] },
+  synchronization: { phase: 'media', automatic: true, repairScope: ['timeline','captions','visual_narration_alignment'] },
+  active_teaching: { phase: 'authoring', automatic: true, repairScope: ['guided_practice','knowledge_checks','interactives'] },
+  mistakes_and_corrections: { phase: 'authoring', automatic: true, repairScope: ['failure_modes','remediation','corrections'] },
+  assessment_alignment: { phase: 'authoring', automatic: true, repairScope: ['knowledge_checks','assessments','objective_mapping'] },
+  render: { phase: 'media', automatic: true, repairScope: ['lesson_video'] },
+  finished_media_qa: { phase: 'media', automatic: true, repairScope: ['decoded_media','continuity','captions','audio'] },
+  instructional_qa: { phase: 'review', automatic: false, repairScope: ['objective_evidence','procedure_evidence','teaching_quality'] },
+  narration_qa: { phase: 'review', automatic: false, repairScope: ['voice_quality','pronunciation','cadence'] },
+  learner_runthrough: { phase: 'review', automatic: false, repairScope: ['learner_preview','mobile','progress','resume'] },
+  selective_repair: { phase: 'review', automatic: true, repairScope: ['failed_component_only'] },
+  publish: { phase: 'review', automatic: false, repairScope: ['publication'] },
+};
+
+const AUTHORING_AUTOMATIC_GATES = new Set<CourseGate>(
+  REQUIRED_COURSE_GATES.filter((gate) => {
+    const policy = COURSE_BUILDER_GATE_REPAIR_POLICY[gate];
+    return policy.phase === 'authoring' && policy.automatic;
+  }),
+);
+const POST_AUTHORING_GATES = new Set<CourseGate>(
+  REQUIRED_COURSE_GATES.filter((gate) => COURSE_BUILDER_GATE_REPAIR_POLICY[gate].phase !== 'authoring'),
+);
+
+export const COURSE_BUILDER_BLUEPRINT_STEPS = REQUIRED_COURSE_GATES.map((gate, index) => ({
+  order: index + 1,
+  gate,
+  repairScope: COURSE_BUILDER_GATE_REPAIR_POLICY[gate].repairScope,
+})) as ReadonlyArray<{order:number;gate:CourseGate;repairScope:readonly string[]}>;
+
+export async function walkCourseBuilderBlueprint(courseId: string) {
+  const readiness = await evaluatePersistedCredentialCourse(courseId);
+  return COURSE_BUILDER_BLUEPRINT_STEPS.map((step) => ({
+    ...step,
+    pass: readiness.gates[step.gate],
+    findings: readiness.findings.filter((finding) => finding.gate === step.gate),
+    action: readiness.gates[step.gate] ? 'preserve' : 'repair_component',
+  }));
+}
 
 const courseProgramConfigSchema = z.object({
   id: z.string().uuid().optional(),
@@ -28,6 +85,8 @@ const courseProgramConfigSchema = z.object({
   credentialTarget: z.enum([
     'INTERNAL',
     'STATE_BOARD',
+    'FEDERAL',
+    'MICROSOFT',
     'IC&RC',
     'NAADAC',
     'CUSTOM',
@@ -56,6 +115,8 @@ const courseProgramConfigSchema = z.object({
     credentialTarget: z.enum([
       'INTERNAL',
       'STATE_BOARD',
+      'FEDERAL',
+      'MICROSOFT',
       'IC&RC',
       'NAADAC',
       'CUSTOM',
@@ -64,6 +125,11 @@ const courseProgramConfigSchema = z.object({
     governingBody: z.string().nullable().optional(),
     governingRegion: z.string().nullable().optional(),
     governingStandardVersion: z.string().nullable().optional(),
+    standardSourceUrl: z.string().url().nullable().optional(),
+    standardEffectiveDate: z.string().date().nullable().optional(),
+    standardStatus: z.enum(['active', 'retired', 'superseded', 'draft']).nullable().optional(),
+    standardRegistryKey: z.string().min(1).nullable().optional(),
+    standardFingerprint: z.string().min(16).nullable().optional(),
     retentionPolicyDays: z.number().nullable().optional(),
     auditNotes: z.string().nullable().optional(),
   }),
@@ -81,27 +147,42 @@ async function resolveRegisteredBlueprint(input: FactoryInput) {
   return loaded?.blueprint ?? null;
 }
 
-async function queueUpgradedMediaIfRequested(
+async function verifyUpgradedMediaBoundToLessons(
   input: FactoryInput,
   result: FactoryOutput,
 ): Promise<FactoryOutput> {
   if (input.videoMode !== 'queue' || !result.courseId || input.dryRun) return result;
-  const media = await queueCourseLessonVideos({
-    courseId: result.courseId,
-    onlyMissing: true,
-    limit: input.videoQueueLimit ?? null,
-  });
+  const db = await requireAdminClient();
+  const [{ data: lessons, error: lessonError }, { data: jobs, error: jobError }] =
+    await Promise.all([
+      db.from('course_lessons').select('id').eq('course_id', result.courseId),
+      db
+        .from('video_jobs')
+        .select('id,lesson_id,status')
+        .eq('course_id', result.courseId)
+        .eq('asset_kind', 'lesson'),
+    ]);
+  if (lessonError) throw lessonError;
+  if (jobError) throw jobError;
+  const lessonIds = new Set((lessons ?? []).map((lesson) => lesson.id));
+  const jobLessonIds = new Set((jobs ?? []).map((job) => job.lesson_id));
+  const missing = [...lessonIds].filter((lessonId) => !jobLessonIds.has(lessonId));
+  if (missing.length) {
+    return {
+      ...result,
+      ok: false,
+      errors: [
+        ...(result.errors ?? []),
+        `Atomic lesson/media contract failed: ${missing.length} lesson(s) have no canonical primary media job.`,
+      ],
+    };
+  }
   return {
     ...result,
-    videosQueued: media.queued + media.microclipsQueued,
-    lessonVideosQueued: media.queued,
-    microclipsQueued: media.microclipsQueued,
-    warnings: [
-      ...(result.warnings ?? []),
-      ...(media.failed > 0
-        ? [`${media.failed} media enqueue attempt(s) failed and remain retryable.`]
-        : []),
-    ],
+    videosQueued: (jobs ?? []).filter((job) =>
+      ['queued', 'rendering', 'complete'].includes(String(job.status)),
+    ).length,
+    lessonVideosQueued: (jobs ?? []).length,
   };
 }
 
@@ -119,6 +200,8 @@ export async function courseFactory(
   input: FactoryInput,
   progress?: ProgressCallback,
 ): Promise<FactoryOutput> {
+  const controlDb = await requireAdminClient();
+  await assertCourseBuilderGenerationEnabled(controlDb, input.courseId);
   if (input.contentSource === 'curriculum_lessons') {
     if (!input.courseId) {
       return {
@@ -128,8 +211,51 @@ export async function courseFactory(
       };
     }
     progress?.('resolve', 'Loading the identified persisted authored curriculum.', 10);
-    const upgraded = await upgradePersistedAuthoredCourse(input.courseId);
-    progress?.('validate', 'All lessons passed the universal interactive contract.', 85);
+    const beforeRepair = await evaluatePersistedCredentialCourse(input.courseId);
+    const failedLessonIds = [
+      ...new Set(
+        beforeRepair.findings
+          .filter((finding) =>
+            finding.gate !== 'identity' &&
+            AUTHORING_AUTOMATIC_GATES.has(finding.gate as CourseGate),
+          )
+          .map((finding) => finding.lessonId)
+          .filter((lessonId): lessonId is string => Boolean(lessonId)),
+      ),
+    ];
+    const upgraded =
+      failedLessonIds.length === 0
+        ? {
+            ok: true as const,
+            courseId: input.courseId,
+            courseSlug: input.programSlug,
+            moduleCount: undefined,
+            lessonCount: undefined,
+            repairedLessonCount: 0,
+          }
+        : await upgradePersistedAuthoredCourse(
+            input.courseId,
+            undefined,
+            { lessonIds: failedLessonIds },
+          );
+    // Blueprint selective repair is iterative: only lessons named by failed
+    // gates are recompiled. Passing lessons and learner state are preserved.
+    progress?.('validate', 'Validating repaired components against the Course Builder Blueprint.', 85);
+    const readiness = await evaluatePersistedCredentialCourse(upgraded.courseId);
+    const authoringBlockers = readiness.findings.filter((finding) => {
+      if (finding.gate === 'identity') return true;
+      return !POST_AUTHORING_GATES.has(finding.gate as CourseGate);
+    });
+    if (authoringBlockers.length > 0) {
+      return {
+        ok: false,
+        courseId: upgraded.courseId,
+        courseSlug: upgraded.courseSlug,
+        errors: authoringBlockers.map((finding) => `${finding.gate}: ${finding.message}`),
+        videosQueued: 0,
+        warnings: readiness.findings.map((finding) => `repair_required:${finding.gate}:${finding.message}`),
+      };
+    }
     const result: FactoryOutput = {
       ok: true,
       courseId: upgraded.courseId,
@@ -139,9 +265,23 @@ export async function courseFactory(
       assessmentsGenerated: 0,
       videosQueued: 0,
     };
-    const withMedia = await queueUpgradedMediaIfRequested(input, result);
-    progress?.('complete', 'Authored course upgrade completed.', 100);
-    return withMedia;
+    const withMedia = await verifyUpgradedMediaBoundToLessons(input, result);
+    const remaining = await evaluatePersistedCredentialCourse(upgraded.courseId);
+    const remainingWarnings = remaining.findings.map(
+      (finding) => `repair_required:${finding.gate}:${finding.message}`,
+    );
+    progress?.(
+      remaining.pass ? 'complete' : 'media',
+      remaining.pass
+        ? 'Authored course upgrade completed against the full contract.'
+        : 'Authoring contract passed; media/review gates remain in the production pipeline.',
+      remaining.pass ? 100 : 95,
+    );
+    return {
+      ...withMedia,
+      completionState: remaining.pass ? 'ready_for_review' : 'media_pending',
+      warnings: [...(withMedia.warnings ?? []), ...remainingWarnings],
+    };
   }
 
   const registeredBlueprint = await resolveRegisteredBlueprint(input);
@@ -238,6 +378,31 @@ export async function publishGovernedCourse(
   return { ...gate, ok: gate.ok && result.ok, result, governance };
 }
 
+export type ContractWalkthroughStep = {
+  order: number;
+  gate: string;
+  pass: boolean;
+  message: string;
+};
+
+/** Walk the persisted course against the canonical contract in required gate order.
+ * This is the single validation trace used by generation, repair, review, and publication. */
+export async function validateCourseAgainstContract(courseId: string) {
+  const readiness = await evaluatePersistedCredentialCourse(courseId);
+  const steps: ContractWalkthroughStep[] = readiness.findings.map((finding, index) => ({
+    order: index + 1,
+    gate: finding.gate,
+    pass: finding.pass !== false,
+    message: finding.message,
+  }));
+  return {
+    courseId,
+    pass: readiness.pass,
+    steps,
+    failedGates: steps.filter((step) => !step.pass).map((step) => step.gate),
+  };
+}
+
 export async function repairCanonicalCourse(courseId: string, progress?: ProgressCallback) {
   const db = await requireAdminClient();
   const { data: course, error } = await db
@@ -249,6 +414,8 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
   if (error) throw error;
   if (!course) throw new Error('Course not found');
 
+  progress?.('contract', 'Walking the canonical course contract before repair.', 5);
+  const before = await validateCourseAgainstContract(courseId);
   const result = await courseFactory(
     {
       courseId,
@@ -266,7 +433,19 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
       ? await normalizeGeneratedCourseForGovernance(result.courseId)
       : null;
 
-  return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug };
+  const after = await validateCourseAgainstContract(courseId);
+  return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug, contractValidation: { before, after } };
+}
+
+export function getInstructionalLessonBuildSteps() {
+  return instructionalLessonSteps();
+}
+
+export function requireInstructionalLessonStage(
+  evidence: Partial<Record<InstructionalLessonStep, boolean>>,
+  through: InstructionalLessonStep,
+) {
+  assertInstructionalLessonPipeline(evidence, through);
 }
 
 export async function queueCourseMedia(input: {
@@ -275,6 +454,7 @@ export async function queueCourseMedia(input: {
   onlyMissing?: boolean;
   force?: boolean;
   limit?: number | null;
+  validateOnly?: boolean;
 }) {
   return queueCourseLessonVideos(input);
 }

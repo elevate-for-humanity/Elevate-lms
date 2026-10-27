@@ -7,6 +7,12 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import {
+  APPRENTICE_TIMECLOCK_HISTORY_URL,
+  APPRENTICE_TIMECLOCK_URL,
+} from '@/lib/portal/apprenticeship-portal-paths';
 
 export const metadata: Metadata = {
   title: 'Apprentice Hours',
@@ -21,10 +27,12 @@ export default async function ApprenticeHoursPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?redirect=/apprentice/hours');
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/hours');
 
   // Fetch hours from consolidated hour_entries table
-  const { data: hoursData, error } = await supabase
+  const { data: hoursData, error } = await db
     .from('hour_entries')
     .select(
       `
@@ -34,37 +42,52 @@ export default async function ApprenticeHoursPage() {
       accepted_hours,
       notes,
       status,
+      approval_status,
       source_type,
       category,
       created_at
     `,
     )
-    .eq('user_id', user.id)
-    .order('work_date', { ascending: false })
-    .limit(20);
+    .eq('user_id', subject.userId)
+    .order('work_date', { ascending: false });
 
   if (error) {
-    logger.error('Error fetching hours', normalizeError(error, 'Failed to fetch hours'), getErrorContext(error));
+    logger.error(
+      'Error fetching hours',
+      normalizeError(error, 'Failed to fetch hours'),
+      getErrorContext(error),
+    );
   }
 
-  const logs = hoursData || [];
-  const totalHours = logs.reduce((sum, log: any) => sum + (log.hours_claimed || 0), 0);
-  const approvedHours = logs
-    .filter((log: any) => log.status === 'approved')
-    .reduce((sum, log: any) => sum + (log.accepted_hours || log.hours_claimed || 0), 0);
+  const allLogs = hoursData || [];
+  // Transfer credit is displayed from the verified enrollment fields below.
+  // Historical transfer rows remain auditable but are excluded from weekly OJL.
+  const workLogs = allLogs.filter(
+    (log: any) => log.category !== 'transfer' && ['ojl', 'timeclock', 'manual', 'host_shop'].includes(log.source_type),
+  );
+  const logs = workLogs.slice(0, 20);
+  const totalHours = workLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
+  const approvedHours = workLogs
+    .filter((log: any) => ['approved', 'locked'].includes(log.status))
+    .reduce((sum, log: any) => sum + (Number(log.accepted_hours ?? log.hours_claimed) || 0), 0);
 
   // Resolve required hours from the learner's active enrollment
-  const { data: activeEnrollment } = await supabase
+  const { data: activeEnrollment } = await db
     .from('program_enrollments')
-    .select('program_slug')
-    .eq('user_id', user.id)
+    .select('program_slug, transfer_hours, transfer_hours_verified')
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   const requiredHours = getApprenticeshipRequiredHours(activeEnrollment?.program_slug ?? null);
+  const transferHoursVerified = activeEnrollment?.transfer_hours_verified === true;
+  const transferHours = transferHoursVerified
+    ? Math.max(0, Number(activeEnrollment?.transfer_hours) || 0)
+    : 0;
+  const creditedHours = approvedHours + transferHours;
   const progressPercent = requiredHours
-    ? Math.min(Math.round((approvedHours / requiredHours) * 100), 100)
+    ? Math.min(Math.round((creditedHours / requiredHours) * 100), 100)
     : 0;
 
   return (
@@ -84,14 +107,14 @@ export default async function ApprenticeHoursPage() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 text-sm"
             >
               <Clock className="w-4 h-4" />
               Timeclock
             </Link>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_HISTORY_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 text-sm"
             >
               Shift Log
@@ -103,7 +126,7 @@ export default async function ApprenticeHoursPage() {
               Competency Log
             </Link>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm"
             >
               <Plus className="w-4 h-4" />
@@ -118,8 +141,8 @@ export default async function ApprenticeHoursPage() {
             <h2 className="font-semibold text-slate-900">Apprenticeship Progress</h2>
             <span className="text-sm text-slate-700">
               {requiredHours
-                ? `${approvedHours} / ${requiredHours} hours`
-                : `${approvedHours} approved hours`}
+                ? `${creditedHours} / ${requiredHours} credited hours`
+                : `${creditedHours} credited hours`}
             </span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4 mb-2">
@@ -129,7 +152,9 @@ export default async function ApprenticeHoursPage() {
             />
           </div>
           <p className="text-sm text-slate-700">
-            {requiredHours ? `${progressPercent}% complete` : 'Program hour target not configured yet'}
+            {requiredHours
+              ? `${progressPercent}% complete`
+              : 'Program hour target not configured yet'}
           </p>
         </div>
 
@@ -163,8 +188,10 @@ export default async function ApprenticeHoursPage() {
                 <Calendar className="w-5 h-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{logs.length}</p>
-                <p className="text-sm text-slate-700">Entries</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {transferHoursVerified ? transferHours : 'Pending'}
+                </p>
+                <p className="text-sm text-slate-700">Transfer Hours</p>
               </div>
             </div>
           </div>
@@ -175,7 +202,7 @@ export default async function ApprenticeHoursPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {requiredHours ? Math.max(requiredHours - approvedHours, 0) : 'N/A'}
+                  {requiredHours ? Math.max(requiredHours - creditedHours, 0) : 'N/A'}
                 </p>
                 <p className="text-sm text-slate-700">Remaining</p>
               </div>
@@ -208,14 +235,14 @@ export default async function ApprenticeHoursPage() {
                     <span className="font-semibold text-slate-900">{log.hours_claimed} hrs</span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        log.status === 'approved'
+                        ['approved', 'locked'].includes(log.status)
                           ? 'bg-brand-green-100 text-brand-green-700'
-                          : log.status === 'rejected'
+                          : log.status === 'rejected' || log.approval_status === 'rejected'
                             ? 'bg-brand-red-100 text-brand-red-700'
                             : 'bg-yellow-100 text-yellow-700'
                       }`}
                     >
-                      {log.status || 'Pending'}
+                      {log.approval_status || log.status || 'Pending'}
                     </span>
                   </div>
                 </div>
@@ -236,7 +263,7 @@ export default async function ApprenticeHoursPage() {
             <h2 className="text-xl font-semibold text-slate-900 mb-2">No hours logged yet</h2>
             <p className="text-slate-700 mb-6">Start tracking your apprenticeship hours.</p>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-4 h-4" />

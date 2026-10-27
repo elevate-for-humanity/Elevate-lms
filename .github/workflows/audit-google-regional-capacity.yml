@@ -1,0 +1,129 @@
+name: Audit Google regional capacity
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/audit-google-regional-capacity.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-regional-capacity.yml/dispatches" -f ref=main
+  audit:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Prepare audit reports
+        run: mkdir -p audit-reports
+      - name: Compare primary and secondary regions without changing resources
+        run: |
+          set -o pipefail
+          node scripts/gcp/audit-runtime-capacity.mjs | tee audit-reports/regional-capacity.json
+      - name: Test cost inventory redaction and read-only behavior
+        if: always()
+        run: node --test scripts/gcp/audit-cost-resources.test.mjs
+      - name: Inventory project resources without provisioning or deleting anything
+        if: always()
+        run: |
+          set -o pipefail
+          node scripts/gcp/audit-cost-resources.mjs | tee audit-reports/cost-resources.json
+      - name: Read regional allocation without changing services
+        if: always()
+        run: |
+          python - <<'PY'
+          import subprocess,json,datetime,urllib.request,urllib.parse
+          project='elegant-racer-299721'
+          region='us-central1'
+          def read(args):
+            p=subprocess.run(['gcloud']+args+['--project='+project,'--region='+region,'--format=json'],capture_output=True,text=True)
+            if p.returncode:raise RuntimeError('Google read failed: '+' '.join(args[:3]))
+            return json.loads(p.stdout)
+          def scaling(annotations):
+            return {k:v for k,v in annotations.items() if any(t in k.lower() for t in ['scaling','cpu-throttling','startup-cpu','execution-environment'])}
+          def runtime(containers):
+            return [{'command':c.get('command'), 'heapArgs':[a for a in c.get('args',[]) if a.startswith('--max-old-space-size=')], 'nodeOptions':next((e.get('value') for e in c.get('env',[]) if e.get('name')=='NODE_OPTIONS'),None)} for c in containers]
+          revisions={}
+          services=read(['run','services','list'])
+          for s in services:
+            name=s['metadata']['name']
+            template=s['spec']['template']
+            traffic=s.get('status',{}).get('traffic',[])
+            print(json.dumps({'kind':'service','name':name,'serviceScaling':scaling(s['metadata'].get('annotations',{})),'templateScaling':scaling(template['metadata'].get('annotations',{})),'runtime':runtime(template['spec']['containers']),'templateResources':[c.get('resources',{}).get('limits',{}) for c in template['spec']['containers']],'concurrency':template['spec'].get('containerConcurrency'),'traffic':[{'revision':t.get('revisionName'),'percent':t.get('percent',0),'tag':t.get('tag')} for t in traffic]}))
+            rows=read(['run','revisions','list','--service='+name])
+            for r in rows:
+              rev=r['metadata']['name'];revisions[rev]=r
+              ann=r['metadata'].get('annotations',{})
+              linked=[t for t in traffic if t.get('revisionName')==rev]
+              if linked or int(ann.get('autoscaling.knative.dev/minScale','0'))>0:
+                print(json.dumps({'kind':'revision','service':name,'revision':rev,'runtime':runtime(r['spec']['containers']),'resources':[c.get('resources',{}).get('limits',{}) for c in r['spec']['containers']],'scaling':scaling(ann),'concurrency':r['spec'].get('containerConcurrency'),'traffic':sum(t.get('percent',0) for t in linked),'tags':[t['tag'] for t in linked if t.get('tag')],'ready':next((c.get('status') for c in r.get('status',{}).get('conditions',[]) if c.get('type')=='Ready'),None)}))
+          for job in read(['run','jobs','list']):
+            name=job['metadata']['name']
+            task=job.get('spec',{}).get('template',{}).get('spec',{})
+            container=task.get('template',{}).get('spec',{})
+            active=read(['run','jobs','executions','list','--job='+name])
+            running=[{'execution':e['metadata']['name'],'runningCount':e.get('status',{}).get('runningCount',0),'startTime':e.get('status',{}).get('startTime')} for e in active if not e.get('status',{}).get('completionTime') and e.get('status',{}).get('startTime')]
+            print(json.dumps({'kind':'job','name':name,'parallelism':task.get('parallelism'),'tasks':task.get('taskCount'),'resources':[c.get('resources',{}).get('limits',{}) for c in container.get('containers',[])],'running':running}))
+          token=subprocess.run(['gcloud','auth','print-access-token'],capture_output=True,text=True,check=True).stdout.strip()
+          end=datetime.datetime.now(datetime.timezone.utc);start=end-datetime.timedelta(minutes=10)
+          params={'filter':'resource.type="cloud_run_revision" AND metric.type="run.googleapis.com/container/instance_count" AND resource.labels.location="us-central1"','interval.startTime':start.isoformat(),'interval.endTime':end.isoformat(),'pageSize':'1000'}
+          url='https://monitoring.googleapis.com/v3/projects/'+project+'/timeSeries?'+urllib.parse.urlencode(params)
+          try:
+            with urllib.request.urlopen(urllib.request.Request(url,headers={'Authorization':'Bearer '+token}),timeout=30) as response:metrics=json.load(response)
+            for series in metrics.get('timeSeries',[]):
+              point=series.get('points',[{}])[0]
+              labels=series.get('resource',{}).get('labels',{})
+              print(json.dumps({'kind':'instances','service':labels.get('service_name'),'revision':labels.get('revision_name'),'state':series.get('metric',{}).get('labels',{}).get('state'),'value':point.get('value'),'time':point.get('interval',{}).get('endTime')}))
+            print(json.dumps({'kind':'monitoring','truncated':bool(metrics.get('nextPageToken'))}))
+          except urllib.error.HTTPError as error:print(json.dumps({'kind':'monitoring','httpStatus':error.code}))
+          PY
+      - name: Read serving Studio destinations and bucket totals
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const scope=['--project=elegant-racer-299721','--region=us-central1','--format=json'];
+          const read=args=>JSON.parse(execFileSync('gcloud',[...args,...scope],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']}));
+          const service=read(['run','services','describe','elevate-admin-migration']);
+          for(const name of new Set((service.status.traffic||[]).filter(t=>t.percent>0).map(t=>t.revisionName))){
+            const revision=read(['run','revisions','describe',name]);
+            const destinations=(revision.spec.containers[0].env||[]).filter(e=>['STUDIO_BROWSER_URL','STUDIO_BROWSER_PUBLIC_URL','NEXT_PUBLIC_STUDIO_BROWSER_URL'].includes(e.name)).map(e=>{
+              let destination=null;try{const u=new URL(e.value);destination=u.origin+u.pathname;}catch{}
+              return {name:e.name,destination,secretReference:Boolean(e.valueFrom)};
+            });
+            console.log(JSON.stringify({kind:'serving_admin_studio',revision:name,destinations}));
+          }
+          for(const bucket of ['elegant-racer-299721-studio-browser-auth','elevate-render-tests-484736877039-us-central1']){
+            try{
+              const result=execFileSync('gcloud',['storage','du','--summarize','gs://'+bucket,'--project=elegant-racer-299721'],{encoding:'utf8',timeout:60000,stdio:['ignore','pipe','pipe']});
+              const bytes=result.trim().match(/^(\d+)\s/);
+              console.log(JSON.stringify({kind:'bucket_total',bucket,bytes:bytes?Number(bytes[1]):null,verified:Boolean(bytes)}));
+            }catch{console.log(JSON.stringify({kind:'bucket_total',bucket,verified:false}));}
+          }
+          NODE
+      - name: Preserve regional and cost inventory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-resource-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: audit-reports/*.json
+          if-no-files-found: warn
+          retention-days: 14

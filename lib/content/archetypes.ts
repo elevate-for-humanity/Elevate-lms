@@ -166,7 +166,7 @@ export function getProgramContent(programSlug: string): PageContent {
     ],
     breadcrumbs: [
       { label: 'Programs', href: '/programs' },
-      { label: 'Apprenticeships', href: '/programs/apprenticeships' },
+      { label: 'Apprenticeships', href: '/apprenticeships' },
     ],
   };
 }
@@ -190,8 +190,7 @@ export function getPolicyContent(policyType: string): PageContent {
     },
     terms: {
       title: 'Terms of Service',
-      description:
-        `Terms and conditions governing your use of ${PLATFORM_DEFAULTS.orgName} services, programs, and digital platforms.`,
+      description: `Terms and conditions governing your use of ${PLATFORM_DEFAULTS.orgName} services, programs, and digital platforms.`,
       imageSrc: '/images/pages/business-sector.webp',
       imageAlt: 'Legal agreement and terms documentation',
       breadcrumbs: [

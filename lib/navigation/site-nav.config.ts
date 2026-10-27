@@ -1,3 +1,5 @@
+import { ROUTES } from '@/lib/navigation/routes';
+
 /**
  * SITE NAVIGATION CONFIGURATION
  *
@@ -22,6 +24,17 @@ export interface NavGroup {
  * Top-level navigation with dropdown menus
  */
 export const headerNavigation: NavGroup[] = [
+  {
+    label: 'Testing',
+    href: '/testing',
+    items: [
+      { label: 'Testing Center', href: '/testing', description: 'Credential exams, providers, pricing and testing information' },
+      { label: 'Book an Exam', href: '/testing/book', description: 'Schedule a testing appointment' },
+      { label: 'Exams & Pricing', href: '/testing#providers', description: 'Compare available exams and published prices' },
+      { label: 'Employer / Group Testing', href: '/testing/for-employers', description: 'Cohort and workforce testing' },
+      { label: 'Testing Policies', href: '/testing/policies', description: 'Identification, arrival, rescheduling and testing rules' },
+    ],
+  },
   {
     label: 'Programs',
     items: [
@@ -72,7 +85,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Apprenticeships',
-        href: '/programs/apprenticeships',
+        href: '/apprenticeships',
         description: 'Earn while you learn programs',
       },
       {
@@ -80,6 +93,17 @@ export const headerNavigation: NavGroup[] = [
         href: '/pathways',
         description: 'Career pathway explorer',
       },
+    ],
+  },
+  {
+    label: 'Microcourses',
+    href: '/microcourses',
+    items: [
+      { label: 'All Microcourses', href: '/microcourses' },
+      { label: 'Workplace Safety', href: '/microcourses?category=workplace-safety' },
+      { label: 'Food Safety', href: '/microcourses?category=food-safety' },
+      { label: 'Drug Testing', href: '/microcourses?category=drug-testing' },
+      { label: 'Certifications', href: '/microcourses?category=certifications' },
     ],
   },
   {
@@ -93,7 +117,7 @@ export const headerNavigation: NavGroup[] = [
       {
         label: 'Funding & Support',
         href: '/funding',
-        description: 'Free training and financial aid',
+        description: 'Funding pathways and participant support',
       },
       {
         label: 'Career Services',
@@ -168,7 +192,7 @@ export const headerNavigation: NavGroup[] = [
       {
         label: '🔥 License Platform',
         href: '/platform',
-        description: 'Use our $650K in government approvals - $2K-$200K/mo',
+        description: 'Platform licensing and workforce infrastructure',
       },
       {
         label: 'Apprenticeship Licensing',
@@ -241,11 +265,6 @@ export const headerNavigation: NavGroup[] = [
         description: 'CareerSafe OSHA training',
       },
       {
-        label: 'HSI Partners',
-        href: '/partners/hsi',
-        description: 'HSI training partnership',
-      },
-      {
         label: 'JRI Partners',
         href: '/partners/jri',
         description: 'Job Ready Indy',
@@ -302,23 +321,23 @@ export const headerNavigation: NavGroup[] = [
   {
     label: 'Community',
     items: [
-      { label: 'Community Hub', href: '/community/members', description: 'Join the community' },
-      { label: 'Classroom', href: '/community/classroom', description: 'Virtual classroom' },
+      { label: 'Community Hub', href: '/community', description: 'Join the community' },
+      { label: 'Barber & Beauty Network', href: '/barber-beauty-network', description: 'Meet shops and beauty professionals' },
       {
         label: 'Career Discussions',
-        href: '/community/discussions/career',
+        href: 'https://app.elevateforhumanity.org/community',
         description: 'Career talk',
       },
       {
         label: 'General Discussions',
-        href: '/community/discussions/general',
+        href: 'https://app.elevateforhumanity.org/community',
         description: 'General forum',
       },
-      { label: 'Leaderboard', href: '/community/leaderboard', description: 'Top contributors' },
+      { label: 'Leaderboard', href: 'https://app.elevateforhumanity.org/community', description: 'Top contributors' },
       {
-        label: 'Marketplace',
-        href: '/community/marketplace',
-        description: 'Community marketplace',
+        label: 'Business Network',
+        href: '/business-network',
+        description: 'Showcase your business',
       },
     ],
   },
@@ -405,19 +424,19 @@ export const footerNavigation = {
       { label: 'Funding & Support', href: '/funding' },
       { label: 'Career Services', href: '/career-services' },
       { label: 'Employment Support', href: '/employment-support' },
-      { label: 'Success Stories', href: '/success' },
+      { label: 'Success Stories', href: '/success-stories' },
       { label: 'Student Login', href: '/lms/dashboard' },
     ],
   },
   partners: {
     title: 'Partners & Employers',
     links: [
-      { label: 'Hire Talent', href: '/employer/dashboard' },
+      { label: 'Hire Talent', href: ROUTES.employerPortal },
       { label: 'Become a Program Holder', href: '/apply/program-holder' },
       { label: '⭐ License Platform', href: '/pricing/platform' },
       { label: 'Apprenticeship Licensing', href: '/pricing/sponsor-licensing' },
       { label: 'Apprenticeships', href: '/employer/apprenticeships' },
-      { label: 'Employer Login', href: '/employer/dashboard' },
+      { label: 'Employer Login', href: ROUTES.employerPortal },
       { label: 'Partner Login', href: '/program-holder/dashboard' },
     ],
   },
@@ -555,7 +574,7 @@ export const footerNavigation = {
       { label: 'Reels', href: '/reels' },
       { label: 'Share', href: '/share' },
       { label: 'Social', href: '/social' },
-      { label: 'Community Tax Support', href: '/tax' },
+      { label: 'Supersonic Fast Cash', href: '/tax' },
       { label: 'Microclasses', href: '/microclasses' },
       { label: 'Educator Hub', href: '/educatorhub' },
       { label: 'Funding Impact', href: '/funding' },
@@ -571,7 +590,7 @@ export const footerNavigation = {
     links: [
       { label: 'NRF', href: '/courses/nrf' },
       { label: 'CNA Certification', href: '/programs/cna' },
-      { label: 'Micro Programs', href: '/programs/micro-programs' },
+      { label: 'Micro Programs', href: '/microclasses' },
       { label: 'Web Development', href: '/programs/web-development' },
     ],
   },
@@ -629,9 +648,9 @@ export const footerNavigation = {
   demo: {
     title: 'Live Demo',
     links: [
-      { label: 'Admin Demo', href: '/demo/admin' },
-      { label: 'Employer Demo', href: '/demo/employer' },
-      { label: 'Learner Demo', href: '/demo/learner' },
+      { label: 'Admin Demo', href: '/store/demo/admin' },
+      { label: 'Employer Demo', href: '/store/demo/employer' },
+      { label: 'Learner Demo', href: '/store/demo/student' },
     ],
   },
   internal: {

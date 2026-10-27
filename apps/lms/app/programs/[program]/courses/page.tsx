@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -91,7 +92,7 @@ export default async function ProgramCoursesPage({ params }: ProgramCoursesPageP
       />
 
       <section className="relative h-[280px] w-full overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={fallbackImage}
           alt={`${programName} courses`}
           fill

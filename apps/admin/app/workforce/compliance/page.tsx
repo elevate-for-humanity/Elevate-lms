@@ -13,7 +13,7 @@ export default async function CompliancePage() {
   const db = await createClient();
 
   const { data: participants } = await db
-    .from('workforce_participants')
+    .from('participants')
     .select('*');
 
   const compliant = participants?.filter(p => p.compliance_status === 'compliant').length || 0;

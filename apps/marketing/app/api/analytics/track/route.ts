@@ -6,6 +6,11 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const ANALYTICS_OUTAGE_BASE_MS = 30_000;
+const ANALYTICS_OUTAGE_MAX_MS = 15 * 60_000;
+let analyticsFailures = 0;
+let suppressWritesUntil = 0;
+
 function clean(value: unknown, max = 500): string | null {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
@@ -16,12 +21,19 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'public');
   if (rateLimited) return rateLimited;
 
-  const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return NextResponse.json({ ok: false }, { status: 400 });
 
   const path = clean(body.path, 1000);
   if (!path || !path.startsWith('/')) {
     return NextResponse.json({ ok: false, error: 'Invalid path' }, { status: 400 });
+  }
+
+  // Analytics is best-effort. During a Data API incident, do not let every
+  // page load add another doomed database request while operational traffic is
+  // trying to recover.
+  if (Date.now() < suppressWritesUntil) {
+    return NextResponse.json({ ok: true, recorded: false, deferred: true, degraded: true });
   }
 
   try {
@@ -38,10 +50,19 @@ export async function POST(request: NextRequest) {
       landing_path: clean(body.landing_path, 1000),
       created_at: new Date().toISOString(),
     });
-    if (error) return NextResponse.json({ ok: true, recorded: false });
+    if (error) throw new Error(error.message);
+    analyticsFailures = 0;
+    suppressWritesUntil = 0;
   } catch {
+    analyticsFailures += 1;
+    suppressWritesUntil =
+      Date.now() +
+      Math.min(
+        ANALYTICS_OUTAGE_MAX_MS,
+        ANALYTICS_OUTAGE_BASE_MS * 2 ** Math.min(analyticsFailures - 1, 5),
+      );
     // Analytics must never break the public experience.
-    return NextResponse.json({ ok: true, recorded: false });
+    return NextResponse.json({ ok: true, recorded: false, degraded: true });
   }
 
   return NextResponse.json({ ok: true, recorded: true });

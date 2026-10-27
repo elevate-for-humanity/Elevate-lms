@@ -110,11 +110,11 @@ export default async function BeautyApplySuccessPage({ params }: Props) {
           <p className="text-slate-500 text-sm mb-4">Questions? We&apos;re here to help.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
               className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition text-sm font-medium"
             >
               <Phone className="w-4 h-4" />
-              {PLATFORM_DEFAULTS.supportPhone}
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>
             <a
               href="mailto:info@elevateforhumanity.org"

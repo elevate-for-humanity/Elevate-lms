@@ -82,8 +82,9 @@ export async function generateTextToSpeech(
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
 
-  const selectedVoice = VALID_VOICES.includes(voice) ? voice : 'alloy';
-  const selectedSpeed = Math.max(0.25, Math.min(4.0, speed));
+  // One canonical narrator prevents audible identity changes between lessons.
+  const selectedVoice = process.env.ELEVATE_TTS_VOICE || 'alloy';
+  const selectedSpeed = Math.max(0.8, Math.min(1.0, speed));
 
   const chunks = chunkText(text);
   const buffers: Buffer[] = [];
@@ -105,9 +106,9 @@ export async function generateAndSaveAudio(
   options: TTSOptions = {},
 ): Promise<string> {
   try {
-    const { voice = 'alloy', speed = 1.0 } = options;
+    const { speed = 1.0 } = options;
 
-    const audioBuffer = await generateTextToSpeech(text, voice, speed);
+    const audioBuffer = await generateTextToSpeech(text, 'alloy', speed);
 
     // Ensure directory exists
     const dir = path.dirname(outputPath);
@@ -140,7 +141,6 @@ export async function generateMultipleAudio(
       const outputPath = path.join(outputDir, `segment-${i + 1}.mp3`);
 
       await generateAndSaveAudio(segment.text, outputPath, {
-        ...(segment.voice !== undefined ? { voice: segment.voice } : {}),
         ...(segment.speed !== undefined ? { speed: segment.speed } : {}),
       });
 

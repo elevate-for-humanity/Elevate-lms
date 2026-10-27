@@ -8,6 +8,9 @@ import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachin
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
+import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
+import { resolveCoursePreview } from '@/lib/admin/course-preview';
+import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -98,6 +101,54 @@ function teachingSlidesFromExperience(
   return authored.length ? authored.slice(0, 12) : teachingSlides(title, html);
 }
 
+function checkpointsFromTimeline(
+  timeline: Record<string, any> | undefined,
+  experience: Record<string, any> | null,
+): Checkpoint[] {
+  const events = Array.isArray(timeline?.events) ? timeline.events : [];
+  const questions = Array.isArray(experience?.knowledgeChecks) ? experience.knowledgeChecks : [];
+  let questionIndex = 0;
+  return events.flatMap((event: any): Checkpoint[] => {
+    const timestamp = Number(event?.at);
+    if (!Number.isFinite(timestamp) || event?.required === false) return [];
+    if (event.type === 'question') {
+      const question = questions[questionIndex++];
+      if (!question || !Array.isArray(question.options)) return [];
+      return [
+        {
+          type: 'quiz',
+          timestamp,
+          question: String(question.question),
+          options: question.options.map(String),
+          answer: Number(question.correct ?? question.correctAnswer),
+          explanation: question.explanation ? String(question.explanation) : undefined,
+        },
+      ];
+    }
+    if (event.type === 'remediation')
+      return [
+        { type: 'key-concept', timestamp, concept: `Required review: ${String(event.objective)}` },
+      ];
+    if (event.type === 'diagram')
+      return [
+        {
+          type: 'key-concept',
+          timestamp,
+          concept: 'Review the required technical diagram before continuing.',
+        },
+      ];
+    if (event.type === 'pause')
+      return [
+        {
+          type: 'key-concept',
+          timestamp,
+          concept: 'Pause and confirm the demonstrated step before continuing.',
+        },
+      ];
+    return [];
+  });
+}
+
 export default async function LessonPage({
   params,
 }: {
@@ -109,49 +160,55 @@ export default async function LessonPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user)
+  // Resolve a signed administrator preview before enforcing learner login. Deployment checkpoint: preview handoff fix.
+  // Course Builder preview handoffs are read-only and already validate the
+  // issuing admin/staff actor, so forcing them through learner authentication
+  // defeats the preview flow and causes the redirect loop.
+  const preview = await resolveCoursePreview(courseId);
+  if (!user && !preview.active)
     redirect(
       `/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`,
     );
+  const db = preview.active ? preview.db : supabase;
 
-  let courseQuery = supabase
+  let courseQuery = db
     .from('courses')
-    .select('id,title,slug,is_active')
-    .eq('is_active', true);
+    .select('id,title,slug,is_active');
+  if (!preview.active) courseQuery = courseQuery.eq('is_active', true);
   courseQuery = isUuid(courseId)
     ? courseQuery.eq('id', courseId)
     : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
 
-  const { data: lesson } = await supabase
+  let lessonQuery = db
     .from('course_lessons')
     .select(
       'id,module_id,title,slug,content,content_json,rendered_html,video_url,video_config,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index',
     )
     .eq('id', lessonId)
-    .eq('course_id', course.id)
-    .eq('is_published', true)
-    .maybeSingle();
+    .eq('course_id', course.id);
+  if (!preview.active) lessonQuery = lessonQuery.eq('is_published', true);
+  const { data: lesson } = await lessonQuery.maybeSingle();
   if (!lesson) notFound();
 
   const [{ data: orderedLessons }, { data: moduleRow }, { data: lessonVisual }] = await Promise.all(
     [
-      supabase
+      db
         .from('course_lessons')
         .select('id,title,order_index')
         .eq('course_id', course.id)
-        .eq('is_published', true)
+        .match(preview.active ? {} : { is_published: true })
         .order('order_index'),
       lesson.module_id
-        ? supabase
+        ? db
             .from('course_modules')
             .select('order_index')
             .eq('id', lesson.module_id)
             .eq('course_id', course.id)
             .maybeSingle()
         : Promise.resolve({ data: null }),
-      supabase
+      db
         .from('course_visual_assets')
         .select('asset_url,poster_url,alt_text,caption,media_type,metadata')
         .eq('course_id', course.id)
@@ -174,6 +231,24 @@ export default async function LessonPage({
   const keyTerms = Array.isArray(lesson.key_terms) ? lesson.key_terms : [];
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
   const experience = lessonExperience(lesson.content_json, lesson.content);
+  const interactiveVideo = experience?.interactiveVideo as Record<string, any> | undefined;
+  const instructionalTimeline = experience?.instructionalTimeline as
+    | Record<string, any>
+    | undefined;
+  const authoredVideoCheckpoints = Array.isArray(interactiveVideo?.checkpoints)
+    ? (interactiveVideo.checkpoints as Checkpoint[])
+    : [];
+  const videoCheckpoints = authoredVideoCheckpoints.length
+    ? authoredVideoCheckpoints
+    : checkpointsFromTimeline(instructionalTimeline, experience);
+  const videoTranscript = Array.isArray(interactiveVideo?.transcript)
+    ? interactiveVideo.transcript
+    : Array.isArray(instructionalTimeline?.captions)
+      ? instructionalTimeline.captions
+      : [];
+  const captionsUrl = [interactiveVideo?.captionsUrl, (lesson.content_json as any)?.film?.captionsUrl, (lesson.content_json as any)?.film?.sceneData?.captionUrl, experience?.film?.captionsUrl,
+    experience?.film?.sceneData?.captionUrl, experience?.media?.caption_url]
+    .find((value): value is string => typeof value === 'string' && /^https:\/\//.test(value));
   const slides = teachingSlidesFromExperience(lesson.title, lessonHtml, experience);
   const videoConfig =
     lesson.video_config && typeof lesson.video_config === 'object'
@@ -228,6 +303,7 @@ export default async function LessonPage({
   return (
     <LessonFocusShell header={lessonHeader}>
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+        {preview.active ? <div className="rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm font-black text-amber-950">Admin draft preview · Completion, assessment, and progress writes are disabled.</div> : null}
         {lessonVisual?.media_type === 'image' ? (
           <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
             <img
@@ -243,33 +319,29 @@ export default async function LessonPage({
           </figure>
         ) : null}
 
-        <AITeachingPlayer
+        {!lesson.video_url ? <AITeachingPlayer
           courseTitle={course.title}
           lessonTitle={lesson.title}
           instructorName={instructorName}
           instructorImage={instructorImage}
           visualImage={lessonVisual?.asset_url ?? lessonVisual?.poster_url ?? undefined}
           slides={slides}
-        />
+        /> : null}
 
         {lesson.video_url ? (
-          <details className="overflow-hidden rounded-3xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-orange-50 shadow-lg">
-            <summary className="cursor-pointer px-6 py-4 font-extrabold text-cyan-950">
-              Watch the produced lesson video
-            </summary>
-            <div className="border-t border-cyan-100 p-3">
-              <video
-                controls
-                preload="metadata"
-                playsInline
-                poster={lessonVisual?.poster_url ?? lessonVisual?.asset_url ?? undefined}
-                className="aspect-video w-full rounded-2xl bg-white"
-                src={lesson.video_url}
-              >
-                Your browser does not support HTML video.
-              </video>
+          <section aria-label="Instructional lesson video" className="overflow-hidden rounded-3xl border border-neutral-700 bg-neutral-900 shadow-lg">
+            <div className="p-3">
+              <InteractiveVideoPlayer
+                videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
+                title={lesson.title}
+                lessonId={lesson.id}
+                courseId={course.id}
+                checkpoints={videoCheckpoints}
+                transcript={videoTranscript}
+                captionsUrl={captionsUrl}
+              />
             </div>
-          </details>
+          </section>
         ) : null}
 
         {objectives.length ? (
@@ -318,7 +390,7 @@ export default async function LessonPage({
           </section>
         ) : null}
 
-        <InteractiveLessonExperience
+        {!preview.active ? <><InteractiveLessonExperience
           courseId={course.id}
           lessonSlug={lesson.slug}
           lessonId={lesson.id}
@@ -330,7 +402,7 @@ export default async function LessonPage({
           moduleOrder={moduleOrder}
           passingScore={passingScore}
           questions={questions as any[]}
-        />
+        /></> : null}
 
         <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
           {previous ? (

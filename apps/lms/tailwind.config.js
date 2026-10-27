@@ -8,6 +8,12 @@ export default {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './lib/**/*.{js,ts,jsx,tsx,mdx}',
+    // LMS portals import the shared shell, dashboards, navigation, and widgets
+    // from the repository root through the @ alias. Without these globs,
+    // production omits responsive utilities used only by shared components.
+    '../../components/**/*.{js,ts,jsx,tsx,mdx}',
+    '../../content/**/*.{js,ts,jsx,tsx,mdx}',
+    '../../lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {

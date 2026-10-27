@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, ArrowRight, CheckCircle, Clock, Play } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { courseOverviewPath } from '@/lib/lms/routes';
 
 export const metadata: Metadata = {
   title: 'Workbook | Apprentice Portal',
@@ -17,10 +20,34 @@ export default async function WorkbookPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/workbook');
 
-  if (!user) {
-    redirect('/login?redirect=/apprentice/workbook');
+  const { data: enrollment } = await db
+    .from('program_enrollments')
+    .select('id,course_id,program_slug')
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let courseTitle = 'No course assigned yet';
+  let totalLessons = 0;
+  let completedLessons = 0;
+  if (enrollment?.course_id) {
+    const [{ data: course }, lessonResult, completedResult] = await Promise.all([
+      db.from('courses').select('title').eq('id', enrollment.course_id).maybeSingle(),
+      db.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', enrollment.course_id).eq('is_published', true),
+      db.from('lesson_progress').select('id', { count: 'exact', head: true }).eq('user_id', subject.userId).eq('course_id', enrollment.course_id).eq('completed', true),
+    ]);
+    courseTitle = course?.title || 'Assigned apprenticeship course';
+    totalLessons = lessonResult.count || 0;
+    completedLessons = completedResult.count || 0;
   }
+  const inProgressLessons = Math.max(0, totalLessons - completedLessons);
+  const progressPercent = totalLessons ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;
+  const courseHref = enrollment?.course_id ? courseOverviewPath(enrollment.course_id) : '/lms/courses';
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -57,8 +84,8 @@ export default async function WorkbookPage() {
                 <BookOpen className="w-6 h-6 text-violet-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">0</p>
-                <p className="text-sm text-slate-500">Modules Completed</p>
+                <p className="text-2xl font-bold text-slate-900">{completedLessons}</p>
+                <p className="text-sm text-slate-500">Lessons Completed</p>
               </div>
             </div>
           </div>
@@ -68,8 +95,8 @@ export default async function WorkbookPage() {
                 <Clock className="w-6 h-6 text-amber-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">0</p>
-                <p className="text-sm text-slate-500">In Progress</p>
+                <p className="text-2xl font-bold text-slate-900">{inProgressLessons}</p>
+                <p className="text-sm text-slate-500">Lessons Remaining</p>
               </div>
             </div>
           </div>
@@ -79,7 +106,7 @@ export default async function WorkbookPage() {
                 <CheckCircle className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">0%</p>
+                <p className="text-2xl font-bold text-slate-900">{progressPercent}%</p>
                 <p className="text-sm text-slate-500">Overall Progress</p>
               </div>
             </div>
@@ -103,13 +130,13 @@ export default async function WorkbookPage() {
               Your apprenticeship workbook contains all the required training modules. 
               Complete each module to track your progress toward certification.
             </p>
-            <Link
-              href="/lms/my-courses"
+            {subject.previewing ? <p className="rounded-xl bg-white/15 px-5 py-3 text-sm font-bold">Admin preview is read-only. This learner can open assigned coursework from their own account.</p> : <Link
+              href={courseHref}
               className="inline-flex items-center gap-2 bg-white text-violet-700 px-8 py-4 rounded-xl font-bold hover:bg-white/90 transition shadow-lg"
             >
-              Go to My Courses
+              {enrollment?.course_id ? 'Open Assigned Course' : 'Go to My Courses'}
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </Link>}
           </div>
         </div>
 
@@ -124,16 +151,16 @@ export default async function WorkbookPage() {
                     <BookOpen className="w-6 h-6 text-violet-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">No modules assigned yet</h3>
-                    <p className="text-sm text-slate-500">Your training modules will appear here once assigned</p>
+                    <h3 className="font-semibold text-slate-900">{courseTitle}</h3>
+                    <p className="text-sm text-slate-500">{enrollment?.course_id ? `${completedLessons} of ${totalLessons} published lessons complete` : 'Training modules will appear here after staff assigns the RTI course.'}</p>
                   </div>
                 </div>
-                <Link 
-                  href="/lms/courses"
+                {!subject.previewing ? <Link
+                  href={courseHref}
                   className="text-violet-600 font-medium text-sm hover:underline"
                 >
-                  Browse Courses
-                </Link>
+                  {enrollment?.course_id ? 'Open Course' : 'View Courses'}
+                </Link> : null}
               </div>
             </div>
           </div>

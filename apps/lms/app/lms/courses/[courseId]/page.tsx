@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { BookOpen, CheckCircle2, Clock3, Gauge, PlayCircle, ShieldCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { resolveCoursePreview } from '@/lib/admin/course-preview';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Course | Elevate LMS', robots: { index: false, follow: false } };
@@ -25,17 +26,20 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}`)}`);
+  const preview = await resolveCoursePreview(courseId);
+  const db = preview.active ? preview.db : supabase;
 
-  let courseQuery = supabase.from('courses').select('id,title,slug,description,status,is_active,duration_hours,governing_standard_version').eq('is_active', true);
+  let courseQuery = db.from('courses').select('id,title,slug,description,status,is_active,duration_hours,governing_standard_version');
+  if (!preview.active) courseQuery = courseQuery.eq('is_active', true);
   courseQuery = isUuid(courseId) ? courseQuery.eq('id', courseId) : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
 
   const [{ data: modules }, { data: lessons }, { data: heroVisual }, { data: readinessData }] = await Promise.all([
-    supabase.from('course_modules').select('id,title,description,order_index,is_published').eq('course_id', course.id).eq('is_published', true).order('order_index'),
-    supabase.from('course_lessons').select('id,module_id,slug,title,lesson_type,order_index,duration_minutes,is_published').eq('course_id', course.id).eq('is_published', true).order('order_index'),
-    supabase.from('course_visual_assets').select('asset_url,poster_url,alt_text,caption,media_type,metadata').eq('course_id', course.id).eq('placement', 'hero').eq('is_active', true).order('sort_order').limit(1).maybeSingle(),
-    supabase.rpc('get_my_course_readiness', { p_course_id: course.id }),
+    db.from('course_modules').select('id,title,description,order_index,is_published').eq('course_id', course.id).match(preview.active ? {} : { is_published: true }).order('order_index'),
+    db.from('course_lessons').select('id,module_id,slug,title,lesson_type,order_index,duration_minutes,is_published').eq('course_id', course.id).match(preview.active ? {} : { is_published: true }).order('order_index'),
+    db.from('course_visual_assets').select('asset_url,poster_url,alt_text,caption,media_type,metadata').eq('course_id', course.id).eq('placement', 'hero').eq('is_active', true).order('sort_order').limit(1).maybeSingle(),
+    preview.active ? Promise.resolve({ data: [] }) : supabase.rpc('get_my_course_readiness', { p_course_id: course.id }),
   ]);
 
   const readiness = (readinessData ?? []) as ReadinessRow[];
@@ -48,6 +52,7 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
   const registeredContract = course.slug ? getRegisteredProgramStandard(course.slug) : null;
 
   return <main className="min-h-screen bg-slate-50 text-slate-950">
+    {preview.active ? <div className="sticky top-0 z-50 bg-amber-300 px-4 py-2 text-center text-sm font-black text-slate-950">Admin draft preview · Learner progress is not recorded</div> : null}
     <section className="border-b border-slate-200 bg-white"><div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       {heroVisual?.media_type === 'video' ? <figure className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl"><video className="aspect-[8/3] w-full object-cover motion-reduce:hidden" autoPlay muted loop playsInline preload="metadata" controls controlsList="nodownload" poster={heroVisual.poster_url || undefined} aria-label={heroVisual.alt_text}><source src={heroVisual.asset_url} type="video/mp4" /></video><img className="hidden aspect-[8/3] w-full object-cover motion-reduce:block" src={heroVisual.poster_url || '/images/barber-hero-new.webp'} alt={heroVisual.alt_text || course.title} />{firstLesson && heroCtaLabel ? <Link href={`/lms/courses/${course.id}/lessons/${firstLesson.id}`} className="absolute bottom-5 left-5 rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-slate-950 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-4 focus:ring-amber-200">{heroCtaLabel}</Link> : null}{heroVisual.caption ? <figcaption className="sr-only">{heroVisual.caption}</figcaption> : null}</figure> : heroVisual?.media_type === 'image' ? <figure className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-xl"><img className="aspect-[8/3] w-full object-cover" src={heroVisual.asset_url} alt={heroVisual.alt_text || course.title} />{heroVisual.caption ? <figcaption className="sr-only">{heroVisual.caption}</figcaption> : null}</figure> : null}
       <p className="text-sm font-bold uppercase tracking-[0.16em] text-cyan-800">Elevate LMS</p><h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{course.title}</h1><p className="mt-4 max-w-4xl text-base font-medium leading-7 text-slate-700">{course.description || 'Course lessons, checkpoints, and required assessments.'}</p>

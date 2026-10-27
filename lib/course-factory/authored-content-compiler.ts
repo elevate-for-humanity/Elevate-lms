@@ -6,6 +6,7 @@ import type {
   CredentialBlueprint,
 } from '@/lib/curriculum/blueprints/types';
 import { CourseExperienceSchema, type CourseExperience } from './experience-contract';
+import { compileLearningIntelligence } from './learning-intelligence';
 import { inferStepType } from './validator';
 
 const GENERIC_MARKERS = [
@@ -239,7 +240,10 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
   learningPoints: string[];
 } {
   const existing = CourseExperienceSchema.safeParse(input.existingExperience);
-  if (existing.success && !sourceIsGeneric(existing.data)) {
+  const existingTimelineComplete =
+    existing.success &&
+    (existing.data.instructionalTimeline?.scenes.length ?? 0) >= 6;
+  if (existing.success && existingTimelineComplete && !sourceIsGeneric(existing.data)) {
     const questions = (Array.isArray(input.quizQuestions) ? input.quizQuestions : [])
       .map((question, index) => normalizeQuestion(question, index, input.domainKey))
       .filter((question): question is AuthoredQuestion => Boolean(question));
@@ -255,7 +259,37 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
     };
   }
 
-  const { sourceText, sections } = authoredSections(input.html, input.lessonTitle);
+  const existingRecord =
+    input.existingExperience &&
+    typeof input.existingExperience === 'object' &&
+    !Array.isArray(input.existingExperience)
+      ? (input.existingExperience as Record<string, any>)
+      : {};
+  const existingGuide =
+    existingRecord.readingGuide &&
+    typeof existingRecord.readingGuide === 'object' &&
+    !Array.isArray(existingRecord.readingGuide)
+      ? (existingRecord.readingGuide as Record<string, any>)
+      : {};
+  const existingSections = Array.isArray(existingGuide.sections)
+    ? existingGuide.sections
+        .filter((section: unknown): section is Record<string, any> =>
+          Boolean(section && typeof section === 'object' && !Array.isArray(section)),
+        )
+        .map(
+          (section: Record<string, any>) =>
+            `<h2>${clean(section.heading)}</h2><p>${clean(section.body)}</p>`,
+        )
+        .join('')
+    : '';
+  const repairSource = clean(
+    `${existingGuide.summary ?? ''} ${existingRecord.content ?? ''} ${existingRecord.narrationScript ?? ''}`,
+  );
+  const repairHtml =
+    existingSections && clean(`${existingSections} ${repairSource}`).length >= 500
+      ? `${existingSections}<p>${repairSource}</p>`
+      : input.html;
+  const { sourceText, sections } = authoredSections(repairHtml, input.lessonTitle);
   const objectives = normalizedObjectives(input.learningObjectives, sections);
   if (objectives.length < 3)
     throw new Error(`${input.lessonTitle}: at least three authored objectives are required`);
@@ -317,6 +351,66 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
   const narrationScript = clean(
     `${input.lessonTitle}. ${objectives.join(' ')} ${sections.map((section) => `${section.heading}. ${section.body}`).join(' ')}`,
   ).slice(0, 12000);
+  const timelineScenes = [
+    {
+      id: `${input.lessonSlug}-scene-1`,
+      purpose: 'introduction' as const,
+      visualType: 'instructor' as const,
+      narration: clean(`${input.lessonTitle}. In this lesson you will ${objective0}`),
+      visualDirection: `Elevate instructor introduces ${input.lessonTitle} beside a labeled lesson roadmap.`,
+      onScreenText: [input.lessonTitle, objectiveLabel(objective0)],
+      sourceReferences: [`Authored lesson objective: ${objective0}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-2`,
+      purpose: 'explanation' as const,
+      visualType: 'animated-text' as const,
+      narration: clean(`${section0.heading}. ${section0.body}`),
+      visualDirection: `Readable teaching slide explaining ${section0.heading} with three concise evidence-based points.`,
+      onScreenText: [section0.heading, ...objectives.slice(0, 2).map(objectiveLabel)],
+      sourceReferences: [`Authored section: ${section0.heading}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-3`,
+      purpose: 'diagram' as const,
+      visualType: 'technical-diagram' as const,
+      narration: clean(`${section1.heading}. ${section1.body}`),
+      visualDirection: `Labeled technical diagram showing the sequence, decision points, and evidence for ${section1.heading}.`,
+      onScreenText: [section1.heading, 'Correct sequence', 'Evidence to check'],
+      sourceReferences: [`Authored section: ${section1.heading}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-4`,
+      purpose: 'demonstration' as const,
+      visualType: 'equipment-image' as const,
+      narration: clean(`Worked example. Apply this objective: ${objective0}. ${section2.body}`),
+      visualDirection: `Side-by-side correct and incorrect worked examples for ${input.lessonTitle}, with labels identifying the observable difference.`,
+      onScreenText: ['Worked example', 'Correct', 'Needs correction'],
+      sourceReferences: [`Authored section: ${section2.heading}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-5`,
+      purpose: 'practice' as const,
+      visualType: 'screen-demonstration' as const,
+      narration: clean(`Now practice: ${objective1}. Use the lesson evidence before choosing your response.`),
+      visualDirection: `Guided practice slide presenting a realistic ${input.lessonTitle} decision and visible evidence for the learner to inspect.`,
+      onScreenText: ['Your turn', question0.question],
+      sourceReferences: [`Authored assessment: ${question0.question}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-6`,
+      purpose: 'summary' as const,
+      visualType: 'animated-text' as const,
+      narration: clean(`Review the key lesson outcomes: ${objectives.slice(0, 3).join(' ')}`),
+      visualDirection: `Accessible recap slide with the three lesson outcomes and the completed-work evidence learners should retain.`,
+      onScreenText: ['Lesson recap', ...objectives.slice(0, 3).map(objectiveLabel)],
+      sourceReferences: sections.slice(0, 3).map((section) => `Authored section: ${section.heading}`),
+    },
+  ].map((scene, index) => ({
+    ...scene,
+    startTime: index * 60,
+    endTime: (index + 1) * 60,
+  }));
 
   const experience = CourseExperienceSchema.parse({
     readingGuide: {
@@ -404,6 +498,32 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
         `${input.lessonTitle} practical evidence`,
       ],
     },
+    instructionalTimeline: {
+      version: 1,
+      width: 1920,
+      height: 1080,
+      fps: 30,
+      durationSeconds: 360,
+      scenes: timelineScenes,
+      captions: timelineScenes.map((scene) => ({
+        start: scene.startTime,
+        end: scene.endTime,
+        text: scene.narration,
+      })),
+      events: [
+        {
+          type: 'question',
+          id: `${input.lessonSlug}-timeline-check`,
+          at: 300,
+          questionId: question0.id ?? `${input.lessonSlug}-q1`,
+          required: true,
+        },
+      ],
+      requiredWatchPercent: 95,
+      minimumSeatTimeSeconds: 300,
+      preventSeekPastRequiredEvents: true,
+      resumeEnabled: true,
+    },
   });
 
   return { experience, objectives, questions, learningPoints: objectives.slice(0, 5) };
@@ -449,17 +569,36 @@ function compileBlueprintLesson(
       { cause: error },
     );
   }
+  const stepType = inferStepType(lesson.slug);
+  const domainKey = clean(lesson.domainKey ?? courseModule.domainKey) || courseModule.slug;
+  const practical =
+    stepType === 'lab' ||
+    Boolean(courseModule.practicalRequired) ||
+    Boolean(lesson.practicalRequired) ||
+    Boolean(lesson.requiresVerification);
+  const intelligence = compileLearningIntelligence({
+    lessonSlug: lesson.slug,
+    lessonTitle: lesson.title,
+    domainKey,
+    competencyKeys: lesson.competencyKeys,
+    objectives: compiled.objectives,
+    masteryThreshold: 80,
+    critical: Boolean(courseModule.isCritical),
+    criticalMasteryThreshold: 100,
+    assessment: ['checkpoint', 'quiz', 'exam'].includes(stepType),
+    practical,
+  });
   const objective = lesson.objective ?? compiled.objectives[0];
   return {
     ...lesson,
-    stepType: inferStepType(lesson.slug),
+    stepType,
     ...(objective ? { objective } : {}),
     learningObjectives: compiled.objectives,
     content: JSON.stringify({
       ...content,
       html,
       learning_points: compiled.learningPoints,
-      experience: compiled.experience,
+      experience: { ...compiled.experience, intelligence },
     }),
     quizQuestions: compiled.questions.map((question, index) => ({
       id: question.id ?? `${lesson.slug}-q${index + 1}`,

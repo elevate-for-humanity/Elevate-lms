@@ -24,11 +24,11 @@ export const metadata: Metadata = {
     'AI business assistant',
     'no code website builder',
   ],
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/apps/website-builder' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/apps/website-builder' },
   openGraph: {
     title: 'AI Website Builder You Can Talk To | Elevate Store',
     description: 'Tell PARIS what you want and keep building by voice or text as your website changes.',
-    url: 'https://www.elevateforhumanity.org/store/apps/website-builder',
+    url: 'https://store.elevateforhumanity.org/store/apps/website-builder',
     type: 'website',
   },
 };
@@ -75,7 +75,7 @@ const jsonLd = {
   name: `Elevate ${catalog.displayName}`,
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
-  url: 'https://www.elevateforhumanity.org/store/apps/website-builder',
+  url: 'https://store.elevateforhumanity.org/store/apps/website-builder',
   description: 'Conversational AI website creation, editing, preview and publishing for businesses and training providers.',
   offers: catalog.plans.map((plan) => ({ '@type': 'Offer', price: String(plan.priceMonthly), priceCurrency: 'USD', category: `${plan.name} monthly subscription` })),
 };

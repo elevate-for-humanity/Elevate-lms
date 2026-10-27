@@ -23,7 +23,7 @@ check() {
   MATCHES=$(echo "$DIFF" | grep -E "$PATTERN" 2>/dev/null)
   if [ -n "$MATCHES" ]; then
     echo "BLOCKED: Possible secret — $LABEL"
-    echo "$MATCHES" | head -2
+    echo "Secret values are intentionally suppressed. Run pnpm security:credentials for safe file and line diagnostics."
     FOUND=1
   fi
 }
@@ -39,7 +39,7 @@ check "Private key block"  'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
 if [ "$FOUND" -eq 1 ]; then
   echo ""
   echo "Commit blocked. Use environment variables instead of hardcoded secrets."
-  echo "False positive? Use: git commit --no-verify"
+  echo "If this is a false positive, update the scanner's narrow allowlist with a documented reason."
   exit 1
 fi
 

@@ -78,6 +78,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     { itHelpDeskBlueprint },
     { entrepreneurshipBlueprint },
     { businessEntrepreneurshipBlueprint },
+    { retailIndustryFundamentalsBlueprint },
   ] = await Promise.all([
     import('./bookkeeping-quickbooks'),
     import('./barber-apprenticeship'),
@@ -92,6 +93,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     import('./it-help-desk'),
     import('./entrepreneurship'),
     import('./business-entrepreneurship'),
+    import('./retail-industry-fundamentals'),
   ]);
 
   const elevateEsbBlueprint: CredentialBlueprint = {
@@ -114,6 +116,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     itHelpDeskBlueprint,
     elevateEsbBlueprint,
     businessEntrepreneurshipBlueprint,
+    retailIndustryFundamentalsBlueprint,
   ].map(sanitizeBlueprint);
 
   const explicitProgramSlugs = new Set(explicitBlueprints.map((bp) => bp.programSlug));

@@ -1,5 +1,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
+import { loadPayPalConfig, verifyPayPalConnection } from '@/lib/integrations/paypal-client';
 
 export type HealthStatus = 'healthy' | 'degraded' | 'down';
 
@@ -111,38 +113,60 @@ export async function getSiteHealthSnapshot(): Promise<SiteHealthSnapshot> {
       };
     })(),
 
-    // Stripe
+    // QuickBooks invoice and accounting connection
     (async () => {
-      const configured = Boolean(process.env.STRIPE_SECRET_KEY);
+      const { latencyMs: configLatency, result: config, error: configError } = await timeCheck(() => loadQuickBooksConfig(db));
+      if (configError || !config) {
+        return { name: 'QuickBooks', status: 'degraded' as HealthStatus, latencyMs: configLatency, detail: 'QuickBooks configuration unavailable' };
+      }
+      const configured = Boolean(config.clientId && config.clientSecret && config.accessToken && config.refreshToken && config.realmId);
       if (!configured) {
         return {
-          name: 'Stripe',
+          name: 'QuickBooks',
           status: 'down' as HealthStatus,
           latencyMs: null,
-          detail: 'STRIPE_SECRET_KEY not set',
+          detail: 'QuickBooks connection needs authorization',
         };
       }
       const { latencyMs, error } = await timeCheck(async () => {
-        const res = await fetch('https://api.stripe.com/v1/balance', {
-          headers: {
-            Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-          },
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        await quickBooksRequest(db, config, `companyinfo/${config.realmId}`);
       });
       if (error) {
         return {
-          name: 'Stripe',
+          name: 'QuickBooks',
           status: 'degraded' as HealthStatus,
           latencyMs,
           detail: error instanceof Error ? error.message : 'API check failed',
         };
       }
       return {
-        name: 'Stripe',
+        name: 'QuickBooks',
         status: 'healthy' as HealthStatus,
         latencyMs,
-        detail: 'API key valid',
+        detail: 'Company connection responding',
+      };
+    })(),
+
+    // PayPal recurring-payment authorization connection
+    (async () => {
+      const { latencyMs: configLatency, result: config, error: configError } = await timeCheck(loadPayPalConfig);
+      if (configError || !config) {
+        return { name: 'PayPal Billing', status: 'degraded' as HealthStatus, latencyMs: configLatency, detail: 'PayPal configuration unavailable' };
+      }
+      if (!config.clientId || !config.clientSecret || !config.billingWebhookId) {
+        return {
+          name: 'PayPal Billing',
+          status: 'down' as HealthStatus,
+          latencyMs: null,
+          detail: 'PayPal billing credentials or webhook ID missing',
+        };
+      }
+      const { latencyMs, error } = await timeCheck(verifyPayPalConnection);
+      return {
+        name: 'PayPal Billing',
+        status: (error ? 'degraded' : 'healthy') as HealthStatus,
+        latencyMs,
+        detail: error ? (error instanceof Error ? error.message : 'Connection check failed') : 'Authentication responding',
       };
     })(),
 

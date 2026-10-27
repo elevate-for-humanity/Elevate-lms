@@ -13,8 +13,10 @@ function persistConsent(choice: ConsentChoice) {
   const expiryDate = new Date();
   expiryDate.setFullYear(expiryDate.getFullYear() + 1);
   document.cookie = `${CONSENT_COOKIE}=${choice}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-  localStorage.setItem(CONSENT_STORAGE, choice);
-  localStorage.setItem('cookie-consent-date', new Date().toISOString());
+  try {
+    localStorage.setItem(CONSENT_STORAGE, choice);
+    localStorage.setItem('cookie-consent-date', new Date().toISOString());
+  } catch { /* The consent cookie and current choice still work in privacy mode. */ }
   window.dispatchEvent(new CustomEvent('efh:cookie-consent', { detail: { choice } }));
 }
 
@@ -23,7 +25,6 @@ export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
   const bannerRef = useRef<HTMLDivElement>(null);
-  const firstFocusRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -37,7 +38,11 @@ export default function CookieConsent() {
       return null;
     };
 
-    const saved = getCookie(CONSENT_COOKIE) || localStorage.getItem(CONSENT_STORAGE);
+    let saved = getCookie(CONSENT_COOKIE);
+    if (!saved) {
+      try { saved = localStorage.getItem(CONSENT_STORAGE); }
+      catch { /* Missing optional storage must not crash the public layout. */ }
+    }
     if (saved === 'accepted') {
       updateConsent(true, true);
       return;
@@ -77,26 +82,10 @@ export default function CookieConsent() {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (!bannerRef.current) return;
+      if (!bannerRef.current?.contains(document.activeElement)) return;
       if (event.key === 'Escape') {
         event.preventDefault();
         handleReject();
-        return;
-      }
-      if (event.key !== 'Tab') return;
-
-      const focusable = bannerRef.current.querySelectorAll<HTMLElement>(
-        'button, a[href], [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
       }
     },
     [handleReject],
@@ -105,10 +94,8 @@ export default function CookieConsent() {
   useEffect(() => {
     if (!isVisible) return;
     document.addEventListener('keydown', handleKeyDown);
-    const focusTimer = window.setTimeout(() => firstFocusRef.current?.focus(), 100);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      window.clearTimeout(focusTimer);
     };
   }, [isVisible, handleKeyDown]);
 
@@ -121,15 +108,14 @@ export default function CookieConsent() {
       aria-modal="false"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-description"
-      className={`fixed inset-x-0 bottom-0 z-[9999] transition-transform duration-300 ${
-        isVisible ? 'translate-y-0' : 'translate-y-full'
-      }`}
+      className="w-full"
+      hidden={!isVisible}
     >
-      <div className="border-t-2 border-slate-200 bg-white shadow-2xl">
-        <div className="mx-auto max-w-7xl px-4 py-5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-2">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div className="max-w-3xl">
-              <h2 id="cookie-consent-title" className="font-semibold text-slate-950">
+              <h2 id="cookie-consent-title" className="text-sm font-semibold text-slate-950">
                 Cookie preferences
               </h2>
               <p
@@ -149,7 +135,6 @@ export default function CookieConsent() {
 
             <div className="flex flex-wrap items-center gap-2">
               <button
-                ref={firstFocusRef}
                 type="button"
                 onClick={handleReject}
                 className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
@@ -183,7 +168,9 @@ export default function CookieConsent() {
 
 export function hasUserConsented(): boolean | null {
   if (typeof window === 'undefined') return null;
-  const consent = localStorage.getItem(CONSENT_STORAGE);
+  let consent: string | null = null;
+  try { consent = localStorage.getItem(CONSENT_STORAGE); }
+  catch { return null; }
   if (!consent) return null;
   return consent === 'accepted';
 }

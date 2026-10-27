@@ -100,12 +100,18 @@ export function HomeEmployerStrip() {
               src="/images/pages/for-employers-page-1.webp"
               alt={`Employer partner meeting with ${PLATFORM_DEFAULTS.orgName} team`}
               fill
-              className="object-cover object-top"
+              className="object-contain object-top"
               sizes="(max-width: 1024px) 100vw, 50vw"
               loading="lazy"
               placeholder="empty"
             />
           </div>
+        </div>
+
+        <div className="mb-8 flex flex-wrap gap-3">
+          <Link href="/apply/program-holder" className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-800">Apply as a Program Holder</Link>
+          <Link href="/partners/apply" className="inline-flex min-h-11 items-center rounded-lg border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-bold text-brand-blue-900 hover:bg-sky-50">Apply as a Partner</Link>
+          <Link href="/apply/employer" className="inline-flex min-h-11 items-center rounded-lg border-2 border-slate-900 px-5 py-2.5 text-sm font-bold text-slate-950 hover:bg-white">Apply as an Employer</Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -119,7 +125,7 @@ export function HomeEmployerStrip() {
                   src={path.img}
                   alt={path.imgAlt}
                   fill
-                  className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  className="object-contain object-top transition-transform duration-500 "
                   sizes="(max-width: 768px) 100vw, 33vw"
                   loading="lazy"
                   placeholder="empty"

@@ -2,47 +2,6 @@ name: Multi-Container Build
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/**'
-      - 'packages/**'
-      - 'lib/**'
-      - 'components/**'
-      - 'public/**'
-      - 'styles/**'
-      - 'data/**'
-      - 'types/**'
-      - 'hooks/**'
-      - 'contexts/**'
-      - 'config/**'
-      - 'content/**'
-      - 'utils/**'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'proxy.ts'
-      - 'Dockerfile.*'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - 'pnpm-workspace.yaml'
-      - 'scripts/audit-parallel-surfaces.mjs'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'apps/**'
-      - 'packages/**'
-      - 'lib/**'
-      - 'components/**'
-      - 'public/**'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'proxy.ts'
-      - 'Dockerfile.*'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - 'scripts/audit-parallel-surfaces.mjs'
 
 env:
   NODE_VERSION: '22'

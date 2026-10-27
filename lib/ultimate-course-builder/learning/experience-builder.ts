@@ -1,0 +1,2 @@
+export const ULTIMATE_LEARNING_OBJECTS=['introduction','objectives','prerequisite_check','instruction','demonstration','knowledge_check','guided_practice','independent_practice','scenario','mistake_correction','practical','lesson_assessment','remediation','reassessment','summary','mastery_decision'] as const;
+export function requiredLearningExperience(){return ULTIMATE_LEARNING_OBJECTS.map((type,index)=>({id:`ultimate-${index+1}`,type,order:index+1,required:!['scenario','practical'].includes(type)}));}

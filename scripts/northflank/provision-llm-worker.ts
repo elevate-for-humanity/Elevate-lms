@@ -9,26 +9,26 @@
  * Run with --execute to apply. Without it, only preflight runs.
  */
 import crypto from 'node:crypto';
-import { nfFetch, projectApiPath } from './lib';
+import { deploymentServiceCreatePath, deploymentServicePatchPath, nfFetch, projectApiPath } from './lib';
 
 const WEB_PROJECT_ID = process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 const GPU_PROJECT_ID = process.env.NORTHFLANK_LLM_PROJECT_ID || 'elevate-media-gpu';
 const GPU_REGION = process.env.NORTHFLANK_GPU_REGION || 'us-central';
 const SERVICE_ID = process.env.NORTHFLANK_LLM_SERVICE_ID || 'elevate-llm-worker';
 const ADMIN_SERVICE_ID = process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
-const MODEL_VOLUME_ID = process.env.NORTHFLANK_LLM_MODEL_VOLUME_ID || 'elevate-llm-models';
+const MODEL_VOLUME_ID = process.env.NORTHFLANK_LLM_MODEL_VOLUME_ID || 'elevate-llm-models-rwx';
 const MODEL_VOLUME_MB = Number(process.env.NORTHFLANK_LLM_MODEL_VOLUME_MB || '81920');
-const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nvme';
+const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nf-multi-rw';
 const GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE || 'l4-24';
 const GPU_COUNT = Number(process.env.NORTHFLANK_GPU_COUNT || '1');
 const GPU_DEPLOYMENT_PLAN = process.env.NORTHFLANK_LLM_DEPLOYMENT_PLAN || `nf-gpu-${GPU_TYPE}-${GPU_COUNT}g`;
 const BUILD_PLAN = process.env.NORTHFLANK_GPU_BUILD_PLAN || 'nf-compute-800-16';
 const GPU_DEPLOYMENT_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_EPHEMERAL_MB || '256000');
-const BUILD_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_BUILD_EPHEMERAL_MB || '32768');
+const BUILD_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_BUILD_EPHEMERAL_MB || '65536');
 const LLM_MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
 const RUNTIME_PORT = 8080;
 const REPO = 'https://github.com/elevate-for-humanity/Elevate-lms';
-const DOCKERFILE = '/services/llm-gpu-worker/Dockerfile';
+const VLLM_IMAGE = process.env.NORTHFLANK_LLM_IMAGE || 'vllm/vllm-openai:v0.10.1.1';
 const BUILD_TIMEOUT_MS = Number(process.env.LLM_PROVISION_BUILD_TIMEOUT_MS || 60 * 60 * 1000);
 const READY_TIMEOUT_MS = Number(process.env.LLM_PROVISION_READY_TIMEOUT_MS || 60 * 60 * 1000);
 
@@ -67,14 +67,14 @@ async function preflight() {
 
 async function ensureVolume(): Promise<string> {
   const volumes = arrayFrom(await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes')), 'volumes');
-  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID || item.name === 'Elevate LLM Models');
+  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID);
   if (!volume) {
     volume = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes'), {
       method: 'POST',
       body: JSON.stringify({
-        name: 'Elevate LLM Models',
+        name: 'Elevate LLM Models RWX',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
-        spec: { storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
+        spec: { accessMode: 'ReadWriteMany', storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
       }),
     });
     log('Created model volume', { id: volume.id, storageSize: MODEL_VOLUME_MB });
@@ -91,34 +91,47 @@ async function serviceExists() {
   }
 }
 
-function servicePayload(volumeId: string): R {
+async function waitForServiceDeletion() {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    try {
+      await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (/404|not found/i.test(message)) return;
+      throw error;
+    }
+    await sleep(2_000);
+  }
+  throw new Error(`Timed out waiting for Northflank to release service id ${SERVICE_ID}`);
+}
+
+function deploymentPayload(volumeId: string): R {
   const gpu = { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } };
+  const command = [
+    'exec python3 -m vllm.entrypoints.openai.api_server' +
+      ' --model "$LLM_MODEL"' +
+      ' --served-model-name elevate-local' +
+      ' --api-key "$LLM_WORKER_SECRET"' +
+      ' --host 0.0.0.0 --port "$PORT"' +
+      ' --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION:-0.90}"' +
+      ' --max-model-len "${MAX_MODEL_LEN:-8192}"' +
+      ' --download-dir "$HF_HOME"' +
+      ' ${VLLM_EXTRA_ARGS:-}',
+  ].join(' ');
   return {
     name: SERVICE_ID,
     description: 'Elevate self-hosted LLM inference worker (vLLM, OpenAI-compatible)',
-    billing: { deploymentPlan: GPU_DEPLOYMENT_PLAN, buildPlan: BUILD_PLAN, gpu },
+    billing: { deploymentPlan: GPU_DEPLOYMENT_PLAN, gpu },
     infrastructure: { architecture: 'x86' },
-    buildSource: 'git',
-    disabledCI: true,
-    vcsData: { projectUrl: REPO, projectType: 'github', projectBranch: 'main' },
-    buildSettings: {
-      storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_MB } },
-      dockerfile: {
-        buildEngine: 'buildkit',
-        dockerFilePath: DOCKERFILE,
-        dockerWorkDir: '/',
-        buildkit: { useCache: true, cacheStorageSize: 16384 },
-      },
-    },
-    buildConfiguration: {
-      storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_MB } },
-      ciIgnoreFlagsEnabled: true,
-      ciIgnoreFlags: ['[skip ci]', '[ci skip]', '[northflank skip]', '[skip northflank]'],
-    },
     deployment: {
       type: 'deployment',
       instances: 1,
-      docker: { configType: 'default' },
+      external: { imagePath: VLLM_IMAGE },
+      docker: {
+        configType: 'customEntrypointCustomCommand',
+        customEntrypoint: '/bin/sh -c',
+        customCommand: `'${command}'`,
+      },
       gpu,
       storage: { shmSize: 16384, ephemeralStorage: { storageSize: GPU_DEPLOYMENT_EPHEMERAL_MB } },
       strategy: { type: 'recreate' },
@@ -136,19 +149,69 @@ function servicePayload(volumeId: string): R {
 }
 
 async function ensureService(volumeId: string) {
-  const payload = servicePayload(volumeId);
-  if (await serviceExists()) {
-    await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`), { method: 'PUT', body: JSON.stringify(payload) });
-    log('Updated LLM worker service');
+  const payload = deploymentPayload(volumeId);
+  let existing: R | null = null;
+  try {
+    existing = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/404|not found/i.test(message)) throw error;
+  }
+
+  const isBuildBacked = Boolean(
+    existing?.buildSource ||
+    existing?.vcsData ||
+    existing?.buildSettings ||
+    existing?.billing?.buildPlan,
+  );
+  const hasTargetVolume = existing ? collectStrings(existing).includes(volumeId) : false;
+  if (existing && (isBuildBacked || !hasTargetVolume)) {
+    await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`), { method: 'DELETE' });
+    await waitForServiceDeletion();
+    existing = null;
+    log('Recreated LLM service boundary for deployment-only image and GPU-compatible volume');
+  }
+
+  if (existing) {
+    await nfFetch(deploymentServicePatchPath(GPU_PROJECT_ID, SERVICE_ID), {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+    log('Updated deployment-only LLM worker service');
   } else {
-    await nfFetch(projectApiPath(GPU_PROJECT_ID, '/services'), { method: 'POST', body: JSON.stringify(payload) });
-    log('Created LLM worker service');
+    await nfFetch(deploymentServiceCreatePath(GPU_PROJECT_ID), {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    log('Created deployment-only LLM worker service');
   }
 }
-
-async function triggerBuild() {
+async function triggerBuild(): Promise<string | undefined> {
   const result = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build`), { method: 'POST', body: '{}' });
   log('Triggered build', result);
+  return typeof result.id === 'string' ? result.id : undefined;
+}
+
+async function reportBuildFailure(buildId?: string) {
+  const query = new URLSearchParams({ queryType: 'range', lineLimit: '250', direction: 'backward' });
+  if (buildId) query.set('buildId', buildId);
+  try {
+    const entries = arrayFrom(
+      await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build-logs?${query}`)),
+    );
+    const lines = entries
+      .map((entry) => typeof entry.log === 'string' ? entry.log : '')
+      .filter(Boolean)
+      .reverse();
+    if (lines.length) {
+      console.error('[llm-provision] Northflank build log tail:\n' + lines.join('\n'));
+    } else {
+      console.error('[llm-provision] Northflank returned no build log lines');
+    }
+  } catch (error) {
+    console.error('[llm-provision] Unable to retrieve Northflank build logs',
+      error instanceof Error ? error.message : String(error));
+  }
 }
 
 function buildStatus(service: R) { return service.status?.build?.status || service.build?.status || service.buildStatus; }
@@ -162,10 +225,11 @@ async function waitForDeployment(): Promise<R> {
     const service = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
     const status = `${buildStatus(service) || 'unknown'}/${deploymentStatus(service) || 'unknown'}`;
     if (status !== previous) { log(`Service status ${status}`); previous = status; }
-    if (failed.has(buildStatus(service) || '') || failed.has(deploymentStatus(service) || '')) {
+    if (failed.has(deploymentStatus(service) || '')) {
       throw new Error(`LLM service failed: ${status}`);
     }
-    if (buildStatus(service) === 'SUCCESS' && deploymentStatus(service) === 'COMPLETED') return service;
+    const build = buildStatus(service);
+    if ((!build || build === 'SUCCESS') && deploymentStatus(service) === 'COMPLETED') return service;
     await sleep(15_000);
   }
   throw new Error('Timed out waiting for LLM build/deployment');
@@ -208,16 +272,11 @@ async function upsertSecretGroup(projectId: string, id: string, serviceId: strin
     restrictions: { restricted: true, nfObjects: [{ id: serviceId, type: 'service' }], tagMatchCondition: 'or' },
     secrets: { variables },
   };
-  try {
-    await nfFetch(projectApiPath(projectId, `/secrets/${id}`));
-    await nfFetch(projectApiPath(projectId, `/secrets/${id}`), { method: 'POST', body: JSON.stringify(payload) });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (!/404|not found/i.test(message)) throw error;
-    await nfFetch(projectApiPath(projectId, '/secrets'), { method: 'POST', body: JSON.stringify(payload) });
-  }
+  await nfFetch(projectApiPath(projectId, '/secrets'), {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 }
-
 async function restart(projectId: string, serviceId: string) {
   await nfFetch(projectApiPath(projectId, `/services/${serviceId}/restart`), { method: 'POST', body: '{}' });
 }
@@ -268,14 +327,20 @@ async function main() {
   if (!execute) return;
 
   const volumeId = await ensureVolume();
-  await ensureService(volumeId);
-  await triggerBuild();
-  const deployed = await waitForDeployment();
-  const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
   const workerSecret = crypto.randomBytes(32).toString('hex');
   console.log(`::add-mask::${workerSecret}`);
-  await wireSecrets(publicUrl, workerSecret);
-  await Promise.all([restart(GPU_PROJECT_ID, SERVICE_ID), restart(WEB_PROJECT_ID, ADMIN_SERVICE_ID)]);
+  await ensureService(volumeId);
+  await upsertSecretGroup(GPU_PROJECT_ID, 'elevate-llm-worker-env', SERVICE_ID, {
+    LLM_WORKER_SECRET: workerSecret,
+  });
+  await restart(GPU_PROJECT_ID, SERVICE_ID);
+  const deployed = await waitForDeployment();
+  const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
+  await upsertSecretGroup(WEB_PROJECT_ID, 'elevate-llm-client-env', ADMIN_SERVICE_ID, {
+    ELEVATE_LLM_URL: publicUrl,
+    ELEVATE_LLM_SECRET: workerSecret,
+  });
+  await restart(WEB_PROJECT_ID, ADMIN_SERVICE_ID);
   await acceptanceChat(publicUrl, workerSecret);
   log('LLM INFERENCE ACCEPTANCE PASSED', { gpuProject: GPU_PROJECT_ID, service: SERVICE_ID, publicUrl, model: LLM_MODEL });
 }

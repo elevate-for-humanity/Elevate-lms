@@ -1,8 +1,7 @@
 name: ESB Video Recovery Test
 
 on:
-  issues:
-    types: [opened]
+  workflow_dispatch:
 
 permissions:
   contents: read

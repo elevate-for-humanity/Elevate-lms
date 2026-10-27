@@ -1,8 +1,8 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { setAuditContext } from '@/lib/audit-context';
+import { resolveDocumentStorageLocator } from '@/lib/admin/document-record';
 
-/** Only bucket admin document access is allowed to sign from */
 const DOCUMENT_BUCKET = 'documents';
 
 /**
@@ -26,42 +26,48 @@ export async function getAdminDocumentUrl(params: {
 
   const db = await requireAdminClient();
   if (!db) return null;
-  await setAuditContext(db, { actorUserId: adminId, systemActor: 'admin_document_access' });
+  await setAuditContext(db, {
+    actorUserId: adminId,
+    systemActor: 'admin_document_access',
+  });
 
   if (!documentId) return null;
 
   // DB is the sole source of truth for document metadata
   const { data: doc } = await db
     .from('documents')
-    .select('file_path, user_id, document_type')
+    .select('file_path, file_url, metadata, user_id, document_type')
     .eq('id', documentId)
     .maybeSingle();
 
-  if (!doc?.file_path) return null;
+  if (!doc) return null;
+  const locator = resolveDocumentStorageLocator(doc);
+  if (!locator) return null;
 
   // Generate short-lived signed URL (60s)
-  const { data, error } = await db.storage.from(DOCUMENT_BUCKET).createSignedUrl(doc.file_path, 60);
+  const { data, error } = await db.storage.from(locator.bucket).createSignedUrl(locator.path, 60);
 
   if (error || !data?.signedUrl) return null;
 
   // Log access to immutable audit trail
   // created_at is omitted — DB default now() is the authoritative timestamp
   try {
-    await db
-      .from('admin_audit_events')
-      .insert({
-        actor_user_id: adminId,
-        action: 'DOCUMENT_URL_ISSUED',
-        target_type: 'document',
-        target_id: documentId,
-        metadata: {
-          document_owner_id: doc.user_id,
-          document_type: doc.document_type,
-          context: context || 'server_render',
-        },
-      });
+    await db.from('admin_audit_events').insert({
+      actor_user_id: adminId,
+      action: 'DOCUMENT_URL_ISSUED',
+      target_type: 'document',
+      target_id: documentId,
+      metadata: {
+        document_owner_id: doc.user_id,
+        document_type: doc.document_type,
+        storage_bucket: locator.bucket,
+        context: context || 'server_render',
+      },
+    });
   } catch (err) {
-    logger.warn('[DocumentAccess] Audit log failed', { error: err instanceof Error ? err.message : err });
+    logger.warn('[DocumentAccess] Audit log failed', {
+      error: err instanceof Error ? err.message : err,
+    });
   }
 
   return data.signedUrl;
@@ -83,12 +89,18 @@ export async function getAdminDocumentUrlByPath(params: {
 
   const db = await requireAdminClient();
   if (!db) return result;
-  await setAuditContext(db, { actorUserId: adminId, systemActor: 'admin_document_access' });
+  await setAuditContext(db, {
+    actorUserId: adminId,
+    systemActor: 'admin_document_access',
+  });
 
   const urlPromises = filePaths.map(async (filePath) => {
     try {
       const { data, error } = await db.storage.from(DOCUMENT_BUCKET).createSignedUrl(filePath, 60);
-      return { filePath, url: error || !data?.signedUrl ? null : data.signedUrl };
+      return {
+        filePath,
+        url: error || !data?.signedUrl ? null : data.signedUrl,
+      };
     } catch {
       return { filePath, url: null };
     }

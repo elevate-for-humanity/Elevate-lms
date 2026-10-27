@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import {
   Users, Building2, Plus, Pencil, Trash2, Save,
   X, ChevronDown, ChevronUp, RefreshCw, CheckCircle, AlertTriangle,
@@ -286,14 +287,17 @@ export default function ContentManagerClient() {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white">Content Management</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Edit site content without code changes. Changes go live immediately.</p>
+          <h1 className="text-xl font-bold text-white">Website Directory Content</h1>
+          <p className="text-slate-400 text-sm mt-0.5">Manage team and training-partner records. Deactivation is reversible.</p>
         </div>
-        <button onClick={() => tab === 'team' ? loadTeam() : loadPartners()} disabled={loading} className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 text-sm transition-colors disabled:opacity-50">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href="/website-editor" className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700">Edit website pages</Link>
+          <button aria-label="Refresh directory" onClick={() => tab === 'team' ? loadTeam() : loadPartners()} disabled={loading} className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 text-sm transition-colors disabled:opacity-50">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}

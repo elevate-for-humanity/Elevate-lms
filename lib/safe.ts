@@ -17,10 +17,20 @@ export const num = (v: any, fallback: number | null = null) =>
 export const bool = (v: any, fallback: boolean | null = null) =>
   typeof v === 'boolean' ? v : fallback;
 
+function parseDateValue(value: string | number): Date {
+  // Date-only values represent a calendar day, not a UTC instant. Parsing
+  // YYYY-MM-DD with the Date constructor shifts the displayed day west of UTC.
+  if (typeof value === 'string') {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+    if (match) return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+  return new Date(value);
+}
+
 export const date = (v: any, fallback: Date | null = null) => {
   if (v instanceof Date) return v;
   if (typeof v === 'string' || typeof v === 'number') {
-    const d = new Date(v);
+    const d = parseDateValue(v);
     return isNaN(d.getTime()) ? fallback : d;
   }
   return fallback;
@@ -29,9 +39,16 @@ export const date = (v: any, fallback: Date | null = null) => {
 export const arr = <T = unknown>(v: any): T[] => (Array.isArray(v) ? v : []);
 
 export const toDateString = (value: any): string => {
-  if (value instanceof Date) return value.toLocaleDateString();
+  if (value instanceof Date) {
+    // Preserve the UTC calendar date for date-only Date instances.
+    return new Date(
+      value.getUTCFullYear(),
+      value.getUTCMonth(),
+      value.getUTCDate(),
+    ).toLocaleDateString();
+  }
   if (typeof value === 'string' || typeof value === 'number') {
-    const d = new Date(value);
+    const d = parseDateValue(value);
     return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString();
   }
   return '';

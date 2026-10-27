@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase
     .from('testing_slots')
     .select('id, exam_type, start_time, end_time, capacity, booked_count, location')
-    .eq('exam_type', examType)
+    // `all` is a shared mixed-provider session. Capacity is enforced on the
+    // single shared row, so six seats means six people total—not six per
+    // provider.
+    .in('exam_type', [examType, 'all'])
     .eq('is_cancelled', false)
     .gte('start_time', earliestStart)
     .order('start_time', { ascending: true })

@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const warnings: string[] = [];
 
     const [generalResult, aiResult] = await Promise.all([
-      db.from('workflows').select('*').order('created_at', { ascending: false }).limit(100),
+      db.from('workflows').select('*,workflow_triggers(enabled),workflow_steps(enabled)').order('created_at', { ascending: false }).limit(100),
       db.from('ai_tasks').select('*').order('created_at', { ascending: false }).limit(100),
     ]);
 
@@ -61,22 +61,27 @@ export async function GET(request: NextRequest) {
       console.error('[admin/workflows/unified] workflows query failed', generalResult.error);
       warnings.push('General workflow records are temporarily unavailable.');
     } else {
-      generalWorkflows = (generalResult.data ?? []).map((w): UnifiedWorkflow => ({
-        id: w.id,
-        title: w.name,
-        description: ((w.metadata as Record<string, unknown> | null)?.description as string) ?? null,
-        type: 'general',
-        category: w.category ?? 'system',
-        status: w.status ?? 'inactive',
-        created_at: w.created_at,
-        updated_at: w.last_run_at ?? w.updated_at ?? w.created_at,
-        last_run_at: w.last_run_at ?? null,
-        last_run_status: w.last_run_status ?? null,
-        run_count: w.run_count ?? 0,
-        workflow_key: w.workflow_key ?? null,
-        trigger_count: w.trigger_count ?? 0,
-        step_count: w.step_count ?? 0,
-      }));
+      generalWorkflows = (generalResult.data ?? []).map((w): UnifiedWorkflow => {
+        const triggerCount = Number(w.workflow_triggers?.filter((trigger: { enabled: boolean }) => trigger.enabled).length ?? 0);
+        const stepCount = Number(w.workflow_steps?.filter((step: { enabled: boolean }) => step.enabled).length ?? 0);
+        const executable = triggerCount > 0 && stepCount > 0;
+        return {
+          id: w.id,
+          title: w.name,
+          description: ((w.metadata as Record<string, unknown> | null)?.description as string) ?? null,
+          type: 'general',
+          category: w.category ?? 'system',
+          status: executable ? (w.status ?? 'inactive') : 'incomplete',
+          created_at: w.created_at,
+          updated_at: w.last_run_at ?? w.updated_at ?? w.created_at,
+          last_run_at: w.last_run_at ?? null,
+          last_run_status: w.last_run_status ?? null,
+          run_count: w.run_count ?? 0,
+          workflow_key: w.workflow_key ?? null,
+          trigger_count: triggerCount,
+          step_count: stepCount,
+        };
+      });
     }
 
     if (aiResult.error) {
@@ -96,11 +101,15 @@ export async function GET(request: NextRequest) {
           updated_at: t.updated_at ?? t.created_at,
           last_run_at: t.updated_at ?? null,
           last_run_status: t.status ?? null,
-          run_count: 1,
+          run_count: 0,
           prompt: typeof config.prompt === 'string' ? config.prompt : null,
           agent_name: typeof config.agent_name === 'string' ? config.agent_name : null,
         };
       });
+    }
+
+    if ((generalResult.data?.length ?? 0) === 100 || (aiResult.data?.length ?? 0) === 100) {
+      warnings.push('Showing up to the latest 100 records of each type. Summary counts cover the displayed records.');
     }
 
     const workflows = [...generalWorkflows, ...aiTasks].sort(

@@ -103,7 +103,7 @@ export default async function FactsVaultPage() {
         )}
 
         {/* Summary */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
           {[
             { label: 'Approved', count: approved, icon: CheckCircle2, cls: 'text-green-600' },
             { label: 'Pending Review', count: pending, icon: Clock, cls: 'text-amber-600' },

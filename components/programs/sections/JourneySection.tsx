@@ -23,12 +23,12 @@ export function JourneySection({
   return (
     <section className="py-12 lg:py-16 px-4 relative overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-rose-50/30" />
-      
+
+
       {/* Decorative shapes */}
       <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-brand-red-500/5 to-transparent rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-tl from-amber-500/5 to-transparent rounded-full blur-3xl" />
-      
+
       <div className="max-w-5xl mx-auto relative">
         {/* Header */}
         <motion.div
@@ -53,12 +53,12 @@ export function JourneySection({
         <div className="relative">
           {/* Vertical connector line */}
           <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-brand-red-500 via-brand-red-400 to-slate-200 md:-translate-x-1/2" />
-          
+
           <div className="space-y-6 md:space-y-0">
             {steps.map((step, i) => {
               const isLeft = i % 2 === 0;
               const isLast = i === steps.length - 1;
-              
+
               return (
                 <motion.div
                   key={i}
@@ -74,10 +74,10 @@ export function JourneySection({
                   <div className="relative z-10 flex-shrink-0">
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red-500 to-brand-red-600 shadow-lg shadow-brand-red-500/30 flex items-center justify-center ring-4 ring-white overflow-hidden">
                       {step.image ? (
-                        <img 
-                          src={step.image} 
+                        <img
+                          src={step.image}
                           alt={step.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
                         <span className="text-2xl">{step.icon}</span>
@@ -98,7 +98,7 @@ export function JourneySection({
                         {step.title}
                       </h3>
                       <p className="text-slate-600 leading-relaxed">{step.description}</p>
-                      
+
                       {/* Progress indicator */}
                       {!isLast && (
                         <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
@@ -117,9 +117,9 @@ export function JourneySection({
               );
             })}
           </div>
-          
+
           {/* End marker */}
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
             viewport={{ once: true }}

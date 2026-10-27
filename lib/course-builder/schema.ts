@@ -3,6 +3,11 @@
  * Single source of truth for the course builder pipeline.
  */
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
+import type {
+  LearningExperienceProfile,
+  LearningPhase,
+  MediaEvidencePolicy,
+} from '@/lib/curriculum/learning-experience';
 // BARBER_COURSE_ID not imported from @/lib/barber/constants — that module re-exports
 // from this file, creating a circular dependency. Use the literal directly here.
 const BARBER_COURSE_ID_SCHEMA = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
@@ -10,6 +15,8 @@ const BARBER_COURSE_ID_SCHEMA = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 export type CredentialTarget =
   | 'INTERNAL'
   | 'STATE_BOARD'
+  | 'FEDERAL'
+  | 'MICROSOFT'
   | 'IC&RC'
   | 'NAADAC'
   | 'CUSTOM'
@@ -179,6 +186,16 @@ export interface RegulatoryMetadata {
   governingBody?: string | null;
   governingRegion?: string | null;
   governingStandardVersion?: string | null;
+  /** Canonical public source used to establish the standard or exam objectives. */
+  standardSourceUrl?: string | null;
+  /** Date the source says this version became effective (YYYY-MM-DD). */
+  standardEffectiveDate?: string | null;
+  /** Prevents generation/publication against retired or superseded standards. */
+  standardStatus?: 'active' | 'retired' | 'superseded' | 'draft' | null;
+  /** Registry identifier such as microsoft:az-900:2026-07-20. */
+  standardRegistryKey?: string | null;
+  /** Immutable content fingerprint captured when alignment was approved. */
+  standardFingerprint?: string | null;
   retentionPolicyDays?: number | null;
   auditNotes?: string | null;
 }
@@ -223,6 +240,12 @@ export interface BuilderLesson {
   instructorRequirement?: InstructorRequirement | null;
   minimumSeatTimeMinutes?: number | null;
   fieldworkEligible?: boolean;
+  /** Universal AI-generated course experience and publication evidence. */
+  learningExperience?: {
+    profile: LearningExperienceProfile;
+    phases: Array<{ phase: LearningPhase; order: number; required: boolean }>;
+    mediaPolicy: MediaEvidencePolicy;
+  };
 }
 
 export interface BuilderModule {
@@ -263,7 +286,10 @@ export interface ProgramBuilderTemplate {
 //
 // content is overridden from Record<string,unknown> to string because the
 // pipeline stores rendered HTML in course_lessons.content (text column).
-export type CourseLesson = Omit<BuilderLesson, 'content' | 'quizQuestions' | 'orderIndex' | 'lessonType'> & {
+export type CourseLesson = Omit<
+  BuilderLesson,
+  'content' | 'quizQuestions' | 'orderIndex' | 'lessonType'
+> & {
   type: LessonType;
   order: number;
   orderIndex?: number;

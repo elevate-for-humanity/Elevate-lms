@@ -1,0 +1,1 @@
+insert into public.platform_settings(key,value,is_secret,is_active,updated_at) values ('contact_phone','(463) 240-1404',false,true,now()) on conflict(key) do update set value=excluded.value,updated_at=now();

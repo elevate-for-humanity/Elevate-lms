@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 import { logger } from '@/lib/logger';
 import { useTimeclock } from '@/lib/timeclock/useTimeclock';
 
@@ -154,6 +155,8 @@ export function TimeclockWidget({
           GPS accuracy: {Math.round(timeclock.gpsPosition.accuracy_m)}m
         </p>
       )}
+
+      <TimeclockAttendanceNotice />
 
       {/* Actions */}
       <div className="pt-4 border-t border-slate-100 space-y-2">

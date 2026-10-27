@@ -1,18 +1,13 @@
 /**
  * Universal narration adapter used by the Remotion lesson renderer.
  *
- * Narration priority:
- *   1. ElevenLabs authenticated MP3
- *   2. Gemini authenticated TTS, transcoded to MP3
- *   3. OpenAI authenticated MP3
- *   4. Edge TTS (zero-cost public endpoint)
- *
- * Edge TTS can reject datacenter traffic with HTTP 403. Production therefore
- * never depends on that public endpoint as the sole narration provider.
+ * This module is retained under its historical filename because renderers
+ * import it directly. Provider selection, however, is authoritative: one
+ * configured narration route owns the request and production never silently
+ * bypasses Elevate orchestration through a commercial fallback chain.
  */
 
 import { spawn } from 'node:child_process';
-import { tts } from 'edge-tts';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { logger } from '@/lib/logger';
 
@@ -33,7 +28,10 @@ export interface EdgeTTSOptions {
   volume?: string;
 }
 
-const OPENAI_VOICE_MAP: Record<EdgeTTSVoice, 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'> = {
+const OPENAI_VOICE_MAP: Record<
+  EdgeTTSVoice,
+  'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'
+> = {
   'en-US-GuyNeural': 'onyx',
   'en-US-JennyNeural': 'nova',
   'en-US-AriaNeural': 'alloy',
@@ -42,22 +40,112 @@ const OPENAI_VOICE_MAP: Record<EdgeTTSVoice, 'alloy' | 'echo' | 'fable' | 'onyx'
 };
 
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
+export const DEFAULT_CLOUDFLARE_TTS_MODEL = '@cf/deepgram/aura-1';
+
+const CLOUDFLARE_SPEAKER_BY_INSTRUCTOR_VOICE: Record<EdgeTTSVoice, string> = {
+  [EDGE_TTS_VOICES.marcus]: 'orion',
+  [EDGE_TTS_VOICES.female]: 'luna',
+  [EDGE_TTS_VOICES.neutral]: 'athena',
+  [EDGE_TTS_VOICES.british]: 'angus',
+  [EDGE_TTS_VOICES.warm]: 'orpheus',
+};
+
+export type NarrationProvider =
+  | 'cloudflare'
+  | 'elevenlabs'
+  | 'gemini'
+  | 'openai'
+  | 'kokoro'
+  | 'local';
+
+export function configuredNarrationProvider(
+  env: NodeJS.ProcessEnv = process.env,
+): NarrationProvider {
+  const explicit = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER)?.trim().toLowerCase();
+  if (explicit) {
+    if (
+      explicit === 'cloudflare' ||
+      explicit === 'elevenlabs' ||
+      explicit === 'gemini' ||
+      explicit === 'openai' ||
+      explicit === 'kokoro' ||
+      explicit === 'local'
+    )
+      return explicit;
+    throw new Error(`Unsupported AI_NARRATION_PROVIDER "${explicit}"`);
+  }
+
+  // Course production defaults to self-hosted Kokoro. External providers remain
+  // explicit opt-ins only; Cloudflare credentials must never silently take
+  // ownership of narration or introduce a quota dependency.
+  if (env.NODE_ENV === 'production') return 'kokoro';
+  return 'local';
+}
+
+export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
+  const provider = configuredNarrationProvider(env);
+  if (env.NODE_ENV === 'production' && provider === 'local') {
+    throw new Error(
+      `Narration provider "${provider}" is diagnostic-only and cannot publish production course media`,
+    );
+  }
+  if (provider === 'cloudflare') {
+    const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim();
+    const token = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();
+    if (!accountId || !token) {
+      throw new Error(
+        'Cloudflare narration route is selected but CLOUDFLARE_ACCOUNT_ID/CLOUDFLARE_AI_API_TOKEN are not configured',
+      );
+    }
+  }
+  if (provider === 'elevenlabs' && !env.ELEVENLABS_API_KEY?.trim()) {
+    throw new Error(
+      'ElevenLabs narration route is selected but ELEVENLABS_API_KEY is not configured',
+    );
+  }
+  if (provider === 'gemini' && !env.GEMINI_API_KEY?.trim()) {
+    throw new Error('Gemini narration route is selected but GEMINI_API_KEY is not configured');
+  }
+  if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
+    throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
+  }
+}
 
 function narrationFailureDetail(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error);
-  return raw
-    .replace(/(api[-_ ]?key|authorization|xi-api-key)(["'\s:=]+)[^\s,"'}]+/gi, '$1$2[redacted]')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 320) || 'unknown error';
+  return (
+    raw
+      .replace(/(api[-_ ]?key|authorization|xi-api-key)(["'\s:=]+)[^\s,"'}]+/gi, '$1$2[redacted]')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 320) || 'unknown error'
+  );
 }
 
-async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
+async function pcm16MonoToMp3(pcm: Buffer, speed = 1, volume = 1): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn('ffmpeg', [
-      '-hide_banner', '-loglevel', 'error',
-      '-f', 's16le', '-ar', '24000', '-ac', '1', '-i', 'pipe:0',
-      '-codec:a', 'libmp3lame', '-b:a', '128k', '-f', 'mp3', 'pipe:1',
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-f',
+      's16le',
+      '-ar',
+      '24000',
+      '-ac',
+      '1',
+      '-i',
+      'pipe:0',
+      ...(speed === 1 && volume === 1
+        ? []
+        : ['-filter:a', [speed === 1 ? null : `atempo=${speed.toFixed(4)}`, volume === 1 ? null : `volume=${volume.toFixed(2)}`].filter(Boolean).join(',')]),
+      '-codec:a',
+      'libmp3lame',
+      '-b:a',
+      '128k',
+      '-f',
+      'mp3',
+      'pipe:1',
     ]);
     const output: Buffer[] = [];
     const errors: Buffer[] = [];
@@ -66,7 +154,11 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
     ffmpeg.on('error', reject);
     ffmpeg.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(`ffmpeg narration transcode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 500)}`));
+        reject(
+          new Error(
+            `ffmpeg narration transcode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 500)}`,
+          ),
+        );
         return;
       }
       const result = Buffer.concat(output);
@@ -75,6 +167,119 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
     });
     ffmpeg.stdin.end(pcm);
   });
+}
+
+const KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+
+interface KokoroAudio {
+  audio?: Float32Array;
+  data?: Float32Array;
+  sampling_rate: number;
+}
+
+interface KokoroModel {
+  generate(text: string, options: { voice: string; speed: number }): Promise<KokoroAudio>;
+}
+
+let kokoroModelPromise: Promise<KokoroModel> | undefined;
+
+function kokoroVoice(instructorVoice: EdgeTTSVoice): string {
+  const voices: Record<EdgeTTSVoice, string> = {
+    [EDGE_TTS_VOICES.marcus]: 'am_michael',
+    [EDGE_TTS_VOICES.female]: 'af_heart',
+    [EDGE_TTS_VOICES.neutral]: 'af_sarah',
+    [EDGE_TTS_VOICES.british]: 'bm_fable',
+    [EDGE_TTS_VOICES.warm]: 'am_puck',
+  };
+  return voices[instructorVoice];
+}
+
+function kokoroSpeed(rate: string): number {
+  const match = /^([+-]?\d+(?:\.\d+)?)%$/.exec(rate.trim());
+  const adjustment = match ? Number(match[1]) / 100 : 0;
+  return Math.max(0.75, Math.min(1.25, 1 + adjustment));
+}
+
+function kokoroNarrationChunks(text: string, maxCharacters = 420): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  const chunks: string[] = [];
+  let remaining = normalized;
+  while (remaining.length > maxCharacters) {
+    const window = remaining.slice(0, maxCharacters + 1);
+    const sentenceBreak = Math.max(
+      window.lastIndexOf('. '),
+      window.lastIndexOf('? '),
+      window.lastIndexOf('! '),
+    );
+    const wordBreak = window.lastIndexOf(' ');
+    const splitAt =
+      sentenceBreak >= Math.floor(maxCharacters * 0.45)
+        ? sentenceBreak + 1
+        : wordBreak > 0
+          ? wordBreak
+          : maxCharacters;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
+async function getKokoroModel(): Promise<KokoroModel> {
+  if (!kokoroModelPromise) {
+    kokoroModelPromise = import('kokoro-js').then(async ({ KokoroTTS }) => {
+      const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+        dtype: 'q8',
+        device: 'cpu',
+        // The image preloads Kokoro at build time. Never download model files
+        // while rendering lessons: remote 429s must not fail production jobs.
+        // Offline availability is enforced by the preloaded model image and
+        // runtime network policy, not by an unsupported KokoroJS option.
+      });
+      return model as unknown as KokoroModel;
+    }).catch((error) => {
+      // Do not permanently cache a rejected model initialization promise.
+      // An operator can restore the model cache before the next bounded attempt.
+      kokoroModelPromise = undefined;
+      throw error;
+    });
+  }
+  return kokoroModelPromise;
+}
+
+async function generateKokoroNarration(
+  text: string,
+  instructorVoice: EdgeTTSVoice,
+  rate: string,
+): Promise<Buffer> {
+  const model = await getKokoroModel();
+  const segments: Float32Array[] = [];
+  let totalSamples = 0;
+  for (const chunk of kokoroNarrationChunks(text)) {
+    const audio = await model.generate(chunk, {
+      voice: kokoroVoice(instructorVoice),
+      speed: kokoroSpeed(rate),
+    });
+    if (audio.sampling_rate !== 24000) {
+      throw new Error(`Kokoro narration returned unsupported sample rate ${audio.sampling_rate}`);
+    }
+    const samples = audio.audio ?? audio.data;
+    if (!samples?.length) throw new Error('Kokoro narration returned an empty audio segment');
+    segments.push(samples);
+    totalSamples += samples.length;
+  }
+  if (!segments.length) throw new Error('Kokoro narration returned no audio segments');
+
+  const pcm = Buffer.allocUnsafe(totalSamples * 2);
+  let offset = 0;
+  for (const segment of segments) {
+    for (const sample of segment) {
+      const value = Math.max(-1, Math.min(1, sample));
+      pcm.writeInt16LE(Math.round(value < 0 ? value * 32768 : value * 32767), offset);
+      offset += 2;
+    }
+  }
+  return pcm16MonoToMp3(pcm);
 }
 
 async function generateLocalNarration(text: string): Promise<Buffer> {
@@ -87,14 +292,34 @@ async function generateLocalNarration(text: string): Promise<Buffer> {
     speech.on('error', reject);
     speech.on('close', (code) => {
       const result = Buffer.concat(output);
-      if (code !== 0 || !result.length) reject(new Error(`local narration failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 300)}`));
+      if (code !== 0 || !result.length)
+        reject(
+          new Error(
+            `local narration failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 300)}`,
+          ),
+        );
       else resolve(result);
     });
     speech.stdin.end(text, 'utf8');
   });
 
   return new Promise((resolve, reject) => {
-    const ffmpeg = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'wav', '-i', 'pipe:0', '-codec:a', 'libmp3lame', '-b:a', '128k', '-f', 'mp3', 'pipe:1']);
+    const ffmpeg = spawn('ffmpeg', [
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-f',
+      'wav',
+      '-i',
+      'pipe:0',
+      '-codec:a',
+      'libmp3lame',
+      '-b:a',
+      '128k',
+      '-f',
+      'mp3',
+      'pipe:1',
+    ]);
     const output: Buffer[] = [];
     const errors: Buffer[] = [];
     ffmpeg.stdout.on('data', (chunk: Buffer) => output.push(chunk));
@@ -102,25 +327,37 @@ async function generateLocalNarration(text: string): Promise<Buffer> {
     ffmpeg.on('error', reject);
     ffmpeg.on('close', (code) => {
       const result = Buffer.concat(output);
-      if (code !== 0 || !result.length) reject(new Error(`local narration transcode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 300)}`));
+      if (code !== 0 || !result.length)
+        reject(
+          new Error(
+            `local narration transcode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 300)}`,
+          ),
+        );
       else resolve(result);
     });
     ffmpeg.stdin.end(wav);
   });
 }
 
-async function generateGeminiNarration(text: string): Promise<Buffer> {
+async function generateGeminiNarration(text: string, instructorVoice: EdgeTTSVoice): Promise<Buffer> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
   const model = process.env.GEMINI_TTS_MODEL?.trim() || DEFAULT_GEMINI_TTS_MODEL;
-  const voiceName = process.env.GEMINI_TTS_VOICE?.trim() || 'Kore';
+  const geminiVoiceByInstructor: Record<EdgeTTSVoice, string> = {
+    [EDGE_TTS_VOICES.marcus]: 'Charon',
+    [EDGE_TTS_VOICES.female]: 'Aoede',
+    [EDGE_TTS_VOICES.neutral]: 'Kore',
+    [EDGE_TTS_VOICES.british]: 'Algenib',
+    [EDGE_TTS_VOICES.warm]: 'Achird',
+  };
+  const voiceName = process.env.GEMINI_TTS_VOICE?.trim() || geminiVoiceByInstructor[instructorVoice];
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
     {
       method: 'POST',
       headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text }] }],
+        contents: [{ parts: [{ text: `Speak as a real workforce instructor teaching one learner. Sound conversational, warm, confident, and human. Vary cadence naturally, pause at sentence and paragraph boundaries, emphasize important safety and technical terms, and avoid a flat announcer or robotic delivery. Do not read punctuation or formatting aloud.\n\n${text}` }] }],
         generationConfig: {
           responseModalities: ['AUDIO'],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
@@ -130,7 +367,9 @@ async function generateGeminiNarration(text: string): Promise<Buffer> {
   );
   if (!response.ok) {
     const detail = await response.text().catch(() => '');
-    throw new Error(`Gemini TTS returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`);
+    throw new Error(
+      `Gemini TTS returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`,
+    );
   }
   const json = await response.json();
   const encoded = json?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
@@ -147,14 +386,190 @@ async function generateElevenLabsNarration(text: string): Promise<Buffer> {
     {
       method: 'POST',
       headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
-      body: JSON.stringify({ text, model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_multilingual_v2' }),
+      body: JSON.stringify({
+        text,
+        model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_multilingual_v2',
+        voice_settings: {
+          stability: 0.42,
+          similarity_boost: 0.78,
+          style: 0.35,
+          use_speaker_boost: true,
+        },
+      }),
     },
   );
   if (!response.ok) {
     const detail = await response.text().catch(() => '');
-    throw new Error(`ElevenLabs TTS returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`);
+    throw new Error(
+      `ElevenLabs TTS returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`,
+    );
   }
   return Buffer.from(await response.arrayBuffer());
+}
+
+async function generateCloudflareNarrationChunk(
+  text: string,
+  instructorVoice: EdgeTTSVoice,
+): Promise<Buffer> {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+  const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
+  if (!accountId || !token) throw new Error('Cloudflare Workers AI narration is not configured');
+  const model = process.env.CLOUDFLARE_TTS_MODEL?.trim() || DEFAULT_CLOUDFLARE_TTS_MODEL;
+  if (!model.startsWith('@cf/')) {
+    throw new Error('CLOUDFLARE_TTS_MODEL must be a Cloudflare Workers AI model identifier');
+  }
+  const gatewayId = process.env.AI_GATEWAY_ID?.trim() || 'default';
+  // An explicit deployment override remains available, but otherwise the
+  // governed course instructor selects a stable speaker. This prevents every
+  // program from collapsing to the same generic voice.
+  const speaker =
+    process.env.CLOUDFLARE_TTS_SPEAKER?.trim() ||
+    CLOUDFLARE_SPEAKER_BY_INSTRUCTOR_VOICE[instructorVoice];
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'cf-aig-gateway-id': gatewayId,
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg, application/json',
+      },
+      body: JSON.stringify(
+        model.includes('melotts')
+          ? { prompt: text, lang: 'en' }
+          : { text, speaker, encoding: 'mp3' },
+      ),
+      signal: AbortSignal.timeout(120_000),
+    },
+  );
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(
+      `Cloudflare Workers AI ${model} returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`,
+    );
+  }
+  const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
+  if (contentType.startsWith('audio/')) {
+    const audio = Buffer.from(await response.arrayBuffer());
+    if (!audio.length) throw new Error('Cloudflare Workers AI returned empty narration audio');
+    return audio;
+  }
+  const payload = await response.json().catch(() => null);
+  const encoded = payload?.result?.audio ?? payload?.audio ?? payload?.result;
+  if (typeof encoded !== 'string' || !encoded) {
+    throw new Error('Cloudflare Workers AI returned no narration audio');
+  }
+  return Buffer.from(encoded.replace(/^data:audio\/[^;]+;base64,/, ''), 'base64');
+}
+
+const CLOUDFLARE_TTS_MAX_CHARACTERS = 1900;
+
+function cloudflareNarrationChunks(text: string): string[] {
+  const chunks: string[] = [];
+  let remaining = text.replace(/\s+/g, ' ').trim();
+  while (remaining.length > CLOUDFLARE_TTS_MAX_CHARACTERS) {
+    const window = remaining.slice(0, CLOUDFLARE_TTS_MAX_CHARACTERS + 1);
+    const sentenceBreak = Math.max(
+      window.lastIndexOf('. '),
+      window.lastIndexOf('? '),
+      window.lastIndexOf('! '),
+    );
+    const wordBreak = window.lastIndexOf(' ');
+    const splitAt =
+      sentenceBreak >= Math.floor(CLOUDFLARE_TTS_MAX_CHARACTERS * 0.5)
+        ? sentenceBreak + 1
+        : wordBreak > 0
+          ? wordBreak
+          : CLOUDFLARE_TTS_MAX_CHARACTERS;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
+async function decodeCloudflareMp3Segment(segment: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', [
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-f',
+      'mp3',
+      '-i',
+      'pipe:0',
+      '-vn',
+      '-ac',
+      '1',
+      '-ar',
+      '24000',
+      '-codec:a',
+      'pcm_s16le',
+      '-f',
+      's16le',
+      'pipe:1',
+    ]);
+    const output: Buffer[] = [];
+    const errors: Buffer[] = [];
+    ffmpeg.stdout.on('data', (chunk: Buffer) => output.push(chunk));
+    ffmpeg.stderr.on('data', (chunk: Buffer) => errors.push(chunk));
+    ffmpeg.on('error', reject);
+    ffmpeg.on('close', (code) => {
+      const result = Buffer.concat(output);
+      if (code !== 0 || !result.length) {
+        reject(
+          new Error(
+            `Cloudflare narration chunk decode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 400)}`,
+          ),
+        );
+      } else {
+        resolve(result);
+      }
+    });
+    ffmpeg.stdin.end(segment);
+  });
+}
+
+async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffer> {
+  if (segments.length === 1) return segments[0];
+  // Each Cloudflare request returns an independent MP3 stream. Byte-concatenating
+  // those streams and presenting them to ffmpeg as one MP3 can stop decoding at
+  // an embedded stream boundary, truncating long lesson narration. Decode each
+  // chunk independently to one PCM format, concatenate the PCM in narration order,
+  // then encode a single learner-facing MP3.
+  const pcmSegments: Buffer[] = [];
+  for (const segment of segments) pcmSegments.push(await decodeCloudflareMp3Segment(segment));
+  return pcm16MonoToMp3(Buffer.concat(pcmSegments));
+}
+
+async function generateCloudflareNarration(
+  text: string,
+  instructorVoice: EdgeTTSVoice,
+): Promise<Buffer> {
+  const chunks = cloudflareNarrationChunks(text);
+  const segments: Buffer[] = [];
+  // Keep calls sequential to preserve narration order and avoid burst pressure
+  // on the authoritative provider.
+  for (const chunk of chunks) {
+    segments.push(await generateCloudflareNarrationChunk(chunk, instructorVoice));
+  }
+  const combined = await normalizeCloudflareMp3Segments(segments);
+  // Cloudflare's TTS API does not honor the Edge-style rate option. Measure the
+  // delivered audio and preserve pitch while bringing instruction into the
+  // narration QA's teaching pace. Do not alter short phrases, where a word
+  // count is too noisy to give a meaningful pace measurement.
+  const words = text.trim().split(/\s+/).length;
+  if (words < 20) return combined;
+  const pcm = await decodeCloudflareMp3Segment(combined);
+  const durationSeconds = pcm.length / (24000 * 2);
+  const measuredWpm = words * 60 / durationSeconds;
+  const speed = measuredWpm >= 118 && measuredWpm <= 145 ? 1 : 135 / measuredWpm;
+  if (!Number.isFinite(speed) || speed < 0.5 || speed > 2) {
+    throw new Error(`Cloudflare narration pace cannot be safely corrected: ${measuredWpm.toFixed(1)} WPM`);
+  }
+  // Leave headroom even when the provider's original peak hit 0 dBFS.
+  return pcm16MonoToMp3(pcm, speed, 0.8);
 }
 
 async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {
@@ -163,14 +578,24 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
   const mappedVoice = OPENAI_VOICE_MAP[voice] ?? 'alloy';
   try {
     const response = await openai.audio.speech.create({
-      model: 'gpt-4o-mini-tts', voice: mappedVoice, input: text,
-      instructions: 'Speak as a clear, professional workforce instructor. Use a natural teaching pace, warm confidence, and precise pronunciation.',
+      model: 'gpt-4o-mini-tts',
+      voice: mappedVoice,
+      input: text,
+      instructions:
+        'Speak as a real workforce instructor teaching one learner, not as an announcer. Sound conversational, warm, confident, and human. Vary cadence naturally, use brief pauses between ideas, emphasize important safety and technical terms, and pronounce trade vocabulary precisely. Never sound robotic or read punctuation aloud.',
       response_format: 'mp3',
     });
     return Buffer.from(await response.arrayBuffer());
   } catch (primaryError) {
-    logger.warn('[Narration] gpt-4o-mini-tts failed; trying tts-1-hd', { error: primaryError instanceof Error ? primaryError.message : String(primaryError) });
-    const response = await openai.audio.speech.create({ model: 'tts-1-hd', voice: mappedVoice, input: text, response_format: 'mp3' });
+    logger.warn('[Narration] gpt-4o-mini-tts failed; trying tts-1-hd', {
+      error: primaryError instanceof Error ? primaryError.message : String(primaryError),
+    });
+    const response = await openai.audio.speech.create({
+      model: 'tts-1-hd',
+      voice: mappedVoice,
+      input: text,
+      response_format: 'mp3',
+    });
     return Buffer.from(await response.arrayBuffer());
   }
 }
@@ -178,43 +603,35 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
 export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}): Promise<Buffer> {
   const normalizedText = text.trim();
   if (!normalizedText) throw new Error('Narration requires non-empty text');
-  const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
-  const failures: string[] = [];
-
-  const recordFailure = (provider: string, error: unknown) => {
-    const detail = narrationFailureDetail(error);
-    failures.push(`${provider}: ${detail}`);
-    return detail;
-  };
-
-  if (process.env.ELEVENLABS_API_KEY?.trim()) {
-    try { return await generateElevenLabsNarration(normalizedText); }
-    catch (error) { logger.warn('[Narration] ElevenLabs unavailable; trying Gemini', { error: recordFailure('ElevenLabs', error) }); }
-  }
-  if (process.env.GEMINI_API_KEY?.trim()) {
-    try { return await generateGeminiNarration(normalizedText); }
-    catch (error) { logger.warn('[Narration] Gemini TTS unavailable; trying OpenAI', { error: recordFailure('Gemini', error) }); }
-  }
-  if (isOpenAIConfigured()) {
-    try { return await generateOpenAINarration(normalizedText, voice); }
-    catch (error) { logger.warn('[Narration] OpenAI TTS unavailable; trying Edge TTS', { error: recordFailure('OpenAI', error) }); }
-  }
-
+  const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%' } = options;
+  assertNarrationProviderConfigured();
+  const provider = configuredNarrationProvider();
   try {
-    const audio = await tts(normalizedText, { voice, rate, pitch, volume });
-    return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
-  } catch (edgeError) {
-    logger.warn('[Narration] Edge TTS unavailable', { error: recordFailure('Edge TTS', edgeError) });
+    if (provider === 'cloudflare')
+      return await generateCloudflareNarration(normalizedText, voice);
+    if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
+    if (provider === 'gemini') return await generateGeminiNarration(normalizedText, voice);
+    if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
+    if (provider === 'kokoro')
+      return await generateKokoroNarration(normalizedText, voice, rate);
+    logger.info('[Narration] Using explicitly selected local narration');
+    return await generateLocalNarration(normalizedText);
+  } catch (error) {
+    throw new Error(
+      `Configured narration route "${provider}" failed; no provider bypass was attempted: ${narrationFailureDetail(error)}`,
+      { cause: error },
+    );
   }
-
-  if (process.env.NODE_ENV !== 'production') {
-    logger.info('[Narration] Using diagnostic-only local espeak-ng fallback');
-    return generateLocalNarration(normalizedText);
-  }
-  throw new Error(`No publication-quality narration provider is available. Attempts: ${failures.join(' | ') || 'none configured'}`);
 }
 
-export function buildLessonScript(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): string {
+export function buildLessonScript(lesson: {
+  title: string;
+  moduleTitle: string;
+  objective: string;
+  keyPoints: string[];
+  example: string;
+  summary: string;
+}): string {
   const { title, moduleTitle, objective, keyPoints, example, summary } = lesson;
   return `
 Welcome to ${moduleTitle}.
@@ -237,12 +654,25 @@ Take a moment to review what you've learned, then complete the knowledge check t
 `.trim();
 }
 
-export function buildSegmentScripts(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): [string, string, string, string, string] {
+export function buildSegmentScripts(lesson: {
+  title: string;
+  moduleTitle: string;
+  objective: string;
+  keyPoints: string[];
+  example: string;
+  summary: string;
+}): [string, string, string, string, string] {
   const { title, moduleTitle, objective, keyPoints, example, summary } = lesson;
   return [
     `Welcome to ${moduleTitle}. In this lesson, we'll explore: ${title}. By the end, you will be able to: ${objective}`,
-    keyPoints.slice(0, 2).map((p, i) => `Key concept ${i + 1}: ${p}`).join('. '),
-    keyPoints.slice(2).map((p, i) => `Point ${i + 3}: ${p}`).join('. '),
+    keyPoints
+      .slice(0, 2)
+      .map((p, i) => `Key concept ${i + 1}: ${p}`)
+      .join('. '),
+    keyPoints
+      .slice(2)
+      .map((p, i) => `Point ${i + 3}: ${p}`)
+      .join('. '),
     `Here's a real-world example. ${example}`,
     `To summarize: ${summary}. Complete the knowledge check to continue.`,
   ];

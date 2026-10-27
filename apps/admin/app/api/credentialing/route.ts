@@ -11,10 +11,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 
 const CREDENTIAL_ENGINE_API = 'https://credentialengine.org/api/';
 
 export async function GET(request: NextRequest) {
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action');
 
@@ -53,6 +57,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   const { credentialCtdlId, competencyFramework, publish } = await request.json();
   const apiKey = process.env.CREDENTIAL_ENGINE_API_KEY;
 
@@ -79,6 +86,13 @@ export async function POST(request: NextRequest) {
         }),
       });
 
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: 'Credential Engine rejected the publish request', upstreamStatus: res.status },
+          { status: 502 },
+        );
+      }
+
       return NextResponse.json({
         success: true,
         published: await res.json(),
@@ -93,6 +107,13 @@ export async function POST(request: NextRequest) {
         headers: { 'Authorization': `Bearer ${apiKey}` },
       }
     );
+
+    if (!searchRes.ok) {
+      return NextResponse.json(
+        { error: 'Credential Engine rejected the search request', upstreamStatus: searchRes.status },
+        { status: 502 },
+      );
+    }
 
     return NextResponse.json({
       results: await searchRes.json(),

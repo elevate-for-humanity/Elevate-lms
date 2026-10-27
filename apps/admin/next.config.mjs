@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { sharedStandaloneTraceExcludes } from '../../scripts/next-standalone-trace-excludes.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
+import { withBuildMemoryDefaults } from '../../scripts/build-memory-policy.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -28,19 +29,14 @@ const adminConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
-  typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 
-  experimental: {
-    workerThreads: false,
-    cpus: 1,
-    parallelServerCompiles: false,
-    parallelServerBuildTraces: false,
-  },
+  // Serve packaged assets directly, as the other standalone applications do.
+  images: { unoptimized: true },
 
   transpilePackages: ['edge-tts'],
 
-  webpack(config, { isServer, nextRuntime }) {
+  webpack(config, { dev, isServer, nextRuntime }) {
     config.resolve.alias['@'] = ROOT;
 
     config.resolve.alias[
@@ -63,17 +59,32 @@ const adminConfig = {
       config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
     }
     config.parallelism = 1;
-    if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
-
-    config.optimization = config.optimization || {};
-    config.optimization.minimize = false;
-    config.optimization.minimizer = [];
+    if (!dev || process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
 
     return config;
   },
 
   async headers() {
     return [
+      {
+        source: '/studio/:path*',
+        headers: [
+          { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+      {
+        // The master Course Builder embeds the authenticated LMS lesson player.
+        // This later, narrower rule overrides Studio's worker isolation header;
+        // COEP credentialless blocks the first-party cross-subdomain iframe.
+        source: '/studio/courses/:path*',
+        headers: [
+          { key: 'Cross-Origin-Embedder-Policy', value: 'unsafe-none' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
       {
         source: '/sw-admin.js',
         headers: [
@@ -121,6 +132,14 @@ const adminConfig = {
   },
 
   serverExternalPackages: [
+    // Kokoro loads platform-specific ONNX binaries at runtime. Keep the full
+    // inference stack outside webpack so Admin instrumentation never attempts
+    // to parse a native `.node` binding during the production build.
+    'kokoro-js',
+    '@huggingface/transformers',
+    'onnxruntime-node',
+    'onnxruntime-common',
+    'onnxruntime-web',
     'remotion', '@remotion/bundler', '@remotion/renderer',
     '@remotion/compositor-linux-x64-gnu', '@rspack/core', '@rspack/binding',
     '@rspack/binding-linux-x64-gnu', 'esbuild', '@sentry/nextjs', '@sentry/node',
@@ -136,4 +155,4 @@ const adminConfig = {
   devIndicators: { position: 'bottom-right' },
 };
 
-export default adminConfig;
+export default withBuildMemoryDefaults(adminConfig);

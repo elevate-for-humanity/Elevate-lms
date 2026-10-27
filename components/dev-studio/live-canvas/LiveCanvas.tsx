@@ -3,11 +3,8 @@
 import { useState, useCallback } from 'react';
 import { 
   X, 
-  Play, 
-  Pause, 
   Volume2, 
   VolumeX,
-  MessageSquare,
   Layers,
   Eye,
   Settings
@@ -24,8 +21,7 @@ import type {
   DeviceView,
   ProjectState,
   WorkerState,
-  TaskState,
-  MessageType
+  TaskState
 } from './types';
 
 interface LiveCanvasProps {
@@ -37,8 +33,8 @@ interface LiveCanvasProps {
 export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanvasProps) {
   // State
   const [state, setState] = useState<LiveCanvasState>({
-    mode: 'building',
-    isLive: true,
+    mode: initialProject ? 'building' : 'preview',
+    isLive: Boolean(initialProject),
     followMode: true,
     currentProject: initialProject,
     workers: [],
@@ -52,76 +48,16 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
   const [showSettings, setShowSettings] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Add sample data for demo
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      type: 'narration',
-      content: "I'm creating the Employer Apprenticeship page now.",
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      type: 'ai',
-      content: "I've connected the application form to your CRM. Students can now apply directly through the page.",
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      type: 'thought',
-      content: "Adding Stripe payment processing for the enrollment deposit.",
-      timestamp: new Date().toISOString(),
-    },
-  ]);
-
-  const [thoughts] = useState<AIThought[]>([
-    {
-      id: '1',
-      step: 1,
-      thought: 'Designing the hero section',
-      reasoning: 'First impressions matter. I should use a large hero with the program image and a clear CTA.',
-      confidence: 0.95,
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      step: 2,
-      thought: 'Building the enrollment form',
-      reasoning: 'The form needs to capture all required information for WIOA eligibility.',
-      confidence: 0.88,
-      timestamp: new Date().toISOString(),
-    },
-  ]);
-
-  const [approvals] = useState<ApprovalRequest[]>([
-    {
-      id: '1',
-      type: 'color_scheme',
-      title: 'Color Scheme Change',
-      description: 'Should I use red or blue as the primary color for this page?',
-      options: [
-        { label: 'Red (Brand)', value: 'red' },
-        { label: 'Blue (Professional)', value: 'blue' },
-      ],
-      requestedAt: new Date().toISOString(),
-      status: 'pending',
-    },
-  ]);
-
-  const [workers] = useState<WorkerState[]>([
-    { id: '1', name: 'Developer AI', role: 'dev', icon: '💻', color: 'blue', status: 'working', currentTask: 'Building Student Dashboard', progress: 92 },
-    { id: '2', name: 'Designer AI', role: 'designer', icon: '🎨', color: 'purple', status: 'working', currentTask: 'Creating Hero Banner', progress: 75 },
-    { id: '3', name: 'Marketing AI', role: 'marketing', icon: '📢', color: 'pink', status: 'working', currentTask: 'Writing SEO content', progress: 45 },
-    { id: '4', name: 'QA AI', role: 'qa', icon: '🧪', color: 'emerald', status: 'idle', progress: 0 },
-  ]);
-
-  const [tasks] = useState<TaskState[]>([
-    { id: '1', title: 'Create page structure', status: 'completed', progress: 100, priority: 'high', createdAt: new Date().toISOString() },
-    { id: '2', title: 'Add hero section', status: 'in_progress', progress: 75, priority: 'high', createdAt: new Date().toISOString() },
-    { id: '3', title: 'Build enrollment form', status: 'pending', progress: 0, priority: 'high', createdAt: new Date().toISOString() },
-    { id: '4', title: 'Add testimonials', status: 'pending', progress: 0, priority: 'medium', createdAt: new Date().toISOString() },
-    { id: '5', title: 'Connect Stripe', status: 'pending', progress: 0, priority: 'high', createdAt: new Date().toISOString() },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => initialProject ? [] : [{
+    id: 'canvas-empty',
+    type: 'system',
+    content: 'No project is connected. Open a project from Repository or Course Builder to begin a real build.',
+    timestamp: new Date().toISOString(),
+  }]);
+  const [thoughts] = useState<AIThought[]>([]);
+  const [approvals] = useState<ApprovalRequest[]>([]);
+  const [workers] = useState<WorkerState[]>([]);
+  const [tasks] = useState<TaskState[]>([]);
 
   // Handlers
   const handleSendMessage = useCallback((message: string) => {
@@ -133,23 +69,16 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
     };
     setMessages(prev => [...prev, newMessage]);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        "I'm on it! Making that change now.",
-        "Got it. I'll update the design.",
-        "Interesting idea. Let me adjust the layout.",
-        "Sure, I can do that. This will take just a moment.",
-      ];
-      const aiResponse: ChatMessage = {
-        id: `msg_${Date.now()}_ai`,
-        type: 'ai',
-        content: responses[Math.floor(Math.random() * responses.length)],
+    if (!state.currentProject) {
+      const systemMessage: ChatMessage = {
+        id: `msg_${Date.now()}_system`,
+        type: 'system',
+        content: 'Command not run: no project or executor is connected to this canvas.',
         timestamp: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
-  }, []);
+      setMessages(prev => [...prev, systemMessage]);
+    }
+  }, [state.currentProject]);
 
   const handleApprove = useCallback((id: string, value?: string) => {
     console.info('Approved:', id, value);
@@ -168,12 +97,17 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
   }, []);
 
   const handlePublish = useCallback(async () => {
+    if (!state.currentProject || !state.previewUrl) return;
     setIsPublishing(true);
-    // Simulate publishing
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    setMessages(prev => [...prev, {
+      id: `publish_${Date.now()}`,
+      type: 'system',
+      content: 'Publishing is unavailable until a verified deployment executor is connected.',
+      timestamp: new Date().toISOString(),
+    }]);
     setIsPublishing(false);
     setShowPublishModal(false);
-  }, []);
+  }, [state.currentProject, state.previewUrl]);
 
   if (!isOpen) return null;
 
@@ -186,7 +120,7 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
           <div className="flex items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${state.isLive ? 'bg-red-500 animate-pulse' : 'bg-slate-400'}`} />
             <span className="font-medium text-slate-700">
-              {state.isLive ? 'Building...' : 'Paused'}
+              {!state.currentProject ? 'No project' : state.isLive ? 'Building...' : 'Paused'}
             </span>
           </div>
           
@@ -226,7 +160,9 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
           {/* Publish Button */}
           <button
             onClick={() => setShowPublishModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 font-medium text-sm transition-colors"
+            disabled={!state.currentProject || !state.previewUrl}
+            title={!state.currentProject ? 'Open a project before publishing' : !state.previewUrl ? 'A verified preview is required before publishing' : 'Publish project'}
+            className="flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 font-medium text-sm transition-colors disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             Publish
           </button>
@@ -265,7 +201,7 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
         <div className="flex-1">
           <CenterPanel
             previewUrl={state.previewUrl}
-            isLoading={state.isLive && workers.some(w => w.status === 'working')}
+            isLoading={Boolean(state.currentProject) && state.isLive && workers.some(w => w.status === 'working')}
             loadingMessage="Building your page..."
             deviceView={state.deviceView}
             onDeviceChange={handleDeviceChange}

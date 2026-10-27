@@ -157,8 +157,9 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 <li>CFCs (R-11, R-12) — highest ozone depletion potential, fully phased out</li>
 <li>HCFCs (R-22) — lower ODP, being phased out. R-22 production ended 2020.</li>
 <li>HFCs (R-410A, R-134a) — zero ODP but high GWP. Current standard.</li>
-<li>HFOs (R-32, R-454B) — low GWP, next generation</li>
-<li>Venting refrigerant intentionally = federal violation, up to $44,539/day fine</li>
+<li><strong>R-32</strong> is an HFC. <strong>R-454B</strong> is an HFC/HFO blend. Both are A2L refrigerants and require mildly-flammable-refrigerant safety procedures.</li>
+<li>HFOs such as R-1234yf have very low GWP. Never identify R-32 as an HFO.</li>
+<li>Intentional venting is prohibited for regulated refrigerants. Penalty amounts change over time, so verify the current EPA enforcement figure instead of memorizing a static dollar amount.</li>
 </ul>
 <h3>Recovery, Recycling, Reclamation</h3>
 <ul>
@@ -178,7 +179,7 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 <ul>
 <li>Small appliances: refrigerators, window ACs, PTACs, dehumidifiers, water coolers, vending machines</li>
 <li>System-dependent recovery equipment is allowed for Type I (does not need to be self-contained)</li>
-<li>Required recovery efficiency: 80% if compressor is operational, 90% if not</li>
+<li>Required recovery efficiency: 90% if the compressor is operational, 80% if it is not</li>
 <li>No leak repair requirements for small appliances (unlike Type II/III)</li>
 <li>Technicians may use system-dependent equipment — does not need to be UL-certified for Type I</li>
 </ul>
@@ -198,9 +199,9 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 </ul>
 <h3>Leak Repair Requirements</h3>
 <ul>
-<li>Commercial/industrial systems with 50+ lbs: repair leaks within 30 days if annual leak rate exceeds 20%</li>
-<li>Comfort cooling systems with 50+ lbs: repair within 30 days if annual leak rate exceeds 15%</li>
-<li>Must keep records of refrigerant added to systems with 50+ lbs</li>
+<li>For appliances containing ozone-depleting refrigerants, current trigger rates are 20% for commercial refrigeration, 30% for industrial process refrigeration, and 10% for comfort cooling.</li>
+<li>The 2020 EPA revision removed Section 608 leak-repair provisions for appliances containing substitute refrigerants such as HFCs, while leaving certification, evacuation, recovery-equipment, sales, safe-disposal, and reclamation requirements in place.</li>
+<li>Before applying a leak rule, identify the refrigerant class and verify the current EPA rule.</li>
 </ul>
 <h3>Leak Detection</h3>
 <ul>
@@ -244,7 +245,7 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 <h3>Most Missed Topics</h3>
 <ul>
 <li>System-dependent vs self-contained equipment — Type I allows system-dependent</li>
-<li>Recovery efficiency: 80% if compressor works, 90% if it does not</li>
+<li>Recovery efficiency: 90% if the compressor works, 80% if it does not</li>
 <li>Small appliance definition: factory-sealed, hermetically sealed compressor, 5 lbs or less</li>
 <li>No leak repair requirements for small appliances</li>
 <li>Technicians servicing small appliances must still be certified</li>
@@ -255,7 +256,8 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 <h3>Most Missed Topics</h3>
 <ul>
 <li>Recovery levels: 0 psig for systems under 200 lbs; 4 in. Hg vacuum for 200+ lbs</li>
-<li>Leak rate thresholds: 15% for comfort cooling, 20% for commercial/industrial (50+ lb systems)</li>
+<li>For ozone-depleting refrigerants in 50+ lb appliances: 10% comfort cooling, 20% commercial refrigeration, and 30% industrial process refrigeration</li>
+<li>Do not apply those Section 608 leak-repair triggers to substitute refrigerants such as HFCs; identify the refrigerant class first</li>
 <li>Repair deadline: 30 days after discovering a leak exceeding the threshold</li>
 <li>Record-keeping required for systems with 50+ lbs of refrigerant</li>
 <li>Self-contained recovery equipment required — system-dependent not allowed</li>

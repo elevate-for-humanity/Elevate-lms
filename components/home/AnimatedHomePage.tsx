@@ -39,7 +39,7 @@ const STATS: Stat[] = [
 ];
 
 const CAMPUSES: Campus[] = [
-  { name: 'Main Campus', address: '6331 N Keystone Ave, Indianapolis, IN 46220', phone: '(317) 314-3757' },
+  { name: 'Main Campus', address: '6331 N Keystone Ave, Indianapolis, IN 46220', phone: '(463) 240-1404' },
 ];
 
 const FUNDING_OPTIONS = [
@@ -54,7 +54,7 @@ export default function AnimatedHomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
@@ -145,8 +145,8 @@ export default function AnimatedHomePage() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-        
+
+
         {/* Animated Geometric Shapes */}
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(6)].map((_, i) => (
@@ -167,7 +167,7 @@ export default function AnimatedHomePage() {
           ))}
         </div>
 
-        <motion.div 
+        <motion.div
           className="relative z-10 text-center px-6 max-w-5xl mx-auto"
           style={{ opacity: heroOpacity, scale: heroScale }}
         >
@@ -199,7 +199,7 @@ export default function AnimatedHomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Earn while you learn with paid apprenticeships in healthcare, trades, and beauty industries. 
+            Earn while you learn with paid apprenticeships in healthcare, trades, and beauty industries.
             Funding available — often at no cost to you.
           </motion.p>
 
@@ -287,16 +287,16 @@ export default function AnimatedHomePage() {
                 <Link href={`/programs/${program.slug}`} className="group block h-full">
                   <div className="relative h-full bg-slate-800 rounded-2xl p-8 border border-slate-700 hover:border-brand-red-500/50 transition-all duration-300 overflow-hidden">
                     <div className={`absolute inset-0 bg-gradient-to-br ${program.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                    
+
                     <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${program.color} flex items-center justify-center text-3xl mb-6 shadow-lg`}>
                       {program.icon}
                     </div>
-                    
+
                     <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-brand-red-400 transition-colors">
                       {program.title}
                     </h3>
                     <p className="text-slate-400 mb-6">{program.description}</p>
-                    
+
                     <div className="flex items-center text-brand-red-400 font-semibold group-hover:gap-3 transition-all">
                       Learn More <span className="group-hover:translate-x-1 transition-transform">→</span>
                     </div>
@@ -469,7 +469,7 @@ export default function AnimatedHomePage() {
             />
           ))}
         </div>
-        
+
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <motion.h2
             className="text-4xl md:text-5xl font-bold text-white mb-6"
@@ -543,7 +543,7 @@ export default function AnimatedHomePage() {
               <h4 className="font-bold mb-4">Contact</h4>
               <div className="space-y-2 text-slate-400">
                 <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220</p>
-                <p className="text-brand-red-400">(317) 314-3757</p>
+                <p className="text-brand-red-400">(463) 240-1404</p>
               </div>
             </div>
           </div>

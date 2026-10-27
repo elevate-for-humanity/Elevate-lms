@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function DocumentsUploadPage() {
-  redirect('/student-portal/documents');
+  redirect('/apprentice/documents');
 }

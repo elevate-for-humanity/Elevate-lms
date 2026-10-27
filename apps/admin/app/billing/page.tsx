@@ -10,14 +10,30 @@ export default async function AdminBillingOverviewPage() {
 
   if (!admin) {
     return (
-      <p className="text-slate-600 text-sm">Admin database client unavailable. Check service role env.</p>
+      <p className="text-slate-600 text-sm">
+        Admin database client unavailable. Check service role env.
+      </p>
     );
   }
 
-  const [{ count: planCount }, { count: subCount }, { count: addonCount }] = await Promise.all([
+  const [
+    { count: planCount },
+    { count: subCount },
+    { count: addonCount },
+    { count: invoiceCount },
+    { count: payableCount },
+  ] = await Promise.all([
     admin.from('subscription_plans').select('id', { count: 'exact', head: true }),
     admin.from('organization_subscriptions').select('id', { count: 'exact', head: true }),
-    admin.from('addon_subscriptions').select('id', { count: 'exact', head: true }).eq('active', true),
+    admin
+      .from('addon_subscriptions')
+      .select('id', { count: 'exact', head: true })
+      .eq('active', true),
+    admin.from('billing_invoices').select('id', { count: 'exact', head: true }),
+    admin
+      .from('provider_payables')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['pending', 'approved', 'held']),
   ]);
 
   const { count: licenseCount } = await supabase
@@ -31,6 +47,8 @@ export default async function AdminBillingOverviewPage() {
         { label: 'Org subscriptions', value: subCount ?? 0, href: '/billing/subscriptions' },
         { label: 'Active add-ons', value: addonCount ?? 0, href: '/billing/addons' },
         { label: 'Licenses (legacy sync)', value: licenseCount ?? 0, href: '/billing/licenses' },
+        { label: 'Invoices', value: invoiceCount ?? 0, href: '/billing/invoices' },
+        { label: 'Provider payables', value: payableCount ?? 0, href: '/billing/payables' },
       ].map((card) => (
         <Link
           key={card.href}

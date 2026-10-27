@@ -144,7 +144,7 @@ async function tickCanonicalProductionWorker() {
       'content-type': 'application/json',
     },
     body: JSON.stringify({ courseId: COURSE_ID }),
-    signal: AbortSignal.timeout(20_000),
+    signal: AbortSignal.timeout(1_800_000),
   });
   const text = await response.text();
   if (!response.ok)

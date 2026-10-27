@@ -1,14 +1,13 @@
 // Service Worker — Admin Domain
 // __CACHE_VERSION__ replaced at build time by scripts/stamp-sw.mjs.
 const CACHE_VERSION = '__CACHE_VERSION__';
-const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 
 const PRECACHE_ASSETS = [
   '/offline.html',
   '/manifest-admin.json',
-  `${CDN}/icons/admin-192.png`,
-  `${CDN}/icons/admin-512.png`,
+  '/icon-192.png',
+  '/icon-512.png',
 ];
 
 function isCacheableResponse(response) {
@@ -81,11 +80,11 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Admin pages and data are authenticated and may contain sensitive records.
-  // Never intercept navigations. A rejected fetch combined with a missing
-  // offline fallback makes respondWith resolve without a Response, which
-  // Chromium surfaces as ERR_FAILED. Let the browser own document navigation
-  // and its native redirect, retry, and error behavior.
+  // Admin pages are authenticated and may contain sensitive records. Do not
+  // intercept document navigation: if both the network request and optional
+  // offline cache fail, respondWith can resolve without a Response and Android
+  // Chromium displays ERR_FAILED. Let the browser own redirects, retry, and
+  // its native offline handling instead.
   if (request.mode === 'navigate') return;
 
   if (
@@ -124,9 +123,10 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification',
-    icon: `${CDN}/icons/admin-192.png`,
-    badge: `${CDN}/icons/admin-96.png`,
-    vibrate: [100, 50, 100],
+    silent: data.silent === true,
+    icon: '/icon-192.png',
+    badge: '/icon-96.png',
+    ...(data.silent === true ? {} : { vibrate: [100, 50, 100] }),
     tag: data.tag || 'elevate-admin',
     renotify: true,
     data: { url: data.url || '/', type: data.type },

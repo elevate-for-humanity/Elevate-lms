@@ -83,7 +83,7 @@ const HANDBOOK_SLIDES = [
       'Program access is suspended if a failed payment is not resolved within 7 days.',
       'Suspended students cannot log hours or access coursework. Suspended hours do not count toward your total.',
       'Enrollment may be terminated after 7 days of non-payment. Amounts already paid are non-refundable.',
-      `Call ${PLATFORM_DEFAULTS.supportPhone} before a payment fails — we can work with you proactively.`,
+      `Call ${PLATFORM_DEFAULTS.mainPhone} before a payment fails — we can work with you proactively.`,
     ],
   },
   {
@@ -154,7 +154,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
       }
       router.push('/programs/barber-apprenticeship/documents');
     } catch {
-      setSubmitError(`We could not save your orientation completion. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setSubmitError(`We could not save your orientation completion. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`);
     } finally {
       setSubmitting(false);
     }
@@ -194,7 +194,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
           <div className="relative bg-black rounded-2xl overflow-hidden aspect-video shadow-2xl">
             <video
               ref={videoRef}
-              src="/videos/barber-lessons/barber-apprenticeship-intro.mp4"
+              src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
               poster="/images/pages/about-career-training.webp"
               controls
               playsInline

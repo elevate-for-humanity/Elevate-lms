@@ -40,7 +40,7 @@ export default async function AdminStaffPage() {
             <p className="text-slate-500 text-sm mt-0.5">{rows.length} staff members</p>
           </div>
           <Link
-            href="/staff"
+            href="/hr/employees/new"
             className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" /> Invite Staff
@@ -83,7 +83,7 @@ export default async function AdminStaffPage() {
                   {rows.map((s) => (
                     <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-slate-900">
-                        <Link href={`/staff/${s.id}`} className="hover:text-blue-600">
+                        <Link href={`/hr/employees/${s.id}`} className="hover:text-blue-600">
                           {s.full_name ?? '(no name)'}
                         </Link>
                       </td>

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -16,15 +17,14 @@ export function MarketingPageContent({ page }: MarketingPageContentProps) {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[clamp(420px,58vh,720px)] flex items-center">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+      <section className="relative h-[clamp(260px,42svh,480px)] flex items-center">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={page.hero_image}
           alt={page.hero_image_alt}
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
 
         <div className="relative max-w-7xl mx-auto px-6 text-white">

@@ -24,31 +24,32 @@ async function _GET(request: NextRequest) {
 
     // Get all active apprenticeships with today's hours
     const { data: apprenticeships, error } = await supabase
-      .from('apprenticeship_enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,
         student_id,
         employer_id,
-        hours_completed,
-        hours_required,
-        student:profiles!apprenticeship_enrollments_student_id_fkey(
+        total_hours_completed,
+        required_hours,
+        student:profiles!program_enrollments_student_id_profiles_fkey(
           id,
           email,
           full_name
         ),
-        employer:profiles!apprenticeship_enrollments_employer_id_fkey(
+        employer:employers!program_enrollments_employer_id_fkey(
           id,
-          email,
-          full_name
+          contact_email,
+          contact_name
         ),
-        program:programs(
+        program:programs!fk_program_enrollments_program(
           id,
           name
         )
       `,
       )
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .eq('enrollment_type', 'apprentice');
 
     if (error) throw error;
 
@@ -86,8 +87,8 @@ async function _GET(request: NextRequest) {
                 studentEmail: student.email,
                 programName: program?.name,
                 todayHours: todayLog.total_hours || 0,
-                totalHours: apprenticeship.hours_completed || 0,
-                requiredHours: apprenticeship.hours_required || 2000,
+                totalHours: apprenticeship.total_hours_completed || 0,
+                requiredHours: apprenticeship.required_hours || 2000,
                 checkInTime: todayLog.check_in_time,
                 checkOutTime: todayLog.check_out_time,
                 approved: todayLog.approved,

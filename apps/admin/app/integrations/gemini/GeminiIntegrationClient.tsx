@@ -66,7 +66,7 @@ export default function GeminiIntegrationClient({
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-1 gap-3 mb-4 sm:grid-cols-3">
           {[
             { label: 'Gemini', configured: hasKey, key: 'GEMINI_API_KEY' },
             { label: 'OpenAI', configured: hasOpenAI, key: 'OPENAI_API_KEY' },

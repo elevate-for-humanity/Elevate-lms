@@ -48,7 +48,7 @@ export default function Page() {
                 <li>• Welding Fundamentals</li>
                 <li>• CDL Training</li>
               </ul>
-              <Link href="/programs/trades" className="text-blue-600 font-semibold hover:text-blue-700">View Trades Programs →</Link>
+              <Link href="/programs/skilled-trades" className="text-blue-600 font-semibold hover:text-blue-700">View Trades Programs →</Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-pink-500">

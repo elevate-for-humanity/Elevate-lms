@@ -101,14 +101,14 @@ function AssetPreview({ asset, className = '' }: { asset: MediaAsset; className?
   return <div className={`grid place-items-center bg-slate-100 text-sm text-slate-500 ${className}`}>File</div>;
 }
 
-export default function MediaStudioPanel() {
+export default function MediaStudioPanel({initialTab = 'create'}: {initialTab?: StudioTab} = {}) {
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
-  const [tab, setTab] = useState<StudioTab>('create');
+  const [tab, setTab] = useState<StudioTab>(initialTab);
   const [mode, setMode] = useState<CreatorMode>('commercial');
 
   const loadAssets = useCallback(async () => {
@@ -134,6 +134,14 @@ export default function MediaStudioPanel() {
   }, [search, type]);
 
   useEffect(() => { void loadAssets(); }, [loadAssets]);
+
+  useEffect(() => {
+    if (initialTab !== 'create') return;
+    const requested = new URLSearchParams(window.location.search).get('tab');
+    if (requested === 'create' || requested === 'projects' || requested === 'library') {
+      setTab(requested);
+    }
+  }, [initialTab]);
 
   const projects = useMemo(() => {
     const grouped = new Map<string, MediaAsset[]>();

@@ -34,14 +34,14 @@ export default function BnplOptions({
         const optionId =
           provider.id === 'affirm' ? 'affirm'
           : provider.id === 'sezzle' ? 'sezzle'
-          : 'stripe_bnpl';
+          : 'quickbooks_bnpl';
 
         const maxAmt = provider.maxAmount > 0 ? provider.maxAmount : fullPrice;
         const minAmt = provider.minAmount;
         const isSelected = selected === optionId;
         const isStripNative = !['affirm', 'sezzle'].includes(provider.id);
 
-        // Group all Stripe-native providers under one button (Klarna represents the group)
+        // Group all QuickBooks-native providers under one button (Klarna represents the group)
         if (isStripNative && provider.id !== 'klarna') return null;
 
         const label = isStripNative
@@ -118,7 +118,7 @@ export default function BnplOptions({
               </div>
             )}
 
-            {/* Stripe-native — no amount input, provider chosen at Stripe checkout */}
+            {/* QuickBooks-native — no amount input, provider chosen at QuickBooks checkout */}
             {isSelected && isStripNative && (
               <div className="bg-brand-blue-50 rounded-xl p-4 mb-3 border-2 border-brand-blue-200">
                 <p className="text-sm text-black">

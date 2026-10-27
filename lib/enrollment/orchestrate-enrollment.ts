@@ -134,19 +134,26 @@ async function triggerWelcomeEmail(
   }
 
   // Queue email via notification outbox (processed by cron)
-  await supabase.from('notification_outbox').insert({
+  const { error: queueError } = await supabase.from('notification_outbox').insert({
     to_email: studentEmail,
     template_key: 'enrollment_welcome',
     template_data: {
       name: studentName,
+      username: studentEmail,
+      email: studentEmail,
       program_name: programName,
       enrollment_id: enrollmentId,
-      dashboard_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.com'}/lms`,
+      login_url: 'https://app.elevateforhumanity.org/login',
+      dashboard_url: 'https://app.elevateforhumanity.org/lms/dashboard',
+      password_setup_url: 'https://www.elevateforhumanity.org/forgot-password',
+      security_url: 'https://app.elevateforhumanity.org/account/settings/security',
     },
     status: 'queued',
     scheduled_for: new Date().toISOString(),
     created_at: new Date().toISOString(),
   });
+
+  if (queueError) throw new Error(`Welcome email queue failed: ${queueError.message}`);
 
   logger.info('[Enrollment Email] Queued welcome email', {
     studentId,

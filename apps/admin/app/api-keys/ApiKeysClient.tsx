@@ -14,6 +14,7 @@ interface ApiKey {
   id: string;
   name: string;
   is_active: boolean;
+  status: string | null;
   created_at: string;
   last_used_at: string | null;
 }
@@ -66,7 +67,11 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
     try {
       const res = await fetch(`/api/admin/api-keys?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
-        setKeys((prev) => prev.filter((k) => k.id !== id));
+        setKeys((prev) =>
+          prev.map((key) =>
+            key.id === id ? { ...key, is_active: false, status: 'revoked' } : key,
+          ),
+        );
         router.refresh();
       }
     } finally {
@@ -159,10 +164,16 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Name</th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Key</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Created</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Last Used</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">
+                  Created
+                </th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">
+                  Last Used
+                </th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Status</th>
-                <th className="text-right px-6 py-4 text-sm font-semibold text-slate-900">Actions</th>
+                <th className="text-right px-6 py-4 text-sm font-semibold text-slate-900">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -197,15 +208,17 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          apiKey.is_active ? statusColors.active : statusColors.revoked
+                          apiKey.is_active && apiKey.status !== 'revoked'
+                            ? statusColors.active
+                            : statusColors.revoked
                         }`}
                       >
-                        {apiKey.is_active ? 'active' : 'revoked'}
+                        {apiKey.is_active && apiKey.status !== 'revoked' ? 'active' : 'revoked'}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        {apiKey.is_active && (
+                        {apiKey.is_active && apiKey.status !== 'revoked' && (
                           <button
                             onClick={() => handleRevoke(apiKey.id)}
                             disabled={revoking === apiKey.id}
@@ -297,15 +310,24 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
       <div className="mt-12">
         <h2 className="text-xl font-bold text-slate-900 mb-2">REST API v1 — Available Endpoints</h2>
         <p className="text-slate-500 text-sm mb-6">
-          Authenticate with <code className="bg-slate-100 px-1 rounded">Authorization: Bearer &lt;api-key&gt;</code> on all requests.
-          Base URL: <code className="bg-slate-100 px-1 rounded">{typeof window !== 'undefined' ? window.location.origin : PLATFORM_DEFAULTS.siteUrl}</code>
+          Authenticate with{' '}
+          <code className="bg-slate-100 px-1 rounded">Authorization: Bearer &lt;api-key&gt;</code>{' '}
+          on all requests. Base URL:{' '}
+          <code className="bg-slate-100 px-1 rounded">
+            {typeof window !== 'undefined' ? window.location.origin : PLATFORM_DEFAULTS.siteUrl}
+          </code>
         </p>
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 {['Method', 'Endpoint', 'Description'].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -317,18 +339,36 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
                 { method: 'POST', path: '/api/v1/enrollments', desc: 'Create an enrollment' },
                 { method: 'GET', path: '/api/v1/certificates', desc: 'List issued certificates' },
                 { method: 'GET', path: '/api/v1/programs', desc: 'List programs' },
-                { method: 'POST', path: '/api/xapi/statement', desc: 'Submit an xAPI learning statement' },
+                {
+                  method: 'POST',
+                  path: '/api/xapi/statement',
+                  desc: 'Submit an xAPI learning statement',
+                },
                 { method: 'POST', path: '/api/lti/launch', desc: 'LTI 1.3 launch (external LMS)' },
                 { method: 'GET', path: '/api/lti/jwks', desc: 'LTI JWKS public key endpoint' },
                 { method: 'GET', path: '/api/lti/config', desc: 'LTI tool configuration JSON' },
-                { method: 'POST', path: '/api/scorm/tracking', desc: 'Submit SCORM CMI tracking data' },
-                { method: 'GET', path: '/api/scorm/content/:id/*', desc: 'Serve SCORM package content files' },
+                {
+                  method: 'POST',
+                  path: '/api/scorm/tracking',
+                  desc: 'Submit SCORM CMI tracking data',
+                },
+                {
+                  method: 'GET',
+                  path: '/api/scorm/content/:id/*',
+                  desc: 'Serve SCORM package content files',
+                },
               ].map((row) => (
                 <tr key={row.path} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-mono font-bold ${
-                      row.method === 'GET' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-                    }`}>{row.method}</span>
+                    <span
+                      className={`inline-flex px-2 py-0.5 rounded text-xs font-mono font-bold ${
+                        row.method === 'GET'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-green-100 text-green-700'
+                      }`}
+                    >
+                      {row.method}
+                    </span>
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-slate-700">{row.path}</td>
                   <td className="px-4 py-3 text-slate-600">{row.desc}</td>

@@ -2,7 +2,7 @@
  * Canonical offering taxonomy for user-facing labels.
  *
  * Programs   = funded ETPL / workforce pathways (WIOA, WRG, WorkOne eligible)
- * Short-Term Courses = direct-purchase, standalone courses (NRF, CareerSafe, HSI)
+ * Short-Term Courses = direct-purchase, standalone courses (NRF, CareerSafe)
  * Certification / Testing = exam issuers only (Certiport)
  * Curriculum Partner = content/platform partners
  *
@@ -20,7 +20,6 @@ const PROVIDER_TYPE_MAP: Record<string, OfferingKind> = {
   // Short-term direct-purchase courses
   nrf: 'short_term_course',
   careersafe: 'short_term_course',
-  hsi: 'short_term_course',
   // Credential / testing infrastructure
   certiport: 'credential_partner',
   // Curriculum / content partners

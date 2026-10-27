@@ -9,8 +9,9 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { defaultActivities } from '../activities';
+import { buildLearningExperience } from '../learning-experience';
 import { loadIndustryStandards, type IndustryStandards } from '@/lib/industry/standards-loader';
-import { publishCourse, publishCourseAtomic } from '@/lib/course-factory/publisher';
+import { courseFactory } from '@/lib/course-builder/orchestrator';
 import type {
   CredentialBlueprint,
   BlueprintModule,
@@ -121,11 +122,13 @@ function validateLessons(modules: CredentialBlueprint['modules']): void {
   const orderKeys = new Set<string>();
   for (const mod of modules) {
     for (const lesson of mod.lessons ?? []) {
-      if (!lesson.slug) throw new Error(`Missing slug in module '${mod.slug}' at order ${lesson.order}`);
+      if (!lesson.slug)
+        throw new Error(`Missing slug in module '${mod.slug}' at order ${lesson.order}`);
       if (slugs.has(lesson.slug)) throw new Error(`Duplicate slug: ${lesson.slug}`);
       slugs.add(lesson.slug);
       const key = `${mod.orderIndex}:${lesson.order}`;
-      if (orderKeys.has(key)) throw new Error(`Duplicate order ${lesson.order} in module '${mod.slug}'`);
+      if (orderKeys.has(key))
+        throw new Error(`Duplicate order ${lesson.order} in module '${mod.slug}'`);
       orderKeys.add(key);
     }
   }
@@ -164,7 +167,7 @@ function mergeInstructorNotes(
   if (lessonRef.competencyChecks?.length) {
     notes.push(
       `Competency checks: ${lessonRef.competencyChecks
-        .map((check) => (typeof check === 'string' ? check : check.label ?? check.key))
+        .map((check) => (typeof check === 'string' ? check : (check.label ?? check.key)))
         .join('; ')}`,
     );
   }
@@ -197,9 +200,7 @@ function normalizeQuizQuestions(raw: unknown, slug: string): BlueprintQuizQuesti
   return normalized.length ? normalized : undefined;
 }
 
-async function prepareBlueprint(
-  blueprint: CredentialBlueprint,
-): Promise<{
+async function prepareBlueprint(blueprint: CredentialBlueprint): Promise<{
   modules: BlueprintModule[];
   contentFailures: LessonFailure[];
   warnings: string[];
@@ -211,11 +212,15 @@ async function prepareBlueprint(
   const curriculumMap = new Map<string, CurriculumRow>();
 
   if (blueprint.contentSource === 'curriculum_lessons') {
-    const slugs = blueprint.modules.flatMap((mod) => (mod.lessons ?? []).map((lesson) => lesson.slug));
+    const slugs = blueprint.modules.flatMap((mod) =>
+      (mod.lessons ?? []).map((lesson) => lesson.slug),
+    );
     if (slugs.length) {
       const { data, error } = await db
         .from('curriculum_lessons')
-        .select('lesson_slug, script_text, step_type, passing_score, quiz_questions, duration_minutes, video_file')
+        .select(
+          'lesson_slug, script_text, step_type, passing_score, quiz_questions, duration_minutes, video_file',
+        )
         .in('lesson_slug', slugs);
       if (error) warnings.push(`curriculum_lessons fetch failed: ${error.message}`);
       for (const row of data ?? []) {
@@ -269,6 +274,11 @@ async function prepareBlueprint(
       }
 
       extra.activities = defaultActivities(String(extra.lessonType ?? inferStepType(lesson.slug)));
+      extra.aiGenerated = true;
+      extra.learningExperience = buildLearningExperience({
+        lessonType: String(extra.lessonType ?? inferStepType(lesson.slug)),
+        practicalRequired: Boolean(mod.practicalRequired || extra.practicalRequired),
+      });
       extra.videoConfig = blueprint.videoConfig ?? extra.videoConfig;
       const notes = mergeInstructorNotes(lesson, standards);
       if (notes) lesson.instructorNotes = notes;
@@ -287,36 +297,29 @@ export async function buildCanonicalCourseFromBlueprint(
   const courseSlug = input.courseSlug ?? input.blueprint.programSlug;
   const courseTitle = input.courseTitle ?? input.blueprint.credentialTitle;
 
-  const persisted = await publishCourse({
+  const persisted = await courseFactory({
     programId: input.programId,
-    courseSlug,
-    courseTitle,
-    blueprint: prepared.modules,
+    programSlug: input.blueprint.programSlug,
+    blueprint: { ...input.blueprint, modules: prepared.modules },
+    title: courseTitle,
     mode: input.mode,
-    contentSource:
-      input.blueprint.contentSource === 'curriculum_lessons'
-        ? 'curriculum_lessons'
-        : 'blueprint',
-    videoConfig: { enabled: Boolean(input.blueprint.videoConfig) },
+    contentSource: 'blueprint',
+    videoMode: input.blueprint.videoConfig ? 'queue' : 'off',
   });
 
-  if (!persisted.success || !persisted.courseId) {
-    throw new Error(`Course Factory persistence failed: ${persisted.errors.join('; ') || 'unknown error'}`);
-  }
-
-  // Preserve historical seeder visibility behavior through the canonical publish RPC.
-  const published = await publishCourseAtomic(persisted.courseId, input.programId);
-  if (!published.success) {
-    prepared.warnings.push(`Course staged but publish failed: ${published.error}`);
+  if (!persisted.ok || !persisted.courseId) {
+    throw new Error(
+      `Canonical Course Builder failed: ${persisted.errors?.join('; ') || 'unknown error'}`,
+    );
   }
 
   const result: BuildCanonicalCourseResult = {
     courseId: persisted.courseId,
-    moduleCount: persisted.moduleCount,
-    lessonCount: persisted.lessonCount,
-    skipped: persisted.skippedCount,
+    moduleCount: persisted.moduleCount ?? 0,
+    lessonCount: persisted.lessonCount ?? 0,
+    skipped: persisted.skippedCount ?? 0,
     contentFailures: prepared.contentFailures,
-    warnings: [...prepared.warnings, ...persisted.warnings],
+    warnings: [...prepared.warnings, ...(persisted.warnings ?? [])],
   };
 
   try {
@@ -330,8 +333,8 @@ export async function buildCanonicalCourseFromBlueprint(
         blueprint_id: input.blueprint.id,
         blueprint_version: input.blueprint.version,
         mode: input.mode,
-        lessons_inserted: persisted.lessonCount,
-        lessons_skipped: persisted.skippedCount,
+        lessons_inserted: persisted.lessonCount ?? 0,
+        lessons_skipped: persisted.skippedCount ?? 0,
         content_failures: prepared.contentFailures.length,
         failed_slugs: prepared.contentFailures.map((failure) => failure.slug),
       },

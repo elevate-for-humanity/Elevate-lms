@@ -4,7 +4,7 @@
  * matches the exact required phrase.
  */
 
-export type ConfirmationAction = 'CONFIRM DEPLOY' | 'CONFIRM MIGRATION' | 'CONFIRM ROLLBACK' | 'CONFIRM BULK EMAIL' | 'CONFIRM PUSH';
+export type ConfirmationAction = 'CONFIRM DEPLOY' | 'CONFIRM MIGRATION' | 'CONFIRM ROLLBACK' | 'CONFIRM BULK EMAIL' | 'CONFIRM PUSH' | 'CONFIRM DELETE SECRET';
 
 const ACTION_PHRASES: Record<string, ConfirmationAction> = {
   deploy_autopilot: 'CONFIRM DEPLOY',
@@ -13,6 +13,7 @@ const ACTION_PHRASES: Record<string, ConfirmationAction> = {
   rollback: 'CONFIRM ROLLBACK',
   send_bulk_email: 'CONFIRM BULK EMAIL',
   git_push: 'CONFIRM PUSH',
+  delete_secret: 'CONFIRM DELETE SECRET',
 };
 
 export function getConfirmationPhrase(action: string): ConfirmationAction | null {

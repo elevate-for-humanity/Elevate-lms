@@ -1,30 +1,46 @@
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Contact Elevate for Humanity | Workforce Development & Apprenticeship Programs',
+  title: 'Contact | Workforce Development & Apprenticeship Programs',
   description: 'Get in touch with our workforce development team. We help job seekers, employers, and training partners connect to funded career programs in Indianapolis and across Indiana.',
 };
 
-export default function ContactPage() {
+type ContactPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function titleFromSlug(value: string) {
+  return value.replaceAll('-', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const params = (await searchParams) || {};
+  const product = typeof params.product === 'string' ? params.product : '';
+  const course = typeof params.course === 'string' ? params.course : '';
+  const submitted = params.submitted === '1';
+  const requestedItem = product || course;
+  const defaultSubject = course ? 'enrollment' : requestedItem ? 'other' : '';
+  const defaultMessage = requestedItem
+    ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
+    : '';
+
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="text-blue-200 font-semibold mb-3 tracking-wide uppercase text-sm">Get in Touch</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Let&apos;s Build Your Workforce Together
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed">
-              Whether you&apos;re an individual seeking training, an employer building a talent pipeline, 
-              or a workforce agency coordinating programs — we&apos;re here to help you succeed.
-            </p>
-          </div>
-        </div>
-      </section>
+      <HeroPicture
+        src="/images/pages/contact-page-1.webp"
+        alt="People collaborating around a table with notes and career planning materials"
+        analyticsName="contact"
+        belowHeroHeadline="Let’s plan your next step."
+        belowHeroSubheadline="Ask about training, payment plans, apprenticeships, or becoming a host shop. We’ll help you find where to start."
+        ctas={[
+          { label: 'Send a message', href: '#contact-form' },
+          { label: 'Call our team', href: siteConfig.phone.href, variant: 'secondary' },
+        ]}
+      />
 
       {/* Main Content */}
       <section className="py-16">
@@ -35,8 +51,13 @@ export default function ContactPage() {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-xl p-8">
                 <h2 className="text-2xl font-bold text-slate-900 mb-6">Send Us a Message</h2>
+                {submitted && (
+                  <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-900" role="status">
+                    Message received. Our team will follow up using the email you provided.
+                  </div>
+                )}
                 
-                <form className="space-y-6">
+                <form id="contact-form" className="space-y-6 scroll-mt-24" action="/api/contact" method="post">
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -100,6 +121,7 @@ export default function ContactPage() {
                       id="subject"
                       name="subject"
                       required
+                      defaultValue={defaultSubject}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors"
                     >
                       <option value="">Select a topic</option>
@@ -126,6 +148,8 @@ export default function ContactPage() {
                       name="message"
                       rows={5}
                       required
+                      minLength={10}
+                      defaultValue={defaultMessage}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors resize-none"
                       placeholder="Tell us about your goals, questions, or how we can support you..."
                     />
@@ -154,16 +178,21 @@ export default function ContactPage() {
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Contact</h3>
                 <div className="space-y-4">
-                  <a href="tel:+13173140199" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                  <a href={siteConfig.phone.href} className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Phone className="w-5 h-5 text-brand-blue-700" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Phone</p>
-                      <p className="font-semibold">(317) 314-3757</p>
+                      <p className="text-sm text-slate-500">Main Phone — Programs and Admissions</p>
+                      <p className="font-semibold">{siteConfig.phone.display}</p>
                     </div>
                   </a>
                   
+                  <a href={siteConfig.technicalSupport.href} className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center"><Phone className="w-5 h-5 text-brand-blue-700" /></div>
+                    <div><p className="text-sm text-slate-500">Technical Support — Login and Website Help</p><p className="font-semibold">{siteConfig.technicalSupport.display}</p></div>
+                  </a>
+
                   <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Mail className="w-5 h-5 text-brand-blue-700" />
@@ -271,7 +300,7 @@ export default function ContactPage() {
             <div className="bg-slate-50 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 mb-2">What programs do you offer?</h3>
               <p className="text-slate-600 text-sm">
-                We offer DOL-registered apprenticeships in barbering and cosmetology, plus workforce training programs in healthcare, skilled trades, technology, and more.
+                We offer registered apprenticeship and workforce-training pathways across barbering, beauty, healthcare, skilled trades, technology, and other career fields. Registration status is program-specific; confirm the current public apprenticeship record before relying on a federal registration claim.
               </p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
@@ -283,7 +312,7 @@ export default function ContactPage() {
             <div className="bg-slate-50 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 mb-2">How do apprenticeships work?</h3>
               <p className="text-slate-600 text-sm">
-                You earn while you learn — working at a host shop while completing related instruction. Most programs take 1-2 years to complete.
+                Registered apprenticeships combine paid on-the-job learning with related instruction. Program length, competencies, and hour requirements vary by occupation and the applicable registered standards.
               </p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">

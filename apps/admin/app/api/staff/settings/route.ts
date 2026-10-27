@@ -14,22 +14,22 @@ async function _PUT(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { data: staffUser } = await supabase
-    .from('staff_users')
-    .select('staff_id')
-    .eq('user_id', user.id)
+    .from('profiles')
+    .select('id, role')
+    .eq('id', user.id)
     .maybeSingle();
-  if (!staffUser?.staff_id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!staffUser?.id || !['staff', 'admin', 'super_admin'].includes(staffUser.role ?? '')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
   const clean = (value: unknown, max: number) => typeof value === 'string' ? value.trim().slice(0, max) : '';
   const payload = {
-    name: clean(body.orgName, 200),
+    company_name: clean(body.orgName, 200),
     address: clean(body.address, 300),
     city: clean(body.city, 120),
     state: clean(body.state, 80),
-    contact_name: clean(body.contactName, 160),
-    contact_email: clean(body.contactEmail, 254),
-    contact_phone: clean(body.contactPhone, 60),
+    full_name: clean(body.contactName, 160),
+    email: clean(body.contactEmail, 254),
+    phone: clean(body.contactPhone, 60),
     notification_preferences: {
       email: Boolean(body.emailNotifications),
       weekly_digest: Boolean(body.weeklyDigest),
@@ -39,10 +39,10 @@ async function _PUT(request: NextRequest) {
   };
 
   const { data, error } = await supabase
-    .from('staffs')
+    .from('profiles')
     .update(payload)
-    .eq('id', staffUser.staff_id)
-    .select('id, name, address, city, state, contact_name, contact_email, contact_phone, notification_preferences')
+    .eq('id', staffUser.id)
+    .select('id, company_name, address, city, state, full_name, email, phone, notification_preferences')
     .maybeSingle();
 
   if (error) return NextResponse.json({ error: 'Failed to save staff settings' }, { status: 500 });

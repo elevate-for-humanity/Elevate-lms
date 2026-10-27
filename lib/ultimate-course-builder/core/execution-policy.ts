@@ -1,16 +1,16 @@
 import type { UltimateBuildStep } from './types';
 
 /**
- * Development acceptance policy for Ultimate Course Builder.
- * Instructional findings are observations during full-course builds.
+ * Production acceptance policy for Ultimate Course Builder.
+ * Error findings block dependent stages and publication.
  * Platform security, authorization, data-integrity and licensing controls
  * remain outside this policy and are never bypassed here.
  */
 export const ULTIMATE_EXECUTION_POLICY = {
-  mode: 'progressive-observation',
-  instructionalFindingsBlockProgress: false,
+  mode: 'fail-closed-versioned-contract',
+  instructionalFindingsBlockProgress: true,
   recordFindings: true,
-  continueThroughAllTwentySteps: true,
+  continueThroughAllTwentySteps: false,
 } as const;
 
 export type UltimateInstructionalFinding = {

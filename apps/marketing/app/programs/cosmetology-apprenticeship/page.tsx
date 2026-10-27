@@ -1,3 +1,6 @@
+import { connection } from 'next/server';
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { getProgramHeroImage } from '@/lib/images/programImages';
 import { notFound } from 'next/navigation';
 
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
@@ -7,6 +10,8 @@ import BeautyApprenticeshipAuthority, {
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import CosmetologyVisualExperience from '@/components/programs/beauty/CosmetologyVisualExperience';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
+import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { getStaticProgram } from '@/data/programs';
@@ -14,6 +19,8 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function CosmetologyApprenticeshipPage() {
+  // Live approved host-shop galleries and placement guides require runtime credentials.
+  await connection();
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
   if (!program) return notFound();
@@ -22,11 +29,9 @@ export default async function CosmetologyApprenticeshipPage() {
     ? {
         ...baseBanner,
         voiceoverSrc: undefined,
-        videoSrcDesktop: undefined,
-        videoSrcMobile: undefined,
         belowHeroHeadline: 'Build your cosmetology career through supervised salon training.',
         belowHeroSubheadline:
-          'Learn in a licensed Host Salon, complete required instruction, document your hours and skills, and prepare for the applicable Indiana licensing process.',
+          'Registered Hair Stylist/Cosmetologist occupation 0096HY V1: complete the 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, required work processes, and the applicable Indiana examination and licensing process.',
         trustIndicators: [
           'Supervised salon training',
           'Related Technical Instruction',
@@ -34,7 +39,7 @@ export default async function CosmetologyApprenticeshipPage() {
           'Licensing preparation',
         ],
         transcript:
-          'Cosmetology Apprenticeship — Program Page Guide. Start by applying to Elevate and reviewing the program requirements. Elevate confirms enrollment, instruction, records, and the available payment or funding path. An approved Host Salon employs and supervises the apprentice during hands-on training. The apprentice completes Related Technical Instruction, records attendance and hours, demonstrates required competencies, and follows the applicable Indiana testing and licensing process. Self-pay students may pay in full or review an available buy now, pay later option. Buy now, pay later is offered by an outside provider, requires separate approval, and is subject to that provider’s payment schedule, fees, and agreement.',
+          'Hair Stylist, existing title Cosmetologist, is registered in RAPIDS as occupation 0096HY V1 using a hybrid model. Apprentices complete a 2,000 to 2,500 hour registered term, including 154 hours of Related Technical Instruction, supervised Host Salon training, required work processes, and program records. The 500-hour figure is the probationary period, not graduation. After registered apprenticeship completion, the apprentice follows the applicable Indiana examination and licensing process.',
       }
     : null;
   const structuredData = buildBeautyProgramStructuredData(program);
@@ -50,9 +55,19 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        heroOverride={<CosmetologyVisualExperience />}
-        afterHero={<BeautyEnrollmentPromotion />}
-        featuredContent={<FeaturedHostPartners programSlug="cosmetology-apprenticeship" />}
+        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="cosmetology-apprenticeship" />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="cosmetology-apprenticeship" programLabel={program.title} />}
+        visualContent={<CosmetologyVisualExperience />}
+        featuredContent={
+          <>
+            <ApprenticeshipExperienceGuide
+              programTitle={program.title}
+              applyHref={program.cta.applyHref}
+            />
+            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" showDirectory={false} />
+            <HostShopPlacementGuide programSlug="cosmetology-apprenticeship" />
+          </>
+        }
       >
         <BeautyApprenticeshipAuthority program={program} />
       </ProgramDetailPage>
@@ -64,7 +79,7 @@ export async function generateMetadata() {
   return {
     title: 'Cosmetology Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Indiana cosmetology apprenticeship pathway with 2,000 hours of supervised salon training, related instruction, host-site placement, progress tracking and licensing preparation. Current funding status is verified per program before enrollment.',
+      'Registered Indiana Hair Stylist/Cosmetologist apprenticeship, RAPIDS 0096HY V1: hybrid 2,000–2,500-hour term, 154 RTI hours, 500-hour probation, supervised Host Salon training, progress tracking, and licensing preparation.',
     keywords: [
       'cosmetology apprenticeship Indiana',
       'Indiana cosmetology apprenticeship program',
@@ -80,7 +95,7 @@ export async function generateMetadata() {
     openGraph: {
       title: 'Cosmetology Apprenticeship Program | Indiana',
       description:
-        'Complete supervised salon training and related instruction with Elevate’s cosmetology apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+        'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1) with a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, and licensing preparation.',
       url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
       type: 'website',
     },

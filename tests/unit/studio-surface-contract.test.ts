@@ -118,7 +118,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
     expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
     expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
-    expect(builds).toContain("return safeError('Northflank is not configured.");
+    expect(builds).toContain("deploymentProvider: 'google-cloud-run'");
+    expect(builds).toContain('dispatchGoogleDeployment(service)');
     expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
     expect(environment).toContain(
       "requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')",
@@ -132,6 +133,41 @@ describe('Admin Dashboard and Studio surface contract', () => {
     );
     expect(workspace).toContain('disabled={runtimeReady !== true || !target.trim()}');
     expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
+  });
+
+  it('pauses the canonical browser task when the worker detects provider authentication', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const worker = source('services/studio-browser/server.mjs');
+    expect(worker).toContain("BrowserServiceError('authentication_required', 409");
+    expect(route).toContain("actionMetrics.error === 'authentication_required'");
+    expect(route).toContain(
+      "mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction'",
+    );
+    expect(route).toContain("snapshot.error === 'interaction_required'");
+    expect(route).toContain("emit({ type: 'interaction_required'");
+    expect(route).toContain('pauseForAuthentication(');
+  });
+
+  it('continues the same browser task from its durable checkpoint instead of failing at the request batch limit', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(route).not.toContain('AI browser reached the 20-step safety limit');
+    expect(route).toContain('continueFromCheckpoint');
+    expect(route).toContain("type: 'continue'");
+    expect(workspace).toContain('setContinuationTaskId(canonicalTaskId)');
+    expect(workspace).toContain('void runAgent(taskId)');
+    expect(workspace).toContain('continuationTaskId !== activeTaskId');
+  });
+
+  it('reconnects expired sessions only after verifying the administrator owns the live browser', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(route).toContain('/identity');
+    expect(route).toContain('identity?.ownerId !== auth.id');
+    expect(route).toContain('browserTaskMatches(task, { command, sessionId: priorSessionId })');
+    expect(route).toContain(".eq('requested_by', auth.id)");
+    expect(workspace).toContain('response?.status === 410');
+    expect(workspace).toContain('lifecycle !== lifecycleRef.current');
   });
 
   it('binds browser evidence to the canonical task identity for the full stream', () => {
@@ -152,7 +188,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const panel = source('components/studio/DevStudioHealthPanel.tsx');
     expect(health).toContain('const githubToken = await getGitHubToken()');
     expect(health).toContain('repositoryWritesReady: githubTokenValid');
-    expect(health).toContain('ready: true');
+    expect(health).toContain('ready: executionPrerequisitesReady');
     expect(panel).toContain(
       "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
     );
@@ -183,9 +219,21 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('<UnifiedEllieChat');
     expect(workspace).toContain('<RepositoryLivePreview');
     expect(workspace).toContain('<CloudBrowserWorkspace');
+    expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
     expect(workspace).toContain(
       "type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability'",
     );
+  });
+
+  it('mounts the first-party Course Builder directly instead of framing it', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const courseBuilder = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+
+    expect(workspace).toContain("import('@/components/admin/course-builder/UnifiedCourseBuilder')");
+    expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
+    expect(courseBuilder).toContain('embedded?: boolean');
+    expect(courseBuilder).toContain('syncLocationWithUrl = !embedded');
+    expect(courseBuilder).toContain('if (!syncLocationWithUrl) return;');
   });
 
   it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {
@@ -256,8 +304,11 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(navigation).toContain('useSearchParams');
     expect(navigation).toContain("pathname === '/studio'");
     expect(navigation).toContain("searchParams.get('embedded') === 'studio'");
-    expect(chrome).toContain('admin-studio-viewport h-full');
-    expect(globalStyles).toContain('.admin-studio-viewport section');
+    expect(chrome).toContain('admin-studio-viewport min-h-0 min-w-0 flex-1 overflow-hidden');
+    expect(chrome).toContain('flex h-dvh min-w-0 flex-col overflow-hidden');
+    expect(globalStyles).toContain('.admin-studio-viewport > section');
+    expect(globalStyles).not.toContain('.admin-studio-viewport section');
+    expect(globalStyles).not.toContain('.admin-studio-viewport main,');
     expect(globalStyles).toContain('padding: 0 !important');
     expect(workspace).toContain('className="flex h-full min-h-0');
     expect(workspace).not.toContain('h-[100dvh]');
@@ -310,7 +361,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
   it('validates GitHub credentials before declaring repository writes ready', () => {
     const health = source('lib/devstudio/health-handler.ts');
-    expect(health).toContain("fetch('https://api.github.com/user'");
+    expect(health).toContain("fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main'");
+    expect(health).toContain("redirect: 'error'");
     expect(health).toContain('repositoryWritesReady: githubTokenValid');
   });
 });
+

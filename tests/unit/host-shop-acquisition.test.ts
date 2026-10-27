@@ -13,7 +13,8 @@ describe('host shop acquisition architecture', () => {
     const page = readFileSync('apps/marketing/app/partners/host-shops/indiana/[city]/page.tsx', 'utf8');
     const estimator = readFileSync('components/partners/WageReimbursementEstimator.tsx', 'utf8');
     const confirmation = readFileSync('apps/marketing/app/partners/host-shop/confirmation/page.tsx', 'utf8');
-    expect(page).toContain('Approval is not automatic');
+    expect(page).toContain('Elevate reviews the worksite and occupation fit');
+    expect(page).toContain('After approval and a suitable match');
     expect(estimator).toContain('WorkOne must approve');
     expect(page).not.toContain('free labor');
     expect(confirmation).toContain('HostShopApplicationConversion');

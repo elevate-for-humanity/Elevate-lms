@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { siteUrls } from '../../lib/utils/site-urls';
 
 test.describe('Canonical application flow', () => {
   test('homepage exposes a visible application path', async ({ page }) => {
@@ -53,11 +54,28 @@ test.describe('Canonical application flow', () => {
     });
   }
 
-  test('login, onboarding and tracking routes exist', async ({ request }) => {
-    const login = await request.get('/login', { maxRedirects: 0, failOnStatusCode: false });
-    expect(login.status()).toBeGreaterThanOrEqual(300);
-    expect(login.status()).toBeLessThan(400);
-    expect(login.headers().location).toMatch(/\/login(?:\?|$)/);
+  test('login, onboarding and tracking routes exist', async ({ page, request }) => {
+    // This suite runs Marketing only. Verify its redirect without requiring the
+    // separately deployed LMS to be online or changing canonical portal routing.
+    const login = await request.get('/login?next=%2Flms&reason=session', {
+      maxRedirects: 0,
+      failOnStatusCode: false,
+    });
+    // Next.js can send this redirect as HTTP 307 or as a streamed HTML
+    // refresh after the shared layout has committed its response headers.
+    expect([200, 307]).toContain(login.status());
+    let destination = login.headers().location;
+    if (login.status() === 200) {
+      const html = await login.text();
+      const refresh = html.match(/<meta[^>]*http-equiv="refresh"[^>]*content="[^"]*url=([^"]+)"/i);
+      expect(refresh, 'streamed login response must contain a redirect').not.toBeNull();
+      destination = refresh![1].replace(/&amp;/g, '&');
+    }
+    const target = new URL(destination);
+    expect(target.origin).toBe(new URL(siteUrls.app).origin);
+    expect(target.pathname).toBe('/login');
+    expect(target.searchParams.get('next')).toBe('/lms');
+    expect(target.searchParams.get('reason')).toBe('session');
 
     const onboarding = await request.get('/onboarding/learner', { failOnStatusCode: false });
     expect(onboarding.status()).not.toBe(404);

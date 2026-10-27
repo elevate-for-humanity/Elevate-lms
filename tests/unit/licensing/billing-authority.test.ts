@@ -64,8 +64,8 @@ describe('billing-authority', () => {
     });
 
     describe('getBillingAuthority', () => {
-      it('returns stripe for subscription tiers', () => {
-        expect(getBillingAuthority('managed_monthly')).toBe('stripe');
+      it('defaults subscription billing to QuickBooks', () => {
+        expect(getBillingAuthority('managed_monthly')).toBe('quickbooks');
       });
 
       it('returns database for DB tiers', () => {
@@ -159,19 +159,21 @@ describe('billing-authority', () => {
     });
   });
 
-  describe('isLicenseActiveNow - Subscription (Stripe-authoritative)', () => {
+  describe('isLicenseActiveNow - Subscription (provider-authoritative)', () => {
     it('allows subscription with valid data and future cpe', () => {
       const license: License = {
         status: 'active',
         tier: 'managed_monthly',
         expires_at: null,
         current_period_end: future.toISOString(),
-        stripe_subscription_id: 'sub_123',
+        stripe_subscription_id: null,
+        billing_provider: 'quickbooks',
+        provider_subscription_id: 'qb_123',
       };
       const result = isLicenseActiveNow(license, now);
       expect(result.ok).toBe(true);
       expect(result.reason).toBe('subscription_active');
-      expect(result.authority).toBe('stripe');
+      expect(result.authority).toBe('quickbooks');
     });
 
     it('denies subscription with missing stripe_subscription_id', () => {

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Restricted Source-Use License',
   description: 'Enterprise-only internal deployment license. Source code access for internal use only. No ownership. No rebranding. No resale. No credentials.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/licenses/source-use',
+    canonical: 'https://store.elevateforhumanity.org/store/licenses/source-use',
   },
 };
 

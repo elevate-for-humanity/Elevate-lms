@@ -16,7 +16,7 @@ describe('platform execution evidence', () => {
     expect(result.status).toBe('FAIL_BLOCKING');
     expect(result.evidence).toMatchObject({
       tool: 'openhands.status',
-      expected_tool: 'openhands.execute',
+      expected_tool: 'studio.engineering.execute|openhands.execute',
     });
   });
 
@@ -75,5 +75,18 @@ describe('platform execution evidence', () => {
         result: { sessionId: 'browser-42', verified: true, failures: [] },
       }).status,
     ).toBe('PASS');
+  });
+});
+
+
+describe('semantic execution failures', () => {
+  it.each([{overall: 'unknown'}, {overall: 'unhealthy'}, {status: 'failed'}, {status: 'unavailable'}, {status: 'degraded'}])('rejects %j as verified success', result => {
+    expect(evaluateExecution({tool: 'system.health', result}).status).toBe('FAIL_BLOCKING');
+  });
+  it.each(['pending', 'queued', 'running', 'awaiting_approval'])('does not verify an unfinished %s operation', status => {
+    expect(evaluateExecution({tool: 'advisory', result: {status}}).status).toBe('REQUIRES_HUMAN_REVIEW');
+  });
+  it('still accepts a healthy observed result', () => {
+    expect(evaluateExecution({tool: 'system.health', result: {overall: 'healthy', timestamp: new Date().toISOString()}}).status).toBe('PASS');
   });
 });

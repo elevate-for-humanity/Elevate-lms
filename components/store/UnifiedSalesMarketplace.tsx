@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { ShieldCheck } from 'lucide-react';
 import {
   CAPABILITY_CATALOG,
   type CapabilityCategory,
@@ -44,14 +46,38 @@ const familyMeta: Record<
   },
 };
 
-const previewStyles: Record<CapabilityCategory, string> = {
-  business: 'from-cyan-500 via-sky-600 to-indigo-700',
-  ai: 'from-fuchsia-500 via-rose-500 to-orange-500',
-  education: 'from-emerald-500 via-teal-600 to-cyan-700',
-  workforce: 'from-amber-500 via-orange-600 to-rose-600',
-  compliance: 'from-violet-600 via-indigo-700 to-slate-800',
-  apps: 'from-blue-500 via-cyan-600 to-teal-700',
-  enterprise: 'from-slate-600 via-slate-800 to-slate-950',
+const previewImages: Record<CapabilityCategory, { src: string; alt: string }> = {
+  business: { src: '/images/pages/store-digital-detail1.webp', alt: 'Business analytics displayed on a tablet' },
+  ai: { src: '/images/pages/store-addons-analytics-hero.webp', alt: 'Analytics workspace on a laptop' },
+  education: { src: '/images/pages/store-compliance-wioa-detail.webp', alt: 'Learners collaborating in a classroom' },
+  workforce: { src: '/images/pages/store-recommendations.webp', alt: 'Skilled trades professionals in a workshop' },
+  compliance: { src: '/images/pages/store-checkout-cancel-hero.webp', alt: 'Organized office workspace and documents' },
+  apps: { src: '/images/pages/store-licenses-checkout-hero.webp', alt: 'Digital content displayed on a tablet' },
+  enterprise: { src: '/images/pages/store-addons-analytics-hero.webp', alt: 'Business reporting on a laptop' },
+};
+
+// Distinct repository photographs illustrate each offer; these are not UI screenshots.
+const offerImages: Record<string, { src: string; alt: string }> = {
+  website_builder: { src: '/images/pages/store-trial-detail.jpg', alt: 'Developer building a website at a desktop workspace' },
+  crm: { src: '/images/pages/store-guide-1.webp', alt: 'Business professionals collaborating at a laptop' },
+  booking: { src: '/images/pages/booking-page-1.webp', alt: 'Professional meeting with a client' },
+  forms: { src: '/images/pages/store-compliance-wcag-hero.jpg', alt: 'Person reviewing and completing documents' },
+  email_marketing: { src: '/images/pages/admin-email-marketing-d2.webp', alt: 'Marketing team planning a campaign together' },
+  sms: { src: '/images/pages/store-cart-hero.jpg', alt: 'Person using a mobile device' },
+  invoicing: { src: '/images/pages/store-compliance-hero.jpg', alt: 'Business calculations beside a notebook' },
+  seo_autopilot: { src: '/images/pages/store-digital-detail1.webp', alt: 'Website performance charts displayed on a tablet' },
+  marketing_autopilot: { src: '/images/pages/admin-email-analytics-detail.webp', alt: 'Team reviewing a marketing presentation' },
+  ai_paris: { src: '/images/pages/store-guides-capital-hero.jpg', alt: 'Business advisor at a desk' },
+  ai_ellie: { src: '/images/pages/store-courses-hero.jpg', alt: 'Learners working together with study materials' },
+  ai_lizzy: { src: '/images/pages/store-checkout-cancel-hero.webp', alt: 'Organized office workspace with documents and equipment' },
+  ai_zora: { src: '/images/pages/store-guides-licensing-hero.jpg', alt: 'Professional reviewing a checklist' },
+  ai_orchestrator: { src: '/images/pages/store-addons-hero.jpg', alt: 'Software code displayed on a screen' },
+  course_builder: { src: '/images/pages/admin-email-automation-new-d2.webp', alt: 'Instructor leading a collaborative lesson' },
+  course_factory: { src: '/images/pages/store-trial-hero.jpg', alt: 'Software development code on a screen' },
+  lms: { src: '/images/pages/store-compliance-wioa-detail.webp', alt: 'Learners collaborating in a classroom' },
+  student_management: { src: '/images/pages/store-success-hero.webp', alt: 'Education team working together' },
+  workforce: { src: '/images/pages/store-recommendations.webp', alt: 'Skilled trades professionals in a workshop' },
+  apprenticeship: { src: '/images/pages/barber-hands-on-bright.webp', alt: 'Supervised hands-on barber training' },
 };
 
 function interactiveDemoHref(capability: PlatformCapability): string | null {
@@ -59,37 +85,16 @@ function interactiveDemoHref(capability: PlatformCapability): string | null {
 }
 
 function ProductPreview({ capability, name }: { capability: PlatformCapability; name: string }) {
-  const cues = capability.keywords.filter((word) => word.length > 2).slice(0, 3);
-  const isInteractive = Boolean(interactiveDemoHref(capability));
+  const image = offerImages[capability.key] ?? previewImages[capability.category];
   return (
-    <div
-      className={`group relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br ${previewStyles[capability.category]} p-5 text-white`}
-    >
-      <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-white/15 blur-2xl transition duration-700 group-hover:scale-150" />
-      <div className="absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-black/15 blur-2xl transition duration-700 group-hover:scale-150" />
-      <div className="relative flex h-full flex-col rounded-2xl border border-white/25 bg-white/10 p-4 shadow-2xl backdrop-blur-sm transition duration-500 group-hover:-translate-y-1 group-hover:bg-white/15">
-        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.16em]">
-          <span>{categoryMeta[capability.category].label}</span>
-          <span className="rounded-full bg-emerald-300 px-2 py-1 text-emerald-950">
-            {isInteractive ? 'Interactive demo' : 'Product preview'}
-          </span>
-        </div>
-        <p className="mt-3 line-clamp-2 text-xl font-black leading-tight">{name}</p>
-        <div className="mt-auto grid grid-cols-3 gap-2">
-          {cues.map((cue, index) => (
-            <div
-              key={cue}
-              className="rounded-lg border border-white/20 bg-white/15 p-2 transition duration-300 group-hover:-translate-y-0.5"
-              style={{ transitionDelay: `${index * 70}ms` }}
-            >
-              <span className="block h-1.5 w-8 rounded-full bg-white/80" />
-              <span className="mt-2 block truncate text-[10px] font-bold capitalize text-white/90">
-                {cue.replaceAll('_', ' ')}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+      <Image src={image.src} alt={image.alt} fill loading="lazy"
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        className="object-cover transition duration-300 group-hover:scale-105" />
+      <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-950 shadow-sm">
+        {categoryMeta[capability.category].label}
+      </span>
+      <span className="sr-only">Explore {name}</span>
     </div>
   );
 }
@@ -292,6 +297,12 @@ export function UnifiedSalesMarketplace() {
                         Open Live Demo
                       </Link>
                     ) : null}
+                    <Link
+                      href={`/store/proof#feature-${capability.key}`}
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-2.5 text-sm font-black text-emerald-900 hover:bg-emerald-100"
+                    >
+                      <ShieldCheck className="h-4 w-4" /> View source-backed proof
+                    </Link>
                   </div>
                 </div>
               </article>

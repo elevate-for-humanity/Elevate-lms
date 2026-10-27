@@ -5,7 +5,7 @@ import { CreditCard } from 'lucide-react';
 interface PayNowButtonProps {
   slug: string;
   cost: string;
-  stripeCheckoutHref?: string;
+  quickbooksCheckoutHref?: string;
   label?: string;
   className?: string;
 }

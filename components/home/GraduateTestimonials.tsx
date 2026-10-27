@@ -28,7 +28,6 @@ const TESTIMONIALS: Testimonial[] = [
     beforeStatus: 'Unemployed for 6 months',
     afterStatus: 'Lead Barber, Great Clips Castleton',
     afterSalary: '$48,000/year + tips ($15K+)',
-    imageUrl: '/images/testimonials/derek.jpg',
   },
   {
     id: '2',
@@ -39,18 +38,6 @@ const TESTIMONIALS: Testimonial[] = [
     beforeStatus: 'Working part-time, minimum wage',
     afterStatus: 'Barber, Sport Clips Greenfield',
     afterSalary: '$38,000/year + tips',
-    imageUrl: '/images/testimonials/tamika.jpg',
-  },
-  {
-    id: '3',
-    name: 'Marcus L.',
-    program: 'Barbering Apprenticeship',
-    graduationYear: 2022,
-    quote: "I came out of prison with nothing. Elevate gave me a chance when nobody else would. They helped me get WIOA funding and placed me at a shop that believed in second chances. Now I own my own barbershop and employ three people.",
-    beforeStatus: 'Justice-involved, unemployed',
-    afterStatus: 'Owner, Precision Cuts Barbershop',
-    afterSalary: '$85,000/year',
-    imageUrl: '/images/testimonials/marcus.jpg',
   },
   {
     id: '4',
@@ -61,7 +48,6 @@ const TESTIMONIALS: Testimonial[] = [
     beforeStatus: 'Working retail, no prospects',
     afterStatus: 'Commercial HVAC Technician',
     afterSalary: '$65,000/year + benefits',
-    imageUrl: '/images/testimonials/james.jpg',
   },
   {
     id: '5',
@@ -72,7 +58,6 @@ const TESTIMONIALS: Testimonial[] = [
     beforeStatus: 'Unemployed, collecting unemployment',
     afterStatus: 'Certified Medical Assistant',
     afterSalary: '$42,000/year + benefits',
-    imageUrl: '/images/testimonials/sarah.jpg',
   },
   {
     id: '6',
@@ -83,7 +68,6 @@ const TESTIMONIALS: Testimonial[] = [
     beforeStatus: 'Underemployed, gig work',
     afterStatus: 'Regional CDL Driver',
     afterSalary: '$75,000/year',
-    imageUrl: '/images/testimonials/michael.jpg',
   },
 ];
 
@@ -114,7 +98,7 @@ export function GraduateTestimonials() {
             From Our Graduates
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Real people, real transformations. See how Elevate helped these graduates 
+            Real people, real transformations. See how Elevate helped these graduates
             go from unemployed to employed.
           </p>
         </div>
@@ -143,10 +127,10 @@ export function GraduateTestimonials() {
               <div className="flex items-center gap-4">
                 {current.imageUrl ? (
                   <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
-                    <img 
-                      src={current.imageUrl} 
+                    <img
+                      src={current.imageUrl}
                       alt={current.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 ) : (
@@ -175,7 +159,7 @@ export function GraduateTestimonials() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
-              <button 
+              <button
                 onClick={prevSlide}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Previous testimonial"
@@ -190,8 +174,8 @@ export function GraduateTestimonials() {
                     key={i}
                     onClick={() => setCurrentIndex(i)}
                     className={`w-2 h-2 rounded-full transition-all ${
-                      i === currentIndex 
-                        ? 'w-6 bg-brand-blue-600' 
+                      i === currentIndex
+                        ? 'w-6 bg-brand-blue-600'
                         : 'bg-gray-300 hover:bg-gray-400'
                     }`}
                     aria-label={`Go to testimonial ${i + 1}`}
@@ -199,7 +183,7 @@ export function GraduateTestimonials() {
                 ))}
               </div>
 
-              <button 
+              <button
                 onClick={nextSlide}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Next testimonial"
@@ -213,11 +197,11 @@ export function GraduateTestimonials() {
         {/* All Testimonials Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TESTIMONIALS.map((testimonial) => (
-            <Card 
+            <Card
               key={testimonial.id}
               className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                testimonial.id === current.id 
-                  ? 'ring-2 ring-brand-blue-500' 
+                testimonial.id === current.id
+                  ? 'ring-2 ring-brand-blue-500'
                   : 'hover:border-brand-blue-200'
               }`}
               onClick={() => setCurrentIndex(TESTIMONIALS.findIndex(t => t.id === testimonial.id))}
@@ -225,10 +209,10 @@ export function GraduateTestimonials() {
               <div className="flex items-start gap-3">
                 {testimonial.imageUrl ? (
                   <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                    <img 
-                      src={testimonial.imageUrl} 
+                    <img
+                      src={testimonial.imageUrl}
                       alt={testimonial.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 ) : (
@@ -241,7 +225,7 @@ export function GraduateTestimonials() {
                   <p className="text-sm text-gray-600">{testimonial.program}</p>
                 </div>
               </div>
-              
+
               <blockquote className="mt-4 text-gray-700 text-sm line-clamp-3">
                 "{testimonial.quote.substring(0, 120)}..."
               </blockquote>
@@ -261,13 +245,13 @@ export function GraduateTestimonials() {
             Ready to write your own success story?
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button 
+            <Button
               className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-4"
               onClick={() => window.location.href = '/apply'}
             >
               Apply Now
             </Button>
-            <Button 
+            <Button
               variant="outline"
               className="border-brand-blue-600 text-brand-blue-600 hover:bg-brand-blue-50 px-8 py-4"
               onClick={() => window.location.href = '/success-stories'}

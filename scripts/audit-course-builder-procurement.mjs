@@ -6,6 +6,7 @@ const root = process.cwd();
 const failures = [];
 const mustExist = [
   'components/admin/course-builder/UnifiedCourseBuilder.tsx',
+  'components/admin/course-builder/CourseProductionWorkspace.tsx',
   'apps/admin/app/studio/courses/page.tsx',
   'apps/admin/app/api/admin/course-builder/route.ts',
   'lib/course-builder/orchestrator.ts',
@@ -35,7 +36,15 @@ for (const file of mustExist) if (!fs.existsSync(path.join(root, file))) fail(`m
 
 if (failures.length === 0) {
   const studioCourses = read('apps/admin/app/studio/courses/page.tsx');
-  if (!studioCourses.includes('UnifiedCourseBuilder')) fail('/studio/courses is not mounted to UnifiedCourseBuilder');
+  const workspace = read('components/admin/course-builder/CourseProductionWorkspace.tsx');
+  if (!studioCourses.includes('<CourseProductionWorkspace') || !workspace.includes('<UnifiedCourseBuilder'))
+    fail('/studio/courses is not mounted to the canonical UnifiedCourseBuilder workspace');
+  // Both the standalone route and embedded Studio use the shared builder shell.
+  // Follow that composition instead of requiring a duplicate browser in the wrapper.
+  const builder = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+  if (!builder.includes("import('@/components/studio/CloudBrowserWorkspace')") ||
+      !builder.includes('<CloudBrowserWorkspace') || !builder.includes('<ResizableWorkspace'))
+    fail('Canonical Course Builder is missing the resizable live Studio browser');
 
   const rootRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
   for (const invariant of [

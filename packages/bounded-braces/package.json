@@ -1,0 +1,22 @@
+{
+  "name": "@elevate/bounded-braces",
+  "version": "3.0.3-elevate.1",
+  "private": true,
+  "description": "MIT-licensed braces 3.0.3 fork with bounded parser and AST traversal for CVE-2026-93687",
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "LICENSE",
+    "SECURITY.md"
+  ],
+  "dependencies": {
+    "fill-range": "7.1.1"
+  },
+  "upstream": {
+    "name": "braces",
+    "version": "3.0.3",
+    "repository": "https://github.com/micromatch/braces"
+  }
+}

@@ -38,7 +38,11 @@ type ProgramIntegrityRow = {
   failing_checks: string[];
 };
 
-function asNumberMap(rows: unknown[] | null | undefined, key: string, value: string): Map<string, number> {
+function asNumberMap(
+  rows: unknown[] | null | undefined,
+  key: string,
+  value: string,
+): Map<string, number> {
   const out = new Map<string, number>();
   for (const row of rows ?? []) {
     if (!row || typeof row !== 'object') continue;
@@ -83,6 +87,8 @@ async function fallbackProgramIntegrity(
     .from('programs')
     .select('id, slug, title, status, category, published, is_active, description')
     .neq('status', 'archived')
+    .not('title', 'ilike', '[QA%')
+    .not('slug', 'ilike', 'qa-%')
     .order('title', { ascending: true })
     .limit(300);
 
@@ -123,12 +129,16 @@ async function fallbackProgramIntegrity(
   }
   const completionRuleIds = new Set(
     (completionRuleRows ?? [])
-      .map((row) => (row && typeof row === 'object' ? (row as Record<string, unknown>).entity_id : null))
+      .map((row) =>
+        row && typeof row === 'object' ? (row as Record<string, unknown>).entity_id : null,
+      )
       .filter((value): value is string => typeof value === 'string'),
   );
 
   return (programs as unknown[])
-    .filter((program): program is Record<string, unknown> => Boolean(program && typeof program === 'object'))
+    .filter((program): program is Record<string, unknown> =>
+      Boolean(program && typeof program === 'object'),
+    )
     .map((program) => {
       const id = String(program.id);
       const slug = typeof program.slug === 'string' ? program.slug : null;
@@ -148,7 +158,13 @@ async function fallbackProgramIntegrity(
         hasCourseRow ? null : 'no_course_row',
         hasCompletionRule ? null : 'no_completion_rule',
         title?.trim() ? null : 'no_title',
-        slug && !slug.includes('test') && !slug.startsWith('ai-') && !slug.startsWith('gen-') && !slug.startsWith('pub-path-') ? null : 'bad_slug',
+        slug &&
+        !slug.includes('test') &&
+        !slug.startsWith('ai-') &&
+        !slug.startsWith('gen-') &&
+        !slug.startsWith('pub-path-')
+          ? null
+          : 'bad_slug',
         category?.trim() ? null : 'no_category',
         published ? null : 'not_published',
         activeEnrollments > 0 ? null : 'no_enrollments',
@@ -174,7 +190,10 @@ async function fallbackProgramIntegrity(
       };
     })
     .filter((row) => row.integrity_score <= maxScore)
-    .sort((a, b) => a.integrity_score - b.integrity_score || String(a.title).localeCompare(String(b.title)))
+    .sort(
+      (a, b) =>
+        a.integrity_score - b.integrity_score || String(a.title).localeCompare(String(b.title)),
+    )
     .slice(0, limit);
 }
 
@@ -188,7 +207,9 @@ export async function GET(request: NextRequest) {
   const parsedLimit = parseInt(searchParams.get('limit') ?? '20', 10);
   const parsedMaxScore = parseInt(searchParams.get('min') ?? '100', 10);
   const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 100) : 20;
-  const maxScore = Number.isFinite(parsedMaxScore) ? Math.min(Math.max(parsedMaxScore, 0), 100) : 100;
+  const maxScore = Number.isFinite(parsedMaxScore)
+    ? Math.min(Math.max(parsedMaxScore, 0), 100)
+    : 100;
 
   const db = await requireAdminClient();
 
@@ -196,10 +217,13 @@ export async function GET(request: NextRequest) {
     .from('program_integrity')
     .select(
       'id, slug, title, status, category, published, is_active, ' +
-      'total_lessons, total_modules, active_enrollments, certificates_issued, ' +
-      'has_course_row, has_completion_rule, integrity_score, failing_checks',
+        'total_lessons, total_modules, active_enrollments, certificates_issued, ' +
+        'has_course_row, has_completion_rule, integrity_score, failing_checks',
     )
     .lte('integrity_score', maxScore)
+    .neq('status', 'archived')
+    .not('title', 'ilike', '[QA%')
+    .not('slug', 'ilike', 'qa-%')
     .order('integrity_score', { ascending: true })
     .limit(limit);
 

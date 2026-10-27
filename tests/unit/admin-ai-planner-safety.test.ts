@@ -4,9 +4,22 @@ vi.mock('server-only', () => ({}));
 
 describe('Admin AI operational planner safety', () => {
   let planAIToolFromCommand: typeof import('@/lib/ai/tools/planner').planAIToolFromCommand;
+  let decomposePlan: typeof import('@/lib/platform/planner').decomposePlan;
 
   beforeAll(async () => {
     ({ planAIToolFromCommand } = await import('@/lib/ai/tools/planner'));
+    ({ decomposePlan } = await import('@/lib/platform/planner'));
+  });
+
+  it.each([
+    'Audit the Course Builder',
+    'Audit the Course Builder. Use read-only checks to inspect its current health, saved build status, worker dispatch and heartbeat, lesson preview, and browser workspace. Do not start jobs, modify data, repair anything, or deploy.',
+  ])('audits the requested course capability: %s', (goal) => {
+    const plan = decomposePlan(goal);
+    expect(plan.steps.map((step) => planAIToolFromCommand(step.command)?.name)).toEqual([
+      'courses.status', 'courses.health', 'devstudio.health',
+    ]);
+    expect(plan.steps.every((step) => !step.depends_on?.length)).toBe(true);
   });
 
   it('routes workflow inspection to the read-only inspector', () => {
@@ -27,5 +40,48 @@ describe('Admin AI operational planner safety', () => {
     const planned = planAIToolFromCommand('Deploy the latest approved Admin build.');
 
     expect(planned).toEqual({ name: 'deployments.autopilot', input: {} });
+  });
+
+  it('keeps an explicit read-only Studio diagnostic on read-only tools', () => {
+    const plan = decomposePlan(
+      'READ-ONLY DIAGNOSTIC TEST. Verify the Studio provider, router, and tool-response path. Report the current Studio health and name one read-only internal tool you can successfully execute. Do not modify data, create records, start or stop jobs, approve tasks, deploy, publish, send messages, upload, or delete anything.',
+    );
+
+    expect(plan.steps).toHaveLength(3);
+    expect(plan.steps.map((step) => planAIToolFromCommand(step.command)?.name)).toEqual([
+      'devstudio.health',
+      'system.health',
+      'workflows.inspect',
+    ]);
+    expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
+  });
+
+  it('never treats an explicit read-only request as affirmative deployment authorization', () => {
+    const plan = decomposePlan(
+      'READ-ONLY: inspect the current course status and report it. Do not deploy anything.',
+    );
+
+    expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
+    expect(plan.steps.some((step) => step.title === 'Execute approved deployment')).toBe(false);
+  });
+
+  it.each([
+    'Fix Paris and Course Builder source code and add regression tests. Begin with a read-only baseline of provider health. Preserve completed lessons.',
+    'Fix Course Builder source code and workflow, inspect jobs and provider health, and add regression tests. Begin with a read-only baseline.',
+  ])('preserves a repair goal that begins with a read-only diagnostic phase: %s', (goal) => {
+    const plan = decomposePlan(goal);
+    expect(plan.steps[0]).toMatchObject({ title: 'Implement repository outcome', command: goal });
+    expect(planAIToolFromCommand(goal)?.name).toBe('studio.engineering.execute');
+  });
+
+  it('keeps incidental provider health words from replacing repository repair', () => {
+    const goal = 'Fix Course Builder source code, verify provider health, and add regression tests.';
+    expect(planAIToolFromCommand(goal)?.name).toBe('studio.engineering.execute');
+  });
+
+  it('preserves a global read-only constraint even with a diagnostic first phase', () => {
+    const goal = 'Read-only diagnostic: inspect provider health and source code. Begin with read-only checks. Do not modify or deploy.';
+    expect(decomposePlan(goal).steps[0]?.title).toBe('Studio provider health');
+    expect(planAIToolFromCommand(goal)?.name).toBe('devstudio.health');
   });
 });

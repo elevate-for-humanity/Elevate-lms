@@ -7,14 +7,40 @@ export function StudentCommunicationActions({ enrollmentId, studentName, hasEmai
   const [message,setMessage]=useState('');
   async function submit(event:FormEvent<HTMLFormElement>){
     event.preventDefault(); setBusy(true); setMessage('');
-    const form=new FormData(event.currentTarget);
+    const formElement=event.currentTarget;
+    const form=new FormData(formElement);
+    try {
     const response=await fetch('/api/program-holder/student-communications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollmentId,channel:form.get('channel'),subject:form.get('subject'),message:form.get('message'),consentConfirmed:form.get('consentConfirmed')==='yes'})});
     const result=await response.json().catch(()=>({})); setBusy(false);
     setMessage(response.ok?(result.delivery === 'queued' ? `Text accepted for ${studentName}; delivery is pending.` : `Email sent to ${studentName}.`):result.error||'Message could not be sent.');
-    if(response.ok) event.currentTarget.reset();
+    if(response.ok) formElement.reset();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Message could not be sent. Please retry.');
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function invite() {
+    setBusy(true); setMessage('');
+    try {
+      const response = await fetch('/api/program-holder/student-invitations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ enrollmentId }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'Student invitation could not be sent.');
+      setMessage('Student portal invitation accepted for email delivery.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Student invitation could not be sent.');
+    } finally {
+      setBusy(false);
+    }
   }
   return <div className="min-w-[170px]">
     <button type="button" onClick={()=>setOpen(!open)} className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-black text-blue-800">{open?'Close message':'Email or text'}</button>
+    <button type="button" disabled={busy} onClick={invite} className="mt-2 block rounded-lg border border-blue-300 px-3 py-2 text-xs font-black text-blue-800 disabled:opacity-50">{busy ? 'Sending…' : 'Send portal invitation'}</button>
+    {!open && message ? <p role="status" className="mt-2 text-xs font-bold text-slate-700">{message}</p> : null}
     {open&&<form onSubmit={submit} className="mt-2 grid gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
       <select name="channel" required className="rounded-lg border px-2 py-2 text-xs">
         <option value="">Choose channel</option>

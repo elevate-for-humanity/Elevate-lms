@@ -1,3 +1,4 @@
+import { recordParisObservation } from '@/lib/ai/runtime/supervision';
 // Higher-order wrapper for API route handlers.
 // Adds audit logging with zero changes to route logic.
 //
@@ -100,8 +101,15 @@ export function withApiAudit<TRequest extends Request, TArgs extends unknown[]>(
       if (options?.actor_type === 'webhook') {
         response = NextResponse.json({ error: 'Internal error' }, { status: 500 });
       } else {
+        await recordParisObservation({kind:'workflow',operation:endpoint,status:'failed',correlationId:rid,
+          durationMs:Date.now()-start,error:e});
         throw e;
       }
+    }
+
+    if (statusCode >= 500) {
+      await recordParisObservation({kind:'workflow',operation:endpoint,status:'failed',correlationId:rid,
+        durationMs:Date.now()-start,error:`HTTP ${statusCode}`});
     }
 
     // Build and fire audit payload asynchronously — never blocks the response.

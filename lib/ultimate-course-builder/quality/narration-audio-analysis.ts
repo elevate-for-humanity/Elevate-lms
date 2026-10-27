@@ -1,12 +1,14 @@
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import type { Metric, NarrationMetrics } from './narration-quality';
+import { getElevateMediaStorageConfig, getSignedElevateMediaUrl } from '../../storage/elevate-media-storage';
 
 const execFileAsync = promisify(execFile);
-const MAX_NARRATION_BYTES = 25 * 1024 * 1024;
+const MAX_NARRATION_BYTES = 512 * 1024 * 1024;
 
 type SignalSummary = {
   durationSeconds: number;
@@ -84,13 +86,89 @@ function requiredNumber(output: string, pattern: RegExp, label: string): number 
   return value;
 }
 
-function assertTrustedNarrationUrl(audioUrl: string): URL {
-  const url = new URL(audioUrl);
-  const configuredBase = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  if (!configuredBase) throw new Error('NARRATION_ANALYSIS_SUPABASE_URL_REQUIRED');
-  const storageOrigin = new URL(configuredBase).origin;
-  if (url.origin !== storageOrigin || !url.pathname.startsWith('/storage/v1/object/')) {
+function trustedHttpsUrl(value?: string): URL | null {
+  try {
+    const url = new URL(value ?? '');
+    return url.protocol === 'https:' && !url.username && !url.password && !url.port && !url.hash ? url : null;
+  } catch { return null; }
+}
+
+function assertTrustedNarrationUrl(audioUrl: string): { url: URL; mediaKey?: string } {
+  const url = trustedHttpsUrl(audioUrl);
+  if (!url) throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
+  const supabase = trustedHttpsUrl(process.env.NEXT_PUBLIC_SUPABASE_URL?.trim());
+  if (supabase && url.origin === supabase.origin &&
+      /^\/storage\/v1\/object\/(public|sign)\/course[-_]videos\//.test(url.pathname)) {
+    return { url };
+  }
+  // Google-generated narration may be delivered from a dedicated Google Cloud
+  // Storage bucket. Trust only an explicitly configured bucket and the course
+  // media keyspace, never the entire googleapis.com domain. Private GCS objects
+  // require a separately provisioned, valid signed HTTPS download URL.
+  const googleBucket = (process.env.GOOGLE_NARRATION_AUDIO_BUCKET ?? process.env.GCS_NARRATION_BUCKET ?? '').trim();
+  if (googleBucket && /^[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]$/.test(googleBucket)) {
+    const googlePathStyle = url.hostname === 'storage.googleapis.com' &&
+      url.pathname.startsWith('/' + googleBucket + '/');
+    const googleVirtualHost = url.hostname === googleBucket + '.storage.googleapis.com';
+    const encodedGcsKey = googlePathStyle
+      ? url.pathname.slice(googleBucket.length + 2)
+      : googleVirtualHost ? url.pathname.slice(1) : undefined;
+    if (encodedGcsKey !== undefined) {
+      let key: string;
+      try { key = decodeURIComponent(encodedGcsKey); }
+      catch { throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL'); }
+      if (key.startsWith('course-videos/') && key.length > 'course-videos/'.length &&
+          !key.split('/').some(part => !part || part === '.' || part === '..') &&
+          ![...key].some(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\')) {
+        return { url };
+      }
+      throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
+    }
+  }
+  // Use the uploader's configuration, including its supported legacy aliases.
+  // S3 signs either endpoint/bucket/key or bucket.endpoint/key. Both identify
+  // the same configured bucket; no provider-wide hostname suffix is trusted.
+  const config = getElevateMediaStorageConfig();
+  const endpoint = trustedHttpsUrl(config.endpoint);
+  const publicBase = trustedHttpsUrl(config.publicUrl);
+  let encodedKey: string | undefined;
+  if (endpoint && config.bucket) {
+    const prefix = endpoint.pathname.replace(/\/$/, '') + '/' + encodeURIComponent(config.bucket) + '/';
+    const virtual = new URL(endpoint);
+    virtual.hostname = `${config.bucket}.${endpoint.hostname}`;
+    const virtualPrefix = endpoint.pathname.replace(/\/$/, '') + '/';
+    if (url.origin === endpoint.origin && url.pathname.startsWith(prefix)) {
+      encodedKey = url.pathname.slice(prefix.length);
+    } else if (url.origin === virtual.origin && url.pathname.startsWith(virtualPrefix)) {
+      encodedKey = url.pathname.slice(virtualPrefix.length);
+    }
+  }
+  if (encodedKey === undefined && publicBase && config.bucket && url.origin === publicBase.origin) {
+    const prefix = publicBase.pathname.replace(/\/$/, '') + '/';
+    if (url.pathname.startsWith(prefix)) encodedKey = url.pathname.slice(prefix.length);
+  }
+  let mediaKey: string;
+  try { mediaKey = decodeURIComponent(encodedKey ?? ''); }
+  catch { throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL'); }
+  if (!mediaKey.startsWith('course-videos/') || !mediaKey.slice('course-videos/'.length) ||
+      mediaKey.split('/').some(part => part === '.' || part === '..' || !part) ||
+      [...mediaKey].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127 || character === '\\')) {
     throw new Error('NARRATION_ANALYSIS_UNTRUSTED_AUDIO_URL');
+  }
+  return { url, mediaKey };
+}
+
+/** Renew access to the same configured object without regenerating saved speech. */
+export async function resolveStoredNarrationUrl(audioUrl: string): Promise<URL> {
+  const reference = assertTrustedNarrationUrl(audioUrl);
+  let url = reference.url;
+  if (reference.mediaKey) {
+    // Checkpoints outlive signed URLs. Renew access, not narration or rendering.
+    const renewed = await getSignedElevateMediaUrl(reference.mediaKey, 3600);
+    if (!renewed) throw new Error('NARRATION_ANALYSIS_MEDIA_SIGNING_FAILED');
+    const checked = assertTrustedNarrationUrl(renewed);
+    if (checked.mediaKey !== reference.mediaKey) throw new Error('NARRATION_ANALYSIS_MEDIA_REFERENCE_MISMATCH');
+    url = checked.url;
   }
   return url;
 }
@@ -98,14 +176,17 @@ function assertTrustedNarrationUrl(audioUrl: string): URL {
 export async function analyzeNarrationAudio(input: {
   audioUrl: string;
   transcript: string;
+  deliveredMp4?: boolean;
+  expectedMediaSha256?: string;
 }): Promise<NarrationMetrics> {
-  const url = assertTrustedNarrationUrl(input.audioUrl);
+  const url = await resolveStoredNarrationUrl(input.audioUrl);
   const response = await fetch(url, {
     cache: 'no-store',
+    redirect: 'error',
     signal: AbortSignal.timeout(120_000),
   });
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
-  if (!response.ok || !contentType.startsWith('audio/')) {
+  if (!response.ok || !(contentType.startsWith('audio/') || (input.deliveredMp4 && contentType.startsWith('video/')))) {
     throw new Error(
       `NARRATION_ANALYSIS_AUDIO_FETCH_FAILED:${response.status}:${contentType || 'unknown'}`,
     );
@@ -113,6 +194,10 @@ export async function analyzeNarrationAudio(input: {
   const audio = Buffer.from(await response.arrayBuffer());
   if (!audio.length || audio.length > MAX_NARRATION_BYTES) {
     throw new Error(`NARRATION_ANALYSIS_AUDIO_SIZE_INVALID:${audio.length}`);
+  }
+  if (input.expectedMediaSha256 &&
+      createHash('sha256').update(audio).digest('hex') !== input.expectedMediaSha256) {
+    throw new Error('NARRATION_ANALYSIS_MEDIA_CHECKSUM_MISMATCH');
   }
 
   const directory = await mkdtemp(path.join(tmpdir(), 'ultimate-narration-'));

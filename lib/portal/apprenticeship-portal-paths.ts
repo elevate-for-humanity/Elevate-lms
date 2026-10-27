@@ -39,9 +39,26 @@ export const ACTIVE_ENROLLMENT_STATES = [
   'documents_complete',
 ] as const;
 
+export function isApprenticeshipSlug(programSlug: string | null | undefined): boolean {
+  if (!programSlug) return false;
+  const normalized = programSlug.toLowerCase().trim();
+  return Boolean(
+    APPRENTICESHIP_SLUG_TO_PORTAL_PATH[normalized] ||
+    normalized.endsWith('-apprenticeship') ||
+    normalized.includes('apprentice')
+  );
+}
+
 export function portalPathForProgramSlug(programSlug: string | null | undefined): string | null {
   if (!programSlug) return null;
-  return APPRENTICESHIP_SLUG_TO_PORTAL_PATH[programSlug] ?? `${LMS_HOST}/apprentice`;
+  const normalized = programSlug.toLowerCase().trim();
+  if (APPRENTICESHIP_SLUG_TO_PORTAL_PATH[normalized]) {
+    return APPRENTICESHIP_SLUG_TO_PORTAL_PATH[normalized];
+  }
+  if (isApprenticeshipSlug(normalized)) {
+    return `${LMS_HOST}/apprentice?program=${normalized}`;
+  }
+  return null;
 }
 
 export function portalTypeForProgramSlug(programSlug: string | null | undefined): string | null {

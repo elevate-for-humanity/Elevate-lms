@@ -12,7 +12,6 @@ import {
   CalendarDays,
   ChevronLeft,
   ClipboardCheck,
-  FileText,
   Folder,
   GraduationCap,
   HelpCircle,
@@ -91,7 +90,6 @@ const toolItems: NavItem[] = [
   { href: '/lms/files', label: 'Files', icon: Folder },
   { href: '/lms/library', label: 'Library', icon: BookOpen },
   { href: '/lms/notifications', label: 'Notifications', icon: Bell },
-  { href: '/lms/payments', label: 'Payments', icon: FileText },
 ];
 
 const bottomItems: NavItem[] = [

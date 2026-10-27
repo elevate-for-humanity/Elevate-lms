@@ -148,5 +148,9 @@ export function timedFetch(input: RequestInfo | URL, init?: RequestInit): Promis
       : new Error('Supabase request failed after bounded retries');
   };
 
-  return isSafeRead(method) && readCircuitEnabled() ? breakers.supabase.call(execute) : execute();
+  // Auth availability is independent of PostgREST. A failed database read
+  // must never suppress the provider's user verification request.
+  return isSafeRead(method) && !isSupabaseAuthRequest(input) && readCircuitEnabled()
+    ? breakers.supabase.call(execute)
+    : execute();
 }

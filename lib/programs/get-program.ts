@@ -16,14 +16,13 @@ import { logger } from '@/lib/logger';
 
 // Slugs fully migrated to DB — no static data/programs/<slug>.ts file exists.
 // For these, a minimal ProgramSchema is synthesized from the DB record.
-const DB_MIGRATED_SLUGS = new Set(['peer-recovery-specialist']);
+const DB_MIGRATED_SLUGS = new Set(['peer-recovery-specialist', 'hvac-technician']);
 
 // Static registry — add new programs here when created
 type ProgramModuleShape = Record<string, unknown>;
 
 const PROGRAM_REGISTRY: Record<string, () => Promise<ProgramModuleShape>> = {
   cna: () => import('@/data/programs/cna'),
-  'hvac-technician': () => import('@/data/programs/hvac-technician'),
   'barber-apprenticeship': () => import('@/data/programs/barber-apprenticeship'),
   bookkeeping: () => import('@/data/programs/bookkeeping'),
   'business-administration': () => import('@/data/programs/business-administration'),

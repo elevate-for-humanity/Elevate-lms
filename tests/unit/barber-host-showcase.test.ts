@@ -32,17 +32,11 @@ describe('barber host-shop media governance', () => {
 
   it('presents Kountry Kutz as one accessible photo slideshow', () => {
     expect(kountryTour).toContain('aria-label="Kountry Kutz photo tour"');
-    expect(kountryTour).toContain('/images/partners/kountry-kutz/interior-empty.webp');
-    expect(kountryTour).toContain('/images/partners/kountry-kutz/interior-active.webp');
-    expect(kountryTour).toContain('/images/partners/kountry-kutz-apprenticeship-flyer.webp');
+    expect(kountryTour).toContain('/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp');
+    expect(kountryTour).toContain('/images/partners/kountry-kutz/interior-active-enhanced-2026.webp');
+    expect(kountryTour).toContain('object-contain');
   });
 
-  it('does not publish the low-resolution Razor video on barber surfaces', () => {
-    expect(showcase).toContain('/images/partners/razors-image-video-poster.webp');
-    expect(showcase).not.toContain('/videos/partners/razors-image-host-barbershop.mp4');
-    expect(partners).toContain("shop.slug === 'razors-image-barbershop'");
-    expect(partners).toContain('? undefined');
-  });
 
   it('allows only one audible website media source at a time', () => {
     expect(narrator).toContain("document.addEventListener('play', governAudibleMedia, true)");

@@ -23,9 +23,9 @@ export function SkillsSection({
   return (
     <section className="py-12 lg:py-16 px-4 relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white" />
+
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-      
+
       <div className="max-w-6xl mx-auto relative">
         {/* Header */}
         <motion.div
@@ -63,10 +63,10 @@ export function SkillsSection({
                 {/* Skill icon */}
                 <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center group-hover:from-brand-red-50 group-hover:to-brand-red-100/50 transition-all duration-300 overflow-hidden">
                   {skill.image ? (
-                    <img 
-                      src={skill.image} 
+                    <img
+                      src={skill.image}
                       alt={skill.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : skill.icon ? (
                     <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{skill.icon}</span>
@@ -78,14 +78,14 @@ export function SkillsSection({
                     </div>
                   )}
                 </div>
-                
+
                 {/* Skill name */}
                 <h3 className="font-bold text-slate-900 text-center text-sm leading-tight group-hover:text-brand-red-600 transition-colors">
                   {skill.name}
                 </h3>
-                
+
                 {/* Hover glow */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-red-500/0 to-amber-500/0 group-hover:from-brand-red-500/5 group-hover:to-amber-500/5 transition-all duration-300 pointer-events-none" />
+
               </div>
             </motion.div>
           ))}

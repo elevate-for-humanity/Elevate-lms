@@ -95,7 +95,7 @@ export default function GrokSettingsClient() {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || `${title} validation failed`);
-    setMessage(`${title} is valid, active, and synchronized to Northflank.`);
+    setMessage(`${title} is valid, active, and synchronized to Google Cloud Run.`);
   }
 
   return (

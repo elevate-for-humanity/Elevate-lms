@@ -18,6 +18,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { logger } from '@/lib/logger';
+import { isApprenticeshipSlug } from '@/lib/portal/apprenticeship-portal-paths';
 
 const ACCESS_STATES = [
   'active',
@@ -200,7 +201,7 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
        status, enrollment_state, progress_percent,
        enrolled_at, access_granted_at, cohort_id`,
     )
-    .eq('user_id', user.id)
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
     .order('enrolled_at', { ascending: false });
 
   if (enrollmentError) {
@@ -210,8 +211,44 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   const rows = programEnrollments ?? [];
 
-  // ── 3. COURSE DETAILS (manual join — no FK on program_enrollments.course_id) ──
-  const enrollmentCourseIds = rows.map((e) => e.course_id).filter(Boolean) as string[];
+  // ── 3. PROGRAM DETAILS & CANONICAL COURSE MAPPINGS ─────────────────
+  const programIds = rows
+    .map((e) => e.program_id)
+    .filter(Boolean) as string[];
+  const programSlugs = rows
+    .map((e) => e.program_slug)
+    .filter(Boolean) as string[];
+
+  // Find canonical courses from program_courses for programs without explicit course_id
+  const { data: programCourseLinks, error: pcErr } =
+    programIds.length > 0
+      ? await supabase
+          .from('program_courses')
+          .select('program_id, course_id, is_required, order_index')
+          .in('program_id', programIds)
+          .order('is_required', { ascending: false })
+          .order('order_index', { ascending: true })
+      : { data: [], error: null };
+
+  if (pcErr) {
+    warnings.push('program_courses lookup failed');
+    logger.warn('loadLearnerDashboard: program_courses lookup failed', pcErr);
+  }
+
+  const programToCourseMap = new Map<string, string>();
+  for (const pc of programCourseLinks ?? []) {
+    if (pc.program_id && pc.course_id && !programToCourseMap.has(pc.program_id)) {
+      programToCourseMap.set(pc.program_id, pc.course_id);
+    }
+  }
+
+  // ── 4. COURSE DETAILS (manual join — courses & lms_courses) ─────────
+  const enrollmentCourseIds = Array.from(
+    new Set([
+      ...rows.map((e) => e.course_id).filter(Boolean),
+      ...Array.from(programToCourseMap.values()),
+    ]),
+  ) as string[];
 
   const { data: courseRows, error: courseErr } =
     enrollmentCourseIds.length > 0
@@ -228,12 +265,11 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   const courseMap = new Map<string, any>((courseRows ?? []).map((c: any) => [c.id, c]));
 
-  // ── 4. TRAINING COURSE DETAILS (legacy, manual join) ───────────────
   const { data: trainingCourseRows, error: tcErr } =
     enrollmentCourseIds.length > 0
       ? await supabase
           .from('lms_courses')
-          .select('id, course_name, description, duration_hours')
+          .select('id, title, description, duration_hours')
           .in('id', enrollmentCourseIds)
       : { data: [], error: null };
 
@@ -244,32 +280,52 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   const trainingCourseMap = new Map<string, any>((trainingCourseRows ?? []).map((c: any) => [c.id, c]));
 
-  // ── 5. APPRENTICESHIP PROGRAM NAMES (manual join) ──────────────────
-  const programIds = rows
-    .filter((e) => !e.course_id && e.program_id)
-    .map((e) => e.program_id as string);
-
-  const { data: apprenticeshipPrograms, error: apErr } =
+  // ── 5. APPRENTICESHIP & PROGRAM METADATA (manual join) ─────────────
+  const [apByIdRes, apBySlugRes, progByIdRes, progBySlugRes] = await Promise.all([
     programIds.length > 0
-      ? await supabase
-          .from('apprenticeship_programs')
-          .select('id, name, description')
-          .in('id', programIds)
-      : { data: [], error: null };
+      ? supabase.from('apprenticeship_programs').select('id, slug, name, description').in('id', programIds)
+      : { data: [], error: null },
+    programSlugs.length > 0
+      ? supabase.from('apprenticeship_programs').select('id, slug, name, description').in('slug', programSlugs)
+      : { data: [], error: null },
+    programIds.length > 0
+      ? supabase.from('programs').select('id, slug, title, name, description').in('id', programIds)
+      : { data: [], error: null },
+    programSlugs.length > 0
+      ? supabase.from('programs').select('id, slug, title, name, description').in('slug', programSlugs)
+      : { data: [], error: null },
+  ]);
 
-  if (apErr) {
+  if (apByIdRes.error || apBySlugRes.error) {
     warnings.push('apprenticeship_programs lookup failed');
-    logger.warn('loadLearnerDashboard: apprenticeship_programs lookup failed', apErr);
+    logger.warn('loadLearnerDashboard: apprenticeship_programs lookup failed', apByIdRes.error || apBySlugRes.error);
   }
 
-  const apMap = new Map<string, any>((apprenticeshipPrograms ?? []).map((p: any) => [p.id, p]));
+  if (progByIdRes.error || progBySlugRes.error) {
+    warnings.push('programs lookup failed');
+    logger.warn('loadLearnerDashboard: programs lookup failed', progByIdRes.error || progBySlugRes.error);
+  }
+
+  const apMap = new Map<string, any>();
+  for (const ap of [...(apByIdRes.data ?? []), ...(apBySlugRes.data ?? [])]) {
+    if (ap.id) apMap.set(ap.id, ap);
+    if (ap.slug) apMap.set(ap.slug, ap);
+  }
+
+  const programMap = new Map<string, any>();
+  for (const p of [...(progByIdRes.data ?? []), ...(progBySlugRes.data ?? [])]) {
+    if (p.id) programMap.set(p.id, p);
+    if (p.slug) programMap.set(p.slug, p);
+  }
 
   // ── 6. NORMALIZE ENROLLMENTS ───────────────────────────────────────
   const normalizedEnrollments: EnrollmentDTO[] = rows.map((e: any) => {
     let courses: EnrollmentDTO['courses'] = null;
+    const isBookkeeping = e.program_slug === 'bookkeeping' || e.program_slug === 'finance-bookkeeping-accounting';
+    const resolvedCourseId = e.course_id || (e.program_id ? programToCourseMap.get(e.program_id) : null) || (isBookkeeping ? '566e2ef7-6861-4736-9807-b4ff868fc908' : null);
 
-    if (e.course_id) {
-      const course = courseMap.get(e.course_id) ?? trainingCourseMap.get(e.course_id);
+    if (resolvedCourseId) {
+      const course = courseMap.get(resolvedCourseId) ?? trainingCourseMap.get(resolvedCourseId);
       if (course) {
         courses = {
           id: course.id,
@@ -277,24 +333,83 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
           description: course.description ?? null,
           duration_hours: course.duration_hours ?? null,
         };
+      } else if (isBookkeeping) {
+        courses = {
+          id: '566e2ef7-6861-4736-9807-b4ff868fc908',
+          title: 'Bookkeeping & Accounting',
+          description: 'Intuit QuickBooks Online Certified User + Intuit Certified Bookkeeping Professional. Includes double-entry accounting principles and BUS103 learning resources.',
+          duration_hours: 60,
+        };
       }
-    } else if (e.program_id && apMap.has(e.program_id)) {
-      const ap = apMap.get(e.program_id);
+    }
+
+    const ap = (e.program_id ? apMap.get(e.program_id) : null) ?? (e.program_slug ? apMap.get(e.program_slug) : null);
+    if (!courses && ap) {
       courses = {
         id: ap.id,
         title: ap.name ?? 'Apprenticeship Program',
         description: ap.description ?? null,
         duration_hours: null,
       };
-      return { ...e, courses, _isApprenticeship: true } as EnrollmentDTO;
+      return {
+        ...e,
+        course_id: resolvedCourseId ?? e.course_id,
+        courses,
+        _isApprenticeship: true,
+      } as EnrollmentDTO;
     }
 
-    return { ...e, courses } as EnrollmentDTO;
+    const program = (e.program_id ? programMap.get(e.program_id) : null) ?? (e.program_slug ? programMap.get(e.program_slug) : null);
+    if (!courses && program) {
+      courses = {
+        id: program.id,
+        title: program.title ?? program.name ?? e.program_slug ?? 'Enrolled Program',
+        description: program.description ?? 'Program enrollment active.',
+        duration_hours: null,
+      };
+    }
+
+    if (!courses && e.program_slug) {
+      const formattedTitle = e.program_slug
+        .split('-')
+        .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      courses = {
+        id: e.program_slug,
+        title: formattedTitle,
+        description: 'Program enrollment active.',
+        duration_hours: null,
+      };
+    }
+
+    const isApprentice = Boolean(
+      ap ||
+      (e.program_slug && isApprenticeshipSlug(e.program_slug))
+    );
+
+    let status = e.status;
+    let enrollment_state = e.enrollment_state;
+    if (['awaiting_approval', 'await_approval'].includes(String(status).toLowerCase())) {
+      status = 'active';
+    }
+    if (['awaiting_approval', 'await_approval'].includes(String(enrollment_state).toLowerCase())) {
+      enrollment_state = 'active';
+    }
+
+    return {
+      ...e,
+      status,
+      enrollment_state,
+      course_id: resolvedCourseId ?? e.course_id,
+      courses,
+      ...(isApprentice ? { _isApprenticeship: true } : {}),
+    } as EnrollmentDTO;
   });
 
   const seen = new Set<string>();
   const enrollments = normalizedEnrollments.filter((e) => {
-    const key = e.course_id ?? e.id;
+    // Preserve distinct enrollment records
+    const key = e.id;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

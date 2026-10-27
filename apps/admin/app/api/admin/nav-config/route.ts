@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apiRequireAdmin } from '@/lib/admin/guards';
+import { apiRequireAdmin, apiRequireRoles } from '@/lib/admin/guards';
+import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { DEFAULT_NAV, isNavSections, type NavSection } from '@/lib/admin/nav-config';
@@ -8,7 +9,11 @@ import { safeError } from '@/lib/api/safe-error';
 function normalizeAdminHref(href: string): string {
   if (href === '/') return '/';
   const withoutLegacyPrefix = href.replace(/^\/admin(?=\/|$)/, '');
-  return withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
+  const rootHref = withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
+  // Persisted navigation may predate the staff directory. Fix the link at its
+  // source instead of sending users through another compatibility redirect.
+  if (rootHref === '/instructors') return '/staff';
+  return rootHref;
 }
 
 function normalizeAdminNavSections(sections: NavSection[]): NavSection[] {
@@ -87,7 +92,7 @@ export async function PUT(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiRequireAdmin(request);
+  const auth = await apiRequireRoles(request, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
 
   let body: unknown;

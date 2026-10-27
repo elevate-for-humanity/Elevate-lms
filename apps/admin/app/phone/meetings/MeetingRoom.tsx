@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {MeetingScreenShare} from '@/components/communications/MeetingScreenShare';
 import { Mic, MonitorUp, Video as VideoIcon } from 'lucide-react';
-import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/components-react';
+import { LiveKitRoom, RoomAudioRenderer, StartAudio, VideoConference } from '@livekit/components-react';
 
 type Connection = { token: string; serverUrl: string };
 
-export function MeetingRoom({ roomId }: { roomId: string }) {
+export function MeetingRoom({ roomId, allowScreenShare=true }: { roomId: string; allowScreenShare?: boolean }) {
   const [connection, setConnection] = useState<Connection | null>(null);
   const [error, setError] = useState('');
   const [deviceStatus, setDeviceStatus] = useState<'checking' | 'ready' | 'blocked'>('checking');
@@ -68,7 +69,7 @@ export function MeetingRoom({ roomId }: { roomId: string }) {
         <span>{deviceMessage}</span>
       </div>
       <div
-      className="h-[72vh] min-h-[520px] overflow-hidden rounded-2xl bg-slate-950"
+      className="min-h-[420px] overflow-hidden rounded-2xl bg-slate-950"
       data-lk-theme="default"
     >
       <LiveKitRoom
@@ -77,9 +78,10 @@ export function MeetingRoom({ roomId }: { roomId: string }) {
         connect
         audio
         video
-        className="h-full"
+        className="flex min-h-[420px] flex-col"
       >
-        <VideoConference />
+        <div className="flex flex-wrap items-center gap-3 p-3"><MeetingScreenShare allowed={allowScreenShare} /><StartAudio label="Enable meeting audio" /></div>
+        <div className="h-[65dvh] min-h-[360px]"><VideoConference /></div>
         <RoomAudioRenderer />
       </LiveKitRoom>
       </div>

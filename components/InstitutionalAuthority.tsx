@@ -25,7 +25,7 @@ const AUTHORITIES = [
     title: 'Authorized Testing Center',
     abbr: 'Certiport',
     desc: 'Certiport Authorized Testing Center for industry certification exams.',
-    image: '/images/partners/microsoft-logo.png',
+    image: '/images/partners/microsoft-logo.svg',
     color: 'text-brand-blue-700',
     bg: 'bg-brand-blue-50',
     border: 'border-brand-blue-200',

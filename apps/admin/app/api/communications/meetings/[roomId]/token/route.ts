@@ -1,3 +1,4 @@
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -49,6 +50,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
     [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
     profile.email ||
     'Team member';
+  await hydrateProcessEnv();
   try {
     return NextResponse.json(
       await createMeetingToken({

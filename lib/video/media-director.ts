@@ -71,6 +71,8 @@ export interface MediaScene {
   transition: Transition;
   referenceImageUrl?: string;
   sourceVideoUrl?: string;
+  /** Optional render-resolved clip: a footage scene must never be accepted as a static slide. */
+  clipUrl?: string | null;
   characterIds: string[];
   negativePrompt?: string;
   seed?: number;
@@ -84,6 +86,12 @@ export interface MediaScene {
   requiredVisualEvidence?: string;
   sceneType?: InstructionalSceneType;
   memoryAnchor?: string;
+  teachingVisual?: import('../ultimate-course-builder/instructional/teaching-visual').TeachingVisual;
+  physicalDemonstration?: boolean;
+  /** Written by the renderer only when the encoded scene uses this measured title box. */
+  titleLayout?: 'footage-title-v1';
+  /** Scene-specific title scale for verified encoded-text readability repairs. */
+  titleFontSize?: number;
   mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
   overlayTemplate: string;
   contentHash: string;
@@ -112,6 +120,8 @@ export interface MediaDirectorInput {
   sceneData?: Record<string, unknown>;
   characters?: MediaCharacterReference[];
   defaultDurationSeconds?: number;
+  /** Preserve the accepted authored storyboard, including expanded teaching scenes. */
+  requiredSceneCount?: number;
 }
 
 export const MIN_LESSON_VIDEO_SCENES = 6;
@@ -328,8 +338,11 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
 export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const raw = input.sceneData ?? {};
   const rawScenes = Array.isArray(raw.scenes) ? raw.scenes : [];
-  if (rawScenes.length > MAX_LESSON_VIDEO_SCENES) {
-    throw new Error(`MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${MAX_LESSON_VIDEO_SCENES}`);
+  const maximumScenes=input.requiredSceneCount ?? MAX_LESSON_VIDEO_SCENES;
+  if (input.requiredSceneCount && rawScenes.length!==input.requiredSceneCount)
+    throw new Error(`MEDIA_REQUIRED_SCENE_COUNT:${rawScenes.length}:${input.requiredSceneCount}`);
+  if (rawScenes.length > maximumScenes) {
+    throw new Error(`MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${maximumScenes}`);
   }
   const characters = Array.isArray(input.characters) ? input.characters : [];
   const defaultDuration = numberValue(
@@ -479,6 +492,11 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
             scene.memory_anchor ?? scene.memoryAnchor,
             stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
           ) || undefined,
+        teachingVisual: scene.teachingVisual as MediaScene['teachingVisual'],
+        titleFontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+          ? scene.titleFontSize
+          : undefined,
+        physicalDemonstration: scene.physical_demonstration === true || scene.physicalDemonstration === true,
         mediaSource,
         overlayTemplate,
         contentHash: stringValue(scene.content_hash ?? scene.contentHash, contentHash),

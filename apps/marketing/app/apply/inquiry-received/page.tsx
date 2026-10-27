@@ -35,8 +35,8 @@ export default function InquiryReceivedPage() {
         </p>
         <p className="text-black text-sm mb-8">
           Check your email for a confirmation. Questions? Call us at{' '}
-          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 font-semibold">
-            {PLATFORM_DEFAULTS.supportPhone}
+          <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 font-semibold">
+            {PLATFORM_DEFAULTS.mainPhone}
           </a>{' '}
           or email{' '}
           <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600">

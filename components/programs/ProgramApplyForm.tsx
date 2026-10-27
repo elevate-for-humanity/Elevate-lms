@@ -40,7 +40,7 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
         Apply for {programTitle}
       </h2>
       <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
-        Complete one application record for contact information, program selection, funding,
+        Complete one application record for contact information, program selection, payment information,
         background questions, support needs, acknowledgements, and program-specific documents.
       </p>
 

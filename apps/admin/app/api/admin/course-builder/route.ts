@@ -5,6 +5,7 @@
  * Studio controls this surface. Course Builder owns orchestration and delegates
  * execution to private/internal Course Builder capability services.
  */
+import { courseLibraryPlayback } from '@/lib/storage/course-library-playback';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -190,21 +191,13 @@ export async function GET(req: NextRequest) {
 
       const { data: videos, error } = await db
         .from('course_videos')
-        .select('id,title,lesson_id,storage_path,status,asset_role,created_at')
+        .select('id,title,lesson_id,storage_path,video_url,status,asset_role,created_at')
         .eq('course_id', courseId)
         .order('created_at', { ascending: false });
       if (error) throw error;
 
       const rows = await Promise.all(
-        (videos ?? []).map(async (video) => {
-          const { data: signed } = await db.storage
-            .from('course_videos')
-            .createSignedUrl(video.storage_path, 60 * 60);
-          return {
-            ...video,
-            playbackUrl: signed?.signedUrl ?? null,
-          };
-        }),
+        (videos ?? []).map(video => courseLibraryPlayback(db,video)),
       );
 
       return NextResponse.json({ ok: true, course, videos: rows });

@@ -24,7 +24,7 @@ const supabaseConfigured =
   /SUPABASE_SERVICE_ROLE_KEY=/.test(envText);
 const northflankConfigured =
   existsSync('Dockerfile.northflank-lms') &&
-  existsSync('Dockerfile.northflank-admin') &&
+  existsSync('Dockerfile.admin') &&
   existsSync('scripts/northflank/configure-services.ts') &&
   existsSync('.github/workflows/deploy-lms.yml') &&
   existsSync('.github/workflows/deploy-admin.yml');

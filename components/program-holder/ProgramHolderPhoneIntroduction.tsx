@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   BellRing,
   Bot,
@@ -45,7 +45,7 @@ const guide = [
   },
   {
     title: 'Immediate administrator assistance',
-    body: 'Callers can press 0 or dial extension 100 for the administrator. The administrator PWA rings first. Only that administrator extension may fall back to 317-760-7908; all other extensions remain PWA-only. If the administrator is unavailable, PARIS securely collects the request.',
+    body: 'Call Administration at (463) 240-1404 and use extension 0 for Elizabeth Greene. Confirm current routing in the live directory. If the administrator is unavailable, review the callback options shown in the phone workspace.',
   },
   {
     title: 'Privacy and emergencies',
@@ -58,15 +58,9 @@ export function ProgramHolderPhoneIntroduction({
 }: {
   roleLabel?: string;
 } = {}) {
-  const storageKey = `${roleLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-phone-introduction-v1`;
   const [showWelcome, setShowWelcome] = useState(false);
 
-  useEffect(() => {
-    setShowWelcome(window.localStorage.getItem(storageKey) !== 'complete');
-  }, [storageKey]);
-
   function completeIntroduction() {
-    window.localStorage.setItem(storageKey, 'complete');
     setShowWelcome(false);
   }
 

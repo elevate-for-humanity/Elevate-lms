@@ -110,6 +110,14 @@ export function safeMailboxDisplayName(value: unknown): string {
   );
 }
 
+export function programHolderMailboxDisplayName(value: unknown): string {
+  const holderName = String(value || '')
+    .replace(/[<>\r\n"]/g, '')
+    .trim()
+    .slice(0, 90);
+  return `Elevate for Humanity — ${holderName || 'Program Holder'}`;
+}
+
 export function textToEmailHtml(value: unknown): string {
   const escaped = String(value || '')
     .replace(/&/g, '&amp;')

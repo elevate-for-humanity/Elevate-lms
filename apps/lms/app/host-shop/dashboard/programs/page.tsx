@@ -18,6 +18,7 @@ export default async function HostShopProgramsPage() {
   const board = await getHostShopBoard(user.id);
   const configured = board.unconfiguredPrograms.length === 0;
   const timeBased = board.timeBasedPrograms.length > 0;
+  const hybrid = board.hybridPrograms.length > 0;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -51,9 +52,11 @@ export default async function HostShopProgramsPage() {
         <h2 className="mt-4 text-2xl font-black text-slate-950">{board.tradeInfo.label}</h2>
         <p className="mt-2 leading-7 text-slate-700">
           {configured
-            ? timeBased
-              ? `The ${Number(board.timeBasedPrograms[0]?.hours || 0).toLocaleString()}-hour time-based apprenticeship target is active. Approved Host Shop OJL entries feed progress automatically.`
-              : `${board.registeredPrograms.length} active registered occupation standard${board.registeredPrograms.length === 1 ? '' : 's'} available for regulated progress.`
+            ? hybrid
+              ? 'Hair Stylist / Cosmetologist is registered as RAPIDS 0096HY V1 using a 2,000–2,500-hour hybrid term with 154 RTI hours and a 500-hour probationary period.'
+              : timeBased
+                ? `The ${Number(board.timeBasedPrograms[0]?.hours || 0).toLocaleString()}-hour time-based apprenticeship target is active. Approved Host Shop OJL entries feed progress automatically.`
+                : `${board.registeredPrograms.length} active registered occupation standard${board.registeredPrograms.length === 1 ? '' : 's'} available for regulated progress.`
             : 'No active approved registered-program standard is configured for the assigned occupation. Competency, RTI, wage-milestone, and regulated completion credit remain blocked.'}
         </p>
       </section>
@@ -93,9 +96,11 @@ export default async function HostShopProgramsPage() {
                   <h3 className="font-black text-slate-950">{apprentice.name}</h3>
                   <p className="text-sm font-medium text-slate-600">
                     {config?.label || apprentice.program_slug || 'Apprenticeship'} ·{' '}
-                    {apprentice.tradeInfo.registered
-                      ? `Appendix A ${apprentice.tradeInfo.rapidsCode}`
-                      : apprentice.tradeInfo.progressModel === 'time_based'
+                    {apprentice.tradeInfo.progressModel === 'hybrid'
+                      ? `RAPIDS ${apprentice.tradeInfo.rapidsCode} · 2,000–2,500-hour hybrid term · ${apprentice.tradeInfo.rtiHours ?? 154} RTI`
+                      : apprentice.tradeInfo.registered
+                        ? `Appendix A ${apprentice.tradeInfo.rapidsCode}`
+                        : apprentice.tradeInfo.progressModel === 'time_based'
                         ? `${Number(apprentice.tradeInfo.hours || 0).toLocaleString()}-hour time-based progress`
                         : 'approved standard pending configuration'}
                   </p>

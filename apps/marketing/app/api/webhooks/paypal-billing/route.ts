@@ -68,6 +68,23 @@ export async function POST(request: NextRequest) {
     .select('id')
     .single();
   if (reservation.error?.code === '23505') {
+    // A previously failed or interrupted delivery must not be acknowledged as successful.
+    // Keep it available for explicit reconciliation rather than risking duplicate invoices.
+    const prior = await db
+      .from('billing_provider_events')
+      .select('status')
+      .eq('provider', 'paypal')
+      .eq('provider_event_id', event.id)
+      .maybeSingle();
+    if (prior.error) {
+      return NextResponse.json({ error: 'Unable to verify prior PayPal delivery.' }, { status: 503 });
+    }
+    if (prior.data?.status !== 'completed') {
+      return NextResponse.json(
+        { error: 'PayPal event requires reconciliation before acknowledgement.' },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ ok: true, duplicate: true });
   }
   if (reservation.error) {
@@ -85,10 +102,13 @@ export async function POST(request: NextRequest) {
       if (!payment) throw new Error('PayPal payment event is missing subscription or amount data.');
       await syncPayPalPaymentToQuickBooks(db, payment);
     }
-    await db
+    const completion = await db
       .from('billing_provider_events')
       .update({ status: 'completed', processed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', reservation.data.id);
+    // PayPal must retry when the durable acknowledgement was not saved.
+    // An HTTP 200 here would hide an interrupted billing event permanently.
+    if (completion.error) throw new Error('PayPal event completion could not be saved.');
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'PayPal billing synchronization failed.';

@@ -62,3 +62,26 @@ test('daily progress preserves totals above 48 and rejects clocks for another pr
 test('invalid requested program fails before account creation or approval writes',async()=>{let writes=0;const db=dbFor(({table,operation})=>{if(operation!=='select')writes++;return{data:table==='profiles'?{id:'admin',role:'admin'}:table==='program_holder_applications'?{id:'a',email:'test@example.test',contact_name:'Test',organization_name:'Test',status:'pending',data:{requested_program_slugs:['unavailable']}}:[],error:null}});const api=load('apps/admin/app/api/program-holder/applications/[id]/approve/route.ts',{'next/server':next,'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user:{id:'admin'}}})}})},'@/lib/supabase/admin':{requireAdminClient:async()=>db},'@/lib/logger':{logger:{error(){},warn(){}}},'@/lib/config/platform-config':{PLATFORM_DEFAULTS:{}}});assert.equal((await api.POST({}, {params:Promise.resolve({id:'a'})})).status,409);assert.equal(writes,0);});
 
 test('regional call logging links only candidates authorized by the server workspace',async()=>{for(const eligible of [true,false]){let writes=[];const db=dbFor(({operation,filters,writes:values})=>{if(operation!=='select')writes.push({operation,filters,values});return{data:operation==='insert'?{id:'actual-roster',status:'applied'}:null,error:null}});const api=load('apps/lms/app/api/program-holder/call-log/route.ts',{'next/server':next,'@/lib/auth/require-program-holder':{requireProgramHolder:async()=>({mode:'holder',holderId:'holder',programIds:['program'],user:{id:'coordinator'},db})},'@/lib/program-holder/workspace':{getProgramHolderWorkspace:async()=>({applicants:eligible?[{id:'a',application_id:'a',regional_application_id:'a',program_id:'program',applicant_name:'Test'}]:[]})}});assert.equal((await api.POST({json:async()=>({program_holder_student_id:'a',regional_application_id:'a',outcome:'no_answer'})})).status,eligible?200:404);if(eligible)assert.ok(writes.find(w=>w.operation==='update').filters.some(([k,v])=>k==='id'&&v==='actual-roster'));else assert.equal(writes.length,0);}});
+
+test('pending approval cannot enter career feed, career detail or phone', async () => {
+ for (const path of ['career/page.tsx','career/[id]/page.tsx','phone/page.tsx']) {
+  let reads=0;
+  const page=load(`apps/lms/app/program-holder/${path}`, {
+   '@/lib/auth/require-program-holder':{requireProgramHolder:async()=>{throw Error('pending-approval')}},
+   '@/lib/data/jobs':{getActiveJobs:async()=>{reads++;return[]},getJobById:async()=>{reads++;return null}},
+  });
+  await assert.rejects(page.default({params:Promise.resolve({id:'11111111-1111-4111-8111-111111111111'})}),/pending-approval/);
+  assert.equal(reads,0);
+ }
+});
+
+test('career detail distinguishes unavailable records from database failures', async () => {
+ for (const failed of [true,false]) {
+  const api=load('lib/data/jobs.ts',{
+   '@/lib/supabase/public':{createPublicClient:()=>dbFor(()=>({data:null,error:failed?{message:'offline'}:null}))},
+   '@/lib/logger':{logger:{error(){}}},
+  });
+  if(failed)await assert.rejects(api.getJobById('id',{throwOnError:true}),/temporarily unavailable/);
+  else assert.equal(await api.getJobById('id',{throwOnError:true}),null);
+ }
+});

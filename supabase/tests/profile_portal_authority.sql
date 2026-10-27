@@ -13,10 +13,10 @@ begin
     return new;
   end if;
   if tg_op = 'INSERT' then
-    if coalesce(new.role, 'student') in (
-      'admin','super_admin','org_admin','staff','instructor','advisor',
-      'test_admin','proctor','program_holder','programholder','site_coordinator',
-      'provider','provider_admin','case_manager','workforce_board','workforce_board_admin'
+    if regexp_replace(lower(btrim(coalesce(new.role, 'student'))), '[-_[:space:]]', '', 'g') in (
+      'admin','superadmin','orgadmin','staff','instructor','advisor',
+      'testadmin','proctor','programholder','sitecoordinator',
+      'provider','provideradmin','casemanager','workforceboard','workforceboardadmin'
     ) or new.program_holder_id is not null
       or coalesce(new.roles, '[]'::jsonb) not in ('[]'::jsonb, '{}'::jsonb)
       or new.verified is true or new.suspended is true then
@@ -56,6 +56,10 @@ begin
   begin
     insert into pg_temp.portal_authority_test(id,role) values ('00000000-0000-4000-8000-000000000002','admin');
     raise exception 'TEST FAILED: privileged signup allowed';
+  exception when insufficient_privilege then null; end;
+  begin
+    insert into pg_temp.portal_authority_test(id,role) values ('00000000-0000-4000-8000-000000000003',' Super-Admin ');
+    raise exception 'TEST FAILED: legacy role alias allowed';
   exception when insufficient_privilege then null; end;
 end;
 $test$;

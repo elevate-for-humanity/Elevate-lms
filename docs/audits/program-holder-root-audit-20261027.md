@@ -21,9 +21,13 @@ Scope: shared Program Holder dashboard pages, APIs and components; existing and 
 - Account-specific insurance exemption now governs both visible upload/checklist requirements and payment readiness. Other accounts keep their existing requirements.
 - Welcome-email delivery markers no longer silently discard save errors, and dashboard links use the LMS origin.
 
+- Career cards now open a holder-scoped job detail page instead of linking back to the feed. Feed/detail query failures display a retry state rather than claiming no opportunities exist.
+- Career and phone pages explicitly retain the operational approval guard after pending onboarding was separated from the parent layout.
+- Profile-authority insert protection normalizes legacy role aliases, including hyphens, whitespace and capitalization.
+
 ## Validation evidence and limits
 
-The restored candidate passes the shared behavioral regression suite plus eleven root-level behavioral tests (19 Node tests total), 87 related Vitest tests, scoped ESLint, and the portal routing contract audit. Full LMS typechecking passes. Final production build/deployment evidence must be recorded for the release commit; an earlier/local test result is not proof that production serves it.
+The restored candidate passes the shared behavioral regression suite plus thirteen root-level behavioral tests (21 Node tests total), 87 related Vitest tests, scoped ESLint, and the portal routing contract audit. Full LMS typechecking and the production compilation passed for commit 2b02e25865a588c2e1097d8995718a089f72d178. The additional career/phone and role-alias repairs require fresh typecheck/build and protected CI evidence; an earlier/local test result is not proof that production serves it.
 
 Live database checks covered all 14 non-test holder records and confirmed all 24 holder document objects exist. Existing signed/approval flags were not fabricated. A missing profile backlink was repaired with an ownership-constrained update. No bank credentials were collected or stored.
 

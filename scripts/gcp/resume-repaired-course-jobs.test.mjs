@@ -1,11 +1,11 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
-const base={id:'job',status:'failed',execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
+const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18},status:'failed',execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
  monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false}}};
 async function run(job,conflict=false){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
- return {ok:true,json:async()=>[job]};
+ return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[job]};
  }});return {writes,result};}
 test('new verified repair queues an exhausted internal failure, retaining checkpoints and previous error',async()=>{
  const {writes,result}=await run(base);assert.deepEqual(result.jobIds,['job']);
@@ -25,4 +25,21 @@ test('pause, live lease, publication, unrelated course and external blockers nev
 });
 test('concurrent claim or monitor change produces no false restart proof',async()=>{
  assert.deepEqual((await run(base,true)).result.jobIds,[]);
+});
+
+test('an active continuation prevents a historical failed attempt being reopened',async()=>{
+ let writes=0;
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options.method==='PATCH'){writes++;throw Error('must not duplicate active work');}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[{build_id:'build'}]:[base]};
+ }});
+ assert.equal(writes,0);assert.deepEqual(result.jobIds,[]);
+});
+test('only the furthest historical cursor is recovered and an admission race is harmless',async()=>{
+ const writes=[];
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options.method==='PATCH'){writes.push(String(url));return {ok:false,status:409};}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[{...base,id:'older',payload:{nextCompetencyIndex:2}},base]};
+ }});
+ assert.equal(writes.length,1);assert.match(writes[0],/id=eq.job/);assert.deepEqual(result.jobIds,[]);
 });

@@ -6,13 +6,24 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  const token=env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('DATABASE_AUTH_REQUIRED');
  const headers={apikey:token,Authorization:'Bearer '+token};
  const url=new URL(ROOT);
- url.searchParams.set('select','id,status,execution_generation,lease_expires_at,last_error,monitor,build:ultimate_course_builds!inner(course_id,status,profile)');
+ url.searchParams.set('select','id,build_id,payload,status,execution_generation,lease_expires_at,last_error,monitor,build:ultimate_course_builds!inner(course_id,status,profile)');
  url.searchParams.set('status','eq.failed');url.searchParams.set('build.course_id','eq.'+COURSE);
  const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw Error('REPAIR_RESUME_READ_HTTP_'+response.status);
  const jobs=await response.json();if(!Array.isArray(jobs))throw Error('REPAIR_RESUME_INVENTORY_INVALID');
+ const activeUrl=new URL(ROOT);activeUrl.searchParams.set('select','build_id');
+ activeUrl.searchParams.set('status','in.(queued,running)');
+ const activeResponse=await request(activeUrl,{headers,signal:AbortSignal.timeout(15000)});
+ if(!activeResponse.ok)throw Error('REPAIR_ACTIVE_READ_HTTP_'+activeResponse.status);
+ const active=await activeResponse.json();if(!Array.isArray(active))throw Error('REPAIR_ACTIVE_INVENTORY_INVALID');
+ const seenBuilds=new Set(active.map(row=>row.build_id));
+ // Historical attempts remain evidence. Recover the furthest saved cursor
+ // once per build, never an older attempt alongside an active continuation.
+ jobs.sort((a,b)=>Number(b.payload?.nextCompetencyIndex??0)-Number(a.payload?.nextCompetencyIndex??0));
  const resumed=[];
  for(const job of jobs){
+  if(!job.build_id||seenBuilds.has(job.build_id))continue;
+  seenBuilds.add(job.build_id);
   if(job.status!=='failed'||job.build?.course_id!==COURSE||job.build?.profile?.ownerPaused===true||
    ['published','archived','cancelled'].includes(job.build?.status)||job.monitor?.enabled!==true||
    job.monitor?.lastRepairDeployment?.imageSha===imageSha||
@@ -33,7 +44,12 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    monitor:{...job.monitor,lastRepairDeployment:{imageSha,imageDigest,at:now.toISOString(),previousError:error}}};
   const changed=await request(target,{method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
    body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
-  if(!changed.ok)throw Error('REPAIR_RESUME_WRITE_HTTP_'+changed.status);
+  if(!changed.ok){
+   // Another coordinator may have queued work after our active scan. The
+   // unique active-build index prevents duplication; do not fail deployment.
+   if(changed.status===409)continue;
+   throw Error('REPAIR_RESUME_WRITE_HTTP_'+changed.status);
+  }
   const saved=await changed.json();if(!Array.isArray(saved))throw Error('REPAIR_RESUME_READBACK_INVALID');
   if(saved.length===1&&saved[0].id===job.id&&saved[0].status==='queued'&&saved[0].execution_generation===job.execution_generation+1)resumed.push(job.id);
   else if(saved.length)throw Error('REPAIR_RESUME_READBACK_INVALID');

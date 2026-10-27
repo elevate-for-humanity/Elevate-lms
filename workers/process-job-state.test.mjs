@@ -33,7 +33,7 @@ function scenario(payload, completed = true, options = {}) {
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
   const names = ['continuousCourseLease','checkpointContinuousLesson','attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [continuousCourseLease,checkpointContinuousLesson,options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const values = [continuousCourseLease,checkpointContinuousLesson,options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } async publishReadyLessons() { events.push('publish-ready');await options.publishReady?.(); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
@@ -114,4 +114,19 @@ test('a failed recovery write preserves its database error instead of reporting 
  const failure=new Error('database failure-state write timed out');
  const s=scenario({acceptance:true},false,{runCourse:async()=>{throw Error('ULTIMATE_FENCED_WRITE_FAILED:update_build:AbortError');},fail:async()=>{throw failure;}});
  await assert.rejects(s.run(),error=>error===failure);assert.deepEqual(s.events,['fail']);
+});
+
+test('authorized publish-as-you-go completes publication before advancing the cursor',async()=>{
+ const s=scenario({},true,{nextWork:()=>({continue:true,payload:{nextCompetencyIndex:19}})});s.build.profile.publishCompletedLessons=true;
+ const result=await s.run();assert.equal(result.continuing,true);
+ assert.deepEqual(s.events,['publish-ready','attach','publish-ready','advance']);
+});
+test('targeted acceptance never publishes other ready lessons even when the course opts in',async()=>{
+ const s=scenario({acceptance:true});s.build.profile.publishCompletedLessons=true;
+ await s.run();assert.equal(s.events.includes('publish-ready'),false);
+});
+test('publication failure prevents advancing beyond a completed lesson',async()=>{
+ let calls=0;const s=scenario({},true,{publishReady:async()=>{if(++calls===2)throw Error('PUBLICATION_READBACK_FAILED');},nextWork:()=>({continue:true,payload:{nextCompetencyIndex:19}})});
+ s.build.profile.publishCompletedLessons=true;
+ const result=await s.run();assert.equal(result.completed,false);assert.equal(s.events.includes('advance'),false);assert.equal(s.events.at(-1),'fail');
 });

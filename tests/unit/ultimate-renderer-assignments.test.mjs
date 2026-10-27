@@ -11,6 +11,20 @@ source = source.replace(/^import .*bindTeachingPhotoAssignments.*;$/m, '');
 source = source.replace(/^import .*storedLicensedMediaMetadata.*;$/m, '');
 source = source.replace(/^import .*MIN_LESSON_VIDEO_SCENES.*;$/m, `const MIN_LESSON_VIDEO_SCENES = ${minimum};`);
 const { prepareUltimateStoryboardInput, requireResolvedVisualEvidence } = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(source, { mode: 'transform' })).toString('base64'));
+const { directMedia } = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(mediaDirector.replace("import 'server-only';", ''), {mode:'transform'})).toString('base64'));
+test('expanded accepted storyboard retains every prepared scene through the director', () => {
+  const scenes=Array.from({length:15},(_,i)=>({id:`expanded-${i}`,title:`Teaching ${i+1}`,dialogue:`Explain color principle ${i+1}.`}));
+  const prepared=prepareUltimateStoryboardInput({artifacts:{
+    storyboard:{storyboard:{scenes}},
+    visual_assignment:{media:{
+      assignments:scenes.map(s=>({sceneId:s.id,assetId:s.id})),
+      readyAssets:scenes.map(s=>({id:s.id,public_url:`https://media.example/${s.id}.mp4`,mime_type:'video/mp4',entitlement_id:'licensed'})),
+    }},
+  }});
+  assert.equal(prepared.requiredSceneCount,15);
+  assert.equal(directMedia(prepared).scenes.length,15);
+  assert.throws(()=>directMedia({...prepared,sceneData:{...prepared.sceneData,scenes:prepared.sceneData.scenes.slice(0,14)}}),/MEDIA_REQUIRED_SCENE_COUNT:14:15/);
+});
 const uri = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
 const licensed = uri(stripTypeScriptTypes((await readFile(new URL('../../lib/media/licensed-course-media.ts', import.meta.url), 'utf8')).replace("import 'server-only';", '')));
 const evidence = uri(stripTypeScriptTypes(await readFile(new URL('../../lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts', import.meta.url), 'utf8')));

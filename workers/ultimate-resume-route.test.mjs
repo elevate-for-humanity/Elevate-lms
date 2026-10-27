@@ -5,8 +5,8 @@ import {stripTypeScriptTypes} from 'node:module';
 
 const source=stripTypeScriptTypes(await readFile(new URL('../apps/admin/app/api/admin/ultimate-course-builder/run/route.ts',import.meta.url),'utf8'))
  .replace(/^import .*;\n/gm,'').replace(/export /g,'');
-function fixture({paused=true,status='blocked',conflict=false,running=false,denied=false}={}){
- const writes=[];let launches=0;
+function fixture({paused=true,status='blocked',conflict=false,running=false,denied=false,limited=false}={}){
+ const writes=[],limits=[];let launches=0;
  const profile={ownerPaused:paused,competencies:[{id:'lesson'}],presentationContract:{approvedReferenceVideo:{sha256:'approved-hash'}}};
  const build={id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status,profile,updated_at:'2026-10-25T20:00:00.123456+00:00'};
  const db={from(table){let write,filters=[];const q={
@@ -20,9 +20,9 @@ function fixture({paused=true,status='blocked',conflict=false,running=false,deni
   {json:(body,options={})=>({body,status:options.status??200})},
   async()=>denied?{error:{status:403}}:{id:'real-admin'},async()=>db,
   class {async enqueue(){build.status='queued';return job;}},
-  async()=>{launches++;return {dispatched:true};},async()=>null,
+  async()=>{launches++;return {dispatched:true};},async(req,tier,scope)=>{limits.push({tier,scope});return limited?{status:429}:null;},
   (error)=>{throw error;},async()=>true);
- return {writes,profile,launches:()=>launches,call:()=>POST({json:async()=>({buildId:build.id})})};
+ return {writes,limits,profile,launches:()=>launches,call:()=>POST({json:async()=>({buildId:build.id})})};
 }
 const buildRevision='2026-10-25T20:00:00.123456+00:00';
 test('explicit Resume clears the hold with real actor and preserves the approved reference',async()=>{
@@ -49,4 +49,11 @@ test('published and archived revisions cannot be resumed',async()=>{
 });
 test('unauthorized callers cannot resume a build',async()=>{
  const f=fixture({denied:true});assert.equal((await f.call()).status,403);assert.equal(f.writes.length,0);assert.equal(f.launches(),0);
+});
+
+test('Resume quota uses authenticated actor scope and retains strict throttling',async()=>{
+ const f=fixture({limited:true});assert.equal((await f.call()).status,429);
+ assert.deepEqual(f.limits,[{tier:'strict',scope:{key:'course-resume:real-admin'}}]);
+ assert.equal(f.writes.length,0);assert.equal(f.launches(),0);
+ const denied=fixture({denied:true});await denied.call();assert.deepEqual(denied.limits,[]);
 });

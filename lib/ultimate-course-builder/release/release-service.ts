@@ -10,33 +10,60 @@ const slug = (v: string) =>
     .slice(0, 120) || 'lesson';
 export class UltimateReleaseService {
   constructor(private db: SupabaseClient) {}
-  async derive(buildId: string) {
+  async derive(buildId: string, lessonBuildId?: string) {
     const { data: b, error } = await this.db
       .from('ultimate_course_builds')
       .select('id,course_id,profile,status')
       .eq('id', buildId)
       .single();
     if (error || !b) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
-    if (b.status !== 'built') throw new Error('ULTIMATE_BUILD_NOT_RELEASE_READY');
-    const { data: ls, error: le } = await this.db
+    if ((!lessonBuildId && b.status !== 'built') || (lessonBuildId && ['archived','cancelled'].includes(b.status)))
+      throw new Error('ULTIMATE_BUILD_NOT_RELEASE_READY');
+    const profile = b.profile as any;
+    const preservedIds: string[] = !lessonBuildId && profile.publishCompletedLessons === true
+      ? [...new Set<string>(profile.preservedPublishedLessonIds ?? [])] : [];
+    let preservedRows: any[] = [];
+    if (preservedIds.length) {
+      if (preservedIds.some(id => !Object.values(profile.canonicalLessonIds ?? {}).includes(id)))
+        throw new Error('ULTIMATE_PRESERVED_PUBLICATION_MAPPING_REQUIRED');
+      const prior = await this.db.from('course_lessons')
+        .select('id,title,slug,order_index,status,is_published,video_status,video_url')
+        .eq('course_id',b.course_id).in('id',preservedIds);
+      if (prior.error) throw prior.error;
+      preservedRows = prior.data ?? [];
+      if (preservedRows.length !== preservedIds.length || preservedRows.some(row =>
+          row.status !== 'published' || row.is_published !== true || row.video_status !== 'complete' || !row.video_url))
+        throw new Error('ULTIMATE_PRESERVED_PUBLICATION_CHANGED');
+    }
+    let lessonQuery = this.db
       .from('ultimate_lesson_builds')
       .select('id,lesson_key,competency_id,status,artifacts')
       .eq('build_id', buildId)
       .order('created_at');
+    if (lessonBuildId) lessonQuery = lessonQuery.eq('id', lessonBuildId);
+    const { data: savedLessons, error: le } = await lessonQuery;
     if (le) throw le;
+    let ls: any[] = savedLessons ?? [];
+    if (preservedRows.length) ls = (profile.competencies ?? []).map((competency: any) => {
+      const prior = preservedRows.find(row => row.id === profile.canonicalLessonIds?.[competency.id]);
+      return prior ? {competency_id:competency.id,preservedPublication:prior}
+        : ls.find(row => row.competency_id === competency.id);
+    }).filter(Boolean);
     if (
       !ls?.length ||
       ls.some(
-        (x: any) => x.status !== 'built' || x.artifacts?.finished_media_qa?.mediaQA?.pass !== true,
+        (x: any) => !x.preservedPublication && (x.status !== 'built' || x.artifacts?.finished_media_qa?.mediaQA?.pass !== true),
       )
     )
       throw new Error('ULTIMATE_LESSONS_NOT_RELEASE_READY');
     if (
-      ls.length !== ((b.profile as any)?.competencies ?? []).length ||
+      (!lessonBuildId && ls.length !== ((b.profile as any)?.competencies ?? []).length) ||
+      (lessonBuildId && ls.length !== 1) ||
       new Set(ls.map((l: any) => l.competency_id)).size !== ls.length
     )
       throw new Error('ULTIMATE_ALL_COMPETENCIES_REQUIRED');
-    for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile, lesson.competency_id);
+    for (const lesson of ls) if (!lesson.preservedPublication)
+      assertCompleteLesson(lesson.artifacts as any, b.profile, lesson.competency_id);
     // Current automated contract evidence authorizes publication. Historical
     // owner-review policies and optional review records cannot strand a build.
 
@@ -50,6 +77,12 @@ export class UltimateReleaseService {
       title: p.title,
       profile: p,
       lessons: ls.map((l: any, i: number) => {
+        if (l.preservedPublication) {
+          const prior = l.preservedPublication;
+          return {canonicalLessonId:prior.id,competencyId:l.competency_id,
+            title:prior.title,slug:prior.slug,orderIndex:prior.order_index,
+            videoUrl:prior.video_url,preservedPublished:true};
+        }
         const c: any = cm.get(String(l.competency_id)) ?? {},
           a = l.artifacts ?? {},
           r = a.lesson_film_render?.render ?? a.lesson_film_render ?? {};
@@ -61,7 +94,7 @@ export class UltimateReleaseService {
           competencyId: l.competency_id,
           slug: slug(String(l.lesson_key)),
           title: c.title ?? c.description ?? l.lesson_key,
-          orderIndex: i + 1,
+          orderIndex: Math.max(0, (p.competencies ?? []).findIndex((item: any) => item.id === l.competency_id)) + 1,
           objectives: (a.learning_objectives?.objectives ?? []).map((o: any) => o.text),
           content: a.active_teaching ?? {},
           assessment: a.assessment_alignment?.assessment ?? a.assessment_alignment ?? {},
@@ -79,10 +112,36 @@ export class UltimateReleaseService {
       }),
     };
   }
+  /** Publish only accepted, unpublished lessons. Prior publications are retained. */
+  async publishReadyLessons(buildId: string, actorId: string) {
+    const build = await this.db.from('ultimate_course_builds').select('course_id,profile').eq('id',buildId).single();
+    if (build.error || !build.data) throw build.error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
+    const ready = await this.db.from('ultimate_lesson_builds').select('id,competency_id').eq('build_id',buildId).eq('status','built');
+    if (ready.error) throw ready.error;
+    const canonical = await this.db.from('course_lessons').select('id,status,is_published').eq('course_id',build.data.course_id);
+    if (canonical.error) throw canonical.error;
+    const published = [];
+    for (const lesson of ready.data ?? []) {
+      const id = (build.data.profile as any)?.canonicalLessonIds?.[lesson.competency_id];
+      const saved = canonical.data?.find(row => row.id === id);
+      if (!saved) throw new Error('ULTIMATE_CANONICAL_DRAFT_REQUIRED');
+      if (saved.is_published === true || saved.status === 'published') continue;
+      const packageForLesson = await this.derive(buildId,lesson.id);
+      await this.applyPackage(packageForLesson,actorId);
+      published.push(id);
+    }
+    return published;
+  }
   async applyPackage(p: any, actorId: string) {
     if (p.contractVersion !== ULTIMATE_LESSON_CONTRACT_VERSION || !p.lessons?.length)
       throw new Error('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
-    for (const lesson of p.lessons) assertCompleteLesson(lesson.contractArtifacts, p.profile, lesson.competencyId);
+    for (const lesson of p.lessons) {
+      if (lesson.preservedPublished) {
+        if (p.profile.publishCompletedLessons !== true ||
+            !p.profile.preservedPublishedLessonIds?.includes(lesson.canonicalLessonId))
+          throw new Error('ULTIMATE_PRESERVED_PUBLICATION_MAPPING_REQUIRED');
+      } else assertCompleteLesson(lesson.contractArtifacts,p.profile,lesson.competencyId);
+    }
     const now = new Date().toISOString();
     const { data: existingModule, error: me } = await this.db
       .from('course_modules')
@@ -125,6 +184,16 @@ export class UltimateReleaseService {
       .update({ is_published: true, is_draft: false }).eq('id', m!.id);
     if (modulePublishError) throw modulePublishError;
     for (const l of p.lessons) {
+      if (l.preservedPublished) {
+        const prior = await this.db.from('course_lessons')
+          .select('status,is_published,video_status,video_url')
+          .eq('id',l.canonicalLessonId).eq('course_id',p.courseId).single();
+        if (prior.error) throw prior.error;
+        if (prior.data?.status !== 'published' || prior.data.is_published !== true ||
+            prior.data.video_status !== 'complete' || prior.data.video_url !== l.videoUrl)
+          throw new Error('ULTIMATE_PRESERVED_PUBLICATION_CHANGED');
+        continue;
+      }
       const row: any = {
         course_id: p.courseId,
         module_id: m.id,
@@ -234,12 +303,15 @@ export class UltimateReleaseService {
       };
       const { data: e, error: ee } = await this.db
         .from('course_lessons')
-        .select('id,module_id,slug,content_json,quiz_questions')
+        .select('id,module_id,slug,lesson_type,practical_required,order_index,content_json,quiz_questions')
         .eq('course_id', p.courseId)
         .eq(l.canonicalLessonId ? 'id' : 'slug', l.canonicalLessonId ?? l.slug)
         .maybeSingle();
       if (ee) throw ee;
       if (!e) throw new Error('ULTIMATE_CANONICAL_DRAFT_REQUIRED');
+      row.lesson_type = e.lesson_type ?? row.lesson_type;
+      row.practical_required = e.practical_required === true || l.practicalRequired === true;
+      row.order_index = e.order_index ?? row.order_index;
       // Retain existing assessments and their stable IDs; new source-reviewed
       // checks may be added, but video regeneration never deletes old checks.
       const oldChecks=(e.content_json as any)?.experience?.knowledgeChecks??[];
@@ -250,6 +322,10 @@ export class UltimateReleaseService {
       const oldReassessment=(e.content_json as any)?.experience?.reassessment??[];
       const oldRetryIds=new Set(oldReassessment.map((q:any)=>q.id).filter(Boolean));
       row.content_json.experience.reassessment=[...oldReassessment,...row.content_json.experience.reassessment.filter((q:any)=>!oldRetryIds.has(q.id))];
+      if (row.practical_required && !row.content_json.experience.practicalTask)
+        row.content_json.experience.practicalTask = (e.content_json as any)?.experience?.practicalTask;
+      row.content_json.mediaAttachment = {...(e.content_json as any)?.mediaAttachment,
+        publicationPending:false,publishedAt:now,sourceLessonBuildId:l.sourceLessonBuildId};
       // Record the already rendered, fully verified Ultimate film for the
       // canonical publication guard. This never queues the retired renderer.
       const mediaJobId = await this.recordApprovedFilm(p, l, e.id, actorId, now);
@@ -387,7 +463,7 @@ export class UltimateReleaseService {
       scene_count: l.storyboard?.scenes?.length ?? l.segments.length,
       completed_at: now, review_status: 'approved', reviewed_by: actorId,
       reviewed_at: now,
-      review_notes: 'Current Ultimate twenty-step contract passed before canonical publication.',
+      review_notes: 'Current required Ultimate lesson contract passed; release authorized by the configured course owner.',
       quality_evidence: {
         ...l.contractArtifacts.finished_media_qa.mediaQA.inspection,
         ultimateBuildId: p.buildId,

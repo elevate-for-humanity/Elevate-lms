@@ -262,7 +262,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
     script,
     defaultDurationSeconds: 8,
-    requiredSceneCount: 13,
+    requiredSceneCount: scenes.length,
     sceneData: {
       ...board,
       // The canonical competency title is authoritative; a restored storyboard

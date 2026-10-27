@@ -41,6 +41,24 @@ async function loadDashboardApplications(db: Awaited<ReturnType<typeof requireAd
   }
 }
 
+async function loadDashboardEnrollments(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db
+      .from('program_enrollments')
+      .select('id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -163,16 +181,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       'profile',
     ),
     timeboxDashboardQuery(loadDashboardApplications(db), 'applications'),
-    timeboxDashboardQuery(
-      db
-        .from('program_enrollments')
-        .select(
-          'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at',
-        )
-        .order('created_at', { ascending: false })
-        .limit(1000),
-      'enrollments',
-    ),
+    timeboxDashboardQuery(loadDashboardEnrollments(db), 'enrollments'),
     timeboxDashboardQuery(
       db
         .from('profiles')

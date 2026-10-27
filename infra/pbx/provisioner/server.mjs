@@ -113,6 +113,12 @@ export function renderConfiguration(records) {
       dialplan.push(`exten => 0,1,Gosub(elevate-pwa-extensions,${adminExtension},1)`, ' same => n,Return()');
     }
   }
+  // Operator zero remains a valid subroutine even when every device lease has
+  // expired. Return unavailable to the existing caller fallback, never a missing
+  // dialplan target or a stale/unregistered device.
+  if (!extensionOwners.has('0') && (!records.length || !extensionOwners.has(records[0].adminExtension))) {
+    dialplan.push('exten => 0,1,Set(PWA_CONTACTS=)', ' same => n,Set(DIALSTATUS=CHANUNAVAIL)', ' same => n,Return()');
+  }
   return { pjsip: `${pjsip.join('\n')}\n`, dialplan: `${dialplan.join('\n')}\n` };
 }
 

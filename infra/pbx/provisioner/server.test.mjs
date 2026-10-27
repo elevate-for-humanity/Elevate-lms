@@ -141,3 +141,15 @@ test('multiple devices owned by the same extension render independent endpoints 
   assert.equal(config.dialplan.split('exten => 101,1,Set(PWA_CONTACTS=)').length - 1, 1);
   assert.ok(config.dialplan.includes('PJSIP_DIAL_CONTACTS(' + second.endpointId + ')'));
 });
+
+
+test('empty device fleet retains an explicit unavailable operator subroutine',()=>{
+ const config=renderConfiguration([]);
+ assert.match(config.dialplan,/\[elevate-pwa-extensions\]\nexten => 0,1,Set\(PWA_CONTACTS=\)\n same => n,Set\(DIALSTATUS=CHANUNAVAIL\)\n same => n,Return\(\)/);
+ assert.doesNotMatch(config.dialplan,/PJSIP_DIAL_CONTACTS/);
+});
+test('a leased non-admin device cannot become the operator when the admin is offline',()=>{
+ const config=renderConfiguration([{...record,adminExtension:'102'}]);
+ assert.match(config.dialplan,/exten => 0,1,Set\(PWA_CONTACTS=\)/);
+ assert.doesNotMatch(config.dialplan,/exten => 0,1,Gosub\(elevate-pwa-extensions,101,1\)/);
+});

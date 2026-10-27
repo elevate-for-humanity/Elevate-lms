@@ -4,15 +4,15 @@ Source: https://chatgpt.com/share/6adff9fc-8118-83e9-a7c5-96bb8b3edf1e?ogimg=pla
 
 This preserves the original 95 findings in order. The later 55-item audit is a different register. Code/test repairs below are not production acceptance. Open items are deliberately not marked complete. Protective conditions require evidence and recovery, not removal.
 
-Validation: 676 Google infrastructure tests, 237 worker tests, and 44 focused dashboard/publication tests pass. Full repository ESLint passes. Admin and Marketing production builds have passed; final LMS and refreshed Admin builds remain in progress. Live health responses from older revisions do not prove deployment of these repairs.
+Validation: 676 Google infrastructure tests, 237 worker tests, and 82 focused dashboard/publication/settings-permission tests pass. Full repository ESLint passes. Admin and Marketing production builds have passed; final LMS and refreshed Admin builds remain in progress. Live health responses from older revisions do not prove deployment of these repairs.
 
 Database migrations `20261027031413_atomic_ultimate_publication` and `20261027031415_documented_paid_invoice_totals` are applied to the primary Elevate project. Three rollback-only SQL regressions pass against the applied functions: publication failure/rollback/idempotency/fencing, enqueue/aggregate atomicity, and a 1,001-invoice aggregate. All synthetic fixtures were rolled back. New functions deny anonymous/authenticated execution and allow service_role. Security advisory counts remain unchanged (31 informational server-only RLS tables; one existing MFA warning).
 
 | ID | Original finding | Current disposition | Evidence / next requirement |
 |---|---|---|---|
 | 1 | Dashboard page permits roles that its data loader rejects | Code repair / test evidence | Page and aggregate loader both require admin/super_admin; loader denial tested before privileged client creation. |
-| 2 | Admin page and API authorization rules are inconsistent | Open | Requires implementation review and/or live acceptance evidence. |
-| 3 | Staff-level API access can exceed the platform-settings permission model | Open | Requires implementation review and/or live acceptance evidence. |
+| 2 | Admin page and API authorization rules are inconsistent | Code repair / role acceptance open | Dashboard page/loader and three platform-setting APIs now use their canonical permissions. 38 real-guard route tests cover denied roles, secondary-role failures, admin/super_admin and verified secondary admin. Other role-specific screens still require live acceptance. |
+| 3 | Staff-level API access can exceed the platform-settings permission model | Code repair / test evidence | platform-settings, settings, and env-vars routes require manage_platform_settings with adminOverride disabled. Staff/org_admin/instructor/student are rejected before privileged client creation; super_admin works through the same guard. |
 | 4 | Navigation configuration API permits broader modification access than intended permissions suggest | Existing repair; acceptance open | Narrow platform-settings permission check already present; runtime validation pending. |
 | 5 | Secondary role lookup errors can be treated as missing permissions | Existing repair; acceptance open | Fail-closed role lookup repair already present; runtime validation pending. |
 | 6 | Dashboard header silently substitutes zero when count queries fail | Code repair / test evidence | Degraded and unavailable header responses now produce a visible warning and retry control; malformed responses fail closed. Frontend retry tests pass. |

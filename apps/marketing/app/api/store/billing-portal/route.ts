@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
@@ -27,10 +28,10 @@ export async function POST() {
   if (!subscription) return NextResponse.json({ error: 'No billing subscription exists yet.' }, { status: 409 });
 
   if (subscription.billing_provider === 'quickbooks') {
-    return NextResponse.json({ url: '/billing', provider: 'quickbooks' });
+    return NextResponse.json({ url: `${LMS_HOST}/billing`, provider: 'quickbooks' });
   }
   if (subscription.billing_provider === 'paypal') {
-    return NextResponse.json({ url: '/billing', provider: 'paypal' });
+    return NextResponse.json({ url: `${LMS_HOST}/billing`, provider: 'paypal' });
   }
-  return NextResponse.json({ url: '/billing', provider: subscription.billing_provider || 'elevate' });
+  return NextResponse.json({ url: `${LMS_HOST}/billing`, provider: subscription.billing_provider || 'elevate' });
 }

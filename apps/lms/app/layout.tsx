@@ -1,3 +1,4 @@
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 // Production recovery deploy marker: 2026-08-13.
 import type { Metadata } from 'next';
 import './globals.css';
@@ -41,10 +42,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="lms-portal efh-contrast">
         <SupabaseConfigBootstrap />
+        <CommunicationTodos />
         <LmsPwaRegistration />
         <ClientProviders>{children}</ClientProviders>
         <PwaInstallBanner
-          message="New: Install the Elevate dashboard for live Program Holder phone calls, PARIS messages, courses, hours, and documents."
+          message="Install the Elevate dashboard for quick access to your courses, hours, messages, and documents."
           storageKey="lms-pwa-phone-install-banner-v1"
         />
       </body>

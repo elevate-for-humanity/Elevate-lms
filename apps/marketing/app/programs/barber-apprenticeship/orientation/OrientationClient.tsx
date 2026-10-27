@@ -83,7 +83,7 @@ const HANDBOOK_SLIDES = [
       'Program access is suspended if a failed payment is not resolved within 7 days.',
       'Suspended students cannot log hours or access coursework. Suspended hours do not count toward your total.',
       'Enrollment may be terminated after 7 days of non-payment. Amounts already paid are non-refundable.',
-      `Call ${PLATFORM_DEFAULTS.supportPhone} before a payment fails — we can work with you proactively.`,
+      `Call ${PLATFORM_DEFAULTS.mainPhone} before a payment fails — we can work with you proactively.`,
     ],
   },
   {
@@ -154,7 +154,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
       }
       router.push('/programs/barber-apprenticeship/documents');
     } catch {
-      setSubmitError(`We could not save your orientation completion. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setSubmitError(`We could not save your orientation completion. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`);
     } finally {
       setSubmitting(false);
     }

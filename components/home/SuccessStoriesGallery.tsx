@@ -17,7 +17,7 @@ interface Story {
   outcome: string;
   location: string;
   yearsAgo: number;
-  image: string;
+  image?: string;
   featured: boolean;
 }
 
@@ -30,7 +30,6 @@ const STORIES: Story[] = [
     outcome: 'Now Owns His Own Barbershop',
     location: 'Indianapolis, IN',
     yearsAgo: 2,
-    image: '/images/testimonials-hq/person-1.jpg',
     featured: true,
   },
   {
@@ -41,7 +40,6 @@ const STORIES: Story[] = [
     outcome: 'Earned EPA 608 Certification',
     location: 'Carmel, IN',
     yearsAgo: 1,
-    image: '/images/testimonials-hq/person-2.jpg',
     featured: true,
   },
   {
@@ -63,7 +61,6 @@ const STORIES: Story[] = [
     outcome: 'Now Works at Local Hospital',
     location: 'South Bend, IN',
     yearsAgo: 2,
-    image: '/images/testimonials-hq/person-3.jpg',
     featured: false,
   },
   {
@@ -74,7 +71,6 @@ const STORIES: Story[] = [
     outcome: 'Employed at Premier Barbershop',
     location: 'Bloomington, IN',
     yearsAgo: 3,
-    image: '/images/testimonials/james.jpg',
     featured: false,
   },
   {
@@ -85,7 +81,6 @@ const STORIES: Story[] = [
     outcome: 'Promoted to Office Manager',
     location: 'Evansville, IN',
     yearsAgo: 2,
-    image: '/images/testimonials-hq/person-4.jpg',
     featured: false,
   },
 ];
@@ -116,17 +111,17 @@ function StoryCard({ story, featured }: { story: Story; featured?: boolean }) {
       <div className="p-6">
         {/* Quote Icon */}
         <Quote className="w-8 h-8 text-brand-red-200 mb-4" />
-        
+
         {/* Quote */}
         <p className="text-slate-700 text-lg mb-6 leading-relaxed">
           "{story.quote}"
         </p>
-        
+
         {/* Rating */}
         <div className="mb-4">
           <StarRating rating={5} />
         </div>
-        
+
         {/* Author */}
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-red-500 to-brand-red-600 flex items-center justify-center text-white font-bold text-xl">
@@ -137,7 +132,7 @@ function StoryCard({ story, featured }: { story: Story; featured?: boolean }) {
             <p className="text-sm text-brand-red-600">{story.program}</p>
           </div>
         </div>
-        
+
         {/* Outcome Badge */}
         <div className="mt-4 pt-4 border-t border-slate-100">
           <p className="text-sm text-emerald-600 font-semibold flex items-center gap-1">
@@ -145,7 +140,7 @@ function StoryCard({ story, featured }: { story: Story; featured?: boolean }) {
             {story.outcome}
           </p>
         </div>
-        
+
         {/* Meta */}
         <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">
           <span className="flex items-center gap-1">
@@ -177,7 +172,7 @@ export function SuccessStoriesGallery({ className = '' }: SuccessStoriesGalleryP
   };
 
   return (
-    <section 
+    <section
       ref={ref as React.RefObject<HTMLElement>}
       className={`py-20 bg-white ${className}`}
     >
@@ -251,7 +246,7 @@ export function SuccessStoriesGallery({ className = '' }: SuccessStoriesGalleryP
                 ))}
               </motion.div>
             </div>
-            
+
             {/* Carousel Controls */}
             <button
               onClick={prevSlide}
@@ -266,7 +261,7 @@ export function SuccessStoriesGallery({ className = '' }: SuccessStoriesGalleryP
               <ChevronRight className="w-6 h-6 text-slate-600" />
             </button>
           </div>
-          
+
           {/* Dots */}
           <div className="flex justify-center gap-2 mt-6">
             {featuredStories.map((_, index) => (

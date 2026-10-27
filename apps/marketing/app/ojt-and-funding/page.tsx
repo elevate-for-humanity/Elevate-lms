@@ -43,12 +43,12 @@ const APPRENTICESHIP = [
   {
     title: 'Employer Sponsors',
     desc: 'Your business becomes the training site. We provide the curriculum, credentials, and oversight.',
-    img: '/images/pages/apprenticeships-page-2.jpg',
+    img: '/images/pages/barber-hands-on-bright.webp',
   },
   {
     title: 'Earn While You Learn',
     desc: 'Apprentices earn wages from day one while working toward a nationally recognized credential.',
-    img: '/images/pages/apprenticeship-structure.jpg',
+    img: '/images/pages/apprenticeship-structure.webp',
   },
 ];
 
@@ -56,7 +56,7 @@ export default function OjtAndFundingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Video hero */}
-      <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
         <LazyVideo
           src="/videos/training-providers-hero.mp4"
           poster="/images/pages/ojt-and-funding-page-1.webp"

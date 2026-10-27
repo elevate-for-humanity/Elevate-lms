@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { Building2, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 
-const MARKETING_HOST_SHOP_APPLICATION = 'https://www.elevateforhumanity.org/host-shop/apply';
+const MARKETING_HOST_SHOP_APPLICATION = 'https://www.elevateforhumanity.org/partners/host-shop/apply';
 
 const IDENTITY_ERRORS: Record<string, string> = {
   identity: 'Your account could not be verified. Please contact support.',

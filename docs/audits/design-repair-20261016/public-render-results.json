@@ -1,0 +1,425 @@
+{
+  "scope": "34 original-finding public routes at 320px/1440px; selected contrast assertions and decoded-image checks.",
+  "results": [
+    {
+      "viewport": "320px",
+      "route": "/paris-ai",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/students",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/ai/job-match",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/ai",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/ai/paris",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/apply/employer",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/barber-beauty-network",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/community",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/connect",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/demos",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/directory",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/events",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/founder",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/fssa",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/help/account",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/help",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/help/technical",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/help/tutorials",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/inquiry",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/news",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/partnerships",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/platform/employer-portal",
+      "result": "passed",
+      "sourceReport": "elevate-stat-final-results.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/platform/enterprise",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/platform/licensing",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/platform/pricing",
+      "result": "passed",
+      "sourceReport": "elevate-last-color-results.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/platform/standards",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/platform/student-portal",
+      "result": "passed",
+      "sourceReport": "elevate-last-color-results.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/pricing",
+      "result": "passed",
+      "sourceReport": "elevate-last-color-results.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/resources",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/scholarships",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/store/compliance",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/success-stories",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/support",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "320px",
+      "route": "/videos",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-mobile.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/paris-ai",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/students",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/ai/job-match",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/ai",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/ai/paris",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/apply/employer",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/barber-beauty-network",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/community",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/connect",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/demos",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/directory",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/events",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/founder",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/fssa",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/help/account",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/help",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/help/technical",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/help/tutorials",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/inquiry",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/news",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/partnerships",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/platform/employer-portal",
+      "result": "passed",
+      "sourceReport": "elevate-stat-final-results.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/platform/enterprise",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/platform/licensing",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/platform/pricing",
+      "result": "passed",
+      "sourceReport": "elevate-last-color-results.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/platform/standards",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/platform/student-portal",
+      "result": "passed",
+      "sourceReport": "elevate-last-color-results.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/pricing",
+      "result": "passed",
+      "sourceReport": "elevate-last-color-results.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/resources",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/scholarships",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/store/compliance",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/success-stories",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/support",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    },
+    {
+      "viewport": "1440px",
+      "route": "/videos",
+      "result": "passed",
+      "sourceReport": "elevate-public-final-desktop.json"
+    }
+  ],
+  "sharedSurfaceRegressionCases": 2,
+  "deferred": [
+    {
+      "route": "/programs/cosmetology-apprenticeship/orientation",
+      "reason": "Requires an authenticated enrolled apprentice."
+    }
+  ],
+  "notes": [
+    "Network data unavailability remains explicit.",
+    "A large dev-server run exited; smaller fresh-server batches passed.",
+    "Finding classification and remaining review states are tracked independently."
+  ]
+}

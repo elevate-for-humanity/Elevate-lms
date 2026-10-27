@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { ReactNode } from 'react';
 import { Section } from '@/components/ui/Section';
 import { Card } from '@/components/ui/Card';
@@ -88,14 +89,13 @@ export function ProgramPageShell({
             {heroImage && (
               <Card className="p-0 overflow-hidden">
                 <div className="relative aspect-[4/3] w-full">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image
+                  <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                     src={heroImage}
                     alt={title}
                     fill
                     sizes="100vw"
-                    className="object-cover"
-                    priority placeholder="empty"
+                    className="object-contain"
+                    priority
                   />
                 </div>
               </Card>

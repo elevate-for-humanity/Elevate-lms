@@ -24,6 +24,7 @@ export interface ParsedInboundEmail {
   eventId: string; // SHA-256 of from+to+subject+timestamp for dedup
   envelopeRecipients: string[];
   attachments: File[];
+  headers?: string;
 }
 
 export function parseEnvelopeAddresses(value: unknown): string[] {
@@ -74,18 +75,31 @@ export async function parseInboundEmail(request: Request): Promise<ParsedInbound
     const html = String(formData.get('html') ?? '');
     const text = String(formData.get('text') ?? '');
     const replyTo = String(formData.get('reply-to') ?? from);
-    const timestamp = String(formData.get('timestamp') ?? Date.now());
+    const headers = String(formData.get('headers') || '');
+    const providerId = headers.match(/^Message-ID:\s*(.+)$/im)?.[1]?.trim();
+    const timestamp = String(formData.get('timestamp') || providerId || '');
     const envelopeRecipients = parseEnvelopeAddresses(formData.get('envelope') ?? to);
     const attachments = inboundAttachmentEntries(formData);
 
     // Stable dedup key — SendGrid doesn't provide a unique event ID in Inbound Parse
     const { createHash } = await import('crypto');
     const eventId = createHash('sha256')
-      .update(`${from}|${to}|${subject}|${timestamp}`)
+      .update(`${from}|${to}|${subject}|${timestamp}|${text}|${html}`)
       .digest('hex')
       .slice(0, 32);
 
-    return { from, to, subject, html, text, replyTo, eventId, envelopeRecipients, attachments };
+    return {
+      from,
+      to,
+      subject,
+      html,
+      text,
+      replyTo,
+      eventId,
+      envelopeRecipients,
+      attachments,
+      headers,
+    };
   } catch (err) {
     logger.error('[SendGrid Inbound] Failed to parse form data:', err);
     return null;

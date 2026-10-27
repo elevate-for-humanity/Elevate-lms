@@ -1,0 +1,57 @@
+/* The browser adapts to its resizable pane, not the full desktop viewport. */
+.root {
+  container: cloud-browser / inline-size;
+  min-width: 0;
+}
+.desktopFlex,
+.desktopBlock {
+  display: none;
+}
+.mobileTabs {
+  display: flex;
+}
+.root .targetInput {
+  flex-basis: 100%;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.signInStack {
+  grid-template-rows: minmax(80px, 35%) minmax(0, 1fr);
+}
+@container cloud-browser (min-width: 1024px) {
+  .desktopFlex {
+    display: flex;
+  }
+  .desktopBlock {
+    display: block;
+  }
+  .mobileTabs {
+    display: none;
+  }
+  .root .targetInput {
+    flex-basis: auto;
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .root .tools {
+    border-left-width: 1px;
+    border-top-width: 0;
+  }
+}
+
+/* Keep typed credentials and the insertion caret readable in embedded/PWA views. */
+.secureInput {
+  color: #0f172a;
+  caret-color: #0f172a;
+  -webkit-text-fill-color: #0f172a;
+  color-scheme: light;
+}
+.secureInput::placeholder {
+  color: #475569;
+  -webkit-text-fill-color: #475569;
+  opacity: 1;
+}

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,7 +23,7 @@ export default function EmploymentSupportPage() {
 
       {/* Hero — image only, no text overlay */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px] overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/employment-support-page-1.webp"
           alt="Employment support services at Elevate for Humanity"
           fill

@@ -26,10 +26,10 @@ describe('apprenticeship entry surfaces', () => {
       'apps/marketing/app/programs/cosmetology-apprenticeship/page.tsx',
       'utf8',
     );
-    expect(page).toContain('heroOverride={<CosmetologyVisualExperience />}');
-    expect(page).toContain('afterHero={<BeautyEnrollmentPromotion />}');
-    expect(page.indexOf('heroOverride={<CosmetologyVisualExperience />}')).toBeLessThan(
-      page.indexOf('afterHero={<BeautyEnrollmentPromotion />}'),
+    expect(page).toContain("heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')}");
+    expect(page).toContain('afterHero={<BeautyEnrollmentPromotion compact');
+    expect(page.indexOf('heroOverride={<HeroPicture')).toBeLessThan(
+      page.indexOf('afterHero={<BeautyEnrollmentPromotion'),
     );
   });
 

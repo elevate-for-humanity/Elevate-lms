@@ -40,9 +40,7 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies deterministically
-        env:
-          NODE_OPTIONS: --max-old-space-size=16384
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Verify public claim integrity
         run: node scripts/check-public-claims.mjs
@@ -50,6 +48,8 @@ jobs:
       - name: Verify canonical hero media registry
         run: pnpm tsx scripts/verify-hero-video-registry.ts
 
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build Marketing container
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}

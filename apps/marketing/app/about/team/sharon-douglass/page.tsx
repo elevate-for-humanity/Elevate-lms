@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft } from 'lucide-react';
@@ -27,14 +26,7 @@ export default function Page() {
           <div className="grid lg:grid-cols-5 gap-10 items-start">
             <div className="lg:col-span-2">
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/business/team-2.jpg"
-                  alt="Sharon Douglass"
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                />
+                <div className="flex h-full items-center justify-center bg-slate-100 text-6xl font-bold text-slate-800" aria-label="Sharon Douglass">SD</div>
               </div>
             </div>
 

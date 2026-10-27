@@ -1,0 +1,9 @@
+import {expect,it,vi} from 'vitest';
+vi.mock('server-only',()=>({}));
+vi.mock('@/lib/devstudio/github-token',()=>({getGitHubToken:async()=>null,getGitHubTokenCandidates:async()=>[]}));
+import {dispatchGoogleDeployment,isGoogleDeploymentConfigured} from '../../lib/gcp/dispatch-production-workflow';
+it('uses the other configured credential after a 403',async()=>{const request=vi.fn().mockResolvedValueOnce(new Response(null,{status:403})).mockResolvedValueOnce(new Response(null,{status:204}));const result=await dispatchGoogleDeployment('course-builder',{request,tokens:async()=>['stored-test','deployed-test']});expect(result.status).toBe('dispatched');expect(request).toHaveBeenCalledTimes(2);expect(request.mock.calls[1][1].headers.Authorization).toBe('Bearer deployed-test');});
+it('does not retry unrelated server failures with another credential',async()=>{const request=vi.fn().mockResolvedValue(new Response(null,{status:500}));await expect(dispatchGoogleDeployment('course-builder',{request,tokens:async()=>['one','two']})).rejects.toThrow('HTTP 500');expect(request).toHaveBeenCalledTimes(1);});
+it('reports the actual permission gap when all configured credentials are forbidden',async()=>{const request=vi.fn().mockResolvedValue(new Response(null,{status:403}));await expect(dispatchGoogleDeployment('course-builder',{request,tokens:async()=>['one','two']})).rejects.toThrow('Actions write permission is required');});
+
+it('checks the same credential fallback for configuration status',async()=>{const request=vi.fn().mockResolvedValueOnce(new Response(null,{status:403})).mockResolvedValueOnce(new Response(JSON.stringify({state:'active'}),{status:200}));expect(await isGoogleDeploymentConfigured({request,tokens:async()=>['one','two']})).toBe(true);expect(request).toHaveBeenCalledTimes(2);});

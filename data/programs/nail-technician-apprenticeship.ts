@@ -20,10 +20,9 @@ export const NAIL_TECH: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
   schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.',
   cohortSize: '1–3 apprentices per salon',
-  fundingStatement:
-    'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
-  selfPayCost: '$5,000',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
+  selfPayCost: '$6,000',
+  fundingOptions: ['self_pay'],
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [
@@ -223,7 +222,7 @@ export const NAIL_TECH: ProgramSchema = {
     'High school diploma or GED (or actively pursuing)',
     'Interest in nail technology career',
   ],
-  equipmentIncluded: 'Basic tool kit provided. Salon supplies provided by host salon.',
+  equipmentIncluded: 'Students provide personal tools and supplies unless their written enrollment terms expressly include them.',
   modality: 'In-person — supervised training in a licensed salon',
   facilityInfo: 'Partner salons in Indianapolis area',
   employerPartners: ['Licensed nail salons in Indianapolis area'],
@@ -236,7 +235,7 @@ export const NAIL_TECH: ProgramSchema = {
     'Licensing exam prep',
   ],
   paymentTerms:
-    'Paid apprenticeship track remains available. For self-pay enrollment, start with a $600 deposit, then weekly payments or BNPL. All options available at checkout.',
+    'Tuition is self-pay only. Review the current published total, initial invoice, remaining installments, and any separately approved financing before payment.',
   faqs: [
     {
       question: 'How long does it take?',
@@ -259,9 +258,9 @@ export const NAIL_TECH: ProgramSchema = {
 
   funding: {
     wioa_eligible: false,
-    fssa_eligible: true,
+    fssa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'Registered Manicurist occupation 2090CB. Any FSSA IMPACT, WIOA, employer, or other funding requires individual eligibility and written authorization.',
+    fundingNotes: 'Apprenticeship enrollment is self-pay only.',
   },
 };

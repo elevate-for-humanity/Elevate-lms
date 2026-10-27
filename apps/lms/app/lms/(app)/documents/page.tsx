@@ -9,7 +9,7 @@ import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-req
 export const dynamic = 'force-dynamic';
 
 export default async function LearnerDocumentsPage() {
-  const { user } = await requireRole(['student', 'learner', 'apprentice', 'admin']);
+  const { user } = await requireRole(['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice', 'admin']);
   const workspace = await loadLearnerWorkspace(user.id);
   const db = await createClient();
   const admin = await requireAdminClient();
@@ -37,6 +37,12 @@ export default async function LearnerDocumentsPage() {
         Review required documents, submitted evidence, agreements, certificates, and permanent
         learner records.
       </p>
+      {workspace.warnings.length > 0 ? (
+        <div role="alert" className="mt-4 rounded-xl border border-amber-400 bg-amber-50 p-4">
+          <p className="font-bold">Some records could not be loaded. Refresh this page or contact learner support if the problem continues.</p>
+          <Link href="/lms/support" className="font-bold underline">Contact learner support</Link>
+        </div>
+      ) : null}
       <div className="mt-5 flex flex-wrap gap-3">
         <Link
           href="/lms/agreements"
@@ -51,6 +57,20 @@ export default async function LearnerDocumentsPage() {
           Certificates
         </Link>
       </div>
+      <section aria-labelledby="learner-agreements" className="mt-6 rounded-2xl border bg-white p-6">
+        <h2 id="learner-agreements" className="text-xl font-black">Your handbook, MOU & agreements</h2>
+        <p className="mt-2 text-sm text-slate-700">These documents stay available to read after you sign them. Your saved acknowledgement is shown below.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {workspace.agreements.map((agreement) => (
+            <article key={agreement.type} className="rounded-xl border p-4">
+              <Link href={agreement.documentUrl} className="font-black text-blue-800 underline">{agreement.title}</Link>
+              <p className="mt-2 text-sm">{agreement.description}</p>
+              <p className="mt-2 text-sm font-bold">{agreement.signed ? `Acknowledged${agreement.acceptedAt ? ` · ${new Date(agreement.acceptedAt).toLocaleDateString()}` : ''}` : 'Acknowledgement required'}</p>
+            </article>
+          ))}
+        </div>
+        <Link href="/lms/handbook" className="mt-4 inline-block font-black text-blue-800 underline">Open handbook & full policy manual</Link>
+      </section>
       {!billingAuthorizations?.length && billingRequirement.required ? (
         <section
           id="billing-authorization"

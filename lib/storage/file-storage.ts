@@ -1,62 +1,22 @@
 import { logger } from '@/lib/logger';
+import {
+  getSignedElevateMediaUrl,
+  isElevateMediaStorageConfigured,
+  uploadToElevateMedia,
+} from '@/lib/storage/elevate-media-storage';
+
 /**
  * File Storage Service
  *
  * Handles secure file storage and signed URL generation for digital downloads.
- * Supports Cloudflare R2 (S3-compatible) and AWS S3.
+ * Uses the shared S3-compatible object-storage layer (Backblaze B2, Wasabi,
+ * AWS S3, Supabase S3, Cloudflare R2, or a custom S3 endpoint).
  */
 
-import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
-// Storage configuration
-const STORAGE_CONFIG = {
-  // Use R2 if configured, otherwise fall back to S3
-  endpoint: process.env.R2_ENDPOINT || undefined,
-  region: process.env.AWS_REGION || 'auto',
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY || process.env.AWS_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.R2_SECRET_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
-  },
-  bucket: process.env.R2_BUCKET || process.env.AWS_S3_BUCKET || 'elevate-media',
-};
-
-// Initialize S3 client (works with R2 and S3)
-let s3Client: S3Client | null = null;
-
-function getS3Client(): S3Client {
-  if (!s3Client) {
-    if (!STORAGE_CONFIG.credentials.accessKeyId || !STORAGE_CONFIG.credentials.secretAccessKey) {
-      throw new Error(
-        'Storage credentials not configured. Set R2_ACCESS_KEY/R2_SECRET_KEY or AWS credentials.',
-      );
-    }
-
-    s3Client = new S3Client({
-      endpoint: STORAGE_CONFIG.endpoint,
-      region: STORAGE_CONFIG.region,
-      credentials: STORAGE_CONFIG.credentials,
-      forcePathStyle: !!STORAGE_CONFIG.endpoint, // Required for R2
-    });
-  }
-  return s3Client;
-}
-
-/**
- * Check if storage is configured
- */
 export function isStorageConfigured(): boolean {
-  return !!(
-    STORAGE_CONFIG.credentials.accessKeyId &&
-    STORAGE_CONFIG.credentials.secretAccessKey &&
-    STORAGE_CONFIG.bucket
-  );
+  return isElevateMediaStorageConfigured();
 }
 
-/**
- * Product file paths mapping
- * Maps product IDs to their file paths in storage
- */
 export const PRODUCT_FILES: Record<
   string,
   { path: string; filename: string; contentType: string; publicPath: string }
@@ -87,20 +47,12 @@ export const PRODUCT_FILES: Record<
   },
 };
 
-/**
- * Get public fallback URL for a product
- * Used when R2/S3 is not configured
- */
 export function getPublicFallbackUrl(productId: string, baseUrl: string): string | null {
   const fileInfo = PRODUCT_FILES[productId];
   if (!fileInfo?.publicPath) return null;
   return `${baseUrl}${fileInfo.publicPath}`;
 }
 
-/**
- * Generate a signed download URL for a product
- * URL expires after the specified duration (default: 1 hour)
- */
 export async function generateSignedDownloadUrl(
   productId: string,
   expiresInSeconds: number = 3600,
@@ -112,63 +64,33 @@ export async function generateSignedDownloadUrl(
   }
 
   if (!isStorageConfigured()) {
-    logger.error('Storage not configured');
+    logger.error('Elevate Media Storage not configured');
     return null;
   }
 
-  try {
-    const client = getS3Client();
-    const command = new GetObjectCommand({
-      Bucket: STORAGE_CONFIG.bucket,
-      Key: fileInfo.path,
-      ResponseContentDisposition: `attachment; filename="${fileInfo.filename}"`,
-      ResponseContentType: fileInfo.contentType,
-    });
-
-    const signedUrl = await getSignedUrl(client, command, {
-      expiresIn: expiresInSeconds,
-    });
-
-    return signedUrl;
-  } catch (error) {
-    logger.error('Error generating signed URL:', error);
-    return null;
-  }
+  return getSignedElevateMediaUrl(fileInfo.path, expiresInSeconds, {
+    contentDisposition: `attachment; filename="${fileInfo.filename}"`,
+    contentType: fileInfo.contentType,
+  });
 }
 
-/**
- * Upload a file to storage
- * Used for admin uploads of new product files
- */
 export async function uploadFile(
   key: string,
   body: Buffer | Uint8Array,
   contentType: string,
 ): Promise<boolean> {
   if (!isStorageConfigured()) {
-    throw new Error('Storage not configured');
+    throw new Error('Elevate Media Storage not configured');
   }
 
-  try {
-    const client = getS3Client();
-    const command = new PutObjectCommand({
-      Bucket: STORAGE_CONFIG.bucket,
-      Key: key,
-      Body: body,
-      ContentType: contentType,
-    });
-
-    await client.send(command);
-    return true;
-  } catch (error) {
-    logger.error('Error uploading file:', error);
+  const result = await uploadToElevateMedia(body, key, contentType);
+  if (!result.success) {
+    logger.error('Error uploading file:', result.error);
     return false;
   }
+  return true;
 }
 
-/**
- * Get file info for a product
- */
 export function getProductFileInfo(productId: string) {
   return PRODUCT_FILES[productId] || null;
 }

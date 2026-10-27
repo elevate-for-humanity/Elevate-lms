@@ -1,24 +1,25 @@
-import {describe,expect,it} from 'vitest';
-import {UltimateAppendixAStandardsSource} from '../../lib/ultimate-course-builder/credential/appendix-a-source';
-import {UltimatePlatformInstructionalGenerator} from '../../lib/ultimate-course-builder/adapters/platform-instructional-generator';
-import {UltimatePlatformAssessment} from '../../lib/ultimate-course-builder/adapters/platform-assessment';
-
-describe('source-only Barber preparation',()=>{
-  it('builds traceable structure, instructional draft, and multiple scenes without an LLM',async()=>{
-    const profile=await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
-    const input={profile,competency:profile.competencies[0]};
-    const generator=new UltimatePlatformInstructionalGenerator();
-    const objectives=await generator.objectives(input) as Array<{authorityRequirementIds:string[]}>;
-    expect(objectives[0].authorityRequirementIds[0]).toContain('RAPIDS:0030CB:APPENDIX_A:A');
-    expect((await generator.prerequisites(input) as {reviewRequired:boolean}).reviewRequired).toBe(true);
-    expect((await generator.teachingSequence(input) as {stages:unknown[]}).stages.length).toBeGreaterThan(5);
-    const narration=await generator.instructorScript(input) as {script:string};
-    expect(narration.script).toContain(profile.competencies[0].description);
-    const storyboard=await generator.storyboard(input) as {scenes:Array<{sourceRequirementIds:string[]}>};
-    expect(storyboard.scenes.length).toBeGreaterThan(2);
-    expect(storyboard.scenes[0].sourceRequirementIds).toEqual(profile.competencies[0].authorityRequirementIds);
-    const assessment=await new UltimatePlatformAssessment().generate({competency:profile.competencies[0]}) as {questions:Array<{choices:string[];objectiveIds:string[]}>};
-    expect(assessment.questions[0].choices).toContain(profile.competencies[0].description);
-    expect(assessment.questions[0].objectiveIds).toEqual(profile.competencies[0].authorityRequirementIds);
+import { describe, expect, it } from 'vitest';
+import { ULTIMATE_TEACHING_SEQUENCE } from '../../lib/ultimate-course-builder/instructional/teaching-sequence';
+import { UltimateAppendixAStandardsSource } from '../../lib/ultimate-course-builder/credential/appendix-a-source';
+import { UltimatePlatformInstructionalGenerator } from '../../lib/ultimate-course-builder/adapters/platform-instructional-generator';
+describe('source-grounded instruction', () => {
+  it('builds the registered barber lesson from the authorized curriculum blueprint', async () => {
+    const profile = await new UltimateAppendixAStandardsSource().load({
+      programSlug: 'barber-apprenticeship',
+    });
+    const objectives = await new UltimatePlatformInstructionalGenerator().objectives({
+      profile,
+      competency: profile.competencies[0],
+    });
+    expect(profile.instructionalSources).toHaveLength(profile.competencies.length);
+    expect(profile.instructionalSources?.[0]?.text).toContain('Clipper Over Comb');
+    expect(objectives[0]?.text).toBe(profile.competencies[0].description);
+    const generator = new UltimatePlatformInstructionalGenerator();
+    for (const competency of profile.competencies) {
+      const storyboard = await generator.storyboard({ profile, competency });
+      expect(storyboard.scenes.length).toBeGreaterThanOrEqual(ULTIMATE_TEACHING_SEQUENCE.length);
+      expect(new Set(storyboard.scenes.map(scene => scene.stage))).toEqual(new Set(ULTIMATE_TEACHING_SEQUENCE));
+      expect(storyboard.scenes.every((scene) => scene.teachingVisual.steps.length > 0)).toBe(true);
+    }
   });
 });

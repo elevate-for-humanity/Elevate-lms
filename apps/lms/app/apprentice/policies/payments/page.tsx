@@ -10,6 +10,7 @@ import {
   APPRENTICE_POLICY_VERSION,
 } from '@/lib/apprenticeship/apprentice-policy';
 import { PolicyAcknowledgment } from '../PolicyAcknowledgment';
+import { NonRefundableDepositNotice } from '@/components/payments/NonRefundableDepositNotice';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,6 +73,7 @@ export default async function PaymentPolicyPage() {
           <Phone className="h-5 w-5" /> Contact Elevate about payments
         </Link>
       </section>
+      <NonRefundableDepositNotice compact />
       <PolicyAcknowledgment
         agreementKey={APPRENTICE_POLICY_KEYS.payment}
         alreadyAccepted={Boolean(acceptance)}

@@ -65,6 +65,13 @@ export function mediaMatchTerms(value: string): string[] {
   ];
 }
 
+export function licensedMediaBelongsToCourse(value: unknown, courseId: string): boolean {
+  if (!value || typeof value !== 'object' || !courseId) return false;
+  const metadata = value as Record<string, unknown>;
+  const owner = String(metadata.courseId ?? metadata.course_id ?? '').trim();
+  return owner === courseId || (Array.isArray(metadata.referenceCourseIds) && metadata.referenceCourseIds.includes(courseId));
+}
+
 export function scoreLicensedMediaMatch(lessonText: string, assetTitle: string) {
   const lessonTerms = mediaMatchTerms(lessonText);
   const assetTerms = mediaMatchTerms(assetTitle);
@@ -135,12 +142,14 @@ export async function recommendLicensedMediaForCourse(input: {
     // Licensed media is selected against the actual teaching/narration context,
     // not merely the lesson title. This lets Envato assets follow the spoken
     // instruction and prevents generic decorative footage from winning.
-    const content = lesson.content && typeof lesson.content === 'object'
-      ? (lesson.content as Record<string, unknown>)
-      : {};
-    const experience = content.experience && typeof content.experience === 'object'
-      ? (content.experience as Record<string, unknown>)
-      : {};
+    const content =
+      lesson.content && typeof lesson.content === 'object'
+        ? (lesson.content as Record<string, unknown>)
+        : {};
+    const experience =
+      content.experience && typeof content.experience === 'object'
+        ? (content.experience as Record<string, unknown>)
+        : {};
     const lessonText = [
       lesson.title,
       typeof lesson.content === 'string' ? lesson.content : JSON.stringify(lesson.content ?? {}),
@@ -152,13 +161,38 @@ export async function recommendLicensedMediaForCourse(input: {
       .filter(Boolean)
       .join(' ');
     const ranked = (entitlements ?? [])
-      .map((entitlement) => ({
-        entitlement,
-        ...scoreLicensedMediaMatch(lessonText, entitlement.title),
-      }))
-      .filter((match) => match.score >= 0.15)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
+      .map((entitlement) => {
+        const metadata =
+          entitlement.metadata && typeof entitlement.metadata === 'object'
+            ? (entitlement.metadata as Record<string, unknown>)
+            : {};
+        const courseScoped = licensedMediaBelongsToCourse(metadata, input.courseId);
+        const stored = Boolean(storedLicensedMediaMetadata(metadata));
+        const retrievableWorkspaceAsset =
+          typeof metadata.assetUrl === 'string' &&
+          metadata.assetUrl.trim().startsWith('https://') &&
+          (metadata.licenseObserved === true ||
+            String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
+            String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
+        return {
+          entitlement,
+          courseScoped,
+          stored,
+          retrievableWorkspaceAsset,
+          ...scoreLicensedMediaMatch(lessonText, entitlement.title),
+        };
+      })
+      .filter(
+        (match) =>
+          match.courseScoped &&
+          match.score >= 0.15 &&
+          (match.stored || match.retrievableWorkspaceAsset),
+      )
+      .sort((a, b) => {
+        if (a.stored !== b.stored) return a.stored ? -1 : 1;
+        return b.score - a.score;
+      })
+      .slice(0, 16);
     for (const match of ranked) {
       suggestions.push({
         course_id: input.courseId,
@@ -185,7 +219,12 @@ export async function recommendLicensedMediaForCourse(input: {
     .eq('course_id', input.courseId)
     .order('match_score', { ascending: false });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).filter((row: any) => {
+    const entitlement = Array.isArray(row.licensed_media_entitlements)
+      ? row.licensed_media_entitlements[0]
+      : row.licensed_media_entitlements;
+    return licensedMediaBelongsToCourse(entitlement?.metadata, input.courseId);
+  });
 }
 
 export type StoredLicensedMediaMetadata = {
@@ -204,9 +243,23 @@ export type StoredLicensedMediaMetadata = {
 export function storedLicensedMediaMetadata(value: unknown): StoredLicensedMediaMetadata | null {
   if (!value || typeof value !== 'object') return null;
   const metadata = value as Record<string, unknown>;
-  const storageBucket = String(metadata.storage_bucket ?? '');
-  const storagePath = String(metadata.storage_path ?? '');
-  if (storageBucket !== 'course_videos' || !storagePath.startsWith('licensed-library/'))
+  const courseId = String(metadata.courseId ?? '');
+  const legacyCoursePath = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    courseId,
+  );
+  const storagePath = String(metadata.storage_path ?? metadata.storagePath ?? '');
+  const storageBucket = String(
+    metadata.storage_bucket ?? (legacyCoursePath ? 'course_videos' : ''),
+  );
+  // Historical imports already live in this private bucket, under their
+  // course UUID. Recognize them without fetching another copy or moving files.
+  const ownedCoursePath = legacyCoursePath && storagePath.startsWith(`${courseId}/`);
+  if (
+    storageBucket !== 'course_videos' ||
+    (!storagePath.startsWith('licensed-library/') && !ownedCoursePath) ||
+    storagePath.split('/').some((part) => !part || part === '.' || part === '..') ||
+    /[\\?#]/.test(storagePath)
+  )
     return null;
   return {
     storage_bucket: storageBucket,
@@ -232,7 +285,7 @@ export async function attachStoredLicensedMedia(input: {
   matchId: string;
   courseId: string;
   lessonId: string;
-  actorId: string;
+  actorId?: string | null;
 }) {
   const { data: match, error: matchError } = await input.db
     .from('course_lesson_media_matches')
@@ -250,6 +303,9 @@ export async function attachStoredLicensedMedia(input: {
   const entitlement = Array.isArray(match.licensed_media_entitlements)
     ? match.licensed_media_entitlements[0]
     : match.licensed_media_entitlements;
+  if (!licensedMediaBelongsToCourse(entitlement?.metadata, input.courseId)) {
+    throw new Error('The licensed asset is scoped to a different course');
+  }
   const stored = storedLicensedMediaMetadata(entitlement?.metadata);
   if (!stored)
     throw new Error('The licensed asset has not been stored in the secure media library');
@@ -272,12 +328,15 @@ export async function attachStoredLicensedMedia(input: {
         course_id: input.courseId,
         lesson_id: input.lessonId,
         storage_path: stored.storage_path,
-        duration_seconds: stored.duration_seconds ?? null,
+        duration_seconds:
+          typeof stored.duration_seconds === 'number' && Number.isFinite(stored.duration_seconds)
+            ? Math.max(0, Math.round(stored.duration_seconds))
+            : null,
         generated_by: 'manual',
         asset_role: 'source_broll',
         entitlement_id: match.entitlement_id,
         status: 'ready',
-        created_by: input.actorId,
+        created_by: input.actorId || null,
       })
       .select('id,title,storage_path,status')
       .single();
@@ -308,7 +367,9 @@ export async function attachLicensedMediaUpload(input: {
 }) {
   const { data: match, error: lookupError } = await input.db
     .from('course_lesson_media_matches')
-    .select('id,status,course_id,lesson_id,entitlement_id')
+    .select(
+      'id,status,course_id,lesson_id,entitlement_id,licensed_media_entitlements!inner(metadata)',
+    )
     .eq('id', input.matchId)
     .maybeSingle();
   if (lookupError) throw lookupError;
@@ -317,6 +378,12 @@ export async function attachLicensedMediaUpload(input: {
   }
   if (match.status !== 'approved') {
     throw new Error('Approve the licensed scene before uploading and attaching it');
+  }
+  const uploadEntitlement = Array.isArray(match.licensed_media_entitlements)
+    ? match.licensed_media_entitlements[0]
+    : match.licensed_media_entitlements;
+  if (!licensedMediaBelongsToCourse(uploadEntitlement?.metadata, input.courseId)) {
+    throw new Error('The licensed asset is scoped to a different course');
   }
   const { error: placementError } = await input.db
     .from('course_videos')

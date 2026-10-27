@@ -243,6 +243,19 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
     .eq('asset_kind', 'lesson');
   if (videoJobError) throw videoJobError;
   const videoJobs = lessonVideoJobs ?? [];
+  const completedVideoJobs = videoJobs.filter((job: any) => job.status === 'complete' && Boolean(job.video_url));
+  const captionReadyLessons = (mods as any[]).flatMap((module) => asArray(module.course_lessons)).filter((lesson: any) => {
+    if (!lesson.video_url) return true;
+    const contentJson = lesson.content_json && typeof lesson.content_json === 'object' ? lesson.content_json as Record<string, any> : {};
+    const experience = contentJson.experience && typeof contentJson.experience === 'object' ? contentJson.experience as Record<string, any> : {};
+    const videoConfig = lesson.video_config && typeof lesson.video_config === 'object' ? lesson.video_config as Record<string, any> : {};
+    return Boolean(String(experience.narrationScript ?? videoConfig.transcript ?? '').trim());
+  }).length;
+  const practicalSignoffReady = (mods as any[]).flatMap((module) => asArray(module.course_lessons)).filter((lesson: any) => {
+    const type = String(lesson.lesson_type ?? '');
+    const isPractical = lesson.practical_required === true || PRACTICAL_TYPES.has(type);
+    return !isPractical || (asArray(lesson.competency_checks).length > 0 && Boolean(lesson.evidence_type) && lesson.requires_instructor_signoff === true);
+  }).length;
   const unfinishedVideoJobs = videoJobs.filter((job: any) =>
     ['draft', 'queued', 'rendering', 'processing'].includes(String(job.status ?? '')),
   );
@@ -280,6 +293,9 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       accessibleNarrationLessons,
       validatedLessons,
       lessonVideoJobs: videoJobs.length,
+      completedVideoJobs: completedVideoJobs.length,
+      captionReadyLessons,
+      practicalSignoffReady,
       unfinishedVideoJobs: unfinishedVideoJobs.length,
       failedVideoJobs: failedVideoJobs.length,
       unapprovedVideoJobs: unapprovedVideoJobs.length,

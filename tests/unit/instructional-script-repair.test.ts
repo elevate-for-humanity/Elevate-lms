@@ -9,7 +9,20 @@ describe('instructional script repair', () => {
       lessonType: 'lesson',
       baseScript: 'Ask the client what service they need.',
       content: {
-        html: `<h2>Client consultation</h2><p>${'Assess hair history, service goals, contraindications, maintenance needs, and informed consent before selecting a safe service plan. '.repeat(24)}</p>`,
+        html: `<h2>Client consultation</h2><p>${[
+          'Ask the client to describe their desired result and explain what they expect from the appointment.',
+          'Record recent chemical services, previous reactions, and products used at home before choosing the service.',
+          'Inspect hair texture, density, elasticity, and porosity so the proposed treatment matches the observed condition.',
+          'Examine the scalp for irritation or broken skin and postpone services that would worsen the condition.',
+          'Discuss maintenance time, available tools, and realistic home care before agreeing on a finished style.',
+          'Use open questions to understand concerns and repeat the requested outcome to confirm your understanding.',
+          'Explain the planned technique, anticipated duration, limitations, and alternatives using language the client understands.',
+          'Check product directions and required patch tests before applying a chemical product to the client.',
+          'Document relevant contraindications and follow the salon procedure for referral when the service is unsuitable.',
+          'Ask permission before touching the hair and scalp and explain each assessment step as you work.',
+          'Confirm informed consent after the client has an opportunity to ask questions about the service plan.',
+          'Record the agreed service and follow up on comfort throughout the appointment, adjusting the plan when needed.',
+        ].join(' ')}</p>`,
       },
       contentJson: {},
     });

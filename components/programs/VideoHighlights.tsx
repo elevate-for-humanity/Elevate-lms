@@ -54,7 +54,7 @@ function VideoCard({ title, description, videoSrc, poster }: VideoHighlight) {
               playsInline
               preload="none"
               controls={started}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
             {!started && (
               <button
@@ -68,7 +68,7 @@ function VideoCard({ title, description, videoSrc, poster }: VideoHighlight) {
         ) : poster ? (
           // No video — show poster image only, no text on frame
           // IMAGE-CONTRACT: allow raw img because legacy markup
-          <img src={poster} alt={title} className="w-full h-full object-cover" />
+          <img src={poster} alt={title} className="w-full h-full object-contain" />
         ) : (
           // No video, no poster — neutral placeholder
           <div className="w-full h-full bg-slate-100 flex items-center justify-center">

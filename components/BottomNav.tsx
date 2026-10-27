@@ -16,7 +16,7 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav role="navigation" aria-label="Learner navigation" className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white lg:hidden">
+    <nav role="navigation" aria-label="Learner navigation" className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
       <div className="grid grid-cols-6">
         {navItems.map((item) => {
           const Icon = item.icon;

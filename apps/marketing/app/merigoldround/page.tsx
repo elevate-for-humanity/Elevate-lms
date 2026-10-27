@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function MerigoldroundAliasPage() {
-  redirect('/meri-gold-round');
+  redirect('/sites/meri-gold-round');
 }

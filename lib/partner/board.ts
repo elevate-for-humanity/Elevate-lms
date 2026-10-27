@@ -120,6 +120,7 @@ type PartnerRecord = {
 };
 
 type HourRow = {
+  source_type: string | null;
   user_id: string | null;
   host_shop_id: string | null;
   program_slug: string | null;
@@ -136,11 +137,25 @@ function numericHours(value: number | string | null | undefined) {
 }
 
 function isApproved(row: HourRow) {
-  return row.approval_status === 'approved' || row.status === 'approved';
+  const status = String(row.status || '')
+    .trim()
+    .toLowerCase();
+  const accepted = new Set(['approved', 'verified', 'accepted', 'complete', 'completed', 'locked']);
+  return (
+    !['disputed', 'rejected', 'draft', 'pending', 'submitted'].includes(status) &&
+    accepted.has(status)
+  );
 }
 
 function isPending(row: HourRow) {
-  return row.approval_status === 'pending' && row.status === 'pending';
+  const approval = String(row.approval_status || '')
+    .trim()
+    .toLowerCase();
+  const status = String(row.status || '')
+    .trim()
+    .toLowerCase();
+  const pending = new Set(['pending', 'submitted', 'awaiting_review']);
+  return pending.has(approval) || pending.has(status);
 }
 
 const ACCEPTED_DOCUMENT_STATUSES = new Set([
@@ -190,7 +205,8 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
     .eq('user_id', userId)
     .eq('status', 'active');
 
-  if (partnerLinkError) throw new Error(`HOST_SHOP_MEMBERSHIP_QUERY_FAILED:${partnerLinkError.message}`);
+  if (partnerLinkError)
+    throw new Error(`HOST_SHOP_MEMBERSHIP_QUERY_FAILED:${partnerLinkError.message}`);
 
   const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
   if (partnerLink?.partner_id && partnerLink.partners) {
@@ -310,7 +326,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     const { data: hourRows, error: hourError } = await db
       .from('hour_entries')
       .select(
-        'user_id, host_shop_id, program_slug, status, approval_status, accepted_hours, hours, hours_claimed',
+        'user_id, host_shop_id, program_slug, source_type, status, approval_status, accepted_hours, hours, hours_claimed',
       )
       .in('user_id', studentIds);
     if (hourError)
@@ -334,11 +350,10 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
       if (placement.programSlug && row.program_slug && row.program_slug !== placement.programSlug)
         continue;
       if (isPending(row)) pendingHoursCount += 1;
-      if (!isApproved(row) || placement.tradeInfo.progressModel === 'unconfigured') continue;
-      workProgress[row.user_id].completed +=
-        numericHours(row.accepted_hours) ||
-        numericHours(row.hours) ||
-        numericHours(row.hours_claimed);
+      if (!isApproved(row) || !['ojl', 'timeclock', 'manual', 'host_shop'].includes(row.source_type || '') || placement.tradeInfo.progressModel === 'unconfigured') continue;
+      workProgress[row.user_id].completed += numericHours(
+        row.accepted_hours ?? row.hours ?? row.hours_claimed,
+      );
     }
   }
 

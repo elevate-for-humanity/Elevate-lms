@@ -1,3 +1,4 @@
+import { fixtureArtifact } from '../fixtures/ultimate-contract';
 import { describe, expect, it, vi } from 'vitest';
 import { UltimateBuildRunner } from '../../lib/ultimate-course-builder/core/build-runner';
 import { ULTIMATE_BUILD_STEPS } from '../../lib/ultimate-course-builder/core/types';
@@ -16,10 +17,17 @@ import { auditTraceability } from '../../lib/ultimate-course-builder/release/tra
 describe('Ultimate builder recovery', () => {
   it('does not approve a rendered lesson with no learning objectives or traceability rows', () => {
     const quality = evaluateUltimateLesson({
-      distinctShots: 7, loopDetected: false, captionSync: true,
-      narrationVisualAlignment: 1, naturalNarration: true,
-      objectivesTaught: 0, objectivesTotal: 0, guidedPractice: true,
-      independentPractice: true, assessmentCoverage: 1, remediation: true,
+      distinctShots: 7,
+      loopDetected: false,
+      captionSync: true,
+      narrationVisualAlignment: 1,
+      naturalNarration: true,
+      objectivesTaught: 0,
+      objectivesTotal: 0,
+      guidedPractice: true,
+      independentPractice: true,
+      assessmentCoverage: 1,
+      remediation: true,
       learnerRunthrough: true,
     });
     expect(quality).toMatchObject({ pass: false, failures: ['LEARNING_OBJECTIVES_MISSING'] });
@@ -33,7 +41,7 @@ describe('Ultimate builder recovery', () => {
         async () => {
           called.push(step);
           if (step === 'learning_objectives') throw new Error('owned inference unavailable');
-          return { artifacts: { step } };
+          return { artifacts: fixtureArtifact(step) };
         },
       ]),
     );
@@ -63,7 +71,7 @@ describe('Ultimate builder recovery', () => {
               artifacts: { mediaQA: { pass: false, failures: ['INSUFFICIENT_DISTINCT_SHOTS'] } },
             };
           }
-          return { artifacts: { step } };
+          return { artifacts: fixtureArtifact(step) };
         },
       ]),
     );
@@ -108,7 +116,7 @@ describe('Ultimate builder recovery', () => {
     ).rejects.toThrow('ULTIMATE_RENDER_MULTISCENE_STORYBOARD_REQUIRED');
   });
 
-  it('restores saved step artifacts when resuming a partially built lesson', async () => {
+  it('rejects unversioned saved step passes when resuming a partially built lesson', async () => {
     const from = (table: string) => ({
       select: () => ({
         eq: () =>
@@ -129,24 +137,36 @@ describe('Ultimate builder recovery', () => {
     const checkpoint = await new UltimateSupabasePersistence({ from } as any).loadLessonCheckpoint({
       lessonBuildId: 'lesson',
     });
-    expect(checkpoint.passedSteps).toEqual(['learning_objectives']);
-    expect(checkpoint.artifacts.learning_objectives).toEqual({ objectives: ['cutting'] });
+    expect(checkpoint.passedSteps).toEqual([]);
+    expect(checkpoint.artifacts.learning_objectives).toBeUndefined();
   });
   it('rebuilds an old five-scene storyboard before retrying licensed media', async () => {
     const steps = ULTIMATE_BUILD_STEPS.slice(0, 8).map((step) => ({
-      step, state: 'passed', artifacts: step === 'storyboard'
-        ? { storyboard: { scenes: Array.from({ length: 5 }, (_, index) => ({ id: `scene-${index}` })) } }
-        : {},
+      step,
+      state: 'passed',
+      artifacts:
+        step === 'storyboard'
+          ? {
+              storyboard: {
+                scenes: Array.from({ length: 5 }, (_, index) => ({ id: `scene-${index}` })),
+              },
+            }
+          : {},
     }));
-    const db = { from: (table: string) => ({ select: () => ({ eq: () =>
-      table === 'ultimate_lesson_builds'
-        ? { single: async () => ({ data: { artifacts: {}, findings: [] }, error: null }) }
-        : Promise.resolve({ data: steps, error: null }),
-    }) }) } as any;
+    const db = {
+      from: (table: string) => ({
+        select: () => ({
+          eq: () =>
+            table === 'ultimate_lesson_builds'
+              ? { single: async () => ({ data: { artifacts: {}, findings: [] }, error: null }) }
+              : Promise.resolve({ data: steps, error: null }),
+        }),
+      }),
+    } as any;
     const checkpoint = await new UltimateSupabasePersistence(db).loadLessonCheckpoint({
       lessonBuildId: 'lesson-1',
     });
-    expect(checkpoint.passedSteps).toEqual(ULTIMATE_BUILD_STEPS.slice(0, 5));
+    expect(checkpoint.passedSteps).toEqual([]);
   });
   it('maps stored Envato media into unique render scenes without stock fallbacks', () => {
     const prepared = prepareUltimateStoryboardInput({
@@ -164,7 +184,12 @@ describe('Ultimate builder recovery', () => {
         },
         visual_assignment: {
           media: {
+            assignments: Array.from({ length: 6 }, (_, index) => ({
+              sceneId: `s${index + 1}`,
+              assetId: `asset-${index + 1}`,
+            })),
             readyAssets: Array.from({ length: 6 }, (_, index) => ({
+              id: `asset-${index + 1}`,
               lesson_id: 'lesson-1',
               public_url:
                 index === 0
@@ -197,30 +222,66 @@ describe('Ultimate builder recovery', () => {
 
   it('renews a checkpointed licensed video URL immediately before rendering', async () => {
     const createSignedUrl = vi.fn().mockResolvedValue({
-      data: { signedUrl: 'https://storage.example.com/fresh.mp4' }, error: null,
+      data: { signedUrl: 'https://storage.example.com/fresh.mp4' },
+      error: null,
     });
     const input = {
-      artifacts: { visual_assignment: { media: { readyAssets: [{
-        id: 'asset-1', storage_path: 'licensed-library/envato/asset-1.mp4',
-        public_url: 'https://storage.example.com/expired.mp4', entitlement_id: 'license-1',
-      }] } } },
+      artifacts: {
+        visual_assignment: {
+          media: {
+            readyAssets: [
+              {
+                id: 'asset-1',
+                storage_path: 'licensed-library/envato/asset-1.mp4',
+                public_url: 'https://storage.example.com/expired.mp4',
+                entitlement_id: 'license-1',
+              },
+            ],
+          },
+        },
+      },
     };
-    const db = { storage: { from: vi.fn().mockReturnValue({ createSignedUrl }) } } as any;
+    const db = {
+      from: vi.fn(() => ({ select: () => ({ eq: () => ({ single: async () => ({ data: { metadata: { storage_bucket: 'course_videos', storage_path: 'licensed-library/envato/current.mp4' } }, error: null }) }) }) })),
+      storage: { from: vi.fn().mockReturnValue({ createSignedUrl }) },
+    } as any;
     const refreshed = await refreshLicensedVisualUrls(input, db);
-    expect(createSignedUrl).toHaveBeenCalledWith('licensed-library/envato/asset-1.mp4', 3600);
-    expect(refreshed.artifacts.visual_assignment.media.readyAssets[0].public_url)
-      .toBe('https://storage.example.com/fresh.mp4');
-    expect(input.artifacts.visual_assignment.media.readyAssets[0].public_url)
-      .toBe('https://storage.example.com/expired.mp4');
+    expect(db.from).toHaveBeenCalledWith('licensed_media_entitlements');
+    expect(createSignedUrl).toHaveBeenCalledWith('licensed-library/envato/current.mp4', 3600);
+    expect(input.artifacts.visual_assignment.media.readyAssets[0].storage_path).toBe('licensed-library/envato/asset-1.mp4');
+    expect(refreshed.artifacts.visual_assignment.media.readyAssets[0].public_url).toBe(
+      'https://storage.example.com/fresh.mp4',
+    );
+    expect(input.artifacts.visual_assignment.media.readyAssets[0].public_url).toBe(
+      'https://storage.example.com/expired.mp4',
+    );
   });
 
   it('fails closed when a licensed video URL cannot be renewed', async () => {
-    const db = { storage: { from: () => ({ createSignedUrl: async () => ({
-      data: null, error: new Error('storage unavailable'),
-    }) }) } } as any;
-    await expect(refreshLicensedVisualUrls({ artifacts: { visual_assignment: {
-      media: { readyAssets: [{ id: 'asset-1', storage_path: 'licensed-library/asset-1.mp4' }] },
-    } } }, db)).rejects.toThrow('ULTIMATE_LICENSED_VISUAL_URL_REFRESH_FAILED:asset-1');
+    const db = {
+      storage: {
+        from: () => ({
+          createSignedUrl: async () => ({
+            data: null,
+            error: new Error('storage unavailable'),
+          }),
+        }),
+      },
+    } as any;
+    await expect(
+      refreshLicensedVisualUrls(
+        {
+          artifacts: {
+            visual_assignment: {
+              media: {
+                readyAssets: [{ id: 'asset-1', storage_path: 'licensed-library/asset-1.mp4' }],
+              },
+            },
+          },
+        },
+        db,
+      ),
+    ).rejects.toThrow('ULTIMATE_LICENSED_VISUAL_URL_REFRESH_FAILED:asset-1');
   });
 
   it('rejects a rendered storyboard whose scenes do not contain real visual assets', () => {
@@ -275,7 +336,7 @@ describe('Ultimate builder recovery', () => {
           },
         },
       }),
-    ).toThrow('ULTIMATE_ENVATO_VISUALS_REQUIRED:1:6');
+    ).toThrow('ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:scene-1');
   });
 
   it('blocks narration before synthesis when Envato visuals do not cover the storyboard', async () => {
@@ -288,7 +349,7 @@ describe('Ultimate builder recovery', () => {
       artifacts: {
         storyboard: {
           storyboard: {
-            scenes: Array.from({ length: 7 }, (_, index) => ({ id: `scene-${index + 1}` })),
+            scenes: Array.from({ length: 13 }, (_, index) => ({ id: `scene-${index + 1}` })),
           },
         },
         visual_assignment: { media: { readyAssets: [] } },
@@ -297,8 +358,80 @@ describe('Ultimate builder recovery', () => {
     };
 
     await expect(handlers.natural_narration(context as any)).rejects.toThrow(
-      'ULTIMATE_ENVATO_VISUALS_REQUIRED:0:7',
+      'ULTIMATE_SCENE_ASSIGNMENT_COVERAGE_REQUIRED:0:13',
     );
     expect(generate).not.toHaveBeenCalled();
   });
+  it('selectively repairs failed media QA and resumes downstream stages', async () => {
+    const called: string[] = [];
+    let qaAttempts = 0;
+    const handlers = Object.fromEntries(
+      ULTIMATE_BUILD_STEPS.map((step) => [
+        step,
+        async () => {
+          called.push(step);
+          if (step === 'finished_media_qa' && qaAttempts++ === 0) {
+            return {
+              findings: [{
+                step,
+                severity: 'error',
+                code: 'INSUFFICIENT_DISTINCT_SHOTS',
+                message: 'Rendered lesson repeated visual material.',
+              }],
+              artifacts: { mediaQA: { pass: false } },
+            };
+          }
+          const artifacts = fixtureArtifact(step);
+          if (step === 'visual_assignment' && qaAttempts > 0) {
+            artifacts.media.assignments = artifacts.media.assignments.map((assignment: any, index: number) => ({
+              ...assignment, assetId: `replacement-shot-${index}`,
+            }));
+          }
+          return { artifacts };
+        },
+      ]),
+    );
+    const ctx: any = {
+      buildId: 'build:competency',
+      courseId: 'course',
+      profile: { competencies: [] },
+      artifacts: {},
+      findings: [],
+      passedSteps: new Set(),
+    };
+    await new UltimateBuildRunner(handlers).run(ctx);
+    expect(called.filter((step) => step === 'visual_assignment')).toHaveLength(2);
+    expect(called.filter((step) => step === 'natural_narration')).toHaveLength(2);
+    expect(called.at(-1)).toBe('credential_release');
+    expect(ctx.findings.some((f: any) => f.severity === 'error')).toBe(false);
+  });
+
+  it('keeps explicit media approval failures as durable blockers', async () => {
+    const called: string[] = [];
+    const handlers = Object.fromEntries(
+      ULTIMATE_BUILD_STEPS.map((step) => [
+        step,
+        async () => {
+          called.push(step);
+          if (step === 'visual_assignment') {
+            throw new Error('MEDIA_LICENSE_REQUIRED:approved entitlement is required');
+          }
+          return { artifacts: fixtureArtifact(step) };
+        },
+      ]),
+    );
+    const ctx: any = {
+      buildId: 'build:competency',
+      courseId: 'course',
+      profile: { competencies: [] },
+      artifacts: {},
+      findings: [],
+      passedSteps: new Set(),
+    };
+    await new UltimateBuildRunner(handlers).run(ctx);
+    expect(called.filter((step) => step === 'visual_assignment')).toHaveLength(1);
+    expect(called).not.toContain('natural_narration');
+    expect(ctx.findings).toMatchObject([{ code: 'MEDIA_LICENSE_REQUIRED' }]);
+  });
+
 });

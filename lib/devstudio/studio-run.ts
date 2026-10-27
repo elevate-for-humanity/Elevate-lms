@@ -223,7 +223,8 @@ export async function failCanonicalStudioStep(
     })
     .eq('id', stepId);
   if (error) throw error;
-  await db.from('studio_runs').update({ status: 'failed', failure: { message } }).eq('id', run.id);
+  const { error: runError } = await db.from('studio_runs').update({ status: 'failed', completed_at: null, failure: { message } }).eq('id', run.id);
+  if (runError) throw runError;
   await appendStudioRunEvent(db, run.id, 'step.failed', message, {}, stepId, 'error');
 }
 

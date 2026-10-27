@@ -1,0 +1,27 @@
+[Unit]
+Description=Elevate authorized Asterisk WebRTC device provisioning
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+EnvironmentFile=/etc/elevate-pbx/provisioner.conf
+ExecStart=/usr/bin/node /opt/elevate-pbx/provisioner/server.mjs
+ExecStopPost=/usr/bin/node /opt/elevate-pbx/provisioner/server.mjs --invalidate
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+# Set the runtime path through a systemd drop-in during staged installation.
+ReadWritePaths=/var/lib/elevate-pbx
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

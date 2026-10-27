@@ -14,7 +14,7 @@ export const LMS_HEROES = {
   messages: '/images/pages/contact-hero.webp',
   certificates: '/images/pages/comp-home-highlight-success.webp',
   assignments: '/images/pages/office-admin-desk.jpg',
-  grades: '/images/pages/bookkeeping-ledger.webp',
+  grades: '/images/bookkeeping-training-vibrant-2026.webp',
   resources: '/images/pages/admin-courses-partners-hero.webp',
   achievements: '/images/pages/certificates-hero.webp',
   profile: '/images/pages/about-hero.webp',
@@ -33,7 +33,7 @@ export const LMS_SECTION_CARDS = {
   progress: '/images/pages/hvac-technician.webp',
   certificates: '/images/pages/cpr-mannequin.webp',
   certification: '/images/pages/programs-cpr-hero.webp',
-  placement: '/images/pages/business-meeting.webp',
+  placement: '/images/business-collaboration-vibrant-2026.webp',
   support: '/images/pages/admin-applications-hero.webp',
   alumni: '/images/business/collaboration-1.webp',
 } as const;
@@ -68,6 +68,6 @@ export const COURSE_CATEGORY_FALLBACKS: Record<string, string> = {
   healthcare: '/images/pages/medical-assistant-real.webp',
   trades: '/images/pages/electrical-conduit.webp',
   technology: '/images/pages/networking-hero.webp',
-  business: '/images/pexels/bookkeeping.webp',
+  business: '/images/bookkeeping-training-vibrant-2026.webp',
   default: '/images/pages/cdl-loading-dock.webp',
 };

@@ -9,6 +9,7 @@
  */
 
 import fs from 'node:fs';
+import { programImageAssignments, sharedProgramImages } from '../visual/program-image-assignments.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LEGACY_IMAGE_ALIASES } from '../../lib/media/legacy-image-aliases.mjs';
@@ -172,22 +173,9 @@ const unmappedPrograms = [...new Set(staticSlugs)].filter((slug) => !registrySlu
 if (unmappedPrograms.length) fail(`Static programs missing PROGRAM_IMAGES entries: ${unmappedPrograms.join(', ')}`);
 else pass(`${new Set(staticSlugs).size} static program slugs have canonical card/hero imagery`);
 
-const imageAssignments = [];
-for (const match of registryBody.matchAll(/\b(card|hero):\s*(?:`([^`]+)`|'([^']+)'|"([^"]+)")/g)) {
-  const role = match[1];
-  const raw = match[2] || match[3] || match[4] || '';
-  const resolved = raw.replace(/\$\{P\}/g, '/images/pages');
-  if (resolved.startsWith('/images/')) imageAssignments.push({ role, path: resolved });
-}
-const assignmentOwners = new Map();
-for (const assignment of imageAssignments) {
-  const current = assignmentOwners.get(assignment.path) || [];
-  current.push(assignment.role);
-  assignmentOwners.set(assignment.path, current);
-}
-const duplicateProgramImages = [...assignmentOwners.entries()].filter(([, roles]) => roles.length > 1);
+const duplicateProgramImages = sharedProgramImages(programImageAssignments(imageRegistrySource));
 if (duplicateProgramImages.length) {
-  fail(`Duplicate image assignments inside PROGRAM_IMAGES: ${duplicateProgramImages.map(([src]) => src).join(', ')}`);
+  fail(`Duplicate image assignments across PROGRAM_IMAGES entries: ${duplicateProgramImages.map(({path, owners}) => `${path} (${owners.join(', ')})`).join('; ')}`);
 } else {
   pass('PROGRAM_IMAGES does not reuse a card/hero asset across unrelated entries');
 }
@@ -228,13 +216,13 @@ if (unauthorizedBrowserSpeech.length) {
 }
 
 const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
-const cloudflareVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/cloudflare-natural-voice.ts'), 'utf8');
-if (!naturalRoute.includes('generateCloudflareNaturalVoice')) {
-  fail('Natural voice handler is not using the shared Cloudflare natural-voice provider');
-} else if (!cloudflareVoice.includes("const DEFAULT_CLOUDFLARE_TTS_MODEL = '@cf/")) {
-  fail('Cloudflare natural-voice provider has no production model default');
+const googleVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/google-natural-voice.ts'), 'utf8');
+if (!naturalRoute.includes('generateGoogleNaturalVoice')) {
+  fail('Natural voice handler is not using the shared Google natural-voice provider');
+} else if (!googleVoice.includes("https://texttospeech.googleapis.com/v1/text:synthesize") || !googleVoice.includes("en-US-Neural2-F")) {
+  fail('Google natural-voice provider has no production speech endpoint or voice');
 } else {
-  pass('Shared natural AI voice handler is configured with the Cloudflare provider');
+  pass('Shared natural AI voice handler is configured with the Google provider');
 }
 
 console.log('\n────────────────────────────');

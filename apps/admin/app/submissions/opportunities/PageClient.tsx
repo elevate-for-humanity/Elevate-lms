@@ -427,7 +427,7 @@ export default function OpportunitiesPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <StatusBadge status={opp.status} />
-                        <span className="text-xs text-slate-400 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full">
+                        <span className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full">
                           {TYPE_LABELS[opp.opportunity_type] ?? opp.opportunity_type}
                         </span>
                         {opp.reference_number && (

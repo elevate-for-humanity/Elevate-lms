@@ -184,35 +184,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialLabel: 'View Cals Kutz photos',
   },
   {
-    slug: 'b-52s-barber-shop',
-    name: "B-52's Barber Shop LLC",
-    dba: 'B-52s Barbershop',
-    businessType: 'BarberShop',
-    city: 'New Castle',
-    state: 'IN',
-    zip: '47362',
-    address: '314 Parkview Dr, Suite C',
-    phone: '(765) 374-9869',
-    programs: ['barber-apprenticeship'],
-    note: 'Traditional New Castle barbershop and apprenticeship host shop.',
-    marketingBlurb:
-      'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
-    media: [
-      {
-        src: '/images/partners/b-52s/interior-derived-2026.webp',
-        alt: 'AI-enhanced interior crop derived from B-52s Barbershop published portfolio',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/b52s-official.webp',
-        alt: 'B-52s Barbershop published shop and haircut portfolio',
-        kind: 'photo',
-      },
-    ],
-    onlineListingUrl: 'https://www.bestprosintown.com/in/new-castle/b-52s-barber-shop-/',
-    onlineListingLabel: 'View B-52s shop profile & photos',
-  },
-  {
     slug: 'style-and-scissor-salon',
     name: 'Style and Scissor Salon',
     dba: 'Style and Scissor Salon & Barber',
@@ -423,7 +394,6 @@ export function getFeaturedHostPartnerBySlug(slug: string) {
   const normalized = slug.trim().toLowerCase().replace(/-[a-f0-9]{8}$/, '');
   const aliases: Record<string, string> = {
     'j-noelle-co': 'j-noelle-co',
-    'b-52-s-barber-shop-llc': 'b-52s-barber-shop',
     'style-and-scissors-salon': 'style-and-scissor-salon',
     'generations-hair-llc-dba-generations-wedding-co': 'generations-hair-llc',
   };

@@ -36,7 +36,7 @@ Scope includes the canonical `/apprentice` dashboard and bookmark alias; billing
 
 Live schema was read on the primary Elevate project only. It confirms missing historical skill-progress identity fields, actual competency/transfer request fields and the timeclock source columns. Read-only database inspection; no real learner/payment/hour data changed.
 
-Focused tests cover >1,000 rows, explicit accepted zero, OJL/RTI separation, transfer verification, unpublished/duplicate completion, later-page failure, completed progress preservation, selected preview identity, orientation access preservation, closed-shift reconciliation, RPC/GPS failure, read-only preview and actual transfer form submission. Source ESLint and diff whitespace checks are run. Full TypeScript/build/CI results must be recorded separately when completed; a waiting check is not a pass.
+84 focused tests pass. The full LMS TypeScript check passes after correcting a typed fallback response caught by protected CI. Changed-source ESLint and whitespace checks pass. Focused tests cover >1,000 rows, explicit accepted zero, OJL/RTI separation, transfer verification, unpublished/duplicate completion, later-page failure, completed progress preservation, selected preview identity, orientation access preservation, closed-shift reconciliation, RPC/GPS failure, read-only preview and actual transfer form submission. Source ESLint and diff whitespace checks are run. Full TypeScript/build/CI results must be recorded separately when completed; a waiting check is not a pass.
 
 Every changed source line, including comments and blank lines, is recorded with old/new line numbers and exact content in `apprentice-dashboard-line-review-2026-10-27.jsonl.gz`. `apprentice-dashboard-side-by-side-2026-10-27.txt.gz` contains full-width `diff -y` comparisons. The classifications describe intentional final repairs, not production acceptance.
 
@@ -46,6 +46,6 @@ Authenticated mobile/desktop sessions for each discipline, real evidence-upload 
 
 ## Other requested work
 
-The Indiana Cosmetology course build was observed running with a valid renewing lease/heartbeat and narration underway; no duplicate job was created. This is not evidence that the course is fully published.
+The Indiana Cosmetology course build was observed running and then blocked during film rendering by TEACHING_PHOTO_REPLACEMENT_REQUIRED for scene seg-01-why-it-matters:cue-3. A separate internal repair is queued. No duplicate job or unapproved substitute photo was created. The course is not verified published.
 
-There were 32 open PRs at inventory. PRs #1826, #1870, #1874, #1892, #1895, #2150 and #2174 were reconciled onto current main and fresh protected CI requested, with automatic merge enabled. Most other PRs have source conflicts; #1826 duplicates a homepage fix already on main, and #2174 overlaps the ownership/communications repairs already merged as #2173. They must not be reported as all merged while conflict/check work remains.
+There were 32 open PRs at inventory. PRs #1826, #1870, #1874, #1892, #1895, #2150 and #2174 were reconciled onto current main and fresh protected CI requested, with automatic merge enabled. The remaining older branches were reviewed and reconciled with newer main implementations or missing changes were carried forward; #1826 duplicates a homepage fix already on main, and #2174 overlaps the ownership/communications repairs already merged as #2173. They must not be reported as all merged while conflict/check work remains.

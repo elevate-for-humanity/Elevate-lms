@@ -92,7 +92,7 @@ async function _GET(request: NextRequest) {
   if (enrollmentError) return NextResponse.json({ error: 'Enrollment unavailable' }, { status: 503 });
   const { data: program } = enrollment?.program_id
     ? await db.from('programs').select('name').eq('id', enrollment.program_id).maybeSingle()
-    : { data: null, error: null };
+    : { data: null };
   let hoursCompleted = 0;
   if (enrollment?.program_slug) {
     try {

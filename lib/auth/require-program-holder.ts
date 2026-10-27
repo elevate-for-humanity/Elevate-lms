@@ -173,12 +173,13 @@ export async function requireProgramHolder(options: { allowPendingApproval?: boo
 
   const { data: holder, error: holderError } = await db
     .from('program_holders')
-    .select('status, mou_signed, approved_at, payout_status, mou_terminated, suspended_at, terminated_at')
+    .select('user_id, status, mou_signed, approved_at, payout_status, mou_terminated, suspended_at, terminated_at')
     .eq('id', holderId)
     .maybeSingle();
 
   if (holderError) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
   if (!holder) redirect(`${siteUrls.apply}/program-holder?status=pending`);
+  if (holder.user_id !== access.user.id) redirect('/unauthorized');
   if (holder.mou_terminated || holder.suspended_at || holder.terminated_at || ['inactive','suspended','terminated','rejected'].includes(holder.status)) redirect('/unauthorized');
   if (!options.allowPendingApproval && (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at)) {
     redirect('/program-holder/onboarding?status=pending-approval');

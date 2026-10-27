@@ -15,7 +15,7 @@ const next={NextResponse:{json:(body,options)=>({body,status:options?.status||20
 
 test('new and legacy holder links resolve without granting approval or causing redirect loops',async()=>{
  for(const pending of [true,false]){
-  const db=dbFor(({table,columns})=>({data:table==='program_holder_programs'?[]:columns==='id'?{id:'owned-holder'}:{status:pending?'approved_pending_mou':'active',approved_at:pending?null:'2026-10-01',features:{}},error:null}));
+  const db=dbFor(({table,columns})=>({data:table==='program_holder_programs'?[]:columns==='id'?{id:'owned-holder'}:{user_id:'user',status:pending?'approved_pending_mou':'active',approved_at:pending?null:'2026-10-01',features:{}},error:null}));
   const api=load('lib/auth/require-program-holder.ts',{'@/lib/supabase/admin':{requireAdminClient:async()=>db},'next/navigation':{redirect:url=>{throw Error(url)}},'@/lib/auth/portal-access':{requirePortalAccess:async()=>({user:{id:'user'},profile:{id:'user',role:'program_holder'},isPlatformAdmin:false})},'@/lib/admin/portal-preview':{resolvePortalPreviewSubject:async()=>({previewing:false})}});
   assert.equal((await api.requireProgramHolder({allowPendingApproval:true})).holderId,'owned-holder');
   if(pending)await assert.rejects(api.requireProgramHolder(),/onboarding\?status=pending-approval/);else assert.equal((await api.requireProgramHolder()).holderId,'owned-holder');
@@ -98,4 +98,27 @@ test('provider activation racing with setup cannot be overwritten', async () => 
  await assert.rejects(api.configureProgramHolderPayoutAccount({user:{id:'u'},holderId:'h',db},'branch'),/changed during setup/);
  assert.equal(holderWrites,0);
  for(const [key,value] of [['payouts_enabled',false],['transfers_enabled',false],['payout_provider','paypal']])assert.ok(updateFilters.some(([k,v])=>k===key&&v===value));
+});
+
+
+test('a profile backlink cannot authorize another owner holder', async () => {
+ const db=dbFor(({table})=>({data:table==='program_holders'?{user_id:'another-user',status:'active',approved_at:'2026-10-01'}:[],error:null}));
+ const api=load('lib/auth/require-program-holder.ts',{'@/lib/supabase/admin':{requireAdminClient:async()=>db},'next/navigation':{redirect:url=>{throw Error(url)}},'@/lib/auth/portal-access':{requirePortalAccess:async()=>({user:{id:'user'},profile:{id:'user',role:'program_holder',program_holder_id:'foreign-holder'},isPlatformAdmin:false})},'@/lib/admin/portal-preview':{resolvePortalPreviewSubject:async()=>({previewing:false})}});
+ await assert.rejects(api.requireProgramHolder({allowPendingApproval:true}),/unauthorized/);
+});
+
+test('communications checks approval, revocation, profile state and lookup failures', async () => {
+ for(const variant of ['active','pending','terminated','suspended','inactive','lookup-error','holder-error','staff']) {
+  let extensionReads=0;
+  const allowed=['active','staff'].includes(variant);
+  const db=dbFor(({table})=>{
+   if(table==='profiles')return{data:{id:'user',role:variant==='staff'?'staff':'program_holder',is_active:variant!=='inactive',suspended:variant==='suspended'},error:variant==='lookup-error'?{}:null};
+   if(table==='user_roles')return{data:[],error:null};
+   if(table==='program_holders')return{data:{status:variant==='pending'?'pending':'active',approved_at:variant==='pending'?null:'2026-10-01',terminated_at:variant==='terminated'?'2026-10-27':null},error:variant==='holder-error'?{}:null};
+   extensionReads++;return{data:null,error:null};
+  });
+  const api=load('lib/communications/actor.ts',{'server-only':{},'@/lib/supabase/admin':{requireAdminClient:async()=>db},'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user:{id:'user'}},error:null})}})},'@/lib/admin/portal-preview':{resolvePortalPreviewSubject:async()=>({previewing:false})},'@/lib/rbac/role-matrix':{normalizeRoles:roles=>roles}});
+  if(allowed)assert.equal((await api.requireCommunicationActor()).user.id,'user');
+  else {await assert.rejects(api.requireCommunicationActor(),/COMMUNICATIONS_(FORBIDDEN|LOOKUP_UNAVAILABLE)/);assert.equal(extensionReads,0);}
+ }
 });

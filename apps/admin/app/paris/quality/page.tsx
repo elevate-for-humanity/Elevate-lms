@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Brain, MessageSquare, ThumbsUp, ThumbsDown, AlertTriangle, TrendingUp, CheckCircle, Clock, BarChart3 } from 'lucide-react';
@@ -20,35 +21,23 @@ export default async function AIQualityPage() {
   await requireRole(['admin', 'ai_admin']);
   const db = await requireAdminClient();
 
-  // Fetch AI task metrics from Supabase
-  const [
-    { data: tasks, count: totalResponses },
-    { data: completedTasks },
-    { data: helpfulTasks },
-    { data: escalatedTasks },
-    { data: agentMetrics },
-  ] = await Promise.all([
-    db.from('ai_tasks').select('*', { count: 'exact', head: true }),
-    db.from('ai_tasks').select('duration_ms').eq('status', 'completed').not('duration_ms', 'is', null),
-    db.from('ai_tasks').select('id').eq('status', 'completed').eq('feedback', 'helpful'),
-    db.from('ai_tasks').select('id').eq('escalated', true),
-    db.from('ai_tasks').select('agent_id, status, quality_score, duration_ms').eq('status', 'completed'),
+  type TaskMetric = { agent_id: string | null; quality_score: number | null; started_at: string | null; completed_at: string | null };
+  const [countResult, agentMetrics] = await Promise.all([
+    db.from('ai_tasks').select('id', { count: 'exact', head: true }),
+    readHoursPages<TaskMetric>((from, to) => db.from('ai_tasks')
+      .select('agent_id,quality_score,started_at,completed_at').eq('status', 'completed').order('id').range(from, to)),
   ]);
-
-  // Compute aggregated metrics
-  const total = totalResponses ?? 0;
-  const completed = completedTasks ?? [];
-  const avgResponseTime = completed.length > 0
-    ? (completed.reduce((s, t) => s + (t.duration_ms ?? 0), 0) / completed.length / 1000).toFixed(1)
-    : '0.0';
-  const scoredTasks = agentMetrics?.filter(t => t.quality_score != null) ?? [];
-  const avgQualityScore = scoredTasks.length > 0
-    ? (scoredTasks.reduce((s, t) => s + (t.quality_score ?? 0), 0) / scoredTasks.length).toFixed(1)
+  if (countResult.error) throw new Error('Unable to load AI task metrics');
+  const total = countResult.count ?? 0;
+  const durations = agentMetrics.map(task => Date.parse(task.completed_at ?? '') - Date.parse(task.started_at ?? ''))
+    .filter(duration => Number.isFinite(duration) && duration >= 0);
+  const avgResponseTime = durations.length
+    ? (durations.reduce((sum, duration) => sum + duration, 0) / durations.length / 1000).toFixed(1)
+    : null;
+  const scoredTasks = agentMetrics.filter(task => task.quality_score != null && task.quality_score >= 0 && task.quality_score <= 5);
+  const avgQualityScore = scoredTasks.length
+    ? (scoredTasks.reduce((sum, task) => sum + task.quality_score!, 0) / scoredTasks.length).toFixed(1)
     : '—';
-  const helpfulCount = helpfulTasks?.length ?? 0;
-  const helpfulRate = total > 0 ? Math.round((helpfulCount / total) * 100) : 0;
-  const escalatedCount = escalatedTasks?.length ?? 0;
-  const escalationRate = total > 0 ? Math.round((escalatedCount / total) * 100) : 0;
 
   // Per-agent breakdown
   const agentMap: Record<string, { responses: number; totalScore: number; scored: number }> = {};
@@ -66,16 +55,11 @@ export default async function AIQualityPage() {
     quality: v.scored > 0 ? parseFloat((v.totalScore / v.scored).toFixed(1)) : 0,
   })).sort((a, b) => b.responses - a.responses);
 
-  // Escalation stats
-  const escalatedTotal = escalatedTasks?.length ?? 0;
-  const resolved = Math.round(escalatedTotal * 0.89);
-  const pending = escalatedTotal - resolved;
-
   const metrics = [
     { label: 'Total Responses', value: total.toLocaleString(), icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Avg Response Time', value: `${avgResponseTime}s`, icon: Clock, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Avg Response Time', value: avgResponseTime == null ? '—' : `${avgResponseTime}s`, icon: Clock, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Quality Score', value: avgQualityScore !== '—' ? `${avgQualityScore}/5` : avgQualityScore, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'Helpful Rate', value: `${helpfulRate}%`, icon: ThumbsUp, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Completed Tasks', value: agentMetrics.length.toLocaleString(), icon: ThumbsUp, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
 
   return (
@@ -90,7 +74,7 @@ export default async function AIQualityPage() {
         </nav>
         <h1 className="text-2xl font-bold text-slate-900">AI Quality Monitor</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Monitor AI response quality, track escalation rates, and improve student experience
+          Review recorded AI task quality, completion counts, and response times
         </p>
       </div>
 
@@ -149,31 +133,10 @@ export default async function AIQualityPage() {
           )}
         </div>
 
-        {/* Escalation Tracking */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900 text-sm mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            Escalation to Human
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="text-center p-4 bg-slate-50 rounded-xl">
-              <p className="text-2xl font-bold text-slate-900">{escalationRate}%</p>
-              <p className="text-xs text-slate-500 mt-1">Escalation Rate</p>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-xl">
-              <p className="text-2xl font-bold text-green-700">{resolved}</p>
-              <p className="text-xs text-green-600 mt-1">Resolved by Staff</p>
-            </div>
-            <div className="text-center p-4 bg-amber-50 rounded-xl">
-              <p className="text-2xl font-bold text-amber-700">{pending}</p>
-              <p className="text-xs text-amber-600 mt-1">Pending Review</p>
-            </div>
-          </div>
-          <div className="mt-4">
-            <Link href="/inbox" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              View Escalated Tickets →
-            </Link>
-          </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="font-semibold text-slate-900">Staff follow-up</h2>
+          <p className="mt-2 text-sm text-slate-600">Resolution statistics are unavailable. Review conversations that need staff assistance in Inbox.</p>
+          <Link href="/inbox" className="mt-4 inline-flex font-semibold text-blue-700">Open staff inbox →</Link>
         </div>
 
         {/* Quick Actions */}

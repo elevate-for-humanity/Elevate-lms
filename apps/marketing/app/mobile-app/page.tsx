@@ -1,7 +1,6 @@
 export const revalidate = 3600;
 import StoreDemoPreview from '@/components/store/StoreDemoPreview';
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Smartphone, Zap, Download, Wifi, Bell, Lock } from 'lucide-react';
@@ -23,13 +22,6 @@ export const metadata: Metadata = {
 };
 
 export default async function MobileAppPage() {
-  const supabase = createPublicClient();
-  const { data: appInfo } = await supabase
-    .from('site_settings')
-    .select('*')
-    .eq('key', 'mobile_app')
-    .maybeSingle();
-
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

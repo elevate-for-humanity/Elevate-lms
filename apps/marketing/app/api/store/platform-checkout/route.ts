@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
   const tenantId = await resolveTenantIdForUser(user.id);
   if (!tenantId)
     return NextResponse.json(
-      { error: 'Set up the organization workspace before purchasing a subscription.' },
+      { error: 'Set up the organization workspace before purchasing a subscription.', trialUrl: '/store/trial' },
       { status: 409 },
     );
   const billingOrganizationId = await resolveBillingOrganizationId(tenantId, admin);
@@ -124,7 +125,8 @@ export async function POST(request: NextRequest) {
     unitAmountCents: interval === 'annual' ? addonPriceCents(addon!) * 12 : addonPriceCents(addon!),
   }));
   const totalCents = baseAmount + addonLines.reduce((sum, line) => sum + line.unitAmountCents, 0);
-  const invoiceKey = `platform:${billingOrganizationId}:${plan.id}:${interval}:${new Date().toISOString().slice(0, 7)}`;
+  const configurationKey = createHash('sha256').update(JSON.stringify({ addonCodes: [...addonCodes].sort(), totalCents })).digest('hex').slice(0, 16);
+  const invoiceKey = `platform:${billingOrganizationId}:${plan.id}:${interval}:${new Date().toISOString().slice(0, 7)}:${configurationKey}`;
   const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
     idempotencyKey: invoiceKey,
     customer: {

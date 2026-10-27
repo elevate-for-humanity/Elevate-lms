@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('program_enrollments')
-    .select('id, user_id, cohort_id, status, enrollment_date, completion_date, created_at, updated_at')
+    .select('id, user_id, cohort_id, status, enrollment_date:enrolled_at, completion_date, created_at, updated_at')
     .not('cohort_id', 'is', null)
     .order('id')
     .range(offset, offset + limit - 1);

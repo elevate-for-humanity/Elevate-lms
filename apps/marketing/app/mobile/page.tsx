@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createPublicClient } from '@/lib/supabase/public';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,25 +13,6 @@ export const metadata: Metadata = {
 };
 
 export default async function MobilePage() {
-  const supabase = createPublicClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
-          <p className="text-slate-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Fetch mobile app info
-  const { data: appInfo } = await supabase
-    .from('site_settings')
-    .select('*')
-    .eq('key', 'mobile_app')
-    .single();
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 py-4">

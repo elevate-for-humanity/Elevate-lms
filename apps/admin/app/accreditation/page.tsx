@@ -36,7 +36,7 @@ export default async function AccreditationPage() {
       .select('id, name, description, category, required, sort_order')
       .order('category')
       .order('sort_order'),
-    db.from('accreditation_evidence').select('id, standard_id, status, submitted_at, reviewed_at'),
+    db.from('accreditation_evidence').select('id, standard_id, status, submitted_at:created_at, reviewed_at'),
   ]);
 
   const rawStandards = standardsRes.data ?? [];

@@ -8,16 +8,20 @@ import { AddOnMarketplaceSection } from '@/components/store/AddOnMarketplaceSect
 
 export function PlansPageClient({
   initialAddon,
+  initialAddons,
+  initialInterval = 'monthly',
 }: {
   vertical?: string;
   initialAddon?: string;
+  initialAddons?: string;
+  initialInterval?: 'monthly' | 'annual';
 }) {
   const validInitialAddon = initialAddon && ADD_ON_MARKETPLACE.some(
     (addon) => addon.slug === initialAddon && !addon.hiddenFromMarketplace,
   )
     ? initialAddon
     : undefined;
-  const [selectedAddons, setSelectedAddons] = useState<string[]>(validInitialAddon ? [validInitialAddon] : []);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>(() => [...new Set([...(validInitialAddon ? [validInitialAddon] : []), ...(initialAddons || '').split(',')])].filter((slug) => ADD_ON_MARKETPLACE.some((addon) => addon.slug === slug && !addon.hiddenFromMarketplace)));
   const [billingBusy, setBillingBusy] = useState(false);
   const [billingError, setBillingError] = useState('');
 
@@ -47,6 +51,7 @@ export function PlansPageClient({
     <>
       <PlatformBasePlansSection
         selectedAddonSlugs={selectedAddons}
+        initialInterval={initialInterval}
         headline="Base plans"
         subheadline="Start with the essentials. Add AI assistants and business, education, workforce or testing modules as you grow."
       />

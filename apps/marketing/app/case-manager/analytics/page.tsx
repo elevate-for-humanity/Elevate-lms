@@ -29,7 +29,7 @@ export default async function CaseManagerAnalyticsPage() {
   const scoped = <T,>(query: any, column = 'user_id') => learnerIds.length ? query.in(column, learnerIds) : query.limit(0);
   const [enrollmentsRes, credentialsRes, placementsRes] = await Promise.all([
     scoped(db.from('program_enrollments').select('id, user_id, status, enrollment_state, enrolled_at, completed_at, program_id')),
-    scoped(db.from('learner_credentials').select('id, learner_id, status, credential_name, issued_at'), 'learner_id'),
+    scoped(db.from('learner_credentials').select('id, learner_id, status, issued_at'), 'learner_id'),
     scoped(db.from('placement_records').select('id, learner_id, status, employer_name, job_title, hourly_wage, start_date, created_at'), 'learner_id'),
   ]);
 

@@ -26,7 +26,7 @@ export default async function CareerCounselingPage() {
   // Pull live published programs from DB
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, title, slug, description, duration_weeks, sector')
+    .select('id, title, slug, description, duration_weeks, category')
     .eq('published', true)
     .eq('is_active', true)
     .neq('status', 'archived')
@@ -95,7 +95,7 @@ export default async function CareerCounselingPage() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-brand-blue-100 text-brand-blue-800">
-                      {p.sector || 'Training'}
+                      {p.category || 'Training'}
                     </span>
                     <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-brand-blue-600 transition-colors flex-shrink-0" />
                   </div>

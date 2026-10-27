@@ -125,7 +125,7 @@ function mapDbRow(row: Record<string, unknown>): CatalogProgramRow {
     seats_available: (row.seats_available as number) ?? null,
     delivery_mode: (row.delivery_mode as string) ?? 'hybrid',
     city: (row.city as string) ?? 'Indianapolis',
-    state: (row.state as string) ?? 'IN',
+    state: (row.state_code as string) ?? 'IN',
     completion_rate: (row.completion_rate as number) ?? null,
     placement_rate: (row.placement_rate as number) ?? null,
   };
@@ -147,7 +147,7 @@ export async function loadProgramCatalog(
     let query = db
       .from('programs')
       .select(
-        'id, slug, title, category, short_description, description, duration, credential_type, wioa_eligible, funding_tags, delivery_mode, city, state',
+        'id, slug, title, category, short_description, description, duration, credential_name, credential_type, wioa_approved, funding_tags, delivery_mode, state_code, duration_weeks, estimated_weeks, next_start_date, seats_available, completion_rate, placement_rate',
         { count: 'exact' },
       )
       .eq('is_active', true)
@@ -166,7 +166,7 @@ export async function loadProgramCatalog(
       query = query.eq('category', params.category);
     }
     if (params.wioaOnly) {
-      query = query.eq('wioa_eligible', true);
+      query = query.eq('wioa_approved', true);
     }
 
     const { data, count, error } = await query;

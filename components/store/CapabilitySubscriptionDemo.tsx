@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { capabilityWalkthrough } from '@/lib/store/capability-walkthroughs';
 import { useEffect, useState } from 'react';
 import {
   ArrowRight,
@@ -20,6 +21,7 @@ type DemoStep = {
 };
 
 interface Props {
+  capabilityKey?: string;
   name: string;
   description: string;
   categoryLabel: string;
@@ -30,6 +32,7 @@ interface Props {
 }
 
 export default function CapabilitySubscriptionDemo({
+  capabilityKey = '',
   name,
   description,
   categoryLabel,
@@ -38,7 +41,8 @@ export default function CapabilitySubscriptionDemo({
   actionHref,
   trialText,
 }: Props) {
-  const steps: DemoStep[] = [
+  const workflow = capabilityWalkthrough(capabilityKey, name);
+  const steps: DemoStep[] = [...workflow.map((slide, index) => ({ eyebrow: `${index + 1} · Workflow example`, title: slide.title, body: slide.action })),
     {
       eyebrow: '1 · See what it does',
       title: name,
@@ -62,7 +66,7 @@ export default function CapabilitySubscriptionDemo({
   ];
 
   const [step, setStep] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const recommendedAddOns = /workforce|compliance|government/i.test(categoryLabel)
     ? ['ZORA compliance assistant', 'Reporting and audit workflows', 'Role-based access']
     : /education|learning|course/i.test(categoryLabel)
@@ -117,14 +121,25 @@ export default function CapabilitySubscriptionDemo({
                   {steps[step].body}
                 </p>
 
+                {step < workflow.length && <div className="mt-6 rounded-2xl border border-cyan-300/30 bg-white/10 p-5" aria-label="Illustrative workflow record">
+                  <p className="text-xs font-bold uppercase text-cyan-300">Illustrative sample · not a live transaction</p>
+                  <p className="mt-3 font-bold">{workflow[step].record}</p>
+                  <p className="mt-2 text-lg text-white">{workflow[step].result}</p>
+                </div>}
+                <p className="mt-5 text-sm text-slate-300">Slide {step + 1} of {steps.length}. This tour explains the workflow; use your trial workspace to test actual delivery.</p>
+                <div className="mt-4 flex gap-3">
+                  <button type="button" onClick={() => { setPlaying(false); setStep((value) => (value - 1 + steps.length) % steps.length); }} className="min-h-11 rounded-lg border border-white/30 px-4">Previous</button>
+                  <button type="button" onClick={() => { setPlaying(false); setStep((value) => (value + 1) % steps.length); }} className="min-h-11 rounded-lg border border-white/30 px-4">Next</button>
+                </div>
                 <div className="mt-7 flex gap-2">
                   {steps.map((item, index) => (
                     <button
                       key={item.eyebrow}
                       type="button"
-                      onClick={() => setStep(index)}
+                      onClick={() => { setStep(index); setPlaying(false); }}
+                      aria-current={index === step ? 'step' : undefined}
                       aria-label={`Show demo step ${index + 1}`}
-                      className={`h-2.5 rounded-full transition-all ${index === step ? 'w-12 bg-cyan-300' : 'w-5 bg-white/25 hover:bg-white/40'}`}
+                      className={`min-h-6 rounded-full transition-all ${index === step ? 'w-12 bg-cyan-300' : 'w-5 bg-white/25 hover:bg-white/40'}`}
                     />
                   ))}
                 </div>

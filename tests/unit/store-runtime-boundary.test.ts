@@ -10,7 +10,7 @@ describe('Store service isolation',()=>{
   const response=await middleware(new NextRequest('https://store.elevateforhumanity.org'+path));
   expect(response.headers.get('location')).toBeNull();expect(response.headers.get('x-middleware-next')).toBe('1');
  });
- it.each(['/api/webhooks/paypal-billing','/api/webhooks/quickbooks','/api/auth/signin','/api/store/cart-checkout'])('handles %s locally while Marketing is unavailable',async path=>{
+ it.each(['/api/webhooks/paypal-billing','/api/webhooks/quickbooks','/api/auth/signin','/api/store/cart-checkout','/api/trial/start-managed','/api/ai-chat','/api/voice/natural'])('handles %s locally while Marketing is unavailable',async path=>{
   vi.stubEnv('K_SERVICE','elevate-store-migration');
   const response=await middleware(new NextRequest('https://store.elevateforhumanity.org'+path,{method:'POST'}));
   expect(response.headers.get('location')).toBeNull();expect(response.headers.get('x-middleware-next')).toBe('1');

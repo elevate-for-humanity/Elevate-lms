@@ -20,7 +20,7 @@ export async function attachLmsCoursesToEnrollments<
 
   const { data: courses, error } = await supabase
     .from('lms_courses')
-    .select('id, course_name, title')
+    .select('id, title')
     .in('id', courseIds);
 
   if (error) {
@@ -32,7 +32,7 @@ export async function attachLmsCoursesToEnrollments<
       c.id as string,
       {
         id: c.id as string,
-        course_name: (c.course_name as string | null) ?? (c.title as string | null) ?? null,
+        course_name: (c.title as string | null) ?? null,
         title: c.title as string | null,
       },
     ]),

@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { continueCourseQueue, courseReleasePending } from './continue-course-queue.mjs';
+test('imminent retry backoff is observed until due and a fresh claim is confirmed',async()=>{
+ const states=['retry_wait','retry_wait','assigned','empty'];let clock=0,calls=0;
+ const result=await continueCourseQueue({dispatch:async()=>{calls++;return {status:states.shift()};},now:()=>clock,delay:async ms=>{clock+=ms;},onState:()=>{}});
+ assert.equal(result.status,'empty');assert.equal(calls,4);assert.equal(clock,90_000);
+});
 test('observes active rendering through an empty scan until the next lesson is assigned',async()=>{
  const states=[{status:'empty',activeExecutions:1},{status:'empty',activeExecutions:1},{status:'assigned'},{status:'empty',activeExecutions:0}];
  let clock=0,calls=0;
@@ -50,8 +55,26 @@ test('pending worker deployment yields the lane without launching work or replac
 });
 test('release inventory uses actual main worker runs and fails closed on an unreadable inventory',async()=>{
  const env={GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',GH_TOKEN:'test'};
- assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'in_progress'}]})})}),true);
+ for (const status of ['queued','in_progress','completed']) {
+  const calls=[];
+  const pending=await courseReleasePending({env,request:async(url)=>{
+   calls.push(url);return {ok:true,json:async()=>url.includes('/jobs?')
+    ? {jobs:[{name:'build',status:'in_progress'},{name:'deploy',status}]}
+    : {workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]}};
+  }});
+  assert.equal(pending,status==='in_progress');
+  assert.match(calls[1],/actions\/runs\/123\/jobs/);
+ }
+ for (const status of ['queued','pending','waiting']) {
+  assert.equal(await courseReleasePending({env,request:async url=>({ok:true,json:async()=>url.includes('/jobs?')
+   ? {jobs:[{name:'build',status:'completed',conclusion:'success'},{name:'deploy',status}]}
+   : {workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]}})}),true);
+ }
+ await assert.rejects(courseReleasePending({env,request:async url=>url.includes('/jobs?')
+  ? {ok:false,status:503}
+  : {ok:true,json:async()=>({workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]})}}),/JOBS_HTTP_503/);
  assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'completed'},{head_branch:'untrusted',status:'queued'}]})})}),false);
  assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'queued'}]})})}),false);
  await assert.rejects(courseReleasePending({env,request:async()=>({ok:false,status:403})}),/HTTP_403/);
 });
+

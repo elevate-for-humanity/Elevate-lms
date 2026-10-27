@@ -137,7 +137,7 @@ async function fallbackReport(
       created_at,
       confirmed_at,
       completed_at,
-      exited_at,
+      exited_at:revoked_at,
       enrollment_state,
       status,
       program_slug,

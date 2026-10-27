@@ -1,3 +1,5 @@
+import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -14,11 +16,13 @@ export const metadata: Metadata = {
 export default async function PlacementsPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
+  const employer = await getEmployerRecord(supabase, user.id);
+  if (!employer) redirect('/employer/register');
 
   const { data: rawPlacements, count } = await supabase
     .from('job_placements')
     .select('*', { count: 'exact' })
-    .eq('employer_id', user.id)
+    .eq('employer_id', employer.id)
     .order('placement_date', { ascending: false })
     .limit(20);
 
@@ -40,12 +44,12 @@ export default async function PlacementsPage() {
   const { count: thisMonthCount } = await supabase
     .from('job_placements')
     .select('*', { count: 'exact', head: true })
-    .eq('employer_id', user.id)
+    .eq('employer_id', employer.id)
     .gte('placement_date', thisMonthStart);
   const { count: activeCount } = await supabase
     .from('job_placements')
     .select('*', { count: 'exact', head: true })
-    .eq('employer_id', user.id)
+    .eq('employer_id', employer.id)
     .eq('status', 'active');
   const retentionRate = count && count > 0 ? Math.round(((activeCount ?? 0) / count) * 100) : null;
 
@@ -69,9 +73,9 @@ export default async function PlacementsPage() {
               <h1 className="text-3xl font-bold text-slate-900">Job Placements</h1>
               <p className="text-slate-700 mt-2">{count || 0} total placements</p>
             </div>
-            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
-              Record Placement
-            </button>
+            <Link href="/communications/email?subject=Placement%20report" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
+              Report a placement to staff
+            </Link>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

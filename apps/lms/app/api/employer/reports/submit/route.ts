@@ -1,3 +1,5 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -25,13 +27,16 @@ async function _POST(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, employer_id')
+      .select('role')
       .eq('id', user.id)
       .maybeSingle();
 
     if (!profile || !['employer', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    const employer = await getEmployerRecord(supabase, user.id);
+    if (profile.role === 'employer' && !employer) return NextResponse.json({ error: 'Employer account is not connected' }, { status: 403 });
 
     const body = await request.json().catch(() => null);
     if (!body) {
@@ -48,67 +53,42 @@ async function _POST(request: NextRequest) {
     const placements = Number(body.placements || 0);
     const retention90 = Number(body.retention90 || 0);
 
-    if (!periodStart || !periodEnd) {
-      return NextResponse.json({ error: 'Reporting period is required' }, { status: 400 });
+    const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value)
+      && Number.isFinite(Date.parse(value))
+      && new Date(value).toISOString().slice(0, 10) === value;
+    if (!validDate(periodStart) || !validDate(periodEnd) || periodEnd < periodStart) {
+      return NextResponse.json({ error: 'A valid reporting period is required' }, { status: 400 });
     }
 
     const invalidMetric = [participantsServed, completions, placements, retention90].some(
-      (n) => !Number.isFinite(n) || n < 0,
+      (n) => !Number.isSafeInteger(n) || n < 0,
     );
     if (invalidMetric) {
       return NextResponse.json({ error: 'Metrics must be non-negative numbers' }, { status: 400 });
     }
 
-    const reportPayload = {
-      report_type: 'employer_wioa_submission',
-      due_date: periodEnd,
-      status: 'submitted',
-      auto_generated: false,
-      submission_method: submissionMethod,
-      created_by: user.id,
-      filters: JSON.stringify({
-        employer_id: profile.employer_id || user.id,
-        period_start: periodStart,
-        period_end: periodEnd,
-        metrics: {
-          participants_served: participantsServed,
-          completions,
-          placements,
-          retention_90_day: retention90,
-        },
-        notes,
-        submitted_from: 'employer_portal',
-      }),
-    };
+    const periodEndDate = new Date(periodEnd);
+    const fiscalYear = periodEndDate.getUTCFullYear();
+    const quarter = `${fiscalYear}Q${Math.floor(periodEndDate.getUTCMonth() / 3) + 1}`;
 
-    let report: any = null;
-
-    const insertPrimary = await supabase
+    // Reporting rows remain staff-only; the authenticated employer submits its own scoped payload through this API.
+    const writer = await requireAdminClient();
+    const { data: report, error: reportError } = await writer
       .from('wioa_compliance_reports')
-      .insert(reportPayload)
-      .select('id, report_type, due_date, status, submission_method, created_at')
-      .maybeSingle();
-
-    if (insertPrimary.error) {
-      // Fallback for environments with reduced schema.
-      const insertFallback = await supabase
-        .from('wioa_compliance_reports')
-        .insert({
-          report_type: 'employer_wioa_submission',
-          due_date: periodEnd,
-          status: 'submitted',
-        })
-        .select('id, report_type, due_date, status, created_at')
-        .maybeSingle();
-
-      if (insertFallback.error) {
-        logger.error('[employer/reports/submit] Failed to insert report', insertFallback.error);
-        return NextResponse.json({ error: 'Failed to submit report' }, { status: 500 });
-      }
-
-      report = insertFallback.data;
-    } else {
-      report = insertPrimary.data;
+      .insert({
+        report_type: 'employer_wioa_submission', due_date: periodEnd, status: 'submitted',
+        quarter, fiscal_year: fiscalYear,
+        submitted_by: user.id, submitted_at: new Date().toISOString(),
+        data: { employer_id: employer?.id || null, submission_method: submissionMethod,
+          period_start: periodStart, period_end: periodEnd,
+          metrics: { participants_served: participantsServed, completions, placements, retention_90_day: retention90 },
+          notes, submitted_from: 'employer_portal' },
+      })
+      .select('id,report_type,due_date,status,data,created_at')
+      .single();
+    if (reportError || !report) {
+      logger.error('[employer/reports/submit] Failed to save complete report', reportError);
+      return NextResponse.json({ error: 'Failed to submit report' }, { status: 503 });
     }
 
     await supabase

@@ -63,18 +63,27 @@ export default async function LibraryPage() {
   // Fetch library resources
   const { data: resources } = await supabase
     .from('library_resources')
-    .select('*')
+    .select('id,title,description,url,type:resource_type,created_at')
     .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(50);
 
   // Fetch course materials for enrolled courses
   const courseIds = enrollments?.map((e) => e.course_id) || [];
-  const { data: courseMaterials } = await supabase
+  const { data: rawCourseMaterials, error: materialsError } = await supabase
     .from('course_materials')
-    .select('id, title, description, file_url, url, course_id, created_at, type')
+    .select('id, title, description, file_url, url, course_id, created_at')
     .in('course_id', courseIds.length > 0 ? courseIds : ['00000000-0000-0000-0000-000000000000'])
     .order('created_at', { ascending: false });
+
+  if (materialsError) throw new Error('Course materials could not be loaded');
+  const courseMaterials = (rawCourseMaterials ?? []).map(material => {
+    const url = material.file_url || material.url || '';
+    const pathname = url.split(/[?#]/)[0].toLowerCase();
+    const type = /\.(mp4|webm|mov)$/.test(pathname) ? 'video'
+      : /\.(pdf|docx?|pptx?|xlsx?)$/.test(pathname) ? 'document' : 'link';
+    return { ...material, file_url: url, type };
+  });
 
   // Fetch user's bookmarked resources
   const { data: bookmarks } = await supabase

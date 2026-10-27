@@ -84,7 +84,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     .map(async (row) => {
       const { data: auditRows } = await db
         .from('enrollment_voucher_audit')
-        .select('id,changed_by,field_changed,old_value,new_value,changed_at,notes')
+        .select('id,changed_by,field_changed:field_name,old_value,new_value,changed_at,notes:note')
         .eq('enrollment_id', row.id)
         .order('changed_at', { ascending: false });
 

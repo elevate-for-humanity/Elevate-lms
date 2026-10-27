@@ -128,11 +128,11 @@ export async function indexRepository(
     const { error } = await db.from('ai_repo_index').upsert(
       {
         repo_path: repoPath,
+        file_path: repoPath,
         file_hash: fileHash,
-        language,
-        symbols,
+        file_type: language,
         last_indexed_at: new Date().toISOString(),
-        metadata: { size: content.length },
+        metadata: { size: content.length, symbols },
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'repo_path' },
@@ -142,7 +142,7 @@ export async function indexRepository(
       if (error.code === '42P01' || error.code === 'PGRST205') {
         throw new Error('ai_repo_index table not found — apply migration 20260708000005');
       }
-      skipped += 1;
+      throw new Error(`Repository index write failed: ${error.code ?? 'unknown'}`);
     } else {
       indexed += 1;
     }
@@ -160,19 +160,19 @@ export async function searchRepoIndex(
   if (!q) {
     const { data, error } = await db
       .from('ai_repo_index')
-      .select('repo_path, language, symbols')
+      .select('repo_path:file_path, language:file_type, symbols:metadata->symbols')
       .order('last_indexed_at', { ascending: false })
       .limit(limit);
-    if (error?.code === '42P01' || error?.code === 'PGRST205') return [];
+    if (error) throw new Error('Repository index unavailable');
     return data ?? [];
   }
 
   const { data, error } = await db
     .from('ai_repo_index')
-    .select('repo_path, language, symbols')
-    .ilike('repo_path', `%${q}%`)
+    .select('repo_path:file_path, language:file_type, symbols:metadata->symbols')
+    .ilike('file_path', `%${q}%`)
     .limit(limit);
 
-  if (error?.code === '42P01' || error?.code === 'PGRST205') return [];
+  if (error) throw new Error('Repository index unavailable');
   return data ?? [];
 }

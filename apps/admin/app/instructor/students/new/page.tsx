@@ -25,7 +25,7 @@ export default async function InstructorAddStudentPage() {
   if (!user) redirect('/login');
   const { data: courses } = await supabase
     .from('lms_courses')
-    .select('id, course_name')
+    .select('id, course_name:title')
     .eq('instructor_id', user.id)
     .eq('is_active', true)
     .order('course_name');

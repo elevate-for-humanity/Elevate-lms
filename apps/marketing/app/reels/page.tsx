@@ -20,7 +20,7 @@ export default async function ReelsPage() {
 
   const { data: reels } = await supabase
     .from('reels')
-    .select('id, title, description, video_url, thumbnail_url, likes, views')
+    .select('id, title, description, video_url, thumbnail_url, likes:likes_count, views:views_count')
     .eq('published', true)
     .order('created_at', { ascending: false })
     .limit(20);

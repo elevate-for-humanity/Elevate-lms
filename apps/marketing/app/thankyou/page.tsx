@@ -23,23 +23,16 @@ export default async function ThankyouPage() {
     .from('content_blocks')
     .select('*')
     .eq('page', 'thankyou')
-    .eq('section', 'next-steps')
-    .order('order', { ascending: true });
+    .eq('is_active', true)
+    .order('order_index', { ascending: true });
 
   // Get featured programs to suggest
   const { data: programs } = await supabase
     .from('programs')
     .select('id, title, slug, description')
     .eq('is_active', true)
-    .eq('is_featured', true)
+    .eq('featured', true)
     .limit(3);
-
-  // Get contact info
-  const { data: contactInfo } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'contact_info')
-    .maybeSingle();
 
   const defaultNextSteps = [
     {

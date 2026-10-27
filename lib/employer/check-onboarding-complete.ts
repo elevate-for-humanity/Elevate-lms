@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { enqueueEmail } from '@/lib/jobs/enqueue-email';
 
 /**
  * Required document types for employer onboarding activation.
@@ -44,40 +44,54 @@ interface OnboardingStatus {
  * Check if an employer has completed all onboarding requirements.
  * Requires documents to be APPROVED, not just uploaded.
  */
+async function employerIdentity(db: SupabaseClient, userId: string) {
+  const { data, error } = await db.from('employers')
+    .select('id,owner_user_id,approved,business_name,company_name,contact_name,contact_email,email')
+    .eq('owner_user_id', userId).maybeSingle();
+  if (error) throw new Error('Unable to resolve employer identity');
+  return data;
+}
+
 export async function checkOnboardingComplete(
   db: SupabaseClient,
   employerId: string,
 ): Promise<OnboardingStatus> {
-  const { data: onboarding } = await db
+  const employer = await employerIdentity(db, employerId);
+  if (!employer) return { complete: false, missing: [...REQUIRED_DOC_TYPES], pendingReview: [], docStatuses: [], hasHiringNeeds: false, hasMOU: false, hasAllDocsApproved: false };
+  const { data: onboarding, error: onboardingError } = await db
     .from('employer_onboarding')
     .select('status, hiring_needs')
-    .eq('employer_id', employerId)
+    .eq('employer_id', employer.id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   // Get documents with their approval status
-  const { data: documents } = await db
+  const { data: documents, error: documentError } = await db
     .from('documents')
-    .select('document_type, status')
+    .select('document_type, status, expiration_date, file_url, file_path, storage_path')
     .eq('user_id', employerId);
 
-  const { data: agreements } = await db
+  const { data: agreements, error: agreementError } = await db
     .from('license_agreement_acceptances')
     .select('agreement_type')
     .eq('user_id', employerId);
 
+  if (onboardingError || documentError || agreementError) throw new Error('Unable to verify employer onboarding requirements');
   const docMap = new Map<string, string>();
   for (const doc of documents || []) {
+    if (!doc.file_url && !doc.file_path && !doc.storage_path) continue;
     // Keep the highest status per type (approved > pending > rejected)
     const existing = docMap.get(doc.document_type);
-    if (!existing || doc.status === 'approved') {
-      docMap.set(doc.document_type, doc.status);
+    const expired = doc.expiration_date && doc.expiration_date.slice(0, 10) < new Date().toISOString().slice(0, 10);
+    const documentStatus = expired ? 'expired' : doc.status;
+    if (!existing || documentStatus === 'approved') {
+      docMap.set(doc.document_type, documentStatus);
     }
   }
 
   const signedAgreements = new Set((agreements || []).map((a: any) => a.agreement_type));
-  const hasHiringNeeds = !!onboarding?.hiring_needs;
+  const hasHiringNeeds = Boolean(onboarding?.hiring_needs && typeof onboarding.hiring_needs === 'object' && Object.keys(onboarding.hiring_needs).length);
 
   // MOU can be satisfied by either a signed agreement or an approved uploaded document
   const hasMOU =
@@ -146,10 +160,12 @@ export async function checkOnboardingComplete(
  * Returns true if the employer was activated.
  */
 export async function tryAutoActivate(db: SupabaseClient, employerId: string): Promise<boolean> {
+  const employer = await employerIdentity(db, employerId);
+  if (!employer?.approved) return false;
   const { data: onboarding } = await db
     .from('employer_onboarding')
-    .select('id, status, contact_name, contact_email, business_name')
-    .eq('employer_id', employerId)
+    .select('id, status')
+    .eq('employer_id', employer.id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -168,22 +184,24 @@ export async function tryAutoActivate(db: SupabaseClient, employerId: string): P
       await db
         .from('employer_onboarding')
         .update({ status: 'onboarding_in_progress', updated_at: new Date().toISOString() })
-        .eq('id', onboarding.id);
+        .eq('id', onboarding.id).eq('status', 'approved');
     }
     return false;
   }
 
   // All requirements met AND all documents approved — activate
-  const { error } = await db
+  const { data: activated, error } = await db
     .from('employer_onboarding')
     .update({
       status: 'active',
       activated_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
-    .eq('id', onboarding.id);
+    .eq('id', onboarding.id)
+    .in('status', ['approved', 'onboarding_in_progress'])
+    .select('id').maybeSingle();
 
-  if (error) {
+  if (error || !activated) {
     logger.error('Failed to auto-activate employer', undefined, { employerId, error });
     return false;
   }
@@ -197,7 +215,7 @@ export async function tryAutoActivate(db: SupabaseClient, employerId: string): P
       resource_type: 'employer_onboarding',
       resource_id: onboarding.id,
       after_state: {
-        business_name: onboarding.business_name,
+        business_name: (employer.business_name || employer.company_name),
         activation_method: 'auto_all_docs_approved',
         docs_verified: status.docStatuses.filter((d) => d.approved).map((d) => d.type),
         hiring_needs: status.hasHiringNeeds,
@@ -210,30 +228,18 @@ export async function tryAutoActivate(db: SupabaseClient, employerId: string): P
 
   logger.info('Employer auto-activated', {
     employerId,
-    businessName: onboarding.business_name,
+    businessName: (employer.business_name || employer.company_name),
     method: 'all_documents_approved',
   });
 
   // Send Welcome to Elevate email
   try {
-    const { getTemplate } = await import('@/lib/notifications/templates');
-    const template = getTemplate('employer_activated', {
-      contact_name: onboarding.contact_name,
-      business_name: onboarding.business_name,
-    });
-
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-    await fetch(`${siteUrl}/api/email/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-internal-secret': process.env.CRON_SECRET ?? '',
-      },
-      body: JSON.stringify({
-        to: onboarding.contact_email,
-        subject: template.subject,
-        html: template.html,
-      }),
+    const recipient = employer.contact_email || employer.email;
+    if (!recipient) throw new Error('Employer contact email is missing');
+    await enqueueEmail({
+      emailType: 'employer_activated', to: recipient,
+      correlationId: `employer-activated:${onboarding.id}`,
+      templateData: { contact_name: employer.contact_name || 'Employer partner', business_name: employer.business_name || employer.company_name || 'Your organization' },
     });
   } catch (err) {
     logger.error('Failed to send activation email', err instanceof Error ? err : undefined);

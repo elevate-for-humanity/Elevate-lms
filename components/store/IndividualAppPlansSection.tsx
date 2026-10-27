@@ -23,7 +23,7 @@ export function IndividualAppPlansSection({ catalog }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ appSlug: catalog.slug, plan: planId }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         if (res.status === 401) {
           window.location.href = storeSignInHref(`/store/apps/${catalog.slug}`);

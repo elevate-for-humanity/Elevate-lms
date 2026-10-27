@@ -1,4 +1,4 @@
-import { isAuthRetryableFetchError } from '@supabase/supabase-js';
+import { isAuthRetryableFetchError } from '@/lib/supabase/auth-errors';
 import { NextResponse, type NextRequest } from 'next/server';
 import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';

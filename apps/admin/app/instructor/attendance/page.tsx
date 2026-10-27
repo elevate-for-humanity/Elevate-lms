@@ -22,8 +22,8 @@ export default async function InstructorAttendancePage() {
 
   const { data: records } = await supabase
     .from('attendance_records')
-    .select('id, attended_at, status, user_id, session_id, profiles(full_name)')
-    .order('attended_at', { ascending: false })
+    .select('id, session_date, status, user_id, session_id, profiles(full_name)')
+    .order('session_date', { ascending: false })
     .limit(100);
 
   return (
@@ -58,7 +58,7 @@ export default async function InstructorAttendancePage() {
                 {records.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50 transition">
                     <td className="px-6 py-3 text-slate-900">{(r.profiles as { full_name?: string })?.full_name ?? '—'}</td>
-                    <td className="px-6 py-3 text-slate-500">{r.attended_at ? new Date(r.attended_at).toLocaleDateString() : '—'}</td>
+                    <td className="px-6 py-3 text-slate-500">{r.session_date ? new Date(r.session_date).toLocaleDateString() : '—'}</td>
                     <td className="px-6 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
                         r.status === 'present' ? 'bg-green-100 text-green-800' :

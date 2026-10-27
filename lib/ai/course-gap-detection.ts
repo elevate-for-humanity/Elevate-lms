@@ -5,22 +5,11 @@
  * missing content that should be generated.
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import 'server-only';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireAdminClient } from '@/lib/supabase/admin';
-// Lazy initialization to prevent build-time execution
-let _supabase: SupabaseClient | null = null;
-export function getGapSupabase(): SupabaseClient {
-  if (!_supabase) {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error('Missing Supabase environment variables');
-    }
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-      { auth: { persistSession: false } }
-    );
-  }
-  return _supabase;
+export async function getGapSupabase(): Promise<SupabaseClient> {
+  return requireAdminClient();
 }
 
 // Database row types
@@ -32,8 +21,6 @@ interface ProgramRow {
   soc_code: string | null;
   credential_type: string | null;
   category: string | null;
-  apprenticeship_hours_required: number | null;
-  program_type: string | null;
   is_active: boolean;
 }
 
@@ -42,8 +29,6 @@ interface CourseRow {
   title: string;
   program_id: string | null;
   status: string;
-  has_final_exam: boolean;
-  has_practical_assessment: boolean;
   updated_at: string;
 }
 
@@ -58,7 +43,6 @@ interface LessonRow {
   id: string;
   title: string;
   module_id: string;
-  has_quiz: boolean;
 }
 
 interface QuizRow {
@@ -110,20 +94,28 @@ async function scanProgramsWithoutCourses(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
   // Get all programs
-  const db = getGapSupabase();
-  const { data: programs } = await db
+  const db = await getGapSupabase();
+  const { data: programs, error: programsError } = await db
     .from('programs')
-    .select('id, title, slug, occupation, soc_code, credential_type, category')
+    .select('id, title, slug, occupation:occupation_code, soc_code, credential_type, category')
     .eq('is_active', true);
+  if (programsError) throw programsError;
 
   // Get all courses
-  const { data: courses } = await db
-    .from('career_courses')
+  const { data: courses, error: coursesError } = await db
+    .from('lms_courses')
     .select('id, title, program_id, status')
     .eq('status', 'published');
+  if (coursesError) throw coursesError;
 
-  const courseProgramIds = new Set((courses as ProgramRow[] | null)?.map((c) => c.program_id).filter(Boolean) || []);
-  const programCourseMap = new Map((courses as CourseRow[] | null)?.map((c) => [c.program_id, c]).filter(([k]) => k) || []) as Map<string, CourseRow>;
+  const publishedCourses = (courses as CourseRow[] | null) ?? [];
+  const { data: links, error: linksError } = await db.from('program_courses').select('program_id, course_id');
+  if (linksError) throw linksError;
+  const publishedIds = new Set(publishedCourses.map(course => course.id));
+  const courseProgramIds = new Set(publishedCourses.map(course => course.program_id).filter(Boolean));
+  for (const link of links ?? []) {
+    if (publishedIds.has(link.course_id)) courseProgramIds.add(link.program_id);
+  }
 
   for (const program of (programs as ProgramRow[] | null) || []) {
     if (!courseProgramIds.has(program.id)) {
@@ -139,22 +131,6 @@ async function scanProgramsWithoutCourses(): Promise<CourseGap[]> {
         recommendation: 'Generate a new course based on program requirements',
         suggested_action: 'generate_course',
       });
-    } else {
-      // Check if course is complete
-      const course = programCourseMap.get(program.id);
-      if (course && course.status !== 'published') {
-        gaps.push({
-          gap_type: 'inactive_draft',
-          severity: 'medium',
-          program_id: program.id,
-          program_name: program.title,
-          course_id: course.id,
-          course_title: course.title,
-          description: `Course "${course.title}" is in draft status and not published`,
-          recommendation: 'Review and publish the course, or complete missing content',
-          suggested_action: 'publish_draft',
-        });
-      }
     }
   }
 
@@ -167,17 +143,19 @@ async function scanProgramsWithoutCourses(): Promise<CourseGap[]> {
 async function scanCoursesWithoutModules(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
-  const { data: courses } = await getGapSupabase()
-    .from('career_courses')
+  const { data: courses, error: coursesError } = await (await getGapSupabase())
+    .from('lms_courses')
     .select('id, title, program_id, status')
     .eq('status', 'published');
+  if (coursesError) throw coursesError;
 
   for (const course of (courses as CourseRow[] | null) || []) {
-    const { data: modules } = await getGapSupabase()
+    const { data: modules, error: modulesError } = await (await getGapSupabase())
       .from('course_modules')
       .select('id, title')
       .eq('course_id', course.id)
       .eq('is_draft', false);
+    if (modulesError) throw modulesError;
 
     if (!modules || modules.length === 0) {
       gaps.push({
@@ -201,16 +179,18 @@ async function scanCoursesWithoutModules(): Promise<CourseGap[]> {
 async function scanModulesWithoutLessons(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
-  const { data: modules } = await getGapSupabase()
+  const { data: modules, error: modulesError } = await (await getGapSupabase())
     .from('course_modules')
     .select('id, title, course_id')
     .eq('is_draft', false);
+  if (modulesError) throw modulesError;
 
   for (const mod of (modules as ModuleRow[] | null) || []) {
-    const { data: lessons } = await getGapSupabase()
+    const { data: lessons, error: lessonsError } = await (await getGapSupabase())
       .from('course_lessons')
       .select('id')
       .eq('module_id', mod.id);
+    if (lessonsError) throw lessonsError;
 
     if (!lessons || lessons.length === 0) {
       gaps.push({
@@ -235,16 +215,19 @@ async function scanModulesWithoutLessons(): Promise<CourseGap[]> {
 async function scanLessonsWithoutQuizzes(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
-  const { data: lessons } = await getGapSupabase()
+  const { data: lessons, error: lessonsError } = await (await getGapSupabase())
     .from('course_lessons')
-    .select('id, title, module_id')
-    .eq('has_quiz', false);
+    .select('id, title, module_id, quiz_questions')
+    .eq('is_published', true);
+  if (lessonsError) throw lessonsError;
 
-  for (const lesson of (lessons as LessonRow[] | null) || []) {
-    const { data: quizzes } = await getGapSupabase()
-      .from('course_quizzes')
+  for (const lesson of (lessons as (LessonRow & { quiz_questions?: unknown })[] | null) || []) {
+    if (Array.isArray(lesson.quiz_questions) && lesson.quiz_questions.length) continue;
+    const { data: quizzes, error: quizzesError } = await (await getGapSupabase())
+      .from('quizzes')
       .select('id')
-      .eq('lesson_id', lesson.id);
+      .eq('lesson_id', lesson.id).eq('is_published', true);
+    if (quizzesError) throw quizzesError;
 
     if (!quizzes || quizzes.length === 0) {
       gaps.push({
@@ -268,20 +251,29 @@ async function scanLessonsWithoutQuizzes(): Promise<CourseGap[]> {
 async function scanCoursesWithoutAssessments(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
-  const { data: courses } = await getGapSupabase()
-    .from('career_courses')
-    .select('id, title, has_final_exam, has_practical_assessment')
+  const { data: courses, error: coursesError } = await (await getGapSupabase())
+    .from('lms_courses')
+    .select('id, title')
     .eq('status', 'published');
+  if (coursesError) throw coursesError;
 
   for (const course of (courses as CourseRow[] | null) || []) {
-    if (!course.has_final_exam || !course.has_practical_assessment) {
+    const db = await getGapSupabase();
+    const [assessmentResult, quizResult, lessonResult] = await Promise.all([
+      db.from('assessments').select('id').eq('course_id', course.id).eq('status', 'published').limit(1),
+      db.from('quizzes').select('id').eq('course_id', course.id).eq('is_published', true).limit(1),
+      db.from('course_lessons').select('quiz_questions').eq('course_id', course.id).eq('is_published', true),
+    ]);
+    if (assessmentResult.error || quizResult.error || lessonResult.error) throw new Error('Assessment evidence unavailable');
+    const inlineQuiz = (lessonResult.data ?? []).some(row => Array.isArray(row.quiz_questions) && row.quiz_questions.length);
+    if (!assessmentResult.data?.length && !quizResult.data?.length && !inlineQuiz) {
       gaps.push({
         gap_type: 'no_assessment',
         severity: 'high',
         course_id: course.id,
         course_title: course.title,
-        description: `Course "${course.title}" is missing assessments (final exam or practical)`,
-        recommendation: 'Add final exam and/or practical assessment',
+        description: `Course "${course.title}" has no published assessment`,
+        recommendation: 'Configure an assessment appropriate to the course requirements',
         suggested_action: 'add_assessment',
       });
     }
@@ -297,19 +289,22 @@ async function scanApprenticeshipContentGaps(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
   // Get apprenticeship programs
-  const { data: programs } = await getGapSupabase()
+  const { data: programs, error: programsError } = await (await getGapSupabase())
     .from('programs')
-    .select('id, title, category, apprenticeship_hours_required')
+    .select('id, title, category')
     .eq('is_active', true)
-    .eq('program_type', 'apprenticeship');
+    .eq('is_apprenticeship', true);
+  if (programsError) throw programsError;
 
   for (const program of (programs as ProgramRow[] | null) || []) {
     // Check if related instruction content exists
-    const { data: content } = await getGapSupabase()
-      .from('course_content')
-      .select('id')
-      .eq('program_id', program.id)
-      .limit(1);
+    const db = await getGapSupabase();
+    const { data: courses, error: courseError } = await db.from('lms_courses').select('id').eq('program_id', program.id);
+    if (courseError) throw courseError;
+    const { data: content, error: contentError } = courses?.length
+      ? await db.from('course_lessons').select('id').in('course_id', courses.map(row => row.id)).eq('is_published', true).limit(1)
+      : { data: [], error: null };
+    if (contentError) throw contentError;
 
     if (!content || content.length === 0) {
       gaps.push({
@@ -333,10 +328,11 @@ async function scanApprenticeshipContentGaps(): Promise<CourseGap[]> {
 async function scanMissingExternalData(): Promise<CourseGap[]> {
   const gaps: CourseGap[] = [];
 
-  const { data: programs } = await getGapSupabase()
+  const { data: programs, error: programsError } = await (await getGapSupabase())
     .from('programs')
-    .select('id, title, occupation, soc_code')
+    .select('id, title, occupation:occupation_code, soc_code')
     .eq('is_active', true);
+  if (programsError) throw programsError;
 
   for (const program of (programs as ProgramRow[] | null) || []) {
     if (!program.soc_code || !program.occupation) {
@@ -365,11 +361,12 @@ async function scanInactiveDrafts(): Promise<CourseGap[]> {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const { data: drafts } = await getGapSupabase()
-    .from('career_courses')
+  const { data: drafts, error: draftsError } = await (await getGapSupabase())
+    .from('lms_courses')
     .select('id, title, updated_at')
     .eq('status', 'draft')
     .lt('updated_at', thirtyDaysAgo.toISOString());
+  if (draftsError) throw draftsError;
 
   for (const draft of (drafts as CourseRow[] | null) || []) {
     gaps.push({
@@ -447,7 +444,7 @@ export async function scanAllGaps(): Promise<GapScanResult> {
  * Create draft course generation jobs from gaps
  */
 export async function createDraftJobsFromGaps(gaps: CourseGap[]): Promise<string[]> {
-  const db = getGapSupabase() as any;
+  const db = await getGapSupabase() as any;
   const jobIds: string[] = [];
 
   for (const gap of gaps) {
@@ -471,7 +468,8 @@ export async function createDraftJobsFromGaps(gaps: CourseGap[]): Promise<string
         .select('id')
         .single();
 
-      if (!error && job && (job as any).id) {
+      if (error) throw new Error('Course generation job creation failed', { cause: error });
+      if (job && (job as any).id) {
         jobIds.push((job as any).id);
       }
     }

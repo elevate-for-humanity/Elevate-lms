@@ -28,7 +28,7 @@ export interface GuardrailViolation {
   programHolderName: string;
   policy: GuardrailPolicy;
   metricValue: number;
-  actionTaken: EnforcementAction | 'skipped_grace_period' | 'already_enforced';
+  actionTaken: EnforcementAction | 'skipped_grace_period' | 'already_enforced' | 'dry_run';
   enforcedAt: string;
 }
 
@@ -50,109 +50,20 @@ async function fetchMetric(
   const db = await requireAdminClient();
   const since = periodToDate(period);
 
-  switch (metric) {
-    case 'fraud_indicators': {
-      const { count } = await db
-        .from('compliance_violations')
-        .select('*', { count: 'exact', head: true })
-        .eq('program_holder_id', programHolderId)
-        .eq('violation_type', 'fraud_suspected')
-        .gte('created_at', since);
-      return count ?? 0;
-    }
-    case 'data_discrepancies': {
-      const { count } = await db
-        .from('compliance_violations')
-        .select('*', { count: 'exact', head: true })
-        .eq('program_holder_id', programHolderId)
-        .eq('violation_type', 'data_quality')
-        .gte('created_at', since);
-      return count ?? 0;
-    }
-    case 'credential_misuse_reports': {
-      const { count } = await db
-        .from('compliance_violations')
-        .select('*', { count: 'exact', head: true })
-        .eq('program_holder_id', programHolderId)
-        .eq('violation_type', 'credential_misuse')
-        .gte('created_at', since);
-      return count ?? 0;
-    }
-    case 'safety_incidents': {
-      const { count } = await db
-        .from('compliance_violations')
-        .select('*', { count: 'exact', head: true })
-        .eq('program_holder_id', programHolderId)
-        .eq('violation_type', 'safety_violation')
-        .gte('created_at', since);
-      return count ?? 0;
-    }
-    case 'major_violations': {
-      const { count } = await db
-        .from('compliance_violations')
-        .select('*', { count: 'exact', head: true })
-        .eq('program_holder_id', programHolderId)
-        .eq('severity', 'major')
-        .gte('created_at', since);
-      return count ?? 0;
-    }
-    case 'data_quality_score': {
-      const { data } = await db
-        .from('program_holder_metrics')
-        .select('data_quality_score')
-        .eq('program_holder_id', programHolderId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return (data as any)?.data_quality_score ?? 100;
-    }
-    case 'completion_rate': {
-      const { data } = await db
-        .from('program_holder_metrics')
-        .select('completion_rate')
-        .eq('program_holder_id', programHolderId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return (data as any)?.completion_rate ?? 100;
-    }
-    case 'placement_rate': {
-      const { data } = await db
-        .from('program_holder_metrics')
-        .select('placement_rate')
-        .eq('program_holder_id', programHolderId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return (data as any)?.placement_rate ?? 100;
-    }
-    case 'financial_discrepancy_amount': {
-      const { data } = await db
-        .from('program_holder_metrics')
-        .select('financial_discrepancy_amount')
-        .eq('program_holder_id', programHolderId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return (data as any)?.financial_discrepancy_amount ?? 0;
-    }
-    case 'days_overdue_critical':
-    case 'days_overdue_minor': {
-      const { data } = await db
-        .from('compliance_reports')
-        .select('days_overdue')
-        .eq('program_holder_id', programHolderId)
-        .eq('priority', metric === 'days_overdue_critical' ? 'critical' : 'standard')
-        .eq('status', 'overdue')
-        .order('days_overdue', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return (data as any)?.days_overdue ?? 0;
-    }
-    default:
-      logger.warn('[guardrail-engine] unknown metric', { metric });
-      return 0;
-  }
+  const supported: Record<string, { column: string; value: string }> = {
+    fraud_indicators: { column: 'violation_type', value: 'fraud_suspected' },
+    data_discrepancies: { column: 'violation_type', value: 'data_quality' },
+    credential_misuse_reports: { column: 'violation_type', value: 'credential_misuse' },
+    safety_incidents: { column: 'violation_type', value: 'safety_violation' },
+    major_violations: { column: 'severity', value: 'major' },
+  };
+  const definition = supported[metric];
+  if (!definition) throw new Error(`Compliance metric ${metric} has no configured evidence source; enforcement was not evaluated`);
+  const { count, error } = await db.from('compliance_violations')
+    .select('id', { count: 'exact', head: true })
+    .eq('program_holder_id', programHolderId).eq(definition.column, definition.value).gte('created_at', since);
+  if (error || count == null) throw new Error(`Compliance metric ${metric} is unavailable; enforcement was not evaluated`);
+  return count;
 }
 
 function periodToDate(period: GuardrailPolicy['detectionRule']['evaluationPeriod']): string {
@@ -327,10 +238,8 @@ export async function runGuardrailEvaluation(
     .select('id, name, status, contact_email')
     .not('status', 'in', '("terminated","suspended")');
 
-  if (error || !holders?.length) {
-    logger.warn('[guardrail-engine] no active program holders found', { error });
-    return result;
-  }
+  if (error) throw new Error('Program Holder evidence could not be loaded');
+  if (!holders?.length) return result;
 
   // Select policies to evaluate
   const policies: GuardrailPolicy[] = [];
@@ -356,14 +265,15 @@ export async function runGuardrailEvaluation(
         // Check if already enforced recently (within grace period)
         const graceMs = policy.gracePeriodHours * 60 * 60 * 1000;
         const since = new Date(Date.now() - graceMs).toISOString();
-        const { count: recentCount } = await db
+        const { count: recentCount, error: recentError } = await db
           .from('guardrail_enforcement_log')
           .select('*', { count: 'exact', head: true })
           .eq('program_holder_id', holder.id)
           .eq('policy_id', policy.id)
           .gte('enforced_at', since);
 
-        if ((recentCount ?? 0) > 0) {
+        if (recentError || recentCount == null) throw new Error('Enforcement history could not be verified');
+        if (recentCount > 0) {
           result.violations.push({
             programHolderId: holder.id,
             programHolderName: holder.name,
@@ -389,7 +299,7 @@ export async function runGuardrailEvaluation(
           programHolderName: holder.name,
           policy,
           metricValue: value,
-          actionTaken: policy.enforcementAction,
+          actionTaken: dryRun ? 'dry_run' : policy.enforcementAction,
           enforcedAt: new Date().toISOString(),
         });
       } catch (err) {

@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface CourseGap {
@@ -48,22 +47,26 @@ export async function detectCourseGaps(
   const byProgram: Record<string, number> = {};
 
   // 1. Detect programs with no course assigned
-  const { data: programs } = await supabase
+  const { data: programs, error: programsError } = await supabase
     .from('programs')
-    .select('id, name, slug, credential_name')
+    .select('id, name:title, slug, credential_name')
     .eq('is_active', true)
     .eq('published', true);
+  if (programsError) throw programsError;
 
   if (programs) {
     for (const program of programs) {
       // Check if program has courses
-      const { data: programCourses } = await supabase
+      const { data: programCourses, error: programCoursesError } = await supabase
         .from('program_courses')
         .select('course_id')
         .eq('program_id', program.id)
         .limit(1);
+      if (programCoursesError) throw programCoursesError;
 
-      if (!programCourses || programCourses.length === 0) {
+      const { data: directCourse, error: directCourseError } = await supabase.from('lms_courses').select('id').eq('program_id', program.id).limit(1);
+      if (directCourseError) throw directCourseError;
+      if ((!programCourses || programCourses.length === 0) && !directCourse?.length) {
         const gap: CourseGap = {
           type: 'no_course',
           program_id: program.id,
@@ -87,18 +90,20 @@ export async function detectCourseGaps(
   }
 
   // 2. Detect courses with missing modules
-  const { data: courses } = await supabase
-    .from('courses')
+  const { data: courses, error: coursesError } = await supabase
+    .from('lms_courses')
     .select('id, title, description')
     .eq('is_active', true);
+  if (coursesError) throw coursesError;
 
   if (courses) {
     for (const course of courses) {
-      const { data: modules } = await supabase
+      const { data: modules, error: modulesError } = await supabase
         .from('course_modules')
         .select('id, title')
         .eq('course_id', course.id)
         .order('order_index');
+      if (modulesError) throw modulesError;
 
       if (!modules || modules.length === 0) {
         const gap: CourseGap = {
@@ -121,11 +126,11 @@ export async function detectCourseGaps(
       } else {
         // 3. Check each module for lessons
         for (const mod of modules) {
-          const { data: lessons } = await supabase
+          const { data: lessons, error: lessonsError } = await supabase
             .from('course_lessons')
-            .select('id, title')
-            .eq('module_id', mod.id)
-            .limit(1);
+            .select('id, title, quiz_questions')
+            .eq('module_id', mod.id);
+          if (lessonsError) throw lessonsError;
 
           if (!lessons || lessons.length === 0) {
             const gap: CourseGap = {
@@ -148,13 +153,14 @@ export async function detectCourseGaps(
           }
 
           // 4. Check for quizzes
-          const { data: quizzes } = await supabase
-            .from('course_quizzes')
-            .select('id')
-            .eq('module_id', mod.id)
-            .limit(1);
+          const lessonIds = (lessons ?? []).map(lesson => lesson.id);
+          const { data: quizzes, error: quizError } = lessonIds.length
+            ? await supabase.from('quizzes').select('id').in('lesson_id', lessonIds).eq('is_published', true).limit(1)
+            : { data: [], error: null };
+          if (quizError) throw quizError;
+          const inlineQuiz = (lessons ?? []).some(lesson => Array.isArray(lesson.quiz_questions) && lesson.quiz_questions.length > 0);
 
-          if (!quizzes || quizzes.length === 0) {
+          if (!inlineQuiz && (!quizzes || quizzes.length === 0)) {
             const gap: CourseGap = {
               type: 'missing_quiz',
               program_id: null,
@@ -179,16 +185,18 @@ export async function detectCourseGaps(
   }
 
   // 5. Check for credential alignment gaps
-  const { data: credentials } = await supabase
+  const { data: credentials, error: credentialsError } = await supabase
     .from('credentials')
-    .select('id, name, credential_type, exam_provider, exam_url');
+    .select('id, name, credential_type, exam_provider');
+  if (credentialsError) throw credentialsError;
 
   if (credentials && programs) {
     for (const program of programs) {
-      const { data: programCredentials } = await supabase
+      const { data: programCredentials, error: programCredentialsError } = await supabase
         .from('program_credentials')
         .select('credential_id')
         .eq('program_id', program.id);
+      if (programCredentialsError) throw programCredentialsError;
 
       if (!programCredentials || programCredentials.length === 0) {
         const gap: CourseGap = {
@@ -266,13 +274,14 @@ export async function createGapDraftJobs(
     }
 
     // Check if job already exists
-    const { data: existing } = await supabase
+    const { data: existing, error: existingError } = await supabase
       .from('gap_draft_jobs')
       .select('id')
       .eq('gap_type', gap.type)
       .eq('target_id', gap.course_id || gap.program_id)
       .eq('status', 'pending')
       .limit(1);
+    if (existingError) throw existingError;
 
     if (existing && existing.length > 0) {
       skipped++;
@@ -294,7 +303,7 @@ export async function createGapDraftJobs(
     if (!error) {
       created++;
     } else {
-      console.error('Error creating gap draft job:', error);
+      throw new Error('Gap draft job creation failed', { cause: error });
     }
   }
 

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
+import { getPublicBookingDirectory } from '@/lib/booking/public-directory';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, MapPin, User, Video, Building } from 'lucide-react';
@@ -14,27 +14,10 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function BookingPage() {
-  const supabase = createPublicClient();
-
-  const { data: appointmentTypes } = await supabase
-    .from('appointment_types')
-    .select('*')
-    .eq('is_active', true)
-    .order('name', { ascending: true });
-
-  const { data: staff } = await supabase
-    .from('staff')
-    .select('id, name, title, department, avatar_url')
-    .eq('accepts_appointments', true)
-    .order('name', { ascending: true });
-
-  const { data: locations } = await supabase
-    .from('locations')
-    .select('id, name, address, city, state')
-    .eq('is_active', true);
+  const { appointmentTypes, staff, locations } = await getPublicBookingDirectory();
 
   const defaultAppointmentTypes = [
     {

@@ -1,5 +1,6 @@
 'use client';
 
+import { isAssignedCourseInstructor } from '@/lib/lms/instructor-course-access';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -48,11 +49,11 @@ export default function InstructorAnnouncementsPage() {
     // Load course
     const { data: courseData } = await supabase
       .from('lms_courses')
-      .select('id, title, instructor_id')
+      .select('id, title')
       .eq('id', courseId)
       .maybeSingle();
 
-    if (!courseData || courseData.instructor_id !== user.id) {
+    if (!courseData || !(await isAssignedCourseInstructor(supabase, user.id, courseId))) {
       router.push('/instructor/courses');
       return;
     }

@@ -15,15 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default async function InstructorDashboard() {
-  const { user, profile, effectiveRoles } = await requireRole(['instructor', 'admin']);
+  const { user, profile, effectiveRoles } = await requireRole(['instructor', 'admin', 'super_admin']);
   const supabase = await createClient();
-  const isAdmin = effectiveRoles.includes('admin');
-
-  const { data: myCourses } = await supabase
-    .from('lms_courses')
-    .select('id')
-    .eq('instructor_id', user.id);
-  const courseIds = (myCourses || []).map((c: any) => c.id);
+  const isAdmin = effectiveRoles.some(role => ['admin', 'super_admin'].includes(role));
 
   let assignedProgramIds: string[] = [];
   if (!isAdmin) {
@@ -139,38 +133,49 @@ export default async function InstructorDashboard() {
   const pendingOjtResult = isAdmin
     ? await supabase
         .from('competency_log')
-        .select('id, created_at, notes, student_id, profiles ( full_name, email )')
+        .select('id, created_at, notes, student_id:apprentice_id')
         .eq('supervisor_verified', false)
         .order('created_at', { ascending: false })
         .limit(10)
     : scopedStudentIds.length > 0
       ? await supabase
           .from('competency_log')
-          .select('id, created_at, notes, student_id, profiles ( full_name, email )')
+          .select('id, created_at, notes, student_id:apprentice_id')
           .eq('supervisor_verified', false)
-          .in('student_id', scopedStudentIds)
+          .in('apprentice_id', scopedStudentIds)
           .order('created_at', { ascending: false })
           .limit(10)
       : { data: [] };
-  const pendingOjtReps = pendingOjtResult.data ?? [];
+  const pendingOjtRows = pendingOjtResult.data ?? [];
 
   const pendingSignoffsResult = isAdmin
     ? await supabase
         .from('barber_instructor_signoffs')
-        .select('id, signoff_type, created_at, student_id, profiles ( full_name, email )')
+        .select('id, signoff_type, created_at:signed_at, student_id:user_id')
         .eq('status', 'pending')
-        .order('created_at', { ascending: false })
+        .order('signed_at', { ascending: false })
         .limit(10)
     : scopedStudentIds.length > 0
       ? await supabase
           .from('barber_instructor_signoffs')
-          .select('id, signoff_type, created_at, student_id, profiles ( full_name, email )')
+          .select('id, signoff_type, created_at:signed_at, student_id:user_id')
           .eq('status', 'pending')
-          .in('student_id', scopedStudentIds)
-          .order('created_at', { ascending: false })
+          .in('user_id', scopedStudentIds)
+          .order('signed_at', { ascending: false })
           .limit(10)
       : { data: [] };
-  const pendingSignoffs = pendingSignoffsResult.data ?? [];
+  const pendingSignoffRows = pendingSignoffsResult.data ?? [];
+  if (('error' in pendingOjtResult && pendingOjtResult.error) || ('error' in pendingSignoffsResult && pendingSignoffsResult.error)) {
+    throw new Error('Unable to load pending instructor reviews');
+  }
+  const reviewUserIds = [...new Set([...pendingOjtRows, ...pendingSignoffRows].map(row => row.student_id).filter(Boolean))];
+  const { data: reviewProfiles, error: reviewProfileError } = reviewUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', reviewUserIds)
+    : { data: [], error: null };
+  if (reviewProfileError) throw new Error('Unable to load pending review students');
+  const reviewProfileMap = new Map((reviewProfiles ?? []).map(row => [row.id, row]));
+  const pendingOjtReps = pendingOjtRows.map(row => ({ ...row, profiles: reviewProfileMap.get(row.student_id) }));
+  const pendingSignoffs = pendingSignoffRows.map(row => ({ ...row, profiles: reviewProfileMap.get(row.student_id) }));
 
   const hourSummaryResult = isAdmin
     ? await supabase

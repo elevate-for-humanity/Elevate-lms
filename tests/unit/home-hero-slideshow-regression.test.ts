@@ -75,7 +75,10 @@ describe('homepage hero slideshow rendering', () => {
     const brightnessValues = [...source.matchAll(/exposureClass: 'brightness-\[([0-9.]+)\]'/g)].map(
       (match) => Number(match[1]),
     );
-    expect(brightnessValues).toHaveLength(6);
+    const slidesSource = source.split('const HOME_SLIDES: HomeHeroSlide[] = [')[1].split('\n];')[0];
+    const imageCount = [...slidesSource.matchAll(/type: 'image'/g)].length;
+    expect(imageCount).toBeGreaterThan(1);
+    expect(brightnessValues).toHaveLength(imageCount);
     expect(Math.max(...brightnessValues) - Math.min(...brightnessValues)).toBeCloseTo(0.02, 5);
   });
 

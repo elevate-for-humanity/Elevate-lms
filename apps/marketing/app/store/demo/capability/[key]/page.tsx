@@ -34,7 +34,7 @@ function subscriptionSnapshot(key: string) {
     };
   }
 
-  const addon = ADD_ON_MARKETPLACE.find((item) => item.features.includes(key as never));
+  const addon = ADD_ON_MARKETPLACE.find((item) => !item.hiddenFromMarketplace && item.features.includes(key as never));
   if (addon) {
     return {
       priceLabel: `$${addon.priceMonthly}/month add-on`,
@@ -86,6 +86,7 @@ export default async function CapabilityDemoPage({ params }: { params: Promise<{
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
       <CapabilitySubscriptionDemo
+        capabilityKey={String(capability.key)}
         name={capability.name}
         description={capability.description}
         categoryLabel={CATEGORY_LABELS[capability.category] || 'Elevate'}

@@ -17,6 +17,8 @@ export const dynamic = 'force-dynamic';
 // GET /api/paris/session — Get or create a session
 async function _GET(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(req, 'api');
+    if (limited) return limited;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -28,7 +30,7 @@ async function _GET(req: NextRequest) {
     }
 
     // Check for existing active session
-    const { data: existingSession } = await supabase
+    const { data: existingSession, error: sessionError } = await supabase
       .from('ai_interview_sessions')
       .select('*')
       .eq('user_id', user.id)
@@ -36,15 +38,13 @@ async function _GET(req: NextRequest) {
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
+    if (sessionError) return NextResponse.json({ error: 'Failed to access session' }, { status: 503 });
     if (existingSession) {
-      // Fetch conversation history
-      const { data: messages } = await supabase
-        .from('ai_interview_messages')
-        .select('*')
-        .eq('session_id', existingSession.id)
-        .order('created_at', { ascending: true });
+      const sessionData = existingSession.session_data;
+      const messages = sessionData && typeof sessionData === 'object' && Array.isArray(sessionData.messages)
+        ? sessionData.messages : [];
 
       return NextResponse.json({
         session: existingSession,
@@ -109,6 +109,13 @@ async function _PATCH(req: NextRequest) {
 
     if (!sessionId) {
       return NextResponse.json({ error: 'sessionId required' }, { status: 400 });
+    }
+
+    if (status && !['active', 'completed', 'abandoned'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid session status' }, { status: 400 });
+    }
+    if (sessionData != null && (typeof sessionData !== 'object' || Array.isArray(sessionData))) {
+      return NextResponse.json({ error: 'sessionData must be an object' }, { status: 400 });
     }
 
     const updates: Record<string, unknown> = {};

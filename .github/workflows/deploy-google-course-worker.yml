@@ -21,6 +21,8 @@ on:
       - 'docs/ultimate-course-builder/lessons/**'
       - '.dockerignore'
       - 'scripts/gcp/dispatch-course-job.mjs'
+      - 'scripts/gcp/resume-repaired-course-jobs.mjs'
+      - 'scripts/gcp/resume-repaired-course-jobs.test.mjs'
       - 'scripts/gcp/execute-course-job.mjs'
       - 'tests/integration/google-lesson-author.test.ts'
       - 'tests/unit/ultimate-registered-profile.test.ts'
@@ -200,6 +202,13 @@ jobs:
         run: node scripts/gcp/deploy-course-job.mjs
       - name: Synchronize approved regional worker image and verify readback
         run: node scripts/gcp/sync-course-worker-regions.mjs
+      - name: Resume repaired saved lessons after verified image deployment
+        env:
+          IMAGE_SHA: ${{ github.sha }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node --test scripts/gcp/resume-repaired-course-jobs.test.mjs
+          node scripts/gcp/resume-repaired-course-jobs.mjs
       - name: Dispatch course work in the approved secondary region
         env:
           COURSE_WORKER_PARALLELISM: '1'

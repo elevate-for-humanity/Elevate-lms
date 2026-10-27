@@ -76,3 +76,18 @@ describe('Store subscriptions preserve delivery on every renewal invoice', () =>
     });
   }
 });
+
+describe('checkout invoice configuration identity', () => {
+  it('does not reuse an invoice when the purchased add-ons change', async () => {
+    const { POST } = await import('@/apps/marketing/app/api/store/platform-checkout/route');
+    await POST(request({ planId: 'solo', addonSlugs: [] }));
+    await POST(request({ planId: 'solo', addonSlugs: ['paris-assistant'] }));
+    expect(state.invoices[0].idempotencyKey).not.toBe(state.invoices[1].idempotencyKey);
+  });
+  it('reuses the same invoice for an equivalent add-on selection in a different order', async () => {
+    const { POST } = await import('@/apps/marketing/app/api/store/platform-checkout/route');
+    await POST(request({ planId: 'solo', addonSlugs: ['paris-assistant', 'ellie-assistant'] }));
+    await POST(request({ planId: 'solo', addonSlugs: ['ellie-assistant', 'paris-assistant'] }));
+    expect(state.invoices[0].idempotencyKey).toBe(state.invoices[1].idempotencyKey);
+  });
+});

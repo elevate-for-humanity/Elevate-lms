@@ -1,3 +1,4 @@
+import { isAssignedCourseInstructor } from '@/lib/lms/instructor-course-access';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
@@ -245,16 +246,14 @@ export async function canAccessCourse(courseId: string): Promise<boolean> {
     .select('id')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
+    .is('revoked_at', null)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+    .limit(1)
     .maybeSingle();
   if (enrollment) return true;
 
   if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
-  const { data: course } = await supabase
-    .from('lms_courses')
-    .select('instructor_id')
-    .eq('id', courseId)
-    .maybeSingle();
-  return course?.instructor_id === user.id;
+  return isAssignedCourseInstructor(supabase, user.id, courseId);
 }
 
 export async function requireCourseAccess(courseId: string) {
@@ -268,12 +267,7 @@ export async function canEditCourse(courseId: string): Promise<boolean> {
   if (hasAnyRole(effectiveRoles, ['super_admin', 'admin'], { adminOverride: false })) return true;
   if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
 
-  const { data: course } = await supabase
-    .from('lms_courses')
-    .select('instructor_id')
-    .eq('id', courseId)
-    .maybeSingle();
-  return course?.instructor_id === user.id;
+  return isAssignedCourseInstructor(supabase, user.id, courseId);
 }
 
 export async function requireCourseEditAccess(courseId: string) {
@@ -288,22 +282,26 @@ export async function canAccessStudentData(studentId: string): Promise<boolean> 
   if (user.id === studentId) return true;
   if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
 
-  const { data: enrollment } = await supabase
+  const { data: enrollments, error } = await supabase
     .from('program_enrollments')
     .select('course_id')
     .eq('user_id', studentId)
-    .not('course_id', 'is', null)
+    .is('revoked_at', null)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+    .not('course_id', 'is', null);
+  if (error) throw new Error('Student enrollment lookup unavailable');
+  const ids = [...new Set((enrollments ?? []).map(row => row.course_id).filter(Boolean))];
+  if (!ids.length) return false;
+  const { data: assignment, error: assignmentError } = await supabase
+    .from('instructor_assignments')
+    .select('id')
+    .eq('instructor_id', user.id)
+    .eq('active', true)
+    .in('course_id', ids)
     .limit(1)
     .maybeSingle();
-  if (!enrollment?.course_id) return false;
-
-  const { data: course } = await supabase
-    .from('lms_courses')
-    .select('id')
-    .eq('id', enrollment.course_id)
-    .eq('instructor_id', user.id)
-    .maybeSingle();
-  return Boolean(course);
+  if (assignmentError) throw new Error('Instructor assignment lookup unavailable');
+  return Boolean(assignment);
 }
 
 export async function requireStudentDataAccess(studentId: string) {

@@ -1,3 +1,4 @@
+import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -16,21 +17,23 @@ export default async function EmployerPostingDetailPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
+  const employer = await getEmployerRecord(supabase, user.id);
+  if (!employer) redirect('/employer/register');
 
   const { data: posting } = await supabase
     .from('job_postings')
     .select('*')
     .eq('id', id)
-    .eq('employer_id', user.id)
+    .eq('employer_id', employer.id)
     .maybeSingle();
 
   if (!posting) notFound();
 
   const { data: applications } = await supabase
     .from('job_applications')
-    .select('id, status, created_at, applicant_name, applicant_email')
+    .select('id, status, created_at:applied_at, applicant:profiles!job_applications_user_id_fkey(full_name, email)')
     .eq('job_posting_id', id)
-    .order('created_at', { ascending: false });
+    .order('applied_at', { ascending: false });
 
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
@@ -56,13 +59,13 @@ export default async function EmployerPostingDetailPage({ params }: Props) {
               </Link>
             </li>
             <li>/</li>
-            <li className="text-slate-900 font-medium">{posting.job_title}</li>
+            <li className="text-slate-900 font-medium">{(posting.title || posting.job_title)}</li>
           </ol>
         </nav>
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{posting.job_title}</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{(posting.title || posting.job_title)}</h1>
             <p className="text-slate-700 mt-1">{posting.location ?? 'Location not specified'}</p>
           </div>
           <Link
@@ -76,7 +79,7 @@ export default async function EmployerPostingDetailPage({ params }: Props) {
         <div className="rounded-xl border p-6">
           <h2 className="text-lg font-semibold mb-3">Job Description</h2>
           <p className="text-slate-900 whitespace-pre-wrap">
-            {posting.job_description || 'No description provided.'}
+            {(posting.description || posting.job_description) || 'No description provided.'}
           </p>
         </div>
 
@@ -95,10 +98,10 @@ export default async function EmployerPostingDetailPage({ params }: Props) {
                 >
                   <div>
                     <p className="font-medium text-slate-900">
-                      {app.applicant_name || 'Applicant'}
+                      {(app.applicant as any)?.full_name || 'Applicant'}
                     </p>
-                    {app.applicant_email && (
-                      <p className="text-sm text-slate-700">{app.applicant_email}</p>
+                    {(app.applicant as any)?.email && (
+                      <p className="text-sm text-slate-700">{(app.applicant as any)?.email}</p>
                     )}
                     <p className="text-xs text-slate-700 mt-0.5">
                       {new Date(app.created_at).toLocaleDateString()}

@@ -41,6 +41,7 @@ afterEach(cleanup);
 it('shows one overview and one roster snapshot, with full work retained at canonical destinations', async () => {
   render(await ProgramHolderWorkspaceView({ section: 'dashboard' }));
   expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  expect(screen.getAllByText(/^Compliance \d+%$/)).toHaveLength(1);
   expect(screen.getAllByText('Assigned learner', { exact: true })).toHaveLength(1);
   expect(screen.getByRole('heading', { name: 'Choose your next task' })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Open all 1 students →' })).toHaveAttribute(

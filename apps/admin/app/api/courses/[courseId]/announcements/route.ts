@@ -1,3 +1,4 @@
+import { canAccessCourse, canEditCourse } from '@/lib/authGuards';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
@@ -17,6 +18,7 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ courseId:
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = await createClient();
   const { courseId } = await params;
+  if (!(await canAccessCourse(courseId))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const { data, error }: any = await supabase
     .from('course_announcements')
@@ -55,28 +57,8 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ courseId:
     return NextResponse.json({ error: 'title and message are required' }, { status: 400 });
   }
 
-  const { data: course, error: courseError } = await supabase
-    .from('courses')
-    .select('instructor_id')
-    .eq('id', courseId)
-    .maybeSingle();
-
-  if (courseError || !course) {
-    logger.error('Course error', courseError);
-    return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
-  if (!isAdmin && course.instructor_id !== user.id) {
-    return NextResponse.json(
-      { error: 'Only the instructor can post announcements' },
-      { status: 403 },
-    );
+  if (!(await canEditCourse(courseId))) {
+    return NextResponse.json({ error: 'Only an assigned instructor or administrator can post announcements' }, { status: 403 });
   }
 
   // Insert announcement

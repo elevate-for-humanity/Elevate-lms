@@ -1,3 +1,5 @@
+import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -15,11 +17,13 @@ export const metadata: Metadata = {
 export default async function OpportunitiesPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
+  const employer = await getEmployerRecord(supabase, user.id);
+  if (!employer) redirect('/employer/register');
 
   const { data: opportunities } = await supabase
     .from('job_postings')
     .select('*')
-    .eq('employer_id', user.id)
+    .eq('employer_id', employer.id)
     .order('created_at', { ascending: false })
     .limit(20);
 
@@ -39,7 +43,7 @@ export default async function OpportunitiesPage() {
               </p>
             </div>
             <Link
-              href="/employer/opportunities"
+              href="/employer/post-job"
               className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition inline-flex items-center gap-2 self-start"
             >
               <Plus className="w-5 h-5" />
@@ -107,7 +111,7 @@ export default async function OpportunitiesPage() {
                 Post your first job opportunity to connect with trained graduates.
               </p>
               <Link
-                href="/employer/opportunities"
+                href="/employer/post-job"
                 className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition inline-flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />

@@ -17,7 +17,7 @@ describe('attachLmsCoursesToEnrollments', () => {
       from: vi.fn(() => ({
         select: vi.fn(() => ({
           in: vi.fn(async () => ({
-            data: [{ id: 'c1', course_name: 'HVAC', title: 'HVAC Tech' }],
+            data: [{ id: 'c1', title: 'HVAC Tech' }],
             error: null,
           })),
         })),
@@ -28,6 +28,6 @@ describe('attachLmsCoursesToEnrollments', () => {
       { id: 'e1', course_id: 'c1' },
     ]);
 
-    expect(result[0].course?.course_name).toBe('HVAC');
+    expect(result[0].course?.course_name).toBe('HVAC Tech');
   });
 });

@@ -38,7 +38,7 @@ export function convertToCSV(data: any[], columns?: ExportColumn[]): string {
     return cols
       .map((col) => {
         const value = row[col.key];
-        const formatted = col.format ? col.format(value) : value;
+        const formatted = value == null ? '' : col.format ? col.format(value) : value;
         return escapeCSVValue(formatted);
       })
       .join(',');
@@ -53,7 +53,8 @@ export function convertToCSV(data: any[], columns?: ExportColumn[]): string {
 function escapeCSVValue(value: any): string {
   if (value === null || value === undefined) return '';
 
-  const str = String(value);
+  const raw = String(value);
+  const str = typeof value === 'string' && /^[\t\r\n ]*[=+@-]/.test(raw) ? `'${raw}` : raw;
 
   // If value contains comma, quote, or newline, wrap in quotes and escape quotes
   if (str.includes(',') || str.includes('"') || str.includes('\n')) {
@@ -124,194 +125,104 @@ export async function exportStudents(options: ExportOptions = {}): Promise<any[]
 /**
  * Export courses data
  */
+function applyExportOptions(query: any, options: ExportOptions) {
+  for (const [key, value] of Object.entries(options.filters ?? {})) query = query.eq(key, value);
+  if (options.sortBy) query = query.order(options.sortBy, { ascending: options.sortOrder === 'asc' });
+  if (options.limit) query = query.limit(options.limit);
+  return query;
+}
+
+async function exportRowsById(db: Awaited<ReturnType<typeof createClient>>, table: string, fields: string, ids: unknown[]) {
+  const keys = [...new Set(ids.filter(Boolean))];
+  if (!keys.length) return [] as any[];
+  const { data, error } = await db.from(table).select(fields).in('id', keys);
+  if (error) throw error;
+  return (data ?? []) as any[];
+}
+
+function exportedPersonName(profile: any, fallback?: string) {
+  return profile?.full_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || fallback || 'N/A';
+}
+
 export async function exportCourses(options: ExportOptions = {}): Promise<any[]> {
-  const supabase = await createClient();
-
-  let query = supabase.from('lms_courses').select(`
-      id,
-      title,
-      description,
-      category,
-      level,
-      duration,
-      price,
-      status,
-      created_at,
-      instructor:profiles!instructor_id(first_name, last_name, email)
-    `);
-
-  if (options.filters) {
-    Object.entries(options.filters).forEach(([key, value]) => {
-      query = query.eq(key, value);
-    });
-  }
-
-  if (options.sortBy) {
-    query = query.order(options.sortBy, {
-      ascending: options.sortOrder === 'asc',
-    });
-  }
-
-  if (options.limit) {
-    query = query.limit(options.limit);
-  }
-
-  const { data, error } = await query;
-
+  const db = await createClient();
+  const { data, error } = await applyExportOptions(db.from('lms_courses')
+    .select('id,title,description,duration:duration_hours,status,created_at,program_id'), options);
   if (error) throw error;
-
-  // Flatten instructor data
-  return (data || []).map((course) => ({
-    ...course,
-    instructor_name: course.instructor
-      ? `${(course.instructor as any)?.[0]?.first_name} ${(course.instructor as any)?.[0]?.last_name}`
-      : 'N/A',
-    instructor_email: (course.instructor as any)?.[0]?.email ?? 'N/A',
-  }));
+  const rows = data ?? [];
+  const [programs, assignmentResult] = await Promise.all([
+    exportRowsById(db, 'programs', 'id,category,tuition', rows.map((row: any) => row.program_id)),
+    rows.length ? db.from('instructor_assignments').select('course_id,instructor_id').in('course_id', rows.map((row: any) => row.id)).eq('active', true) : { data: [], error: null },
+  ]);
+  if (assignmentResult.error) throw assignmentResult.error;
+  const assignments = assignmentResult.data ?? [];
+  const instructors = await exportRowsById(db, 'profiles', 'id,full_name,first_name,last_name,email', assignments.map(row => row.instructor_id));
+  const programById = new Map(programs.map(row => [row.id, row]));
+  const instructorById = new Map(instructors.map(row => [row.id, row]));
+  return rows.map((row: any) => {
+    const program = programById.get(row.program_id);
+    const assigned = assignments.filter(assignment => assignment.course_id === row.id).map(assignment => instructorById.get(assignment.instructor_id)).filter(Boolean);
+    const price = program?.tuition == null ? null : Number(program.tuition);
+    return { ...row, category: program?.category ?? null, level: null, price: price != null && Number.isFinite(price) ? price : null,
+      instructor_name: assigned.length ? assigned.map(profile => exportedPersonName(profile)).join('; ') : 'N/A',
+      instructor_email: assigned.map(profile => profile.email).filter(Boolean).join('; ') || 'N/A' };
+  });
 }
 
-/**
- * Export enrollments data
- */
 export async function exportEnrollments(options: ExportOptions = {}): Promise<any[]> {
-  const supabase = await createClient();
-
-  let query = supabase.from('program_enrollments').select(`
-      id,
-      enrolled_at,
-      completed_at,
-      progress,
-      grade,
-      status,
-      student:profiles!user_id(first_name, last_name, email),
-      course:courses(title, category)
-    `);
-
-  if (options.filters) {
-    Object.entries(options.filters).forEach(([key, value]) => {
-      query = query.eq(key, value);
-    });
-  }
-
-  if (options.sortBy) {
-    query = query.order(options.sortBy, {
-      ascending: options.sortOrder === 'asc',
-    });
-  }
-
-  if (options.limit) {
-    query = query.limit(options.limit);
-  }
-
-  const { data, error } = await query;
-
+  const db = await createClient();
+  const { data, error } = await applyExportOptions(db.from('program_enrollments')
+    .select('id,enrolled_at,completed_at,progress:progress_percent,status,user_id,course_id,program_id,full_name,email'), options);
   if (error) throw error;
-
-  // Flatten nested data
-  return (data || []).map((enrollment) => ({
-    ...enrollment,
-    student_name: enrollment.student
-      ? `${enrollment.student?.[0]?.first_name} ${enrollment.student?.[0]?.last_name}`
-      : 'N/A',
-    student_email: enrollment.student?.[0]?.email || 'N/A',
-    course_title: enrollment.course?.[0]?.title || 'N/A',
-    course_category: enrollment.course?.[0]?.category || 'N/A',
-  }));
+  const rows = data ?? [];
+  const [students, courses, programs] = await Promise.all([
+    exportRowsById(db, 'profiles', 'id,full_name,first_name,last_name,email', rows.map((row: any) => row.user_id)),
+    exportRowsById(db, 'lms_courses', 'id,title', rows.map((row: any) => row.course_id)),
+    exportRowsById(db, 'programs', 'id,title,category', rows.map((row: any) => row.program_id)),
+  ]);
+  const studentById = new Map(students.map(row => [row.id, row]));
+  const courseById = new Map(courses.map(row => [row.id, row]));
+  const programById = new Map(programs.map(row => [row.id, row]));
+  return rows.map((row: any) => ({ ...row, student_name: exportedPersonName(studentById.get(row.user_id), row.full_name),
+    student_email: studentById.get(row.user_id)?.email || row.email || 'N/A',
+    course_title: courseById.get(row.course_id)?.title || programById.get(row.program_id)?.title || 'N/A',
+    course_category: programById.get(row.program_id)?.category ?? 'N/A' }));
 }
 
-/**
- * Export assignments data
- */
 export async function exportAssignments(options: ExportOptions = {}): Promise<any[]> {
-  const supabase = await createClient();
-
-  let query = supabase.from('assignments').select(`
-      id,
-      title,
-      description,
-      due_date,
-      points,
-      created_at,
-      course:courses(title)
-    `);
-
-  if (options.filters) {
-    Object.entries(options.filters).forEach(([key, value]) => {
-      query = query.eq(key, value);
-    });
-  }
-
-  if (options.sortBy) {
-    query = query.order(options.sortBy, {
-      ascending: options.sortOrder === 'asc',
-    });
-  }
-
-  if (options.limit) {
-    query = query.limit(options.limit);
-  }
-
-  const { data, error } = await query;
-
+  const db = await createClient();
+  const { data, error } = await applyExportOptions(db.from('assignments')
+    .select('id,title,description,due_date,points:max_points,created_at,course_id'), options);
   if (error) throw error;
-
-  return (data || []).map((assignment) => ({
-    ...assignment,
-    course_title: assignment.course?.[0]?.title || 'N/A',
-  }));
+  const rows = data ?? [];
+  const courses = await exportRowsById(db, 'lms_courses', 'id,title', rows.map((row: any) => row.course_id));
+  const courseById = new Map(courses.map(row => [row.id, row]));
+  return rows.map((row: any) => ({ ...row, course_title: courseById.get(row.course_id)?.title || 'N/A' }));
 }
 
-/**
- * Export grades data
- */
 export async function exportGrades(options: ExportOptions = {}): Promise<any[]> {
-  const supabase = await createClient();
-
-  let query = supabase.from('assignment_submissions').select(`
-      id,
-      submitted_at,
-      grade,
-      feedback,
-      status,
-      student:profiles!user_id(first_name, last_name, email),
-      assignment:assignments(title, points, course:courses(title))
-    `);
-
-  if (options.filters) {
-    Object.entries(options.filters).forEach(([key, value]) => {
-      query = query.eq(key, value);
-    });
-  }
-
-  if (options.sortBy) {
-    query = query.order(options.sortBy, {
-      ascending: options.sortOrder === 'asc',
-    });
-  }
-
-  if (options.limit) {
-    query = query.limit(options.limit);
-  }
-
-  const { data, error } = await query;
-
+  const db = await createClient();
+  const { data, error } = await applyExportOptions(db.from('assignment_submissions')
+    .select('id,submitted_at,grade,feedback,status,user_id,student_id,assignment_id,course_id'), options);
   if (error) throw error;
-
-  return (data || []).map((submission) => ({
-    ...submission,
-    student_name: submission.student
-      ? `${submission.student?.[0]?.first_name} ${submission.student?.[0]?.last_name}`
-      : 'N/A',
-    student_email: submission.student?.[0]?.email || 'N/A',
-    assignment_title: submission.assignment?.[0]?.title || 'N/A',
-    assignment_points: submission.assignment?.[0]?.points || 0,
-    course_title: submission.assignment?.[0]?.course?.[0]?.title || 'N/A',
-  }));
+  const rows = data ?? [];
+  const [students, assignments] = await Promise.all([
+    exportRowsById(db, 'profiles', 'id,full_name,first_name,last_name,email', rows.map((row: any) => row.user_id || row.student_id)),
+    exportRowsById(db, 'assignments', 'id,title,max_points,course_id', rows.map((row: any) => row.assignment_id)),
+  ]);
+  const courses = await exportRowsById(db, 'lms_courses', 'id,title', [...rows.map((row: any) => row.course_id), ...assignments.map(row => row.course_id)]);
+  const studentById = new Map(students.map(row => [row.id, row]));
+  const assignmentById = new Map(assignments.map(row => [row.id, row]));
+  const courseById = new Map(courses.map(row => [row.id, row]));
+  return rows.map((row: any) => {
+    const student = studentById.get(row.user_id || row.student_id);
+    const assignment = assignmentById.get(row.assignment_id);
+    return { ...row, student_name: exportedPersonName(student), student_email: student?.email || 'N/A',
+      assignment_title: assignment?.title || 'N/A', assignment_points: assignment?.max_points ?? null,
+      course_title: courseById.get(assignment?.course_id || row.course_id)?.title || 'N/A' };
+  });
 }
 
-/**
- * Export analytics data
- */
 export async function exportAnalytics(
   type: 'course' | 'student' | 'instructor',
   id: string,

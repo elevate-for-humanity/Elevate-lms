@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
-import { applySceneTitleReadabilityRepair } from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
+import { applySceneTitleReadabilityRepair, orderSceneTeachingStates } from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
+import { measuredTeachingStep } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
+import { quoteStartSeconds } from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
 
 function loadTypeScript(path, exportName, injectedNames = [], injectedValues = []) {
   const source = stripTypeScriptTypes(readFileSync(new URL(path, import.meta.url), 'utf8'), { mode: 'transform' })
@@ -16,8 +18,8 @@ function loadTypeScript(path, exportName, injectedNames = [], injectedValues = [
 const createProductionHandlers = loadTypeScript(
   '../../lib/ultimate-course-builder/core/production-handlers.ts',
   'createProductionHandlers',
-  ['instructionView', 'applySceneTitleReadabilityRepair'],
-  [value => value, applySceneTitleReadabilityRepair],
+  ['instructionView', 'applySceneTitleReadabilityRepair', 'orderSceneTeachingStates'],
+  [value => value, applySceneTitleReadabilityRepair, orderSceneTeachingStates],
 );
 const prepareUltimateStoryboardInput = loadTypeScript(
   '../../lib/ultimate-course-builder/adapters/platform-renderer.ts',
@@ -43,6 +45,35 @@ function storyboard(title = 'Cosmetology') {
     })),
   };
 }
+
+test('lesson 19 overlapping knowledge-check quotes each become visible in spoken order', async () => {
+  const dialogue = 'Pause and verify your understanding. Which complementary hue reduces unwanted orange tones? Remember the pairings: violet opposes yellow, blue opposes orange, and green opposes red.';
+  const steps = [
+    {label:'Orange Neutralizer', value:'blue opposes orange', narrationQuote:'blue opposes orange'},
+    {label:'Complementary Pairs', value:'violet opposes yellow, blue opposes orange, and green opposes red', narrationQuote:'violet opposes yellow, blue opposes orange, and green opposes red'},
+  ];
+  const scene = {id:'scene:seg-10-knowledge-check', dialogue, teachingVisual:{kind:'choices', steps}, sourceRequirementIds:['source-19']};
+  const cues = dialogue.toLowerCase().match(/[a-z0-9]+/g).map((text, index) => ({text, startSeconds:index, endSeconds:index+1}));
+  // Reproduce the actual defect: the earlier array entry never gets displayed.
+  assert.equal(measuredTeachingStep(steps, cues, quoteStartSeconds(steps[0].narrationQuote, cues)+1), 1);
+  const result = await createProductionHandlers({}).scene_construction({
+    artifacts:{storyboard:{storyboard:{scenes:[scene]}},visual_assignment:{media:{assignments:[{sceneId:scene.id,assetId:'licensed-photo'}]}}},
+    repairDirective:{target:'scene_construction',requirements:[{code:'MEDIA_TEACHING_STATE_NOT_VISIBLE',message:'MEDIA_TEACHING_STATE_NOT_VISIBLE:'+scene.id+':0:1280'}]},
+  });
+  const repaired = result.artifacts.scenes.storyboard.storyboard.scenes[0];
+  assert.deepEqual(repaired.teachingVisual.steps, [steps[1],steps[0]]);
+  for (const [index, step] of repaired.teachingVisual.steps.entries())
+    assert.equal(measuredTeachingStep(repaired.teachingVisual.steps, cues, quoteStartSeconds(step.narrationQuote,cues)+1), index);
+  assert.equal(repaired.dialogue, dialogue);
+  assert.deepEqual(repaired.sourceRequirementIds, scene.sourceRequirementIds);
+  assert.deepEqual(scene.teachingVisual.steps, steps);
+  assert.equal(result.artifacts.scenes.shots[0].assetId,'licensed-photo');
+  assert.deepEqual(orderSceneTeachingStates({scenes:[repaired]}).scenes[0], repaired);
+});
+
+test('state ordering cannot substitute unsupported narration or silently drop cards', () => {
+  assert.throws(() => orderSceneTeachingStates({scenes:[{id:'missing-quote',dialogue:'Use clean tools',teachingVisual:{steps:[{label:'Wrong',value:'Skip sanitation',narrationQuote:'Skip sanitation'}]}}]}), /BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND/);
+});
 
 test('scene construction applies the failure-specific layout directive without changing authored content', async () => {
   const board = storyboard();
@@ -99,3 +130,4 @@ test('the renderer consumes the repaired scene-construction storyboard', () => {
   const renderedStoryboard = directMedia(prepared);
   assert.equal(renderedStoryboard.scenes[2].titleFontSize, 128);
 });
+

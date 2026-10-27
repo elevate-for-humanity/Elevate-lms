@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID, randomBytes } from 'node:crypto';
-import { createClient } from '@supabase/supabase-js';
+import { createPublicClient } from '@/lib/supabase/public';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   contractHash,
@@ -92,11 +92,7 @@ export async function POST(req: NextRequest) {
         snapshot,
       });
     if (saveError) throw saveError;
-    const authClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    const authClient = createPublicClient();
     const { data: session, error: sessionError } = await authClient.auth.signInWithPassword({
       email,
       password,

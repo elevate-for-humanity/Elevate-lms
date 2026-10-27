@@ -20,12 +20,12 @@ async function getAccessRequests() {
 
   const { data, error } = await db
     .from('documents')
-    .select('id, user_id, document_type, status, created_at, notes, profiles(full_name, email)')
+    .select('id, user_id, document_type, status, created_at, notes:verification_notes, profiles(full_name, email)')
     .eq('document_type', 'access_request')
     .order('created_at', { ascending: false })
     .limit(100);
 
-  if (error) return [];
+  if (error) throw new Error('Unable to load FERPA access requests');
   return data ?? [];
 }
 

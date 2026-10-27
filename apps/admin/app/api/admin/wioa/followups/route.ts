@@ -50,18 +50,26 @@ export async function GET(request: NextRequest) {
 
   let participantQuery = db
     .from('wioa_participants')
-    .select('id,first_name,last_name,email,status,wioa_program,program_id,case_manager_id,workforce_region,career_pathway');
+    .select('id,first_name,last_name,email,status,wioa_program,program_id,case_manager_id');
   if (participantIds.length) participantQuery = participantQuery.in('id', participantIds);
   else return NextResponse.json({ followups: [], count: 0 });
 
-  const { data: participants } = await participantQuery;
+  const { data: participants, error: participantError } = await participantQuery;
+  if (participantError) return NextResponse.json({ error: 'Could not load WIOA participants.' }, { status: 503 });
+  const programIds = [...new Set((participants ?? []).map((row: any) => row.program_id).filter(Boolean))];
+  const programResult = programIds.length
+    ? await db.from('programs').select('id,title,category,slug').in('id', programIds)
+    : { data: [], error: null };
+  if (programResult.error) return NextResponse.json({ error: 'Could not load participant programs.' }, { status: 503 });
+  const programs = new Map<string, any>((programResult.data ?? []).map((row: any) => [row.id, row]));
   const filteredParticipants = (participants ?? []).filter((participant: any) => {
     if (program) {
       const haystack = `${participant.wioa_program ?? ''} ${participant.program_id ?? ''}`.toLowerCase();
       if (!haystack.includes(program.toLowerCase())) return false;
     }
     if (sector) {
-      const haystack = `${participant.career_pathway ?? ''} ${participant.workforce_region ?? ''}`.toLowerCase();
+      const participantProgram = programs.get(participant.program_id);
+      const haystack = `${participantProgram?.category ?? ''} ${participantProgram?.title ?? ''}`.toLowerCase();
       if (!haystack.includes(sector.toLowerCase())) return false;
     }
     return true;
@@ -96,8 +104,8 @@ export async function GET(request: NextRequest) {
           email: participant.email,
           status: participant.status,
           wioaProgram: participant.wioa_program,
-          workforceRegion: participant.workforce_region,
-          careerPathway: participant.career_pathway,
+          workforceRegion: null,
+          careerPathway: programs.get(participant.program_id)?.title ?? null,
         } : null,
         caseManager: manager ? {
           id: manager.id,

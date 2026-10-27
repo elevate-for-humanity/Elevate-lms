@@ -1,3 +1,4 @@
+import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
@@ -25,16 +26,26 @@ async function _GET(request: Request) {
     // Get user profile and check role
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, employer_id')
+      .select('role')
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['employer', 'admin', 'sponsor'].includes(profile.role)) {
+    if (!profile || !['employer', 'admin', 'super_admin', 'sponsor'].includes(profile.role)) {
       return NextResponse.json(
         { error: 'Forbidden - requires employer/admin/sponsor role' },
         { status: 403 },
       );
     }
+
+    const isAdmin = ['admin', 'super_admin'].includes(profile.role);
+    const employer = isAdmin ? null : await getEmployerRecord(supabase, user.id);
+    if (!isAdmin && !employer) return NextResponse.json({ error: 'Employer account is not connected' }, { status: 403 });
+    const { data: apprentices, error: scopeError } = !isAdmin
+      ? await supabase.from('apprentices').select('user_id').eq('employer_id', employer!.id).eq('status', 'active')
+      : { data: [], error: null };
+    if (scopeError) throw scopeError;
+    const studentIds = (apprentices ?? []).map(row => row.user_id).filter(Boolean);
+    if (!isAdmin && !studentIds.length) return NextResponse.json({ hours: [] });
 
     // Get pending hours from hour_entries
     const query = supabase
@@ -55,7 +66,8 @@ async function _GET(request: Request) {
       .eq('status', 'pending')
       .order('work_date', { ascending: false });
 
-    const { data: pendingHours } = await query;
+    const { data: pendingHours, error: hoursError } = await (isAdmin ? query : query.in('user_id', studentIds));
+    if (hoursError) throw hoursError;
 
     // Enrich with user profile data
     const userIds = [...new Set((pendingHours || []).map((h: any) => h.user_id).filter(Boolean))];
@@ -63,22 +75,17 @@ async function _GET(request: Request) {
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, email, employer_id')
+        .select('id, full_name, email')
         .in('id', userIds);
       for (const p of profiles || []) {
         profileMap[p.id] = p;
       }
     }
 
-    let hours = (pendingHours || []).map((h: any) => ({
+    const hours = (pendingHours || []).map((h: any) => ({
       ...h,
       profile: profileMap[h.user_id] || null,
     }));
-
-    // Filter by employer if not admin
-    if (profile.role === 'employer' && profile.employer_id) {
-      hours = hours.filter((item: any) => item.profile?.employer_id === profile.employer_id);
-    }
 
     return NextResponse.json({ hours });
   } catch (err: any) {

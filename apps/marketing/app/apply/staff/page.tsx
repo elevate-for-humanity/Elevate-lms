@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
 import StaffApplicationForm from './StaffApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -17,14 +16,6 @@ export const metadata: Metadata = {
 };
 
 export default async function StaffApplicationPage() {
-  const supabase = await createClient();
-
-  // Fetch application settings
-  const { data: settings } = await supabase
-    .from('site_settings')
-    .select('*')
-    .eq('key', 'staff_applications')
-    .maybeSingle();
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}

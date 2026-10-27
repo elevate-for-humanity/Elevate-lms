@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 async function getAccreditationData(supabase: any) {
   const [programs, courses, certificates, enrollments, completions] = await Promise.all([
     supabase.from('programs').select('id, title, status, created_at').eq('status', 'active'),
-    supabase.from('lms_courses').select('id, course_name, is_active').eq('is_active', true),
+    supabase.from('lms_courses').select('id, course_name:title, is_active').eq('is_active', true),
     supabase.from('certificates').select('id, created_at, status'),
     supabase.from('program_enrollments').select('id, status, created_at'),
     supabase.from('completions').select('id, created_at'),

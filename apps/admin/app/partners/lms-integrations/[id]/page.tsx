@@ -23,7 +23,7 @@ export default async function LMSIntegrationDetailPage({ params }: { params: Pro
 
   const { data: courses } = await db
     .from('partner_lms_courses')
-    .select('id, course_name, course_url, status, created_at')
+    .select('id, course_name, course_url:scorm_package_url, is_active, created_at')
     .eq('provider_id', id)
     .order('course_name');
 
@@ -34,7 +34,7 @@ export default async function LMSIntegrationDetailPage({ params }: { params: Pro
 
   const { data: syncLogs } = await db
     .from('partner_lms_sync_logs')
-    .select('id, status, message, created_at')
+    .select('id, status, message:error_message, created_at')
     .eq('provider_id', id)
     .order('created_at', { ascending: false })
     .limit(8);

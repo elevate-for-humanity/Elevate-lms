@@ -46,14 +46,14 @@ export default async function OrientationCompletePage() {
   // Check funding source from most recent active enrollment
   const { data: enrollment } = await supabase
     .from('program_enrollments')
-    .select('funding_source, requested_funding_source')
+    .select('funding_source')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   const fundingSource =
-    enrollment?.funding_source || enrollment?.requested_funding_source || 'self_pay';
+    enrollment?.funding_source || 'self_pay';
 
   const needsICC = WIOA_SOURCES.has(fundingSource.toLowerCase());
 

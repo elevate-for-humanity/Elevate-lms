@@ -23,7 +23,8 @@ export async function GET(request: NextRequest) {
   try {
     const result = await runGuardrailEvaluation({ dryRun, severity: 'all' });
     logger.info('[cron/guardrail-evaluation] complete', result);
-    return NextResponse.json({ ok: true, ...result });
+    const complete = result.errors.length === 0;
+    return NextResponse.json({ ok: complete, ...result }, { status: complete ? 200 : 503 });
   } catch (error) {
     logger.error('[cron/guardrail-evaluation] failed', error as Error);
     return NextResponse.json(

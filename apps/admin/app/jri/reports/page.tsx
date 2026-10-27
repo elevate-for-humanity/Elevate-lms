@@ -1,3 +1,5 @@
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
+import { summarizeJriReport, type JriReportRow } from '@/lib/learner/jri-report-summary';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -17,22 +19,10 @@ export default async function JRIReportsPage() {
 
 
 
-  const [
-    { count: total },
-    { count: active },
-    { count: completed },
-    { count: employed },
-    { data: participants },
-  ] = await Promise.all([
-    supabase.from('jri_participants').select('id', { count: 'exact', head: true }),
-    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
-    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('employment_status', 'employed'),
-    supabase.from('jri_participants').select('id, status, program, enrolled_at, employment_status, profiles(full_name, email)').limit(500),
-  ]);
-
-  const placementRate = (total || 0) > 0 ? Math.round(((employed || 0) / (total || 1)) * 100) : 0;
-  const completionRate = (total || 0) > 0 ? Math.round(((completed || 0) / (total || 1)) * 100) : 0;
+  const rows = await readHoursPages<JriReportRow>((from, to) => supabase.from('participant_report')
+    .select('enrollment_id,participant_id,full_name,email,program_title,enrollment_status,enrolled_at,placement_status')
+    .eq('funding_source', 'jri').order('enrollment_id').range(from, to));
+  const { enrollments: participants, total, learners, active, completed, employed, placementRate, completionRate } = summarizeJriReport(rows);
 
   return (
     <div className="min-h-screen bg-white">
@@ -69,8 +59,8 @@ export default async function JRIReportsPage() {
               <Briefcase className="w-5 h-5 text-purple-600" />
             </div>
             <p className="text-2xl font-bold text-slate-900">{placementRate}%</p>
-            <p className="text-sm text-slate-700 mt-1">Placement Rate</p>
-            <p className="text-xs text-slate-700 mt-0.5">{employed || 0} employed</p>
+            <p className="text-sm text-slate-700 mt-1">Verified Placement Rate</p>
+            <p className="text-xs text-slate-700 mt-0.5">{employed} of {learners} learners</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm border p-5">
             <div className="w-10 h-10 bg-brand-orange-50 rounded-lg flex items-center justify-center mb-3">
@@ -84,18 +74,18 @@ export default async function JRIReportsPage() {
         {/* Report Types */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {[
-            { title: 'Enrollment Report', desc: 'All participants with enrollment dates and program assignments', period: 'Current period' },
-            { title: 'Completion Report', desc: 'Participants who completed training with credential outcomes', period: 'Current period' },
-            { title: 'Employment Outcomes', desc: 'Post-program employment status and wage data', period: 'Current period' },
+            { href: '/api/reports/participants/export?funding=jri', title: 'Enrollment Report', desc: 'All participants with enrollment dates and program assignments', period: 'Current period' },
+            { href: '/api/reports/participants/export?funding=jri&status=completed', title: 'Completion Report', desc: 'Participants who completed training with credential outcomes', period: 'Current period' },
+            { href: '/api/reports/participants/export?funding=jri', title: 'Employment Outcomes', desc: 'Post-program employment status and wage data', period: 'Current period' },
           ].map((r) => (
             <div key={r.title} className="bg-white rounded-xl shadow-sm border p-5">
               <div className="flex items-start justify-between mb-3">
                 <div className="w-9 h-9 bg-brand-blue-50 rounded-lg flex items-center justify-center">
                   <FileText className="w-4 h-4 text-brand-blue-600" />
                 </div>
-                <button className="flex items-center gap-1 text-xs text-brand-blue-600 hover:text-brand-blue-800 border border-brand-blue-200 px-2 py-1 rounded">
+                <Link href={r.href} className="flex items-center gap-1 text-xs text-brand-blue-600 hover:text-brand-blue-800 border border-brand-blue-200 px-2 py-1 rounded">
                   <Download className="w-3 h-3" /> Export CSV
-                </button>
+                </Link>
               </div>
               <h3 className="font-semibold text-slate-900">{r.title}</h3>
               <p className="text-sm text-slate-700 mt-1">{r.desc}</p>
@@ -107,7 +97,7 @@ export default async function JRIReportsPage() {
         {/* Full Participant Table */}
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-5 border-b">
-            <h2 className="text-base font-semibold text-slate-900">All Participants — Export Ready</h2>
+            <h2 className="text-base font-semibold text-slate-900">JRI Training Enrollments</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -123,12 +113,12 @@ export default async function JRIReportsPage() {
               </thead>
               <tbody className="divide-y">
                 {participants && participants.length > 0 ? participants.map((p: any) => (
-                  <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-900">{p.profiles?.full_name || '—'}</td>
-                    <td className="px-4 py-3 text-slate-700">{p.profiles?.email || '—'}</td>
-                    <td className="px-4 py-3 text-slate-700">{p.program || '—'}</td>
-                    <td className="px-4 py-3 capitalize text-slate-700">{p.status || '—'}</td>
-                    <td className="px-4 py-3 capitalize text-slate-700">{p.employment_status || '—'}</td>
+                  <tr key={p.enrollment_id} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 font-medium text-slate-900">{p.full_name || '—'}</td>
+                    <td className="px-4 py-3 text-slate-700">{p.email || '—'}</td>
+                    <td className="px-4 py-3 text-slate-700">{p.program_title || '—'}</td>
+                    <td className="px-4 py-3 capitalize text-slate-700">{p.enrollment_status || '—'}</td>
+                    <td className="px-4 py-3 capitalize text-slate-700">{p.placement_status || 'Not recorded'}</td>
                     <td className="px-4 py-3 text-slate-700 text-xs">{p.enrolled_at ? new Date(p.enrolled_at).toLocaleDateString() : '—'}</td>
                   </tr>
                 )) : (

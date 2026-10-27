@@ -207,8 +207,9 @@ export async function getOrgProgress(filters: OrgReportFilters): Promise<OrgProg
 
   // 2. Enrollments (date-filtered if requested)
   let enrollQuery = db
-    .from('cohort_enrollments')
-    .select('learner_id, enrollment_status')
+    .from('program_enrollments')
+    .select('learner_id:user_id, enrollment_status:status')
+    .is('revoked_at', null)
     .in('cohort_id', cohortIds);
 
   if (filters.dateFrom) enrollQuery = enrollQuery.gte('enrolled_at', filters.dateFrom);

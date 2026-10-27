@@ -14,12 +14,27 @@ export default function ProductionPanelLayout({
   children: ReactNode;
 }) {
   const previewRoot = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
   const [mobilePane, setMobilePane] = useState<
     "outline" | "preview" | "operations"
   >("preview");
   const [outlineOpen, setOutlineOpen] = useState(true);
   const [operationsOpen, setOperationsOpen] = useState(true);
   const [previewExpanded, setPreviewExpanded] = useState(false);
+  useEffect(() => {
+    const element = root.current;
+    if (!element) return;
+    const measure = () => setCompact(element.getBoundingClientRect().width <= 760);
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     if (!previewExpanded) return;
     const element = previewRoot.current;
@@ -34,21 +49,18 @@ export default function ProductionPanelLayout({
     };
   }, [previewExpanded]);
   return (
-    <div className={styles.root} data-mobile-pane={mobilePane}>
+    <div ref={root} className={styles.root} data-compact={compact}>
       <nav
         className={styles.mobileTabs}
         aria-label="Mobile production workspace"
+        hidden={!compact}
       >
-        {(["outline", "preview", "operations"] as const).map((pane) => (
+        {(["outline", "preview", "operations"] as const).filter((pane) => pane !== "operations" || operations != null).map((pane) => (
           <button
             key={pane}
             type="button"
             aria-pressed={mobilePane === pane}
-            onClick={() => {
-              setMobilePane(pane);
-              setOutlineOpen(pane === "outline");
-              setOperationsOpen(pane === "operations");
-            }}
+            onClick={() => setMobilePane(pane)}
             className="min-h-11 rounded-lg border border-cyan-700 px-3 text-sm font-bold text-cyan-200"
           >
             {pane === "outline"
@@ -66,6 +78,7 @@ export default function ProductionPanelLayout({
         open={operationsOpen}
         onOpenChange={setOperationsOpen}
         panel={operations}
+        activePane={compact ? mobilePane === "operations" ? "panel" : "primary" : undefined}
       >
         <ResizableWorkspace
           className={`${styles.outline} h-full`}
@@ -75,6 +88,7 @@ export default function ProductionPanelLayout({
           open={outlineOpen}
           onOpenChange={setOutlineOpen}
           panel={outline}
+          activePane={compact ? mobilePane === "outline" ? "panel" : "primary" : undefined}
         >
           <div
             ref={previewRoot}

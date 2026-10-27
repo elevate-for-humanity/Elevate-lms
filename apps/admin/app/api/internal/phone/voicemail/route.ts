@@ -8,6 +8,8 @@ import {usesGooglePhoneBindings} from '@/lib/phone/runtime-authority';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Only emit fixed diagnostic classes. Never log recordings, callers, credentials or provider bodies.
+const SAFE_VOICEMAIL_FAILURES=new Set(['voice_identity_unavailable','system_lookup_unavailable','workspace_lookup_unavailable','extension_lookup_unavailable','voicemail_lookup_unavailable','private_audio_storage_unavailable','voicemail_bucket_must_be_private','audio_persistence_unavailable','call_persistence_unavailable','voicemail_persistence_unavailable','callback_persistence_unavailable']);
 async function readBody(request:Request){
  const reader=request.body?.getReader();if(!reader)throw Error('missing_body');
  const chunks:Uint8Array[]=[];let size=0;
@@ -68,5 +70,10 @@ export async function POST(request:Request){
   if(taskError)throw Error('callback_persistence_unavailable');
   await notifyAssignee(db,{profileId:extension.profile_id,taskId:body.id,caller,urgency:'normal',source:'voicemail',transcript:transcript||undefined,summary:transcript?undefined:'No speech was detected. Open the recording to listen.'},system);
   return NextResponse.json({saved:true,transcriptAvailable:Boolean(transcript)});
- }catch(error){const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.',code},{status:503});}
+ }catch(error){
+  const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';
+  const reason=error instanceof Error && SAFE_VOICEMAIL_FAILURES.has(error.message)?error.message:code==='voicemail_processing_unavailable'?'unexpected_failure':code;
+  console.error('phone_voicemail_processing_failed',{reason});
+  return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.',code},{status:503});
+ }
 }

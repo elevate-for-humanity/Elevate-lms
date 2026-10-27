@@ -418,6 +418,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         audioUrl: renderMediaUrl(render),
         transcript: inspection.actualTranscript,
         deliveredMp4: true,
+        expectedMediaSha256: inspection.mediaSha256,
       });
       const narrationQA = {
         ...evaluateNarration(metrics),
@@ -545,8 +546,32 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         rows,
         releaseEvidenceRecorded: true,
       };
-      return { passed: !release.blocked, artifacts: { release } };
+      // Report the owning content defect, not just an opaque release failure.
+      // The existing BLUEPRINT route returns this to bounded source authoring.
+      const missingPractice = new Map<string, Set<string>>();
+      for (const row of traceability.failures) {
+        const missing = [
+          ...(!row.guidedPracticeId ? ['guided_practice'] : []),
+          ...(!row.independentPracticeId ? ['independent_practice'] : []),
+        ];
+        if (missing.length) {
+          const types = missingPractice.get(row.objectiveId) ?? new Set<string>();
+          missing.forEach((type) => types.add(type));
+          missingPractice.set(row.objectiveId, types);
+        }
+      }
+      return {
+        passed: !release.blocked,
+        artifacts: { release },
+        findings: [...missingPractice].map(([objectiveId, types]) => ({
+          step: 'credential_release' as const,
+          severity: 'error' as const,
+          code: 'BLUEPRINT_OBJECTIVE_PRACTICE_REQUIRED',
+          message: `Objective ${objectiveId} is missing ${[...types].join(', ')}. Supply source-grounded learner tasks and corrective feedback; do not relabel unrelated activities.`,
+        })),
+      };
     },
   };
 }
+
 

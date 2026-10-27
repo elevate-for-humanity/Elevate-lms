@@ -6,8 +6,6 @@ import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComp
 import { tenantSiteHref } from '@/lib/tenant/site-links';
 import { ResponsivePreviewClient } from '../../apps/marketing/app/apps/website-builder/edit/[websiteId]/preview/ResponsivePreviewClient';
 
-const { push } = vi.hoisted(() => ({ push: vi.fn() }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 const config = saved as TenantSiteConfig;
 const site = { id: 'existing', subdomain: 'legacy83-preview', siteName: 'Legacy 83 Business', organizationId: null, config };
@@ -55,11 +53,18 @@ describe('nine saved Legacy 83 pages', () => {
     await waitFor(() => expect(within(frame.contentDocument!.body).getByRole('heading', { level: 1 })).toHaveTextContent('Build something that outlasts you.'));
     const services = within(within(frame.contentDocument!.body).getByRole('navigation', { name: 'Main navigation' })).getByRole('link', { name: 'Services' });
     expect(services).toHaveAttribute('href', '/apps/website-builder/edit/existing/preview?page=%2Fservices');
-    fireEvent.click(services);
-    expect(push).toHaveBeenCalledWith('/apps/website-builder/edit/existing/preview?page=%2Fservices', { scroll: false });
+    const assign = vi.fn();
+    const realWindow = window;
+    vi.stubGlobal('window', new Proxy(realWindow, { get: (target, key) => key === 'location' ? { assign } : Reflect.get(target, key) }));
+    try {
+      fireEvent.click(services);
+      expect(assign).toHaveBeenCalledWith('/apps/website-builder/edit/existing/preview?page=%2Fservices');
+    } finally {
+      vi.unstubAllGlobals();
+    }
     fireEvent.click(screen.getByRole('button', { name: 'Mobile' }));
     expect(frame.style.width).toBe('390px');
-    expect(screen.getByRole('link', { name: 'About', current: 'page' })).toHaveAttribute('href', '/apps/website-builder/edit/existing/preview?page=%2Fabout');
+    expect(screen.getByRole('link', { name: 'About', current: 'page' })).toHaveAttribute('href', '/apps/website-builder/edit/existing/preview?page=%2Fabout&device=mobile');
   });
   it('preserves private destinations for copied links, anchors and query strings', () => {
     const base = '/apps/website-builder/edit/existing/preview?page=';

@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';
 function fixture({trafficPercent=0,active=0,unchangedProcess=false,userProcesses=0}={}){
- const url='https://studio-verify---elevate-studio-browser-fixture.a.run.app',revision='elevate-studio-browser-00042-fixture',sha='a'.repeat(40),secret='fixture-shared-secret';
+ const sha='a'.repeat(40),candidateTag='sc-'+sha.slice(0,8)+'-1234abcd',url='https://'+candidateTag+'---elevate-studio-browser-fixture.a.run.app',revision='elevate-studio-browser-00042-fixture',secret='fixture-shared-secret';
  const calls=[];let restarted=false,opens=0;
- const options={url,revision,sha,secret,attempts:2,sleep:async()=>{},readTraffic:async()=>[{revisionName:revision,percent:trafficPercent,tag:'studio-verify',url},{revisionName:'old',percent:100-trafficPercent}],request:async(target,init)=>{
+ const options={url,revision,sha,secret,candidateTag,attempts:2,sleep:async()=>{},readTraffic:async()=>[{revisionName:revision,percent:trafficPercent,tag:candidateTag,url},{revisionName:'old',percent:100-trafficPercent}],request:async(target,init)=>{
   const route=new URL(target).pathname,body=init.body?JSON.parse(init.body):null;calls.push({route,body,method:init.method});let result;
   if(route==='/health')result={ready:true,commit:sha,activeSessions:active,workspaceRecovery:{ready:true,persistent:true},browserWorkspaceRecovery:{persistent:true},terminalRecovery:{persistent:true,active:0}};
   else if(route==='/workspace/exec'){
@@ -42,4 +42,16 @@ test('unclassified executions block restart and retain application state',async(
 });
 test('rejects arbitrary endpoints before sending any shared credentials',async()=>{
  const f=fixture();await assert.rejects(verifyStudioRuntimeReplacement({...f.options,url:'https://external.example/'}),/CANDIDATE_INVALID/);assert.equal(f.calls.length,0);
+});
+test('never restarts the shared Admin browser alias even when its canonical traffic is zero',async()=>{
+ const f=fixture(),url='https://studio-verify---elevate-studio-browser-fixture.a.run.app';
+ await assert.rejects(verifyStudioRuntimeReplacement({...f.options,url,candidateTag:'studio-verify',readTraffic:async()=>[{revisionName:f.options.revision,percent:0,tag:'studio-verify',url},{revisionName:'old',percent:100}]}),/CANDIDATE_INVALID/);
+ assert.equal(f.calls.length,0);assert.equal(f.restarted,false);
+});
+test('rejects a candidate URL belonging to another verification attempt',async()=>{
+ const f=fixture();await assert.rejects(verifyStudioRuntimeReplacement({...f.options,candidateTag:'sc-aaaaaaaa-deadbeef'}),/CANDIDATE_INVALID/);assert.equal(f.calls.length,0);
+});
+test('binds candidate tags to the immutable release commit',async()=>{
+ const f=fixture(),candidateTag='sc-bbbbbbbb-1234abcd';
+ await assert.rejects(verifyStudioRuntimeReplacement({...f.options,candidateTag,url:f.options.url.replace(f.options.candidateTag,candidateTag)}),/CANDIDATE_INVALID/);assert.equal(f.calls.length,0);
 });

@@ -143,3 +143,22 @@ test('completed authoring drafts renew progress while bounded repairs preserve t
   tick+=600001;await watch.check();assert.equal(watch.signal.aborted,true);
  } finally {watch.dispose();}
 });
+
+test('RTI author repairs navigation filler while retaining the actual quiz and subject teaching', async () => {
+  const {input,result}=fixture();
+  input.profile.id='course:a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
+  const invalid=structuredClone(result);
+  invalid.blueprint.segments[0].text+=' Click the next button.';
+  let calls=0;
+  const output=await authorGoogleLesson(input,async(system,request:any)=>{
+    calls++;
+    assert.match(system,/Hands-on performance is practiced and verified by the shop supervisor/);
+    if(calls===1)return invalid;
+    assert.equal(request.repair.code,'BLUEPRINT_RTI_NAVIGATION_FILLER');
+    assert.match(request.repair.contentRepair,/Preserve actual subject questions/);
+    return result;
+  });
+  assert.equal(calls,2);
+  assert.deepEqual(output.assessment,result.blueprint.assessment);
+  assert.deepEqual(output.segments,result.blueprint.segments);
+});

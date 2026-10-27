@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {continuousCourseLease,checkpointContinuousLesson} from '../lib/ultimate-course-builder/worker/continuous-course-lease.mjs';
 import {preservedCourseCursor} from '../lib/ultimate-course-builder/worker/preserve-completed.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -26,12 +27,13 @@ function scenario(payload, completed = true, options = {}) {
     async claim() { return { id: 'job', build_id: 'build', execution_generation: 1, payload }; }
     async heartbeat() { return true; }
     async complete() { events.push('complete'); }
-    async fail() { events.push('fail'); }
+    async yieldProgress() { events.push('advance'); }
+    async fail() { events.push('fail');await options.fail?.(); }
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [preservedCourseCursor,async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const names = ['continuousCourseLease','checkpointContinuousLesson','attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [continuousCourseLease,checkpointContinuousLesson,options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } async publishReadyLessons() { events.push('publish-ready');await options.publishReady?.(); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
@@ -41,7 +43,7 @@ test('a successful targeted lesson clears course running state before releasing 
     const s = scenario(payload);
     const result = await s.run();
     assert.equal(result.completed, true);
-    assert.deepEqual(s.events, [{ buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
+    assert.deepEqual(s.events, ['attach', { buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
   }
 });
 
@@ -76,5 +78,55 @@ test('a completed legacy owner-review course publishes without waiting for a man
  const s=scenario({});s.build.profile.publicationPolicy='owner-review-required';
  const result=await s.run();assert.equal(result.completed,true);
  assert.equal(s.profileWrites[0]?.publicationPolicy,'automatic-quality-verified');
- assert.deepEqual(s.events,[{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
+ assert.deepEqual(s.events,['attach',{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
+});
+
+
+test('failed media attachment cannot advance or complete the job',async()=>{
+ const s=scenario({},true,{attach:async()=>{throw Error('ULTIMATE_ATTACHMENT_READBACK_FAILED');},nextWork:()=>({continue:true,payload:{nextCompetencyIndex:3}})});
+ const result=await s.run();
+ assert.equal(result.completed,false);assert.deepEqual(s.events,['fail']);
+});
+test('attachment completes before the course cursor advances',async()=>{
+ const s=scenario({},true,{nextWork:()=>({continue:true,payload:{nextCompetencyIndex:3}})});
+ const result=await s.run();assert.equal(result.continuing,true);
+ assert.deepEqual(s.events,['attach','advance']);
+});
+
+test('stall cancellation has one failure-state writer while provider unwinds',async()=>{
+ let watch,clock=0,finishFailure;
+ const pendingFailure=new Promise(resolve=>{finishFailure=resolve;});
+ const s=scenario({acceptance:true},false,{
+  progressFactory:options=>(watch=createCourseProgressWatch({...options,idleMs:100,now:()=>clock,schedule:()=>0,cancel:()=>{}})),
+  fail:()=>pendingFailure,
+  runCourse:async()=>{
+   clock=101;void watch.check();
+   await Promise.resolve();
+   throw watch.signal.reason;
+  },
+ });
+ const result=await s.run();
+ await new Promise(setImmediate);
+ assert.equal(result.stalled,true);assert.deepEqual(s.events,['fail']);
+ finishFailure();
+});
+test('a failed recovery write preserves its database error instead of reporting a progress stall',async()=>{
+ const failure=new Error('database failure-state write timed out');
+ const s=scenario({acceptance:true},false,{runCourse:async()=>{throw Error('ULTIMATE_FENCED_WRITE_FAILED:update_build:AbortError');},fail:async()=>{throw failure;}});
+ await assert.rejects(s.run(),error=>error===failure);assert.deepEqual(s.events,['fail']);
+});
+
+test('authorized publish-as-you-go completes publication before advancing the cursor',async()=>{
+ const s=scenario({},true,{nextWork:()=>({continue:true,payload:{nextCompetencyIndex:19}})});s.build.profile.publishCompletedLessons=true;
+ const result=await s.run();assert.equal(result.continuing,true);
+ assert.deepEqual(s.events,['publish-ready','attach','publish-ready','advance']);
+});
+test('targeted acceptance never publishes other ready lessons even when the course opts in',async()=>{
+ const s=scenario({acceptance:true});s.build.profile.publishCompletedLessons=true;
+ await s.run();assert.equal(s.events.includes('publish-ready'),false);
+});
+test('publication failure prevents advancing beyond a completed lesson',async()=>{
+ let calls=0;const s=scenario({},true,{publishReady:async()=>{if(++calls===2)throw Error('PUBLICATION_READBACK_FAILED');},nextWork:()=>({continue:true,payload:{nextCompetencyIndex:19}})});
+ s.build.profile.publishCompletedLessons=true;
+ const result=await s.run();assert.equal(result.completed,false);assert.equal(s.events.includes('advance'),false);assert.equal(s.events.at(-1),'fail');
 });

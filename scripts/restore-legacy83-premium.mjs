@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { restoreLegacy83ApprovedReference } from './restore-legacy83-approved-reference.mjs';
 import { pathToFileURL } from 'node:url';
 
 export const designSource = '26d5559c2cfb5d52232fcb770679f7d99a1ba9b9';
@@ -116,7 +117,10 @@ export function restoreLegacy83Premium(input) {
     }
   }
   // The existing pages, forms, assessment answers, backend config and billing state remain authoritative.
-  return config;
+  // Reapply the approved photographic reference after rebuilding premium cards.
+  // The earlier services.map() intentionally replaces content and otherwise drops image props.
+  // Keep the original nine-page customer identity, founder photo and authorizations intact.
+  return restoreLegacy83ApprovedReference(config);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -43,7 +43,7 @@ RUN node --test lib/ultimate-course-builder/instructional/competency-classificat
 # Download the narrator at build time, then fail closed to offline-only inference.\n# The runtime image must never reach Hugging Face while rendering a lesson.
 RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 node --input-type=module -e "const {KokoroTTS}=await import('kokoro-js');await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'})"
 # Cache CPU speech recognition so captions and rendered-audio QA do not depend on API quotas.
-RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 node --input-type=module -e "const {loadLocalTranscriber}=await import('./lib/video/local-transcription.mjs');await loadLocalTranscriber()"
+RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 node --input-type=module -e "const {loadLocalTranscriber}=await import('./lib/video/local-transcription-worker.mjs');await loadLocalTranscriber()"
 RUN /opt/course-alignment/bin/python lib/video/alignment-vocabulary-preflight.py && node workers/local-speech-smoke.mjs
 # Lazy media adapters are the worker's production boundary. Resolve them in the
 # image build so a missing shared renderer file cannot reach a live course job.

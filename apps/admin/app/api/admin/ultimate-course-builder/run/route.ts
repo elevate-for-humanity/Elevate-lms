@@ -11,18 +11,20 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  const limited = await applyRateLimit(req, 'strict');
-  if (limited) return limited;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   const body = await req.json().catch(() => null);
   if (typeof body?.buildId !== 'string' || !/^[a-f0-9-]{36}$/i.test(body.buildId))
     return NextResponse.json({ error: 'A valid buildId is required' }, { status: 400 });
+  // Unrelated Studio requests must not consume this administrator's resume quota.
+  // Keep the strict limit and derive its scope only from the authenticated actor.
+  const limited = await applyRateLimit(req, 'strict', { key: `course-resume:${auth.id}` });
+  if (limited) return limited;
   try {
     const db = await requireAdminClient();
     const { data: build, error } = await db
       .from('ultimate_course_builds')
-      .select('id,status,profile')
+      .select('id,status,profile,updated_at')
       .eq('id', body.buildId)
       .single();
     if (error || !build)
@@ -34,6 +36,8 @@ export async function POST(req: NextRequest) {
       );
     // An explicit authenticated Resume must clear a saved production pause.
     // Record the real authenticated actor; the legacy flag alone proves no actor.
+    if (typeof build.updated_at !== 'string')
+      return NextResponse.json({ error: 'The saved revision is unavailable. Refresh before changing the build.' }, { status: 409 });
     const profile = build.profile as Record<string, unknown>;
     if (profile?.ownerPaused === true) {
       const now = new Date().toISOString();
@@ -61,7 +65,7 @@ export async function POST(req: NextRequest) {
           'failed',
           'built_with_findings',
         ])
-        .eq('profile', JSON.stringify(profile))
+        .eq('updated_at', build.updated_at)
         .select('id');
       if (resumed.error || resumed.data?.length !== 1)
         return NextResponse.json(

@@ -2,12 +2,13 @@ import {expect,it,vi} from 'vitest';
 import {UltimateJobQueue} from '@/lib/ultimate-course-builder/worker/job-queue';
 function database(previous:unknown) {
  const insert=vi.fn();let reads=0;
- const db={from:(table:string)=>{
+ const db={rpc:async(name:string,args:any)=>{
+  expect(name).toBe('enqueue_ultimate_build_job');
+  insert({payload:args.p_payload,monitor:args.p_monitor});
+  return {data:[{id:'new-job',status:'queued'}],error:null};
+ },from:()=>{
   const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,
-   maybeSingle:async()=>({data:reads++===0?null:previous,error:null}),
-   insert:(value:unknown)=>{insert(value);return q;},
-   single:async()=>({data:{id:'new-job'},error:null}),update:()=>q,
-   then:(resolve:(v:unknown)=>unknown)=>resolve({error:null})};return q;
+   maybeSingle:async()=>({data:reads++===0?null:previous,error:null})};return q;
  }};return {db,insert};
 }
 it('Resume preserves the failed job lesson cursor and targeted repair while refreshing the requesting actor',async()=>{

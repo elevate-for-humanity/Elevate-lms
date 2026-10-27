@@ -4,7 +4,7 @@ import { getSystemRegistryContext } from '@/lib/platform/system-registry';
 
 export interface AdminAiPromptContext {
   agent?: 'ADMIN_AI';
-  contextProfile?: 'full' | 'owned-cpu';
+  contextProfile?: 'full' | 'owned-cpu' | 'conversation';
   institutionalContext?: string;
   ragContext?: string;
   fileContext?: string;
@@ -66,6 +66,10 @@ export function buildAdminAiSystemPrompt({
   lastUserMessage = '',
   contextProfile = 'full',
 }: AdminAiPromptContext): string {
+  if (contextProfile === 'conversation') {
+    return `${PARIS_SYSTEM_IDENTITY}\n\nThis request is conversation only. Do not call tools, start workflows, or claim that any action was performed. Answer the user's message directly and follow the requested output format. Use the supplied conversation as context; do not invent live platform facts.`;
+  }
+
   const diagnosticMode = isOperationalDiagnosticRequest(lastUserMessage);
 
   const role =

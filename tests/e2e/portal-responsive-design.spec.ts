@@ -479,6 +479,15 @@ test.describe('Studio single-session access and composer', () => {
     // Envato may require its own provider login, but Studio must reuse the Admin session.
     await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
     await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);
+    // Diagnose browser-session admission before reporting a responsive-design failure.
+    // Keep the real stream assertion: runtime failures must never be accepted as passes.
+    const runtimeResponse = await page.request.get(`${ADMIN_BASE}/api/admin/dev-studio/browser/session`, {
+      failOnStatusCode: false,
+    });
+    const runtime = await runtimeResponse.json().catch(() => ({}));
+    expect(runtimeResponse.status(), 'Studio browser runtime check must succeed').toBe(200);
+    expect(runtime.configured, 'Studio browser must be configured').toBe(true);
+    expect(runtime.ready, 'Studio browser runtime must be ready for live mobile acceptance').toBe(true);
     const stream = page.getByAltText('Live isolated Chromium browser');
     await expect(stream).toBeVisible({ timeout: 30_000 });
     await expect.poll(() => stream.evaluate(el => (el as HTMLImageElement).naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);

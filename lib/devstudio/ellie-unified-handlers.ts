@@ -155,6 +155,7 @@ export async function streamPlatformChat(
   messages: { role: string; content: string }[],
   opts: {
     agent?: 'ADMIN_AI';
+    conversationId?: string;
     fileContext?: string;
     documentsContext?: string;
     provider?: string;
@@ -174,6 +175,7 @@ export async function streamPlatformChat(
     body: JSON.stringify({
       messages,
       agent: opts.agent,
+      conversationId: opts.conversationId,
       fileContext: opts.fileContext,
       documentsContext: opts.documentsContext,
       provider: opts.provider,

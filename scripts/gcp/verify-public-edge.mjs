@@ -30,12 +30,18 @@ export async function probeEndpoint(origin, path, {request=fetch, sha=null}={}) 
       catch { return {path,state:'failed',status:response.status,reason:'invalid_json'}; }
     }
     const reported = body?.commitSha || body?.commit || null;
-    const expected = sha && validSha(sha) ? sha : null;
-    const mismatch = expected && validSha(reported) && reported !== expected;
-    return {path,state:response.ok && !mismatch?'passed':'failed',status:response.status,
+    const expected = validSha(sha) ? sha : null;
+    // HTTP 200 alone cannot establish a release identity. A missing or malformed
+    // version commit is a failed verification, not a passing health probe.
+    const missingCommit = url.pathname === '/api/version' && !validSha(reported);
+    const mismatch = expected && reported !== expected;
+    const failureReason = !response.ok ? 'http_status'
+      : missingCommit ? 'invalid_commit_sha'
+      : mismatch ? 'commit_mismatch' : null;
+    return {path,state:failureReason?'failed':'passed',status:response.status,
       service:body?.service || null,commit:validSha(reported)?reported:null,
       cacheControl:response.headers?.get?.('cache-control') || null,
-      ...(mismatch?{reason:'commit_mismatch'}:{})};
+      ...(failureReason?{reason:failureReason}:{})};
   } catch(e) { return {path,...problem(e)}; }
 }
 export async function probeRedirect(origin,{request=fetch}={}) {
@@ -95,7 +101,9 @@ export async function auditEdge({request=fetch,sha=null,dns=probeDns,tlsCheck=pr
     results[service]={dns:dnsResult,tls:tlsResult,version,health,ready,ping};
   }
   results.programHolder=await probeRedirect(origins.lms,{request});
-  return {expectedCommit:sha,results,allVerified:Object.entries(results).every(([name,entry])=>name==='programHolder'
+  // Without an authoritative full expected SHA, a successful HTTP request
+  // cannot certify that the live deployment matches current main.
+  return {expectedCommit:sha,results,allVerified:validSha(sha) && Object.entries(results).every(([name,entry])=>name==='programHolder'
     ? entry.state==='passed' : ['dns','tls','version','health','ready','ping'].every(key=>entry[key]?.state==='passed'))};
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){

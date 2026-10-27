@@ -168,10 +168,10 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
           ))}
         </section>
 
-        {data.userId && !preview ? (
+        {loaded ? (
           <section aria-label="Meeting calendar">
             <h2 className="mb-3 text-xl font-black">Your calendar</h2>
-            <CalendarWidget
+            {data.userId && !preview ? <CalendarWidget
               userId={data.userId}
               additionalEvents={(data.meetings || [])
                 .filter((meeting: any) => meeting.status === 'scheduled')
@@ -182,7 +182,7 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
                   startsAt: meeting.starts_at,
                   type: 'event' as const,
                 }))}
-            />
+            /> : <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">Sign in as the assigned Program Holder to load your private calendar. Your meeting dates are not displayed in administrator preview.</div>}
           </section>
         ) : null}
         {data.contactAccessGranted === false ? (

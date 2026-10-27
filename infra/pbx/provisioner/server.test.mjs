@@ -131,3 +131,25 @@ test('asynchronous Asterisk apply and revocation settle before acceptance', asyn
   assert.equal(f.waits(), 4);
   assert.equal((await f.request('/status')).status, 200);
 });
+
+test('multiple devices owned by the same extension render independent endpoints and one ring group', () => {
+  const otherIdentity = { ...identity, deviceId: 'asterisk_second_device' };
+  const second = { ...record, ...otherIdentity, endpointId: endpointFor(otherIdentity) };
+  const config = renderConfiguration([record, second]);
+  assert.ok(config.pjsip.includes(endpoint));
+  assert.ok(config.pjsip.includes(second.endpointId));
+  assert.equal(config.dialplan.split('exten => 101,1,Set(PWA_CONTACTS=)').length - 1, 1);
+  assert.ok(config.dialplan.includes('PJSIP_DIAL_CONTACTS(' + second.endpointId + ')'));
+});
+
+
+test('empty device fleet retains an explicit unavailable operator subroutine',()=>{
+ const config=renderConfiguration([]);
+ assert.match(config.dialplan,/\[elevate-pwa-extensions\]\nexten => 0,1,Set\(PWA_CONTACTS=\)\n same => n,Set\(DIALSTATUS=CHANUNAVAIL\)\n same => n,Return\(\)/);
+ assert.doesNotMatch(config.dialplan,/PJSIP_DIAL_CONTACTS/);
+});
+test('a leased non-admin device cannot become the operator when the admin is offline',()=>{
+ const config=renderConfiguration([{...record,adminExtension:'102'}]);
+ assert.match(config.dialplan,/exten => 0,1,Set\(PWA_CONTACTS=\)/);
+ assert.doesNotMatch(config.dialplan,/exten => 0,1,Gosub\(elevate-pwa-extensions,101,1\)/);
+});

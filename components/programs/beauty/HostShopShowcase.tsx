@@ -486,16 +486,21 @@ export default function HostShopShowcase({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-5 py-4 sm:px-7">
-            <div className="flex gap-2" aria-label="Choose a host shop slide">
+            <div className="flex min-w-0 max-w-full flex-wrap gap-1" aria-label="Choose a host shop slide">
               {slides.map(({ shop: item, media }, index) => (
                 <button
                   key={`${item.slug}-${media?.src ?? 'no-media'}`}
                   type="button"
                   onClick={() => setActiveIndex(index)}
-                  className={`h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-brand-red-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
                   aria-label={`Show ${item.dba ?? item.name}${media ? ` — ${media.alt}` : ''}`}
                   aria-current={index === activeIndex ? 'true' : undefined}
-                />
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-brand-red-600' : 'w-2.5 bg-slate-300'}`}
+                  />
+                </button>
               ))}
             </div>
             <div className="flex gap-2">

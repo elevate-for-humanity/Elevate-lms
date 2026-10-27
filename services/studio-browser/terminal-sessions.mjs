@@ -101,6 +101,7 @@ export class TerminalSessions {
     this.pruneCache();this.sessions.set(id,s);await this.flush(s);return s;
   }
   async start(s){
+    if(s.state==='closed')throw new TerminalSessionError('terminal_session_closed',409);
     if(s.startingPromise)return s.startingPromise;
     if(s.state==='running'&&s.shell)return s;
     if(this.activeCount()>=this.maxActive)throw new TerminalSessionError('terminal_capacity_reached',429);
@@ -109,6 +110,9 @@ export class TerminalSessions {
       await this.flush(s);
       const cwd=await fs.realpath(s.cwd).catch(()=>{throw new TerminalSessionError('terminal_directory_unavailable');});
       if(cwd!==this.cwd&&!cwd.startsWith(this.cwd+path.sep))throw new TerminalSessionError('terminal_directory_unavailable');
+      // Stop/shutdown can run while persistence or directory resolution awaits.
+      // Recheck immediately before spawning so a closed terminal stays closed.
+      if(s.state!=='starting')throw new TerminalSessionError(s.state==='closed'?'terminal_session_closed':'terminal_resume_required',409);
       const shell=this.spawnShell('/bin/bash',['--noprofile','--norc'],{cwd,env:{...process.env,HOME:'/home/studio',TERM:'xterm-256color',BASH_ENV:bootstrap},stdio:['pipe','pipe','pipe','pipe']});
       s.shell=shell;s.state='running';s.version++;
       let directoryBytes='';
@@ -127,7 +131,7 @@ export class TerminalSessions {
       shell.on('close',code=>{if(s.shell!==shell)return;s.shell=null;if(!['closed','interrupted'].includes(s.state)){s.state='exited';s.exitCode=code??0;}this.record(s,'system',s.state==='interrupted'?'[Terminal process interrupted; commands were not replayed.]\n':`[Process exited ${s.exitCode??0}.]\n`);});
       await this.flush(s);return s;
     })().finally(()=>{s.startingPromise=null;});
-    try{return await s.startingPromise;}catch(error){if(s.shell){s.state='interrupted';s.shell.kill('SIGTERM');}else{s.state='interrupted';s.version++;}throw error;}
+    try{return await s.startingPromise;}catch(error){if(s.state!=='closed'){s.state='interrupted';s.version++;s.shell?.kill('SIGTERM');}throw error;}
   }
   async create(owner){
     if(!validOwner(owner))throw new TerminalSessionError('terminal_owner_required',400);
@@ -143,7 +147,7 @@ export class TerminalSessions {
   async resume(owner,id){const s=await this.get(owner,id);if(s.state==='closed')throw new TerminalSessionError('terminal_session_closed',409);await this.start(s);return {id:s.id,cwd:s.cwd,state:s.state,persistent:Boolean(this.directory),commandsReplayed:false};}
   async stop(owner,id){const s=await this.get(owner,id);s.state='closed';s.exitCode=s.exitCode??0;s.version++;s.shell?.kill('SIGTERM');await this.flush(s);return {ok:true};}
   async shutdown(){
-    for(const s of this.sessions.values()){clearTimeout(s.timer);s.timer=null;if(s.shell){s.state='interrupted';s.exitCode=null;s.version++;s.shell.kill('SIGTERM');}}
+    for(const s of this.sessions.values()){clearTimeout(s.timer);s.timer=null;if(s.shell||s.state==='starting'){s.state='interrupted';s.exitCode=null;s.version++;s.shell?.kill('SIGTERM');}}
     await Promise.all([...this.sessions.values()].map(s=>this.flush(s)));
   }
 }

@@ -79,7 +79,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white pt-[env(safe-area-inset-top)] shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-1 px-2 py-1 sm:gap-2 sm:px-4 lg:px-6">
           {pathname !== '/dashboard' && (
             <button
@@ -89,7 +89,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 else router.push('/dashboard');
               }}
               aria-label="Go back"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -158,7 +158,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               <button
                 onClick={() => setNotifOpen((v) => !v)}
                 aria-label="Notifications"
-                className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                className="relative w-11 h-11 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
               >
                 <Bell className="w-4 h-4" />
                 {unread > 0 && (
@@ -166,7 +166,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 )}
               </button>
               {notifOpen && (
-                <div className="fixed inset-x-2 top-14 mt-2 max-h-[calc(100dvh-4.5rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:w-80">
+                <div className="fixed inset-x-2 top-[calc(3.5rem+env(safe-area-inset-top))] mt-2 max-h-[calc(100dvh-4.5rem-env(safe-area-inset-top))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:w-80">
                   <div className="flex items-center justify-between px-4 py-3 border-b">
                     <p className="text-sm font-bold text-slate-900">Notifications</p>
                     <Link href="/notifications" className="text-xs font-semibold text-blue-600">

@@ -94,11 +94,12 @@ function ringtone() {
 export async function createPhoneClient(
   credential: PhoneCredential,
   remoteAudio: HTMLAudioElement,
+  options: { signal?: AbortSignal } = {},
 ): Promise<PhoneClient> {
   if (credential.provider !== 'asterisk') {
     throw new Error('This phone connection is no longer supported. Reconnect the phone to get current credentials.');
   }
-  await verifyPhoneMicrophone();
+  await verifyPhoneMicrophone(undefined, { signal: options.signal });
 
   const { SessionManager } = await import('sip.js/lib/platform/web');
   const listeners = new Map<string, Array<(data?: any) => void>>();

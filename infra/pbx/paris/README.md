@@ -149,3 +149,7 @@ not yet persist to Supabase, the model is not yet grounded in the approved live
 program catalog, and tool-mediated booking/transfer/voicemail are not implemented.
 Neither file is wired into the production dialplan; no existing Telnyx numbers
 or existing extensions have been changed. DO NOT activate in production yet.
+
+## Reviewed extension directory routing (2026-10-26)
+
+PARIS may recognize a caller's explicit spoken three-digit extension only when that extension is present in `PARIS_ALLOWED_EXTENSIONS`, a comma-separated list of active, authorized PWA extension numbers. Configure the identical list for both the private turn adapter and the ARI media gateway through the reviewed root-owned runtime environment; the default empty list disables nonoperator transfers. Do not add an extension before its provisioned `elevate-pwa-extensions` dialplan route, owner authorization, and reachability are verified. The gateway resumes the existing `elevate-pwa-extensions` context rather than constructing a SIP URI. Failed transfers return to the owning dialplan fallback. This code is not evidence of successful live calls or a carrier cutover.

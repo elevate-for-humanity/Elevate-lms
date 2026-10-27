@@ -11,13 +11,22 @@ type SavedLesson = {
   running: boolean;
 };
 
+function followedLesson(rows: SavedLesson[]) {
+  const active = rows.find((row) => row.running);
+  // Keep saved media visible through both queued and partially rendered lessons.
+  // The unfinished lesson remains selectable for watching its progressive frames.
+  if (active?.videoUrl) return active.id;
+  return rows.filter((row) => row.videoUrl).at(-1)?.id || active?.id || rows[0]?.id || "";
+}
+
 /** Read-only saved media preview; opening it never queues or repairs a build. */
 export default function CourseSidePreview({ courseId }: { courseId: string }) {
   const followActive = useRef(true);
+  const [following, setFollowing] = useState(true);
   const [lessons, setLessons] = useState<SavedLesson[]>([]);
   const [selected, setSelected] = useState("");
   const [buildId, setBuildId] = useState("");
-  const [activity, setActivity] = useState("");
+  const [buildRunning, setBuildRunning] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -25,10 +34,11 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
     let pending = false;
     const controller = new AbortController();
     followActive.current = true;
+    setFollowing(true);
     setLessons([]);
     setSelected("");
     setBuildId("");
-    setActivity("");
+    setBuildRunning(false);
     setError("");
     if (!courseId) return () => controller.abort();
     async function refresh() {
@@ -53,12 +63,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
           const job = build.ultimate_build_jobs?.find(
             (row: { status: string }) => row.status === "running",
           );
-          setActivity(
-            job?.payload?.progress?.phase?.replaceAll(":", " · ") ||
-              build.current_step?.replaceAll("_", " ") ||
-              build.status ||
-              "",
-          );
+          setBuildRunning(Boolean(job));
         }
         const response = await fetch(
           `/api/admin/ultimate-course-builder?view=checkpoints&buildId=${encodeURIComponent(build.id)}`,
@@ -111,7 +116,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
         setLessons(rows);
         setSelected(
           (previous) =>
-            (followActive.current && rows.find((row) => row.running)?.id) ||
+            (followActive.current && followedLesson(rows)) ||
             (rows.some((row) => row.id === previous)
               ? previous
               : rows[0]?.id || ""),
@@ -138,77 +143,48 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
     };
   }, [courseId]);
   const lesson = lessons.find((row) => row.id === selected);
+  const active = lessons.find((row) => row.running);
+  const waitingFor = following && active && !active.videoUrl && active.id !== selected ? active : null;
   return (
-    <section
-      aria-label="Saved course video preview"
-      className="space-y-4 bg-slate-950 p-4 text-white"
-    >
-      <h3 className="font-bold">Live course preview</h3>
-      {activity && <p role="status">Build activity: {activity}</p>}
+    <section aria-label="Saved course video preview" className="flex h-full min-h-0 flex-col gap-3 bg-slate-950 p-3 text-white">
+      <h3 className="sr-only">Live course preview</h3>
       {!courseId && <p>Select a course to watch its saved lessons here.</p>}
       {error && <p role="alert">{error}</p>}
       {loading && !lessons.length && <p role="status">Loading saved videos…</p>}
-      {courseId && !loading && !error && !lessons.length && (
-        <p>No saved lesson videos yet.</p>
-      )}
+      {courseId && !loading && !error && !lessons.length && <p>No saved lesson videos yet.</p>}
       {!!lessons.length && (
-        <label className="block">
-          Lesson to watch
-          <select
-            value={selected}
-            onChange={(event) => {
-              followActive.current = false;
-              setSelected(event.target.value);
-            }}
-            className="mt-2 w-full rounded-lg border border-slate-600 bg-slate-900 p-3 text-white"
-          >
-            {lessons.map((row) => (
-              <option key={row.id} value={row.id}>
-                {row.title}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      {!!lessons.length && (
-        <button
-          type="button"
-          className="min-h-11 rounded-lg border border-slate-600 px-3"
-          onClick={() => {
-            followActive.current = true;
-            setSelected(lessons.find((row) => row.running)?.id || selected);
-          }}
-        >
-          Follow current build
-        </button>
+        <div className="flex shrink-0 items-end gap-2">
+          <label className="block min-w-0 flex-1 text-xs">
+            Lesson to watch
+            <select value={selected} onChange={(event) => { followActive.current = false; setFollowing(false); setSelected(event.target.value); }}
+              className="mt-1 min-h-11 w-full rounded-lg border border-slate-600 bg-slate-900 px-2 text-sm text-white">
+              {lessons.map((row) => <option key={row.id} value={row.id}>{row.title}</option>)}
+            </select>
+          </label>
+          <button type="button" aria-label="Follow current build" className="min-h-11 shrink-0 rounded-lg border border-slate-600 px-2 text-xs"
+            onClick={() => { followActive.current = true; setFollowing(true); setSelected(followedLesson(lessons) || selected); }}>
+            Follow build
+          </button>
+        </div>
       )}
       {lesson && (
         <>
-          <h4 className="font-bold">{lesson.title}</h4>
-          {lesson.videoUrl ? (
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              src={lesson.videoUrl}
-              aria-label={`${lesson.title} side preview`}
-              className="aspect-video w-full rounded-lg bg-black"
-            />
-          ) : lesson.running && lesson.lessonId ? (
-            <ProgressiveLessonVideo
-              buildId={buildId}
-              lessonId={lesson.lessonId}
-              title={lesson.title}
-            />
-          ) : (
-            <p>This lesson has no saved video yet.</p>
-          )}
-          <p className="text-sm text-slate-300">
-            Latest saved video. New videos appear automatically as they are
-            saved.
+          <h4 className="sr-only">{lesson.title}</h4>
+          {waitingFor && <p className="shrink-0 text-xs text-slate-300">{waitingFor.title} has no saved video yet. Showing {lesson.title} while waiting.</p>}
+          <div className="min-h-0 flex-1 overflow-auto">
+            {lesson.videoUrl ? (
+              <video controls playsInline preload="metadata" src={lesson.videoUrl} aria-label={`${lesson.title} side preview`}
+                className="h-full w-full rounded-lg bg-black object-contain" />
+            ) : lesson.running && lesson.lessonId ? (
+              <ProgressiveLessonVideo buildId={buildId} lessonId={lesson.lessonId} title={lesson.title} />
+            ) : <p>This lesson has no saved video yet.</p>}
+          </div>
+          <p role="status" className="shrink-0 text-xs text-slate-300">
+            {buildRunning ? "Course build in progress. Saved videos stay available." : "Latest saved lesson video."}
           </p>
         </>
       )}
     </section>
   );
 }
+

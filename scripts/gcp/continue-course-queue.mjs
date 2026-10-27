@@ -31,7 +31,11 @@ export async function continueCourseQueue({ dispatch = dispatchQueuedCourseJob,
   let last;
   do {
     if (await releasePending()) return {status:'yielded_for_release'};
-    const state = await dispatch();
+    const observed = await dispatch();
+    // No claimable row does not mean production is idle: the active worker
+    // may still be rendering before its next durable lesson checkpoint.
+    const state = observed?.status === 'empty' && Number.isSafeInteger(observed.activeExecutions) && observed.activeExecutions > 0
+      ? {...observed,status:'busy'} : observed;
     if (!['empty', 'busy', 'assigned', 'capacity_wait'].includes(state?.status))
       throw new Error('COURSE_CONTINUATION_STATE_INVALID');
     if (state.status !== last) onState(state);

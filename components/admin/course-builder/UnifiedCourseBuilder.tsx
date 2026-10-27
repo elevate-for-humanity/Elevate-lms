@@ -1,4 +1,5 @@
 'use client';
+import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 
 import dynamic from 'next/dynamic';
 import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
@@ -290,6 +291,9 @@ export default function UnifiedCourseBuilder({
         </div>
       </div>
 
+      <div className="mx-auto w-full max-w-[1600px] px-3 sm:px-5">
+        <PodcastProgramGuideReview authorized />
+      </div>
       <div className="overflow-x-auto border-b border-slate-800 bg-slate-950 px-4 py-3">
         <div className="mx-auto flex max-w-[1600px] gap-2">
           {TABS.map(({ id, label, icon: Icon }) => (
@@ -362,6 +366,9 @@ export default function UnifiedCourseBuilder({
     <ResizableWorkspace
       className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
       title="Course side panel"
+      stackedTabs
+      primaryLabel="Build course"
+      panelLabel="Lesson preview"
       open={browserOpen}
       onOpenChange={(open) => {
         setBrowserOpen(open);
@@ -371,7 +378,7 @@ export default function UnifiedCourseBuilder({
         <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
           <nav
             aria-label="Course side panel views"
-            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-3"
+            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-1.5"
           >
             <button
               type="button"
@@ -395,7 +402,7 @@ export default function UnifiedCourseBuilder({
           </nav>
           <div
             hidden={sidePanel !== "lesson"}
-            className="min-h-0 flex-1 overflow-auto"
+            className="min-h-0 flex-1 overflow-hidden"
           >
             <CourseSidePreview courseId={courseId} />
           </div>
@@ -1628,3 +1635,4 @@ export function UltimateBuildPanel({
     </section>
   );
 }
+

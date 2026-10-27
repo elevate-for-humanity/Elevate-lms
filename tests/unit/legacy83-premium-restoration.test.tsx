@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComposableSite';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
@@ -39,25 +39,27 @@ describe('Legacy 83 repository design restoration', () => {
     expect(validateSiteConfig(ensureComposableSiteConfig(result)).errors).toEqual([]);
   });
 
-  it('renders one founder photo, the highlighted headline, two hero actions and four numbered pathways', () => {
+  it('renders the approved founder portrait, highlighted headline and photographic service pathways', () => {
     const config = ensureComposableSiteConfig(restoreLegacy83Premium(fixture()));
     const { container } = render(<PublicTenantComposableSite site={{ id: 'existing', subdomain: 'legacy83-preview', siteName: 'Legacy 83 Business', organizationId: null, config }} basePath="/sites/legacy83-preview" />);
-    expect(screen.getAllByAltText('Icy Williams')).toHaveLength(1);
+    expect(screen.getAllByAltText('Icy Williams, founder of Legacy 83 Business')).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(container.querySelector('h1 .tenant-title-highlight')?.textContent).toBe('Leave a Legacy');
-    expect(container.querySelector('h1 .tenant-title-prefix')?.textContent?.trim()).toBe('Build Today.');
-    expect(screen.getByRole('link', { name: 'Schedule a Conversation →' })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
-    expect(screen.getByRole('link', { name: 'Explore Our Services' })).toHaveAttribute('href', '/sites/legacy83-preview/services');
-    expect(container.querySelectorAll('[data-variant="pathways"] article')).toHaveLength(4);
-    expect(Array.from(container.querySelectorAll('[data-variant="pathways"] .tenant-card-marker'), element => element.textContent)).toEqual(['01', '02', '03', '04']);
-    expect(container.querySelectorAll('[data-variant="framework"] article')).toHaveLength(5);
+    expect(container.querySelector('h1 em')?.textContent).toBe('Legacy');
+    expect(Array.from(container.querySelectorAll('h1 .tenant-title-line'), element => element.textContent?.trim())).toEqual(['Build Today.', 'Leave a Legacy', 'Tomorrow.']);
+    const hero = within(container.querySelector('[data-variant="reference"]') as HTMLElement);
+    expect(hero.getByRole('link', { name: 'Book a Consultation →' })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
+    expect(hero.getByRole('link', { name: 'Explore Our Services' })).toHaveAttribute('href', '/sites/legacy83-preview/services');
+    expect(container.querySelectorAll('[data-variant="photographic"] article')).toHaveLength(4);
+    expect(container.querySelectorAll('[data-variant="photographic"] article img')).toHaveLength(4);
+    expect(container.querySelectorAll('[data-variant="reference-framework"] article')).toHaveLength(5);
   });
 
   it('keeps draft navigation inside the editor without persisting or leaving the customer project', () => {
     const config = ensureComposableSiteConfig(restoreLegacy83Premium(fixture()));
     const navigate = vi.fn();
-    render(<PublicTenantComposableSite site={{ id: 'existing', subdomain: 'legacy83-preview', siteName: 'Legacy 83 Business', organizationId: null, config }} onNavigate={navigate} />);
-    fireEvent.click(screen.getByRole('link', { name: 'Schedule a Conversation →' }));
+    const { container } = render(<PublicTenantComposableSite site={{ id: 'existing', subdomain: 'legacy83-preview', siteName: 'Legacy 83 Business', organizationId: null, config }} onNavigate={navigate} />);
+    const hero = within(container.querySelector('[data-variant="reference"]') as HTMLElement);
+    fireEvent.click(hero.getByRole('link', { name: 'Book a Consultation →' }));
     expect(navigate).toHaveBeenCalledWith('/contact');
     expect(navigate).toHaveBeenCalledTimes(1);
   });

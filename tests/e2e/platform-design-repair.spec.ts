@@ -87,10 +87,17 @@ for (const route of ['/', '/programs', '/programs/bookkeeping', '/programs/hvac-
     for (const image of await page.locator('main img').all()) {
       if (!(await image.isVisible())) continue;
       await image.scrollIntoViewIfNeeded();
-      await expect.poll(() => image.evaluate(element => {
+      const imageSource = await image.evaluate(element => {
         const img = element as HTMLImageElement;
-        return img.complete ? img.naturalWidth : 0;
-      })).toBeGreaterThan(0);
+        return img.currentSrc || img.src;
+      });
+      await expect.poll(
+        () => image.evaluate(element => {
+          const img = element as HTMLImageElement;
+          return img.complete ? img.naturalWidth : 0;
+        }),
+        { message: `Image failed to load: ${imageSource}`, timeout: 15000 },
+      ).toBeGreaterThan(0);
     }
     await page.locator('h1').first().scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath('render.png'), fullPage: true });

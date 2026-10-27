@@ -252,6 +252,21 @@ export function ProgramHolderPhone({
     connectionAbortRef.current?.abort();
     const controller = new AbortController();
     connectionAbortRef.current = controller;
+    const deadline = setTimeout(() => {
+      if (controller.signal.aborted) return;
+      controller.abort();
+      registrationEpochRef.current += 1;
+      registeredRef.current = false;
+      setConnected(false);
+      setConnecting(false);
+      setMessage('');
+      setError('Phone connection timed out. Reconnect the phone and check microphone access.');
+      const expiredClient = clientRef.current;
+      clientRef.current = null;
+      void expiredClient?.disconnect().catch(() => undefined);
+    }, 45_000);
+    const clearDeadline = () => clearTimeout(deadline);
+    controller.signal.addEventListener('abort', clearDeadline, { once: true });
     try {
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       heartbeatRef.current = null;
@@ -266,7 +281,7 @@ export function ProgramHolderPhone({
       const tokenData = await tokenResponse.json().catch(() => ({}));
       if (!tokenResponse.ok) throw new Error(tokenData.error || 'The phone could not connect.');
       if (!remoteAudioRef.current) throw new Error('The call audio player is unavailable.');
-      const client = await createPhoneClient(tokenData, remoteAudioRef.current);
+      const client = await createPhoneClient(tokenData, remoteAudioRef.current, { signal: controller.signal });
       if (controller.signal.aborted) {
         await client.disconnect();
         return;
@@ -287,6 +302,7 @@ export function ProgramHolderPhone({
         registeredRef.current = false;
         ready = false;
         setConnected(false);
+        setConnecting(false);
         setMessage('Phone is offline.');
       });
       client.on('error', (event: any) => {
@@ -295,6 +311,7 @@ export function ProgramHolderPhone({
         registeredRef.current = false;
         ready = false;
         setConnected(false);
+        setConnecting(false);
         setMessage('');
         setError(
           event?.error?.message || event?.message || 'The phone connection reported an error.',
@@ -349,6 +366,9 @@ export function ProgramHolderPhone({
       setConnecting(false);
       await disconnect();
       setError(cause instanceof Error ? cause.message : 'The phone could not connect.');
+    } finally {
+      clearDeadline();
+      controller.signal.removeEventListener('abort', clearDeadline);
     }
   }, [connected, connecting, data, disconnect, heartbeat]);
 

@@ -49,7 +49,31 @@ export async function recognize(audioBase64,request=googleJson){
   const phrase=(data.results||[]).map(x=>x.alternatives?.[0]?.transcript||'').join(' ').trim();
   return phrase.slice(0,1500);
 }
-export async function converse(history,request=googleJson){
+/** Explicit phone-only opt-in keeps batch work and live voice independently routable.
+ * This file is staged standalone on the PBX; it must not import the web app. */
+export async function converse(history,request=googleJson,{env=process.env,request:ownedRequest=fetch}={}){
+  if(env.PARIS_PHONE_INFERENCE_PROVIDER==='owned') {
+    let url;
+    try {url=new URL(env.PARIS_PHONE_LLM_URL);} catch {throw Error('PARIS_PHONE_LLM_ENDPOINT_REQUIRED');}
+    if(url.protocol!=='https:' || !/^[a-z0-9-]+\.proxy\.runpod\.net$/.test(url.hostname) ||
+       url.username || url.password || url.search || url.hash || url.pathname!=='/' || url.port)
+      throw Error('PARIS_PHONE_LLM_ENDPOINT_INVALID');
+    const token=env.PARIS_PHONE_LLM_SECRET?.trim();
+    if(!token)throw Error('PARIS_PHONE_LLM_AUTH_REQUIRED');
+    const response=await ownedRequest(url.origin+'/v1/chat/completions',{
+      method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),
+      headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({model:'elevate-local',stream:false,temperature:0.25,max_tokens:240,
+        messages:[{role:'system',content:SYSTEM},...history.map(h=>({role:h.role==='model'?'assistant':'user',content:h.text}))]}),
+    });
+    if(!response.ok){await response.body?.cancel();throw Error('PARIS_PHONE_LLM_HTTP_'+response.status);}
+    const data=await response.json();
+    const answer=data.choices?.[0]?.message?.content;
+    if(typeof answer!=='string' || !answer.trim())throw Error('EMPTY_PARIS_ANSWER');
+    return answer.trim().slice(0,1200);
+  }
+  if(env.PARIS_PHONE_INFERENCE_PROVIDER && env.PARIS_PHONE_INFERENCE_PROVIDER!=='google')
+    throw Error('PARIS_PHONE_INFERENCE_PROVIDER_INVALID');
   const model=process.env.PARIS_VERTEX_MODEL||'gemini-2.5-flash';
   if(!/^[a-zA-Z0-9._-]+$/.test(model))throw Error('INVALID_MODEL');
   const url='https://us-central1-aiplatform.googleapis.com/v1/projects/'+PROJECT+'/locations/us-central1/publishers/google/models/'+model+':generateContent';
@@ -60,10 +84,15 @@ export async function converse(history,request=googleJson){
 }
 // Routing is driven by a caller's explicit request, not by generated model text.
 // No external dial string or arbitrary extension can be routed by this service.
-export function callerRouteIntent(transcript){
+export function callerRouteIntent(transcript,{allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || ''}={}){
   const text=String(transcript||'').toLowerCase().trim();
   const asked=/(?:\b(?:transfer|connect|speak|talk|reach|put me through)\b.{0,48}\b(?:operator|administrator|human|person|representative|front desk)\b|\b(?:operator|administrator)\b.{0,28}\bplease\b)/i;
-  return asked.test(text)?{type:'operator',extension:'0'}:null;
+  if(asked.test(text))return {type:'operator',extension:'0'};
+  // Explicit caller-provided extension, restricted to a reviewed, deployed allowlist.
+  // Never infer a destination from AI output or route a raw dial string.
+  const match=text.match(/\b(?:extension|ext)\s*(?:number\s*)?(\d{3})\b/);
+  const allowed=new Set(String(allowedExtensions).split(',').map(v=>v.trim()).filter(v=>/^[1-9]\d{2}$/.test(v)));
+  return match && allowed.has(match[1]) ? {type:'extension',extension:match[1]} : null;
 }
 
 export async function synthesize(text,request=googleJson){
@@ -116,7 +145,7 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
         if(!words)return fail('NO_SPEECH',422);
         const history=[...prior.history,{role:'user',text:words}].slice(-12);
         const route=callerRouteIntent(words);
-        const reply=route?'I will connect you to the operator now.':await llm(history);
+        const reply=route?(route.type==='operator'?'I will connect you to the operator now.':'I will connect you to extension '+route.extension+' now.'):await llm(history);
         const audioReply=await tts(reply);
         prior.history=[...history,{role:'model',text:reply}].slice(-12);
         prior.sequence=body.sequence;prior.updated=Date.now();

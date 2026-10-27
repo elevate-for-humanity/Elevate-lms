@@ -24,17 +24,18 @@ test('CLI failures are redacted and invalid project IDs never run commands', () 
   assert.throws(() => verifyBilling(project, () => { throw new Error('secret credential'); }), /Cannot verify/);
   assert.throws(() => verifyBilling('$(unsafe)', () => assert.fail('must not execute')), /valid Google project/);
 });
-test('paid build paths check billing before Docker and refresh credentials before upload', () => {
-  for (const [file, build, uploadName] of [
-    ['build-google-migration-images.yml', 'Build existing Dockerfile', 'Upload versioned image'],
+test('Google uploads require billing and identity while independent builds stay outside Google admission', () => {
+  for (const [file, build, uploadName, independent = false] of [
+    ['build-google-migration-images.yml', 'Build existing Dockerfile', 'Upload versioned image', true],
     ['deploy-google-marketing-trigger.yml', 'Install dependencies and validate', 'Push Marketing image'],
     ['deploy-google-course-worker.yml', 'Build existing CPU Course Builder image', 'Upload immutable worker image'],
-    ['deploy-admin.yml', 'Build the Admin image', 'Upload and deploy the exact Admin image'],
-    ['deploy-google-store-runtime.yml', 'Build shared commerce application for Store', 'Upload tested Store image'],
+    ['deploy-admin.yml', 'Build the Admin image', 'Upload tested Admin image', true],
+    ['deploy-google-store-runtime.yml', 'Build shared commerce application for Store', 'Upload tested Store image', true],
   ]) {
     const source = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8');
     const guard = source.indexOf('node scripts/gcp/preflight-billing.mjs');
-    assert.ok(guard > 0 && guard < source.indexOf(build), file);
+    assert.ok(guard > 0 && guard < source.indexOf(uploadName), file);
+    assert.ok(independent ? source.indexOf(build) < guard : guard < source.indexOf(build), file);
     assert.ok(source.indexOf('google-github-actions/auth@v3') < guard, file);
     const refresh = source.indexOf('Refresh Google credentials after build');
     assert.ok(refresh > source.indexOf(build) && refresh < source.indexOf(uploadName), file);

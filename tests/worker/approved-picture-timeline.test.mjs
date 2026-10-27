@@ -68,3 +68,14 @@ test('registered cosmetology scene 9 plural transcription aligns with authored p
  assert.equal(quoteStartSeconds('At 20 OJL hours per week the same hour range is 100 to 125 weeks',recorded),12.74);
  assert.throws(()=>quoteStartSeconds('',recorded),/NOT_ALIGNED/);
 });
+
+
+test('saved cosmetology recap resolves an exact ASR-split compound without fuzzy word substitution',()=>{
+ const recorded=[{text:'auto',startSeconds:14.36},{text:'-claving',startSeconds:14.48},
+  {text:'disinfecting',startSeconds:15.02},{text:'solutions',startSeconds:15.82},
+  {text:'and',startSeconds:16.12},{text:'ultrasonic',startSeconds:16.34},
+  {text:'cleanersers',startSeconds:16.86}];
+ assert.equal(quoteStartSeconds('autoclaving, disinfecting solutions, and ultrasonic cleaners',recorded),14.36);
+ assert.throws(()=>quoteStartSeconds('disinfect tools for 10 minutes',[{text:'disinfect tools for 20 minutes',startSeconds:0}]),/NOT_ALIGNED/);
+ assert.throws(()=>quoteStartSeconds('do not disinfect tools',[{text:'do disinfect tools',startSeconds:0}]),/NOT_ALIGNED/);
+});

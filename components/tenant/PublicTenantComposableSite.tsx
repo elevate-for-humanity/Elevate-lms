@@ -3,8 +3,8 @@
 
 import type { MouseEvent, ReactNode } from 'react';
 import './legacy83-premium.css';
-import Link from 'next/link';
-import { ChartNoAxesCombined, UsersRound, Sprout } from 'lucide-react';
+import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
+import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantParis } from '@/components/tenant/TenantParis';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
 import type { PublishedTenantSite, TenantSiteSection } from '@/lib/tenant/site-types';
@@ -108,6 +108,8 @@ function Section({ section, primary, secondary, basePath, isPageHeading = false 
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
             <Heading className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{titleLines.length ? titleLines.map((line, index) => <span className="tenant-title-line" key={index}>{index > 0 ? ' ' : ''}{highlight && line.includes(highlight) ? <>{line.slice(0, line.indexOf(highlight))}<em>{highlight}</em>{line.slice(line.indexOf(highlight) + highlight.length)}</> : line}</span>) : highlightAt >= 0 ? <><span className="tenant-title-prefix">{title.slice(0, highlightAt)}</span><span className="tenant-title-highlight">{highlight}</span>{title.slice(highlightAt + highlight.length)}</> : title}</Heading>
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
+            {text(c.veteranAcknowledgement) ? <p className="tenant-veteran-note"><Flag aria-hidden="true" /><span>{text(c.veteranAcknowledgement)}</span></p> : null}
+            {text(c.narration) ? <TenantIntroduction narration={text(c.narration)} musicUrl={text(c.musicUrl)} /> : null}
             {text(c.buttonText) || text(c.secondaryButtonText) ? <div className={`tenant-hero-actions mt-8 flex flex-wrap gap-4 ${centered || !image ? 'justify-center' : ''}`}>{text(c.buttonText) ? <ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink> : null}{text(c.secondaryButtonText) ? <ActionLink href={text(c.secondaryButtonHref) || '/services'} primary={secondary} basePath={basePath}>{text(c.secondaryButtonText)}</ActionLink> : null}</div> : null}
             {highlights.length ? <div className="tenant-hero-highlights">{highlights.slice(0, 3).map((item, index) => { const Icon = highlightIcons[index] || Sprout; return <div key={index}><Icon aria-hidden="true" /><strong>{text(item.title)}</strong><span>{text(item.text)}</span></div>; })}</div> : null}
           </div>
@@ -176,7 +178,7 @@ function Section({ section, primary, secondary, basePath, isPageHeading = false 
   }
 
   if (section.type === 'cta') {
-    return <section className="tenant-cta mx-auto max-w-6xl px-5 py-14 sm:px-6" data-variant={variant}><div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: primary }}>{text(c.eyebrow) ? <p className="tenant-cta-eyebrow text-xs font-bold uppercase tracking-[.3em]">{text(c.eyebrow)}</p> : null}<h2 className="mt-4 text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
+    return <section className={`tenant-cta mx-auto max-w-6xl px-5 py-14 sm:px-6 ${text(c.image) ? 'relative isolate overflow-hidden' : ''}`} data-variant={variant} data-has-background={Boolean(text(c.image))}>{text(c.image) ? <img className="tenant-cta-background absolute inset-0 -z-10 h-full w-full object-cover" src={text(c.image)} alt={text(c.imageAlt)} /> : null}<div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: text(c.image) ? 'rgba(0,0,0,0.65)' : primary }}>{text(c.eyebrow) ? <p className="tenant-cta-eyebrow text-xs font-bold uppercase tracking-[.3em]">{text(c.eyebrow)}</p> : null}<h2 className="mt-4 text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
   }
 
   if (section.type === 'booking') {
@@ -206,7 +208,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const config = ensureComposableSiteConfig(site.config);
   const path = normalizePageSlug(pathname);
   const page = config.pages?.find((candidate) => candidate.slug === path);
-  if (!page) return <section role="status" className="p-8"><h1>Page not found</h1><p>This page is not available.</p><Link href={hrefFor('/', basePath)}>Return to Home</Link></section>;
+  if (!page) return <section role="status" className="p-8"><h1>Page not found</h1><p>This page is not available.</p><a href={hrefFor('/', basePath)}>Return to Home</a></section>;
   const primary = config.branding.primaryColor || '#7c3f58';
   const secondary = config.branding.secondaryColor || '#475569';
   const background = config.branding.backgroundColor || '#ffffff';
@@ -226,17 +228,18 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   return (
     <div data-page={page.slug} onClickCapture={onNavigate ? navigateDraft : undefined} className={`min-h-screen antialiased ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
+      {/* Real document links remain usable when client routing cannot complete. */}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
-          <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
-          <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.filter((item) => item.slug !== '/contact').map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
-          {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</Link> : null}
+          <a href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></a>
+          <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.filter((item) => item.slug !== '/contact').map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</a>)}</nav>
+          {navigation.some((item) => item.slug === '/contact') ? <a href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</a> : null}
         </div>
       </header>
-      {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></details></div> : null}
+      {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
       <main>{page.sections.map((section, index) => <Section key={section.id} section={section} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
-      <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></div></footer>
+      <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
     </div>
   );
 }

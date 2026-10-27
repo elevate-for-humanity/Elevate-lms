@@ -11,6 +11,7 @@ on:
       - 'scripts/build-next-app.*'
       - 'scripts/container-build-policy.mjs'
       - 'components/**'
+      - 'styles/**'
       - 'public/**'
       - 'content/**'
       - 'config/**'
@@ -27,7 +28,9 @@ on:
       - 'components/studio/**'
       - 'components/analytics/**'
       - 'instrumentation.ts'
-      - 'Dockerfile.northflank-admin'
+      - 'Dockerfile.admin'
+      - 'scripts/gcp/paris-github-app-binding.mjs'
+      - 'scripts/gcp/paris-github-app-binding.test.mjs'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - '.github/workflows/build-google-migration-images.yml'
@@ -69,12 +72,13 @@ jobs:
           # current main containing them; the build retains exact-SHA checks.
           [[ "$latest" =~ ^[a-f0-9]{40}$ ]]
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
-  deploy-admin:
+  build-admin:
     concurrency:
-      group: google-runtime-us-central1
-      cancel-in-progress: false
-      queue: max
-    name: Build and deploy Admin on Google
+      group: google-admin-build-main
+      cancel-in-progress: true
+    name: Build and upload Admin image
+    outputs:
+      digest: ${{ steps.upload.outputs.digest }}
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
@@ -94,6 +98,8 @@ jobs:
           node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-phone-sending-number.mjs
           node --test scripts/test-public-revision-activation.mjs
           node --test scripts/gcp/shared-runtime-concurrency.test.mjs
+          node --test scripts/gcp/production-browser-binding.test.mjs
+          node --test scripts/gcp/admin-build-boundary.test.mjs
           node scripts/audit-course-builder-procurement.mjs
       - name: Reject superseded deployment requests before building
         env:
@@ -116,18 +122,6 @@ jobs:
           # Later unrelated commits do not invalidate the latest Admin request.
           # A newer Admin request does; retire it before any expensive build.
           node scripts/gcp/prune-web-release-requests.mjs --assert-latest
-      - uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
-      - name: Verify Google SDK
-        run: node scripts/gcp/verify-sdk.mjs
-      - name: Verify project billing and empty upload admission before building
-        run: node scripts/gcp/preflight-billing.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build the Admin image
@@ -140,7 +134,7 @@ jobs:
           node --test scripts/test-independent-studio-diagnostics.mjs
           node scripts/verify-admin-instrumentation-boundary.mjs
           node scripts/verify-portal-production-contracts.mjs
-          docker build -f Dockerfile.northflank-admin -t "elevate-admin:$GITHUB_SHA" \
+          docker build -f Dockerfile.admin -t "elevate-admin:$GITHUB_SHA" \
             --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL \
@@ -151,7 +145,15 @@ jobs:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - name: Upload and deploy the exact Admin image
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify project billing and empty upload admission before building
+        run: node scripts/gcp/preflight-billing.mjs
+      - name: Upload tested Admin image
+        id: upload
         shell: bash
         run: |
           set -euo pipefail
@@ -161,15 +163,69 @@ jobs:
           docker push "$IMAGE:$GITHUB_SHA"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+  deploy-admin:
+    needs: build-admin
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
+    name: Deploy and verify Admin on Google
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 30
+    env:
+      IMAGE_DIGEST: ${{ needs.build-admin.outputs.digest }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Reject superseded deployment requests before rollout
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-admin.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
+      - name: Upload and deploy the exact Admin image
+        env:
+          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin'
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          test "$DIGEST" = "$IMAGE_DIGEST"
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
+          # Validate the stored key/App installation and pin its Secret Manager
+          # version before rollout. The flags file contains no secret payload.
+          node scripts/gcp/paris-github-app-binding.mjs > "$RUNNER_TEMP/paris-app-flags"
+          mapfile -t PARIS_APP_FLAGS < "$RUNNER_TEMP/paris-app-flags"
+          PARIS_APP_FLAGS[0]="${PARIS_APP_FLAGS[0]},AI_NARRATION_PROVIDER=kokoro"
           # Reserve rollout headroom before creating a replacement revision.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            --update-env-vars=AI_NARRATION_PROVIDER=kokoro --quiet
+            "${PARIS_APP_FLAGS[@]}" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         run: |
@@ -183,6 +239,10 @@ jobs:
           set -euo pipefail
           export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
           node scripts/gcp/verify-admin-revision.mjs
+      - name: Dispatch read-only live PARIS verification using the App credential
+        env:
+          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}
+        run: node scripts/gcp/paris-github-app-binding.mjs --verify-live "$GITHUB_SHA"
 
   acceptance:
     needs: deploy-admin

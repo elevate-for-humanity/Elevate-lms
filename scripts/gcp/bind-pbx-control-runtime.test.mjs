@@ -54,7 +54,7 @@ test('reads only the VM reference and metadata, never a secret payload',async()=
       const source=quoted.slice(1,-1).split("'\\''").join("'");
       const compiled=spawnSync('python3',['-c',"import sys; compile(sys.stdin.read(), '<probe>', 'exec')"],{input:source,encoding:'utf8'});
       assert.equal(compiled.status,0,compiled.stderr);
-      return '1';
+      return 'SSH login notice\nPBX_REF_RESULT:1';
     }
     return JSON.stringify({name:'projects/484736877039/secrets/elevate-pbx-provisioning-token/versions/1',state:'ENABLED'});
   });
@@ -64,7 +64,7 @@ test('reads only the VM reference and metadata, never a secret payload',async()=
 test('missing VM reference fails closed before querying Secret Manager',async()=>{
   let calls=0;
   await assert.rejects(pinnedControlVersion(args=>{
-    if(args[0]==='compute')return 'PBX_REF_FILE_MISSING';
+    if(args[0]==='compute')return 'PBX_REF_RESULT:FILE_MISSING';
     calls++;
     throw Error('unexpected Secret Manager access');
   }),error=>error.message==='pbx_control_reference_file_missing');
@@ -73,11 +73,17 @@ test('missing VM reference fails closed before querying Secret Manager',async()=
 test('invalid VM reference fails closed before querying Secret Manager',async()=>{
   let calls=0;
   await assert.rejects(pinnedControlVersion(args=>{
-    if(args[0]==='compute')return 'PBX_REF_INVALID';
+    if(args[0]==='compute')return 'PBX_REF_RESULT:INVALID';
     calls++;
     throw Error('unexpected Secret Manager access');
   }),error=>error.message==='pbx_control_reference_unverified');
   assert.equal(calls,0);
+});
+test('rejects ambiguous tagged VM references without reading secret metadata',async()=>{
+  await assert.rejects(pinnedControlVersion(args=>{
+    if(args[0]==='compute')return 'PBX_REF_RESULT:1\\nPBX_REF_RESULT:2';
+    throw Error('unexpected metadata access');
+  }),/pbx_control_reference_unverified/);
 });
 test('updates only phone bindings and verifies the actual revision after promotion',async()=>{
   const f=fixture(); const result=await bindControl('lms','1',f.dependencies);

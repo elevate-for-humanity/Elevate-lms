@@ -86,6 +86,66 @@
         "href": "/lms/career",
         "action": "Open career tools",
         "image": "/images/pages/career-services-page-5.webp"
+      },
+      {
+        "title": "Inter-office email: contact your Elevate team",
+        "image": "/images/pages/contact-hero.jpg",
+        "points": [
+          "Open your mailbox and choose Compose.",
+          "Use your assigned staff contact and a clear subject.",
+          "Check Inbox for replies and keep the same conversation."
+        ],
+        "narration": "Use inter-office email inside your dashboard as your regular way to communicate with Elevate staff. Open the mailbox, choose Compose, and select or enter the staff address provided in your program instructions. Include your full name, program, the page or lesson involved, and what help you need. Send the message, check Sent, and return to Inbox for replies. Reply in the same conversation so staff can follow the history. If your mailbox is unavailable or your contact is missing, use Learner Support to report it. Do not send passwords or Social Security numbers.",
+        "href": "/communications/email",
+        "action": "Open inter-office email"
+      },
+      {
+        "title": "Community: learn with your peers",
+        "image": "/images/pages/training-classroom.webp",
+        "points": [
+          "Browse groups for your program or study interests.",
+          "Join a group, ask a question, and reply respectfully.",
+          "Use inter-office email for private questions to staff."
+        ],
+        "narration": "Open Community to connect with other learners and find study groups. Choose Browse groups, read the group description, and join a group relevant to your program. Introduce yourself, ask a learning question, or share a useful study resource. Read replies and respond respectfully. Community conversations can be visible to other members, so keep personal documents, financial information, and account details out of posts. Questions about your enrollment, document review, attendance corrections, or individual support belong in inter-office email to your assigned staff contact.",
+        "href": "/lms/community",
+        "action": "Open community"
+      },
+      {
+        "title": "Career services: explore your job feed",
+        "image": "/images/pages/career-services-page-5.webp",
+        "points": [
+          "Start career services while you are training.",
+          "Review job requirements, location, and closing dates.",
+          "Open the listing to follow the employer’s application steps."
+        ],
+        "narration": "Career Services is available while you train and as you prepare for your next step after training. Open your personalized career feed and review the opportunities shown. Check the job duties, location, requirements, application instructions, and closing date before applying. A suggested opportunity is not a job offer or a guarantee that you meet every requirement. If no matches appear, you can still open the résumé builder and placement center. Contact your program team through inter-office email for help with career planning and applications.",
+        "href": "/lms/career",
+        "action": "Open career services"
+      },
+      {
+        "title": "Résumé builder: save, preview, and download",
+        "image": "/images/pages/office-admin-desk.jpg",
+        "points": [
+          "Enter your contact details, experience, education, and skills.",
+          "Save your résumé and reopen it to check your changes.",
+          "Preview and download a PDF for applications."
+        ],
+        "narration": "Open the résumé builder and enter your current contact information, work experience, education, and skills you can demonstrate. Add credentials accurately and review spelling and dates. Choose Save Resume and wait for the confirmation before leaving. Reopen the builder to check that your saved work appears. Use Preview to review the layout, then Download PDF to keep a copy for job applications. You can also upload an existing résumé from this page. Update your résumé when you gain skills or earn a credential, and ask staff for help through inter-office email.",
+        "href": "/lms/resume-builder",
+        "action": "Open résumé builder"
+      },
+      {
+        "title": "Credential uploads: submit and track review",
+        "image": "/images/pages/comp-home-highlight-success.webp",
+        "points": [
+          "Choose your program and the appropriate credential.",
+          "Upload a clear supported file and submit it.",
+          "Check Your submissions for review status or corrections."
+        ],
+        "narration": "Use Upload an earned credential for certificates, licenses, prerequisites, and exam results that you have actually earned. Choose the matching enrolled program and credential when available. Upload a readable PDF or supported image and submit it. Check Your submissions to see the file and its review status. Submitted for review means the file is waiting for staff verification; it does not mean approved. If a submission is rejected, read the reason and provide corrected evidence. Keep your original credential. Contact staff through inter-office email if your program or credential is missing from the choices.",
+        "href": "/lms/certification/upload",
+        "action": "Upload an earned credential"
       }
     ],
     "hero": "/images/pages/training-classroom.webp"
@@ -180,11 +240,7 @@
       },
       {
         "title": "Contact David to schedule practical training",
-        "points": [
-          "David Nazaire",
-          "(215) 214-9355",
-          "indyondemandservices@gmail.com"
-        ],
+        "points": ["David Nazaire", "(215) 214-9355", "indyondemandservices@gmail.com"],
         "narration": "Contact David Nazaire to arrange the hands-on portion of your HVAC program. His saved program contact number is two one five, two one four, nine three five five. His email is indyondemandservices at gmail dot com. Tell him your full name, that you are an Elevate HVAC learner, your online-study progress, and the dates you are available. Ask him to confirm the training dates, times, location, required clothing, tools, and safety equipment. Wait for confirmation before attending.",
         "href": "mailto:indyondemandservices@gmail.com?subject=Elevate%20HVAC%20hands-on%20training%20schedule",
         "action": "Email David",
@@ -225,6 +281,66 @@
         "href": "/lms/career",
         "action": "Open career tools",
         "image": "/images/pages/career-services-page-5.webp"
+      },
+      {
+        "title": "Inter-office email: contact your Elevate team",
+        "image": "/images/pages/contact-hero.jpg",
+        "points": [
+          "Open your mailbox and choose Compose.",
+          "Use your assigned staff contact and a clear subject.",
+          "Check Inbox for replies and keep the same conversation."
+        ],
+        "narration": "Use inter-office email inside your dashboard as your regular way to communicate with Elevate staff. Open the mailbox, choose Compose, and select or enter the staff address provided in your program instructions. Include your full name, program, the page or lesson involved, and what help you need. Send the message, check Sent, and return to Inbox for replies. Reply in the same conversation so staff can follow the history. If your mailbox is unavailable or your contact is missing, use Learner Support to report it. Do not send passwords or Social Security numbers.",
+        "href": "/communications/email",
+        "action": "Open inter-office email"
+      },
+      {
+        "title": "Community: learn with your peers",
+        "image": "/images/pages/training-classroom.webp",
+        "points": [
+          "Browse groups for your program or study interests.",
+          "Join a group, ask a question, and reply respectfully.",
+          "Use inter-office email for private questions to staff."
+        ],
+        "narration": "Open Community to connect with other learners and find study groups. Choose Browse groups, read the group description, and join a group relevant to your program. Introduce yourself, ask a learning question, or share a useful study resource. Read replies and respond respectfully. Community conversations can be visible to other members, so keep personal documents, financial information, and account details out of posts. Questions about your enrollment, document review, attendance corrections, or individual support belong in inter-office email to your assigned staff contact.",
+        "href": "/lms/community",
+        "action": "Open community"
+      },
+      {
+        "title": "Career services: explore your job feed",
+        "image": "/images/pages/career-services-page-5.webp",
+        "points": [
+          "Start career services while you are training.",
+          "Review job requirements, location, and closing dates.",
+          "Open the listing to follow the employer’s application steps."
+        ],
+        "narration": "Career Services is available while you train and as you prepare for your next step after training. Open your personalized career feed and review the opportunities shown. Check the job duties, location, requirements, application instructions, and closing date before applying. A suggested opportunity is not a job offer or a guarantee that you meet every requirement. If no matches appear, you can still open the résumé builder and placement center. Contact your program team through inter-office email for help with career planning and applications.",
+        "href": "/lms/career",
+        "action": "Open career services"
+      },
+      {
+        "title": "Résumé builder: save, preview, and download",
+        "image": "/images/pages/office-admin-desk.jpg",
+        "points": [
+          "Enter your contact details, experience, education, and skills.",
+          "Save your résumé and reopen it to check your changes.",
+          "Preview and download a PDF for applications."
+        ],
+        "narration": "Open the résumé builder and enter your current contact information, work experience, education, and skills you can demonstrate. Add credentials accurately and review spelling and dates. Choose Save Resume and wait for the confirmation before leaving. Reopen the builder to check that your saved work appears. Use Preview to review the layout, then Download PDF to keep a copy for job applications. You can also upload an existing résumé from this page. Update your résumé when you gain skills or earn a credential, and ask staff for help through inter-office email.",
+        "href": "/lms/resume-builder",
+        "action": "Open résumé builder"
+      },
+      {
+        "title": "Credential uploads: submit and track review",
+        "image": "/images/pages/comp-home-highlight-success.webp",
+        "points": [
+          "Choose your program and the appropriate credential.",
+          "Upload a clear supported file and submit it.",
+          "Check Your submissions for review status or corrections."
+        ],
+        "narration": "Use Upload an earned credential for certificates, licenses, prerequisites, and exam results that you have actually earned. Choose the matching enrolled program and credential when available. Upload a readable PDF or supported image and submit it. Check Your submissions to see the file and its review status. Submitted for review means the file is waiting for staff verification; it does not mean approved. If a submission is rejected, read the reason and provide corrected evidence. Keep your original credential. Contact staff through inter-office email if your program or credential is missing from the choices.",
+        "href": "/lms/certification/upload",
+        "action": "Upload an earned credential"
       }
     ],
     "hero": "/images/hvac-training-vibrant-2026.webp"
@@ -316,6 +432,66 @@
         "href": "/lms/career",
         "action": "Open career tools",
         "image": "/images/pages/career-services-page-5.webp"
+      },
+      {
+        "title": "Inter-office email: contact your Elevate team",
+        "image": "/images/pages/contact-hero.jpg",
+        "points": [
+          "Open your mailbox and choose Compose.",
+          "Use your assigned staff contact and a clear subject.",
+          "Check Inbox for replies and keep the same conversation."
+        ],
+        "narration": "Use inter-office email inside your dashboard as your regular way to communicate with Elevate staff. Open the mailbox, choose Compose, and select or enter the staff address provided in your program instructions. Include your full name, program, the page or lesson involved, and what help you need. Send the message, check Sent, and return to Inbox for replies. Reply in the same conversation so staff can follow the history. If your mailbox is unavailable or your contact is missing, use Learner Support to report it. Do not send passwords or Social Security numbers.",
+        "href": "/communications/email",
+        "action": "Open inter-office email"
+      },
+      {
+        "title": "Community: learn with your peers",
+        "image": "/images/pages/training-classroom.webp",
+        "points": [
+          "Browse groups for your program or study interests.",
+          "Join a group, ask a question, and reply respectfully.",
+          "Use inter-office email for private questions to staff."
+        ],
+        "narration": "Open Community to connect with other learners and find study groups. Choose Browse groups, read the group description, and join a group relevant to your program. Introduce yourself, ask a learning question, or share a useful study resource. Read replies and respond respectfully. Community conversations can be visible to other members, so keep personal documents, financial information, and account details out of posts. Questions about your enrollment, document review, attendance corrections, or individual support belong in inter-office email to your assigned staff contact.",
+        "href": "/lms/community",
+        "action": "Open community"
+      },
+      {
+        "title": "Career services: explore your job feed",
+        "image": "/images/pages/career-services-page-5.webp",
+        "points": [
+          "Start career services while you are training.",
+          "Review job requirements, location, and closing dates.",
+          "Open the listing to follow the employer’s application steps."
+        ],
+        "narration": "Career Services is available while you train and as you prepare for your next step after training. Open your personalized career feed and review the opportunities shown. Check the job duties, location, requirements, application instructions, and closing date before applying. A suggested opportunity is not a job offer or a guarantee that you meet every requirement. If no matches appear, you can still open the résumé builder and placement center. Contact your program team through inter-office email for help with career planning and applications.",
+        "href": "/lms/career",
+        "action": "Open career services"
+      },
+      {
+        "title": "Résumé builder: save, preview, and download",
+        "image": "/images/pages/office-admin-desk.jpg",
+        "points": [
+          "Enter your contact details, experience, education, and skills.",
+          "Save your résumé and reopen it to check your changes.",
+          "Preview and download a PDF for applications."
+        ],
+        "narration": "Open the résumé builder and enter your current contact information, work experience, education, and skills you can demonstrate. Add credentials accurately and review spelling and dates. Choose Save Resume and wait for the confirmation before leaving. Reopen the builder to check that your saved work appears. Use Preview to review the layout, then Download PDF to keep a copy for job applications. You can also upload an existing résumé from this page. Update your résumé when you gain skills or earn a credential, and ask staff for help through inter-office email.",
+        "href": "/lms/resume-builder",
+        "action": "Open résumé builder"
+      },
+      {
+        "title": "Credential uploads: submit and track review",
+        "image": "/images/pages/comp-home-highlight-success.webp",
+        "points": [
+          "Choose your program and the appropriate credential.",
+          "Upload a clear supported file and submit it.",
+          "Check Your submissions for review status or corrections."
+        ],
+        "narration": "Use Upload an earned credential for certificates, licenses, prerequisites, and exam results that you have actually earned. Choose the matching enrolled program and credential when available. Upload a readable PDF or supported image and submit it. Check Your submissions to see the file and its review status. Submitted for review means the file is waiting for staff verification; it does not mean approved. If a submission is rejected, read the reason and provide corrected evidence. Keep your original credential. Contact staff through inter-office email if your program or credential is missing from the choices.",
+        "href": "/lms/certification/upload",
+        "action": "Upload an earned credential"
       }
     ],
     "hero": "/images/barber-hero.jpg"

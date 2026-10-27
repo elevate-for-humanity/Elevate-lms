@@ -65,6 +65,11 @@ test('release inventory uses actual main worker runs and fails closed on an unre
   assert.equal(pending,status==='in_progress');
   assert.match(calls[1],/actions\/runs\/123\/jobs/);
  }
+ for (const status of ['queued','pending','waiting']) {
+  assert.equal(await courseReleasePending({env,request:async url=>({ok:true,json:async()=>url.includes('/jobs?')
+   ? {jobs:[{name:'build',status:'completed',conclusion:'success'},{name:'deploy',status}]}
+   : {workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]}})}),true);
+ }
  await assert.rejects(courseReleasePending({env,request:async url=>url.includes('/jobs?')
   ? {ok:false,status:503}
   : {ok:true,json:async()=>({workflow_runs:[{id:123,head_branch:'main',status:'in_progress'}]})}}),/JOBS_HTTP_503/);

@@ -12,7 +12,9 @@ export async function courseReleasePending({request = fetch, env = process.env} 
   if (!Array.isArray(data.workflow_runs)) throw new Error('COURSE_RELEASE_INVENTORY_INVALID');
   // Image builds and authoring-access checks may run for a long time. They do
   // not own the runtime lane and must not strand saved lessons. Only the
-  // actual deployment job can ask this coordinator to yield.
+  // actual deployment job can ask this coordinator to yield. Once its image
+  // build succeeds, a queued deploy also needs this shared lane; waiting for
+  // it to be in_progress while holding the lane would deadlock the handoff.
   for (const run of data.workflow_runs.filter(run => run.head_branch === 'main' && run.status === 'in_progress')) {
     if (!Number.isSafeInteger(run.id) || run.id <= 0) throw new Error('COURSE_RELEASE_RUN_INVALID');
     const jobsResponse = await request(`https://api.github.com/repos/elevate-for-humanity/Elevate-lms/actions/runs/${run.id}/jobs?per_page=100`, {
@@ -21,7 +23,9 @@ export async function courseReleasePending({request = fetch, env = process.env} 
     if (!jobsResponse.ok) throw new Error('COURSE_RELEASE_JOBS_HTTP_' + jobsResponse.status);
     const jobs = await jobsResponse.json();
     if (!Array.isArray(jobs.jobs)) throw new Error('COURSE_RELEASE_JOBS_INVALID');
-    if (jobs.jobs.some(job => job.name === 'deploy' && job.status === 'in_progress')) return true;
+    const imageReady = jobs.jobs.some(job => job.name === 'build' && job.status === 'completed' && job.conclusion === 'success');
+    if (jobs.jobs.some(job => job.name === 'deploy' &&
+      (job.status === 'in_progress' || imageReady && ['queued', 'pending', 'waiting'].includes(job.status)))) return true;
   }
   return false;
 }

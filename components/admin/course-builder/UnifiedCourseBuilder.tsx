@@ -13,6 +13,7 @@ import type { SyllabusPlan } from '@/lib/ultimate-course-builder/authoring/sylla
 import LicensedMediaLibrary from './LicensedMediaLibrary';
 import { courseExecutionState } from '@/lib/ultimate-course-builder/core/execution-state.mjs';
 import { orderCourseJobs } from '@/lib/ultimate-course-builder/core/job-observation.mjs';
+import ParallelLessonAutopilots from './ParallelLessonAutopilots';
 
 const MediaStudioPanel = dynamic(() => import('@/components/studio/MediaStudioPanel'), {
   ssr: false,
@@ -49,6 +50,7 @@ type UltimateBuildRow = {
   updated_at?: string | null;
   ultimate_build_jobs?: Array<{
     id: string;
+    available_at?: string | null;
     status: string;
     last_error?: string | null;
     created_at: string;
@@ -71,6 +73,7 @@ type UltimateBuildRow = {
     };
     payload?: {
       ownerPreview?: boolean;
+      autopilot?: {version:string;competencyId:string;lessonTitle?:string;role:string};
       progress?: { phase: string; at: string; completed: number; total?: number | null };
     };
   }>;
@@ -930,7 +933,9 @@ export function UltimateBuildPanel({
   const jobs: NonNullable<UltimateBuildRow['ultimate_build_jobs']> = orderCourseJobs(
     latest?.ultimate_build_jobs ?? [],
   );
-  const activeJob = jobs.find((job) => ['queued', 'running'].includes(job.status));
+  const activeJob = jobs.find((job) => courseExecutionState(job).active) ??
+    jobs.find((job) => job.status === 'running') ??
+    jobs.find((job) => job.status === 'queued' && job.available_at !== 'infinity');
   const savedWorkerJob = activeJob ?? jobs[0];
   const observed = courseExecutionState(savedWorkerJob);
   const workerJob =
@@ -1017,6 +1022,21 @@ export function UltimateBuildPanel({
     } finally {
       setBusy(false);
     }
+  }
+
+  async function startParallelAutopilots() {
+    if (!latest) return;
+    setBusy(true);setError('');
+    try {
+      const response=await fetch('/api/admin/ultimate-course-builder/autopilot',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({buildId:latest.id,enabled:true,mode:'three-role-v1'}),signal:AbortSignal.timeout(25000),
+      });
+      const result=await readJson(response);
+      if(!response.ok)throw Error(result.error || 'Parallel lesson teams could not start');
+      setNotice(result.message);await refresh();
+    }catch(reason){setError(reason instanceof Error?reason.message:'Parallel lesson teams could not start');}
+    finally{setBusy(false);}
   }
 
   async function loadSyllabus(file: File | undefined) {
@@ -1356,6 +1376,7 @@ export function UltimateBuildPanel({
         </div>
       )}
 
+      {latest && <ParallelLessonAutopilots jobs={jobs} busy={busy || statusLoading} onStart={()=>void startParallelAutopilots()} />}
       {latest && workerJob && (
         <section
           aria-label="PARIS course autopilot"

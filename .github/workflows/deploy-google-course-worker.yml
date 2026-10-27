@@ -40,6 +40,11 @@ on:
       - 'Dockerfile.ultimate-worker'
       - 'tsconfig.ultimate-worker.json'
       - 'scripts/gcp/deploy-course-job.mjs'
+      - 'scripts/gcp/deploy-lesson-autopilots.mjs'
+      - 'scripts/gcp/deploy-lesson-autopilots.test.mjs'
+      - 'scripts/gcp/dispatch-lesson-autopilots.mjs'
+      - 'scripts/gcp/dispatch-lesson-autopilots.test.mjs'
+      - 'supabase/migrations/20261027175230_parallel_lesson_autopilots.sql'
       - 'scripts/gcp/prepare-course-authoring-access.mjs'
       - 'scripts/gcp/prepare-course-authoring-access.test.mjs'
       - 'scripts/gcp/audit-course-production.mjs'
@@ -202,6 +207,12 @@ jobs:
         run: node scripts/gcp/deploy-course-job.mjs
       - name: Synchronize approved regional worker image and verify readback
         run: node scripts/gcp/sync-course-worker-regions.mjs
+      - name: Deploy three lesson autopilot roles and verify immutable configurations
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node --test scripts/gcp/deploy-lesson-autopilots.test.mjs scripts/gcp/dispatch-lesson-autopilots.test.mjs
+          node scripts/gcp/deploy-lesson-autopilots.mjs
       - name: Resume repaired saved lessons after verified image deployment
         env:
           IMAGE_SHA: ${{ github.sha }}

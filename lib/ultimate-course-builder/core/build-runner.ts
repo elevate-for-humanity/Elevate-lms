@@ -53,6 +53,9 @@ export interface UltimateRunContext {
   beforeCheckpoint?: (step: UltimateBuildStep) => Promise<UltimateBuildStep | null>;
   /** Owner preview stops after encoding; it never certifies QA or publication. */
   renderPreviewOnly?: boolean;
+  /** Durable role boundary; a partial stage never certifies a full lesson. */
+  stopAfterStep?: UltimateBuildStep;
+  startAtStep?: UltimateBuildStep;
 }
 
 export class UltimateBuildRunner {
@@ -75,6 +78,7 @@ export class UltimateBuildRunner {
     ctx.repairDirective = savedRepair?.status === 'producer-validated' ? undefined : savedRepair?.directive;
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
+      if (ctx.stopAfterStep && index > ULTIMATE_BUILD_STEPS.indexOf(ctx.stopAfterStep)) break;
       if (ctx.renderPreviewOnly && index > ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render')) break;
       ctx.assertActive?.();
       const requestedRepair = await ctx.beforeCheckpoint?.(ULTIMATE_BUILD_STEPS[index]);
@@ -100,6 +104,14 @@ export class UltimateBuildRunner {
           (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;
         continue;
+      }
+      if (ctx.startAtStep && index < ULTIMATE_BUILD_STEPS.indexOf(ctx.startAtStep)) {
+        const failure: UltimateInstructionalFinding = {step,severity:'error',code:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED',message:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED:'+step};
+        const directive = repairDirective([failure],step,step,ctx.artifacts[step],1);
+        (ctx.artifacts as any).__repairState = {directive,status:'diagnosed',at:new Date().toISOString()};
+        ctx.findings.push(failure);
+        await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{directive,unresolved:1}}});
+        break;
       }
       // A changed input invalidates this stage and every dependent stage.
       for (const dependent of ULTIMATE_BUILD_STEPS.slice(index)) {
@@ -248,6 +260,10 @@ export class UltimateBuildRunner {
         ctx.repairDirective=directive;
         (ctx.artifacts as any).__repairState={directive,status:'diagnosed',at:new Date().toISOString()};
         await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{directive,unresolved:failures.length}}});
+        if (ctx.startAtStep && ULTIMATE_BUILD_STEPS.indexOf(target) < ULTIMATE_BUILD_STEPS.indexOf(ctx.startAtStep)) {
+          ctx.findings.push(...failures);
+          break; // The responsible producer gets its own durable role job.
+        }
         attempts.push({ failedStep: step, target, codes: failures.map((f) => f.code) });
         index = Math.min(index, ULTIMATE_BUILD_STEPS.indexOf(target));
         // A routed repair deliberately changes an upstream producer. Its old

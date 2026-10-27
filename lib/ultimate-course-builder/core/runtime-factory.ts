@@ -1,6 +1,7 @@
 import {UltimateSupabasePersistence} from '../persistence/supabase-persistence';
 import {UltimateFencedPersistence} from '../persistence/fenced-persistence';
 import {UltimateArtifactStore} from '../artifacts/artifact-store';
+import {UltimateFencedArtifactStore} from '../artifacts/fenced-artifact-store';
 import {UltimatePlatformWorkforce} from '../adapters/platform-workforce';
 import {UltimatePlatformCredential} from '../adapters/platform-credential';
 import {UltimatePlatformInstructionalGenerator} from '../adapters/platform-instructional-generator';
@@ -27,7 +28,7 @@ class LazyRenderer implements UltimateRenderPort{
 export async function createUltimateRuntime(db:SupabaseClient, fence?: {jobId:string;workerId:string;generation:number}):Promise<UltimateRuntime>{
   return {
     persistence:fence ? new UltimateFencedPersistence(db,fence.jobId,fence.workerId,fence.generation) : new UltimateSupabasePersistence(db as any),
-    artifacts:new UltimateArtifactStore(db as any),
+    artifacts:fence ? new UltimateFencedArtifactStore(db,fence) : new UltimateArtifactStore(db as any),
     workforce:new UltimatePlatformWorkforce(),
     credential:new UltimatePlatformCredential(db as any),
     instructional:new UltimatePlatformInstructionalGenerator(),

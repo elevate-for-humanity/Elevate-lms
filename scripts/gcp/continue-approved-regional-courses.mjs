@@ -4,6 +4,7 @@ import {inspectRegionalCapacity} from './regional-capacity.mjs';
 import {dispatchQueuedCourseJob} from './dispatch-course-job.mjs';
 import {continueCourseQueue,courseReleasePending} from './continue-course-queue.mjs';
 import {pathToFileURL} from 'node:url';
+import {dispatchLessonAutopilots} from './dispatch-lesson-autopilots.mjs';
 // The worker queue is shared across registered course builds. Do not silently
 // exclude newly started courses using a hard-coded build allowlist.
 export function regionalArguments(args) {
@@ -31,6 +32,9 @@ export async function dispatchApprovedRegionalCourses({env=process.env}={}) {
   await monitorCourseQueue({env,dispatchState:{status:'dispatch_failed',reason:'Google worker dispatch failed: '+(error.code??'assignment_unconfirmed')}});
   throw error;
  }
+ const pool=await dispatchLessonAutopilots({env});
+ if(['assigned','busy','retry_wait'].includes(pool.status))return pool;
+ if(state.status==='empty' && pool.status==='capacity_wait')state=pool;
  if(state.status==='capacity_wait')await monitorCourseQueue({env,dispatchState:state});
  return state;
 }

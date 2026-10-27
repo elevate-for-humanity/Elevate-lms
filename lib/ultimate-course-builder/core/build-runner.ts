@@ -203,7 +203,7 @@ export class UltimateBuildRunner {
         }
       } catch (error) {
         const message =
-          error instanceof Error
+          error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
             ? error.message
             : typeof error === 'string'
               ? error

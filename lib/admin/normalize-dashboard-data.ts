@@ -324,7 +324,7 @@ export function normalizeAdminDashboardData(
       profile: null,
       generatedAt: new Date().toISOString(),
       sitePreviewTargets: FALLBACK_SITE_PREVIEW,
-      degradedSections: [],
+      degradedSections: ['dashboard_data'],
       systemHealth: FALLBACK_SYSTEM_HEALTH,
       isSuperAdmin: false,
     };

@@ -33,7 +33,7 @@ export async function payoutProviderConfigured(provider: PayoutProvider) {
 }
 
 export async function getProgramHolderPayoutAccount(ctx: HolderContext): Promise<PayoutReadiness> {
-  const { data } = await ctx.db
+  const { data, error } = await ctx.db
     .from('program_holder_payouts')
     .select(
       'payout_provider,provider_recipient_id,transfers_enabled,payouts_enabled,verification_status',
@@ -41,6 +41,7 @@ export async function getProgramHolderPayoutAccount(ctx: HolderContext): Promise
     .eq('user_id', ctx.user.id)
     .maybeSingle();
 
+  if (error) throw new Error('Unable to load the payout account.');
   const provider =
     data?.payout_provider === 'paypal' || data?.payout_provider === 'branch'
       ? data.payout_provider
@@ -61,12 +62,15 @@ export async function configureProgramHolderPayoutAccount(
   ctx: HolderContext,
   provider: PayoutProvider = 'branch',
 ) {
-  const { data: existing } = await ctx.db
+  const { data: existing, error: lookupError } = await ctx.db
     .from('program_holder_payouts')
-    .select('user_id')
+    .select('user_id,payout_provider,payouts_enabled,transfers_enabled')
     .eq('user_id', ctx.user.id)
     .maybeSingle();
 
+  if (lookupError) throw new Error('Unable to check the payout account.');
+  if (existing?.payout_provider === provider) return getProgramHolderPayoutAccount(ctx);
+  if (existing?.payouts_enabled || existing?.transfers_enabled) throw new Error('Contact Elevate to change a verified payout provider.');
   const payoutState = {
     payout_provider: provider,
     transfers_enabled: false,
@@ -89,11 +93,12 @@ export async function configureProgramHolderPayoutAccount(
 
   if (error) throw new Error('Unable to save the payout account.');
 
-  await ctx.db
+  const { error: holderError } = await ctx.db
     .from('program_holders')
     .update({ payout_status: `${provider}_setup_required` })
     .eq('id', ctx.holderId);
 
+  if (holderError) throw new Error('Payout setup saved, but holder status could not be updated.');
   return getProgramHolderPayoutAccount(ctx);
 }
 

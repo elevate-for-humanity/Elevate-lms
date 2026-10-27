@@ -12,6 +12,7 @@ export function ProgramHolderAcknowledgements({
   async function submit(formData: FormData) {
     setBusy(true);
     setMessage('');
+    try {
     const response = await fetch('/api/program-holder/acknowledgements', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -22,14 +23,19 @@ export function ProgramHolderAcknowledgements({
         enchanted_hearts_referral_terms: formData.get('enchanted_hearts_referral_terms') === 'yes',
       }),
     });
-    const result = await response.json();
-    setBusy(false);
+    if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Your session or connection changed. Reload the page and try again.');
+    const result = await response.json().catch(() => ({}));
     setMessage(
       response.ok
         ? 'Acknowledgements recorded.'
         : result.error || 'Unable to save acknowledgements.',
     );
     if (response.ok) window.setTimeout(() => window.location.reload(), 500);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'The request could not be completed. Please retry.');
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <form action={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

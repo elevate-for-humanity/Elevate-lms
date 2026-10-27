@@ -52,7 +52,7 @@ export type ProgramHolderContext =
   | ProgramHolderPreviewContext;
 
 async function resolveProgramIdsForHolder(db: any, holderId: string): Promise<string[]> {
-  const [{ data: associations }, { data: holder }] = await Promise.all([
+  const [{ data: associations, error: associationError }, { data: holder, error: featuresError }] = await Promise.all([
     db
       .from('program_holder_programs')
       .select('program_id')
@@ -61,13 +61,15 @@ async function resolveProgramIdsForHolder(db: any, holderId: string): Promise<st
     db.from('program_holders').select('features').eq('id', holderId).maybeSingle(),
   ]);
 
+  if (associationError || featuresError) throw new Error('PROGRAM_HOLDER_PROGRAMS_UNAVAILABLE');
   const regional = holder?.features?.regional_assignment;
   if (regional?.all_programs_in_region === true) {
-    const { data: regionalPrograms } = await db
+    const { data: regionalPrograms, error: regionalError } = await db
       .from('programs')
       .select('id')
       .eq('is_active', true)
       .eq('status', 'active');
+    if (regionalError) throw new Error('PROGRAM_HOLDER_PROGRAMS_UNAVAILABLE');
     return (regionalPrograms || []).map((row: { id: string }) => row.id);
   }
 
@@ -81,7 +83,7 @@ async function resolveProgramIdsForHolder(db: any, holderId: string): Promise<st
  * The active platform `admin` role receives oversight access without being
  * assigned a fake holder/tenant identity.
  */
-export async function requireProgramHolder(): Promise<ProgramHolderContext> {
+export async function requireProgramHolder(options: { allowPendingApproval?: boolean } = {}): Promise<ProgramHolderContext> {
   const db = await requireAdminClient();
 
   // A cross-domain Admin preview arrives with a short-lived signed handoff
@@ -135,6 +137,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     }
   }
 
+  if (access.profile.is_active === false || access.profile.suspended === true) redirect('/unauthorized');
   const profile: ProgramHolderProfile = {
     id: access.profile.id,
     role: access.profile.role,
@@ -158,17 +161,25 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     };
   }
 
-  const holderId = profile.program_holder_id;
-  if (!holderId) redirect('/program-holder?error=pending-approval');
+  let holderId = profile.program_holder_id;
+  if (!holderId) {
+    const { data: ownedHolder, error } = await db.from('program_holders').select('id').eq('user_id', access.user.id).maybeSingle();
+    if (error) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
+    holderId = ownedHolder?.id ?? null;
+  }
+  if (!holderId) redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+  profile.program_holder_id = holderId;
 
-  const { data: holder } = await db
+  const { data: holder, error: holderError } = await db
     .from('program_holders')
-    .select('status, mou_signed, approved_at, payout_status')
+    .select('status, mou_signed, approved_at, payout_status, mou_terminated, suspended_at, terminated_at')
     .eq('id', holderId)
     .maybeSingle();
 
-  if (!holder) redirect('/program-holder?error=pending-approval');
-  if (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at) {
+  if (holderError) throw new Error('PROGRAM_HOLDER_LOOKUP_UNAVAILABLE');
+  if (!holder) redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+  if (holder.mou_terminated || holder.suspended_at || holder.terminated_at || ['inactive','suspended','terminated','rejected'].includes(holder.status)) redirect('/unauthorized');
+  if (!options.allowPendingApproval && (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at)) {
     redirect('/program-holder/onboarding?status=pending-approval');
   }
   // Program Holders may view their dashboard while completing onboarding.

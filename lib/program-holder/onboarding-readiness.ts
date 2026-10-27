@@ -18,6 +18,11 @@ export const CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'training_plan', label: 'Approved program syllabus and training plan' },
 ] as const;
 
+export function requiredProgramHolderDocuments(isHvac: boolean, features: Record<string, any> = {}) {
+  const requirements = isHvac ? HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS : CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS;
+  return requirements.filter(item => !(item.type === 'insurance' && features.insurance_required === false));
+}
+
 export type ProgramHolderReadiness = {
   ready: boolean;
   missing: string[];
@@ -132,9 +137,7 @@ export async function getProgramHolderPaymentReadiness(
   const features = holder.features && typeof holder.features === 'object' ? holder.features : {};
   const requiresMediaRelease = features.require_image_release === true || features.student_media_required === true;
   const payoutProvider = String(features.payout_provider || payoutProfile?.payout_provider || '').toLowerCase();
-  const required = isHvac
-    ? HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS
-    : CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS;
+  const required = requiredProgramHolderDocuments(isHvac, features);
   const incompleteBackWork = (graduated || []).flatMap((student: any) => {
     const name = student.full_name || 'Graduated student';
     const gaps = [] as string[];

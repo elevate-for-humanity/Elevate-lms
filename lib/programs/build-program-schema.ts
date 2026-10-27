@@ -121,7 +121,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     schedule: 'Flexible / cohort-based — contact admissions for next start date',
     cohortSize: 'Small cohorts with instructor support',
     fundingStatement:
-      'WIOA, Workforce Ready Grant, and FSSA IMPACT funding may be available for eligible Indiana residents.',
+      'No public workforce-funding claim is made for this program unless exact program-level evidence is recorded in the canonical funding registry. Review the published self-pay options or contact admissions.',
     selfPayCost: 'Contact admissions',
     credentials: defaultCredentials(title, input.credential),
     outcomes: defaultOutcomes(title),
@@ -170,12 +170,8 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     ],
     complianceAlignment: [
       {
-        standard: 'WIOA-Aligned Training Structure',
-        description: 'Structured competency-based training aligned with workforce development standards.',
-      },
-      {
-        standard: 'ETPL-Approved Provider',
-        description: `${PLATFORM_DEFAULTS.orgName} is an Indiana Eligible Training Provider.`,
+        standard: 'Program-specific requirements',
+        description: 'Credential, licensing, funding, and regulatory claims must be verified for this exact program before publication.',
       },
     ],
     laborMarket: {
@@ -203,7 +199,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
       {
         question: 'What funding is available?',
         answer:
-          'WIOA, Workforce Ready Grant, and FSSA IMPACT may cover tuition for eligible participants. Use our eligibility checker or contact admissions.',
+          'Do not assume workforce funding applies. Review the exact program page and canonical funding disclosure. Any agency-funded enrollment requires program-level eligibility and written authorization.',
       },
       {
         question: 'How do I apply?',
@@ -218,13 +214,14 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     metaTitle: `${title} | ${PLATFORM_DEFAULTS.orgName}`,
     metaDescription: subtitle,
     funding: {
-      wioa_eligible: programType !== 'certification',
-      wrg_eligible: programType !== 'certification',
-      fssa_eligible: programType !== 'certification',
+      wioa_eligible: false,
+      wrg_eligible: false,
+      fssa_eligible: false,
+      fundingNotes: 'No public workforce-funding claim is made unless the canonical funding registry contains exact program-level evidence.',
     },
     enrollmentType: 'internal',
     deliveryModel: 'internal',
-    fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+    fundingOptions: ['self_pay'],
   };
 }
 

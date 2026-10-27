@@ -11,7 +11,7 @@ const web = app => ({ family: 'next-web', app,
 export const containerBuildPolicy = Object.freeze({
   marketing: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
   store: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
-  admin: { dockerfile: 'Dockerfile.northflank-admin', ...web('admin') },
+  admin: { dockerfile: 'Dockerfile.admin', ...web('admin') },
   lms: { dockerfile: 'Dockerfile.northflank-lms', ...web('lms') },
   'ultimate-worker': { dockerfile: 'Dockerfile.ultimate-worker', family: 'native-course-worker',
     memoryControl: 'scripts/gcp/regional-capacity.mjs',
@@ -29,6 +29,10 @@ export const containerBuildPolicy = Object.freeze({
     memoryControl: 'services/llm-gpu-worker/entrypoint.google.sh',
     savingControl: 'services/llm-gpu-worker/bake_model.py',
     recoveryControl: 'services/llm-gpu-worker/README.md' },
+  'owned-cpu-llm': { dockerfile: 'services/llm-cpu-worker/Dockerfile.google', family: 'cpu-llm',
+    memoryControl: 'services/llm-cpu-worker/entrypoint.sh',
+    savingControl: 'services/llm-cpu-worker/finalize_model.py',
+    recoveryControl: 'services/llm-cpu-worker/README.md' },
   'media-gpu-worker': { dockerfile: 'services/media-gpu-worker/Dockerfile', family: 'gpu-media',
     memoryControl: 'services/media-gpu-worker/worker.py',
     savingControl: 'lib/storage/elevate-media-storage.ts',
@@ -38,7 +42,7 @@ export const containerBuildPolicy = Object.freeze({
 // These are reviewed source references, not claims of live backup/load-test
 // acceptance. Admission prevents future images silently omitting these concerns.
 export function validateContainerProfiles(profiles, exists) {
-  const families = new Set(['next-web', 'native-course-worker', 'chromium-browser', 'gpu-llm', 'gpu-media']);
+  const families = new Set(['next-web', 'native-course-worker', 'chromium-browser', 'gpu-llm', 'gpu-media', 'cpu-llm']);
   for (const [name, profile] of Object.entries(profiles)) {
     if (!families.has(profile.family)) throw new Error(`${name}: unknown workload family`);
     for (const field of ['dockerfile', 'memoryControl', 'savingControl', 'recoveryControl']) {

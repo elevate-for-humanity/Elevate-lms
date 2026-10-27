@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: 'Store Capability Proof | Elevate for Humanity',
   description:
     'Source-backed evidence, working surfaces, scope, and limitations for every product advertised in the Elevate Store.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/proof' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/proof' },
 };
 
 const REPOSITORY = 'https://github.com/elevate-for-humanity/Elevate-lms';

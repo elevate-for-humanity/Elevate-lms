@@ -1,5 +1,6 @@
 name: Audit complete Google migration parity
 # Compare the saved Northflank topology with the current Google production setup.
+# 2026-10-22: Revalidate Google parity before retiring any legacy services or bound volumes.
 on:
   push:
     branches: [main]

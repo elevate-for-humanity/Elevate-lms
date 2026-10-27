@@ -71,6 +71,8 @@ export interface MediaScene {
   transition: Transition;
   referenceImageUrl?: string;
   sourceVideoUrl?: string;
+  /** Optional render-resolved clip: a footage scene must never be accepted as a static slide. */
+  clipUrl?: string | null;
   characterIds: string[];
   negativePrompt?: string;
   seed?: number;
@@ -118,8 +120,8 @@ export interface MediaDirectorInput {
   sceneData?: Record<string, unknown>;
   characters?: MediaCharacterReference[];
   defaultDurationSeconds?: number;
-  /** Ultimate's authored thirteen-stage film must never be compacted to ten. */
-  requiredSceneCount?: 13;
+  /** Preserve the accepted authored storyboard, including expanded teaching scenes. */
+  requiredSceneCount?: number;
 }
 
 export const MIN_LESSON_VIDEO_SCENES = 6;

@@ -8,6 +8,33 @@ export const sites = {
   store: 'https://store.elevateforhumanity.org',
 };
 
+const quickBooksReasons = new Set(['oauth_configuration_missing', 'webhook_verifier_missing']);
+const safeError = error => ['TimeoutError', 'AbortError', 'TypeError', 'SyntaxError'].includes(error?.name) ? error.name : 'probe_failed';
+function dependencyEvidence(value) {
+  if (!value || typeof value !== 'object') return undefined;
+  const allowed = ['missing_configuration', 'non_success_status', 'invalid_response', 'request_failed', 'TimeoutError', 'AbortError', 'TypeError', 'SyntaxError'];
+  return { ok: value.ok === true,
+    status: Number.isInteger(value.status) && value.status >= 100 && value.status <= 599 ? value.status : null,
+    latencyMs: Number.isFinite(value.latencyMs) && value.latencyMs >= 0 ? value.latencyMs : undefined,
+    error: allowed.includes(value.error) ? value.error : undefined };
+}
+
+// Retry only transport failures on idempotent public-health GETs. A real HTTP
+// response (including 503) or a malformed body must still fail its gate.
+// Each attempt gets its own abort signal; the total retry budget is bounded.
+async function getWithTransportRetry(request, url, options) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await request(url, {
+        ...options,
+        signal: AbortSignal.timeout(attempt === 0 ? 20_000 : 10_000),
+      });
+    } catch (error) {
+      if (attempt === 1 || !['TimeoutError', 'AbortError', 'TypeError'].includes(error?.name)) throw error;
+    }
+  }
+}
+
 export async function verifySite(component, request = fetch) {
   const base = sites[component];
   if (!base) throw new Error('Unknown public service');
@@ -15,14 +42,17 @@ export async function verifySite(component, request = fetch) {
   const results = [];
   for (const path of ['/api/ping', '/api/health', '/api/ready']) {
     try {
-      const r = await request(base + path, { redirect: 'manual', signal: AbortSignal.timeout(20000), headers: { 'Cache-Control': 'no-cache' } });
+      const r = await getWithTransportRetry(request, base + path, { redirect: 'manual', headers: { 'Cache-Control': 'no-cache' } });
       const body = await r.json();
       const passed = path === '/api/ping'
         ? r.status === 200 && body.ok === true && body.service === processService
         : healthPassed(processService, path, r.status, body);
       results.push({ component, path, status: r.status, passed,
-        commit: /^[a-f0-9]{40}$/.test(body.commit ?? '') ? body.commit : undefined });
-    } catch { results.push({ component, path, passed: false, error: 'probe_failed' }); }
+        commit: /^[a-f0-9]{40}$/.test(body.commit ?? '') ? body.commit : undefined,
+        supabase: dependencyEvidence(body.dependencies?.supabase),
+        auth: dependencyEvidence(body.dependencies?.supabase?.checks?.auth),
+        database: dependencyEvidence(body.dependencies?.supabase?.checks?.database) });
+    } catch (error) { results.push({ component, path, passed: false, error: safeError(error) }); }
   }
   if (component === 'marketing') {
     try {
@@ -30,7 +60,11 @@ export async function verifySite(component, request = fetch) {
       const body = await r.json();
       results.push({ component, path: '/api/health/quickbooks', status: r.status,
         passed: r.status === 200 && body.ready === true && body.connected === true &&
-          body.configured === true && body.webhookVerifierConfigured === true });
+          body.configured === true && body.webhookVerifierConfigured === true,
+        reason: quickBooksReasons.has(body.reason) ? body.reason : undefined,
+        configured: typeof body.configured === 'boolean' ? body.configured : undefined,
+        connected: typeof body.connected === 'boolean' ? body.connected : undefined,
+        webhookVerifierConfigured: typeof body.webhookVerifierConfigured === 'boolean' ? body.webhookVerifierConfigured : undefined });
     } catch { results.push({ component, path: '/api/health/quickbooks', passed: false, error: 'probe_failed' }); }
   }
   return results;

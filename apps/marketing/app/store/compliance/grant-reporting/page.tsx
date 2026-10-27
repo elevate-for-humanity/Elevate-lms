@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: `Grant Reporting Tools | ${PLATFORM_DEFAULTS.orgName} Store`,
   description: 'Automated grant reporting with customizable templates, outcome tracking, and one-click exports for federal and state workforce grants.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/compliance/grant-reporting',
+    canonical: 'https://store.elevateforhumanity.org/store/compliance/grant-reporting',
   },
 };
 

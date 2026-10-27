@@ -115,7 +115,7 @@ export async function GET() {
       .select('id', { count: 'exact', head: true })
       .eq('extension_id', extension.id)
       .eq('status', 'active')
-      .eq('provider', extension.webrtc_provider || 'telnyx')
+      .eq('provider', 'asterisk')
       .eq('connection_state', 'connected')
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
   ]);
@@ -158,7 +158,7 @@ export async function GET() {
       externalFallbackEnabled: adminForwardingAllowed(system, extension, ctx.roles) && extension.admin_external_fallback === true,
       externalFallbackNumber: adminForwardingAllowed(system, extension, ctx.roles) ? ADMIN_FORWARDING_NUMBER : '',
       presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
-      provider: extension.webrtc_provider || 'telnyx',
+      provider: 'asterisk',
     },
     voicemail: {
       unreadCount: (voicemails || []).filter((item: any) => !item.is_read).length,
@@ -236,7 +236,7 @@ export async function PATCH(request: Request) {
   }
   const body = await request.json().catch(() => ({}));
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  const provider = extension.webrtc_provider || 'telnyx';
+  const provider = 'asterisk';
   if (body.action === 'heartbeat') {
     const requestedDeviceId = String(body.deviceId || '');
     const deviceId =

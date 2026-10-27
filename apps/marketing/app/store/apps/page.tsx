@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     'grant management software',
   ],
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/apps',
+    canonical: 'https://store.elevateforhumanity.org/store/apps',
   },
   openGraph: {
     title: 'Software, Apps & Add-Ons | Elevate Store',
     description:
       'Search the Elevate commerce catalog across platform plans, apps, AI, education, workforce, operations, and enterprise tools.',
-    url: 'https://www.elevateforhumanity.org/store/apps',
+    url: 'https://store.elevateforhumanity.org/store/apps',
     type: 'website',
   },
 };

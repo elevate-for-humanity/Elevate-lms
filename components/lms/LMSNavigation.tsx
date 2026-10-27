@@ -113,7 +113,9 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
   // Resources available to learners inside the LMS — not surfaced on the marketing site.
   const resourceItems = [
     { href: '/lms/orientation', label: 'Orientation' },
-    { href: '/student-handbook', label: 'Student Handbook' },
+    { href: '/lms/handbook', label: 'Student Handbook' },
+    { href: '/lms/documents', label: 'Documents & Records' },
+    { href: '/lms/agreements', label: 'MOUs & Agreements' },
     { href: '/academic-calendar', label: 'Academic Calendar' },
     { href: '/resources', label: 'Learning Resources' },
     { href: '/career-services', label: 'Career Services' },

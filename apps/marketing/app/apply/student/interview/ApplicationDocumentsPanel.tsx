@@ -120,7 +120,12 @@ export default function ApplicationDocumentsPanel({ locale = 'en' }: { locale?: 
     }
   }
 
-  const byType = new Map(documents.map((document) => [document.document_type, document]));
+  const byType = new Map<string, UploadedDocument[]>();
+  for (const document of documents) {
+    const group = byType.get(document.document_type) ?? [];
+    group.push(document);
+    byType.set(document.document_type, group);
+  }
 
   return (
     <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="application-documents-title">
@@ -151,9 +156,9 @@ export default function ApplicationDocumentsPanel({ locale = 'en' }: { locale?: 
       ) : requirements.length ? (
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {requirements.map((requirement) => {
-            const document = byType.get(requirement.document_type);
-            const accepted = document && (document.verified || document.status === 'verified' || document.verification_status === 'verified');
-            const rejected = document && (document.status === 'rejected' || document.verification_status === 'rejected');
+            const matchingDocuments = byType.get(requirement.document_type) ?? [];
+            const accepted = matchingDocuments.some((document) => document.verified || document.status === 'verified' || document.verification_status === 'verified');
+            const rejected = matchingDocuments.some((document) => document.status === 'rejected' || document.verification_status === 'rejected');
             return (
               <article key={requirement.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -168,31 +173,29 @@ export default function ApplicationDocumentsPanel({ locale = 'en' }: { locale?: 
                       </p>
                     </div>
                   </div>
-                  {document ? (
+                  {matchingDocuments.length ? (
                     accepted ? <CheckCircle2 className="h-5 w-5 flex-none text-emerald-600" /> : rejected ? <XCircle className="h-5 w-5 flex-none text-red-600" /> : <Loader2 className="h-5 w-5 flex-none text-amber-600" />
                   ) : null}
                 </div>
                 {requirement.description ? <p className="mt-3 text-xs leading-5 text-slate-600">{requirement.description}</p> : null}
-                {document ? (
-                  <div className={`mt-3 rounded-lg border p-3 text-xs ${rejected ? 'border-red-200 bg-red-50 text-red-800' : accepted ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-amber-200 bg-amber-50 text-amber-900'}`}>
+                {matchingDocuments.map((document) => (
+                  <div key={document.id} className="mt-3 rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-800">
                     <p className="font-black">{statusLabel(document, locale)}</p>
                     <p className="mt-1 break-all">{document.file_name}</p>
-                    {document.rejection_reason ? <p className="mt-2">{document.rejection_reason}</p> : null}
+                    {document.rejection_reason ? <p className="mt-2 text-red-700">{document.rejection_reason}</p> : null}
                   </div>
-                ) : null}
-                {!accepted ? (
-                  <label className="mt-4 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white hover:bg-slate-800">
-                    {uploading === requirement.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
-                    {text.upload}
-                    <input
-                      type="file"
-                      accept="application/pdf,image/jpeg,image/png,image/webp"
-                      disabled={uploading === requirement.id}
-                      onChange={(event) => void upload(requirement, event.target.files?.[0] || null)}
-                      className="sr-only"
-                    />
-                  </label>
-                ) : null}
+                ))}
+                <label className="mt-4 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white hover:bg-slate-800">
+                  {uploading === requirement.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
+                  {matchingDocuments.length ? (locale === 'es' ? 'Cargar otro archivo (por ejemplo, reverso de identificación)' : 'Upload another file (for example, ID back)') : text.upload}
+                  <input
+                    type="file"
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
+                    disabled={uploading === requirement.id}
+                    onChange={(event) => { void upload(requirement, event.target.files?.[0] || null); event.target.value = ''; }}
+                    className="sr-only"
+                  />
+                </label>
               </article>
             );
           })}

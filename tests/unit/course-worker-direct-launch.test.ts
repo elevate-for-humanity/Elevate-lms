@@ -46,3 +46,43 @@ describe('Admin one-click Course Builder worker execution', () => {
     expect(calls).toHaveLength(0);
   });
 });
+
+describe('complete execution history before launching', () => {
+  function pages(second: unknown, status = 200) {
+    const calls: string[] = [];
+    const request = vi.fn(async (url: URL | RequestInfo) => {
+      const target = String(url); calls.push(target);
+      if (target.startsWith('http://metadata.google.internal/')) return response({ access_token: 'test-only' });
+      if (target.includes('pageToken=')) return response(second, status);
+      if (target.includes('/executions?')) return response({
+        executions: Array.from({ length: 50 }, (_, i) => ({ name: String(i), completionTime: '2026-10-01T00:00:00Z' })),
+        nextPageToken: 'next/older+page',
+      });
+      if (target.endsWith(':run')) return response({ name: 'operations/paged' });
+      return response({ name: jobName });
+    });
+    return { request: request as typeof fetch, calls };
+  }
+  it('finds active work beyond 50 completed executions without launching another', async () => {
+    const { request, calls } = pages({ executions: [{ name: jobName + '/executions/older-active' }] });
+    const result = await startDeployedCourseWorker({ request, env: { K_SERVICE: 'admin' } });
+    expect(result.executionName).toContain('older-active');
+    expect(calls.some(url => url.endsWith(':run'))).toBe(false);
+    expect(calls.some(url => url.includes('pageToken=next%2Folder%2Bpage'))).toBe(true);
+  });
+  it('launches only after all history pages have no active execution', async () => {
+    const { request, calls } = pages({ executions: [{ conditions: [{ type: 'Completed', state: 'CONDITION_FAILED' }] }] });
+    expect((await startDeployedCourseWorker({ request, env: { K_SERVICE: 'admin' } })).operationName).toBe('operations/paged');
+    expect(calls.at(-1)).toContain(':run');
+  });
+  it('does not launch when a later history page is unreadable', async () => {
+    const { request, calls } = pages({}, 503);
+    await expect(startDeployedCourseWorker({ request, env: { K_SERVICE: 'admin' } })).rejects.toThrow('EXECUTIONS_UNAVAILABLE_HTTP_503');
+    expect(calls.some(url => url.endsWith(':run'))).toBe(false);
+  });
+  it('rejects repeated pagination tokens without launching', async () => {
+    const { request, calls } = pages({ executions: [], nextPageToken: 'next/older+page' });
+    await expect(startDeployedCourseWorker({ request, env: { K_SERVICE: 'admin' } })).rejects.toThrow('PAGE_CYCLE');
+    expect(calls.some(url => url.endsWith(':run'))).toBe(false);
+  });
+});

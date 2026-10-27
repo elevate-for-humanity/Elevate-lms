@@ -1,6 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { continueCourseQueue, courseReleasePending } from './continue-course-queue.mjs';
+test('observes active rendering through an empty scan until the next lesson is assigned',async()=>{
+ const states=[{status:'empty',activeExecutions:1},{status:'empty',activeExecutions:1},{status:'assigned'},{status:'empty',activeExecutions:0}];
+ let clock=0,calls=0;
+ const result=await continueCourseQueue({dispatch:async()=>{calls++;return states.shift();},now:()=>clock,delay:async ms=>{clock+=ms;},onState:()=>{}});
+ assert.equal(result.status,'empty');assert.equal(calls,4);
+});
+test('active rendering beyond the coordinator budget gets one trusted successor',async()=>{
+ let handoffs=0;
+ const result=await continueCourseQueue({dispatch:async()=>({status:'empty',activeExecutions:1}),budgetMs:0,onState:()=>{},
+ env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',GH_TOKEN:'test'},request:async()=>{handoffs++;return {status:204};}});
+ assert.equal(result.status,'handed_off');assert.equal(handoffs,1);
+});
+test('capacity waits still terminate without spinning or dispatching a successor',async()=>{
+ const result=await continueCourseQueue({dispatch:async()=>({status:'capacity_wait'}),request:async()=>{throw Error('must not dispatch');},onState:()=>{}});
+ assert.equal(result.status,'capacity_wait');
+});
 test('continues after a running task and fresh claim, then stops without dispatching an empty queue', async () => {
   const states = ['busy', 'assigned', 'busy', 'empty']; let clock = 0, handoffs = 0;
   const result = await continueCourseQueue({ dispatch: async () => ({ status: states.shift() }), now: () => clock,

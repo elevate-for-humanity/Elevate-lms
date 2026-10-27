@@ -102,10 +102,13 @@ export async function POST(request: NextRequest) {
       if (!payment) throw new Error('PayPal payment event is missing subscription or amount data.');
       await syncPayPalPaymentToQuickBooks(db, payment);
     }
-    await db
+    const completion = await db
       .from('billing_provider_events')
       .update({ status: 'completed', processed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', reservation.data.id);
+    // PayPal must retry when the durable acknowledgement was not saved.
+    // An HTTP 200 here would hide an interrupted billing event permanently.
+    if (completion.error) throw new Error('PayPal event completion could not be saved.');
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'PayPal billing synchronization failed.';

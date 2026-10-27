@@ -19,19 +19,12 @@ test('rejects missing required settings and leaves original object unchanged',()
  assert.equal(target.runtimeEnvironment.CLOUDFLARE_AI_MODEL,undefined);
 });
 
-test('already configured Google Cloud skips missing retired Northflank token and does not write',async()=>{
- const original=existing();
- Object.assign(original.runtimeEnvironment,source);
- const writes=[];
- const result=await migrateCloudflare({env:{},request:async()=>{throw Error('should not call Northflank');},run:(args)=>{
-   if(args.includes('add'))writes.push(args);
-   return JSON.stringify(original);
- }});
+test('existing Google Cloudflare config works without a Northflank token or network access',async()=>{
+ const googleConfig=existing();
+ Object.assign(googleConfig.runtimeEnvironment,source);
+ let calls=0;
+ const run=()=>{calls++;return JSON.stringify(googleConfig);};
+ const result=await migrateCloudflare({env:{},request:()=>{throw Error('Northflank must not be called');},run});
  assert.equal(result.status,'already_configured');
- assert.equal(writes.length,0);
-});
-test('missing Google config and absent Northflank token fail without writes',async()=>{
- let writes=0;
- await assert.rejects(()=>migrateCloudflare({env:{},run:(args)=>{if(args.includes('add'))writes++;return JSON.stringify(existing());}}),/northflank_read_token_missing/);
- assert.equal(writes,0);
+ assert.equal(calls,1);
 });

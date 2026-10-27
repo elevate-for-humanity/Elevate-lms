@@ -44,6 +44,19 @@ export function credentialMatches(actual, expected) {
     b = Buffer.from(expected);
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
+export function stagedCompletionStatus(page) {
+  return page.getByTestId('staged-lesson').getByRole('status').filter({hasText:'Lesson completed'});
+}
+export async function completeStagedLesson(page, state) {
+  // Role queries exclude hidden streamed/cached copies; retain strict matching
+  // if more than one visible completion control or status is present.
+  await page.getByTestId('staged-lesson').getByRole('button', {name:'Complete lesson',exact:true}).click();
+  await stagedCompletionStatus(page).waitFor();
+  await page.reload();
+  await stagedCompletionStatus(page).waitFor();
+  assert((await state()).completed === true, 'Completion not persistent');
+  return 'Completion persisted across reload';
+}
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -395,12 +408,7 @@ export async function runLearnerTest(
       'completion',
       'Complete after playback and required activities; reload and verify persistence',
       async () => {
-        await page.getByRole('button', { name: 'Complete lesson', exact: true }).click();
-        await page.getByTestId('lesson-completed').waitFor();
-        await page.reload();
-        await page.getByTestId('lesson-completed').waitFor();
-        assert((await state()).completed === true, 'Completion not persistent');
-        return 'Completion persisted across reload';
+        return completeStagedLesson(page, state);
       },
     );
     await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
@@ -433,7 +441,7 @@ export async function runLearnerTest(
     }));
     const nonColor =
       (await page.getByRole('status').filter({ hasText: 'Passed.' }).count()) > 0 &&
-      (await page.getByTestId('lesson-completed').isVisible());
+      (await stagedCompletionStatus(page).isVisible());
     const accessibility = {
       contractVersion: input.contractVersion,
       semanticHeadings: !violations.some((v) => /heading/.test(v.id)),

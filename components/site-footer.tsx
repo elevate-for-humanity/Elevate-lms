@@ -25,7 +25,7 @@ export function SiteFooter() {
     <PublicPageFacts />
     <footer data-public-footer className="border-t border-slate-200 bg-slate-50 text-slate-950">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-        <p className="mb-7 max-w-4xl text-sm leading-6 text-slate-700"><strong className="text-slate-950">Funding notice:</strong> Apprenticeship programs are self-pay only. Individual programs may be eligible for WIOA, Workforce Ready Grant, or other funding. Eligibility and availability vary by program and participant; funding is not guaranteed.</p>
+        <p className="mb-7 max-w-4xl text-sm leading-6 text-slate-700"><strong className="text-slate-950">Funding notice:</strong> Apprenticeship programs are self-pay unless the exact program page documents another approved payment source. Public WIOA or Workforce Ready Grant labels are shown only for programs with verified program-level evidence; participant eligibility and written authorization remain agency decisions.</p>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5 lg:gap-7">
           <div>
             <p className="text-lg font-bold text-slate-950">{siteConfig.name}</p>

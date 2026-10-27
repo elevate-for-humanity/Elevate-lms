@@ -7,6 +7,8 @@ describe('PARIS browser launch wiring', () => {
     expect(r).toContain("name: 'browser.launch'");
     expect(r).toContain("path: '/api/admin/dev-studio/browser/session'");
     expect(r).toContain("name: 'browser.execute'");
+    const browserExecute = r.slice(r.indexOf("name: 'browser.execute'"), r.indexOf("name: 'openhands.execute'"));
+    expect(browserExecute).toContain("requiredInput: ['task', 'sessionId', 'sessionToken']");
     expect(r).toContain("name: 'studio.runtime.exec'");
     expect(r).toContain("name: 'workflows.runTests'");
   });

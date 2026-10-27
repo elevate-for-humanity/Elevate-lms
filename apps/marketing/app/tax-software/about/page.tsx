@@ -56,10 +56,10 @@ export default function About() {
                 Indianapolis, IN 46204
               </address>
               <a
-                href="tel:+13179999620"
+                href="tel:+14632401404"
                 className="mt-5 inline-block text-xl font-bold text-[#082b66]"
               >
-                (317) 999-9620
+                (463) 240-1404
               </a>
               <p className="mt-5 text-sm leading-7 text-slate-600">
                 Contact us to confirm the appropriate service or appointment before visiting. Keep

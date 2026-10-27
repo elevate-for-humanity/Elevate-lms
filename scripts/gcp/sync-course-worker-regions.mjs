@@ -4,7 +4,7 @@ import {isDeepStrictEqual} from 'node:util';
 const source={name:'elevate-course-builder',region:'us-central1'};
 const target={name:'elevate-course-builder-parallel',region:'us-east1'};
 const taskOf=job=>job?.spec?.template?.spec?.template?.spec;
-function boundary(job){
+export function courseWorkerBoundary(job){
  const envelope=job?.spec?.template?.spec,task=taskOf(job);
  if(!task||task.containers?.length!==1||task.serviceAccountName!==`elevate-worker-runtime@${PROJECT}.iam.gserviceaccount.com`)
   throw Error('APPROVED_COURSE_WORKER_IDENTITY_REQUIRED');
@@ -17,10 +17,10 @@ function boundary(job){
  * executions, resource limits, environment, identity and leases are preserved. */
 export function syncCourseWorkerRegions(run=google){
  const read=where=>JSON.parse(run(['run','jobs','describe',where.name,'--project='+PROJECT,'--region='+where.region,'--format=json']));
- const origin=boundary(read(source)),before=boundary(read(target));
+ const origin=courseWorkerBoundary(read(source)),before=courseWorkerBoundary(read(target));
  if(before.image===origin.image)return {changed:false,region:target.region,imageVerified:true};
  run(['run','jobs','update',target.name,'--project='+PROJECT,'--region='+target.region,'--image='+origin.image,'--quiet']);
- const after=boundary(read(target));
+ const after=courseWorkerBoundary(read(target));
  if(after.image!==origin.image||!isDeepStrictEqual(before.contract,after.contract))
   throw Error('REGIONAL_WORKER_IMAGE_ONLY_READBACK_FAILED');
  return {changed:true,region:target.region,imageVerified:true,configurationPreserved:true};

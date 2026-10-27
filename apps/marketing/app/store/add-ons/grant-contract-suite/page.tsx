@@ -11,7 +11,7 @@ export const dynamic = 'force-static'; // deploy-trigger: 20260518174229
 export const metadata: Metadata = {
   title: 'Grant & Contract Automation Suite',
   description: 'Upload, extract, prefill, sign, and export state contracts and grant applications — powered by verified org data.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/add-ons/grant-contract-suite' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/add-ons/grant-contract-suite' },
 };
 
 const PIPELINE = [

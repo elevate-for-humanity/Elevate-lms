@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
@@ -24,15 +25,14 @@ function ProgramCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
     <div className="group flex h-full flex-col rounded-2xl overflow-hidden bg-slate-900 shadow-md hover:shadow-xl transition-shadow">
       {/* Image — aspect ratio keeps subjects visible at all viewport widths */}
       <div className="relative w-full aspect-[4/3] overflow-hidden flex-shrink-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={prog.heroImage}
           alt={prog.heroImageAlt || prog.title}
           fill
           className="object-cover object-center contrast-105 saturate-110 transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           priority={priority}
-          loading={priority ? undefined : 'lazy'} placeholder="empty"
+          loading={priority ? undefined : 'lazy'}
         />
         {/* Category badge top-left */}
         <div className="absolute top-3 left-3">

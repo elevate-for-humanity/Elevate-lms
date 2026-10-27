@@ -119,7 +119,7 @@ export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Worksp
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search workspaces"
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-950 outline-none transition placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+                className="h-10 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-950 outline-none transition placeholder:text-gray-600 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
               />
             </label>
             <button

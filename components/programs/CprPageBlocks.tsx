@@ -11,6 +11,7 @@
  * Video: /videos/cpr-training.mp4 — placeholder path, falls back to image
  */
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -49,14 +50,13 @@ function FactsStrip() {
 function FullBleedImage({ src, alt }: { src: string; alt: string }) {
   return (
     <div className="relative w-full h-[420px] sm:h-[520px] overflow-hidden border-y border-slate-200">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-      <Image
+      <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
         src={src}
         alt={alt}
         fill
         className="object-contain object-center"
         sizes="100vw"
-        priority placeholder="empty"
+        priority
       />
       {/* Hard overlay strip at bottom — no gradient, just a solid band */}
       <div className="absolute bottom-0 left-0 right-0 bg-slate-900 py-3 px-6">

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ApplicationQueue from './ApplicationQueue';
@@ -18,32 +17,14 @@ export default async function ProviderApplicationsPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-
-  // Guard against null user
-  if (!user) redirect('/login');
+  await requireRole(['admin']);
   const db = await requireAdminClient();
-  if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['admin'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
 
   const { status: filterStatus } = await searchParams;
   const activeFilter = filterStatus ?? 'pending';
 
   // Counts per status for tab badges
-  const { data: counts } = await supabase.from('provider_applications').select('status');
+  const { data: counts } = await db.from('provider_applications').select('status');
 
   const statusCounts = (counts ?? []).reduce<Record<string, number>>((acc, row) => {
     acc[row.status] = (acc[row.status] ?? 0) + 1;
@@ -51,7 +32,7 @@ export default async function ProviderApplicationsPage({
   }, {});
 
   // Applications for active tab
-  const query = supabase
+  const query = db
     .from('provider_applications')
     .select('*')
     .order('created_at', { ascending: false });

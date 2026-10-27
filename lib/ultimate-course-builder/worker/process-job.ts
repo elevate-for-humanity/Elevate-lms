@@ -1,3 +1,7 @@
+import { checkpointContinuousLesson, continuousCourseLease } from './continuous-course-lease.mjs';
+import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
+import { preservedCourseCursor } from './preserve-completed.mjs';
+import { recordProductionAlert } from './production-alert';
 import {ULTIMATE_BUILD_STEPS} from '../core/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateJobQueue } from './job-queue';
@@ -21,6 +25,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
+  const executionStarted = Date.now();
   const generation = Number(job.execution_generation);
   if (!Number.isSafeInteger(generation) || generation < 1)
     throw new Error('ULTIMATE_EXECUTION_GENERATION_REQUIRED');
@@ -60,32 +65,87 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       if(!data?.length)throw Error('ULTIMATE_JOB_LEASE_LOST:'+job.id);
     },
     onStall:async(progress:any)=>{
+      // Cancellation can reject the active provider immediately. Only this
+      // callback owns the fenced failure transition, even if its write hangs.
+      leaseLost=true;
       console.error('[UltimateWorker] progress stalled', {jobId:job.id,...progress});
       await queue.fail(job.id,workerId,'ULTIMATE_PROGRESS_STALLED:'+JSON.stringify(progress),generation,true);
-      leaseLost=true;deadline.lose();
+      deadline.lose();
     },
   });
   const work = async () => {
   try {
+    while (true) {
     const { data: build, error } = await db
       .from('ultimate_course_builds')
       .select('id,course_id,profile,status')
       .eq('id', job.build_id)
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
-    const storedProfile = build.profile as UltimateCredentialProfile;
-    if ((storedProfile as any).ownerPaused === true) {
+    // Upgrade saved owner-review profiles under this worker's fenced write.
+    // The checkpoint hash treats this policy migration as operational metadata.
+    const storedProfile = {
+      ...build.profile,
+      ...(build.profile?.publicationPolicy === 'owner-review-required'
+        ? { publicationPolicy: 'automatic-quality-verified' } : {}),
+    } as UltimateCredentialProfile;
+    const ensureNotPaused = async () => {
+      const state = await db.from('ultimate_course_builds').select('profile').eq('id',build.id).single();
+      if (state.error) throw state.error;
+      if (state.data?.profile?.ownerPaused === true) throw new Error('OWNER_PAUSED_REFERENCE_BUILD');
+    };
+    if ((storedProfile as any).ownerPaused === true && job.payload?.ownerPreview !== true) {
       await queue.waitForDependency(job.id,workerId,'OWNER_PAUSED_REFERENCE_BUILD',generation);
       return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
     }
     if (!storedProfile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
-    const payload = (job.payload ?? {}) as any;
-    const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
+    let payload = (job.payload ?? {}) as any;
+      if (
+        !payload.competencyId &&
+        !payload.lessonBuildId &&
+        !payload.acceptance &&
+        !payload.ownerPreview &&
+        !payload.checkpointRepair
+      ) {
+        const [canonical, completed] = await Promise.all([
+          db
+            .from("course_lessons")
+            .select(
+              "id,status,is_published,approved,video_status,media_quality_status,video_url,video_job_id,media_attachment:content_json->mediaAttachment,film:content_json->film",
+            )
+            .eq("course_id", build.course_id),
+          db
+            .from("ultimate_lesson_builds")
+            .select("id,competency_id,status,render_source:artifacts->lesson_film_render->render->>videoUrl,captions_source:artifacts->lesson_film_render->render->>captionsUrl,transcript_source:artifacts->lesson_film_render->render->>transcriptUrl")
+            .eq("build_id", build.id),
+        ]);
+        if (canonical.error) throw canonical.error;
+        if (completed.error) throw completed.error;
+        payload = preservedCourseCursor(
+          storedProfile,
+          payload,
+          canonical.data ?? [],
+          completed.data ?? [],
+        );
+      }
+      const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
       storedProfile.competencies[Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0]?.id;
-    const profile = await materializeUltimateDraft(db, build.course_id,
+    const hydrated = await materializeUltimateDraft(db, build.course_id,
       await hydrateUltimateProfileSources(db, build.course_id, storedProfile), [currentCompetencyId]);
+    // Inherit the owner's approved production identity between lessons. Draft
+    // hydration can refresh competency content, but must not reset the saved
+    // reference presentation or lesson progression policy.
+    const inheritedKeys = [
+      'lessonPresentation', 'presentationContract', 'lessonCompletionPolicy',
+      'sourcePolicy', 'publicationPolicy',
+    ] as const;
+    const profile = { ...hydrated } as typeof hydrated & Record<string, any>;
+    for (const key of inheritedKeys) {
+      if ((storedProfile as any)?.[key] !== undefined)
+        profile[key] = (storedProfile as any)[key];
+    }
     if (
-      JSON.stringify(profile) !== JSON.stringify(storedProfile)
+      JSON.stringify(profile) !== JSON.stringify(build.profile)
     ) {
       const { error: profileError } = await db.rpc('ultimate_fenced_write', {
         p_job: job.id, p_worker: workerId, p_generation: generation,
@@ -96,6 +156,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
     const runtime = await createUltimateRuntime(db, fence);
     console.info('[UltimateWorker] runtime ready', { jobId: job.id });
+    const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance || payload.ownerPreview);
+    const publishAsYouGo = profile.publishCompletedLessons === true && !targeted;
+    const lessonReleases = publishAsYouGo ? new UltimateReleaseService(db) : null;
+    const lessonReleaseActor = publishAsYouGo
+      ? await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId) : null;
+    if (lessonReleases && lessonReleaseActor) {
+      assertActive();
+      await ensureNotPaused();
+      await lessonReleases.publishReadyLessons(build.id, lessonReleaseActor, {jobId: job.id, workerId, generation});
+    }
     const originalHandlers = createProductionHandlers(runtime);
     const handlers = Object.fromEntries(Object.entries(originalHandlers).map(([step,handler])=>[step,async(ctx:any)=>{
       reportCourseProgress('stage:'+step);
@@ -103,7 +173,6 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       reportCourseProgress('finished:'+step,1,1);
       return result;
     }]));
-    const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
     console.info('[UltimateWorker] lesson processing started', { jobId: job.id, targeted, competencyId: payload.competencyId ?? null });
     const result = await runUltimateCourse(
       {
@@ -115,7 +184,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
-        beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
+        renderPreviewOnly: payload.ownerPreview === true,
+        beforeCheckpoint: async (step) => {
+          await ensureNotPaused();
+          return liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId)(step);
+        },
         repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
         repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
@@ -125,11 +198,48 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       assertActive,
     );
     assertActive();
+    await ensureNotPaused();
     console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
+    if (result.completed || result.previewReady) await recordProductionAlert(db, {
+      actorId:job.payload?.requestedBy ?? profile.mediaAcquisitionOwnerId,buildId:build.id,courseId:build.course_id,
+      eventKey:`lesson:${currentCompetencyId}:${generation}`,title:result.previewReady ? 'Lesson preview saved' : 'Lesson processing completed',
+      message:`${profile.title}: ${currentCompetencyId}. Open production to review saved media and quality evidence.`,
+    });
+    if (payload.ownerPreview === true && result.previewReady) {
+      await runtime.persistence.updateBuild({buildId:build.id,status:'blocked',currentStep:'lesson_film_render'});
+      await queue.complete(job.id,workerId,generation);
+      return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
+    }
+    await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
+      validate:assertCompleteLesson,assertActive});
+    if (lessonReleases && lessonReleaseActor && result.completed && !result.previewReady) {
+      assertActive();
+      await ensureNotPaused();
+      await lessonReleases.publishReadyLessons(build.id, lessonReleaseActor, {jobId: job.id, workerId, generation});
+      assertActive();
+    }
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
         if (result.completed) delete continuation.payload.checkpointRepair;
+        if (continuousCourseLease(build.course_id, payload, Date.now() - executionStarted)) {
+          // Drain writes from the previous lesson before committing its cursor.
+          // Subsequent progress must use the new payload under the same fence.
+          await progressWatch.flush();
+          assertActive();
+          await ensureNotPaused();
+          if (await checkpointContinuousLesson({db, jobId:job.id, workerId, generation,
+            payload:continuation.payload})) {
+            job.payload = continuation.payload;
+            reportCourseProgress('continuing:lesson:' + continuation.payload.nextCompetencyIndex);
+            console.info('[UltimateWorker] continuing under same lease', {
+              jobId:job.id,workerId,generation,nextIndex:continuation.payload.nextCompetencyIndex,
+            });
+            continue;
+          }
+        }
+        // Pending media/repair requests and the bounded execution budget use
+        // the existing atomic wakeup transition rather than losing requests.
         await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
@@ -141,7 +251,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           await queue.waitForDependency(job.id,workerId,`ULTIMATE_EXTERNAL_ASSET_REQUIRED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
           return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
         }
-        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}`,generation,true);
+        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}:FINDINGS=${JSON.stringify((result.findings || []).map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,2800)}`,generation,true);
         return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
       }
     }
@@ -168,6 +278,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         .select('competency_id,status,artifacts').eq('build_id', build.id);
       if (lessonError) throw lessonError;
       for (const competency of profile.competencies) {
+        // The release service rechecks these existing publications without
+        // replacing their films or claiming the new contract was run on them.
+        if (profile.publishCompletedLessons === true && profile.preservedPublishedLessonIds?.includes(
+          profile.canonicalLessonIds?.[competency.id] ?? '')) continue;
         const lesson = lessons?.find(l => l.competency_id === competency.id);
         if (!lesson || lesson.status !== 'built') throw new Error(`ULTIMATE_COMPETENCY_NOT_COMPLETE:${competency.id}`);
         assertCompleteLesson(lesson.artifacts, profile);
@@ -201,11 +315,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
       assertActive();
-      if ((profile as any).publicationPolicy === 'owner-review-required') {
-      await queue.waitForDependency(job.id,workerId,'OWNER_COURSE_REVIEW_REQUIRED',generation);
-      return {claimed:true,completed:false,awaitingOwnerReview:true,jobId:job.id,result};
-    }
-    await new UltimateReleaseService(db).publish(build.id, releaseActor);
+      await new UltimateReleaseService(db).publish(build.id, releaseActor, {jobId: job.id, workerId, generation});
     }
     if (targeted) {
       // A lesson acceptance/repair job does not complete or publish the course.
@@ -218,15 +328,24 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     assertActive();
     await queue.complete(job.id, workerId, generation);
     return { claimed: true, completed: true, jobId: job.id, result };
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (leaseLost || message.startsWith('ULTIMATE_JOB_LEASE_LOST')) {
       console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
       return {claimed:true,completed:false,jobId:job.id,error:message};
     }
+    if (message === 'OWNER_PAUSED_REFERENCE_BUILD') {
+      await queue.waitForDependency(job.id,workerId,message,generation);
+      return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
+    }
     if (isDurableExternalBlocker({code:message.split(':')[0],step:'learning_objectives',severity:'error',message}))
       await queue.waitForDependency(job.id,workerId,message,generation);
     else await queue.fail(job.id, workerId, message, generation, true);
+    const failedBuild = await db.from('ultimate_course_builds').select('course_id').eq('id',job.build_id).single();
+    if (failedBuild.data) await recordProductionAlert(db,{actorId:job.payload?.requestedBy,buildId:job.build_id,
+      courseId:failedBuild.data.course_id,eventKey:`attention:${job.id}:${generation}`,title:'Course production needs attention',
+      message:'A worker attempt stopped. Review the saved checkpoint, recovery state and worker logs.',attention:true});
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {
     if (timer) clearInterval(timer);
@@ -238,7 +357,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   try {
     return await progressWatch.race(deadline.race(progressWatch.run(work)));
   } catch (error) {
-    if (progressWatch.signal.aborted) return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
+    // Disposal also aborts this signal. Only the watchdog's own reason is a stall.
+    if (String(progressWatch.signal.reason?.message ?? '').startsWith('ULTIMATE_PROGRESS_STALLED:'))
+      return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
     if (leaseLost) return {claimed:true,completed:false,jobId:job.id,error:'ULTIMATE_JOB_LEASE_LOST:' + job.id};
     throw error;
   } finally {
@@ -248,3 +369,4 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     progressWatch.dispose();
   }
 }
+

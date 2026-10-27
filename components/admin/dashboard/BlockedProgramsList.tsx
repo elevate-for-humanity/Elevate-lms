@@ -5,29 +5,29 @@ import type { BlockedProgram } from './types';
 export function BlockedProgramsList({ items }: { items: BlockedProgram[] }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-900">Unpublished Programs</h2>
-        <Link href="/programs" className="text-xs text-blue-600 font-medium hover:underline">
-          View all →
+      <div className="px-5 py-4 border-b border-slate-100 flex flex-wrap gap-2 items-center justify-between">
+        <h2 className="text-sm font-bold text-slate-900">Unpublished Programs ({items.length})</h2>
+        <Link href="/programs" className="inline-flex min-h-11 items-center text-sm text-blue-700 font-medium hover:underline">
+          View all programs →
         </Link>
       </div>
       <div className="divide-y divide-slate-50">
         {items.length === 0 ? (
           <div className="px-5 py-8 text-center">
             <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
-            <p className="text-xs text-slate-400">All programs published</p>
+            <p className="text-xs text-slate-600">All programs published</p>
           </div>
         ) : (
-          items.map((p) => (
+          items.slice(0, 6).map((p) => (
             <Link
               key={p.id}
               href={p.href}
-              className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
+              className="flex flex-wrap items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
             >
               <div className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-slate-800 truncate">{p.title}</div>
-                <div className="text-xs text-slate-400 mt-0.5">
+              <div className="flex-1 min-w-0 basis-36">
+                <div className="text-sm font-medium text-slate-800 break-words">{p.title}</div>
+                <div className="text-xs text-slate-600 mt-0.5">
                   Status: <span className="capitalize">{p.status}</span>
                   {p.updatedAt &&
                     ` · ${new Date(p.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
@@ -41,6 +41,11 @@ export function BlockedProgramsList({ items }: { items: BlockedProgram[] }) {
           ))
         )}
       </div>
+      {items.length > 6 && (
+        <p className="border-t border-slate-100 px-5 py-3 text-sm text-slate-600">
+          Showing 6 of {items.length} unpublished programs. Open View all programs for the complete list.
+        </p>
+      )}
     </div>
   );
 }

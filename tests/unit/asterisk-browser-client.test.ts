@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createPhoneClient, phoneDestination } from '@/lib/phone/browser-client';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createPhoneClient, phoneDestination, type PhoneCredential } from '@/lib/phone/browser-client';
 
 const state = vi.hoisted(() => ({ options: null as any, manager: null as any }));
 vi.mock('sip.js/lib/platform/web', () => ({
@@ -28,11 +28,34 @@ const credential = {
   wsUrl: 'wss://phone.elevateforhumanity.org/ws',
   iceServers: [],
 };
-afterEach(() => vi.useRealTimers());
+const stopCapture = vi.fn();
+const getUserMedia = vi.fn();
+beforeEach(() => {
+  state.options = null;
+  state.manager = null;
+  stopCapture.mockClear();
+  getUserMedia.mockReset().mockResolvedValue({
+    getAudioTracks: () => [{ readyState: 'live' }],
+    getTracks: () => [{ stop: stopCapture }],
+  });
+  vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe('Asterisk browser registration', () => {
+  it('rejects an unsupported runtime provider before requesting microphone access', async () => {
+    const unsupported = { provider: 'retired', token: 'test-only' } as unknown as PhoneCredential;
+    await expect(createPhoneClient(unsupported, document.createElement('audio'))).rejects.toThrow('This phone connection is no longer supported');
+    expect(getUserMedia).not.toHaveBeenCalled();
+    expect(state.manager).toBeNull();
+  });
   it('does not report ready when transport opens or a REGISTER is merely sent', async () => {
     const client = await createPhoneClient(credential, document.createElement('audio'));
+    expect(getUserMedia).toHaveBeenCalledWith({ audio: true, video: false });
+    expect(stopCapture).toHaveBeenCalledOnce();
     const ready = vi.fn();
     client.on('ready', ready);
     let connected = false;
@@ -48,6 +71,16 @@ describe('Asterisk browser registration', () => {
     expect(connected).toBe(true);
     expect(ready).toHaveBeenCalledOnce();
     expect(state.options.userAgentOptions.logBuiltinEnabled).toBe(false);
+  });
+
+  it('rejects blocked microphone capture before creating a SIP client', async () => {
+    const cause = Object.assign(new Error('blocked by browser'), { name: 'NotAllowedError' });
+    getUserMedia.mockRejectedValue(cause);
+    await expect(createPhoneClient(credential, document.createElement('audio'))).rejects.toMatchObject({
+      message: expect.stringContaining('Microphone access is blocked'),
+      cause,
+    });
+    expect(state.manager).toBeNull();
   });
 
   it('clears online state on lost registration and disallows calls before reconnect', async () => {
@@ -76,12 +109,13 @@ describe('Asterisk browser registration', () => {
     expect(state.manager.disconnect).toHaveBeenCalledOnce();
   });
 
-  it('restricts pilot destinations to internal extensions and preserves carrier number normalization', () => {
+  it('routes internal extensions and normalized Twilio-bound PSTN through owned SIP', () => {
     expect(phoneDestination('0', 'asterisk')).toBe('0');
     expect(phoneDestination('102', 'asterisk')).toBe('102');
-    expect(phoneDestination('+13175550100', 'asterisk')).toBeNull();
+    expect(phoneDestination('+13175550100', 'asterisk')).toBe('+13175550100');
     expect(phoneDestination('102@untrusted.example', 'asterisk')).toBeNull();
-    expect(phoneDestination('(317) 555-0100', 'telnyx')).toBe('+13175550100');
+    expect(phoneDestination('(317) 555-0100', 'asterisk')).toBe('+13175550100');
+    expect(phoneDestination('102', 'telnyx')).toBeNull();
   });
 });
 

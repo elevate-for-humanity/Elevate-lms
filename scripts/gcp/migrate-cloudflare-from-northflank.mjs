@@ -21,53 +21,45 @@ export function mergeCloudflareConfig(target, source) {
   return validateConfig(next, 'admin');
 }
 export async function migrateCloudflare({env = process.env, request=fetch, run=google}={}) {
+  // Google is authoritative. Do not require the retired Northflank API when
+  // the Admin runtime already contains a complete Cloudflare configuration.
   const secret = configSecret('admin');
   const read = () => run(['secrets','versions','access','latest','--secret',secret,'--project',PROJECT]);
   const original = read();
   const parsed = JSON.parse(original);
   validateConfig(parsed,'admin');
-  // Google configuration is authoritative. Do not require the retired
-  // Northflank account when the full settings are already present in Google.
-  try {
-    mergeCloudflareConfig(parsed, {});
-    return {status:'already_configured',keys:KEYS.filter(k=>parsed.runtimeEnvironment[k]),runtimeChanged:false,sourceDeleted:false};
-  } catch (error) {
-    if (error.message !== 'cloudflare_source_config_incomplete') throw error;
+  const configured = parsed.runtimeEnvironment;
+  if (configured.CLOUDFLARE_ACCOUNT_ID &&
+      configured.CLOUDFLARE_AI_API_TOKEN &&
+      configured.CLOUDFLARE_AI_MODEL?.startsWith('@cf/')) {
+    return {status:'already_configured',keys:KEYS.filter(k=>configured[k]),runtimeChanged:false,sourceDeleted:false};
   }
-  if (!env.NORTHFLANK_API_TOKEN) throw new Error('northflank_read_token_missing');
+  if (!env.NORTHFLANK_API_TOKEN) throw new Error('northflank_read_token_missing_google_config_incomplete');
   const source = {};
-  const unavailable = [];
   for (const group of GROUPS) {
-    let response;
-    try {
-      response = await request(SOURCE + '/secrets/' + group + '/details', {
-        headers: {Authorization: 'Bearer ' + env.NORTHFLANK_API_TOKEN},
-        signal: AbortSignal.timeout(30000),
-      });
-    } catch { unavailable.push(group); continue; }
-    if (!response.ok) { unavailable.push(group); continue; }
-    const payload = await response.json().catch(()=>({}));
+    const response = await request(SOURCE + '/secrets/' + group + '/details', {
+      headers: {Authorization: 'Bearer ' + env.NORTHFLANK_API_TOKEN},
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!response.ok) throw new Error('northflank_group_unavailable_' + group + '_HTTP_' + response.status);
+    const payload = await response.json();
     const vars = (payload.data ?? payload).secrets?.variables;
-    if (!vars || typeof vars !== 'object') { unavailable.push(group); continue; }
+    if (!vars || typeof vars !== 'object') throw new Error('northflank_group_invalid_' + group);
     Object.assign(source, vars);
   }
   if (!source.CLOUDFLARE_AI_API_TOKEN && source.CLOUDFLARE_API_TOKEN)
     source.CLOUDFLARE_AI_API_TOKEN = source.CLOUDFLARE_API_TOKEN;
-  // Never overwrite existing Google secrets; missing optional Northflank
-  // groups are acceptable only if required values are already recoverable.
   const merged = mergeCloudflareConfig(parsed,source);
   const updated = JSON.stringify(merged);
-  if (updated === JSON.stringify(parsed))
-    return {status:'already_configured',keys:KEYS.filter(k=>merged.runtimeEnvironment[k]),runtimeChanged:false,sourceDeleted:false,unavailableGroups:unavailable};
+  if (updated === JSON.stringify(parsed)) return {status:'already_configured',keys:KEYS.filter(k=>merged.runtimeEnvironment[k]),runtimeChanged:false};
   if (read() !== original) throw new Error('google_config_changed_concurrently');
   const created = JSON.parse(run(['secrets','versions','add',secret,'--project',PROJECT,'--data-file=-','--format=json'],updated));
   const version = created.name?.split('/').at(-1);
-  if (!/^\\d+$/.test(version ?? '') ||
+  if (!/^\d+$/.test(version ?? '') ||
       run(['secrets','versions','access',version,'--secret',secret,'--project',PROJECT]) !== updated)
     throw new Error('google_secret_readback_failed');
-  return {status:'transferred',keys:KEYS.filter(k=>merged.runtimeEnvironment[k]),runtimeChanged:false,sourceDeleted:false,unavailableGroups:unavailable};
+  return {status:'transferred',keys:KEYS.filter(k=>merged.runtimeEnvironment[k]),runtimeChanged:false,sourceDeleted:false};
 }
-
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   migrateCloudflare().then(result=>console.log(JSON.stringify(result)))
     .catch(error => { console.error('Cloudflare configuration migration failed: ' + String(error.message).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,100)); process.exitCode=1; });

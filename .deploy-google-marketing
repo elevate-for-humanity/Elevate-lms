@@ -1,1 +1,3 @@
-Release verified public photo-card sizing correction 1d85b8d9ce8c13a934d31590453f296508698203.
+Release current main after production database normalization and funding-checkout hardening.
+Includes canonical program catalog records, public funding/RAPIDS flag cleanup, checkout authorization from verified registry, and separation of enrollment availability from funding confirmation.
+Triggered 2026-10-19 production acceptance pass.

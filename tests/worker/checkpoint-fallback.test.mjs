@@ -11,10 +11,13 @@ test('permission and corrupt storage errors are not hidden by fallback',async()=
  const c=createCheckpointFallback({readPrimary:async()=>{throw Error('AccessDenied');},readFallback:()=>assert.fail('unexpected fallback')});
  await assert.rejects(c.read('lesson'),/AccessDenied/);
 });
-test('private checkpoint uploads require exact readback and use authenticated private bucket',async()=>{
- let stored;const p=privateCheckpointStorage({env:{NEXT_PUBLIC_SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'test-only'},request:async(url,opts)=>{
-  assert.match(url,/object\/course_videos\//);assert.equal(opts.headers.Authorization,'Bearer test-only');
-  if(opts.method==='POST'){stored=opts.body;return new Response('{}');}return new Response(stored);
+test('legacy Supabase checkpoint recovery is read-only; no new video writes are accepted',async()=>{
+ let calls=0;
+ const p=privateCheckpointStorage({env:{NEXT_PUBLIC_SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'test-only'},request:async(url,opts)=>{
+  calls++;assert.match(url,/object\/course_videos\//);assert.equal(opts.headers.Authorization,'Bearer test-only');
+  assert.equal(opts.method,undefined);return new Response('saved historical segment');
  }});
- await p.write('checkpoints/lesson.mp4',Buffer.from('actual rendered bytes'));
+ assert.equal((await p.read('checkpoints/lesson.mp4')).toString(),'saved historical segment');
+ await assert.rejects(p.write('checkpoints/new.mp4',Buffer.from('new video bytes')),/COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED/);
+ assert.equal(calls,1);
 });

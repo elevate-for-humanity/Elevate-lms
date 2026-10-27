@@ -9,7 +9,8 @@ const source=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course
  .replace("'./types'",JSON.stringify(types))
  .replace("'../../video/render-checkpoint-contract.mjs'",JSON.stringify(new URL('../lib/video/render-checkpoint-contract.mjs',import.meta.url).href))
  .replace("'../instructional/approved-delivery.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/instructional/approved-delivery.mjs',import.meta.url).href))
- .replace("'../media/playback-source.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/media/playback-source.mjs',import.meta.url).href));
+ .replace("'../media/playback-source.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/media/playback-source.mjs',import.meta.url).href))
+ .replace("'../../storage/course-video-policy.mjs'",JSON.stringify(new URL('../lib/storage/course-video-policy.mjs',import.meta.url).href));
 const {stepInputHash,stepInputHashes,contractHash,artifactPayload,currentEvidence,ULTIMATE_LESSON_CONTRACT_VERSION}=await import(uri(source));
 const profile={id:'course',competencies:[{id:'lesson'}]};
 const prior={standards_lock:{requirements:{version:'registered-standard'}}};

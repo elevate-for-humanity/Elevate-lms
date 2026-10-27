@@ -1,9 +1,8 @@
-// pre-auth-registry: exempt - requireProgramHolder verifies the holder before a scoped Telnyx token is minted.
+// pre-auth-registry: exempt - requireCommunicationActor verifies the owner before provider-scoped credentials are issued.
 import { NextResponse } from 'next/server';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
-import { publicPhoneNumber } from '@/lib/phone/telnyx';
-import { ensureDeviceCredential } from '@/lib/phone/webrtc';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { provisionAsteriskDevice, asteriskDeviceId } from '@/lib/phone/asterisk';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,9 +10,13 @@ export const dynamic = 'force-dynamic';
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 export async function POST(request: Request) {
-  const ctx = await requireProgramHolder();
-  if (ctx.mode !== 'holder') {
-    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
+  if (ctx.previewing) {
+    return NextResponse.json(
+      { error: 'Administrator portal previews cannot connect or place calls.' },
+      { status: 403 },
+    );
   }
   const body = await request.json().catch(() => ({}));
   const deviceId = String(body.deviceId || '');
@@ -32,6 +35,15 @@ export async function POST(request: Request) {
   if (!extension?.communication_workspaces?.phone_system_id) {
     return NextResponse.json({ error: 'No enabled phone extension is assigned.' }, { status: 404 });
   }
+  // The PBX provisioner rejects legacy carrier assignments. Return the real
+  // migration blocker to the UI instead of a misleading generic 502.
+  // Do not change existing extension ownership or telephone routing here.
+  if (extension.webrtc_provider !== 'asterisk') {
+    return NextResponse.json(
+      { error: 'This extension is still assigned to the retired phone provider. An administrator must migrate this extension to Elevate Phone before device registration.' },
+      { status: 409 },
+    );
+  }
   if (['offline', 'do_not_disturb'].includes(extension.ring_mode)) {
     return NextResponse.json(
       { error: 'Set the phone to Ring, Vibrate, or Silent before connecting.' },
@@ -48,32 +60,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'The phone system is not active.' }, { status: 503 });
   try {
     await hydrateProcessEnv();
-    const credential = await ensureDeviceCredential({
-      db: ctx.db,
-      system,
-      extension,
+    // Twilio is the carrier for external PSTN calls. PWA endpoints register
+    // against Elevate's independent Asterisk WSS transport, not Telnyx.
+    // External dialing must be routed by the verified Twilio PBX trunk.
+    const credential = await provisionAsteriskDevice(ctx.db, {
       profileId: ctx.user.id,
-      deviceId,
+      deviceId: asteriskDeviceId(deviceId),
+      extensionId: extension.id,
     });
-    await ctx.db
-      .from('communication_extensions')
-      .update({
-        presence_status: extension.ring_mode === 'do_not_disturb' ? 'do_not_disturb' : 'available',
-        last_presence_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', extension.id)
-      .eq('profile_id', ctx.user.id);
-    return NextResponse.json({
-      token: credential.token,
-      sipUsername: credential.sipUsername,
-      extension: extension.extension,
-      callerId: publicPhoneNumber(),
-    });
-  } catch (cause) {
-    console.error('WebRTC credential provisioning failed:', cause);
     return NextResponse.json(
-      { error: cause instanceof Error ? cause.message : 'The phone device could not connect.' },
+      { ...credential, callerId: extension.extension },
+      { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
+    );
+  } catch (cause) {
+    return NextResponse.json(
+      { error: 'The phone device could not connect. Please retry or contact the administrator.' },
       { status: 502 },
     );
   }

@@ -1,3 +1,4 @@
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 /** Course Builder Health Endpoint */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -10,6 +11,7 @@ import { getGroqClient } from '@/lib/ai/groq-client';
 import { getOpenAIClient } from '@/lib/ai/openai-client';
 import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
 import { logger } from '@/lib/logger';
+import { getXAIAPIKey } from '@/lib/ai/xai-config';
 
 interface IntegrityIssue {
   courseId: string;
@@ -124,7 +126,25 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   let aiMessage = 'Canonical AI provider is unavailable; manual editing remains available';
   if (aiAvailable) {
     try {
-      if (provider === 'cloudflare') {
+      if (provider === 'elevate') {
+        const owned = await probeOwnedModel();
+        if (!owned.verified) throw new Error('Owned model discovery failed: ' + owned.status);
+      } else if (provider === 'xai') {
+        const token = getXAIAPIKey();
+        if (!token) throw new Error('xAI configuration is incomplete');
+        // Catalog lookup only: health checks must never generate paid content.
+        const response = await fetch('https://api.x.ai/v1/models', {
+          headers: { Authorization: `Bearer ${token}` },
+          redirect: 'error',
+          signal: AbortSignal.timeout(10_000),
+        });
+        if (!response.ok) throw new Error(`xAI model catalog returned ${response.status}`);
+        const catalog = await response.json() as { data?: Array<{ id?: string }> };
+        const model = process.env.XAI_MODEL?.trim() || 'grok-4.6';
+        if (!catalog.data?.some((entry) => entry.id === model)) {
+          throw new Error('Configured xAI model is not available to this credential');
+        }
+      } else if (provider === 'cloudflare') {
         const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
         const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
         if (!accountId || !token) throw new Error('Cloudflare Workers AI credentials are incomplete');
@@ -143,6 +163,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `course-builder-health:${crypto.randomUUID()}`,
           () => getOpenAIClient().models.list(),
         );
+      } else {
+        throw new Error('No read-only live health check is implemented for the configured provider');
       }
       aiVerified = true;
       aiMessage = `${provider} authenticated and reachable`;

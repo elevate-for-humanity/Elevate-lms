@@ -8,7 +8,6 @@ import FundingEligibilityFlow, {
 } from '@/components/programs/FundingEligibilityFlow';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, CheckCircle, CreditCard } from 'lucide-react';
-import { PAYMENT_LINKS } from '@/lib/stripe/price-map';
 import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
 import { BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -64,7 +63,7 @@ export default function BeautyApplyPage() {
   const monthlyDollars = (remainingCents / 6 / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
   const FUNDING_OPTIONS: { value: FundingType; label: string; desc: string; badge?: string }[] = [
-    { value: 'wioa', label: 'WIOA / WorkOne', desc: 'Free for eligible unemployed or underemployed Indiana residents.', badge: 'Most common' },
+    { value: 'wioa', label: 'WIOA / WorkOne', desc: 'Possible workforce funding; WorkOne determines participant and program eligibility and must authorize payment.', badge: 'Most common' },
     { value: 'employer', label: 'Employer Sponsored', desc: 'Your employer or a workforce grant covers your tuition.' },
     {
       value: 'self_pay',
@@ -74,14 +73,7 @@ export default function BeautyApplyPage() {
     { value: 'unsure', label: 'Not Sure', desc: "We'll help you find the right funding option during your intake call." },
   ];
 
-  // Stripe payment links keyed by canonical program slug
-  const paymentLinks: Record<string, { full: string; deposit: string }> = {
-    'barber-apprenticeship': { full: PAYMENT_LINKS.barber?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.barber?.deposit ?? cfg.stripeDepositLink },
-    'cosmetology-apprenticeship': { full: PAYMENT_LINKS.cosmetology?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.cosmetology?.deposit ?? cfg.stripeDepositLink },
-    'esthetician-apprenticeship': { full: PAYMENT_LINKS.esthetician?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.esthetician?.deposit ?? cfg.stripeDepositLink },
-    'nail-technician-apprenticeship': { full: PAYMENT_LINKS.nailTech?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.nailTech?.deposit ?? cfg.stripeDepositLink },
-  };
-  const links = paymentLinks[cfg.slug] ?? { full: cfg.stripeFullLink, deposit: cfg.stripeDepositLink };
+
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -145,8 +137,19 @@ export default function BeautyApplyPage() {
       const json = await res.json();
 
       if (fundingType === 'self_pay') {
-        const link = paymentPlan === 'full' ? links.full : links.deposit;
-        window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}&ref=${encodeURIComponent(json.referenceNumber || json.id || '')}`;
+        const checkout = await fetch('/api/programs/enroll/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            program_id: json.programId || json.program_id,
+            funding_source: 'self_pay',
+            payment_plan: paymentPlan === 'full' ? 'full' : 'installments',
+            coupon_code: normalizedPromoCode || '',
+          }),
+        });
+        const checkoutData = await checkout.json().catch(() => ({}));
+        if (!checkout.ok || !checkoutData.url) throw new Error(checkoutData.error || 'Unable to start secure billing.');
+        window.location.href = checkoutData.url;
         return;
       }
 
@@ -293,7 +296,7 @@ export default function BeautyApplyPage() {
                   {
                     value: 'full' as const,
                     title: `Pay in Full — ${fullDollars}`,
-                    desc: 'Card, bank transfer, or BNPL accepted at checkout.',
+                    desc: 'Available payment methods are shown by the current billing provider at checkout.',
                     badge: null,
                   },
                 ].map(opt => (
@@ -315,7 +318,7 @@ export default function BeautyApplyPage() {
                   </label>
                 ))}
                 <p className="text-xs text-slate-400 pt-1">
-                  You&apos;ll be redirected to secure Stripe checkout after submitting.
+                  You&apos;ll continue to secure billing after submitting.
                 </p>
               </div>
             )}
@@ -355,7 +358,7 @@ export default function BeautyApplyPage() {
 
             <p className="text-xs text-slate-400 text-center">
               Questions?{' '}
-              <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`} className={`${c.text} hover:underline`}>{PLATFORM_DEFAULTS.supportPhone}</a>
+              <a href={`tel:${PLATFORM_DEFAULTS.mainPhone}`} className={`${c.text} hover:underline`}>{PLATFORM_DEFAULTS.mainPhone}</a>
             </p>
           </form>
         </div>

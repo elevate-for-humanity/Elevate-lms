@@ -1,0 +1,67 @@
+import {pathToFileURL} from 'node:url';
+
+export const WEB_RELEASE_WORKFLOWS = [
+  'deploy-admin.yml', 'deploy-google-marketing-trigger.yml',
+  'deploy-google-lms-trigger.yml', 'deploy-google-store-runtime.yml',
+];
+const waiting = new Set(['queued', 'pending', 'requested', 'waiting', 'in_progress']);
+const preparationJobs = new Set(['dispatch', 'validate', 'build', 'build / image', 'authoring-access']);
+const eligible = run => run.event === 'workflow_dispatch' && run.head_branch === 'main';
+
+export async function releaseApi(path,method='GET',{token=process.env.GH_TOKEN,request=fetch}={}) {
+  if(!token)throw Error('RELEASE_API_AUTH_REQUIRED');
+  if(!path.startsWith('repos/elevate-for-humanity/Elevate-lms/actions/')||!['GET','POST'].includes(method))throw Error('RELEASE_API_PATH_NOT_AUTHORIZED');
+  const response=await request('https://api.github.com/'+path,{method,headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},signal:AbortSignal.timeout(20000)});
+  if(!response.ok)throw Error('RELEASE_API_HTTP_'+response.status);
+  if(response.status===204 || (method==='POST' && response.status===202))return {};
+  return response.json();
+}
+
+export async function assertLatestWebReleaseRequest({api,repository,workflow,runId}) {
+  if(repository!=='elevate-for-humanity/Elevate-lms'||!WEB_RELEASE_WORKFLOWS.includes(workflow))throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
+  const inventory=await api(`repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`);
+  if(!Array.isArray(inventory.workflow_runs))throw Error('RELEASE_INVENTORY_UNAVAILABLE');
+  const runs=inventory.workflow_runs.filter(eligible);
+  if(runs.some(r=>!Number.isSafeInteger(r.id)||!Number.isSafeInteger(r.run_number)))throw Error('RELEASE_INVENTORY_INVALID');
+  const current=runs.find(r=>String(r.id)===String(runId));
+  if(!current||runs.some(r=>r.run_number>current.run_number))throw Error('SUPERSEDED_RELEASE_REQUEST');
+  return {workflow,runId:current.id,status:'latest_requested_release'};
+}
+
+/** Cancel only unstarted requests superseded by a newer request for the SAME app.
+ * Never cancel an active build/deployment, course execution, or another branch. */
+export async function pruneWebReleaseRequests({api, repository, execute=false}) {
+  if(repository !== 'elevate-for-humanity/Elevate-lms') throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
+  const results=[];
+  for(const workflow of WEB_RELEASE_WORKFLOWS) {
+    const inventory=await api(`repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`);
+    if(!Array.isArray(inventory.workflow_runs)) throw Error('RELEASE_INVENTORY_UNAVAILABLE');
+    const runs=inventory.workflow_runs.filter(eligible);
+    if(!runs.length)continue;
+    if(runs.some(r=>!Number.isSafeInteger(r.id)||!Number.isSafeInteger(r.run_number)))throw Error('RELEASE_INVENTORY_INVALID');
+    const latest=Math.max(...runs.map(r=>r.run_number));
+    for(const run of runs.filter(r=>r.run_number<latest && waiting.has(r.status))) {
+      const endpoint=`repos/${repository}/actions/runs/${run.id}`;
+      const current=await api(endpoint);
+      if(!eligible(current)||current.id!==run.id||current.run_number!==run.run_number||!waiting.has(current.status))continue;
+      const jobs=await api(endpoint+'/jobs?per_page=100');
+      if(!Array.isArray(jobs.jobs)||jobs.total_count>100)throw Error('RELEASE_JOB_INVENTORY_UNAVAILABLE');
+      // A started deployment must finish its own acceptance/rollback sequence.
+      if(jobs.jobs.some(j=>j.status==='in_progress' || (!preparationJobs.has(j.name) && (j.status==='completed' && j.conclusion!=='skipped' || j.steps?.some(step=>step.status==='in_progress'||step.status==='completed')))))continue;
+      const beforeCancel=await api(endpoint);
+      if(!waiting.has(beforeCancel.status)||beforeCancel.id!==run.id)continue;
+      if(execute)await api(endpoint+'/cancel','POST');
+      results.push({workflow,runId:run.id,status:execute?'cancellation_requested':'superseded_unstarted'});
+    }
+  }
+  return results;
+}
+
+if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
+  const api=(path,method='GET')=>releaseApi(path,method);
+  const repository=process.env.GITHUB_REPOSITORY;
+  const result=process.argv.includes('--assert-latest')
+    ? await assertLatestWebReleaseRequest({api,repository,workflow:process.env.RELEASE_WORKFLOW,runId:process.env.GITHUB_RUN_ID})
+    : await pruneWebReleaseRequests({api,repository,execute:process.env.PRUNE_SUPERSEDED_RELEASES==='true'});
+  console.log(JSON.stringify(result));
+}

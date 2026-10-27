@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { requireRole } from '@/lib/auth/require-role';
-import { PROGRAM_HOLDER_ROLES } from '@/lib/rbac/role-matrix';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ProgramHolderPhoneReceiver } from '@/components/program-holder/ProgramHolderPhoneReceiver';
+import { ProgramHolderMobileNav } from '@/components/program-holder/ProgramHolderMobileNav';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 const PORTAL_LINKS = [
   ['Dashboard', '/program-holder/dashboard'],
@@ -10,13 +11,16 @@ const PORTAL_LINKS = [
   ['Applicants', '/program-holder/students/pending'],
   ['Programs', '/program-holder/programs'],
   ['Hours', '/program-holder/hours'],
-  ['Meetings', '/program-holder/meetings'],
-  ['Phone · New', '/program-holder/phone'],
-  ['Email · New', '/program-holder/email'],
-  ['Community', '/lms/community'],
-  ['Career Feed', '/lms/career'],
+  ['Calendar & Meetings', '/program-holder/meetings'],
+  ['Phone', '/program-holder/phone'],
+  ['AirScript', '/program-holder/airscript'],
+  ['Email', '/program-holder/email'],
+  ['Community', '/program-holder/community'],
+  ['Career Feed', '/program-holder/career'],
   ['Office Mail', '/program-holder/inbox'],
   ['Documents', '/program-holder/documents'],
+  ['Handbook', '/program-holder/handbook'],
+  ['MOU', '/program-holder/sign-mou'],
   ['Compliance', '/program-holder/compliance'],
   ['Reports', '/program-holder/reports'],
   ['Payouts', '/program-holder/payouts'],
@@ -43,30 +47,59 @@ export default async function ProgramHolderPortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Protect every Program Holder route, including pages that do not perform
-  // their own data lookup. Page-level guards remain defense in depth.
-  await requireRole(PROGRAM_HOLDER_ROLES);
+  const context = await requireProgramHolder({ allowPendingApproval: true });
+  const profileName = context.profile?.full_name || 'Program Holder';
+  const avatarUrl = context.profile?.avatar_url?.trim();
+  const initials = profileName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
 
   return (
     <>
       <nav
         aria-label="Program Holder portal"
-        className="sticky top-0 z-40 overflow-x-auto border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur"
+        className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur"
       >
-        <div className="mx-auto flex min-w-max max-w-[1600px] items-center gap-2">
-          {PORTAL_LINKS.map(([label, href]) => (
-            <Link
-              key={href}
-              href={href}
-              className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
-            >
-              {label}
-            </Link>
-          ))}
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-2">
+          <ProgramHolderMobileNav links={PORTAL_LINKS} />
+          <div className="hidden min-w-0 max-w-[calc(100vw-240px)] items-center gap-1 overflow-x-auto md:flex">
+            {PORTAL_LINKS.map(([label, href]) => (
+              <Link
+                key={href}
+                href={href}
+                className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+          <Link
+            href="/program-holder/settings"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 py-1 pl-1 pr-2 sm:pr-3"
+            aria-label={`Open ${profileName} profile settings`}
+          >
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt={profileName}
+                width={38}
+                height={38}
+                className="h-9 w-9 rounded-full object-cover object-top"
+              />
+            ) : (
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-xs font-black text-white">
+                {initials || 'PH'}
+              </span>
+            )}
+            <span className="hidden max-w-40 truncate text-sm font-black text-slate-800 sm:inline">{profileName}</span>
+          </Link>
         </div>
       </nav>
       <ProgramHolderPhoneReceiver />
-      {children}
+      <div className="program-holder-portal min-w-0 overflow-x-clip">{children}</div>
     </>
   );
 }

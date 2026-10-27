@@ -32,7 +32,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM (20 hrs/week)',
   eveningSchedule: 'Evening cohorts available.',
   cohortSize: '12–16 participants per cohort',
-  fundingStatement: '$0 with WIOA funding. Next Level Jobs accepted.',
+  fundingStatement: 'Workforce funding may apply only with program and participant eligibility plus written agency authorization.',
   selfPayCost: '$4,200 (payment plans available)',
   fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',

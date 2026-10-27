@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Standalone Website & Learning Platform Packages | Elevate Store',
   description:
     'Purchase a standalone branded website, client portal, unlimited-course builder, course runner and PARIS assistant implementation from Elevate.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/implementation-packages' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/implementation-packages' },
 };
 
 export default function ImplementationPackagesPage() {

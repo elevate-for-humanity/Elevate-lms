@@ -11,12 +11,21 @@ const LMS_URL = (process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhuman
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('handoff') || '';
+  const requestedLessonId = request.nextUrl.searchParams.get('lessonId')?.trim() || '';
   const handoff = verifyPortalPreviewHandoff(token);
   if (!handoff) return NextResponse.json({ error: 'Invalid preview handoff' }, { status: 403 });
   const db = await requireAdminClient();
-  const [{ data: actor }, { data: course }, { data: videoLesson }, { data: firstLesson }] = await Promise.all([
+  const [{ data: actor }, { data: course }, { data: requestedLesson }, { data: videoLesson }, { data: firstLesson }] = await Promise.all([
     db.from('profiles').select('role').eq('id', handoff.actorId).maybeSingle(),
     db.from('courses').select('id').eq('id', handoff.targetId).maybeSingle(),
+    requestedLessonId
+      ? db
+          .from('course_lessons')
+          .select('id')
+          .eq('id', requestedLessonId)
+          .eq('course_id', handoff.targetId)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
     db
       .from('course_lessons')
       .select('id')
@@ -34,7 +43,7 @@ export async function GET(request: NextRequest) {
       .maybeSingle(),
   ]);
   if (!course || !ADMIN_ROLES.has(String(actor?.role || ''))) return NextResponse.json({ error: 'Preview denied' }, { status: 403 });
-  const openingLesson = videoLesson ?? firstLesson;
+  const openingLesson = requestedLesson ?? videoLesson ?? firstLesson;
   const destination = openingLesson
     ? `/lms/courses/${course.id}/lessons/${openingLesson.id}`
     : `/lms/courses/${course.id}`;

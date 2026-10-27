@@ -743,12 +743,26 @@ function PracticalActivity({
   const [done, setDone] = useState<Set<number>>(new Set());
   const [evidence, setEvidence] = useState('');
   const [attested, setAttested] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'saving' | 'submitted' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'saving' | 'submitted' | 'approved' | 'revision_required' | 'rejected' | 'error'>('idle');
+  const [reviewComments, setReviewComments] = useState('');
+  useEffect(() => {
+    let active = true;
+    void fetch(`/api/learner/practical-submissions?lessonId=${encodeURIComponent(lessonId)}&interactionId=${encodeURIComponent(interaction.id)}`)
+      .then(async response => { if (!response.ok) throw new Error('Practical status unavailable'); return response.json(); })
+      .then(({ submission }) => {
+        if (!active || !submission) return;
+        setStatus(submission.status === 'in_review' ? 'submitted' : submission.status);
+        const review = [...(submission.course_practical_reviews ?? [])].sort((a, b) => Date.parse(b.reviewed_at) - Date.parse(a.reviewed_at))[0];
+        setReviewComments(review?.comments || '');
+      }).catch(() => { if (active) setReviewComments('Current review status could not be loaded. Refresh before submitting again.'); });
+    return () => { active = false; };
+  }, [lessonId, interaction.id]);
   const competencyKeys = Array.isArray(data.competencyKeys)
     ? data.competencyKeys.map(String)
     : [String(data.competencyKey ?? interaction.id)];
   async function submitEvidence() {
     setStatus('saving');
+    try {
     const response = await fetch('/api/learner/practical-submissions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -762,6 +776,7 @@ function PracticalActivity({
       }),
     });
     setStatus(response.ok ? 'submitted' : 'error');
+    } catch { setStatus('error'); }
   }
   return (
     <div className="rounded-2xl border border-teal-300 bg-teal-50 p-5">
@@ -845,16 +860,17 @@ function PracticalActivity({
             !evidence.trim() ||
             !attested ||
             status === 'saving' ||
-            status === 'submitted'
+            status === 'submitted' || status === 'approved'
           }
           className="rounded-lg bg-teal-800 px-4 py-2 font-bold text-white disabled:opacity-40"
         >
-          {status === 'saving'
+          {status === 'approved' ? 'Practical approved' : status === 'saving'
             ? 'Submitting…'
             : status === 'submitted'
               ? 'Submitted for expert review'
               : 'Submit evidence'}
         </button>
+        {reviewComments ? <p role="status">{status.replaceAll('_', ' ')}: {reviewComments}</p> : null}
         {status === 'error' ? (
           <p className="text-sm font-semibold text-red-700">
             Evidence could not be submitted. Check the required fields and retry.

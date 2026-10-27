@@ -22,9 +22,8 @@ const affirmCapture = 'apps/lms/app/api/affirm/capture/route.ts';
 const enrollmentActivator = 'lib/enrollment/create-enrollment.ts';
 const platformCheckout = 'apps/marketing/app/api/store/platform-checkout/route.ts';
 const billingPortal = 'apps/marketing/app/api/store/billing-portal/route.ts';
-const stripeWebhook = 'apps/marketing/app/api/webhooks/stripe/route.ts';
-const preSwitchDispatcher = 'lib/payments/career-course-webhook.ts';
-const subscriptionProcessor = 'lib/platform/process-subscription-event.ts';
+const quickBooksWebhook = 'apps/marketing/app/api/webhooks/quickbooks/route.ts';
+const fulfillment = 'lib/billing/fulfillment.ts';
 const featureCatalog = 'lib/platform/feature-catalog.ts';
 const unifiedCourseMigration = 'supabase/migrations/20260822101500_add_unified_course_platform_addon.sql';
 
@@ -33,9 +32,8 @@ for (const path of [
   enrollmentActivator,
   platformCheckout,
   billingPortal,
-  stripeWebhook,
-  preSwitchDispatcher,
-  subscriptionProcessor,
+  quickBooksWebhook,
+  fulfillment,
   featureCatalog,
   unifiedCourseMigration,
 ]) read(path);
@@ -61,7 +59,7 @@ requireText(platformCheckout, 'resolveBillingOrganizationId', 'Platform checkout
 requireText(platformCheckout, 'getBasePlan(planId)', 'Platform checkout must resolve canonical plan pricing');
 requireText(platformCheckout, 'addonSlugs.map(getAddOn)', 'Platform checkout must resolve canonical add-on pricing');
 requireText(platformCheckout, "['active', 'trialing'].includes(existing.status || '')", 'Platform checkout must detect an existing active/trial subscription');
-requireText(platformCheckout, 'existing?.stripe_subscription_id', 'Platform checkout must detect an active legacy Stripe subscription');
+requireText(platformCheckout, 'existing?.provider_subscription_id', 'Platform checkout must detect an existing provider subscription');
 requireText(platformCheckout, 'preventing duplicate billing', 'Provider cutover must block duplicate billing');
 requireText(platformCheckout, 'createQuickBooksBillingProvider(admin).createManualInvoice({', 'Platform checkout must create the canonical QuickBooks invoice');
 requireText(platformCheckout, ".from('billing_schedules').upsert(", 'Platform checkout must persist the recurring billing schedule');
@@ -80,32 +78,14 @@ requireText(featureCatalog, 'PlatformFeature.CERTIFICATES', 'Unified course prod
 requireText(unifiedCourseMigration, "'course-creation-learning-platform'", 'Database catalog must seed the unified course product');
 requireText(unifiedCourseMigration, "array['course_builder','course_factory','ai_content','lms','certificates']", 'Database entitlement bundle must match the unified course product');
 
-// Canonical webhook: signed event construction, exactly-once protection, and
-// fail-closed handling for destructive recurring/refund events.
-requireText(stripeWebhook, 'constructStripeEventWithAnySecret', 'Canonical Stripe webhook must verify Stripe signatures');
-requireText(stripeWebhook, ".from('stripe_webhook_events')", 'Canonical Stripe webhook must persist idempotency state');
-requireText(stripeWebhook, "'customer.subscription.deleted'", 'Canonical Stripe webhook must classify subscription deletion as destructive');
-requireText(stripeWebhook, "'customer.subscription.updated'", 'Canonical Stripe webhook must classify subscription updates as destructive');
-requireText(stripeWebhook, "'invoice.payment_failed'", 'Canonical Stripe webhook must fail-close failed-invoice subscription mutations');
-requireText(stripeWebhook, 'processCareerCourseStripeEvent(event)', 'Canonical Stripe webhook must run the verified-event pre-switch dispatcher');
-
-// The verified-event dispatcher now sends recognized recurring families to the
-// single subscription processor before legacy subscription logic can run.
-requireText(preSwitchDispatcher, "import { processSubscriptionEvent } from '@/lib/platform/process-subscription-event'", 'Canonical verified-event dispatcher must use shared subscription processing');
-requireText(preSwitchDispatcher, "'customer.subscription.created'", 'Dispatcher must accept subscription creation events');
-requireText(preSwitchDispatcher, "'customer.subscription.updated'", 'Dispatcher must accept subscription update events');
-requireText(preSwitchDispatcher, "'customer.subscription.deleted'", 'Dispatcher must accept subscription deletion events');
-requireText(preSwitchDispatcher, "'invoice.payment_failed'", 'Dispatcher must accept invoice failure events');
-requireText(preSwitchDispatcher, 'await processSubscriptionEvent(db, stripe, event)', 'Recognized recurring events must enter the canonical subscription processor');
-
-// Shared recurring processor: organization SaaS, individual apps, and Host Shop
-// subscriptions must be synchronized from the same verified Stripe event.
-requireText(subscriptionProcessor, 'await syncPlatformSubscriptionLifecycle(db, subscription)', 'Recurring processor must sync organization SaaS state');
-requireText(subscriptionProcessor, 'await syncIndividualAppLifecycle(db, subscription)', 'Recurring processor must sync individual-app state');
-requireText(subscriptionProcessor, 'await syncHostShopSubscriptionLifecycle(db, subscription)', 'Recurring processor must sync Host Shop state');
-requireText(subscriptionProcessor, "case 'customer.subscription.deleted':", 'Recurring processor must handle cancellations');
-requireText(subscriptionProcessor, "case 'invoice.payment_failed':", 'Recurring processor must handle failed invoices');
-requireText(subscriptionProcessor, ".from('subscription_invoices').upsert", 'Recurring processor must preserve invoice audit history');
+// Canonical provider-neutral payment lifecycle: QuickBooks webhook queues
+// fulfillment and fulfillment activates the purchased resource.
+requireText(quickBooksWebhook, 'billing_fulfillment_jobs', 'QuickBooks webhook must queue canonical fulfillment jobs');
+requireText(quickBooksWebhook, "provider: 'quickbooks'", 'QuickBooks webhook must identify the active provider');
+requireText(fulfillment, "job.fulfillment_type === 'program_enrollment'", 'Fulfillment must activate program enrollments');
+requireText(fulfillment, "job.fulfillment_type === 'testing_booking'", 'Fulfillment must create paid testing bookings');
+requireText(fulfillment, "job.fulfillment_type === 'individual_app_subscription'", 'Fulfillment must activate individual app subscriptions');
+requireText(fulfillment, "job.fulfillment_type === 'testing_enforcement'", 'Fulfillment must clear paid testing enforcement fees');
 
 // Billing portal must be authenticated and scoped to the caller's organization,
 // so cancellation/payment-method management cannot cross tenant boundaries.
@@ -113,7 +93,7 @@ requireText(billingPortal, 'await sessionClient.auth.getUser()', 'Billing portal
 requireText(billingPortal, 'resolveTenantIdForUser(user.id)', 'Billing portal must resolve the caller tenant');
 requireText(billingPortal, 'resolveBillingOrganizationId(tenantId, db)', 'Billing portal must resolve the tenant billing organization');
 requireText(billingPortal, ".eq('organization_id', organizationId)", 'Billing portal must load only the resolved organization subscription');
-requireText(billingPortal, 'stripe.billingPortal.sessions.create({', 'Billing portal must use Stripe Billing Portal');
+requireText(billingPortal, 'billing_provider', 'Billing portal must use the provider-neutral subscription record');
 
 if (failures.length) {
   console.error('[payment-lifecycle-contract] FAILED');
@@ -122,4 +102,4 @@ if (failures.length) {
 }
 
 console.log('[payment-lifecycle-contract] PASS');
-console.log('Affirm capture/enrollment + QuickBooks platform checkout + Stripe legacy webhook/subscription contracts are canonical');
+console.log('Affirm capture/enrollment + QuickBooks checkout + provider-neutral fulfillment contracts are canonical');

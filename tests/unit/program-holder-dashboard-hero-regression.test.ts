@@ -21,7 +21,8 @@ describe('program-holder dashboard hero', () => {
     expect(workspace).toContain(
       'if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true }',
     );
-    expect(workspace).toContain("getProgramCardImage(programSlug || 'business-administration')");
+    expect(workspace).toContain('getProgramHeroImage(program.slug)');
+    expect(workspace).toContain("src: '/images/pages/community-page-2.webp'");
   });
 
   it('uses the holder profile image without hard-coded account identities', () => {
@@ -37,7 +38,7 @@ describe('program-holder dashboard hero', () => {
   });
 
   it('scopes HVAC requirements and payout copy to the assigned program', () => {
-    expect(workspace).toContain("...(isHvac ? [{ label: 'HVAC program assignment'");
+    expect(workspace).toMatch(/\.\.\.\(isHvac\s*\?\s*\[\s*\{\s*label: 'HVAC program assignment'/);
     expect(payment).not.toContain('David must finish');
     expect(payment).not.toContain('HVAC training payment');
     expect(mou).not.toContain('INDY ON DEMAND SERVICES LLC');
@@ -46,13 +47,14 @@ describe('program-holder dashboard hero', () => {
 
   it('requires every roster row to belong to an assigned program and learner role', () => {
     expect(holderData).toContain(".in('program_id', programIds)");
-    expect(holderData).toContain("['student', 'learner', 'apprentice'].includes");
+    expect(holderData).toContain("import { isLearnerRosterProfile } from './roster-eligibility'");
+    expect(holderData).toContain('.filter(isLearnerRosterProfile)');
     expect(holderData).toContain('eligibleRosterUserIds.has(row.user_id)');
     expect(holderData).not.toContain("'pending',\n        'applied'");
   });
 
   it('does not label shared dashboard tools as HVAC-only', () => {
-    expect(callList).toContain('Program applicants');
+    expect(callList).toContain('call every new applicant');
     expect(callList).not.toContain('HVAC applicants');
     expect(closeout).toContain('Practical program skills verified');
     expect(closeout).not.toContain('Practical HVAC skills verified');

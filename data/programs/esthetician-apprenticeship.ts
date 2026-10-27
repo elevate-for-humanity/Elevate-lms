@@ -19,9 +19,8 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 300, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
   schedule: 'Competency-based progression through 20 Appendix A competencies, with 300 required related-instruction hours and supervised host-site practice.',
   cohortSize: '1–3 participants per approved host site',
-  fundingStatement:
-    'Self-pay enrollment is available. Any employer or workforce funding must be confirmed in writing for the individual participant before enrollment.',
-  selfPayCost: '$4,980',
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
+  selfPayCost: '$6,000',
   fundingOptions: ['self_pay'],
   badge: 'Indiana Esthetics Pathway',
   badgeColor: 'blue',
@@ -225,7 +224,6 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes:
-      'No public workforce-funding claim is made for this program. Any third-party funding must be verified and authorized for the individual participant before enrollment.',
+    fundingNotes: 'Apprenticeship enrollment is self-pay only.',
   },
 };

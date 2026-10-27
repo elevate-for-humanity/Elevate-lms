@@ -72,7 +72,7 @@ export function normalizeLessonContract(raw: string): string {
       (typeof parsed.objective === 'string' ? parsed.objective : 'the lesson objective');
     const expandToMinimum = (value: unknown, minimum: number, context: string) => {
       if (typeof value !== 'string' || value.trim().length >= minimum) return value;
-      const addition = ` Apply this to ${lessonFocus} by identifying the relevant evidence, comparing realistic choices, documenting the decision, and checking the result against the stated objective. ${context}`;
+      const addition = ` ${context}`;
       let expanded = value.trim();
       while (expanded.length < minimum) expanded = `${expanded}${addition}`;
       return expanded;
@@ -91,7 +91,7 @@ export function normalizeLessonContract(raw: string): string {
             body: expandToMinimum(
               section?.body,
               120,
-              `This is guided reading section ${index + 1}; the learner should be able to explain and use the concept after reviewing it.`,
+              `Explain the concept in practical terms, include one realistic example, and state how the learner should apply it on the job.`,
             ),
           }),
         );
@@ -356,7 +356,7 @@ export function normalizeLessonContract(raw: string): string {
           content: expandToMinimum(
             resource?.content,
             40,
-            `Resource ${index + 1} must provide complete, reusable learner directions grounded in the lesson.`,
+            `Include complete learner-facing directions and a practical example grounded in the lesson.`,
           ),
         }),
       );

@@ -16,7 +16,7 @@ import { buildLicensedAssetProjectPolicy } from '@/lib/media/licensed-asset-poli
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 90;
 
 const PLAN_SITE_LIMITS: Record<string, number | null> = { starter: 1, professional: 3, enterprise: null };
 
@@ -46,6 +46,7 @@ async function _POST(request: NextRequest) {
     getWebsiteBuilderAccess(user.id, supabase),
     supabase.from('user_websites').select('id, site_config, organization_id, subdomain').eq('user_id', user.id).order('updated_at', { ascending: false }),
   ]);
+  if (sitesResult.error) return NextResponse.json({ error: 'Could not load your existing websites. No new website was created.' }, { status: 503 });
   const ownedSites = sitesResult.data;
 
   if (!access.allowed) {
@@ -72,7 +73,22 @@ async function _POST(request: NextRequest) {
   const answers: WebsiteInterviewAnswers = Object.fromEntries(
     Object.entries(rawAnswers).map(([key, value]) => [key, safeString(value, '', 3000)]),
   );
-  const missing = missingRequiredWebsiteAnswers(answers);
+  const briefMode = typeof body.brief === 'string';
+  const allowedDesigns = ['executive', 'modern', 'creative', 'minimal'] as const;
+  const designDirection = typeof body.designDirection === 'string' && allowedDesigns.some(item => item === body.designDirection) ? body.designDirection : null;
+  if (briefMode) {
+    const brief = safeString(body.brief, '', 12000);
+    const name = safeString(body.businessName, '', 120);
+    if (!name || brief.length < 40 || body.brief.length > 12000) {
+      return NextResponse.json({ error: 'Provide a business name and a description between 40 and 12,000 characters.' }, { status: 400 });
+    }
+    // A single customer-authored brief is an alternative input, not invented interview answers.
+    for (const key of Object.keys(answers)) delete answers[key];
+    answers.businessName = name;
+    answers.siteOwnerType = 'business';
+    answers.brief = brief;
+  }
+  const missing = briefMode ? [] : missingRequiredWebsiteAnswers(answers);
   if (missing.length) {
     return NextResponse.json({ error: 'Complete the required PARIS interview questions before generation.', missing }, { status: 400 });
   }
@@ -80,7 +96,7 @@ async function _POST(request: NextRequest) {
   const siteOwnerType = answers.siteOwnerType === 'individual' ? 'individual' : 'business or organization';
   const industry = safeString(answers.industry, '', 500);
   const contactEmail = safeString(user.email, '', 240);
-  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers }, null, 2).slice(0, 24000);
+  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers, ...(designDirection ? { designDirection } : {}) }, null, 2).slice(0, 24000);
 
   const fallback = buildDefaultSiteConfig({ organizationName: businessName, industry, contactEmail: contactEmail || undefined });
   let config: TenantSiteConfig = fallback;
@@ -103,9 +119,9 @@ async function _POST(request: NextRequest) {
     const result = await runAITask({
       task: 'general_chat',
       context: { userId: user.id, skipRAG: true },
-      prompt: `You are PARIS, a senior website strategist and designer inside Elevate Website Builder. Build a polished, specific website from the verified business brief below. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nStructured interview brief:\n${structuredBrief}\n\nThe result must look intentionally designed for this exact business, never like a generic SaaS template. Avoid generic phrases such as "welcome to", "quality service", "your trusted partner", "solutions for you", "we are committed to excellence", or filler statistics. Give the hero a distinctive point of view based on the supplied facts. Choose a coherent color system rather than default blue/purple gradients. Create only pages the business truly needs, normally 2-5 pages, and keep each page focused with 1-5 strong sections. Use only these section types: hero, rich_text, features, services, products, gallery, image, video, faq, team, cta, contact_form, booking. Do not generate testimonial, stats, pricing, accreditation, ratings, outcomes, customer counts, staff identities, addresses, licenses, or other material claims; those are inserted only from separately verified claim records. Every contact page should include contact_form. Supported field types are text, email, tel, textarea, and select. Every custom lead form MUST include an email field named exactly "email". Only collect information reasonably needed for the stated purpose. Never request passwords, Social Security numbers, payment-card data, health records, or unnecessary sensitive data. Use internal links matching generated slugs. If information is unknown, omit it. Make the experience conversion-focused, accessible, mobile-first, and visually distinctive.`,
+      prompt: `You are PARIS, a senior website strategist and designer inside Elevate Website Builder. Build a polished, specific website from the verified business brief below. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nStructured interview brief:\n${structuredBrief}\n\nThe result must look intentionally designed for this exact business, never like a generic SaaS template. Avoid generic phrases such as "welcome to", "quality service", "your trusted partner", "solutions for you", "we are committed to excellence", or filler statistics. Give the hero a distinctive point of view based on the supplied facts. Choose a coherent color system rather than default blue/purple gradients. Create all pages the business truly needs, normally 4-8 complete pages, with 3-7 meaningful sections per page (home normally 6-9). Never create empty interior pages. Every page must have an intentional hero, relevant substantive content, and a contextual next-step CTA. Use at least three distinct visual compositions across the site: split photographic hero, editorial story, and service or feature grid. Use premium photographic art direction: choose visual concepts specific to the customer's industry, with consistent lighting, composition, crop, color harmony, and image focal points. Prefer authentic, licensed customer assets and preserve the real logo and founder photos. Where assets are not supplied, do not fabricate image URLs or identities; instead include descriptive imageBrief fields in image-bearing section content so a separate licensed-asset selection or image-generation stage can fulfill them. Image briefs must describe subject, framing, mood, palette, orientation, and alt-text intent. Never represent an AI-generated portrait as a real person. Avoid generic stock imagery, distorted logos, and mismatched aspect ratios. Do not mark the website as visually complete until real image URLs are resolved and checked. Preserve the customer's existing brand assets when supplied. Avoid invented numerical outcomes, statistics, testimonials, and claims. The result must feel like a premium custom-designed multi-page site, not a starter template. Use only these section types: hero, rich_text, features, services, products, gallery, image, video, faq, team, cta, contact_form, booking. Do not generate testimonial, stats, pricing, accreditation, ratings, outcomes, customer counts, staff identities, addresses, licenses, or other material claims; those are inserted only from separately verified claim records. Every contact page should include contact_form. Supported field types are text, email, tel, textarea, and select. Every custom lead form MUST include an email field named exactly "email". Only collect information reasonably needed for the stated purpose. Never request passwords, Social Security numbers, payment-card data, health records, or unnecessary sensitive data. Use internal links matching generated slugs. If information is unknown, omit it. Make the experience conversion-focused, accessible, mobile-first, and visually distinctive.`,
       temperature: 0.5,
-      maxTokens: 3500,
+      maxTokens: 10000,
     });
 
     const generated = cleanJson(result.content);
@@ -119,7 +135,7 @@ async function _POST(request: NextRequest) {
         description: safeString(generated.seo?.description, fallback.seo?.description || '', 500),
         keywords: Array.isArray(generated.seo?.keywords) ? generated.seo.keywords.map((item: unknown) => safeString(item, '', 80)).filter(Boolean).slice(0, 20) : fallback.seo?.keywords,
       },
-      meta: { ...(fallback.meta || {}), generatedBy: 'paris-autonomous-website-builder', parisInterviewCompleted: true, interview: answers, generatedAt: new Date().toISOString(), licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }) },
+      meta: { ...(fallback.meta || {}), ...(designDirection ? { designDirection } : {}), generatedBy: 'paris-autonomous-website-builder', parisInterviewCompleted: true, interview: answers, generatedAt: new Date().toISOString(), licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }) },
     });
   } catch (error) {
     logger.error('[website-builder] PARIS generation failed', error instanceof Error ? error : new Error(String(error)));

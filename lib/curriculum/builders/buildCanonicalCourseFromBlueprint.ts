@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger';
 import { defaultActivities } from '../activities';
 import { buildLearningExperience } from '../learning-experience';
 import { loadIndustryStandards, type IndustryStandards } from '@/lib/industry/standards-loader';
-import { publishCourse, publishCourseAtomic } from '@/lib/course-factory/publisher';
+import { courseFactory } from '@/lib/course-builder/orchestrator';
 import type {
   CredentialBlueprint,
   BlueprintModule,
@@ -297,36 +297,29 @@ export async function buildCanonicalCourseFromBlueprint(
   const courseSlug = input.courseSlug ?? input.blueprint.programSlug;
   const courseTitle = input.courseTitle ?? input.blueprint.credentialTitle;
 
-  const persisted = await publishCourse({
+  const persisted = await courseFactory({
     programId: input.programId,
-    courseSlug,
-    courseTitle,
-    blueprint: prepared.modules,
+    programSlug: input.blueprint.programSlug,
+    blueprint: { ...input.blueprint, modules: prepared.modules },
+    title: courseTitle,
     mode: input.mode,
-    contentSource:
-      input.blueprint.contentSource === 'curriculum_lessons' ? 'curriculum_lessons' : 'blueprint',
-    videoConfig: { enabled: Boolean(input.blueprint.videoConfig) },
+    contentSource: 'blueprint',
+    videoMode: input.blueprint.videoConfig ? 'queue' : 'off',
   });
 
-  if (!persisted.success || !persisted.courseId) {
+  if (!persisted.ok || !persisted.courseId) {
     throw new Error(
-      `Course Factory persistence failed: ${persisted.errors.join('; ') || 'unknown error'}`,
+      `Canonical Course Builder failed: ${persisted.errors?.join('; ') || 'unknown error'}`,
     );
-  }
-
-  // Preserve historical seeder visibility behavior through the canonical publish RPC.
-  const published = await publishCourseAtomic(persisted.courseId, input.programId);
-  if (!published.success) {
-    prepared.warnings.push(`Course staged but publish failed: ${published.error}`);
   }
 
   const result: BuildCanonicalCourseResult = {
     courseId: persisted.courseId,
-    moduleCount: persisted.moduleCount,
-    lessonCount: persisted.lessonCount,
-    skipped: persisted.skippedCount,
+    moduleCount: persisted.moduleCount ?? 0,
+    lessonCount: persisted.lessonCount ?? 0,
+    skipped: persisted.skippedCount ?? 0,
     contentFailures: prepared.contentFailures,
-    warnings: [...prepared.warnings, ...persisted.warnings],
+    warnings: [...prepared.warnings, ...(persisted.warnings ?? [])],
   };
 
   try {
@@ -340,8 +333,8 @@ export async function buildCanonicalCourseFromBlueprint(
         blueprint_id: input.blueprint.id,
         blueprint_version: input.blueprint.version,
         mode: input.mode,
-        lessons_inserted: persisted.lessonCount,
-        lessons_skipped: persisted.skippedCount,
+        lessons_inserted: persisted.lessonCount ?? 0,
+        lessons_skipped: persisted.skippedCount ?? 0,
         content_failures: prepared.contentFailures.length,
         failed_slugs: prepared.contentFailures.map((failure) => failure.slug),
       },

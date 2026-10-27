@@ -1,4 +1,9 @@
-# OpenHands Agent Memory - Elevate LMS
+# Agent Instructions — Elevate LMS
+
+## Current deployment authority
+
+Production builds and deployments use Google Cloud only, from `main`. Do not provision, deploy to, or synchronize secrets with Northflank. Historical provider references do not authorize using that provider. Preserve billing and incident evidence; remove obsolete operational instructions.
+
 
 ## ACTIVE HANDOFF — WEBSITE DESIGN PAGES (Priority Task, 2026-08-23)
 
@@ -9,7 +14,7 @@ top priority.
 ### What is already finished (do NOT rebuild)
 - Cloudflare Workers AI verified live (token has Workers AI permission; account ff0d5ca582b5911a626ba012935cf3ec)
 - Cloudflare + Groq credentials stored in BOTH Supabase `platform_secrets` (scope=runtime) and GitHub Actions secrets
-- Self-hosted vLLM worker + `ElevateProvider` + Northflank provisioner on main (commit 456d9e620a)
+- Historical self-hosted vLLM worker and `ElevateProvider` implementation: commit 456d9e620a. Verify current Google runtime health before relying on it.
 - Provider order configurable via `AI_PROVIDER_ORDER`; default: elevate → cloudflare → groq → gemini → google → anthropic → azure → openai
 - Deterministic Course Builder checkpointing; `generation_status` uses canonical `queued` value
 - OpenAI is optional everywhere
@@ -326,9 +331,9 @@ Do not skip migration errors. Fix them.
 
 ---
 
-## NORTHFLANK PRODUCTION AUDIT
+## GOOGLE CLOUD PRODUCTION AUDIT
 
-Enter Northflank and audit:
+Audit the Google Cloud production services:
 - Build logs
 - Docker logs
 - Runtime logs
@@ -375,7 +380,7 @@ Return:
 6. Database migrations
 7. Dashboard connections
 8. LMS connections
-9. Northflank errors fixed
+9. Google Cloud errors fixed
 10. Runtime status
 11. Build results
 12. Remaining credential-only issues
@@ -393,35 +398,9 @@ Return:
 
 ---
 
-## VERIFIED PRODUCTION MARKETING DEPLOYMENT
+## PRODUCTION DEPLOYMENT EVIDENCE
 
-### Active Production Deployment
-| Field | Value |
-|-------|-------|
-| Service | elevate-marketing |
-| Deployment ID | 7757897c64 |
-| Git SHA | 36e59cc23c6e82a0713c8042b150d6e74f38c549 |
-| Source | GitHub Actions pipeline (CD) |
-| Health Verification | Pipeline verified |
-| Commit | fix: update health check to use root path |
-
-### Stale Deployments (TERMINATED)
-- elevate-marketing-6df5655d8d (manual/unknown source)
-- elevate-marketing-58c79d89c6
-- elevate-marketing-865d584596
-- elevate-marketing-7dfdf5c5c5
-
-### Deployment Rules
-1. ONLY trust deployments with Reason: "CD" (GitHub Actions pipeline)
-2. DO NOT use deployments with blank Reason (manual/unknown)
-3. DELETE stale/duplicate deployments to avoid conflicts
-4. Keep only ONE active deployment revision per service
-
-### Northflank API
-- Team ID: 6a1e9a33da6e472da6551c07
-- Project ID: 01j5e5b3e3v8z9z5z6q3t9a
-- Service: elevate-marketing
-- Domain: www.elevateforhumanity.org
+Use the current Google Cloud workflow run, immutable image digest, ready revision, and live runtime SHA as deployment evidence. An old deployment ID is not evidence of current production state. Preserve revisions required for rollback.
 
 ---
 

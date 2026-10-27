@@ -8,6 +8,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { MediaQualityEvidence } from './media-quality-gate';
+import { evaluatePersistedCredentialLesson } from '@/lib/course-factory/canonical-course-gate';
 
 export type VideoJobStatus = 'draft' | 'queued' | 'rendering' | 'complete' | 'failed';
 export type VideoAssetKind = 'lesson' | 'microclip';
@@ -493,7 +494,7 @@ export async function markComplete(
   if (job?.lesson_id && job.asset_kind === 'lesson') {
     const { data: lesson } = await supabase
       .from('course_lessons')
-      .select('video_url')
+      .select('video_url,content_json')
       .eq('id', job.lesson_id)
       .maybeSingle();
     await supabase
@@ -534,9 +535,30 @@ export async function markComplete(
           .eq('id', existingVersion.id)
       : await supabase.from('lesson_video_versions').insert(candidateVersion);
     if (versionResult.error) throw versionResult.error;
+    const currentContentJson =
+      lesson?.content_json && typeof lesson.content_json === 'object'
+        ? structuredClone(lesson.content_json as Record<string, any>)
+        : {};
+    const currentExperience =
+      currentContentJson.experience && typeof currentContentJson.experience === 'object'
+        ? (currentContentJson.experience as Record<string, any>)
+        : {};
+    currentExperience.technicalReview = {
+      approved: true,
+      mode: 'automated_media_quality_gate',
+      gateVersion:
+        result.quality_evidence && typeof result.quality_evidence === 'object'
+          ? (result.quality_evidence as unknown as Record<string, unknown>).gateVersion ?? null
+          : null,
+      checkedAt: now,
+      evidence: result.quality_evidence ?? {},
+    };
+    currentContentJson.experience = currentExperience;
+
     const { error: lessonPromotionError } = await supabase
       .from('course_lessons')
       .update({
+        content_json: currentContentJson,
         video_url: result.video_url,
         video_status: 'complete',
         video_error: null,
@@ -545,16 +567,38 @@ export async function markComplete(
         media_quality_status: 'approved',
         media_quality_evidence: result.quality_evidence ?? {},
         media_verified_at: now,
-        // This is the only transition that completes a unified lesson build.
-        // The video has already passed narration, visual, caption, and media
-        // quality gates and still matches the locked source fingerprint.
-        generation_status: 'generated',
+        // Media completion is necessary but not sufficient for credential
+        // lesson completion. The strict persisted lesson contract runs below
+        // before generation_status may advance to generated.
+        generation_status: 'generating',
         scene_data: result.scene_data ?? null,
         duration_seconds: result.duration_seconds ?? null,
         updated_at: now,
       })
       .eq('id', job.lesson_id);
     if (lessonPromotionError) throw lessonPromotionError;
+
+    const lessonContract = await evaluatePersistedCredentialLesson(job.lesson_id);
+    if (lessonContract.pass) {
+      const { error: lessonCompletionError } = await supabase
+        .from('course_lessons')
+        .update({
+          generation_status: 'generated',
+          updated_at: now,
+        })
+        .eq('id', job.lesson_id);
+      if (lessonCompletionError) throw lessonCompletionError;
+    } else {
+      logger.warn('[VideoJob] Media approved but credential lesson contract remains incomplete', {
+        jobId,
+        lessonId: job.lesson_id,
+        findings: lessonContract.findings.map((finding) => ({
+          gate: finding.gate,
+          path: finding.path,
+          message: finding.message,
+        })),
+      });
+    }
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'approved',
@@ -628,6 +672,37 @@ export async function markFailed(
   if (!job) {
     logger.warn('[VideoJob] Failure transition skipped because the lease changed', { jobId });
     return;
+  }
+
+  try {
+    await supabase.from('platform_events').insert({
+      event_type: 'video_job_failed',
+      category: 'course_media',
+      severity: terminalFailure ? 'error' : 'warning',
+      actor_type: 'system',
+      subject_id: jobId,
+      subject_type: 'video_job',
+      source: 'video-worker',
+      correlation_id: jobId,
+      idempotency_key: `video-job-failure:${jobId}:${retryCount}:${now}`,
+      message: errorMessage,
+      payload: {
+        job_id: jobId,
+        lesson_id: job?.lesson_id ?? null,
+        asset_kind: job?.asset_kind ?? null,
+        asset_key: job?.asset_key ?? null,
+        retry_count: retryCount,
+        failure_class: failureClass,
+        terminal: terminalFailure,
+        provider: evidence.provider ?? null,
+        provider_model: evidence.provider_model ?? null,
+      },
+    });
+  } catch (eventError) {
+    logger.warn('[VideoJob] Unable to persist failure event', {
+      jobId,
+      error: eventError instanceof Error ? eventError.message : String(eventError),
+    });
   }
 
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {

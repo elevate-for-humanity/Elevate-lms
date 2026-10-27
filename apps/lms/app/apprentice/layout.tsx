@@ -24,17 +24,30 @@ export const dynamic = 'force-dynamic';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const h = await headers();
-  const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
+  const pathname =
+    h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
 
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   const [{ data: profile }, { data: actorProfile }] = await Promise.all([
-    db.from('profiles').select('id, role, full_name, first_name, last_name, avatar_url').eq('id', subject.userId).maybeSingle(),
-    db.from('profiles').select('id, role, full_name, first_name, last_name, avatar_url').eq('id', user!.id).maybeSingle(),
+    db
+      .from('profiles')
+      .select('id, role, full_name, first_name, last_name, avatar_url, onboarding_completed')
+      .eq('id', subject.userId)
+      .maybeSingle(),
+    user
+      ? db
+          .from('profiles')
+          .select('id, role, full_name, first_name, last_name, avatar_url')
+          .eq('id', user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
@@ -52,15 +65,45 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   const actorIsAdmin = ['admin', 'super_admin'].includes(String(actorProfile?.role || ''));
   const isDashboard = pathname === '/apprentice' || pathname === '/apprentice/dashboard';
-  if (actorIsAdmin && !isDashboard) {
-    const moduleName = pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'apprentice module';
+  if (actorIsAdmin && !subject.previewing && !isDashboard) {
+    const moduleName =
+      pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'apprentice module';
     return (
-      <PlatformShell user={{ id: user!.id, email: user?.email || '', full_name: actorProfile?.full_name || undefined, first_name: actorProfile?.first_name || undefined, last_name: actorProfile?.last_name || undefined, avatar_url: actorProfile?.avatar_url || undefined }} role="apprentice" breadcrumbs={breadcrumbs}>
+      <PlatformShell
+        user={{
+          id: user!.id,
+          email: user?.email || '',
+          full_name: actorProfile?.full_name || undefined,
+          first_name: actorProfile?.first_name || undefined,
+          last_name: actorProfile?.last_name || undefined,
+          avatar_url: actorProfile?.avatar_url || undefined,
+        }}
+        role="apprentice"
+        breadcrumbs={breadcrumbs}
+      >
         <main className="mt-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Administrator portal preview</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+            Administrator portal preview
+          </p>
           <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
-          <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">This Apprentice Portal module is operational. Learner hours, payments, competencies, documents, and actions remain isolated from the administrator session.</p>
-          <div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/students" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Select or manage a learner</a><a href="/apprentice" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Apprentice PWA overview</a></div>
+          <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
+            Select an apprentice in Admin to view this page with their saved records. No apprentice
+            is selected in this session, so their hours, payments, and documents are not shown.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="https://admin.elevateforhumanity.org/students"
+              className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+            >
+              Select or manage a learner
+            </a>
+            <a
+              href="/apprentice"
+              className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950"
+            >
+              Apprentice PWA overview
+            </a>
+          </div>
         </main>
       </PlatformShell>
     );
@@ -80,33 +123,46 @@ export default async function Layout({ children }: { children: React.ReactNode }
       breadcrumbs={breadcrumbs}
       paris={{
         surface: 'learner',
-        courseTitle: beautyProgram ? `${beautyProgram.label} Apprenticeship` : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship',
-        nextLessonTitle: 'Complete the required items highlighted in red on your apprentice dashboard',
+        courseTitle: beautyProgram
+          ? `${beautyProgram.label} Apprenticeship`
+          : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship',
+        nextLessonTitle:
+          'Complete the required items highlighted in red on your apprentice dashboard',
       }}
     >
       {subject.previewing && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           <span>
-            Admin preview: viewing {profile?.full_name || 'this learner'}&apos;s apprentice dashboard.
+            Admin preview: viewing {profile?.full_name || 'this learner'}&apos;s apprentice
+            dashboard.
           </span>
           <a className="font-semibold underline" href="/api/admin/preview?end=1">
             Exit preview
           </a>
         </div>
       )}
-      <section className="mb-4 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm" role="status" aria-label="Apprentice start notice">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Apprentice notice</p>
-        <h2 className="mt-1 text-lg font-black">Theory coursework opens September 11, 2026.</h2>
-        <p className="mt-1 text-sm font-semibold leading-6">
-          You can sign in and use your apprentice portal now. Please complete and upload every required document before theory begins.
-        </p>
-        <a
-          href="/apprentice/documents"
-          className="mt-3 inline-flex rounded-xl bg-amber-950 px-4 py-2 text-sm font-black text-white hover:bg-amber-900"
+      {!profile?.onboarding_completed && (
+        <section
+          className="mb-4 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm"
+          role="status"
+          aria-label="Apprentice start notice"
         >
-          Complete required documents
-        </a>
-      </section>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
+            Apprentice notice
+          </p>
+          <h2 className="mt-1 text-lg font-black">Complete your apprentice onboarding</h2>
+          <p className="mt-1 text-sm font-semibold leading-6">
+            Review your assigned courses, training schedule, and required documents. Course access
+            follows your actual enrollment and onboarding status.
+          </p>
+          <a
+            href="/apprentice/documents"
+            className="mt-3 inline-flex rounded-xl bg-amber-950 px-4 py-2 text-sm font-black text-white hover:bg-amber-900"
+          >
+            Complete required documents
+          </a>
+        </section>
+      )}
       <div className="mt-4">{children}</div>
     </PlatformShell>
   );

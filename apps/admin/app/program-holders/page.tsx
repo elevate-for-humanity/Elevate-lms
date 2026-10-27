@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Building2, Clock, CheckCircle, XCircle, Eye, Send } from 'lucide-react';
+import { AlertTriangle, Building2, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
 import ResendOnboardingButton from './ResendOnboardingButton';
 import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
 
@@ -26,12 +26,18 @@ export default async function AdminProgramHoldersPage() {
   const supabase = await requireAdminClient();
 
   // Fetch all program holders
-  const { data: holders } = await supabase
-    .from('program_holders')
-    .select(
-      'id, organization_name, name, contact_name, contact_email, contact_phone, status, mou_signed, created_at, user_id',
-    )
-    .order('created_at', { ascending: false });
+  const [{ data: holders }, { data: roleProfiles }] = await Promise.all([
+    supabase
+      .from('program_holders')
+      .select(
+        'id, organization_name, name, contact_name, contact_email, contact_phone, status, mou_signed, created_at, user_id',
+      )
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('profiles')
+      .select('id,full_name,email,role,program_holder_id,is_active')
+      .in('role', ['program_holder', 'programholder', 'site_coordinator']),
+  ]);
 
   // Fetch program counts per holder
   const holderIds = (holders || []).map((h: any) => h.id);
@@ -62,6 +68,19 @@ export default async function AdminProgramHoldersPage() {
   });
   const pending = items.filter((h: any) => h.status === 'pending').length;
   const active = items.filter((h: any) => ['active', 'approved'].includes(h.status)).length;
+  const linkedUserIds = new Set((holders || []).map((holder: any) => holder.user_id).filter(Boolean));
+  const linkedHolderIds = new Set((holders || []).map((holder: any) => holder.id));
+  const unlinkedRoleProfiles = (roleProfiles || []).filter((profile: any) => {
+    const email = String(profile.email || '').toLowerCase();
+    const name = String(profile.full_name || '').trim();
+    return (
+      profile.is_active !== false &&
+      !email.endsWith('@qa.invalid') &&
+      !/^\[qa(?:\s|\])/i.test(name) &&
+      !linkedUserIds.has(profile.id) &&
+      (!profile.program_holder_id || !linkedHolderIds.has(profile.program_holder_id))
+    );
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -80,7 +99,7 @@ export default async function AdminProgramHoldersPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 xl:grid-cols-4">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center gap-2 mb-2">
               <Building2 className="w-5 h-5 text-slate-700" />
@@ -102,7 +121,39 @@ export default async function AdminProgramHoldersPage() {
             </div>
             <p className="text-3xl font-bold text-brand-green-600">{active}</p>
           </div>
+          <div className={`rounded-lg border p-6 shadow-sm ${unlinkedRoleProfiles.length ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+            <div className="mb-2 flex items-center gap-2">
+              <AlertTriangle className={`h-5 w-5 ${unlinkedRoleProfiles.length ? 'text-amber-700' : 'text-slate-500'}`} />
+              <h3 className="text-sm font-medium text-slate-700">Unlinked Role Accounts</h3>
+            </div>
+            <p className={`text-3xl font-bold ${unlinkedRoleProfiles.length ? 'text-amber-800' : 'text-slate-900'}`}>{unlinkedRoleProfiles.length}</p>
+          </div>
         </div>
+
+        {unlinkedRoleProfiles.length ? (
+          <section className="mb-8 rounded-2xl border border-amber-300 bg-amber-50 p-5">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-amber-800" />
+              <div>
+                <h2 className="text-lg font-black text-amber-950">Program Holder role accounts need review</h2>
+                <p className="mt-1 text-sm leading-6 text-amber-950">
+                  These active user profiles have a Program Holder or Site Coordinator role but no linked Program Holder organization. They cannot receive programs, applicants, phone, email, or a complete dashboard until an approved organization record is linked.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {unlinkedRoleProfiles.map((profile: any) => (
+                <article key={profile.id} className="rounded-xl border border-amber-200 bg-white p-4">
+                  <p className="font-black text-slate-950">{profile.full_name || 'Unnamed user'}</p>
+                  <p className="mt-1 text-sm text-slate-700">{profile.email || 'No email recorded'}</p>
+                  <p className="mt-2 text-xs font-black uppercase tracking-wide text-amber-800">
+                    {String(profile.role).replaceAll('_', ' ')} · organization link required
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border">

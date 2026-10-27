@@ -6,7 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
-import { telnyxClient } from '@/lib/phone/telnyx';
+import {hydrateProcessEnv} from '@/lib/secrets';
 
 export type PhoneActionState = { ok: boolean; message: string };
 
@@ -92,6 +92,10 @@ async function requireWorkspace() {
 }
 
 export async function createMeeting(formData: FormData): Promise<void> {
+  await hydrateProcessEnv();
+  const scheduledInput=String(formData.get('scheduledAt')||'');
+  const scheduledAt=scheduledInput?new Date(scheduledInput):null;
+  if(scheduledAt && (!Number.isFinite(scheduledAt.getTime()) || scheduledAt.getTime()<Date.now()-60000))throw new Error('Choose a future meeting date and time.');
   const title = String(formData.get('title') ?? '').trim();
   const roomType = String(formData.get('roomType') ?? 'meeting');
   if (title.length < 3 || title.length > 120)
@@ -113,7 +117,8 @@ export async function createMeeting(formData: FormData): Promise<void> {
     room_type: roomType,
     host_profile_id: auth.profile.id,
     status: 'open',
-    started_at: new Date().toISOString(),
+    scheduled_at: scheduledAt?.toISOString() || null,
+    started_at: scheduledAt ? null : new Date().toISOString(),
     max_participants: 50,
     allow_screen_share: true,
     allow_chat: true,
@@ -175,6 +180,13 @@ export async function savePhoneSettings(
     if (aiEnabled && aiInstructions.length < 20) {
       return { ok: false, message: 'Give the AI receptionist clear operating instructions.' };
     }
+    // Asterisk currently records unanswered-call voicemail regardless of this
+    // database setting. The ingest API rejects recordings when disabled, which
+    // would discard callers' messages. Do not permit that unsafe mismatch until
+    // Admin settings are applied and acknowledged by the PBX itself.
+    if (!checked(formData, 'voicemailEnabled')) {
+      return { ok: false, message: 'Voicemail cannot be disabled from Admin until the live PBX confirms the change. No settings were saved.' };
+    }
     const recordingEnabled = checked(formData, 'callRecordingEnabled');
     const recordingDisclosure = String(formData.get('recordingDisclosure') ?? '').trim();
     if (recordingEnabled && !recordingDisclosure) {
@@ -209,7 +221,7 @@ export async function savePhoneSettings(
       .eq('id', id);
     if (error) return { ok: false, message: error.message };
     revalidatePath('/phone');
-    return { ok: true, message: 'Phone routing, hours, voicemail, and AI settings saved.' };
+    return { ok: true, message: 'Phone preferences saved to the database only; live PBX greetings, hours, routing and voicemail have NOT been applied or verified. Existing live phone configuration remains unchanged.' };
   } catch (error) {
     return failure(error, 'Unable to save phone settings.');
   }
@@ -384,58 +396,12 @@ export async function removeDestination(formData: FormData): Promise<void> {
 }
 
 export async function testDestination(formData: FormData): Promise<void> {
-  const { db, id } = await requireSystemId();
-  const destinationId = String(formData.get('destinationId') ?? '');
-  const [{ data: destination }, { data: number }] = await Promise.all([
-    db
-      .from('phone_destinations')
-      .select('destination,enabled,destination_type,extension_id')
-      .eq('id', destinationId)
-      .eq('phone_system_id', id)
-      .maybeSingle(),
-    db
-      .from('phone_numbers')
-      .select('e164')
-      .eq('phone_system_id', id)
-      .eq('source', 'provider')
-      .eq('status', 'active')
-      .eq('is_primary', true)
-      .maybeSingle(),
-  ]);
-  if (!destination?.enabled || !number?.e164) {
-    throw new Error('An active primary number and enabled PWA route are required for a test call.');
-  }
-  let target = destination.destination as string | null;
-  if (destination.destination_type === 'webrtc') {
-    if (!destination.extension_id) throw new Error('This PWA route has no assigned extension.');
-    const { data: device } = await db
-      .from('phone_webrtc_devices')
-      .select('sip_username')
-      .eq('extension_id', destination.extension_id)
-      .eq('status', 'active')
-      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
-      .order('last_seen_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!device?.sip_username) {
-      throw new Error('That Program Holder must connect Phone in the PWA before a test call.');
-    }
-    target = `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`;
-  }
-  if (!target) throw new Error('This route has no callable PWA device.');
-  const connectionId = process.env.TELNYX_CONNECTION_ID;
-  if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  await telnyxClient().calls.dial({
-    connection_id: connectionId,
-    from: number.e164,
-    to: target,
-    timeout_secs: 25,
-    answering_machine_detection: 'disabled',
-    client_state: Buffer.from(
-      JSON.stringify({ systemId: id, destinationId, purpose: 'admin_test' }),
-    ).toString('base64'),
-  });
-  revalidatePath('/phone');
+  // The retired carrier must never be used for a test call.
+  // Use the authenticated Elevate/Asterisk PWA dial pad for extension calls.
+  // Do not silently initiate a chargeable Twilio PSTN call from this action.
+  await requireSystemId();
+  void formData;
+  throw new Error('Carrier-originated test calling is retired. Use Elevate Phone in the PWA to test an extension; live Twilio/PBX test-call support is not yet verified.');
 }
 
 export async function removeMenuOption(formData: FormData): Promise<void> {
@@ -463,9 +429,9 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
       .from('profiles')
       .select('id,role')
       .eq('id', profileId)
-      .in('role', ['program_holder', 'programholder'])
+      .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
       .maybeSingle();
-    if (!profile) throw new Error('Select a valid Program Holder account.');
+    if (!profile) throw new Error('Select a valid staff or Program Holder account.');
   }
   const { error } = await db
     .from('phone_numbers')
@@ -483,15 +449,15 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
   const extension = String(formData.get('extension') ?? '').trim();
   const department = String(formData.get('department') ?? '').trim() || null;
   if (!profileId || !/^\d{2,6}$/.test(extension)) {
-    throw new Error('Select a Program Holder and enter a 2 to 6 digit extension.');
+    throw new Error('Select a staff member or Program Holder and enter a 2 to 6 digit extension.');
   }
   const { data: profile } = await db
     .from('profiles')
     .select('id,full_name,email,role')
     .eq('id', profileId)
-    .in('role', ['program_holder', 'programholder'])
+    .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
     .maybeSingle();
-  if (!profile) throw new Error('Select a valid Program Holder account.');
+  if (!profile) throw new Error('Select a valid staff or Program Holder account.');
   const { data: savedExtension, error } = await db
     .from('communication_extensions')
     .upsert(
@@ -499,7 +465,7 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
         workspace_id: workspace.id,
         profile_id: profile.id,
         extension,
-        display_name: profile.full_name || profile.email || 'Program Holder',
+        display_name: profile.full_name || profile.email || 'Team member',
         department,
         enabled: true,
         updated_at: new Date().toISOString(),
@@ -562,4 +528,18 @@ export async function toggleExtension(formData: FormData): Promise<void> {
     .eq('workspace_id', workspace.id);
   if (error) throw new Error(error.message);
   revalidatePath('/phone');
+}
+
+export async function destinationActionResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
+ try{
+  const command=String(formData.get('command')||'');
+  if(command==='default'){await setDefaultDestination(formData);return {ok:true,message:'Default call route saved.'};}
+  if(command==='toggle'){await toggleDestination(formData);return {ok:true,message:String(formData.get('enabled'))==='true'?'Call route enabled.':'Call route paused.'};}
+  if(command==='test'){await testDestination(formData);return {ok:true,message:'Test call requested. Answer the destination and verify two-way audio.'};}
+  return {ok:false,message:'Choose a valid phone action.'};
+ }catch(error){return failure(error,'The phone action could not be completed.');}
+}
+
+export async function createMeetingResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
+ try{await createMeeting(formData);return {ok:true,message:'Meeting saved. Copy or share its link from the meeting list below.'};}catch(error){return failure(error,'The meeting could not be created.');}
 }

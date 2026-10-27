@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
+import { AccessToken, RoomServiceClient, TrackSource } from 'livekit-server-sdk';
 
 export type LiveKitReadiness = { ready: true; url: string } | { ready: false; missing: string[] };
 
@@ -66,7 +66,10 @@ export async function createMeetingToken(input: {
     room: input.roomName,
     canSubscribe: true,
     canPublish: input.canPublish,
-    canPublishData: input.canShare,
+    canPublishData: true,
+    canPublishSources: input.canShare
+      ? [TrackSource.CAMERA, TrackSource.MICROPHONE, TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO]
+      : [TrackSource.CAMERA, TrackSource.MICROPHONE],
   });
   return { token: await token.toJwt(), serverUrl: config.url };
 }

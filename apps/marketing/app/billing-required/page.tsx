@@ -16,7 +16,7 @@ function BillingRequiredContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/barber/update-payment', { method: 'POST' });
+      const res = await fetch('/api/store/billing-portal', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Something went wrong. Please try again.');
@@ -41,8 +41,7 @@ function BillingRequiredContent() {
             </div>
             <h1 className="text-2xl font-black text-slate-900 mb-2">Payment Method Updated</h1>
             <p className="text-slate-600 mb-6">
-              Your payment method has been updated. Access is restored after the past-due balance is
-              successfully processed.
+              Your billing account has been updated. Access is restored after the past-due balance is confirmed.
             </p>
             <a
               href="https://app.elevateforhumanity.org/lms/dashboard"
@@ -92,22 +91,22 @@ function BillingRequiredContent() {
                     Opening payment portal…
                   </>
                 ) : (
-                  'Update Payment Method'
+                  'Open Billing'
                 )}
               </button>
 
               <p className="text-xs text-slate-500 text-center">
-                You will be redirected to Stripe's secure payment portal.
+                You will continue to the Elevate billing center.
               </p>
 
               <div className="border-t pt-4 space-y-2">
                 <p className="text-sm font-medium text-slate-700">Need help?</p>
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                  href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                   className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
                 >
                   <Phone className="w-4 h-4" />
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.mainPhone}
                 </a>
                 <a
                   href="mailto:elevate4humanityedu@gmail.com"

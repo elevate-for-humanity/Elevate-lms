@@ -73,7 +73,7 @@ export default async function VerifyCertificatePage({
     return (
       <div className="min-h-screen bg-slate-50">
         {/* Hero Section */}
-        <section className="relative h-[clamp(520px,72svh,860px)] w-full flex items-center justify-center text-white overflow-hidden">
+        <section className="relative h-[clamp(260px,42svh,480px)] w-full flex items-center justify-center text-white overflow-hidden">
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
@@ -414,8 +414,8 @@ export default async function VerifyCertificatePage({
               Elevate4humanityedu@gmail.com
             </a>{' '}
             or call{' '}
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
-              {PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </p>
         </div>

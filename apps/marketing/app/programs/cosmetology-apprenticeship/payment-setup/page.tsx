@@ -25,10 +25,7 @@ export default function CosmetologyPaymentSetupPage() {
             Choose a secure tuition payment option
           </h1>
           <p className="mt-3 text-base leading-7 text-slate-700">
-            The calculator below loads the published program price from the server. The minimum
-            enrollment deposit is $600. You can adjust the deposit, pay tuition in full, or review
-            available buy-now-pay-later options. Final financing terms are provided by the selected
-            payment provider at checkout.
+            The calculator below loads the current published tuition. Compare paying in full with the initial installment and three remaining monthly invoices. Review the complete schedule before payment. BNPL is separate financing, available only when an enabled provider approves it.
           </p>
 
           <div className="mt-7">

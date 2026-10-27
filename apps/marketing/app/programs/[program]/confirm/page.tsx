@@ -56,7 +56,7 @@ function ConfirmContent() {
               Try Again
             </Link>
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone}`}
               className="px-6 py-3 border border-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition flex items-center gap-2 justify-center"
             >
               <Phone className="w-4 h-4" /> Call Us

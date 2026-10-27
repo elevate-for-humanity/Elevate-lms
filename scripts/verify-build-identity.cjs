@@ -22,7 +22,7 @@ const targets = [
   'apps/admin/next.config.mjs',
   'apps/lms/next.config.mjs',
   'apps/marketing/next.config.mjs',
-  'Dockerfile.northflank-admin',
+  'Dockerfile.admin',
   'Dockerfile.northflank-lms',
   'Dockerfile.marketing',
 ].filter((f) => fs.existsSync(f));

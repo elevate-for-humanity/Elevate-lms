@@ -34,10 +34,9 @@ type ServiceConfig = {
 type RolloutMode = 'custom' | 'rollout-steady' | 'recreate';
 
 const RUNTIME_PORT = 3000;
-const DESIRED_INSTANCES = Number(
-  process.env.NORTHFLANK_DESIRED_INSTANCES ||
-    (process.env.NORTHFLANK_TARGET_SERVICE === 'admin' ? 2 : 1),
-);
+// Two steady-state replicas prevent a single container failure from taking the
+// public website, learner LMS, or Admin offline. Override only intentionally.
+const DESIRED_INSTANCES = Number(process.env.NORTHFLANK_DESIRED_INSTANCES || 2);
 const BUILDKIT_CACHE_MB = 32768;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [
@@ -104,6 +103,11 @@ function requirePublicBuildArgs(): Record<string, string> {
     NEXT_PUBLIC_ADMIN_URL:
       process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
     NEXT_PUBLIC_LMS_URL: process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
+    // Client bundles cannot read the runtime secret group. Keep the public
+    // contact address in the Docker build contract so client hydration uses
+    // the same value as the server runtime.
+    NEXT_PUBLIC_SUPPORT_EMAIL:
+      process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@elevateforhumanity.org',
   };
 }
 

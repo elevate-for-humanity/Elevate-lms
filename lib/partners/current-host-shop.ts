@@ -24,6 +24,7 @@ export type CurrentHostShopPartner = {
   program_type?: string | null;
   programs?: unknown;
   approval_status?: string | null;
+  account_status?: string | null;
   status?: string | null;
   is_active?: boolean | null;
   mou_signed?: boolean | null;
@@ -42,7 +43,7 @@ export type CurrentHostShopPartner = {
 };
 
 const PARTNER_SELECT =
-  'id, name, dba, contact_email, contact_phone, phone, website, website_url, address_line1, address_line2, city, state, zip, partner_type, program_type, programs, approval_status, status, is_active, mou_signed, mou_signed_at, mou_version, onboarding_completed, onboarding_step, documents_verified, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify';
+  'id, name, dba, contact_email, contact_phone, phone, website, website_url, address_line1, address_line2, city, state, zip, partner_type, program_type, programs, approval_status, account_status, status, is_active, mou_signed, mou_signed_at, mou_version, onboarding_completed, onboarding_step, documents_verified, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify';
 
 /**
  * Resolve the signed-in Host Shop context once for every Host Shop surface.
@@ -50,7 +51,7 @@ const PARTNER_SELECT =
  * only through the explicit short-lived tenant selector used by the Host Shop
  * board, so admin access never mutates partner membership.
  */
-export async function requireCurrentHostShopPartner() {
+export async function requireCurrentHostShopPartner(options: { allowPendingOnboarding?: boolean } = {}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -128,10 +129,18 @@ export async function requireCurrentHostShopPartner() {
     .select(PARTNER_SELECT)
     .eq('id', partnerId)
     .eq('status', 'active')
-    .eq('approval_status', 'approved')
     .maybeSingle();
 
   if (partnerError || !partner || partner.is_active === false) {
+    throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
+  }
+
+  // Only document onboarding may admit a linked pending partner with conditional access.
+  // Operational Host Shop routes still require full approval.
+  const fullyApproved = partner.approval_status === 'approved';
+  const conditionalOnboarding = options.allowPendingOnboarding === true &&
+    partner.approval_status === 'pending' && partner.account_status === 'conditional_access';
+  if (!fullyApproved && !conditionalOnboarding) {
     throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
   }
 

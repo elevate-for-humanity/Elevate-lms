@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
-import { resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
+import { isSharedPostLoginDestination, resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
@@ -93,9 +93,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (callbackError === 'magic_link_expired') {
-      setError('That secure sign-in link has expired. Request a new link or sign in with your password.');
+      setError(
+        'That secure sign-in link has expired. Request a new link or sign in with your password.',
+      );
     } else if (callbackError === 'magic_link_failed') {
-      setError('That secure sign-in link is invalid. Request a new link or sign in with your password.');
+      setError(
+        'That secure sign-in link is invalid. Request a new link or sign in with your password.',
+      );
     }
   }, [callbackError]);
 
@@ -159,15 +163,13 @@ export default function LoginPage() {
       const requestedDestination = safeRedirect
         ? resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles)
         : '';
-      const isStoreReturn =
-        requestedDestination.startsWith('https://store.elevateforhumanity.org/store');
+      const isSharedReturn = isSharedPostLoginDestination(requestedDestination);
 
       let destination: string;
 
-      // Store checkout is a shared buyer surface, not a role-owned portal.
-      // Preserve this return for students and apprentices too; otherwise a
-      // successful checkout sign-in incorrectly strands them in their portal.
-      if (isStoreReturn) {
+      // Store checkout and Website Builder retain their deployed owner after login.
+      // Their routes enforce the actual subscription and website ownership.
+      if (isSharedReturn) {
         destination = requestedDestination;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
@@ -272,7 +274,7 @@ export default function LoginPage() {
             <Link
               href={
                 isProgramHolderLogin
-                  ? '/reset-password?portal=program-holder&next=/program-holder/onboarding'
+                  ? '/reset-password?portal=program-holder'
                   : '/reset-password'
               }
               className="text-sm font-semibold text-blue-700 hover:underline"

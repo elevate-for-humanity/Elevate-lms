@@ -10,7 +10,7 @@ import { resolve } from 'node:path';
 describe('unified engineering runner planning', () => {
   it('uses only repository work and authoritative CI for a backend repair', () => {
     const stages = buildUnifiedEngineeringStages('Fix the repository API route and add tests');
-    expect(stages.map((stage) => stage.runner)).toEqual(['openhands', 'github-actions']);
+    expect(stages.map((stage) => stage.runner)).toEqual(['studio-engineering', 'github-actions']);
   });
 
   it('adds browser QA for user-facing work', () => {
@@ -46,7 +46,7 @@ describe('unified engineering runner planning', () => {
       'Fix the homepage component, deploy to production, and verify the live site',
     );
     expect(stages.map((stage) => planAIToolFromCommand(stage.command)?.name)).toEqual([
-      'openhands.execute',
+      'studio.engineering.execute',
       'workflows.runTests',
       'browser.execute',
       'deployments.autopilot',
@@ -54,12 +54,15 @@ describe('unified engineering runner planning', () => {
     ]);
   });
 
-  it('dispatches OpenHands control-plane calls in-process', () => {
+  it('dispatches internal engineering in-process and keeps OpenHands opt-in', () => {
     const executor = readFileSync(resolve('lib/ai/tools/executor.ts'), 'utf8');
-    expect(executor).toContain("tool.name === 'openhands.execute'");
-    expect(executor).toContain("tool.name === 'openhands.status'");
+    const planner = readFileSync(resolve('lib/ai/tools/planner.ts'), 'utf8');
+    expect(executor).toContain("tool.name === 'studio.engineering.execute'");
     expect(executor).toContain(
-      "@/apps/admin/app/api/admin/dev-studio/openhands/agent/route",
+      "@/apps/admin/app/api/admin/dev-studio/engineering/route",
+    );
+    expect(planner).toContain(
+      "/\\bopenhands\\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute'",
     );
   });
 });

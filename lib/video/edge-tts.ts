@@ -8,10 +8,8 @@
  */
 
 import { spawn } from 'node:child_process';
-import { tts } from 'edge-tts';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { logger } from '@/lib/logger';
-import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 export const EDGE_TTS_VOICES = {
   marcus: 'en-US-GuyNeural',
@@ -57,33 +55,38 @@ export type NarrationProvider =
   | 'elevenlabs'
   | 'gemini'
   | 'openai'
-  | 'edge'
+  | 'kokoro'
   | 'local';
 
 export function configuredNarrationProvider(
   env: NodeJS.ProcessEnv = process.env,
 ): NarrationProvider {
-  const safeDefault = env.NODE_ENV === 'production' ? 'cloudflare' : 'local';
-  const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || safeDefault)
-    .trim()
-    .toLowerCase();
-  if (
-    configured === 'cloudflare' ||
-    configured === 'elevenlabs' ||
-    configured === 'gemini' ||
-    configured === 'openai' ||
-    configured === 'edge' ||
-    configured === 'local'
-  )
-    return configured;
-  throw new Error(`Unsupported AI_NARRATION_PROVIDER "${configured}"`);
+  const explicit = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER)?.trim().toLowerCase();
+  if (explicit) {
+    if (
+      explicit === 'cloudflare' ||
+      explicit === 'elevenlabs' ||
+      explicit === 'gemini' ||
+      explicit === 'openai' ||
+      explicit === 'kokoro' ||
+      explicit === 'local'
+    )
+      return explicit;
+    throw new Error(`Unsupported AI_NARRATION_PROVIDER "${explicit}"`);
+  }
+
+  // Course production defaults to self-hosted Kokoro. External providers remain
+  // explicit opt-ins only; Cloudflare credentials must never silently take
+  // ownership of narration or introduce a quota dependency.
+  if (env.NODE_ENV === 'production') return 'kokoro';
+  return 'local';
 }
 
 export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
   const provider = configuredNarrationProvider(env);
-  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+  if (env.NODE_ENV === 'production' && provider === 'local') {
     throw new Error(
-      `${provider} narration is diagnostic-only and cannot publish learner-facing media in production`,
+      `Narration provider "${provider}" is diagnostic-only and cannot publish production course media`,
     );
   }
   if (provider === 'cloudflare') {
@@ -106,9 +109,6 @@ export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = proce
   if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
     throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
   }
-  // Edge/local remain diagnostic-only in production. Paid/managed narration
-  // routes are required for learner-facing media so synthetic fallback speech
-  // can never be silently published.
 }
 
 function narrationFailureDetail(error: unknown): string {
@@ -122,7 +122,7 @@ function narrationFailureDetail(error: unknown): string {
   );
 }
 
-async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
+async function pcm16MonoToMp3(pcm: Buffer, speed = 1, volume = 1): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
@@ -136,6 +136,9 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
       '1',
       '-i',
       'pipe:0',
+      ...(speed === 1 && volume === 1
+        ? []
+        : ['-filter:a', [speed === 1 ? null : `atempo=${speed.toFixed(4)}`, volume === 1 ? null : `volume=${volume.toFixed(2)}`].filter(Boolean).join(',')]),
       '-codec:a',
       'libmp3lame',
       '-b:a',
@@ -164,6 +167,119 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
     });
     ffmpeg.stdin.end(pcm);
   });
+}
+
+const KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+
+interface KokoroAudio {
+  audio?: Float32Array;
+  data?: Float32Array;
+  sampling_rate: number;
+}
+
+interface KokoroModel {
+  generate(text: string, options: { voice: string; speed: number }): Promise<KokoroAudio>;
+}
+
+let kokoroModelPromise: Promise<KokoroModel> | undefined;
+
+function kokoroVoice(instructorVoice: EdgeTTSVoice): string {
+  const voices: Record<EdgeTTSVoice, string> = {
+    [EDGE_TTS_VOICES.marcus]: 'am_michael',
+    [EDGE_TTS_VOICES.female]: 'af_heart',
+    [EDGE_TTS_VOICES.neutral]: 'af_sarah',
+    [EDGE_TTS_VOICES.british]: 'bm_fable',
+    [EDGE_TTS_VOICES.warm]: 'am_puck',
+  };
+  return voices[instructorVoice];
+}
+
+function kokoroSpeed(rate: string): number {
+  const match = /^([+-]?\d+(?:\.\d+)?)%$/.exec(rate.trim());
+  const adjustment = match ? Number(match[1]) / 100 : 0;
+  return Math.max(0.75, Math.min(1.25, 1 + adjustment));
+}
+
+function kokoroNarrationChunks(text: string, maxCharacters = 420): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  const chunks: string[] = [];
+  let remaining = normalized;
+  while (remaining.length > maxCharacters) {
+    const window = remaining.slice(0, maxCharacters + 1);
+    const sentenceBreak = Math.max(
+      window.lastIndexOf('. '),
+      window.lastIndexOf('? '),
+      window.lastIndexOf('! '),
+    );
+    const wordBreak = window.lastIndexOf(' ');
+    const splitAt =
+      sentenceBreak >= Math.floor(maxCharacters * 0.45)
+        ? sentenceBreak + 1
+        : wordBreak > 0
+          ? wordBreak
+          : maxCharacters;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
+async function getKokoroModel(): Promise<KokoroModel> {
+  if (!kokoroModelPromise) {
+    kokoroModelPromise = import('kokoro-js').then(async ({ KokoroTTS }) => {
+      const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+        dtype: 'q8',
+        device: 'cpu',
+        // The image preloads Kokoro at build time. Never download model files
+        // while rendering lessons: remote 429s must not fail production jobs.
+        // Offline availability is enforced by the preloaded model image and
+        // runtime network policy, not by an unsupported KokoroJS option.
+      });
+      return model as unknown as KokoroModel;
+    }).catch((error) => {
+      // Do not permanently cache a rejected model initialization promise.
+      // An operator can restore the model cache before the next bounded attempt.
+      kokoroModelPromise = undefined;
+      throw error;
+    });
+  }
+  return kokoroModelPromise;
+}
+
+async function generateKokoroNarration(
+  text: string,
+  instructorVoice: EdgeTTSVoice,
+  rate: string,
+): Promise<Buffer> {
+  const model = await getKokoroModel();
+  const segments: Float32Array[] = [];
+  let totalSamples = 0;
+  for (const chunk of kokoroNarrationChunks(text)) {
+    const audio = await model.generate(chunk, {
+      voice: kokoroVoice(instructorVoice),
+      speed: kokoroSpeed(rate),
+    });
+    if (audio.sampling_rate !== 24000) {
+      throw new Error(`Kokoro narration returned unsupported sample rate ${audio.sampling_rate}`);
+    }
+    const samples = audio.audio ?? audio.data;
+    if (!samples?.length) throw new Error('Kokoro narration returned an empty audio segment');
+    segments.push(samples);
+    totalSamples += samples.length;
+  }
+  if (!segments.length) throw new Error('Kokoro narration returned no audio segments');
+
+  const pcm = Buffer.allocUnsafe(totalSamples * 2);
+  let offset = 0;
+  for (const segment of segments) {
+    for (const sample of segment) {
+      const value = Math.max(-1, Math.min(1, sample));
+      pcm.writeInt16LE(Math.round(value < 0 ? value * 32768 : value * 32767), offset);
+      offset += 2;
+    }
+  }
+  return pcm16MonoToMp3(pcm);
 }
 
 async function generateLocalNarration(text: string): Promise<Buffer> {
@@ -373,8 +489,7 @@ function cloudflareNarrationChunks(text: string): string[] {
   return chunks;
 }
 
-async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffer> {
-  if (segments.length === 1) return segments[0];
+async function decodeCloudflareMp3Segment(segment: Buffer): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
@@ -384,12 +499,15 @@ async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffe
       'mp3',
       '-i',
       'pipe:0',
+      '-vn',
+      '-ac',
+      '1',
+      '-ar',
+      '24000',
       '-codec:a',
-      'libmp3lame',
-      '-b:a',
-      '128k',
+      'pcm_s16le',
       '-f',
-      'mp3',
+      's16le',
       'pipe:1',
     ]);
     const output: Buffer[] = [];
@@ -402,15 +520,27 @@ async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffe
       if (code !== 0 || !result.length) {
         reject(
           new Error(
-            `Cloudflare narration segment composition failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 400)}`,
+            `Cloudflare narration chunk decode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 400)}`,
           ),
         );
       } else {
         resolve(result);
       }
     });
-    ffmpeg.stdin.end(Buffer.concat(segments));
+    ffmpeg.stdin.end(segment);
   });
+}
+
+async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffer> {
+  if (segments.length === 1) return segments[0];
+  // Each Cloudflare request returns an independent MP3 stream. Byte-concatenating
+  // those streams and presenting them to ffmpeg as one MP3 can stop decoding at
+  // an embedded stream boundary, truncating long lesson narration. Decode each
+  // chunk independently to one PCM format, concatenate the PCM in narration order,
+  // then encode a single learner-facing MP3.
+  const pcmSegments: Buffer[] = [];
+  for (const segment of segments) pcmSegments.push(await decodeCloudflareMp3Segment(segment));
+  return pcm16MonoToMp3(Buffer.concat(pcmSegments));
 }
 
 async function generateCloudflareNarration(
@@ -424,7 +554,22 @@ async function generateCloudflareNarration(
   for (const chunk of chunks) {
     segments.push(await generateCloudflareNarrationChunk(chunk, instructorVoice));
   }
-  return normalizeCloudflareMp3Segments(segments);
+  const combined = await normalizeCloudflareMp3Segments(segments);
+  // Cloudflare's TTS API does not honor the Edge-style rate option. Measure the
+  // delivered audio and preserve pitch while bringing instruction into the
+  // narration QA's teaching pace. Do not alter short phrases, where a word
+  // count is too noisy to give a meaningful pace measurement.
+  const words = text.trim().split(/\s+/).length;
+  if (words < 20) return combined;
+  const pcm = await decodeCloudflareMp3Segment(combined);
+  const durationSeconds = pcm.length / (24000 * 2);
+  const measuredWpm = words * 60 / durationSeconds;
+  const speed = measuredWpm >= 118 && measuredWpm <= 145 ? 1 : 135 / measuredWpm;
+  if (!Number.isFinite(speed) || speed < 0.5 || speed > 2) {
+    throw new Error(`Cloudflare narration pace cannot be safely corrected: ${measuredWpm.toFixed(1)} WPM`);
+  }
+  // Leave headroom even when the provider's original peak hit 0 dBFS.
+  return pcm16MonoToMp3(pcm, speed, 0.8);
 }
 
 async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {
@@ -458,27 +603,17 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
 export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}): Promise<Buffer> {
   const normalizedText = text.trim();
   if (!normalizedText) throw new Error('Narration requires non-empty text');
-  const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
+  const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%' } = options;
   assertNarrationProviderConfigured();
   const provider = configuredNarrationProvider();
-  if (
-    provider === 'cloudflare' ||
-    provider === 'elevenlabs' ||
-    provider === 'gemini' ||
-    provider === 'openai'
-  ) {
-    requirePaidInferenceContext('narration');
-  }
   try {
     if (provider === 'cloudflare')
       return await generateCloudflareNarration(normalizedText, voice);
     if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
     if (provider === 'gemini') return await generateGeminiNarration(normalizedText, voice);
     if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
-    if (provider === 'edge') {
-      const audio = await tts(normalizedText, { voice, rate, pitch, volume });
-      return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
-    }
+    if (provider === 'kokoro')
+      return await generateKokoroNarration(normalizedText, voice, rate);
     logger.info('[Narration] Using explicitly selected local narration');
     return await generateLocalNarration(normalizedText);
   } catch (error) {

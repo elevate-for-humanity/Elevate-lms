@@ -1,6 +1,6 @@
 /**
  * Individual (per-user) subscription plans for Elevate Store apps.
- * Billed monthly via Stripe — see app/api/apps/upgrade/route.ts APP_PRICES.
+ * Billed monthly through the provider-neutral billing system; current checkout uses QuickBooks invoices.
  *
  * IMPORTANT: these plans grant access to one authenticated user account.
  * Organization-wide seats, shared entity ownership, white-label delivery and

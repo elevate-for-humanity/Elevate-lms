@@ -1,7 +1,9 @@
+import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import 'server-only';
 
 import {
   FEATURED_BEAUTY_HOST_PARTNERS,
+  getFeaturedHostPartnerBySlug,
   type FeaturedHostPartner,
 } from '@/lib/apprenticeship-programs/host-partners';
 import { getApprovedShops, type HostShop } from '@/lib/programs/host-shops';
@@ -44,6 +46,8 @@ function approvedAddress(shop: HostShop) {
 }
 
 function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
+  const knownProfile = getFeaturedHostPartnerBySlug(approved.publicSlug ?? '');
+  if (knownProfile?.slug === featured.slug) return true;
   const sameName =
     identityKey(approved.name) === identityKey(featured.name) ||
     (featured.dba ? identityKey(approved.name) === identityKey(featured.dba) : false);
@@ -78,6 +82,19 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       sameBusiness(shop, candidate),
     );
     if (featured) matchedFeatured.add(featured.slug);
+    const gallery = curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [
+      ...(shop.mediaGallery ?? []),
+      ...(featured?.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })) ?? []),
+      ...(shop.logoUrl ? [{ url: shop.logoUrl, alt: `${shop.name} official business image` }] : []),
+      ...(shop.flyerUrl ? [{ url: shop.flyerUrl, alt: `${shop.name} official announcement` }] : []),
+    ]);
+    // Lead with the shop's current curated photography, retaining its full portfolio.
+    const preferredPhoto = featured?.slug === 'cals-kutz-studio'
+      ? '/images/partners/cals-kutz/storefront-enhanced-2026.webp'
+      : featured?.slug === 'top-shelf-barber-lounge'
+        ? '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp'
+        : featured?.slug === 'b-52s-barber-shop' ? '/images/partners/b-52s/interior-derived-2026.webp' : undefined;
+    if (preferredPhoto) gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {
       id: shop.id,
       slug: featured?.slug ?? shop.publicSlug!,
@@ -86,15 +103,16 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       state: shop.state || featured?.state || 'IN',
       address: approvedAddress(shop) || (featured ? featuredAddress(featured) : ''),
       phone: featured?.phone || shop.phone || undefined,
-      programs: shop.programs.length ? shop.programs : (featured?.programs ?? []),
+      programs: shop.programs,
+      primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
-        featured?.marketingBlurb ||
         shop.description ||
+        featured?.marketingBlurb ||
         `${shop.name} participates in Elevate's apprenticeship Host Site network.`,
-      image: featured
-        ? firstImage(featured)
-        : shop.logoUrl || shop.flyerUrl || shop.mediaGallery?.[0]?.url,
-      website: featured?.websiteUrl || shop.website,
+      image: gallery[0]?.url,
+      videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
+      gallery,
+      website: shop.website || featured?.websiteUrl,
       social: featured?.socialUrl,
       booking: featured?.bookingUrl,
       approval: 'approved',
@@ -102,7 +120,7 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
   });
 
   const publishedOnly = FEATURED_BEAUTY_HOST_PARTNERS.filter(
-    (shop) => !matchedFeatured.has(shop.slug),
+    (shop) => !matchedFeatured.has(shop.slug) && approved.some((record) => sameBusiness(record, shop)),
   ).map(
     (shop): HostShopNetworkEntry => ({
       id: `featured:${shop.slug}`,
@@ -113,11 +131,14 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       address: featuredAddress(shop),
       phone: shop.phone,
       programs: shop.programs,
+      primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
         shop.marketingBlurb ||
         shop.note ||
         `${shop.name} is listed in Elevate's Host Shop network.`,
       image: firstImage(shop),
+      videoUrl: shop.media?.find((item) => item.kind === 'video')?.src,
+      gallery: shop.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })),
       website: shop.websiteUrl,
       social: shop.socialUrl,
       booking: shop.bookingUrl,
@@ -125,7 +146,23 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
     }),
   );
 
-  return [...operational, ...publishedOnly].sort(
+  // Multiple historical approval records can refer to the same public shop.
+  // Keep one destination and preserve its independently approved pathways.
+  const unique = new Map<string, HostShopNetworkEntry>();
+  for (const shop of [...operational, ...publishedOnly]) {
+    const existing = unique.get(shop.slug);
+    unique.set(shop.slug, existing ? {
+      ...existing,
+      programs: [...new Set([...existing.programs, ...shop.programs])],
+      primaryProgram: existing.primaryProgram ?? shop.primaryProgram,
+      description: existing.programs.length ? existing.description : shop.description,
+      website: existing.website || shop.website,
+      phone: existing.phone || shop.phone,
+      booking: existing.booking || shop.booking,
+      social: existing.social || shop.social,
+    } : shop);
+  }
+  return [...unique.values()].sort(
     (left, right) => left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );
 }

@@ -20,6 +20,8 @@ import {
   LayoutDashboard,
   Palette,
   Plus,
+  Phone,
+  Mail,
   Settings,
   Shield,
   Target,
@@ -53,6 +55,7 @@ export type UserRole =
   | 'workforce_board_admin'
   | 'government'
   | 'program_holder'
+  | 'site_coordinator'
   | 'provider'
   | 'provider_admin'
   | 'creator'
@@ -122,6 +125,26 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
       items: [
         { id: 'dashboard', label: 'Dashboard', href: p('lms'), icon: LayoutDashboard },
         {
+          id: 'dashboard-orientation',
+          label: 'Dashboard & Class Guide',
+          href: `${p('lms', 'dashboard')}#orientation`,
+          icon: BookOpen,
+        },
+        {
+          id: 'interoffice-email',
+          label: 'Interoffice Email',
+          href: '/communications/email',
+          icon: Mail,
+        },
+        { id: 'learner-messages', label: 'Messages', href: p('lms', 'messages'), icon: Mail },
+        { id: 'learner-support', label: 'Get Help', href: p('lms', 'support'), icon: Phone },
+        {
+          id: 'upload-credential',
+          label: 'Upload Credentials',
+          href: p('lms', 'certification/upload'),
+          icon: Award,
+        },
+        {
           id: 'onboarding',
           label: 'Onboarding',
           href: p('lms', 'onboarding'),
@@ -144,7 +167,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
           href: p('lms', 'assignments'),
           icon: ClipboardCheck,
         },
-        { id: 'calendar', label: 'Schedule', href: p('lms', 'calendar'), icon: Calendar },
+        { id: 'calendar', label: 'Calendar & Appointments', href: p('lms', 'calendar'), icon: Calendar },
         { id: 'certificates', label: 'Certificates', href: p('lms', 'certificates'), icon: Award },
         { id: 'career', label: 'Career Services', href: p('lms', 'career'), icon: Briefcase },
         { id: 'resume', label: 'Resume Builder', href: p('lms', 'resume-builder'), icon: FileText },
@@ -268,6 +291,13 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'schedule', label: 'Schedule', href: `${p('hostshop')}/schedule`, icon: Calendar },
         { id: 'messages', label: 'Messages', href: `${p('hostshop')}/messages`, icon: Users },
+        {
+          id: 'communications',
+          label: 'Communications',
+          href: `${p('hostshop')}/communications`,
+          icon: Mail,
+        },
+        { id: 'phone', label: 'Phone & Extension', href: `${p('hostshop')}/phone`, icon: Phone },
         { id: 'reports', label: 'Reports', href: `${p('hostshop')}/reports`, icon: BarChart3 },
         { id: 'programs', label: 'Programs', href: `${p('hostshop')}/programs`, icon: BookOpen },
         { id: 'profile', label: 'Shop Profile', href: `${p('hostshop')}/profile`, icon: Building2 },
@@ -471,6 +501,7 @@ const ROLE_TO_NAVIGATION: Readonly<Record<UserRole, NavigationRole>> = {
   workforce_board_admin: 'workforce_board',
   government: 'workforce_board',
   program_holder: 'program_holder',
+  site_coordinator: 'program_holder',
   provider: 'provider',
   provider_admin: 'provider',
   creator: 'creator',

@@ -2,6 +2,7 @@
 // All route strings are resolved before reaching JSX (never built inline in render).
 
 export interface KPICard {
+  unavailable?: boolean;
   label: string;
   value: number;
   delta: number;
@@ -98,8 +99,8 @@ export interface SystemHealthAlert {
 }
 
 export interface SystemHealth {
-  stripeWebhookOk: boolean;
-  stripeIssuingOk: boolean;
+  quickBooksWebhookOk: boolean;
+  quickBooksBillingOk: boolean;
   buildEnvOk: boolean;
   staleJobs: number;
   degraded: boolean;
@@ -172,6 +173,9 @@ export interface RecentPayment {
 }
 
 export interface AdminDashboardData {
+  paidInvoiceSummary?: {allTimeAvailable: boolean; monthAvailable: boolean; paidCount: number};
+  totalStudentsAvailable?: boolean;
+  newTodayAvailable?: boolean;
   counts: DashboardCounts;
   revenueAllTimeCents: number;
   totalStudents: number;

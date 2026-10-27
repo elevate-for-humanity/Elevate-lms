@@ -39,6 +39,7 @@ export function getRequiredAgreementsForProgram(role: string, programSlug?: stri
 export type UserRole =
   | 'student'
   | 'program_holder'
+  | 'site_coordinator'
   | 'employer'
   | 'staff'
   | 'admin'
@@ -95,6 +96,16 @@ export const REQUIRED_AGREEMENTS: Record<UserRole, RequiredAgreement[]> = {
       version: '1.0',
       title: 'Program Holder MOU',
       description: 'Memorandum of Understanding for program delivery partnership',
+      documentUrl: '/legal/program-holder-mou',
+    },
+  ],
+
+  site_coordinator: [
+    {
+      type: 'program_holder_mou',
+      version: '1.0',
+      title: 'Site Coordinator MOU',
+      description: 'Memorandum of Understanding for regional program coordination responsibilities',
       documentUrl: '/legal/program-holder-mou',
     },
   ],
@@ -226,7 +237,7 @@ export const PROTECTED_ROUTES: Record<string, UserRole[]> = {
   '/lms': ['student', 'instructor', 'admin', 'staff', 'super_admin'],
   '/student-portal': ['student'],
   '/lms/dashboard': ['student'],
-  '/program-holder': ['program_holder'],
+  '/program-holder': ['program_holder', 'site_coordinator'],
   '/employer': ['employer'],
   '/admin/staff-portal': ['staff', 'admin', 'super_admin'],
   '/admin': ['admin', 'super_admin'],

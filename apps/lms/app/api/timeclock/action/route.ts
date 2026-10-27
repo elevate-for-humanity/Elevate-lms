@@ -8,7 +8,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkBarberSuspension } from '@/lib/barber/suspension';
 import { sendEmail } from '@/lib/email/service';
 import { emitEvent } from '@/lib/events/emit';
-import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import { getTimeclockWeekEnding, getTimeclockWorkDate } from '@/lib/timeclock/work-date';
@@ -59,7 +58,7 @@ async function writeComplianceAlert(
 ) {
   const message =
     alertType === 'geofence_violation'
-      ? `Geofence violation: ${details.distance_m}m from ${details.site_name ?? 'site'} (allowed ${details.radius_m}m) during ${details.action}`
+      ? `Geofence violation: ${details.student_name ?? details.apprentice_id} — ${details.distance_m}m from ${details.site_name ?? 'site'} (allowed ${details.radius_m}m) during ${details.action}`
       : alertType === 'missing_lunch'
         ? `No lunch break recorded for ${details.shift_hours}h shift`
         : alertType === 'excessive_lunch'
@@ -83,6 +82,7 @@ async function writeComplianceAlert(
 async function emitGeofenceEvidence(params: {
   userId: string;
   apprenticeId: string;
+  studentName: string;
   progressEntryId?: string | null;
   siteId: string;
   siteName: string | null;
@@ -106,6 +106,7 @@ async function emitGeofenceEvidence(params: {
     subject_type: params.progressEntryId ? 'progress_entry' : 'apprentice_site',
     payload: {
       apprentice_id: params.apprenticeId,
+      student_name: params.studentName,
       progress_entry_id: params.progressEntryId ?? null,
       site_id: params.siteId,
       site_name: params.siteName,
@@ -119,8 +120,8 @@ async function emitGeofenceEvidence(params: {
       evaluated_at: new Date().toISOString(),
     },
     message: params.accepted
-      ? `Geofence verified: ${params.distanceM}m from ${params.siteName ?? 'site'} during ${params.action}`
-      : `Geofence violation: ${params.distanceM}m from ${params.siteName ?? 'site'} during ${params.action}`,
+      ? `Geofence verified: ${params.studentName} — ${params.distanceM}m from ${params.siteName ?? 'site'} during ${params.action}`
+      : `Geofence violation: ${params.studentName} — ${params.distanceM}m from ${params.siteName ?? 'site'} during ${params.action}`,
   }).catch((error) => logger.warn('[Timeclock] geofence event emission failed', error));
 }
 
@@ -147,6 +148,72 @@ async function notifyClockIn(
       idempotency_key: `timeclock-clock-in-${params.entryId}-${params.userId}`,
     })
     .then(() => {}, () => {});
+}
+
+async function notifyAdminsOfClockAttempt(
+  db: any,
+  params: {
+    userId: string;
+    apprenticeId?: string | null;
+    siteId?: string | null;
+    siteName?: string | null;
+    successful: boolean;
+    reason?: string | null;
+    code?: string | null;
+    progressEntryId?: string | null;
+    attemptedAt: string;
+    action?: 'clock_in' | 'clock_out';
+  },
+) {
+  const [{ data: profile }, { data: admins }] = await Promise.all([
+    db.from('profiles').select('full_name,first_name,last_name,email').eq('id', params.userId).maybeSingle(),
+    db.from('profiles').select('id').in('role', ['admin', 'super_admin']),
+  ]);
+  const learner = profile?.full_name
+    || [profile?.first_name, profile?.last_name].filter(Boolean).join(' ')
+    || profile?.email || params.userId;
+  const clockAction = params.action || 'clock_in';
+  const label = clockAction === 'clock_out' ? 'clock-out' : 'clock-in';
+  const verb = clockAction === 'clock_out' ? 'clock out' : 'clock in';
+  const outcome = params.successful ? `Successful ${label}` : `${label} blocked`;
+  const site = params.siteName || params.siteId || 'unresolved site';
+  const reason = params.successful ? `${label} accepted; hours remain subject to review.` : params.reason || `${label} was not accepted.`;
+  const rows = (admins || []).map((admin: any) => ({
+    user_id: admin.id,
+    type: 'timeclock',
+    title: `${outcome}: ${learner}`,
+    message: `${learner} — ${site}. ${reason}`,
+    action_label: 'Review timeclock',
+    action_url: '/apprenticeships/hours',
+    link: '/apprenticeships/hours',
+    read: false,
+    metadata: {
+      learner_user_id: params.userId,
+      student_name: learner,
+      action: clockAction,
+      apprentice_id: params.apprenticeId || null,
+      site_id: params.siteId || null,
+      site_name: params.siteName || null,
+      successful: params.successful,
+      reason: params.reason || null,
+      code: params.code || null,
+      progress_entry_id: params.progressEntryId || null,
+      attempted_at: params.attemptedAt,
+    },
+    idempotency_key: `admin-${clockAction}-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
+  }));
+  if (rows.length) {
+    const { error } = await db.from('notifications').insert(rows);
+    if (error) logger.warn('[Timeclock] admin clock notification failed', error);
+  }
+  // The geofence path already sends a detailed named email.
+  if (params.code === 'OUTSIDE_GEOFENCE') return;
+  await sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `${outcome}: ${learner}`,
+    text: `${learner} attempted to ${verb} at ${site} on ${params.attemptedAt}. ${reason}`,
+    html: `<p><strong>${escapeHtml(outcome)}</strong></p><p>${escapeHtml(learner)} attempted to ${verb} at ${escapeHtml(site)} on ${escapeHtml(params.attemptedAt)}.</p><p>${escapeHtml(reason)}</p>`,
+  }).catch((error) => logger.warn('[Timeclock] admin clock email failed', error));
 }
 
 function validateCoordinates(lat: number, lng: number, accuracyM?: number) {
@@ -209,6 +276,12 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden: apprentice_id does not match authenticated user' }, { status: 403 });
     }
 
+    const { data: studentProfile } = await db.from('profiles')
+      .select('full_name,first_name,last_name,email').eq('id', user.id).maybeSingle();
+    const studentName = studentProfile?.full_name
+      || [studentProfile?.first_name, studentProfile?.last_name].filter(Boolean).join(' ')
+      || studentProfile?.email || user.email || `Apprentice ${apprentice.id}`;
+
     // Enforce identity at the mutation boundary. Existing open shifts may still
     // be closed safely; the gate applies when starting a new shift.
     if (action === 'clock_in') {
@@ -236,6 +309,7 @@ async function _POST(request: NextRequest) {
           verification_basis: identity.basis,
           timestamp: new Date().toISOString(),
         });
+        await notifyAdminsOfClockAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, successful: false, reason: 'Secure ID and selfie verification is incomplete.', code: 'IDENTITY_VERIFICATION_REQUIRED', attemptedAt: new Date().toISOString() });
         return NextResponse.json(
           { error: 'Complete secure ID and selfie verification before clock-in.', code: 'IDENTITY_VERIFICATION_REQUIRED' },
           { status: 403 },
@@ -278,6 +352,8 @@ async function _POST(request: NextRequest) {
     if (!accepted) {
       const details = {
         apprentice_id: apprentice.id,
+        student_name: studentName,
+        learner_user_id: user.id,
         progress_entry_id: progress_entry_id ?? null,
         site_id,
         site_name: site.name,
@@ -293,6 +369,7 @@ async function _POST(request: NextRequest) {
       await emitGeofenceEvidence({
         userId: user.id,
         apprenticeId: apprentice.id,
+        studentName,
         progressEntryId: progress_entry_id,
         siteId: site_id,
         siteName: site.name ?? null,
@@ -313,7 +390,7 @@ async function _POST(request: NextRequest) {
       const siteLabel = site.name ?? 'your approved work site';
       const studentGuidance =
         action === 'clock_out'
-          ? 'You must clock out before leaving the shop radius. Return to the approved radius and try again.'
+          ? 'You must clock out at your school or assigned site before leaving. Your day\'s hours are blocked from automatic credit pending attendance review. Time away does not count. Contact your supervisor and Elevate with your actual departure time.'
           : action === 'clock_in'
             ? 'You must be inside the shop radius to clock in. Enter the approved radius and try again.'
             : 'You must be inside the shop radius to record this timeclock action. Return to the approved radius and try again.';
@@ -344,9 +421,9 @@ async function _POST(request: NextRequest) {
       const emailJobs = [
         sendEmail({
           to: ADMIN_EMAIL,
-          subject: `Geofence violation: ${site.name ?? site_id}`,
-          text: `Blocked ${action}: apprentice ${apprentice.id} was ${distanceM}m from the approved site (allowed ${radiusM}m).`,
-          html: `<p>Blocked <strong>${action}</strong> for apprentice ${apprentice.id}.</p><p>Distance: ${distanceM}m; allowed radius: ${radiusM}m.</p><p>No time was accepted for this action.</p>`,
+          subject: `Geofence violation: ${studentName} — ${site.name ?? site_id}`,
+          text: `Blocked ${action}: ${studentName} at ${siteLabel} on ${details.timestamp}. Apprentice ID: ${apprentice.id}. Reported distance: ${distanceM}m (allowed ${radiusM}m). No time was accepted for this action. ${studentGuidance}`,
+          html: `<p>Blocked <strong>${action}</strong> for <strong>${escapeHtml(studentName)}</strong> at ${escapedSiteLabel}.</p><p>Attempted at: ${details.timestamp}<br />Apprentice ID: ${apprentice.id}</p><p>Reported distance: ${distanceM}m; allowed radius: ${radiusM}m.</p><p>No time was accepted for this action.</p><p>${escapeHtml(studentGuidance)}</p>`,
         }),
       ];
       if (user.email && user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
@@ -366,6 +443,19 @@ async function _POST(request: NextRequest) {
           }
         });
       });
+      if (action === 'clock_in' || action === 'clock_out') {
+        await notifyAdminsOfClockAttempt(db, {
+          action,
+          userId: user.id,
+          apprenticeId: apprentice.id,
+          siteId: site_id,
+          siteName: site.name ?? null,
+          successful: false,
+          reason: studentText,
+          code: 'OUTSIDE_GEOFENCE',
+          attemptedAt: details.timestamp,
+        });
+      }
       return NextResponse.json(
         {
           error: 'Outside geofence',
@@ -401,6 +491,7 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (activeTheorySession) {
+        await notifyAdminsOfClockAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'An active theory lesson blocked OJL clock-in.', code: 'THEORY_SESSION_ACTIVE', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: 'Close or pause the active theory lesson before clocking into OJL.',
@@ -420,7 +511,33 @@ async function _POST(request: NextRequest) {
         (sum: number, row: any) => sum + Number(row.hours_worked || 0),
         0,
       );
+      const weekStart = new Date(`${weekEnding}T12:00:00Z`);
+      weekStart.setUTCDate(weekStart.getUTCDate() - 6);
+      const weekStartDate = weekStart.toISOString().slice(0, 10);
+      const { data: weeklyTheoryEntries } = await db
+        .from('apprenticeship_rti_entries')
+        .select('minutes_verified')
+        .eq('user_id', user.id)
+        .eq('status', 'verified')
+        .gte('instruction_date', weekStartDate)
+        .lte('instruction_date', weekEnding);
+      const weeklyTheoryHours = (weeklyTheoryEntries || []).reduce(
+        (sum: number, row: any) => sum + Number(row.minutes_verified || 0) / 60,
+        0,
+      );
+      if (weeklyOjlHours + weeklyTheoryHours >= APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours) {
+        await notifyAdminsOfClockAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Combined weekly OJL and RTI limit reached.', code: 'WEEKLY_COMBINED_LIMIT_REACHED', attemptedAt: serverNow });
+        return NextResponse.json(
+          {
+            error: `The ${APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours}-hour combined weekly OJL and RTI limit has been reached. Clock-in is disabled until the next work week.`,
+            code: 'WEEKLY_COMBINED_LIMIT_REACHED',
+          },
+          { status: 409 },
+        );
+      }
+
       if (weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours) {
+        await notifyAdminsOfClockAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Weekly OJL limit reached.', code: 'WEEKLY_OJL_LIMIT_REACHED', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`,
@@ -441,6 +558,17 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (openShift) {
+        await notifyAdminsOfClockAttempt(db, {
+          userId: user.id,
+          apprenticeId: apprentice.id,
+          siteId: site_id,
+          siteName: site.name ?? null,
+          successful: true,
+          reason: 'Clock-in retry recognized; apprentice was already clocked in.',
+          code: 'ALREADY_CLOCKED_IN',
+          progressEntryId: openShift.id,
+          attemptedAt: serverNow,
+        });
         return NextResponse.json({
           success: true,
           action,
@@ -460,11 +588,20 @@ async function _POST(request: NextRequest) {
         resolvedPartnerId = shop?.partner_id ?? null;
       }
       if (!resolvedPartnerId) {
+        await writeComplianceAlert(db, 'timeclock_configuration_error', {
+          apprentice_id: apprentice.id,
+          site_id,
+          shop_id: site.shop_id,
+          reason: 'partner_not_resolved',
+          action,
+          timestamp: serverNow,
+        });
         logger.warn('[Timeclock] no partner configured for apprentice site', {
           apprentice_id: apprentice.id,
           site_id,
           shop_id: site.shop_id,
         });
+        await notifyAdminsOfClockAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Training site is not connected to a program partner.', code: 'PARTNER_NOT_RESOLVED', attemptedAt: serverNow });
         return NextResponse.json(
           { error: 'This training site is not connected to a program partner. Contact support.' },
           { status: 409 },
@@ -515,13 +652,24 @@ async function _POST(request: NextRequest) {
         .single();
 
       if (insertError || !newEntry) {
+        await writeComplianceAlert(db, 'timeclock_persistence_error', {
+          apprentice_id: apprentice.id,
+          site_id,
+          program_id: resolvedProgramId,
+          partner_id: resolvedPartnerId,
+          action,
+          database_error: insertError?.message || 'unknown insert failure',
+          timestamp: serverNow,
+        });
         logger.error('[Timeclock] clock_in insert failed', insertError);
+        await notifyAdminsOfClockAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: insertError?.message || 'Clock-in persistence failed.', code: 'TIMECLOCK_PERSISTENCE_ERROR', attemptedAt: serverNow });
         return NextResponse.json({ error: 'Failed to clock in' }, { status: 500 });
       }
 
       await emitGeofenceEvidence({
         userId: user.id,
         apprenticeId: apprentice.id,
+        studentName,
         progressEntryId: newEntry.id,
         siteId: site_id,
         siteName: site.name ?? null,
@@ -534,6 +682,15 @@ async function _POST(request: NextRequest) {
         accepted: true,
       });
       await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: serverNow });
+      await notifyAdminsOfClockAttempt(db, {
+        userId: user.id,
+        apprenticeId: apprentice.id,
+        siteId: site_id,
+        siteName: site.name ?? null,
+        successful: true,
+        progressEntryId: newEntry.id,
+        attemptedAt: serverNow,
+      });
 
       return NextResponse.json({
         success: true,
@@ -606,7 +763,7 @@ async function _POST(request: NextRequest) {
       });
     }
 
-    const { error: clockOutError } = await db
+    const { data: completedEntry, error: clockOutError } = await db
       .from('progress_entries')
       .update({
         clock_out_at: serverNow,
@@ -617,12 +774,15 @@ async function _POST(request: NextRequest) {
         last_known_lng: lng,
         last_location_at: serverNow,
       })
-      .eq('id', entry.id);
-    if (clockOutError) return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
+      .eq('id', entry.id)
+      .select('hours_worked')
+      .single();
+    if (clockOutError || !completedEntry) return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
 
     await emitGeofenceEvidence({
       userId: user.id,
       apprenticeId: apprentice.id,
+      studentName,
       progressEntryId: entry.id,
       siteId: site_id,
       siteName: site.name ?? null,
@@ -635,28 +795,27 @@ async function _POST(request: NextRequest) {
       accepted: true,
     });
 
-    const syncResult = await syncProgressEntryToHourEntries(db, entry.id);
-    if (!syncResult) logger.warn('[Timeclock] completed shift did not sync to hour_entries', { progress_entry_id: entry.id });
+    await notifyAdminsOfClockAttempt(db, {
+      userId: user.id,
+      apprenticeId: apprentice.id,
+      siteId: site_id,
+      siteName: site.name ?? null,
+      successful: true,
+      action: 'clock_out',
+      progressEntryId: entry.id,
+      attemptedAt: serverNow,
+    }).catch((error) => logger.warn('[Timeclock] clock-out notification failed after shift closed', error));
 
-    if (syncResult?.hoursWorked && apprentice.id) {
-      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/api/rapids/safe-update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          apprentice_id: apprentice.id,
-          trigger: 'clock_out',
-          progress_entry_id: entry.id,
-          hours_worked: syncResult.hoursWorked,
-        }),
-      }).catch((error) => logger.warn('[Timeclock] RAPIDS update failed (non-blocking)', error));
-    }
+    // The database trigger writes the linked pending ledger entry atomically.
+    // Return its persisted fractional hours; approval belongs to the review queue.
+    const hoursWorked = Number(completedEntry.hours_worked);
 
     return NextResponse.json({
       success: true,
       action: 'clock_out',
       progress_entry_id: entry.id,
       clock_out_at: serverNow,
-      hours_worked: syncResult?.hoursWorked ?? 0,
+      hours_worked: hoursWorked,
       geofence_verified: true,
       distance_m: distanceM,
       radius_m: radiusM,

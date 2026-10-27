@@ -6,7 +6,9 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
-import { getAITool, type AIAgentId, type AIToolDefinition } from './registry';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { dispatchGoogleDeployment, type GoogleDeployTarget } from '@/lib/gcp/dispatch-production-workflow';
+import { canAgentUseTool, getAITool, type AIAgentId, type AIToolDefinition } from './registry';
 
 export type AIToolExecutionContext = {
   agent: AIAgentId;
@@ -59,11 +61,80 @@ function headerValue(headers: AIToolExecutionContext['requestHeaders'], name: st
 
 function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context: AIToolExecutionContext): string {
   const path = typeof tool.path === 'function' ? tool.path(input) : tool.path;
-  const isAdminControlPlane = path.startsWith('/api/admin/') || path.startsWith('/api/admin/dev-studio/');
+  const isAdminControlPlane = tool.name === 'paris.supervision' || path.startsWith('/api/admin/');
   const origin = isAdminControlPlane
     ? context.adminOrigin
     : context.appOrigin ?? context.adminOrigin;
   return `${origin.replace(/\/$/, '')}${path}`;
+}
+
+async function githubToken(): Promise<string> {
+  const token = await getGitHubToken();
+  if (!token) throw new Error('GitHub authentication is not configured for the internal Actions control plane.');
+  return token;
+}
+
+async function dispatchGithubWorkflow(
+  workflow: string,
+): Promise<Response> {
+  const token = await githubToken();
+  const repository = 'elevate-for-humanity/Elevate-lms';
+  const api = `https://api.github.com/repos/${repository}`;
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+  const before = await fetch(`${api}/actions/workflows/${workflow}/runs?branch=main&per_page=5`, {
+    headers,
+    cache: 'no-store',
+    signal: AbortSignal.timeout(20_000),
+  });
+  const beforePayload = before.ok ? await before.json().catch(() => ({})) : {};
+  const beforeIds = new Set(
+    Array.isArray((beforePayload as any).workflow_runs)
+      ? (beforePayload as any).workflow_runs.map((run: any) => String(run.id))
+      : [],
+  );
+
+  const dispatch = await fetch(`${api}/actions/workflows/${workflow}/dispatches`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ ref: 'main' }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!dispatch.ok) {
+    const body = await dispatch.text().catch(() => '');
+    throw new Error(`GitHub workflow dispatch failed for ${workflow}: HTTP ${dispatch.status} ${body}`.slice(0, 500));
+  }
+
+  let workflowRun: any = null;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const response = await fetch(
+      `${api}/actions/workflows/${workflow}/runs?branch=main&event=workflow_dispatch&per_page=10`,
+      { headers, cache: 'no-store', signal: AbortSignal.timeout(20_000) },
+    );
+    if (!response.ok) continue;
+    const payload = await response.json().catch(() => ({}));
+    workflowRun = Array.isArray((payload as any).workflow_runs)
+      ? (payload as any).workflow_runs.find((run: any) => !beforeIds.has(String(run.id)))
+      : null;
+    if (workflowRun) break;
+  }
+
+  return Response.json(
+    {
+      status: 'queued',
+      workflow,
+      workflow_run_id: workflowRun?.id ?? null,
+      run_id: workflowRun?.id ?? null,
+      html_url: workflowRun?.html_url ?? null,
+      head_sha: workflowRun?.head_sha ?? null,
+    },
+    { status: 202 },
+  );
 }
 
 async function dispatchToolRequest(
@@ -81,6 +152,31 @@ async function dispatchToolRequest(
     );
     const request = new NextRequest(url, init);
     return tool.method === 'GET' ? route.GET(request) : route.POST(request);
+  }
+  if (tool.name === 'browser.launch') {
+    const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/session/route');
+    return POST(new NextRequest(url, init));
+  }
+  if (tool.name === 'workflows.runTests') {
+    return dispatchGithubWorkflow('ci.yml');
+  }
+  if (tool.name === 'deployments.autopilot') {
+    const input = JSON.parse(typeof init.body === 'string' ? init.body : '{}');
+    const target = input.target ?? 'admin';
+    if (typeof target !== 'string' || !['admin','marketing','lms','store','course-builder'].includes(target)) {
+      return Response.json({error:'Unsupported Google deployment target'}, {status:400});
+    }
+    return Response.json(await dispatchGoogleDeployment(target as GoogleDeployTarget), {status:202});
+  }
+  if (tool.name === 'studio.engineering.execute') {
+    const { POST } = await import(
+      '@/apps/admin/app/api/admin/dev-studio/engineering/route'
+    );
+    return POST(new NextRequest(url, init));
+  }
+  if (tool.name === 'courses.status') {
+    const { GET } = await import('@/apps/admin/app/api/admin/ultimate-course-builder/route');
+    return GET(new NextRequest(url, init));
   }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(
@@ -208,7 +304,7 @@ export async function executeRegisteredAITool(
     };
   }
 
-  if (!tool.allowedAgents.includes(context.agent)) {
+  if (!canAgentUseTool(tool, context.agent)) {
     await emitAuditEvent(tool, context, input, 'blocked', { reason: 'agent_not_authorized' });
     return {
       ok: false,

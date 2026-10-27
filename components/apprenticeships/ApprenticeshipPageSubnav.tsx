@@ -8,7 +8,7 @@ const LINKS = [
   { label: 'Programs', hash: '#pathways' },
   { label: 'For learners', hash: '#learners' },
   { label: 'For employers', hash: '#employers' },
-  { label: 'Host shops', href: '/programs/barber-apprenticeship/host-shops' },
+  { label: 'Host shops', href: '/partners/host-shops' },
   { label: 'Apply', href: '/apply' },
 ] as const;
 

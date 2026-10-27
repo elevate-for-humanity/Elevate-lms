@@ -56,7 +56,7 @@ export default function HostShopSelect({ program, value, onChange }: Props) {
       <label className="block text-sm font-medium text-black mb-1">Select Your Training Shop</label>
 
       {loading ? (
-        <div className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 text-slate-400 text-sm">
+        <div className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 text-sm">
           Loading approved shops…
         </div>
       ) : (
@@ -89,7 +89,7 @@ export default function HostShopSelect({ program, value, onChange }: Props) {
       {shops.length === 0 && !loading && (
         <p className="mt-1 text-xs text-slate-500">
           No approved shops on file yet.{' '}
-          <a href="/programs/barber-apprenticeship/host-shops" className="underline">
+          <a href="/partners/host-shops?program=barber" className="underline">
             Learn about becoming a training site.
           </a>
         </p>

@@ -101,7 +101,7 @@ export const DEFAULT_WHITE_LABEL: WhiteLabelConfig = {
   termsUrl: '/terms',
   footerText: '© 2026 Elevate for Humanity. All Rights Reserved.',
   showPoweredBy: true,
-  poweredByText: 'Powered by Elevate Course Factory',
+  poweredByText: 'Powered by Elevate Ultimate Course Builder',
 };
 
 /** Load white label config based on domain or org ID */
@@ -152,7 +152,7 @@ export async function getWhiteLabelConfig(
       termsUrl: '/terms',
       footerText: '© 2026 State Barber Association',
       showPoweredBy: true,
-      poweredByText: 'Powered by Elevate Course Factory',
+      poweredByText: 'Powered by Elevate Ultimate Course Builder',
       accreditationBody: 'Approved by State Barber Board',
       programs: {
         'barber-apprenticeship': {

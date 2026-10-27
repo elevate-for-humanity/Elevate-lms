@@ -49,7 +49,11 @@ export default async function ApprenticeDocumentsPage() {
   ]);
 
   const docs = documents ?? [];
-  const uploadRequirements = (requirements ?? []).filter((item: any) =>
+  // Never render a blank documents portal for a valid apprentice enrollment.
+  // Program-specific requirements should be provisioned in apprentice_document_types;
+  // this visible fallback keeps onboarding actionable while Admin repairs configuration.
+  const configuredRequirements = requirements ?? [];
+  const uploadRequirements = configuredRequirements.filter((item: any) =>
     !['apprenticeship_agreement', 'employer_verification', 'offer_letter'].includes(String(item.document_type || '').toLowerCase()),
   );
   const required = uploadRequirements.filter((item: any) => item.is_required);
@@ -101,6 +105,12 @@ export default async function ApprenticeDocumentsPage() {
           <div className="mt-5"><UploadDocuments programSlug={programSlug} /></div>
         </section> : <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">Admin preview is read-only. This learner can upload these documents from their own account.</div>}
 
+        {configuredRequirements.length === 0 ? (
+          <section role="alert" className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-950">
+            <h2 className="font-black">Document checklist configuration needs attention</h2>
+            <p className="mt-2 text-sm font-semibold">Your enrollment is active, but this program's document checklist has not been configured yet. You can still complete orientation and the apprenticeship agreement. Elevate has been alerted to add the program-specific upload requirements.</p>
+          </section>
+        ) : null}
         <section className="mt-6 grid gap-4">
           {rows.map(({ requirement, document, status }: any) => {
             const complete = status === 'complete';

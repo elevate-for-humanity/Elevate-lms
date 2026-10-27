@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
@@ -9,11 +11,29 @@ export const metadata: Metadata = {
   description:
     'Prepare for a WorkOne or agency funding review. This page does not determine eligibility or issue WIOA, Workforce Ready Grant, JRI, or other funding approval.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/check-eligibility' },
+
+  ...publicArtworkMetadata({
+    path: '/check-eligibility',
+    image: '/images/refresh-20261014/admissions.webp',
+    alt: 'Illustrative admissions funding review',
+    title: 'Prepare for Workforce Funding Review | Elevate for Humanity',
+    description:
+      'Prepare for a WorkOne or agency funding review. This page does not determine eligibility or issue WIOA, Workforce Ready Grant, JRI, or other funding approval.',
+  }),
 };
 
 export default function CheckEligibilityPage() {
   return (
     <main className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative admissions funding review"
+        actions={[
+          { href: '/apply/student', label: 'Start a student application' },
+          { href: '/advising', label: 'Ask an advisor' },
+        ]}
+      />
+
       <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-5xl">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400">
@@ -24,8 +44,8 @@ export default function CheckEligibilityPage() {
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
             Use this page to understand the next steps before applying. Elevate does not determine
-            WIOA, Workforce Ready Grant, JRI, vocational-rehabilitation, or other third-party funding
-            eligibility and does not issue a funding award.
+            WIOA, Workforce Ready Grant, JRI, vocational-rehabilitation, or other third-party
+            funding eligibility and does not issue a funding award.
           </p>
         </div>
       </section>
@@ -72,7 +92,10 @@ export default function CheckEligibilityPage() {
                     </span>
                   )}
                 </div>
-                <Link href={`/programs/${program.slug}`} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue-700 hover:underline">
+                <Link
+                  href={`/programs/${program.slug}`}
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue-700 hover:underline"
+                >
                   Review program <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </article>
@@ -84,7 +107,9 @@ export default function CheckEligibilityPage() {
       <section className="border-y border-slate-200 bg-slate-50 px-6 py-14">
         <div className="mx-auto max-w-5xl">
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-extrabold text-slate-900">Funding preparation checklist</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900">
+              Funding preparation checklist
+            </h2>
             <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-600">
               This checklist routes you to the student application. It intentionally does not return
               a qualified/not-qualified result.
@@ -111,7 +136,10 @@ export default function CheckEligibilityPage() {
             >
               Indiana Career Connect
             </a>
-            <Link href="/apply/student" className="rounded-lg border border-slate-300 px-6 py-3 font-bold text-slate-800 hover:bg-slate-50">
+            <Link
+              href="/apply/student"
+              className="rounded-lg border border-slate-300 px-6 py-3 font-bold text-slate-800 hover:bg-slate-50"
+            >
               Student Application
             </Link>
           </div>

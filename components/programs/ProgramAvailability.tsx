@@ -194,7 +194,6 @@ export function getAvailabilityStatus(program: {
   funding_confirmed?: boolean;
 }): AvailabilityStatus {
   if (program.status === 'coming_soon') return 'coming_soon';
-  if (program.funding_confirmed === false) return 'funding_pending';
   if (program.enrollment_open === false) return 'closed';
   if (program.seats_available === 0) return 'waitlist';
   return 'open';

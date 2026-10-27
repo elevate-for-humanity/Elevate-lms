@@ -95,7 +95,7 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   {
     id: 'browser',
     label: 'Cloud Browser',
-    description: 'Operate isolated Playwright Chromium sessions and capture live runtime evidence.',
+    description: 'Operate isolated direct-CDP Chromium sessions and capture live runtime evidence.',
     permission: 'studio.repository.view',
     route: '/studio/browser',
     healthEndpoint: '/api/admin/dev-studio/browser/session',

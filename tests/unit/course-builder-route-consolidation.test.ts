@@ -76,11 +76,11 @@ describe('Admin UI route consolidation', () => {
       path.join(root, 'apps/lms/app/lms/courses/layout.tsx'),
       'utf8',
     );
-    expect(unified).toContain("id: 'workspace'");
-    expect(unified).toContain('<CourseProvider');
-    expect(unified).toContain('<CourseStudioApplication embedded>');
+    expect(unified).toContain("id: 'ultimate'");
+    expect(unified).toContain('<UltimateBuildPanel');
+    expect(unified).toContain('<UltimateStageInspector');
     expect(unified).not.toContain('src={`/studio/courses/');
-    expect(unified).toContain('Unified course workspace');
+    expect(unified).toContain('Ultimate Course Builder');
     expect(studioApplication).toContain('Live LMS browser');
     expect(studioApplication).toContain('src={previewUrl}');
     expect(studioApplication).not.toContain('srcDoc=');
@@ -107,8 +107,8 @@ describe('Admin UI route consolidation', () => {
       path.join(root, 'apps/admin/app/studio/courses/lifecycle/page.tsx'),
       'utf8',
     );
-    expect(directCourse).toContain("tab=workspace");
-    expect(lifecycle).toContain("tab: 'governance'");
+    expect(directCourse).toContain("tab=ultimate");
+    expect(lifecycle).toContain("tab: 'ultimate'");
   });
 
   it('declares one Course Builder authority and routes generated courses into it', () => {
@@ -130,7 +130,7 @@ describe('Admin UI route consolidation', () => {
     );
     expect(catalog).toContain("adminHref: '/studio/courses'");
     expect(catalog).not.toContain("adminHref: '/admin/dev-studio'");
-    expect(automaticBuilder).toContain('`/studio/courses?courseId=${encodeURIComponent(result.course_id)}&tab=workspace`');
+    expect(automaticBuilder).toContain('`/studio/courses?courseId=${encodeURIComponent(result.course_id)}&tab=ultimate`');
     expect(automaticBuilder).not.toContain('`/curriculum/${result.course_id}`');
   });
 
@@ -140,15 +140,16 @@ describe('Admin UI route consolidation', () => {
       'utf8',
     );
     expect(existsSync(path.join(root, 'apps/admin/app/admin/course-builder/CourseBuilderClient.tsx'))).toBe(false);
-    expect(canonical).toContain('/api/admin/courses/${course.id}/clone');
-    expect(canonical).toContain("? '/api/admin/course-builder'");
-    expect(canonical).toContain("action: 'publish-persisted', courseId: course.id");
-    expect(canonical).toContain("method: action === 'delete' ? 'DELETE'");
-    expect(canonical).toContain("JSON.stringify({ status: 'draft', is_published: false })");
-    expect(canonical).toContain('runCourseFactoryPipeline');
-    expect(canonical).toContain('CourseInstructorMediaPanel');
-    expect(canonical).toContain('overflow-x-clip');
-    expect(canonical).toContain('xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]');
+    expect(canonical).toContain('/api/admin/ultimate-course-builder/run');
+    expect(canonical).toContain('/api/admin/ultimate-course-builder/publish');
+    expect(canonical).toContain("body: JSON.stringify({ buildId: latest.id })");
+    expect(canonical).toContain('/api/admin/ultimate-course-builder/autopilot');
+    expect(canonical).not.toContain('runCourseFactoryPipeline');
+    expect(canonical).toContain('<UltimateStageInspector');
+    expect(canonical).toContain('operations={operations}');
+    const layout = readFileSync(path.join(root,'components/admin/course-builder/ProductionPanelLayout.tsx'),'utf8');
+    expect(layout).toContain('Production operations');
+    expect(layout).toContain('Course outline');
   });
 
   it('does not expose retired /admin UI links or redirects from executable source', () => {

@@ -1,28 +1,32 @@
 'use client';
+import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Activity, Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, ShieldCheck, Sparkles, Video } from 'lucide-react';
-import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
-import CourseLifecycleWorkspace from '@/components/admin/course-builder/CourseLifecycleWorkspace';
+import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
+import CourseSidePreview from './CourseSidePreview';
+import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
+import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
-import CoursePipelineDiagram from '@/components/admin/course-builder/CoursePipelineDiagram';
-import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
-import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
-import { CourseProvider } from '@/components/studio/CourseProvider';
-import { CourseStudioApplication } from '@/components/studio/CourseStudioApplication';
-import { StudioWorkspace } from '@/components/studio/StudioWorkspace';
-import type { CourseSession } from '@/lib/studio/course-session';
+import type { SyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
+import LicensedMediaLibrary from './LicensedMediaLibrary';
+import { courseExecutionState } from '@/lib/ultimate-course-builder/core/execution-state.mjs';
+import { orderCourseJobs } from '@/lib/ultimate-course-builder/core/job-observation.mjs';
 
-const AutomaticCourseBuilder = dynamic(() => import('@/components/course/AutomaticCourseBuilder'), {
+const MediaStudioPanel = dynamic(() => import('@/components/studio/MediaStudioPanel'), {
+  ssr: false,
+});
+const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), {
   ssr: false,
 });
 
-type Tab = 'courses' | 'workspace' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'governance' | 'registry';
+type Tab = 'courses' | 'ultimate' | 'registry' | 'media';
 type CourseRow = {
   id: string;
   title: string;
   slug: string;
+  description?: string | null;
   program_id?: string | null;
   status?: string;
   duration_hours?: number | null;
@@ -30,64 +34,127 @@ type CourseRow = {
 type ProgramRow = {
   id: string;
   title: string;
+  slug?: string | null;
   status?: string | null;
   is_active?: boolean | null;
 };
-type BlueprintRow = {
+type UltimateBuildRow = {
   id: string;
-  title: string;
-  slug: string;
-  state?: string | null;
-  modules: number;
-  lessons: number;
-  status?: string;
-};
-type CreditState = {
-  operator?: boolean;
-  metered?: boolean;
-  credits?: { balance?: number };
-};
-type HealthState = {
-  status: 'healthy' | 'degraded' | 'unavailable';
-  checks: Array<{
-    name: string;
-    passed: boolean;
-    message: string;
-    issues?: Array<{ courseId: string; title: string; slug: string; issues: string[] }>;
-    state?: 'ready' | 'paused' | 'attention';
+  course_id: string;
+  status: string;
+  owner_paused?: boolean | null;
+  current_step?: string | null;
+  findings?: unknown[] | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  ultimate_build_jobs?: Array<{
+    id: string;
+    status: string;
+    last_error?: string | null;
+    created_at: string;
+    updated_at?: string | null;
+    heartbeat_at?: string | null;
+    lease_expires_at?: string | null;
+    lease_owner?: string | null;
+    attempts?: number;
+    max_attempts?: number;
+    execution_generation?: number;
+    monitor?: {
+      enabled?: boolean;
+      coordinator?: string;
+      state?: string;
+      checkedAt?: string;
+      reason?: string;
+      recoveries?: number;
+      confirmedAssignments?: number;
+      lastDispatch?: { accepted: boolean; mode?: string; requestedAt?: string };
+    };
+    payload?: {
+      ownerPreview?: boolean;
+      progress?: { phase: string; at: string; completed: number; total?: number | null };
+    };
   }>;
-  checkedAt: string;
 };
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
-  { id: 'workspace', label: 'Build · Lessons · LMS Browser', icon: Boxes },
-  { id: 'ai', label: 'Talk to Course Builder', icon: Sparkles },
-  { id: 'blueprints', label: 'Blueprints', icon: Boxes },
-  { id: 'media', label: 'Media Library', icon: Video },
-  { id: 'monitor', label: 'Build Monitor', icon: Activity },
-  { id: 'governance', label: 'Governance · Publish · SCORM', icon: ShieldCheck },
+  { id: 'ultimate', label: 'Ultimate Build', icon: Rocket },
+  { id: 'media', label: 'Media library', icon: BookOpen },
   { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 
+async function readJson(response: Response) {
+  return response.json().catch(() => {
+    throw new Error(
+      response.status === 503
+        ? 'Admin service unavailable (HTTP 503). Saved progress is unchanged; waiting for runtime recovery.'
+        : `Course Builder returned an unreadable response (HTTP ${response.status}). Saved progress is unchanged.`,
+    );
+  });
+}
+
+async function startUltimateCourse(input: {
+  course: CourseRow;
+  programSlug: string;
+  topic?: string;
+  audience?: string;
+  googleModel?: string;
+  googleLocation?: string;
+  acceptanceBuild?: boolean;
+  syllabusPlan?: SyllabusPlan;
+}) {
+  const response = await fetch('/api/admin/ultimate-course-builder', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'queue-course',
+      courseId: input.course.id,
+      programSlug: input.programSlug,
+      title: input.course.title,
+      topic: input.topic ?? input.course.description ?? '',
+      audience: input.audience ?? '',
+      ...(input.syllabusPlan ? { syllabusPlan: input.syllabusPlan } : {}),
+      ...(input.googleModel?.trim()
+        ? {
+            instructionalAuthoring: {
+              provider: 'google',
+              model: input.googleModel.trim(),
+              location: input.googleLocation || 'us',
+            },
+          }
+        : {}),
+      ...(input.acceptanceBuild ? { acceptanceBuild: true } : {}),
+    }),
+  });
+  const payload = await readJson(response);
+  if (!response.ok || !payload?.buildId) {
+    throw new Error(payload?.error || payload?.message || 'Ultimate build could not be started');
+  }
+  if (payload?.queued !== true && payload?.dispatched !== true)
+    throw new Error('The worker request was not saved.');
+  return payload;
+}
+
 export default function UnifiedCourseBuilder({
   initialCourseId = '',
-  initialTab = 'workspace',
+  initialTab = 'ultimate',
+  embedded = false,
+  initialBrowserTarget = '',
+  syncLocationWithUrl = !embedded,
 }: {
   initialCourseId?: string;
   initialTab?: Tab;
+  embedded?: boolean;
+  initialBrowserTarget?: string;
+  syncLocationWithUrl?: boolean;
 }) {
+  const [browserOpen, setBrowserOpen] = useState(true);
+  const [sidePanel, setSidePanel] = useState<'lesson' | 'browser'>('lesson');
+  const [browserVisited, setBrowserVisited] = useState(false);
   const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [programs, setPrograms] = useState<ProgramRow[]>([]);
   const [courseId, setCourseId] = useState(initialCourseId);
-  const [blueprints, setBlueprints] = useState<BlueprintRow[]>([]);
-  const [courseSession, setCourseSession] = useState<CourseSession | null>(null);
-  const [workspaceLoading, setWorkspaceLoading] = useState(false);
-  const [workspaceError, setWorkspaceError] = useState('');
-  const [workspaceRevision, setWorkspaceRevision] = useState(0);
-  const [creditState, setCreditState] = useState<CreditState | null>(null);
-  const [health, setHealth] = useState<HealthState | null>(null);
   const [inventoryLoading, setInventoryLoading] = useState(true);
   const [inventoryError, setInventoryError] = useState('');
   const [programError, setProgramError] = useState('');
@@ -97,80 +164,13 @@ export default function UnifiedCourseBuilder({
     [courses, courseId],
   );
 
-  async function loadCourses() {
-    setInventoryLoading(true); setInventoryError('');
-    try {
-      const res = await fetch('/api/admin/courses', { cache: 'no-store' });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.error ?? `Course inventory failed (${res.status})`);
-      const rows: CourseRow[] = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.courses)
-          ? data.courses
-          : [];
-      setCourses(rows);
-      const requestedCourse = courseId
-        ? rows.find((course) => course.id === courseId || course.slug === courseId)
-        : null;
-      if (requestedCourse?.id && requestedCourse.id !== courseId) selectCourse(requestedCourse.id);
-      else if (!requestedCourse && rows[0]?.id) selectCourse(rows[0].id);
-    } catch (error) {
-      setInventoryError(error instanceof Error ? error.message : 'Unable to load course inventory');
-    } finally { setInventoryLoading(false); }
-  }
-
-  useEffect(() => {
-    void loadCourses();
-    fetch('/api/admin/dev-studio/programs', { cache: 'no-store' })
-      .then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data?.error ?? `Programs failed (${response.status})`); return data; })
-      .then((data) => setPrograms(Array.isArray(data?.data) ? data.data : []))
-      .catch((error) => setProgramError(error instanceof Error ? error.message : 'Unable to load programs'));
-    fetch('/api/admin/course-builder?action=credits', { cache: 'no-store' })
-      .then((response) => response.json())
-      .then((data) => setCreditState(data))
-      .catch(() => setCreditState(null));
-    fetch('/api/admin/courses/health', { cache: 'no-store' })
-      .then((response) => response.json())
-      .then((data) => setHealth(data?.checks ? data : null))
-      .catch(() => setHealth(null));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (tab !== 'blueprints' || blueprints.length) return;
-    fetch('/api/admin/course-builder?action=blueprints')
-      .then((r) => r.json())
-      .then((data) => setBlueprints(Array.isArray(data.blueprints) ? data.blueprints : []))
-      .catch(() => setBlueprints([]));
-  }, [tab, blueprints.length]);
-
-  useEffect(() => {
-    if (tab !== 'workspace' || !courseId) return;
-    const controller = new AbortController();
-    setWorkspaceLoading(true);
-    setWorkspaceError('');
-    setCourseSession(null);
-    fetch(
-      `/api/admin/course-builder?action=session&courseId=${encodeURIComponent(courseId)}`,
-      { cache: 'no-store', signal: controller.signal },
-    )
-      .then(async (response) => {
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload?.session) {
-          throw new Error(payload?.error || `Course workspace failed (${response.status})`);
-        }
-        return payload.session as CourseSession;
-      })
-      .then(setCourseSession)
-      .catch((error) => {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        setWorkspaceError(error instanceof Error ? error.message : 'Unable to load course workspace');
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setWorkspaceLoading(false);
-      });
-    return () => controller.abort();
-  }, [courseId, tab, workspaceRevision]);
+  const selectedProgram = useMemo(
+    () => programs.find((program) => program.id === selectedCourse?.program_id) ?? null,
+    [programs, selectedCourse?.program_id],
+  );
 
   function syncLocation(nextCourseId: string, nextTab: Tab) {
+    if (!syncLocationWithUrl) return;
     const params = new URLSearchParams(window.location.search);
     if (nextCourseId) params.set('courseId', nextCourseId);
     else params.delete('courseId');
@@ -188,35 +188,78 @@ export default function UnifiedCourseBuilder({
     syncLocation(courseId, nextTab);
   }
 
-  function openWorkspace(id: string) {
+  function openUltimate(id: string) {
     setCourseId(id);
-    setTab('workspace');
-    syncLocation(id, 'workspace');
+    setTab('ultimate');
+    syncLocation(id, 'ultimate');
   }
 
-  return (
-    <div className="min-h-screen min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100">
-      <div className="border-b border-slate-800 bg-slate-900 px-5 py-4">
+  async function loadCourses(preferredCourseId?: string) {
+    setInventoryLoading(true);
+    setInventoryError('');
+    try {
+      const response = await fetch('/api/admin/courses', { cache: 'no-store' });
+      const payload = await readJson(response);
+      if (!response.ok)
+        throw new Error(payload?.error ?? `Course inventory failed (${response.status})`);
+      const rows: CourseRow[] = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.courses)
+          ? payload.courses
+          : [];
+      setCourses(rows);
+      const requested = preferredCourseId || courseId;
+      const matched = requested
+        ? rows.find((course) => course.id === requested || course.slug === requested)
+        : null;
+      if (matched?.id) setCourseId(matched.id);
+      else if (!selectedCourse && rows[0]?.id) setCourseId(rows[0].id);
+    } catch (error) {
+      setInventoryError(error instanceof Error ? error.message : 'Unable to load course inventory');
+    } finally {
+      setInventoryLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadCourses();
+    fetch('/api/admin/dev-studio/programs', { cache: 'no-store' })
+      .then(async (response) => {
+        const payload = await readJson(response);
+        if (!response.ok) throw new Error(payload?.error ?? `Programs failed (${response.status})`);
+        return payload;
+      })
+      .then((payload) => setPrograms(Array.isArray(payload?.data) ? payload.data : []))
+      .catch((error) =>
+        setProgramError(error instanceof Error ? error.message : 'Unable to load programs'),
+      );
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const workspace = (
+    <div
+      className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100`}
+    >
+      <div className="border-b border-slate-800 bg-slate-900 px-3 py-2 sm:px-5 sm:py-4">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
-              <Bot className="h-4 w-4" /> Master Course Builder
+              <Bot className="h-4 w-4" /> Ultimate Course Builder
             </div>
-            <p className="mt-1 max-w-3xl text-sm text-slate-400">
-              One workspace for course authoring, standards, media sourcing, instructor production, review, and publishing.
+            <p className="mt-1 hidden max-w-3xl text-sm text-slate-200 sm:block">
+              One durable 20-stage authority for standards, instruction, media, narration,
+              assessments, QA, repair, and LMS release.
             </p>
-            {creditState ? (
-              <p className="mt-2 text-sm font-bold text-amber-300">
-                {creditState.operator
-                  ? 'Platform operator workspace • usage metering exempt'
-                  : `${Number(creditState.credits?.balance ?? 0).toLocaleString()} Course Builder credits available`}
-              </p>
-            ) : null}
+            <p className="mt-2 hidden items-center gap-2 text-sm font-bold text-emerald-300 sm:inline-flex">
+              <ShieldCheck className="h-4 w-4" /> Legacy Course Factory is archived and cannot start
+              production builds.
+            </p>
           </div>
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <label className="sr-only" htmlFor="master-course-selector">Selected course</label>
+            <label className="sr-only" htmlFor="ultimate-course-selector">
+              Selected course
+            </label>
             <select
-              id="master-course-selector"
+              id="ultimate-course-selector"
               value={courseId}
               onChange={(event) => selectCourse(event.target.value)}
               className="min-h-10 max-w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm font-semibold text-white sm:min-w-80"
@@ -238,16 +281,19 @@ export default function UnifiedCourseBuilder({
             {selectedCourse ? (
               <button
                 type="button"
-                onClick={() => selectTab('workspace')}
+                onClick={() => selectTab('ultimate')}
                 className="max-w-full truncate rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 hover:bg-cyan-400"
               >
-                Open workspace
+                Open Ultimate build
               </button>
             ) : null}
           </div>
         </div>
       </div>
 
+      <div className="mx-auto w-full max-w-[1600px] px-3 sm:px-5">
+        <PodcastProgramGuideReview authorized />
+      </div>
       <div className="overflow-x-auto border-b border-slate-800 bg-slate-950 px-4 py-3">
         <div className="mx-auto flex max-w-[1600px] gap-2">
           {TABS.map(({ id, label, icon: Icon }) => (
@@ -264,57 +310,13 @@ export default function UnifiedCourseBuilder({
       </div>
 
       <main className="mx-auto min-w-0 max-w-[1600px] p-3 pb-24 sm:p-4 sm:pb-24">
-        {health ? (
-          <section
-            aria-label="Course Builder health"
-            className={`mb-4 rounded-xl border p-4 ${health.status === 'healthy' ? 'border-emerald-700 bg-emerald-950/40' : 'border-amber-700 bg-amber-950/40'}`}
-          >
-            <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
-              <h2 className="min-w-0 break-words font-bold text-white">Course Builder health: {health.status}</h2>
-              <span className="text-xs text-slate-400">Checked {new Date(health.checkedAt).toLocaleString()}</span>
-            </div>
-            <ul className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-              {health.checks.map((check) => (
-                <li key={check.name} className="rounded-lg bg-slate-950/60 p-3 text-sm">
-                  <div
-                    className={
-                      check.state === 'paused'
-                        ? 'font-bold text-amber-300'
-                        : check.passed
-                          ? 'font-bold text-emerald-300'
-                          : 'font-bold text-amber-300'
-                    }
-                  >
-                    {check.state === 'paused'
-                      ? 'Paused'
-                      : check.passed
-                        ? 'Ready'
-                        : 'Needs attention'}{' '}
-                    · {check.name}
-                  </div>
-                  <p className="mt-1 text-slate-300">{check.message}</p>
-                  {check.issues?.length ? (
-                    <ul className="mt-2 space-y-2 border-t border-slate-800 pt-2">
-                      {check.issues.map((issue) => (
-                        <li key={issue.courseId}>
-                          <button
-                            type="button"
-                            onClick={() => openWorkspace(issue.courseId)}
-                            className="font-semibold text-cyan-300 hover:text-cyan-200"
-                          >
-                            Open {issue.title}
-                          </button>
-                          <span className="block text-xs text-slate-400">
-                            {issue.issues.join(' · ')}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </section>
+        {tab !== 'courses' && inventoryError ? (
+          <div role="alert" className="mb-4 rounded-lg bg-red-950/60 p-3 text-red-100">
+            Course inventory could not load: {inventoryError}{' '}
+            <button type="button" onClick={() => void loadCourses()} className="underline">
+              Retry course inventory
+            </button>
+          </div>
         ) : null}
         {tab === 'courses' && (
           <CourseCatalog
@@ -324,70 +326,181 @@ export default function UnifiedCourseBuilder({
             inventoryError={inventoryError}
             programError={programError}
             onChanged={loadCourses}
-            onOpen={openWorkspace}
+            onOpen={openUltimate}
             onCreated={async (id) => {
-              await loadCourses();
-              openWorkspace(id);
+              await loadCourses(id);
+              openUltimate(id);
             }}
           />
         )}
 
-        {tab === 'workspace' && (
-          courseId ? (
-            <section className="overflow-hidden rounded-2xl border border-slate-700 bg-white">
-              <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-slate-900">
-                <div>
-                  <h2 className="font-bold">Unified course workspace</h2>
-                  <p className="text-xs text-slate-600">Curriculum · quizzes · assessments · media · interactions · compliance · publish · learner preview</p>
-                </div>
-                {selectedCourse ? <span className="text-xs font-semibold text-slate-500">{selectedCourse.title}</span> : null}
-              </div>
-              {workspaceError ? (
-                <div className="m-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
-                  {workspaceError}
-                  <button type="button" onClick={() => setWorkspaceRevision((value) => value + 1)} className="ml-2 font-bold underline">Retry</button>
-                </div>
-              ) : workspaceLoading || !courseSession ? (
-                <div className="flex min-h-[32rem] items-center justify-center gap-3 text-sm font-semibold text-slate-600" role="status">
-                  <Loader2 className="h-5 w-5 animate-spin" /> Loading the course workspace and LMS browser…
-                </div>
-              ) : (
-                <CourseProvider key={courseSession.loadedAt} session={courseSession}>
-                  <CourseStudioApplication embedded>
-                    <StudioWorkspace />
-                  </CourseStudioApplication>
-                </CourseProvider>
-              )}
-            </section>
+        {tab === 'ultimate' &&
+          (selectedCourse ? (
+            <UltimateBuildPanel
+              key={selectedCourse.id}
+              course={selectedCourse}
+              programSlug={selectedProgram?.slug?.trim() || selectedCourse.slug}
+              compact={embedded}
+            />
           ) : (
-            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to open its unified workspace.</div>
-          )
-        )}
-        {tab === 'ai' && (
-          <div className="rounded-2xl bg-white p-6 text-slate-900">
-            <AutomaticCourseBuilder />
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-200">
+              Select a course, or create a course shell, to start an Ultimate build.
+            </div>
+          ))}
+        {tab === 'media' && (
+          <div className="space-y-4">
+            <LicensedMediaLibrary key={courseId} courseId={courseId} />
+            <details className="rounded-xl border border-slate-700 p-4">
+              <summary className="min-h-11 cursor-pointer font-bold">
+                Organization assets · images, narration, licensed media and projects
+              </summary>
+              <MediaStudioPanel initialTab="library" />
+            </details>
           </div>
         )}
-        {tab === 'blueprints' && (
-          <BlueprintPanel
-            blueprints={blueprints}
-            selectedCourse={selectedCourse}
-            onGenerated={async (id) => {
-              await loadCourses();
-              openWorkspace(id);
-            }}
-          />
-        )}
-        {tab === 'media' && <CourseInstructorMediaPanel courseId={courseId} />}
-        {tab === 'monitor' && (
-          courseId
-            ? <CoursePipelineDiagram courseId={courseId} />
-            : <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to watch its live build pipeline.</div>
-        )}
-        {tab === 'governance' && <CourseLifecycleWorkspace selectedCourseId={courseId} embedded />}
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>
+  );
+  return (
+    <ResizableWorkspace
+      className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
+      title="Course side panel"
+      stackedTabs
+      primaryLabel="Build course"
+      panelLabel="Lesson preview"
+      open={browserOpen}
+      onOpenChange={(open) => {
+        setBrowserOpen(open);
+        if (open) setBrowserVisited(true);
+      }}
+      panel={
+        <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
+          <nav
+            aria-label="Course side panel views"
+            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-1.5"
+          >
+            <button
+              type="button"
+              aria-pressed={sidePanel === "lesson"}
+              onClick={() => setSidePanel("lesson")}
+              className="min-h-11 rounded-lg border border-slate-600 px-3"
+            >
+              Lesson video
+            </button>
+            <button
+              type="button"
+              aria-pressed={sidePanel === "browser"}
+              onClick={() => {
+                setSidePanel("browser");
+                setBrowserVisited(true);
+              }}
+              className="min-h-11 rounded-lg border border-slate-600 px-3"
+            >
+              Web browser
+            </button>
+          </nav>
+          <div
+            hidden={sidePanel !== "lesson"}
+            className="min-h-0 flex-1 overflow-hidden"
+          >
+            <CourseSidePreview courseId={courseId} />
+          </div>
+          <div hidden={sidePanel !== "browser"} className="min-h-0 flex-1">
+            {browserVisited && (
+              <CloudBrowserWorkspace
+                autoStart={browserOpen && sidePanel === "browser"}
+                initialTarget={initialBrowserTarget}
+              />
+            )}
+          </div>
+        </div>
+      }
+    >
+      {workspace}
+    </ResizableWorkspace>
+  );
+}
+
+type CourseIntegrityCheck = {
+  name: string;
+  passed: boolean;
+  message: string;
+  issues?: Array<{ courseId: string; title: string; issues: string[] }>;
+};
+
+export function CourseIntegrityChecks({ onOpen }: { onOpen: (id: string) => void }) {
+  const [checks, setChecks] = useState<CourseIntegrityCheck[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  async function refresh() {
+    setLoading(true);
+    setError('');
+    setChecks([]);
+    try {
+      const response = await fetch('/api/admin/courses/health', { cache: 'no-store' });
+      const payload = await readJson(response);
+      // An unavailable capability can still include actionable failed checks.
+      if ((!response.ok && response.status !== 503) || !Array.isArray(payload?.checks)) {
+        throw new Error(payload?.error || `Course checks failed (${response.status})`);
+      }
+      setChecks(payload.checks);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Course checks are unavailable');
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    void refresh();
+  }, []);
+  return (
+    <section
+      aria-label="Course integrity"
+      className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-4"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-bold">Course checks</h2>
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => void refresh()}
+          className="rounded-lg border border-slate-600 px-3 py-2 text-sm disabled:opacity-50"
+        >
+          {loading ? 'Checking courses…' : 'Refresh course checks'}
+        </button>
+      </div>
+      {error && (
+        <p role="alert" className="mt-3 text-red-200">
+          {error}
+        </p>
+      )}
+      <ul className="mt-3 space-y-3">
+        {checks.map((check) => (
+          <li key={check.name}>
+            <p className={check.passed ? 'text-emerald-300' : 'text-amber-200'}>
+              <strong>{check.name}:</strong> {check.message}
+            </p>
+            {check.issues?.length ? (
+              <ul className="mt-2 space-y-2">
+                {check.issues.map((issue) => (
+                  <li key={issue.courseId} className="rounded-lg border border-amber-900/60 p-3">
+                    <button
+                      type="button"
+                      onClick={() => onOpen(issue.courseId)}
+                      className="font-semibold text-cyan-300 underline"
+                    >
+                      Open {issue.title}
+                    </button>
+                    <p className="mt-1 text-sm text-slate-300">{issue.issues.join('; ')}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -406,87 +519,101 @@ function CourseCatalog({
   loading: boolean;
   inventoryError: string;
   programError: string;
-  onChanged: () => void | Promise<void>;
+  onChanged: (preferredCourseId?: string) => void | Promise<void>;
   onOpen: (id: string) => void;
   onCreated: (id: string) => void | Promise<void>;
 }) {
-  const [busyId, setBusyId] = useState('');
-  const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
-  const visibleCourses = courses.filter(course => (status === 'all' || (course.status ?? 'draft') === status) && course.title.toLowerCase().includes(query.toLowerCase()));
-
-  async function mutate(course: CourseRow, action: 'clone' | 'publish' | 'unpublish' | 'delete') {
-    if (action === 'delete' && !window.confirm(`Archive ${course.title}? You can restore it later.`)) return;
-    setBusyId(course.id);
-    setError('');
-    try {
-      const endpoint = action === 'clone'
-        ? `/api/admin/courses/${course.id}/clone`
-        : action === 'publish'
-          ? '/api/admin/course-builder'
-          : `/api/admin/courses/${course.id}`;
-      const response = await fetch(endpoint, {
-        method: action === 'delete' ? 'DELETE' : action === 'unpublish' ? 'PATCH' : 'POST',
-        ...(action === 'publish'
-          ? {
-              headers: courseBuilderJsonHeaders(`course-publish:${course.id}`),
-              body: JSON.stringify({ action: 'publish-persisted', courseId: course.id }),
-            }
-          : action === 'unpublish'
-          ? {
-              headers: courseBuilderJsonHeaders(`course-unpublish:${course.id}`),
-              body: JSON.stringify({ status: 'draft', is_published: false }),
-            }
-          : {}),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? `${action} failed`);
-      await onChanged();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : `${action} failed`);
-    } finally {
-      setBusyId('');
-    }
-  }
+  const visibleCourses = courses.filter(
+    (course) =>
+      (status === 'all' || (course.status ?? 'draft') === status) &&
+      course.title.toLowerCase().includes(query.toLowerCase()),
+  );
 
   return (
-    <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]">
-      <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
-        <h2 className="text-lg font-bold">Course applications</h2>
-        <p className="mt-1 text-sm text-slate-400">
-          Every course opens the same session, state provider, mutation layer and feature workspace.
-        </p>
-        {error ? <p role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-2 text-sm text-red-200">{error}</p> : null}
-        {inventoryError ? <div role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-3 text-sm text-red-100"><strong>Course inventory could not load.</strong> {inventoryError} <button onClick={() => void onChanged()} className="ml-2 underline">Retry</button></div> : null}
-        {programError ? <p role="alert" className="mt-3 rounded-lg bg-amber-950/60 px-3 py-2 text-sm text-amber-100">Program list could not load: {programError}</p> : null}
-        <div className="mt-4 flex min-w-0 flex-wrap gap-2"><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search courses" className="min-w-0 w-full flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm sm:min-w-56"/><select value={status} onChange={e => setStatus(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm sm:w-auto"><option value="all">All statuses</option><option value="draft">Draft</option><option value="published">Published</option></select></div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {visibleCourses.map((course) => (
-            <article
-              key={course.id}
-              className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
+    <>
+      <CourseIntegrityChecks onOpen={onOpen} />
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]">
+        <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
+          <h2 className="text-lg font-bold">Course inventory</h2>
+          <p className="mt-1 text-sm text-slate-200">
+            Open a canonical course in Ultimate Course Builder. Publishing is available only after
+            the Ultimate release gate passes.
+          </p>
+          {inventoryError ? (
+            <div
+              role="alert"
+              className="mt-3 rounded-lg bg-red-950/60 px-3 py-3 text-sm text-red-100"
             >
-              <button type="button" onClick={() => onOpen(course.id)} className="break-words text-left font-bold text-white hover:text-cyan-300">{course.title}</button>
-              <div className="mt-1 text-xs text-slate-400">
-                {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
-                <button type="button" onClick={() => onOpen(course.id)} className="rounded-md bg-cyan-500 px-2.5 py-1.5 text-slate-950">Open</button>
-                <button disabled={busyId === course.id} onClick={() => void mutate(course, course.status === 'published' ? 'unpublish' : 'publish')} className="rounded-md border border-slate-600 px-2.5 py-1.5 text-slate-200 disabled:opacity-50">
-                  {course.status === 'published' ? 'Unpublish' : 'Publish'}
+              <strong>Course inventory could not load.</strong> {inventoryError}{' '}
+              <button onClick={() => void onChanged()} className="underline">
+                Retry
+              </button>
+            </div>
+          ) : null}
+          {programError ? (
+            <p
+              role="alert"
+              className="mt-3 rounded-lg bg-amber-950/60 px-3 py-2 text-sm text-amber-100"
+            >
+              Program list could not load: {programError}
+            </p>
+          ) : null}
+          <div className="mt-4 flex min-w-0 flex-wrap gap-2">
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search courses"
+              className="min-w-0 w-full flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm sm:min-w-56"
+            />
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm sm:w-auto"
+            >
+              <option value="all">All statuses</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {visibleCourses.map((course) => (
+              <article
+                key={course.id}
+                className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
+              >
+                <button
+                  type="button"
+                  onClick={() => onOpen(course.id)}
+                  className="break-words text-left font-bold text-white hover:text-cyan-300"
+                >
+                  {course.title}
                 </button>
-                <button disabled={busyId === course.id} onClick={() => void mutate(course, 'clone')} className="rounded-md border border-slate-600 px-2.5 py-1.5 text-slate-200 disabled:opacity-50">Clone</button>
-                <button disabled={busyId === course.id} onClick={() => void mutate(course, 'delete')} className="rounded-md border border-red-800 px-2.5 py-1.5 text-red-300 disabled:opacity-50">Archive</button>
-              </div>
-            </article>
-          ))}
-          {loading && <p className="text-sm text-slate-400">Loading course inventory…</p>}
-          {!loading && !inventoryError && !visibleCourses.length && <p className="text-sm text-slate-400">{courses.length ? 'No courses match these filters.' : 'No courses exist yet.'}</p>}
-        </div>
-      </section>
-      <CreateCoursePanel programs={programs} onCreated={onCreated} />
-    </div>
+                <div className="mt-1 text-xs text-slate-200">
+                  {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onOpen(course.id)}
+                  className="mt-4 rounded-md bg-cyan-500 px-2.5 py-1.5 text-xs font-bold text-slate-950"
+                >
+                  Open Ultimate build
+                </button>
+              </article>
+            ))}
+            {loading && <p className="text-sm text-slate-200">Loading course inventory…</p>}
+            {!loading && !inventoryError && !visibleCourses.length && (
+              <p className="text-sm text-slate-200">
+                {courses.length ? 'No courses match these filters.' : 'No courses exist yet.'}
+              </p>
+            )}
+          </div>
+        </section>
+        <CreateCoursePanel programs={programs} onCreated={onCreated} />
+      </div>
+    </>
   );
 }
 
@@ -497,8 +624,72 @@ function CreateCoursePanel({
   programs: ProgramRow[];
   onCreated: (id: string) => void | Promise<void>;
 }) {
+  const [syllabus, setSyllabus] = useState('');
+  const [syllabusPlan, setSyllabusPlan] = useState<SyllabusPlan | null>(null);
+  const [syllabusBusy, setSyllabusBusy] = useState(false);
+  const [planConfirmed, setPlanConfirmed] = useState(false);
+  async function importSyllabus(file?: File) {
+    if (!file) return;
+    setSyllabusBusy(true);
+    setError('');
+    setSyllabusPlan(null);
+    setPlanConfirmed(false);
+    try {
+      const form = new FormData();
+      form.set('file', file);
+      const response = await fetch('/api/admin/courses/generate/parse', {
+        method: 'POST',
+        body: form,
+      });
+      const result = await readJson(response);
+      if (!response.ok || !result.raw_text)
+        throw new Error(result.error || 'Syllabus extraction failed');
+      setSyllabus(result.raw_text);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Syllabus extraction failed');
+    } finally {
+      setSyllabusBusy(false);
+    }
+  }
+  async function generateSyllabusPlan() {
+    setSyllabusBusy(true);
+    setError('');
+    setPlanConfirmed(false);
+    try {
+      const response = await fetch('/api/admin/courses/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raw_text: syllabus, input_type: 'syllabus' }),
+        signal: AbortSignal.timeout(120000),
+      });
+      const result = await readJson(response);
+      if (!response.ok || !result.course?.modules?.length)
+        throw new Error(result.error || 'Curriculum generation failed');
+      setSyllabusPlan({
+        text: syllabus,
+        modules: result.course.modules.map(
+          (m: {
+            title: string;
+            lessons: Array<{ title: string; objectives: string[]; content: string }>;
+          }) => ({
+            title: m.title,
+            lessons: m.lessons.map((l) => ({
+              title: l.title,
+              objectives: l.objectives,
+              content: l.content,
+            })),
+          }),
+        ),
+      });
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Curriculum generation failed');
+    } finally {
+      setSyllabusBusy(false);
+    }
+  }
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
@@ -508,32 +699,130 @@ function CreateCoursePanel({
       const title = String(data.get('title') ?? '').trim();
       const topic = String(data.get('topic') ?? '').trim();
       const audience = String(data.get('audience') ?? '').trim();
+      const googleModel = String(data.get('googleModel') ?? '').trim();
+      const googleLocation = String(data.get('googleLocation') || 'us');
+      if (googleModel && !/^gemini-[a-z0-9.-]+$/.test(googleModel))
+        throw new Error('Enter a supported Google model ID for source-grounded teaching');
       const programId = String(data.get('programId') ?? '').trim();
-      const result = await runCourseFactoryPipeline({
-        title,
+      const selectedProgram = programs.find((program) => program.id === programId);
+      if (!selectedProgram?.slug) throw new Error('The selected program needs a canonical slug');
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 100);
+      const createResponse = await fetch('/api/admin/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          slug,
+          description: topic,
+          programId,
+          status: 'draft',
+        }),
+      });
+      const course = await readJson(createResponse);
+      if (!createResponse.ok || !course?.id) {
+        throw new Error(course?.error || 'Unable to create the canonical course shell');
+      }
+      await startUltimateCourse({
+        course,
+        programSlug: selectedProgram.slug,
         topic,
         audience,
-        programId,
-        difficulty: 'intermediate',
-        moduleCount: Number(data.get('moduleCount') ?? 6),
-        lessonsPerModule: Number(data.get('lessonsPerModule') ?? 5),
-        includeVideos: true,
-        dryRun: false,
+        googleModel,
+        googleLocation,
+        ...(syllabusPlan && planConfirmed ? { syllabusPlan } : {}),
       });
-      if (!result.courseId) throw new Error('Course Factory completed without a course ID');
-      await onCreated(result.courseId);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unable to create course');
+      await onCreated(course.id);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to create course');
     } finally {
       setSaving(false);
     }
   }
+
   return (
     <form
       onSubmit={submit}
       className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
     >
-      <h2 className="text-xl font-bold">Create course</h2>
+      <h2 className="text-xl font-bold">Create and start in Ultimate</h2>
+      <p className="text-sm text-slate-200">
+        Creates only the canonical course shell, then hands all generation to Ultimate Course
+        Builder.
+      </p>
+      <section
+        aria-label="Create course from syllabus"
+        className="space-y-3 rounded-lg border border-cyan-800 p-3"
+      >
+        <label className="block text-sm font-bold" htmlFor="new-course-syllabus">
+          Upload syllabus (PDF, DOCX, TXT)
+        </label>
+        <input
+          id="new-course-syllabus"
+          type="file"
+          accept=".pdf,.docx,.txt"
+          disabled={syllabusBusy || saving}
+          onChange={(event) => void importSyllabus(event.target.files?.[0])}
+          className="w-full text-sm"
+        />
+        {syllabus && (
+          <>
+            <textarea
+              aria-label="New course syllabus text"
+              value={syllabus}
+              onChange={(event) => {
+                setSyllabus(event.target.value);
+                setSyllabusPlan(null);
+                setPlanConfirmed(false);
+              }}
+              className="min-h-40 w-full rounded-lg bg-slate-950 p-3 text-sm"
+            />
+            <button
+              type="button"
+              disabled={syllabusBusy || saving}
+              onClick={() => void generateSyllabusPlan()}
+              className="min-h-11 rounded-lg border border-cyan-500 px-3"
+            >
+              {syllabusBusy ? 'Generating curriculum…' : 'Generate curriculum from syllabus'}
+            </button>
+          </>
+        )}
+        {syllabusPlan && (
+          <>
+            <ol className="space-y-3">
+              {syllabusPlan.modules.map((module, mi) => (
+                <li key={mi}>
+                  <strong>{module.title}</strong>
+                  <ol className="ml-4 list-decimal">
+                    {module.lessons.map((lesson, li) => (
+                      <li key={li}>
+                        {lesson.title}
+                        <p className="text-xs text-slate-300">{lesson.objectives.join('; ')}</p>
+                        <details>
+                          <summary>Review lesson instruction</summary>
+                          <p className="whitespace-pre-wrap text-sm">{lesson.content}</p>
+                        </details>
+                      </li>
+                    ))}
+                  </ol>
+                </li>
+              ))}
+            </ol>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={planConfirmed}
+                onChange={(event) => setPlanConfirmed(event.target.checked)}
+              />
+              Use this reviewed curriculum and syllabus for generation. Registered program
+              requirements stay authoritative.
+            </label>
+          </>
+        )}
+      </section>
       <input
         name="title"
         required
@@ -544,7 +833,7 @@ function CreateCoursePanel({
         name="topic"
         required
         rows={5}
-        placeholder="Specific course scope, standards, credential domains, practical skills, and outcomes"
+        placeholder="Specific scope, standards, practical skills, and outcomes"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
       />
       <input
@@ -559,175 +848,791 @@ function CreateCoursePanel({
         aria-label="Canonical program"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
       >
-        <option value="" disabled>Select a canonical program</option>
+        <option value="" disabled>
+          Select a canonical program
+        </option>
         {programs
           .filter((program) => program.is_active !== false && program.status !== 'archived')
           .map((program) => (
-            <option key={program.id} value={program.id}>{program.title}</option>
+            <option key={program.id} value={program.id}>
+              {program.title}
+            </option>
           ))}
       </select>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <label className="block space-y-2 text-sm">
+        <span>Google model for source-grounded teaching (optional)</span>
         <input
-          name="moduleCount"
-          type="number"
-          min={1}
-          max={40}
-          defaultValue={6}
-          className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+          name="googleModel"
+          placeholder="Verified model ID"
+          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
         />
-        <input
-          name="lessonsPerModule"
-          type="number"
-          min={1}
-          max={20}
-          defaultValue={5}
-          className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
-        />
-      </div>
-      {error && (
+        <select
+          name="googleLocation"
+          defaultValue="us"
+          aria-label="Google authoring location"
+          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+        >
+          <option value="us">United States multi-region</option>
+          <option value="us-central1">Iowa region (supported models)</option>
+          <option value="global">Global</option>
+        </select>
+        <span className="block text-slate-200">
+          Use a model verified for this worker's Google region. Authorized teaching sources and all
+          media acceptance checks remain required.
+        </span>
+      </label>
+      {error ? (
         <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
           {error}
         </p>
-      )}
+      ) : null}
       <button
         type="submit"
-        disabled={saving}
+        disabled={saving || syllabusBusy || Boolean(syllabus && (!syllabusPlan || !planConfirmed))}
         className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
       >
-        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-        {saving ? 'Building…' : 'Build complete course'}
+        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
+        {saving ? 'Starting Ultimate build…' : 'Create and start Ultimate build'}
       </button>
     </form>
   );
 }
 
-function BlueprintPanel({
-  blueprints,
-  selectedCourse,
-  onGenerated,
+export function UltimateBuildPanel({
+  course,
+  programSlug,
+  compact = false,
 }: {
-  blueprints: BlueprintRow[];
-  selectedCourse: CourseRow | null;
-  onGenerated: (courseId: string) => void | Promise<void>;
+  course: CourseRow;
+  programSlug: string;
+  compact?: boolean;
 }) {
-  const [busy, setBusy] = useState('');
+  const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
+  const [acquisitions, setAcquisitions] = useState<Array<{ id: string; goal: string | null }>>([]);
+  const [buildsCourseId, setBuildsCourseId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  async function generate(blueprint: BlueprintRow) {
-    if (!selectedCourse?.program_id) {
-      setError('Select a course linked to a canonical program before generating from a blueprint.');
-      return;
-    }
-    setBusy(blueprint.id);
-    setError('');
+  const [statusError, setStatusError] = useState('');
+  const refreshToken = useRef(0);
+  const refreshController = useRef<AbortController | null>(null);
+  const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
+  const statusLoading = loading;
+  const statusLoaded = buildsCourseId === course.id;
+  const [lastStatusAt, setLastStatusAt] = useState<string | null>(null);
+  const [notice, setNotice] = useState('');
+  const [googleModel, setGoogleModel] = useState('');
+  const [googleLocation, setGoogleLocation] = useState('us');
+  const [syllabusText, setSyllabusText] = useState('');
+  const [syllabusName, setSyllabusName] = useState('');
+  const [syllabusBusy, setSyllabusBusy] = useState(false);
+  const [syllabusConfirmed, setSyllabusConfirmed] = useState(false);
+  const jobs: NonNullable<UltimateBuildRow['ultimate_build_jobs']> = orderCourseJobs(
+    latest?.ultimate_build_jobs ?? [],
+  );
+  const activeJob = jobs.find((job) => ['queued', 'running'].includes(job.status));
+  const savedWorkerJob = activeJob ?? jobs[0];
+  const observed = courseExecutionState(savedWorkerJob);
+  const workerJob =
+    savedWorkerJob?.status === 'running' && !observed.active
+      ? {
+          ...savedWorkerJob,
+          status: 'stalled',
+          last_error:
+            'Worker heartbeat is missing or stale. Resume preserves saved progress and respects the existing lease.',
+        }
+      : savedWorkerJob;
+  const execution = courseExecutionState(savedWorkerJob, { paused: latest?.owner_paused === true });
+  const previewReady =
+    workerJob?.status === 'completed' && workerJob?.payload?.ownerPreview === true;
+
+  async function refresh(requestedCourseId = course.id, background = false) {
+    if (background && refreshController.current) return;
+    refreshController.current?.abort();
+    const controller = new AbortController();
+    refreshController.current = controller;
+    const token = ++refreshToken.current;
+    if (!background) setLoading(true);
+    setStatusError('');
     try {
-      const res = await fetch('/api/admin/course-builder', {
-        method: 'POST',
-        headers: courseBuilderJsonHeaders('generate-from-blueprint'),
-        body: JSON.stringify({
-          action: 'generate-from-blueprint',
-          blueprintId: blueprint.id,
-          programId: selectedCourse.program_id,
-          mode: 'refresh',
-          contentSource: 'ai',
-          videoMode: 'queue',
-        }),
-      });
-      const result = await res.json();
-      if (!res.ok || !result.courseId)
-        throw new Error(result.error || 'Blueprint generation failed');
-      await onGenerated(result.courseId);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Blueprint generation failed');
+      const response = await fetch(
+        `/api/admin/ultimate-course-builder?courseId=${encodeURIComponent(requestedCourseId)}`,
+        {
+          cache: 'no-store',
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]),
+        },
+      );
+      const payload = await readJson(response);
+      if (token !== refreshToken.current) return;
+      if (!response.ok) throw new Error(payload?.error || 'Unable to load Ultimate build status');
+      setBuilds(Array.isArray(payload?.builds) ? payload.builds : []);
+      setAcquisitions(Array.isArray(payload?.acquisitions) ? payload.acquisitions : []);
+      setBuildsCourseId(requestedCourseId);
+      setLastStatusAt(new Date().toISOString());
+    } catch (reason) {
+      if (token !== refreshToken.current) return;
+      setStatusError(
+        reason instanceof Error ? reason.message : 'Unable to load Ultimate build status',
+      );
     } finally {
-      setBusy('');
+      if (token === refreshToken.current) {
+        setLoading(false);
+        refreshController.current = null;
+      }
     }
   }
-  async function restoreAuthoredBlueprint(blueprint: BlueprintRow) {
-    if (!selectedCourse?.program_id) {
-      setError('Select a course linked to a canonical program before restoring its authored blueprint.');
-      return;
-    }
-    setBusy(`restore:${blueprint.id}`);
+
+  useEffect(() => {
+    setBuilds([]);
+    setAcquisitions([]);
+    setBuildsCourseId('');
+    setError('');
+    void refresh(course.id);
+  }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    // Keep retrying read-only status even after a failed initial load or blocked build.
+    // Queue writes and worker dispatch belong to the server coordinator, not polling.
+    const timer = window.setInterval(() => void refresh(course.id, true), 15000);
+    return () => window.clearInterval(timer);
+  }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function toggleAutopilot() {
+    if (!latest) return;
+    setBusy(true);
     setError('');
     try {
-      const res = await fetch('/api/admin/course-builder', {
+      const response = await fetch('/api/admin/ultimate-course-builder/autopilot', {
         method: 'POST',
-        headers: courseBuilderJsonHeaders('restore-authored-blueprint'),
-        body: JSON.stringify({
-          action: 'generate-from-blueprint',
-          blueprintId: blueprint.id,
-          programId: selectedCourse.program_id,
-          mode: 'replace',
-          contentSource: 'blueprint',
-          videoMode: 'off',
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buildId: latest.id, enabled: !workerJob?.monitor?.enabled }),
+        signal: AbortSignal.timeout(25000),
       });
-      const result = await res.json();
-      if (!res.ok || !result.courseId)
-        throw new Error(
-          result.error ||
-            (Array.isArray(result.errors) ? result.errors.join('; ') : '') ||
-            'Authored blueprint restoration failed',
-        );
-      await onGenerated(result.courseId);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Authored blueprint restoration failed');
+      const result = await readJson(response);
+      if (!response.ok) throw new Error(result.error || 'Autopilot setting could not be saved');
+      setNotice(result.message);
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Autopilot configuration failed');
     } finally {
-      setBusy('');
+      setBusy(false);
     }
   }
-  return (
-    <div className="space-y-4">
-      <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-        <h2 className="text-lg font-bold">Credential blueprints</h2>
-        <p className="mt-1 text-sm text-slate-400">
-          Generate through the same Course Builder authority. Blueprints provide regulated
-          structure; Course Factory fills governed course content and media.
+
+  async function loadSyllabus(file: File | undefined) {
+    if (!file) return;
+    setSyllabusBusy(true);
+    setError('');
+    setSyllabusConfirmed(false);
+    try {
+      const form = new FormData();
+      form.set('file', file);
+      const response = await fetch('/api/admin/courses/generate/parse', {
+        method: 'POST',
+        body: form,
+      });
+      const result = await readJson(response);
+      if (!response.ok || typeof result.raw_text !== 'string')
+        throw new Error(result.error || 'Syllabus extraction failed');
+      setSyllabusText(result.raw_text);
+      setSyllabusName(file.name);
+      setNotice('Syllabus extracted. Review the text, then attach it to this saved build.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Syllabus extraction failed');
+    } finally {
+      setSyllabusBusy(false);
+    }
+  }
+
+  async function attachSyllabus() {
+    if (!latest || !syllabusText.trim() || !syllabusConfirmed) return;
+    setSyllabusBusy(true);
+    setError('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'configure-contract',
+          buildId: latest.id,
+          instructionalSources: [
+            {
+              id: `syllabus:${course.id}:${syllabusName || 'manual'}`,
+              text: syllabusText.trim(),
+            },
+          ],
+        }),
+      });
+      const result = await readJson(response);
+      if (!response.ok || result.ok !== true)
+        throw new Error(result.error || 'Could not save the instructional source');
+      setNotice(
+        'Syllabus attached to the saved Ultimate build. Review its contract and start the worker when ready.',
+      );
+      setSyllabusConfirmed(false);
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Syllabus attachment failed');
+    } finally {
+      setSyllabusBusy(false);
+    }
+  }
+
+  async function startBuild() {
+    setBusy(true);
+    setError('');
+    try {
+      setNotice('');
+      if (latest) {
+        const response = await fetch('/api/admin/ultimate-course-builder/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ buildId: latest.id }),
+        });
+        const payload = await readJson(response);
+        if (!response.ok || (payload?.queued !== true && payload?.alreadyRunning !== true))
+          throw new Error(payload?.error || 'The worker request could not be saved');
+        if (payload.dispatched === false) {
+          setError(payload.message || 'Course saved, but the Google worker has not started.');
+        } else {
+          setNotice(payload.message || 'Worker launch accepted. Waiting for a verified heartbeat.');
+        }
+      } else {
+        const result = await startUltimateCourse({
+          course,
+          programSlug,
+          googleModel,
+          googleLocation,
+        });
+        setNotice(result.message || 'Build saved. Waiting for worker assignment.');
+        if (result.dispatched === false)
+          setError(
+            'Build queued but the Google worker launch was not accepted. Confirm the GitHub dispatch connection in Dev Studio.',
+          );
+      }
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to start Ultimate build');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function pauseBuild() {
+    if (!latest) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder/pause', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buildId: latest.id }),
+        signal: AbortSignal.timeout(25000),
+      });
+      const result = await readJson(response);
+      if (!response.ok) throw new Error(result.error || 'Pause failed');
+      setNotice(result.message);
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Pause failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function startAcceptanceBuild() {
+    setBusy(true);
+    setError('');
+    try {
+      if (!/^gemini-[a-z0-9.-]+$/.test(googleModel.trim()))
+        throw new Error('Enter a supported Google model ID');
+      await startUltimateCourse({
+        course,
+        programSlug,
+        googleModel,
+        googleLocation,
+        acceptanceBuild: true,
+      });
+      setNotice(
+        'Separate acceptance build queued for this course. Previous builds and media remain preserved.',
+      );
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to start the acceptance build');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function publish() {
+    if (!latest) return;
+    setBusy(true);
+    setError('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buildId: latest.id }),
+      });
+      const payload = await readJson(response);
+      if (!response.ok) throw new Error(payload?.error || 'Ultimate release failed');
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Ultimate release failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const operations = (
+    <div className="min-w-0">
+      <section
+        aria-label="Worker execution evidence"
+        className="rounded-xl border border-cyan-800 bg-slate-950 p-4"
+      >
+        <h3 className="font-bold">
+          Execution: {statusError ? 'unverified' : execution.phase.replaceAll('_', ' ')}
+        </h3>
+        <p className="mt-2 text-sm">
+          Queue → dispatch request → claim → verified heartbeat → processing → completed
         </p>
-      </div>
-      {error && (
-        <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
-          {error}
+        <p className="mt-2 text-xs text-slate-300">
+          Only saved worker evidence confirms execution. Course lifecycle appears separately below.
         </p>
-      )}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {blueprints.map((blueprint) => (
-          <div key={blueprint.id} className="min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-5">
-            <div className="text-xs font-bold uppercase tracking-wide text-cyan-400">
-              {blueprint.state ?? 'General'}
-            </div>
-            <h3 className="mt-1 break-words font-bold text-white">{blueprint.title}</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              {blueprint.modules} modules · {blueprint.lessons} lessons
-            </p>
-            <button
-              type="button"
-              onClick={() => void generate(blueprint)}
-              disabled={busy === blueprint.id || !selectedCourse?.program_id}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 disabled:opacity-40"
-            >
-              {busy === blueprint.id ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              Generate governed course
-            </button>
-            <button
-              type="button"
-              onClick={() => void restoreAuthoredBlueprint(blueprint)}
-              disabled={busy === `restore:${blueprint.id}` || !selectedCourse?.program_id}
-              className="ml-2 mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-400 px-3 py-2 text-sm font-bold text-amber-200 disabled:opacity-40"
-            >
-              {busy === `restore:${blueprint.id}` ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : null}
-              Restore authored blueprint
-            </button>
+        <dl className="mt-3 space-y-2 break-all text-sm">
+          <div>
+            <dt>Dispatch request</dt>
+            <dd>
+              {workerJob?.monitor?.lastDispatch
+                ? workerJob.monitor.lastDispatch.accepted
+                  ? 'Accepted · awaiting worker evidence'
+                  : 'Launch failed · saved queue preserved'
+                : 'No dispatch acknowledgement recorded'}
+            </dd>
           </div>
-        ))}
+          <div>
+            <dt>Assigned worker</dt>
+            <dd>{workerJob?.lease_owner || 'No live assignment recorded'}</dd>
+          </div>
+          <div>
+            <dt>Execution generation</dt>
+            <dd>{workerJob?.execution_generation ?? 'Not assigned'}</dd>
+          </div>
+          <div>
+            <dt>Heartbeat</dt>
+            <dd>
+              {statusError
+                ? 'Unverified'
+                : execution.active
+                  ? 'Verified fresh heartbeat and lease'
+                  : 'No verified live heartbeat'}
+            </dd>
+          </div>
+        </dl>
+      </section>
+      {!statusLoading && latest ? (
+        <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
+          <p className="text-xs uppercase tracking-wide text-slate-300">Worker job</p>
+          <p className="mt-1 text-sm font-bold text-slate-200">
+            {workerJob?.status === 'queued'
+              ? 'Awaiting worker assignment'
+              : (workerJob?.status ?? 'Not started')}
+          </p>
+          {workerJob?.last_error ? (
+            workerJob.status === "running" ? (
+              <details className="mt-2 break-words text-sm text-slate-300">
+                <summary>Previous attempt history — worker is running</summary>
+                <p>{workerJob.last_error}</p>
+              </details>
+            ) : (
+              <p
+                role="alert"
+                className="mt-2 break-words text-sm text-amber-200"
+              >
+                {workerJob.last_error}
+              </p>
+            )
+          ) : null}
+          {workerJob?.status === 'running' && !statusError && workerJob?.payload?.progress && (
+            <div className="mt-3 space-y-2 text-white">
+              <p>
+                Worker activity:{' '}
+                {workerJob.payload.progress.phase.replaceAll('_', ' ').replaceAll(':', ' · ')}
+              </p>
+              {typeof workerJob.payload.progress.total === 'number' &&
+                workerJob.payload.progress.total > 0 && (
+                  <>
+                    <progress
+                      aria-label="Current worker activity progress"
+                      className="h-3 w-full"
+                      max={workerJob.payload.progress.total}
+                      value={Math.min(
+                        workerJob.payload.progress.total,
+                        workerJob.payload.progress.completed,
+                      )}
+                    />
+                    <p className="text-sm">
+                      {workerJob.payload.progress.completed} of {workerJob.payload.progress.total}{' '}
+                      work units in this activity.
+                    </p>
+                  </>
+                )}
+            </div>
+          )}
+          {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
+            <p className="mt-2 hidden text-sm text-slate-200 sm:block">
+              {previewReady
+                ? 'The single-lesson preview finished. Full course validation and continuation have not run.'
+                : 'This worker job finished. Course acceptance and release are still required.'}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {error || statusError ? (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
+        >
+          {error || statusError}
+          {statusError && lastStatusAt && (
+            <span className="mt-1 block">
+              Showing saved status. Live status could not be confirmed.
+            </span>
+          )}
+        </p>
+      ) : null}
+
+      <div
+        data-course-status-cards
+        className="mt-5 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-2 sm:gap-4"
+      >
+        <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
+          <p className="text-xs uppercase tracking-wide text-slate-300">Course lifecycle</p>
+          <p className="mt-1 text-lg font-black text-white">
+            {statusLoading
+              ? 'loading…'
+              : !statusLoaded || statusError
+                ? 'Unavailable'
+                : (latest?.status ?? 'not started')}
+          </p>
+        </div>
+        <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
+          <p className="text-xs uppercase tracking-wide text-slate-300">Current stage</p>
+          <p className="mt-1 break-words text-lg font-black text-white">
+            {statusLoading
+              ? 'loading…'
+              : !statusLoaded || statusError
+                ? 'Unavailable'
+                : (latest?.current_step?.replaceAll('_', ' ') ?? 'Not started')}
+          </p>
+        </div>
+        <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
+          <p className="text-xs uppercase tracking-wide text-slate-300">Saved work</p>
+          <p className="mt-1 break-words text-sm font-bold text-slate-200">
+            {statusLoading
+              ? 'Loading course build…'
+              : !statusLoaded || statusError
+                ? 'Unavailable'
+                : latest
+                  ? 'Lesson checkpoints preserved'
+                  : 'Saved when started'}
+          </p>
+        </div>
+      </div>
+
+      {!statusLoading && acquisitions.length > 0 && (
+        <div className="mt-5 space-y-2">
+          {acquisitions.map((request) => (
+            <a
+              key={request.id}
+              href={`/studio/browser?acquisitionRunId=${encodeURIComponent(request.id)}`}
+              className="block rounded-lg border border-cyan-700 bg-slate-950 p-3 text-cyan-300"
+            >
+              {request.goal || 'Complete lesson scene media'} · Open existing Studio browser
+            </a>
+          ))}
+        </div>
+      )}
+
+      {latest && workerJob && (
+        <section
+          aria-label="PARIS course autopilot"
+          className="mt-5 rounded-xl border border-cyan-700 bg-slate-950 p-4 text-white"
+        >
+          <h3 className="font-bold">Automatic recovery center</h3>
+          <p className="mt-2">
+            The queue supervisor runs independently of this dashboard. Direct course controls do not
+            require PARIS chat.
+          </p>
+          <p className="mt-2">
+            {workerJob.monitor?.enabled ? 'Enabled' : 'Disabled'} ·{' '}
+            {workerJob.monitor?.state?.replaceAll('_', ' ') || 'No supervisor observation yet'}
+          </p>
+          {workerJob.monitor?.enabled &&
+            (!workerJob.monitor.checkedAt ||
+              !Number.isFinite(Date.parse(workerJob.monitor.checkedAt)) ||
+              Date.now() - Date.parse(workerJob.monitor.checkedAt) < 0 ||
+              Date.now() - Date.parse(workerJob.monitor.checkedAt) > 600000) && (
+              <p role="alert" className="mt-2 text-amber-200">
+                Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but
+                automatic execution is not verified.
+              </p>
+            )}
+          <p className="mt-2 text-sm">
+            Confirmed assignments: {workerJob.monitor?.confirmedAssignments ?? 0} · Recovery
+            attempts: {workerJob.monitor?.recoveries ?? 0} · Worker attempts:{' '}
+            {workerJob.attempts ?? 'Unavailable'} / {workerJob.max_attempts ?? 'Unavailable'}
+          </p>
+          {workerJob.monitor?.reason && (
+            <p className="mt-2">
+              {workerJob.monitor.reason === 'Owner pause or finished revision'
+                ? 'A saved pause or finished-revision condition was reported. This does not establish who set it.'
+                : workerJob.monitor.reason}
+            </p>
+          )}
+          <p className="mt-2 text-sm text-slate-200">
+            Repairs preserve saved lessons, respect active worker leases, and stop at retry limits
+            or missing evidence. Publishing requires the existing quality checks.
+          </p>
+          <button
+            type="button"
+            onClick={() => void toggleAutopilot()}
+            disabled={busy || statusLoading}
+            className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
+          >
+            {workerJob.monitor?.enabled ? 'Pause PARIS autopilot' : 'Enable PARIS autopilot'}
+          </button>
+        </section>
+      )}
+
+      {latest && <details className="mt-4 rounded-xl border border-slate-700 p-3"><summary className="min-h-11 cursor-pointer font-bold">PARIS repair execution and production evidence</summary><ParisSupervisionPanel buildId={latest.id} /></details>}
+
+      <details className="mt-4 rounded-xl border border-slate-700 p-3">
+        <summary className="min-h-11 cursor-pointer font-bold">
+          Worker logs and history ({jobs.length})
+        </summary>
+        <ol className="mt-3 space-y-3">
+          {jobs.map((job) => (
+            <li key={job.id} className="break-words rounded-lg bg-slate-950 p-3 text-sm">
+              <p className="font-bold">
+                {job.status} · Attempt {job.attempts ?? '—'} / {job.max_attempts ?? '—'}
+              </p>
+              <p className="break-all text-xs text-slate-400">{job.id}</p>
+              {job.payload?.progress && <p>{job.payload.progress.phase.replaceAll('_', ' ')}</p>}
+              {job.last_error && <p className="mt-2 text-amber-200">{job.last_error}</p>}
+              {job.monitor?.state && (
+                <p className="mt-2">
+                  Recovery: {job.monitor.state.replaceAll('_', ' ')} ·{' '}
+                  {job.monitor.reason || 'No recovery reason recorded'}
+                </p>
+              )}
+            </li>
+          ))}
+        </ol>
+      </details>
+      {notice ? (
+        <p role="status" className="mt-4 text-sm text-cyan-200">
+          {notice}
+        </p>
+      ) : null}
+
+      {statusLoaded &&
+      (!latest || ['blocked', 'failed', 'built_with_findings'].includes(latest.status)) ? (
+        <label className="mt-4 block space-y-2 text-sm">
+          <span>Google model for source-grounded teaching (optional)</span>
+          <input
+            value={googleModel}
+            onChange={(event) => setGoogleModel(event.target.value)}
+            placeholder="Verified model ID"
+            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+          />
+          <select
+            value={googleLocation}
+            onChange={(event) => setGoogleLocation(event.target.value)}
+            aria-label="Google authoring location"
+            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+          >
+            <option value="us">United States multi-region</option>
+            <option value="us-central1">Iowa region (supported models)</option>
+            <option value="global">Global</option>
+          </select>
+          <span className="block text-slate-200">
+            Set before starting this build. Authorized teaching sources and all media acceptance
+            checks remain required.
+          </span>
+        </label>
+      ) : null}
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        {latest && ['blocked', 'failed', 'built_with_findings'].includes(latest.status) ? (
+          <button
+            type="button"
+            onClick={() => void startAcceptanceBuild()}
+            disabled={busy || !googleModel.trim() || execution.active}
+            className="rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white disabled:opacity-50"
+          >
+            Start source-grounded acceptance build
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => void startBuild()}
+          disabled={
+            busy || statusLoading || !statusLoaded || Boolean(statusError) || execution.active
+          }
+          className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
+        >
+          {busy || statusLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Rocket className="h-4 w-4" />
+          )}
+          {statusLoading
+            ? 'Loading build status…'
+            : !statusLoaded
+              ? 'Build status unavailable'
+              : workerJob?.status === 'queued'
+                ? 'Start Google worker'
+                : execution.active
+                  ? 'Ultimate build running'
+                  : latest
+                    ? 'Resume Ultimate build'
+                    : 'Start Ultimate build'}
+        </button>
+        {latest && !['built', 'published', 'archived'].includes(latest.status) && (
+          <button
+            type="button"
+            onClick={() => void pauseBuild()}
+            disabled={busy || latest.owner_paused === true || Boolean(statusError)}
+            className="min-h-11 rounded-lg border border-amber-500 px-4 py-2 font-bold disabled:opacity-50"
+          >
+            {latest.owner_paused ? 'Pause requested' : 'Pause at checkpoint'}
+          </button>
+        )}
+        {latest?.status === 'built' ? (
+          <button
+            type="button"
+            onClick={() => void publish()}
+            disabled={busy}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
+          >
+            <ShieldCheck className="h-4 w-4" /> Publish Ultimate release
+          </button>
+        ) : null}
       </div>
     </div>
+  );
+
+  return (
+    <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-2 sm:rounded-2xl sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-400">
+            Ultimate Course Builder
+          </p>
+          <h2 className="mt-1 break-words text-lg font-black text-white sm:text-2xl">{course.title}</h2>
+          <p className="mt-2 text-sm text-slate-200">
+            Program authority: {programSlug || 'course-defined'} · Google Course Builder worker · 20
+            checkpointed stages
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          disabled={statusLoading}
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 disabled:opacity-50"
+        >
+          <RefreshCw className={`h-4 w-4 ${statusLoading ? 'animate-spin' : ''}`} /> Refresh
+        </button>
+      </div>
+
+      <details
+        aria-label="Syllabus instructional source"
+        className="mt-5 rounded-xl border border-cyan-800 bg-slate-950 p-4 text-white"
+      >
+        <summary className="min-h-11 cursor-pointer font-bold">
+          Upload syllabus for course production
+        </summary>
+        <p className="mt-1 text-sm text-slate-300">
+          Extract PDF, DOCX, or TXT material and review the complete text before attaching it to the
+          selected Ultimate build. This does not publish or replace lessons.
+        </p>
+        <label className="mt-3 block text-sm font-semibold" htmlFor={`syllabus-${course.id}`}>
+          Syllabus document (10 MB maximum)
+        </label>
+        <input
+          id={`syllabus-${course.id}`}
+          type="file"
+          accept=".pdf,.docx,.txt"
+          disabled={syllabusBusy}
+          onChange={(event) => void loadSyllabus(event.target.files?.[0])}
+          className="mt-2 block w-full rounded-lg border border-slate-700 p-2 text-sm"
+        />
+        {syllabusText && (
+          <>
+            <label
+              className="mt-3 block text-sm font-semibold"
+              htmlFor={`syllabus-text-${course.id}`}
+            >
+              Review extracted syllabus: {syllabusName}
+            </label>
+            <textarea
+              id={`syllabus-text-${course.id}`}
+              className="mt-2 min-h-40 w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm"
+              value={syllabusText}
+              onChange={(event) => {
+                setSyllabusText(event.target.value);
+                setSyllabusConfirmed(false);
+              }}
+            />
+            <label className="mt-3 flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={syllabusConfirmed}
+                onChange={(event) => setSyllabusConfirmed(event.target.checked)}
+              />
+              I reviewed this instructional source and authorize its use for this build.
+            </label>
+            <button
+              type="button"
+              disabled={
+                !latest ||
+                latest.status === 'running' ||
+                syllabusBusy ||
+                !syllabusConfirmed ||
+                !syllabusText.trim()
+              }
+              onClick={() => void attachSyllabus()}
+              className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
+            >
+              {syllabusBusy ? 'Processing…' : 'Attach approved syllabus to Ultimate build'}
+            </button>
+            {!latest && (
+              <p className="mt-2 text-sm text-amber-200">
+                Create a saved Ultimate build before attaching syllabus sources.
+              </p>
+            )}
+          </>
+        )}
+      </details>
+      <div className="mt-5">
+        {latest ? (
+          <UltimateStageInspector
+            buildId={latest.id}
+            updatedAt={latest.updated_at}
+            operations={operations}
+          />
+        ) : (
+          operations
+        )}
+      </div>
+      <p className="mt-4 text-xs text-slate-300">
+        Course Factory generation, blueprint execution, and standalone media queues are not
+        available from this surface.
+      </p>
+    </section>
   );
 }
 

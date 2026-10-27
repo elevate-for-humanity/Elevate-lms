@@ -1,0 +1,56 @@
+name: Google Deployment Coordination
+
+# Existing service-specific workflows already deploy automatically when a PR
+# reaches main. Do not launch a second copy of those workflows here.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: google-deployment-coordination
+  cancel-in-progress: true
+
+jobs:
+  coordinate:
+    name: Verify automatic production deployment coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retire superseded unstarted web release requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRUNE_SUPERSEDED_RELEASES: 'true'
+        run: |
+          node --test scripts/gcp/prune-web-release-requests.test.mjs
+          node scripts/gcp/prune-web-release-requests.mjs
+      - name: Verify each production service has its own automatic trigger
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          services = {
+              'admin': '.github/workflows/deploy-admin.yml',
+              'marketing': '.github/workflows/deploy-google-marketing-trigger.yml',
+              'lms': '.github/workflows/deploy-google-lms-trigger.yml',
+              'store': '.github/workflows/deploy-google-store-runtime.yml',
+              'studio': '.github/workflows/repair-google-studio-browser.yml',
+              'course': '.github/workflows/deploy-google-course-worker.yml',
+          }
+          for name, file in services.items():
+              content = Path(file).read_text()
+              if 'push:' not in content or 'workflow_dispatch:' not in content or 'main' not in content:
+                  raise SystemExit(f'{name}: automatic main trigger missing in {file}')
+              print(f'{name}: automatic main trigger verified ({file})')
+          PY
+      - name: Record deployment boundaries
+        run: |
+          echo "Commit: $GITHUB_SHA"
+          echo "Each existing service workflow owns its build, QA, deployment and rollback."
+          echo "This coordinator will not report a dispatched job as a completed deployment."

@@ -14,6 +14,8 @@ export function ProgramHolderMeetingRoom({
 }) {
   const [connection, setConnection] = useState<Connection | null>(null);
   const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const [mediaError, setMediaError] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -29,25 +31,28 @@ export function ProgramHolderMeetingRoom({
     return () => {
       active = false;
     };
-  }, [tokenEndpoint]);
+  }, [tokenEndpoint, attempt]);
 
-  if (error) return <div className="rounded-xl bg-red-50 p-5 font-bold text-red-800">{error}</div>;
+  if (error) return <div role="alert" className="space-y-3 rounded-xl bg-red-50 p-5 font-bold text-red-800"><p>{error}</p><button type="button" onClick={() => { setConnection(null); setError(''); setMediaError(''); setAttempt(value => value + 1); }} className="min-h-11 rounded-lg border border-red-300 px-4">Retry meeting connection</button></div>;
   if (!connection)
     return <div className="rounded-xl bg-slate-100 p-5">Preparing the secure room…</div>;
 
   return (
     <div
-      className="h-[72vh] min-h-[520px] overflow-hidden rounded-2xl bg-slate-950"
+      className="h-[min(72dvh,760px)] min-h-[420px] w-full min-w-0 max-w-full overflow-hidden rounded-2xl bg-slate-950 sm:min-h-[520px]"
       data-lk-theme="default"
     >
       <LiveKitRoom
         token={connection.token}
         serverUrl={connection.serverUrl}
         connect
+        onError={(cause) => setError(cause.message || 'The meeting connection failed. Please retry.')}
+        onMediaDeviceFailure={() => setMediaError('Camera or microphone access failed. Check browser permissions and your selected devices, then use the room controls to try again.')}
         audio
         video
-        className="h-full"
+        className="h-full min-w-0 max-w-full overflow-hidden"
       >
+        {mediaError ? <p role="alert" className="bg-amber-100 p-3 text-sm font-bold text-amber-950">{mediaError}</p> : null}
         <VideoConference />
         <RoomAudioRenderer />
       </LiveKitRoom>

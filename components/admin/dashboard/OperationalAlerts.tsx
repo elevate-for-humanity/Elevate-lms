@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { AlertTriangle, Clock, DollarSign, Flag } from 'lucide-react';
 import type { AdminDashboardData } from './types';
 
+const ALERT_PREVIEW_LIMIT = 10;
+
 interface AlertRowProps {
   label: string;
   href: string;
@@ -44,6 +46,7 @@ function AlertSection({ icon, title, count, viewAllHref, children }: AlertSectio
         <Link href={viewAllHref} className="text-xs text-amber-700 hover:underline font-medium">View all</Link>
       </div>
       <div className="divide-y divide-slate-50">{children}</div>
+      {count > ALERT_PREVIEW_LIMIT && <p className="px-5 py-3 text-sm text-slate-600">Showing {ALERT_PREVIEW_LIMIT} of {count}. Use View all to review every record.</p>}
     </div>
   );
 }
@@ -72,8 +75,8 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
         <span className="text-xs font-bold bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">{totalAlerts}</span>
       </div>
 
-      <AlertSection icon={<Clock className="h-4 w-4 text-amber-600" />} title="Applications stalled 7+ days" count={stalledApplications.length} viewAllHref="/applications?status=submitted">
-        {stalledApplications.map((app: any) => {
+      <AlertSection icon={<Clock className="h-4 w-4 text-amber-600" />} title="Applications stalled 7+ days" count={stalledApplications.length} viewAllHref="/applications?status=awaiting_review">
+        {stalledApplications.slice(0, ALERT_PREVIEW_LIMIT).map((app: any) => {
           const name = app.full_name || [app.first_name, app.last_name].filter(Boolean).join(' ') || app.email || 'Unknown';
           const ageDays = Math.floor((Date.now() - new Date(app.submitted_at || app.created_at).getTime()) / 86400000);
           const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -85,7 +88,7 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
       </AlertSection>
 
       <AlertSection icon={<span className="w-4 h-4 rounded-full bg-amber-600 inline-block flex-shrink-0" aria-hidden="true" />} title="Enrolled — no placement or credential outcome" count={noOutcomeEnrollments.length} viewAllHref="/reports/wioa">
-        {noOutcomeEnrollments.map((enr: any) => {
+        {noOutcomeEnrollments.slice(0, ALERT_PREVIEW_LIMIT).map((enr: any) => {
           const id = (enr.enrollment_id ?? enr.id ?? enr.participant_id) as string;
           const name = enr.full_name || [enr.first_name, enr.last_name].filter(Boolean).join(' ') || enr.email || (id?.slice(0, 8) + '…');
           return <AlertRow key={enr.participant_id ?? id} href={id ? `/enrollments/${id}` : `/students/${enr.participant_id}`} label={name} detail={`${enr.program_title ?? 'unknown program'} · no outcome recorded`} />;
@@ -93,7 +96,7 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
       </AlertSection>
 
       <AlertSection icon={<DollarSign className="h-4 w-4 text-amber-600" />} title="Active enrollments — no funding source" count={missingFundingEnrollments.length} viewAllHref="/reports/wioa?status=active">
-        {missingFundingEnrollments.map((enr: any) => {
+        {missingFundingEnrollments.slice(0, ALERT_PREVIEW_LIMIT).map((enr: any) => {
           const id = (enr.id ?? enr.enrollment_id) as string;
           const profile = enr.profiles as { full_name?: string | null; email?: string | null } | null;
           const name = profile?.full_name || profile?.email || enr.full_name || enr.email || (id?.slice(0, 8) + '…');
@@ -103,7 +106,7 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
 
       {openComplianceAlerts.length > 0 && (
         <AlertSection icon={<Flag className="w-4 h-4" />} title="Open Compliance Alerts" count={openComplianceAlerts.length} viewAllHref="/compliance">
-          {openComplianceAlerts.map((alert: any) => (
+          {openComplianceAlerts.slice(0, ALERT_PREVIEW_LIMIT).map((alert: any) => (
             <AlertRow key={alert.id} href={`/compliance?alert=${alert.id}`} label={alert.title ?? alert.alert_type ?? 'Compliance alert'} detail={`${alert.severity ?? 'unknown'} severity · opened ${Math.floor((Date.now() - new Date(alert.created_at).getTime()) / 86400000)}d ago`} />
           ))}
         </AlertSection>

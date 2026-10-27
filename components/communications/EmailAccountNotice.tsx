@@ -1,24 +1,37 @@
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import {
   selectPrimaryMailbox,
   type CommunicationMailboxKind,
 } from '@/lib/email/communication-email';
 
-export async function EmailAccountNotice({ href }: { href: string }) {
-  const db = await createClient();
+export async function EmailAccountNotice({
+  href,
+  userId,
+  accountName,
+}: {
+  href: string;
+  userId?: string;
+  accountName?: string;
+}) {
+  const authDb = await createClient();
   const {
     data: { user },
-  } = await db.auth.getUser();
-  if (!user) return null;
+  } = await authDb.auth.getUser();
+  const db = await requireAdminClient();
+  const preview = await resolvePortalPreviewSubject(db, user?.id ?? null);
+  const effectiveUserId = userId || (preview.previewing ? preview.userId : user?.id);
+  if (!effectiveUserId) return null;
 
   const { data } = await db
     .from('communication_email_mailbox_members')
     .select(
       'mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active)',
     )
-    .eq('user_id', user.id)
+    .eq('user_id', effectiveUserId)
     .eq('mailbox.active', true);
   const mailboxes = (data ?? [])
     .map((row: any) => (Array.isArray(row.mailbox) ? row.mailbox[0] : row.mailbox))
@@ -43,6 +56,9 @@ export async function EmailAccountNotice({ href }: { href: string }) {
             Your Elevate email is ready
           </p>
           <p className="mt-1 font-black text-slate-950">{mailbox.address}</p>
+          {accountName ? (
+            <p className="mt-1 text-sm font-black text-blue-900">{accountName}</p>
+          ) : null}
           <p className="mt-1 text-sm font-medium text-slate-700">
             Inbox, compose, replies, and attachments are available in the Communications Hub.
           </p>

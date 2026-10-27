@@ -26,7 +26,7 @@ export default async function AdminBillingSubscriptionsPage() {
     db
       .from('billing_schedules')
       .select(
-        'id,customer_name,product_name,status,cadence,next_invoice_date,collection_mode,collection_provider,provider_status,provider_approval_url,legacy_stripe_subscription_id',
+        'id,customer_name,product_name,status,cadence,next_invoice_date,provider,collection_mode,collection_provider,provider_status,provider_approval_url',
       )
       .order('created_at', { ascending: false })
       .limit(250),
@@ -46,7 +46,7 @@ export default async function AdminBillingSubscriptionsPage() {
     db
       .from('organization_subscriptions')
       .select(
-        'status,billing_interval,current_period_end,stripe_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
+        'status,billing_interval,current_period_end,billing_provider,provider_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
       )
       .order('created_at', { ascending: false })
       .limit(100),
@@ -154,6 +154,7 @@ export default async function AdminBillingSubscriptionsPage() {
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Cadence</th>
               <th className="px-4 py-3">Next invoice</th>
+              <th className="px-4 py-3">Ledger</th>
               <th className="px-4 py-3">Automatic collection</th>
             </tr>
           </thead>
@@ -167,6 +168,7 @@ export default async function AdminBillingSubscriptionsPage() {
                 </td>
                 <td className="px-4 py-3 capitalize">{s.cadence}</td>
                 <td className="px-4 py-3">{new Date(s.next_invoice_date).toLocaleDateString()}</td>
+                <td className="px-4 py-3 capitalize">{s.provider || 'quickbooks'}</td>
                 <td className="px-4 py-3">
                   {s.collection_mode === 'automatic' ? (
                     <PayPalSetupAction
@@ -184,13 +186,14 @@ export default async function AdminBillingSubscriptionsPage() {
         </table>
       </section>
       <section className="overflow-x-auto rounded-xl border bg-white">
-        <h2 className="border-b px-4 py-3 font-bold">Retired provider history (read-only)</h2>
+        <h2 className="border-b px-4 py-3 font-bold">Organization subscription history</h2>
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left">
             <tr>
               <th className="px-4 py-3">Organization</th>
               <th className="px-4 py-3">Plan</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Provider</th>
               <th className="px-4 py-3">Period end</th>
             </tr>
           </thead>
@@ -207,6 +210,7 @@ export default async function AdminBillingSubscriptionsPage() {
                   )?.name || '—'}
                 </td>
                 <td className="px-4 py-3">{r.status}</td>
+                <td className="px-4 py-3 capitalize">{r.billing_provider || 'quickbooks'}</td>
                 <td className="px-4 py-3">
                   {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : '—'}
                 </td>

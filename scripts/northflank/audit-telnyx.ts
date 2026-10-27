@@ -3,9 +3,9 @@
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 type Json = Record<string, any>;
 const groupId = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
-const numberId = process.env.TELNYX_PHONE_NUMBER_ID || '3050756061020554451';
-const connectionId = process.env.TELNYX_CONNECTION_ID || '3053364749187155214';
-const expectedNumber = process.env.TELNYX_PHONE_NUMBER || '+13179999620';
+const numberId = process.env.TELNYX_PHONE_NUMBER_ID?.trim();
+const connectionId = process.env.TELNYX_CONNECTION_ID?.trim();
+const expectedNumber = process.env.TELNYX_PHONE_NUMBER?.trim();
 const webhook = process.env.TELNYX_WEBHOOK_URL || 'https://admin.elevateforhumanity.org/api/webhooks/telnyx';
 
 function findSecret(root: unknown, key: string): string | undefined {
@@ -68,6 +68,9 @@ function list(result: any): Json[] { return Array.isArray(result?.value?.data) ?
 
 async function main() {
   const projectId = resolveProjectId();
+  if (!numberId) throw new Error('TELNYX_PHONE_NUMBER_ID is required');
+  if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is required');
+  if (!expectedNumber) throw new Error('TELNYX_PHONE_NUMBER is required');
   if (!projectId) throw new Error('NORTHFLANK_PROJECT_ID is required');
   const group = await nfFetch<Json>(projectApiPath(projectId, `/secrets/${groupId}`));
   const apiKey = process.env.TELNYX_API_KEY?.trim() || findSecret(group, 'TELNYX_API_KEY');

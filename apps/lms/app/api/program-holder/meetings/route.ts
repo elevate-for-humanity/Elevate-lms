@@ -1,8 +1,11 @@
 // pre-auth-registry: exempt - requireProgramHolder and holder filters authorize every operation.
+import { studentContactHolderIds } from '@/lib/email/assigned-student-directory';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +13,36 @@ export const dynamic = 'force-dynamic';
 async function holderWorkspace(ctx: Awaited<ReturnType<typeof requireProgramHolder>>) {
   let query = ctx.db.from('communication_workspaces').select('id,phone_system_id,status').limit(1);
   query = ctx.tenantId ? query.eq('tenant_id', ctx.tenantId) : query.is('tenant_id', null);
-  return query.maybeSingle();
+  const tenantResult = await query.maybeSingle();
+  if (tenantResult.data || tenantResult.error || !ctx.tenantId) return tenantResult;
+
+  const { data: platformWorkspace, error: platformError } = await ctx.db
+    .from('communication_workspaces')
+    .select('phone_system_id')
+    .is('tenant_id', null)
+    .limit(1)
+    .maybeSingle();
+  if (platformError) return { data: null, error: platformError };
+
+  const created = await ctx.db
+    .from('communication_workspaces')
+    .insert({
+      tenant_id: ctx.tenantId,
+      phone_system_id: platformWorkspace?.phone_system_id ?? null,
+      name: 'Elevate Communications',
+      status: liveKitReadiness().ready ? 'active' : 'setup',
+    })
+    .select('id,phone_system_id,status')
+    .single();
+  if (!created.error) return created;
+
+  // A concurrent first meeting may have created the unique tenant workspace.
+  return ctx.db
+    .from('communication_workspaces')
+    .select('id,phone_system_id,status')
+    .eq('tenant_id', ctx.tenantId)
+    .limit(1)
+    .maybeSingle();
 }
 
 export async function GET() {
@@ -19,24 +51,32 @@ export async function GET() {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }
   await hydrateProcessEnv();
-  const [{ data, error }, { data: applicants }] = await Promise.all([
-    ctx.db
-      .from('program_holder_meetings')
-      .select('*')
-      .eq('program_holder_id', ctx.holderId)
-      .order('starts_at'),
-    ctx.db
-      .from('program_holder_students')
-      .select('id,applicant_name,user_id')
-      .eq('program_holder_id', ctx.holderId)
-      .in('status', ['applied', 'pending', 'enrolled'])
-      .order('applicant_name'),
-  ]);
-  return error
+  const [{ data, error }, { data: applicants, error: applicantError }, contactHolderIds] =
+    await Promise.all([
+      ctx.db
+        .from('program_holder_meetings')
+        .select('*')
+        .eq('program_holder_id', ctx.holderId)
+        .order('starts_at'),
+      ctx.db
+        .from('program_holder_students')
+        .select('id,applicant_name,user_id,applicant_email,applicant_phone')
+        .eq('program_holder_id', ctx.holderId)
+        .in('status', ['applied', 'pending', 'enrolled'])
+        .order('applicant_name'),
+      studentContactHolderIds(ctx.db, ctx.user.id),
+    ]);
+  return error || applicantError
     ? NextResponse.json({ error: 'Unable to load meetings.' }, { status: 500 })
     : NextResponse.json({
+        userId: ctx.user.id,
         meetings: data ?? [],
-        applicants: applicants ?? [],
+        contactAccessGranted: contactHolderIds.includes(ctx.holderId),
+        applicants: (applicants ?? []).map((student: any) =>
+          contactHolderIds.includes(ctx.holderId)
+            ? student
+            : { id: student.id, applicant_name: student.applicant_name, user_id: student.user_id },
+        ),
         videoReady: liveKitReadiness().ready,
       });
 }
@@ -67,7 +107,7 @@ export async function POST(request: Request) {
   }
   const { data: student } = await ctx.db
     .from('program_holder_students')
-    .select('id,applicant_name,user_id')
+    .select('id,applicant_name,user_id,applicant_email,applicant_phone')
     .eq('id', studentId)
     .eq('program_holder_id', ctx.holderId)
     .maybeSingle();
@@ -163,7 +203,7 @@ export async function POST(request: Request) {
           email: studentProfile?.email || null,
           display_name: studentProfile?.full_name || student.applicant_name || 'Student',
           role: 'participant',
-          invite_status: 'sent',
+          invite_status: 'pending',
         },
       ]);
     if (participantError) {
@@ -201,5 +241,52 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ error: 'Unable to schedule meeting.' }, { status: 500 });
   }
-  return NextResponse.json({ meeting: data }, { status: 201 });
+  // A saved meeting is not a delivered invitation. Use the student's portal
+  // route, never the host-only Program Holder URL.
+  let invitationDelivery: 'accepted' | 'failed' | 'missing_email' = 'missing_email';
+  const { data: recipient } = student.user_id
+    ? await ctx.db.from('profiles').select('email').eq('id', student.user_id).maybeSingle()
+    : { data: null };
+  if (recipient?.email) {
+    const joinUrl = communicationRoomId
+      ? `https://app.elevateforhumanity.org/lms/meetings/${communicationRoomId}`
+      : 'https://app.elevateforhumanity.org/learner/dashboard';
+    const loginUrl = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(new URL(joinUrl).pathname)}`;
+    const text = [
+      title,
+      `Starts: ${new Date(startsAt).toISOString()} (UTC)`,
+      `Duration: ${duration} minutes`,
+      `Method: ${method.replaceAll('_', ' ')}`,
+      agenda || '',
+      method === 'in_person' ? String(body.location || '') : '',
+      `Sign in with your student account: ${loginUrl}`,
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+    const escaped = text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    try {
+      const delivery = await sendEmail({
+        to: recipient.email,
+        replyTo: ctx.profile.email || undefined,
+        subject: `Meeting invitation: ${title}`,
+        text,
+        html: `<div style="white-space:pre-wrap">${escaped}</div>`,
+        singleAttempt: true,
+      });
+      invitationDelivery = delivery.success ? 'accepted' : 'failed';
+      if (delivery.success && communicationRoomId) {
+        const { error: inviteUpdateError } = await ctx.db
+          .from('communication_room_participants')
+          .update({ invite_status: 'sent' })
+          .eq('room_id', communicationRoomId)
+          .eq('profile_id', student.user_id);
+        if (inviteUpdateError)
+          logger.error('[holder-meetings] invitation status update failed', inviteUpdateError);
+      }
+    } catch (cause) {
+      invitationDelivery = 'failed';
+      logger.error('[holder-meetings] invitation failed', cause);
+    }
+  }
+  return NextResponse.json({ meeting: data, invitationDelivery }, { status: 201 });
 }

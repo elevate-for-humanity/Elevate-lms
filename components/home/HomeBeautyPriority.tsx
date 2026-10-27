@@ -6,15 +6,15 @@ import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollm
 const TRACKS = [
   {
     title: 'Barber Apprenticeship',
-    hours: '2,000 hours of supervised host-shop training',
+    hours: '14 Appendix A competencies + 260 RTI hours',
     focus: 'Haircutting, fades, grooming, sanitation, client service, and professional practice',
     image: '/images/partners/kountry-kutz/interior-active.webp',
     href: '/programs/barber-apprenticeship',
     icon: BadgeCheck,
   },
   {
-    title: 'Cosmetology Apprenticeship',
-    hours: '2,000 hours of supervised salon training',
+    title: 'Hair Stylist / Cosmetology Apprenticeship',
+    hours: '2,000–2,500-hour hybrid term + 154 RTI hours',
     focus: 'Haircutting, styling, color, chemical services, sanitation, and client care',
     image: '/images/pexels/cosmetology.webp',
     href: '/programs/cosmetology-apprenticeship',
@@ -22,7 +22,7 @@ const TRACKS = [
   },
   {
     title: 'Esthetician Apprenticeship',
-    hours: '2,000 hours of supervised work-based training',
+    hours: '20 Appendix A competencies + 300 RTI hours',
     focus: 'Skin care, sanitation, client consultation, services, safety, and professional practice',
     image: '/images/beauty/esthetics-hero.webp',
     href: '/programs/esthetician-apprenticeship',
@@ -30,7 +30,7 @@ const TRACKS = [
   },
   {
     title: 'Nail Technician Apprenticeship',
-    hours: '2,000 hours of supervised nail-salon training',
+    hours: '19 Appendix A competencies + 210 RTI hours',
     focus: 'Manicuring, pedicuring, nail enhancements, sanitation, and client safety',
     image: '/images/pexels/nail-tech.webp',
     href: '/programs/nail-technician-apprenticeship',
@@ -62,8 +62,8 @@ export function HomeBeautyPriority() {
             <article key={title} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
               <Link href={href} className="block h-full">
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                  <Image src={image} alt={`${title} training`} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, 25vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
+                  <Image src={image} alt={`${title} training`} fill className="object-contain transition-transform duration-500 " sizes="(max-width: 768px) 100vw, 25vw" />
+
                   <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-black text-slate-900 shadow-sm">
                     <Icon className="h-4 w-4 text-rose-700" /> Apprenticeship Pathway
                   </div>

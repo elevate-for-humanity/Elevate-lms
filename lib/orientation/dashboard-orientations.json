@@ -1,0 +1,584 @@
+{
+  "learner": {
+    "title": "Your learning journey starts here",
+    "subtitle": "Courses, records, support, and your next step—one clear topic at a time.",
+    "slides": [
+      {
+        "title": "Your first five minutes",
+        "points": [
+          "Confirm your name and assigned program",
+          "Review the next required action",
+          "Keep your own sign-in secure"
+        ],
+        "narration": "Start with the name and program on your dashboard. Confirm that both belong to you. Read the next required action before opening a new task. A dashboard card summarizes a saved record; open the card to see its details. Never share your password or work from another person’s account. If the wrong program, organization, or student appears, stop and report it to support.",
+        "href": "/lms/onboarding",
+        "action": "Review my checklist",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Documents: upload, review, correction",
+        "points": [
+          "Upload only the requested item",
+          "Submitted does not mean approved",
+          "Read correction notes before replacing a file"
+        ],
+        "narration": "Open Documents and Records. Select the requirement, choose a readable file, and submit it through the protected upload form. Check the saved status after uploading. Pending review means staff must review the evidence; it does not mean you should upload it again. If an item is rejected, read the correction note and replace only that item. The generic learner intake confirmation upload has been retired. Do not send identity or tax documents through ordinary messages.",
+        "href": "/lms/documents",
+        "action": "Review my documents",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Find your course and resume learning",
+        "points": [
+          "Open My Courses",
+          "Follow the assigned lesson order",
+          "Complete activities and real quizzes"
+        ],
+        "narration": "Open My Courses and select your assigned program. Use Continue to return to unfinished work. Review the pictures, narration, reading, and examples before answering the knowledge checks. Complete required activities yourself, then confirm that your progress saved. A partner course may open another provider’s website and require its assigned login. Follow the access instructions on your account. Report a missing link, unexpected purchase request, or incorrect course instead of buying a second course.",
+        "href": "/lms/courses",
+        "action": "Continue my courses",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Plan your study week",
+        "points": [
+          "Check the syllabus and calendar",
+          "Complete lessons, practice, and quizzes",
+          "Contact staff before missing a deadline"
+        ],
+        "narration": "Read the syllabus for your own program’s sequence, pace, assessments, and completion requirements. Self-paced study gives you flexibility within the assigned schedule; it does not remove deadlines. Set a weekly study routine, take notes, and practice before taking a quiz. Review feedback and use the allowed retry or correction process. Check the calendar for confirmed appointments and join the meeting link at the scheduled time. Ask your assigned instructor about a schedule conflict before the deadline.",
+        "href": "/lms/calendar",
+        "action": "Review my schedule",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Track attendance and learning evidence",
+        "points": [
+          "Use the correct attendance tool",
+          "Check saved hours and feedback",
+          "Request corrections with actual dates"
+        ],
+        "narration": "When your program requires attendance or a study clock, open Attendance and follow the instructions for that activity. Online study time and supervised work time are different records. Record only time you actually completed and do not run overlapping clocks. At the end of a session, confirm the entry saved. If an entry is missing or incorrect, report the date, actual start and finish times, and what you were doing. Staff must review corrections before hours are credited.",
+        "href": "/lms/attendance",
+        "action": "Review attendance",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Messages, meetings, and getting help",
+        "points": [
+          "Check Inbox and announcements",
+          "Explain the exact blocked step",
+          "Keep sensitive records in protected uploads"
+        ],
+        "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
+        "href": "/lms/support",
+        "action": "Contact learner support",
+        "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Finish training and prepare for work",
+        "points": [
+          "Complete every assigned requirement",
+          "Submit earned credentials for review",
+          "Build your résumé and review career tools"
+        ],
+        "narration": "A finished video is one part of learning. Program completion can also require quizzes, assignments, attendance, supervised competencies, and verified credential evidence. Check your completion checklist with your program contact. Certification testing and a course completion certificate can be separate steps. Upload credentials you earn outside Elevate for verification. Start your résumé while you train and add only skills and credentials you can support. Use the career tools to prepare for applications and next steps.",
+        "href": "/lms/career",
+        "action": "Open career tools",
+        "image": "/images/pages/career-services-page-5.webp"
+      }
+    ],
+    "hero": "/images/pages/training-classroom.webp"
+  },
+  "hvac": {
+    "title": "Your six-week HVAC training journey",
+    "subtitle": "Four weeks of self-paced study. Two weeks of scheduled hands-on training.",
+    "slides": [
+      {
+        "title": "Six weeks: online study, then hands-on",
+        "points": [
+          "Weeks 1–4: self-paced online learning",
+          "Weeks 5–6: scheduled hands-on training",
+          "Confirm your individual dates with David"
+        ],
+        "narration": "Your HVAC training plan is six weeks. The first four weeks focus on self-paced online study, assigned lessons, practice activities, and knowledge checks. The next two weeks focus on scheduled hands-on training. Self-paced does not mean unscheduled: follow the deadlines and course sequence in your assigned plan. Your enrollment dates and David’s confirmed training appointment control when and where you attend. Do not arrive at a facility without a confirmed appointment.",
+        "href": "/lms/courses",
+        "action": "Open my HVAC courses",
+        "image": "/images/hvac-training-vibrant-2026.webp"
+      },
+      {
+        "title": "Your first five minutes",
+        "points": [
+          "Confirm your name and assigned program",
+          "Review the next required action",
+          "Keep your own sign-in secure"
+        ],
+        "narration": "Start with the name and program on your dashboard. Confirm that both belong to you. Read the next required action before opening a new task. A dashboard card summarizes a saved record; open the card to see its details. Never share your password or work from another person’s account. If the wrong program, organization, or student appears, stop and report it to support.",
+        "href": "/lms/onboarding",
+        "action": "Review my checklist",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Documents: upload, review, correction",
+        "points": [
+          "Upload only the requested item",
+          "Submitted does not mean approved",
+          "Read correction notes before replacing a file"
+        ],
+        "narration": "Open Documents and Records. Select the requirement, choose a readable file, and submit it through the protected upload form. Check the saved status after uploading. Pending review means staff must review the evidence; it does not mean you should upload it again. If an item is rejected, read the correction note and replace only that item. The generic learner intake confirmation upload has been retired. Do not send identity or tax documents through ordinary messages.",
+        "href": "/lms/documents",
+        "action": "Review my documents",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "HVAC course access and certification",
+        "points": [
+          "Use the assigned provider access instructions",
+          "Save course and assessment progress",
+          "Confirm EPA testing arrangements with staff"
+        ],
+        "narration": "Your account may include Elevate lessons and an assigned external HVAC learning provider. Open the links provided in My Courses and use the access instructions assigned to your own account. Complete the required online lessons and quizzes and keep your completion evidence. EPA certification testing is a separate verified step. Confirm the current exam appointment, identification requirements, and readiness instructions with David or learner support. Report missing access or a blocked lesson promptly so your practical training is not delayed.",
+        "href": "/lms/courses",
+        "action": "Review HVAC course access",
+        "image": "/images/hvac-training-vibrant-2026.webp"
+      },
+      {
+        "title": "Find your course and resume learning",
+        "points": [
+          "Open My Courses",
+          "Follow the assigned lesson order",
+          "Complete activities and real quizzes"
+        ],
+        "narration": "Open My Courses and select your assigned program. Use Continue to return to unfinished work. Review the pictures, narration, reading, and examples before answering the knowledge checks. Complete required activities yourself, then confirm that your progress saved. A partner course may open another provider’s website and require its assigned login. Follow the access instructions on your account. Report a missing link, unexpected purchase request, or incorrect course instead of buying a second course.",
+        "href": "/lms/courses",
+        "action": "Continue my courses",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Plan your study week",
+        "points": [
+          "Check the syllabus and calendar",
+          "Complete lessons, practice, and quizzes",
+          "Contact staff before missing a deadline"
+        ],
+        "narration": "Read the syllabus for your own program’s sequence, pace, assessments, and completion requirements. Self-paced study gives you flexibility within the assigned schedule; it does not remove deadlines. Set a weekly study routine, take notes, and practice before taking a quiz. Review feedback and use the allowed retry or correction process. Check the calendar for confirmed appointments and join the meeting link at the scheduled time. Ask your assigned instructor about a schedule conflict before the deadline.",
+        "href": "/lms/calendar",
+        "action": "Review my schedule",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Track attendance and learning evidence",
+        "points": [
+          "Use the correct attendance tool",
+          "Check saved hours and feedback",
+          "Request corrections with actual dates"
+        ],
+        "narration": "When your program requires attendance or a study clock, open Attendance and follow the instructions for that activity. Online study time and supervised work time are different records. Record only time you actually completed and do not run overlapping clocks. At the end of a session, confirm the entry saved. If an entry is missing or incorrect, report the date, actual start and finish times, and what you were doing. Staff must review corrections before hours are credited.",
+        "href": "/lms/attendance",
+        "action": "Review attendance",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Contact David to schedule practical training",
+        "points": [
+          "David Nazaire",
+          "(215) 214-9355",
+          "indyondemandservices@gmail.com"
+        ],
+        "narration": "Contact David Nazaire to arrange the hands-on portion of your HVAC program. His saved program contact number is two one five, two one four, nine three five five. His email is indyondemandservices at gmail dot com. Tell him your full name, that you are an Elevate HVAC learner, your online-study progress, and the dates you are available. Ask him to confirm the training dates, times, location, required clothing, tools, and safety equipment. Wait for confirmation before attending.",
+        "href": "mailto:indyondemandservices@gmail.com?subject=Elevate%20HVAC%20hands-on%20training%20schedule",
+        "action": "Email David",
+        "image": "/images/hvac-training-vibrant-2026.webp"
+      },
+      {
+        "title": "Before your hands-on appointment",
+        "points": [
+          "Finish the assigned online prerequisites",
+          "Confirm the location and safety requirements",
+          "Bring the materials David specifies"
+        ],
+        "narration": "Before hands-on training, complete the online work David or your syllabus requires. Review safety lessons and write down the questions you want to practice. Confirm the appointment, travel plans, arrival time, clothing, tools, and personal protective equipment with David. Do not guess which equipment to bring. At the facility, follow the instructor’s directions and record attendance through the assigned process. Hands-on competency requires supervised performance and instructor verification; watching an example does not certify a practical skill.",
+        "href": "/lms/calendar",
+        "action": "Review my appointment",
+        "image": "/images/hvac-training-vibrant-2026.webp"
+      },
+      {
+        "title": "Messages, meetings, and getting help",
+        "points": [
+          "Check Inbox and announcements",
+          "Explain the exact blocked step",
+          "Keep sensitive records in protected uploads"
+        ],
+        "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
+        "href": "/lms/support",
+        "action": "Contact learner support",
+        "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Finish training and prepare for work",
+        "points": [
+          "Complete every assigned requirement",
+          "Submit earned credentials for review",
+          "Build your résumé and review career tools"
+        ],
+        "narration": "A finished video is one part of learning. Program completion can also require quizzes, assignments, attendance, supervised competencies, and verified credential evidence. Check your completion checklist with your program contact. Certification testing and a course completion certificate can be separate steps. Upload credentials you earn outside Elevate for verification. Start your résumé while you train and add only skills and credentials you can support. Use the career tools to prepare for applications and next steps.",
+        "href": "/lms/career",
+        "action": "Open career tools",
+        "image": "/images/pages/career-services-page-5.webp"
+      }
+    ],
+    "hero": "/images/hvac-training-vibrant-2026.webp"
+  },
+  "apprentice": {
+    "title": "Build your skills, one training day at a time",
+    "subtitle": "Connect your theory lessons, shop practice, hours, and supervisor feedback.",
+    "slides": [
+      {
+        "title": "Two connected parts of apprenticeship",
+        "points": [
+          "RTI: related theory instruction",
+          "OJL: supervised training at your approved shop",
+          "Each has its own evidence and progress"
+        ],
+        "narration": "Your apprenticeship combines related technical instruction, or RTI, with supervised on-the-job learning, or OJL. Use the assigned course for theory, examples, and knowledge checks. Your approved shop and qualified supervisor provide practical training. Pictures and videos explain procedures, but they do not replace supervised practice or a competency sign-off. Read your own registered program plan and syllabus so you understand the hours, competencies, and evidence that apply to your occupation.",
+        "href": "/apprentice/orientation",
+        "action": "Review my program plan",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Your daily apprentice routine",
+        "points": [
+          "Read your next RTI lesson",
+          "Clock in at your approved worksite",
+          "Check hours and supervisor feedback"
+        ],
+        "narration": "Open your apprentice dashboard each training day. Review announcements and your next theory lesson. At the approved shop, allow the location permissions the timeclock needs and clock in before supervised work starts. Record only the actual activity and time you completed. Clock out before you leave. Do not overlap theory study and supervised work entries. If a location or timeclock error occurs, tell your supervisor and request a correction with accurate dates, times, and evidence.",
+        "href": "/apprentice/timeclock",
+        "action": "Open my timeclock",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Skill practice and verification",
+        "points": [
+          "Practice with your assigned supervisor",
+          "Request sign-off after demonstrating the skill",
+          "Review returned work and corrections"
+        ],
+        "narration": "Your competency checklist shows the skills your registered apprenticeship requires. Ask your supervisor which skill you should practice next. Demonstrate it safely under the required supervision, then ask the supervisor to record the observed evidence and sign-off. A self-reported completion, printed checklist, or watched video is not a verified practical competency. Review feedback and repeat practice when needed. Use the dashboard to check which records are submitted, approved, or returned for correction.",
+        "href": "/apprentice",
+        "action": "Review my progress",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Your weekly review",
+        "points": [
+          "Review approved and pending hours",
+          "Check RTI lessons and quizzes",
+          "Plan the next week with your supervisor"
+        ],
+        "narration": "Before the week ends, compare your clock entries, approved training hours, theory progress, and competency checklist. Follow the limits and targets shown in your program plan; do not invent extra hours to reach a target. Ask about a pending or returned entry before it becomes a reporting problem. Check your schedule and agree on the next week’s practical training with your shop supervisor. Contact Elevate if you cannot reach your shop or the assigned course is unavailable.",
+        "href": "/apprentice",
+        "action": "Review this week",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Documents, payments, and support",
+        "points": [
+          "Read your actual agreement",
+          "Use protected uploads and official invoices",
+          "Ask staff about a hold or incorrect balance"
+        ],
+        "narration": "Keep required agreements, documents, and contact information current. Review any invoice or payment-plan terms in your own account. A displayed amount or due date should match your signed agreement; report a mismatch rather than paying an unfamiliar request. Do not send card details or identity documents through chat. A document submission may still need staff review. Use the dashboard support and communication tools to report an access hold, disputed hour, safety concern, or schedule problem.",
+        "href": "/apprentice/billing",
+        "action": "Review billing and records",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Messages, meetings, and getting help",
+        "points": [
+          "Check Inbox and announcements",
+          "Explain the exact blocked step",
+          "Keep sensitive records in protected uploads"
+        ],
+        "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
+        "href": "/lms/support",
+        "action": "Contact learner support",
+        "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Finish training and prepare for work",
+        "points": [
+          "Complete every assigned requirement",
+          "Submit earned credentials for review",
+          "Build your résumé and review career tools"
+        ],
+        "narration": "A finished video is one part of learning. Program completion can also require quizzes, assignments, attendance, supervised competencies, and verified credential evidence. Check your completion checklist with your program contact. Certification testing and a course completion certificate can be separate steps. Upload credentials you earn outside Elevate for verification. Start your résumé while you train and add only skills and credentials you can support. Use the career tools to prepare for applications and next steps.",
+        "href": "/lms/career",
+        "action": "Open career tools",
+        "image": "/images/pages/career-services-page-5.webp"
+      }
+    ],
+    "hero": "/images/barber-hero.jpg"
+  },
+  "host-shop": {
+    "title": "Help your apprentices grow with confidence",
+    "subtitle": "Plan supervision, verify training, and keep your shop records together.",
+    "slides": [
+      {
+        "title": "Welcome to your Host Shop workspace",
+        "points": [
+          "Your shop, apprentices, and supervisor",
+          "Training evidence in one place",
+          "One clear next action at a time"
+        ],
+        "narration": "Your Host Shop dashboard is the working record for your approved apprenticeship site. Confirm your shop name, assigned apprentices, and supervisor. Review the next required actions first. An assigned apprentice still needs the correct registered program, schedule, supervision, and documentation. Use the dashboard to coordinate training, review actual hours, record competency evidence, and communicate with Elevate. If the wrong apprentice or shop appears, stop and ask Administration to correct the assignment.",
+        "href": "/host-shop/dashboard",
+        "action": "Open shop dashboard",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Plan safe supervised training",
+        "points": [
+          "Review the registered work process",
+          "Assign a qualified supervisor",
+          "Match practical work to the apprentice’s progress"
+        ],
+        "narration": "Open the apprentice’s assigned program and review the work process, supervision requirements, and current progress. Plan safe practical work that fits the apprentice’s training stage. Confirm who will supervise the session and what tools and supplies are needed. Explain the task, observe performance, and give feedback. Theory coursework and shop practice are connected, but one does not replace the other. Report an unsafe task, missing supervisor, or incorrect program assignment before training continues.",
+        "href": "/host-shop/dashboard/apprentices",
+        "action": "Review apprentices",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Review hours and location exceptions",
+        "points": [
+          "Approve actual supervised time",
+          "Return incorrect entries with a reason",
+          "Never manufacture or duplicate hours"
+        ],
+        "narration": "Review each apprentice’s time entries against the work you supervised. Confirm dates, start and finish times, breaks, activity, and supporting evidence. Approve accurate entries and return incorrect entries with a clear correction note. A geofence exception is a reason to investigate; it is not proof that all claimed time was supervised. Ask for the actual facts and use the correction process. Do not estimate, duplicate, or approve hours you cannot support.",
+        "href": "/host-shop/dashboard/hours",
+        "action": "Review training hours",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Record competency sign-offs",
+        "points": [
+          "Select the correct apprentice and skill",
+          "Observe the required performance",
+          "Save the evidence and verification"
+        ],
+        "narration": "Open Competencies and select the assigned apprentice and registered skill. Observe the required performance and record the date, task, outcome, and supporting evidence. Sign only after the apprentice has demonstrated the skill at the required standard. If more practice is needed, record useful feedback and the next practice step. A printed checklist, watched video, or student request alone is not a completed electronic verification. Confirm the saved sign-off appears in the record.",
+        "href": "/host-shop/dashboard/competencies",
+        "action": "Open competencies",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Keep shop documents and agreements current",
+        "points": [
+          "Read your assigned MOU",
+          "Upload requested licenses and insurance",
+          "Respond to correction or expiry notices"
+        ],
+        "narration": "Open Documents and Guides and Agreements. Read the agreement assigned to your shop and the responsibilities it creates. Upload only the requested current records, such as applicable licenses, insurance, and supervisor evidence. Check whether each submission is pending review, approved, or returned. Replace an expired or rejected item with the correct file and explanation. Uploading a document does not certify its authenticity or automatically approve the shop. Ask Administration about a requirement that does not fit your occupation.",
+        "href": "/host-shop/dashboard/documents",
+        "action": "Review shop documents",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Communicate, report, and close the week",
+        "points": [
+          "Check shop messages and meetings",
+          "Resolve missing evidence before deadlines",
+          "Report safety and attendance concerns"
+        ],
+        "narration": "Use the shop’s dashboard communication tools for apprentice and Elevate coordination. Check announcements, messages, and confirmed appointments. Keep a written next action and follow-up date when a learner is absent or struggling. Before a reporting deadline, review attendance, RTI, OJL, wages, competencies, and exceptions. Report safety incidents or supervision problems promptly. Closeout requires the applicable verified records; do not mark a learner complete just because the scheduled training period ended.",
+        "href": "/host-shop/dashboard/reports",
+        "action": "Open reporting center",
+        "image": "/images/pages/career-counseling.jpg"
+      }
+    ],
+    "hero": "/images/barber-hero.jpg"
+  },
+  "program-holder": {
+    "title": "A clear path for every learner you support",
+    "subtitle": "From first contact to verified completion: your daily operations guide.",
+    "slides": [
+      {
+        "title": "Start with your assigned programs",
+        "points": [
+          "Confirm your organization and role",
+          "Review applicants and active learners",
+          "Open the next required action"
+        ],
+        "narration": "Your Program Holder dashboard connects applicants, students, training, records, communication, and payment readiness. Confirm your organization, assigned programs, and contact details. Review the next required action and any at-risk learners before starting new work. Applicants are not the same as enrolled students. Open the appropriate record, check its status, and identify who owns the next action. Report an incorrect program, learner, mailbox, or organization before accessing or changing records.",
+        "href": "/program-holder/dashboard",
+        "action": "Open my dashboard",
+        "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Contact applicants and document outcomes",
+        "points": [
+          "Review the application and program",
+          "Call or email through your assigned office tools",
+          "Save the outcome and follow-up date"
+        ],
+        "narration": "Open Applicants and review the applicant’s program interest and current next step. Contact the person through your assigned office phone or email. Confirm their interest, explain the next action, and record the outcome in the account. When funding applies, direct the applicant through the required agency process and document the result. Do not promise a voucher, eligibility decision, job, or payment. End each contact with a clear action, responsible person, and follow-up date.",
+        "href": "/program-holder/students/pending",
+        "action": "Open applicants",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Explain how each assigned course works",
+        "points": [
+          "Read the actual syllabus and schedule",
+          "Explain online and practical requirements separately",
+          "Confirm the first assignment and instructor contact"
+        ],
+        "narration": "Open Programs and the assigned syllabus before explaining a course. Confirm the duration, learning provider, required lessons, quizzes, assignments, practical training, credential, and completion evidence. Do not use one program’s hours or schedule for another program. Give each enrolled learner a clear first assignment and a way to contact the instructor. If the program includes hands-on training, confirm the location, supervisor, schedule, and prerequisites. Report missing course access before the learner falls behind.",
+        "href": "/program-holder/programs",
+        "action": "Review my programs",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Manage enrolled and at-risk learners",
+        "points": [
+          "Check progress and missed assignments",
+          "Contact the learner before the deadline",
+          "Record the barrier and intervention"
+        ],
+        "narration": "Open Students to review confirmed enrollments and active training. Check attendance, lesson and assignment progress, upcoming deadlines, and instructor feedback. Use the at-risk view to focus follow-up. Ask what the learner is working on, what is incomplete, and what is blocking progress. Give a specific next action and due date and record the response. Escalate unresolved access, funding, safety, instructor, or worksite problems rather than leaving the account idle.",
+        "href": "/program-holder/students",
+        "action": "Review enrolled learners",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Clear documents and required agreements",
+        "points": [
+          "Upload registration, insurance, W-9, and credentials as requested",
+          "Read the handbook and assigned agreements",
+          "Separate your tasks from Elevate review"
+        ],
+        "narration": "Open Documents and Compliance. Review each applicable item and identify whether you, Elevate, or both parties own the next step. Upload the requested current records through the protected form. Pending review means the file is submitted and awaits review; do not repeatedly upload it. Read rejection or correction notes before replacing a document. Review and sign only the agreement assigned to your organization, including scope, privacy, payment terms, responsibilities, and termination provisions.",
+        "href": "/program-holder/documents",
+        "action": "Open documents",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Record hours, skills, and completion evidence",
+        "points": [
+          "Use actual dates and supervised activities",
+          "Verify the program’s own completion requirements",
+          "Finish closeout before requesting a payout"
+        ],
+        "narration": "Record actual training and supervised activity with dates, hours, outcomes, and supporting evidence. Never duplicate, estimate, or backdate records. Before marking a learner complete, verify the required coursework, assessments, hours, practical skills where applicable, credentials, and final records. Submit the reporting period and resolve missing evidence. Payout readiness follows the signed agreement, verified milestones, compliance, and receipt of applicable funding. A lead, phone call, or attendance claim alone does not create a payment.",
+        "href": "/program-holder/reports",
+        "action": "Review reports and closeout",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Your daily office routine",
+        "points": [
+          "Check phone, Inbox, and appointments",
+          "Document every follow-up in the account",
+          "Use PARIS for guidance; verify facts yourself"
+        ],
+        "narration": "Check your assigned phone connection, Inbox, calendar, and required actions each working day. Use the correct From address and extension when contacting applicants or learners. Keep program communication in the official workspace so the record stays connected. For a meeting, confirm the appointment and join link and test your chosen microphone or camera before it starts. PARIS can help explain a page or prepare a draft; review facts and recipients before sending or submitting anything.",
+        "href": "/program-holder/how-to-use",
+        "action": "Open the detailed office guide",
+        "image": "/images/pages/career-counseling.jpg"
+      }
+    ],
+    "hero": "/images/pages/career-counseling.jpg"
+  },
+  "site-coordinator": {
+    "title": "Bring your regional training team together",
+    "subtitle": "Coordinate people, programs, sites, and follow-up with a clear next action.",
+    "slides": [
+      {
+        "title": "Your regional coordination role",
+        "points": [
+          "Confirm your assigned region and organizations",
+          "Keep program delivery and records connected",
+          "Escalate decisions outside your authority"
+        ],
+        "narration": "Your Site Coordinator dashboard connects regional intake, Program Holders, host sites, active learners, reporting, and follow-up. Confirm the regional assignment and responsibilities in your own signed agreement. Use only the organizations, programs, and records assigned to you. A coordinator organizes and documents the next step; the role does not automatically authorize every funding, eligibility, access, or credential decision. Route those decisions to the responsible authorized staff and record the outcome.",
+        "href": "/program-holder/dashboard",
+        "action": "Open regional workspace",
+        "image": "/images/pages/career-counseling.jpg"
+      },
+      {
+        "title": "Move regional applicants to a clear next step",
+        "points": [
+          "Review applicant interest and location",
+          "Confirm the assigned program and contact",
+          "Record the action, owner, and due date"
+        ],
+        "narration": "Review newly routed applicants for your region. Confirm their program interest, location, and correct program contact. Explain the current application, onboarding, and agency steps without promising approval. Assign or coordinate follow-up using the tools available to your role. Keep a contact outcome and next action on every active account. If a program has no assigned qualified Program Holder, coordinate with Elevate to resolve the gap rather than telling the applicant that training is ready when it is not.",
+        "href": "/program-holder/students/pending",
+        "action": "Review regional applicants",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Support Program Holders and host sites",
+        "points": [
+          "Confirm the qualified training contact",
+          "Check agreement and document readiness",
+          "Resolve supervision and scheduling gaps"
+        ],
+        "narration": "Coordinate with approved Program Holders and host shops for the programs assigned to your region. Confirm who teaches the theory, who supervises practical training, and where learners attend. Review operational readiness, agreements, document issues, and missing assignments through authorized records. Do not invent an instructor, location, start date, or approval. Escalate a missing qualified provider or unsafe site before learners are scheduled to attend. Record who is responsible for closing each gap.",
+        "href": "/program-holder/programs",
+        "action": "Review regional programs",
+        "image": "/images/barber-hero.jpg"
+      },
+      {
+        "title": "Monitor learning and intervene early",
+        "points": [
+          "Review attendance, progress, and barriers",
+          "Check practical training arrangements",
+          "Track the follow-up until resolved"
+        ],
+        "narration": "Review active learners and any at-risk flags regularly. Confirm that course links, the first assignment, and the program contact are available. Where practical training is required, confirm the scheduled site and supervisor. Follow up on absence, stalled progress, missing paperwork, and learner support needs. Document the learner’s response, the action taken, and the next review date. Share only the information needed with authorized staff and the assigned provider.",
+        "href": "/program-holder/students",
+        "action": "Review regional learners",
+        "image": "/images/pages/training-classroom.webp"
+      },
+      {
+        "title": "Report verified regional outcomes",
+        "points": [
+          "Reconcile hours and completion evidence",
+          "Keep funding decisions with the authorized agency",
+          "Submit accurate reports and closeout"
+        ],
+        "narration": "Before submitting regional reports, reconcile the applicable enrollment, attendance, training, credential, placement, and closeout records. Do not report an unsupported outcome or assume that a provider’s message is verified evidence. WorkOne and other responsible agencies determine their funding decisions; record written outcomes through the approved workflow. Follow your signed regional agreement for reporting and compensation. Escalate missing evidence and unresolved account conflicts before marking a reporting period complete.",
+        "href": "/program-holder/reports",
+        "action": "Open regional reports",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Clear documents and required agreements",
+        "points": [
+          "Upload registration, insurance, W-9, and credentials as requested",
+          "Read the handbook and assigned agreements",
+          "Separate your tasks from Elevate review"
+        ],
+        "narration": "Open Documents and Compliance. Review each applicable item and identify whether you, Elevate, or both parties own the next step. Upload the requested current records through the protected form. Pending review means the file is submitted and awaits review; do not repeatedly upload it. Read rejection or correction notes before replacing a document. Review and sign only the agreement assigned to your organization, including scope, privacy, payment terms, responsibilities, and termination provisions.",
+        "href": "/program-holder/documents",
+        "action": "Open documents",
+        "image": "/images/pages/office-admin-desk.jpg"
+      },
+      {
+        "title": "Your daily office routine",
+        "points": [
+          "Check phone, Inbox, and appointments",
+          "Document every follow-up in the account",
+          "Use PARIS for guidance; verify facts yourself"
+        ],
+        "narration": "Check your assigned phone connection, Inbox, calendar, and required actions each working day. Use the correct From address and extension when contacting applicants or learners. Keep program communication in the official workspace so the record stays connected. For a meeting, confirm the appointment and join link and test your chosen microphone or camera before it starts. PARIS can help explain a page or prepare a draft; review facts and recipients before sending or submitting anything.",
+        "href": "/program-holder/how-to-use",
+        "action": "Open the detailed office guide",
+        "image": "/images/pages/career-counseling.jpg"
+      }
+    ],
+    "hero": "/images/pages/career-counseling.jpg"
+  }
+}

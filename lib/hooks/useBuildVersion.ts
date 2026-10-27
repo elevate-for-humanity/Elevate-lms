@@ -2,18 +2,17 @@
  * lib/hooks/useBuildVersion.ts
  *
  * Prevents Server Action mismatches by tracking build version on client
- * and forcing reload when deployment happens during user session.
+ * and offering a safe refresh when deployment happens during a user session.
  */
 
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
 
 const BUILD_VERSION_KEY = 'elevate_build_version';
 const CHECK_INTERVAL_MS = 60_000;
 const FAILURE_BACKOFF_MS = 5 * 60_000;
 
-let checkIntervalId: ReturnType<typeof setInterval> | null = null;
 let backoffUntil = 0;
 
 async function fetchBuildVersion(): Promise<Response | null> {
@@ -40,52 +39,55 @@ async function fetchBuildVersion(): Promise<Response | null> {
 }
 
 export function useBuildVersion() {
-  const initialized = useRef(false);
-
-  const checkForBuildMismatch = useCallback(async (): Promise<boolean> => {
-    const response = await fetchBuildVersion();
-    if (!response) return false;
-
-    try {
-      const data = await response.json();
-      const serverVersion = data.buildVersion ?? data.commit ?? data.gitSha ?? null;
-      if (!serverVersion) return false;
-
-      const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
-
-      if (!storedVersion) {
-        sessionStorage.setItem(BUILD_VERSION_KEY, serverVersion);
-        return false;
-      }
-
-      if (storedVersion !== serverVersion) {
-        sessionStorage.setItem(BUILD_VERSION_KEY, serverVersion);
-        window.location.reload();
-        return true;
-      }
-    } catch {
-      // Malformed response; ignore and retry on the next scheduled check.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') return;
+    let cancelled = false;
+    let checking = false;
+    // Compare the loaded JavaScript with the server, not just two server polls.
+    // Otherwise a stale installed app can adopt the new SHA on its first poll.
+    let loadedVersion = process.env.NEXT_PUBLIC_GIT_SHA ||
+      process.env.NEXT_PUBLIC_BUILD_VERSION || process.env.NEXT_PUBLIC_DEPLOYMENT_ID || '';
+    if (!loadedVersion || loadedVersion === 'unknown') {
+      try { loadedVersion = sessionStorage.getItem(BUILD_VERSION_KEY) || ''; }
+      catch { loadedVersion = ''; }
     }
 
-    return false;
-  }, []);
-
-  useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
-    void checkForBuildMismatch();
-    checkIntervalId = setInterval(() => {
-      void checkForBuildMismatch();
-    }, CHECK_INTERVAL_MS);
-
-    return () => {
-      if (checkIntervalId) {
-        clearInterval(checkIntervalId);
-        checkIntervalId = null;
+    const check = async () => {
+      if (cancelled || checking) return;
+      checking = true;
+      try {
+        const response = await fetchBuildVersion();
+        if (!response || cancelled) return;
+        const data = await response.json();
+        const serverVersion = data.commit ?? data.gitSha ?? data.buildVersion;
+        if (cancelled || typeof serverVersion !== 'string' || !serverVersion || serverVersion === 'unknown') return;
+        if (!loadedVersion) loadedVersion = serverVersion;
+        if (loadedVersion !== serverVersion) {
+          // Never discard an unsaved form or Studio conversation automatically.
+          window.dispatchEvent(new CustomEvent('elevate-build-update-ready'));
+        } else {
+          try { sessionStorage.setItem(BUILD_VERSION_KEY, loadedVersion); } catch { /* Storage is optional. */ }
+        }
+      } catch {
+        // Ignore malformed responses and retry on the next scheduled check.
+      } finally {
+        checking = false;
       }
     };
-  }, [checkForBuildMismatch]);
+
+    const onVisible = () => { if (document.visibilityState === 'visible') void check(); };
+    const onOnline = () => { void check(); };
+    void check();
+    const interval = setInterval(() => { void check(); }, CHECK_INTERVAL_MS);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onOnline);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onOnline);
+    };
+  }, []);
 }
 
 export function isStaleBuild(): boolean {

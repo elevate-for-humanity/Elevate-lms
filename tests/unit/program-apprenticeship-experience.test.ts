@@ -30,7 +30,9 @@ describe('program and apprenticeship experience regressions', () => {
     expect(showcase).toContain('failedVideos');
     expect(showcase).toContain('image.backdropSrc');
     expect(showcase).toContain('onError={() =>');
-    expect(directory).toContain('Read the Salon Saloon video script');
+    expect(directory).toContain('<HostShopMediaCarousel');
+    expect(read('components/partners/NarratedShopTour.tsx')).toContain('{shopName} tour script');
+    expect(read('components/partners/NarratedShopTour.tsx')).toContain('{script}</p>');
     expect(partners).toContain('Welcome to Salon Saloon in South Bend, Indiana');
   });
 

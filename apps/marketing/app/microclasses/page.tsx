@@ -1,32 +1,33 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, Award, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
-import {
-  HSI_COURSES,
-  NRF_COURSES,
-  type PartnerCourse,
-} from '@/lib/partners/link-based-integration';
+import { NRF_COURSES, type PartnerCourse } from '@/lib/partners/link-based-integration';
 import { canonicalRoutes } from '@/lib/routes/canonical-routes';
 
 export const metadata: Metadata = {
   title: 'Microclasses | Elevate for Humanity',
   description:
-    'Job-ready certifications in hours. CPR, First Aid, ServSafe and more. Free with WIOA or pay as low as $18.',
+    'Job-ready certifications in hours. ServSafe and other short-form credentials with available funding options.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/microclasses',
   },
+
+  ...publicArtworkMetadata({
+    path: '/microclasses',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative adults learning workplace and business skills',
+    title: 'Microclasses | Elevate for Humanity',
+    description:
+      'Job-ready certifications in hours. ServSafe and other short-form credentials with available funding options.',
+  }),
 };
 
 const SECTIONS = [
-  {
-    id: 'healthcare',
-    label: 'Healthcare',
-    partner: 'Health & Safety Institute',
-    courses: HSI_COURSES,
-  },
   {
     id: 'food',
     label: 'Food Service',
@@ -39,6 +40,15 @@ function CourseCard({ course }: { course: PartnerCourse }) {
   const isFree = course.retailPrice === 0;
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col hover:shadow-md transition-shadow">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative adults learning workplace and business skills"
+        actions={[
+          { href: '/microclasses#microcourse-catalog', label: 'Explore short courses' },
+          { href: '/contact', label: 'Ask about a course' },
+        ]}
+      />
+
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="text-sm font-bold text-slate-900 leading-snug">{course.title}</h3>
         {isFree ? (
@@ -97,7 +107,9 @@ export default function MicroclassesPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Microclasses' }]} />
+        <Breadcrumbs
+          items={[{ label: 'Programs', href: '/programs' }, { label: 'Microclasses' }]}
+        />
       </div>
       {/* Hero */}
       <section className="bg-slate-900 text-white py-16 lg:py-20">
@@ -107,8 +119,8 @@ export default function MicroclassesPage() {
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Microclasses</h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-            Job-ready certifications in hours, not months. Free through WIOA for eligible Indiana
-            residents — or pay as low as $18 out of pocket.
+            Job-ready certifications in hours, not months, with available funding and self-pay
+            options.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300">
             <div className="flex items-center gap-2">
@@ -133,8 +145,7 @@ export default function MicroclassesPage() {
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-5 h-5 text-green-600 shrink-0" />
             <p className="text-sm text-green-900 font-medium">
-              All courses are <strong>free for eligible Indiana residents</strong> through WIOA /
-              WorkOne funding.
+              Eligible programs may qualify for workforce funding through WorkOne.
             </p>
           </div>
           <Link
@@ -154,7 +165,10 @@ export default function MicroclassesPage() {
               <h2 className="text-xl font-bold text-slate-900">{section.label}</h2>
               <p className="text-sm text-slate-500 mt-0.5">via {section.partner}</p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div
+              id="microcourse-catalog"
+              className="scroll-mt-24 grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+            >
               {section.courses.map((course) => (
                 <CourseCard key={course.id} course={course} />
               ))}

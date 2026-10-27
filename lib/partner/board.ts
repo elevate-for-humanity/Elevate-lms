@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
@@ -16,10 +17,11 @@ export type TradeTarget = {
   programSlug: string | null;
   hours: number | null;
   label: string;
-  progressModel: 'competency_based' | 'time_based' | 'unconfigured';
+  progressModel: 'competency_based' | 'hybrid' | 'time_based' | 'unconfigured';
   registered: boolean;
   competencyCount?: number;
   rtiHours?: number;
+  maxHours?: number;
   rapidsCode?: string;
   mentorRatio?: string;
   blockingReason?: string;
@@ -49,6 +51,19 @@ export function resolveTradeTarget(programSlug: string | null | undefined): Trad
     .trim()
     .toLowerCase();
   const canonical = REGISTERED_PROGRAM_ALIASES[raw] || raw;
+  if (canonical === 'cosmetology-apprenticeship') {
+    return {
+      programSlug: canonical,
+      hours: 2000,
+      maxHours: 2500,
+      label: 'Registered Hair Stylist / Cosmetologist Apprenticeship',
+      progressModel: 'hybrid',
+      registered: true,
+      rtiHours: 154,
+      rapidsCode: '0096HY V1',
+      mentorRatio: '1:1',
+    };
+  }
   const registered = canonical ? getRegisteredProgramStandard(canonical) : null;
   if (registered) {
     return {
@@ -105,6 +120,7 @@ type PartnerRecord = {
 };
 
 type HourRow = {
+  source_type: string | null;
   user_id: string | null;
   host_shop_id: string | null;
   program_slug: string | null;
@@ -121,11 +137,25 @@ function numericHours(value: number | string | null | undefined) {
 }
 
 function isApproved(row: HourRow) {
-  return row.approval_status === 'approved' || row.status === 'approved';
+  const status = String(row.status || '')
+    .trim()
+    .toLowerCase();
+  const accepted = new Set(['approved', 'verified', 'accepted', 'complete', 'completed', 'locked']);
+  return (
+    !['disputed', 'rejected', 'draft', 'pending', 'submitted'].includes(status) &&
+    accepted.has(status)
+  );
 }
 
 function isPending(row: HourRow) {
-  return row.approval_status === 'pending' || row.status === 'pending';
+  const approval = String(row.approval_status || '')
+    .trim()
+    .toLowerCase();
+  const status = String(row.status || '')
+    .trim()
+    .toLowerCase();
+  const pending = new Set(['pending', 'submitted', 'awaiting_review']);
+  return pending.has(approval) || pending.has(status);
 }
 
 const ACCEPTED_DOCUMENT_STATUSES = new Set([
@@ -175,8 +205,11 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
     .eq('user_id', userId)
     .eq('status', 'active');
 
+  if (partnerLinkError)
+    throw new Error(`HOST_SHOP_MEMBERSHIP_QUERY_FAILED:${partnerLinkError.message}`);
+
   const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
-  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) {
+  if (partnerLink?.partner_id && partnerLink.partners) {
     return partnerLink.partners as unknown as PartnerRecord;
   }
 
@@ -205,7 +238,9 @@ export async function getHostShopAdminPartnerOptions() {
   });
 }
 
-export async function getHostShopBoard(userId: string) {
+// Layout and nested pages request the same board during one render. Sharing the
+// result avoids repeating the entire set of database reads on every navigation.
+export const getHostShopBoard = cache(async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
   const partner = await resolvePartnerForBoard(db, userId);
 
@@ -291,7 +326,7 @@ export async function getHostShopBoard(userId: string) {
     const { data: hourRows, error: hourError } = await db
       .from('hour_entries')
       .select(
-        'user_id, host_shop_id, program_slug, status, approval_status, accepted_hours, hours, hours_claimed',
+        'user_id, host_shop_id, program_slug, source_type, status, approval_status, accepted_hours, hours, hours_claimed',
       )
       .in('user_id', studentIds);
     if (hourError)
@@ -310,16 +345,15 @@ export async function getHostShopBoard(userId: string) {
     for (const row of (hourError ? [] : hourRows || []) as HourRow[]) {
       if (!row.user_id || !workProgress[row.user_id]) continue;
       const placement = placementByStudent.get(row.user_id);
-      if (!placement || placement.tradeInfo.progressModel === 'unconfigured') continue;
+      if (!placement) continue;
       if (row.host_shop_id && row.host_shop_id !== placement.shopId) continue;
       if (placement.programSlug && row.program_slug && row.program_slug !== placement.programSlug)
         continue;
       if (isPending(row)) pendingHoursCount += 1;
-      if (!isApproved(row)) continue;
-      workProgress[row.user_id].completed +=
-        numericHours(row.accepted_hours) ||
-        numericHours(row.hours) ||
-        numericHours(row.hours_claimed);
+      if (!isApproved(row) || !['ojl', 'timeclock', 'manual', 'host_shop'].includes(row.source_type || '') || placement.tradeInfo.progressModel === 'unconfigured') continue;
+      workProgress[row.user_id].completed += numericHours(
+        row.accepted_hours ?? row.hours ?? row.hours_claimed,
+      );
     }
   }
 
@@ -460,6 +494,13 @@ export async function getHostShopBoard(userId: string) {
         .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
     ).values(),
   );
+  const hybridPrograms = Array.from(
+    new Map(
+      apprentices
+        .filter((apprentice) => apprentice.tradeInfo.progressModel === 'hybrid')
+        .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
+    ).values(),
+  );
   const unconfiguredPrograms = Array.from(
     new Map(
       apprentices
@@ -476,6 +517,7 @@ export async function getHostShopBoard(userId: string) {
     programType,
     onboardingPaths,
     registeredPrograms,
+    hybridPrograms,
     timeBasedPrograms,
     unconfiguredPrograms,
     documentStatuses,
@@ -495,4 +537,4 @@ export async function getHostShopBoard(userId: string) {
     })),
     pendingHoursCount,
   };
-}
+});

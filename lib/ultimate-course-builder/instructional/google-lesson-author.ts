@@ -145,7 +145,22 @@ export async function generateVertexLessonJson(model: string, system: string, in
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: vertexLessonGenerationConfig(model,maxOutputTokens) }),
     signal: courseProgressSignal() ? AbortSignal.any([courseProgressSignal(), AbortSignal.timeout(180000)]) : AbortSignal.timeout(180000),
   });
-  if ([429,500,502,503,504].includes(response.status)&&attempt<2) {await new Promise(r=>setTimeout(r,15000*2**attempt));continue;}
+  if ([429,500,502,503,504].includes(response.status)&&attempt<2) {
+    const retryAfterRaw=response.headers.get('retry-after');
+    const retrySeconds=Number(retryAfterRaw);
+    const retryDate=Date.parse(retryAfterRaw||'');
+    const serverDelay=Number.isFinite(retrySeconds)&&retrySeconds>=0?retrySeconds*1000:Number.isFinite(retryDate)?Math.max(0,retryDate-Date.now()):0;
+    const backoff=Math.min(120000,Math.max(15000*2**attempt,serverDelay));
+    reportCourseProgress('authoring:google-backoff:'+response.status,attempt+1,3);
+    await new Promise((resolve,reject)=>{
+      const signal=courseProgressSignal();
+      if(signal?.aborted){reject(signal.reason);return;}
+      const timer=setTimeout(()=>{signal?.removeEventListener('abort',onAbort);resolve(undefined);},backoff);
+      function onAbort(){clearTimeout(timer);reject(signal?.reason??new Error('COURSE_WORK_CANCELLED'));}
+      signal?.addEventListener('abort',onAbort,{once:true});
+    });
+    continue;
+  }
   if (!response.ok) throw new Error(`ULTIMATE_GOOGLE_AUTHORING_HTTP_${response.status}`);
   const output = await response.json();
   try {return parseVertexLessonResponse(output);}

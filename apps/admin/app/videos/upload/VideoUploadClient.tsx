@@ -2,10 +2,12 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { Upload, X, CheckCircle, Loader2, Film } from 'lucide-react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSignedUploadClient } from '@/lib/supabase/signed-upload-client';
+import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
 const MAX_FILE_SIZE = 1024 * 1024 * 1024;
 const ACCEPTED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const ACCEPTED_LICENSED_TYPES = [...ACCEPTED_TYPES, 'image/jpeg', 'image/png', 'image/webp'];
 
 type UploadResponse = {
   success?: boolean;
@@ -93,8 +95,13 @@ export default function VideoUploadClient({
       setError('Enter a real title for this video.');
       return;
     }
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      setError('Only MP4, WebM, and QuickTime video files are accepted.');
+    const acceptedTypes = licensedLibrary ? ACCEPTED_LICENSED_TYPES : ACCEPTED_TYPES;
+    if (!acceptedTypes.includes(file.type)) {
+      setError(
+        licensedLibrary
+          ? 'Licensed media must be MP4, WebM, QuickTime, JPEG, PNG, or WebP.'
+          : 'Only MP4, WebM, and QuickTime video files are accepted.',
+      );
       return;
     }
     if (file.size <= 0 || file.size > MAX_FILE_SIZE) {
@@ -143,7 +150,9 @@ export default function VideoUploadClient({
             prepared.error || 'The secure media-library upload could not be prepared.',
           );
         }
-        const supabase = createBrowserClient();
+        const config = getBrowserPublicSupabaseConfig();
+        if (!config) throw new Error('Media storage configuration is unavailable.');
+        const supabase = createSignedUploadClient(config);
         const { error: uploadError } = await supabase.storage
           .from(prepared.bucket)
           .uploadToSignedUrl(prepared.storagePath, prepared.token, file, {
@@ -164,6 +173,7 @@ export default function VideoUploadClient({
         if (!finalizeResponse.ok || !finalized.success) {
           throw new Error(finalized.error || 'The licensed media could not be indexed.');
         }
+        setUploadedUrl('licensed-library');
         setFile(null);
         setTitle('');
         setDescription('');
@@ -203,7 +213,9 @@ export default function VideoUploadClient({
         if (!prepareResponse.ok || !prepared.storagePath || !prepared.token || !prepared.bucket) {
           throw new Error(prepared.error || 'The course video upload could not be prepared.');
         }
-        const supabase = createBrowserClient();
+        const config = getBrowserPublicSupabaseConfig();
+        if (!config) throw new Error('Media storage configuration is unavailable.');
+        const supabase = createSignedUploadClient(config);
         const { error: uploadError } = await supabase.storage
           .from(prepared.bucket)
           .uploadToSignedUrl(prepared.storagePath, prepared.token, file, {
@@ -443,13 +455,21 @@ export default function VideoUploadClient({
 
       <label className="block rounded-2xl border-2 border-dashed border-slate-300 bg-white p-8 text-center">
         <Upload className="mx-auto h-10 w-10 text-slate-500" />
-        <span className="mt-3 block font-black text-slate-900">Select a real video file</span>
+        <span className="mt-3 block font-black text-slate-900">
+          {licensedLibrary ? 'Select a licensed photo or video file' : 'Select a real video file'}
+        </span>
         <span className="mt-1 block text-sm text-slate-600">
-          MP4, WebM, or QuickTime · maximum 500 MB
+          {licensedLibrary
+            ? 'MP4, WebM, QuickTime, JPEG, PNG, or WebP · maximum 1 GB'
+            : 'MP4, WebM, or QuickTime · maximum 500 MB'}
         </span>
         <input
           type="file"
-          accept="video/mp4,video/webm,video/quicktime"
+          accept={
+            licensedLibrary
+              ? 'video/mp4,video/webm,video/quicktime,image/jpeg,image/png,image/webp'
+              : 'video/mp4,video/webm,video/quicktime'
+          }
           className="mt-4 block w-full text-sm"
           onChange={(e) => setFile(e.currentTarget.files?.[0] ?? null)}
         />
@@ -466,16 +486,20 @@ export default function VideoUploadClient({
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
           <div className="flex items-center gap-2 font-black text-emerald-800">
             <CheckCircle className="h-5 w-5" />
-            Video saved and playable
+            {uploadedUrl === 'licensed-library'
+              ? 'Licensed media stored in the secure course library'
+              : 'Video saved and playable'}
           </div>
-          <a
-            href={uploadedUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 block break-all text-sm font-semibold text-emerald-800 underline"
-          >
-            {uploadedUrl}
-          </a>
+          {uploadedUrl !== 'licensed-library' ? (
+            <a
+              href={uploadedUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 block break-all text-sm font-semibold text-emerald-800 underline"
+            >
+              {uploadedUrl}
+            </a>
+          ) : null}
         </div>
       )}
 

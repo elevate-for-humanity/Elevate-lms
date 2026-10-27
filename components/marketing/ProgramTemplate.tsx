@@ -1,4 +1,5 @@
 // components/marketing/ProgramTemplate.tsx
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -58,7 +59,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 🔥 NOW ENROLLING
               </span>
               <p className="text-slate-900 font-semibold text-sm sm:text-base">
-                Free Career Training - 100% Government Funded • Start in 2 Weeks
+                Career training enrollment open • Review program tuition, funding status, and start dates
               </p>
             </div>
             <Link
@@ -72,16 +73,15 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
       </section>
 
       {/* Hero Section */}
-      <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+      <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={program.heroImage}
           alt={`${program.name} in training`}
           fill
           className="object-cover"
           priority
           quality={90}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
 
         <div className="relative h-full flex items-center">
@@ -89,7 +89,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white mb-6">
                 <Award aria-label="award" size={16} />
-                <span>No-Cost Training for Eligible Students</span>
+                <span>Program-Specific Tuition & Funding</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl font-light text-slate-900 mb-6 leading-tight">

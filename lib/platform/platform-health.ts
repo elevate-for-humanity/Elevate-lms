@@ -5,6 +5,7 @@
 
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
 
@@ -35,9 +36,10 @@ export type PlatformHealthSnapshot = {
   services: {
     database: ServiceCheck;
     redis: ServiceCheck;
-    stripe: ServiceCheck;
+    billing: ServiceCheck;
     email: ServiceCheck;
     storage: ServiceCheck;
+    studioBrowser: ServiceCheck;
   };
   ai: {
     activeProvider: string | null;
@@ -57,7 +59,6 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Pro
 async function checkDatabase(): Promise<ServiceCheck> {
   const start = Date.now();
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
     const db = createAdminClient();
     const { error } = await db
       .from('profiles')
@@ -158,61 +159,49 @@ async function checkRedis(): Promise<ServiceCheck> {
   }
 }
 
-async function checkStripe(): Promise<ServiceCheck> {
-  try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
-    const { data: settings } = await createAdminClient()
-      .from('platform_settings')
-      .select('key,value')
-      .in('key', ['billing_provider', 'stripe_billing_mode']);
-    const values = Object.fromEntries((settings ?? []).map((row: any) => [row.key, row.value]));
-    if (values.billing_provider !== 'stripe' || values.stripe_billing_mode === 'archive') {
-      return {
-        name: 'Stripe (legacy archive)',
-        status: 'unknown',
-        configured: false,
-        message: 'Disabled for new transactions; retained only for historical records',
-      };
-    }
-  } catch {
-    // If settings cannot be read, continue to the credential probe. The
-    // database health check will separately expose the settings-store outage.
-  }
-  const { getStripeRuntimeKey } = await import('@/lib/stripe/runtime-key');
-  const key = getStripeRuntimeKey();
-  const configured = Boolean(key);
-  if (!configured) {
-    return {
-      name: 'Stripe',
-      status: 'unknown',
-      configured: false,
-      message: 'Stripe server credential not set',
-    };
-  }
-
+async function checkBilling(): Promise<ServiceCheck> {
   const start = Date.now();
   try {
-    const { getStripeServer } = await import('@/lib/stripe/get-stripe-server');
-    const stripe = await getStripeServer();
-    await stripe.balance.retrieve();
-    const latencyMs = Date.now() - start;
+    const { data: rows, error } = await createAdminClient()
+      .from('app_settings')
+      .select('key,value')
+      .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']);
+    if (error) throw new Error('Billing configuration could not be read');
+    const stored = Object.fromEntries((rows ?? []).map((row: any) => [row.key, row.value]));
+    const has = (key: string) => Boolean(process.env[key] || stored[key]);
+    const quickBooksConfigured =
+      has('QB_CLIENT_ID') &&
+      has('QB_CLIENT_SECRET') &&
+      has('QB_REFRESH_TOKEN') &&
+      has('QB_REALM_ID');
+    const payPalConfigured = Boolean(
+      process.env.PAYPAL_CLIENT_ID &&
+        process.env.PAYPAL_CLIENT_SECRET &&
+        process.env.PAYPAL_BILLING_WEBHOOK_ID,
+    );
+    const configured = quickBooksConfigured && payPalConfigured;
     return {
-      name: 'Stripe',
-      status: latencyMs > 3000 ? 'degraded' : 'healthy',
-      latencyMs,
-      configured: true,
+      name: 'Billing (QuickBooks + PayPal)',
+      // Presence cannot prove that OAuth is valid or payment collection works.
+      status: configured ? 'unknown' : quickBooksConfigured || payPalConfigured ? 'degraded' : 'unknown',
+      latencyMs: Date.now() - start,
+      configured,
+      message: configured
+        ? 'Configuration present. QuickBooks authorization, PayPal connectivity, and payment collection are not verified by this check.'
+        : `Missing ${[
+            !payPalConfigured ? 'PayPal billing' : null,
+            !quickBooksConfigured ? 'QuickBooks configuration' : null,
+          ]
+            .filter(Boolean)
+            .join(' and ')}`,
     };
   } catch (err) {
-    const raw = err instanceof Error ? err.message : '';
-    const message = /expired api key|invalid api key|api key provided/i.test(raw)
-      ? 'The configured Stripe API key is expired or invalid.'
-      : 'Stripe API probe failed.';
     return {
-      name: 'Stripe',
+      name: 'Billing (QuickBooks + PayPal)',
       status: 'down',
       latencyMs: Date.now() - start,
-      configured: true,
-      message,
+      configured: false,
+      message: err instanceof Error ? err.message : 'Billing configuration check failed',
     };
   }
 }
@@ -270,7 +259,6 @@ async function checkStorage(): Promise<ServiceCheck> {
 
   const start = Date.now();
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
     const db = createAdminClient();
     const { error } = await db.storage.listBuckets();
     if (error) throw error;
@@ -288,6 +276,57 @@ async function checkStorage(): Promise<ServiceCheck> {
       latencyMs: Date.now() - start,
       configured: true,
       message: err instanceof Error ? err.message : 'Storage API probe failed',
+    };
+  }
+}
+
+async function checkStudioBrowser(): Promise<ServiceCheck> {
+  const url = process.env.STUDIO_BROWSER_URL?.trim().replace(/\/$/, '');
+  const publicUrl = (
+    process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL
+  )?.trim();
+  const secret = process.env.STUDIO_BROWSER_SECRET?.trim();
+  const configured = Boolean(url && publicUrl && secret);
+  if (!configured) {
+    return {
+      name: 'Studio Browser',
+      status: 'unknown',
+      configured: false,
+      message: 'Studio Browser URL, public URL, or shared secret is not configured',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const response = await fetch(`${url}/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5_000),
+    });
+    const payload = (await response.json().catch(() => null)) as {
+      browserState?: string;
+      browserConnected?: boolean;
+      commit?: string;
+    } | null;
+    const runtimeReady =
+      response.ok && payload?.browserState === 'ready' && payload.browserConnected === true;
+    return {
+      name: 'Studio Browser',
+      status: runtimeReady ? 'healthy' : 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: runtimeReady
+        ? `Chromium ready${payload?.commit ? ` · ${payload.commit.slice(0, 7)}` : ''}`
+        : response.ok
+          ? `Runtime reported ${payload?.browserState || 'not ready'}`
+          : `Health endpoint returned HTTP ${response.status}`,
+    };
+  } catch (err) {
+    return {
+      name: 'Studio Browser',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'Studio Browser health check failed',
     };
   }
 }
@@ -326,13 +365,20 @@ function generateAlerts(
     alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — Redis is not configured' });
   }
 
-  for (const service of [services.stripe, services.email, services.storage]) {
+  for (const service of [
+    services.billing,
+    services.email,
+    services.storage,
+    services.studioBrowser,
+  ]) {
     if (!service.configured && !/disabled for new transactions/i.test(service.message ?? '')) {
       alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is not configured` });
     } else if (service.status === 'down') {
       alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is unreachable` });
     } else if (service.status === 'degraded') {
-      alerts.push({ severity: 'warning', service: service.name, message: `High latency: ${service.latencyMs}ms` });
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `High latency: ${service.latencyMs}ms` });
+    } else if (service.status === 'unknown') {
+      alerts.push({ severity: 'info', service: service.name, message: service.message ?? 'Operational status has not been verified' });
     }
   }
 
@@ -350,15 +396,17 @@ function determineOverall(
   if (services.database.status === 'down') return 'down';
   if (alerts.some((alert) => alert.severity === 'critical')) return 'degraded';
   if (alerts.some((alert) => alert.severity === 'warning')) return 'degraded';
+  if (Object.values(services).some((service) => service.status === 'unknown')) return 'unknown';
   return 'healthy';
 }
 
 const TIMEOUT_MS = 5000;
 const DOWN_DB: ServiceCheck = { name: 'Database', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: true, message: 'Timed out' };
-const DOWN_STRIPE: ServiceCheck = { name: 'Stripe', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_BILLING: ServiceCheck = { name: 'Billing (QuickBooks + PayPal)', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_EMAIL: ServiceCheck = { name: 'Email (SendGrid)', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_STORAGE: ServiceCheck = { name: 'Storage (Supabase)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STUDIO_BROWSER: ServiceCheck = { name: 'Studio Browser', status: 'down', configured: true, message: 'Timed out' };
 
 export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   const start = Date.now();
@@ -368,16 +416,17 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
     // especially important after credential rotation (Stripe, Redis, AI, etc.).
     await hydrateProcessEnv().catch(() => undefined);
 
-    const [database, redis, stripe, email, storage] = await Promise.all([
+    const [database, redis, billing, email, storage, studioBrowser] = await Promise.all([
       withTimeout(checkDatabase(), TIMEOUT_MS, DOWN_DB),
       withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
-      withTimeout(checkStripe(), TIMEOUT_MS, DOWN_STRIPE),
+      withTimeout(checkBilling(), TIMEOUT_MS, DOWN_BILLING),
       withTimeout(checkEmail(), TIMEOUT_MS, DOWN_EMAIL),
       withTimeout(checkStorage(), TIMEOUT_MS, DOWN_STORAGE),
+      withTimeout(checkStudioBrowser(), TIMEOUT_MS, DOWN_STUDIO_BROWSER),
     ]);
 
     const ai = checkAIProviders();
-    const services = { database, redis, stripe, email, storage };
+    const services = { database, redis, billing, email, storage, studioBrowser };
     const alerts = generateAlerts(services, ai);
     const overall = determineOverall(services, alerts);
 
@@ -398,9 +447,10 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
       services: {
         database: DOWN_DB,
         redis: DOWN_REDIS,
-        stripe: DOWN_STRIPE,
+        billing: DOWN_BILLING,
         email: DOWN_EMAIL,
         storage: DOWN_STORAGE,
+        studioBrowser: DOWN_STUDIO_BROWSER,
       },
       ai: { activeProvider: null, providers: [], anyConfigured: false },
       alerts: [{ severity: 'critical', service: 'Platform', message: 'Health check failed entirely' }],
@@ -410,7 +460,17 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
 
 /** Configuration-only snapshot. Never present this as operational health. */
 export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'services'> {
-  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY?.startsWith('sk_'));
+  const payPalConfigured = Boolean(
+    process.env.PAYPAL_CLIENT_ID &&
+      process.env.PAYPAL_CLIENT_SECRET &&
+      process.env.PAYPAL_BILLING_WEBHOOK_ID,
+  );
+  const quickBooksConfigured = Boolean(
+    process.env.QB_CLIENT_ID &&
+      process.env.QB_CLIENT_SECRET &&
+      process.env.QB_REFRESH_TOKEN &&
+      process.env.QB_REALM_ID,
+  );
   const emailConfigured = Boolean(process.env.SENDGRID_API_KEY?.startsWith('SG.'));
   const storageConfigured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -430,11 +490,14 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
         configured: redisConfigured,
         message: redisConfigured ? 'Not probed' : 'Redis connection is not configured',
       },
-      stripe: {
-        name: 'Stripe',
+      billing: {
+        name: 'Billing (QuickBooks + PayPal)',
         status: 'unknown',
-        configured: stripeConfigured,
-        message: stripeConfigured ? 'Not probed' : 'STRIPE_SECRET_KEY not set',
+        configured: payPalConfigured && quickBooksConfigured,
+        message:
+          payPalConfigured && quickBooksConfigured
+            ? 'Configured; runtime not probed'
+            : 'PayPal billing or QuickBooks connection is not configured',
       },
       email: {
         name: 'Email (SendGrid)',
@@ -447,6 +510,17 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
         status: 'unknown',
         configured: storageConfigured,
         message: storageConfigured ? 'Not probed' : 'Supabase URL or service-role key not configured',
+      },
+      studioBrowser: {
+        name: 'Studio Browser',
+        status: 'unknown',
+        configured: Boolean(
+          process.env.STUDIO_BROWSER_URL &&
+            (process.env.STUDIO_BROWSER_PUBLIC_URL ||
+              process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
+            process.env.STUDIO_BROWSER_SECRET,
+        ),
+        message: 'Not probed',
       },
     },
     ai,

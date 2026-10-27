@@ -99,8 +99,8 @@ export default async function VerificationsPage() {
     >
       <AdminCard>
         {verificationsWithProfiles && verificationsWithProfiles.length > 0 ? (
-          <div className="divide-y divide-slate-100">
-            <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          <div className="min-w-[640px] divide-y divide-slate-100">
+            <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-600">
               <div className="col-span-3">Name</div>
               <div className="col-span-3">Email</div>
               <div className="col-span-2">ID Type</div>

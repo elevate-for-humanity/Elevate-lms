@@ -10,8 +10,8 @@ export const nailConfig: ProgramConfig = {
   primaryCta: { label: 'Apply Now', href: '/programs/nail-technician-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },
   stats: [
-    { value: '700+', label: 'Training Hours' },
-    { value: '6-12', label: 'Months' },
+    { value: '19', label: 'Appendix A Competencies' },
+    { value: '210', label: 'RTI Hours' },
     { value: '$0', label: 'with Funding' },
   ],
 
@@ -48,7 +48,7 @@ export const nailConfig: ProgramConfig = {
     { icon: '🏪', title: 'Salon Match', description: 'Get matched with a host salon partner' },
     { icon: '🎓', title: 'Orientation', description: 'Learn the program, meet your mentor' },
     { icon: '💅', title: 'Training Begins', description: 'Start your apprenticeship journey' },
-    { icon: '🎉', title: 'Graduation', description: 'Complete hours, pass state exam, get licensed' },
+    { icon: '🎉', title: 'Completion', description: 'Complete 19 verified competencies and 210 RTI hours, then follow Indiana examination and licensing steps' },
   ],
 
   // Skills

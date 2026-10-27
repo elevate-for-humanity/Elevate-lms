@@ -69,8 +69,26 @@ if (!orchestrator.includes('saveCourseProgramConfiguration'))
 if (!orchestrator.includes('queueCourseLessonVideos'))
   failures.push('Course Builder orchestrator does not own canonical media queue orchestration');
 const controller = readRequired('lib/devstudio/course-builder-controller.ts');
-if (!controller.includes("from '../course-builder/orchestrator'"))
-  failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
+if (!controller.includes('DevStudioUltimateCourseControl'))
+  failures.push('Studio Course Builder controller is not backed by Ultimate control plane');
+const studioChat = readRequired(studioChatRoute);
+for (const required of ['DevStudioUltimateCourseControl','ultimate_course_builds']) {
+  if (!studioChat.includes(required)) failures.push(`${studioChatRoute}: Ultimate build_course path missing ${required}`);
+}
+// Standards loading belongs to the shared controller/profile builder, not a
+// duplicate implementation in the chat route. Verify the complete delegation.
+const ultimateControl = readRequired('lib/devstudio/ultimate-course-control.ts');
+for (const required of ['buildUltimateProfile', "from '@/lib/ultimate-course-builder/core/course-profile'", 'UltimateJobQueue']) {
+  if (!ultimateControl.includes(required)) failures.push(`Ultimate Studio controller missing ${required}`);
+}
+const ultimateProfile = readRequired('lib/ultimate-course-builder/core/course-profile.ts');
+for (const required of ['apprenticeship_standard_versions', 'apprenticeship_standard_competencies']) {
+  if (!ultimateProfile.includes(required)) failures.push(`Ultimate profile builder missing standards authority ${required}`);
+}
+for (const forbidden of ['process-course-builder-jobs',"from('devstudio_jobs')"]) {
+  const buildCase = studioChat.slice(studioChat.indexOf("case 'build_course':"), studioChat.indexOf("case 'generate_videos':"));
+  if (buildCase.includes(forbidden)) failures.push(`${studioChatRoute}: legacy build_course orchestration remains: ${forbidden}`);
+}
 const editService = readRequired('lib/course-builder/edit-service.ts');
 for (const capability of [
   'saveCourseModule',
@@ -218,8 +236,11 @@ if (
 )
   failures.push('SCORM POST still mutates outside Course Builder root');
 
+// Ultimate release-service is the governed release adapter for the dedicated Ultimate pipeline.
+// It may materialize a completed, quality-gated Ultimate package into canonical LMS tables.
 const specializedPackageWriters = new Set([
   'lib/course-builder/clone-service.ts',
+  'lib/ultimate-course-builder/release/release-service.ts',
   'lib/course-factory/versioning.ts',
   'lib/course-factory/post-generation-governance.ts',
   'lib/db/courses.ts',
@@ -313,5 +334,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  'Course Builder authority gate passed: Studio control plane -> Course Builder generation/editing/review/media/clone/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; legacy lesson/media/clone routes are compatibility-only and no raw-engine, parallel package, review, media, clone, or publication authority was detected.',
+  'Course Builder authority gate passed: Dev Studio build_course -> Ultimate control plane -> registered standards -> Ultimate durable queue/worker; legacy build orchestration is excluded. Existing editing/review/clone/publication compatibility surfaces remain separately governed.',
 );

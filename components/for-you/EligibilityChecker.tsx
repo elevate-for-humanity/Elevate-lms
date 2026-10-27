@@ -120,8 +120,7 @@ export function EligibilityChecker() {
                   <h4 className="text-2xl font-bold text-brand-green-900">You Qualify!</h4>
                 </div>
                 <p className="text-brand-green-900 mb-6">
-                  Based on your responses, you appear eligible for free training programs through
-                  workforce funding.
+                  Based on your responses, you may have a reason to complete an agency eligibility review. This screening is not a funding decision and does not verify that a specific program is eligible.
                 </p>
                 <div className="bg-white rounded-lg p-6 border border-brand-green-200">
                   <h5 className="font-bold text-brand-green-900 mb-3">What Happens Next:</h5>

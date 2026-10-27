@@ -1,0 +1,271 @@
+{
+  "references": 491,
+  "decoded": 438,
+  "missing": [
+    {
+      "src": "/images/beauty/esthetician-hero.webp",
+      "files": [
+        "components/programs/config/cosmetology-config.ts",
+        "components/programs/config/esthetics-config.ts"
+      ]
+    },
+    {
+      "src": "/images/og-default.webp",
+      "files": [
+        "components/seo/IndianapolisProgramHubPage.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/apprenticeship-structure.jpg",
+      "files": [
+        "apps/marketing/app/ojt-and-funding/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/apprenticeships-page-2.jpg",
+      "files": [
+        "apps/marketing/app/ojt-and-funding/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/barber-apprenticeship-hero.webp",
+      "files": [
+        "components/programs/config/cosmetology-config.ts"
+      ]
+    },
+    {
+      "src": "/images/pages/social-media-1.jpg",
+      "files": [
+        "apps/marketing/app/blog/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/technology-sector.jpg",
+      "files": [
+        "apps/marketing/app/mobile-app/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/testing-page-1.jpg",
+      "files": [
+        "apps/marketing/app/testing/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/video-apply.webp",
+      "files": [
+        "apps/marketing/app/videos/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/video-apprentice.webp",
+      "files": [
+        "apps/marketing/app/videos/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/video-funding.webp",
+      "files": [
+        "apps/marketing/app/videos/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/video-hvac.webp",
+      "files": [
+        "apps/marketing/app/videos/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/video-maria.webp",
+      "files": [
+        "apps/marketing/app/videos/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/pages/video-workone.webp",
+      "files": [
+        "apps/marketing/app/videos/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/partners/ase-logo.png",
+      "files": [
+        "components/testing/TestingCenter.tsx"
+      ]
+    },
+    {
+      "src": "/images/programs/efh-barber-hero.jpg",
+      "files": [
+        "config/programs.json"
+      ]
+    },
+    {
+      "src": "/images/programs/efh-hvac-hero.jpg",
+      "files": [
+        "config/programs.json"
+      ]
+    }
+  ],
+  "small": [],
+  "invalid": [
+    {
+      "src": "/images/clear-path-main-image.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/home/Assurance.tsx"
+      ]
+    },
+    {
+      "src": "/images/healthcare/healthcare-professional-portrait-1.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "lib/images/programImages.ts"
+      ]
+    },
+    {
+      "src": "/images/healthcare/program-cna-training.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "apps/marketing/app/programs/healthcare-training/[slug]/page.tsx",
+        "apps/marketing/app/programs/healthcare-training/page.tsx"
+      ]
+    },
+    {
+      "src": "/images/healthcare/program-healthcare-overview.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "lib/images/programImages.ts"
+      ]
+    },
+    {
+      "src": "/images/healthcare/program-medical-assistant.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "lib/images/programImages.ts"
+      ]
+    },
+    {
+      "src": "/images/healthcare/video-thumbnail-dental-assistant.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/store/WebsiteBuilderCommercial.tsx",
+        "lib/images/programImages.ts"
+      ]
+    },
+    {
+      "src": "/images/icon-192.png",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/NotificationSettings.tsx",
+        "components/pwa/PushNotifications.tsx"
+      ]
+    },
+    {
+      "src": "/images/icon-192x192.png",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/push-notification-settings.tsx"
+      ]
+    },
+    {
+      "src": "/images/icon-72.png",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/NotificationSettings.tsx",
+        "components/push-notification-settings.tsx"
+      ]
+    },
+    {
+      "src": "/images/logo-small.png",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/site/logo.tsx"
+      ]
+    },
+    {
+      "src": "/images/logo.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/ui/Logo.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials-hq/person-1.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/TestimonialCarousel.tsx",
+        "components/home/SuccessStoriesGallery.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials-hq/person-2.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/TestimonialCarousel.tsx",
+        "components/home/SuccessStoriesGallery.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials-hq/person-3.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/TestimonialCarousel.tsx",
+        "components/home/SuccessStoriesGallery.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials-hq/person-4.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/TestimonialCarousel.tsx",
+        "components/home/SuccessStoriesGallery.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials/derek.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/home/GraduateTestimonials.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials/james.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/home/GraduateTestimonials.tsx",
+        "components/home/SuccessStoriesGallery.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials/michael.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/home/GraduateTestimonials.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials/sarah.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/home/GraduateTestimonials.tsx"
+      ]
+    },
+    {
+      "src": "/images/testimonials/tamika.jpg",
+      "error": "broken data stream when reading image file",
+      "files": [
+        "components/home/GraduateTestimonials.tsx"
+      ]
+    }
+  ],
+  "nearblank": [
+    {
+      "src": "/images/business/team-2.jpg",
+      "files": [
+        "apps/marketing/app/about/team/sharon-douglass/page.tsx",
+        "apps/marketing/app/programs/ProgramCardImage.tsx",
+        "lib/images/programImages.ts"
+      ]
+    }
+  ]
+}

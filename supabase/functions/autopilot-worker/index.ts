@@ -4,11 +4,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const AUTOPILOT_SECRET = Deno.env.get('AUTOPILOT_SECRET')!;
-const NORTHFLANK_API_TOKEN = Deno.env.get('NORTHFLANK_API_TOKEN') || Deno.env.get('NF_API_TOKEN') || '';
-const NORTHFLANK_TEAM_ID = Deno.env.get('NORTHFLANK_TEAM_ID') || 'elevates-team';
-const NORTHFLANK_PROJECT_ID = Deno.env.get('NORTHFLANK_PROJECT_ID') || '';
-const NORTHFLANK_LMS_SERVICE_ID = Deno.env.get('NORTHFLANK_LMS_SERVICE_ID') || 'elevate-lms';
-const NORTHFLANK_ADMIN_SERVICE_ID = Deno.env.get('NORTHFLANK_ADMIN_SERVICE_ID') || 'elevate-admin';
 const SLACK_WEBHOOK_URL = Deno.env.get('SLACK_WEBHOOK_URL') || '';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -48,35 +43,6 @@ async function notifySlack(text: string) {
   } catch {
     // Notification failures must not fail the worker task.
   }
-}
-
-async function triggerNorthflankBuild(serviceId: string) {
-  if (!NORTHFLANK_API_TOKEN || !NORTHFLANK_PROJECT_ID) {
-    throw new Error('Northflank credentials are not configured');
-  }
-
-  const encodedProject = encodeURIComponent(NORTHFLANK_PROJECT_ID);
-  const encodedService = encodeURIComponent(serviceId);
-  const teamPrefix = NORTHFLANK_TEAM_ID
-    ? `/teams/${encodeURIComponent(NORTHFLANK_TEAM_ID)}`
-    : '';
-  const url = `https://api.northflank.com/v1${teamPrefix}/projects/${encodedProject}/services/${encodedService}/build`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${NORTHFLANK_API_TOKEN}`,
-    },
-    body: JSON.stringify({}),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Northflank build trigger failed for ${serviceId}: ${response.status} ${text.slice(0, 240)}`);
-  }
-
-  return response.json().catch(() => ({}));
 }
 
 // =============================================
@@ -190,22 +156,11 @@ async function runTask(task: any) {
       }
 
       case 'redeploy': {
-        const [lmsRes, adminRes] = await Promise.allSettled([
-          triggerNorthflankBuild(NORTHFLANK_LMS_SERVICE_ID),
-          triggerNorthflankBuild(NORTHFLANK_ADMIN_SERVICE_ID),
-        ]);
-        const lmsOk = lmsRes.status === 'fulfilled';
-        const adminOk = adminRes.status === 'fulfilled';
-        if (!lmsOk || !adminOk) {
-          const detail = [
-            lmsRes.status === 'rejected' ? `LMS: ${lmsRes.reason?.message ?? lmsRes.reason}` : null,
-            adminRes.status === 'rejected' ? `Admin: ${adminRes.reason?.message ?? adminRes.reason}` : null,
-          ].filter(Boolean).join(' | ');
-          throw new Error(`Northflank deploy trigger incomplete. ${detail}`);
-        }
-        await log('worker', 'deploy', 'ok', `Northflank builds triggered — LMS:${lmsOk} Admin:${adminOk}`, undefined, task.id);
-        await notifySlack(`✅ Task #${task.id}: Northflank builds triggered (LMS:${lmsOk} Admin:${adminOk})`);
-        break;
+        // Legacy redeploy tasks must never invoke Northflank. Dispatch Google
+        // using the approved, service-specific authenticated release workflow.
+        // This worker cannot establish revision/traffic acceptance and must
+        // not claim a successful deployment.
+        throw new Error('Legacy autopilot redeploy disabled: use Google Cloud Run release workflows on main.');
       }
 
       case 'cache_purge': {

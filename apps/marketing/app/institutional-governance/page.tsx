@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
@@ -7,14 +9,30 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Institutional Governance & Compliance',
-  description:
-    `Governance framework, legal structure, and compliance posture of 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
+  description: `Governance framework, legal structure, and compliance posture of 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/institutional-governance' },
+
+  ...publicArtworkMetadata({
+    path: '/institutional-governance',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative education team reviewing institutional records',
+    title: 'Institutional Governance & Compliance',
+    description: `Governance framework, legal structure, and compliance posture of 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
+  }),
 };
 
 export default function InstitutionalGovernancePage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative education team reviewing institutional records"
+        actions={[
+          { href: '/compliance/center', label: 'Open compliance center' },
+          { href: '/contact', label: 'Contact the institution' },
+        ]}
+      />
+
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
@@ -30,12 +48,12 @@ export default function InstitutionalGovernancePage() {
 
         <div className="prose prose-slate max-w-none">
           <p className="text-lg text-slate-700 leading-relaxed mb-8">
-            {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute operates under the legal governance
-            of 2Exclusive LLC-S and functions as a centralized workforce training provider,
-            Registered Apprenticeship sponsor, and career and technical instructional institution.
-            The organization administers structured training programs, apprenticeship sponsorship,
-            related technical instruction (RTI), and employer-aligned work-based learning through a
-            unified and documented governance framework.
+            {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute operates under the legal
+            governance of 2Exclusive LLC-S and functions as a centralized workforce training
+            provider, Registered Apprenticeship sponsor, and career and technical instructional
+            institution. The organization administers structured training programs, apprenticeship
+            sponsorship, related technical instruction (RTI), and employer-aligned work-based
+            learning through a unified and documented governance framework.
           </p>
 
           {/* Governance Structure Diagram */}
@@ -165,10 +183,10 @@ export default function InstitutionalGovernancePage() {
               <div className="bg-white border border-slate-200 rounded-lg p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Instructional Delivery</h3>
                 <p>
-                  {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute delivers related technical
-                  instruction (RTI) through its learning management system (LMS) and in-person
-                  classroom sessions. All instructional content is aligned with occupation-specific
-                  competency standards and documented per program requirements.
+                  {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute delivers related
+                  technical instruction (RTI) through its learning management system (LMS) and
+                  in-person classroom sessions. All instructional content is aligned with
+                  occupation-specific competency standards and documented per program requirements.
                 </p>
               </div>
               <div className="bg-white border border-slate-200 rounded-lg p-5">
@@ -277,7 +295,7 @@ export default function InstitutionalGovernancePage() {
                     {
                       occ: 'Nail Tech',
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-                      hours: '200',
+                      hours: '210',
                       method: 'Classroom / Web-Based',
                     },
                     {
@@ -307,7 +325,8 @@ export default function InstitutionalGovernancePage() {
             <p className="text-sm text-slate-700 leading-relaxed">
               Training may be fully funded for eligible participants through workforce programs such
               as WIOA, Job Ready Indy, and approved funding partners. Eligibility and funding
-              determinations are subject to program and agency guidelines. {PLATFORM_DEFAULTS.orgName}
+              determinations are subject to program and agency guidelines.{' '}
+              {PLATFORM_DEFAULTS.orgName}
               Career &amp; Technical Institute does not guarantee funding approval. Self-pay
               enrollment options are available for participants who do not qualify for funded
               programs.

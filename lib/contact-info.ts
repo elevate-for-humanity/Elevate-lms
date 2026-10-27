@@ -4,14 +4,14 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 // Public pages should import from this module instead of hardcoding contact data.
 export const CONTACT_INFO = {
   phone: {
-    display: PLATFORM_DEFAULTS.supportPhone,
-    tel: '+13173143757',
+    display: PLATFORM_DEFAULTS.mainPhone,
+    tel: '+14632401404',
   },
 
   email: {
-    general: 'info@elevateforhumanity.org',
-    support: 'info@elevateforhumanity.org',
-    partnerships: 'info@elevateforhumanity.org',
+    general: 'elevate4humanityedu@gmail.com',
+    support: 'elevate4humanityedu@gmail.com',
+    partnerships: 'elevate4humanityedu@gmail.com',
   },
 
   address: {

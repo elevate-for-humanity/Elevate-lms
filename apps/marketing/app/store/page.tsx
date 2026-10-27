@@ -1,9 +1,10 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, PlayCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, PlayCircle, ShieldCheck, Sparkles } from 'lucide-react';
 import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { UnifiedSalesMarketplace } from '@/components/store/UnifiedSalesMarketplace';
@@ -11,15 +12,15 @@ import { GuidedProductInterview } from '@/components/store/GuidedProductIntervie
 import { StoreGlossary } from '@/components/store/StoreGlossary';
 import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercial';
 import { StandaloneBuildPackages } from '@/components/store/StandaloneBuildPackages';
-import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
-import StoreDemoVideo from './StoreDemoVideo';
-const STORE_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
+import Image from 'next/image';
+import StoreDemoPreview from '@/components/store/StoreDemoPreview';
+import StorePlatformDemos from '@/components/store/StorePlatformDemos';
 
 export const metadata: Metadata = {
   title: 'Store | AI Business, Workforce & Education Platform',
   description:
     'Start with Elevate and add the tools your organization needs: AI website builder, CRM, virtual assistants, LMS, course builder, testing, workforce, apprenticeship, compliance and business apps.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store' },
   robots: { index: true, follow: true },
 };
 
@@ -52,48 +53,61 @@ export default function StorePage() {
       <section className="overflow-hidden border-b border-slate-200 bg-slate-50 px-4 py-6 sm:px-6 sm:py-14">
         <div className="mx-auto grid min-w-0 max-w-7xl items-center gap-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-10">
           <div>
-            <p className="text-xs font-black uppercase leading-5 tracking-[0.14em] text-brand-red-700 sm:text-sm sm:tracking-[0.2em]">Elevate Business Operating Platform</p>
-            <h1 className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:mt-4 sm:text-5xl lg:text-6xl">Start with what you need. Grow in one connected workspace.</h1>
-            <p className="mt-3 max-w-xl text-base font-semibold leading-6 text-slate-700 sm:mt-5 sm:text-lg sm:leading-8">Website, CRM, AI assistants, education, workforce, testing, and operations—connected around one customer record.</p>
+            <p className="text-xs font-black uppercase leading-5 tracking-[0.14em] text-brand-red-700 sm:text-sm sm:tracking-[0.2em]">
+              Elevate Business Operating Platform
+            </p>
+            <h1 className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:mt-4 sm:text-5xl lg:text-6xl">
+              Start with what you need. Grow in one connected workspace.
+            </h1>
+            <p className="mt-3 max-w-xl text-base font-semibold leading-6 text-slate-700 sm:mt-5 sm:text-lg sm:leading-8">
+              Website, CRM, AI assistants, education, workforce, testing, and operations—connected
+              around one customer record.
+            </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Link href="/store/trial" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 text-center font-black text-white hover:bg-brand-red-800 sm:w-auto">Start Free Trial</Link>
-              <Link href="#role-demos" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 text-center font-black text-slate-950 hover:border-brand-red-600 sm:w-auto">See Role Demos</Link>
+              <Link
+                href="/store/trial"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 text-center font-black text-white hover:bg-brand-red-800 sm:w-auto"
+              >
+                Start Free Trial
+              </Link>
+              <Link
+                href="#platform-demos"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 text-center font-black text-slate-950 hover:border-brand-red-600 sm:w-auto"
+              >
+                Watch Product Demos
+              </Link>
+              <Link
+                href="/store/proof"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-300 bg-emerald-50 px-6 py-3 text-center font-black text-emerald-950 hover:border-emerald-600 sm:w-auto"
+              >
+                <ShieldCheck className="h-5 w-5" /> Verify Every Offer
+              </Link>
             </div>
-            <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · build new or connect an existing website</p>
+            <p className="mt-4 text-sm font-semibold text-slate-600">
+              14 days · no card required · source-backed proof and limits available before checkout
+            </p>
           </div>
-          <div className="relative h-[280px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:h-[500px] sm:rounded-3xl sm:shadow-2xl">
-            <SafeHeroVideo src={STORE_VIDEO} poster="/images/pages/platform-page-1.webp" ariaLabel="Elevate connected business and workforce platform" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-x-0 bottom-0 z-20 bg-slate-950/80 p-4 text-sm font-bold text-white backdrop-blur-sm">Website, CRM, LMS, workforce, apprenticeship, testing, and compliance—one connected workspace.</div>
+          <div className="relative aspect-[16/10] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:rounded-3xl sm:shadow-2xl">
+            <Image
+              src="/images/store/barber-beauty-platform-2026.webp"
+              alt="AI-generated illustration of barber and beauty professionals using a laptop"
+              fill
+              priority
+              sizes="(min-width: 1024px) 55vw, 100vw"
+              className="object-contain"
+            />
+            <div className="absolute inset-x-0 bottom-0 z-20 bg-slate-950/80 p-4 text-sm font-bold text-white backdrop-blur-sm">
+              Website, CRM, LMS, workforce, apprenticeship, testing, and compliance—one connected
+              workspace.
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">
-              Real course demonstration
-            </p>
-            <h2 className="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">
-              See what learners receive—not just a list of features.
-            </h2>
-            <p className="mt-4 text-base font-semibold leading-7 text-slate-700">
-              Watch a working lesson from the HVAC Technician course. Organizations can evaluate
-              the lesson experience, instructional structure, and media delivery before choosing a
-              licensing or platform package.
-            </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link href="/store/demos" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">
-                Browse platform demos
-              </Link>
-              <Link href="/store/courses" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-950 hover:border-brand-red-600">
-                View licensable courses
-              </Link>
-            </div>
-          </div>
-          <StoreDemoVideo />
-        </div>
-      </section>
+      <UnifiedSalesMarketplace />
+
+      <StorePlatformDemos />
+      <div className="mx-auto max-w-6xl px-5"><ProgramGuideResources /></div>
 
       <section className="border-b border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-6xl px-5">
@@ -152,14 +166,23 @@ export default function StorePage() {
               unless explicitly labeled as an interactive sandbox.
             </p>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {ROLE_DEMOS.map((demo) => (
               <Link
                 key={demo.href}
                 href={demo.href}
-                className="rounded-2xl border border-slate-300 bg-white p-5 shadow-sm hover:border-brand-red-300 hover:shadow-md"
+                className="rounded-2xl border border-slate-300 bg-white p-3 shadow-sm hover:border-brand-red-300 hover:shadow-md"
               >
-                <PlayCircle className="h-6 w-6 text-brand-red-700" />
+                <StoreDemoPreview
+                  compact
+                  role={
+                    demo.label === 'Student'
+                      ? 'learner'
+                      : demo.label === 'Institutional'
+                        ? 'workforce'
+                        : demo.label.toLowerCase()
+                  }
+                />
                 <h3 className="mt-3 text-lg font-black">{demo.label} Demo</h3>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
                   {demo.description}
@@ -172,8 +195,6 @@ export default function StorePage() {
           </div>
         </div>
       </section>
-
-      <UnifiedSalesMarketplace />
 
       <StandaloneBuildPackages compact />
 

@@ -93,7 +93,7 @@ const QUICK_COMMANDS = [
 ];
 
 const IMAGE_BY_KEY: Record<string, string> = {
-  dental: '/images/healthcare/video-thumbnail-dental-assistant.jpg',
+  dental: '/images/pages/healthcare-sector.webp',
   'home-health': '/images/pages/platform-page-12.webp',
   beauty: '/images/beauty/program-barber-training.jpg',
   training: '/images/pages/certifications-page-1.webp',

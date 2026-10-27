@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: `WIOA Reporting & Evidence Tools | ${PLATFORM_DEFAULTS.orgName} Store`,
   description:
     'Workforce reporting support with participant records, PIRL mapping/export infrastructure, performance records, document evidence, and auditable report workflows.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/compliance/wioa' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/compliance/wioa' },
 };
 
 const capabilities = [

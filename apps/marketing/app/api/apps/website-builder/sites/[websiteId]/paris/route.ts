@@ -1,3 +1,5 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -26,9 +28,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
-  const { data: site, error: readError } = await supabase.from('user_websites').select('id, user_id, site_name, site_config, is_published').eq('id', websiteId).maybeSingle();
+  // Server-owned roles and exact organization membership remain mandatory.
+  const admin = await requireAdminClient();
+  const { data: site, error: readError } = await admin.from('user_websites').select('id, user_id, site_name, subdomain, site_config, is_published').eq('id', websiteId).maybeSingle();
   if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
-  if (!site || site.user_id !== user.id) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
 
   const body = await request.json().catch(() => ({}));
   const instruction = safeString(body.instruction, 5000);
@@ -64,10 +68,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   let generated: Record<string, any>;
   try {
     const result = await aiChat({
+      providerPolicy: 'owned-only',
       messages: [
         {
           role: 'system',
-          content: `You are PARIS, the autonomous website-building agent inside Elevate Website Builder. You edit a real multi-page website by issuing operations against its canonical page/section model. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nAllowed section types: hero, rich_text, features, services, products, testimonial, stats, gallery, image, video, faq, team, pricing, cta, contact_form, booking.\n\nRules:\n- Execute the user's requested website change through operations; do not merely describe it.\n- You may create, delete, rename and reorder pages; add, update, remove and move sections; and change site-wide branding/SEO.\n- Preserve unrelated content.\n- Use existing page and section IDs from CURRENT SITE when targeting existing sections.\n- When creating a page, add useful sections in the same response.\n- If the user asks for About, FAQ, Team, Gallery, Pricing, Services, Booking, Shop, Contact or another page, create the page if it does not exist.\n- If the user asks for a form, add or update a contact_form section. Supported custom form fields are {name,label,type,required,options?}; type must be text, email, tel, textarea, or select. Every custom form MUST include an email field named exactly "email". Only collect fields reasonably needed for the stated business purpose; never request passwords, Social Security numbers, payment-card data, health records, or other unnecessary sensitive data.\n- If the user asks for booking, use booking. If they ask for video, use video.\n- Never fabricate licenses, accreditations, testimonials, ratings, addresses, outcomes, customers, staff, prices or legal claims.\n- Never purchase a domain, charge money, or change billing. Publishing is handled separately by the user's explicit publish command and deterministic QA gate.\n- Do not return legacy homepage/program/navigation patches; operate on pages and sections.\n- message must state what you actually changed.\n\nCURRENT SITE:\n${JSON.stringify(currentConfig)}`,
+          content: `You are PARIS, the autonomous website-building agent inside Elevate Website Builder. You edit a real multi-page website by issuing operations against its canonical page/section model. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nAllowed section types: hero, rich_text, features, services, products, testimonial, stats, gallery, image, video, faq, team, pricing, cta, contact_form, booking, assessment, journal, events.\n\nRules:\n- Execute the user's requested website change through operations; do not merely describe it.\n- You may create, delete, rename and reorder pages; add, update, remove and move sections; and change site-wide branding/SEO.\n- Preserve unrelated content.\n- Use existing page and section IDs from CURRENT SITE when targeting existing sections.\n- When creating a page, add useful sections in the same response.\n- If the user asks for About, FAQ, Team, Gallery, Pricing, Services, Booking, Shop, Contact or another page, create the page if it does not exist.\n- If the user asks for a form, add or update a contact_form section. Supported custom form fields are {name,label,type,required,options?}; type must be text, email, tel, textarea, or select. Every custom form MUST include an email field named exactly "email". Only collect fields reasonably needed for the stated business purpose; never request passwords, Social Security numbers, payment-card data, health records, or other unnecessary sensitive data.\n- If the user asks for booking, use booking. If they ask for video, use video.\n- Never fabricate licenses, accreditations, testimonials, ratings, addresses, outcomes, customers, staff, prices or legal claims.\n- Never purchase a domain, charge money, or change billing. Publishing is handled separately by the user's explicit publish command and deterministic QA gate.\n- Do not return legacy homepage/program/navigation patches; operate on pages and sections.\n- message must state what you actually changed.\n\nCURRENT SITE:\n${JSON.stringify(currentConfig)}`,
         },
         ...conversation,
         { role: 'user', content: instruction },
@@ -85,7 +90,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const nextConfig = applySiteOperations(currentConfig, operations);
   const nextSiteName = safeString(generated.siteName, 120) || site.site_name || 'My Website';
-  const { data: saved, error: saveError } = await supabase.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId).eq('user_id', user.id).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
+  const { error: revisionError } = await admin.from('website_revisions').insert({
+    website_id: websiteId, user_id: user.id, site_name: site.site_name,
+    subdomain: site.subdomain, site_config: site.site_config,
+    is_published: site.is_published, reason: 'before_paris_edit',
+  });
+  if (revisionError) return NextResponse.json({ error: 'Could not preserve the current revision. No website changes were saved.' }, { status: 503 });
+
+  const { data: saved, error: saveError } = await admin.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
 
   if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save PARIS changes', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 500 });
 

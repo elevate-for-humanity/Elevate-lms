@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Settings, RefreshCw, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { GOOGLE_CLOUD_SERVICES } from '@/lib/platform/hosting';
 import { isSupabaseAuthConfigured } from '@/lib/supabase/public-config';
 
 interface HealthStatus {
@@ -14,7 +15,6 @@ interface HealthStatus {
   hasGitHub: boolean;
   aiConfigured: boolean;
   execution?: { mode?: string; ready?: boolean; legacyShellRemoved?: boolean };
-  northflank?: { ready?: boolean; tokenPresent?: boolean; projectIdPresent?: boolean };
 }
 
 interface HealthCheck {
@@ -115,7 +115,7 @@ export default function SettingsClient() {
       const allHealthy =
         probed && services.every((service: { healthy?: boolean }) => service.healthy === true);
       results.push({
-        name: 'Northflank',
+        name: 'Google Cloud Run',
         status: allHealthy ? 'healthy' : probed ? 'degraded' : 'offline',
         detail: allHealthy
           ? `${services.length} service health probes passed`
@@ -123,14 +123,12 @@ export default function SettingsClient() {
             ? 'Configured, but one or more service probes are not healthy'
             : 'No services returned by the canonical service endpoint',
       });
-    } catch (northflankError) {
+    } catch (serviceError) {
       results.push({
-        name: 'Northflank',
+        name: 'Google Cloud Run',
         status: 'offline',
         detail:
-          northflankError instanceof Error
-            ? northflankError.message
-            : 'Unable to reach service API',
+          serviceError instanceof Error ? serviceError.message : 'Unable to reach service API',
       });
     }
 
@@ -236,12 +234,16 @@ export default function SettingsClient() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="rounded-xl bg-white border border-slate-200 p-4">
               <p className="text-xs text-slate-500 mb-1">Admin Service</p>
-              <p className="font-mono text-sm font-bold text-blue-700">elevate-admin</p>
+              <p className="font-mono text-sm font-bold text-blue-700">
+                {GOOGLE_CLOUD_SERVICES.admin}
+              </p>
               <p className="text-xs text-slate-400 mt-1">admin.elevateforhumanity.org</p>
             </div>
             <div className="rounded-xl bg-white border border-slate-200 p-4">
               <p className="text-xs text-slate-500 mb-1">LMS Service</p>
-              <p className="font-mono text-sm font-bold text-emerald-700">elevate-lms</p>
+              <p className="font-mono text-sm font-bold text-emerald-700">
+                {GOOGLE_CLOUD_SERVICES.lms}
+              </p>
               <p className="text-xs text-slate-400 mt-1">app.elevateforhumanity.org</p>
             </div>
             <div className="rounded-xl bg-white border border-slate-200 p-4">
@@ -251,7 +253,7 @@ export default function SettingsClient() {
             </div>
             <div className="rounded-xl bg-white border border-slate-200 p-4">
               <p className="text-xs text-slate-500 mb-1">Platform</p>
-              <p className="font-mono text-sm font-bold text-slate-700">Northflank</p>
+              <p className="font-mono text-sm font-bold text-slate-700">Google Cloud Run</p>
               <p className="text-xs text-slate-400 mt-1">Docker + CI/CD</p>
             </div>
           </div>

@@ -14,11 +14,14 @@ describe('resolveProgramFundingStatus', () => {
     expect(status.fundingSourceLabels).toContain('Indiana ETPL');
   });
 
-  it('does not show WIOA process for cosmetology (not ETPL)', () => {
+  it('shows cosmetology apprenticeship as self-pay only', () => {
     const status = resolveProgramFundingStatus(COSMETOLOGY);
     expect(status.isEtplListed).toBe(false);
     expect(status.showWorkforceFundingProcess).toBe(false);
-    expect(status.isImpactFundable).toBe(true);
+    expect(status.isImpactFundable).toBe(false);
+    expect(status.isEmployerFunded).toBe(false);
+    expect(status.fundingSourceLabels).toEqual(['Self-Pay']);
+    expect(status.fundabilityHeadline).toMatch(/self-pay only/i);
   });
 
   it('defaults short CPR program to self-pay messaging', () => {

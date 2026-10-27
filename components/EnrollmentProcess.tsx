@@ -64,7 +64,7 @@ export default function EnrollmentProcess() {
             How to Enroll &mdash; Step by Step
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Follow these steps to start your free training through Indiana Career Connect.
+            Follow these steps to review training and, where applicable, complete the responsible workforce-agency funding process.
           </p>
         </div>
 

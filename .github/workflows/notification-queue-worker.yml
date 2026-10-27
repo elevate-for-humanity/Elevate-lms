@@ -1,48 +1,40 @@
 name: Notification Queue Worker
-
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/lms/app/api/cron/process-notifications/**'
-      - '.github/workflows/notification-queue-worker.yml'
   schedule:
     - cron: '*/5 * * * *'
-
 permissions:
   contents: read
-
+  actions: write
+  id-token: write
 concurrency:
-  group: canonical-notification-queue-worker
+  group: canonical-notification-queue-worker-${{ github.event_name }}
   cancel-in-progress: false
-
 jobs:
-  process-notifications:
-    name: Drain canonical notification outbox
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    env:
-      RUNTIME_URL: https://site--elevate-lms--pknyktykz4wg.code.run
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  dispatch:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
     steps:
-      - name: Require cron secret
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "$CRON_SECRET" || { echo '::error::CRON_SECRET is not configured'; exit 1; }
-
-      - name: Process canonical notification queue through direct LMS runtime
-        shell: bash
-        run: |
-          set -euo pipefail
-          response_file="$(mktemp)"
-          status="$(curl -sS -X POST "$RUNTIME_URL/api/cron/process-notifications" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 60 \
-            -o "$response_file" \
-            -w '%{http_code}')"
-          cat "$response_file"
-          test "$status" = "200" || { echo "::error::notification queue worker returned HTTP $status"; exit 1; }
-          grep -q '"success":true' "$response_file" || { echo '::error::notification queue worker did not report success'; exit 1; }
+      - name: Dispatch trusted main worker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/notification-queue-worker.yml/dispatches" -f ref=main
+  process-notifications:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    environment: production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Process reviewed outbox through Google Admin
+        run: node scripts/gcp/process-notifications.mjs

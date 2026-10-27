@@ -6,7 +6,7 @@ import AITeamConsole from '@/components/platform/AITeamConsole';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'AI Team | Elevate LMS',
-  description: 'Work with PARIS, ELLIE, LIZZY, and ZORA from one learner workspace.',
+  description: 'PARIS combines admissions, learning support, operations, and compliance in one workspace.',
   robots: { index: false, follow: false },
 };
 
@@ -17,7 +17,7 @@ export default async function LearnerAITeamPage() {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
-      <AITeamConsole title="Your AI Team" />
+      <AITeamConsole unified title="PARIS" />
     </main>
   );
 }

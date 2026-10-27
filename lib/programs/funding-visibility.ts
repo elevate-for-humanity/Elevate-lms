@@ -33,8 +33,9 @@ export function resolveProgramFundingStatus(program: ProgramSchema): ProgramFund
   const isWrgFundable = showWorkforceFundingProcess && verified?.wrgEligible === true;
 
   // Non-WIOA sources remain independent, but do not alter the public WIOA/WRG track.
-  const isImpactFundable = program.funding?.fssa_eligible === true;
-  const isEmployerFunded = program.fundingOptions?.includes('employer_paid') ?? false;
+  const apprenticeship = program.programType === 'apprenticeship' || /apprenticeship/i.test(program.slug);
+  const isImpactFundable = !apprenticeship && program.funding?.fssa_eligible === true;
+  const isEmployerFunded = !apprenticeship && (program.fundingOptions?.includes('employer_paid') ?? false);
 
   const fundingSourceLabels = showWorkforceFundingProcess
     ? getPublicFundingLabels(program.slug)
@@ -63,8 +64,8 @@ export function resolveProgramFundingStatus(program: ProgramSchema): ProgramFund
     isEmployerFunded,
     showWorkforceFundingProcess: false,
     fundingSourceLabels,
-    fundabilityHeadline: 'Regular program — self-pay enrollment',
-    fundabilitySummary:
+    fundabilityHeadline: apprenticeship ? 'Apprenticeship — self-pay only' : 'Regular program — self-pay enrollment',
+    fundabilitySummary: apprenticeship ? 'Apprenticeship enrollment is self-pay only. Review the published tuition and payment terms.' :
       'This program is not currently presented as a WIOA/Workforce Ready Grant program under Elevate’s strict ETPL + Top Jobs verification rule. Self-pay and available payment-plan options apply unless Elevate publishes a verified funding update.',
   };
 }

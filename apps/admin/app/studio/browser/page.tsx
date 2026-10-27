@@ -1,12 +1,101 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useStudioViewport } from '@/components/studio/useStudioViewport';
+import { useEffect, useState } from 'react';
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 
 const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), {
   ssr: false,
-  loading: () => <div className="flex min-h-[720px] items-center justify-center text-slate-400">Connecting cloud browser…</div>,
+  loading: () => (
+    <div className="flex h-full items-center justify-center text-slate-600">
+      Connecting cloud browser…
+    </div>
+  ),
 });
 
 export default function StudioBrowserPage() {
-  return <main className="h-full min-h-0 overflow-hidden"><CloudBrowserWorkspace /></main>;
+  const viewportStyle = useStudioViewport();
+  const [request, setRequest] = useState<{
+    id: string;
+    command: string;
+    context: {
+      browser_target: string;
+      media_gaps: Array<{ sceneId: string; visualRequirement: string }>;
+    };
+  } | null>(null);
+  const [error, setError] = useState('');
+  const [envatoSignIn, setEnvatoSignIn] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setEnvatoSignIn(params.get('provider') === 'envato' && params.get('signin') === '1');
+    const runId = params.get('acquisitionRunId');
+    if (!runId) return;
+    let current = true;
+    void fetch(`/api/admin/ultimate-course-builder?acquisitionRunId=${encodeURIComponent(runId)}`, {
+      cache: 'no-store',
+    })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok || !payload.acquisition)
+          throw new Error(payload.error || 'Media request could not be loaded');
+        if (current) setRequest(payload.acquisition);
+      })
+      .catch((cause) => {
+        if (current)
+          setError(cause instanceof Error ? cause.message : 'Media request could not be loaded');
+      });
+    return () => {
+      current = false;
+    };
+  }, []);
+  return (
+    <main
+      style={viewportStyle}
+      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
+    >
+      <nav aria-label="Studio access" className="flex shrink-0 flex-wrap items-center border-b border-slate-200">
+        <details className="max-h-[25dvh] overflow-y-auto px-3">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">Messages and alerts</summary>
+          <CommunicationTodos inboxPath="/phone/email" />
+        </details>
+        <Link href="/dashboard" className="flex min-h-11 items-center px-4 text-base font-semibold">Admin dashboard</Link>
+        <Link href="/studio/courses" className="flex min-h-11 items-center px-4 text-base font-semibold">Course Builder</Link>
+      <Link
+        href="/studio"
+        className="flex min-h-11 shrink-0 items-center px-4 text-base font-semibold text-slate-950"
+      >
+        Back to Studio chat
+      </Link>
+      </nav>
+      {error && (
+        <p role="alert" className="p-4 text-red-700">
+          {error}
+        </p>
+      )}
+      {request && (
+        <details className="max-h-[25vh] shrink-0 overflow-auto p-3 text-base text-slate-950">
+          <summary className="font-semibold">
+            Required scenes for this lesson ({request.context.media_gaps.length})
+          </summary>
+          <ol className="list-decimal space-y-2 pl-6">
+            {request.context.media_gaps.map((scene) => (
+              <li key={scene.sceneId}>{scene.visualRequirement}</li>
+            ))}
+          </ol>
+        </details>
+      )}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <CloudBrowserWorkspace
+          autoStart={Boolean(request) || envatoSignIn}
+          autoRunTask={Boolean(request)}
+          acquisitionRunId={request?.id || ''}
+          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://account.envato.com/sign_in' : '')}
+          initialSignIn={envatoSignIn}
+          initialTask={request?.command || ''}
+        />
+      </div>
+    </main>
+  );
 }

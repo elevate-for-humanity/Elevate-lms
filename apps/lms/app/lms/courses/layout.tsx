@@ -3,7 +3,6 @@ import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +13,7 @@ export const dynamic = 'force-dynamic';
  * boundary here so an admin session can never be mistaken for a learner.
  */
 export default async function LearnerCoursesLayout({ children }: { children: React.ReactNode }) {
+  let isAdminCoursePreview = false;
   const userDb = await createClient();
   const {
     data: { user },
@@ -27,18 +27,11 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
       resolveCoursePreview(),
     ]);
     const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
-
-    if (!isAdmin && !subject.previewing) {
-      const billingAccess = await getApprenticeBillingAccess(db, user.id);
-      if (billingAccess.suspended) {
-        await userDb.auth.signOut();
-        redirect('/login?reason=billing_past_due');
-      }
-    }
+    isAdminCoursePreview = isAdmin && coursePreview.active;
 
     if (isAdmin && !coursePreview.active) {
       return (
-        <CanonicalLearnerWorkspaceLayout>
+        <CanonicalLearnerWorkspaceLayout showLearnerNotices={false}>
           <main className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
               Administrator portal preview
@@ -47,7 +40,7 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
             <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
               {subject.previewing
                 ? 'The learner dashboard preview is read-only. Course records and actions stay in secured Admin management so an administrator cannot accidentally act as the learner.'
-                : 'This Student Portal module is operational. No learner identity, enrollment, course, or progress record is attached to the administrator session.'}
+                : 'Select a learner in Admin to view their course records. No learner is selected in this session.'}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
@@ -77,5 +70,9 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
     }
   }
 
-  return <CanonicalLearnerWorkspaceLayout>{children}</CanonicalLearnerWorkspaceLayout>;
+  return (
+    <CanonicalLearnerWorkspaceLayout showLearnerNotices={!isAdminCoursePreview}>
+      {children}
+    </CanonicalLearnerWorkspaceLayout>
+  );
 }

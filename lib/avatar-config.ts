@@ -290,7 +290,7 @@ export const PAGE_AVATAR_CONFIGS: Record<string, AvatarContext> = {
     role: 'guide',
     intent: 'explain',
     message:
-      "This checks if you qualify for free training. Answer honestly — it's confidential and takes 2 minutes.",
+      "This screening helps identify possible next steps for training-cost assistance. It does not determine funding eligibility or verify a program.",
     maxMessages: 1,
   },
 

@@ -158,8 +158,11 @@ if (homeWrapper === null) {
   console.error('FAIL HomeHeroVideo wrapper is missing');
   failures += 1;
 } else {
-  const expectedDesktopHeight = 'h-[clamp(520px,72svh,860px)]';
-  if (!homeWrapper.includes(expectedDesktopHeight)) {
+  // The production homepage now uses a paired copy/media layout, rather
+  // than the former full-width, near-viewport-height hero.
+  const expectedDesktopHeight = 'h-[clamp(260px,42svh,480px)]';
+  if (!homeWrapper.includes(expectedDesktopHeight) ||
+      !homeWrapper.includes('lg:grid-cols-[0.84fr_1.16fr]')) {
     console.error('FAIL homepage hero desktop proportions drifted from the production contract');
     failures += 1;
   }

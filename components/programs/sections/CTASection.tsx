@@ -31,13 +31,13 @@ export function CTASection({
           <SafeHeroVideo
             src={videoSrc}
             poster={videoPoster || '/images/og-default.jpg'}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain"
             ariaLabel="Program call to action video"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-slate-900 to-slate-800" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 to-slate-900/80" />
+
       </div>
 
       {/* Content */}

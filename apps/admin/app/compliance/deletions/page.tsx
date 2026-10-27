@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import Image from 'next/image';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
@@ -31,19 +30,10 @@ export default async function DeletionsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Image */}
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/pages/admin-compliance-deletions-detail.webp"
-          alt="Deletions"
-          fill
-          className="object-cover"
-          quality={90}
-          priority
-          sizes="100vw"
-        />
-      </section>
+      <header className="border-b border-slate-200 bg-slate-50 px-6 py-8">
+        <h1 className="text-3xl font-bold text-slate-900">Data Deletion Requests</h1>
+        <p className="mt-2 text-slate-700">Review privacy requests and verify the required records before processing data removal.</p>
+      </header>
 
       {/* Content Section */}
       <section className="py-16">

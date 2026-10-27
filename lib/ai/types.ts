@@ -277,6 +277,7 @@ export interface ChatMessage {
 }
 
 export interface ChatCompletionOptions {
+  signal?: AbortSignal;
   model?: string;
   messages: ChatMessage[];
   temperature?: number;

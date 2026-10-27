@@ -11,16 +11,64 @@ import {
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 
+type RegisteredBeautyRequirement = {
+  occupation: string;
+  rapidsCode: string;
+  model: 'Competency-Based' | 'Hybrid';
+  rtiHours: number;
+  probationHours: number;
+  termLabel: string;
+  competencyCount?: number;
+};
+
+const REGISTERED_BEAUTY_REQUIREMENTS: Record<string, RegisteredBeautyRequirement> = {
+  'barber-apprenticeship': {
+    occupation: 'Barber',
+    rapidsCode: '0030CB V1',
+    model: 'Competency-Based',
+    rtiHours: 260,
+    probationHours: 500,
+    termLabel: '14 verified Appendix A competencies',
+    competencyCount: 14,
+  },
+  'esthetician-apprenticeship': {
+    occupation: 'Esthetician',
+    rapidsCode: '2089CB V1',
+    model: 'Competency-Based',
+    rtiHours: 300,
+    probationHours: 500,
+    termLabel: '20 verified Appendix A competencies',
+    competencyCount: 20,
+  },
+  'nail-technician-apprenticeship': {
+    occupation: 'Manicurist / Nail Tech',
+    rapidsCode: '2090CB V1',
+    model: 'Competency-Based',
+    rtiHours: 210,
+    probationHours: 500,
+    termLabel: '19 verified Appendix A competencies',
+    competencyCount: 19,
+  },
+  'cosmetology-apprenticeship': {
+    occupation: 'Hair Stylist (existing title: Cosmetologist)',
+    rapidsCode: '0096HY V1',
+    model: 'Hybrid',
+    rtiHours: 154,
+    probationHours: 500,
+    termLabel: '2,000–2,500 hour registered hybrid term',
+  },
+};
+
+function registeredRequirement(program: ProgramSchema) {
+  return REGISTERED_BEAUTY_REQUIREMENTS[program.slug] ?? null;
+}
+
 function totalHours(program: ProgramSchema): number {
   return Object.values(program.hoursBreakdown).reduce((sum, value) => sum + value, 0);
 }
 
-function fundingAnswer(program: ProgramSchema): string {
-  if (program.funding?.wioa_eligible && program.funding?.etpl_approved) {
-    return 'This track is marked WIOA-eligible and ETPL-approved in Elevate’s canonical program record. Participant eligibility, local authorization, and available funds still determine whether WorkOne can issue funding.';
-  }
-  if (program.funding?.fundingNotes) return program.funding.fundingNotes;
-  return 'Funding varies by program, participant, region, and current authorization. This track is not marked as WIOA-funded in Elevate’s canonical program record, so staff should not promise tuition coverage.';
+function fundingAnswer(): string {
+  return 'Apprenticeship enrollment is self-pay only. Review the published tuition and payment terms before applying.';
 }
 
 function registrationAnswer(program: ProgramSchema): string {
@@ -39,6 +87,7 @@ function trackNoun(program: ProgramSchema): string {
 export function buildBeautyProgramStructuredData(program: ProgramSchema) {
   const registered = isRAPIDSProgram(program.slug);
   const hours = totalHours(program);
+  const requirement = registeredRequirement(program);
   const credentialNames = program.credentials.map((credential) => credential.name).filter(Boolean);
 
   return {
@@ -60,7 +109,7 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
     offers: {
       '@type': 'Offer',
       category: 'Apprenticeship Program',
-      description: fundingAnswer(program),
+      description: fundingAnswer(),
       priceSpecification: program.selfPayCost
         ? {
             '@type': 'PriceSpecification',
@@ -74,16 +123,15 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
     additionalProperty: [
       {
         '@type': 'PropertyValue',
-        name: 'Total structured training hours displayed by Elevate',
-        value: String(hours),
+        name: requirement ? 'Registered apprenticeship requirement' : 'Total structured training hours displayed by Elevate',
+        value: requirement
+          ? `${requirement.model}; ${requirement.termLabel}; ${requirement.rtiHours} RTI hours; ${requirement.probationHours}-hour probation`
+          : String(hours),
       },
       {
         '@type': 'PropertyValue',
-        name: 'Funding status',
-        value:
-          program.funding?.wioa_eligible && program.funding?.etpl_approved
-            ? 'Program record indicates WIOA/ETPL eligibility; participant authorization still required.'
-            : 'Funding varies; WIOA tuition coverage is not represented as guaranteed.',
+        name: 'Payment method',
+        value: 'Self-pay only',
       },
     ],
   };
@@ -92,7 +140,7 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
 export default function BeautyApprenticeshipAuthority({ program }: { program: ProgramSchema }) {
   const registered = isRAPIDSProgram(program.slug);
   const hours = totalHours(program);
-  const wioaEtpl = Boolean(program.funding?.wioa_eligible && program.funding?.etpl_approved);
+  const requirement = registeredRequirement(program);
   const locations = program.locations?.filter((location) => location.status === 'active') ?? [];
   const shopNoun = trackNoun(program);
   const pathwaySteps = [
@@ -101,8 +149,8 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
       'Choose the track, submit the application, and provide the identity, eligibility, and enrollment information requested in your portal.',
     ],
     [
-      'Confirm tuition or funding',
-      'Staff verifies self-pay, an approved payment option, or current workforce funding authorization before enrollment is finalized.',
+      'Confirm self-pay tuition',
+      'Review the published tuition and select an available self-pay payment option before enrollment is finalized.',
     ],
     [
       'Secure an approved Host Site',
@@ -122,18 +170,24 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
     ],
     [
       'Finish closeout and licensing steps',
-      'Complete the required hours and competencies, resolve missing records, complete final documentation, and follow the applicable state testing or licensing process.',
+      requirement?.model === 'Competency-Based'
+        ? 'Complete the registered competencies and required RTI, resolve missing records, complete sponsor closeout, and then follow the applicable Indiana examination and licensing process.'
+        : 'Complete the registered hybrid term, required RTI, work-process requirements, resolve missing records, complete sponsor closeout, and then follow the applicable Indiana examination and licensing process.',
     ],
   ] as const;
 
   const faqs = [
     {
-      question: `How many hours is the ${program.title}?`,
-      answer: `Elevate’s canonical program record currently displays ${hours.toLocaleString()} structured hours across on-the-job/practical training and related instruction components. The program page above shows the detailed breakdown used by the platform.`,
+      question: `What do I actually have to complete for the ${program.title}?`,
+      answer: requirement
+        ? requirement.model === 'Competency-Based'
+          ? `This is a registered competency-based occupation. Complete ${requirement.termLabel} plus ${requirement.rtiHours} verified RTI hours. RAPIDS displays a 2,000-hour term value for this occupation, but the approved Appendix A completion model is competency-based. The 500-hour figure is probation, not graduation.`
+          : `This is a registered hybrid Hair Stylist/Cosmetologist occupation. The registered term is ${requirement.termLabel}, including ${requirement.rtiHours} RTI hours. The 500-hour figure is probation, not graduation.`
+        : `Program requirements are confirmed from the registered standard before enrollment.`,
     },
     {
-      question: 'Can I use WorkOne / WIOA funding for this apprenticeship?',
-      answer: fundingAnswer(program),
+      question: 'How do I pay for this apprenticeship?',
+      answer: fundingAnswer(),
     },
     {
       question: 'Is this track DOL registered?',
@@ -141,7 +195,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
     },
     {
       question: `How does the ${program.title} differ from a traditional school-only pathway?`,
-      answer: `This pathway is structured around supervised training in a real ${shopNoun} plus related technical instruction and digital progress tracking. Employment, wages, placement, funding, and licensing outcomes depend on the applicable host-site arrangement and program requirements and are not guaranteed by the website.`,
+      answer: `This pathway is structured around supervised training in a real ${shopNoun} plus related technical instruction and digital progress tracking. Employment, wages, placement, and licensing outcomes depend on the applicable host-site arrangement and program requirements and are not guaranteed by the website.`,
     },
   ];
 
@@ -164,7 +218,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
                 Train in a real Indiana {shopNoun} with a clearly documented pathway.
               </h2>
               <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700">
-                Elevate separates the training model, funding status, host-site relationship, and
+                Elevate separates the training model, self-pay tuition, host-site relationship, and
                 licensing requirements so applicants and workforce partners can see exactly what
                 applies to this track.
               </p>
@@ -184,20 +238,21 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <CircleDollarSign className="h-6 w-6 text-emerald-700" />
                   <div className="mt-3 text-sm font-black text-slate-950">
-                    {wioaEtpl ? 'WIOA / ETPL Eligible' : 'Funding Review Required'}
+                    Self-Pay Only
                   </div>
                   <p className="mt-1 text-xs font-medium leading-5 text-slate-600">
-                    Funding is never represented as guaranteed without current program and
-                    participant authorization.
+                    Apprentices pay the published tuition. Review payment terms before enrollment.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <GraduationCap className="h-6 w-6 text-violet-700" />
                   <div className="mt-3 text-sm font-black text-slate-950">
-                    {hours.toLocaleString()} Structured Hours
+                    {requirement ? `${requirement.rtiHours} RTI Hours` : `${hours.toLocaleString()} Structured Hours`}
                   </div>
                   <p className="mt-1 text-xs font-medium leading-5 text-slate-600">
-                    Pulled from the canonical program hours breakdown shown on this page.
+                    {requirement
+                      ? `${requirement.rapidsCode} • ${requirement.model} • ${requirement.termLabel} • 500-hour probation`
+                      : 'Pulled from the canonical program hours breakdown shown on this page.'}
                   </p>
                 </div>
               </div>
@@ -285,7 +340,9 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
               />
               <Responsibility
                 title="What the Host Site does"
-                body="Provides qualified supervision, a safe workplace, scheduled learning opportunities, and verification of hours, competencies, and progress."
+                body={requirement?.model === 'Competency-Based'
+                  ? `Provides qualified supervision and real work opportunities, teaches the registered work processes, and verifies demonstrated competencies and work records. Do not treat the 500-hour probation period as program completion.`
+                  : `Provides qualified supervision and real work opportunities, teaches the registered Hair Stylist work processes, and verifies hours, skills, and progress toward the 2,000–2,500-hour hybrid term. The 500-hour probation period is not program completion.`}
               />
               <Responsibility
                 title="What Elevate does"

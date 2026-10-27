@@ -67,7 +67,7 @@ export default function Programs() {
                   src={program.image}
                   alt={program.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>

@@ -219,7 +219,7 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                placeholder={PLATFORM_DEFAULTS.supportPhone}
+                placeholder={PLATFORM_DEFAULTS.mainPhone}
               />
             </div>
           </div>

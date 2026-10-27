@@ -12,6 +12,7 @@ describe('POST /api/billing/payment-method/setup', () => {
     const body = await response.json();
 
     expect(response.status).toBe(410);
-    expect(body).toMatchObject({ code: 'STRIPE_CHECKOUT_RETIRED', destination: '/lms/documents' });
+    expect(body.error).toContain('QuickBooks invoice');
+    expect(body).toMatchObject({ url: '/account/payment-methods' });
   });
 });

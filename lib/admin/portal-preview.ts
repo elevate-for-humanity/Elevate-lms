@@ -22,17 +22,10 @@ export async function resolvePortalPreviewSubject(
       return { userId: target.id, previewing: true };
     }
   }
-  const previewActorId = cookieStore.get(PORTAL_PREVIEW_ACTOR_COOKIE)?.value?.trim();
+  // Unsigned selector cookies are preferences, never administrator credentials.
+  // Cross-service previews require the verified signed session above; legacy
+  // selectors are honored only after independently authenticating an admin.
   const targetUserId = cookieStore.get(PORTAL_PREVIEW_COOKIE)?.value?.trim();
-  if (previewActorId && targetUserId) {
-    const [{ data: actor }, { data: target }] = await Promise.all([
-      db.from('profiles').select('id,role').eq('id', previewActorId).maybeSingle(),
-      db.from('profiles').select('id,role').eq('id', targetUserId).maybeSingle(),
-    ]);
-    if (actor?.id && ADMIN_ROLES.has(String(actor.role || '')) && target?.id && !ADMIN_ROLES.has(String(target.role || ''))) {
-      return { userId: target.id, previewing: true };
-    }
-  }
   if (!authenticatedUserId) return { userId: '', previewing: false };
   const { data: actor } = await db.from('profiles').select('role').eq('id', authenticatedUserId).maybeSingle();
   if (!ADMIN_ROLES.has(String(actor?.role || ''))) {

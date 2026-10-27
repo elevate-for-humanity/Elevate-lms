@@ -1,3 +1,4 @@
+import { respondToParisMail } from '@/lib/email/paris-mail';
 import { logger } from '@/lib/logger';
 // PUBLIC ROUTE: SendGrid inbound webhook
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,7 +8,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { hydrateProcessEnv } from '@/lib/secrets';
 import { storeInboundCommunicationEmail } from '@/lib/email/communication-inbound';
 
 export const runtime = 'nodejs';
@@ -63,7 +63,9 @@ async function _POST(request: NextRequest) {
     }
 
     const workspaceDelivery = await storeInboundCommunicationEmail(parsed);
+    if(workspaceDelivery.filtered){await finalizeWebhookEvent('sendgrid-inbound',eventId,'processed');return NextResponse.json({ok:true,filtered:true});}
     if (workspaceDelivery.stored) {
+      await respondToParisMail(parsed);
       await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
       logger.info('[SendGrid Inbound] Stored in Elevate Email', {
         eventId,
@@ -89,31 +91,6 @@ async function _POST(request: NextRequest) {
       logger.error('[SendGrid Inbound] Forward failed:', result.error);
       await finalizeWebhookEvent('sendgrid-inbound', eventId, 'errored', String(result.error));
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
-    }
-
-    // PARIS handles genuine applicant replies after the staff copy succeeds.
-    // Never feed Elevate's own automated messages back into the responder.
-    const senderEmail = (replyTo || from)
-      .match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]
-      ?.toLowerCase();
-    const isElevateSender = senderEmail?.endsWith('@elevateforhumanity.org');
-    if (senderEmail && !isElevateSender) {
-      await hydrateProcessEnv();
-      const functionBase = process.env.SUPABASE_URL?.replace(/\/$/, '');
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      if (functionBase && serviceKey) {
-        const parisResponse = await fetch(`${functionBase}/functions/v1/paris-response`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: senderEmail, text: text || '', reply_subject: subject }),
-        });
-        if (!parisResponse.ok && parisResponse.status !== 404) {
-          logger.error('[SendGrid Inbound] PARIS response failed', undefined, {
-            status: parisResponse.status,
-            eventId,
-          });
-        }
-      }
     }
 
     await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');

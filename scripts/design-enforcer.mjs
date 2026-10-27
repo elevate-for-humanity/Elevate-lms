@@ -13,7 +13,8 @@ const STRICT_MODE = args.has('--strict');
 const BASELINE_FILE = process.env.DESIGN_ENFORCER_BASELINE;
 const JSON_MODE = args.has('--json');
 const QUIET = args.has('--quiet');
-const IS_MAIN = process.env.GITHUB_REF_NAME === 'main' || process.env.GITHUB_REF === 'refs/heads/main';
+const IS_MAIN =
+  process.env.GITHUB_REF_NAME === 'main' || process.env.GITHUB_REF === 'refs/heads/main';
 
 const findings = [];
 
@@ -25,7 +26,10 @@ function walk(dir, exts = new Set(['.tsx', '.jsx'])) {
   const out = [];
   if (!fs.existsSync(dir)) return out;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (['node_modules', '.git', '.next', 'dist', 'build', '.turbo', 'coverage'].includes(entry.name)) continue;
+    if (
+      ['node_modules', '.git', '.next', 'dist', 'build', '.turbo', 'coverage'].includes(entry.name)
+    )
+      continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) out.push(...walk(full, exts));
     else if (exts.has(path.extname(entry.name))) out.push(full);
@@ -50,19 +54,37 @@ function scanFile(absPath) {
   const isSharedComponentDir = /^components\//.test(rel);
   if (!isSharedComponentDir && /function\s+ProgramCard\b|const\s+ProgramCard\s*=/.test(content)) {
     const idx = content.search(/function\s+ProgramCard\b|const\s+ProgramCard\s*=/);
-    addFinding('STRICT', 'CUSTOM_PROGRAM_CARD', rel, lineNumber(content, idx), 'Custom program card detected. Use shared components/programs/ProgramCard.tsx');
+    addFinding(
+      'STRICT',
+      'CUSTOM_PROGRAM_CARD',
+      rel,
+      lineNumber(content, idx),
+      'Custom program card detected. Use shared components/programs/ProgramCard.tsx',
+    );
   }
 
   // 2) cosmetic token consistency — report, do not block Release 1
   const greenRe = /\b(?:bg|text|border)-green-\d+\b/g;
   for (const m of content.matchAll(greenRe)) {
-    addFinding('REPORT', 'NON_BRAND_GREEN', rel, lineNumber(content, m.index), `Use brand-green-* token instead of ${m[0]}`);
+    addFinding(
+      'REPORT',
+      'NON_BRAND_GREEN',
+      rel,
+      lineNumber(content, m.index),
+      `Use brand-green-* token instead of ${m[0]}`,
+    );
   }
 
   // 3) bullet/icon consistency — report for Release 2
   const checkCircleRe = /<CheckCircle2\b/g;
   for (const m of content.matchAll(checkCircleRe)) {
-    addFinding('REPORT', 'PROHIBITED_CHECKCIRCLE2', rel, lineNumber(content, m.index), 'CheckCircle2 used. Replace with brand dot bullet where decorative.');
+    addFinding(
+      'REPORT',
+      'PROHIBITED_CHECKCIRCLE2',
+      rel,
+      lineNumber(content, m.index),
+      'CheckCircle2 used. Replace with brand dot bullet where decorative.',
+    );
   }
 
   // 4) decorative accessibility intent — report unless it creates a functional defect
@@ -72,7 +94,13 @@ function scanFile(absPath) {
     const end = Math.min(content.length, m.index + 240);
     const window = content.slice(start, end);
     if (!/aria-label=|title=|INTENTIONAL_ICON/.test(window)) {
-      addFinding('REPORT', 'PROHIBITED_DECORATIVE_ICON', rel, lineNumber(content, m.index), `${m[1]} appears decorative without accessibility intent marker`);
+      addFinding(
+        'REPORT',
+        'PROHIBITED_DECORATIVE_ICON',
+        rel,
+        lineNumber(content, m.index),
+        `${m[1]} appears decorative without accessibility intent marker`,
+      );
     }
   }
 
@@ -90,37 +118,86 @@ function scanFile(absPath) {
       if (/\/\/|\/\*|\*\/|\{\/\*/.test(lineText)) continue;
       const isButtonLabel =
         />[\s]*(?:Learn More|Click Here|Submit|Explore)[\s]*</.test(lineText) ||
-        /(?:children|label|text|buttonText|cta)=["'](?:Learn More|Click Here|Submit|Explore)["']/.test(lineText) ||
-        /\bbutton\b.*(?:Learn More|Click Here|Submit|Explore)|(?:Learn More|Click Here|Submit|Explore).*\bbutton\b/i.test(lineText);
+        /(?:children|label|text|buttonText|cta)=["'](?:Learn More|Click Here|Submit|Explore)["']/.test(
+          lineText,
+        ) ||
+        /\bbutton\b.*(?:Learn More|Click Here|Submit|Explore)|(?:Learn More|Click Here|Submit|Explore).*\bbutton\b/i.test(
+          lineText,
+        );
       if (!isButtonLabel) continue;
-      addFinding('REPORT', 'WEAK_CTA_COPY', rel, lineNumber(content, m.index), `Weak CTA copy found: "${m[0]}"`);
+      addFinding(
+        'REPORT',
+        'WEAK_CTA_COPY',
+        rel,
+        lineNumber(content, m.index),
+        `Weak CTA copy found: "${m[0]}"`,
+      );
     }
   }
 
   // 6) dead href="#" is a real interaction blocker
   const deadHrefRe = /href=["']#["']/g;
   for (const m of content.matchAll(deadHrefRe)) {
-    addFinding('STRICT', 'DEAD_HREF', rel, lineNumber(content, m.index), 'Dead CTA/link href="#" detected');
+    addFinding(
+      'STRICT',
+      'DEAD_HREF',
+      rel,
+      lineNumber(content, m.index),
+      'Dead CTA/link href="#" detected',
+    );
   }
 
   // 7) invisible foreground/background combination is blocking
   const classRe = /className=["'`][^"'`]*["'`]/g;
   for (const m of content.matchAll(classRe)) {
-    if (/\bbg-white\b/.test(m[0]) && /\btext-white\b/.test(m[0])) {
-      addFinding('STRICT', 'INVISIBLE_TEXT', rel, lineNumber(content, m.index), 'className contains bg-white and text-white on the same element');
+    const tokens = new Set(m[0].replace(/^className=["'`]|["'`]$/g, '').split(/\s+/));
+    if (tokens.has('bg-white') && tokens.has('text-white')) {
+      addFinding(
+        'STRICT',
+        'INVISIBLE_TEXT',
+        rel,
+        lineNumber(content, m.index),
+        'className contains bg-white and text-white on the same element',
+      );
     }
   }
 
-  // 8) hero image/video without approved treatment is blocking because it can
-  // recreate the blinking/multi-layer hero defects this recovery is removing.
-  if (/hero/i.test(rel) || /Hero/.test(content)) {
-    if (/<video\b/.test(content) && !/useHeroVideo|HeroVideo/.test(content)) {
-      const idx = content.search(/<video\b/);
-      addFinding('STRICT', 'HERO_VIDEO_TREATMENT', rel, lineNumber(content, idx), 'Hero video should use approved HeroVideo/useHeroVideo treatment');
+  // 8) Inspect public hero sections, not player controls, media editors or
+  // unrelated images later in a page. Controlled gallery videos are intentional.
+  const isPublicHeroSurface =
+    rel.startsWith('apps/marketing/app/') || /^components\/(?:hero|marketing|home)\//.test(rel);
+  if (isPublicHeroSurface && (/hero/i.test(rel) || /Hero/.test(content))) {
+    const heroSections = [...content.matchAll(/<section\b[\s\S]*?<\/section>/g)];
+    for (const match of heroSections) {
+      const section = match[0];
+      if (
+        /<(?:Image|img)\b/.test(section) &&
+        /from-black\/|from-gray-900|from-slate-900/.test(section)
+      ) {
+        const idx =
+          (match.index ?? 0) + section.search(/from-black\/|from-gray-900|from-slate-900/);
+        addFinding(
+          'STRICT',
+          'HERO_OVERLAY_TREATMENT',
+          rel,
+          lineNumber(content, idx),
+          'Public hero media uses a dark overlay instead of the canonical picture/content treatment',
+        );
+      }
     }
-    if (/<Image\b|<img\b/.test(content) && /from-black\/|from-gray-900|from-slate-900/.test(content)) {
-      const idx = content.search(/from-black\/|from-gray-900|from-slate-900/);
-      addFinding('STRICT', 'HERO_OVERLAY_TREATMENT', rel, lineNumber(content, idx), 'Hero media uses prohibited dark overlay. Use from-brand-blue-900/* instead.');
+    if (
+      /<video\b/.test(content) &&
+      !/useHeroVideo|HeroVideo/.test(content) &&
+      !/<video\b[^>]*\bcontrols\b/.test(content)
+    ) {
+      const idx = content.search(/<video\b/);
+      addFinding(
+        'STRICT',
+        'HERO_VIDEO_TREATMENT',
+        rel,
+        lineNumber(content, idx),
+        'Autoplay hero video should use approved HeroVideo/useHeroVideo treatment',
+      );
     }
   }
 
@@ -129,12 +206,26 @@ function scanFile(absPath) {
   for (const m of content.matchAll(maxWRe)) {
     const val = m[0];
     if (/calc\(|vw|vh|%|\//.test(val)) continue;
-    addFinding('REPORT', 'INCONSISTENT_CONTAINER', rel, lineNumber(content, m.index), `Non-standard max-width pattern ${val} detected`);
+    addFinding(
+      'REPORT',
+      'INCONSISTENT_CONTAINER',
+      rel,
+      lineNumber(content, m.index),
+      `Non-standard max-width pattern ${val} detected`,
+    );
   }
 
   const reportPatterns = [
-    { re: /\btext-gray-\d+\b/g, code: 'REPORT_TYPOGRAPHY', msg: 'Use text-slate-* tokens for typography consistency' },
-    { re: /\bspace-y-\[\d+px\]/g, code: 'REPORT_SPACING', msg: 'Custom spacing token detected; prefer design tokens' },
+    {
+      re: /\btext-gray-\d+\b/g,
+      code: 'REPORT_TYPOGRAPHY',
+      msg: 'Use text-slate-* tokens for typography consistency',
+    },
+    {
+      re: /\bspace-y-\[\d+px\]/g,
+      code: 'REPORT_SPACING',
+      msg: 'Custom spacing token detected; prefer design tokens',
+    },
   ];
   for (const p of reportPatterns) {
     for (const m of content.matchAll(p.re)) {
@@ -174,7 +265,8 @@ function main() {
     : findings;
 
   const summary = { counts: { CRITICAL: 0, STRICT: 0, REPORT: 0 }, topFiles: [] };
-  for (const f of filteredFindings) summary.counts[f.severity] = (summary.counts[f.severity] || 0) + 1;
+  for (const f of filteredFindings)
+    summary.counts[f.severity] = (summary.counts[f.severity] || 0) + 1;
   const topFilesMap = new Map();
   for (const f of filteredFindings) topFilesMap.set(f.file, (topFilesMap.get(f.file) || 0) + 1);
   summary.topFiles = [...topFilesMap.entries()]
@@ -199,7 +291,9 @@ function main() {
   if (JSON_MODE) console.log(JSON.stringify(report));
   else if (!QUIET) {
     console.log('\nDesign Enforcer Summary');
-    console.log(`CRITICAL: ${summary.counts.CRITICAL}  STRICT: ${summary.counts.STRICT}  REPORT: ${summary.counts.REPORT}`);
+    console.log(
+      `CRITICAL: ${summary.counts.CRITICAL}  STRICT: ${summary.counts.STRICT}  REPORT: ${summary.counts.REPORT}`,
+    );
     console.log(`Scanned production/shared files: ${files.length}`);
     if (summary.topFiles.length) {
       console.log('Top files needing attention:');
@@ -208,8 +302,9 @@ function main() {
     console.log(`Report: ${path.relative(ROOT, out)}`);
   }
 
-  const shouldBlockStrict = BASELINE_MODE ? false : (STRICT_MODE || IS_MAIN);
-  const shouldFail = summary.counts.CRITICAL > 0 || (shouldBlockStrict && summary.counts.STRICT > 0);
+  const shouldBlockStrict = BASELINE_MODE ? false : STRICT_MODE || IS_MAIN;
+  const shouldFail =
+    summary.counts.CRITICAL > 0 || (shouldBlockStrict && summary.counts.STRICT > 0);
   process.exit(shouldFail ? 1 : 0);
 }
 

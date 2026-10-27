@@ -110,6 +110,14 @@ export function safeMailboxDisplayName(value: unknown): string {
   );
 }
 
+export function programHolderMailboxDisplayName(value: unknown): string {
+  const holderName = String(value || '')
+    .replace(/[<>\r\n"]/g, '')
+    .trim()
+    .slice(0, 90);
+  return `Elevate for Humanity — ${holderName || 'Program Holder'}`;
+}
+
 export function textToEmailHtml(value: unknown): string {
   const escaped = String(value || '')
     .replace(/&/g, '&amp;')
@@ -125,9 +133,9 @@ export function selectPrimaryMailbox<T extends CommunicationMailboxSummary>(
 ): T | null {
   const priority: Record<CommunicationMailboxKind, number> = {
     program_holder: 0,
-    host_shop: 0,
-    individual: 1,
-    department: 2,
+    host_shop: 1,
+    individual: 2,
+    department: 3,
   };
   return (
     [...mailboxes].sort((a, b) => priority[a.mailboxKind] - priority[b.mailboxKind])[0] ?? null

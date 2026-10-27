@@ -5,6 +5,7 @@
  * Studio controls this surface. Course Builder owns orchestration and delegates
  * execution to private/internal Course Builder capability services.
  */
+import { courseLibraryPlayback } from '@/lib/storage/course-library-playback';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -190,21 +191,13 @@ export async function GET(req: NextRequest) {
 
       const { data: videos, error } = await db
         .from('course_videos')
-        .select('id,title,lesson_id,storage_path,status,asset_role,created_at')
+        .select('id,title,lesson_id,storage_path,video_url,status,asset_role,created_at')
         .eq('course_id', courseId)
         .order('created_at', { ascending: false });
       if (error) throw error;
 
       const rows = await Promise.all(
-        (videos ?? []).map(async (video) => {
-          const { data: signed } = await db.storage
-            .from('course_videos')
-            .createSignedUrl(video.storage_path, 60 * 60);
-          return {
-            ...video,
-            playbackUrl: signed?.signedUrl ?? null,
-          };
-        }),
+        (videos ?? []).map(video => courseLibraryPlayback(db,video)),
       );
 
       return NextResponse.json({ ok: true, course, videos: rows });
@@ -319,6 +312,27 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
+  const archivedGenerationActions: CourseBuilderAction[] = [
+    'generate',
+    'generate-from-blueprint',
+    'queue-media',
+    'repair',
+    'generate-missing',
+    'start-existing',
+  ];
+  if (archivedGenerationActions.includes(action)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'COURSE_FACTORY_ARCHIVED',
+        message:
+          'Course Factory is archived. Start or resume production through Ultimate Course Builder.',
+        ultimateEndpoint: '/api/admin/ultimate-course-builder',
+        ultimateRoute: '/studio/courses?tab=ultimate',
+      },
+      { status: 410 },
+    );
+  }
   if (
     ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing', 'start-existing'].includes(
       action,
@@ -824,18 +838,23 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const paidAuthorization = await reservePaidInference(db, {
-    scopeKey,
-    tenantId,
-    actorId: auth.id,
-    artifactFingerprint,
-    idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
-    provider: paidProvider,
-    model: paidModel,
-    operation: 'course-builder-generate',
-    projectedCostMicros,
-  });
-  if (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId) {
+  const paidAuthorization = creditOwner.operator
+    ? null
+    : await reservePaidInference(db, {
+        scopeKey,
+        tenantId,
+        actorId: auth.id,
+        artifactFingerprint,
+        idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
+        provider: paidProvider,
+        model: paidModel,
+        operation: 'course-builder-generate',
+        projectedCostMicros,
+      });
+  if (
+    paidAuthorization &&
+    (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId)
+  ) {
     return NextResponse.json(
       {
         ok: false,
@@ -900,10 +919,8 @@ export async function POST(req: NextRequest) {
       const write = (data: object) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       try {
-        const paidExecution = await executePaidInference({
-          db,
-          authorize: async () => paidAuthorization,
-          dispatch: () => courseFactory(
+        const runFactory = () =>
+          courseFactory(
             {
             title,
             topic,
@@ -929,10 +946,17 @@ export async function POST(req: NextRequest) {
             },
             (stage, message, progress) =>
               write({ stage: toPipelineStage(stage), message, progress }),
-          ),
-        });
-        if (!paidExecution.value) throw new Error('Paid generation completed without a result');
-        const result = paidExecution.value;
+          );
+        const result = creditOwner.operator
+          ? await runFactory()
+          : (
+              await executePaidInference({
+                db,
+                authorize: async () => paidAuthorization!,
+                dispatch: runFactory,
+              })
+            ).value;
+        if (!result) throw new Error('Course generation completed without a result');
 
         let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
           null;

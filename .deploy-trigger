@@ -1,6 +1,4 @@
-2026-09-26 marketing root suspense repair
-isolate pathname consumers during Next prerender
-Marketing known-good build constraints restored 2026-09-26
-Verify store prerender repair 2026-09-26
-Marketing deploy after concurrency repair 2026-09-26
-Canonical single Marketing production release 2026-09-26
+Marketing deployment trigger
+Target: current main
+Reason: deploy responsive homepage media and hardened production verification
+Timestamp marker: 2026-10-02T17:17:00-04:00

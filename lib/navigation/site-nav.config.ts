@@ -1,3 +1,5 @@
+import { ROUTES } from '@/lib/navigation/routes';
+
 /**
  * SITE NAVIGATION CONFIGURATION
  *
@@ -319,23 +321,23 @@ export const headerNavigation: NavGroup[] = [
   {
     label: 'Community',
     items: [
-      { label: 'Community Hub', href: '/community/members', description: 'Join the community' },
-      { label: 'Classroom', href: '/community/classroom', description: 'Virtual classroom' },
+      { label: 'Community Hub', href: '/community', description: 'Join the community' },
+      { label: 'Barber & Beauty Network', href: '/barber-beauty-network', description: 'Meet shops and beauty professionals' },
       {
         label: 'Career Discussions',
-        href: '/community/discussions/career',
+        href: 'https://app.elevateforhumanity.org/community',
         description: 'Career talk',
       },
       {
         label: 'General Discussions',
-        href: '/community/discussions/general',
+        href: 'https://app.elevateforhumanity.org/community',
         description: 'General forum',
       },
-      { label: 'Leaderboard', href: '/community/leaderboard', description: 'Top contributors' },
+      { label: 'Leaderboard', href: 'https://app.elevateforhumanity.org/community', description: 'Top contributors' },
       {
-        label: 'Marketplace',
-        href: '/community/marketplace',
-        description: 'Community marketplace',
+        label: 'Business Network',
+        href: '/business-network',
+        description: 'Showcase your business',
       },
     ],
   },
@@ -429,12 +431,12 @@ export const footerNavigation = {
   partners: {
     title: 'Partners & Employers',
     links: [
-      { label: 'Hire Talent', href: '/employer/dashboard' },
+      { label: 'Hire Talent', href: ROUTES.employerPortal },
       { label: 'Become a Program Holder', href: '/apply/program-holder' },
       { label: '⭐ License Platform', href: '/pricing/platform' },
       { label: 'Apprenticeship Licensing', href: '/pricing/sponsor-licensing' },
       { label: 'Apprenticeships', href: '/employer/apprenticeships' },
-      { label: 'Employer Login', href: '/employer/dashboard' },
+      { label: 'Employer Login', href: ROUTES.employerPortal },
       { label: 'Partner Login', href: '/program-holder/dashboard' },
     ],
   },
@@ -572,7 +574,7 @@ export const footerNavigation = {
       { label: 'Reels', href: '/reels' },
       { label: 'Share', href: '/share' },
       { label: 'Social', href: '/social' },
-      { label: 'Community Tax Support', href: '/tax' },
+      { label: 'Supersonic Fast Cash', href: '/tax' },
       { label: 'Microclasses', href: '/microclasses' },
       { label: 'Educator Hub', href: '/educatorhub' },
       { label: 'Funding Impact', href: '/funding' },

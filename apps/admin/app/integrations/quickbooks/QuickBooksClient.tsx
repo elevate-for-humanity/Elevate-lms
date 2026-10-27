@@ -1,5 +1,6 @@
 'use client';
 
+import { QuickBooksPayoutMapping } from './QuickBooksPayoutMapping';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -249,6 +250,8 @@ export default function QuickBooksClient() {
           {result}
         </div>
       )}
+
+      {status.connected && <QuickBooksPayoutMapping />}
 
       {/* Disconnect */}
       {status.connected && (

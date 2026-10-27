@@ -1,139 +1,87 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 
-type Provider = 'paypal' | 'branch';
-
 type Status = {
-  provider: Provider | null;
+  provider: 'paypal' | 'quickbooks' | 'branch' | null;
   destination: string | null;
+  recipientEmail: string | null;
   transfersEnabled: boolean;
   payoutsEnabled: boolean;
   providerConfigured: boolean;
+  quickbooksInvitationAvailable: boolean;
   verificationStatus: string;
   onboardingReady: boolean;
   missingRequirements: string[];
 };
 
-const initial: Status = {
-  provider: null,
-  destination: null,
-  transfersEnabled: false,
-  payoutsEnabled: false,
-  providerConfigured: false,
-  verificationStatus: 'not_started',
-  onboardingReady: false,
-  missingRequirements: [],
-};
-
 export function PayoutAccessPanel() {
-  const [status, setStatus] = useState<Status>(initial);
+  const [status, setStatus] = useState<Status | null>(null);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [preview, setPreview] = useState(false);
+  const [email, setEmail] = useState('');
 
-  const load = () =>
-    fetch('/api/program-holder/payouts')
-      .then(async (response) => {
-        const data = await response.json();
-        if (response.status === 403 && data.error === 'Program Holder session required.') {
-          setPreview(true);
-          return;
-        }
-        if (!response.ok) throw new Error(data.error);
-        setPreview(false);
-        setStatus(data);
-      })
-      .catch((cause) =>
-        setError(cause instanceof Error ? cause.message : 'Unable to load payout setup.'),
-      )
-      .finally(() => setBusy(false));
-
-  useEffect(() => {
-    void load();
-  }, []);
-
-  async function openPayoutProvider(action: 'onboard' | 'dashboard') {
-    setBusy(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/program-holder/payouts', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action, provider: status.provider || 'branch' }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Unable to continue.');
-      if (data.url) window.location.assign(data.url);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to continue.');
-    } finally {
-      setBusy(false);
-    }
+  async function readResponse(response: Response) {
+    if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Your session or connection changed. Reload and try again.');
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Payout setup could not load.');
+    return data;
   }
-
-  const ready =
-    status.onboardingReady &&
-    status.transfersEnabled &&
-    status.payoutsEnabled &&
-    status.providerConfigured;
-
+  const load = useCallback(async () => {
+    setBusy(true); setError('');
+    try {
+      const response = await fetch('/api/program-holder/payouts', { cache: 'no-store' });
+      if (response.status === 403) { setPreview(true); return; }
+      const data = await readResponse(response);
+      setPreview(false); setStatus(data); setEmail(data.recipientEmail || '');
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to load payout setup.'); }
+    finally { setBusy(false); }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
+  async function act(body: Record<string, unknown>) {
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const data = await readResponse(await fetch('/api/program-holder/payouts', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }));
+      if (data.url) { window.location.assign(data.url); return; }
+      setMessage(data.message || 'PayPal email saved for Elevate review. This does not confirm a bank account or send a payment.');
+      await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to continue.'); }
+    finally { setBusy(false); }
+  }
+  const verified = Boolean(status?.payoutsEnabled && status?.transfersEnabled && status?.verificationStatus === 'active');
+  const lockedProvider = verified ? status?.provider : null;
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-xs font-black uppercase tracking-[.16em] text-blue-700">
-        Secure contractor payouts
-      </p>
-      <h2 className="mt-2 text-2xl font-black">
-        {preview ? 'Payout setup preview' : ready ? 'Funds access is ready' : 'Finish secure payment setup'}
-      </h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Your payment provider securely collects your banking details. Elevate never receives or
-        stores the full account or debit-card number. QuickBooks records completed payments but does
-        not hold your payout credentials.
-      </p>
-
-      {!preview && <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-        <p className="font-bold text-blue-950">
-          {status.provider === 'paypal' ? 'PayPal' : 'Direct deposit (ACH)'}
-        </p>
-        <p className="mt-1 text-sm text-blue-900">
-          {status.provider === 'paypal'
-            ? 'Connect PayPal only if you want payments delivered to PayPal.'
-            : 'Add banking information through the secure ACH provider to receive direct deposits. Availability and speed are confirmed by the provider.'}
-        </p>
-      </div>}
-
-      {status.destination ? (
-        <p className="mt-3 text-sm">Connected destination: {status.destination}</p>
-      ) : null}
-
-      {error ? (
-        <p role="alert" className="mt-4 rounded-xl bg-red-50 p-4 text-sm font-bold text-red-800">
-          {error}
-        </p>
-      ) : null}
-
-      {preview ? (
-        <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950">
-          Administrator preview is read only. Sign in as this Program Holder to check banking setup and payout readiness.
+    <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <p className="text-xs font-black uppercase tracking-[.16em] text-blue-700">Program Holder banking and payments</p>
+      <h2 className="text-2xl font-black">QuickBooks and PayPal setup</h2>
+      <p className="text-sm text-slate-600">Enter bank details only on the provider’s secure website. Elevate does not store bank account, routing, or debit-card numbers. QuickBooks supports contractor direct deposit and payment records. PayPal receives payments to your confirmed PayPal email; link a bank within PayPal to withdraw funds.</p>
+      {error && <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-900"><p>{error}</p><button type="button" disabled={busy} onClick={() => void load()} className="mt-2 min-h-11 font-bold underline">Retry setup status</button></div>}
+      {message && <p role="status" className="rounded-xl bg-blue-50 p-4 text-sm">{message}</p>}
+      {preview ? <p className="rounded-xl bg-blue-50 p-4">Administrator preview is read only. The Program Holder completes their own banking setup.</p> : status ? <>
+        <p className="text-sm">Current method: <strong>{status.provider === 'paypal' ? 'PayPal' : status.provider === 'quickbooks' ? 'QuickBooks' : 'Choose QuickBooks or PayPal'}</strong>. {verified ? 'Elevate has confirmed this payout setup.' : status.verificationStatus === 'pending' ? 'Destination saved; Elevate review is pending.' : 'Banking setup is incomplete.'}</p>
+        {status.destination && <p className="text-sm">Saved destination: {status.destination}</p>}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <section className="space-y-3 rounded-xl border border-blue-200 p-4">
+            <h3 className="text-lg font-black">QuickBooks direct deposit</h3>
+            <p className="text-sm">Use your personal Intuit contractor invitation to add your W-9 and banking information. Elevate must issue the invitation from its QuickBooks contractor account.</p>
+            <button type="button" disabled={busy || Boolean(lockedProvider && lockedProvider !== 'quickbooks')} onClick={() => void act({ provider: 'quickbooks', action: status.quickbooksInvitationAvailable ? 'onboard' : 'request_quickbooks' })} className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white disabled:opacity-50">{status.quickbooksInvitationAvailable ? 'Open my QuickBooks invitation' : 'Request QuickBooks bank setup'}</button>
+          </section>
+          <section className="space-y-3 rounded-xl border border-blue-200 p-4">
+            <h3 className="text-lg font-black">PayPal payouts</h3>
+            <form className="space-y-3" onSubmit={event => { event.preventDefault(); void act({ provider: 'paypal', action: 'save_paypal', email, confirm: true }); }}>
+              <label className="block text-sm font-bold">Your PayPal email<input type="email" maxLength={254} autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy || verified} className="mt-1 min-h-11 w-full min-w-0 rounded-lg border px-3 font-normal" /></label>
+              <label className="flex items-start gap-2 text-sm"><input type="checkbox" required disabled={busy || verified} className="mt-1" />I control this email and want approved payments delivered to this PayPal account.</label>
+              <button disabled={busy || verified} className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white disabled:opacity-50">Save PayPal destination</button>
+            </form>
+            <a href="https://www.paypal.com/myaccount/money" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-bold text-blue-800 underline">Link or manage a bank in PayPal</a>
+          </section>
         </div>
-      ) : !busy && !status.providerConfigured ? (
-        <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
-          <p className="font-bold">The secure banking invitation is not available for this account yet.</p>
-          <p className="mt-1">Ask Elevate to activate the payout provider. Do not send bank account or routing numbers in messages.</p>
-          <Link href="/program-holder/inbox" className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-amber-900 px-4 py-2 font-bold text-white">Contact Elevate</Link>
-        </div>
-      ) : (
-        <button
-          disabled={busy}
-          onClick={() => openPayoutProvider(ready ? 'dashboard' : 'onboard')}
-          className="mt-5 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-50"
-        >
-          {busy ? 'Checking…' : ready ? 'Open payout settings' : 'Add banking information'}
-        </button>
-      )}
+        <p className="text-sm text-slate-600">Saving a destination does not verify banking or release money. Payments still require your agreement, completion records, and Elevate’s approval. Verified destinations can be changed through <Link href="/program-holder/inbox" className="font-bold text-blue-700 underline">Office Mail</Link>.</p>
+        {!status.onboardingReady && <div className="rounded-xl bg-amber-50 p-4 text-sm"><p className="font-bold">Payment release requirements remain outstanding:</p><ul className="mt-2 list-inside list-disc">{status.missingRequirements.map(item => <li key={item}>{item}</li>)}</ul></div>}
+      </> : busy && <p role="status">Loading banking setup…</p>}
     </section>
   );
 }

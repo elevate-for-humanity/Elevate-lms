@@ -34,3 +34,22 @@ Live database checks covered all 14 non-test holder records and confirmed all 24
 The prepared profile-authority migration is independently tested with a temporary, rolled-back database fixture: ordinary profile edits succeed, role elevation and holder reassignment fail, and privileged self-provisioning fails. The role-alias rollback test also rejects mixed-case, spaced and hyphenated administrator aliases. The migration connector returned `Invalid or expired requestState` twice; the permanent trigger was not confirmed installed. This remains an explicit deployment/security gate, not a completed live repair.
 
 Branch direct-deposit onboarding is not configured in the runtime secret store. A real organization/provider invitation or activation URL is still needed before banking setup can be verified end to end. No placeholder invitation or fabricated payout verification is supplied.
+
+## QuickBooks and PayPal banking repair
+
+The user selected QuickBooks and PayPal for all Program Holders. The shared banking panel now offers personal Intuit contractor invitations and a PayPal recipient email form plus the official PayPal bank/wallet page. A saved email remains pending review; no setup action marks a bank verified or sends money. The private admin review attaches the actual holder-specific Intuit invitation and records explicit provider setup verification with actor/time and an optimistic concurrency check.
+
+Invitation tokens are stored only in owner-scoped payout notes. The existing holder features table permits broad authenticated reads, so invitation tokens must never be stored there. Legacy notes are preserved. The current production database already allows the quickbooks provider; an idempotent migration records that schema contract. Seven Branch records were found unconfigured; existing verified methods must not be bulk-replaced.
+
+The QuickBooks accounting recorder now uses the canonical production-only OAuth client, explicit bank/clearing and expense account mappings, and stable provider-transfer request IDs. The Admin QuickBooks integration screen loads actual company accounts for selection. It no longer picks the first bank or expense account. A QuickBooks accounting entry does not initiate ACH; direct deposits remain submitted inside the actual QuickBooks contractor service. PayPal release still uses administrator-approved schedules and verified destinations.
+
+Local validation: 36 Node behavioral tests and 107 focused Vitest tests, scoped ESLint, portal contracts and migration lint. Production compilation, protected CI and deployment evidence must be checked for the final banking commit. Actual QuickBooks contractor invitations, provider verification and account mappings are required before calling an individual holder payment-ready.
+
+
+## Automatic QuickBooks contractor setup follow-up
+
+Verified 13 external, non-test Program Holders in Elevate's QuickBooks contractor list. Created accounting contact records without sending email invitations, collecting bank/tax identifiers, or issuing payments. W-9 and bank setup remain incomplete. QA records and Elevate's umbrella record were excluded.
+
+Both administrator approval paths now attempt contractor reconciliation. Actual holder dashboard loads schedule a post-response retry; previews cannot create contractors. The production-only canonical OAuth client matches vendor name and exact contact email, refuses conflicts, uses stable holder/company request IDs, and persists company-scoped vendor links. Retry finds an existing contractor rather than creating another. Neither contractor provisioning nor contact linking verifies banking or enables payouts. Inactive and test holders are excluded from future automatic provisioning.
+
+The integrity job on head 1ff09b9 failed because the env example lacked two accounting mapping keys and its auth scanner did not recognize requireProgramHolder. Documented the keys and added that canonical guard to recognized patterns; no anonymous staff-notification access was added. Production builds, functional tests, lint, and all three app TypeScript jobs passed on that prior head. Automatic contractor follow-up requires its own protected checks and deployment evidence.

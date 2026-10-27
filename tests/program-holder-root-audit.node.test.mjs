@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import ts from 'typescript';
@@ -132,4 +133,117 @@ test('communications reject suspended, inactive and missing profiles before load
   if(state==='active'){assert.equal((await api.requireCommunicationActor()).user.id,'user');assert.equal(phoneReads,1);}
   else {await assert.rejects(api.requireCommunicationActor(),/COMMUNICATIONS_(FORBIDDEN|LOOKUP_UNAVAILABLE)/);assert.equal(phoneReads,0);}
  }
+});
+
+test('QuickBooks invitations reject lookalike hosts and resolve only the authenticated payout row',async()=>{
+ const db=dbFor(({table,filters})=>{assert.equal(table,'program_holder_payouts');assert.ok(filters.some(([k,v])=>k==='user_id'&&v==='owner'));return{data:{notes:JSON.stringify({quickbooks_invitation_url:'https://workforce.intuit.com/invite/private-token'})},error:null}});
+ const api=load('lib/program-holder/payout-account.ts',{'server-only':{},'@/lib/secrets':{hydrateProcessEnv:async()=>{}}});
+ for(const bad of ['https://intuit.com.evil.example/invite','https://evil.example/intuit.com','http://intuit.com/invite','https://user:password@intuit.com/invite','javascript:alert(1)'])assert.equal(api.quickBooksInvitationUrl(bad),null);
+ assert.equal(await api.payoutProviderUrl('quickbooks','onboard',{user:{id:'owner'},holderId:'h',db}),'https://workforce.intuit.com/invite/private-token');
+ assert.equal(api.payoutSetupNotes('Existing audit note').previous_notes,'Existing audit note');
+});
+
+test('PayPal banking settings use the official wallet without a fabricated organization URL',async()=>{
+ const api=load('lib/program-holder/payout-account.ts',{'server-only':{},'@/lib/secrets':{hydrateProcessEnv:async()=>{}}},{process:{env:{PAYPAL_CLIENT_ID:'configured',PAYPAL_CLIENT_SECRET:'configured',PAYPAL_ENVIRONMENT:'production'}}});
+ assert.equal(await api.payoutProviderConfigured('paypal'),true);
+ assert.equal(await api.payoutProviderUrl('paypal','onboard'),'https://www.paypal.com/myaccount/money');
+});
+
+test('saving a PayPal destination preserves payment locks and requires later review',async()=>{
+ let saved;
+ const db=dbFor(({operation,writes})=>{if(operation==='update'){saved=writes[0];return{data:{user_id:'owner'},error:null}}return{data:{user_id:'owner',payout_provider:'branch',payouts_enabled:false,transfers_enabled:false},error:null}});
+ const api=load('lib/program-holder/payout-account.ts',{'server-only':{},'@/lib/secrets':{hydrateProcessEnv:async()=>{}}});
+ await api.saveProgramHolderPayPalRecipient({user:{id:'owner'},holderId:'h',db},' Person@Example.com ');
+ assert.equal(saved.provider_recipient_id,'person@example.com');assert.equal(saved.verification_status,'pending');assert.equal(saved.payouts_enabled,false);assert.equal(saved.transfers_enabled,false);
+ await assert.rejects(api.saveProgramHolderPayPalRecipient({user:{id:'owner'},holderId:'h',db},'not-an-email'),/valid PayPal email/);
+});
+
+test('verified payout destinations cannot be replaced by a new PayPal email',async()=>{
+ let writes=0;const db=dbFor(({operation})=>{if(operation!=='select')writes++;return{data:{payout_provider:'paypal',provider_recipient_id:'old@example.com',payouts_enabled:true,transfers_enabled:true},error:null}});
+ const api=load('lib/program-holder/payout-account.ts',{'server-only':{},'@/lib/secrets':{hydrateProcessEnv:async()=>{}}});
+ await assert.rejects(api.saveProgramHolderPayPalRecipient({user:{id:'owner'},holderId:'h',db},'new@example.com'),/verified payout destination/);assert.equal(writes,0);
+});
+
+test('compliance lookup errors block release but leave banking setup accessible',async()=>{
+ const api=load('apps/lms/app/api/program-holder/payouts/route.ts',{'next/server':next,'@/lib/auth/require-program-holder':{requireProgramHolder:async()=>({mode:'holder',holderId:'h',db:{}})},'@/lib/program-holder/payout-account':{getProgramHolderPayoutAccount:async()=>({provider:'quickbooks'})},'@/lib/program-holder/onboarding-readiness':{getProgramHolderPaymentReadiness:async()=>{throw Error('offline')}}});
+ const result=await api.GET();assert.equal(result.status,200);assert.equal(result.body.provider,'quickbooks');assert.equal(result.body.onboardingReady,false);assert.ok(result.body.missingRequirements.length);
+});
+
+test('QuickBooks requests do not report an invitation delivered when notification writes fail',async()=>{
+ const api=load('apps/lms/app/api/program-holder/payouts/route.ts',{'next/server':next,'@/lib/api/withRateLimit':{applyRateLimit:async()=>null},'@/lib/auth/require-program-holder':{requireProgramHolder:async()=>({mode:'holder',holderId:'h',user:{id:'owner'},db:dbFor(()=>({error:{message:'offline'}}))})},'@/lib/program-holder/payout-account':{configureProgramHolderPayoutAccount:async()=>({})}});
+ const result=await api.POST({json:async()=>({provider:'quickbooks',action:'request_quickbooks'})});assert.equal(result.status,503);assert.equal(result.body.ok,undefined);
+});
+
+test('administrator previews cannot save PayPal destinations',async()=>{
+ let writes=0;const api=load('apps/lms/app/api/program-holder/payouts/route.ts',{'next/server':next,'@/lib/api/withRateLimit':{applyRateLimit:async()=>null},'@/lib/auth/require-program-holder':{requireProgramHolder:async()=>({mode:'preview'})},'@/lib/program-holder/payout-account':{saveProgramHolderPayPalRecipient:async()=>{writes++}}});assert.equal((await api.POST({json:async()=>({action:'save_paypal',email:'x@example.com',confirm:true})})).status,403);assert.equal(writes,0);
+});
+
+
+test('QuickBooks payment recording refuses missing account mappings instead of guessing a bank',async()=>{
+ let calls=0;const api=load('lib/integrations/quickbooks-contractor-payment.ts',{'server-only':{},'node:crypto':{createHash},'@/lib/logger':{logger:{error(){}}},'./quickbooks-client':{assertQuickBooksProductionEnvironment(){},loadQuickBooksConfig:async()=>({}),quickBooksRequest:async()=>{calls++}}});
+ const result=await api.recordContractorPaymentInQuickBooks(dbFor(()=>({data:[],error:null})),{amountCents:10000,providerTransferId:'real-transfer',contractorName:'Test',enrollmentId:'e',memo:'Test'});assert.equal(result.synced,false);assert.match(result.reason,/Select the payout clearing/);assert.equal(calls,0);
+});
+
+test('QuickBooks recording retries share the provider transfer request ID',async()=>{
+ const requests=[];const api=load('lib/integrations/quickbooks-contractor-payment.ts',{'server-only':{},'node:crypto':{createHash},'@/lib/logger':{logger:{error(){}}},'./quickbooks-client':{assertQuickBooksProductionEnvironment(){},loadQuickBooksConfig:async()=>({}),quickBooksRequest:async(_db,_config,path,options)=>{requests.push({path,options});return path.startsWith('query')?{QueryResponse:{Vendor:[{Id:'vendor',PrimaryEmailAddr:{Address:'test@example.com'}}]}}:{Purchase:{Id:'record'}}}}});
+ const db=dbFor(()=>({data:[{key:'QB_PAYOUT_BANK_ACCOUNT_ID',value:'bank'},{key:'QB_CONTRACTOR_EXPENSE_ACCOUNT_ID',value:'expense'}],error:null}));
+ const input={amountCents:10000,providerTransferId:'real-transfer',contractorName:'Test',contractorEmail:'test@example.com',enrollmentId:'e',memo:'Test'};
+ for(let i=0;i<2;i++)assert.equal((await api.recordContractorPaymentInQuickBooks(db,input)).synced,true);
+ const writes=requests.filter(r=>r.options?.method==='POST');assert.equal(writes.length,2);assert.equal(writes[0].path,writes[1].path);assert.match(writes[0].path,/purchase\?requestid=efh-payout-/);assert.equal(JSON.parse(writes[0].options.body).AccountRef.value,'bank');
+});
+
+test('staff roles cannot verify banking or attach invitation tokens',async()=>{
+ let reads=0;const api=load('apps/admin/app/api/admin/program-holders/[id]/banking/route.ts',{'next/server':next,'@/lib/api/withRateLimit':{applyRateLimit:async()=>null},'@/lib/admin/guards':{apiRequireAdmin:async()=>({effectiveRoles:['staff']})},'@/lib/supabase/admin':{requireAdminClient:async()=>{reads++;return{}}}});
+ assert.equal((await api.POST({json:async()=>({action:'confirm_setup',confirmed:true})},{params:Promise.resolve({id:'h'})})).status,403);assert.equal(reads,0);
+});
+
+test('QuickBooks invitations are attached to private payout notes while preserving previous notes',async()=>{
+ let written;
+ const service=load('lib/program-holder/payout-account.ts',{'server-only':{}});
+ const db=dbFor(({table,operation,writes,filters})=>{
+  if(table==='program_holders')return{data:{user_id:'owner'},error:null};
+  if(operation==='update'){written=writes[0];assert.ok(filters.some(([k,v])=>k==='user_id'&&v==='owner'));assert.ok(filters.some(([k,v])=>k==='updated_at'&&v==='snapshot'));return{data:{user_id:'owner'},error:null};}
+  return{data:{notes:'Existing audit record',updated_at:'snapshot'},error:null};
+ });
+ const api=load('apps/admin/app/api/admin/program-holders/[id]/banking/route.ts',{'next/server':next,'@/lib/api/withRateLimit':{applyRateLimit:async()=>null},'@/lib/admin/guards':{apiRequireAdmin:async()=>({id:'admin',effectiveRoles:['admin']})},'@/lib/supabase/admin':{requireAdminClient:async()=>db},'@/lib/program-holder/payout-account':service});
+ const result=await api.POST({json:async()=>({action:'save_invitation',url:'https://workforce.intuit.com/invite/private'})},{params:Promise.resolve({id:'h'})});assert.equal(result.status,200);assert.equal(JSON.parse(written.notes).previous_notes,'Existing audit record');assert.equal(written.features,undefined);assert.equal(written.payouts_enabled,undefined);
+});
+
+test('banking review requires explicit administrator confirmation before enabling payments',async()=>{
+ let writes=0;const db=dbFor(({operation})=>{if(operation!=='select')writes++;return{data:{user_id:'owner'},error:null}});
+ const api=load('apps/admin/app/api/admin/program-holders/[id]/banking/route.ts',{'next/server':next,'@/lib/api/withRateLimit':{applyRateLimit:async()=>null},'@/lib/admin/guards':{apiRequireAdmin:async()=>({id:'admin',effectiveRoles:['admin']})},'@/lib/supabase/admin':{requireAdminClient:async()=>db}});
+ assert.equal((await api.POST({json:async()=>({action:'confirm_setup',provider:'paypal',reference:'review-ref'})},{params:Promise.resolve({id:'h'})})).status,400);assert.equal(writes,0);
+});
+
+test('contractor provisioning links existing contractors and creates new ones without banking or payment writes',async()=>{
+ for(const existing of [false,true]) {
+  const writes=[],requests=[];const holder={id:'holder',organization_name:'Business',contact_email:'owner@example.com',status:'approved_pending_mou',features:{}};
+  const db=dbFor(q=>{if(q.operation!=='select')writes.push(q);return {data:q.table==='program_holders'?holder:null,error:null}});
+  // This fixture captures the canonical mapping upsert separately from payout tables.
+  const original=db.from.bind(db);db.from=table=>{const q=original(table);q.upsert=value=>{writes.push({table,value});return Promise.resolve({error:null})};return q};
+  const vendor={Id:'vendor',Vendor1099:true,PrimaryEmailAddr:{Address:'owner@example.com'}};
+  const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'server-only':{},'node:crypto':{createHash},'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async(_db,_config,path,options)=>{requests.push({path,options});return path.startsWith('query')?{QueryResponse:{Vendor:existing?[vendor]:[]}}:{Vendor:vendor}}}});
+  assert.equal((await api.ensureProgramHolderQuickBooksContractor(db,'holder')).linked,true);
+  assert.equal(requests.filter(r=>r.options).length,existing?0:1);
+  if(!existing){const body=JSON.parse(requests[1].options.body);assert.equal(body.Vendor1099,true);assert.deepEqual(Object.keys(body).sort(),['CompanyName','DisplayName','PrimaryEmailAddr','Vendor1099']);assert.match(requests[1].path,/requestid=efh-holder-/);}
+  assert.equal(writes.length,1);assert.equal(writes[0].table,'app_settings');assert.equal(JSON.parse(writes[0].value.value).vendorId,'vendor');
+ }
+});
+
+test('contractor provisioning excludes test and inactive holders before contacting QuickBooks',async()=>{
+ for(const holder of [{organization_name:'[QA] Company',status:'active'},{organization_name:'Business',status:'inactive'},{organization_name:'Business',status:'active',contact_email:'test@example.invalid'}]) {
+  let providerCalls=0;const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'node:crypto':{createHash},'./quickbooks-client':{loadQuickBooksConfig:async()=>{providerCalls++;throw Error('Must not connect')}}});
+  const result=await api.ensureProgramHolderQuickBooksContractor(dbFor(()=>({data:holder,error:null})),'holder');assert.equal(result.linked,false);assert.equal(providerCalls,0);
+ }
+});
+
+test('contractor contact conflicts fail closed without creating a duplicate',async()=>{
+ const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'node:crypto':{createHash},'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async(_db,_config,path,options)=>{assert.equal(options,undefined);return{QueryResponse:{Vendor:[{Id:'other',PrimaryEmailAddr:{Address:'other@example.com'}}]}}}}});
+ const db=dbFor(q=>({data:q.table==='program_holders'?{organization_name:'Business',contact_email:'owner@example.com',status:'active'}:null,error:null}));await assert.rejects(api.ensureProgramHolderQuickBooksContractor(db,'holder'),/contact does not match/);
+});
+
+test('contractor mapping is company scoped and cannot mark banking verified',async()=>{
+ const db=dbFor(q=>({data:q.table==='program_holders'?{organization_name:'Business',contact_email:'owner@example.com',status:'active'}:{value:JSON.stringify({realmId:'realm',vendorId:'vendor'})},error:null}));
+ const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async()=>{throw Error('Already mapped')}}});assert.equal((await api.ensureProgramHolderQuickBooksContractor(db,'holder')).vendorId,'vendor');
+ const source=readFileSync(new URL('../lib/integrations/quickbooks-program-holder-contractor.ts',import.meta.url),'utf8');assert.doesNotMatch(source,/payouts_enabled|transfers_enabled|verification_status|sendEmail|TaxIdentifier/);
 });

@@ -86,22 +86,46 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      // Storage-first, generate only for missing inventory, never duplicate a hash.
+      // Cache each cue so checkpoint resumes reuse the saved real photograph.
+      // A new namespace excludes the historical conceptual/text-card cache.
       const prompt=['Professional cosmetology educational photograph, realistic, no logos or text.',
         String(input.courseTitle),String(scene.visualRequirement),String(step.narrationQuote),String(step.view)].join('\\n');
-      const generated=await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto});
-      const bytes=generated.bytes;
-      const sha256=createHash('sha256').update(bytes).digest('hex');
-      if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');
-      const mimeType=generated.mimeType;
-      const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
-      const storagePath='approved-teaching-photos/'+sha256+'.'+extension;
-      const uploaded=await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:mimeType,upsert:false});
-      if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
-      const downloaded=await db.storage.from('course_videos').download(storagePath);
-      if(downloaded.error||!downloaded.data)throw new Error('TEACHING_PHOTO_READBACK_FAILED');
-      const verified=createHash('sha256').update(Buffer.from(await downloaded.data.arrayBuffer())).digest('hex');
-      if(verified!==sha256)throw new Error('TEACHING_PHOTO_HASH_MISMATCH');
+      const requestHash=createHash('sha256').update(JSON.stringify({
+        version:'storage-first-photographs-v3',courseId:input.courseId,lessonId:input.lessonId,
+        sceneId:scene.id,cueIndex:index,prompt,
+      })).digest('hex');
+      let storagePath='',file:any=null;
+      for(const extension of ['png','jpg','webp']){
+        const path='approved-teaching-photos/'+requestHash+'.'+extension;
+        const cached=await db.storage.from('course_videos').download(path);
+        if(cached.data){storagePath=path;file=cached.data;break;}
+      }
+      if(!file){
+        const generated=await recoverTeachingPhoto({
+          primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,
+          persistFailure:async(detail:any)=>{
+            const saved=await db.storage.from('course_videos').upload(
+              'approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',
+              Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),
+              {contentType:'application/json',upsert:true});
+            if(saved.error)throw new Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);
+          },
+        });
+        const bytes=generated.bytes;
+        const expectedHash=createHash('sha256').update(bytes).digest('hex');
+        if(usedPhotoHashes.has(expectedHash))throw new Error('COURSE_PHOTO_ALREADY_USED');
+        const mimeType=generated.mimeType;
+        const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
+        storagePath='approved-teaching-photos/'+requestHash+'.'+extension;
+        const uploaded=await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:mimeType,upsert:false});
+        if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
+        const downloaded=await db.storage.from('course_videos').download(storagePath);
+        if(downloaded.error||!downloaded.data)throw new Error('TEACHING_PHOTO_READBACK_FAILED');
+        file=downloaded.data;
+        const verified=createHash('sha256').update(Buffer.from(await file.arrayBuffer())).digest('hex');
+        if(verified!==expectedHash)throw new Error('TEACHING_PHOTO_HASH_MISMATCH');
+      }
+      const sha256=createHash('sha256').update(Buffer.from(await file.arrayBuffer())).digest('hex');
       const signed=await db.storage.from('course_videos').createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,

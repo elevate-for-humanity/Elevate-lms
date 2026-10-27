@@ -67,7 +67,7 @@ export default async function SignMouPage() {
           <strong>After signature:</strong> your acceptance is recorded with timestamp and audit
           data. Dashboard access continues, but payout setup and fund access remain locked until the
           handbook, rights and non-compete acknowledgements, identity, business registration,
-          insurance, W-9, program-specific credentials, and training plan have all been approved.
+          W-9, required business documents, program-specific credentials, and training plan have all been approved.
         </section>
 
         {holder.mou_signed ? (

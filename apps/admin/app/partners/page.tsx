@@ -63,7 +63,7 @@ export default async function PartnersPage() {
     const linkedUsers = (hostUsers || []).filter((row: any) => row.partner_id === partner.id).length;
     const linkedShops = (canonicalShops || []).filter((row: any) => row.partner_id === partner.id).length;
     const previewUserId = (hostUsers || []).find((row: any) => row.partner_id === partner.id)?.user_id ?? null;
-    const complete = requirements.length > 0 && missing.length === 0 && partner.mou_signed === true && partner.onboarding_completed === true && linkedUsers > 0 && linkedShops > 0;
+    const complete = partner.approval_status === 'approved' && requirements.length > 0 && missing.length === 0 && partner.mou_signed === true && partner.onboarding_completed === true && linkedUsers > 0 && linkedShops > 0;
     return { partner, program, requirements, missing, linkedUsers, linkedShops, previewUserId, complete };
   });
 

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { isCurrentHostShopPartner } from '@/lib/partners/host-shop-directory';
 
@@ -36,6 +37,10 @@ describe('Host Shop directory classification', () => {
         ...overrides,
       }),
     ).toBe(false);
+  });
+  it('requires approval before showing an operationally ready shop', () => {
+    const page = readFileSync('apps/admin/app/partners/page.tsx', 'utf8');
+    expect(page).toContain("const complete = partner.approval_status === 'approved' &&");
   });
   it('does not classify unrelated employers as host shops', () => {
     expect(

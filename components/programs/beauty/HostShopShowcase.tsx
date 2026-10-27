@@ -35,11 +35,6 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     alt: 'Cals Kutz Studio apprenticeship host barbershop',
     kind: 'photo',
   },
-  'b-52s-barber-shop': {
-    src: '/images/partners/b52s-official.webp',
-    alt: "B-52's Barbershop in New Castle",
-    kind: 'photo',
-  },
   'salon-saloon': {
     src: '/videos/partners/salon-saloon-tour.mp4',
     alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon',

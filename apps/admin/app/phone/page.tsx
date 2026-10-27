@@ -1,10 +1,22 @@
+import { DestinationControls } from './DestinationControls';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Bot, Phone, PhoneForwarded, Radio, Users, Video, Voicemail, Workflow } from 'lucide-react';
+import {
+  Bot,
+  Mail,
+  MessageSquareText,
+  Phone,
+  PhoneForwarded,
+  Radio,
+  Video,
+  Voicemail,
+  Workflow,
+} from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -13,8 +25,9 @@ import {
 } from './PhoneSetupForms';
 import {
   dismissCommunicationsAnnouncement,
-  setDefaultDestination,
-  toggleDestination,
+  removeExternalNumber,
+  removeMenuOption,
+  toggleExtension,
   assignPhoneNumber,
   saveProgramHolderExtension,
 } from './actions';
@@ -25,12 +38,21 @@ export const metadata: Metadata = { title: 'Communications Hub' };
 export default async function PhonePage() {
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const db = await requireAdminClient();
+  await hydrateProcessEnv();
   const tenantId = auth.profile.tenant_id ?? auth.profile.organization_id ?? null;
+  const platformAdmin = auth.effectiveRoles.some(
+    (role) => role === 'admin' || role === 'super_admin',
+  );
   let systemQuery = db.from('phone_systems').select('*').limit(1);
   systemQuery = tenantId
     ? systemQuery.eq('tenant_id', tenantId)
     : systemQuery.is('tenant_id', null);
-  const { data: system } = await systemQuery.maybeSingle();
+  const { data: tenantSystem } = await systemQuery.maybeSingle();
+  const { data: platformSystem } =
+    !tenantSystem && platformAdmin && tenantId
+      ? await db.from('phone_systems').select('*').is('tenant_id', null).limit(1).maybeSingle()
+      : { data: null };
+  const system = tenantSystem ?? platformSystem;
   const systemId = system?.id as string | undefined;
 
   const [
@@ -42,6 +64,7 @@ export default async function PhonePage() {
     workspaceResult,
     programHoldersResult,
     extensionsResult,
+    devicesResult,
   ] = systemId
     ? await Promise.all([
         db.from('phone_numbers').select('*').eq('phone_system_id', systemId).order('created_at'),
@@ -73,8 +96,7 @@ export default async function PhonePage() {
         db
           .from('profiles')
           .select('id,full_name,email,role,program_holder_id')
-          .in('role', ['program_holder', 'programholder'])
-          .not('program_holder_id', 'is', null)
+          .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
           .order('full_name'),
         db
           .from('communication_extensions')
@@ -83,6 +105,11 @@ export default async function PhonePage() {
           )
           .eq('workspace.phone_system_id', systemId)
           .order('extension'),
+        db
+          .from('phone_webrtc_devices')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'active')
+          .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
       ])
     : ([
         { data: [] },
@@ -93,21 +120,28 @@ export default async function PhonePage() {
         { data: null },
         { data: [] },
         { data: [] },
+        { count: 0 },
       ] as any);
 
-  const numbers = numbersResult.data ?? [];
+  // Retired carrier inventory must not appear as a current dashboard number.
+  const numbers = (numbersResult.data ?? []).filter(
+    (number: any) => number.status === 'active' || number.source === 'external_forwarding',
+  );
   const destinations = destinationsResult.data ?? [];
   const menuOptions = menuResult.data ?? [];
   const programHolders = (programHoldersResult.data ?? []).filter(
     (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
   );
   const extensions = extensionsResult.data ?? [];
+  const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
-    greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity.',
+    greeting:
+      system?.greeting ??
+      'Thank you for calling Elevate for Humanity. This is PARIS. How may I help you today?',
     afterHours:
       system?.after_hours_message ??
       'Our office is currently closed. Please leave a message and we will return your call.',
-    routingMode: system?.routing_mode ?? 'menu',
+    routingMode: system?.routing_mode === 'ai_receptionist' ? 'ai_receptionist' : 'menu',
     timezone: system?.timezone ?? 'America/Indiana/Indianapolis',
     businessHours: parseBusinessHours(
       system?.business_hours ?? {
@@ -124,26 +158,43 @@ export default async function PhonePage() {
     recordingDisclosure: system?.recording_disclosure ?? '',
     maxQueueSeconds: system?.max_queue_seconds ?? 90,
     aiEnabled: system?.ai_enabled ?? false,
-    aiName: system?.ai_name ?? 'Elevate Assistant',
+    aiName: system?.ai_name ?? 'PARIS',
     aiVoice: system?.ai_voice ?? 'natural',
     aiLanguage: system?.ai_language ?? 'en-US',
     aiInstructions:
       system?.ai_instructions ??
-      'Answer questions about Elevate for Humanity, collect caller information, and transfer to a person when requested or uncertain.',
+      'Identify yourself as PARIS with Elevate for Humanity. Answer ordinary caller questions first using verified Elevate website and platform knowledge. Use the live enabled extension directory when the caller asks for a person or department or needs a human. Name the staff member and extension before offering the transfer. Never identify an individual staff member as the administrator unless their live role says so. Never guess unverified program, funding, enrollment, licensing, payment, or compliance information; offer a human transfer when uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
   };
 
   const cards = [
     ['Business numbers', numbers.length, Phone],
-    ['Team phones', destinations.length, PhoneForwarded],
+    ['PWA routes', destinations.length, PhoneForwarded],
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  const carrierReady = numbers.some(
-    (number: any) => number.source === 'provider' && number.status === 'active',
-  );
+  // A database row or legacy Telnyx probe cannot certify live Twilio/PBX calling.
+  // Keep the dashboard fail-closed until independent carrier and audio acceptance.
+  const carrierReady = false;
   const meetingReady = workspaceResult.data?.status === 'active';
+  const primaryNumber = numbers.find(
+    (number: any) =>
+      number.source === 'provider' && number.status === 'active' && number.is_primary,
+  );
+  const routingReady =
+    system?.routing_mode === 'ai_receptionist'
+      ? Boolean(system?.ai_enabled)
+      : menuOptions.some((option: any) => option.enabled && option.destination_id);
+  const setupSteps = [
+    { label: 'Assign PWA extensions', complete: destinations.some((item: any) => item.enabled) },
+    { label: 'Choose call routing', complete: routingReady },
+    { label: 'Create extensions', complete: extensions.some((item: any) => item.enabled) },
+    { label: 'Connect one PWA phone', complete: (devicesResult.count ?? 0) > 0 },
+    { label: 'Call history recorded', complete: (callsResult.count ?? 0) > 0 },
+  ];
+  const phoneReady =
+    Boolean(primaryNumber) && setupSteps.every((step) => step.complete) && carrierReady;
   const { data: onboarding } = workspaceResult.data?.id
     ? await db
         .from('communication_onboarding_progress')
@@ -162,11 +213,17 @@ export default async function PhonePage() {
           </p>
           <h1 className="mt-1 text-3xl font-black text-slate-950">Elevate Communications Hub</h1>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">
-            Manage business numbers, team cell phones, extensions, call routing, AI reception, video
-            meetings, screen sharing, and communication history.
+            Manage business numbers, PWA extensions, call routing, AI reception, video meetings,
+            screen sharing, and communication history.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+          <Link
+            href="/phone/email"
+            className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"
+          >
+            Email
+          </Link>
           <Link
             href="/phone/meetings"
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white"
@@ -175,15 +232,47 @@ export default async function PhonePage() {
             Meetings
           </Link>
           <Link
-            href="/inbox"
+            href="/phone/inbox"
             className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
           >
             Inbox
           </Link>
         </div>
       </div>
+      <section className="grid gap-3 sm:grid-cols-3">
+        <Link
+          href="/phone/inbox"
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
+          <MessageSquareText className="h-5 w-5 text-indigo-700" />
+          <p className="mt-2 font-black text-slate-950">Phone inbox & texts</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Missed calls, voicemail, callback interviews, SMS conversations, and call notes.
+          </p>
+        </Link>
+        <Link
+          href="/phone/email"
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
+          <Mail className="h-5 w-5 text-orange-600" />
+          <p className="mt-2 font-black text-slate-950">Email</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Read, reply, compose, and manage Elevate office email from the Communications Hub.
+          </p>
+        </Link>
+        <Link
+          href="/phone/meetings"
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
+          <Video className="h-5 w-5 text-cyan-700" />
+          <p className="mt-2 font-black text-slate-950">Meetings</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Video meetings, microphone, chat, and screen sharing.
+          </p>
+        </Link>
+      </section>
       {!onboarding?.announcement_seen_at ? (
-        <NewSystemNotice dismissAction={dismissCommunicationsAnnouncement} />
+        <NewSystemNotice dismissAction={dismissCommunicationsAnnouncement} steps={setupSteps} />
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(([label, value, Icon]) => (
@@ -200,12 +289,19 @@ export default async function PhonePage() {
         >
           <div className="flex items-center gap-2 font-black">
             <Radio className="h-4 w-4" />
-            Phone network: {carrierReady ? 'Connected' : 'Setup required'}
+            Phone network:{' '}
+            {phoneReady
+              ? 'Ready'
+              : carrierReady
+                ? 'Connected — setup incomplete'
+                : 'Setup required'}
           </div>
           <p className="mt-1">
-            {carrierReady
-              ? 'A carrier number is active for this organization.'
-              : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
+            {phoneReady
+              ? 'The carrier number and dashboard routes are configured. Verify ringing and two-way audio with a test call.'
+              : carrierReady
+                ? 'The carrier is connected, but one or more routing, extension, destination, or testing steps are incomplete.'
+                : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
           </p>
         </div>
         <div
@@ -222,6 +318,12 @@ export default async function PhonePage() {
           </p>
         </div>
       </div>
+      <Link
+        href="https://app.elevateforhumanity.org/communications/phone"
+        className="inline-flex min-h-12 items-center rounded-xl bg-blue-700 px-5 font-black text-white"
+      >
+        Open my phone and dial pad
+      </Link>
       <CapabilityGuide />
       <PhoneSetupForms
         settings={settings}
@@ -239,7 +341,10 @@ export default async function PhonePage() {
           {numbers.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {numbers.map((item: any) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <li
+                  key={item.id}
+                  className="grid min-w-0 gap-3 py-4 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                >
                   <span>
                     <b>{item.label}</b>
                     <br />
@@ -250,12 +355,12 @@ export default async function PhonePage() {
                         : 'workspace number'}
                     </span>
                   </span>
-                  <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">
+                  <span className="w-fit rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">
                     {item.status}
                   </span>
                   <form
                     action={assignPhoneNumber}
-                    className="grid min-w-64 gap-2 sm:grid-cols-[1fr_5rem_auto]"
+                    className="grid w-full min-w-0 gap-2 sm:col-span-2 sm:grid-cols-[minmax(0,1fr)_5rem_auto]"
                   >
                     <input type="hidden" name="phoneNumberId" value={item.id} />
                     <select
@@ -284,6 +389,14 @@ export default async function PhonePage() {
                       Assign
                     </button>
                   </form>
+                  {item.source === 'external_forwarding' && !item.is_primary ? (
+                    <form action={removeExternalNumber}>
+                      <input type="hidden" name="phoneNumberId" value={item.id} />
+                      <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                        Remove
+                      </button>
+                    </form>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -292,11 +405,14 @@ export default async function PhonePage() {
           )}
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-black">Team cell phones</h2>
+          <h2 className="font-black">PWA call routes</h2>
           {destinations.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {destinations.map((item: any) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <li
+                  key={item.id}
+                  className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                >
                   <span>
                     <b>{item.name}</b>
                     {item.department ? (
@@ -304,36 +420,25 @@ export default async function PhonePage() {
                     ) : null}
                     <br />
                     <span className="text-slate-600">
-                      {formatUsPhone(item.destination)} · rings {item.ring_seconds}s
+                      {item.destination_type === 'webrtc'
+                        ? `PWA extension ${extensions.find((extension: any) => extension.id === item.extension_id)?.extension ?? 'unassigned'}`
+                        : item.destination_type === 'phone'
+                          ? `Main Office fallback · ${formatUsPhone(item.destination)}`
+                          : 'PARIS / voicemail route'}{' '}
+                      · rings {item.ring_seconds}s
                     </span>
                   </span>
-                  <div className="flex gap-2">
-                    {system?.default_destination_id !== item.id ? (
-                      <form action={setDefaultDestination}>
-                        <input type="hidden" name="destinationId" value={item.id} />
-                        <button className="rounded-lg border px-2 py-1 text-xs font-bold">
-                          Make default
-                        </button>
-                      </form>
-                    ) : (
-                      <span className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">
-                        Default
-                      </span>
-                    )}
-                    <form action={toggleDestination}>
-                      <input type="hidden" name="destinationId" value={item.id} />
-                      <input type="hidden" name="enabled" value={String(!item.enabled)} />
-                      <button className="rounded-lg border px-2 py-1 text-xs font-bold">
-                        {item.enabled ? 'Pause' : 'Enable'}
-                      </button>
-                    </form>
-                  </div>
+                  <DestinationControls
+                    id={item.id}
+                    enabled={item.enabled}
+                    isDefault={system?.default_destination_id === item.id}
+                  />
                 </li>
               ))}
             </ul>
           ) : (
             <p className="mt-3 text-sm text-slate-600">
-              Add the first team cell phone that should receive business calls.
+              Assign a Program Holder extension to create the first PWA call route.
             </p>
           )}
         </div>
@@ -359,6 +464,12 @@ export default async function PhonePage() {
                     Keywords: {item.spoken_keywords.join(', ')}
                   </p>
                 ) : null}
+                <form action={removeMenuOption} className="mt-3">
+                  <input type="hidden" name="menuOptionId" value={item.id} />
+                  <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                    Remove route
+                  </button>
+                </form>
               </div>
             ))}
           </div>
@@ -405,7 +516,7 @@ export default async function PhonePage() {
             Save extension
           </button>
         </form>
-        {extensions.length ? (
+        {directoryEntries.length ? (
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-950 text-white">
@@ -418,7 +529,7 @@ export default async function PhonePage() {
                 </tr>
               </thead>
               <tbody>
-                {extensions.map((entry: any) => {
+                {directoryEntries.map((entry: any) => {
                   const assigned = numbers.find(
                     (number: any) => number.assigned_profile_id === entry.profile_id,
                   );
@@ -429,7 +540,16 @@ export default async function PhonePage() {
                       <td className="px-3 py-2">{entry.department || '—'}</td>
                       <td className="px-3 py-2">{entry.extension}</td>
                       <td className="px-3 py-2">{formatUsPhone((assigned || primary)?.e164)}</td>
-                      <td className="px-3 py-2">{entry.enabled ? 'Active' : 'Paused'}</td>
+                      <td className="px-3 py-2">
+                        <form action={toggleExtension} className="flex items-center gap-2">
+                          <input type="hidden" name="extensionId" value={entry.id} />
+                          <input type="hidden" name="enabled" value={String(!entry.enabled)} />
+                          <span>{entry.enabled ? 'Active' : 'Paused'}</span>
+                          <button className="rounded border px-2 py-1 text-xs font-bold">
+                            {entry.enabled ? 'Pause' : 'Enable'}
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                   );
                 })}
@@ -441,8 +561,8 @@ export default async function PhonePage() {
         )}
       </section>
       <aside className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950">
-        <b>Number protection:</b> external numbers such as 317-314-3757 remain with their current
-        provider. Elevate records them as forwarding-only and never treats them as ported numbers.
+        <b>Number protection:</b> external numbers remain with their current provider. Elevate only
+        stores an external number after an administrator intentionally adds it as forwarding-only.
       </aside>
     </main>
   );

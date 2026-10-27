@@ -1,19 +1,16 @@
+import {DevStudioUltimateCourseControl} from '@/lib/devstudio/ultimate-course-control';
+import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
-  appendAgenticMessage,
-  createAgenticProject,
   listAgenticEvents,
   listAgenticMessages,
   loadAgenticProject,
-  updateAgenticProjectMetadata,
 } from '@/lib/agentic/project-service';
-import { startAgenticRun } from '@/lib/agentic/orchestrator';
-import { runAgenticExecutorOnce } from '@/lib/agentic/executor';
-import { runPersistedCourseProcurementHealthCheckWithClient } from '@/lib/course-builder/persisted-publish-service';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -84,112 +81,26 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const action = text(body.action) ?? 'start';
+  const studioRunId = text(body.studioRunId);
+  const studioRunStepId = text(body.studioRunStepId);
 
-  if (action === 'resume-after-review') {
-    const projectId = text(body.projectId);
-    if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
-    // Status polling also wakes queued work, preventing a cold background timer from stranding runs.
-  await runAgenticExecutorOnce();
-
-  const project = await loadAgenticProject({ projectId, userId: auth.id });
-    if (!project || project.target_type !== 'course') {
-      return NextResponse.json({ error: 'Course agent project not found.' }, { status: 404 });
-    }
-    if (!project.target_id) {
-      return NextResponse.json({ error: 'The agentic project is not linked to a canonical course yet.' }, { status: 409 });
-    }
-
-    const db = await requireAdminClient();
-    const health = await runPersistedCourseProcurementHealthCheckWithClient(db, project.target_id);
-    if (!health.pass) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Course is not ready to resume publication.',
-          blocking_issues: health.blocking_issues,
-          metrics: health.metrics,
-        },
-        { status: 422 },
-      );
-    }
-
-    const { data: run, error: runError } = await db
-      .from('agentic_build_runs')
-      .select('id,status')
-      .eq('project_id', project.id)
-      .in('status', ['running', 'waiting_for_approval'])
-      .order('started_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (runError) throw runError;
-    if (!run) return NextResponse.json({ error: 'No resumable course build run exists.' }, { status: 409 });
-
-    const { data: waitingTasks, error: taskError } = await db
-      .from('agentic_build_tasks')
-      .select('id,worker,status')
-      .eq('run_id', run.id)
-      .eq('status', 'waiting_review');
-    if (taskError) throw taskError;
-
-    const pendingHumanReviews = (waitingTasks ?? []).filter(
-      (task) => task.worker === 'compliance-qa',
-    );
-    if (pendingHumanReviews.length > 0) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Qualified human compliance review is still required.',
-          pending_review_task_ids: pendingHumanReviews.map((task) => task.id),
-          procurement: health.metrics,
-        },
-        { status: 409 },
-      );
-    }
-
-    await updateAgenticProjectMetadata({
-      project,
-      metadata: {
-        publication_ready: true,
-        publication_ready_at: new Date().toISOString(),
-        publication_approved: false,
-        publication_readiness_basis: 'automated_checks_passed_and_review_tasks_completed',
-      },
-      status: 'active',
-      lifecycleStatus: 'awaiting_approval',
-    });
-
-    await db.from('agentic_build_events').insert({
-      project_id: project.id,
-      run_id: run.id,
-      event_type: 'agentic.course.publication_ready',
-      summary: 'Automated checks passed; explicit qualified-human publication approval is still required.',
-      payload: {
-        course_id: project.target_id,
-        actor_id: auth.id,
-        approval_required: true,
-        procurement: health.metrics,
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      projectId: project.id,
-      runId: run.id,
-      courseId: project.target_id,
-      procurement: health.metrics,
-      readyForHumanApproval: true,
-      publicationApproved: false,
-    });
+  let resumedCourseId: string | null = null;
+  if(action==='resume-after-review') {
+    const projectId=text(body.projectId);
+    if(!projectId)return NextResponse.json({error:'projectId is required'},{status:400});
+    const project=await loadAgenticProject({projectId,userId:auth.id});
+    if(!project || project.target_type!=='course' || !project.target_id)
+      return NextResponse.json({error:'Canonical course project not found'},{status:404});
+    resumedCourseId=project.target_id;
+  } else if(action!=='start') {
+    return NextResponse.json({error:`Unsupported action: ${action}`},{status:400});
   }
 
-  if (action !== 'start') {
-    return NextResponse.json({ error: `Unsupported action: ${action}` }, { status: 400 });
-  }
-
-  const goal = text(body.goal);
+  const goal = text(body.goal) || (resumedCourseId ? `Resume canonical course ${resumedCourseId}` : null);
   let programId = text(body.programId);
   let programSlug = text(body.programSlug);
-  let courseId = text(body.courseId);
+  let courseId = resumedCourseId || text(body.courseId);
+  const freshRequested = action === 'start' && (body.fresh === true || /\b(?:new|fresh|from scratch)\b/i.test(goal ?? ''));
   if (!goal) return NextResponse.json({ error: 'A course build goal is required.' }, { status: 400 });
 
   const db = await requireAdminClient();
@@ -227,95 +138,70 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (courseId) {
-    const { data: existingProject, error: projectError } = await db
-      .from('agentic_build_projects')
-      .select('*')
-      .eq('user_id', auth.id)
-      .eq('target_type', 'course')
-      .eq('target_id', courseId)
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (projectError) throw projectError;
-
-    if (existingProject) {
-      const { data: existingRun, error: runError } = await db
-        .from('agentic_build_runs')
-        .select('id,status,plan')
-        .eq('project_id', existingProject.id)
-        .in('status', ['queued', 'running', 'waiting_for_approval'])
-        .order('started_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (runError) throw runError;
-      if (existingRun) {
-        await appendAgenticMessage({
-          projectId: existingProject.id,
-          runId: existingRun.id,
-          role: 'user',
-          content: goal,
-          inputMode: 'text',
-        });
-        await runAgenticExecutorOnce({ runId: existingRun.id });
-        return NextResponse.json({
-          ok: true,
-          reused: true,
-          projectId: existingProject.id,
-          runId: existingRun.id,
-          courseId,
-          plan: existingRun.plan,
-        });
-      }
-    }
+  // A fresh Devian command resolves a reference course but never reuses its ID.
+  // Keep the canonical program, compliance standards and competency metadata.
+  if (freshRequested) {
+    const referenceId = courseId;
+    if (!referenceId) return NextResponse.json(
+      { error: 'No unambiguous reference course found for the new course. Specify its program name.' },
+      { status: 422 },
+    );
+    const { data: reference, error: referenceError } = await db.from('courses')
+      .select('id,title,slug,program_id,description,short_description,metadata,org_id,compliance_profile_key,governing_body,governing_region,governing_standard_version,duration_hours')
+      .eq('id', referenceId).single();
+    if (referenceError || !reference) return NextResponse.json(
+      { error: 'Reference course unavailable' }, { status: 404 },
+    );
+    const newTitle = text(body.title) ?? (
+      /prestige.*barber/i.test(goal) ? 'New Prestige Barber Course — Production Test' : `New ${reference.title}`
+    );
+    const newSlug = `${reference.slug}-devian-${crypto.randomUUID().slice(0, 12)}`;
+    const { data: created, error: createError } = await db.from('courses').insert({
+      title: newTitle, slug: newSlug, program_id: reference.program_id,
+      description: reference.description, short_description: reference.short_description,
+      org_id: reference.org_id, status: 'draft', is_active: false,
+      compliance_profile_key: reference.compliance_profile_key,
+      governing_body: reference.governing_body,
+      governing_region: reference.governing_region,
+      governing_standard_version: reference.governing_standard_version,
+      duration_hours: reference.duration_hours,
+      metadata: { ...(reference.metadata ?? {}), devian_fresh_course: true, reference_course_id: reference.id },
+    }).select('id,slug').single();
+    if (createError || !created) throw createError ?? new Error('DEVIAN_COURSE_CREATION_FAILED');
+    courseId = created.id;
+    programId = reference.program_id;
+    programSlug = reference.slug;
   }
 
-  const created = await createAgenticProject({
-    targetType: 'course',
-    title: text(body.title) ?? goal.slice(0, 120),
-    originalPrompt: goal,
-    userId: auth.id,
-    targetId: courseId,
-    metadata: {
-      programId,
-      programSlug,
-      courseId,
-      execution_approved: true,
-      publication_approved: false,
-      source: 'dev_studio_course_agent',
-    },
+  if (!courseId || !programSlug) return NextResponse.json(
+    {error:'Select the canonical course and program before queuing the Ultimate builder.'},{status:400});
+  if (studioRunId) {
+    const {data:ownedRun,error}=await db.from('studio_runs').select('id')
+      .eq('id',studioRunId).eq('user_id',auth.id).maybeSingle();
+    if(error)throw error;
+    if(!ownedRun)return NextResponse.json({error:'Studio run is not owned by this operator'},{status:403});
+  }
+  const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
+    courseId,programSlug,actorId:auth.id,goal,
   });
-
-  await appendAgenticMessage({
-    projectId: created.project.id,
-    role: 'user',
-    content: goal,
-    inputMode: 'text',
-  });
-
-  const started = await startAgenticRun({
-    projectId: created.project.id,
-    targetType: 'course',
-    prompt: goal,
-  });
-
-  await appendAgenticMessage({
-    projectId: created.project.id,
-    runId: started.run.id,
-    role: 'assistant',
-    content: started.plan.summary,
-    metadata: { task_count: started.plan.tasks.length },
-  });
-
-  // Wake the durable executor immediately; its claim is atomic and safe alongside the background poller.
-  await runAgenticExecutorOnce({ runId: started.run.id });
-
-  return NextResponse.json({
-    ok: true,
-    projectId: created.project.id,
-    runId: started.run.id,
-    plan: started.plan,
-  });
+  // Use the same approved worker-launch path as the Admin Start/Resume button.
+  // Do not create a duplicate build just because GitHub Actions dispatch failed.
+  const dispatch = await requestCourseWorker();
+  if (!dispatch.dispatched) {
+    return NextResponse.json({
+      error: dispatch.message,
+      dispatchError: 'dispatchError' in dispatch ? dispatch.dispatchError : 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
+      courseId, buildId: queued.build.id, jobId: queued.job.id,
+      queued: true, executionVerified: false,
+    }, { status: 503 });
+  }
+  if(studioRunId)await recordMasterStudioArtifact(db,{runId:studioRunId,
+    stepId:studioRunStepId ?? undefined,type:'ultimate-course-command',name:goal,status:'generated',
+    metadata:{courseId,buildId:queued.build.id,jobId:queued.job.id,status:queued.job.status},
+    evidence:[{source:'ultimate-build-jobs',captured_at:new Date().toISOString()}]});
+  return NextResponse.json({ok:true,queued:true,authority:'ultimate-course-builder',
+    courseId,buildId:queued.build.id,jobId:queued.job.id,reused:queued.reused,status:queued.job.status,dispatch,executionVerified:false},
+    {status:202});
 }
 
 export async function GET(req: NextRequest) {
@@ -325,6 +211,8 @@ export async function GET(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
+  const buildId = text(req.nextUrl.searchParams.get('buildId'));
+  if(buildId) return NextResponse.json({ok:true,...await new DevStudioUltimateCourseControl(await requireAdminClient()).status(buildId)});
   const projectId = text(req.nextUrl.searchParams.get('projectId'));
   if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
 
@@ -343,8 +231,7 @@ export async function GET(req: NextRequest) {
     .maybeSingle();
   if (runError) throw runError;
 
-  // Advance only this project's run so unrelated stale tasks cannot starve it.
-  if (run?.id) await runAgenticExecutorOnce({ runId: run.id });
+  // Historical agentic runs are read-only; active commands use Ultimate.
 
   let tasks: any[] = [];
   if (run?.id) {

@@ -4,8 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
-import { resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
-import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { isSharedPostLoginDestination, resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
@@ -26,15 +25,32 @@ type SignInApiResponse = {
 };
 
 async function serverSignIn(email: string, password: string): Promise<string> {
-  const response = await fetch('/api/auth/signin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
-    body: JSON.stringify({ email: email.trim(), password }),
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
+  let response: Response;
+
+  try {
+    response = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify({ email: email.trim(), password }),
+    });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(
+        'The sign-in service took too long to respond. Your internet may be working; please retry once or use password reset.',
+        { cause: error },
+      );
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
   if (!contentType.includes('application/json')) {
@@ -58,11 +74,12 @@ async function serverSignIn(email: string, password: string): Promise<string> {
 }
 
 export default function LoginPage() {
-  const searchParams = useSafeSearchParams();
+  const [searchParams, setSearchParams] = useState(() => new URLSearchParams());
   const requestedRedirect = searchParams.get('next') || searchParams.get('redirect') || '';
   const safeRedirect = validateRedirect(requestedRedirect, '');
   const isProgramHolderLogin = safeRedirect.startsWith('/program-holder');
   const reason = searchParams.get('reason');
+  const callbackError = searchParams.get('error');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -70,8 +87,21 @@ export default function LoginPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setSearchParams(new URLSearchParams(window.location.search));
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (callbackError === 'magic_link_expired') {
+      setError(
+        'That secure sign-in link has expired. Request a new link or sign in with your password.',
+      );
+    } else if (callbackError === 'magic_link_failed') {
+      setError(
+        'That secure sign-in link is invalid. Request a new link or sign in with your password.',
+      );
+    }
+  }, [callbackError]);
 
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.
@@ -133,15 +163,13 @@ export default function LoginPage() {
       const requestedDestination = safeRedirect
         ? resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles)
         : '';
-      const isStoreReturn =
-        requestedDestination.startsWith('https://store.elevateforhumanity.org/store');
+      const isSharedReturn = isSharedPostLoginDestination(requestedDestination);
 
       let destination: string;
 
-      // Store checkout is a shared buyer surface, not a role-owned portal.
-      // Preserve this return for students and apprentices too; otherwise a
-      // successful checkout sign-in incorrectly strands them in their portal.
-      if (isStoreReturn) {
+      // Store checkout and Website Builder retain their deployed owner after login.
+      // Their routes enforce the actual subscription and website ownership.
+      if (isSharedReturn) {
         destination = requestedDestination;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
@@ -246,7 +274,7 @@ export default function LoginPage() {
             <Link
               href={
                 isProgramHolderLogin
-                  ? '/reset-password?portal=program-holder&next=/program-holder/onboarding'
+                  ? '/reset-password?portal=program-holder'
                   : '/reset-password'
               }
               className="text-sm font-semibold text-blue-700 hover:underline"

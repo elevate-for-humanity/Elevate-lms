@@ -55,7 +55,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'See enrollment disclosure for current licensing/exam charges and inclusions',
       materials: 0,
-      fundingType: 'Registered Apprenticeship — funding eligibility varies; self-pay and payment options available',
+      fundingType: 'Registered Apprenticeship — self-pay only',
     }),
     withTotal({
       name: 'Bookkeeping / Accounting Clerk',
@@ -240,8 +240,54 @@ export default async function TuitionFeesPage() {
           </ul>
         </section>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
-          <table className="w-full border-collapse">
+        <div className="space-y-4 md:hidden" aria-label="Tuition and fees by program">
+          {programs.map((program) => (
+            <article
+              key={program.name}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+            >
+              <div className="bg-slate-950 px-5 py-4 text-white">
+                <h2 className="text-xl font-bold leading-snug text-white">{program.name}</h2>
+                <p className="mt-1 text-sm leading-5 text-slate-200">{program.duration}</p>
+              </div>
+              <dl className="divide-y divide-slate-100 px-5">
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <dt className="text-sm font-medium text-slate-600">Tuition</dt>
+                  <dd className="max-w-[60%] text-right font-bold text-slate-950">
+                    {program.tuition > 0
+                      ? `$${program.tuition.toLocaleString()}`
+                      : 'Confirm with admissions'}
+                  </dd>
+                </div>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <dt className="text-sm font-medium text-slate-600">Separate exam fees*</dt>
+                  <dd className="text-right font-semibold text-slate-900">
+                    {program.examFees > 0 ? `$${program.examFees.toLocaleString()}` : '—'}
+                  </dd>
+                </div>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <dt className="text-sm font-medium text-slate-600">Materials</dt>
+                  <dd className="text-right font-semibold text-slate-900">
+                    {program.materials > 0 ? `$${program.materials.toLocaleString()}` : '—'}
+                  </dd>
+                </div>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <dt className="text-sm font-bold text-slate-800">Listed total</dt>
+                  <dd className="text-right text-lg font-black text-slate-950">
+                    {program.tuition > 0 ? `$${program.total.toLocaleString()}` : '—'}
+                  </dd>
+                </div>
+                <div className="py-4">
+                  <dt className="text-sm font-bold text-slate-800">Funding</dt>
+                  <dd className="mt-1 text-sm leading-6 text-slate-700">{program.fundingType}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+
+        <div className="hidden overflow-x-auto rounded-xl border border-slate-200 md:block">
+          <table className="min-w-[1050px] w-full border-collapse">
             <thead>
               <tr className="bg-slate-950 text-white">
                 <th className="p-4 text-left font-bold">Program</th>
@@ -345,7 +391,7 @@ export default async function TuitionFeesPage() {
 
         <div className="mt-12 border-t pt-8 text-center">
           <p className="text-slate-800">
-            Questions about tuition or payment options? Call {PLATFORM_DEFAULTS.supportPhone} or use
+            Questions about tuition or payment options? Call {PLATFORM_DEFAULTS.mainPhone} or use
             the contact form.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-5 text-sm">
@@ -374,11 +420,11 @@ export default async function TuitionFeesPage() {
               Apply Now
             </Link>
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '')}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/\D/g, '')}`}
               className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-white px-6 py-3 font-bold text-white hover:bg-brand-blue-900"
             >
               <Phone className="h-4 w-4" />
-              {PLATFORM_DEFAULTS.supportPhone}
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </div>
         </section>

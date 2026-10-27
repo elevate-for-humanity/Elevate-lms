@@ -10,7 +10,7 @@
   const config = {
     siteName: 'Elevate for Humanity',
     logo: '🎓',
-    phone: '+1-317-314-3757',
+    phone: '+1-463-240-1404',
     email: 'elevateforhumanity@gmail.com',
     socialMedia: {
       facebook: 'https://www.facebook.com/elevateforhumanity',

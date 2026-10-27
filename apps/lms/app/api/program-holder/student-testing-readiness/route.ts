@@ -1,9 +1,16 @@
 // pre-auth-registry: exempt - requireProgramHolder enforces holder-scoped access.
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+async function checkEpaProgram(db: any, programId: string) {
+  const { data: program, error } = await db.from('programs').select('slug').eq('id', programId).maybeSingle();
+  if (error) return NextResponse.json({ error: 'Program eligibility could not be verified.' }, { status: 503 });
+  if (!isEpaTestingProgram(program?.slug)) return NextResponse.json({ error: 'EPA testing readiness is only available for the approved HVAC pathway.' }, { status: 400 });
+  return null;
+}
 export async function POST(request: Request) {
   const ctx = await requireProgramHolder();
   if (ctx.mode !== 'holder') {
@@ -35,6 +42,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This student is not in your assigned roster.' }, { status: 403 });
     }
 
+    const eligibilityError = await checkEpaProgram(ctx.db, enrollment.program_id);
+    if (eligibilityError) return eligibilityError;
     studentName = enrollment.full_name || enrollment.email || 'Student';
     programId = enrollment.program_id;
     studentUserId = enrollment.user_id;
@@ -42,7 +51,7 @@ export async function POST(request: Request) {
     const { error } = await ctx.db
       .from('program_enrollments')
       .update({
-        next_required_action: 'Admin testing-readiness review',
+        next_required_action: 'EPA 608 testing requested — Admin review',
         updated_at: new Date().toISOString(),
       })
       .eq('id', studentId)
@@ -63,6 +72,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This student is not in your assigned roster.' }, { status: 403 });
     }
 
+    const eligibilityError = await checkEpaProgram(ctx.db, holderStudent.program_id);
+    if (eligibilityError) return eligibilityError;
     studentName = holderStudent.applicant_name || holderStudent.applicant_email || 'Student';
     programId = holderStudent.program_id;
     studentUserId = holderStudent.student_id || holderStudent.user_id;
@@ -70,7 +81,7 @@ export async function POST(request: Request) {
     const { error } = await ctx.db
       .from('program_holder_students')
       .update({
-        work_progress: 'Ready for testing — Admin review requested',
+        work_progress: 'EPA 608 testing requested — Admin review',
         updated_at: new Date().toISOString(),
       })
       .eq('id', studentId)
@@ -83,8 +94,8 @@ export async function POST(request: Request) {
 
   const { error: notificationError } = await ctx.db.from('staff_notifications').insert({
     type: 'student_ready_for_testing',
-    title: `${studentName} is ready to test`,
-    message: `${ctx.profile.full_name || 'A Program Holder'} reported that ${studentName} completed training and is ready to test.`,
+    title: `EPA 608 test requested for ${studentName}`,
+    message: `${ctx.profile.full_name || 'A Program Holder'} requested EPA 608 testing review for ${studentName}. Verify training hours, progress, and eligibility before scheduling.`,
     severity: 'action_required',
     metadata: {
       source: body.source,

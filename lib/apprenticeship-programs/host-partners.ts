@@ -19,6 +19,7 @@ export type FeaturedHostPartner = {
   zip: string;
   address: string;
   programs: string[];
+  primaryProgram?: string;
   note?: string;
   marketingBlurb?: string;
   media?: FeaturedHostPartnerMedia[];
@@ -36,6 +37,34 @@ export type FeaturedHostPartner = {
 
 export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   {
+    slug: 'j-noelle-co', name: 'J Noelle & Co.', dba: 'J Noelle Collective', businessType: 'HairSalon',
+    city: 'West Lafayette', state: 'IN', zip: '47906', address: '1020 Gemini Ln, Suite 120', phone: '(765) 413-0606',
+    programs: ['cosmetology-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship',
+    marketingBlurb: 'A West Lafayette salon offering hair, extensions, brows, lashes, makeup, and skincare services. Explore the salon, book directly with the team, and ask Elevate about cosmetology apprenticeship placement.',
+    media: [
+      { src: '/images/partners/j-noelle/official-salon-2026.webp', alt: 'Styling stations and mirrors inside J Noelle Collective in West Lafayette', kind: 'photo' },
+      { src: '/images/partners/j-noelle/official-brand-2026.webp', alt: 'J Noelle Collective official salon branding', kind: 'photo' },
+    ],
+    websiteUrl: 'https://jnoellecollective.com/', bookingUrl: 'https://www.vagaro.com/jnoelleandco',
+  },
+
+  {
+    slug: 'prestige-elevation-barber-and-beauty-institute',
+    name: 'Prestige Elevation Barber and Beauty Institute LLC',
+    businessType: 'BarberShop',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46220',
+    address: '6331 N Keystone Ave, Suite D',
+    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    primaryProgram: 'barber-apprenticeship',
+    marketingBlurb: 'An Indianapolis barber and beauty business offering haircuts, beard grooming, styling and client care. Explore the shop portfolio and contact Elevate about supervised apprenticeship placement.',
+    media: [{ src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Haircut portfolio published by Prestige Elevation Barber and Beauty Institute', kind: 'photo' }],
+    websiteUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
+    websiteLabel: 'Explore services and book with Prestige Elevation',
+    bookingUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
+  },
+  {
     slug: 'kountry-kutz-barbershop',
     name: 'Kountry Kutz Barbershop',
     businessType: 'BarberShop',
@@ -49,22 +78,16 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A family-oriented Main Street barbershop serving New Palestine with classic cuts, modern grooming, and an apprenticeship training environment.',
     media: [
+      { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Kountry Kutz Barbershop video introduction and tour', kind: 'video' },
       {
-        src: '/images/partners/kountry-kutz/interior-empty.webp',
+        src: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
         alt: 'Kountry Kutz Barbershop interior and apprenticeship training stations',
         kind: 'photo',
       },
       {
-        src: '/images/partners/kountry-kutz/interior-active.webp',
+        src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
         alt: 'Barbers and clients inside Kountry Kutz Barbershop in New Palestine',
         kind: 'photo',
-      },
-      {
-        src: '/videos/partners/kountry-kutz/shop-tour.mp4',
-        alt: 'Guided interior tour of Kountry Kutz Barbershop',
-        kind: 'video',
-        script:
-          'Welcome to Kountry Kutz Barbershop, located at 56 West Main Street, Suite A, in New Palestine, Indiana. As the video takes you through the shop, notice the professional barber stations, mirrors, chairs, work surfaces, tools, and client service areas that make this a real working barbershop. This family-oriented Main Street shop is an approved Elevate Barber Apprenticeship Host Shop. Here, apprentices can learn how to prepare and sanitize a station, disinfect tools, greet and consult with clients, drape clients correctly, and develop supervised skills in clipper cutting, shear work, fading, lineups, beard grooming, and professional customer service. The tour also shows the daily shop environment where apprentices practice organization, time management, communication, and safe workplace routines. Apply through Elevate before reporting to the shop. Placement, employment, wages, schedule, supervisor capacity, documented training hours, and licensing requirements are confirmed before training begins.',
       },
       {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
@@ -92,43 +115,41 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       "An Elkhart barbershop offering fades, shape ups, beard trims, children's haircuts, shear cuts, and supervised barber apprenticeship experience.",
     media: [
       {
-        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
-        alt: 'Top Shelf Barber Lounge barber providing a haircut',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp',
+        alt: 'Top Shelf Barber Lounge precision fade and professional barbering work',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge clean fade and textured haircut',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge textured crop and blended fade',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge wave haircut, lineup, and beard grooming',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge modern fringe haircut with tapered sides',
         kind: 'photo',
       },
+
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
-        alt: 'Top Shelf Barber Lounge precision fade and lineup',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge fade haircut and full beard shaping',
         kind: 'photo',
       },
     ],
     websiteUrl: 'https://barbershopelkhart.com/',
     websiteLabel: 'Visit Top Shelf Barber Lounge',
+    socialUrl: 'https://www.instagram.com/topshelfbarberlounge/',
+    socialLabel: 'View Top Shelf Instagram',
   },
   {
     slug: 'cals-kutz-studio',
@@ -144,6 +165,12 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A full-service Indianapolis barber studio offering precision cuts, grooming, hair-loss consultation, and professional mentorship in a working shop environment.',
     media: [
+      { src: '/images/partners/cals-kutz/cut-profile-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced fade and beard profile photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/curly-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced curly haircut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/beard-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced beard and precision cut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/client-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced client haircut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/interior-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced studio interior photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/storefront-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced storefront photograph', kind: 'photo' },
       {
         src: '/images/partners/cals-kutz-confidence-restored.webp',
         alt: 'Cals Kutz Studio Confidence Restored hair replacement promotion',
@@ -152,54 +179,9 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
     websiteLabel: 'Book / view Cals Kutz online',
-    socialUrl: 'https://www.instagram.com/calskutzstudio/',
+    bookingUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
+    socialUrl: 'https://www.instagram.com/cal_kutz/',
     socialLabel: 'View Cals Kutz photos',
-  },
-  {
-    slug: 'razors-image-barbershop',
-    name: "Razor's Image Barbershop",
-    businessType: 'BarberShop',
-    city: 'Bloomington',
-    state: 'IN',
-    zip: '47408',
-    address: '155 S Kingston Dr',
-    phone: '(812) 287-7166',
-    programs: ['barber-apprenticeship'],
-    note: 'Approved barber apprenticeship host shop in Bloomington.',
-    marketingBlurb:
-      'A multicultural Bloomington barbershop focused on professional grooming, customer service, hair and scalp care, and hands-on barber development.',
-    media: [
-      {
-        src: '/images/partners/razors-image-logo.jpg',
-        alt: "Razor's Image Barbershop official logo",
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/razors-image-storefront-2026.jpg',
-        alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/razors-image-apprenticeship-flyer.webp',
-        alt: "Original Razor's Image Barber Apprenticeship Program artwork",
-        kind: 'flyer',
-      },
-      {
-        src: '/videos/partners/razors-image-host-barbershop.mp4',
-        alt: "Razor's Image owner introducing the Bloomington barber apprenticeship Host Shop",
-        kind: 'video',
-        script:
-          "Welcome to Razor's Image Barbershop in Bloomington, Indiana. Razor's Image is a multicultural working barbershop and an approved Elevate Barber Apprenticeship Host Shop. Apprentices may build supervised skills in professional grooming, sanitation, client consultation, hair and scalp care, customer service, shop operations, and barbering technique while completing related instruction and documented training hours. Apply through Elevate first. Placement, employment, wages, supervision, schedule, enrollment, and licensing requirements are confirmed before training begins.",
-      },
-    ],
-    resourceUrl:
-      'https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:8be7070f-ef4e-42b8-b646-1806801ac9b3',
-    resourceLabel: "View Razor's Image apprenticeship document",
-    websiteUrl: 'https://razorsimage.com',
-    websiteLabel: "Visit Razor's Image website",
-    bookingUrl: 'https://razorsimage.com/schedule-now/',
-    socialUrl: 'https://www.instagram.com/razors.image/',
-    socialLabel: "View Razor's Image photos",
   },
   {
     slug: 'b-52s-barber-shop',
@@ -217,8 +199,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
     media: [
       {
+        src: '/images/partners/b-52s/interior-derived-2026.webp',
+        alt: 'AI-enhanced interior crop derived from B-52s Barbershop published portfolio',
+        kind: 'photo',
+      },
+      {
         src: '/images/partners/b52s-official.webp',
-        alt: "B-52's Barbershop in New Castle, Indiana",
+        alt: 'B-52s Barbershop published shop and haircut portfolio',
         kind: 'photo',
       },
     ],
@@ -241,8 +228,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
       {
-        src: '/images/partners/style-and-scissor-salon/contact-card.webp',
-        alt: 'Style and Scissor Salon contact card for owner Cori Meid',
+        src: '/images/partners/style-and-scissor-salon/logo.webp',
+        alt: 'Style and Scissor Salon business logo',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
+        alt: 'Professional nail art portfolio from Style and Scissor Salon',
         kind: 'photo',
       },
       {
@@ -251,13 +243,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
-        alt: 'Pink nail designs completed at Style and Scissor Salon',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
-        alt: 'Nail art portfolio from Style and Scissor Salon',
+        src: '/images/partners/style-and-scissor-salon/contact-card.webp',
+        alt: 'Style and Scissor Salon contact card for owner Cori Meid',
         kind: 'photo',
       },
       {
@@ -273,6 +260,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   {
     slug: 'generations-hair-llc',
     name: 'Generations Hair LLC DBA Generations Wedding Co',
+    dba: 'Generations Hair / Cat Eye Collective',
     businessType: 'HairSalon',
     city: 'Martinsville',
     state: 'IN',
@@ -284,12 +272,12 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'An independent Martinsville hair business located inside Cat Eye Collective and participating in the Elevate apprenticeship host-shop network.',
     media: [
       {
-        src: '/images/partners/generations-hair/color-transformation.webp',
-        alt: 'Generations Hair LLC dimensional color transformation',
+        src: '/images/partners/generations-hair/premium-curls.jpg',
+        alt: 'Generations Hair highlighted curls portfolio',
         kind: 'photo',
       },
       {
-        src: '/images/partners/generations-hair/dimensional-color.webp',
+        src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
         alt: 'Generations Hair LLC dimensional brunette and blonde color work',
         kind: 'photo',
       },
@@ -299,7 +287,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/generations-hair/stylist-at-work.webp',
+        src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
         alt: 'Generations Hair LLC stylist working with a salon guest',
         kind: 'photo',
       },
@@ -362,6 +350,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialUrl: 'https://www.instagram.com/midwesternmanes/',
     socialLabel: 'Contact / view shop photos',
   },
+  /* Mesmerized by Beauty Host Shop archived 2026-10-01; Jozanna George remains a Program Holder only.
   {
     slug: 'mesmerized-by-beauty-cosmetology-academy',
     name: 'Mesmerized by Beauty Cosmetology Academy',
@@ -384,6 +373,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     websiteUrl: '/schools/mesmerized-by-beauty',
     websiteLabel: 'Visit Mesmerized by Beauty school page',
   },
+  */
   {
     slug: 'salon-saloon',
     name: 'Salon Saloon LLC',
@@ -419,16 +409,26 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         alt: 'Salon Saloon team and salon tour',
         kind: 'video',
         script:
-          'Welcome to Salon Saloon, located at 1740 South Bend Avenue, Suite A, in South Bend, Indiana. As we move through the salon, notice the open service floor, professional styling stations, mirrors, salon chairs, product displays, and organized work areas designed for serving clients and supporting hands-on learning. Salon Saloon is a participating Elevate Cosmetology Apprenticeship Host Salon. In this real salon environment, apprentices can learn how to prepare and sanitize a station, disinfect tools, conduct a professional client consultation, evaluate hair and scalp needs, assist with shampoo and conditioning services, and build supervised skills in cutting, coloring, styling, finishing, and client care. The tour also introduces the workplace routines apprentices are expected to master, including safety, organization, communication, scheduling, and maintaining a clean professional environment between every guest. Apply through Elevate before reporting to the salon. Placement, employment, schedule, supervision, documented training hours, and enrollment approval are confirmed before training begins.',
+          'Welcome to Salon Saloon in South Bend, Indiana. The salon is located at 1740 South Bend Avenue, Suite A. As we move through the salon, notice the open service floor, professional styling stations, mirrors, salon chairs, product displays, and organized work areas designed for serving clients and supporting hands-on learning. Salon Saloon is a participating Elevate Cosmetology Apprenticeship Host Salon. In this real salon environment, apprentices can learn how to prepare and sanitize a station, disinfect tools, conduct a professional client consultation, evaluate hair and scalp needs, assist with shampoo and conditioning services, and build supervised skills in cutting, coloring, styling, finishing, and client care. The tour also introduces the workplace routines apprentices are expected to master, including safety, organization, communication, scheduling, and maintaining a clean professional environment between every guest. Apply through Elevate before reporting to the salon. Placement, employment, schedule, supervision, documented training hours, and enrollment approval are confirmed before training begins.',
       },
     ],
     websiteUrl: 'https://tory-103460.square.site/',
     websiteLabel: 'Book / view Salon Saloon online',
+    socialUrl: 'https://www.instagram.com/salonsaloon_/',
+    socialLabel: 'View Salon Saloon Instagram',
   },
 ];
 
 export function getFeaturedHostPartnerBySlug(slug: string) {
-  return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === slug);
+  const normalized = slug.trim().toLowerCase().replace(/-[a-f0-9]{8}$/, '');
+  const aliases: Record<string, string> = {
+    'j-noelle-co': 'j-noelle-co',
+    'b-52-s-barber-shop-llc': 'b-52s-barber-shop',
+    'style-and-scissors-salon': 'style-and-scissor-salon',
+    'generations-hair-llc-dba-generations-wedding-co': 'generations-hair-llc',
+  };
+  const canonical = aliases[normalized] ?? normalized;
+  return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === canonical);
 }
 
 export const PARTNER_BRAND_ALIASES = {

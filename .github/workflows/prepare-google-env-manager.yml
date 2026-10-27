@@ -1,0 +1,41 @@
+name: Prepare Google runtime settings ownership
+on:
+  push:
+    branches: [main]
+    paths:
+      - config/google-runtime-policy.json
+      - scripts/gcp/prepare-env-manager.mjs
+      - .github/workflows/prepare-google-env-manager.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-env-manager-preparation
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/prepare-google-env-manager.yml/dispatches" -f ref=main
+  prepare:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/prepare-env-manager.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - run: node scripts/gcp/prepare-env-manager.mjs admin
+      - run: node scripts/gcp/prepare-env-manager.mjs lms

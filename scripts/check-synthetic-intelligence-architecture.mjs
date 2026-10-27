@@ -45,7 +45,9 @@ if (exists('lib/platform/orchestration/agent-planner.ts')) {
 }
 
 requireText('lib/ai/ai-service.ts', "elevate: () => new ElevateProvider()", 'self-hosted Elevate provider registration');
-requireText('lib/ai/ai-service.ts', "['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai']", 'self-hosted/free-first provider order');
+requireText('lib/ai/ai-service.ts', "const PROVIDER_DISCOVERY_ORDER = ['elevate']", 'owned-provider discovery default');
+requireText('lib/ai/ai-service.ts', 'resolveConfiguredChatProvider', 'single configured-provider selection');
+requireText('lib/ai/ai-service.ts', 'requirePaidInferenceContext', 'paid provider authorization gate');
 requireText('lib/ai/ai-service.ts', 'AI_PROVIDER_ORDER', 'configurable provider ordering');
 requireText('lib/ai/providers/elevate.ts', 'ELEVATE_LLM_URL', 'self-hosted inference endpoint configuration');
 requireText('lib/ai/providers/elevate.ts', 'ELEVATE_LLM_SECRET', 'self-hosted inference bearer secret');
@@ -67,7 +69,8 @@ requireText('lib/ai/tools/registry.ts', 'audit', 'tool audit policy');
 requireText('lib/ai/tools/registry.ts', "name: 'openhands.execute'", 'governed OpenHands execution tool');
 requireText('lib/ai/tools/registry.ts', "name: 'openhands.status'", 'governed OpenHands status tool');
 requireText('lib/ai/tools/registry.ts', 'CONFIRM OPENHANDS EXECUTION', 'OpenHands human approval boundary');
-requireText('lib/ai/tools/planner.ts', "name: 'openhands.execute'", 'engineering delegation to OpenHands');
+requireText('lib/ai/tools/planner.ts', "name: /\\bopenhands\\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute'", 'conditional authorized engineering routing');
+requireText('lib/ai/tools/planner.ts', "name: 'openhands.status'", 'OpenHands status routing');
 requireText('lib/ai/tools/planner.ts', "name: 'courses.generate'", 'Course Builder remains outside OpenHands');
 requireText('lib/ai/tools/executor.ts', "status: 'accepted'", 'asynchronous governed tool status');
 requireText('lib/ai/runtime/command-executor.ts', "status: 'running'", 'async command lifecycle');
@@ -131,14 +134,14 @@ if (errors.length) {
 }
 
 console.log('Synthetic intelligence architecture gate: PASS');
-console.log('- self-hosted Elevate/vLLM inference is present and registered first');
-console.log('- external providers remain fallback paths behind the canonical AI service');
+console.log('- owned-provider discovery is the default; explicit paid providers require authorization');
+console.log('- a selected provider remains authoritative without silent paid-provider fallback');
 console.log('- structured JSON output is normalized for Cloudflare and Elevate open-model paths');
 console.log('- canonical agent/tool runtime retained');
 console.log('- planner checkpoints and uses persisted ai_tasks');
 console.log('- shared context composes existing memory/workflow/RAG authorities');
 console.log('- evaluator and approval-aware plan state present');
 console.log('- OpenHands uses current Cloud V1 API, follow-up messaging, and configured model selection through one canonical server client');
-console.log('- OpenHands engineering runs are governed, persisted, asynchronous, and independently verified through GitHub');
+console.log('- owned engineering and explicitly selected OpenHands routing retain approval and verification controls');
 console.log('- Course Builder remains on the normal inference path, not the OpenHands engineering path');
 console.log('- workflow primitives are governed separately from domain AI tools');

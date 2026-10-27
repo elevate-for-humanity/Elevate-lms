@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node ../../scripts/sync-pwa-public.mjs marketing",
-    "build": "node --require ../../scripts/next-fs-rm-retry.cjs ../../node_modules/next/dist/bin/next build",
+    "prebuild": "node ../../scripts/check-build-memory-policy.mjs && node ../../scripts/sync-pwa-public.mjs marketing",
+    "build": "node ../../scripts/run-bounded-build.mjs -- node ../../scripts/build-next-app.mjs",
     "prestart": "node ../../scripts/sync-pwa-public.mjs marketing",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "node ../../scripts/run-bounded-build.mjs -- node ../../node_modules/eslint/bin/eslint.js . --ext .js,.jsx,.ts,.tsx --quiet",
+    "predev": "node ../../scripts/sync-development-public.mjs marketing"
   },
   "dependencies": {
     "buffer": "^6.0.3",
@@ -16,5 +17,8 @@
     "process": "^0.11.10",
     "react": "19.2.7",
     "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "supports-color": "10.2.2"
   }
 }

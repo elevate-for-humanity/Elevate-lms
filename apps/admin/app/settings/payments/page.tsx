@@ -7,25 +7,16 @@ import SettingsFormClient, { SettingsField } from '@/components/admin/settings/S
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Payments | Admin Settings' };
 
-const KEYS = ['billing_provider', 'stripe_billing_mode', 'currency', 'payment_methods'];
+const KEYS = ['billing_provider', 'currency', 'payment_methods'];
 
 const FIELDS: SettingsField[] = [
   {
     key: 'billing_provider',
     label: 'Primary Billing Provider',
-    description: 'New invoices and payment requests are created with this provider.',
+    description: 'QuickBooks is the invoice and accounting ledger for every new billing plan.',
     type: 'select',
         options: [
       { value: 'quickbooks', label: 'QuickBooks — invoices and Pay Now links' },
-    ],
-  },
-  {
-    key: 'stripe_billing_mode',
-    label: 'Legacy Payment History',
-    description: 'Prior transactions remain read-only for accounting, refunds, disputes, and audit history.',
-    type: 'select',
-    options: [
-      { value: 'archive', label: 'Archive only — no new charges' },
     ],
   },
   {
@@ -43,11 +34,11 @@ const FIELDS: SettingsField[] = [
   {
     key: 'payment_methods',
     label: 'Payment Methods',
-    description: 'Enabled payment providers',
+    description: 'Collection and ledger services used by Admin billing schedules',
     type: 'select',
     options: [
-      { value: 'quickbooks_invoice,paypal', label: 'QuickBooks invoice + PayPal payouts' },
-      { value: 'quickbooks_invoice,paypal,manual', label: 'QuickBooks invoice + PayPal payouts + manual payment' },
+      { value: 'quickbooks_invoice,paypal', label: 'PayPal automatic collection + QuickBooks ledger' },
+      { value: 'quickbooks_invoice,paypal,manual', label: 'PayPal automatic collection + QuickBooks ledger + manual invoice' },
     ],
   },
 ];
@@ -66,7 +57,6 @@ export default async function PaymentSettingsPage() {
     (rows ?? []).map((r: any) => [r.key, r.value ?? '']),
   );
   if (!initialValues['billing_provider']) initialValues['billing_provider'] = 'quickbooks';
-  if (!initialValues['stripe_billing_mode']) initialValues['stripe_billing_mode'] = 'archive';
   if (!initialValues['currency'])        initialValues['currency']        = 'USD';
   if (!initialValues['payment_methods']) initialValues['payment_methods'] = 'quickbooks_invoice,paypal';
 
@@ -77,7 +67,7 @@ export default async function PaymentSettingsPage() {
           <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Payments
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment Settings</h1>
-        <p className="text-slate-500">QuickBooks invoicing, PayPal payouts, payment methods, and currency.</p>
+        <p className="text-slate-500">Admin payment plans with PayPal automatic collection and QuickBooks invoicing.</p>
       </div>
 
       <SettingsFormClient
@@ -88,7 +78,7 @@ export default async function PaymentSettingsPage() {
       />
 
       <p className="text-xs text-slate-400 max-w-xl">
-        QuickBooks creates new invoices and Pay Now requests. PayPal sends approved program-holder and contractor payouts. Prior payment-provider records remain read-only for reconciliation. Integration secrets are managed in{' '}
+        The Admin billing dashboard is the subscription authority. PayPal collects approved recurring payments, and QuickBooks records invoices, balances, and Pay Now links. Prior provider records remain read-only for reconciliation. Integration secrets are managed in{' '}
         <Link href="/settings/integrations" className="text-brand-blue-600 underline">
           Dev Studio → Secrets
         </Link>. Connection settings live in the{' '}

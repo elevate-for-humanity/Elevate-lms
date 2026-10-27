@@ -165,7 +165,7 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <DollarSign className="w-5 h-5 text-slate-400" />
+          <DollarSign className="w-5 h-5 text-slate-600" />
           <div>
             <h3 className="font-semibold text-slate-900 text-sm">Voucher &amp; Payout Tracking</h3>
             <p className="text-xs text-slate-500">
@@ -227,35 +227,35 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1.5">
               Student Start Date
-              <span className="ml-1 text-slate-400 font-normal">(triggers invoicing)</span>
+              <span className="ml-1 text-slate-600 font-normal">(triggers invoicing)</span>
             </label>
             <input
               type="date"
               value={studentStart}
               onChange={(e) => setStudentStart(e.target.value)}
               disabled={localData.payout_status === 'paid'}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-500"
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1.5">
               Voucher Issued Date
-              <span className="ml-1 text-slate-400 font-normal">(required before paid date)</span>
+              <span className="ml-1 text-slate-600 font-normal">(required before paid date)</span>
             </label>
             <input
               type="date"
               value={voucherIssued}
               onChange={(e) => setVoucherIssued(e.target.value)}
               disabled={localData.payout_status === 'paid'}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-500"
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1.5">
               Voucher Paid Date
-              <span className="ml-1 text-slate-400 font-normal">(starts 10-day clock)</span>
+              <span className="ml-1 text-slate-600 font-normal">(starts 10-day clock)</span>
             </label>
             <input
               type="date"
@@ -263,7 +263,7 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
               onChange={(e) => setVoucherPaid(e.target.value)}
               disabled={!voucherIssued || localData.payout_status === 'paid'}
               title={!voucherIssued ? 'Set voucher issued date first' : ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
             />
             {voucherPaid && (
               <p className="text-xs text-slate-500 mt-1">
@@ -285,7 +285,7 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
             disabled={localData.payout_status === 'paid'}
             rows={3}
             placeholder="Reference numbers, WorkOne case IDs, confirmation details..."
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-400 resize-none"
+            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-500 resize-none"
           />
         </div>
 
@@ -350,14 +350,14 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
           {showAudit && (
             <div className="mt-3 space-y-2">
               {localData.audit_log.length === 0 ? (
-                <p className="text-xs text-slate-400">No changes recorded yet.</p>
+                <p className="text-xs text-slate-600">No changes recorded yet.</p>
               ) : (
                 localData.audit_log.map((entry) => (
                   <div
                     key={entry.id}
                     className="flex items-start gap-3 text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2"
                   >
-                    <span className="text-slate-400 flex-shrink-0 w-32">
+                    <span className="text-slate-600 flex-shrink-0 w-32">
                       {new Date(entry.changed_at).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -367,11 +367,11 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
                     <span className="flex-shrink-0 font-medium text-slate-700 w-40">
                       {entry.field_name.replace(/_/g, ' ')}
                     </span>
-                    <span className="text-slate-400">
+                    <span className="text-slate-600">
                       {entry.old_value ?? '—'} →{' '}
                       <span className="text-slate-700 font-medium">{entry.new_value ?? '—'}</span>
                     </span>
-                    <span className="ml-auto text-slate-400 flex-shrink-0">
+                    <span className="ml-auto text-slate-600 flex-shrink-0">
                       {entry.changed_by_name}
                     </span>
                   </div>

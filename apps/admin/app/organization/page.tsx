@@ -128,7 +128,7 @@ export default function OrganizationPage() {
               <Phone className="w-5 h-5 text-purple-600" />
               <div>
                 <div className="font-medium">Phone</div>
-                <div className="text-slate-600 text-sm">(317) 314-3757</div>
+                <div className="text-slate-600 text-sm">(463) 240-1404</div>
               </div>
             </div>
             <div className="flex items-center gap-3">

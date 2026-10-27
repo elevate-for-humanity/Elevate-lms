@@ -66,6 +66,10 @@ function duplicateCount(values: string[]): number {
   return [...counts.values()].reduce((total, count) => total + Math.max(0, count - 1), 0);
 }
 
+export function repeatedTeachingSegments(value: string): number {
+  return duplicateCount(normalizedTeachingSegments(value));
+}
+
 function domain(courseTitle: string): InstructionalQualityEvidence['courseDomain'] {
   const title = courseTitle.toLowerCase();
   if (/cosmetolog|beauty/.test(title)) return 'cosmetology';
@@ -177,23 +181,34 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   );
   const objectiveCoverage = objectivesCoverage(learningObjectives, input.script);
   const sceneNarrationAlignment = sceneAlignment(input.storyboard);
-  const repeatedNarrationSegments = duplicateCount(normalizedTeachingSegments(input.script));
+  const repeatedNarrationSegments = repeatedTeachingSegments(input.script);
   const repeatedSceneDialogues = duplicateCount(
     input.storyboard.scenes.flatMap((scene) =>
       scene.dialogue ? normalizedTeachingSegments(scene.dialogue) : [],
     ),
   );
+  // Inspect both the canonical script and the exact scene dialogue that will be
+  // sent to production TTS. Legacy timeline/LMS control tokens are a hard
+  // failure even when ordinary prose around them would otherwise pass.
+  const narrationSurface = [
+    input.script,
+    ...input.storyboard.scenes.map((scene) => scene.dialogue ?? ''),
+  ].join('\n');
   const instructionLeakageDetected =
-    /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i.test(
-      input.script,
+    /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering|knowledge-check-\d+|repository_blueprint|course_lessons|readingGuide\.summary|learning_objectives|preAssessment|video_url|knowledgeChecks|practicalTask|quiz_questions|pre_assessment|review_exam|original_capture|licensed_demonstration|animated-text|technical-diagram|equipment-image|screen-demonstration|instructor objective|instructor and lesson roadmap|approved lesson source|three sourced teaching points|labeled sequence diagram|decision and evidence checklist)\b/i.test(
+      narrationSurface,
     );
   const lessonKind =
     `${input.lessonType ?? ''} ${input.evidenceType ?? ''} ${input.lessonTitle}`.toLowerCase();
   const isAssessment = /\b(checkpoint|quiz|exam|assessment|review)\b/.test(lessonKind);
+  // Keep the practical safety contract tied to the lesson identity, not incidental
+  // words in learner narration. Theory lessons can legitimately mention a
+  // practical exam or styling products without becoming hands-on procedures.
   const practicalBeautyLesson =
+    !isAssessment &&
     (courseDomain === 'cosmetology' || courseDomain === 'barbering') &&
-    /\b(cut|clipper|shear|razor|shav|fade|style|color|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|nail|procedure|practical|hands-on|demonstrat)\b/i.test(
-      `${input.lessonTitle} ${input.script}`,
+    /\b(cut|cutting|clipper|shear|razor|shav|fade|styling|updo|blow[- ]?dry|thermal|curling|flat iron|color(?:ing)?|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|pedicur|nail|shampoo|scalp massage|scalp treatment|wax|thread|braid|twist|procedure|practical|hands-on)\b/i.test(
+      lessonKind,
     );
 
   if (scriptWords.length < minimumWordCount) {
@@ -207,7 +222,7 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
     );
   }
   if (instructionLeakageDetected)
-    failures.push('narration contains internal generation instructions');
+    failures.push('narration contains internal generation instructions or authoring metadata');
   if (repeatedNarrationSegments > 0)
     failures.push(`narration repeats ${repeatedNarrationSegments} substantial teaching segment(s)`);
   if (repeatedSceneDialogues > 0)

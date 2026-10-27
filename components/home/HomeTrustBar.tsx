@@ -54,26 +54,6 @@ const TRUST_ITEMS = [
   },
 ];
 
-const PARTNER_LOGOS = [
-  {
-    src: '/images/pages/about-funding-nav.webp',
-    alt: 'US Department of Labor workforce system',
-    href: '/federal-compliance',
-  },
-  {
-    src: '/images/pages/about-partner-cta.webp',
-    alt: 'Indiana Department of Workforce Development',
-    href: '/for-agencies',
-  },
-  {
-    src: '/images/pages/workforce-board-page-2.webp',
-    alt: 'WorkOne Indiana workforce system',
-    href: '/for-agencies',
-  },
-  { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs funding pathway', href: '/eligibility' },
-  { src: '/images/pages/about-hero.webp', alt: 'Workplace safety training', href: '/compliance' },
-];
-
 export function HomeTrustBar() {
   return (
     <section
@@ -113,33 +93,6 @@ export function HomeTrustBar() {
         </div>
       </div>
 
-      <div className="border-t border-slate-200 bg-white py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-center text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-6">
-            Workforce systems and public-sector alignment
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
-            {PARTNER_LOGOS.map((logo) => (
-              <Link
-                key={logo.src}
-                href={logo.href}
-                aria-label={logo.alt}
-                className="relative h-12 w-28 md:h-14 md:w-32 opacity-80 hover:opacity-100 transition-opacity duration-300"
-              >
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 40vw, 10vw"
-                  loading="lazy"
-                  placeholder="empty"
-                />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

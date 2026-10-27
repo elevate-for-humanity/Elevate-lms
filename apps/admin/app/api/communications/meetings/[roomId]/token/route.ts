@@ -1,3 +1,4 @@
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -32,10 +33,13 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
     : (room as any)?.communication_workspaces;
   const tenantId = profile.tenant_id ?? profile.organization_id ?? null;
   const platformAdmin = ['admin', 'super_admin'].includes(String(profile.role || '').toLowerCase());
+  const workspaceTenantId = workspace?.tenant_id ?? null;
+  const canAccessWorkspace =
+    Boolean(tenantId || platformAdmin) &&
+    (workspaceTenantId === tenantId || (platformAdmin && workspaceTenantId === null));
   if (
     !room ||
-    workspace?.tenant_id !== tenantId ||
-    (!tenantId && !platformAdmin) ||
+    !canAccessWorkspace ||
     workspace?.status !== 'active' ||
     room.status === 'cancelled'
   ) {
@@ -46,6 +50,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
     [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
     profile.email ||
     'Team member';
+  await hydrateProcessEnv();
   try {
     return NextResponse.json(
       await createMeetingToken({

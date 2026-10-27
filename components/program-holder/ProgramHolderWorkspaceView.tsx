@@ -1,4 +1,10 @@
+import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
+import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
+import CourseSyllabus from '@/components/learner/CourseSyllabus';
+import { completionAlert } from '@/lib/program-holder/student-training';
+import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
+import { StudentProgressReportForm } from './StudentProgressReportForm';
 import Image from 'next/image';
 import {
   AlertTriangle,
@@ -9,6 +15,9 @@ import {
   ShieldCheck,
   Users,
   Phone,
+  BriefcaseBusiness,
+  CalendarDays,
+  MessageSquare,
 } from 'lucide-react';
 import { formatUsPhone } from '@/lib/phone/config';
 import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/workspace';
@@ -20,19 +29,39 @@ import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificatio
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
 import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
-import { getProgramCardImage } from '@/lib/images/programImages';
+import { getProgramCardImage, getProgramHeroImage } from '@/lib/images/programImages';
 import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 import { CallListPanel } from './CallListPanel';
 import { StudentReadyForTestingButton } from './StudentReadyForTestingButton';
+import { getActiveJobs } from '@/lib/data/jobs';
+import JobCard from '@/components/jobs/JobCard';
+import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
+import { ProgramHolderOperationsGuide } from './ProgramHolderOperationsGuide';
+import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
-  programSlug: string | undefined,
+  program:
+    | {
+        hero_image_url?: string | null;
+        image_url?: string | null;
+        cover_image_url?: string | null;
+        slug?: string;
+      }
+    | undefined,
 ) {
   if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
+  const programPhoto = program?.hero_image_url || program?.image_url || program?.cover_image_url;
+  // Some legacy database image paths point to files that were never published.
+  // Use the maintained program image map for local paths; keep hosted program photos.
+  if (programPhoto?.trim() && /^https:\/\//.test(programPhoto.trim())) {
+    return { src: programPhoto.trim(), isPortrait: false };
+  }
+  if (program?.slug) return { src: getProgramHeroImage(program.slug), isPortrait: false };
   return {
-    src: getProgramCardImage(programSlug || 'business-administration'),
+    src: '/images/pages/community-page-2.webp',
     isPortrait: false,
   };
 }
@@ -40,6 +69,7 @@ function resolveDashboardHero(
 type Section =
   | 'dashboard'
   | 'students'
+  | 'at-risk'
   | 'pending'
   | 'programs'
   | 'hours'
@@ -57,7 +87,20 @@ export async function ProgramHolderWorkspaceView({
   payoutPanel?: React.ReactNode;
 }) {
   const data = await getProgramHolderWorkspace();
+  const coordinatorRole =
+    data.mode === 'holder' ? String(data.holder?.features?.approved_role || (data.profile?.role === 'site_coordinator' ? 'Site Coordinator' : '')) : '';
+  const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
+  const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
+  const texasLaunchKit =
+    section === 'dashboard' && isTexasStateCoordinator ? (
+      <TexasCoordinatorLaunchKit
+        coordinatorName={data.profile?.full_name || undefined}
+        coordinatorPhone={data.profile?.phone || data.holder?.contact_phone || undefined}
+        coordinatorEmail={data.profile?.email || data.holder?.contact_email || undefined}
+      />
+    ) : null;
+  const careerJobs = section === 'dashboard' ? await getActiveJobs({ limit: 2 }) : [];
 
   const active = data.enrollments.filter((row) =>
     ['active', 'enrolled', 'in_progress'].includes(row.enrollment_state || row.status),
@@ -83,16 +126,16 @@ export async function ProgramHolderWorkspaceView({
       .filter((row) => row.approved === true || row.status === 'approved')
       .map((row) => row.document_type),
   );
-  const requiredDocumentTypes = ['government_id', 'business_registration', 'insurance', 'w9'];
   const holderFeatures =
     data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const requiredDocumentTypes = requiredProgramHolderDocuments(isHvac, holderFeatures).map(item => item.type);
   const regionalAssignment =
     holderFeatures.regional_assignment && typeof holderFeatures.regional_assignment === 'object'
-      ? holderFeatures.regional_assignment as Record<string, unknown>
+      ? (holderFeatures.regional_assignment as Record<string, unknown>)
       : null;
   const customMou =
     holderFeatures.custom_mou && typeof holderFeatures.custom_mou === 'object'
-      ? holderFeatures.custom_mou as Record<string, unknown>
+      ? (holderFeatures.custom_mou as Record<string, unknown>)
       : null;
   const coordinatorRequirements = Array.isArray(customMou?.requirements)
     ? customMou.requirements.map((item) => String(item))
@@ -101,7 +144,8 @@ export async function ProgramHolderWorkspaceView({
     ? holderFeatures.training_topics.map((item) => String(item))
     : [];
   const requiresMediaEvidence = holderFeatures.student_media_required === true;
-  const requiresImageRelease = holderFeatures.require_image_release === true || requiresMediaEvidence;
+  const requiresImageRelease =
+    holderFeatures.require_image_release === true || requiresMediaEvidence;
   const selectedPayoutProvider = String(
     holderFeatures.payout_provider || data.payoutProfile?.payout_provider || '',
   ).toLowerCase();
@@ -128,8 +172,22 @@ export async function ProgramHolderWorkspaceView({
       required: true,
       owner: 'Elevate',
     },
-    { label: 'Memorandum of Understanding', complete: Boolean(data.holder?.mou_signed), required: true, owner: 'Shared' },
-    ...(isHvac ? [{ label: 'HVAC program assignment', complete: true, required: true, owner: 'Elevate' as const }] : []),
+    {
+      label: 'Memorandum of Understanding',
+      complete: Boolean(data.holder?.mou_signed),
+      required: true,
+      owner: 'Shared',
+    },
+    ...(isHvac
+      ? [
+          {
+            label: 'HVAC program assignment',
+            complete: true,
+            required: true,
+            owner: 'Elevate' as const,
+          },
+        ]
+      : []),
     ...(isHvac
       ? [
           {
@@ -144,6 +202,14 @@ export async function ProgramHolderWorkspaceView({
     {
       label: 'Program Holder handbook acknowledgement',
       complete: data.acknowledgements.some((item) => item.document_type === 'handbook'),
+      required: true,
+      owner: 'Program Holder',
+    },
+    {
+      label: 'Non-disclosure and confidentiality agreement',
+      complete: data.acknowledgements.some((item) =>
+        ['nda', 'non_disclosure', 'confidentiality'].includes(item.document_type),
+      ),
       required: true,
       owner: 'Program Holder',
     },
@@ -166,7 +232,7 @@ export async function ProgramHolderWorkspaceView({
         ]
       : []),
     {
-      label: 'Approved ID, business registration, insurance, and W-9',
+      label: 'Approved required onboarding documents',
       complete: requiredDocumentTypes.every((type) => approvedDocumentTypes.has(type)),
       required: true,
       owner: 'Shared',
@@ -176,58 +242,84 @@ export async function ProgramHolderWorkspaceView({
       complete:
         Boolean(data.profile?.avatar_url) ||
         data.documents.some((row) => row.document_type === 'profile_photo'),
-      required: false,
+      required: true,
       owner: 'Program Holder',
     },
-    ...(requiresImageRelease ? [{
-      label: 'Signed image release',
-      complete: Boolean(data.imageReleaseConsent?.signed_at),
-      required: true,
-      owner: 'Program Holder' as const,
-    }] : []),
+    ...(requiresImageRelease
+      ? [
+          {
+            label: 'Signed image release',
+            complete: Boolean(data.imageReleaseConsent?.signed_at),
+            required: true,
+            owner: 'Program Holder' as const,
+          },
+        ]
+      : []),
     {
       label: 'Company logo upload',
       complete: data.documents.some((row) => row.document_type === 'company_logo'),
-      required: false,
+      required: true,
       owner: 'Program Holder',
     },
-    ...(selectedPayoutProvider === 'quickbooks' ? [{
-      label: 'QuickBooks payment-record connection',
-      complete: ['active', 'connected', 'synced', 'complete'].includes(
-        String(data.payoutProfile?.quickbooks_sync_status || '').toLowerCase(),
-      ),
-      required: true,
-      owner: 'Elevate' as const,
-    }] : []),
-    ...(selectedPayoutProvider === 'paypal' ? [{
-      label: 'PayPal payout connection',
-      complete:
-        data.payoutProfile?.payout_provider === 'paypal' &&
-        Boolean(data.payoutProfile?.payouts_enabled) &&
-        Boolean(data.payoutProfile?.transfers_enabled),
-      required: true,
-      owner: 'Shared' as const,
-    }] : []),
-    ...(requiresMediaEvidence ? [{
-      label: 'Student photos and training videos',
-      complete: data.documents.some((row) =>
-        ['student_photo', 'student_video'].includes(row.document_type),
-      ),
-      required: true,
-      owner: 'Program Holder' as const,
-    }] : []),
-    ...(completed.length ? [{
-      label: 'Graduated-student back work and 48-hour sign-offs',
-      complete: incompleteBackWork.length === 0,
-      required: true,
-      owner: 'Shared' as const,
-    }] : []),
-    { label: 'Course delivery assignment', complete: data.courseAssignments.length > 0, required: data.programs.length > 0, owner: 'Elevate' },
+    ...(selectedPayoutProvider === 'quickbooks'
+      ? [
+          {
+            label: 'QuickBooks payment-record connection',
+            complete: ['active', 'connected', 'synced', 'complete'].includes(
+              String(data.payoutProfile?.quickbooks_sync_status || '').toLowerCase(),
+            ),
+            required: true,
+            owner: 'Elevate' as const,
+          },
+        ]
+      : []),
+    ...(selectedPayoutProvider === 'paypal'
+      ? [
+          {
+            label: 'PayPal payout connection',
+            complete:
+              data.payoutProfile?.payout_provider === 'paypal' &&
+              Boolean(data.payoutProfile?.payouts_enabled) &&
+              Boolean(data.payoutProfile?.transfers_enabled),
+            required: true,
+            owner: 'Shared' as const,
+          },
+        ]
+      : []),
+    ...(requiresMediaEvidence
+      ? [
+          {
+            label: 'Student photos and training videos',
+            complete: data.documents.some((row) =>
+              ['student_photo', 'student_video'].includes(row.document_type),
+            ),
+            required: true,
+            owner: 'Program Holder' as const,
+          },
+        ]
+      : []),
+    ...(completed.length
+      ? [
+          {
+            label: 'Graduated-student back work and 48-hour sign-offs',
+            complete: incompleteBackWork.length === 0,
+            required: true,
+            owner: 'Shared' as const,
+          },
+        ]
+      : []),
+    {
+      label: 'Course delivery assignment',
+      complete: data.courseAssignments.length > 0,
+      required: data.programs.length > 0,
+      owner: 'Elevate',
+    },
   ];
   const requiredComplianceItems = complianceItems.filter((item) => item.required);
   const complianceScore = Math.round(
     (requiredComplianceItems.filter((item) => item.complete).length /
-      Math.max(1, requiredComplianceItems.length)) * 100,
+      Math.max(1, requiredComplianceItems.length)) *
+      100,
   );
   const completedRequirements = requiredComplianceItems.filter((item) => item.complete).length;
   const missingRequirements = requiredComplianceItems.length - completedRequirements;
@@ -239,22 +331,19 @@ export async function ProgramHolderWorkspaceView({
     data.payoutProfile?.transfers_enabled &&
     data.payoutProfile?.verification_status === 'active',
   );
-  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]?.slug);
+  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]);
 
   if (section === 'students')
-    return (
-      <Students
-        title="Enrolled Students"
-        rows={[...data.enrollments, ...data.convertedStudents]}
-        programs={data.programs}
-      />
-    );
+    return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
+  if (section === 'at-risk')
+    return <Students title="At-Risk Students" rows={atRisk} programs={data.programs} />;
   if (section === 'pending')
     return (
       <Applicants
         rows={data.applicants}
         programs={data.programs}
         contactAccessGranted={data.contactAccessGranted}
+        namesOnly={data.requiresEnchantedHeartsTerms}
       />
     );
   if (section === 'programs') return <Programs data={data} />;
@@ -268,20 +357,24 @@ export async function ProgramHolderWorkspaceView({
         rows={data.documents}
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
+        insuranceRequired={holderFeatures.insurance_required !== false}
       />
     );
   if (section === 'reports')
     return (
-      <Reports
-        rows={data.reports}
-        enrolled={data.enrollments.length}
-        active={active.length}
-        completed={completed.length}
-        programLabel={primaryProgramLabel}
-      />
+      <div className="space-y-6">
+        <Reports
+          rows={data.reports}
+          enrolled={data.enrollments.length}
+          active={active.length}
+          completed={completed.length}
+          programLabel={primaryProgramLabel}
+        />
+        <StudentProgressReportForm students={data.enrollments.map(row => ({id:row.id, full_name:row.full_name}))} />
+      </div>
     );
   if (section === 'payouts')
-    return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;
+    return <section className="space-y-4 p-4"><h1 className="text-2xl font-black">Financial records</h1><p>Student funding, reimbursements, and payment records are managed by authorized Elevate administrators.</p>{payoutPanel}</section>;
   if (section === 'settings')
     return (
       <Settings
@@ -293,43 +386,242 @@ export async function ProgramHolderWorkspaceView({
     );
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="w-full min-w-0 space-y-6 px-3 pb-28 sm:space-y-8 sm:px-6 lg:pb-8 [&_h1]:[overflow-wrap:normal] [&_h2]:[overflow-wrap:normal] [&_h3]:[overflow-wrap:normal] [&_h1]:[word-break:normal] [&_h2]:[word-break:normal] [&_h3]:[word-break:normal] [&_section]:min-w-0 [&_article]:min-w-0">
+      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">
+              This week
+            </p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">
+              Your weekly responsibilities
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              This list is calculated from your live applicants, students, hours, reports,
+              compliance record, agreement, and payout setup. Open an item to finish the work; do
+              not mark work complete unless the record supports it.
+            </p>
+          </div>
+          <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">
+            {
+              [
+                callQueue.length === 0,
+                pendingHours.length === 0,
+                atRisk.length === 0,
+                missingRequirements === 0,
+                Boolean(data.holder?.mou_signed),
+              ].filter(Boolean).length
+            }
+            /5 core checks clear
+          </span>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {[
+            {
+              label: 'Contact every new applicant',
+              detail: callQueue.length
+                ? `${callQueue.length} applicant${callQueue.length === 1 ? '' : 's'} still need a documented call/outcome.`
+                : 'Every routed applicant has a documented call/outcome.',
+              done: callQueue.length === 0,
+              href: '/program-holder/students/pending',
+            },
+            {
+              label: 'Review and verify training hours',
+              detail: pendingHours.length
+                ? `${pendingHours.length} hour entr${pendingHours.length === 1 ? 'y' : 'ies'} need review.`
+                : 'No submitted training-hour records are waiting for review.',
+              done: pendingHours.length === 0,
+              href: '/program-holder/hours',
+            },
+            {
+              label: 'Follow up with students needing attention',
+              detail: atRisk.length
+                ? `${atRisk.length} student${atRisk.length === 1 ? '' : 's'} currently need intervention or follow-up.`
+                : 'No active students are currently flagged at risk.',
+              done: atRisk.length === 0,
+              href: '/program-holder/students/at-risk',
+            },
+            {
+              label: 'Clear documents and compliance',
+              detail: missingRequirements
+                ? `${missingRequirements} required compliance item${missingRequirements === 1 ? '' : 's'} remain incomplete.`
+                : 'Required compliance checks are currently complete.',
+              done: missingRequirements === 0,
+              href: '/program-holder/compliance',
+            },
+            {
+              label: 'Review your actual agreement and payment readiness',
+              detail: data.holder?.mou_signed
+                ? 'Your MOU is recorded as signed. Review payout milestones and payment history against that agreement.'
+                : 'Your assigned MOU still requires signature before agreement-controlled payment milestones can be completed.',
+              done: Boolean(data.holder?.mou_signed),
+              href: data.holder?.mou_signed
+                ? '/program-holder/payouts'
+                : '/program-holder/sign-mou',
+            },
+          ].map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"
+            >
+              <span
+                className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}
+              >
+                {item.done ? '✓' : '!'}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-black text-slate-950">{item.label}</span>
+                <span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span>
+                <span className="mt-2 block text-xs font-black text-blue-800">
+                  {item.done ? 'Review record' : 'Open required action'} →
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
+      {texasLaunchKit}
+      <ProgramHolderOperationsGuide
+        holderName={data.holder?.organization_name || data.holder?.name || data.profile?.full_name}
+        programs={data.programs}
+        role={coordinatorRole || 'Program Holder'}
+      />
       {regionalAssignment && customMou ? (
         <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Regional operating assignment</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Regional operating assignment
+          </p>
           <h2 className="mt-2 text-2xl font-black text-slate-950">
             {String(holderFeatures.approved_role || 'Regional Site Coordinator')}
           </h2>
           <p className="mt-2 text-sm text-slate-700">
-            Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>. Your dashboard is linked to the Gary regional team while preserving your individual login and audit history.
+            Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>.
+            Your dashboard is linked to the assigned regional team while preserving your individual
+            login and audit history.
           </p>
+          {coordinatorRole === 'Gary Regional Site Coordinator' && (
+            <Link
+              href="/program-holder/gary-launch"
+              className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white"
+            >
+              Open your Gary step-by-step launch guide
+            </Link>
+          )}
+          <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            <strong>Applicant routing:</strong> Your regional queue includes applicants across all
+            Elevate programs whose residence is within the assigned regional service area when no
+            local Program Holder controls that applicant/program. Applicants outside your regional
+            territory must not be worked from this dashboard. When an approved local Program Holder
+            is assigned, Elevate may transfer the program-specific applicant to that holder while
+            preserving the regional audit history.
+          </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-4">
               <h3 className="font-black text-slate-950">How the role works</h3>
-              <p className="mt-2 text-sm text-slate-700">Recruit qualified Program Holders for every program offered in the region. Until an approved holder is assigned, the Site Coordinators remain responsible for coordinating that program, applicants, students, WorkOne steps, records, communication, progress, and closeout.</p>
-              <p className="mt-2 text-sm text-slate-700">Use PARIS and the interactive office to open workspaces, call or message people, record notes and outcomes, manage tasks and documents, monitor learners, submit reports, and review payout readiness.</p>
+              <p className="mt-2 text-sm text-slate-700">
+                Recruit qualified Program Holders for every program offered in the region. Until an
+                approved holder is assigned, the Site Coordinators remain responsible for
+                coordinating that program, applicants, students, WorkOne steps, records,
+                communication, progress, and closeout.
+              </p>
+              <p className="mt-2 text-sm text-slate-700">
+                Use PARIS and the interactive office to open workspaces, call or message people,
+                record notes and outcomes, manage tasks and documents, monitor learners, submit
+                reports, and review payout readiness.
+              </p>
             </div>
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <h3 className="font-black text-emerald-950">Compensation</h3>
               <p className="mt-2 text-sm text-emerald-950">
-                <strong>{formatUsd(Number(customMou.compensation_per_eligible_enrollment || 1000))}</strong> per eligible, verified enrollment: {formatUsd(Number(customMou.initial_payment || 500))} after verified enrollment, documentation, and funding authorization; {formatUsd(Number(customMou.completion_payment || 500))} after verified completion and closeout.
+                Compensation terms are recorded in the current signed coordinator agreement. Review
+                the agreement and payout schedule for the applicable amounts and milestones.
               </p>
-              <p className="mt-2 text-xs text-emerald-900">A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p>
-              <p className="mt-2 text-sm font-bold text-rose-800">{String(customMou.payout_contact_requirement || 'No payout credit is earned until you make a documented call/contact on the assigned applicant and record the outcome in the system.')}</p>
-              <p className="mt-2 text-xs text-rose-700">{String(customMou.uncontacted_alert_rule || 'Applicants without a documented contact outcome for five days are escalated to the admin dashboard.')}</p>
+              <p className="mt-2 text-xs text-emerald-900">
+                A lead, incomplete application, unverified enrollment, or unverified completion does
+                not by itself trigger payment.
+              </p>
+              <p className="mt-2 text-sm font-bold text-rose-800">
+                {String(
+                  customMou.payout_contact_requirement ||
+                    'No payout credit is earned until you make a documented call/contact on the assigned applicant and record the outcome in the system.',
+                )}
+              </p>
+              <p className="mt-2 text-xs text-rose-700">
+                {String(
+                  customMou.uncontacted_alert_rule ||
+                    'Applicants without a documented contact outcome for five days are escalated to the admin dashboard.',
+                )}
+              </p>
             </div>
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <div>
               <h3 className="font-black text-slate-950">Required setup and operating checklist</h3>
-              <ul className="mt-2 space-y-2 text-sm text-slate-700">
-                {coordinatorRequirements.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">□</span><span>{item}</span></li>)}
-              </ul>
+              <div className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorRequirements.map((item) => {
+                  const normalized = item.toLowerCase();
+                  const href =
+                    normalized.includes('mou') || normalized.includes('agreement')
+                      ? '/program-holder/sign-mou'
+                      : normalized.includes('document') ||
+                          normalized.includes('w-9') ||
+                          normalized.includes('insurance') ||
+                          normalized.includes('license')
+                        ? '/program-holder/documents'
+                        : normalized.includes('payment') ||
+                            normalized.includes('payout') ||
+                            normalized.includes('bank')
+                          ? '/program-holder/payouts'
+                          : normalized.includes('phone') ||
+                              normalized.includes('extension') ||
+                              normalized.includes('call')
+                            ? '/program-holder/phone'
+                            : normalized.includes('applicant') ||
+                                normalized.includes('workone') ||
+                                normalized.includes('outreach')
+                              ? '/program-holder/students/pending'
+                              : normalized.includes('student') || normalized.includes('learner')
+                                ? '/program-holder/students'
+                                : normalized.includes('hour') || normalized.includes('attendance')
+                                  ? '/program-holder/hours'
+                                  : normalized.includes('report')
+                                    ? '/program-holder/reports'
+                                    : normalized.includes('program') ||
+                                        normalized.includes('catalog')
+                                      ? '/program-holder/programs'
+                                      : isGaryRegionalCoordinator
+                                        ? '/program-holder/gary-launch'
+                                        : '/program-holder/how-to-use';
+                  return (
+                    <Link
+                      key={item}
+                      href={href}
+                      className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold hover:border-blue-300 hover:bg-blue-50"
+                    >
+                      <span
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black text-amber-900"
+                        aria-hidden="true"
+                      >
+                        !
+                      </span>
+                      <span className="min-w-0 flex-1">{item}</span>
+                      <span className="shrink-0 text-xs font-black text-blue-800">Open →</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <h3 className="font-black text-slate-950">Required training</h3>
               <ul className="mt-2 space-y-2 text-sm text-slate-700">
-                {coordinatorTrainingTopics.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">•</span><span>{item}</span></li>)}
+                {coordinatorTrainingTopics.map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <span aria-hidden="true">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -359,7 +651,7 @@ export async function ProgramHolderWorkspaceView({
                     {' · '}
                     {data.phoneLine.status === 'active' ? 'Active' : 'Setup in progress'}
                   </p>
-                  {data.programs.length ? (
+                  {data.programs.length && !regionalAssignment?.all_programs_in_region ? (
                     <div className="mt-3">
                       <p className="text-xs font-black uppercase tracking-wider text-slate-500">
                         Programs on this extension
@@ -391,10 +683,10 @@ export async function ProgramHolderWorkspaceView({
             </div>
           </div>
           <Link
-            href="/program-holder/how-to-use"
+            href="/program-holder/phone"
             className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-indigo-300 px-4 py-2 text-sm font-black text-indigo-900"
           >
-            Phone system instructions
+            Open new phone dashboard
           </Link>
         </div>
       </section>
@@ -405,15 +697,27 @@ export async function ProgramHolderWorkspaceView({
               New here?
             </p>
             <h2 className="mt-1 text-xl font-black text-slate-950">
-              Start with Elizabeth and Paris
+              {isGaryRegionalCoordinator
+                ? 'Start with your Gary coordinator launch guide'
+                : 'Start with Elizabeth and Paris'}
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough, and
-              learn what is required for payment.
+              {isGaryRegionalCoordinator ? (
+                'Follow the coordinator steps in order: account setup, program review, WorkOne outreach, Program Holder recruitment, employer outreach, applicant routing, and weekly operations.'
+              ) : (
+                <>
+                  Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough,
+                  and learn what is required for payment.
+                </>
+              )}
             </p>
           </div>
           <Link
-            href="/program-holder/how-to-use"
+            href={
+              isGaryRegionalCoordinator
+                ? '/program-holder/gary-launch'
+                : '/program-holder/how-to-use'
+            }
             className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white"
           >
             Start orientation
@@ -455,6 +759,105 @@ export async function ProgramHolderWorkspaceView({
         heroImage={dashboardHero.src}
         isPortrait={dashboardHero.isPortrait}
       />
+      <PortalStartChecklist role="program-holder" />
+      <BusinessNetworkCard href="/program-holder/community" label="Program Holder network" />
+      <section className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
+        <div className="relative isolate overflow-hidden px-5 py-7 text-white sm:px-7">
+          <Image
+            src="/images/pages/community-page-2.webp"
+            alt="Elevate school and workforce community"
+            fill
+            sizes="100vw"
+            className="-z-20 object-cover object-center"
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-blue-950/90 to-violet-950/55" />
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-200">
+            School, Career &amp; Community
+          </p>
+          <h2 className="mt-2 text-2xl font-black">Keep your students connected beyond class</h2>
+          <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-100">
+            Open the community hub, connect students to career opportunities, and keep up with
+            school events without leaving your Program Holder workspace.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/program-holder/community"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-slate-950"
+            >
+              <MessageSquare className="h-4 w-4" aria-hidden="true" /> Community hub
+            </Link>
+            <Link
+              href="/program-holder/career"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 py-2.5 text-sm font-black text-white backdrop-blur"
+            >
+              <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" /> Career services
+            </Link>
+            <Link
+              href="/program-holder/meetings"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 py-2.5 text-sm font-black text-white backdrop-blur"
+            >
+              <CalendarDays className="h-4 w-4" aria-hidden="true" /> School events
+            </Link>
+          </div>
+        </div>
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+                Live career feed
+              </p>
+              <h3 className="mt-1 text-xl font-black text-slate-950">
+                Opportunities to share with students
+              </h3>
+            </div>
+            <Link
+              href="/program-holder/career"
+              className="text-sm font-black text-blue-800 underline"
+            >
+              Open full career center
+            </Link>
+          </div>
+          {careerJobs.length > 0 ? (
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              {careerJobs.map((job) => (
+                <JobCard key={job.id} job={job} href="/program-holder/career" />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 rounded-2xl bg-slate-50 p-5 text-sm text-slate-700">
+              New employer opportunities will appear here as they are published. Career coaching and
+              placement support remain available now.
+            </div>
+          )}
+        </div>
+      </section>
+      {data.requiresEnchantedHeartsTerms &&
+      Array.isArray(data.holder?.features?.partner_document_receipts) ? (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-black">Documents already received by email</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            These receipts do not mean documents have passed review. Please provide an updated
+            flyer; the existing flyer is historical.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {data.holder.features.partner_document_receipts.map(
+              (item: { name: string; state: string }) => (
+                <li key={item.name} className="rounded-xl bg-slate-50 p-3 text-sm">
+                  <strong>{item.name}</strong> — {item.state}
+                </li>
+              ),
+            )}
+          </ul>
+          <a
+            href={ENCHANTED_HEARTS.trainingUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex font-bold text-blue-700"
+          >
+            Training website
+          </a>
+        </section>
+      ) : null}
       {data.requiresEnchantedHeartsTerms ? (
         <section className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm sm:p-6">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-700">
@@ -698,7 +1101,8 @@ export async function ProgramHolderWorkspaceView({
             <div>
               <h2 className="text-xl font-black text-slate-950">Program readiness</h2>
               <p className="mt-1 text-sm text-slate-600">
-                {completedRequirements} of {requiredComplianceItems.length} applicable requirements complete.
+                {completedRequirements} of {requiredComplianceItems.length} applicable requirements
+                complete.
               </p>
             </div>
             <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-800">
@@ -722,6 +1126,13 @@ export async function ProgramHolderWorkspaceView({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
+                {programHolderRequirementLink(item.label) ? (
+                  <Link href={programHolderRequirementLink(item.label)!} className="ml-auto inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">
+                    {item.complete ? 'View' : 'Open'}
+                  </Link>
+                ) : item.owner === 'Elevate' ? (
+                  <span className="ml-auto text-xs font-semibold text-slate-500">Elevate-managed</span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -752,77 +1163,81 @@ export async function ProgramHolderWorkspaceView({
         </article>
       </section>
       <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
-                Call and enrollment queue
-              </p>
-              <h2 className="mt-1 text-xl font-black text-slate-950">
-                People who still need follow-up
-              </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                {callQueue.length} applicants have no completed call outcome and{' '}
-                {data.applicants.length} are not enrolled.
-              </p>
-            </div>
-            <Link
-              href="/program-holder/students/pending"
-              className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950"
-            >
-              Open full queue
-            </Link>
-            <WorkOneOutreachButton count={data.applicants.length} />
-          </div>
-          <div className="mt-4 grid gap-2">
-            {callQueue.slice(0, 6).map((row) => (
-              <div
-                key={row.id}
-                className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0">
-                  <p className="break-words font-black text-slate-950">
-                    {row.applicant_name || 'Applicant'}
-                  </p>
-                  <p className="break-all text-xs text-slate-500">
-                    {row.applicant_email || 'No email on file'}
-                  </p>
-                  <p className="mt-1 text-xs font-bold text-slate-700">
-                    {row.applicant_phone || 'No phone on file'}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">
-                    Not enrolled
-                  </span>
-                  {row.applicant_email && (
-                    <a
-                      href={`mailto:${row.applicant_email}`}
-                      className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900"
-                    >
-                      Email
-                    </a>
-                  )}
-                  {row.applicant_phone ? (
-                    <a
-                      href={`tel:${row.applicant_phone}`}
-                      className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white"
-                    >
-                      Call
-                    </a>
-                  ) : (
-                    <span className="text-xs font-bold text-slate-500">Phone missing</span>
-                  )}
-                </div>
+        {data.requiresEnchantedHeartsTerms ? (
+          <ApplicantsByProgram rows={data.applicants} programs={data.programs} />
+        ) : (
+          <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                  Call and enrollment queue
+                </p>
+                <h2 className="mt-1 text-xl font-black text-slate-950">
+                  People who still need follow-up
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  {callQueue.length} applicants have no completed call outcome and{' '}
+                  {data.applicants.length} are not enrolled.
+                </p>
               </div>
-            ))}
-            {!callQueue.length && (
-              <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
-                Every applicant has a recorded call outcome.
-              </p>
-            )}
-          </div>
-        </article>
+              <Link
+                href="/program-holder/students/pending"
+                className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950"
+              >
+                Open full queue
+              </Link>
+              <WorkOneOutreachButton count={data.applicants.length} />
+            </div>
+            <div className="mt-4 grid gap-2">
+              {callQueue.slice(0, 6).map((row) => (
+                <div
+                  key={row.id}
+                  className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="break-words font-black text-slate-950">
+                      {row.applicant_name || 'Applicant'}
+                    </p>
+                    <p className="break-all text-xs text-slate-500">
+                      {row.applicant_email || 'No email on file'}
+                    </p>
+                    <p className="mt-1 text-xs font-bold text-slate-700">
+                      {row.applicant_phone || 'No phone on file'}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">
+                      Not enrolled
+                    </span>
+                    {row.applicant_email && (
+                      <a
+                        href={`mailto:${row.applicant_email}`}
+                        className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900"
+                      >
+                        Email
+                      </a>
+                    )}
+                    {row.applicant_phone ? (
+                      <a
+                        href={`tel:${row.applicant_phone}`}
+                        className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white"
+                      >
+                        Call
+                      </a>
+                    ) : (
+                      <span className="text-xs font-bold text-slate-500">Phone missing</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {!callQueue.length && (
+                <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
+                  Every applicant has a recorded call outcome.
+                </p>
+              )}
+            </div>
+          </article>
+        )}
         <div className="min-w-0">{payoutPanel}</div>
       </section>
       <section className="grid gap-4 lg:grid-cols-2">
@@ -906,17 +1321,27 @@ export async function ProgramHolderWorkspaceView({
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 id="program-holder-programs-heading" className="text-xl font-black text-slate-950">
-              Your programs
+              {regionalAssignment?.all_programs_in_region
+                ? 'Regional program coverage'
+                : 'Your programs'}
             </h2>
             <p className="mt-1 text-sm text-slate-600">
-              Approved training pathways connected to this Program Holder account.
+              {regionalAssignment?.all_programs_in_region
+                ? `${data.programs.length} active pathways in your regional coordination scope. Local Program Holder assignments still control delivery.`
+                : 'Approved training pathways connected to this Program Holder account.'}
             </p>
           </div>
           <Link href="/program-holder/programs" className="text-sm font-bold text-blue-700">
             View details
           </Link>
         </div>
-        <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} compact />
+        <ProgramCards
+          programs={
+            regionalAssignment?.all_programs_in_region ? data.programs.slice(0, 4) : data.programs
+          }
+          courseAssignments={data.courseAssignments}
+          compact
+        />
       </section>
       <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -968,10 +1393,10 @@ function Hero({
   description: string;
 }) {
   return (
-    <section className="min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-blue-950 to-blue-800 p-5 text-white shadow-lg sm:rounded-3xl sm:p-7">
-      <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">{eyebrow}</p>
+    <section className="min-w-0 overflow-hidden rounded-2xl border border-blue-200 bg-white p-5 text-slate-950 shadow-sm sm:rounded-3xl sm:p-6">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-700">{eyebrow}</p>
       <h1 className="mt-2 break-words text-2xl font-black sm:text-4xl">{title}</h1>
-      <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-blue-50 sm:text-base">
+      <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700 sm:text-base">
         {description}
       </p>
     </section>
@@ -1001,9 +1426,9 @@ function DashboardHero({
         fill
         priority
         sizes="100vw"
-        className={`object-cover opacity-60 ${isPortrait ? 'object-top' : 'object-center'}`}
+        className={`object-cover opacity-90 ${isPortrait ? 'object-top' : 'object-center'}`}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/72 via-slate-950/42 to-transparent" />
       <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="min-w-0">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">
@@ -1026,12 +1451,25 @@ function DashboardHero({
             </span>
           </div>
         </div>
-        <Link
-          href="/program-holder/hours"
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto"
-        >
-          Record training hours
-        </Link>
+        <div className="flex flex-col items-center gap-3">
+          {isPortrait ? (
+            <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white/80 bg-white shadow-xl">
+              <Image
+                src={heroImage}
+                alt={title}
+                fill
+                sizes="96px"
+                className="object-cover object-top"
+              />
+            </div>
+          ) : null}
+          <Link
+            href="/program-holder/hours"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto"
+          >
+            Record training hours
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -1097,36 +1535,10 @@ function Metric({
   );
 }
 
-function voucherStatus(row: any) {
-  const paid =
-    Boolean(row.voucher_paid_date) ||
-    Number(row.amount_paid_cents || 0) > 0 ||
-    ['paid', 'completed', 'succeeded'].includes(String(row.payment_status || '').toLowerCase());
-  if (paid) return 'Paid';
-
-  const verified = Boolean(row.voucher_issued_date) || row.funding_verified === true;
-  return verified ? 'Voucher verified' : 'Voucher pending';
-}
-
-function expectedPaymentStatus(row: any) {
-  const cents = Number(row.expected_payout_cents || 0);
-  if (cents <= 0) return 'Not projected';
-
-  const amount = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(cents / 100);
-  const status =
-    row.expected_payout_status === 'pending_voucher_payment'
-      ? 'pending voucher/payment'
-      : String(row.expected_payout_status || 'projected').replaceAll('_', ' ');
-  return `${amount} — ${status}`;
-}
-
 function completionStatus(row: any) {
   const state = String(row.enrollment_state || row.status || '').toLowerCase();
   if (
-    Boolean(row.completed_at) ||
+    Boolean(row.completed_at || row.completion_date) ||
     ['completed', 'graduated'].includes(state) ||
     String(row.work_progress || '').toLowerCase() === 'completed'
   ) {
@@ -1149,6 +1561,13 @@ function applicantPipelineStatus(row: any) {
   return status === 'approved' ? 'Voucher pending' : status.replaceAll('_', ' ');
 }
 
+function isCompletionOverdue(row: any): boolean {
+  const status = String(row.status || row.enrollment_state || '').toLowerCase();
+  if (['completed', 'graduated', 'withdrawn', 'cancelled'].includes(status) || row.completed_at || row.completion_date) return false;
+  const end = String(row.expected_end_date || row.training_end_date || '').slice(0, 10);
+  return Boolean(end && end < new Date().toISOString().slice(0, 10));
+}
+
 function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
   return (
     <div className="mt-5 min-w-0">
@@ -1158,7 +1577,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <article
               key={row.id}
               data-testid="student-card"
-              className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"
+              className={isCompletionOverdue(row) ? "min-w-0 rounded-xl border-2 border-red-600 bg-red-50 p-4" : "min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"}
             >
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -1176,14 +1595,17 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   label="Program"
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
-                <Row label="Voucher" value={voucherStatus(row)} />
-                <Row label="Expected payment" value={expectedPaymentStatus(row)} />
                 <Row label="Completion" value={completionStatus(row)} />
+                {isCompletionOverdue(row) && <p role="alert" className="rounded-lg bg-red-700 p-2 text-xs font-black text-white">Completion overdue — review testing and closeout</p>}
+                <Row label="Actual completion" value={(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'} />
+                <Row label="Certification evidence" value={row.certification_status || 'Upload missing'} />
+                {row.credential_earned_date && <Row label="Credential earned" value={row.credential_earned_date} />}
+                {row.certificate_verified_at && <Row label="Credential verified" value={row.certificate_verified_at.slice(0, 10)} />}
                 <Row
                   label="Training"
-                  value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`}
+                  value={`${row.training_start_date || 'Start missing'} — ${row.expected_end_date || row.training_end_date || 'End missing'}`}
                 />
-                <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+                <Row label="Next action" value={completionAlert(row) || row.next_required_action || 'Continue training'} />
                 <Row
                   label="WorkOne hours"
                   value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
@@ -1202,11 +1624,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   hasEmail={Boolean(row.email)}
                   hasPhone={Boolean(row.phone)}
                 />
-                <StudentReadyForTestingButton
+                {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
                   studentId={row.id}
                   studentName={row.full_name || 'Student'}
                   source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
-                />
+                /> : null}
               </div>
             </article>
           ))
@@ -1216,14 +1638,12 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           </div>
         )}
       </div>
-      <div className="hidden overflow-x-auto md:block">
+      <div className="hidden max-w-full overflow-x-auto md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-3 py-3">Student</th>
               <th className="px-3 py-3">Program</th>
-              <th className="px-3 py-3">Voucher</th>
-              <th className="px-3 py-3">Expected payment</th>
               <th className="px-3 py-3">Completion</th>
               <th className="px-3 py-3">Progress</th>
               <th className="px-3 py-3">WorkOne hours</th>
@@ -1235,7 +1655,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           <tbody className="divide-y divide-slate-100">
             {rows.length ? (
               rows.map((row) => (
-                <tr key={row.id} data-testid="student-row">
+                <tr key={row.id} data-testid="student-row" className={isCompletionOverdue(row) ? "bg-red-50" : undefined}>
                   <td className="px-3 py-4">
                     <p className="font-bold">{row.full_name || 'Student'}</p>
                     <p className="text-xs text-slate-500">{row.email || ''}</p>
@@ -1243,18 +1663,16 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4 font-bold">{voucherStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{expectedPaymentStatus(row)}</td>
-                  <td className="px-3 py-4 font-bold">{completionStatus(row)}</td>
+                  <td className="px-3 py-4"><p className={isCompletionOverdue(row) ? "font-black text-red-800" : "font-bold"}>{completionStatus(row)}</p>{isCompletionOverdue(row) && <p role="alert" className="text-xs font-black text-red-800">Completion overdue</p>}<p className="text-xs">{row.certification_status || 'Upload missing'}</p>{row.credential_earned_date && <p className="text-xs">Earned: {row.credential_earned_date}</p>}{row.certificate_verified_at && <p className="text-xs">Verified: {row.certificate_verified_at.slice(0, 10)}</p>}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
                     {Math.min(48, Number(row.total_hours_completed || 0))} / 48
                   </td>
                   <td className="px-3 py-4 text-xs">
                     <span className="block">Start: {row.training_start_date || 'Missing'}</span>
-                    <span className="block">End: {row.training_end_date || 'Missing'}</span>
+                    <span className="block">End: {row.expected_end_date || row.training_end_date || 'Missing'}</span><span className="block">Actual completion: {(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'}</span>
                   </td>
-                  <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
+                  <td className="px-3 py-4">{completionAlert(row) || row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
                       <StudentCommunicationActions
@@ -1263,20 +1681,20 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                         hasEmail={Boolean(row.email)}
                         hasPhone={Boolean(row.phone)}
                       />
-                      <StudentReadyForTestingButton
+                      {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
                         studentId={row.id}
                         studentName={row.full_name || 'Student'}
                         source={
                           row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
                         }
-                      />
+                      /> : null}
                     </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
                   No confirmed student enrollments are linked.
                 </td>
               </tr>
@@ -1344,22 +1762,65 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
           View Applicants
         </Link>
       </div>
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-6">
         <EnrollmentTable rows={rows} programs={programs} />
       </section>
       <ProgramHolderStudentCloseoutForm enrollments={rows} />
     </div>
   );
 }
+function ApplicantsByProgram({ rows, programs }: { rows: any[]; programs: any[] }) {
+  const groups = new Map<string, any[]>();
+  for (const row of rows) {
+    const title = programTitle(programs, row.program_id, row.program_slug);
+    groups.set(title, [...(groups.get(title) || []), row]);
+  }
+  return (
+    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Applicants by program</h2>
+        <p className="mt-2 text-sm text-slate-600">
+          {rows.length} applicant records. Elevate coordinates student outreach. Email addresses,
+          phone numbers, and other contact details remain private.
+        </p>
+      </div>
+      {[...groups.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([title, applicants]) => (
+          <details key={title} open className="rounded-xl border border-slate-200 p-4">
+            <summary className="cursor-pointer font-black text-slate-950">
+              {title} ({applicants.length})
+            </summary>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {[...applicants]
+                .sort((a, b) =>
+                  String(a.applicant_name || '').localeCompare(String(b.applicant_name || '')),
+                )
+                .map((row) => (
+                  <li key={row.id} className="rounded-lg bg-slate-50 p-3 text-sm font-bold">
+                    {row.applicant_name || 'Applicant'}
+                  </li>
+                ))}
+            </ul>
+          </details>
+        ))}
+      {!rows.length && <p className="text-sm text-slate-600">No applicants are assigned yet.</p>}
+    </section>
+  );
+}
+
 function Applicants({
   rows,
   programs,
   contactAccessGranted,
+  namesOnly = false,
 }: {
   rows: any[];
   programs: any[];
   contactAccessGranted: boolean;
+  namesOnly?: boolean;
 }) {
+  if (namesOnly) return <ApplicantsByProgram rows={rows} programs={programs} />;
   return (
     <div className="space-y-6">
       <Hero
@@ -1452,9 +1913,61 @@ function Programs({ data }: { data: any }) {
         title={label}
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
+      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>
   );
+}
+
+function formatProgramAmount(program: any) {
+  if (['nha-ekg-technician', 'nha-ehr', 'nha-billing-coding'].includes(program.slug)) {
+    return 'Contact admissions — à-la-carte items';
+  }
+  const raw = program.tuition ?? program.total_cost ?? program.price;
+  const amount = Number(raw);
+  if (Number.isFinite(amount) && amount >= 0) {
+    return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+  if (program.is_free === true) return '$0.00';
+  return 'Amount not configured';
+}
+
+function formatProgramFunding(program: any) {
+  const tags = Array.isArray(program.funding_tags) ? program.funding_tags.filter(Boolean) : [];
+  const fundingTags = tags.filter(
+    (tag: string) => !['self-pay', 'a-la-carte'].includes(tag.toLowerCase()),
+  );
+  const listedAmount = Number(program.tuition ?? program.total_cost ?? program.price);
+  if (program.is_free === true && (!Number.isFinite(listedAmount) || listedAmount <= 0)) {
+    return fundingTags.length
+      ? `No student tuition; ${fundingTags.join(', ')} eligibility rules may apply`
+      : 'No student tuition charged';
+  }
+  if (fundingTags.length)
+    return `${fundingTags.join(', ')} may be available; verify written approval`;
+  if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
+    return 'Funding may be available; verify written approval';
+  }
+  if (tags.some((tag: string) => tag.toLowerCase() === 'a-la-carte')) {
+    return 'Self-pay, à-la-carte; confirm selected items with Admissions';
+  }
+  return 'Self-pay at the published amount';
+}
+
+function formatCareerPay(program: any) {
+  const usd = (value: unknown) =>
+    Number(value) > 0
+      ? Number(value).toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0,
+        })
+      : null;
+  const low = usd(program.salary_min);
+  const high = usd(program.salary_max);
+  return low || high
+    ? `${low || 'Varies'}–${high || 'Varies'} annual estimate; confirm local wages`
+    : 'No verified local pay range on file';
 }
 
 function ProgramCards({
@@ -1511,8 +2024,54 @@ function ProgramCards({
                         program.total_hours ? String(program.total_hours) : 'Review program record'
                       }
                     />
-                    <Row label="Course assignments" value={String(courses.length)} />
+                    <Row label="Published amount" value={formatProgramAmount(program)} />
+                    <Row label="Funding path" value={formatProgramFunding(program)} />
+                    <Row label="Career pay" value={formatCareerPay(program)} />
+                    <Row label="Connected course records" value={String(courses.length)} />
+                    <Row
+                      label="Delivery"
+                      value={program.delivery_method || 'Confirm with the program team'}
+                    />
+                    <Row
+                      label="Duration"
+                      value={
+                        program.estimated_weeks
+                          ? `${program.estimated_weeks} estimated weeks`
+                          : 'Confirm schedule with the program team'
+                      }
+                    />
                   </dl>
+                  <p className="mt-5 text-sm leading-6 text-slate-700">
+                    {program.full_description ||
+                      program.description ||
+                      program.short_description ||
+                      'Ask the program team for the approved course outline before recruiting.'}
+                  </p>
+                  {Array.isArray(program.what_you_learn) && program.what_you_learn.length > 0 && (
+                    <div className="mt-3 text-sm text-slate-700">
+                      <p className="font-bold">What students learn</p>
+                      <ul className="mt-1 list-disc space-y-1 pl-5">
+                        {program.what_you_learn.map((topic: string, index: number) => (
+                          <li key={`${program.id}-${index}`}>{topic}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <p className="mt-3 text-xs font-bold text-slate-600">
+                    Indiana WIOA status:{' '}
+                    {program.etpl_listed || program.wioa_approved
+                      ? 'Internal record has a funding flag; confirm this exact program and location on Indiana INTraining before offering a funded seat.'
+                      : 'Indiana ETPL approval has not been verified in this workspace. Treat as self-pay until WorkOne confirms eligibility in writing.'}
+                  </p>
+                  <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+                    <strong>Student payment conversation:</strong> confirm whether Elevate has
+                    documented funding approval before describing a program as funded. Otherwise
+                    explain the published self-pay amount. Students may use the payment options
+                    shown at checkout; eligible applicants can request a buy-now-pay-later decision,
+                    including Affirm when offered. Approval is made by the payment provider, not by
+                    the Program Holder.
+                  </div>
+                  {courses.length > 0 && <ul className="mt-4 space-y-2 text-sm">{courses.map((course: any) => <li key={`${program.id}-${course.course_id}`} className="rounded-lg border p-3"><strong>{course.title || 'Assigned course'}</strong><span className="block">{course.source === 'canonical_program' ? 'Canonical program course' : 'Holder delivery assignment'} · {course.status || 'Status requires review'}</span>{course.source === 'canonical_program' && !course.published && <span className="block font-bold text-amber-800">Publication has not been verified. This mapping does not unlock learner access.</span>}</li>)}</ul>}
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
                       This program is assigned, but no delivery course is connected yet.
@@ -1543,7 +2102,8 @@ function Hours({
         title="Training Hours"
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
-      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
+      <HolderHourSubmissionForm enrollments={enrollments} />
+      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} verifiedHours={rows} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>
         <p className="mt-1 text-sm text-slate-600">
@@ -1592,6 +2152,23 @@ function Hours({
     </div>
   );
 }
+function programHolderRequirementLink(label: string): string | null {
+    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
+    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+    if (label === 'Approved required onboarding documents') return '/program-holder/documents';
+    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
+    if (label === 'Signed image release') return '/program-holder/documents';
+    if (label === 'Program-holder approval') return '/program-holder/onboarding';
+    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+    if (label === 'QuickBooks payment-record connection') return '/program-holder/payouts';
+    if (label === 'Graduated-student back work and 48-hour sign-offs') return '/program-holder/students';
+    if (label === 'Course delivery assignment' || label === 'HVAC program assignment') return '/program-holder/programs';
+    return null;
+}
+
 function Compliance({
   score,
   items,
@@ -1606,6 +2183,7 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
+
   return (
     <div className="space-y-6">
       <Hero
@@ -1627,7 +2205,7 @@ function Compliance({
             {items.map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
+                className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 p-4"
               >
                 <span className="font-semibold">
                   {item.label}
@@ -1635,11 +2213,18 @@ function Compliance({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
-                {item.complete ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {programHolderRequirementLink(item.label) ? (
+                    <Link href={programHolderRequirementLink(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                      {item.complete ? 'View form' : 'Open form'}
+                    </Link>
+                  ) : null}
+                  {item.complete ? (
+                    <CheckCircle2 aria-label="Completed" className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle aria-label="Action required" className="h-5 w-5 text-amber-600" />
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -1652,10 +2237,12 @@ function Documents({
   rows,
   isHvac,
   requiresEnchantedHeartsTerms,
+  insuranceRequired,
 }: {
   rows: any[];
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
+  insuranceRequired: boolean;
 }) {
   return (
     <div className="space-y-6">
@@ -1664,21 +2251,27 @@ function Documents({
         title="Documents"
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
-      <ProgramHolderDocumentUpload isHvac={isHvac} />
+      <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
       <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">
           {rows.length ? (
             rows.map((row) => (
-              <div key={row.id} className="flex items-center gap-3 rounded-xl border p-4">
+              <div key={row.id} className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border p-4">
                 <FileText className="h-5 w-5 text-blue-700" />
-                <div>
-                  <p className="font-bold">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words font-bold">
                     {row.document_type || row.file_name || 'Program document'}
                   </p>
                   <p className="text-xs capitalize text-slate-500">{row.status || 'submitted'}</p>
+                  {row.file_name && row.document_type && <p className="break-all text-xs text-slate-600">{row.file_name}</p>}
                 </div>
+                {typeof row.file_url === 'string' && row.file_url.length > 0 ? (
+                  <a href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">View uploaded file</a>
+                ) : (
+                  <span className="text-xs font-semibold text-amber-800">File preview unavailable — contact Office Mail</span>
+                )}
               </div>
             ))
           ) : (
@@ -1849,9 +2442,9 @@ function Settings({
 }
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
-      <dt className="text-slate-600">{label}</dt>
-      <dd className="font-bold text-right">{value}</dd>
+    <div className="grid min-w-0 grid-cols-[minmax(0,0.9fr)_minmax(0,1.35fr)] items-start gap-3 border-b border-slate-100 pb-3">
+      <dt className="min-w-0 break-words text-slate-600">{label}</dt>
+      <dd className="min-w-0 break-words text-right font-bold">{value}</dd>
     </div>
   );
 }

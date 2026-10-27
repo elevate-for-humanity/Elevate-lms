@@ -3,6 +3,12 @@ import { randomBytes } from 'node:crypto';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { testingAppointmentLabel, testingCalendarUrl } from '@/lib/testing/booking-calendar';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { notifyAdminOfStudentPayment } from '@/lib/billing/notify-student-payment';
+import { recordSchoolInvoiceOrder } from '@/lib/billing/school-invoice-order';
 
 type Database = any;
 
@@ -31,7 +37,6 @@ export async function fulfillPaidBillingInvoice(
         completed_at: new Date().toISOString(),
         metadata: {
           program_enrollment_id: payload.enrollment_id,
-          legacy_stripe_subscription_id: payload.legacy_stripe_subscription_id,
         },
       },
       { onConflict: 'billing_invoice_id' },
@@ -47,6 +52,7 @@ export async function fulfillPaidBillingInvoice(
       })
       .eq('id', payload.enrollment_id);
     if (enrollment.error) throw new Error(enrollment.error.message);
+    await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
     return;
   }
   if (job.fulfillment_type === 'tenant_offer') {
@@ -134,7 +140,6 @@ export async function fulfillPaidBillingInvoice(
           user_id: user.id,
           plan_id: planId,
           status: 'active',
-          stripe_subscription_id: null,
           metadata: {
             billing_provider: 'quickbooks',
             billing_invoice_id: job.billing_invoice_id,
@@ -236,43 +241,121 @@ export async function fulfillPaidBillingInvoice(
     return;
   }
 
-  if (job.fulfillment_type === 'testing_booking') {
-    const names = String(payload.customer_name || 'Customer')
-      .trim()
-      .split(/\s+/);
-    const firstName = names.shift() || 'Customer';
-    const lastName = names.join(' ');
-    const result = await db.from('exam_bookings').insert({
-      exam_type: payload.exam_type,
-      exam_name: payload.exam_name,
-      booking_type: payload.booking_type,
-      first_name: firstName,
-      last_name: lastName,
-      email: payload.customer_email,
-      participant_count: payload.participant_count,
-      status: 'pending',
-      payment_status: 'paid',
-      fee_cents: payload.amount_cents,
-      confirmation_code: confirmationCode(),
-      add_on: Boolean(payload.add_on),
-      add_on_paid: Boolean(payload.add_on),
-      slot_id: payload.slot_id,
-      provider: 'quickbooks',
-      provider_invoice_id: job.billing_invoice_id,
-    });
+  if (job.fulfillment_type === 'testing_enforcement') {
+    const result = await db.from('testing_enforcement').update({
+      fee_paid: true,
+      paid_at: new Date().toISOString(),
+      billing_provider: 'quickbooks',
+      billing_invoice_id: job.billing_invoice_id,
+    }).eq('id', payload.enforcement_id).eq('email', payload.email).eq('fee_paid', false);
     if (result.error) throw new Error(result.error.message);
-    if (payload.slot_id) await db.rpc('increment_slot_booked_count', { slot_id: payload.slot_id });
+    return;
+  }
+
+  if (job.fulfillment_type === 'testing_booking') {
+    const reserved = await db.rpc('fulfill_paid_testing_booking', { p_invoice_id: job.billing_invoice_id });
+    if (reserved.error) throw new Error(reserved.error.message);
+    const booking = reserved.data?.booking;
+    if (!booking) throw new Error('Testing reservation was not returned.');
+    if (!reserved.data.created) return;
+    const slot = await db.from('testing_slots').select('start_time,end_time,location').eq('id', booking.slot_id).single();
+    if (slot.error) throw new Error(slot.error.message);
+    const appointment = testingAppointmentLabel(slot.data.start_time);
+    const calendar = testingCalendarUrl({
+      examName: booking.exam_name, confirmationCode: booking.confirmation_code,
+      start: slot.data.start_time, end: slot.data.end_time,
+      location: slot.data.location || TESTING_CENTER.address,
+    });
+    const confirmation = new URL('/testing/book', PLATFORM_DEFAULTS.siteUrl);
+    confirmation.searchParams.set('invoice_id', job.billing_invoice_id);
+    confirmation.searchParams.set('booking_token', String(payload.booking_token || ''));
+    const escape = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
+    if (booking.email) {
+      await sendEmail({
+        to: booking.email,
+        from: 'Elevate Testing Center <testing@elevateforhumanity.org>',
+        subject: `Exam Booking Confirmed — ${booking.confirmation_code} | Elevate Testing Center`,
+        html: `<p>Hi ${escape(booking.first_name)}, your paid testing appointment for <strong>${escape(booking.exam_name)}</strong> is reserved.</p><p><strong>${escape(appointment)}</strong></p><p>Confirmation code: <strong>${escape(booking.confirmation_code)}</strong></p><p>Testing Center: ${escape(slot.data.location || TESTING_CENTER.address)}</p><p><a href="${escape(confirmation.href)}">View your private booking confirmation</a></p><p><a href="${escape(calendar)}">Add your reserved appointment to Google Calendar</a></p><p>Questions: ${escape(TESTING_CENTER.phone)}</p>`,
+      });
+    }
+    return;
+  }
+
+  if (job.fulfillment_type === 'apprenticeship_deposit') {
+    const email = String(payload.customer_email || '').toLowerCase().trim();
+    const programSlug = String(payload.program_slug || '');
+    if (!email || !programSlug) throw new Error('Apprenticeship deposit requires customer_email and program_slug.');
+
+    const profile = await db.from('profiles').select('id,full_name').ilike('email', email).maybeSingle();
+    if (profile.error || !profile.data?.id) throw new Error(profile.error?.message || 'Apprentice profile was not found.');
+
+    const program = await db.from('programs').select('id,organization_id,tenant_id,title').eq('slug', programSlug).maybeSingle();
+    if (program.error || !program.data?.id) throw new Error(program.error?.message || 'Apprenticeship program was not found.');
+
+    const existing = await db.from('program_enrollments').select('id').eq('user_id', profile.data.id).eq('program_id', program.data.id).maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+
+    const enrollmentValues = {
+      user_id: profile.data.id,
+      student_id: profile.data.id,
+      program_id: program.data.id,
+      program_slug: programSlug,
+      email,
+      full_name: profile.data.full_name || payload.customer_name || email,
+      status: 'active',
+      enrollment_state: 'enrolled',
+      payment_status: 'paid',
+      funding_source: 'self_pay',
+      amount_paid_cents: Number(payload.amount_cents || 0),
+      billing_provider: 'quickbooks',
+      organization_id: program.data.organization_id,
+      tenant_id: program.data.tenant_id,
+      enrolled_at: new Date().toISOString(),
+      access_granted_at: new Date().toISOString(),
+      next_required_action: 'ONBOARDING',
+      updated_at: new Date().toISOString(),
+    };
+
+    let enrollmentId = existing.data?.id as string | undefined;
+    if (enrollmentId) {
+      const updated = await db.from('program_enrollments').update(enrollmentValues).eq('id', enrollmentId);
+      if (updated.error) throw new Error(updated.error.message);
+    } else {
+      const created = await db.from('program_enrollments').insert(enrollmentValues).select('id').single();
+      if (created.error || !created.data?.id) throw new Error(created.error?.message || 'Enrollment was not created.');
+      enrollmentId = created.data.id;
+    }
+
+    const app = await db.from('applications').update({
+      status: 'approved',
+      payment_status: 'paid',
+      payment_provider: 'quickbooks',
+      payment_amount_cents: Number(payload.amount_cents || 0),
+      payment_received_at: new Date().toISOString(),
+      enrollment_id: enrollmentId,
+      user_id: profile.data.id,
+      updated_at: new Date().toISOString(),
+    }).ilike('email', email).eq('program_slug', programSlug);
+    if (app.error) throw new Error(app.error.message);
+
+    const portal = await db.from('profiles').update({
+      enrollment_status: 'active',
+      portal_type: 'apprentice',
+      updated_at: new Date().toISOString(),
+    }).eq('id', profile.data.id);
+    if (portal.error) throw new Error(portal.error.message);
     return;
   }
 
   if (job.fulfillment_type === 'program_enrollment') {
+    const schoolOrder = await recordSchoolInvoiceOrder(db, job.billing_invoice_id, payload);
     const result = await db
       .from('program_enrollments')
       .update({
-        status: 'active',
+        status: schoolOrder ? 'pending' : 'active',
         payment_status: 'paid',
-        enrollment_state: 'active',
-        next_required_action: 'ONBOARDING',
+        enrollment_state: schoolOrder ? 'onboarding' : 'active',
+        next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : 'ONBOARDING',
         amount_paid_cents: payload.amount_cents,
         billing_provider: 'quickbooks',
         updated_at: new Date().toISOString(),
@@ -280,6 +363,11 @@ export async function fulfillPaidBillingInvoice(
       .eq('id', payload.enrollment_id)
       .eq('payment_status', 'pending');
     if (result.error) throw new Error(result.error.message);
+    await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
+    if (schoolOrder) {
+      const { sendSchoolRegistrationEmail } = await import('@/lib/billing/school-registration-email');
+      await sendSchoolRegistrationEmail(db, job.billing_invoice_id, payload);
+    }
     return;
   }
 
@@ -363,6 +451,68 @@ export async function fulfillPaidBillingInvoice(
           .eq('id', item.product_id)
           .eq('inventory_quantity', product.data.inventory_quantity);
     }
+    return;
+  }
+
+  if (job.fulfillment_type === 'website_domain_purchase') {
+    const { checkDomainPurchase, buyDomain } = await import('@/lib/domainee/client');
+    const { data: row, error } = await db.from('website_domains')
+      .select('id,website_id,user_id,hostname,status,retail_cents,origin_url,customer_reference,metadata')
+      .eq('id', payload.domain_record_id).eq('user_id', payload.user_id).maybeSingle();
+    if (error || !row) throw new Error(error?.message || 'Domain purchase record was not found.');
+    if (row.status === 'active' || row.status === 'processing') return;
+    if (Number(row.retail_cents) !== Number(payload.amount_cents)) throw new Error('Domain invoice does not match the order amount.');
+    const quote = await checkDomainPurchase(row.hostname);
+    if (!quote.available) {
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', error: 'Domain became unavailable after payment.' }).eq('id', row.id);
+      throw new Error('Domain became unavailable after payment; refund review is required.');
+    }
+    if (quote.pricing.totalCents > Number(row.retail_cents)) {
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', provider_cost_cents: quote.pricing.totalCents, error: 'Registrar cost exceeds collected amount.' }).eq('id', row.id);
+      throw new Error('Registrar cost changed after payment; refund review is required.');
+    }
+    const registrant = row.metadata?.registrant;
+    const years = Number(row.metadata?.years || 1);
+    if (!registrant || !row.origin_url) throw new Error('Domain registrant or origin data is missing.');
+    await db.from('website_domains').update({ status: 'processing', payment_status: 'paid', provider_cost_cents: quote.pricing.totalCents }).eq('id', row.id);
+    const result = await buyDomain(row.hostname, years, registrant, {
+      originUrl: row.origin_url,
+      customerReference: row.customer_reference || `elevate-${row.user_id}-${row.website_id}`,
+      idempotencyKey: `billing-invoice-${job.billing_invoice_id}`,
+    });
+    const purchase = result.purchase;
+    const saved = await db.from('website_domains').update({
+      domainee_domain_id: purchase.connectedDomainId || null,
+      domainee_purchase_id: purchase.id,
+      status: purchase.status === 'completed' ? 'active' : 'processing',
+      payment_status: 'paid',
+      provider_cost_cents: purchase.totalCents,
+      updated_at: new Date().toISOString(),
+    }).eq('id', row.id);
+    if (saved.error) throw new Error(saved.error.message);
+    return;
+  }
+
+  if (job.fulfillment_type === 'individual_app_subscription') {
+    const now = new Date();
+    const periodEnd = new Date(now);
+    periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+    const result = await db.from('user_app_subscriptions').upsert(
+      {
+        user_id: payload.user_id,
+        app_slug: payload.app_slug,
+        plan: payload.plan_id,
+        status: 'active',
+        trial_ends_at: null,
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        billing_provider: 'quickbooks',
+        provider_subscription_id: `schedule:user:${payload.user_id}:individual-app-${payload.app_slug}`,
+        updated_at: now.toISOString(),
+      },
+      { onConflict: 'user_id,app_slug' },
+    );
+    if (result.error) throw new Error(result.error.message);
     return;
   }
 

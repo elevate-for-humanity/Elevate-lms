@@ -9,11 +9,9 @@ import {
   PhoneForwarded,
   Route,
   Sparkles,
-  Users,
 } from 'lucide-react';
 import { WEEKDAYS, type BusinessHours } from '@/lib/phone/config';
 import {
-  addDestination,
   addExternalNumber,
   saveMenuOption,
   savePhoneSettings,
@@ -85,11 +83,19 @@ export type PhoneSettings = {
   aiHumanHandoffEnabled: boolean;
 };
 
-export function NewSystemNotice({ dismissAction }: { dismissAction: () => Promise<void> }) {
+export type PhoneSetupStep = { label: string; complete: boolean };
+
+export function NewSystemNotice({
+  dismissAction,
+  steps,
+}: {
+  dismissAction: () => Promise<void>;
+  steps: PhoneSetupStep[];
+}) {
   return (
     <section className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 gap-3">
           <span className="rounded-xl bg-indigo-700 p-2 text-white">
             <Sparkles className="h-5 w-5" />
           </span>
@@ -101,33 +107,32 @@ export function NewSystemNotice({ dismissAction }: { dismissAction: () => Promis
               Welcome to Elevate Communications
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              Give your organization a business number, ring staff cell phones, assign extensions,
-              route callers, hold browser video meetings, share your screen, and keep communications
-              connected to the dashboard.
+              Give your organization a business number, ring staff through the installed PWA, assign
+              extensions, route callers, hold browser video meetings, share your screen, and keep
+              communications connected to the dashboard.
             </p>
           </div>
         </div>
         <form action={dismissAction}>
-          <button className="rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-bold text-indigo-800">
+          <button className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm font-bold text-indigo-800 sm:w-auto sm:py-1.5 sm:text-xs">
             Dismiss
           </button>
         </form>
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          ['1', 'Add team cell phones'],
-          ['2', 'Choose call routing'],
-          ['3', 'Create extensions'],
-          ['4', 'Test before activation'],
-        ].map(([step, text]) => (
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+        {steps.map((item, index) => (
           <div
-            key={step}
+            key={item.label}
             className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 text-sm font-semibold text-slate-800"
           >
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-indigo-100 text-xs font-black text-indigo-800">
-              {step}
+            <span
+              className={`grid h-6 w-6 place-items-center rounded-full text-xs font-black ${
+                item.complete ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'
+              }`}
+            >
+              {item.complete ? '✓' : index + 1}
             </span>
-            {text}
+            {item.label}
           </div>
         ))}
       </div>
@@ -144,10 +149,6 @@ export function PhoneSetupForms({
 }) {
   const [saved, saveAction, savePending] = useActionState(savePhoneSettings, initial);
   const [number, numberAction, numberPending] = useActionState(addExternalNumber, initial);
-  const [destination, destinationAction, destinationPending] = useActionState(
-    addDestination,
-    initial,
-  );
   const [menu, menuAction, menuPending] = useActionState(saveMenuOption, initial);
 
   return (
@@ -164,7 +165,6 @@ export function PhoneSetupForms({
               <select name="routingMode" defaultValue={settings.routingMode} className={field}>
                 <option value="menu">Automated menu</option>
                 <option value="ai_receptionist">AI receptionist</option>
-                <option value="direct_forward">Direct forwarding</option>
               </select>
             </label>
             <label className="text-sm font-bold">
@@ -333,7 +333,7 @@ export function PhoneSetupForms({
         <Result state={saved} />
       </form>
 
-      <section className="grid gap-5 xl:grid-cols-3">
+      <section className="grid gap-5 xl:grid-cols-2">
         <form
           action={numberAction}
           className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
@@ -345,7 +345,12 @@ export function PhoneSetupForms({
           </p>
           <label className="mt-4 block text-sm font-bold">
             Label
-            <input name="label" required placeholder="Current TextMe number" className={field} />
+            <input
+              name="label"
+              required
+              placeholder="Name this external number"
+              className={field}
+            />
           </label>
           <label className="mt-3 block text-sm font-bold">
             Phone number
@@ -353,7 +358,7 @@ export function PhoneSetupForms({
               name="phone"
               inputMode="tel"
               required
-              placeholder="317-314-3757"
+              placeholder="Enter the external phone number"
               className={field}
             />
           </label>
@@ -363,67 +368,15 @@ export function PhoneSetupForms({
           <Result state={number} />
         </form>
         <form
-          action={destinationAction}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-        >
-          <Users className="h-5 w-5 text-orange-600" />
-          <h2 className="mt-2 font-black">Team cell phone</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Add a cell phone that can ring for business calls.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="mt-4 block text-sm font-bold">
-              Team member
-              <input name="name" required placeholder="Elizabeth" className={field} />
-            </label>
-            <label className="mt-4 block text-sm font-bold">
-              Department
-              <input name="department" placeholder="Admissions" className={field} />
-            </label>
-          </div>
-          <label className="mt-3 block text-sm font-bold">
-            Cell phone
-            <input
-              name="destination"
-              inputMode="tel"
-              required
-              placeholder="317-555-0100"
-              className={field}
-            />
-          </label>
-          <label className="mt-3 block text-sm font-bold">
-            Ring seconds
-            <input
-              name="ringSeconds"
-              type="number"
-              min={5}
-              max={120}
-              defaultValue={25}
-              className={field}
-            />
-          </label>
-          <div className="mt-3">
-            <Toggle
-              name="fallbackToVoicemail"
-              label="Send unanswered calls to voicemail"
-              defaultChecked
-            />
-          </div>
-          <button disabled={destinationPending} className={button}>
-            {destinationPending ? 'Adding…' : 'Add team phone'}
-          </button>
-          <Result state={destination} />
-        </form>
-        <form
           action={menuAction}
           className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
         >
           <ChevronDown className="h-5 w-5 text-orange-600" />
           <h2 className="mt-2 font-black">Menu route</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Map a keypad digit or spoken department to a team phone.
+            Map a keypad digit or spoken department to a PWA extension.
           </p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <label className="mt-4 block text-sm font-bold">
               Digit
               <select name="digit" className={field}>
@@ -434,13 +387,13 @@ export function PhoneSetupForms({
             </label>
             <label className="col-span-2 mt-4 block text-sm font-bold">
               Label
-              <input name="label" required placeholder="Admissions" className={field} />
+              <input name="label" required placeholder="Route label" className={field} />
             </label>
           </div>
           <label className="mt-3 block text-sm font-bold">
             Destination
             <select name="destinationId" required className={field}>
-              <option value="">Choose team phone</option>
+              <option value="">Choose PWA extension</option>
               {destinations
                 .filter((item) => item.enabled)
                 .map((item) => (
@@ -452,7 +405,11 @@ export function PhoneSetupForms({
           </label>
           <label className="mt-3 block text-sm font-bold">
             Spoken keywords
-            <input name="keywords" placeholder="admissions, enrollment, apply" className={field} />
+            <input
+              name="keywords"
+              placeholder="Comma-separated spoken keywords"
+              className={field}
+            />
           </label>
           <button disabled={menuPending || destinations.length === 0} className={button}>
             {menuPending ? 'Saving…' : 'Save menu route'}
@@ -471,8 +428,8 @@ export function CapabilityGuide() {
       'Give each organization a dedicated number while keeping external numbers forwarding-only.',
     ],
     [
-      'Cell-phone ringing',
-      'Ring one person, a department, or several team members without publishing personal cell numbers.',
+      'PWA ringing',
+      'Ring one person or department through the installed dashboard app without using personal cell-phone forwarding.',
     ],
     [
       'Extensions and transfers',

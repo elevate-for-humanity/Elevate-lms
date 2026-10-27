@@ -71,17 +71,27 @@ export interface MediaScene {
   transition: Transition;
   referenceImageUrl?: string;
   sourceVideoUrl?: string;
+  /** Optional render-resolved clip: a footage scene must never be accepted as a static slide. */
+  clipUrl?: string | null;
   characterIds: string[];
   negativePrompt?: string;
   seed?: number;
   /** Persisted evidence of the source selected for this rendered scene. */
   resolvedProvider?: string;
   resolvedModel?: string;
+  sourceProviderItemId?: string;
+  sourceLicenseEvidenceUrl?: string;
   /** Instructional phase and the exact action the picture must prove. */
   procedurePhase?: string;
   requiredVisualEvidence?: string;
   sceneType?: InstructionalSceneType;
   memoryAnchor?: string;
+  teachingVisual?: import('../ultimate-course-builder/instructional/teaching-visual').TeachingVisual;
+  physicalDemonstration?: boolean;
+  /** Written by the renderer only when the encoded scene uses this measured title box. */
+  titleLayout?: 'footage-title-v1';
+  /** Scene-specific title scale for verified encoded-text readability repairs. */
+  titleFontSize?: number;
   mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
   overlayTemplate: string;
   contentHash: string;
@@ -110,6 +120,8 @@ export interface MediaDirectorInput {
   sceneData?: Record<string, unknown>;
   characters?: MediaCharacterReference[];
   defaultDurationSeconds?: number;
+  /** Preserve the accepted authored storyboard, including expanded teaching scenes. */
+  requiredSceneCount?: number;
 }
 
 export const MIN_LESSON_VIDEO_SCENES = 6;
@@ -326,8 +338,11 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
 export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const raw = input.sceneData ?? {};
   const rawScenes = Array.isArray(raw.scenes) ? raw.scenes : [];
-  if (rawScenes.length > MAX_LESSON_VIDEO_SCENES) {
-    throw new Error(`MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${MAX_LESSON_VIDEO_SCENES}`);
+  const maximumScenes=input.requiredSceneCount ?? MAX_LESSON_VIDEO_SCENES;
+  if (input.requiredSceneCount && rawScenes.length!==input.requiredSceneCount)
+    throw new Error(`MEDIA_REQUIRED_SCENE_COUNT:${rawScenes.length}:${input.requiredSceneCount}`);
+  if (rawScenes.length > maximumScenes) {
+    throw new Error(`MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${maximumScenes}`);
   }
   const characters = Array.isArray(input.characters) ? input.characters : [];
   const defaultDuration = numberValue(
@@ -347,16 +362,34 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
     action: input.script,
     subject: input.title,
   };
+  const usedSourceVideoUrls = new Set<string>();
+  const topLevelSourceVideoUrl =
+    stringValue(raw.source_video_url ?? raw.sourceVideoUrl) || undefined;
 
   const scenes = (sourceScenes.length ? sourceScenes : [fallbackScene]).map(
     (scene, index): MediaScene => {
       const referenceImageUrl =
-        stringValue(scene.reference_image_url ?? scene.referenceImageUrl, stringValue(raw.reference_image_url ?? raw.referenceImageUrl)) || undefined;
+        stringValue(
+          scene.reference_image_url ?? scene.referenceImageUrl,
+          stringValue(raw.reference_image_url ?? raw.referenceImageUrl),
+        ) || undefined;
+      const authoredSourceVideoUrl =
+        stringValue(scene.source_video_url ?? scene.sourceVideoUrl) || undefined;
+      const requestedSourceVideoUrl =
+        authoredSourceVideoUrl ??
+        (index === 0 || sourceScenes.length === 1 ? topLevelSourceVideoUrl : undefined);
       const sourceVideoUrl =
-        stringValue(scene.source_video_url ?? scene.sourceVideoUrl, stringValue(raw.source_video_url ?? raw.sourceVideoUrl)) || undefined;
+        requestedSourceVideoUrl &&
+        (sourceScenes.length === 1 || !usedSourceVideoUrls.has(requestedSourceVideoUrl))
+          ? requestedSourceVideoUrl
+          : undefined;
+      if (sourceVideoUrl) usedSourceVideoUrls.add(sourceVideoUrl);
       const action = stringValue(
         scene.action,
-        stringValue(scene.visual_prompt ?? scene.visualPrompt, stringValue(raw.visual_prompt ?? raw.visualPrompt, input.script)),
+        stringValue(
+          scene.visual_prompt ?? scene.visualPrompt,
+          stringValue(raw.visual_prompt ?? raw.visualPrompt, input.script),
+        ),
       );
       const subject = stringValue(scene.subject, input.title);
       const environment = stringValue(
@@ -392,7 +425,10 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
         : index < Math.ceil(sourceScenes.length * 0.6)
           ? 'pexels'
           : 'elevate-motion';
-      const overlayTemplate = stringValue(scene.overlay_template ?? scene.overlayTemplate, 'elevate-callout-v1');
+      const overlayTemplate = stringValue(
+        scene.overlay_template ?? scene.overlayTemplate,
+        'elevate-callout-v1',
+      );
       const id = stringValue(scene.id, `scene-${index + 1}`);
       const contentHash = crypto
         .createHash('sha256')
@@ -403,7 +439,12 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
       return {
         id,
         order: index + 1,
-        durationSeconds: numberValue(scene.duration_seconds ?? scene.durationSeconds, defaultDuration, 1, 90),
+        durationSeconds: numberValue(
+          scene.duration_seconds ?? scene.durationSeconds,
+          defaultDuration,
+          1,
+          90,
+        ),
         operation: operationValue(
           scene.operation,
           Boolean(referenceImageUrl),
@@ -423,20 +464,45 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
         sourceVideoUrl,
         characterIds,
         negativePrompt:
-          stringValue(scene.negative_prompt ?? scene.negativePrompt, stringValue(raw.negative_prompt ?? raw.negativePrompt)) || undefined,
+          stringValue(
+            scene.negative_prompt ?? scene.negativePrompt,
+            stringValue(raw.negative_prompt ?? raw.negativePrompt),
+          ) || undefined,
         seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
-        procedurePhase: stringValue(scene.procedure_phase ?? scene.procedurePhase) || undefined,
-        requiredVisualEvidence: stringValue(scene.required_visual_evidence ?? scene.requiredVisualEvidence, action) || undefined,
-        sceneType: sceneTypeValue(scene.scene_type ?? scene.sceneType, index, sourceScenes.length),
+        resolvedProvider:
+          stringValue(scene.resolved_provider ?? scene.resolvedProvider) || undefined,
+        resolvedModel:
+          stringValue(scene.resolved_model ?? scene.resolvedModel) || undefined,
+        sourceProviderItemId:
+          stringValue(scene.source_provider_item_id ?? scene.sourceProviderItemId) || undefined,
+        sourceLicenseEvidenceUrl:
+          stringValue(scene.source_license_evidence_url ?? scene.sourceLicenseEvidenceUrl) || undefined,
+        procedurePhase:
+          stringValue(scene.procedure_phase ?? scene.procedurePhase) || undefined,
+        requiredVisualEvidence:
+          stringValue(scene.required_visual_evidence ?? scene.requiredVisualEvidence, action) ||
+          undefined,
+        sceneType: sceneTypeValue(
+          scene.scene_type ?? scene.sceneType,
+          index,
+          sourceScenes.length,
+        ),
         memoryAnchor:
           stringValue(
             scene.memory_anchor ?? scene.memoryAnchor,
             stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
           ) || undefined,
+        teachingVisual: scene.teachingVisual as MediaScene['teachingVisual'],
+        titleFontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+          ? scene.titleFontSize
+          : undefined,
+        physicalDemonstration: scene.physical_demonstration === true || scene.physicalDemonstration === true,
         mediaSource,
         overlayTemplate,
         contentHash: stringValue(scene.content_hash ?? scene.contentHash, contentHash),
-        reviewStatus: ['approved', 'rejected'].includes(String(scene.review_status ?? scene.reviewStatus))
+        reviewStatus: ['approved', 'rejected'].includes(
+          String(scene.review_status ?? scene.reviewStatus),
+        )
           ? ((scene.review_status ?? scene.reviewStatus) as MediaScene['reviewStatus'])
           : 'draft',
       };

@@ -1,43 +1,30 @@
 /**
- * Admin Environment Manager API.
- *
- * This route lives in the dedicated Admin app so /integrations/env-manager
- * does not depend on the retired apps/app container.
- *
- * Non-secret settings live in platform_settings. Secret-looking keys are
- * transparently routed to encrypted platform_secrets so the fields rendered by
- * the Environment Manager actually persist to the canonical runtime store.
+ * Admin Environment Manager API. Credentials are encrypted in platform_secrets.
+ * Runtime credentials are bound and verified through Google Secret Manager.
  */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { apiRequireAdmin } from '@/lib/admin/guards';
+import { apiRequireRoles } from '@/lib/admin/guards';
+import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { refreshSecrets } from '@/lib/secrets';
+import { saveGoogleRuntimeConfiguration, validateRuntimeEntries, GoogleConfigurationError } from '@/lib/google/runtime-configuration';
+import googlePolicy from '@/config/google-runtime-policy.json';
+import { isElevateMediaRuntimeKey, validateElevateMediaUpdates } from '@/lib/google/elevate-media-settings';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SECRET_PATTERNS = [
-  /key$/i,
-  /secret$/i,
-  /token$/i,
-  /password$/i,
-  /pass$/i,
-  /api_key/i,
-  /private/i,
-  /auth/i,
-  /sid$/i,
-  /dsn$/i,
-  /salt$/i,
-  /encryption/i,
-  /webhook/i,
+  /key$/i, /secret$/i, /token$/i, /password$/i, /pass$/i, /api_key/i,
+  /private/i, /auth/i, /sid$/i, /dsn$/i, /salt$/i, /encryption/i, /webhook/i,
 ];
 
 function isSecret(key: string): boolean {
-  return SECRET_PATTERNS.some((pattern) => pattern.test(key));
+  return key.startsWith('IRS_') || key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
+    SECRET_PATTERNS.some((pattern) => pattern.test(key));
 }
 
 function maskValue(key: string, value: string): string {
@@ -69,32 +56,23 @@ async function auditWrite(userId: string, action: 'upsert' | 'delete', keys: str
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
-
   const db = await requireAdminClient();
   const [{ data, error }, { data: secrets, error: secretError }] = await Promise.all([
     db.from('platform_settings').select('key, value, updated_at').order('key'),
     db.from('platform_secrets').select('key, updated_at').order('key'),
   ]);
-
   if (error) return safeDbError(error, 'Failed to load settings');
   if (secretError) return safeDbError(secretError, 'Failed to load encrypted secrets');
-
   return NextResponse.json({
     settings: [
       ...(data ?? []).map((row) => ({
-        key: row.key,
-        value: maskValue(row.key, row.value ?? ''),
-        is_secret: isSecret(row.key),
-        updated_at: row.updated_at,
+        key: row.key, value: maskValue(row.key, row.value ?? ''),
+        is_secret: isSecret(row.key), updated_at: row.updated_at,
       })),
       ...(secrets ?? []).map((row) => ({
-        key: row.key,
-        value: '••••••••',
-        is_secret: true,
-        updated_at: row.updated_at,
+        key: row.key, value: '••••••••', is_secret: true, updated_at: row.updated_at,
       })),
     ],
     secretWritePolicy: 'encrypted-platform-secrets',
@@ -104,92 +82,108 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
 
-  let body: { entries?: { key?: string; value?: string }[] };
+  let body: { entries?: { key?: string; value?: string }[] } | null;
   try {
     body = await req.json();
   } catch {
     return safeError('Invalid JSON', 400);
   }
-
-  if (!Array.isArray(body.entries) || body.entries.length === 0) {
+  if (!body || !Array.isArray(body.entries) || body.entries.length === 0) {
     return safeError('entries array required', 400);
   }
-  if (body.entries.length > 50) {
-    return safeError('Maximum 50 entries per request', 400);
-  }
-
+  if (body.entries.length > 50) return safeError('Maximum 50 entries per request', 400);
+  const seen = new Set<string>();
   for (const entry of body.entries) {
-    const key = entry.key?.trim() ?? '';
-    if (!key) return safeError('Each entry must have a key', 400);
-    if (!isAllowedKey(key)) {
-      return safeError(`Invalid key format: ${key}`, 400);
+    if (!entry || typeof entry.key !== 'string' || typeof entry.value !== 'string') {
+      return safeError('Each entry must have a string key and value', 400);
     }
-    if (entry.value === undefined || entry.value === null) {
-      return safeError(`Missing value for key: ${key}`, 400);
+    const key = entry.key.trim();
+    if (!isAllowedKey(key)) return safeError('Invalid key format', 400);
+    if (seen.has(key)) return safeError('Duplicate settings are not allowed', 400);
+    seen.add(key);
+    if ((key.startsWith('ELEVATE_MEDIA_') || key.startsWith('NEXT_PUBLIC_ELEVATE_MEDIA_')) &&
+        !isElevateMediaRuntimeKey(key)) {
+      return safeError('Unsupported Elevate Media setting; credentials must be server-only', 400);
     }
   }
-
-  const settingRows = body.entries
-    .filter((entry) => !isSecret(entry.key!.trim()))
-    .map((entry) => ({
-      key: entry.key!.trim(),
-      value: entry.value!,
-      updated_at: new Date().toISOString(),
-      updated_by: auth.id,
-    }));
-  const secretRows = body.entries
-    .filter((entry) => isSecret(entry.key!.trim()))
-    .map((entry) => ({
-      key: entry.key!.trim(),
-      value_enc: entry.value!,
-      scope: 'runtime',
-      category: 'integrations',
-      is_sensitive: true,
-      updated_at: new Date().toISOString(),
-      updated_by: auth.id,
-    }));
-
+  const entries = body.entries.map((entry) => ({ key: entry.key!.trim(), value: entry.value! }));
+  const mediaUpdates = Object.fromEntries(
+    entries.filter((entry) => isElevateMediaRuntimeKey(entry.key)).map(({ key, value }) => [key, value]),
+  );
+  try {
+    validateElevateMediaUpdates(mediaUpdates);
+  } catch (error) {
+    return safeError(error instanceof Error ? error.message : 'Invalid Elevate Media settings', 400);
+  }
+  const runtimeEntries = entries.filter(entry => googlePolicy.components.admin.keys.includes(entry.key));
+  const lmsEntries = runtimeEntries.filter(entry =>
+    (isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_') || entry.key.startsWith('PBX_')) &&
+    googlePolicy.components.lms.keys.includes(entry.key));
+  try {
+    if (runtimeEntries.length) validateRuntimeEntries('admin', runtimeEntries);
+    if (lmsEntries.length) validateRuntimeEntries('lms', lmsEntries);
+    if (entries.some(entry => entry.key.startsWith('AGENT_MEMORY_') && !googlePolicy.components.admin.keys.includes(entry.key))) {
+      return safeError('Unsupported agent memory runtime key', 400);
+    }
+  } catch { return safeError('Invalid or unsupported Google runtime settings', 400); }
+  const settingRows = entries.filter((entry) => !isSecret(entry.key)).map((entry) => ({
+    ...entry, updated_at: new Date().toISOString(), updated_by: auth.id,
+  }));
+  const secretEntries = entries.filter((entry) => isSecret(entry.key));
   const db = await requireAdminClient();
   if (settingRows.length) {
     const { error } = await db.from('platform_settings').upsert(settingRows, { onConflict: 'key' });
     if (error) return safeDbError(error, 'Failed to save settings');
   }
-  if (secretRows.length) {
-    const { error } = await db.from('platform_secrets').upsert(secretRows, { onConflict: 'key' });
-    if (error) return safeDbError(error, 'Failed to save encrypted secrets');
+  if (secretEntries.length) {
+    for (const entry of secretEntries) {
+      const { error } = await db.rpc('set_platform_secret', {
+        p_key: entry.key, p_value: entry.value,
+        p_description: `Updated through Admin Environment Manager by ${auth.id}`,
+        p_category: 'integrations',
+      });
+      if (error) return safeDbError(error, `Failed to save encrypted secret ${entry.key}`);
+    }
     await refreshSecrets();
   }
-
-  const keys = body.entries.map((entry) => entry.key!.trim());
+  const keys = entries.map((entry) => entry.key);
+  // Persistence must remain auditable even when the external sync fails.
   await auditWrite(auth.id, 'upsert', keys);
-  return NextResponse.json({ saved: keys.length, encrypted: secretRows.length });
+
+  const verified = [];
+  try {
+    if (runtimeEntries.length) verified.push(await saveGoogleRuntimeConfiguration('admin', runtimeEntries));
+    if (lmsEntries.length) verified.push(await saveGoogleRuntimeConfiguration('lms', lmsEntries));
+    return NextResponse.json({ saved: keys.length, encrypted: secretEntries.length,
+      runtimeSync: verified.length ? 'google-secret-manager' : 'not-requested',
+      runtimeSynced: verified.length > 0, configurationVerified: verified.length > 0,
+      verifiedServices: verified, bucketConnectionTested: false,
+      message: verified.length ? 'Settings saved and verified on Google Cloud. Bucket access and video playback were not tested.' : 'Settings saved successfully.' });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof GoogleConfigurationError ? error.message : 'Google runtime synchronization failed',
+      settingsSaved: true, saved: keys.length, runtimeSynced: false, configurationVerified: false,
+      verifiedServices: verified.map(result => ({ component: result.component, revision: result.revision })),
+    }, { status: 503 });
+  }
 }
 
 export async function DELETE(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireRoles(req, PERMISSIONS.manage_platform_settings, { adminOverride: false });
   if (auth.error) return auth.error;
-
   const key = new URL(req.url).searchParams.get('key')?.trim();
   if (!key) return safeError('key query param required', 400);
   if (!isAllowedKey(key)) return safeError(`Invalid key format: ${key}`, 400);
-  if (isSecret(key)) {
-    return safeError(
-      'Secret credentials must be removed from the owning runtime environment.',
-      400,
-    );
+  if (isSecret(key) || isElevateMediaRuntimeKey(key)) {
+    return safeError('Runtime-backed settings must be removed from both the owning runtime and saved settings.', 400);
   }
-
   const db = await requireAdminClient();
   const { error } = await db.from('platform_settings').delete().eq('key', key);
   if (error) return safeDbError(error, 'Failed to delete setting');
-
   await auditWrite(auth.id, 'delete', [key]);
   return NextResponse.json({ deleted: key });
 }

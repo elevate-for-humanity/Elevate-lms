@@ -19,13 +19,15 @@ export function WebsiteAdvancedSettings({
   websiteId: string;
   initialConfig: TenantSiteConfig;
 }) {
+  const hero = initialConfig.pages?.find((page) => page.slug === '/')?.sections.find((section) => section.type === 'hero')?.content;
+  const heroText = (key: string, fallback?: string) => typeof hero?.[key] === 'string' ? hero[key] as string : fallback || '';
   const [logoImage, setLogoImage] = useState(initialConfig.branding.logoImage || '');
   const [accentColor, setAccentColor] = useState(initialConfig.branding.accentColor || initialConfig.branding.primaryColor || '#1d4ed8');
   const [backgroundColor, setBackgroundColor] = useState(initialConfig.branding.backgroundColor || '#ffffff');
   const [textColor, setTextColor] = useState(initialConfig.branding.textColor || '#0f172a');
-  const [heroImage, setHeroImage] = useState(initialConfig.homepage.heroImage || '');
-  const [heroImageAlt, setHeroImageAlt] = useState(initialConfig.homepage.heroImageAlt || '');
-  const [heroCtaHref, setHeroCtaHref] = useState(initialConfig.homepage.heroCtaHref || '');
+  const [heroImage, setHeroImage] = useState(heroText('image', initialConfig.homepage.heroImage));
+  const [heroImageAlt, setHeroImageAlt] = useState(heroText('imageAlt', initialConfig.homepage.heroImageAlt));
+  const [heroCtaHref, setHeroCtaHref] = useState(heroText('buttonHref', initialConfig.homepage.heroCtaHref));
   const [announcement, setAnnouncement] = useState(initialConfig.homepage.announcement || '');
   const [email, setEmail] = useState(initialConfig.contact?.email || initialConfig.footer.contactEmail || '');
   const [phone, setPhone] = useState(initialConfig.contact?.phone || '');

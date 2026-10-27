@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -11,6 +13,15 @@ export const metadata: Metadata = {
   description:
     'Current guidance for Indiana Workforce Ready Grant consideration. Eligibility depends on the participant, the qualifying program, the approved provider record, and current state requirements.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/wrg' },
+
+  ...publicArtworkMetadata({
+    path: '/funding/wrg',
+    image: '/images/refresh-20261014/admissions.webp',
+    alt: 'Illustrative advisor helping a learner review training funding',
+    title: 'Workforce Ready Grant | Indiana Funding Guidance',
+    description:
+      'Current guidance for Indiana Workforce Ready Grant consideration. Eligibility depends on the participant, the qualifying program, the approved provider record, and current state requirements.',
+  }),
 };
 
 const WRG_PROGRAMS = VERIFIED_WORKFORCE_FUNDED_PROGRAMS.filter((program) => program.wrgEligible);
@@ -18,6 +29,15 @@ const WRG_PROGRAMS = VERIFIED_WORKFORCE_FUNDED_PROGRAMS.filter((program) => prog
 export default function WorkforceReadyGrantPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/admissions.webp"
+        alt="Illustrative advisor helping a learner review training funding"
+        actions={[
+          { href: '/check-eligibility', label: 'Check my funding options' },
+          { href: '/programs', label: 'Compare programs' },
+        ]}
+      />
+
       <div className="max-w-5xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[{ label: 'Funding', href: '/funding' }, { label: 'Workforce Ready Grant' }]}
@@ -115,8 +135,8 @@ export default function WorkforceReadyGrantPage() {
 
           <div className="mt-10 rounded-xl bg-amber-50 border border-amber-200 p-6 text-sm text-amber-950 leading-relaxed">
             <strong>Important:</strong> State rules, funding availability, participant eligibility,
-            grant caps, and qualifying-program lists can change. Elevate&apos;s application and intake
-            process does not itself create funding eligibility or an award.
+            grant caps, and qualifying-program lists can change. Elevate&apos;s application and
+            intake process does not itself create funding eligibility or an award.
           </div>
         </div>
       </section>

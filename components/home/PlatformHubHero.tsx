@@ -1,93 +1,82 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap, Store } from 'lucide-react';
-import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
-import { buildGuidedNarration } from '@/lib/narration/guided-script';
+import Image from 'next/image';
+import ImageMetadata from '@/components/marketing/ImageMetadata';
 
-const HOME_VIDEO =
-  'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
-
-const HOME_NARRATION = buildGuidedNarration({
-  welcome: "Welcome to Elevate for Humanity. Let's slow down and find the right starting point for you.",
-  concept:
-    'There are two main paths. An apprenticeship lets you learn a trade while practicing under supervision at an approved workplace. Career training prepares you for a specific job through classes, practice, and credential preparation.',
-  example:
-    'For example, someone choosing barbering may learn technique in class and then practice with clients at a Host Shop. Someone choosing HVAC may build technical skills first, then prepare for certification and employment.',
-  reflection:
-    'Think about which sounds more like you: learning inside a workplace, or completing focused career training before moving into a job.',
-  nextStep:
-    'Choose I want career training to compare your options. If cost is a concern, look for the funding step. Training may be free if you qualify, but WorkOne must approve it before training begins. If you are unsure, choose Check your options and we will guide you from there.',
-});
-
-const PROOF = [
-  { icon: GraduationCap, label: 'Hands-on training' },
-  { icon: BriefcaseBusiness, label: 'Employer-connected pathways' },
-  { icon: BadgeCheck, label: 'Funding guidance' },
-] as const;
+const HOME_IMAGE = '/images/refresh-20261014/home-signed-20261017.webp';
 
 export function PlatformHubHero() {
   return (
     <section
-      className="border-b border-slate-200 bg-white"
+      className="relative w-full overflow-hidden bg-slate-950 text-white"
       aria-labelledby="home-hero-heading"
       data-scroll-narration
-      data-narration={HOME_NARRATION}
-      data-narration-src="/audio/narration/home-hero.mp3"
-      data-narration-rate="0.84"
-      data-narration-style="assistant"
+      data-narration="Elevate for Humanity connects career training, workforce development, registered apprenticeship, employer partnerships, and business technology. Choose the path that fits what you came here to do."
+      data-narration-style="instructor"
     >
-      <div className="mx-auto grid max-w-[1440px] lg:min-h-[720px] lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="order-1 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:px-14 lg:py-16">
-          <div className="max-w-2xl">
-            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
-              Career training in Indiana
-            </p>
-            <h1 id="home-hero-heading" className="mt-4 text-4xl font-black leading-[1.03] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-              One platform for training, apprenticeships, and workforce operations.
-            </h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700">
-              Learn, operate programs, coordinate employers, document compliance, and move people
-              from application to credential in one connected system.
-            </p>
-            <div className="mt-7 grid gap-3 sm:grid-cols-3">
-              <Link href="/programs" className="group rounded-2xl bg-brand-red-700 p-4 text-white no-underline hover:bg-brand-red-800 hover:no-underline">
-                <GraduationCap className="h-6 w-6" aria-hidden="true" />
-                <span className="mt-3 block font-black">I want career training</span>
-                <span className="mt-1 block text-sm font-semibold text-white/85">Compare programs and apply.</span>
-              </Link>
-              <Link href="/partners/host-shops" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
-                <Store className="h-6 w-6" aria-hidden="true" />
-                <span className="mt-3 block font-black">I am a Host Shop</span>
-                <span className="mt-1 block text-sm font-semibold text-slate-600">Employ and train apprentices.</span>
-              </Link>
-              <Link href="/apply/program-holder" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
-                <BriefcaseBusiness className="h-6 w-6" aria-hidden="true" />
-                <span className="mt-3 block font-black">I run a program</span>
-                <span className="mt-1 block text-sm font-semibold text-slate-600">Use Elevate to deliver it.</span>
-              </Link>
-            </div>
-            <Link href="/check-eligibility" className="mt-4 inline-flex items-center gap-2 font-black text-brand-blue-800 no-underline hover:no-underline">
-              Not sure where to start? Check your options <ArrowRight className="h-5 w-5" aria-hidden="true" />
+      <ImageMetadata
+        src={HOME_IMAGE}
+        description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
+      />
+      <div className="relative aspect-video sm:aspect-auto sm:h-[clamp(240px,38svh,480px)] w-full overflow-hidden bg-sky-100">
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+          src={HOME_IMAGE}
+          alt="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[center_74%]"
+        />
+      </div>
+      <div className="relative mx-auto flex max-w-6xl items-center px-5 py-6 sm:px-8 sm:py-8">
+        <div className="max-w-3xl">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">
+            Career training • Workforce development • Registered apprenticeship • Business growth
+          </p>
+          <h1
+            id="home-hero-heading"
+            className="mt-3 text-3xl font-black leading-[1.1] tracking-tight sm:text-5xl"
+          >
+            Build a career. Build a workforce. Build a business.
+          </h1>
+          <p className="mt-4 max-w-3xl text-lg font-semibold leading-8 text-slate-100 sm:text-xl">
+            Elevate for Humanity connects individuals, employers, workforce partners, and businesses
+            through career training, state and workforce funding pathways for eligible participants,
+            Registered Apprenticeship, employer services, and practical business technology.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/programs"
+              className="inline-flex min-h-12 items-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+            >
+              Explore Career Training
             </Link>
-            <div className="mt-8 grid gap-3 border-t border-slate-200 pt-6 sm:grid-cols-3">
-              {PROOF.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                  <Icon className="h-5 w-5 shrink-0 text-brand-red-700" aria-hidden="true" />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
+            <Link
+              href="/check-eligibility"
+              className="inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
+            >
+              Check Funding Options
+            </Link>
+            <Link
+              href="/employers"
+              className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-200 px-6 py-3 font-black text-white hover:bg-slate-100 hover:text-slate-950"
+            >
+              Employers & Partners
+            </Link>
+            <Link
+              href="/store/apps/website-builder"
+              className="inline-flex min-h-12 items-center rounded-xl border-2 border-cyan-300 px-6 py-3 font-black text-cyan-100 hover:bg-cyan-50 hover:text-cyan-950"
+            >
+              Business & Website Builder
+            </Link>
           </div>
-        </div>
-        <div className="relative order-2 min-h-[clamp(340px,58svh,560px)] overflow-hidden bg-slate-950 lg:min-h-[720px]">
-          <SafeHeroVideo
-            src={HOME_VIDEO}
-            poster="/images/beauty/program-beauty-training.webp"
-            showPosterBeforePlayback
-            loop
-            ariaLabel="Elevate career training and workforce platform in action"
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-slate-950/35 to-transparent" aria-hidden="true" />
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-200">
+            <span>Registered Apprenticeship</span>
+            <span>Workforce training</span>
+            <span>Employer partnerships</span>
+            <span>Industry credentials</span>
+            <span>Compliance & reporting</span>
+          </div>
         </div>
       </div>
     </section>

@@ -24,7 +24,7 @@ export function CourseCard({ course }: Props) {
           src={coverSrc}
           alt={course.course_name}
           fill
-          sizes="(min-width: 1024px) 25vw, 50vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover transition group-hover:scale-105"
         />
       </div>

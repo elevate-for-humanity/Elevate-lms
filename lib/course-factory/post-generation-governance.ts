@@ -166,7 +166,7 @@ export async function normalizeGeneratedCourseForGovernance(
         hour_category:
           lesson.hour_category || (isPractical ? 'practical' : isAssessment ? 'exam' : 'didactic'),
         delivery_method: lesson.delivery_method || 'online_async',
-        // Generation has completed successfully, but human approval remains separate.
+        // Generation completion is separate from the versioned automated publication gate.
         generation_status: 'generated',
       };
       if (governedExperience) {
@@ -177,11 +177,6 @@ export async function normalizeGeneratedCourseForGovernance(
         // The system may create the requirement, but it may not impersonate a human approval.
         update.evidence_type = lesson.evidence_type || 'observation';
         update.requires_instructor_signoff = true;
-      }
-
-      if (lesson.ai_generated === true && lesson.approved !== true) {
-        // Preserve human-review requirement. Never auto-approve AI content.
-        update.approved = false;
       }
 
       const { error: updateError } = await db

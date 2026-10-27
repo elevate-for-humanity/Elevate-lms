@@ -388,7 +388,7 @@ function Results({
           Not sure about funding?
         </h3>
         <p className="text-slate-300 mb-6">
-          Most students qualify for WIOA or other workforce funding that covers their training.
+          Funding is program-specific. Review the exact program record and obtain written agency authorization before relying on workforce funding.
         </p>
         <Link
           href="/eligibility"

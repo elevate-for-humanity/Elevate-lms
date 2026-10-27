@@ -3,14 +3,22 @@ import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
-import { HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS } from '@/lib/program-holder/onboarding-readiness';
+import {
+  CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
+  HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
+} from '@/lib/program-holder/onboarding-readiness';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const MAX_BYTES = 10 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'video/mp4']);
-const DOCUMENT_TYPES = new Set(HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type));
+const DOCUMENT_TYPES = new Set([
+  ...CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
+  ...HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
+  'company_logo',
+  'provider_invoice',
+]);
 
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, 'strict');
@@ -24,6 +32,23 @@ export async function POST(request: NextRequest) {
   const documentType = String(form.get('documentType') || '');
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
+  if (documentType === 'provider_invoice') {
+    const holder = await ctx.db
+      .from('program_holders')
+      .select('organization_name')
+      .eq('id', ctx.holderId)
+      .maybeSingle();
+    if (holder.error || holder.data?.organization_name !== 'The CDL Academy')
+      return NextResponse.json(
+        { error: 'Training invoice submission is unavailable for this account.' },
+        { status: 403 },
+      );
+    if (file.type === 'video/mp4')
+      return NextResponse.json(
+        { error: 'Submit the invoice as a PDF, JPG, or PNG.' },
+        { status: 400 },
+      );
+  }
   const maxBytes = file.type === 'video/mp4' ? MAX_VIDEO_BYTES : MAX_BYTES;
   if (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes)
     return NextResponse.json(
@@ -55,9 +80,13 @@ export async function POST(request: NextRequest) {
       document_type: documentType,
       file_name: file.name,
       file_url: path,
+      storage_bucket: 'documents',
       file_size: file.size,
       mime_type: file.type,
-      description: 'Submitted through protected Program Holder onboarding',
+      description:
+        documentType === 'provider_invoice'
+          ? 'CDL training invoice submitted to Elevate for payment review'
+          : 'Submitted through protected Program Holder onboarding',
       uploaded_by: ctx.user.id,
       uploaded_at: now,
       status: 'pending',

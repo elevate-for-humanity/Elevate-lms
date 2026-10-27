@@ -1,6 +1,6 @@
 {
   "schemaSource": "migrations (1747 tables — live schema credentials unavailable)",
-  "entryCount": 334,
+  "entryCount": 335,
   "entries": [
     "apps/admin/app/accreditation/page.tsx|accreditation_evidence|submitted_at",
     "apps/admin/app/accreditation/report/page.tsx|lms_courses|course_name,is_active",
@@ -244,6 +244,7 @@
     "lib/automation/enrollment-automation.ts|at_risk_learners|TABLE_NOT_IN_SCHEMA",
     "lib/automation/enrollment-automation.ts|program_enrollments|student_id",
     "lib/autopilot/deploy-prep.ts|lms_courses|slug",
+    "lib/barber/suspension.ts|barber_subscriptions|billing_exception_until",
     "lib/blended-learning/attendance.ts|program_enrollments|student_id",
     "lib/case-file/loader.ts|program_enrollments|student_id",
     "lib/communication/announcements.ts|program_enrollments|student_id",
@@ -327,8 +328,6 @@
     "lib/studio/orchestration.ts|studio_tasks|TABLE_NOT_IN_SCHEMA",
     "lib/studio/orchestration.ts|workforce_agents|TABLE_NOT_IN_SCHEMA",
     "lib/timeclock/queries.ts|progress_entries|work_date",
-    "lib/timeclock/sync-to-hour-entries.ts|apprentices|employer_id",
-    "lib/timeclock/sync-to-hour-entries.ts|progress_entries|work_date",
     "lib/video/auto-video-generator.ts|course_lessons|module_name",
     "lib/video/auto-video-generator.ts|courses|category",
     "lib/video/job-queue.ts|course_lessons|content_json",

@@ -12,8 +12,9 @@ import type { CourseTemplate } from './schema';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import { validateCourseTemplate, type CourseValidationResult } from './validate';
 import { adaptCourseTemplateToBlueprint } from './publish-adapter';
-import { courseFactory } from '@/lib/course-factory';
+import { courseFactory } from '@/lib/course-builder/orchestrator';
 import { logger } from '@/lib/logger';
+import { isBeautyApprenticeshipRti } from './beauty-rti-policy';
 
 export function generateCourseCode(slug: string): string {
   const parts = slug
@@ -83,7 +84,9 @@ export async function runCoursePublishPipeline(opts: PipelineOptions): Promise<P
     blueprint,
     mode,
     contentSource: 'ai',
-    videoMode: 'queue',
+    // Beauty RTI may be authored and reviewed without mandatory video jobs.
+    // This does not publish lessons or award RTI credit.
+    videoMode: isBeautyApprenticeshipRti(template.programSlug) ? 'off' : 'queue',
     dryRun,
   });
 

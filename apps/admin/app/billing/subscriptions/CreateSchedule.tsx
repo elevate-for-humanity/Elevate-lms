@@ -28,13 +28,13 @@ export function CreateSchedule() {
         cadence: String(data.get('cadence')),
         nextInvoiceDate: String(data.get('date')),
         remainingInvoices: remaining ? Number(remaining) : null,
-        legacyStripeSubscriptionId: String(data.get('stripeId') || '').trim() || undefined,
+        collectionMode: String(data.get('collectionMode') || 'automatic'),
       }),
     });
     const result = await response.json();
     setMessage(
       response.ok
-        ? 'QuickBooks invoice schedule saved.'
+        ? 'Subscription saved. Approve the signed release, then connect its PayPal billing agreement.'
         : result.error || 'Schedule could not be saved.',
     );
     setSaving(false);
@@ -59,6 +59,10 @@ export function CreateSchedule() {
             placeholder="Customer name"
             className="rounded-lg border px-3 py-2"
           />
+          <select name="collectionMode" className="rounded-lg border px-3 py-2">
+            <option value="automatic">Automatic — PayPal collection + QuickBooks ledger</option>
+            <option value="manual_invoice">Manual QuickBooks invoice</option>
+          </select>
           <input
             name="email"
             type="email"
@@ -102,11 +106,6 @@ export function CreateSchedule() {
             max="520"
             placeholder="Number of invoices (blank = ongoing)"
             className="rounded-lg border px-3 py-2"
-          />
-          <input
-            name="stripeId"
-            placeholder="Old Stripe subscription ID (optional)"
-            className="rounded-lg border px-3 py-2 sm:col-span-2"
           />
           <button
             disabled={saving}

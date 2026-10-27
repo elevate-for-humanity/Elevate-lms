@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
@@ -60,6 +61,18 @@ export async function POST(request: NextRequest) {
     );
 
   const admin = await requireAdminClient();
+  // Verify delivery can resolve the selected catalog before taking payment.
+  const deliveryPlan = await admin.from('subscription_plans')
+    .select('id').eq('slug', plan.id).eq('active', true).maybeSingle();
+  if (deliveryPlan.error || !deliveryPlan.data?.id)
+    return NextResponse.json({ error: 'This plan is not ready for access activation.' }, { status: 503 });
+  const addonCodes = addonSlugs.map(normalizeAddonCode);
+  if (addonCodes.length) {
+    const deliveryAddons = await admin.from('saas_addon_catalog')
+      .select('code').in('code', addonCodes).eq('active', true);
+    if (deliveryAddons.error || addonCodes.some((code) => !deliveryAddons.data?.some((row) => row.code === code)))
+      return NextResponse.json({ error: 'A selected add-on is not ready for access activation.' }, { status: 503 });
+  }
   const tenantId = await resolveTenantIdForUser(user.id);
   if (!tenantId)
     return NextResponse.json(
@@ -76,25 +89,31 @@ export async function POST(request: NextRequest) {
   const { data: existing } = await admin
     .from('organization_subscriptions')
     .select(
-      'status,stripe_subscription_id,billing_provider,provider_subscription_id,current_period_end',
+      'status,billing_provider,provider_subscription_id,current_period_end',
     )
     .eq('organization_id', billingOrganizationId)
     .maybeSingle();
   if (
-    existing?.stripe_subscription_id &&
+    existing?.provider_subscription_id &&
     ['active', 'trialing'].includes(existing.status || '') &&
+    existing.billing_provider &&
     existing.billing_provider !== 'quickbooks'
   ) {
+    logger.warn('[platform-checkout] preventing duplicate billing during provider cutover', {
+      organizationId: billingOrganizationId,
+      activeProvider: existing.billing_provider,
+      currentPeriodEnd: existing.current_period_end,
+    });
     return NextResponse.json(
       {
-        error:
-          'This organization still has an active Stripe subscription. Its QuickBooks schedule was not started, preventing duplicate billing.',
+        error: 'This organization already has an active subscription with another billing provider. Duplicate billing was prevented.',
         cutoverRequired: true,
         currentPeriodEnd: existing.current_period_end,
       },
       { status: 409 },
     );
   }
+
 
   const baseAmount = priceCents(plan, interval);
   const addonLines = addons.filter(Boolean).map((addon) => ({
@@ -131,7 +150,7 @@ export async function POST(request: NextRequest) {
         tenant_id: tenantId,
         plan_id: plan.id,
         billing_interval: interval,
-        addon_codes: addonSlugs.map(normalizeAddonCode),
+        addon_codes: addonCodes,
         amount_cents: totalCents,
       },
     },
@@ -150,6 +169,15 @@ export async function POST(request: NextRequest) {
       cadence: interval === 'annual' ? 'annual' : 'monthly',
       next_invoice_date: nextPeriod(interval),
       status: 'active',
+      fulfillment_type: 'platform_subscription',
+      fulfillment_payload: {
+        organization_id: billingOrganizationId,
+        tenant_id: tenantId,
+        plan_id: plan.id,
+        billing_interval: interval,
+        addon_codes: addonCodes,
+        amount_cents: totalCents,
+      },
     },
     { onConflict: 'provider,customer_external_key,canonical_product_key' },
   );

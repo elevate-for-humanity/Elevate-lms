@@ -47,7 +47,7 @@ export function AgenticCourseRunPanel({
   courseTitle: string;
 }) {
   const storageKey = `elevate:course-agent:${courseId}`;
-  const [goal, setGoal] = useState(`Finish ${courseTitle} as a complete learner-ready governed course, repair missing instructional content and assessments, generate required media, validate every required checklist, approve with Course Builder AI when all gates pass, then publish through the canonical Course Builder while preserving human review and editing controls.`);
+  const [goal, setGoal] = useState(`Finish ${courseTitle} as a complete learner-ready governed course, repair missing instructional content and assessments, generate required media, validate every required checklist, automatically approve when all deterministic gates pass, then publish through the canonical Course Builder.`);
   const [projectId, setProjectId] = useState('');
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [starting, setStarting] = useState(false);
@@ -123,7 +123,7 @@ export function AgenticCourseRunPanel({
           </div>
           <h3 className="mt-1 text-base font-bold text-slate-950">Visible build plan · persistent task graph</h3>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-600">
-            Course Builder AI performs the first governed checklist review. An authorized human must inspect the evidence and approve publication after every required gate passes.
+            Course Builder validates persisted evidence, records a versioned automated approval, and publishes without waiting for human course-content review. Practical learner performance still requires authorized sign-off where configured.
           </p>
         </div>
         {projectId ? (

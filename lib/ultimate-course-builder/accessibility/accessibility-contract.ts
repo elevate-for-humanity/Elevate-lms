@@ -1,0 +1,2 @@
+export interface AccessibilityEvidence{captions:boolean;transcript:boolean;altText:boolean;keyboardOperation:boolean;focusOrder:boolean;semanticHeadings:boolean;colorContrast:boolean;nonColorMeaning:boolean;screenReaderLabels:boolean;reducedMotion:boolean;accessibleInteractionFallback:boolean}
+export function evaluateAccessibility(e:AccessibilityEvidence){const failures=Object.entries(e).filter(([,v])=>v!==true).map(([k])=>`ACCESSIBILITY_${k.toUpperCase()}_FAILED`);return {pass:failures.length===0,critical:failures.length>0,failures};}

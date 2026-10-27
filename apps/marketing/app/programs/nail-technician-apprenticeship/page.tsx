@@ -1,9 +1,16 @@
+import { connection } from 'next/server';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
+
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
-import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
-import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
+import BeautyApprenticeshipAuthority, {
+  buildBeautyProgramStructuredData,
+} from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
+import NailDesignShowcase from '@/components/programs/beauty/NailDesignShowcase';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
+import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 import { getStaticProgram } from '@/data/programs';
@@ -11,6 +18,8 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function NailTechnicianApprenticeshipPage() {
+  // Live approved host-shop galleries and placement guides require runtime credentials.
+  await connection();
   const loaded = await loadProgramForPage('nail-technician-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('nail-technician-apprenticeship');
   if (!program) return notFound();
@@ -24,11 +33,11 @@ export default async function NailTechnicianApprenticeshipPage() {
       posterImage={banner.posterImage || program.heroImage}
       microLabel={banner.microLabel}
       analyticsName={banner.analyticsName}
-      belowHeroHeadline={banner.belowHeroHeadline}
-      belowHeroSubheadline={banner.belowHeroSubheadline}
-      ctas={[banner.primaryCta, banner.secondaryCta].filter(Boolean) as any}
-      trustIndicators={banner.trustIndicators}
+      overlayMode="none"
+      mediaFit="contain"
+      heightClassName="h-[clamp(220px,32svh,360px)]"
       transcript={banner.transcript}
+      narrateTranscript
     />
   ) : undefined;
 
@@ -36,31 +45,56 @@ export default async function NailTechnicianApprenticeshipPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
+        }}
       />
       <ProgramDetailPage
         program={program}
         banner={banner}
         heroOverride={heroOverride}
-        featuredContent={<FeaturedHostPartners programSlug="nail-technician-apprenticeship" />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="nail-technician-apprenticeship" programLabel={program.title} />}
+        visualContent={<NailDesignShowcase program="nail-technician" />}
+        featuredContent={
+          <>
+            <ApprenticeshipExperienceGuide
+              programTitle={program.title}
+              applyHref={program.cta.applyHref}
+            />
+            <FeaturedHostPartners programSlug="nail-technician-apprenticeship" showDirectory={false} />
+            <HostShopPlacementGuide programSlug="nail-technician-apprenticeship" />
+          </>
+        }
       >
         <div className="space-y-10">
-          <JozannaIndustryInstructor industry="nail-technician" />
           <BeautyApprenticeshipAuthority program={program} />
 
-      <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-9">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">For Indiana employers and Host Shops</p>
-          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Build your workforce with apprenticeship support</h2>
-          <p className="mt-4 text-base font-medium leading-7 text-slate-700">It is free to apply to join Elevate’s Host Shop network. Approved employers can grow service capacity by hiring and training apprentices, developing future licensed talent, and earning revenue from the apprentice’s supervised work in accordance with wage, licensing, supervision, and program requirements.</p>
-          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">Eligible employers may also qualify for workforce reimbursement or training-cost support through WorkOne, WIOA, on-the-job training, or another workforce partner. Reimbursement is not automatic or guaranteed; the employer, apprentice, occupation, costs, and funding authorization must be approved by the responsible workforce agency before costs are incurred.</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <a href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800">Become a Host Shop — Free</a>
-            <a href="/funding/wioa" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50">Review workforce funding</a>
-          </div>
-        </div>
-      </section>
+          <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">
+            <div className="mx-auto max-w-5xl rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-9">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+                For Indiana employers and Host Shops
+              </p>
+              <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+                Build your workforce with apprenticeship support
+              </h2>
+              <p className="mt-4 text-base font-medium leading-7 text-slate-700">
+                It is free to apply to join Elevate’s Host Shop network. Approved employers can grow
+                service capacity by hiring and training apprentices, developing future licensed
+                talent, and earning revenue from the apprentice’s supervised work in accordance with
+                wage, licensing, supervision, and program requirements.
+              </p>
 
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="/partners/host-shop/apply?program=nail"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800"
+                >
+                  Become a Host Shop — Free
+                </a>
+
+              </div>
+            </div>
+          </section>
         </div>
       </ProgramDetailPage>
     </>
@@ -80,10 +114,13 @@ export async function generateMetadata() {
       'earn while you learn nail technician',
       'Indiana nail technician license pathway',
     ],
-    alternates: { canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship' },
+    alternates: {
+      canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship',
+    },
     openGraph: {
       title: 'Nail Technician Apprenticeship Program | Indiana',
-      description: 'Complete supervised salon/spa training and related instruction through Elevate’s nail technician apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+      description:
+        'Complete supervised salon/spa training and related instruction through Elevate’s nail technician apprenticeship pathway. Apprenticeship enrollment is self-pay only.',
       url: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship',
       type: 'website',
     },

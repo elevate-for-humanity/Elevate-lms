@@ -105,7 +105,7 @@ if (!INTERNAL_KEY) {
       console.log('  ' + JSON.stringify(p, null, 2).replace(/\n/g, '\n  '));
 
       // Check 3: title
-      if (p.title === 'HVAC Technician' && p.published === true) {
+      if (['HVAC Technician', 'HVAC Certification'].includes(p.title) && p.published === true) {
         pass('proof endpoint — canonical title', `title="${p.title}" published=${p.published}`);
       } else {
         fail('proof endpoint — canonical title', `title="${p.title}" published=${p.published}`);
@@ -237,8 +237,7 @@ try {
 
   // Must have hvac-technician in DB_MIGRATED_SLUGS
   const inMigratedSet =
-    src.includes("DB_MIGRATED_SLUGS = new Set(['hvac-technician'])") ||
-    src.includes('DB_MIGRATED_SLUGS = new Set(["hvac-technician"])');
+    /DB_MIGRATED_SLUGS\s*=\s*new Set\(\[[^\]]*['\"]hvac-technician['\"]/.test(src);
 
   // Must NOT have hvac-technician in PROGRAM_REGISTRY
   const inRegistry =

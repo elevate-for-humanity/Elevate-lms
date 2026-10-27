@@ -1,4 +1,7 @@
+import { affirmativeActionText } from '@/lib/ai/command-intent';
+
 export type EngineeringRunnerId =
+  | 'studio-engineering'
   | 'openhands'
   | 'webcontainer'
   | 'github-actions'
@@ -33,7 +36,7 @@ export function buildUnifiedEngineeringStages(goal: string): EngineeringStageSpe
       id: 'engineering',
       title: 'Implement repository outcome',
       command: goal,
-      runner: 'openhands',
+      runner: 'studio-engineering',
       expectedOutput: 'Repository branch or pull request with concrete changed-file evidence',
       verificationRule:
         'A registered engineering runner must return independently verified repository evidence.',
@@ -69,7 +72,7 @@ export function buildUnifiedEngineeringStages(goal: string): EngineeringStageSpe
     previous = 'browser-qa';
   }
 
-  if (DEPLOY_RE.test(goal)) {
+  if (DEPLOY_RE.test(affirmativeActionText(goal))) {
     stages.push({
       id: 'deploy',
       title: 'Deploy the verified build',
@@ -96,7 +99,8 @@ export function buildUnifiedEngineeringStages(goal: string): EngineeringStageSpe
 }
 
 export const ENGINEERING_RUNNER_CAPABILITIES = {
-  openhands: { mode: 'server', authority: 'repository-mutation' },
+  'studio-engineering': { mode: 'server', authority: 'repository-mutation' },
+  openhands: { mode: 'external-opt-in', authority: 'repository-mutation' },
   webcontainer: { mode: 'browser-local', authority: 'advisory-validation' },
   'github-actions': { mode: 'server', authority: 'ci-and-deployment' },
   'studio-browser': { mode: 'server', authority: 'browser-qa' },

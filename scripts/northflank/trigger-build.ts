@@ -123,7 +123,7 @@ async function main() {
     process.exit(1);
   }
 
-  const currentSha = process.env.GITHUB_SHA || process.env.BUILD_SHA || '';
+  const currentSha = process.env.BUILD_SHA || process.env.GITHUB_SHA || '';
   if (!/^[a-f0-9]{40}$/i.test(currentSha)) {
     console.error(
       `Northflank POST /build requires a full 40-character Git SHA. Received: ${currentSha || 'missing'}`,

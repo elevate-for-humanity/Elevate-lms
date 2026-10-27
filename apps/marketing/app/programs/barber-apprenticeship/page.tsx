@@ -1,4 +1,7 @@
 import Image from 'next/image';
+import { TUITION_CENTS } from '@/lib/barber/pricing';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -12,26 +15,28 @@ import {
 } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
-import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
+import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
-import BarberPaymentPlanner from '@/components/programs/beauty/BarberPaymentPlanner';
+import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
+import KountryKutzTourSlideshow from '@/components/programs/beauty/KountryKutzTourSlideshow';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import heroBanners from '@/content/heroBanners';
 
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-const BARBER_HERO_IMAGE =
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
-const BARBER_RTI_HOURS = 260;
-// Approved, conversational hero narration for the featured Kountry Kutz host shop.
+const BARBER_HERO_IMAGE = getProgramHeroImage('barber-apprenticeship');
+const BARBER_STANDARD = getRegisteredProgramStandard('barber-apprenticeship')!.standard;
+const BARBER_RTI_HOURS = BARBER_STANDARD.relatedInstructionHours;
 const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
-  "Welcome to the Barber Apprenticeship program. Right now, you're getting a look inside Kountry Kutz Barbershop in New Palestine, Indiana. This is the kind of real workplace where an approved apprentice can learn, practice, and grow under qualified supervision. As the tour moves through the shop, imagine yourself building confidence at these workstations. You will learn how to protect every client through proper sanitation and safety. You will strengthen your haircutting and grooming skills. And you will learn the communication and daily routines that turn technical ability into professional service. Keep going when you're ready. The next sections explain how apprenticeship works, introduce participating Host Shops, and show you how to apply. Elevate confirms placement, wages, supervision, enrollment, and licensing requirements before training begins."
-
+  'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. As the video moves through the shop, notice the professional stations, working barbershop environment, and approved Host Shop where eligible apprentices may build supervised barbering skills.';
 const FLOW = [
   {
     icon: BookOpen,
@@ -84,6 +89,7 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   const program = loaded.program;
+  const shops = await getHostShopNetwork();
   const heroBanner = heroBanners['barber-apprenticeship'];
   const structuredData = buildBeautyProgramStructuredData({
     ...program,
@@ -99,81 +105,17 @@ export default async function BarberApprenticeshipPage() {
         }}
       />
 
-      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT} data-narration-rate="0.84" data-narration-style="instructor">
-        <HeroVideo
-          videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
-          videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
-          videoPlaybackRate={0.55}
-          posterImage="/images/partners/kountry-kutz/interior-empty.webp"
-          mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
-          microLabel={heroBanner.microLabel}
-          transcript={KOUNTRY_KUTZ_HERO_TRANSCRIPT}
-          narrateTranscript={false}
-          transcriptVoiceStyle="assistant"
-          transcriptVoiceRate={0.84}
-          preloadTranscriptVoice={false}
-          analyticsName="barber-apprenticeship"
-          heightClassName="h-[clamp(520px,72svh,860px)]"
-          mediaFit="contain"
-          mediaClassName="bg-black"
-          overlayMode="none"
-          deferVideoMs={0}
-        />
-      </div>
-
-      <section
-        data-scroll-narration
-        data-narration="Meet Kountry Kutz Barbershop, a participating Host Shop in New Palestine, Indiana. Apprentices can build supervised workplace skills here while Elevate verifies placement, instruction, and progress requirements."
-        className="border-b border-slate-200 bg-slate-950 px-4 py-7 text-white"
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Featured Host Shop</p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Tour Kountry Kutz Barbershop</h2>
-            <p className="mt-2 leading-7 text-slate-200">
-              Kountry Kutz is a family-oriented Main Street barbershop in New Palestine, Indiana,
-              offering classic cuts, modern grooming, and supervised workplace experience for the
-              barber apprenticeship pathway.
-            </p>
-          </div>
-          <Link
-            href="/host-shops/kountry-kutz-barbershop"
-            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
-          >
-            Explore Kountry Kutz <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      <section aria-label="Kountry Kutz apprenticeship story" className="border-b border-slate-200 bg-white px-4 py-8">
-        <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-3">
-          {[
-            { src: '/images/partners/kountry-kutz/interior-empty.webp', alt: 'Training stations inside Kountry Kutz Barbershop in New Palestine' },
-            { src: '/images/partners/kountry-kutz/interior-active.webp', alt: 'Barbers and clients inside Kountry Kutz Barbershop' },
-            { src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp', alt: 'Kountry Kutz barber apprenticeship host-shop announcement' },
-          ].map((photo) => (
-            <div key={photo.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-              <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain" />
-            </div>
-          ))}
-        </div>
-        <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-700">
-          One of Elevate's first barber apprenticeship host shops, Kountry Kutz provides a
-          real-workplace setting at 56 W Main St, Suite A, New Palestine, Indiana.
-        </p>
-      </section>
-
       <section
         data-scroll-narration
         data-narration="The registered barber apprenticeship connects required technical instruction, supervised Host Shop training, documented progress, and preparation for Indiana licensing requirements."
         className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12"
       >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-2 lg:items-center">
           <div className="max-w-4xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Registered Barber Apprenticeship
             </p>
-            <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
+            <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-4xl">
               Learn the trade where the work happens.
             </h1>
             <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700 sm:text-lg sm:leading-8">
@@ -201,13 +143,65 @@ export default async function BarberApprenticeshipPage() {
                 Become a Host Shop
               </Link>
             </div>
+            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
+              <p className="font-black">
+                {BARBER_STANDARD.totalOjlHours.toLocaleString()} OJL hours + {BARBER_RTI_HOURS} RTI
+                hours · Self-pay only
+              </p>
+              <p>
+                ${(TUITION_CENTS / 100).toLocaleString()} tuition: pay in full or four invoices of $
+                {(TUITION_CENTS / 400).toLocaleString()} (initial invoice, then three monthly
+                invoices). Third-party financing, when offered, requires provider approval.
+              </p>
+              <Link
+                href="/contact?program=barber-apprenticeship&topic=enrollment"
+                className="inline-flex min-h-11 items-center font-bold text-brand-blue-900 underline"
+              >
+                Ask a question (inquiry)
+              </Link>
+              <span aria-hidden="true"> · </span>
+              <Link
+                href="#barber-payment-heading"
+                className="inline-flex min-h-11 items-center font-bold text-brand-blue-900 underline"
+              >
+                Compare payment choices
+              </Link>
+              <p className="text-xs">
+                An inquiry asks questions. An application requests admission. Enrollment is
+                confirmed after review, placement, and payment requirements.
+              </p>
+            </div>
           </div>
+          <section
+            className="order-first min-w-0 overflow-hidden rounded-2xl lg:order-last"
+            data-scroll-narration
+            data-narration={heroBanner.transcript}
+            data-narration-rate="0.95"
+            data-narration-style="instructor"
+          >
+            <HeroVideo
+              videoSrcDesktop={heroBanner.videoSrcDesktop}
+              videoSrcMobile={heroBanner.videoSrcMobile ?? heroBanner.videoSrcDesktop}
+              posterImage={BARBER_HERO_IMAGE}
+              microLabel={heroBanner.microLabel}
+              transcript={heroBanner.transcript}
+              narrateTranscript={false}
+              analyticsName="barber-apprenticeship"
+              heightClassName="aspect-video h-auto max-h-[360px]"
+              mediaFit="contain"
+              overlayMode="none"
+            />
+          </section>
         </div>
       </section>
 
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-8">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 lg:grid-cols-4">
-          <Fact icon={ShieldCheck} label="Registered model" value="Competency based" />
+          <Fact
+            icon={ShieldCheck}
+            label="On-the-job learning"
+            value={`${BARBER_STANDARD.totalOjlHours.toLocaleString()} OJL hours`}
+          />
           <Fact icon={BookOpen} label="Required RTI" value={`${BARBER_RTI_HOURS} verified hours`} />
           <Fact icon={Scissors} label="Training setting" value="Approved host shop" />
           <Fact
@@ -218,10 +212,15 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
+      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
+        <KountryKutzTourSlideshow />
+      </div>
+
       <section
         data-scroll-narration
         data-narration="Explore the barber Host Shop network. Approved shops provide the supervised work setting, while placement availability is confirmed during enrollment."
-        className="border-b border-slate-200 bg-sky-50 px-4 py-10 sm:py-14"
+        id="host-shops"
+        className="border-b border-slate-200 bg-sky-50 px-4 py-8 sm:py-10"
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 max-w-3xl">
@@ -236,10 +235,30 @@ export default async function BarberApprenticeshipPage() {
               verified during enrollment and is not implied by a public listing.
             </p>
           </div>
-          <FeaturedHostPartners programSlug="barber-apprenticeship" />
+          <HostShopPlacementGuide programSlug="barber-apprenticeship" />
           <div className="mt-10">
-            <BarberWorkforceNetworkMap />
+            <details className="rounded-xl border border-slate-200 bg-white p-4">
+              <summary className="cursor-pointer py-2 font-bold">
+                View the barber Host Shop map
+              </summary>
+              <BarberWorkforceNetworkMap shops={shops} />
+            </details>
           </div>
+        </div>
+      </section>
+
+      <ApprenticeshipExperienceGuide
+        programTitle={program.title}
+        applyHref={program.cta.applyHref}
+      />
+
+      <section className="border-b border-slate-200 bg-white px-4 py-5">
+        <div className="mx-auto max-w-6xl">
+          <BeautyEnrollmentPromotion
+            compact
+            programSlug="barber-apprenticeship"
+            programLabel="Barber Apprenticeship"
+          />
         </div>
       </section>
 
@@ -250,7 +269,7 @@ export default async function BarberApprenticeshipPage() {
       >
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[360px]">
               <Image
                 src="/images/pages/barber-hero-main.webp"
                 alt="Barber apprentice practicing supervised haircutting and grooming skills"
@@ -340,7 +359,7 @@ export default async function BarberApprenticeshipPage() {
 
       <section
         data-scroll-narration
-        data-narration="Before checkout, compare available payment and funding paths. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
+        data-narration="Before checkout, review self-pay tuition and payment terms. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
         className="border-y border-orange-200 bg-orange-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-payment-heading"
       >
@@ -353,7 +372,7 @@ export default async function BarberApprenticeshipPage() {
               id="barber-payment-heading"
               className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
             >
-              Can’t afford to pay {program.selfPayCost} in full? See if you qualify.
+              Understand your self-pay payment choices.
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700 sm:text-lg">
               Buy Now, Pay Later lets an approved financing provider split tuition into smaller
@@ -382,7 +401,7 @@ export default async function BarberApprenticeshipPage() {
               </Link>
             </div>
           </div>
-          <BarberPaymentPlanner />
+          <PaymentPlanCalculator programSlug="barber-apprenticeship" />
         </div>
       </section>
 
@@ -421,27 +440,39 @@ export default async function BarberApprenticeshipPage() {
       <BeautyApprenticeshipAuthority program={program} />
 
       <section className="border-t border-sky-200 bg-white px-4 py-14 text-slate-950">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-black sm:text-4xl">
-            Ready to start the barber apprenticeship?
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-slate-700 sm:text-lg">
-            Apply as an apprentice or start the host-shop process. Funding and placement are
-            verified separately before enrollment is finalized.
-          </p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href={program.cta.applyHref}
-              className="rounded-xl bg-brand-red-600 px-8 py-4 font-black text-white hover:bg-brand-red-700"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/partners/host-shops"
-              className="rounded-xl border-2 border-brand-blue-700 bg-white px-8 py-4 font-black text-brand-blue-900 hover:bg-sky-50"
-            >
-              Host a Barber Apprentice
-            </Link>
+        <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+            <Image
+              src={getProgramHeroImage('barber-apprenticeship')}
+              alt={getProgramImageAlt('barber-apprenticeship')}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              loading="lazy"
+              className="object-cover"
+            />
+          </div>
+          <div className="mx-auto max-w-4xl text-center">
+            <h2 className="text-3xl font-black sm:text-4xl">
+              Ready to start the barber apprenticeship?
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-slate-700 sm:text-lg">
+              Apply as an apprentice or start the host-shop process. Apprenticeship tuition is
+              self-pay only. Host-shop placement is confirmed before training begins.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link
+                href={program.cta.applyHref}
+                className="rounded-xl bg-brand-red-600 px-8 py-4 font-black text-white hover:bg-brand-red-700"
+              >
+                Apply Now
+              </Link>
+              <Link
+                href="/partners/host-shops"
+                className="rounded-xl border-2 border-brand-blue-700 bg-white px-8 py-4 font-black text-brand-blue-900 hover:bg-sky-50"
+              >
+                Host a Barber Apprentice
+              </Link>
+            </div>
           </div>
         </div>
       </section>

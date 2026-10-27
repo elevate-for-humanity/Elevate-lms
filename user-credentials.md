@@ -12,18 +12,6 @@
 
 ---
 
-## HOST SHOP PARTNERS
-| Host Shop | Owner | Email | Password |
-|-----------|-------|-------|----------|
-| Cal's Kutz Studio | Calvin Pena | calvincutz1985@gmail.com | Calvin1234619$ |
-| Prestige Elevation | Elizabeth Greene | info@prestigeelevation.com | Prestige20264619Elijah |
-| Razors Image Barbershop | Aaron Brown | razorsimage11@gmail.com | Aaron1234619$ |
-| Kountry Kutz Barbershop | Adam Kriech | adamkriech1@gmail.com | Adam1234619$ |
-| Style and Scissors Salon | Corienne Meid | styleandscissorsalon@gmail.com | Corienne1234619$ |
-| Chris Newkirk Salon | Chris Newkirk | christopherd.newkirk@gmail.com | Chris1234619$ |
-
----
-
 ## PROGRAM HOLDERS
 | Name | Email | Password |
 |------|-------|----------|

@@ -1,8 +1,10 @@
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 import { NextRequest } from 'next/server';
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,19 +16,12 @@ export async function GET(request: NextRequest) {
     const supabaseConfigured = Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
     );
-    const aiConfigured = Boolean(
-      process.env.GROQ_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      process.env.ANTHROPIC_API_KEY ||
-      process.env.GEMINI_API_KEY ||
-      ((process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN) &&
-        process.env.CLOUDFLARE_ACCOUNT_ID &&
-        process.env.CLOUDFLARE_AI_MODEL?.startsWith('@cf/')),
-    );
-    const northflankConfigured = Boolean(
-      (process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY) &&
-      process.env.NORTHFLANK_PROJECT_ID,
-    );
+    const [aiRuntime, cloudflareAI] = await Promise.all([
+      resolveAIRuntimeState(),
+      probeCloudflareWorkersAI(),
+    ]);
+    const aiConfigured = aiRuntime.anyConfigured;
+    const googleConfigured = await isGoogleDeploymentConfigured();
     const browserConfigured = Boolean(
       process.env.STUDIO_BROWSER_URL &&
       (process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
@@ -35,10 +30,6 @@ export async function GET(request: NextRequest) {
     const stripeConfigured = Boolean(
       (process.env.STRIPE_RESTRICTED_KEY || process.env.STRIPE_SECRET_KEY) &&
       process.env.STRIPE_WEBHOOK_SECRET,
-    );
-    const cloudflareAiConfigured = Boolean(
-      (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN) &&
-      process.env.CLOUDFLARE_ACCOUNT_ID,
     );
     const cloudflareControlPlaneConfigured = Boolean(
       process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ACCOUNT_ID,
@@ -71,12 +62,12 @@ export async function GET(request: NextRequest) {
           : 'No governed AI provider is configured.',
       },
       {
-        name: 'northflank',
-        passed: northflankConfigured,
+        name: 'google-deployment',
+        passed: googleConfigured,
         required: false,
-        message: northflankConfigured
-          ? 'Northflank deployment control is configured.'
-          : 'Northflank deployment control is not configured.',
+        message: googleConfigured
+          ? 'Google deployment workflow dispatch is configured.'
+          : 'Google deployment workflow dispatch is not configured.',
       },
       {
         name: 'cloud-browser',
@@ -96,11 +87,9 @@ export async function GET(request: NextRequest) {
       },
       {
         name: 'cloudflare-workers-ai',
-        passed: cloudflareAiConfigured,
+        passed: cloudflareAI.reachable,
         required: false,
-        message: cloudflareAiConfigured
-          ? 'Cloudflare Workers AI is configured.'
-          : 'Cloudflare Workers AI configuration is incomplete.',
+        message: cloudflareAI.detail,
       },
       {
         name: 'instructional-gpu-video',

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, GitBranch, Loader2, PackageOpen, RefreshCw, RotateCcw, Send, ShieldCheck } from 'lucide-react';
 import CoursePipelineDiagram from './CoursePipelineDiagram';
 
@@ -39,9 +40,17 @@ function rowsFrom(payload: any): Course[] {
   return [];
 }
 
-export default function CourseLifecycleWorkspace() {
+export default function CourseLifecycleWorkspace({
+  selectedCourseId = '',
+  embedded = false,
+}: {
+  selectedCourseId?: string;
+  embedded?: boolean;
+}) {
+  const searchParams = useSearchParams();
+  const requestedCourse = searchParams.get('course')?.trim() ?? '';
   const [courses, setCourses] = useState<Course[]>([]);
-  const [courseId, setCourseId] = useState('');
+  const [courseId, setCourseId] = useState(selectedCourseId);
   const [course, setCourse] = useState<Course | null>(null);
   const [versions, setVersions] = useState<VersionRow[]>([]);
   const [packages, setPackages] = useState<ScormPackage[]>([]);
@@ -58,7 +67,13 @@ export default function CourseLifecycleWorkspace() {
     const payload = await response.json().catch(() => []);
     const rows = rowsFrom(payload);
     setCourses(rows);
-    if (!courseId && rows[0]?.id) setCourseId(rows[0].id);
+    if (!courseId) {
+      const requested = requestedCourse
+        ? rows.find((row) => row.id === requestedCourse || row.slug === requestedCourse)
+        : undefined;
+      if (requested?.id) setCourseId(requested.id);
+      else if (rows[0]?.id) setCourseId(rows[0].id);
+    }
   }
 
   async function loadCourse(id = courseId) {
@@ -99,6 +114,9 @@ export default function CourseLifecycleWorkspace() {
   }
 
   useEffect(() => { void loadCourses(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (selectedCourseId && selectedCourseId !== courseId) setCourseId(selectedCourseId);
+  }, [selectedCourseId, courseId]);
   useEffect(() => { if (courseId) void refresh(); }, [courseId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function review(action: 'submit' | 'approve' | 'reject' | 'revert_to_draft') {
@@ -228,7 +246,7 @@ export default function CourseLifecycleWorkspace() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 p-5 text-slate-100">
+    <div className={`${embedded ? 'bg-transparent p-0' : 'min-h-screen bg-slate-950 p-5'} text-slate-100`}>
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -238,10 +256,14 @@ export default function CourseLifecycleWorkspace() {
               <p className="mt-1 text-sm text-slate-400">Controls the canonical course record. Publishing requires review approval and readiness checks.</p>
             </div>
             <div className="flex min-w-0 items-center gap-2">
+              {embedded && course ? (
+                <span className="max-w-md truncate text-sm font-bold text-cyan-200">{course.title}</span>
+              ) : (
               <select value={courseId} onChange={(event) => setCourseId(event.target.value)} className="min-h-10 min-w-[300px] rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white">
                 <option value="">Select a course…</option>
                 {courses.map((row) => <option key={row.id} value={row.id}>{row.title} — {row.status ?? 'draft'}</option>)}
               </select>
+              )}
               <button onClick={() => void refresh()} disabled={!courseId || busy === 'refresh'} className="rounded-lg border border-slate-700 p-2 hover:bg-slate-800 disabled:opacity-40" title="Refresh"><RefreshCw className={`h-4 w-4 ${busy === 'refresh' ? 'animate-spin' : ''}`} /></button>
             </div>
           </div>

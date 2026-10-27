@@ -8,6 +8,7 @@ import { cleanupCommercialRender, renderCommercialVideo } from '@/lib/media/comm
 import { persistStudioAsset } from '@/lib/media/studio-assets';
 import { processCourseAgenticTask } from './course-executor';
 import { adaptiveBackoffMs } from '@/lib/resilience/adaptive-backoff';
+import { createAiTask } from '@/lib/devstudio/os/task-runner';
 
 const DEFAULT_POLL_MS = 60_000;
 const MAX_OUTAGE_BACKOFF_MS = 15 * 60_000;
@@ -167,6 +168,127 @@ async function resolveOrganizationId(tenantId: string | null) {
     .limit(1)
     .maybeSingle();
   return data?.id ?? null;
+}
+
+async function processPlatformHardeningTask(task: any, run: any, project: any) {
+  const db = await requireAdminClient();
+  const input =
+    task.input && typeof task.input === 'object' ? (task.input as Record<string, any>) : {};
+  const delegatedTaskId =
+    task.output && typeof task.output === 'object'
+      ? String((task.output as Record<string, any>).delegated_task_id ?? '')
+      : '';
+
+  if (delegatedTaskId) {
+    const { data: delegated, error } = await db
+      .from('ai_tasks')
+      .select('id,status,result_json,tool_output,error_message,approval_status')
+      .eq('id', delegatedTaskId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!delegated) throw new Error('Delegated platform task no longer exists.');
+    if (delegated.status === 'completed') {
+      await completeTask(task.id, {
+        delegated_task_id: delegated.id,
+        summary: 'Platform hardening task completed through the canonical AI task runtime.',
+        result: delegated.result_json ?? delegated.tool_output ?? {},
+      });
+      return;
+    }
+    if (delegated.status === 'awaiting_approval') {
+      await db
+        .from('agentic_build_tasks')
+        .update({
+          status: 'queued',
+          requires_approval: true,
+          error: delegated.error_message ?? 'Delegated task is awaiting human approval.',
+          lease_owner: null,
+          lease_expires_at: null,
+          heartbeat_at: null,
+          output: { delegated_task_id: delegated.id, approval_status: delegated.approval_status },
+        })
+        .eq('id', task.id)
+        .eq('lease_owner', executorId);
+      return;
+    }
+    if (['failed', 'blocked', 'cancelled'].includes(String(delegated.status))) {
+      throw new Error(delegated.error_message ?? `Delegated task ended in ${delegated.status}`);
+    }
+
+    await db
+      .from('agentic_build_tasks')
+      .update({
+        status: 'queued',
+        next_attempt_at: new Date(Date.now() + 30_000).toISOString(),
+        lease_owner: null,
+        lease_expires_at: null,
+        heartbeat_at: null,
+        output: { delegated_task_id: delegated.id, delegated_status: delegated.status },
+      })
+      .eq('id', task.id)
+      .eq('lease_owner', executorId);
+    return;
+  }
+
+  const requestedBy = project.user_id;
+  if (!requestedBy) throw new Error('Platform hardening project requires an owning user.');
+  const delegated = await createAiTask(
+    db,
+    {
+      title: String(input.title ?? task.action ?? 'Platform hardening task'),
+      description: String(input.description ?? run.prompt ?? task.action ?? ''),
+      command: String(input.command ?? input.description ?? task.action ?? ''),
+      requestedBy,
+      agentSlug: typeof input.agentSlug === 'string' ? input.agentSlug : undefined,
+      toolName: typeof input.toolName === 'string' ? input.toolName : undefined,
+      toolInput:
+        input.toolInput && typeof input.toolInput === 'object'
+          ? input.toolInput
+          : undefined,
+      priority: Number(input.priority ?? 75),
+      executionMode: input.executionMode === 'interactive' ? 'interactive' : 'automatic',
+    },
+    {
+      actorRoles: ['super_admin'],
+      tenantId: project.tenant_id ?? null,
+      adminOrigin: process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org',
+      appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhumanity.org',
+    },
+  );
+
+  const { data: delegatedState } = await db
+    .from('ai_tasks')
+    .select('id,status,result_json,tool_output,error_message,approval_status')
+    .eq('id', delegated.id)
+    .single();
+
+  if (delegatedState.status === 'completed') {
+    await completeTask(task.id, {
+      delegated_task_id: delegatedState.id,
+      summary: 'Platform hardening task completed through the canonical AI task runtime.',
+      result: delegatedState.result_json ?? delegatedState.tool_output ?? {},
+    });
+    return;
+  }
+
+  await db
+    .from('agentic_build_tasks')
+    .update({
+      status: 'queued',
+      requires_approval: delegatedState.status === 'awaiting_approval',
+      error: delegatedState.error_message,
+      next_attempt_at: new Date(Date.now() + 30_000).toISOString(),
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+      output: {
+        delegated_task_id: delegatedState.id,
+        delegated_status: delegatedState.status,
+        approval_status: delegatedState.approval_status,
+      },
+    })
+    .eq('id', task.id)
+    .eq('lease_owner', executorId);
 }
 
 async function processMarketingTask(task: any, run: any, project: any) {
@@ -368,6 +490,8 @@ export async function runAgenticExecutorOnce(input: { runId?: string } = {}): Pr
           await processCourseAgenticTask({ task: { ...task, status: 'running' }, run, project });
         } else if (project.target_type === 'marketing_campaign') {
           await processMarketingTask({ ...task, status: 'running' }, run, project);
+        } else if (project.target_type === 'platform_hardening') {
+          await processPlatformHardeningTask({ ...task, status: 'running' }, run, project);
         } else {
           throw new Error(`No executor is registered for target type ${project.target_type}`);
         }

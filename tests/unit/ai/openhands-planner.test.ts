@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { planAIToolFromCommand } from '../../../lib/ai/tools/planner';
 
-describe('OpenHands engineering delegation', () => {
-  it('routes repository engineering work to OpenHands', () => {
+describe('engineering delegation', () => {
+  it('routes repository engineering work to internal Studio', () => {
     const planned = planAIToolFromCommand(
       'Fix the broken TypeScript route and add a regression test',
     );
-    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.name).toBe('studio.engineering.execute');
     expect(planned?.input.task).toContain('Fix the broken TypeScript route');
   });
 
@@ -14,17 +14,17 @@ describe('OpenHands engineering delegation', () => {
     'Can you fix the Dev Studio? It is generic.',
     'Can you fix the divint studio its generic',
     'Repair Admin AI so live tools execute',
-  ])('routes named Studio repair work to OpenHands: %s', (command) => {
+  ])('routes named Studio repair work to internal engineering: %s', (command) => {
     const planned = planAIToolFromCommand(command);
-    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.name).toBe('studio.engineering.execute');
     expect(planned?.input.task).toBe(command);
   });
 
-  it('routes compound browser and repository repair to OpenHands', () => {
+  it('routes compound browser and repository repair to internal engineering', () => {
     const command =
       'Fix every public Store demo in the live browser and repository, including claims that do not match the real workflow';
     const planned = planAIToolFromCommand(command);
-    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.name).toBe('studio.engineering.execute');
     expect(planned?.input.task).toContain('Store demo');
   });
 
@@ -76,6 +76,18 @@ describe('OpenHands engineering delegation', () => {
     expect(planned).toEqual({ name: 'openhands.status', input: { taskId: 'task-123' } });
   });
 
+  it('does not dispatch course generation for a read-only production audit', () => {
+    const command =
+      'Read-only audit: inspect Course Builder status, saved checkpoints, worker heartbeat, and Studio browser readiness for build 572cca43-6bd6-4a91-b385-a8b576209c4e. Do not modify jobs, reset attempts, generate assets, or publish content.';
+    const planned = planAIToolFromCommand(command, {
+      buildId: '572cca43-6bd6-4a91-b385-a8b576209c4e',
+    });
+    expect(planned).toEqual({
+      name: 'courses.status',
+      input: { buildId: '572cca43-6bd6-4a91-b385-a8b576209c4e' },
+    });
+  });
+
   it('keeps Course Builder generation on the canonical course tool', () => {
     const planned = planAIToolFromCommand('Build the Business Administration course');
     expect(planned?.name).toBe('courses.generate');
@@ -117,8 +129,15 @@ describe('OpenHands engineering delegation', () => {
     );
   });
 
-  it('routes workflow repair to executable engineering instead of read-only inspection', () => {
+  it('routes workflow repair to internal engineering instead of read-only inspection', () => {
     const command = 'Fix the failed deployment workflow and add a regression test';
+    const planned = planAIToolFromCommand(command);
+    expect(planned?.name).toBe('studio.engineering.execute');
+    expect(planned?.input.task).toBe(command);
+  });
+
+  it('keeps OpenHands available only when explicitly requested', () => {
+    const command = 'Use OpenHands to fix the repository regression test';
     const planned = planAIToolFromCommand(command);
     expect(planned?.name).toBe('openhands.execute');
     expect(planned?.input.task).toBe(command);

@@ -1,0 +1,3 @@
+import type {UltimateCompetency} from '../core/types';
+export interface UltimateObjective{id:string;competencyId:string;statement:string;authorityRequirementIds:string[];type:UltimateCompetency['type'];mastery:{passingScore:number;practicalEvidenceRequired:boolean;criticalSafety:boolean}}
+export function buildObjectives(c:UltimateCompetency):UltimateObjective[]{return c.authorityRequirementIds.map((r,i)=>({id:`${c.id}:objective:${i+1}`,competencyId:c.id,statement:`Demonstrate ${c.title} in accordance with requirement ${r}.`,authorityRequirementIds:[r],type:c.type,mastery:{passingScore:80,practicalEvidenceRequired:c.requiresPracticalEvidence,criticalSafety:c.criticalSafetyCompetency===true}}));}

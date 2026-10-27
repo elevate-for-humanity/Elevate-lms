@@ -27,7 +27,7 @@ export const sharedStandaloneTraceExcludes = [
   '**/node_modules/typescript/**',
   '**/node_modules/jsdom/**',
   '**/node_modules/core-js/**',
-  // Sharp: platform binaries copied explicitly in Dockerfile.northflank-admin
+  // Sharp: platform binaries copied explicitly in Dockerfile.admin
   '**/node_modules/@img/sharp-libvips-*/**',
   '**/node_modules/@img/sharp-linux-*/**',
   '**/node_modules/@img/sharp-darwin-*/**',

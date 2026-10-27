@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
+import { getBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 
 // Chainable stub that returns empty data for every query method.
 // Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
@@ -98,6 +99,9 @@ const noOpClient = {
 } as unknown as SupabaseClient<any>;
 
 let warnedOnce = false;
+// @supabase/ssr returns a cached browser client. Install listeners and wrappers
+// once per client, rather than stacking another auth layer on every render.
+const initializedBrowserClients = new WeakSet<SupabaseClient<any>>();
 
 export function createBrowserClient(): SupabaseClient<any> {
   // process.env.NEXT_PUBLIC_* is inlined by Next.js at build time.
@@ -128,6 +132,7 @@ export function createBrowserClient(): SupabaseClient<any> {
     const sharedPortalSession =
       hostname === 'elevateforhumanity.org' || hostname.endsWith('.elevateforhumanity.org');
     const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey, {
+      global: { fetch: getBrowserAuthFetch(supabaseUrl) },
       cookieOptions: sharedPortalSession
         ? {
             domain: '.elevateforhumanity.org',
@@ -138,6 +143,8 @@ export function createBrowserClient(): SupabaseClient<any> {
         : { path: '/', sameSite: 'lax' },
     });
 
+    if (initializedBrowserClients.has(client)) return client;
+
     // Silently clear stale sessions when the refresh token is invalid or expired.
     // Without this, Supabase logs "Invalid Refresh Token: Refresh Token Not Found"
     // as an unhandled error every time a user with an old session cookie visits
@@ -145,7 +152,7 @@ export function createBrowserClient(): SupabaseClient<any> {
     client.auth.onAuthStateChange((event, session) => {
       if (event === 'TOKEN_REFRESHED' && !session) {
         // Refresh succeeded but returned no session — sign out to clear cookies
-        client.auth.signOut().catch(() => {});
+        client.auth.signOut({ scope: 'local' }).catch(() => {});
       }
     });
 
@@ -161,12 +168,13 @@ export function createBrowserClient(): SupabaseClient<any> {
           result.error.message?.includes('refresh_token_not_found'))
       ) {
         // Stale cookie — clear it silently so the user gets a clean anonymous state
-        await client.auth.signOut().catch(() => {});
+        await client.auth.signOut({ scope: 'local' }).catch(() => {});
         return { data: { session: null }, error: null };
       }
       return result;
     };
 
+    initializedBrowserClients.add(client);
     return client;
   } catch {
     return noOpClient;
@@ -178,6 +186,6 @@ export const createClient = createBrowserClient;
 
 // No-op cache reset for dynamic config updates (called from public-config.ts)
 export function resetSupabaseBrowserClientCache(): void {
-  // Client is recreated on each call, no cache to reset
+  // The SSR SDK owns the browser singleton; retain it and its refresh backoff.
   // This function exists for API compatibility
 }

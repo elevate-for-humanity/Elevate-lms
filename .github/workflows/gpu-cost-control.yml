@@ -4,13 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: GPU capacity action
+        description: Archived GPU capacity; sleep only
         required: true
         type: choice
-        default: auto
-        options: [auto, sleep, wake-video]
-  schedule:
-    - cron: '*/5 * * * *'
+        default: sleep
+        options: [sleep]
 
 permissions:
   contents: read
@@ -37,5 +35,5 @@ jobs:
         with: { version: 10.28.2 }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - name: Enforce demand-based GPU capacity
-        run: node scripts/northflank/control-gpu-cost.mjs "${{ github.event_name == 'workflow_dispatch' && inputs.action || 'auto' }}"
+      - name: Keep archived source GPUs stopped
+        run: node scripts/northflank/control-gpu-cost.mjs sleep

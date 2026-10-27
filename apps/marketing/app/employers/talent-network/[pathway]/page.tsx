@@ -9,9 +9,7 @@ import {
 } from '@/lib/marketing/employer-talent-network';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
-export function generateStaticParams() {
-  return EMPLOYER_TALENT_PATHWAYS.map(({ slug }) => ({ pathway: slug }));
-}
+export const dynamic = 'force-dynamic';
 export async function generateMetadata({
   params,
 }: {

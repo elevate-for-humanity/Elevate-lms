@@ -29,7 +29,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative flex h-[clamp(520px,72svh,860px)] w-full items-center overflow-hidden bg-slate-900">
+      <section className="relative flex h-[clamp(260px,42svh,480px)] w-full items-center overflow-hidden bg-slate-900">
         <UltraVideoPlayer
           src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hvac-hero-final.mp4"
           className="absolute inset-0 w-full h-full object-cover brightness-110"
@@ -43,7 +43,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
               Skilled Trades Programs
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mb-8">
-              Build your future with WIOA-funded skilled trades training — no cost for eligible participants
+              Explore skilled-trades programs with program-specific tuition, credential, and funding disclosures.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -80,7 +80,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
               Choose Your Trade
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Funding is available for eligible participants through WIOA and state grants.
+              Funding varies by program. Review the exact program record before relying on WIOA, Workforce Ready Grant, or another agency payment source.
             </p>
           </div>
 
@@ -107,7 +107,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
                   )}
                   {program.funded && (
                     <div className="absolute top-3 left-3 bg-brand-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      Free
+                      Review funding
                     </div>
                   )}
                 </div>
@@ -208,13 +208,13 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold text-orange-600 mb-4">For Free Training (WIOA)</h3>
+              <h3 className="text-xl font-bold text-orange-600 mb-4">For Agency Funding Review</h3>
               <ul className="space-y-3">
                 {[
-                  'Indiana resident',
-                  'Unemployed or underemployed',
-                  'OR receiving public assistance',
-                  'OR veteran status',
+                  'Open the exact program funding disclosure',
+                  'Complete the responsible agency intake',
+                  'Confirm both participant and program eligibility',
+                  'Obtain written authorization before funded training begins',
                 ].map((req) => (
                   <li key={req} className="flex items-start gap-3">
                     <svg
@@ -248,10 +248,10 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { stat: '$18-$30', label: 'Starting hourly wage' },
-              { stat: '100+', label: 'Hiring employer partners' },
-              { stat: '8-16 wks', label: 'Typical program duration' },
-              { stat: 'High', label: 'Demand for skilled workers' },
+              { stat: 'Program', label: 'Duration varies by pathway' },
+              { stat: 'Credential', label: 'Authority disclosed by program' },
+              { stat: 'Employer', label: 'Placement is never guaranteed' },
+              { stat: 'Funding', label: 'Requires exact eligibility and authorization' },
             ].map(({ stat, label }) => (
               <div key={label} className="text-center">
                 <div className="text-5xl font-black text-white mb-2">{stat}</div>
@@ -276,7 +276,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
               },
               {
                 q: 'Is the training really free?',
-                a: 'Yes, for eligible participants. WIOA and WRG funding covers tuition, tools, certifications, and supplies. Check your eligibility to see if you qualify.',
+                a: 'Do not assume a skilled-trades program is free. Review the exact program page. If workforce funding is verified for that program, the responsible agency still determines participant eligibility, covered costs, available funds, and written authorization.',
               },
               {
                 q: 'How long are the programs?',
@@ -292,11 +292,11 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
               },
               {
                 q: 'What if I have a criminal record?',
-                a: 'We work with justice-involved individuals. Many trades employers are open to second-chance hiring. JRI funding may cover your training.',
+                a: 'Some employers consider applicants with prior justice involvement. Employer hiring decisions and any JRI or other funding support must be confirmed for the individual participant and program.',
               },
               {
                 q: 'Do you help with job placement?',
-                a: 'Yes! We have partnerships with construction companies, manufacturers, and contractors throughout Indianapolis. We provide resume help and direct employer connections.',
+                a: 'Career services can include resume help, interview preparation, job-search support, and employer connections. Placement and employment are not guaranteed.',
               },
               {
                 q: 'Can I work while in training?',
@@ -334,7 +334,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Trades Career?</h2>
           <p className="text-orange-100 mb-8">
-            Free training available for eligible Indiana residents.
+            Review each program for current tuition and verified funding status. Funding requires program and participant eligibility plus agency authorization.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

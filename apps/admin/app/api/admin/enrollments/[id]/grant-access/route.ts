@@ -57,6 +57,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (fetchError || !enrollment) return safeError('Enrollment not found', 404);
   if (enrollment.access_granted_at) return safeError('Access already granted', 409);
 
+  // Fail closed: OCR submission is not verification. Every applicable
+  // enrollment requirement must be verified or explicitly not applicable.
+  const { data: requirements, error: requirementsError } = await db
+    .from('enrollment_requirements')
+    .select('id,status')
+    .eq('enrollment_id', enrollmentId);
+  if (requirementsError) return safeInternalError(requirementsError, 'Cannot verify enrollment requirements');
+  if (!requirements?.length) return safeError('Enrollment requirements have not been configured', 409);
+  const outstanding = requirements.filter((r) => !['verified', 'not_applicable'].includes(r.status));
+  if (outstanding.length) return NextResponse.json({ error: 'Document and enrollment requirements need verification before course access', outstanding_requirements: outstanding.length }, { status: 409 });
+
   // Resolve course_id for programs that have a canonical LMS course.
   // Without this, the learner dashboard routes to the marketing page instead of the LMS.
   const resolvedCourseId = enrollment.program_slug

@@ -18,10 +18,8 @@ async function getPricingData() {
     const [programsRes, licenseTiersRes, storeProductsRes] = await Promise.all([
       supabase
         .from('programs')
-        .select('id, name, slug, price, duration_weeks, program_type, status')
+        .select('id, name, title, slug, price, tuition, total_cost, duration_weeks, estimated_weeks, program_type, status, funding_eligible, is_free')
         .eq('status', 'active')
-        .not('price', 'is', null)
-        .gt('price', 0)
         .order('name'),
       supabase
         .from('curriculum_licenses')
@@ -56,7 +54,15 @@ function formatDuration(weeks?: number | null): string {
 
 export default async function PricingPage() {
   const { programs, licenseTiers, storeProducts } = await getPricingData();
-  const featuredPrograms = programs.slice(0, 6);
+  const pricedPrograms = programs
+    .map((program: any) => ({
+      ...program,
+      displayName: program.name || program.title,
+      publishedPrice: Number(program.price ?? program.tuition ?? program.total_cost ?? 0),
+      publishedWeeks: program.duration_weeks ?? program.estimated_weeks ?? null,
+    }))
+    .filter((program: any) => program.publishedPrice > 0 && program.is_free !== true);
+  const featuredPrograms = pricedPrograms.slice(0, 12);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -65,15 +71,15 @@ export default async function PricingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 justify-center text-sm">
             <span className="font-semibold text-slate-900">Pricing for:</span>
-            <Link href="/tuition" className="text-green-600 hover:underline font-medium">
+            <Link href="/tuition" className="text-green-800 hover:underline font-medium">
               Training Tuition
             </Link>
             <span className="text-slate-300">|</span>
-            <Link href="/platform/pricing" className="text-green-600 hover:underline font-medium">
+            <Link href="/platform/pricing" className="text-green-800 hover:underline font-medium">
               Platform Software
             </Link>
             <span className="text-slate-300">|</span>
-            <Link href="/for-agencies" className="text-green-600 hover:underline font-medium">
+            <Link href="/for-agencies" className="text-green-800 hover:underline font-medium">
               Agency Contracts
             </Link>
           </div>
@@ -92,7 +98,7 @@ export default async function PricingPage() {
               <DollarSign className="w-5 h-5" />
               Check Eligibility
             </Link>
-            <Link href="/roi" className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-500 flex items-center gap-2">
+            <Link href="/roi" className="bg-green-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-800 flex items-center gap-2">
               <Building2 className="w-5 h-5" />
               See ROI Calculator
             </Link>
@@ -105,16 +111,16 @@ export default async function PricingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Program Tuition</h2>
-            <p className="text-lg text-slate-600">Prices shown before funding. Most students pay $0 out of pocket.</p>
+            <p className="text-lg text-slate-600">Prices shown before any approved assistance. Funding is program- and participant-specific and requires written authorization from the responsible agency.</p>
             {programs.length > 0 ? (
-              <p className="text-sm text-green-600 mt-2">{programs.length} programs with published pricing</p>
+              <p className="text-sm text-green-800 mt-2">{pricedPrograms.length} programs with published pricing</p>
             ) : (
               <p className="text-sm text-slate-500 mt-2">
-                <Link href="/programs" className="text-green-600 hover:underline font-medium">
+                <Link href="/programs" className="text-green-800 hover:underline font-medium">
                   Browse all programs →
                 </Link>
                 {' '}or{' '}
-                <Link href="/contact" className="text-green-600 hover:underline font-medium">
+                <Link href="/contact" className="text-green-800 hover:underline font-medium">
                   contact admissions
                 </Link>
                 {' '}for current pricing.
@@ -127,32 +133,37 @@ export default async function PricingPage() {
               <div key={program.id} className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:border-green-500 transition-all hover:shadow-md">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="font-bold text-slate-900">{program.name}</h3>
+                    <h3 className="font-bold text-slate-900">{program.displayName}</h3>
                     <p className="text-sm text-slate-500 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {formatDuration(program.duration_weeks)}
+                      {formatDuration(program.publishedWeeks)}
                     </p>
                   </div>
-                  <GraduationCap className="w-6 h-6 text-green-600" />
+                  <GraduationCap className="w-6 h-6 text-green-800" />
                 </div>
                 <div className="mb-4">
-                  <span className="text-3xl font-bold text-slate-900">${(program.price || 0).toLocaleString()}</span>
+                  <span className="text-3xl font-bold text-slate-900">${program.publishedPrice.toLocaleString()}</span>
                   <span className="text-slate-500 ml-2">full tuition</span>
                 </div>
                 <div className="text-sm text-slate-600 mb-4 space-y-1">
-                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Funding options may be available</p>
-                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Payment plan from $50/week</p>
-                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Employer sponsorship</p>
+                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-800" /> See the program page for verified funding records</p>
+                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-800" /> Installment options shown before enrollment</p>
+                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-800" /> Employer sponsorship</p>
                 </div>
-                <Link href={`/programs/${program.slug}`} className="text-green-600 font-semibold text-sm flex items-center gap-1 hover:underline">
-                  View program <ArrowRight className="w-4 h-4" />
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link href={`/programs/${program.slug}`} className="text-green-700 font-semibold text-sm flex items-center gap-1 hover:underline">
+                    Program details <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link href={`https://app.elevateforhumanity.org/checkout/${program.slug}`} className="rounded-lg bg-green-700 px-3 py-2 text-sm font-bold text-white hover:bg-green-800">
+                    Enroll & Pay
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
 
           <div className="text-center mb-8">
-            <Link href="/programs" className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline">
+            <Link href="/programs" className="inline-flex items-center gap-2 text-green-800 font-semibold hover:underline">
               View all programs <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -193,32 +204,32 @@ export default async function PricingPage() {
                       <p className="text-sm text-slate-500">${tier.price_per_student || 0}/student</p>
                     </>
                   ) : (
-                    <span className="text-3xl font-bold text-green-600">Custom</span>
+                    <span className="text-3xl font-bold text-green-800">Custom</span>
                   )}
                 </div>
 
                 <div className="space-y-2 mb-6 text-sm">
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-green-600" />
+                    <Users className="w-4 h-4 text-green-800" />
                     <span className="text-slate-700">{tier.student_seats || 0} students</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-green-600" />
+                    <BookOpen className="w-4 h-4 text-green-800" />
                     <span className="text-slate-700">{tier.instructor_accounts || 0} instructors</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-green-600" />
+                    <Shield className="w-4 h-4 text-green-800" />
                     <span className="text-slate-700">{tier.admin_accounts || 0} admins</span>
                   </div>
                   {tier.api_access && (
                     <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-green-600" />
+                      <Zap className="w-4 h-4 text-green-800" />
                       <span className="text-slate-700">API Access</span>
                     </div>
                   )}
                   {tier.custom_branding && (
                     <div className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
+                      <Check className="w-4 h-4 text-green-800" />
                       <span className="text-slate-700">Custom Branding</span>
                     </div>
                   )}
@@ -268,7 +279,7 @@ export default async function PricingPage() {
             </div>
 
             <div className="text-center mt-8">
-              <Link href="/store" className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline">
+              <Link href="/store" className="inline-flex items-center gap-2 text-green-800 font-semibold hover:underline">
                 View all products <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -285,12 +296,12 @@ export default async function PricingPage() {
               <div className="space-y-4">
                 <div className="bg-slate-800 rounded-lg p-4">
                   <h3 className="font-semibold mb-2">Workforce Funding</h3>
-                  <p className="text-slate-300 text-sm">WIOA, Indiana Workforce Ready Grant, and other programs may help cover tuition for eligible participants in approved programs. Contact admissions or your local WorkOne office to confirm options.</p>
+                  <p className="text-slate-300 text-sm">Public workforce funding is program- and participant-specific. Review the verified funding registry and obtain written authorization from the responsible agency before relying on funding.</p>
                   <Link href="/check-eligibility" className="text-green-400 font-semibold text-sm hover:underline mt-2 inline-block">Check eligibility</Link>
                 </div>
                 <div className="bg-slate-800 rounded-lg p-4">
                   <h3 className="font-semibold mb-2">Payment Plans</h3>
-                  <p className="text-slate-300 text-sm">Weekly payments from $50/week. No credit check.</p>
+                  <p className="text-slate-300 text-sm">Installment or third-party payment options may be available. Review the exact terms for your selected program before enrolling.</p>
                 </div>
               </div>
             </div>
@@ -321,7 +332,7 @@ export default async function PricingPage() {
             <Link href="/check-eligibility" className="bg-white text-green-700 font-bold py-3 px-6 rounded-lg hover:bg-green-50">
               Check My Eligibility
             </Link>
-            <Link href="/demos" className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-500">
+            <Link href="/demos" className="bg-green-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-800">
               Schedule Demo
             </Link>
           </div>

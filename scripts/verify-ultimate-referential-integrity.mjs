@@ -1,0 +1,8 @@
+import fs from 'node:fs';
+const files=['supabase/migrations/20260926090000_ultimate_course_builder_core.sql','supabase/migrations/20260926101500_ultimate_mastery_runtime.sql','supabase/migrations/20260926124500_ultimate_durable_worker.sql','supabase/migrations/20260926133000_ultimate_authoring_artifact_model.sql','supabase/migrations/20260926140000_ultimate_referential_integrity.sql'];
+const src=files.map(f=>fs.readFileSync(f,'utf8')).join('\n');
+const required=['ultimate_course_builds_course_fk','ultimate_mastery_user_fk','ultimate_mastery_course_fk','ultimate_mastery_lesson_fk','ultimate_remediation_user_fk','ultimate_remediation_course_fk','ultimate_artifact_versions_locked_by_fk','ultimate_artifact_versions_approved_by_fk','ultimate_review_decisions_reviewer_fk','ultimate_artifact_dependency_not_self','guard_ultimate_build_delete'];
+const missing=required.filter(x=>!src.includes(x));if(missing.length){console.error('Missing Ultimate integrity contracts: '+missing.join(', '));process.exit(1);}
+const bad=[];for(const line of src.split('\n')){if(/objective_id\s+uuid\s+references/i.test(line)||/scene_id\s+uuid\s+references/i.test(line)||/interaction_id\s+uuid\s+references/i.test(line))bad.push(line.trim());}
+if(bad.length){console.error('Generated instructional identities incorrectly promoted to relational authorities:\n'+bad.join('\n'));process.exit(1);}
+console.log('Ultimate referential-integrity contract: PASS');

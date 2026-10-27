@@ -30,42 +30,48 @@ const DISCIPLINE_CONFIG = {
     icon: <Sparkles className="w-10 h-10 text-white" />,
     color: 'bg-purple-700',
     lightColor: 'bg-purple-500',
-    targetHours: 2000, // Indiana DOL Registered Apprenticeship
+    targetHours: 2000, // RAPIDS 0096HY V1 minimum hybrid term
     applyHref: '/programs/cosmetology-apprenticeship/apply',
     logHref: '/apprentice/hours/log',
     historyHref: '/apprentice/hours/history',
     progressHref: '/apprentice',
     lmsHref: '/lms/dashboard',
-    subtitle: 'Track your hours, access training, and progress toward your cosmetology license.',
+    requiredRtiHours: 154,
+    probationHours: 500,
+    subtitle: 'Hair Stylist/Cosmetologist 0096HY V1: 2,000–2,500-hour hybrid term, 154 RTI hours, and a 500-hour probationary period.',
   },
   'nail-tech': {
     label: 'Nail Tech Apprentice',
     icon: <Hand className="w-10 h-10 text-white" />,
     color: 'bg-pink-700',
     lightColor: 'bg-pink-500',
-    targetHours: 450,
+    targetHours: 2000,
+    targetCompetencies: 19,
+    requiredRtiHours: 210,
+    probationHours: 500,
     applyHref: '/apply?program=nail-technician-apprenticeship',
     logHref: '/pwa/nail-tech/log-hours',
     historyHref: '/pwa/nail-tech/history',
     progressHref: '/pwa/nail-tech/progress',
     lmsHref: '/lms/dashboard',
     subtitle:
-      'Track your hours, access training, and progress toward your nail technician license.',
+      'Complete 19 Appendix A competencies and 210 RTI hours while documenting supervised work. The 500-hour figure is probation, not graduation.',
   },
   esthetician: {
     label: 'Esthetician Apprentice',
     icon: <Flower2 className="w-10 h-10 text-white" />,
     color: 'bg-rose-700',
     lightColor: 'bg-rose-500',
-    targetHours: 0,
+    targetHours: 2000,
     targetCompetencies: 20,
     requiredRtiHours: 300,
+    probationHours: 500,
     applyHref: '/programs/esthetician/apply',
     logHref: '/pwa/esthetician/log-hours',
     historyHref: '/pwa/esthetician/history',
     progressHref: '/pwa/esthetician/progress',
     lmsHref: '/lms/dashboard',
-    subtitle: 'Complete 20 Appendix A competencies and 300 RTI hours while documenting supervised work.',
+    subtitle: 'Complete 20 Appendix A competencies and 300 RTI hours while documenting supervised work. The 500-hour figure is probation, not graduation.',
   },
 };
 
@@ -133,9 +139,9 @@ function Dashboard({
   discipline: Props['discipline'];
 }) {
   const config = DISCIPLINE_CONFIG[discipline];
-  const isCompetencyBased = discipline === 'esthetician';
-  const pct = isCompetencyBased ? 0 : Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
-  const remaining = isCompetencyBased ? 0 : Math.max(0, config.targetHours - data.totalHours);
+  const isCompetencyBased = false;
+  const pct = Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
+  const remaining = Math.max(0, config.targetHours - data.totalHours);
 
   return (
     <div className="min-h-screen bg-slate-900 pb-8">

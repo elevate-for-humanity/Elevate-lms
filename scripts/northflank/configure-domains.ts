@@ -40,6 +40,11 @@ const SERVICE_DOMAINS = {
   admin: ['admin.elevateforhumanity.org'],
 } as const;
 
+// Durable owns the apex URL forward. It must never be attached to a Northflank
+// application port because Durable cannot CNAME-flatten the zone apex to the
+// Northflank ingress. Keeping it here also removes any stale historical binding.
+const EXTERNALLY_ROUTED_DOMAINS = new Set(['elevateforhumanity.org']);
+
 async function getSubdomainCname(domain: string): Promise<{ verified: boolean; content?: string }> {
   const teamId = resolveTeamId();
   if (!teamId) return { verified: false };
@@ -47,10 +52,46 @@ async function getSubdomainCname(domain: string): Promise<{ verified: boolean; c
     const row = await nfFetch<{ verified?: boolean; content?: string }>(
       `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@`,
     );
-    return { verified: Boolean(row.verified), content: row.content };
+    if (row.verified) return { verified: true, content: row.content };
   } catch {
-    return { verified: false };
+    // Apex domains do not always expose the CNAME-oriented subdomain status.
   }
+
+  const registry = await nfFetch<{ domains?: Array<{ name: string; status?: string }> }>(
+    `/teams/${teamId}/domains`,
+  );
+  const registered = (registry.domains ?? []).find((item) => item.name === domain);
+  return { verified: registered?.status === 'verified' };
+}
+
+async function verifySubdomain(domain: string): Promise<{ verified: boolean; content?: string }> {
+  const teamId = resolveTeamId();
+  if (!teamId) return { verified: false };
+
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      await nfFetch(`/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@/verify`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+    } catch {
+      // Northflank may reject verification while DNS and certificate state propagates.
+    }
+
+    try {
+      const row = await nfFetch<{ verified?: boolean; content?: string }>(
+        `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@`,
+      );
+      if (row.verified) return { verified: true, content: row.content };
+    } catch {
+      // Retry: the subdomain record can be temporarily unavailable after registration.
+    }
+
+    console.log(`  Waiting for Northflank subdomain verification (${attempt}/6)...`);
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+  }
+
+  return { verified: false };
 }
 
 async function assignDomainToService(
@@ -59,15 +100,20 @@ async function assignDomainToService(
   serviceId: string,
   dryRun: boolean,
 ) {
-  const { verified, content } = await getSubdomainCname(domain);
+  let { verified, content } = await getSubdomainCname(domain);
   console.log(`\nDomain ${domain} -> service ${serviceId}`);
   console.log(`  CNAME target: ${content ?? '(see print-cname-targets.ts)'}`);
-  console.log(`  CNAME verified: ${verified}`);
-  if (!verified) {
-    console.warn('  CNAME not verified — assignment skipped. Correct DNS before deployment verification.');
-    return;
-  }
+  console.log(`  Registry verified: ${verified}`);
   if (dryRun) return;
+
+  // Northflank tracks the team-domain registry and the @ subdomain separately.
+  // Assignment requires the latter to be verified even when the registry already
+  // reports this domain as verified.
+  ({ verified, content } = await verifySubdomain(domain));
+  console.log(`  Subdomain verified: ${verified}`);
+  if (!verified) {
+    throw new Error(`${domain} did not verify as a Northflank @ subdomain`);
+  }
 
   const teamId = resolveTeamId();
   const pathEnc = encodeURIComponent('/');
@@ -103,7 +149,7 @@ async function updateServiceDomains(
   // of only appending the new correct hostname.
   const existing = (httpPort.domains ?? [])
     .map((domain) => domain.name)
-    .filter((domain) => !forbiddenDomains.has(domain));
+    .filter((domain) => !forbiddenDomains.has(domain) && !EXTERNALLY_ROUTED_DOMAINS.has(domain));
   const merged = [...new Set([...existing, ...domainNames])];
 
   console.log(`\nService ${serviceId} port ${httpPort.name} (${httpPort.id})`);
@@ -162,6 +208,7 @@ async function configureService(
 }
 
 async function main() {
+  throw new Error('Retired: production DNS and domain ownership use Google Cloud. See docs/dns-configuration.md; no legacy network operation is allowed.');
   const dryRun = !process.argv.includes('--execute');
   const projectId = resolveProjectId();
   const marketingId = resolveMarketingServiceId();
@@ -190,7 +237,7 @@ async function main() {
 www.elevateforhumanity.org   -> Marketing service
 app.elevateforhumanity.org   -> LMS service
 admin.elevateforhumanity.org -> Admin service
-elevateforhumanity.org       -> permanent redirect to https://www.elevateforhumanity.org
+elevateforhumanity.org       -> Durable permanent redirect to https://www.elevateforhumanity.org
 
 After DNS verification, TLS certificates provision automatically in Northflank.
 `);

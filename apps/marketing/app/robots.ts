@@ -1,8 +1,5 @@
 import type { MetadataRoute } from 'next';
-import {
-  PRIVATE_ROUTE_PREFIXES,
-  PUBLIC_SITE_ORIGIN,
-} from '@/lib/navigation/public-route-registry';
+import { PRIVATE_ROUTE_PREFIXES, PUBLIC_SITE_ORIGIN } from '@/lib/navigation/public-route-registry';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -18,7 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [...PRIVATE_ROUTE_PREFIXES],
       },
     ],
-    sitemap: `${PUBLIC_SITE_ORIGIN}/sitemap.xml`,
+    sitemap: [`${PUBLIC_SITE_ORIGIN}/sitemap.xml`, `${PUBLIC_SITE_ORIGIN}/image-sitemap.xml`],
     host: PUBLIC_SITE_ORIGIN,
   };
 }

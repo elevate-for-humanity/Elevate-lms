@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {BrowserFileStore} from './browser-file-store.mjs';
+async function fixture(t){const root=await fs.mkdtemp(path.join(os.tmpdir(),'browser-files-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));const config={secret:'fixture-secret',directory:path.join(root,'private')};const store=new BrowserFileStore(config),item={id:crypto.randomUUID(),fileName:'lesson-视频.mp4',filePath:path.join(root,'source'),createdAt:'2026-10-17T00:00:00Z'};await fs.writeFile(item.filePath,Buffer.from('private lesson bytes'));return {root,config,store,item};}
+test('binary browser download survives replacement, encrypted and owner scoped',async t=>{const f=await fixture(t),manifest=await f.store.save('owner-a',f.item);assert.ok(!(await fs.readFile(f.store.file('owner-a',f.item.id))).includes(Buffer.from('private lesson')));const restored=await new BrowserFileStore(f.config).restore('owner-a',[manifest],path.join(f.root,'replaced'));assert.equal(await fs.readFile(restored.get(f.item.id).filePath,'utf8'),'private lesson bytes');const other=f.store.file('owner-b',f.item.id);await fs.mkdir(path.dirname(other),{recursive:true});await fs.copyFile(f.store.file('owner-a',f.item.id),other);await assert.rejects(f.store.restore('owner-b',[manifest],path.join(f.root,'other')));});
+test('corrupted file never publishes a partially restored download',async t=>{const f=await fixture(t),manifest=await f.store.save('owner-a',f.item),source=f.store.file('owner-a',f.item.id),bytes=await fs.readFile(source);bytes[13]^=1;await fs.writeFile(source,bytes);const output=path.join(f.root,'restore');await assert.rejects(f.store.restore('owner-a',[manifest],output));assert.deepEqual(await fs.readdir(output),[]);});
+test('traversal metadata cannot choose an arbitrary restore path',async t=>{const f=await fixture(t),manifest=await f.store.save('owner-a',f.item);await assert.rejects(f.store.restore('owner-a',[{...manifest,fileName:'../escape'}],path.join(f.root,'restore')));await assert.rejects(f.store.save('../owner',f.item));});
+test('empty downloaded files retain authenticated integrity',async t=>{const f=await fixture(t);await fs.writeFile(f.item.filePath,'');const manifest=await f.store.save('owner-a',f.item),restored=await f.store.restore('owner-a',[manifest],path.join(f.root,'restore'));assert.equal((await fs.stat(restored.get(f.item.id).filePath)).size,0);});
+
+test('oversized files and manifests fail before streaming or restoring data',async t=>{const f=await fixture(t);await fs.truncate(f.item.filePath,2*1024*1024*1024+1);await assert.rejects(f.store.save('owner-a',f.item),/LIMIT_EXCEEDED/);await assert.rejects(f.store.restore('owner-a',Array(201).fill({}),path.join(f.root,'restore')),/MANIFEST_INVALID/);});

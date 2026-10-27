@@ -5,23 +5,20 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/ui/HomeHeroVideo.tsx'), 'utf8');
 
 describe('homepage hero slideshow rendering', () => {
-  it('loads the homepage content before the hero video without a splash transition', () => {
-    const homepageHero = fs.readFileSync(
-      path.resolve('components/home/PlatformHubHero.tsx'),
-      'utf8',
-    );
-
-    expect(homepageHero).toContain('SafeHeroVideo');
-    expect(homepageHero).toContain('hero-home-fast.mp4');
-    expect(homepageHero).toContain('showPosterBeforePlayback');
-    expect(homepageHero).toContain('loop');
-    expect(homepageHero).toContain('There are two main paths');
-    expect(homepageHero).toContain('For example, someone choosing barbering');
-    expect(homepageHero).toContain('Think about which sounds more like you');
-    expect(homepageHero).toContain('Training may be free if you qualify');
-    expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
-    expect(homepageHero).toContain('className="order-1 flex items-center');
-    expect(homepageHero).toContain('className="relative order-2');
+  it('loads the current static hero with bounded responsive sizing and direct navigation', () => {
+    const hero = fs.readFileSync(path.resolve('components/home/PlatformHubHero.tsx'), 'utf8');
+    const image = hero.match(/const HOME_IMAGE = '([^']+)'/)?.[1];
+    expect(image).toMatch(/^\/images\/.+\.webp$/);
+    expect(fs.existsSync(path.resolve('public', image!.slice(1)))).toBe(true);
+    expect(hero).toContain('priority');
+    expect(hero).toContain('aspect-video');
+    expect(hero).toContain('38svh,480px');
+    expect(hero).toContain('object-cover');
+    for (const href of ['/programs', '/check-eligibility', '/employers', '/store/apps/website-builder']) {
+      expect(hero).toContain(`href="${href}"`);
+    }
+    expect(hero).not.toContain('SafeHeroVideo');
+    expect(hero).not.toContain('min-h-screen');
   });
 
   it('loops only the homepage hero visual while narration remains separate', () => {
@@ -36,13 +33,13 @@ describe('homepage hero slideshow rendering', () => {
     expect(safeHeroVideo).toContain('video.loop = loop');
   });
 
-  it('keeps scripts attached to the Salon Saloon, Razor Image, and Kountry Kutz videos', () => {
+  it('keeps scripts attached to the Salon Saloon and Kountry Kutz videos', () => {
     const hostProfiles = fs.readFileSync(
       path.resolve('apps/marketing/app/host-shops/[slug]/page.tsx'),
       'utf8',
     );
     const featuredHosts = fs.readFileSync(
-      path.resolve('components/programs/beauty/FeaturedHostPartners.tsx'),
+      path.resolve('lib/apprenticeship-programs/host-partners.ts'),
       'utf8',
     );
     const barberPage = fs.readFileSync(
@@ -52,10 +49,10 @@ describe('homepage hero slideshow rendering', () => {
 
     expect(hostProfiles).toContain('data-narration={videoScript}');
     expect(hostProfiles).toContain('tour script');
-    expect(featuredHosts).toContain("Welcome to Razor's Image Barbershop");
-    expect(featuredHosts).toContain('data-narration={video.script}');
+    expect(featuredHosts).toContain('Welcome to Salon Saloon in South Bend, Indiana.');
+    expect(hostProfiles).toContain('videoScript={videoScript}');
     expect(barberPage).toContain('KOUNTRY_KUTZ_HERO_TRANSCRIPT');
-    expect(barberPage).toContain('As the tour moves through the shop');
+    expect(barberPage).toContain('As the video moves through the shop');
   });
 
   it('keeps every slide mounted so transitions never expose the placeholder', () => {
@@ -87,7 +84,6 @@ describe('homepage hero slideshow rendering', () => {
     expect(source).toContain('Employers looking to fill open jobs');
     expect(source).toContain('build a website');
     expect(source).toContain('narrateTranscript');
-    expect(source).not.toContain('razors-image-storefront-2026.jpg');
     expect(source).not.toContain('style-and-scissor-salon/contact-card.webp');
     expect(source).not.toContain('Learn by doing, build real confidence');
   });
@@ -103,7 +99,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(salonSlide).toBeLessThan(kountrySlide);
     expect(source).toContain('className="relative z-20 order-1');
     expect(source).toContain('className="relative order-2 w-full');
-    expect(source).toContain('h-[clamp(520px,72svh,860px)]');
+    expect(source).toContain('h-[clamp(260px,42svh,480px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
     expect(source).toContain('narrateTranscript');
     expect(source).toContain('soundButtonVariant="prominent"');
@@ -116,7 +112,8 @@ describe('homepage hero slideshow rendering', () => {
     const renderer = fs.readFileSync(path.resolve('components/marketing/HeroVideo.tsx'), 'utf8');
     expect(renderer).toContain('transition-[opacity,transform] duration-1000 ease-in-out');
     expect(renderer).toContain('motion-reduce:transition-none');
-    expect(renderer).toContain("'scale-100 opacity-100'");
-    expect(renderer).toContain("'scale-[1.015] opacity-0'");
+    expect(renderer).toContain("'opacity-100'");
+    expect(renderer).toContain("'opacity-0'");
+    expect(renderer).not.toContain('scale-[1.015]');
   });
 });

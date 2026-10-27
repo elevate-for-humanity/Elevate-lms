@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { StateConfig, getOtherStates } from '@/config/states';
@@ -63,14 +64,13 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/heroes/hero-homepage.webp"
             alt={`Community Services in ${state.name}`}
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw"
           />
         </div>
         <div className="bg-white py-10 border-t">

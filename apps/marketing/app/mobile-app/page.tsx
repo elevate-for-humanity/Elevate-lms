@@ -1,4 +1,5 @@
 export const revalidate = 3600;
+import StoreDemoPreview from '@/components/store/StoreDemoPreview';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     title: 'Mobile App | Elevate For Humanity',
     description:
       'Install our mobile app directly from your browser. Access programs, track progress, and stay connected on the go.',
-    images: ['/images/pages/technology-sector.jpg'],
+    images: ['/images/pages/technology-sector.webp'],
   },
 };
 
@@ -38,17 +39,41 @@ export default async function MobileAppPage() {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/pages/mobile-app-page-1.webp"
-          alt="Mobile App"
-          fill
-          className="object-cover"
-          quality={90}
-          priority
-          sizes="100vw"
-        />
+      <section className="border-b border-slate-200 bg-blue-50 px-4 py-8 sm:py-10">
+        <div className="mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-2">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-700">
+              Elevate on your phone
+            </p>
+            <h1 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">
+              Your learning. Your next step. Wherever you go.
+            </h1>
+            <p className="mt-4 text-lg leading-7 text-slate-700">
+              Open Elevate in your phone's browser and use your existing student account. Add the
+              app to your home screen for quick access to your learning workspace.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link
+                href="https://app.elevateforhumanity.org/lms/dashboard"
+                className="inline-flex min-h-11 items-center rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white"
+              >
+                Open my student portal
+              </Link>
+              <Link
+                href="/store/demo/student"
+                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-950"
+              >
+                Explore the learner demo
+              </Link>
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-600">
+              Sample learner workspace
+            </p>
+            <StoreDemoPreview role="learner" compact />
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}

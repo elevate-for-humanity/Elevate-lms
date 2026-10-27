@@ -50,7 +50,7 @@ const START_OPTIONS = [
       'Learn about hiring, apprenticeship host-site participation, work-based learning, and employer training pathways. Incentives and reimbursements require separate eligibility and authorization.',
     href: '/employers',
     action: 'Employer Information',
-    image: '/images/pages/business-meeting.webp',
+    image: '/images/business-collaboration-vibrant-2026.webp',
     imageAlt: 'Employer and workforce partnership meeting',
   },
   {

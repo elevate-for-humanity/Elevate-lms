@@ -30,7 +30,12 @@ export class UltimateJobQueue {
         .maybeSingle();
     const { data: existing, error: readError } = await active();
     if (readError) throw readError;
-    if (existing) return existing;
+    if (existing) {
+      if (existing.status === 'queued' && (!existing.available_at || Date.parse(existing.available_at) <= Date.now())) {
+        await notifyCourseDispatcher({});
+      }
+      return existing;
+    }
     const { data: previous, error: previousError } = await this.db.from('ultimate_build_jobs')
       .select('monitor,status,payload,pending_dependency_resume').eq('build_id', buildId).eq('job_type', 'course_build')
       .order('created_at', {ascending: false}).limit(1).maybeSingle();
@@ -54,7 +59,12 @@ export class UltimateJobQueue {
     if (error?.code === '23505') {
       const { data: concurrent, error: concurrentError } = await active();
       if (concurrentError) throw concurrentError;
-      if (concurrent) return concurrent;
+      if (concurrent) {
+        if (concurrent.status === 'queued' && (!concurrent.available_at || Date.parse(concurrent.available_at) <= Date.now())) {
+          await notifyCourseDispatcher({});
+        }
+        return concurrent;
+      }
     }
     if (error) throw error;
     const { error: buildError } = await this.db.from('ultimate_course_builds')

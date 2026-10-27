@@ -1,3 +1,5 @@
+import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -110,7 +112,11 @@ export const POST = withAuth(
       status_code: 200,
       params: { id, status, mou_status },
     });
-    return Response.json({ ok: true });
+    const contractorSync = status === 'approved'
+      ? await requireAdminClient().then(db => ensureProgramHolderQuickBooksContractor(db, id))
+        .catch(() => ({ linked: false, reason: 'QuickBooks contractor setup is pending reconciliation.' }))
+      : undefined;
+    return Response.json({ ok: true, quickbooksContractor: contractorSync });
   },
   { roles: ['admin'] },
 );

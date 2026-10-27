@@ -1,3 +1,6 @@
+import { after } from 'next/server';
+import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
+import { logger } from '@/lib/logger';
 import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
@@ -83,6 +86,14 @@ function getGaryRegionalCityCenter(city: unknown): RegionalLocation | null {
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
 export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspace> {
   const ctx = await requireProgramHolder();
+  if (ctx.mode === 'holder') {
+    const holderId = ctx.holderId;
+    after(async () => {
+      await ensureProgramHolderQuickBooksContractor(ctx.db, holderId).catch(() => {
+        logger.warn('[program-holder] QuickBooks contractor reconciliation pending');
+      });
+    });
+  }
   if (ctx.mode === 'admin') {
     return {
       mode: 'admin',

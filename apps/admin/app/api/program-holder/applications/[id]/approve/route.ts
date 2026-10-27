@@ -1,3 +1,4 @@
+import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -322,6 +323,9 @@ export async function POST(
       .eq('id', id);
     if (appUpdateError) throw appUpdateError;
 
+    const contractorSync = await ensureProgramHolderQuickBooksContractor(db, holderId)
+      .catch(() => ({ linked: false, reason: 'QuickBooks contractor setup is pending reconciliation.' }));
+
     const accessLink = await secureAccessLink(db, email, identity.isNewUser);
     const portalUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent('/program-holder/dashboard')}`;
     const fallbackPath = alreadySigned ? '/program-holder/dashboard' : '/program-holder/sign-mou';
@@ -356,6 +360,7 @@ export async function POST(
       success: true,
       applicationId: id,
       programHolderId: holderId,
+      quickbooksContractor: contractorSync,
       userId: identity.userId,
       mouSigned: alreadySigned,
       emailStatus: result.success ? 'sent' : 'failed',

@@ -214,3 +214,36 @@ test('banking review requires explicit administrator confirmation before enablin
  const api=load('apps/admin/app/api/admin/program-holders/[id]/banking/route.ts',{'next/server':next,'@/lib/api/withRateLimit':{applyRateLimit:async()=>null},'@/lib/admin/guards':{apiRequireAdmin:async()=>({id:'admin',effectiveRoles:['admin']})},'@/lib/supabase/admin':{requireAdminClient:async()=>db}});
  assert.equal((await api.POST({json:async()=>({action:'confirm_setup',provider:'paypal',reference:'review-ref'})},{params:Promise.resolve({id:'h'})})).status,400);assert.equal(writes,0);
 });
+
+test('contractor provisioning links existing contractors and creates new ones without banking or payment writes',async()=>{
+ for(const existing of [false,true]) {
+  const writes=[],requests=[];const holder={id:'holder',organization_name:'Business',contact_email:'owner@example.com',status:'approved_pending_mou',features:{}};
+  const db=dbFor(q=>{if(q.operation!=='select')writes.push(q);return {data:q.table==='program_holders'?holder:null,error:null}});
+  // This fixture captures the canonical mapping upsert separately from payout tables.
+  const original=db.from.bind(db);db.from=table=>{const q=original(table);q.upsert=value=>{writes.push({table,value});return Promise.resolve({error:null})};return q};
+  const vendor={Id:'vendor',Vendor1099:true,PrimaryEmailAddr:{Address:'owner@example.com'}};
+  const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'server-only':{},'node:crypto':{createHash},'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async(_db,_config,path,options)=>{requests.push({path,options});return path.startsWith('query')?{QueryResponse:{Vendor:existing?[vendor]:[]}}:{Vendor:vendor}}}});
+  assert.equal((await api.ensureProgramHolderQuickBooksContractor(db,'holder')).linked,true);
+  assert.equal(requests.filter(r=>r.options).length,existing?0:1);
+  if(!existing){const body=JSON.parse(requests[1].options.body);assert.equal(body.Vendor1099,true);assert.deepEqual(Object.keys(body).sort(),['CompanyName','DisplayName','PrimaryEmailAddr','Vendor1099']);assert.match(requests[1].path,/requestid=efh-holder-/);}
+  assert.equal(writes.length,1);assert.equal(writes[0].table,'app_settings');assert.equal(JSON.parse(writes[0].value.value).vendorId,'vendor');
+ }
+});
+
+test('contractor provisioning excludes test and inactive holders before contacting QuickBooks',async()=>{
+ for(const holder of [{organization_name:'[QA] Company',status:'active'},{organization_name:'Business',status:'inactive'},{organization_name:'Business',status:'active',contact_email:'test@example.invalid'}]) {
+  let providerCalls=0;const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'node:crypto':{createHash},'./quickbooks-client':{loadQuickBooksConfig:async()=>{providerCalls++;throw Error('Must not connect')}}});
+  const result=await api.ensureProgramHolderQuickBooksContractor(dbFor(()=>({data:holder,error:null})),'holder');assert.equal(result.linked,false);assert.equal(providerCalls,0);
+ }
+});
+
+test('contractor contact conflicts fail closed without creating a duplicate',async()=>{
+ const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'node:crypto':{createHash},'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async(_db,_config,path,options)=>{assert.equal(options,undefined);return{QueryResponse:{Vendor:[{Id:'other',PrimaryEmailAddr:{Address:'other@example.com'}}]}}}}});
+ const db=dbFor(q=>({data:q.table==='program_holders'?{organization_name:'Business',contact_email:'owner@example.com',status:'active'}:null,error:null}));await assert.rejects(api.ensureProgramHolderQuickBooksContractor(db,'holder'),/contact does not match/);
+});
+
+test('contractor mapping is company scoped and cannot mark banking verified',async()=>{
+ const db=dbFor(q=>({data:q.table==='program_holders'?{organization_name:'Business',contact_email:'owner@example.com',status:'active'}:{value:JSON.stringify({realmId:'realm',vendorId:'vendor'})},error:null}));
+ const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async()=>{throw Error('Already mapped')}}});assert.equal((await api.ensureProgramHolderQuickBooksContractor(db,'holder')).vendorId,'vendor');
+ const source=readFileSync(new URL('../lib/integrations/quickbooks-program-holder-contractor.ts',import.meta.url),'utf8');assert.doesNotMatch(source,/payouts_enabled|transfers_enabled|verification_status|sendEmail|TaxIdentifier/);
+});

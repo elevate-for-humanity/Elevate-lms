@@ -44,3 +44,12 @@ Invitation tokens are stored only in owner-scoped payout notes. The existing hol
 The QuickBooks accounting recorder now uses the canonical production-only OAuth client, explicit bank/clearing and expense account mappings, and stable provider-transfer request IDs. The Admin QuickBooks integration screen loads actual company accounts for selection. It no longer picks the first bank or expense account. A QuickBooks accounting entry does not initiate ACH; direct deposits remain submitted inside the actual QuickBooks contractor service. PayPal release still uses administrator-approved schedules and verified destinations.
 
 Local validation: 36 Node behavioral tests and 107 focused Vitest tests, scoped ESLint, portal contracts and migration lint. Production compilation, protected CI and deployment evidence must be checked for the final banking commit. Actual QuickBooks contractor invitations, provider verification and account mappings are required before calling an individual holder payment-ready.
+
+
+## Automatic QuickBooks contractor setup follow-up
+
+Verified 13 external, non-test Program Holders in Elevate's QuickBooks contractor list. Created accounting contact records without sending email invitations, collecting bank/tax identifiers, or issuing payments. W-9 and bank setup remain incomplete. QA records and Elevate's umbrella record were excluded.
+
+Both administrator approval paths now attempt contractor reconciliation. Actual holder dashboard loads schedule a post-response retry; previews cannot create contractors. The production-only canonical OAuth client matches vendor name and exact contact email, refuses conflicts, uses stable holder/company request IDs, and persists company-scoped vendor links. Retry finds an existing contractor rather than creating another. Neither contractor provisioning nor contact linking verifies banking or enables payouts. Inactive and test holders are excluded from future automatic provisioning.
+
+The integrity job on head 1ff09b9 failed because the env example lacked two accounting mapping keys and its auth scanner did not recognize requireProgramHolder. Documented the keys and added that canonical guard to recognized patterns; no anonymous staff-notification access was added. Production builds, functional tests, lint, and all three app TypeScript jobs passed on that prior head. Automatic contractor follow-up requires its own protected checks and deployment evidence.

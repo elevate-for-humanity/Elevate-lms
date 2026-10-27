@@ -19,6 +19,8 @@ const PORTAL_LINKS = [
   ['Career Feed', '/program-holder/career'],
   ['Office Mail', '/program-holder/inbox'],
   ['Documents', '/program-holder/documents'],
+  ['Handbook', '/program-holder/handbook'],
+  ['MOU', '/program-holder/sign-mou'],
   ['Compliance', '/program-holder/compliance'],
   ['Reports', '/program-holder/reports'],
   ['Payouts', '/program-holder/payouts'],
@@ -45,7 +47,7 @@ export default async function ProgramHolderPortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const context = await requireProgramHolder();
+  const context = await requireProgramHolder({ allowPendingApproval: true });
   const profileName = context.profile?.full_name || 'Program Holder';
   const avatarUrl = context.profile?.avatar_url?.trim();
   const initials = profileName
@@ -63,12 +65,12 @@ export default async function ProgramHolderPortalLayout({
       >
         <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-2">
           <ProgramHolderMobileNav links={PORTAL_LINKS} />
-          <div className="hidden min-w-0 flex-wrap items-center gap-1 md:flex">
+          <div className="hidden min-w-0 max-w-[calc(100vw-240px)] items-center gap-1 overflow-x-auto md:flex">
             {PORTAL_LINKS.map(([label, href]) => (
               <Link
                 key={href}
                 href={href}
-                className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
+                className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
               >
                 {label}
               </Link>

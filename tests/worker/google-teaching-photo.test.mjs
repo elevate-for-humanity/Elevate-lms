@@ -11,13 +11,13 @@ test('transient image timeout retries before discarding lesson progress',async()
  }});
  assert.equal(result.bytes.toString(),'photo');assert.equal(calls,3);assert.equal(retries,1);
 });
-test('persistent image timeout exhausts six attempts without a substitute',async()=>{
+test('persistent image timeout exhausts three attempts without a substitute',async()=>{
  let calls=0;
  await assert.rejects(generateTeachingPhoto('prompt',{env:{},delay:async()=>{},request:async()=>{
   if(++calls===1)return {ok:true,json:async()=>({access_token:'token'})};
   throw new DOMException('timed out','TimeoutError');
  }}),/timed out/);
- assert.equal(calls,7);
+ assert.equal(calls,4);
 });
 test('Google identity generates PNG illustrations without an external API key',async()=>{
  const calls=[];

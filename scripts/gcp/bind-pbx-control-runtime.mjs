@@ -30,11 +30,15 @@ function assertNoConflict(env,plan){
     throw Error('existing_phone_credential_requires_review');
 }
 export async function pinnedControlVersion(run=google){
-  const code=`from pathlib import Path\nimport re\np=Path('/etc/elevate-pbx/provisioner.conf')\nif not p.is_file():\n print('PBX_REF_FILE_MISSING')\n raise SystemExit(0)\ns=p.read_text()\nm=re.search(r'^PBX_PROVISIONING_TOKEN_SECRET=[\\"\\\']?(projects/(?:elegant-racer-299721|484736877039)/secrets/elevate-pbx-provisioning-token/versions/([1-9][0-9]*|latest))[\\"\\\']?$',s,re.M)\nif not m:\n print('PBX_REF_INVALID')\n raise SystemExit(0)\nprint(m[2])\n`;
+  // VM stdout can include an SSH banner. Only an exact tagged result is trusted.
+  // Never print the config file, secret reference, or credential bytes.
+  const code=`from pathlib import Path\nimport re\np=Path('/etc/elevate-pbx/provisioner.conf')\nif not p.is_file():\n print('PBX_REF_RESULT:FILE_MISSING')\n raise SystemExit(0)\ntry:\n lines=p.read_text().splitlines()\nexcept OSError:\n print('PBX_REF_RESULT:INVALID')\n raise SystemExit(0)\nvalues=[]\nfor line in lines:\n m=re.fullmatch(r"\\s*PBX_PROVISIONING_TOKEN_SECRET\\s*=\\s*(.*?)\\s*",line)\n if m:\n  values.append(m[1].strip().strip(chr(34)+chr(39)))\nif len(values)!=1:\n print('PBX_REF_RESULT:INVALID')\n raise SystemExit(0)\nm=re.fullmatch(r"projects/(?:elegant-racer-299721|484736877039)/secrets/elevate-pbx-provisioning-token/versions/([1-9][0-9]*|latest)",values[0])\nprint('PBX_REF_RESULT:'+m[1] if m else 'PBX_REF_RESULT:INVALID')\n`;
   const quoted="'"+code.replace(/'/g,"'\\''")+"'";
-  const pin=run(['compute','ssh','elevate-pbx','--project',PROJECT,'--zone','us-central1-a','--quiet','--command','sudo python3 -c '+quoted]).trim();
-  if(pin==='PBX_REF_FILE_MISSING')throw Error('pbx_control_reference_file_missing');
-  if(pin==='PBX_REF_INVALID')throw Error('pbx_control_reference_unverified');
+  const output=run(['compute','ssh','elevate-pbx','--project',PROJECT,'--zone','us-central1-a','--quiet','--command','sudo python3 -c '+quoted]).trim();
+  const matches=output.split(/\r?\n/).map(line=>line.trim()).filter(line=>line.startsWith('PBX_REF_RESULT:'));
+  if(matches.length!==1)throw Error('pbx_control_reference_unverified');
+  const pin=matches[0].slice('PBX_REF_RESULT:'.length);
+  if(pin==='FILE_MISSING')throw Error('pbx_control_reference_file_missing');
   if(!/^(?:[1-9][0-9]*|latest)$/.test(pin))throw Error('pbx_control_reference_unverified');
   const meta=JSON.parse(run(['secrets','versions','describe',pin,'--secret',SECRET,'--project',PROJECT,'--format=json']));
   const match=meta.name?.match(/^projects\/(?:elegant-racer-299721|484736877039)\/secrets\/elevate-pbx-provisioning-token\/versions\/([1-9][0-9]*)$/);

@@ -6,7 +6,7 @@ import {DevStudioUltimateCourseControl} from '@/lib/devstudio/ultimate-course-co
 import {buildUltimateProfile} from '@/lib/ultimate-course-builder/core/course-profile';
 function database(failure=false,missingJob=false){
  const calls:string[]=[];
- const api={from(table:string){calls.push(table);const q={select(){return q;},eq(){return q;},neq(){return q;},in(){return q;},order(){return q;},limit(){return q;},
+ const api={rpc:async()=>({data:null,error:new Error('queue write failed')}),from(table:string){calls.push(table);const q={select(){return q;},eq(){return q;},neq(){return q;},in(){return q;},order(){return q;},limit(){return q;},
   async single(){return {data:table==='courses'?{id:'course',title:'Cosmetology'}:{id:'existing-build',course_id:'course',status:'running'},error:null};},
   async maybeSingle(){return table==='ultimate_build_jobs'?{data:missingJob?null:{id:'existing-job',status:'running'},error:null}:{data:{id:'existing-build',status:'running',current_step:'visual_assignment'},error:failure?new Error('lookup failed'):null};},
   insert(){return {select(){return {async single(){return {data:null,error:new Error('queue write failed')};}}}};}};return q;}};return {api,calls};

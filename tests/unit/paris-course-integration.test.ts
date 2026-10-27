@@ -22,7 +22,11 @@ it('a replacement queue job inherits PARIS monitoring without overwriting its wo
  const {UltimateJobQueue}=await import('@/lib/ultimate-course-builder/worker/job-queue');
  let inserted:any;
  const monitor={enabled:true,coordinator:'PARIS',recoveries:1};
- const db:any={from:(table:string)=>{
+ const db:any={rpc:async(name:string,args:any)=>{
+  expect(name).toBe('enqueue_ultimate_build_job');
+  inserted={monitor:args.p_monitor,payload:args.p_payload};
+  return {data:[{id:'new-job'}],error:null};
+ },from:(table:string)=>{
   let selection='',mutation=false;
   const q:any={select:(s:string)=>{selection=s;return q;},eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,
    maybeSingle:async()=>({data:selection.split(',').includes('monitor')?{monitor,status:'failed',payload:{nextCompetencyIndex:1}}:null}),

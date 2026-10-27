@@ -1,3 +1,4 @@
+import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
 import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
 import { applySyllabusPlan, validateSyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
 import { renderReview } from '@/lib/ultimate-course-builder/authoring/render-review';
@@ -15,6 +16,7 @@ import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/inst
 import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
 import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
+import { checkpointPreviewArtifacts } from '@/lib/ultimate-course-builder/core/checkpoint-preview.mjs';
 import {
   renderMediaUrl,
   renderPlaybackUrl,
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest) {
       ? await db
           .from('ultimate_course_builds')
           .select(
-            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))',
+            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,preview_objectives:artifacts->learning_objectives->objectives,preview_assessment:artifacts->assessment_alignment->assessment,preview_script:artifacts->instructor_script->script,preview_scenes:artifacts->storyboard->storyboard->scenes,preview_media_url:artifacts->lesson_film_render->render->mediaUrl,preview_video_url:artifacts->lesson_film_render->render->videoUrl,preview_playback_url:artifacts->lesson_film_render->render->playbackUrl,preview_media_approved:artifacts->finished_media_qa->mediaQA->pass,ultimate_lesson_steps(step,state,findings,completed_at))',
           )
           .eq('id', buildId)
           .single()
@@ -70,7 +72,9 @@ export async function GET(req: NextRequest) {
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
       const lessons = await Promise.all(
         (data.ultimate_lesson_builds ?? []).map(async (lesson: any) => {
-          const { artifacts, ...saved } = lesson;
+          const {preview_objectives,preview_assessment,preview_script,preview_scenes,
+            preview_media_url,preview_video_url,preview_playback_url,preview_media_approved,...saved} = lesson;
+          const artifacts = checkpointPreviewArtifacts(lesson);
           const preview = {
             ...lessonPreview(artifacts),
             historicalVersion: null as number | null,
@@ -130,15 +134,9 @@ export async function GET(req: NextRequest) {
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
-  let query = db
-    .from('ultimate_course_builds')
-    .select(
-      'id,course_id,status,owner_paused:profile->ownerPaused,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,updated_at,heartbeat_at,lease_owner,lease_expires_at,attempts,max_attempts,execution_generation,payload,monitor)',
-    )
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if (courseId) query = query.eq('course_id', courseId);
-  const { data, error } = await query;
+  const page = parseBuildListPage(req.nextUrl.searchParams.get('page'));
+  if (page === null) return NextResponse.json({ error: 'page must be an integer from 1 to 10000' }, { status: 400 });
+  const { data, error, pagination } = await loadUltimateBuildPage(db, courseId, page);
   if (error) return databaseFailure(error);
   let acquisitions: Array<{ id: string; goal: string | null }> = [];
   if (courseId) {
@@ -153,7 +151,7 @@ export async function GET(req: NextRequest) {
     if (requests.error) return databaseFailure(requests.error);
     acquisitions = requests.data ?? [];
   }
-  return NextResponse.json({ builds: data ?? [], acquisitions });
+  return NextResponse.json({ builds: data ?? [], acquisitions, pagination });
 }
 
 export async function POST(req: NextRequest) {

@@ -5,7 +5,19 @@ on:
     paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/*pwa-config-includes*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
   push:
     branches: [main]
-    paths: ['.github/workflows/exercise-owned-pbx-device.yml', 'infra/pbx/provisioner/server.mjs', 'scripts/gcp/repair-pbx-provisioner-reload.py']
+    # A verified main-branch PBX change automatically dispatches the protected
+    # production exercise. No broad every-commit provisioning or cron loop.
+    paths:
+      - '.github/workflows/exercise-owned-pbx-device.yml'
+      - 'infra/pbx/provisioner/**'
+      - 'infra/pbx/asterisk/**'
+      - 'scripts/gcp/repair-pbx-provisioner-reload.py'
+      - 'scripts/gcp/repair-pwa-config-includes.py'
+      - 'scripts/gcp/probe-operator-provisioning.py'
+      - 'scripts/gcp/test-operator-provisioning.py'
+      - 'scripts/gcp/audit-pbx-runtime.py'
+      - 'scripts/gcp/bind-pbx-control-runtime.mjs'
+      - 'scripts/gcp/bind-pbx-control-runtime.test.mjs'
 permissions:
   actions: write
   contents: read

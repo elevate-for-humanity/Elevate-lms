@@ -1322,9 +1322,7 @@ img:not([data-nimg]) {
  * their existing spacing.
  */
 .admin-studio-viewport,
-.admin-studio-viewport > section,
-.admin-studio-viewport main,
-.admin-studio-viewport section {
+.admin-studio-viewport > section {
   padding: 0 !important;
 }
 
@@ -1728,3 +1726,4 @@ body[data-app-route='true'] [data-marketing-main] {
     width: 100%;
   }
 }
+

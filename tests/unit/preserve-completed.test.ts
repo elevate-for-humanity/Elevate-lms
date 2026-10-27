@@ -23,8 +23,8 @@ it("resumes at lesson three and removes obsolete repairs for finished lessons", 
         repairCompetencyIds: ["one", "two"],
         unresolvedCompetencyIds: ["two"],
       },
-      [published],
-      [{ competency_id: "two", status: "built" }],
+      [published,{id:'l2',video_status:'complete',video_url:'/playback',media_attachment:{sourceLessonBuildId:'built-two'},film:{videoUrl:'film',captionsUrl:'captions',transcriptUrl:'transcript'}}],
+      [{id:'built-two',competency_id:"two",status:"built",render_source:'film',captions_source:'captions',transcript_source:'transcript'}],
     ),
   ).toMatchObject({
     nextCompetencyIndex: 2,
@@ -50,4 +50,13 @@ it("honors an explicit repair instead of silently skipping it", () => {
   expect(preservedCourseCursor(profile, payload, [published], [])).toBe(
     payload,
   );
+});
+
+
+it("does not skip a built lesson whose canonical media handoff is missing or stale",()=>{
+ const built={id:'built-two',competency_id:'two',status:'built',render_source:'new-film',captions_source:'captions',transcript_source:'transcript'};
+ for(const film of [undefined,{videoUrl:'old-film',captionsUrl:'captions',transcriptUrl:'transcript'}]){
+  const canonical={id:'l2',video_status:'complete',video_url:'/playback',media_attachment:{sourceLessonBuildId:'built-two'},film};
+  expect(preservedCourseCursor(profile,{nextCompetencyIndex:1},[canonical],[built]).nextCompetencyIndex).toBe(1);
+ }
 });

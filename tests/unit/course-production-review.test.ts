@@ -19,7 +19,7 @@ describe('immutable video review and publication',()=>{
  });
  it('looks up the decision for the exact selected film version',async()=>{
   const {db,filters}=database();
-  expect(await renderReview(db as never,'build','lesson-build','https://media.example/new.mp4')).toEqual({artifactVersionId:'new',version:2,decision:'approve'});
+  expect(await renderReview(db as never,'build','lesson-build','https://media.example/new.mp4')).toEqual({artifactVersionId:'new',version:2,decision:'approve',comment:null});
   expect(filters).toContainEqual(['ultimate_review_decisions','artifact_version_id','new']);
  });
  it('does not attach approval to an unknown or regenerated video URL',async()=>{
@@ -34,3 +34,4 @@ describe('immutable video review and publication',()=>{
   await expect(new UltimateReleaseService(database().db as never).derive('build')).resolves.toMatchObject({buildId:'build',lessons:[{sourceLessonBuildId:'lesson-build'}]});
  });
 });
+

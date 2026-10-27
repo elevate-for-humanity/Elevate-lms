@@ -14,9 +14,9 @@ test('FFmpeg concat assembly receives real codec arguments and an output destina
   // This regression once shipped literal backslash-n text inside a // comment,
   // commenting out every FFmpeg option and the final output path.
   assert.doesNotMatch(argumentBlock, /\\n\s*\/\//);
-  assert.match(argumentBlock, /^\s*'-c:v', 'libx264'/m);
+  assert.match(argumentBlock, /^\s*\.\.\.videoEncoderArgs\(20\),/m);
   assert.match(argumentBlock, /^\s*'-c:a', 'aac'/m);
-  assert.match(argumentBlock, /^\s*paths\.videoPath,/m);
-  assert.match(source.slice(end, end+250), /concatArgs\.at\(-1\) !== paths\.videoPath/);
+  assert.match(argumentBlock, /^\s*concatOutputPath,/m);
+  assert.match(source.slice(end, end+250), /concatArgs\.at\(-1\) !== concatOutputPath/);
   assert.match(source.slice(end, end+550), /execFileAsync\('ffmpeg', concatArgs/);
 });

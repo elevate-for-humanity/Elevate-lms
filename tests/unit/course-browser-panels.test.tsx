@@ -36,6 +36,7 @@ vi.mock("@/components/studio/CourseProvider", () => ({
   }),
 }));
 beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 1280, height: 800 } as DOMRect);
   vi.stubGlobal(
     "fetch",
     vi.fn(async () => ({
@@ -47,6 +48,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 it("opens the live course preview by default and launches the web browser only on request", async () => {
@@ -112,3 +114,4 @@ it("provides the course preview without launching a homepage browser on the stan
   expect(screen.queryByTitle("Cloud browser session")).toBeNull();
   expect(screen.getAllByRole("separator")).toHaveLength(1);
 });
+

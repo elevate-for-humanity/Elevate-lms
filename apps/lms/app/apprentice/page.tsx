@@ -1,4 +1,6 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
+import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -298,6 +300,15 @@ export default async function ApprenticePortalPage() {
     totalLessons = lessonCountRes.count ?? 0;
     completedLessons = progressCountRes.count ?? 0;
   }
+  // Display recorded OJL progress without inventing a theory-unlock threshold.
+  // Access remains controlled by the existing server-side enrollment policy.
+  const { data: apprenticeHours } = await db
+    .from('apprentices')
+    .select('ojl_hours,hours_completed')
+    .eq('user_id', subject.userId)
+    .maybeSingle();
+  const recordedOjlHours = Math.max(0, Number(apprenticeHours?.ojl_hours ?? apprenticeHours?.hours_completed ?? 0) || 0);
+
   const digitalCoursePercent = totalLessons
     ? Math.min(100, Math.round((completedLessons / totalLessons) * 100))
     : 0;
@@ -474,6 +485,7 @@ export default async function ApprenticePortalPage() {
     return (
       <main className="space-y-7 pb-10">
         <TimeclockAttendanceNotice />
+        <ProgramGuideResources />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
           <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
@@ -589,6 +601,7 @@ export default async function ApprenticePortalPage() {
           syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'}
           completedLessons={completedLessons}
           totalLessons={totalLessons}
+          recordedOjlHours={recordedOjlHours}
         />
         {priorLearning ? (
           <PriorLearningPanel priorLearning={priorLearning} nativePercent={digitalCoursePercent} />
@@ -648,6 +661,7 @@ export default async function ApprenticePortalPage() {
   return (
     <main className="space-y-7 pb-10">
       <TimeclockAttendanceNotice />
+        <ProgramGuideResources />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">
@@ -857,6 +871,7 @@ export default async function ApprenticePortalPage() {
         syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'}
         completedLessons={completedLessons}
         totalLessons={totalLessons}
+        recordedOjlHours={recordedOjlHours}
       />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -1078,12 +1093,14 @@ function TheorySchedulePanel({
   syllabusHref,
   completedLessons,
   totalLessons,
+  recordedOjlHours,
 }: {
   schedule: any;
   courseHref: string;
   syllabusHref: string;
   completedLessons: number;
   totalLessons: number;
+  recordedOjlHours: number;
 }) {
   if (!schedule)
     return (
@@ -1106,23 +1123,20 @@ function TheorySchedulePanel({
     );
   };
   return (
-    <section className="rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm sm:p-8">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+    <section className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-4 shadow-sm sm:p-8">
+      <div className="flex min-w-0 flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">
             Your weekly theory plan
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-950">{days}</h2>
+          <h2 className="mt-2 break-words text-2xl font-black text-slate-950">{days}</h2>
           <p className="mt-2 font-bold text-slate-800">
             {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>
-          {schedule.starts_on ? (
+          {formatTheoryStartDate(schedule.starts_on) ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
               Theory/RTI begins{' '}
-              {new Date(`${String(schedule.starts_on).slice(0, 10)}T12:00:00Z`).toLocaleDateString(
-                'en-US',
-                { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' },
-              )}
+              {formatTheoryStartDate(schedule.starts_on)}
               .
             </p>
           ) : null}
@@ -1132,6 +1146,12 @@ function TheorySchedulePanel({
             <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You
             will receive automatic alerts when each scheduled block starts and stops.
           </p>
+          <div className="mt-4 rounded-xl border border-fuchsia-200 bg-white p-4 text-sm text-slate-800">
+            <p className="font-black">Theory schedule and eligibility</p>
+            <p className="mt-1">Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours.</p>
+            <p className="mt-1">Scheduled theory: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')} hours weekly, up to {(schedule.weekly_max_minutes / 60).toLocaleString('en-US')} hours weekly.</p>
+            <p className="mt-1">Any minimum work-hour requirement for unlocking theory must be confirmed by your program administrator. This dashboard does not impose an unverified hour threshold.</p>
+          </div>
           <p className="mt-2 text-sm font-semibold text-slate-700">
             Course progress: {completedLessons} of {totalLessons} published lessons complete.
           </p>

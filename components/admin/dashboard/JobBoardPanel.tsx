@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { Briefcase, Zap, RefreshCw, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react';
 
 type FeedStats = {
-  total: number;
-  lastImport: string | null;
+  count: number;
+  sources: Record<string, { records: number; latestImport: string | null }>;
   configured: {
     usajobs: boolean;
-    careeronestop: boolean;
+    careerOneStop: boolean;
   };
 };
 
@@ -18,32 +18,51 @@ export function JobBoardPanel() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
-  const [importResult, setImportResult] = useState<{ imported: number; skipped: number } | null>(null);
+  const [importResult, setImportResult] = useState<number | null>(null);
+  const [importError, setImportError] = useState('');
+  const [sourceErrors, setSourceErrors] = useState<string[]>([]);
+
+  async function loadStats() {
+    const response = await fetch('/api/jobs/government-feed', { cache: 'no-store' });
+    const json = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(json.error ?? `Job feed status failed (HTTP ${response.status})`);
+    if (!Number.isInteger(json.count) || !json.configured || !json.sources) {
+      throw new Error('Job feed returned an invalid status response.');
+    }
+    setStats(json);
+    setError('');
+  }
 
   useEffect(() => {
-    fetch('/api/jobs/government-feed')
-      .then(async (r) => {
-        const json = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(json.error ?? `HTTP ${r.status}`);
-        return json;
-      })
-      .then((json) => { setStats(json); setError(''); })
+    void loadStats()
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load job feed status'))
       .finally(() => setLoading(false));
   }, []);
 
   async function runImport() {
+    if (importing) return;
     setImporting(true);
     setImportResult(null);
+    setImportError('');
+    setSourceErrors([]);
     try {
       const res = await fetch('/api/jobs/government-feed', { method: 'POST' });
-      const data = await res.json();
-      setImportResult({ imported: data.imported ?? 0, skipped: data.skipped ?? 0 });
-      // Refresh stats
-      const updated = await fetch('/api/jobs/government-feed').then((r) => r.json());
-      setStats(updated);
-    } catch {
-      setImportResult({ imported: 0, skipped: -1 });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? `Job import failed (HTTP ${res.status})`);
+      if (data.ok !== true || !Number.isInteger(data.imported?.total) || data.imported.total < 0) {
+        throw new Error('The server did not confirm the import result. Check job feed status before retrying.');
+      }
+      setImportResult(data.imported.total);
+      setSourceErrors([
+        ['usaJobs', 'USAJobs'], ['careerOneStop', 'CareerOneStop'], ['onet', 'O*NET'],
+      ].flatMap(([key, label]) => typeof data.errors?.[key] === 'string' && data.errors[key] ? [`${label}: ${data.errors[key]}`] : []));
+      try {
+        await loadStats();
+      } catch (reason) {
+        setError(`Import completed, but status could not refresh: ${reason instanceof Error ? reason.message : 'Unknown status error'}`);
+      }
+    } catch (reason) {
+      setImportError(reason instanceof Error ? reason.message : 'Job import could not complete.');
     } finally {
       setImporting(false);
     }
@@ -51,8 +70,12 @@ export function JobBoardPanel() {
 
   const sources = [
     { key: 'usajobs' as const, label: 'USAJobs.gov', href: 'https://developer.usajobs.gov', note: 'Federal jobs API' },
-    { key: 'careeronestop' as const, label: 'CareerOneStop', href: 'https://www.careeronestop.org/Developers/WebAPI/', note: 'DOL-funded job listings' },
+    { key: 'careerOneStop' as const, label: 'CareerOneStop', href: 'https://www.careeronestop.org/Developers/WebAPI/', note: 'DOL-funded job listings' },
   ];
+  const lastImport = Object.values(stats?.sources ?? {})
+    .map(source => source.latestImport)
+    .filter((date): date is string => typeof date === 'string' && Number.isFinite(Date.parse(date)))
+    .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-5">
@@ -76,19 +99,19 @@ export function JobBoardPanel() {
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-slate-50 rounded-lg p-3 text-center">
           <p className="text-2xl font-extrabold text-slate-900">
-            {loading ? '—' : (stats?.total ?? 0)}
+            {stats?.count ?? '—'}
           </p>
           <p className="text-xs text-slate-500 mt-0.5 flex items-center justify-center gap-1">
-            <Zap className="w-3 h-3 text-amber-500" /> Gov feed jobs
+            <Zap className="w-3 h-3 text-amber-500" /> Recent feed jobs
           </p>
         </div>
         <div className="bg-slate-50 rounded-lg p-3 text-center">
           <p className="text-xs font-semibold text-slate-700 mb-1">Last import</p>
           <p className="text-xs text-slate-500">
-            {loading
+            {loading || !stats
               ? '—'
-              : stats?.lastImport
-              ? new Date(stats.lastImport).toLocaleDateString('en-US', {
+              : lastImport
+              ? new Date(lastImport).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   hour: '2-digit',
@@ -100,7 +123,7 @@ export function JobBoardPanel() {
       </div>
 
       {error && (
-        <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        <div role="alert" className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
           {error}
         </div>
       )}
@@ -136,17 +159,21 @@ export function JobBoardPanel() {
       </div>
 
       {/* Import result */}
-      {importResult && (
-        <div className={`text-xs rounded-lg px-3 py-2 mb-3 ${importResult.skipped === -1 ? 'bg-red-50 text-red-700' : 'bg-brand-green-50 text-brand-green-700'}`}>
-          {importResult.skipped === -1
-            ? 'Import failed — check server logs.'
-            : `Imported ${importResult.imported} jobs, ${importResult.skipped} skipped.`}
+      {importResult !== null && (
+        <div role="status" className="text-xs rounded-lg px-3 py-2 mb-3 bg-brand-green-50 text-brand-green-700">
+          Imported {importResult} jobs.
+        </div>
+      )}
+      {(importError || sourceErrors.length > 0) && (
+        <div role="alert" className="text-xs rounded-lg px-3 py-2 mb-3 bg-red-50 text-red-700">
+          {importError || `Some sources could not complete: ${sourceErrors.join('; ')}`}
         </div>
       )}
 
       {/* Actions */}
       <div className="flex gap-2">
         <button
+          type="button"
           onClick={runImport}
           disabled={importing}
           className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 px-3 py-2 rounded-lg transition-colors"

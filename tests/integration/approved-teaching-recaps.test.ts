@@ -50,3 +50,20 @@ test('recap generation and evidence count as real progress during a long objecti
   tick+=600001;await watch.check();assert.equal(watch.signal.aborted,true);
  } finally {watch.dispose();}
 });
+
+test('RTI recap filler is repaired without removing subject narration or quizzes',async()=>{
+ let drafts=0;
+ const profile={id:'course:a6b0b712-1cf0-475a-ba79-ee2023dea8ec'};
+ const result=await addFreshTeachingRecaps(blueprint,profile,sources,async(_model,system,input)=>{
+  if(system.includes('recaps:')){
+   drafts++;
+   assert.match(input.rtiRequirements,/picture sequences/);
+   if(drafts===1)return {recaps:[{...recaps[0],text:'Click the next button to proceed to the next lesson.'},recaps[1]]};
+   assert.equal(input.repair.error,'BLUEPRINT_RTI_NAVIGATION_FILLER');
+   return {recaps};
+  }
+  return {pass:true,findings:[],hash:input.hash,blueprintHash:input.hash,competencyId:input.competencyId};
+ });
+ assert.equal(drafts,2);
+ assert.equal(result.segments[0].text,blueprint.segments[0].text);
+});

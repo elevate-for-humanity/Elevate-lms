@@ -25,6 +25,12 @@ export async function POST(req: NextRequest) {
       { error: 'Select an exact saved video version and review action.' },
       { status: 400 },
     );
+  const comment = typeof input.comment === 'string' ? input.comment.trim() : '';
+  if (input.action === 'request_change' && (!comment || comment.length > 4000))
+    return NextResponse.json(
+      { error: 'Describe the changes needed using 1 to 4,000 characters.' },
+      { status: 400 },
+    );
   try {
     const db = await requireAdminClient();
     const artifact = await db
@@ -61,14 +67,17 @@ export async function POST(req: NextRequest) {
         artifact_version_id: version.data.id,
         action: input.action,
         reviewer_id: auth.id,
-        comment: typeof input.comment === 'string' ? input.comment.slice(0, 4000) : null,
+        comment: comment ? comment.slice(0, 4000) : null,
       });
     if (saved.error) throw saved.error;
     return NextResponse.json({
       ok: true,
-      message: `Review recorded for video version ${version.data.version}. Automated quality checks remain separate.`,
+      message: input.action === 'request_change'
+        ? `Change request saved for video version ${version.data.version}. No repair has been scheduled. Saved media is unchanged.`
+        : `Review recorded for video version ${version.data.version}. Automated quality checks remain separate.`,
     });
   } catch (error) {
     return safeInternalError(error, 'Lesson review failed', 'The video review could not be saved.');
   }
 }
+

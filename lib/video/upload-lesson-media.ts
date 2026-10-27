@@ -1,7 +1,8 @@
 /**
  * Upload generated lesson audio/video to durable storage.
  * - Small assets (MP3, slide JPEG) → Supabase `course-videos`
- * - Large MP4 → configured Elevate Media Storage when available
+ * - Every video, including small clips → configured external Elevate Media Storage
+ * Video uploads never fall back to Supabase, including on quota/provider errors.
  *
  * Production Elevate Media Storage can be Backblaze B2, Wasabi, AWS S3, Supabase S3,
  * Cloudflare R2, or another S3-compatible endpoint. Container disk remains
@@ -15,6 +16,7 @@ import os from 'os';
 import path from 'path';
 import {
   uploadToElevateMedia,
+  getElevateMediaStorageConfig,
   getSignedElevateMediaUrl,
   uploadFileToElevateMedia,
   isElevateMediaStorageConfigured,
@@ -77,7 +79,9 @@ export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   if (raw === 'supabase' || raw === 'auto') return raw;
   // Legacy "r2" and provider-oriented values map to the Elevate Media backend.
   if (raw === 'elevate-media' || raw === 'object' || raw === 's3' || raw === 'b2' || raw === 'r2') return 'elevate-media';
-  return 'auto';
+  // Invalid explicit modes must never silently reroute production media to
+  // Supabase: a typo can exhaust its storage cap while appearing successful.
+  throw new Error('COURSE_VIDEO_STORAGE_BACKEND_INVALID');
 }
 
 export function isAnyElevateMediaStorageConfigured(): boolean {
@@ -93,9 +97,27 @@ export function shouldUploadCourseMediaToElevateMedia(
   contentType: string,
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
+  if (contentType.toLowerCase().startsWith('video/')) {
+    if (backend === 'supabase') throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
+    const config = getElevateMediaStorageConfig();
+    if (config.provider === 'supabase-s3' || /(?:^|\.)supabase\.(?:co|com)(?:[/:]|$)/i.test((config.endpoint || '').replace(/^https?:\/\//, '')))
+      throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
+    if (!isElevateMediaStorageConfigured())
+      throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
+    return true;
+  }
   if (backend === 'supabase') return false;
-  if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
-    if (backend === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
+  // Private B2 does not require public bucket access. Owner previews use
+  // signed reads; uploads only require the S3 endpoint, bucket and credentials.
+  const privateB2 = process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2';
+  if (!isElevateMediaStorageConfigured() || (!privateB2 && !isElevateMediaPublicDeliveryConfigured())) {
+    // When an operator selected Backblaze, missing credentials or delivery is a
+    // configuration error, never permission to consume Supabase storage.
+    const b2Selected =
+      process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2' ||
+      /backblazeb2\.com/i.test(process.env.ELEVATE_MEDIA_ENDPOINT ?? '');
+    if (backend === 'elevate-media' || (b2Selected && contentType.startsWith('video/')))
+      throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
     return false;
   }
 
@@ -210,16 +232,24 @@ async function uploadCourseVideosToElevateMedia(
   contentType: string,
 ): Promise<string> {
   const key = elevateMediaKeyForStoragePath(storagePath);
-  const result = await ownerPreviewMediaDelivery(await uploadToElevateMedia(buffer, key, contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
-  if (!result.success || !result.url) {
-    throw new Error(result.error ?? `Elevate Media Storage upload failed for ${key}`);
+  const uploaded = await uploadToElevateMedia(buffer, key, contentType);
+  if (!uploaded.success) {
+    throw new Error(uploaded.error ?? `Elevate Media Storage upload failed for ${key}`);
   }
+  const result = await ownerPreviewMediaDelivery(uploaded, {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
+  // Private B2 intentionally has no public URL. An absent public URL after
+  // successful PutObject is NOT an upload failure. Mint a short-lived signed
+  // read for immediate rendering/QA, without granting public bucket access.
+  // The durable object identity remains result.key; release consumers must
+  // resolve a fresh authorized URL rather than permanently publish this token.
+  const deliveryUrl = result.url ?? await getSignedElevateMediaUrl(key, 21600, {contentType});
+  if (!deliveryUrl) throw new Error(`COURSE_OBJECT_STORAGE_READBACK_SIGNING_FAILED:${key}`);
   logger.info('[upload-lesson-media] uploaded to Elevate Media Storage', {
     key,
     bytes: buffer.length,
     // Signed read URLs are bearer credentials; never log them.
   });
-  return result.url;
+  return deliveryUrl;
 }
 
 export async function uploadCourseVideosObject(
@@ -228,6 +258,8 @@ export async function uploadCourseVideosObject(
   contentType: string,
   options?: { forceSupabase?: boolean },
 ): Promise<string> {
+  if (contentType.toLowerCase().startsWith('video/') && options?.forceSupabase)
+    throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia(buffer, contentType)) {
     try {
       return await uploadCourseVideosToElevateMedia(buffer, storagePath, contentType);
@@ -235,7 +267,9 @@ export async function uploadCourseVideosObject(
       // The ordinary request ceiling does not apply to the TUS route below.
       // Keep the completed bytes and let Storage enforce its actual object
       // limit instead of rejecting a valid film before a chunked upload.
-      if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED', { cause: err });
+      if (contentType.toLowerCase().startsWith('video/') || resolveCourseVideoStorageBackend() === 'elevate-media' ||
+          process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
+        throw new Error(`COURSE_OBJECT_STORAGE_UPLOAD_FAILED:${err instanceof Error ? err.message.replace(/https?:\/\/\S+/g, '[url redacted]').slice(0, 240) : 'unknown storage failure'}`, { cause: err });
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }
@@ -278,6 +312,8 @@ export async function uploadLessonFileFromDisk(
   // Large MP4s use the resumable route in uploadCourseVideosObject. The
   // single-request ceiling is not an object-size limit and must not trigger
   // an unnecessary lossy transcode or reject a valid completed lesson.
+  if (ext === 'mp4' && options?.forceSupabase)
+    throw new Error('COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED');
   const {size} = await stat(filePath);
   const storagePath = lessonMediaStoragePath(lessonId, ext);
   const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
@@ -285,8 +321,15 @@ export async function uploadLessonFileFromDisk(
   // Selection only needs the byte count; large source files remain on disk.
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
     const result = await ownerPreviewMediaDelivery(await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
-    if (result.success && result.url) url = result.url;
-    else if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED');
+    if (result.success) {
+      // Private B2 provides durable keys, not public URLs. Mint a temporary
+      // authorized read for the current render; never interpret missing
+      // public access as a failed MP4 upload.
+      url = result.url ?? await getSignedElevateMediaUrl(elevateMediaKeyForStoragePath(storagePath), 21600, { contentType }) ?? undefined;
+      if (!url) throw new Error('COURSE_OBJECT_STORAGE_READBACK_SIGNING_FAILED');
+    } else if (ext === 'mp4' || resolveCourseVideoStorageBackend() === 'elevate-media' ||
+             process.env.ELEVATE_MEDIA_PROVIDER?.trim().toLowerCase() === 'backblaze-b2')
+      throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED:' + (result.error || 'unknown'));
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');
   }
   if (!url && ext === 'mp4' && size > SUPABASE_TUS_CHUNK_BYTES) {

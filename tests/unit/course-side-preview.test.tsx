@@ -15,7 +15,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
-function mock(saved = true) {
+function mock(saved = true, activeJob = false, secondSaved = true) {
   const fetcher = vi.fn(async (url: string, options?: RequestInit) => ({
     ok: true,
     json: async () =>
@@ -41,7 +41,7 @@ function mock(saved = true) {
                   id: "l2",
                   competency_id: "two",
                   status: "built",
-                  preview: { videoUrl: "https://media.example/two.mp4" },
+                  preview: { videoUrl: secondSaved ? "https://media.example/two.mp4" : "" },
                 },
               ],
             },
@@ -52,6 +52,7 @@ function mock(saved = true) {
                 id: "build",
                 status: "running",
                 current_step: "lesson_film_render",
+                ...(activeJob ? { ultimate_build_jobs: [{ status: 'running', payload: { progress: { phase: 'render-frames:1800' } } }] } : {}),
               },
             ],
           },
@@ -65,7 +66,8 @@ it("shows selected course video without a general browser or writes", async () =
   const video = await screen.findByLabelText("First lesson side preview");
   expect(video).toHaveAttribute("src", "https://media.example/one.mp4");
   expect(screen.queryByText("Live render portions")).toBeNull();
-  expect(screen.getByRole("status")).toHaveTextContent("lesson film render");
+  expect(screen.getByRole("status")).toHaveTextContent("Latest saved lesson video.");
+  expect(screen.queryByText(/lesson film render/)).toBeNull();
   fireEvent.change(screen.getByLabelText("Lesson to watch"), {
     target: { value: "two" },
   });
@@ -77,10 +79,28 @@ it("shows selected course video without a general browser or writes", async () =
     f.mock.calls.every(([, options]) => !options || !("method" in options)),
   ).toBe(true);
 });
+it("keeps plain-language build status after the player instead of exposing render internals", async () => {
+  mock(true, true);
+  render(<CourseSidePreview courseId="course" />);
+  const video = await screen.findByLabelText("First lesson side preview");
+  const status = screen.getByRole('status');
+  expect(status).toHaveTextContent('Course build in progress. Saved videos stay available.');
+  expect(screen.queryByText(/render-frames/)).toBeNull();
+  expect(video.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
 it("shows completed render portions while a lesson has no saved final video", async () => {
-  mock(false);
+  mock(false, false, false);
   render(<CourseSidePreview courseId="course" />);
   expect(await screen.findByText("Live render portions")).toBeInTheDocument();
+});
+it("keeps a saved video visible even after the unfinished lesson row exists", async () => {
+  mock(false);
+  render(<CourseSidePreview courseId="course" />);
+  expect(await screen.findByLabelText('Second lesson side preview')).toHaveAttribute('src', 'https://media.example/two.mp4');
+  expect(screen.getByText(/First lesson has no saved video yet/)).toBeVisible();
+  fireEvent.change(screen.getByLabelText('Lesson to watch'), { target: { value: 'one' } });
+  expect(screen.getByText('Live render portions')).toBeVisible();
+  expect(screen.queryByText(/Showing Second lesson while waiting/)).toBeNull();
 });
 it("removes the old course video when switching courses", async () => {
   mock();
@@ -95,7 +115,7 @@ it("removes the old course video when switching courses", async () => {
   ).toBeInTheDocument();
 });
 
-it("follows the queued course cursor rather than a stale running lesson", async () => {
+it("keeps a saved video visible while the queued lesson has no preview, without hiding manual selection", async () => {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => ({
@@ -118,6 +138,12 @@ it("follows the queued course cursor rather than a stale running lesson", async 
                     status: "running",
                     preview: { videoUrl: "old.mp4" },
                   },
+                  {
+                    id: "latest",
+                    competency_id: "two",
+                    status: "built",
+                    preview: { videoUrl: "latest.mp4" },
+                  },
                 ],
               },
             }
@@ -135,9 +161,14 @@ it("follows the queued course cursor rather than a stale running lesson", async 
     })),
   );
   render(<CourseSidePreview courseId="course" />);
-  expect(
-    await screen.findByRole("heading", { name: "Current third lesson" }),
-  ).toBeVisible();
-  expect(screen.getByLabelText("Lesson to watch")).toHaveValue("three");
-  expect(screen.queryByLabelText("Old lesson side preview")).toBeNull();
+  const video = await screen.findByLabelText("Lesson two side preview");
+  expect(video).toHaveAttribute('src', 'latest.mp4');
+  expect(screen.getByLabelText("Lesson to watch")).toHaveValue("two");
+  expect(screen.getByText(/Current third lesson has no saved video yet/)).toBeVisible();
+  fireEvent.change(screen.getByLabelText('Lesson to watch'), { target: { value: 'three' } });
+  expect(screen.getByText('This lesson has no saved video yet.')).toBeVisible();
+  expect(screen.queryByText(/Showing Lesson two while waiting/)).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Follow current build' }));
+  expect(screen.getByLabelText('Lesson two side preview')).toHaveAttribute('src', 'latest.mp4');
 });
+

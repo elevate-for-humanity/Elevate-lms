@@ -14,11 +14,11 @@ async function execute(overrides={}){
   if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return f.storedKey||key;
   if(args[0]==='storage'&&args[1]==='buckets'&&args[2]==='describe')return JSON.stringify({name:f.missingBucket?'unapproved':'elegant-racer-299721-studio-browser-auth'});
   if(args[0]==='artifacts')return 'sha256:'+sha+sha.slice(0,24);
-  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.run.app',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:'studio-verify',url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
+  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.run.app',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:f.commands.find(a=>a[0]==='run'&&a[1]==='deploy')?.find(a=>a.startsWith('--tag='))?.slice(6),url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
   return '';
  };
  globalThis.__studioCutoverFixture={
-  async verifyStudioRuntimeReplacement(){f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
+  async verifyStudioRuntimeReplacement(options){f.replacementOptions=options;f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
   async inventoryStudioLiveState(){return f.live||{activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true};},
   execFileSync(_program,args){return output(args);},
   execFile(_program,args,_options,callback){f.diagnostics.push(args);callback(null,{stdout:args.includes('--format=value(status.latestCreatedRevisionName)')?'browser-failed-revision':args[0]==='run'?JSON.stringify({metadata:{name:'failed'},spec:{containers:[{env:[{name:'PRIVATE_TOKEN',value:'private-runtime-value'}]}]}}):JSON.stringify([{textPayload:'private-log-value',severity:'ERROR',timestamp:'2026-10-17T00:00:00Z'}])});},
@@ -43,12 +43,37 @@ async function execute(overrides={}){
  return f;
 }
 function switched(f){return f.commands.some(a=>a[0]==='run'&&a[1]==='services'&&a[2]==='update'&&a[3]==='elevate-admin-migration');}
+
+test('recovery verification receives the exact isolated deployment tag and release',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const tag=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag=')).slice(6);
+ assert.equal(f.replacementOptions.candidateTag,tag);
+ assert.equal(f.replacementOptions.sha,sha);
+ assert.equal(f.replacementOptions.revision,'browser-candidate');
+ assert.equal(f.replacementOptions.url,'https://candidate.example.test');
+});
+test('candidate hostname fits the Cloud Run service and traffic tag limit',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ const tag=deploy.find(a=>a.startsWith('--tag=')).slice(6);
+ assert.ok(tag.length+deploy[2].length<=46,'Cloud Run rejects combined service and tag names above 46 characters');
+});
 test('Admin cutover requires exact revision, durable storage and both authorization proofs',async()=>{
  const f=await execute();assert.equal(f.error,undefined);assert.equal(switched(f),true);
  const grants=f.commands.filter(a=>a[0]==='secrets'&&a[1]==='add-iam-policy-binding');
  assert.equal(grants.length,0);
  assert.ok(grants.every(a=>a.includes('studio-browser-shared-secret')));
 });
+
+test('new image deployments replace a stale runtime commit override with the exact immutable image SHA',async()=>{
+ const f=await execute({browserSpec:{containers:[{env:[{name:'GIT_SHA',value:'old-release'}]}]}});
+ assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ const env=deploy.find(a=>a.startsWith('--update-env-vars='));
+ assert.ok(env.split(',').includes('GIT_SHA='+sha));
+ assert.ok(!deploy.some(a=>a.startsWith('--set-env-vars=')));
+});
+
 test('unready persistent storage preserves Admin and collects exact revision diagnostics',async()=>{
  const f=await execute({state:{commit:sha,ready:true,providerAuthStorage:{persistent:false}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
@@ -81,7 +106,7 @@ test('browser releases preserve mounted storage and restored runtime settings',a
 test('pinned old traffic is preserved until the exact candidate passes all proofs',async()=>{
  const f=await execute();assert.equal(f.error,undefined);
  const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
- assert.ok(deploy.includes('--no-traffic'));assert.ok(deploy.includes('--tag=studio-verify'));
+ assert.ok(deploy.includes('--no-traffic'));assert.match(deploy.find(a=>a.startsWith('--tag=')),/^--tag=sc-[a-f0-9]{8}-[a-f0-9]{8}$/);
  const activation=f.events.findIndex(e=>e.command?.includes('--to-revisions=browser-candidate=100'));
  assert.ok(activation>0);
  const before=f.events.slice(0,activation).filter(e=>e.request).map(e=>e.request);
@@ -127,7 +152,9 @@ test('candidate acceptance leaves serving traffic and Admin untouched',async()=>
  const f=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
  assert.equal(f.error,undefined);assert.equal(switched(f),false);
  assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);
- assert.ok(f.commands.some(a=>a.includes('--remove-tags=studio-verify')));
+ const tag=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag=')).slice(6);
+ assert.ok(f.commands.some(a=>a.includes('--remove-tags='+tag)));
+ assert.ok(!f.commands.some(a=>a.includes('--remove-tags=studio-verify')));
  assert.equal(f.commands.some(a=>a.includes('delete')),false);
  assert.ok(f.requests.includes('https://candidate.example.test/health'));
  assert.equal(f.requests.filter(u=>u==='https://candidate.example.test/workspace/files').length,2);
@@ -152,4 +179,13 @@ test('HTTP health and browser foundation cannot replace full runtime recovery ac
 });
 test('a passing replacement proof never discards existing serving workspace files',async()=>{
  const f=await execute({live:{activeBrowserSessions:0,workspace:{files:1,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true}});assert.match(f.error.message,/STUDIO_LIVE_STATE_REQUIRES_PRESERVATION/);assert.equal(switched(f),false);assert.ok(!f.commands.some(a=>a.includes('--to-revisions=browser-candidate=100')));
+});
+
+test('repeated verification of the same image uses a fresh tag and never reuses the active browser alias',async()=>{
+ const first=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}}),second=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
+ for(const f of [first,second])assert.equal(f.error,undefined);
+ const tag=f=>f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag='));
+ assert.notEqual(tag(first),tag(second));
+ assert.notEqual(tag(first),'--tag=studio-verify');
+ assert.notEqual(tag(second),'--tag=studio-verify');
 });

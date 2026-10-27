@@ -21,6 +21,10 @@ export class WorkspaceCheckpoint {
   const walk=async directory=>{
    for(const item of (await fsp.readdir(path.join(this.root,directory),{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){
     if(excluded.has(item.name))continue;
+    // Git transfer temporaries are not accepted objects or recoverable work.
+    // A timed-out fetch can leave gigabytes here; preserve them locally without
+    // letting an incomplete transfer invalidate every durable checkpoint.
+    if(directory==='.git/objects/pack' && /^tmp_(?:pack|idx)_/.test(item.name))continue;
     const name=safeRelative(directory?directory+'/'+item.name:item.name),full=path.join(this.root,name),stat=await fsp.lstat(full);
     const entry={name,mode:stat.mode&0o777,mtimeMs:stat.mtimeMs,ctimeMs:stat.ctimeMs,size:stat.size};
     if(stat.isSymbolicLink()){
@@ -57,7 +61,13 @@ export class WorkspaceCheckpoint {
  }
  async checkpoint(){
   if(this.pending)return this.pending;
-  this.pending=this.save().finally(()=>{this.pending=null;});return this.pending;
+  // Retry only a changing snapshot; never repeat the command that produced it.
+  this.pending=(async()=>{
+   for(let attempt=1;attempt<=3;attempt++){
+    try{return await this.save();}
+    catch(error){if(error?.message!=='WORKSPACE_CHANGED_DURING_CHECKPOINT'||attempt===3)throw error;}
+   }
+  })().finally(()=>{this.pending=null;});return this.pending;
  }
  async save(){
   if(!this.initialized||this.blocked)fail();
@@ -72,10 +82,10 @@ export class WorkspaceCheckpoint {
     if(entry.type==='file'){
      const full=path.join(root,entry.name),handle=await fsp.open(full,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW);
      try{
-      const before=await handle.stat();if(!before.isFile()||before.size!==entry.size||before.mtimeMs!==entry.mtimeMs||before.ctimeMs!==entry.ctimeMs)fail();
+      const before=await handle.stat();if(!before.isFile())fail();if(before.size!==entry.size||before.mtimeMs!==entry.mtimeMs||before.ctimeMs!==entry.ctimeMs)throw Error('WORKSPACE_CHANGED_DURING_CHECKPOINT');
       const fileHash=crypto.createHash('sha256');let total=0;
       for await(const chunk of handle.createReadStream({autoClose:false,highWaterMark:65536})){total+=chunk.length;fileHash.update(chunk);yield emit({type:'chunk',data:chunk.toString('base64')});}
-      const after=await handle.stat();if(total!==entry.size||after.size!==before.size||after.mtimeMs!==before.mtimeMs||after.ctimeMs!==before.ctimeMs)fail();
+      const after=await handle.stat();if(total!==entry.size||after.size!==before.size||after.mtimeMs!==before.mtimeMs||after.ctimeMs!==before.ctimeMs)throw Error('WORKSPACE_CHANGED_DURING_CHECKPOINT');
       yield emit({type:'endfile',digest:fileHash.digest('hex')});
      }finally{await handle.close();}
     }

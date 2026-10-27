@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
+import { isExternalCourseVideoReference } from '../../storage/course-video-policy.mjs';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
 export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
@@ -41,8 +42,9 @@ export function stepInputHash(
   profile: unknown,
   prior: Partial<Record<UltimateBuildStep, Artifact>>,
 ): string {
-  // Resume audit metadata is operational history, not instructional content.
-  const { pauseResumeAudit: _resumeAudit, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
+  // Publication settings and resume history do not change instructional inputs.
+  const { pauseResumeAudit: _resumeAudit, publishCompletedLessons: _publishAsYouGo,
+    preservedPublishedLessonIds: _preservedPublications, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,
@@ -212,6 +214,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
       break;
     case 'lesson_film_render':
+      require(isExternalCourseVideoReference(renderMediaUrl(a.render)), 'VIDEO_EXTERNAL_STORAGE_REQUIRED');
       require(renderPlaybackUrl(a.render) && renderMediaUrl(a.render) &&
         a.render.duration > 0 &&
         nonempty(a.render.captionsUrl) &&

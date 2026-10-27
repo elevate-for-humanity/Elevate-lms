@@ -92,7 +92,10 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
 
         if (cancelled) return;
         const announceUpdate = () => {
-          if (!cancelled && navigator.serviceWorker.controller) {
+          // An installing worker reaching "installed" is not sufficient evidence
+          // that an actionable update is waiting. Otherwise an unchanged PWA
+          // can repeatedly display an update button that only reloads the page.
+          if (!cancelled && registration.waiting && navigator.serviceWorker.controller) {
             window.dispatchEvent(new CustomEvent('elevate-pwa-update-ready', { detail: registration }));
           }
         };

@@ -11,8 +11,15 @@ export async function GET(request: Request) {
   )
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const followups = await queueInterviewFollowups();
-    return NextResponse.json({ ...(await processInterofficeOutbox()), followups });
+    // Existing approved messages must not be blocked by a failure in follow-up discovery.
+    const delivery = await processInterofficeOutbox();
+    let followups: { queued: number } | { error: string };
+    try {
+      followups = await queueInterviewFollowups();
+    } catch {
+      followups = { error: 'Follow-up discovery failed; existing outbox was still processed' };
+    }
+    return NextResponse.json({ ...delivery, followups });
   } catch {
     return NextResponse.json({ error: 'Interoffice queue failed' }, { status: 503 });
   }

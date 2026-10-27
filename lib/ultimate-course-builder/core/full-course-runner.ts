@@ -71,6 +71,12 @@ export async function runUltimateCourse(
         plan.profile,
         competency.id,
       );
+      // createLesson reopens the saved row as running. Restore acceptance before
+      // the attachment transaction checks built status; never rerun producers.
+      await persistence.finishLesson({
+        lessonBuildId: lesson.id, status: 'built', artifacts: checkpoint.artifacts,
+        findings: checkpoint.findings.filter((f) => f.severity !== 'error'),
+      });
       lessons.push({
         competencyId: competency.id,
         lessonBuildId: lesson.id,

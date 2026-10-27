@@ -17,6 +17,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import ApplicationDocumentsPanel from './ApplicationDocumentsPanel';
 import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
   uploadTransferHoursEvidence,
@@ -95,6 +96,7 @@ const LABELS: Record<string, { en: string; es: string }> = {
   transportationNeeds: { en: 'Transportation support', es: 'Apoyo de transporte' },
   childcareNeeds: { en: 'Childcare support', es: 'Apoyo de cuidado infantil' },
   supportNeeds: { en: 'Other support', es: 'Otro apoyo' },
+  applicationCertification: { en: 'Application certification', es: 'Certificación de la solicitud' },
 };
 
 function makeIdempotencyKey(projectId: string) {
@@ -444,6 +446,7 @@ export default function ParisApplicationWorkspace({
     : programOptions ?? question?.options ?? [];
 
   return (
+    <>
     <div className="max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="flex min-w-0 flex-col items-stretch gap-3 border-b border-slate-200 bg-slate-950 px-4 py-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="min-w-0">
@@ -650,5 +653,7 @@ export default function ParisApplicationWorkspace({
         </aside>
       </div>
     </div>
+    <ApplicationDocumentsPanel key={session.projectId} locale={locale} />
+    </>
   );
 }

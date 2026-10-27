@@ -642,6 +642,42 @@
       ]
     },
     {
+      "id": "independent-response",
+      "type": "independent_practice",
+      "prompt": "A client asks you to perform a service you have practiced once with supervision. Independently write what you would verify before accepting the assignment, who you would contact if authorization is unclear, and what you would tell the client.",
+      "feedback": "Practice once does not establish independent authorization. Verify your assignment and authorized scope with the designated supervisor, explain any uncertainty, and give the client the verified next step without promising an unauthorized service.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "id": "guided-training-map",
+      "type": "guided_practice",
+      "prompt": "With the instructor, draw four labeled boxes: mentored workplace learning, related instruction, apprenticeship completion, and state licensing. Place one completed LMS lesson under related instruction, explain why it does not establish completion of the other three boxes, and identify the supervisor or official source needed to verify each remaining requirement.",
+      "feedback": "The completed lesson documents that lesson's related instruction. Workplace learning needs its own evidence; apprenticeship completion and state licensing each require separate verification. Do not infer completion or eligibility from the lesson alone.",
+      "objectiveIds": [
+        "training-path"
+      ]
+    },
+    {
+      "id": "independent-training-map",
+      "type": "independent_practice",
+      "prompt": "Independently evaluate this fictional statement: 'I finished an online lesson, so my apprenticeship is complete and I may accept any cosmetology service.' Rewrite it accurately, distinguish all four training and licensing categories, and list the records or official confirmations you would seek.",
+      "feedback": "Reject both unsupported conclusions. State only that the online lesson is complete, distinguish mentored workplace learning from related instruction, and verify apprenticeship completion and state licensing separately using the designated supervisor and official sources.",
+      "objectiveIds": [
+        "training-path"
+      ]
+    },
+    {
+      "id": "guided-record-review",
+      "type": "guided_practice",
+      "prompt": "With the instructor, review this fictional draft: 'Monday: performed consultation, 60 minutes.' The supplied facts say you observed a consultation for 30 minutes. Correct the activity and duration, identify the designated reviewer, and write a question about the appropriate record category. Keep the fictional entry out of actual hours logs.",
+      "feedback": "Record observation rather than performance and 30 minutes rather than 60. Include the date and designated reviewer, ask that reviewer to verify the category and correction process, and never claim fictional practice as completed training hours.",
+      "objectiveIds": [
+        "verify-record"
+      ]
+    },
+    {
       "id": "check-pathways",
       "type": "knowledge_check",
       "prompt": "Does one completed LMS lesson alone establish completion of apprenticeship and state licensing requirements? Explain.",

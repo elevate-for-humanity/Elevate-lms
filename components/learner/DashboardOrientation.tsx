@@ -1,5 +1,8 @@
 'use client';
 
+import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
+
+
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -65,9 +68,11 @@ const slides = [
 
 export default function DashboardOrientation({
   bookkeeping = false,
+  hvac = false,
   instructorEmail,
 }: {
   bookkeeping?: boolean;
+  hvac?: boolean;
   instructorEmail?: string;
 }) {
   const emailHref = instructorEmail
@@ -153,6 +158,9 @@ export default function DashboardOrientation({
   const [index, setIndex] = useState(0);
   const slide = allSlides[index];
   return (
+    <div className="space-y-5">
+    <VisualDashboardOrientation audience={hvac ? 'hvac' : 'learner'} compact />
+    <details className="rounded-2xl border border-slate-200 bg-white p-4"><summary className="min-h-11 cursor-pointer font-bold">More program-specific instructions and instructor contact</summary>
     <section
       aria-label="Student orientation slideshow"
       aria-roledescription="carousel"
@@ -232,11 +240,14 @@ export default function DashboardOrientation({
         </div>
       ) : null}
     </section>
+    </details>
+    </div>
   );
 }
 
 export function DashboardOrientationPanel(props: {
   bookkeeping?: boolean;
+  hvac?: boolean;
   instructorEmail?: string;
 }) {
   const panel = useRef<HTMLDetailsElement>(null);

@@ -1,6 +1,8 @@
+import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
+import { isLearnerRosterProfile } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -162,7 +164,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     documentsRes,
     reportsRes,
     coursesRes,
-    progressEntriesRes,
+    canonicalCourseLinksRes,
     payoutRes,
     schedulesRes,
     notificationRes,
@@ -184,6 +186,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .select(
             'id,user_id,full_name,first_name,last_name,email,phone,address,city,state,zip,zip_code,program_id,program_slug,program_interest,status,created_at',
           )
+          .is('revoked_at', null)
           .in('status', ['submitted', 'under_review', 'pending', 'applied'])
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),
@@ -215,7 +218,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ? db
           .from('program_holder_students')
           .select(
-            `id,user_id,student_id,program_holder_id,applicant_name,status,application_status,program_id,created_at,label${applicantNotesColumns},call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
+            `id,application_id,user_id,student_id,program_holder_id,applicant_name,status,application_status,program_id,created_at,label${applicantNotesColumns},call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
@@ -236,7 +239,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('hour_entries')
       .select(
-        'id,user_id,status,approval_status,hours,hours_claimed,work_date,program_slug,category,notes,created_at',
+        'id,user_id,status,approval_status,hours,hours_claimed,accepted_hours,progress_entry_id,work_date,program_slug,category,notes,created_at',
       )
       .eq('program_holder_id', holderId)
       .order('work_date', { ascending: false })
@@ -258,13 +261,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         'id,program_id,course_id,status,term_name,start_date,end_date,credential_alignment_status',
       )
       .eq('program_holder_id', holderId),
-    db
-      .from('progress_entries')
-      .select('apprentice_id,hours_worked,work_date,clock_in_at,clock_out_at,status')
-      .not('apprentice_id', 'is', null)
-      .eq('status', 'verified')
-      .order('work_date', { ascending: false })
-      .limit(5000),
+    programIds.length ? db.from('program_courses').select('id,program_id,course_id').in('program_id', programIds) : Promise.resolve({ data: [] }),
     db
       .from('program_holder_payouts')
       .select(
@@ -313,7 +310,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     documents: documentsRes,
     reports: reportsRes,
     courses: coursesRes,
-    progressEntries: progressEntriesRes,
+    canonicalCourseLinks: canonicalCourseLinksRes,
     payout: payoutRes,
     schedules: schedulesRes,
     notifications: notificationRes,
@@ -324,6 +321,19 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
   }
 
+  // Holder-specific course rows override the canonical program/course catalog.
+  const canonicalCourseIds = [...new Set((canonicalCourseLinksRes.data ?? []).map((row: any) => row.course_id))];
+  const [trainingCoursesRes, authoredCoursesRes] = canonicalCourseIds.length
+    ? await Promise.all([db.from('training_courses').select('id,title,status,is_published').in('id', canonicalCourseIds), db.from('courses').select('id,title,status,is_active').in('id', canonicalCourseIds)])
+    : [{ data: [], error: null }, { data: [], error: null }];
+  if (trainingCoursesRes.error || authoredCoursesRes.error) throw new Error('Program Holder course catalog could not load.');
+  const courseMetadata = new Map([...(trainingCoursesRes.data ?? []), ...(authoredCoursesRes.data ?? [])].map((row: any) => [row.id, row]));
+  const deliveryAssignments = [...(coursesRes.data ?? [])];
+  for (const link of canonicalCourseLinksRes.data ?? []) {
+    const course: any = courseMetadata.get(link.course_id);
+    if (!course || deliveryAssignments.some(row => row.program_id === link.program_id && row.course_id === link.course_id)) continue;
+    deliveryAssignments.push({ ...link, title: course.title, status: course.status, source: 'canonical_program', published: course.is_published === true || course.status === 'published' });
+  }
   const rosterUserIds: string[] = Array.from(
     new Set(
       [
@@ -335,6 +345,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
     ),
   );
+  const progressEntriesRes = rosterUserIds.length && programIds.length
+    ? await db.from('progress_entries').select('id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status')
+        .in('apprentice_id', rosterUserIds).in('program_id', programIds).eq('status', 'verified').order('work_date', { ascending: false }).limit(5000)
+    : { data: [], error: null };
+  if (progressEntriesRes.error) throw new Error('Program Holder verified training hours could not load.');
   const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
     ? await db.from('profiles').select('id,role,email,full_name').in('id', rosterUserIds)
     : { data: [], error: null };
@@ -353,44 +368,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   });
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])
-      .filter(
-        (row: any) =>
-          !String(row.email || '')
-            .toLowerCase()
-            .endsWith('@qa.invalid'),
-      )
+      .filter(isLearnerRosterProfile)
       .map((row: any) => row.id),
   );
-  const verifiedHoursByUser = new Map<string, number>();
-  const firstClockDateByUser = new Map<string, string>();
-  for (const entry of hoursRes.data ?? []) {
-    if (
-      !entry.user_id ||
-      !['approved', 'verified', 'complete', 'completed'].includes(
-        String(entry.approval_status || entry.status || '').toLowerCase(),
-      )
-    )
-      continue;
-    verifiedHoursByUser.set(
-      entry.user_id,
-      (verifiedHoursByUser.get(entry.user_id) ?? 0) +
-        Number(entry.hours_claimed ?? entry.hours ?? 0),
-    );
-  }
-  for (const entry of progressEntriesRes.data ?? []) {
-    if (!entry.apprentice_id) continue;
-    const hours = Number(entry.hours_worked || 0);
-    if (hours > 0)
-      verifiedHoursByUser.set(
-        entry.apprentice_id,
-        (verifiedHoursByUser.get(entry.apprentice_id) ?? 0) + hours,
-      );
-    if (entry.work_date) {
-      const existing = firstClockDateByUser.get(entry.apprentice_id);
-      if (!existing || entry.work_date < existing)
-        firstClockDateByUser.set(entry.apprentice_id, entry.work_date);
-    }
-  }
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])
       .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
@@ -398,15 +378,18 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   );
   const enrolledRoster = (enrollmentsRes.data ?? [])
     .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
-    .map((row: any) => ({
+    .map((row: any) => {
+      const verified = verifiedTrainingForEnrollment(row, hoursRes.data ?? [], progressEntriesRes.data ?? []);
+      return {
       ...row,
       full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
       total_hours_completed: Math.max(
         Number(row.total_hours_completed || 0),
-        verifiedHoursByUser.get(row.user_id) ?? 0,
+        verified.total,
       ),
-      training_start_date: row.training_start_date || firstClockDateByUser.get(row.user_id) || null,
-    }));
+      training_start_date: row.training_start_date || verified.firstDate || null,
+    };
+    });
   const upcomingRoster = (upcomingRes.data ?? []).filter((row: any) =>
     !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );
@@ -462,9 +445,19 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         )
       ).filter(Boolean)
     : [];
+  const regionalOwnership = distanceCheckedRegionalApplicants.length
+    ? await db.from('program_holder_students').select('application_id,program_holder_id,program_holders(status,features)').in('application_id', distanceCheckedRegionalApplicants.map((row: any) => row.id))
+    : { data: [], error: null };
+  if (regionalOwnership.error) throw new Error('Regional applicant ownership could not be verified.');
+  const locallyControlledApplicationIds = new Set((regionalOwnership.data ?? []).filter((row: any) => {
+    const holder = Array.isArray(row.program_holders) ? row.program_holders[0] : row.program_holders;
+    return row.program_holder_id !== holderId && ['active','approved','approved_pending_mou'].includes(holder?.status) && holder?.features?.regional_assignment?.shared_team_key !== regionalAssignment?.shared_team_key;
+  }).map((row: any) => row.application_id));
   const regionalApplicantRows = isGaryRegionalCoordinator
-    ? distanceCheckedRegionalApplicants.map((row: any) => ({
-        id: row.id,
+    ? distanceCheckedRegionalApplicants.filter((row: any) => !locallyControlledApplicationIds.has(row.id)).map((row: any) => ({
+        ...holderApplicantRows.find((assigned: any) => assigned.application_id === row.id),
+        id: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.id || row.id,
+        regional_application_id: row.id,
         application_id: row.id,
         user_id: row.user_id,
         enrollment_id: null,
@@ -478,15 +471,17 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         program_slug: row.program_slug || row.program_interest,
         created_at: row.created_at,
         label: `Gary regional applicant · ${row.distanceMiles.toFixed(1)} mi`,
-        call_notes: null,
-        call_date: null,
-        call_outcome: null,
-        next_follow_up: null,
+        call_notes: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.call_notes || null,
+        call_date: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.call_date || null,
+        call_outcome: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.call_outcome || null,
+        next_follow_up: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.next_follow_up || null,
         work_start_date: null,
         work_site: row.city,
       }))
     : [];
-  const applicantRows = isGaryRegionalCoordinator ? regionalApplicantRows : holderApplicantRows;
+  const applicantRows = isGaryRegionalCoordinator
+    ? [...regionalApplicantRows, ...holderApplicantRows.filter((assigned: any) => !regionalApplicantRows.some((row: any) => row.id === assigned.id || row.application_id === assigned.application_id))]
+    : holderApplicantRows;
   const deduplicatedApplicants =
     allApplicantAccess || isGaryRegionalCoordinator
       ? applicantRows.filter((row: any, index: number, rows: any[]) => {
@@ -552,7 +547,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
-    courseAssignments: coursesRes.data ?? [],
+    courseAssignments: deliveryAssignments,
     payoutProfile: payoutRes.data ?? null,
     payoutSchedules: schedulesRes.data ?? [],
     notificationPreferences: notificationRes.data ?? null,

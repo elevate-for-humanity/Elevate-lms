@@ -1,20 +1,22 @@
 import {inspectCourseAutopilot,COURSE_AI_ROLES} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
 
 /** Runs outside Admin so a 503 in the dashboard cannot stop queue supervision. */
-export async function monitorCourseQueue({request=fetch,env=process.env,now=new Date(),dispatchState}={}) {
+export async function monitorCourseQueue({request=fetch,env=process.env,now=new Date(),dispatchState,jobIds,conflictRetries=2}={}) {
   if(env.GITHUB_REPOSITORY!=='elevate-for-humanity/Elevate-lms'||!env.SUPABASE_SERVICE_ROLE_KEY)
     throw Error('PARIS_MONITOR_AUTHORITY_REQUIRED');
   const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
   const headers={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY};
   const url=new URL(root);
-  url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,ownerPaused:profile->ownerPaused)');
+  url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,findings,ownerPaused:profile->ownerPaused)');
   url.searchParams.set('monitor->>enabled','eq.true');
-  url.searchParams.set('order','updated_at.desc,id.desc');
+  url.searchParams.set('order','id.asc');
+  if(jobIds)url.searchParams.set('id','in.('+jobIds.join(',')+')');
   const rows=[];
   const pageSize=100;
-  for(let offset=0;;offset+=pageSize){
+  let cursor;
+  for(;;){
     const pageUrl=new URL(url);
-    pageUrl.searchParams.set('offset',String(offset));
+    if(cursor)pageUrl.searchParams.set('id','gt.'+cursor);
     pageUrl.searchParams.set('limit',String(pageSize));
     const response=await request(pageUrl,{headers,signal:AbortSignal.timeout(15000)});
     if(!response.ok)throw Error('PARIS_MONITOR_READ_HTTP_'+response.status);
@@ -22,6 +24,9 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(!Array.isArray(page))throw Error('PARIS_MONITOR_RESPONSE_INVALID');
     rows.push(...page);
     if(page.length<pageSize)break;
+    const nextCursor=page.at(-1)?.id;
+    if(!nextCursor || (cursor && nextCursor<=cursor))throw Error('PARIS_MONITOR_CURSOR_NOT_ADVANCING');
+    cursor=nextCursor;
   }
   const observations=[];
   for(const job of rows){
@@ -39,7 +44,8 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     const confirmedAssignment=observation.state==='running' && Boolean(job.lease_owner) &&
       Number.isFinite(heartbeatMs) && now.getTime()-heartbeatMs>=0 && now.getTime()-heartbeatMs<90000 &&
       leaseMs>now.getTime() && job.heartbeat_at!==previousHeartbeat &&
-      job.lease_owner!==job.monitor?.lastConfirmedLeaseOwner;
+      (job.lease_owner!==job.monitor?.lastConfirmedLeaseOwner ||
+       Number(job.execution_generation)!==Number(job.monitor?.lastConfirmedExecutionGeneration));
     // A PARIS recovery request is an intent, not a verified recovery.
     // Persist the observed execution generation so an eventual new worker
     // can be correlated with the request without crediting ordinary leases.
@@ -49,17 +55,19 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
       priorRequest?.executionGeneration != null &&
       Number(job.execution_generation) >= Number(priorRequest.executionGeneration) &&
       Date.parse(job.heartbeat_at) > Date.parse(priorRequest.requestedAt) &&
-      job.lease_owner !== priorRequest.previousLeaseOwner;
+      (job.lease_owner !== priorRequest.previousLeaseOwner ||
+       Number(job.execution_generation) > Number(priorRequest.previousExecutionGeneration ?? priorRequest.executionGeneration));
     const recoveryRequest = confirmedRecovery ? null : priorRequest ?? (recoveryRequested
       ? {requestedAt:now.toISOString(),executionGeneration:Number(job.execution_generation) +
-          (observation.action==='requeue'?1:0),previousLeaseOwner:job.lease_owner ?? job.monitor?.lastConfirmedLeaseOwner ?? null}
+          (observation.action==='requeue'?1:0),previousExecutionGeneration:Number(job.execution_generation),previousLeaseOwner:job.lease_owner ?? job.monitor?.lastConfirmedLeaseOwner ?? null}
       : null);
     const monitor={...job.monitor,...observation,
       recoveryRequest,
       ...(confirmedRecovery ? {lastConfirmedRecoveryAt:now.toISOString(),
         lastConfirmedRecoveryOwner:job.lease_owner} : {}),
       ...(confirmedAssignment?{confirmedAssignments:(job.monitor.confirmedAssignments??0)+1,
-        lastConfirmedWorkerHeartbeat:job.heartbeat_at,lastConfirmedLeaseOwner:job.lease_owner}:{}),
+        lastConfirmedWorkerHeartbeat:job.heartbeat_at,lastConfirmedLeaseOwner:job.lease_owner,
+        lastConfirmedExecutionGeneration:job.execution_generation}:{}),
       reason:observation.reason ?? null,coordinator:'PARIS',agents:COURSE_AI_ROLES,checkedAt:now.toISOString(),
       recoveries:(job.monitor.recoveries??0)+(confirmedRecovery?1:0)};
     const target=new URL(root);target.searchParams.set('id','eq.'+job.id);
@@ -88,7 +96,12 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     const changed=await request(target,{method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
     if(!changed.ok)throw Error('PARIS_MONITOR_WRITE_HTTP_'+changed.status);
     const saved=await changed.json();
-    observations.push({jobId:job.id,...observation,saved:Array.isArray(saved)&&saved.length===1});
+    if(Array.isArray(saved)&&saved.length===0 && conflictRetries>0){
+      const reconciled=await monitorCourseQueue({request,env,now,dispatchState,jobIds:[job.id],conflictRetries:conflictRetries-1});
+      observations.push(...(reconciled.length?reconciled:[{jobId:job.id,state:'changed',action:'none',saved:false}]));
+    }else{
+      observations.push({jobId:job.id,...observation,saved:Array.isArray(saved)&&saved.length===1});
+    }
   }
   return observations;
 }

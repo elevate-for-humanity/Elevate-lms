@@ -53,7 +53,11 @@ function useCountUp(target: number) {
 function KpiCard({ card }: { card: KPICard }) {
   const pos = card.delta >= 0;
   const label = typeof card.label === 'string' ? card.label : 'Metric';
-  const deltaLabel = typeof card.deltaLabel === 'string' ? card.deltaLabel : '';
+  const deltaLabel = card.unavailable
+    ? 'Source query failed; retry to refresh'
+    : typeof card.deltaLabel === 'string'
+      ? card.deltaLabel
+      : '';
   const IconComponent = ICON_MAP[iconKeyFor(label)] ?? Award;
   const isRevenue = label.toLowerCase().includes('revenue');
   const animated = useCountUp(typeof card.value === 'number' ? card.value : 0);
@@ -65,9 +69,7 @@ function KpiCard({ card }: { card: KPICard }) {
         'group relative overflow-hidden rounded-2xl border bg-white',
         'shadow-sm hover:shadow-lg hover:-translate-y-0.5',
         'transition-all duration-200 ease-out',
-        card.urgent
-          ? 'border-rose-300'
-          : 'border-slate-200',
+        card.urgent ? 'border-rose-300' : 'border-slate-200',
       ].join(' ')}
     >
       {/* Top accent bar */}
@@ -85,15 +87,13 @@ function KpiCard({ card }: { card: KPICard }) {
               {label}
             </p>
             <p className="text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
-              {isRevenue ? fmtCents(animated) : fmt(animated)}
+              {card.unavailable ? 'Unavailable' : isRevenue ? fmtCents(animated) : fmt(animated)}
             </p>
           </div>
           <div
             className={[
               'rounded-xl p-2.5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
-              card.urgent
-                ? 'bg-rose-50 text-rose-600'
-                : 'bg-slate-100 text-slate-600',
+              card.urgent ? 'bg-rose-50 text-rose-600' : 'bg-slate-100 text-slate-600',
             ].join(' ')}
           >
             <IconComponent className="h-5 w-5" />
@@ -101,13 +101,11 @@ function KpiCard({ card }: { card: KPICard }) {
         </div>
 
         <div className="mt-4 flex items-center gap-2 flex-wrap">
-          {card.delta !== 0 && deltaLabel.includes('%') && (
+          {!card.unavailable && card.delta !== 0 && deltaLabel.includes('%') && (
             <span
               className={[
                 'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold',
-                pos
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'bg-rose-50 text-rose-700',
+                pos ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700',
               ].join(' ')}
             >
               {pos ? (

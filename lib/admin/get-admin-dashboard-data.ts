@@ -183,6 +183,23 @@ async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof require
   }
 }
 
+async function loadDashboardVouchers(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('ita_vouchers')
+      .select('id,payments_to_date')
+      .gt('payments_to_date', 0)
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -368,10 +385,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     timeboxDashboardQuery(loadDashboardBarberSubscriptions(db), 'barber subscriptions'),
     timeboxDashboardQuery(loadDashboardCosmetologySubscriptions(db), 'cosmetology subscriptions'),
     timeboxDashboardQuery(loadDashboardBarberPayments(db), 'barber payments'),
-    timeboxDashboardQuery(
-      db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
-      'ITA vouchers',
-    ),
+    timeboxDashboardQuery(loadDashboardVouchers(db), 'ITA vouchers'),
     timeboxDashboardQuery(db.rpc('get_revenue_all_time'), 'all-time revenue'),
     timeboxDashboardQuery(db.rpc('get_revenue_this_month'), 'monthly revenue'),
     timeboxDashboardHealth(getSystemHealth(db)),
@@ -543,7 +557,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     (payment) => !isTestOrSuspiciousPayment(payment),
   );
 
-  if (revenueAllTimeRes.error || revenueThisMonthRes.error) {
+  if ([revenueAllTimeRes, revenueThisMonthRes, stripeSessionsRes, barberSubsRes, cosmetologySubsRes, barberPaymentsRes, voucherPaymentsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
   // Use the same payment authorities shown on Funding and Recent Payments.
@@ -710,6 +724,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     (row: any) => (row.created_at ?? '') >= todayIso,
   ).length;
   const newLeadsToday = leadRows.filter((row: any) => (row.updated_at ?? '') >= todayIso).length;
+  if ([studentsRes, certificatesRes, holdersRes, holderDocsRes, wioaDocsRes].some(result => result.error)) {
+    if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
+  }
   const counts = {
     pendingApplications: pendingApplications.length,
     activeEnrollments: activeEnrollments.length,
@@ -722,6 +739,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const kpis = [
     {
       label: 'Pending Applications',
+      unavailable: Boolean(applicationsRes.error),
       value: counts.pendingApplications,
       delta: 0,
       deltaLabel: 'Live pending count',
@@ -731,6 +749,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Active Enrollments',
+      unavailable: Boolean(enrollmentsRes.error),
       value: counts.activeEnrollments,
       delta: 0,
       deltaLabel: 'Live active count',
@@ -740,6 +759,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Revenue This Month',
+      unavailable: Boolean(revenueThisMonthRes.error),
       value: revenueThisMonthCents,
       delta: 0,
       deltaLabel: 'Database aggregate',
@@ -749,6 +769,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Certificates Issued',
+      unavailable: Boolean(certificatesRes.error),
       value: counts.certificatesIssued,
       delta: 0,
       deltaLabel: 'Live certificate count',
@@ -757,6 +778,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Program Holders',
+      unavailable: Boolean(holdersRes.error),
       value: counts.pendingProgramHolders,
       delta: 0,
       deltaLabel: 'Awaiting approval',
@@ -765,6 +787,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Pending Documents',
+      unavailable: Boolean(holderDocsRes.error),
       value: counts.pendingDocuments,
       delta: 0,
       deltaLabel: 'Awaiting review',

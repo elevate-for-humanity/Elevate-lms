@@ -77,6 +77,7 @@ const FALLBACK_SITE_PREVIEW: SitePreviewTarget[] = [];
 
 function normalizeKpis(kpis: KPICard[] | null | undefined): KPICard[] {
   return asObjectArray(kpis).map((kpi) => ({
+    unavailable: kpi.unavailable === true,
     label: typeof kpi.label === 'string' ? kpi.label : 'Metric',
     value: asCount(kpi.value),
     delta: asCount(kpi.delta),

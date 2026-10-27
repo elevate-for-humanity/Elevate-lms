@@ -2,6 +2,7 @@
 // All route strings are resolved before reaching JSX (never built inline in render).
 
 export interface KPICard {
+  unavailable?: boolean;
   label: string;
   value: number;
   delta: number;

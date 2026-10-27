@@ -142,7 +142,10 @@ export async function middleware(req: NextRequest) {
   // Infrastructure probes use internal hosts as well as public domains. These
   // exact service endpoints must never enter tenant, auth or canonical routing.
   if (['/api/ping', '/api/ready', '/api/health'].includes(pathname)) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
   }
   if (isStaticRequest(pathname) && !isProtectedPortal(pathname) && !getPortalKeyFromPath(pathname) && !pathname.startsWith('/admin/') && !pathname.startsWith('/cosmetology-host-shop/')) return NextResponse.next();
 

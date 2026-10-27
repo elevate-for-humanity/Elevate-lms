@@ -24,10 +24,19 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // hide eligible work. Missing pause flags retain their existing eligibility.
   url.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
   url.searchParams.set('limit','50');
-  const response = await request(url, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
-  if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);
-  const candidates = await response.json();
-  if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
+  const candidates = [];
+  // Exhausted and storage-blocked rows may fill an entire page. Continue the
+  // scan so those rows cannot starve runnable work later in queue order.
+  for(let offset=0;;offset+=50){
+    const pageUrl=new URL(url);
+    pageUrl.searchParams.set('offset',String(offset));
+    const response = await request(pageUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
+    if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);
+    const page = await response.json();
+    if (!Array.isArray(page)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
+    candidates.push(...page);
+    if(page.length<50)break;
+  }
   // Storage capacity failures require a successful capacity/upload preflight.
   // Never dispatch another expensive render merely because its lease expired.
   const blockedByStorage = job => /storage cap exceeded|COURSE_OBJECT_STORAGE_UPLOAD_FAILED|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED/i.test(job.last_error ?? '');

@@ -165,6 +165,7 @@ export class UltimateJobQueue {
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    await notifyCourseDispatcher({});
   }
 
   /** Yield between lessons. A successful checkpoint is progress, not a failed
@@ -224,6 +225,7 @@ export class UltimateJobQueue {
       .select('id');
     if (updateError) throw updateError;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    if (canRetry) await notifyCourseDispatcher({});
     // The database transition atomically blocks or requeues the build. A
     // separate update here could overwrite a concurrently arriving media wakeup.
   }

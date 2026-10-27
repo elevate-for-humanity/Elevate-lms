@@ -4,7 +4,7 @@
  *
  * Usage:
  *   pnpm tsx scripts/smoke-routes.ts                              # defaults to http://localhost:3000
- *   BASE_URL=https://elevateforhumanity.org pnpm tsx scripts/smoke-routes.ts
+ *   BASE_URL=https://www.elevateforhumanity.org pnpm tsx scripts/smoke-routes.ts
  */
 
 const BASE_URL = (process.env.BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');

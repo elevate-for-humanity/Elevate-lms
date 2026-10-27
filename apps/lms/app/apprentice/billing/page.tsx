@@ -82,11 +82,13 @@ function BillingFallback({
   message,
   requirement,
   readOnly,
+  invoices,
 }: {
   portalPath: string;
   message: string;
   requirement: LearnerBillingRequirement;
   readOnly: boolean;
+  invoices: ApprenticeDashboardInvoice[];
 }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
@@ -106,6 +108,7 @@ function BillingFallback({
           </div>
         </div>
       </div>
+      <InvoiceLedger invoices={invoices} readOnly={readOnly} />
       <StudentPaymentCard />
     </div>
   );
@@ -145,7 +148,7 @@ function InvoiceLedger({
                 <span className="text-lg font-black text-slate-950">
                   ${(invoice.amountCents / 100).toFixed(2)}
                 </span>
-                {invoice.paymentUrl ? (
+                {invoice.paymentUrl && !readOnly ? (
                   <a
                     href={invoice.paymentUrl}
                     target="_blank"
@@ -260,6 +263,7 @@ export default async function ApprenticeBillingPage() {
           message="No barber tuition account was found. Contact support if you recently enrolled."
           requirement={billingRequirement}
           readOnly={subject.previewing}
+          invoices={billingAccess.invoices}
         />
       );
     const billing = summary('barber', sub || {}, schedule);
@@ -308,6 +312,7 @@ export default async function ApprenticeBillingPage() {
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
       <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
+      <InvoiceLedger invoices={billingAccess.invoices} readOnly={subject.previewing} />
       <StudentPaymentCard />
     </div>
   );

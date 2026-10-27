@@ -20,7 +20,7 @@ const fs = require('fs');
 
 // Enhanced Meta Tags for All Pages
 const siteConfig = {
-  domain: 'https://elevateforhumanity.org',
+  domain: 'https://www.elevateforhumanity.org',
   siteName: 'Elevate for Humanity',
   defaultImage: '/images/Social_media_open_graph_2ded65c5.png',
   googleVerification: 'EFH-workforce-development-2025',

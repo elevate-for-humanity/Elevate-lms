@@ -1,3 +1,4 @@
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -26,19 +27,23 @@ export default async function TransferHoursPage() {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice/transfer-hours');
 
-  // Get apprentice profile
-  const { data: apprentice } = await db
-    .from('apprentices')
-    .select('*, program:program_id(name, allows_transfer)')
-    .eq('user_id', subject.userId)
-    .maybeSingle();
-
-  // Get transfer requests
-  const { data: transferRequests } = await db
-    .from('hour_transfer_requests')
-    .select('*')
-    .eq('apprentice_id', apprentice?.id)
-    .order('created_at', { ascending: false });
+  const { data: apprentice, error: apprenticeError } = await db.from('apprentices')
+    .select('id').eq('user_id', subject.userId).eq('status', 'active').maybeSingle();
+  if (apprenticeError) throw apprenticeError;
+  const [currentRequests, historicalRequests] = await Promise.all([
+    readHoursPages<any>((from, to) => db.from('transfer_hour_requests')
+      .select('id,status,hours_requested,hours_approved,previous_school_name,created_at')
+      .eq('student_id', subject.userId).order('created_at', { ascending: false }).order('id').range(from, to)),
+    apprentice ? readHoursPages<any>((from, to) => db.from('hour_transfer_requests')
+      .select('id,status,hours_requested,hours_accepted,source,created_at')
+      .eq('apprentice_id', apprentice.id).order('created_at', { ascending: false }).order('id').range(from, to)) : [],
+  ]);
+  // Preserve historical requests while showing new submissions from their actual ledger.
+  const transferRequests = [
+    ...currentRequests.map(row => ({ ...row, id: `current:${row.id}` })),
+    ...historicalRequests.map(row => ({ ...row, id: `historical:${row.id}`,
+      hours_approved: row.hours_accepted, previous_school_name: row.source })),
+  ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -64,11 +69,11 @@ export default async function TransferHoursPage() {
 
   const approvedHours = transferRequests
     ?.filter(r => r.status === 'approved')
-    .reduce((sum, r) => sum + (r.hours_approved || 0), 0) || 0;
+    .reduce((sum, r) => sum + Math.max(0, Number(r.hours_approved) || 0), 0) || 0;
 
   const pendingHours = transferRequests
     ?.filter(r => r.status === 'pending')
-    .reduce((sum, r) => sum + (r.hours_requested || 0), 0) || 0;
+    .reduce((sum, r) => sum + Math.max(0, Number(r.hours_requested) || 0), 0) || 0;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -208,7 +213,7 @@ export default async function TransferHoursPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900">
-                        {request.hours_requested} hours from {request.source || 'Previous Training'}
+                        {request.hours_requested} hours from {request.previous_school_name || 'Previous Training'}
                       </h3>
                       <p className="text-sm text-slate-500">
                         Submitted {new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

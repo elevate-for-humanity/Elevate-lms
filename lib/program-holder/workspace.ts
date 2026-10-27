@@ -1,3 +1,4 @@
+import { loadApprovedSchoolApplicants } from './school-applicants';
 import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
@@ -12,6 +13,7 @@ export type ProgramHolderWorkspace = {
   profile: any | null;
   programs: any[];
   enrollments: any[];
+  schoolApplicants: any[];
   upcomingEnrollments: any[];
   applicants: any[];
   convertedStudents: any[];
@@ -90,6 +92,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       profile: null,
       programs: [],
       enrollments: [],
+      schoolApplicants: [],
       upcomingEnrollments: [],
       applicants: [],
       convertedStudents: [],
@@ -515,8 +518,13 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       !(key && canonicalEnrollmentKeys.has(key));
   });
 
+  const schoolApplicants = await loadApprovedSchoolApplicants(
+    db, holderRes.data?.features, programsRes.data || [], contactAccessGranted,
+  );
+
   return {
     mode: 'holder',
+    schoolApplicants,
     holder: holderRes.data ?? null,
     profile,
     programs: programsRes.data ?? [],

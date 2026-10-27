@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { Clock, Plus, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { logger } from '@/lib/logger';
-import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
+import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
+import { recordedHours, isOjlEntry } from '@/lib/apprenticeship/recorded-hours';
+import { formatHoursDate } from '@/lib/apprenticeship/admin-hours-model';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
@@ -31,54 +33,38 @@ export default async function ApprenticeHoursPage() {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice/hours');
 
-  // Fetch hours from consolidated hour_entries table
-  const { data: hoursData, error } = await db
+  const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
+  if (!programSlug) redirect('/apprentice');
+  const hoursData = await readHoursPages<any>((from, to) => db
     .from('hour_entries')
-    .select(
-      `
-      id,
-      work_date,
-      hours_claimed,
-      accepted_hours,
-      notes,
-      status,
-      approval_status,
-      source_type,
-      category,
-      created_at
-    `,
-    )
+    .select('id,work_date,hours_claimed,accepted_hours,notes,status,approval_status,source_type,category,created_at')
     .eq('user_id', subject.userId)
-    .order('work_date', { ascending: false });
-
-  if (error) {
-    logger.error(
-      'Error fetching hours',
-      normalizeError(error, 'Failed to fetch hours'),
-      getErrorContext(error),
-    );
-  }
+    .eq('program_slug', programSlug)
+    .order('work_date', { ascending: false }).order('id').range(from, to));
 
   const allLogs = hoursData || [];
   // Transfer credit is displayed from the verified enrollment fields below.
   // Historical transfer rows remain auditable but are excluded from weekly OJL.
   const workLogs = allLogs.filter(
-    (log: any) => log.category !== 'transfer' && ['ojl', 'timeclock', 'manual', 'host_shop'].includes(log.source_type),
+    (log: any) => isOjlEntry(log),
   );
   const logs = workLogs.slice(0, 20);
   const totalHours = workLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
   const approvedHours = workLogs
     .filter((log: any) => ['approved', 'locked'].includes(log.status))
-    .reduce((sum, log: any) => sum + (Number(log.accepted_hours ?? log.hours_claimed) || 0), 0);
+    .reduce((sum, log: any) => sum + recordedHours(log), 0);
 
   // Resolve required hours from the learner's active enrollment
-  const { data: activeEnrollment } = await db
+  const { data: activeEnrollment, error: enrollmentError } = await db
     .from('program_enrollments')
     .select('program_slug, transfer_hours, transfer_hours_verified')
     .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
+    .eq('program_slug', programSlug)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  if (enrollmentError) throw enrollmentError;
 
   const requiredHours = getApprenticeshipRequiredHours(activeEnrollment?.program_slug ?? null);
   const transferHoursVerified = activeEnrollment?.transfer_hours_verified === true;
@@ -221,11 +207,7 @@ export default async function ApprenticeHoursPage() {
                 <div key={log.id} className="px-6 py-4 flex items-center justify-between">
                   <div>
                     <p className="font-medium text-slate-900">
-                      {new Date(log.work_date).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {formatHoursDate(log.work_date)}
                     </p>
                     <p className="text-sm text-slate-700">
                       {log.notes || log.source_type?.toUpperCase() || 'Apprenticeship work'}

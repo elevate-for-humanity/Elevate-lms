@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const DOMAIN = 'https://elevateforhumanity.org';
+const DOMAIN = 'https://www.elevateforhumanity.org';
 const GOOGLE_ANALYTICS_ID = 'G-EFHWORKFORCE01';
 const BING_TAG_ID = 'YOUR_BING_TAG_ID';
 const MAX_URLS_PER_SITEMAP = 50;

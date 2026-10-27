@@ -1,3 +1,4 @@
+import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -36,14 +37,15 @@ export default async function WorkbookPage() {
   let totalLessons = 0;
   let completedLessons = 0;
   if (enrollment?.course_id) {
-    const [{ data: course }, lessonResult, completedResult] = await Promise.all([
+    const [courseResult, lessonProgress] = await Promise.all([
       db.from('courses').select('title').eq('id', enrollment.course_id).maybeSingle(),
-      db.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', enrollment.course_id).eq('is_published', true),
-      db.from('lesson_progress').select('id', { count: 'exact', head: true }).eq('user_id', subject.userId).eq('course_id', enrollment.course_id).eq('completed', true),
+      loadPublishedLessonProgress(db, enrollment.course_id, subject.userId),
     ]);
+    if (courseResult.error) throw courseResult.error;
+    const course = courseResult.data;
     courseTitle = course?.title || 'Assigned apprenticeship course';
-    totalLessons = lessonResult.count || 0;
-    completedLessons = completedResult.count || 0;
+    totalLessons = lessonProgress.totalLessons;
+    completedLessons = lessonProgress.completedLessons;
   }
   const inProgressLessons = Math.max(0, totalLessons - completedLessons);
   const progressPercent = totalLessons ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;

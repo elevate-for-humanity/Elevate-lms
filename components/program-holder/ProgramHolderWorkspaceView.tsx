@@ -334,7 +334,7 @@ export async function ProgramHolderWorkspaceView({
   const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]);
 
   if (section === 'students')
-    return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
+    return <><Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} /><SchoolApplicantRoster rows={data.schoolApplicants || []} /></>;
   if (section === 'at-risk')
     return <Students title="At-Risk Students" rows={atRisk} programs={data.programs} />;
   if (section === 'pending')
@@ -1162,6 +1162,7 @@ export async function ProgramHolderWorkspaceView({
           </div>
         </article>
       </section>
+      <SchoolApplicantRoster rows={data.schoolApplicants || []} />
       <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         {data.requiresEnchantedHeartsTerms ? (
           <ApplicantsByProgram rows={data.applicants} programs={data.programs} />
@@ -2465,4 +2466,10 @@ function AdminBoundary() {
       </Link>
     </div>
   );
+}
+
+
+function SchoolApplicantRoster({ rows }: { rows: any[] }) {
+  if (!rows.length) return null;
+  return <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-black">Accepted school applicants</h2><p className="mt-2 text-sm text-slate-700">These school application records remain separate from canonical learner enrollments. Application acceptance does not award course access, hours, competencies or credentials.</p><ul className="mt-5 divide-y">{rows.map(row => <li key={row.id} className="flex flex-wrap items-start justify-between gap-4 py-4"><div><p className="font-bold">{row.full_name}</p><p className="text-sm text-slate-600">{String(row.program_interest).replace(/-/g, ' ')}</p>{row.email ? <p className="text-sm">{row.email}</p> : null}{row.phone ? <p className="text-sm">{row.phone}</p> : null}</div><span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold capitalize">{row.status}</span></li>)}</ul></section>;
 }

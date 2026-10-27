@@ -1,3 +1,5 @@
+import { recordedHours, isOjlEntry } from '@/lib/apprenticeship/recorded-hours';
+import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -22,20 +24,22 @@ async function _GET(request: NextRequest) {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { data: apprentice } = await db
+  const { data: apprentice, error: apprenticeError } = await db
     .from('apprentices')
     .select('id, user_id, program_id, shop_id, employer_id, created_at')
     .eq('user_id', subject.userId)
+    .eq('status', 'active')
     .maybeSingle();
+  if (apprenticeError) return NextResponse.json({ error: 'Apprentice context unavailable' }, { status: 503 });
   const apprenticeSiteScopeId = apprentice?.shop_id || apprentice?.employer_id || null;
-  const { data: identityDocuments } = apprentice
+  const { data: identityDocuments, error: identityError } = apprentice
     ? await db
         .from('documents')
         .select('document_type,status,verification_status,verified,metadata')
         .eq('user_id', subject.userId)
         .eq('document_type', 'photo_id')
-    : { data: [] };
-  const { data: providerIdentity } = apprentice
+    : { data: [], error: null };
+  const { data: providerIdentity, error: providerError } = apprentice
     ? await db
         .from('id_verifications')
         .select('id')
@@ -43,7 +47,8 @@ async function _GET(request: NextRequest) {
         .in('status', ['approved', 'verified'])
         .limit(1)
         .maybeSingle()
-    : { data: null };
+    : { data: null, error: null };
+  if (identityError || providerError) return NextResponse.json({ error: 'Identity verification unavailable' }, { status: 503 });
   const identity = evaluateIdentityClockEligibility(
     apprentice?.created_at,
     identityDocuments || [],
@@ -53,16 +58,19 @@ async function _GET(request: NextRequest) {
   // The action endpoint validates apprentice_sites.id, so the context must
   // return that same canonical site identity. Returning shops.id here makes the
   // UI look configured but every clock action fail with "Site not found".
-  const { data: sites } = apprenticeSiteScopeId
+  const { data: sites, error: sitesError } = apprenticeSiteScopeId
     ? await db
         .from('apprentice_sites')
         .select('id,name,latitude,longitude,radius_meters,shop_id,partner_id,is_active')
         .eq('shop_id', apprenticeSiteScopeId)
         .eq('is_active', true)
-    : { data: [] };
+    : { data: [], error: null };
+  if (sitesError) return NextResponse.json({ error: 'Approved sites unavailable' }, { status: 503 });
   const allowedSites = (sites || [])
     .filter(
       (site: any) =>
+        site.latitude != null && Math.abs(Number(site.latitude)) <= 90 &&
+        site.longitude != null && Math.abs(Number(site.longitude)) <= 180 &&
         Number.isFinite(Number(site.latitude)) &&
         Number.isFinite(Number(site.longitude)) &&
         Number.isFinite(Number(site.radius_meters)) &&
@@ -77,15 +85,26 @@ async function _GET(request: NextRequest) {
       shopId: site.shop_id,
     }));
 
-  const { data: enrollment } = await db.from('program_enrollments')
-    .select('program_slug,program_id').eq('user_id', subject.userId)
+  const { data: enrollment, error: enrollmentError } = await db.from('program_enrollments')
+    .select('program_slug,program_id').or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (enrollmentError) return NextResponse.json({ error: 'Enrollment unavailable' }, { status: 503 });
   const { data: program } = enrollment?.program_id
     ? await db.from('programs').select('name').eq('id', enrollment.program_id).maybeSingle()
     : { data: null };
-  const { data: approvedHours } = await db.from('hour_entries')
-    .select('accepted_hours,hours_claimed').eq('user_id', subject.userId).eq('status', 'approved');
-  const hoursCompleted = (approvedHours || []).reduce((sum: number, row: any) => sum + Number(row.accepted_hours || row.hours_claimed || 0), 0);
+  let hoursCompleted = 0;
+  if (enrollment?.program_slug) {
+    try {
+      const approvedHours = await readHoursPages<any>((from, to) => db.from('hour_entries')
+        .select('id,accepted_hours,hours_claimed,source_type,category')
+        .eq('user_id', subject.userId).eq('program_slug', enrollment.program_slug)
+        .in('status', ['approved', 'locked']).order('id').range(from, to));
+      hoursCompleted = approvedHours.filter(isOjlEntry).reduce((sum, row) => sum + recordedHours(row), 0);
+    } catch {
+      return NextResponse.json({ error: 'Recorded hours unavailable' }, { status: 503 });
+    }
+  }
 
   let activeShift = null;
   let weeklyOjlHours = 0;
@@ -97,7 +116,7 @@ async function _GET(request: NextRequest) {
     const weekStart = new Date(`${weekEnding}T12:00:00Z`);
     weekStart.setUTCDate(weekStart.getUTCDate() - 6);
     const weekStartDate = weekStart.toISOString().slice(0, 10);
-    const [{ data: weeklyEntries }, { data: weeklyTheory }, { data: weeklyTheorySessions }] = await Promise.all([
+    const weeklyResults = await Promise.all([
       db.from('progress_entries')
         .select('hours_worked')
         .eq('apprentice_id', apprentice.id)
@@ -115,6 +134,10 @@ async function _GET(request: NextRequest) {
         .eq('user_id', subject.userId)
         .eq('week_ending', weekEnding),
     ]);
+    if (weeklyResults.some(result => result.error)) {
+      return NextResponse.json({ error: 'Weekly attendance unavailable' }, { status: 503 });
+    }
+    const [{ data: weeklyEntries }, { data: weeklyTheory }, { data: weeklyTheorySessions }] = weeklyResults;
     weeklyOjlHours = (weeklyEntries || []).reduce(
       (sum: number, row: any) => sum + Number(row.hours_worked || 0),
       0,
@@ -127,7 +150,7 @@ async function _GET(request: NextRequest) {
       (sum: number, row: any) => sum + Number(row.active_seconds || 0) / 3600,
       0,
     );
-    const { data: shift } = await db
+    const { data: shift, error: shiftError } = await db
       .from('progress_entries')
       .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
       .eq('apprentice_id', apprentice.id)
@@ -137,6 +160,7 @@ async function _GET(request: NextRequest) {
       .order('clock_in_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+    if (shiftError) return NextResponse.json({ error: 'Active shift unavailable' }, { status: 503 });
     activeShift = shift ?? null;
   }
 
@@ -168,7 +192,7 @@ async function _GET(request: NextRequest) {
     weeklyTheoryMaxHours: APPRENTICE_TIME_POLICY.weeklyTheoryMaxHours,
     weeklyCombinedMaxHours: APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours,
     outsideGeofenceGraceMinutes: APPRENTICE_TIME_POLICY.outsideGeofenceGraceMinutes,
-    canClock: Boolean(apprentice && allowedSites.length && identity.eligible && !subject.previewing && weeklyOjlHours < APPRENTICE_TIME_POLICY.weeklyOjlMaxHours),
+    canClock: Boolean(enrollment && apprentice && allowedSites.length && identity.eligible && !subject.previewing && weeklyOjlHours < APPRENTICE_TIME_POLICY.weeklyOjlMaxHours),
     identityVerification: identity,
     previewing: subject.previewing,
     configurationMessage: !apprentice

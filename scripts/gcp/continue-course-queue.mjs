@@ -45,7 +45,7 @@ export async function continueCourseQueue({ dispatch = dispatchQueuedCourseJob,
     // may still be rendering before its next durable lesson checkpoint.
     const state = observed?.status === 'empty' && Number.isSafeInteger(observed.activeExecutions) && observed.activeExecutions > 0
       ? {...observed,status:'busy'} : observed;
-    if (!['empty', 'busy', 'assigned', 'capacity_wait'].includes(state?.status))
+    if (!['empty', 'busy', 'assigned', 'capacity_wait', 'retry_wait'].includes(state?.status))
       throw new Error('COURSE_CONTINUATION_STATE_INVALID');
     if (state.status !== last) onState(state);
     last = state.status;
@@ -77,3 +77,4 @@ export async function continueCourseQueue({ dispatch = dispatchQueuedCourseJob,
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
   console.log(JSON.stringify(await continueCourseQueue({releasePending: () => courseReleasePending()})));
+

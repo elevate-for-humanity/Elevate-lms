@@ -15,11 +15,15 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  url.searchParams.set('select','id,heartbeat_at,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
+  url.searchParams.set('select','id,status,available_at,heartbeat_at,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
   // A stopped execution leaves an expired running lease. Claim RPC performs
   // recovery, but it cannot run unless the dispatcher launches a worker.
-  url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + now.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
+  // Observe imminent retry backoff without launching it before available_at.
+  // Otherwise the last execution can finish seconds before a queued retry is
+  // due, and the coordinator exits until a delayed scheduled event arrives.
+  const retryHorizon = new Date(now.getTime() + 5 * 60_000);
+  url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + retryHorizon.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
   // Filter the joined build before the queue limit so paused rows cannot
   // hide eligible work. Missing pause flags retain their existing eligibility.
   url.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
@@ -43,7 +47,14 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // Respect explicit owner pauses before launching paid Cloud Run work.
   // The worker independently enforces this pause if it changes after dispatch.
   const ownerPaused = job => job.build?.owner_paused === true || job.build?.owner_paused === 'true';
-  const queued = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job) && !ownerPaused(job));
+  const eligible = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job) && !ownerPaused(job));
+  const availableTime = job => {
+    if (job.available_at == null) return 0;
+    const timestamp = Date.parse(job.available_at);
+    if (!Number.isFinite(timestamp)) throw new Error('COURSE_QUEUE_AVAILABLE_AT_INVALID');
+    return timestamp;
+  };
+  const queued = eligible.filter(job => availableTime(job) <= now.getTime());
   // Never claim an empty queue merely because an earlier failed job exists.
   // Emit durable, actionable diagnostics without exposing Supabase credentials.
   console.info(JSON.stringify({event:'course_dispatch_queue_scan',candidateCount:candidates.length,
@@ -54,7 +65,11 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // An already-running Cloud Run execution owns its task independently.
   // With no claimable queue entries there is nothing to dispatch; keeping
   // the GitHub coordinator awake wastes runtime and cannot advance a lesson.
-  if (queued.length === 0) return {status:'empty',activeExecutions:active.length};
+  if (queued.length === 0) {
+    const next = eligible.map(availableTime).filter(time => time > now.getTime()).sort((a,b) => a-b)[0];
+    if (next !== undefined) return {status:'retry_wait',availableAt:new Date(next).toISOString(),activeExecutions:active.length};
+    return {status:'empty',activeExecutions:active.length};
+  }
   const job = JSON.parse(run('gcloud', ['run','jobs','describe','elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
   const task = job.spec?.template?.spec?.template?.spec;
   if (!task?.containers?.length) throw new Error('COURSE_JOB_CONFIGURATION_UNAVAILABLE');
@@ -104,3 +119,4 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   console.log(JSON.stringify(await dispatchQueuedCourseJob()));
 }
+

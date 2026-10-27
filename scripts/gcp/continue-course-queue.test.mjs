@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { continueCourseQueue, courseReleasePending } from './continue-course-queue.mjs';
+test('imminent retry backoff is observed until due and a fresh claim is confirmed',async()=>{
+ const states=['retry_wait','retry_wait','assigned','empty'];let clock=0,calls=0;
+ const result=await continueCourseQueue({dispatch:async()=>{calls++;return {status:states.shift()};},now:()=>clock,delay:async ms=>{clock+=ms;},onState:()=>{}});
+ assert.equal(result.status,'empty');assert.equal(calls,4);assert.equal(clock,90_000);
+});
 test('observes active rendering through an empty scan until the next lesson is assigned',async()=>{
  const states=[{status:'empty',activeExecutions:1},{status:'empty',activeExecutions:1},{status:'assigned'},{status:'empty',activeExecutions:0}];
  let clock=0,calls=0;
@@ -67,3 +72,4 @@ test('release inventory uses actual main worker runs and fails closed on an unre
  assert.equal(await courseReleasePending({env,request:async()=>({ok:true,json:async()=>({workflow_runs:[{head_branch:'main',status:'queued'}]})})}),false);
  await assert.rejects(courseReleasePending({env,request:async()=>({ok:false,status:403})}),/HTTP_403/);
 });
+

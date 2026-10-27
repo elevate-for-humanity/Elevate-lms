@@ -18,6 +18,32 @@ test('empty queue does not start a paid execution',async()=>{
   assert.equal((await dispatchQueuedCourseJob(s.options)).status,'empty');
   assert.equal(s.calls.length,1);
 });
+
+test('imminent queued retry keeps coordination alive without an early paid execution',async()=>{
+ const s=setup([],[{id:'retry',status:'queued',available_at:'2026-10-06T10:01:30Z',attempts:4,max_attempts:7}]);
+ const base=s.options.request;
+ s.options.request=async url=>{
+  assert.match(url.searchParams.get('or'),/available_at.lte.2026-10-06T10:05:00.000Z/);
+  return base(url);
+ };
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.equal(result.status,'retry_wait');
+ assert.equal(result.availableAt,'2026-10-06T10:01:30.000Z');
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
+});
+
+test('due work dispatches while future retries cannot join the paid batch',async()=>{
+ const s=setup([],[{id:'future',available_at:'2026-10-06T10:01:30Z'},{id:'queued',available_at:'2026-10-06T09:59:59Z'}]);
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.deepEqual(result.jobIds,['queued']);
+ assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
+});
+
+test('exhausted or storage-blocked future retries cannot keep coordination alive',async()=>{
+ const s=setup([],[{id:'exhausted',available_at:'2026-10-06T10:01:30Z',attempts:7,max_attempts:7},{id:'storage',available_at:'2026-10-06T10:01:30Z',last_error:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'}]);
+ assert.equal((await dispatchQueuedCourseJob(s.options)).status,'empty');
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
+});
 test('a leased execution does not keep an empty-queue coordinator running',async()=>{
   const s=setup([{status:{}}],[]);
   const result=await dispatchQueuedCourseJob(s.options);
@@ -177,3 +203,4 @@ test('a full page of storage-blocked jobs cannot hide runnable work',async()=>{
  const result=await dispatchQueuedCourseJob(s.options);
  assert.deepEqual(offsets,[0,50]);assert.equal(result.status,'assigned');assert.deepEqual(result.jobIds,['queued']);
 });
+

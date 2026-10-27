@@ -1,5 +1,7 @@
 import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
+import {recoverTeachingPhoto} from './photo-repair.mjs';
+import {generateTeachingPhoto} from './google-teaching-photo.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
@@ -61,13 +63,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'}))continue;
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'}))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
       const selected=await courseSelectedStill(input,db,scene,index,step);
       if(selected){
-        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))continue;
+        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -84,11 +86,28 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      // Storage-only express mode: never call a generative image provider.
-      // Existing approved, selected and licensed assets above remain eligible.
-      // Missing inventory is a distinct recoverable asset gap, not permission to
-      // silently create a new picture or reuse a duplicate.
-      throw new Error('COURSE_STORAGE_IMAGE_REQUIRED:'+scene.id+':cue-'+index);
+      // Storage-first, generate only for missing inventory, never duplicate a hash.
+      const prompt=['Professional cosmetology educational photograph, realistic, no logos or text.',
+        String(input.courseTitle),String(scene.visualRequirement),String(step.narrationQuote),String(step.view)].join('\\n');
+      const generated=await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto});
+      const bytes=generated.bytes;
+      const sha256=createHash('sha256').update(bytes).digest('hex');
+      if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');
+      const mimeType=generated.mimeType;
+      const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
+      const storagePath='approved-teaching-photos/'+sha256+'.'+extension;
+      const uploaded=await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:mimeType,upsert:false});
+      if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
+      const downloaded=await db.storage.from('course_videos').download(storagePath);
+      if(downloaded.error||!downloaded.data)throw new Error('TEACHING_PHOTO_READBACK_FAILED');
+      const verified=createHash('sha256').update(Buffer.from(await downloaded.data.arrayBuffer())).digest('hex');
+      if(verified!==sha256)throw new Error('TEACHING_PHOTO_HASH_MISMATCH');
+      const signed=await db.storage.from('course_videos').createSignedUrl(storagePath,3600);
+      if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
+      if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
+        stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'google-generated'}))
+        throw new Error('COURSE_PHOTO_ALREADY_USED');
+      reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
     }
     if(new Set(photos[scene.id].map(p=>p.sha256)).size<2) throw new Error('TEACHING_PHOTOS_MUST_BE_DISTINCT');
   }

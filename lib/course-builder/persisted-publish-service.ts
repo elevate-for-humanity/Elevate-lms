@@ -5,8 +5,11 @@ import { publishCourse } from '../lms/course-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
 import { publicationRequirements, type PublicationRequirement } from '../course-factory/experience-contract';
+import { assessmentQuestionIssues } from './assessment-validation';
 
-const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
+// Keep assessment detection aligned with the persisted lesson_type contract.
+const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'assessment']);
+const PRACTICE_EXAM_TYPES = new Set(['exam', 'assessment']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
 
 function asArray(value: unknown): any[] {
@@ -143,7 +146,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       if (isAssessment) {
         assessments += 1;
         moduleHasAssessment = true;
-        if (type === 'exam' || type === 'final_exam') practiceExams += 1;
+        if (PRACTICE_EXAM_TYPES.has(type)) practiceExams += 1;
       }
       if (isPractical) practicals += 1;
       competencyMappings += competencies.length;
@@ -165,6 +168,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
           'verification_ready',
           'certificate_ready',
           'published',
+          'complete',
           'completed',
           'generated',
         ].includes(lesson.generation_status)
@@ -174,10 +178,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
         if (questions.length === 0) issues.push('assessment has no questions');
         if (lesson.passing_score == null) issues.push('assessment passing score missing');
         questions.forEach((question: any, qi: number) => {
-          if (!String(question?.explanation ?? '').trim())
-            issues.push(`question ${qi + 1} rationale missing`);
-          if (!question?.domainKey && asArray(question?.competencyKeys).length === 0)
-            issues.push(`question ${qi + 1} standards/competency mapping missing`);
+          issues.push(...assessmentQuestionIssues(question, qi));
         });
       } else {
         if (
@@ -242,6 +243,19 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
     .eq('asset_kind', 'lesson');
   if (videoJobError) throw videoJobError;
   const videoJobs = lessonVideoJobs ?? [];
+  const completedVideoJobs = videoJobs.filter((job: any) => job.status === 'complete' && Boolean(job.video_url));
+  const captionReadyLessons = (mods as any[]).flatMap((module) => asArray(module.course_lessons)).filter((lesson: any) => {
+    if (!lesson.video_url) return true;
+    const contentJson = lesson.content_json && typeof lesson.content_json === 'object' ? lesson.content_json as Record<string, any> : {};
+    const experience = contentJson.experience && typeof contentJson.experience === 'object' ? contentJson.experience as Record<string, any> : {};
+    const videoConfig = lesson.video_config && typeof lesson.video_config === 'object' ? lesson.video_config as Record<string, any> : {};
+    return Boolean(String(experience.narrationScript ?? videoConfig.transcript ?? '').trim());
+  }).length;
+  const practicalSignoffReady = (mods as any[]).flatMap((module) => asArray(module.course_lessons)).filter((lesson: any) => {
+    const type = String(lesson.lesson_type ?? '');
+    const isPractical = lesson.practical_required === true || PRACTICAL_TYPES.has(type);
+    return !isPractical || (asArray(lesson.competency_checks).length > 0 && Boolean(lesson.evidence_type) && lesson.requires_instructor_signoff === true);
+  }).length;
   const unfinishedVideoJobs = videoJobs.filter((job: any) =>
     ['draft', 'queued', 'rendering', 'processing'].includes(String(job.status ?? '')),
   );
@@ -279,6 +293,9 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       accessibleNarrationLessons,
       validatedLessons,
       lessonVideoJobs: videoJobs.length,
+      completedVideoJobs: completedVideoJobs.length,
+      captionReadyLessons,
+      practicalSignoffReady,
       unfinishedVideoJobs: unfinishedVideoJobs.length,
       failedVideoJobs: failedVideoJobs.length,
       unapprovedVideoJobs: unapprovedVideoJobs.length,

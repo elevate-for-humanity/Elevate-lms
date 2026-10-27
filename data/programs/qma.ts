@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const QMA: ProgramSchema = {
   slug: 'qma',
   title: 'Qualified Medication Aide (QMA)',
-  subtitle: 'Indiana state QMA certification in 4 weeks. Administer medications under nurse supervision in residential care settings. WIOA and WRG funding available for eligible participants. Self-pay: $1,200.',
+  subtitle: 'Indiana QMA training pathway in 4 weeks. Administer medications under nurse supervision in residential care settings. Public workforce funding is not represented unless a verified program record is published. Self-pay: $1,200.',
   sector: 'healthcare', category: 'Healthcare', programType: 'workforce',
   heroImage: '/images/pages/pharmacy-tech.webp',
   heroImageAlt: 'Qualified Medication Aide preparing medications for supervised administration',
@@ -11,8 +11,8 @@ export const QMA: ProgramSchema = {
   deliveryMode: 'hybrid', deliveredBy: 'Elevate', durationWeeks: 4, hoursPerWeekMin: 30, hoursPerWeekMax: 40,
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 60, examPrep: 20, careerPlacement: 10 },
   schedule: 'Mon–Fri, 30–40 hours per week', cohortSize: '8–12 participants per cohort',
-  fundingStatement: 'WIOA and WRG funding available for eligible Indiana residents. Covers tuition and exam fees when approved. Eligibility is not guaranteed. Self-pay: $1,200.',
-  selfPayCost: '$1,200', badge: 'WIOA Eligible', badgeColor: 'green',
+  fundingStatement: 'Public workforce funding is not currently represented for this program in the verified funding registry. Agency eligibility and written authorization are separate from admission. Self-pay: $1,200.',
+  selfPayCost: '$1,200',
   credentials: [
     { name: 'Indiana QMA Certificate', issuer: 'Indiana State Department of Health (ISDH)', description: 'State-issued certification authorizing the holder to administer medications under nurse supervision in licensed residential care facilities.', validity: 'Renewable every 2 years with documented work hours' },
     { name: 'CPR/AED Certification', issuer: 'American Red Cross', description: 'Required for all healthcare workers. Covers adult, child, and infant CPR plus AED operation.', validity: '2 years' },
@@ -63,7 +63,7 @@ export const QMA: ProgramSchema = {
   breadcrumbs: [{ label: 'Programs', href: '/programs' },{ label: 'Healthcare', href: '/programs/healthcare' },{ label: 'Qualified Medication Aide (QMA)' }],
   cta: { applyHref: '/apply?program=qma', requestInfoHref: '/contact?program=qma' },
   metaTitle: 'QMA Program — Indiana Qualified Medication Aide Certification | Elevate for Humanity',
-  metaDescription: 'Indiana state QMA certification in 4 weeks. Administer medications under nurse supervision. WIOA and WRG funding available for eligible participants. Self-pay: $1,200. Indianapolis.',
-  funding: { wioa_eligible: true, wrg_eligible: true, etpl_approved: true, snap_et_eligible: false, fssa_eligible: false },
-  enrollmentType: 'internal', deliveryModel: 'internal', fundingOptions: ['wioa', 'wrg', 'self_pay'],
+  metaDescription: 'Indiana state QMA certification in 4 weeks. Administer medications under nurse supervision. Public workforce funding is not represented unless a verified program record is published. Self-pay: $1,200. Indianapolis.',
+  funding: { wioa_eligible: false, wrg_eligible: false, etpl_approved: false, snap_et_eligible: false, fssa_eligible: false },
+  enrollmentType: 'internal', deliveryModel: 'internal', fundingOptions: ['self_pay'],
 };

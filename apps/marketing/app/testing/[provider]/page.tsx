@@ -1,12 +1,11 @@
+import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
+import { TESTING_PROVIDER_IMAGES } from '@/lib/testing/provider-images';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, BadgeCheck, ExternalLink, MapPin, ShieldCheck } from 'lucide-react';
-import {
-  CERT_PROVIDERS,
-  type ExamDefinition,
-} from '@/lib/testing/proctoring-capabilities';
+import { CERT_PROVIDERS, type ExamDefinition } from '@/lib/testing/proctoring-capabilities';
 import {
   getPublicTestingPricingNote,
   isPublicTestingPriceVerified,
@@ -17,16 +16,6 @@ import { AddExamToCartButton } from '@/components/testing/TestingCart';
 import TestingCart from '@/components/testing/TestingCart';
 
 export const dynamic = 'force-dynamic';
-
-const PROVIDER_HERO: Record<string, string> = {
-  esco: '/images/pages/hvac-technician.webp',
-  certiport: '/images/pages/programs-it-hero.webp',
-  nha: '/images/pages/medical-assistant.webp',
-  nrf: '/images/pages/apply-employer-hero.webp',
-  workkeys: '/images/pages/career-services-page-4.webp',
-  careersafe: '/images/pages/apprenticeships-hero.webp',
-  midland: '/images/pages/hvac-technician.webp',
-};
 
 const CAPABILITY_LABELS: Record<string, string> = {
   IN_PERSON_ONLY: 'In-person proctored',
@@ -57,25 +46,20 @@ function examDescription(exam: string | ExamDefinition): string | undefined {
   return typeof exam === 'string' ? undefined : exam.description;
 }
 
-function examAmount(exam: string | ExamDefinition): number | null {
-  if (typeof exam === 'string') return null;
-  return exam.amountCents && exam.amountCents > 0 ? exam.amountCents : null;
-}
-
 export default async function ProviderPage({ params }: Props) {
   const { provider: key } = await params;
   const provider = CERT_PROVIDERS[key];
   if (!provider || provider.publicVisible === false) notFound();
 
   const verified = isPublicTestingPriceVerified(key);
-  const hero = PROVIDER_HERO[key] ?? '/images/pages/career-services-page-1.webp';
+  const hero = TESTING_PROVIDER_IMAGES[key]?.src ?? '/images/refresh-20261014/technology.webp';
 
   return (
     <main className="min-h-screen bg-white">
-      <section className="relative h-[300px] overflow-hidden bg-slate-100 sm:h-[420px]">
+      <section className="relative aspect-video sm:aspect-auto sm:h-[clamp(220px,34svh,420px)] overflow-hidden bg-slate-100">
         <Image
           src={hero}
-          alt={provider.name}
+          alt={TESTING_PROVIDER_IMAGES[key]?.alt || `Illustrative training for ${provider.name}`}
           fill
           sizes="100vw"
           className="object-cover object-center"
@@ -117,13 +101,18 @@ export default async function ProviderPage({ params }: Props) {
       <section className="py-12">
         <div className="mx-auto max-w-5xl px-4">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-xs font-black uppercase tracking-widest text-slate-500">Pricing policy</p>
+            <p className="text-xs font-black uppercase tracking-widest text-slate-500">
+              Pricing policy
+            </p>
             <p className="mt-2 text-sm leading-relaxed text-slate-700">
               {getPublicTestingPricingNote(key)}
             </p>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-6">
+            <TestingCart />
+          </div>
+          <div className="mt-6">
             <h2 className="text-3xl font-black text-slate-950">Available exams</h2>
             <p className="mt-2 text-slate-600">
               Select the exact exam. Verified prices are shown per exam; unverified provider costs
@@ -134,14 +123,19 @@ export default async function ProviderPage({ params }: Props) {
               {provider.exams.map((exam) => {
                 const name = examName(exam);
                 const description = examDescription(exam);
-                const cents = verified ? examAmount(exam) : null;
+                const cents = verified ? getPublicExamAmountCents(provider, exam) : null;
                 return (
-                  <article key={name} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <article
+                    key={name}
+                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                  >
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                       <div className="max-w-3xl">
                         <h3 className="text-lg font-black text-slate-950">{name}</h3>
                         {description && (
-                          <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
+                          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                            {description}
+                          </p>
                         )}
                         {typeof exam !== 'string' && exam.durationMinutes && (
                           <p className="mt-2 text-xs font-semibold text-slate-500">
@@ -152,9 +146,13 @@ export default async function ProviderPage({ params }: Props) {
 
                       <div className="shrink-0 sm:text-right">
                         {cents ? (
-                          <p className="text-2xl font-black text-slate-950">${(cents / 100).toFixed(0)}</p>
+                          <p className="text-2xl font-black text-slate-950">
+                            ${(cents / 100).toFixed(0)}
+                          </p>
                         ) : (
-                          <p className="text-sm font-bold text-amber-800">Price confirmed before payment</p>
+                          <p className="text-sm font-bold text-amber-800">
+                            Price confirmed before payment
+                          </p>
                         )}
                       </div>
                     </div>
@@ -166,7 +164,7 @@ export default async function ProviderPage({ params }: Props) {
                             href={`/testing/checkout?provider=${key}&exam_name=${encodeURIComponent(name)}`}
                             className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-700"
                           >
-                            Pay ${(cents / 100).toFixed(0)} now <ArrowRight className="h-4 w-4" />
+                            Book — ${(cents / 100).toFixed(0)} <ArrowRight className="h-4 w-4" />
                           </Link>
                           <AddExamToCartButton
                             examType={key}
@@ -191,19 +189,13 @@ export default async function ProviderPage({ params }: Props) {
             </div>
           </div>
 
-          <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
-            <h2 className="text-2xl font-black text-slate-950">Testing cart</h2>
-            <p className="mt-2 mb-5 text-sm text-slate-600">
-              Add one exam, then pay the server-verified retail total. Scheduling stays locked until Stripe confirms payment.
-            </p>
-            <TestingCart />
-          </section>
-
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <MapPin className="h-5 w-5 text-brand-red-600" />
               <h2 className="mt-3 font-black text-slate-950">Testing location</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{TESTING_CENTER.address}</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                {TESTING_CENTER.address}
+              </p>
               <p className="mt-2 text-sm text-slate-600">Appointment required. No walk-ins.</p>
             </div>
 

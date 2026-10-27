@@ -6,13 +6,12 @@ export const dynamic = 'force-dynamic';
 
 const PROVIDER_TARGETS: Record<string, string> = {
   jotform: '/api/webhooks/jotform',
-  stripe: '/api/webhooks/stripe',
   marketplace: '/api/webhooks/marketplace',
   store: '/api/webhooks/store',
   sendgrid: '/api/webhooks/sendgrid-inbound',
 };
 
-const FORWARDED_HEADER_PREFIXES = ['stripe-', 'x-', 'sendgrid-'];
+const FORWARDED_HEADER_PREFIXES = ['x-', 'sendgrid-'];
 const FORWARDED_HEADERS = new Set(['authorization', 'content-type', 'user-agent']);
 
 function buildForwardHeaders(request: NextRequest, provider: string): Headers {

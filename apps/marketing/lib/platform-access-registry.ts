@@ -62,7 +62,7 @@ const DASHBOARD_IMAGES: Partial<Record<PortalKey, string>> = {
   lms: '/images/pages/training-classroom.webp',
   apprentice: '/images/pages/apprenticeship-structure.webp',
   hostshop: '/images/pages/barber-training.webp',
-  programholder: '/images/pages/business-meeting.webp',
+  programholder: '/images/business-collaboration-vibrant-2026.webp',
 };
 
 function portalCard(key: PortalKey, surface: AccessSurface): PlatformAccessCard {

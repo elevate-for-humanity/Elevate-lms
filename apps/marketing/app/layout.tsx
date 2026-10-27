@@ -5,13 +5,19 @@
 import './client-polyfills';
 
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import './layout.css';
 import '../../../styles/contrast-guardrails.css';
 import '../../../styles/responsive-guardrails.css';
 import { MarketingChromeBoundary } from '@/components/site/MarketingChromeBoundary';
+import Header from '@/components/site/Header';
+import { SiteFooter } from '@/components/site-footer';
+import StoreFooter from '@/components/store/StoreFooter';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { I18nProvider } from '@/lib/i18n/context';
-import { ChunkRecovery } from '@/components/system/ChunkRecovery';
+import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
@@ -19,6 +25,7 @@ import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { FirstPartyTraffic } from '@/components/analytics/FirstPartyTraffic';
 import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
+import SpeechCanceller from '@/components/ui/SpeechCanceller';
 import CookieConsent from '@/components/CookieConsent';
 import FacebookPixel from '@/components/FacebookPixel';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
@@ -26,6 +33,7 @@ import { MediaPlaybackCoordinator } from '@/components/media/MediaPlaybackCoordi
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
+const shareImageUrl = `${siteUrl}/images/partners/salon-saloon/team-sign.webp`;
 
 export const metadata: Metadata = {
   title: {
@@ -62,8 +70,9 @@ export const metadata: Metadata = {
     title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
     description:
       'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',
-    images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
+    images: [{ url: shareImageUrl, alt: 'Elevate for Humanity career training' }],
   },
+  twitter: { card: 'summary_large_image', images: [shareImageUrl] },
   robots: {
     index: true,
     follow: true,
@@ -87,7 +96,7 @@ const organizationJsonLd = {
   url: siteUrl,
   logo: { '@type': 'ImageObject', url: logoUrl, contentUrl: logoUrl, width: 256, height: 256 },
   image: logoUrl,
-  telephone: '+1-317-314-3757',
+  telephone: '+1-463-240-1404',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '120 East Market Street, Suite 930',
@@ -114,12 +123,15 @@ const organizationJsonLd = {
   ],
 };
 
-export const revalidate = 300;
+// Public pages can prerender or revalidate. Authenticated route layouts and
+// request-dependent pages retain their own dynamic rendering boundaries.
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const storeOnly = getPublicRuntimeService() === 'store';
   return (
     <html lang="en">
       <head>
+        <script id="marketing-chunk-recovery" dangerouslySetInnerHTML={{ __html: chunkRecoveryBootstrap() }} />
         <SupabasePublicConfigScript />
         <script
           type="application/ld+json"
@@ -130,16 +142,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipToContent />
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
-        <ChunkRecovery />
         <GoogleAnalytics />
-        <FacebookPixel />
-        <FirstPartyTraffic />
+        <Suspense fallback={null}><FacebookPixel /></Suspense>
+        <Suspense fallback={null}><FirstPartyTraffic /></Suspense>
         <AssociateFormLabels />
+        <Suspense fallback={null}><SpeechCanceller /></Suspense>
         <I18nProvider>
-          <MarketingChromeBoundary>{children}</MarketingChromeBoundary>
+          <Suspense fallback={<div id="main-content" role="status" className="min-h-dvh p-6">Loading page…</div>}>
+          <MarketingChromeBoundary
+            storeOnly={storeOnly}
+            header={<Header />}
+            footer={storeOnly ? <StoreFooter /> : <SiteFooter />}
+            paris={<ParisFloatingWrapper surface="public" />}
+          >
+            {children}
+          </MarketingChromeBoundary>
+        </Suspense>
         </I18nProvider>
         <MediaPlaybackCoordinator />
-        <ScrollNarrator />
+        <Suspense fallback={null}><ScrollNarrator /></Suspense>
         <CookieConsent />
       </body>
     </html>

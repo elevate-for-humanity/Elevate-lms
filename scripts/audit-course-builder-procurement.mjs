@@ -6,6 +6,7 @@ const root = process.cwd();
 const failures = [];
 const mustExist = [
   'components/admin/course-builder/UnifiedCourseBuilder.tsx',
+  'components/admin/course-builder/CourseProductionWorkspace.tsx',
   'apps/admin/app/studio/courses/page.tsx',
   'apps/admin/app/api/admin/course-builder/route.ts',
   'lib/course-builder/orchestrator.ts',
@@ -35,7 +36,15 @@ for (const file of mustExist) if (!fs.existsSync(path.join(root, file))) fail(`m
 
 if (failures.length === 0) {
   const studioCourses = read('apps/admin/app/studio/courses/page.tsx');
-  if (!studioCourses.includes('UnifiedCourseBuilder')) fail('/studio/courses is not mounted to UnifiedCourseBuilder');
+  const workspace = read('components/admin/course-builder/CourseProductionWorkspace.tsx');
+  if (!studioCourses.includes('<CourseProductionWorkspace') || !workspace.includes('<UnifiedCourseBuilder'))
+    fail('/studio/courses is not mounted to the canonical UnifiedCourseBuilder workspace');
+  // Both the standalone route and embedded Studio use the shared builder shell.
+  // Follow that composition instead of requiring a duplicate browser in the wrapper.
+  const builder = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+  if (!builder.includes("import('@/components/studio/CloudBrowserWorkspace')") ||
+      !builder.includes('<CloudBrowserWorkspace') || !builder.includes('<ResizableWorkspace'))
+    fail('Canonical Course Builder is missing the resizable live Studio browser');
 
   const rootRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
   for (const invariant of [
@@ -54,12 +63,11 @@ if (failures.length === 0) {
   }
 
   const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
+  const assessmentValidation = read('lib/course-builder/assessment-validation.ts');
   for (const invariant of [
     'review_status',
     'governing_standard_version',
     'AUTOMATED_COURSE_GATE_VERSION',
-    'rationale missing',
-    'standards/competency mapping missing',
     'canonical interactive lesson experience missing',
     'mastery remediation plan missing',
     'record_course_automated_approval',
@@ -68,6 +76,11 @@ if (failures.length === 0) {
     'module_completion_rules',
     'publishCourse',
   ]) if (!persistedPublish.includes(invariant)) fail(`persisted Course Builder publish gate missing: ${invariant}`);
+  for (const invariant of ['rationale missing', 'standards/competency mapping missing']) {
+    if (!assessmentValidation.includes(invariant) || !persistedPublish.includes('assessmentQuestionIssues')) {
+      fail(`persisted Course Builder publish gate missing: ${invariant}`);
+    }
+  }
 
   for (const retiredPath of [
     'apps/admin/app/api/admin/course-builder/publish/route.ts',
@@ -92,8 +105,11 @@ if (failures.length === 0) {
   }
 
   const governance = read('lib/course-factory/post-generation-governance.ts');
-  for (const invariant of ['competency_checks', 'competencyKeys', "source: 'course_factory'", 'update.approved = false']) {
+  for (const invariant of ['competency_checks', 'competencyKeys', "source: 'course_factory'", "generation_status: 'generated'"]) {
     if (!governance.includes(invariant)) fail(`post-generation governance missing: ${invariant}`);
+  }
+  if (governance.includes('update.approved = false')) {
+    fail('post-generation governance still requires human course-content approval');
   }
 
   const tutor = read('apps/lms/app/api/courses/[courseId]/tutor/route.ts');

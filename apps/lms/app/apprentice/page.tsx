@@ -1,3 +1,6 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
+import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -31,6 +34,14 @@ import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-progr
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 // Keep shared and preview navigation on the canonical LMS host.
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
+import {
+  APPRENTICE_POLICY_KEYS,
+  APPRENTICE_POLICY_VERSION,
+} from '@/lib/apprenticeship/apprentice-policy';
+import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
+import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -84,6 +95,8 @@ export default async function ApprenticePortalPage() {
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice');
+  const invoiceAccess = await getApprenticeBillingAccess(db, subject.userId);
+  const billingRequirement = await loadLearnerBillingRequirement(db, subject.userId);
   const { data: subjectProfile } = await db
     .from('profiles')
     .select('role')
@@ -165,7 +178,9 @@ export default async function ApprenticePortalPage() {
     { data: documentRequirements },
     { data: handbookAcceptance },
     { data: cosmetologyBilling },
+    { data: billingAuthorization },
     { data: theorySchedule },
+    { data: policyAcceptances },
   ] = await Promise.all([
     db
       .from('profiles')
@@ -186,21 +201,32 @@ export default async function ApprenticePortalPage() {
       .eq('program_slug', programSlug)
       .eq('is_required', true),
     db
-      .from('license_agreement_acceptances')
+      .from('handbook_acknowledgments')
       .select('id')
       .eq('user_id', subject.userId)
-      .eq('agreement_type', 'handbook')
+      .eq('handbook_version', '2026.2')
       .limit(1)
       .maybeSingle(),
-    programSlug === 'cosmetology-apprenticeship'
+    programSlug === 'cosmetology-apprenticeship' || programSlug === 'barber-apprenticeship'
       ? db
-          .from('cosmetology_subscriptions')
-          .select('stripe_subscription_id,payment_status,setup_fee_paid,fully_paid')
+          .from(
+            programSlug === 'barber-apprenticeship'
+              ? 'barber_subscriptions'
+              : 'cosmetology_subscriptions',
+          )
+          .select('payment_status,setup_fee_paid,fully_paid')
           .eq('user_id', subject.userId)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle()
       : Promise.resolve({ data: null }),
+    db
+      .from('billing_migration_authorizations')
+      .select('billing_schedule_id,status')
+      .eq('user_id', subject.userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     (db as any)
       .from('apprenticeship_theory_schedules')
       .select(
@@ -211,7 +237,20 @@ export default async function ApprenticePortalPage() {
       .eq('active', true)
       .limit(1)
       .maybeSingle(),
+    db
+      .from('agreement_acceptances')
+      .select('agreement_key,agreement_version')
+      .eq('subject_type', 'apprentice')
+      .eq('subject_id', subject.userId)
+      .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
+  const { data: automaticBillingSchedule } = billingAuthorization?.billing_schedule_id
+    ? await db
+        .from('billing_schedules')
+        .select('status,provider_status,provider_subscription_id')
+        .eq('id', billingAuthorization.billing_schedule_id)
+        .maybeSingle()
+    : { data: null };
 
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
   const displayProgram =
@@ -261,6 +300,15 @@ export default async function ApprenticePortalPage() {
     totalLessons = lessonCountRes.count ?? 0;
     completedLessons = progressCountRes.count ?? 0;
   }
+  // Display recorded OJL progress without inventing a theory-unlock threshold.
+  // Access remains controlled by the existing server-side enrollment policy.
+  const { data: apprenticeHours } = await db
+    .from('apprentices')
+    .select('ojl_hours,hours_completed')
+    .eq('user_id', subject.userId)
+    .maybeSingle();
+  const recordedOjlHours = Math.max(0, Number(apprenticeHours?.ojl_hours ?? apprenticeHours?.hours_completed ?? 0) || 0);
+
   const digitalCoursePercent = totalLessons
     ? Math.min(100, Math.round((completedLessons / totalLessons) * 100))
     : 0;
@@ -320,15 +368,71 @@ export default async function ApprenticePortalPage() {
     },
   ] as const;
 
+  const acceptedPolicyKeys = new Set(
+    (policyAcceptances || [])
+      .filter((acceptance) => acceptance.agreement_version === APPRENTICE_POLICY_VERSION)
+      .map((acceptance) => acceptance.agreement_key),
+  );
+  const timeclockPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.timeclock);
+  const paymentPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.payment);
+  const automaticBillingActive = Boolean(
+    automaticBillingSchedule?.status === 'active' &&
+    automaticBillingSchedule?.provider_status === 'active' &&
+    automaticBillingSchedule?.provider_subscription_id,
+  );
+  const requiredPolicyPanel = (
+    <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
+      <div className="flex gap-3">
+        <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-amber-800" />
+        <div className="w-full">
+          <h2 className="text-xl font-black text-amber-950">Required apprentice policies</h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">
+            Every apprentice must read and sign both policies. These pages remain in every new
+            apprentice dashboard.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Link
+              href="/apprentice/policies/timeclock"
+              className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:shadow-md"
+            >
+              <p className="font-black text-slate-950">Timeclock & geofence</p>
+              <p className="mt-1 text-sm text-slate-700">
+                When and where to clock in and out, weekly limits, and automatic clock-out.
+              </p>
+              <p
+                className={`mt-3 text-xs font-black uppercase ${timeclockPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
+              >
+                {timeclockPolicyAccepted ? '✓ Signed' : 'Signature required'}
+              </p>
+            </Link>
+            <Link
+              href="/apprentice/policies/payments"
+              className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:shadow-md"
+            >
+              <p className="font-black text-slate-950">Payments & communication</p>
+              <p className="mt-1 text-sm text-slate-700">
+                Call before the due date if there is a problem; nonpayment without communication is
+                enforced.
+              </p>
+              <p
+                className={`mt-3 text-xs font-black uppercase ${paymentPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
+              >
+                {paymentPolicyAccepted ? '✓ Signed' : 'Signature required'}
+              </p>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
   if (!runtime.contract) {
-    const billingConfigured = Boolean(
-      cosmetologyBilling?.fully_paid || cosmetologyBilling?.stripe_subscription_id,
-    );
+    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || automaticBillingActive || invoiceAccess.accessExemptUntil);
     const todoItems = [
       {
-        label: 'Authorize automatic tuition payments and save a card',
+        label: invoiceAccess.accessExemptUntil ? 'Billing access approved by sponsor' : 'Choose a payment method or financing option',
         done: billingConfigured,
-        href: '/apprentice/billing',
+        href: '/account/payment-methods',
         icon: CreditCard,
       },
       {
@@ -338,10 +442,22 @@ export default async function ApprenticePortalPage() {
         icon: BookOpen,
       },
       {
-        label: 'Read and acknowledge the student handbook',
+        label: 'Read and acknowledge timeclock and weekly-hours handbook rules',
         done: Boolean(handbookAcceptance?.id),
         href: '/apprentice/handbook',
         icon: ShieldCheck,
+      },
+      {
+        label: 'Read and sign the timeclock and geofence policy',
+        done: timeclockPolicyAccepted,
+        href: '/apprentice/policies/timeclock',
+        icon: Clock3,
+      },
+      {
+        label: 'Read and sign the payment and communication policy',
+        done: paymentPolicyAccepted,
+        href: '/apprentice/policies/payments',
+        icon: CreditCard,
       },
       {
         label: `Complete required documents${missingDocumentCount ? ` (${missingDocumentCount} remaining)` : ''}`,
@@ -368,8 +484,10 @@ export default async function ApprenticePortalPage() {
       (runtime.placement?.id ? beautyProgram?.hostLabel || 'Assigned Host Shop' : 'Not connected');
     return (
       <main className="space-y-7 pb-10">
+        <TimeclockAttendanceNotice />
+        <ProgramGuideResources />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
             alt={`${displayProgram} apprentice training`}
             fill
@@ -397,7 +515,7 @@ export default async function ApprenticePortalPage() {
                 href="/apprentice/billing"
                 className="rounded-xl bg-pink-600 px-5 py-3 font-black text-white shadow-lg hover:bg-pink-500"
               >
-                Complete payment setup
+                {invoiceAccess.accessExemptUntil ? 'Review billing' : 'Complete payment setup'}
               </Link>
               <Link
                 href="/apprentice/documents"
@@ -416,8 +534,8 @@ export default async function ApprenticePortalPage() {
                 Required to-do — {incompleteCount} incomplete
               </h2>
               <p className="mt-1 text-sm font-semibold text-red-900">
-                PARIS will walk you through these items in order. Red items must be completed before
-                the corresponding activity is unlocked.
+                PARIS will walk you through these items in order. Items marked Open still need attention,
+                but sponsor-approved access remains available while an active access exception is in place.
               </p>
               <div className="mt-5 grid gap-3">
                 {todoItems.map(({ label, done, href, icon: Icon }, index) => (
@@ -444,6 +562,11 @@ export default async function ApprenticePortalPage() {
             </div>
           </div>
         </section>
+        <MandatoryBillingSetup
+          requirement={billingRequirement}
+          readOnly={subject.previewing}
+        />
+        {requiredPolicyPanel}
         <section className="grid gap-4 sm:grid-cols-3">
           <Metric
             label={beautyProgram?.hostLabel || 'Host Shop'}
@@ -478,6 +601,7 @@ export default async function ApprenticePortalPage() {
           syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'}
           completedLessons={completedLessons}
           totalLessons={totalLessons}
+          recordedOjlHours={recordedOjlHours}
         />
         {priorLearning ? (
           <PriorLearningPanel priorLearning={priorLearning} nativePercent={digitalCoursePercent} />
@@ -507,6 +631,7 @@ export default async function ApprenticePortalPage() {
   );
 
   const actions = [
+    { title: 'My Website Traffic', text: 'See views, visitor sources, and locations for your connected website.', href: '/apprentice/analytics', image: '/images/pages/admin-analytics-hero.webp' },
     {
       title: 'Clock work hours',
       text: 'Record geofenced supervised work time for Host Shop review. OJL hours remain evidence; competency verification controls competency-based progression.',
@@ -535,6 +660,8 @@ export default async function ApprenticePortalPage() {
 
   return (
     <main className="space-y-7 pb-10">
+      <TimeclockAttendanceNotice />
+        <ProgramGuideResources />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">
@@ -617,26 +744,52 @@ export default async function ApprenticePortalPage() {
         </div>
       </section>
 
+      <MandatoryBillingSetup
+        requirement={billingRequirement}
+        readOnly={subject.previewing}
+      />
+
+      {requiredPolicyPanel}
+
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Your employer placement</p>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+              Your employer placement
+            </p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">{shopName}</h2>
-            <p className="mt-2 text-sm font-semibold text-slate-700">Supervisor: {supervisorName}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">
+              Supervisor: {supervisorName}
+            </p>
             {runtime.shop ? (
               <p className="mt-1 text-sm text-slate-600">
-                {[runtime.shop.address1, runtime.shop.address2, runtime.shop.city, runtime.shop.state, runtime.shop.zip].filter(Boolean).join(', ')}
+                {[
+                  runtime.shop.address1,
+                  runtime.shop.address2,
+                  runtime.shop.city,
+                  runtime.shop.state,
+                  runtime.shop.zip,
+                ]
+                  .filter(Boolean)
+                  .join(', ')}
               </p>
             ) : (
-              <p className="mt-1 text-sm font-bold text-amber-800">An employer or Host Shop has not been assigned yet.</p>
+              <p className="mt-1 text-sm font-bold text-amber-800">
+                An employer or Host Shop has not been assigned yet.
+              </p>
             )}
           </div>
-          <Link href="/apprentice/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">
+          <Link
+            href="/apprentice/documents"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+          >
             Open my forms and documents
           </Link>
         </div>
         <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm font-medium leading-6 text-slate-700">
-          Your enrollment agreement, student MOU, apprenticeship agreement, and acknowledgments are provided in your dashboard for electronic completion. Upload only your supporting evidence. Employer agreements and employer MOUs stay in the employer workspace.
+          Your enrollment agreement, student MOU, apprenticeship agreement, and acknowledgments are
+          provided in your dashboard for electronic completion. Upload only your supporting
+          evidence. Employer agreements and employer MOUs stay in the employer workspace.
         </p>
       </section>
 
@@ -718,6 +871,7 @@ export default async function ApprenticePortalPage() {
         syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'}
         completedLessons={completedLessons}
         totalLessons={totalLessons}
+        recordedOjlHours={recordedOjlHours}
       />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -764,7 +918,7 @@ export default async function ApprenticePortalPage() {
                   src={action.image}
                   alt=""
                   fill
-                  sizes="(max-width:640px) 100vw,25vw"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
                   className="object-cover transition-transform group-hover:scale-[1.03]"
                 />
               </div>
@@ -939,12 +1093,14 @@ function TheorySchedulePanel({
   syllabusHref,
   completedLessons,
   totalLessons,
+  recordedOjlHours,
 }: {
   schedule: any;
   courseHref: string;
   syllabusHref: string;
   completedLessons: number;
   totalLessons: number;
+  recordedOjlHours: number;
 }) {
   if (!schedule)
     return (
@@ -967,19 +1123,21 @@ function TheorySchedulePanel({
     );
   };
   return (
-    <section className="rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm sm:p-8">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+    <section className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-4 shadow-sm sm:p-8">
+      <div className="flex min-w-0 flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">
             Your weekly theory plan
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-950">{days}</h2>
+          <h2 className="mt-2 break-words text-2xl font-black text-slate-950">{days}</h2>
           <p className="mt-2 font-bold text-slate-800">
             {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>
-          {schedule.starts_on ? (
+          {formatTheoryStartDate(schedule.starts_on) ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
-              Theory/RTI begins Monday, September 21, 2026.
+              Theory/RTI begins{' '}
+              {formatTheoryStartDate(schedule.starts_on)}
+              .
             </p>
           ) : null}
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
@@ -988,6 +1146,12 @@ function TheorySchedulePanel({
             <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You
             will receive automatic alerts when each scheduled block starts and stops.
           </p>
+          <div className="mt-4 rounded-xl border border-fuchsia-200 bg-white p-4 text-sm text-slate-800">
+            <p className="font-black">Theory schedule and eligibility</p>
+            <p className="mt-1">Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours.</p>
+            <p className="mt-1">Scheduled theory: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')} hours weekly, up to {(schedule.weekly_max_minutes / 60).toLocaleString('en-US')} hours weekly.</p>
+            <p className="mt-1">Any minimum work-hour requirement for unlocking theory must be confirmed by your program administrator. This dashboard does not impose an unverified hour threshold.</p>
+          </div>
           <p className="mt-2 text-sm font-semibold text-slate-700">
             Course progress: {completedLessons} of {totalLessons} published lessons complete.
           </p>

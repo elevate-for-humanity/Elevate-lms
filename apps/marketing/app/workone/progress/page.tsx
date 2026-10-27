@@ -43,7 +43,7 @@ export default async function WorkOneProgressPage({
         )}
 
         <div className="mt-8 text-center text-sm text-slate-600">
-          <p>Need help? Call {PLATFORM_DEFAULTS.supportPhone}.</p>
+          <p>Need help? Call {PLATFORM_DEFAULTS.mainPhone}.</p>
           <Link href="/" className="mt-3 inline-block font-bold text-brand-blue-700 hover:underline">Return to Elevate</Link>
         </div>
       </div>

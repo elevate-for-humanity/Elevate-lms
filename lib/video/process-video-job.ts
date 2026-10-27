@@ -2,19 +2,7 @@ import 'server-only';
 
 import { getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
-import { recordPlatformUsage } from '@/lib/platform/usage-metering';
 import { createAdminClient } from '@/lib/supabase/admin';
-import {
-  executePaidInference,
-  paidArtifactFingerprint,
-  reservePaidInference,
-} from '@/lib/ai/paid-inference-gateway';
-import {
-  deleteGpuVideoAsset,
-  downloadGpuVideoAsset,
-  generateGpuVideo,
-  gpuVideoAvailable,
-} from './gpu-video-client';
 import {
   heartbeatJob,
   markAwaitingPaidApproval,
@@ -30,7 +18,6 @@ import {
   compactLegacySceneData,
   directMedia,
   MAX_LESSON_VIDEO_SCENES,
-  scenePrompt,
   type MediaCharacterReference,
   type MediaStoryboard,
 } from './media-director';
@@ -268,20 +255,9 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
       ? (policy.narration as Record<string, unknown>)
       : null;
   if (policy?.locked_by === 'course_builder' && narration?.strategy === 'repository_voice') {
-    if (narration.allow_paid_provider === true && narration.provider === 'cloudflare') {
-      process.env.AI_NARRATION_PROVIDER = 'cloudflare';
-      return;
-    }
-    if (narration.allow_paid_provider !== false) {
-      throw new Error('MEDIA_NARRATION_POLICY_INVALID');
-    }
-    // A locked zero-credit narration policy cannot publish learner-facing
-    // media in production. Edge/local voices are diagnostic-only; fail before
-    // rendering rather than producing an ungoverned or low-quality artifact.
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
-    }
-    process.env.AI_NARRATION_PROVIDER = 'local';
+    // Course Builder narration is self-hosted Kokoro. Do not let historical
+    // Cloudflare/paid-provider policy or environment variables override it.
+    process.env.AI_NARRATION_PROVIDER = 'kokoro';
   }
 }
 
@@ -389,7 +365,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       .maybeSingle();
     const { data: licensedLessonVideos, error: licensedVideoError } = await db
       .from('course_videos')
-      .select('id,storage_path,title,created_at,asset_role,sequence_index')
+      .select('id,storage_path,title,created_at,asset_role,sequence_index,entitlement_id,media_asset_id')
       .eq('course_id', job.course_id)
       .eq('lesson_id', job.lesson_id)
       .eq('asset_role', 'source_broll')
@@ -402,6 +378,17 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       throw new Error(`LICENSED_MEDIA_LOOKUP_FAILED:${licensedVideoError.message}`);
     }
     const licensedLessonVideo = licensedLessonVideos?.[0] ?? null;
+    const { data: licensedEntitlement, error: licensedEntitlementError } =
+      licensedLessonVideo?.entitlement_id
+        ? await db
+            .from('licensed_media_entitlements')
+            .select('id,provider,provider_item_id,item_url,license_document_url,purchase_code,license_type')
+            .eq('id', licensedLessonVideo.entitlement_id)
+            .maybeSingle()
+        : { data: null, error: null };
+    if (licensedEntitlementError) {
+      throw new Error(`LICENSED_MEDIA_ENTITLEMENT_LOOKUP_FAILED:${licensedEntitlementError.message}`);
+    }
     let licensedSourceVideoUrl: string | null = null;
     if (licensedLessonVideo?.storage_path) {
       const { data: signedLicensedVideo, error: signedLicensedVideoError } = await db.storage
@@ -615,8 +602,16 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
           ...sceneData,
           licensed_media: {
             course_video_id: licensedLessonVideo?.id,
+            media_asset_id: licensedLessonVideo?.media_asset_id,
+            entitlement_id: licensedLessonVideo?.entitlement_id,
             title: licensedLessonVideo?.title,
             storage_path: licensedLessonVideo?.storage_path,
+            provider: licensedEntitlement?.provider ?? null,
+            provider_item_id: licensedEntitlement?.provider_item_id ?? null,
+            item_url: licensedEntitlement?.item_url ?? null,
+            license_document_url: licensedEntitlement?.license_document_url ?? null,
+            purchase_code: licensedEntitlement?.purchase_code ?? null,
+            license_type: licensedEntitlement?.license_type ?? null,
           },
           scenes: plannedScenes.map((scene, index) =>
             index === 0
@@ -624,6 +619,17 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
                   ...scene,
                   source_video_url: licensedSourceVideoUrl,
                   media_source: 'elevate-owned',
+                  resolved_provider: licensedEntitlement?.provider ?? 'licensed',
+                  resolved_model:
+                    licensedEntitlement?.provider_item_id ??
+                    licensedLessonVideo?.id ??
+                    'licensed-source',
+                  source_provider_item_id:
+                    licensedEntitlement?.provider_item_id ?? licensedLessonVideo?.id,
+                  source_license_evidence_url:
+                    licensedEntitlement?.license_document_url ??
+                    licensedEntitlement?.item_url ??
+                    undefined,
                   operation: 'videoToVideo',
                 }
               : scene,
@@ -636,8 +642,16 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
           media_source: 'elevate-owned',
           licensed_media: {
             course_video_id: licensedLessonVideo?.id,
+            media_asset_id: licensedLessonVideo?.media_asset_id,
+            entitlement_id: licensedLessonVideo?.entitlement_id,
             title: licensedLessonVideo?.title,
             storage_path: licensedLessonVideo?.storage_path,
+            provider: licensedEntitlement?.provider ?? null,
+            provider_item_id: licensedEntitlement?.provider_item_id ?? null,
+            item_url: licensedEntitlement?.item_url ?? null,
+            license_document_url: licensedEntitlement?.license_document_url ?? null,
+            purchase_code: licensedEntitlement?.purchase_code ?? null,
+            license_type: licensedEntitlement?.license_type ?? null,
           },
         };
       }
@@ -695,191 +709,10 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     const primaryScene = storyboard.scenes[0];
     if (!primaryScene) throw new Error('MEDIA_STORYBOARD_EMPTY');
 
-    // A single GPU clip is a valid terminal asset only for a single-scene plan.
-    // Multi-scene instructional clips must continue to the compositor so the
-    // remaining objective-aligned scenes are not discarded.
-    // Direct GPU microclips do not currently produce the captions, transcript,
-    // or multi-scene evidence required by the canonical quality gate. Keep this
-    // expensive path opt-in until it can satisfy that same completion contract.
-    if (
-      isMicroclip &&
-      !cpuOnlyCourseMedia() &&
-      storyboard.scenes.length === 1 &&
-      (await gpuVideoAvailable())
-    ) {
-      const scene = primaryScene;
-      const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
-      const gpuStartedAt = Date.now();
-      let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
-      try {
-        generated = await generateGpuVideo({
-          prompt: scenePrompt(scene, storyboard.characters),
-          operation: scene.operation,
-          width: storyboard.width,
-          height: storyboard.height,
-          durationSeconds: requestedDuration,
-          ...(scene.seed !== undefined ? { seed: scene.seed } : {}),
-          ...(scene.referenceImageUrl ? { imageUrl: scene.referenceImageUrl } : {}),
-          ...(scene.sourceVideoUrl ? { sourceVideoUrl: scene.sourceVideoUrl } : {}),
-          ...(scene.negativePrompt ? { negativePrompt: scene.negativePrompt } : {}),
-        });
-        if (generated) {
-          const buffer = await downloadGpuVideoAsset(generated);
-          const videoUrl = await uploadLessonMediaBuffer(buffer, renderId, 'mp4');
-          const renderSeconds = Math.max(0, (Date.now() - gpuStartedAt) / 1000);
-          const outputSeconds = generated.durationSeconds ?? requestedDuration;
-          const model = generated.provider === 'wan' ? 'Wan2.2-TI2V-5B' : 'LTX-Video';
-
-          try {
-            await Promise.all([
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'video_generation_attempt',
-                quantity: 1,
-                unit: 'attempt',
-                externalRef: job.id,
-                idempotencyKey: `gpu-attempt:${job.id}:success`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  success: true,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                  storyboard_hash: storyboard.promptHash,
-                },
-              }),
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'gpu_video_seconds',
-                quantity: outputSeconds,
-                unit: 'second',
-                externalRef: job.id,
-                idempotencyKey: `gpu-video-seconds:${job.id}`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                },
-              }),
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'gpu_render_seconds',
-                quantity: renderSeconds,
-                unit: 'second',
-                externalRef: job.id,
-                idempotencyKey: `gpu-render-seconds:${job.id}`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                },
-              }),
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'gpu_output_bytes',
-                quantity: buffer.length,
-                unit: 'byte',
-                externalRef: job.id,
-                idempotencyKey: `gpu-output-bytes:${job.id}`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                },
-              }),
-              recordMediaProvenance(db, {
-                tenantId,
-                courseId: job.course_id,
-                lessonId: job.lesson_id,
-                videoJobId: job.id,
-                storyboard,
-                scene,
-                provider: generated.provider,
-                model,
-                operation: scene.operation,
-                referenceUrls: [scene.referenceImageUrl, scene.sourceVideoUrl].filter(
-                  (value): value is string => Boolean(value),
-                ),
-                likenessConsentRecordIds: storyboard.characters
-                  .map((character) => character.consentRecordId)
-                  .filter((value): value is string => Boolean(value)),
-                moderationDecision: 'approved',
-                generatedAssetUrl: videoUrl,
-                generatedBytes: buffer.length,
-              }),
-            ]);
-          } catch (meterError) {
-            logger.error(
-              '[video-worker] GPU output succeeded but usage/provenance recording failed',
-              meterError,
-              {
-                jobId: job.id,
-                tenantId,
-              },
-            );
-          }
-
-          // The GPU clip is a scene candidate, not a terminal lesson asset.
-          // Feed it through the compositor below so captions, transcript,
-          // compression, and final quality evidence are always produced.
-          Object.assign(scene, {
-            sourceVideoUrl: videoUrl,
-            resolvedProvider: generated.provider,
-            resolvedModel: model,
-          });
-        }
-      } catch (gpuError) {
-        const gpuMessage = gpuError instanceof Error ? gpuError.message : String(gpuError);
-        await db
-          .from('video_jobs')
-          .update({
-            last_provider: 'gpu',
-            last_provider_model: null,
-            last_failure_at: new Date().toISOString(),
-            error_message: `GPU fallback: ${gpuMessage}`.slice(0, 2000),
-          })
-          .eq('id', job.id);
-        try {
-          await recordPlatformUsage(db, {
-            tenantId,
-            source: 'video.gpu-worker',
-            metric: 'video_generation_attempt',
-            quantity: 1,
-            unit: 'attempt',
-            externalRef: job.id,
-            idempotencyKey: `gpu-attempt:${job.id}:failed`,
-            metadata: {
-              success: false,
-              operation: scene.operation,
-              storyboard_hash: storyboard.promptHash,
-              course_id: job.course_id,
-              lesson_id: job.lesson_id,
-              elapsed_seconds: Math.max(0, (Date.now() - gpuStartedAt) / 1000),
-              error: gpuMessage.slice(0, 500),
-            },
-          });
-        } catch (meterError) {
-          logger.warn('[video-worker] Unable to meter failed GPU attempt', {
-            jobId: job.id,
-            error: meterError instanceof Error ? meterError.message : String(meterError),
-          });
-        }
-        logger.warn('[video-worker] GPU scene failed; falling back to Remotion', {
-          jobId: job.id,
-          operation: scene.operation,
-          error: gpuMessage,
-        });
-      } finally {
-        if (generated) await deleteGpuVideoAsset(generated);
-      }
-    }
+    // Paid GPU generation is archived from the active Course Builder route.
+    // Licensed/downloaded Envato assets and deterministic repository rendering
+    // remain the production media path. GPU code is retained in its dedicated
+    // module for future reactivation, but this worker never dispatches to it.
 
     const result = await renderStoryboardVideo({
       lessonId: renderId,
@@ -910,7 +743,9 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     const completedStoryboard: MediaStoryboard & { source_contract: unknown } = {
       ...renderedStoryboard,
       scenes: renderedStoryboard.scenes.map((scene) =>
-        scene.sceneType && exactInstructionalSceneTypes.has(scene.sceneType)
+        scene.sceneType &&
+        exactInstructionalSceneTypes.has(scene.sceneType) &&
+        !scene.sourceVideoUrl
           ? {
               ...scene,
               mediaSource: 'elevate-motion' as const,
@@ -949,6 +784,11 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
         .filter(Boolean)
         .join(' '),
       instructionalQuality,
+      narrationProviderClass: ['cloudflare', 'elevenlabs', 'gemini', 'openai', 'kokoro'].includes(String(process.env.AI_NARRATION_PROVIDER || '').trim().toLowerCase())
+        ? 'professional'
+        : ['edge', 'local'].includes(String(process.env.AI_NARRATION_PROVIDER || '').trim().toLowerCase())
+          ? 'diagnostic'
+          : 'unknown',
     });
     const sourceContract =
       persistedSceneData.source_contract && typeof persistedSceneData.source_contract === 'object'
@@ -998,202 +838,8 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
 }
 
 export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
-  const db = createAdminClient();
-
-  // An allowlisted controlled build uses the canonical deterministic CPU
-  // compositor for full lessons. Do not classify that path as paid WAN/GPU
-  // inference. Other courses and opted-in microclips retain the existing paid
-  // authorization contract.
-  const generationControl = await getCourseBuilderGenerationControl(db);
-  if (
-    job.asset_kind !== 'microclip' &&
-    cpuOnlyCourseMedia() &&
-    generationControl.allowedCourseIds.includes(job.course_id) &&
-    !usesPaidNarration(job)
-  ) {
-    await runClaimedVideoJob(job);
-    return;
-  }
-
-  try {
-    const { data: course } = await db
-      .from('courses')
-      .select('org_id')
-      .eq('id', job.course_id)
-      .maybeSingle();
-    let tenantId: string | null = null;
-    if (course?.org_id) {
-      const { data: organization } = await db
-        .from('organizations')
-        .select('tenant_id')
-        .eq('id', course.org_id)
-        .maybeSingle();
-      tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
-    }
-    const paidNarration = usesPaidNarration(job);
-    // Pre-authorized Cloudflare narration uses an isolated course scope. This
-    // lets approved course narration auto-dispatch under a tight budget without
-    // weakening manual approval for GPU video or unrelated paid inference.
-    const scopeKey = paidNarration
-      ? `course:${job.course_id}:cloudflare-tts`
-      : tenantId
-        ? `tenant:${tenantId}`
-        : 'platform';
-    const normalizedSceneData =
-      job.scene_data && typeof job.scene_data === 'object'
-        ? compactLegacySceneData(job.scene_data as Record<string, unknown>).sceneData
-        : job.scene_data;
-    const cloudflareTtsModel = process.env.CLOUDFLARE_TTS_MODEL?.trim() || '@cf/deepgram/aura-1';
-    const fingerprint = paidArtifactFingerprint({
-      operation: 'lesson-video',
-      authorizationRoute: paidNarration ? 'cloudflare-tts-cpu-remotion' : 'paid-video-render',
-      narrationModel: paidNarration ? cloudflareTtsModel : null,
-      courseId: job.course_id,
-      lessonId: job.lesson_id,
-      assetKind: job.asset_kind,
-      assetKey: job.asset_key,
-      script: job.script,
-      bulletPoints: job.bullet_points,
-      sceneData: normalizedSceneData,
-    });
-    const estimatedScenes = Math.min(
-      MAX_LESSON_VIDEO_SCENES,
-      Math.max(
-        1,
-        job.scene_count ??
-          (normalizedSceneData &&
-          typeof normalizedSceneData === 'object' &&
-          Array.isArray((normalizedSceneData as Record<string, unknown>).scenes)
-            ? ((normalizedSceneData as Record<string, unknown>).scenes as unknown[]).length
-            : Math.ceil((job.script?.split(/\s+/).filter(Boolean).length ?? 1) / 45)),
-      ),
-    );
-    const projectedCostMicros = paidNarration
-      ? Math.max(0, Number(process.env.CLOUDFLARE_TTS_PROJECTED_COST_MICROS ?? '100000'))
-      : Math.max(
-          0,
-          Number(
-            process.env.LESSON_VIDEO_PROJECTED_COST_MICROS ??
-              String(Math.max(500_000, estimatedScenes * 150_000)),
-          ),
-        );
-    const authorization = await reservePaidInference(db, {
-      scopeKey,
-      tenantId,
-      courseId: job.course_id,
-      lessonId: job.lesson_id,
-      jobId: job.id,
-      artifactFingerprint: fingerprint,
-      idempotencyKey: `lesson-video:${job.id}:${fingerprint}`,
-      provider: paidNarration ? 'cloudflare' : 'media-pipeline',
-      model: paidNarration
-        ? cloudflareTtsModel
-        : process.env.GPU_VIDEO_PROVIDER?.trim() || REMOTION_MODEL,
-      operation: 'lesson-video',
-      projectedCostMicros,
-    });
-    if (authorization.decision === 'cache_hit') {
-      const { data: cached, error: cachedError } = await db
-        .from('paid_inference_artifacts')
-        .select('storage_location,metadata')
-        .eq('scope_key', scopeKey)
-        .eq('artifact_fingerprint', fingerprint)
-        .eq('asset_type', 'lesson-video')
-        .eq('validation_status', 'valid')
-        .maybeSingle();
-      if (cachedError || !cached?.storage_location) {
-        await markFailed(
-          job.id,
-          'Validated media cache record is unavailable',
-          {
-            provider: 'paid-inference-gateway',
-          },
-          job.lease_token,
-        );
-        return;
-      }
-      const metadata =
-        cached.metadata && typeof cached.metadata === 'object'
-          ? (cached.metadata as Record<string, unknown>)
-          : {};
-      await markComplete(
-        job.id,
-        {
-          video_url: cached.storage_location,
-          ...(typeof metadata.audio_url === 'string' ? { audio_url: metadata.audio_url } : {}),
-          ...(typeof metadata.duration_seconds === 'number'
-            ? { duration_seconds: metadata.duration_seconds }
-            : {}),
-          ...(typeof metadata.scene_count === 'number'
-            ? { scene_count: metadata.scene_count }
-            : {}),
-          ...(metadata.scene_data ? { scene_data: metadata.scene_data } : {}),
-          provider: 'artifact-cache',
-          provider_model: 'validated-reuse',
-          ...(metadata.quality_evidence && typeof metadata.quality_evidence === 'object'
-            ? { quality_evidence: metadata.quality_evidence as never }
-            : {}),
-        },
-        job.lease_token,
-      );
-      return;
-    }
-    if (authorization.decision !== 'approved' || !authorization.requestId) {
-      if (authorization.decision === 'approval_required') {
-        await markAwaitingPaidApproval(job);
-        return;
-      }
-      await markFailed(
-        job.id,
-        `Paid media authorization blocked: ${authorization.decision}`,
-        {
-          provider: 'paid-inference-gateway',
-        },
-        job.lease_token,
-      );
-      return;
-    }
-    const paidExecution = await executePaidInference({
-      db,
-      authorize: async () => authorization,
-      dispatch: () => runClaimedVideoJob(job),
-    });
-    if (paidExecution.decision === 'approved' && paidExecution.requestId) {
-      const { data: completedJob, error: completedJobError } = await db
-        .from('video_jobs')
-        .select(
-          'status,video_url,audio_url,duration_seconds,scene_count,scene_data,quality_evidence',
-        )
-        .eq('id', job.id)
-        .maybeSingle();
-      if (completedJobError) throw completedJobError;
-      if (completedJob?.status === 'complete' && completedJob.video_url) {
-        const { error: artifactError } = await db.from('paid_inference_artifacts').upsert(
-          {
-            scope_key: scopeKey,
-            tenant_id: tenantId,
-            artifact_fingerprint: fingerprint,
-            asset_type: 'lesson-video',
-            storage_location: completedJob.video_url,
-            validation_status: 'valid',
-            source_request_id: paidExecution.requestId,
-            validated_at: new Date().toISOString(),
-            metadata: {
-              audio_url: completedJob.audio_url,
-              duration_seconds: completedJob.duration_seconds,
-              scene_count: completedJob.scene_count,
-              scene_data: completedJob.scene_data,
-              quality_evidence: completedJob.quality_evidence,
-            },
-          },
-          { onConflict: 'scope_key,artifact_fingerprint,asset_type' },
-        );
-        if (artifactError) {
-          throw new Error(`MEDIA_ARTIFACT_CACHE_PERSIST_FAILED:${artifactError.message}`);
-        }
-      }
-    }
-  } catch (error) {
-    logger.error('[video-worker] Paid media orchestration failed', error, { jobId: job.id });
-  }
+  // Canonical Course Builder lesson media never uses the paid-inference
+  // authorization gateway. Subscription-licensed Envato/repository media and
+  // the configured professional narration/render pipeline execute directly.
+  await runClaimedVideoJob(job);
 }

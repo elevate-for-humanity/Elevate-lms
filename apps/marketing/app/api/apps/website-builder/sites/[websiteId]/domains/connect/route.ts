@@ -22,7 +22,7 @@ export async function POST(
   const { websiteId } = await params;
   const resolved = await resolveOwnedSite(websiteId);
   if ('error' in resolved) return resolved.error;
-  const { user, supabase, site, originUrl, entitlement } = resolved;
+  const { user, supabase, site, originUrl, entitlement, ownerUserId } = resolved;
 
   const entitlementError = requireCustomDomainEntitlement(entitlement);
   if (entitlementError) return entitlementError;
@@ -41,7 +41,6 @@ export async function POST(
     .from('website_domains')
     .select('id')
     .eq('website_id', websiteId)
-    .eq('user_id', user.id)
     .ilike('hostname', hostname)
     .neq('status', 'deleted')
     .maybeSingle();
@@ -50,7 +49,7 @@ export async function POST(
   try {
     const idempotencyKey = `elevate-connect-${websiteId}-${hostname}`;
     const result = await connectDomain(hostname, originUrl, {
-      metadata: { websiteId, userId: user.id, siteName: site.site_name },
+      metadata: { websiteId, userId: ownerUserId, siteName: site.site_name },
       idempotencyKey,
     });
     const domain = result.domain;
@@ -58,7 +57,7 @@ export async function POST(
       .from('website_domains')
       .insert({
         website_id: websiteId,
-        user_id: user.id,
+        user_id: ownerUserId,
         hostname: domain.hostname,
         domainee_domain_id: domain.id,
         mode: 'connect',

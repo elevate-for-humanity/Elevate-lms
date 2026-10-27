@@ -1,26 +1,65 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Shield, Server, Database, RefreshCw, Clock, CheckCircle,
-  AlertTriangle, Download, Cloud, HardDrive, Activity, Users,
-  Phone, Mail, ArrowRight, Lock, Monitor
+import {
+  Shield,
+  Server,
+  Database,
+  RefreshCw,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Download,
+  Cloud,
+  HardDrive,
+  Activity,
+  Users,
+  Phone,
+  Mail,
+  ArrowRight,
+  Lock,
+  Monitor,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Disaster Recovery & Business Continuity',
-  keywords: ["disaster recovery", "business continuity", "backup", "data protection", "uptime", "SLA"],
-  description: 'Learn about our disaster recovery and business continuity plans. Backup schedules, recovery procedures, and uptime guarantees.',
+  keywords: [
+    'disaster recovery',
+    'business continuity',
+    'backup',
+    'data protection',
+    'uptime',
+    'SLA',
+  ],
+  description:
+    'Learn about our disaster recovery and business continuity plans. Backup schedules, recovery procedures, and uptime guarantees.',
+
+  ...publicArtworkMetadata({
+    path: '/disaster-recovery',
+    image: '/images/refresh-20261014/security.webp',
+    alt: 'Illustrative data-center infrastructure for business continuity',
+    title: 'Disaster Recovery & Business Continuity',
+    description:
+      'Learn about our disaster recovery and business continuity plans. Backup schedules, recovery procedures, and uptime guarantees.',
+  }),
 };
 
 export default function DisasterRecoveryPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/security.webp"
+        alt="Illustrative data-center infrastructure for business continuity"
+        actions={[
+          { href: '/contact', label: 'Discuss continuity requirements' },
+          { href: '/security', label: 'Review security information' },
+        ]}
+      />
+
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <Image src="/images/team/instructors/instructor-recovery.webp" alt="Disaster recovery and business continuity - Elevate for Humanity" fill className="object-cover" sizes="100vw" />
-        </div>
+      <section className="relative bg-slate-950 text-white py-8 sm:py-10 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -31,14 +70,20 @@ export default function DisasterRecoveryPage() {
               Disaster Recovery & Continuity
             </h1>
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              "If the system goes down, what happens?" — We have the answer. 
-              Our infrastructure is built for resilience with multiple layers of protection.
+              "If the system goes down, what happens?" — We have the answer. Our infrastructure is
+              built for resilience with multiple layers of protection.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/security" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/security"
+                className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 Security Overview
               </Link>
-              <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/contact"
+                className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 System Status
               </Link>
             </div>
@@ -78,8 +123,8 @@ export default function DisasterRecoveryPage() {
               What Happens If the System Goes Down?
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              We understand that your organization depends on Elevate being available. 
-              Here's exactly what happens in various scenarios.
+              We understand that your organization depends on Elevate being available. Here's
+              exactly what happens in various scenarios.
             </p>
           </div>
 
@@ -306,9 +351,7 @@ export default function DisasterRecoveryPage() {
                 <Database className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">Daily Backups</h3>
-              <p className="text-slate-600 text-sm">
-                Automated daily full backups at 2:00 AM EST
-              </p>
+              <p className="text-slate-600 text-sm">Automated daily full backups at 2:00 AM EST</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
@@ -316,9 +359,7 @@ export default function DisasterRecoveryPage() {
                 <RefreshCw className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">Continuous Replication</h3>
-              <p className="text-slate-600 text-sm">
-                Real-time data sync to secondary location
-              </p>
+              <p className="text-slate-600 text-sm">Real-time data sync to secondary location</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
@@ -326,9 +367,7 @@ export default function DisasterRecoveryPage() {
                 <HardDrive className="w-8 h-8 text-amber-600" />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">30-Day Retention</h3>
-              <p className="text-slate-600 text-sm">
-                Point-in-time recovery for last 30 days
-              </p>
+              <p className="text-slate-600 text-sm">Point-in-time recovery for last 30 days</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
@@ -336,9 +375,7 @@ export default function DisasterRecoveryPage() {
                 <Shield className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">Encrypted Storage</h3>
-              <p className="text-slate-600 text-sm">
-                All backups encrypted with AES-256
-              </p>
+              <p className="text-slate-600 text-sm">All backups encrypted with AES-256</p>
             </div>
           </div>
         </div>
@@ -353,13 +390,15 @@ export default function DisasterRecoveryPage() {
                 24/7 Monitoring & Escalation
               </h2>
               <p className="text-lg text-slate-700 leading-relaxed mb-8">
-                Our infrastructure is monitored around the clock. When issues occur, 
-                our team follows a proven escalation path to minimize impact.
+                Our infrastructure is monitored around the clock. When issues occur, our team
+                follows a proven escalation path to minimize impact.
               </p>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">
+                    1
+                  </div>
                   <div>
                     <h4 className="font-bold text-slate-900 mb-1">Automated Monitoring</h4>
                     <p className="text-slate-600 text-sm">
@@ -369,7 +408,9 @@ export default function DisasterRecoveryPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">
+                    2
+                  </div>
                   <div>
                     <h4 className="font-bold text-slate-900 mb-1">On-Call Response</h4>
                     <p className="text-slate-600 text-sm">
@@ -379,7 +420,9 @@ export default function DisasterRecoveryPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">
+                    3
+                  </div>
                   <div>
                     <h4 className="font-bold text-slate-900 mb-1">Escalation Path</h4>
                     <p className="text-slate-600 text-sm">
@@ -389,7 +432,9 @@ export default function DisasterRecoveryPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold">
+                    4
+                  </div>
                   <div>
                     <h4 className="font-bold text-slate-900 mb-1">Customer Communication</h4>
                     <p className="text-slate-600 text-sm">
@@ -405,12 +450,14 @@ export default function DisasterRecoveryPage() {
                 <Monitor className="w-6 h-6 text-brand-blue-600" />
                 Support Escalation Contacts
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-slate-900">Critical Outage</span>
-                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">Immediate</span>
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                      Immediate
+                    </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <span className="flex items-center gap-1">
@@ -427,7 +474,9 @@ export default function DisasterRecoveryPage() {
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-slate-900">Urgent Issue</span>
-                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">15 min</span>
+                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                      15 min
+                    </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <span className="flex items-center gap-1">
@@ -444,7 +493,9 @@ export default function DisasterRecoveryPage() {
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-slate-900">Standard Support</span>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Business Hours</span>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      Business Hours
+                    </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <span className="flex items-center gap-1">
@@ -502,7 +553,9 @@ export default function DisasterRecoveryPage() {
                   <td className="text-center py-4 px-4 font-bold text-brand-blue-600">99.99%</td>
                   <td className="text-center py-4 px-4 font-bold text-brand-blue-600">1 hour</td>
                   <td className="text-center py-4 px-4 font-bold text-brand-blue-600">15 min</td>
-                  <td className="text-center py-4 px-4 font-bold text-brand-blue-600">24/7 Dedicated</td>
+                  <td className="text-center py-4 px-4 font-bold text-brand-blue-600">
+                    24/7 Dedicated
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -512,8 +565,9 @@ export default function DisasterRecoveryPage() {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-800">
-                <strong>Service Credits:</strong> If we fail to meet our SLA, Enterprise customers receive 
-                service credits on a sliding scale (1 hour of free service per 1 hour of downtime below 99.9%).
+                <strong>Service Credits:</strong> If we fail to meet our SLA, Enterprise customers
+                receive service credits on a sliding scale (1 hour of free service per 1 hour of
+                downtime below 99.9%).
               </p>
             </div>
           </div>
@@ -527,14 +581,20 @@ export default function DisasterRecoveryPage() {
             Questions About Our Infrastructure?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Our team is happy to provide detailed technical documentation, runbook summaries, 
-            or answer any questions about our disaster recovery capabilities.
+            Our team is happy to provide detailed technical documentation, runbook summaries, or
+            answer any questions about our disaster recovery capabilities.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Contact Sales <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               View System Status
             </Link>
           </div>

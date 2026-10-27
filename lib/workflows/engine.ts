@@ -11,6 +11,7 @@ import { emitEvent } from '@/lib/platform/events';
 import { sendEmail } from '@/lib/email/service';
 import { aiChat } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 import {
   getWorkflowToolDefinition,
   isWorkflowMutationTableAllowed,
@@ -278,6 +279,10 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
       ],
     });
 
+    if (typeof response.content !== 'string' || !response.content.trim()) {
+      return { ok: false, output: { error: 'AI action did not produce usable content' } };
+    }
+
     const persistTable = typeof config.persist_table === 'string' ? config.persist_table.trim() : '';
     const persistMatch = config.persist_match as Record<string, unknown> | string | undefined;
     const persistField = typeof config.persist_field === 'string' ? config.persist_field.trim() : '';
@@ -295,16 +300,20 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
       } catch {
         return { ok: false, output: { error: 'ai_action persist_match must be valid JSON' } };
       }
-      if (!Object.keys(matchObj).length) {
+      if (!matchObj || typeof matchObj !== 'object' || Array.isArray(matchObj) || !Object.keys(matchObj).length) {
         return { ok: false, output: { error: 'ai_action persist_match must be non-empty' } };
       }
 
       const db = await requireAdminClient();
-      const { error } = await db
+      const { data, error } = await db
         .from(persistTable)
         .update({ [persistField]: response.content })
-        .match(interpolateObj(matchObj, ctx.triggerPayload));
+        .match(interpolateObj(matchObj, ctx.triggerPayload))
+        .select(persistField);
       if (error) return { ok: false, output: { error: error.message } };
+      if (!data?.length || data.some(row => row[persistField] !== response.content)) {
+        return { ok: false, output: { error: 'AI action persistence could not be verified' } };
+      }
     }
 
     return {
@@ -420,6 +429,8 @@ export async function executeWorkflow(
   triggerId?: string,
   traceId?: string,
   tenantId?: string,
+  studioContext?: { runId?: string; stepId?: string },
+  executionContext?: { platformEventId?: string },
 ): Promise<{ runId: string; status: RunStatus; stepsRun: number; error?: string }> {
   const runStart = Date.now();
   const db = await requireAdminClient();
@@ -439,6 +450,12 @@ export async function executeWorkflow(
     return { runId: '', status: 'failed', stepsRun: 0, error: stepsErr.message };
   }
 
+  // A zero-step run cannot verify an outcome. Reject it before creating a
+  // misleading successful history entry or emitting execution events.
+  if (!steps?.length) {
+    return { runId: '', status: 'failed', stepsRun: 0, error: 'Workflow has no enabled steps. Add and enable a step before running it.' };
+  }
+
   const { data: run, error: runErr } = await db
     .from('workflow_runs')
     .insert({
@@ -451,10 +468,23 @@ export async function executeWorkflow(
       steps_done: 0,
       retry_count: 0,
       started_at: new Date().toISOString(),
+      ...(executionContext?.platformEventId ? { platform_event_id: executionContext.platformEventId } : {}),
       ...(tenantId ? { tenant_id: tenantId } : {}),
     })
     .select('id')
     .single();
+
+  if (studioContext?.runId && run) {
+    await recordMasterStudioArtifact(db, {
+      runId: studioContext.runId,
+      stepId: studioContext.stepId,
+      type: 'workflow-run',
+      name: `Workflow run ${run.id}`,
+      status: 'generated',
+      metadata: { workflow_id: workflowId, workflow_run_id: run.id, triggered_by: triggeredBy, trace_id: trace },
+      evidence: [{ source: 'workflow-engine', captured_at: new Date().toISOString() }],
+    }).catch(() => undefined);
+  }
 
   if (runErr || !run) {
     const err = runErr ? new Error(runErr.message) : new Error('Failed to create run record');

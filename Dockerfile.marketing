@@ -1,5 +1,6 @@
-# syntax=docker/dockerfile:1.7
-FROM node:22-alpine AS base
+# Use Docker BuildKit's bundled frontend; this file needs no external syntax features.
+ARG NODE_IMAGE=node:22-alpine
+FROM ${NODE_IMAGE} AS base
 
 # Invalidate Northflank's runtime image after the September 20 production 502 incident.
 RUN echo "nf-cache-invalidate-marketing-2026-09-20-runtime-recovery"
@@ -16,6 +17,7 @@ RUN corepack disable || true \
     && test "$(pnpm --version)" = "10.28.2"
 
 WORKDIR /workspace
+RUN apk add --no-cache util-linux
 
 FROM base AS dependencies
 
@@ -28,14 +30,18 @@ COPY packages/db/package.json ./packages/db/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
 
-# Marketing does not use the ffmpeg-static binary at runtime. The repository's
-# last known-good Northflank recovery removed it from pnpm's allowed build
-# scripts because its GitHub-hosted postinstall download repeatedly failed with
-# ECONNRESET/socket-hang-up and blocked otherwise valid images.
-RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
-RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
+# Marketing and Store do not use ffmpeg-static at runtime. Fail closed unless
+# the workspace explicitly blocks its network-dependent postinstall download.
+RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
+COPY packages/bounded-braces ./packages/bounded-braces
+COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
+RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
+
+ARG APPLICATION_SERVICE=marketing
+ENV APPLICATION_SERVICE=$APPLICATION_SERVICE
+RUN case "$APPLICATION_SERVICE" in marketing|store) ;; *) exit 1 ;; esac
 
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
@@ -46,16 +52,16 @@ ARG NEXT_PUBLIC_LMS_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SUPPORT_EMAIL=support@elevateforhumanity.org
 
 ENV NODE_ENV=production
 ENV CI=true
-ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GITHUB_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
-ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
+ENV NEXT_PUBLIC_BUILD_ID="$APPLICATION_SERVICE-$NF_GIT_SHA"
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
@@ -65,6 +71,7 @@ ENV NEXT_PUBLIC_LMS_URL=$NEXT_PUBLIC_LMS_URL
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPPORT_EMAIL=$NEXT_PUBLIC_SUPPORT_EMAIL
 
 COPY --from=dependencies /workspace/node_modules ./node_modules
 # pnpm keeps direct workspace dependencies (including browser polyfills) in the
@@ -75,6 +82,7 @@ COPY . .
 
 RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+    && test -n "$NEXT_PUBLIC_SUPPORT_EMAIL" \
     && echo "Marketing public build arguments verified"
 
 # Website Builder defaults and shared authenticated portal contracts are release
@@ -90,8 +98,8 @@ RUN EFFECTIVE_SHA="${NF_GIT_SHA}" && \
     test "${EFFECTIVE_SHA}" != "unknown" && \
     echo "${EFFECTIVE_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
     echo "Marketing build SHA validated: ${EFFECTIVE_SHA}" && \
-    printf '{"service":"marketing","commit":"%s","builtAt":"%s"}\n' \
-      "${EFFECTIVE_SHA}" "${EFFECTIVE_BUILT_AT}" > /workspace/public/version.json
+    printf '{"service":"%s","commit":"%s","builtAt":"%s"}\n' \
+      "${APPLICATION_SERVICE}" "${EFFECTIVE_SHA}" "${EFFECTIVE_BUILT_AT}" > /workspace/public/version.json
 
 RUN node scripts/stamp-sw.mjs
 
@@ -103,7 +111,9 @@ RUN pnpm --filter @elevate/marketing build
 RUN test -d /workspace/apps/marketing/.next
 RUN test -f /workspace/apps/marketing/.next/BUILD_ID
 
-FROM node:22-alpine AS runner
+FROM ${NODE_IMAGE} AS runner
+
+ARG APPLICATION_SERVICE=marketing
 
 WORKDIR /app
 
@@ -118,7 +128,7 @@ ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GITHUB_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
-ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
+ENV NEXT_PUBLIC_BUILD_ID="$APPLICATION_SERVICE-$NF_GIT_SHA"
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
@@ -130,6 +140,14 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/standalone \
     ./
 
+# Preserve the pnpm virtual-store graph used by the traced standalone server.
+# Copying one package at a time breaks Next transitive resolution (for example
+# styled-jsx). The standalone tree contains package links; materialize the
+# matching production dependency graph from the builder so those links resolve.
+COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules ./node_modules/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/node_modules ./apps/marketing/node_modules/
+RUN mkdir -p /app/apps/marketing/node_modules && src=$(find /app/node_modules/.pnpm -maxdepth 1 -type d -name 'styled-jsx@*' | head -n1) && test -n "$src" && cp -aL "$src/node_modules/styled-jsx" /app/apps/marketing/node_modules/styled-jsx
+
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
@@ -139,15 +157,17 @@ COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/pub
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./public/data/hero-banners.json
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./apps/marketing/public/data/hero-banners.json
 
-RUN test -f /app/public/version.json && \
+RUN test -s /app/public/images/social/elevate-career-training-20261009.jpg && \
+    test -s /app/apps/marketing/public/images/social/elevate-career-training-20261009.jpg && \
+    test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
     test -f /app/apps/marketing/public/manifest-marketing.json && \
     test -f /app/apps/marketing/server.js && \
+    test -f /app/apps/marketing/node_modules/next/dist/server/next.js && \
+    node -e "require.resolve('styled-jsx/style',{paths:['/app/apps/marketing']})" && \
     test -s /app/public/data/hero-banners.json && \
     test -s /app/apps/marketing/public/data/hero-banners.json && \
-    test -s /app/public/images/partners/razors-image-storefront.webp && \
-    test -s /app/apps/marketing/public/images/partners/razors-image-storefront.webp && \
     test -s /app/public/images/heroes/hero-homepage.webp && \
     test -s /app/apps/marketing/public/images/heroes/hero-homepage.webp && \
     test -s /app/public/images/pages/barber-apprenticeship-hero.jpg && \
@@ -162,6 +182,8 @@ RUN test -f /app/public/version.json && \
 
 RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true
 
+COPY --chown=nextjs:nodejs scripts/runtime-memory-policy.mjs scripts/build-memory-policy.mjs ./scripts/
+
 USER nextjs
 
 EXPOSE 3000
@@ -169,4 +191,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
 
-CMD ["node", "--max-old-space-size=4096", "apps/marketing/server.js"]
+CMD ["sh", "-c", "exec node --max-old-space-size=$(node scripts/runtime-memory-policy.mjs) apps/marketing/server.js"]

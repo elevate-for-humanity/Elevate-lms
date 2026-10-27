@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'AI Workforce Platform | Elevate for Humanity',
-  description: 'AI-powered workforce technology platform. PARIS AI, Dev Studio, Course Factory, Credential Engine, and more.',
+  description: 'AI-powered workforce technology platform. PARIS AI, Dev Studio, Ultimate Course Builder, Credential Engine, and more.',
 };
 
 const aiProducts = [
@@ -41,7 +41,7 @@ const aiProducts = [
   },
   {
     slug: 'course-factory',
-    name: 'AI Course Factory',
+    name: 'AI Ultimate Course Builder',
     tagline: 'Create Curriculum at Scale',
     description: 'Generate complete courses with lessons, quizzes, and assessments using AI automation.',
     icon: '📚',
@@ -136,7 +136,7 @@ export default function AIPage() {
     <div className="min-h-screen">
       <SEO
         title="AI Workforce Platform"
-        description="AI-powered workforce technology. PARIS AI, Dev Studio, Course Factory, Credential Engine, and more."
+        description="AI-powered workforce technology. PARIS AI, Dev Studio, Ultimate Course Builder, Credential Engine, and more."
         breadcrumb={[{ name: 'Platform', url: '/platform' }, { name: 'AI', url: '/ai' }]}
       />
       

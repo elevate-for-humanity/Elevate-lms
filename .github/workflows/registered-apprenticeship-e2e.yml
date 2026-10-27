@@ -2,6 +2,16 @@ name: Registered Apprenticeship E2E
 
 on:
   workflow_dispatch:
+    inputs:
+      deployed_sha:
+        description: Exact live commit from a completed deployment
+        type: string
+      deployment_run_id:
+        description: Source deployment run to verify before accepting its commit
+        type: string
+      component:
+        description: Deployed component whose public revision must match
+        type: string
   push:
     branches:
       - main
@@ -10,33 +20,45 @@ on:
       - 'playwright.config.ts'
       - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
       - 'tests/e2e/portal-responsive-design.spec.ts'
+      - 'tests/e2e/public-runtime-acceptance.spec.ts'
+      - 'scripts/gcp/production-acceptance.*'
+      - 'scripts/qa/require-portal-e2e-identities.*'
+      - 'components/home/ScrollNarrator.tsx'
+      - 'components/voice/useNaturalVoice.ts'
+      - 'components/marketing/HeroVideo.tsx'
+      - 'components/pwa/**'
       - 'scripts/check-registered-apprenticeship-architecture.mjs'
       - 'scripts/qa/provision-apprenticeship-e2e.mjs'
       - 'scripts/qa/provision-learner-program-holder-e2e.mjs'
       - 'scripts/qa/provision-remaining-portal-e2e.mjs'
   workflow_run:
     workflows:
-      - Deploy LMS
+      - Deploy repaired Google services
       - Deploy Admin
+      - Repair Google Studio browser runtime
+      - Deploy LMS automatically on Google
+      - Deploy Google Marketing on trigger
     types:
       - completed
 
 permissions:
   contents: read
+  actions: read
   issues: write
 
 # Keep source-regression QA and exact deployed-SHA certification independent.
 # Newer runs may supersede older runs of the same authority class, but a
 # test-only push must never cancel the workflow_run that certifies production.
 concurrency:
-  group: registered-apprenticeship-e2e-${{ github.event_name == 'workflow_run' && 'deployment' || 'source' }}
+  group: registered-apprenticeship-e2e-${{ (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
   cancel-in-progress: true
 
 jobs:
   production-authenticated-e2e:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Dispatch-only success proves the deployment ran, not just that it was queued.
+    if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
     name: Full portal authenticated persistence and responsive design
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 70
     env:
@@ -46,7 +68,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify explicit deployment handoff before checking out its tested commit
+        if: inputs.deployment_run_id != '' || inputs.deployed_sha != '' || inputs.component != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: ${{ inputs.component }}
+          ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
+          ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs verify
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -55,6 +94,8 @@ jobs:
           node-version: '22'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Verify runtime Studio browser URL precedence
+        run: node --test scripts/test-studio-browser-configuration.mjs
       - name: Verify production LMS is ready
         shell: bash
         run: |
@@ -82,14 +123,34 @@ jobs:
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
       - name: Provision Employer + Instructor + Staff + Case Manager + Admin identities
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
+      - name: Require all nine roles so authenticated tests cannot silently skip
+        run: |
+          node --test scripts/qa/require-portal-e2e-identities.test.mjs
+          node scripts/qa/require-portal-e2e-identities.mjs
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install chromium webkit --with-deps
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
+      - name: Verify public hydration, startup stability and audible-media exclusivity
+        if: ${{ !cancelled() }}
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+      - name: Certify Studio sign-in and fonts on all devices
+        if: ${{ !cancelled() }}
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
+        if: ${{ !cancelled() }}
         run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
+        if: ${{ !cancelled() }}
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+      - name: Require the attested release to remain live through acceptance
+        if: ${{ !cancelled() && inputs.deployment_run_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: ${{ inputs.component }}
+          ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
+          ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
+        run: node scripts/gcp/production-acceptance.mjs verify
       - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
@@ -114,7 +175,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           QA_STATUS: ${{ job.status }}
-          QA_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          QA_SHA: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
           QA_EVENT: ${{ github.event_name }}
           QA_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash

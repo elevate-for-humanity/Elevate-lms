@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CourseExperienceSchema } from './experience-contract';
+import { normalizeProviderJson } from './provider-json-normalizer';
 
 export const quizQuestionSchema = z
   .object({
@@ -152,7 +153,7 @@ function parseRawJson(raw: string | null | undefined, label: string): unknown {
     throw new Error(`${label} returned markdown-wrapped JSON; plain JSON is required`);
   }
   try {
-    return JSON.parse(content);
+    return JSON.parse(normalizeProviderJson(content));
   } catch (error) {
     throw new Error(
       `${label} returned malformed JSON: ${error instanceof Error ? error.message : String(error)}`,

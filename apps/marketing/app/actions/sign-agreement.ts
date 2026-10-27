@@ -6,6 +6,7 @@ import {
   recordAgreementAcceptance,
   type AgreementType,
 } from '@/lib/legal/recordAgreementAcceptance';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
 
@@ -30,6 +31,10 @@ export async function signAgreement(data: {
     .eq('id', user.id)
     .maybeSingle();
 
+  if (data.agreementType === 'program_holder_mou') {
+    const context = await requireProgramHolder();
+    if (context.mode !== 'holder' || context.user.id !== user.id || data.agreementVersion !== `3.0-${context.holderId}`) return { success: false, error: 'Sign the current Program Holder agreement from your own portal.' };
+  }
   const requestHeaders = await headers();
   const ipAddress =
     requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -73,8 +78,6 @@ export async function signAgreement(data: {
         mou_holder_name: signerName,
         mou_status: 'signed',
         status: 'active',
-        enrollments_restricted: false,
-        restriction_reason: null,
         updated_at: signedAt,
       })
       .eq('id', profile.program_holder_id);

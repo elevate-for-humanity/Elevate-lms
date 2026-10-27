@@ -3,19 +3,14 @@ import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
-import {
-  getNorthflankProjectId,
-  getNorthflankServices,
-  isNorthflankReady,
-} from '@/lib/northflank/runtime';
-import { hydrateNorthflankEnv } from '@/lib/secrets';
+import { getGoogleServices, isGoogleRuntimeReady, googleProjectId } from '@/lib/google/runtime';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
-import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
  *
- * Dev Studio execution is admin-native. The legacy Studio Shell was removed and
+ * Master Studio execution uses the Admin control plane and the Google Studio runtime. The legacy Studio Shell was removed and
  * is explicitly forbidden by scripts/verify-no-studio-shell.mjs, so health must
  * never require STUDIO_SHELL_* variables or advertise a separate shell service.
  */
@@ -23,19 +18,35 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
-  const ai = await resolveAIRuntimeState().catch(() => ({
+  const [ai, cloudflareProbe] = await Promise.all([
+    resolveAIRuntimeState().catch(() => ({
     providers: { groq: false, xai: false, gemini: false, openai: false, anthropic: false, cloudflare: false },
     activeProvider: 'none', elevate: false, anyConfigured: false,
-  }));
-  await hydrateNorthflankEnv().catch(() => undefined);
-  const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic, cloudflare: hasCloudflare } = ai.providers;
-  const githubToken = await getGitHubToken();
+    })),
+    probeCloudflareWorkersAI().catch(() => ({
+      configured: false,
+      reachable: false,
+      status: 'unreachable' as const,
+      detail: 'Cloudflare Workers AI live probe failed.',
+      checkedAt: new Date().toISOString(),
+    })),
+  ]);
+  const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
+  const hasCloudflare = cloudflareProbe.reachable;
+  let githubAuthError: string | null = null;
+  const githubToken = await getGitHubToken().catch(() => {
+    githubAuthError = 'github_authentication_unavailable';
+    return null;
+  });
   const hasGitHub = Boolean(githubToken);
   let githubTokenValid = false;
   if (githubToken) {
     try {
-      const response = await fetch('https://api.github.com/user', {
+      // Installation credentials represent an App, not a user. Probe the
+      // repository PARIS actually needs rather than the user-only endpoint.
+      const response = await fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main', {
         headers: { Authorization: `Bearer ${githubToken}`, Accept: 'application/vnd.github+json' },
+        redirect: 'error',
         cache: 'no-store',
         signal: AbortSignal.timeout(5000),
       });
@@ -47,16 +58,10 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const activeProvider = ai.activeProvider;
   const hasElevate = ai.elevate;
   const aiConfigured = ai.anyConfigured;
-  const northflankServices = getNorthflankServices().map((service) => ({
-    key: service.key,
-    id: service.id,
-    configured: Boolean(service.id),
-  }));
-  const northflankTokenPresent = Boolean(
-    process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY || process.env.NF_API_TOKEN,
-  );
-  const northflankProjectIdPresent = Boolean(getNorthflankProjectId());
-
+  // Configuration alone does not establish successful browser or workflow execution.
+  const executionPrerequisitesReady = githubTokenValid && isGoogleRuntimeReady() &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && hasElevate;
   let nextVersion = 'unknown';
   try {
     nextVersion = require('next/package.json').version;
@@ -71,10 +76,13 @@ export async function handleDevStudioHealth(req: NextRequest) {
     hasOpenAI,
     hasAnthropic,
     hasElevate,
+    ownedModel: 'ownedModel' in ai ? ai.ownedModel : { configured: false, verified: false, status: 'unavailable' },
     hasCloudflare,
+    cloudflare: cloudflareProbe,
     activeProvider,
     hasGitHub,
     githubTokenValid,
+    githubAuthError,
     aiConfigured,
     supabaseUrlPresent: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL),
     supabaseServiceKeyPresent: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
@@ -97,16 +105,17 @@ export async function handleDevStudioHealth(req: NextRequest) {
       pushScript: 'pnpm run git:push-main',
     },
     execution: {
-      mode: 'admin-native',
-      ready: true,
+      mode: 'master-studio',
+      ready: executionPrerequisitesReady,
+      verifiedEndToEnd: false,
+      status: executionPrerequisitesReady ? 'prerequisites-configured-not-tested' : 'missing-prerequisites',
       repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,
     },
-    northflank: {
-      ready: isNorthflankReady(),
-      tokenPresent: northflankTokenPresent,
-      projectIdPresent: northflankProjectIdPresent,
-      services: northflankServices,
+    google: {
+      provider: 'google-cloud', ready: isGoogleRuntimeReady(), project: googleProjectId(),
+      deploymentDispatchReady: githubTokenValid,
+      services: getGoogleServices().map(({ key, id }) => ({ key, id })),
     },
     runtime: 'nodejs',
     service: 'admin',

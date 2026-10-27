@@ -127,7 +127,7 @@ export default function SearchModal() {
           <circle cx="11" cy="11" r="8" />
           <path strokeLinecap="round" d="M21 21l-4.35-4.35" />
         </svg>
-        <span className="hidden xl:inline text-xs text-slate-400 border border-slate-200 rounded px-1.5 py-0.5">
+        <span className="hidden xl:inline text-xs text-slate-600 border border-slate-200 rounded px-1.5 py-0.5">
           ⌘K
         </span>
       </button>
@@ -153,7 +153,7 @@ export default function SearchModal() {
             <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-slate-400 flex-shrink-0"
+                className="w-5 h-5 text-slate-600 flex-shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -178,7 +178,7 @@ export default function SearchModal() {
                 type="button"
                 onClick={close}
                 aria-label="Close search"
-                className="text-xs text-slate-400 border border-slate-200 rounded px-1.5 py-0.5 hover:bg-slate-100 transition-colors"
+                className="text-xs text-slate-600 border border-slate-200 rounded px-1.5 py-0.5 hover:bg-slate-100 transition-colors"
               >
                 Esc
               </button>
@@ -202,7 +202,7 @@ export default function SearchModal() {
                           <p className="text-xs text-slate-500 truncate mt-0.5">{r.subtitle}</p>
                         )}
                       </div>
-                      <span className="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide text-slate-400 border border-slate-200 rounded px-1.5 py-0.5">
+                      <span className="flex-shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-600 border border-slate-200 rounded px-1.5 py-0.5">
                         {r.category}
                       </span>
                     </Link>
@@ -210,12 +210,12 @@ export default function SearchModal() {
                 ))}
               </ul>
             ) : query.trim() ? (
-              <p className="px-4 py-6 text-sm text-slate-400 text-center">
+              <p className="px-4 py-6 text-sm text-slate-600 text-center">
                 No results for &ldquo;{query}&rdquo;
               </p>
             ) : (
               <div className="px-4 py-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Quick links</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-600 mb-3">Quick links</p>
                 <div className="flex flex-wrap gap-2">
                   {['Barber Apprenticeship', 'CNA', 'HVAC', 'Medical Assistant', 'Check Eligibility'].map((q) => (
                     <button
@@ -232,7 +232,7 @@ export default function SearchModal() {
             )}
 
             {/* Footer */}
-            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-slate-100 bg-slate-50 text-xs text-slate-400">
+            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-slate-100 bg-slate-50 text-xs text-slate-600">
               <span><kbd className="font-mono">↑↓</kbd> navigate</span>
               <span><kbd className="font-mono">↵</kbd> open</span>
               <span><kbd className="font-mono">Esc</kbd> close</span>

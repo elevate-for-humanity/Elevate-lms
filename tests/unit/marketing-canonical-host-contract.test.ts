@@ -18,7 +18,7 @@ describe('marketing canonical host contract', () => {
   });
 
   it('keeps deployment-provider copies out of search results', () => {
-    expect(middleware).toContain("const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app']");
+    expect(middleware).toContain("const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app']");
     expect(middleware).not.toContain("'.vercel.app'");
     expect(middleware).not.toContain("'.pages.dev'");
     expect(middleware).not.toContain("'.netlify.app'");

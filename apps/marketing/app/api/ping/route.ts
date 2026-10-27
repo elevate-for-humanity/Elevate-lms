@@ -6,6 +6,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,7 +16,7 @@ export async function GET() {
   return NextResponse.json(
     {
       ok: true,
-      service: 'marketing',
+      service: getPublicRuntimeService(),
       commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),

@@ -1,0 +1,85 @@
+# Canonical production continuation: Barber + Cosmetology media checkpoints
+name: Course Builder Production Kick
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/course-builder-production-kick.yml'
+      - 'Dockerfile.ultimate-worker'
+      - 'lib/video/edge-tts.ts'
+      - 'workers/local-speech-smoke.mjs'
+      - 'workers/admin-speech-cache.mjs'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: course-builder-production-kick
+  # A workflow-file repair must replace the older continuation loop immediately.
+  # The actual render stays owned by the Admin worker/database lease, so cancelling
+  # this HTTP-kick loop does not terminate an in-flight canonical render.
+  cancel-in-progress: true
+
+jobs:
+  kick-canonical-runs:
+    name: Keep Barber and Cosmetology canonical media workers active
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      ADMIN_URL: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app'
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Require production worker credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CRON_SECRET"
+          test -n "$ADMIN_URL"
+
+      - name: Continue canonical media workers for one hour
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BARBER_ID="$(node scripts/course-factory/resolve-course-id.mjs barber-apprenticeship)"
+          COSMETOLOGY_ID="$(node scripts/course-factory/resolve-course-id.mjs cosmetology-apprenticeship)"
+
+          kick_course() {
+            local label="$1"
+            local course_id="$2"
+            local failure_reason="$3"
+            echo "$label:"
+            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data "{\"courseId\":\"${course_id}\",\"maxJobs\":1}" \
+              --max-time 60 || echo "{\"ok\":false,\"reason\":\"${failure_reason}\"}"
+            echo
+          }
+
+          for pass in $(seq 1 12); do
+            echo "=== media continuation pass $pass/12 ==="
+            # The Admin renderer intentionally allows one local Chromium job at a
+            # time. Always calling Barber first starved Cosmetology whenever
+            # Barber still had backlog. Alternate the first claim so both canonical
+            # courses get a fair chance at the next available local render slot.
+            if [ $((pass % 2)) -eq 1 ]; then
+              kick_course "Cosmetology" "$COSMETOLOGY_ID" "cosmetology-worker-request-failed"
+              kick_course "Barber" "$BARBER_ID" "barber-worker-request-failed"
+            else
+              kick_course "Barber" "$BARBER_ID" "barber-worker-request-failed"
+              kick_course "Cosmetology" "$COSMETOLOGY_ID" "cosmetology-worker-request-failed"
+            fi
+            if [ "$pass" -lt 12 ]; then
+              sleep 300
+            fi
+          done

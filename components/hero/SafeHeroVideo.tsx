@@ -11,6 +11,8 @@ interface SafeHeroVideoProps {
   showPosterBeforePlayback?: boolean;
   /** Repeat the visual continuously. Audio/narration is controlled separately. */
   loop?: boolean;
+  /** Prioritize the visible poster and video metadata for above-the-fold heroes. */
+  priority?: boolean;
 }
 
 type NetworkInformationLike = {
@@ -50,6 +52,7 @@ export function SafeHeroVideo({
   ariaLabel = 'Hero video',
   showPosterBeforePlayback = true,
   loop = false,
+  priority = false,
 }: SafeHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -60,7 +63,8 @@ export function SafeHeroVideo({
     const updateNetworkPolicy = () => setAvoidAutoplay(shouldAvoidAutoplay());
     updateNetworkPolicy();
 
-    const connection = (navigator as Navigator & { connection?: NetworkInformationLike }).connection;
+    const connection = (navigator as Navigator & { connection?: NetworkInformationLike })
+      .connection;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     connection?.addEventListener?.('change', updateNetworkPolicy);
     motion.addEventListener('change', updateNetworkPolicy);
@@ -94,13 +98,14 @@ export function SafeHeroVideo({
   return (
     <>
       {showPosterBeforePlayback || hasFailed || avoidAutoplay ? (
+        /* IMAGE-CONTRACT: allow raw img because the native poster must share the video source and remain available without image optimization during playback failure. */
         <img
           src={poster}
           alt=""
           aria-hidden="true"
-          className={`${className} z-0`}
+          className={`absolute inset-0 h-full w-full object-contain ${className} z-0`}
           decoding="async"
-          fetchPriority={showPosterBeforePlayback ? 'high' : 'auto'}
+          fetchPriority={priority || showPosterBeforePlayback ? 'high' : 'auto'}
         />
       ) : null}
       {!hasFailed && !avoidAutoplay ? (
@@ -123,7 +128,7 @@ export function SafeHeroVideo({
             setIsPlaying(false);
             setHasFailed(true);
           }}
-          className={`${className} z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 h-full w-full object-contain ${className} z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
         >
           <source src={src} type="video/mp4" />
         </video>

@@ -39,7 +39,7 @@ export default function UniversalMarketingPage({
                 <Flame className="w-4 h-4 inline mr-1"/> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
-                Free Career Training - 100% Government Funded • Start in 2 Weeks
+                Career training enrollment open • Review program tuition, funding status, and start dates
               </p>
             </div>
             <Link
@@ -53,7 +53,7 @@ export default function UniversalMarketingPage({
       </section>
 
       {/* HERO */}
-      <section className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
         <Image
           src={heroImage}
           alt={title}

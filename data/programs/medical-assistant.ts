@@ -19,7 +19,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   schedule: 'Mon–Fri, 8:00 AM–12:30 PM (20–25 hrs/week)',
   eveningSchedule: 'Evening cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding. Self-pay: $5,000. BNPL financing available through Affirm and Sezzle.',
+  fundingStatement: 'Workforce funding may apply only with program and participant eligibility plus written agency authorization. Self-pay: $5,000. BNPL financing available through Affirm and Sezzle.',
   selfPayCost: '$5,000',
   badge: 'Funding Available',
   badgeColor: 'green',
@@ -355,7 +355,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       courseId: 'hsi-bloodborne-pathogens',
       label: 'Bloodborne Pathogens Training',
-      partnerName: 'Health & Safety Institute',
+      partnerName: 'Approved CPR/AED credential provider',
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,
@@ -375,7 +375,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       courseId: 'hsi-cpr-aed',
       label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute',
+      partnerName: 'Approved CPR/AED credential provider',
       credentialIssued: 'CPR/AED Certification',
       duration: '4 hours',
       required: true,

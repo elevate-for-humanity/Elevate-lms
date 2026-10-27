@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { assertQuickBooksProductionEnvironment } from '@/lib/integrations/quickbooks-client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,6 +22,11 @@ const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'auth');
   if (rateLimited) return rateLimited;
+
+  // The OAuth app credentials live in the canonical runtime secret store.
+  // Hydrate them before state verification and the authorization-code
+  // exchange; otherwise a reconnect can start in Admin but fail here.
+  await hydrateProcessEnv();
 
   const { searchParams } = request.nextUrl;
   const code = searchParams.get('code');
@@ -58,6 +65,8 @@ export async function GET(request: NextRequest) {
   const redirectUri =
     process.env.QB_REDIRECT_URI || stored.QB_REDIRECT_URI || `${base}/api/auth/quickbooks/callback`;
 
+  try { assertQuickBooksProductionEnvironment(); }
+  catch { return redirect('error=production_environment_unverified'); }
   if (!clientId || !clientSecret) return redirect('error=not_configured');
   if (!verifyQuickBooksOAuthState(state, clientSecret)) {
     return redirect('error=invalid_state');

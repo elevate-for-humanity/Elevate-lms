@@ -39,8 +39,13 @@ const STATIC_ENV: Record<string, string> = {
   NEXT_PUBLIC_EMAIL_FROM_ADDRESS: 'noreply@elevateforhumanity.org',
   NEXT_PUBLIC_CERT_HOLDER: 'Elevate for Humanity',
   DEVSTUDIO_DEVCONTAINER_MODE: 'github-only',
+  // Learner-facing production narration must never inherit a stale local/edge
+  // diagnostic setting from the shared Northflank secret group. Cloudflare is
+  // the canonical managed TTS route; edge/espeak remain diagnostics only.
+  AI_NARRATION_PROVIDER: 'cloudflare',
   COURSE_VIDEO_STORAGE_BACKEND: 'auto',
-  COURSE_VIDEO_R2_MIN_BYTES: '5242880',
+  ELEVATE_MEDIA_PROVIDER: 'backblaze-b2',
+  ELEVATE_MEDIA_VIDEO_MIN_BYTES: '5242880',
   REMOTION_RELEASE_BUNDLE_AFTER_RENDER: 'true',
 };
 
@@ -174,7 +179,6 @@ async function main() {
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
     'NEXTAUTH_SECRET',
-    'STRIPE_SECRET_KEY',
     'SENDGRID_API_KEY',
   ].filter((k) => !variables[k]?.trim());
   if (missingCritical.length) {

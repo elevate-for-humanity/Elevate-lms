@@ -231,99 +231,35 @@ test.describe('Host Shop production workspace', () => {
     }
   });
 
-  test('assigned Host Shop verifier can persist a competency change and restore the original state', async ({
-    page,
-  }) => {
+  test('Host Shop cannot perform sponsor-only formal Appendix A competency approval', async ({ page }) => {
     await login(page, HOST_EMAIL, HOST_PASSWORD);
-
-    const dashboard = await page.goto(`${BASE}/host-shop/dashboard`, {
-      waitUntil: 'domcontentloaded',
-    });
+    const dashboard = await page.goto(`${BASE}/host-shop/dashboard`, { waitUntil: 'domcontentloaded' });
     expect(dashboard?.status() ?? 200).toBeLessThan(500);
     expect(page.url()).not.toContain('/unauthorized');
 
-    const listResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
-      failOnStatusCode: false,
-    });
-    expect(listResponse.status()).toBe(200);
-    const list = await listResponse.json();
+    const response = await page.request.get(`${BASE}/api/host-shop/competencies`, { failOnStatusCode: false });
+    expect(response.status()).toBe(200);
+    const list = await response.json();
     expect(Array.isArray(list.apprentices)).toBe(true);
-    expect(list.apprentices.length).toBeGreaterThan(0);
-
-    const apprentice = list.apprentices.find(
-      (item: any) => item?.standard?.competencies?.length && item?.enrollmentId,
-    );
-    expect(
-      apprentice,
-      'No assigned registered apprentice with competencies found for Host Shop E2E account',
-    ).toBeTruthy();
-
+    const apprentice = list.apprentices.find((item: any) => item?.standard?.competencies?.length && item?.enrollmentId);
+    expect(apprentice, 'No assigned apprentice with competency standards found').toBeTruthy();
     const competency = apprentice.standard.competencies[0];
-    const original = (apprentice.competencyRecords || []).find(
-      (row: any) => row.competency_id === competency.id,
-    );
-    const originalCompleted = Boolean(original?.completed);
-    const testCompleted = !originalCompleted;
+    const before = (apprentice.competencyRecords || []).find((row: any) => row.competency_id === competency.id);
 
-    const mutate = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
-      data: {
-        enrollmentId: apprentice.enrollmentId,
-        competencyId: competency.id,
-        completed: testCompleted,
-        notes: 'Automated reversible E2E verification',
-        ...(testCompleted
-          ? {
-              performanceSubject: 'mannequin',
-              evidenceType: 'observation',
-              evidenceUrl: `https://qa.invalid/apprenticeship-evidence/${apprentice.enrollmentId}/${competency.id}`,
-              performedAt: new Date().toISOString().slice(0, 10),
-              instructorLicenseNumber: 'QA-E2E-IN-0001',
-            }
-          : {}),
-      },
+    // A Host Shop must log practice separately. Formal Appendix A completion is
+    // sponsor-administration authority and must remain protected by HTTP 403.
+    const denied = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
+      data: { enrollmentId: apprentice.enrollmentId, competencyId: competency.id,
+        completed: !Boolean(before?.completed), notes: 'QA forbidden formal signoff probe' },
       failOnStatusCode: false,
     });
-    expect(mutate.status()).toBe(200);
+    expect(denied.status()).toBe(403);
 
-    try {
-      const verifyResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
-        failOnStatusCode: false,
-      });
-      expect(verifyResponse.status()).toBe(200);
-      const verifyBody = await verifyResponse.json();
-      const reloadedApprentice = verifyBody.apprentices.find(
-        (item: any) => item.enrollmentId === apprentice.enrollmentId,
-      );
-      const persisted = (reloadedApprentice?.competencyRecords || []).find(
-        (row: any) => row.competency_id === competency.id,
-      );
-      expect(Boolean(persisted?.completed)).toBe(testCompleted);
-      expect(persisted?.verified_by_name).toBeTruthy();
-      if (testCompleted) expect(persisted?.date_completed).toBeTruthy();
-    } finally {
-      const restore = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
-        data: {
-          enrollmentId: apprentice.enrollmentId,
-          competencyId: competency.id,
-          completed: originalCompleted,
-          notes: original?.notes || null,
-        },
-        failOnStatusCode: false,
-      });
-      expect(restore.status()).toBe(200);
-    }
-
-    const restoredResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
-      failOnStatusCode: false,
-    });
-    expect(restoredResponse.status()).toBe(200);
-    const restoredBody = await restoredResponse.json();
-    const restoredApprentice = restoredBody.apprentices.find(
-      (item: any) => item.enrollmentId === apprentice.enrollmentId,
-    );
-    const restored = (restoredApprentice?.competencyRecords || []).find(
-      (row: any) => row.competency_id === competency.id,
-    );
-    expect(Boolean(restored?.completed)).toBe(originalCompleted);
+    const afterResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, { failOnStatusCode: false });
+    expect(afterResponse.status()).toBe(200);
+    const afterBody = await afterResponse.json();
+    const afterApprentice = afterBody.apprentices.find((item: any) => item.enrollmentId === apprentice.enrollmentId);
+    const after = (afterApprentice?.competencyRecords || []).find((row: any) => row.competency_id === competency.id);
+    expect(Boolean(after?.completed)).toBe(Boolean(before?.completed));
   });
 });

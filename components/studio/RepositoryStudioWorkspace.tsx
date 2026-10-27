@@ -41,7 +41,7 @@ export default function RepositoryStudioWorkspace() {
         <div className="mr-auto">
           <p className="text-xs font-extrabold text-white">Repository Workspace</p>
           <p className="text-[10px] text-slate-400">
-            Edit and preview source, or run code in the isolated WebContainer terminal.
+            Edit and preview source, or run code in the existing Studio container terminal.
           </p>
         </div>
         <button

@@ -40,10 +40,17 @@ function collectTypecheckErrors() {
       ...process.env,
       NODE_OPTIONS: process.env.NODE_OPTIONS || '--max-old-space-size=8192',
     },
+    timeout: 10 * 60 * 1000,
     maxBuffer: 1024 * 1024 * 20,
   });
 
+  if (result.error || result.signal || result.status === null) {
+    throw new Error(`TypeScript did not complete: ${result.error?.message || result.signal || 'unknown process failure'}`);
+  }
   const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+  if (result.status !== 0 && !/error TS\d+:/.test(output)) {
+    throw new Error(`TypeScript failed without diagnostics (exit ${result.status})`);
+  }
   return output
     .split('\n')
     .map(normalizeErrorLine)

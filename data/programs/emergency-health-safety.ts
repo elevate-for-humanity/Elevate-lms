@@ -19,7 +19,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 8, careerPlacement: 2 },
   schedule: 'Monthly cohorts — full-time intensive, day or evening options',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $4,950.',
+  fundingStatement: 'Self-pay: $4,950. Workforce funding may apply only with program and participant eligibility plus written agency authorization.',
   selfPayCost: '$4,950',
   badge: 'ETPL Approved',
   badgeColor: 'green',
@@ -219,27 +219,8 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   },
 
   // ─── Content model ──────────────────────────────────────────────
-  deliveryModel: 'partner',
-  partnerCourses: [
-    {
-      courseId: 'hsi-cpr-aed',
-      label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute / AHA',
-      credentialIssued: 'AHA BLS CPR/AED Certificate',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
-    },
-    {
-      courseId: 'hsi-first-aid',
-      label: 'First Aid Certification',
-      partnerName: 'Health & Safety Institute / AHA',
-      credentialIssued: 'AHA Heartsaver First Aid Certificate',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
-    },
-  ],
+  deliveryModel: 'hybrid',
+  partnerCourses: [],
   microCourses: [
     {
       courseId: 'careersafe-osha10-general',

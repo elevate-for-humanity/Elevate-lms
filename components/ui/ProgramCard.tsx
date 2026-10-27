@@ -18,7 +18,7 @@ export function ProgramCard({ title, description, image, href }: ProgramCardProp
           src={image}
           alt={title}
           fill
-          className="object-cover object-center transition-transform duration-500 motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
+          className="object-cover object-center contrast-105 saturate-110 transition-transform duration-500 motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
       </div>

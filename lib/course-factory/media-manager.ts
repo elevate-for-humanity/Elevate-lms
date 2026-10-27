@@ -50,10 +50,11 @@ export function canonicalMediaIdentityKey(
 }
 
 export function isCourseMediaFailureRetryable(message: string | null): boolean {
-  if (!message) return true;
-  return !['configuration', 'authorization', 'not_found', 'content'].includes(
-    classifyVideoFailure(message),
-  );
+  // Only transport/runtime failures may be retried without a source repair.
+  // Quality, storage, unknown and configuration failures require investigation;
+  // repeated rendering cannot resolve missing capacity or bad narration.
+  if (!message) return false;
+  return ['transient', 'renderer'].includes(classifyVideoFailure(message));
 }
 
 export function courseMediaRetryDelayMs(retryCount: number): number {
@@ -266,7 +267,7 @@ async function verifyPlayableRows(rows: VideoJob[]) {
 export async function getCourseMediaState(courseId: string, options: { verifyUrls?: boolean } = {}): Promise<CourseMediaState> {
   const db = await requireAdminClient();
   const [{ data: lessons, error: lessonError }, { data: jobs, error: jobError }] = await Promise.all([
-    db.from('course_lessons').select('id,content_json,video_config,video_status,video_url,video_job_id,generation_status').eq('course_id', courseId),
+    db.from('course_lessons').select('id,content_json,video_config,video_status,video_url,video_job_id,generation_status,media_origin,media_quality_status').eq('course_id', courseId),
     db.from('video_jobs').select('*').eq('course_id', courseId),
   ]);
   if (lessonError) throw lessonError;
@@ -275,6 +276,16 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   const rows = (jobs ?? []) as VideoJob[];
   const lessonJobs = new Map<string, VideoJob>();
   const microJobs = new Map<string, VideoJob>();
+  const approvedExternalLessonIds = new Set(
+    (lessons ?? [])
+      .filter((lesson) =>
+        lesson.media_origin === 'uploaded' &&
+        lesson.media_quality_status === 'approved' &&
+        ['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) &&
+        Boolean(typeof lesson.video_url === 'string' && lesson.video_url.trim()),
+      )
+      .map((lesson) => lesson.id),
+  );
   for (const row of rows) {
     if ((row.asset_kind ?? 'lesson') === 'lesson') lessonJobs.set(row.lesson_id, row);
     else microJobs.set(`${row.lesson_id}:${row.asset_key ?? ''}`, row);
@@ -288,12 +299,20 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     const lessonJob = lessonJobs.get(lesson.id);
     const lessonUrl = typeof lesson.video_url === 'string' ? lesson.video_url.trim() : '';
     const jobUrl = typeof lessonJob?.video_url === 'string' ? lessonJob.video_url.trim() : '';
+    const approvedExternalMedia =
+      lesson.media_origin === 'uploaded' &&
+      lesson.media_quality_status === 'approved' &&
+      ['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) &&
+      Boolean(lessonUrl);
     if (
-      !lessonJob ||
-      lesson.generation_status !== 'generated' ||
-      lesson.video_job_id !== lessonJob.id ||
-      lesson.video_status !== lessonJob.status ||
-      (lessonJob.status === 'complete' && lessonUrl !== jobUrl)
+      !approvedExternalMedia &&
+      (
+        !lessonJob ||
+        lesson.generation_status !== 'generated' ||
+        lesson.video_job_id !== lessonJob.id ||
+        lesson.video_status !== lessonJob.status ||
+        (lessonJob.status === 'complete' && lessonUrl !== jobUrl)
+      )
     ) {
       lessonStateMismatches += 1;
     }
@@ -336,7 +355,7 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   // contract unless the lesson explicitly opts in. They must not block a new
   // primary lesson package or consume its readiness counts.
   const canonicalRows = rows.filter((row) =>
-    (row.asset_kind ?? 'lesson') === 'lesson' ||
+    ((row.asset_kind ?? 'lesson') === 'lesson' && !approvedExternalLessonIds.has(row.lesson_id)) ||
     requiredMicroclipIdentities.has(`${row.lesson_id}:${row.asset_key ?? ''}`),
   );
   const canonicalIdentities = new Set<string>();
@@ -348,6 +367,8 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   }
 
   const requiredLessonVideos = lessons?.length ?? 0;
+  const approvedExternalLessons = approvedExternalLessonIds.size;
+  const expectedJobTotal = Math.max(0, requiredLessonVideos - approvedExternalLessons) + requiredMicroclips;
   const expectedTotal = requiredLessonVideos + requiredMicroclips;
   const now = Date.now();
   const staleRendering = canonicalRows.filter(
@@ -361,19 +382,19 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   const invalidQualityEvidence = completeRows.filter((row) =>
     row.review_status !== 'approved' || !hasCanonicalMediaQualityEvidence(row.quality_evidence),
   ).length;
-  let playable = options.verifyUrls ? 0 : completeRows.length;
+  let playable = options.verifyUrls ? 0 : completeRows.length + approvedExternalLessons;
   let unreachable: Array<{ jobId: string; url: string; reason: string }> = [];
 
   if (options.verifyUrls) {
     const verified = await verifyPlayableRows(completeRows);
-    playable = verified.playable;
+    playable = verified.playable + approvedExternalLessons;
     unreachable = verified.unreachable;
   }
 
   const queued = canonicalRows.filter((row) => row.status === 'queued').length;
   const rendering = canonicalRows.filter((row) => row.status === 'rendering').length;
   const failed = canonicalRows.filter((row) => row.status === 'failed').length;
-  const complete = completeRows.length;
+  const complete = completeRows.length + approvedExternalLessons;
   return {
     courseId,
     requiredLessonVideos,
@@ -392,7 +413,7 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     microclipStateMismatches,
     invalidQualityEvidence,
     completePackage:
-      canonicalRows.length === expectedTotal &&
+      canonicalRows.length === expectedJobTotal &&
       duplicates === 0 &&
       queued === 0 && rendering === 0 && failed === 0 && staleRendering === 0 &&
       lessonStateMismatches === 0 && microclipStateMismatches === 0 &&

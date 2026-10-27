@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { CreditCard, AlertCircle, Clock, DollarSign, CalendarDays } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { askParisForPortalHelp } from '@/lib/paris/portal-support';
 
 export interface BillingSummary {
   program: 'barber' | 'cosmetology';
@@ -87,10 +86,6 @@ export default function BillingCard({
   billing: BillingSummary;
   readOnly?: boolean;
 }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [authorized, setAuthorized] = useState(false);
-
   const statusCfg = STATUS_CONFIG[billing.paymentStatus] ?? {
     label: billing.paymentStatus,
     color: 'bg-slate-100 text-slate-700',
@@ -102,54 +97,6 @@ export default function BillingCard({
     billing.fullTuitionAmount !== null && billing.remainingBalance !== null
       ? billing.fullTuitionAmount - billing.remainingBalance
       : null;
-
-  async function handleUpdatePayment() {
-    setLoading(true);
-    setError('');
-    try {
-      const needsSetup = !billing.hasSubscription;
-      if (needsSetup && !authorized) {
-        setError('Review and accept the automatic-payment authorization before continuing.');
-        return;
-      }
-      const endpoint = needsSetup ? '/api/billing/setup' : '/api/billing/portal';
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: needsSetup ? JSON.stringify({ authorized: true }) : undefined,
-      });
-      const responseText = await res.text();
-      let json: { error?: string; url?: string } = {};
-      try {
-        json = responseText ? JSON.parse(responseText) : {};
-      } catch {
-        json = {};
-      }
-      if (!res.ok) {
-        const message = json.error ?? 'The secure billing page did not open.';
-        setError('PARIS is ready to help resolve this billing setup issue.');
-        askParisForPortalHelp({ workflow: 'billing_setup', message, status: res.status });
-        return;
-      }
-      if (!json.url) {
-        setError('PARIS is ready to help resolve this billing setup issue.');
-        askParisForPortalHelp({
-          workflow: 'billing_setup',
-          message: 'The secure billing link was not returned.',
-        });
-        return;
-      }
-      window.location.href = json.url;
-    } catch {
-      setError('PARIS is ready to help resolve this billing setup issue.');
-      askParisForPortalHelp({
-        workflow: 'billing_setup',
-        message: 'The billing service could not be reached.',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200">
@@ -203,7 +150,9 @@ export default function BillingCard({
           <span
             className={`font-semibold ${billing.hasSubscription ? 'text-brand-green-700' : 'text-red-700'}`}
           >
-            {billing.hasSubscription ? 'Authorized and active' : 'Card and authorization required'}
+            {billing.hasSubscription
+              ? 'PayPal agreement active'
+              : 'Release and PayPal approval required'}
           </span>
         </div>
 
@@ -257,7 +206,7 @@ export default function BillingCard({
           <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
-              Your payment is past due. Update your payment method below to avoid suspension.
+              Your payment is past due. Review the billing agreement below or contact support.
             </span>
           </div>
         )}
@@ -278,54 +227,35 @@ export default function BillingCard({
           </div>
         )}
 
-        {/* Error */}
-        {error && <p className="text-xs text-red-600 bg-red-50 rounded p-2">{error}</p>}
-
-        {/* Update payment method — only if not paid in full and has Stripe */}
+        {/* PayPal owns recurring collection; QuickBooks records the accounting entry. */}
         {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && !readOnly && (
           <div className="space-y-3 pt-2">
             {!billing.hasSubscription && !billing.setupFeePaid && (
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
-                Pay the enrollment deposit first. Weekly automatic-payment authorization becomes
-                available after the deposit is recorded.
+                Complete the enrollment deposit first. The recurring-payment release and PayPal
+                approval become available after the deposit is recorded.
               </div>
             )}
             {!billing.hasSubscription && billing.setupFeePaid && (
-              <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={authorized}
-                  onChange={(event) => setAuthorized(event.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-slate-400"
-                />
-                <span>
-                  I authorize Elevate for Humanity to securely save my payment method with Stripe
-                  and automatically charge the weekly tuition amount shown above until the remaining
-                  balance is paid or the finite payment schedule ends. I understand I will receive
-                  receipts and can update my payment method from this dashboard.
-                </span>
-              </label>
+              <p className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
+                Upload the signed recurring-payment release, then approve the PayPal billing
+                agreement. PayPal collects the scheduled amount automatically and QuickBooks records
+                the payment; you do not pay a separate invoice each week.
+              </p>
             )}
-            <button
-              onClick={handleUpdatePayment}
-              disabled={
-                loading || (!billing.hasSubscription && (!billing.setupFeePaid || !authorized))
-              }
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
+            <Link
+              href="/lms/documents"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
             >
               <CreditCard className="w-4 h-4" />
-              {loading
-                ? 'Opening secure Stripe page…'
-                : billing.hasSubscription
-                  ? 'Update Payment Method'
-                  : 'Authorize & Add Card'}
-            </button>
+              {billing.hasSubscription ? 'Review Billing Documents' : 'Complete PayPal Authorization'}
+            </Link>
           </div>
         )}
         {readOnly && !billing.fullyPaid && !billing.hasSubscription && billing.setupFeePaid && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
-            Admin preview is read-only. The learner will see the authorization checkbox and
-            “Authorize &amp; Add Card” button after the enrollment deposit is paid.
+            Admin preview is read-only. The learner will see the recurring-payment release and
+            PayPal approval steps after the enrollment deposit is paid.
           </div>
         )}
       </div>

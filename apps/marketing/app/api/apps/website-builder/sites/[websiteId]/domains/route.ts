@@ -22,7 +22,6 @@ export async function GET(
     .from('website_domains')
     .select('*')
     .eq('website_id', websiteId)
-    .eq('user_id', user.id)
     .neq('status', 'deleted')
     .order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: 'Could not load domains.' }, { status: 500 });

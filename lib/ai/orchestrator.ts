@@ -1,3 +1,4 @@
+import { PARIS_SYSTEM_IDENTITY } from './paris-identity';
 /**
  * lib/ai/orchestrator.ts
  *
@@ -67,6 +68,8 @@ export type AITask =
 // ─── Context shapes ───────────────────────────────────────────────────────────
 
 export type AITaskContext = {
+  // Commercial Store products preserve their licensed persona boundary.
+  commercialIdentity?: boolean;
   // Shared
   history?: ChatMessage[];
   userId?: string;
@@ -270,7 +273,7 @@ export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
 
   // ── Build system prompt ───────────────────────────────────────────────────
   const systemPromptFn = SYSTEM_PROMPTS[task];
-  let systemPrompt = systemPromptFn(context);
+  let systemPrompt = (context.commercialIdentity ? '' : PARIS_SYSTEM_IDENTITY + '\n\nTask requirements:\n') + systemPromptFn(context);
 
   // Augment with knowledge graph for architecture-aware tasks
   const KG_TASKS: AITask[] = ['diagnostics', 'deployment_analysis', 'knowledge_graph_query'];

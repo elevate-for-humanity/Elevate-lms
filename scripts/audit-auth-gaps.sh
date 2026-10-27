@@ -72,7 +72,7 @@ while IFS= read -r f; do
   fi
   grep -q "supersonicfastermoney.com" "$f" 2>/dev/null && continue
 
-  if ! grep -qE "requireAuth|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|apiAuthGuard|requireAdmin|getUser|getCurrentUser|getAuthUser|createClient|createAdminClient|requireApiAuth|requireApiRole|requireRole|requireStaffPortalApi|CRON_SECRET|apiGuard|withAuth|checkAuth|verifyAuth|authMiddleware|requireOrgAdmin|AUDIT_SECRET|apiRequireInstructor|builderGuard|requireInstructor|apiRequireRole" "$f" 2>/dev/null; then
+  if ! grep -qE "requireAuth|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|apiAuthGuard|requireAdmin|getUser|getCurrentUser|getAuthUser|createClient|createAdminClient|requireApiAuth|requireApiRole|requireRole|requireProgramHolder|requireStaffPortalApi|CRON_SECRET|apiGuard|withAuth|checkAuth|verifyAuth|authMiddleware|requireOrgAdmin|AUDIT_SECRET|apiRequireInstructor|builderGuard|requireInstructor|apiRequireRole" "$f" 2>/dev/null; then
     NO_AUTH=$((NO_AUTH + 1))
     if is_sensitive_route "$f"; then
       SENSITIVE_NO_AUTH=$((SENSITIVE_NO_AUTH + 1))
@@ -87,8 +87,8 @@ echo ""
 echo "--- ROLE_BLIND: admin/* routes that check identity but not role ---"
 while IFS= read -r f; do
   [[ -z "$f" ]] && continue
-  has_auth=$(grep -cE "getCurrentUser|getAuthUser|requireAuth|apiAuthGuard|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|getUser\(\)|requireApiAuth|requireApiRole|requireRole|requireStaffPortalApi|withAuth|checkAuth|verifyAuth" "$f" 2>/dev/null || true)
-  has_role=$(grep -cE "apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole|requireRole|requireStaffPortalApi|API_ADMIN_ROLES|roles:\s*\[|roles:\s*[A-Z_]+" "$f" 2>/dev/null || true)
+  has_auth=$(grep -cE "getCurrentUser|getAuthUser|requireAuth|apiAuthGuard|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|getUser\(\)|requireApiAuth|requireApiRole|requireRole|requireProgramHolder|requireStaffPortalApi|withAuth|checkAuth|verifyAuth" "$f" 2>/dev/null || true)
+  has_role=$(grep -cE "apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole|requireRole|requireProgramHolder|requireStaffPortalApi|API_ADMIN_ROLES|roles:\s*\[|roles:\s*[A-Z_]+" "$f" 2>/dev/null || true)
   if [[ "${has_auth:-0}" -gt 0 && "${has_role:-0}" -eq 0 ]]; then
     ROLE_BLIND=$((ROLE_BLIND + 1))
     if is_production_file "$f"; then
@@ -107,7 +107,7 @@ while IFS= read -r f; do
   grep -qE "CRON_SECRET|x-internal-token|JOB_PROCESSOR_TOKEN|AUDIT_SECRET" "$f" 2>/dev/null && continue
   grep -qE "// PUBLIC ROUTE:" "$f" 2>/dev/null && continue
   leaking=$(grep -n "err\.message\|error\.message\|error\.toString()" "$f" 2>/dev/null \
-    | grep -v "logger\.\|console\.\|\.includes(\|error_message\|error_summary\|\.slice(\|writeApiAudit\|\.update(\|\.from(\|throw \|throw new\|Error(\|\.code\b\|setAuditContext\|audit_context\|sendSlack\|sendSlackMessage\|last_error\|\.message ===\|\.message !==\|\.message\.includes\|// \|= err instanceof\|= error instanceof\|msg = \|message = \|error: err\|error: error\|fields:\|results\.errors\.push\|detail:\|message: error\.\|message: err\." \
+    | grep -v "logger\.\|console\.\|\.includes(\|\.test(.*error\.message\|\.test(.*err\.message\|error_message\|error_summary\|\.slice(\|writeApiAudit\|\.update(\|\.from(\|throw \|throw new\|Error(\|\.code\b\|setAuditContext\|audit_context\|sendSlack\|sendSlackMessage\|last_error\|\.message ===\|\.message !==\|\.message\.includes\|// \|= err instanceof\|= error instanceof\|msg = \|message = \|error: err\|error: error\|fields:\|results\.errors\.push\|detail:\|message: error\.\|message: err\." \
     | grep -v "^[^:]*:[^:]*://" || true)
   if [[ -n "$leaking" ]]; then
     LEAKS=$((LEAKS + 1))

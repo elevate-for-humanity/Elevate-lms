@@ -1,5 +1,6 @@
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/navigation/routes';
 import { GraduationCap, Building2, Landmark, ArrowRight, CheckCircle } from 'lucide-react';
 
 const STAKEHOLDERS = [
@@ -30,7 +31,7 @@ const STAKEHOLDERS = [
       'Registered Apprenticeship setup and compliance support',
     ],
     cta: 'Access Talent Pipeline',
-    href: '/employer/dashboard',
+    href: ROUTES.employerPortal,
     gradient: 'bg-emerald-600',
     bg: 'bg-emerald-50',
     border: 'border-emerald-200',

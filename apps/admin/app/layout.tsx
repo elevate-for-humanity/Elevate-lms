@@ -7,17 +7,17 @@
  * expose canned public actions inside a privileged workspace.
  */
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import '../../../styles/contrast-guardrails.css';
 import '../../../styles/responsive-guardrails.css';
-import BuildVersionSync from '@/components/BuildVersionSync';
 import { AdminApplicationChrome } from '@/components/admin/AdminApplicationChrome';
 import { DEFAULT_NAV } from '@/lib/admin/nav-config';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
-import { AdminUpdateNotice } from '@/components/pwa/AdminUpdateNotice';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
+import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 
 export const metadata: Metadata = {
   title: {
@@ -68,15 +68,19 @@ export default async function AdminGroupLayout({ children }: { children: React.R
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          id="admin-chunk-recovery"
+          dangerouslySetInnerHTML={{ __html: chunkRecoveryBootstrap() }}
+        />
         <SupabasePublicConfigScript />
       </head>
       <body className="admin-portal efh-contrast">
         <SupabaseConfigBootstrap />
         <AdminPwaRegister />
-        <AdminUpdateNotice />
         <I18nProvider>
-          <BuildVersionSync />
-          <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+          <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
+            <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+          </Suspense>
         </I18nProvider>
       </body>
     </html>

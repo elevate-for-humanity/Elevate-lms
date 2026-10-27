@@ -413,7 +413,7 @@ export function CourseProvider({ session, children }: CourseProviderProps) {
       s.videos.length > 0 ? `VIDEOS (${s.videos.length}):` : '',
       ...videoLines,
       '',
-      `PUBLISH STATE: ${s.publishState.publishedLessons}/${s.publishState.totalLessons} lessons published, ${s.publishState.approvedLessons} approved`,
+      `PUBLISH STATE: ${s.publishState.publishedLessons}/${s.publishState.totalLessons} lessons published; acceptance uses the automated persisted quality gate`,
       s.publishState.readyToPublish ? 'Ready to publish: YES' : 'Ready to publish: NO',
     ].filter(l => l !== undefined && l !== null).join('\n');
   }, []);

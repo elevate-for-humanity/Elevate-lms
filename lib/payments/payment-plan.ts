@@ -116,19 +116,19 @@ export const PROGRAM_PAYMENT_PLANS: Record<string, PaymentPlanConfig> = {
   'cosmetology-apprenticeship': {
     totalAmount: 5500,
     downPaymentPercent: 0.1,
-    programHours: 1500,
+    programHours: 2000,
     hoursPerWeek: 40,
   },
   'nail-technician-apprenticeship': {
     totalAmount: 2500,
     downPaymentPercent: 0.15,
-    programHours: 600,
+    programHours: 2000,
     hoursPerWeek: 30,
   },
   'esthetician-apprenticeship': {
     totalAmount: 3500,
     downPaymentPercent: 0.15,
-    programHours: 700,
+    programHours: 2000,
     hoursPerWeek: 30,
   },
   'cna-certification': {

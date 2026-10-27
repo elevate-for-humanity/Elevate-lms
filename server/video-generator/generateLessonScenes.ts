@@ -38,6 +38,98 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+function isPracticalBeautyInstruction(input: {
+  domainKey: string;
+  title: string;
+  content: string;
+  lessonType?: string;
+  requiresPracticalEvidence?: boolean;
+}): boolean {
+  if (input.requiresPracticalEvidence) return true;
+  if (/\b(lab|practical|procedure|hands-on)\b/i.test(input.lessonType ?? '')) return true;
+  if (!['barbering', 'cosmetology', 'esthetics', 'nail_technology'].includes(input.domainKey)) {
+    return false;
+  }
+  const lessonIdentity = `${input.lessonType ?? ''} ${input.title}`;
+  if (/\b(checkpoint|quiz|exam|assessment|review)\b/i.test(lessonIdentity)) {
+    return false;
+  }
+  // Practical classification must come from the lesson identity rather than
+  // incidental words in explanatory narration. A licensing lesson may mention
+  // a practical exam, and a retail lesson may mention styling products, without
+  // becoming a hands-on service procedure.
+  return /\b(cut|cutting|clipper|shear|razor|shav|fade|styling|updo|blow[- ]?dry|thermal|curling|flat iron|color(?:ing)?|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|pedicur|nail|shampoo|scalp massage|scalp treatment|wax|thread|braid|twist|procedure|practical|hands-on)\b/i.test(
+    lessonIdentity,
+  );
+}
+
+function sceneSafetyText(scene: LessonRenderPlanDraft['scenes'][number]): string {
+  return [
+    scene.instructionalObjective,
+    scene.demonstrationStep,
+    scene.evidenceExpectation,
+    scene.narration,
+    scene.videoQuery,
+    scene.visualFocus,
+  ]
+    .filter((value): value is string => typeof value === 'string')
+    .join(' ');
+}
+
+/**
+ * The production MediaStoryboard vocabulary intentionally uses a smaller set of
+ * scene types than the scene-generation schema. Preserve the practical meaning
+ * at that boundary so sanitation and critical close-ups cannot collapse into a
+ * generic theory arc before the instructional quality gate evaluates them.
+ */
+function normalizePracticalBeautyPlan(
+  plan: LessonRenderPlanDraft,
+  practicalBeautyInstruction: boolean,
+): LessonRenderPlanDraft {
+  if (!practicalBeautyInstruction) return plan;
+
+  let closeupAssigned = false;
+  let safetyAssigned = false;
+  return {
+    ...plan,
+    scenes: plan.scenes.map((scene) => {
+      const sanitationScene = scene.sceneType === 'sanitation_check';
+      const authoredSafetyScene = scene.sceneType === 'safety_warning';
+      const safetyBearing =
+        sanitationScene ||
+        authoredSafetyScene ||
+        /\b(sanit|disinfect|infection|safety|ppe|protective equipment|glove|patch test|strand test|allerg|contraindicat|burn|irritat|chemical exposure|cross[- ]?contamin)\b/i.test(
+          sceneSafetyText(scene),
+        );
+      const safetyScene = !safetyAssigned && safetyBearing;
+      if (safetyScene) safetyAssigned = true;
+
+      const criticalCloseup = scene.sceneType === 'critical_closeup';
+      const procedureCloseup = !closeupAssigned && scene.sceneType === 'procedure_step';
+      if (criticalCloseup || procedureCloseup) closeupAssigned = true;
+
+      return {
+        ...scene,
+        // MediaDirector understands safety_warning/equipment_closeup and the
+        // quality gate consumes those exact semantic scene types. Existing
+        // safety-bearing narration may be retagged, but no safety content is
+        // invented merely to satisfy the gate.
+        sceneType: safetyScene
+          ? 'safety_warning'
+          : criticalCloseup
+            ? 'equipment_closeup'
+            : scene.sceneType,
+        // generatedSceneData derives shot size from visualFocus. Make the
+        // requested close-up explicit instead of relying on model wording.
+        visualFocus:
+          criticalCloseup || procedureCloseup
+            ? `Close-up: ${scene.visualFocus ?? scene.demonstrationStep}`
+            : scene.visualFocus,
+      };
+    }),
+  };
+}
+
 export async function generateLessonScenes(opts: {
   lessonId: string;
   title: string;
@@ -60,6 +152,14 @@ export async function generateLessonScenes(opts: {
   const plainContent = stripHtml(opts.content);
   const seed = opts.seed ?? `${opts.lessonId}-${Date.now()}`;
   const profile = resolveInstructionalDomainProfile(opts.domainKey);
+  const practicalBeautyInstruction = isPracticalBeautyInstruction({
+    domainKey: profile.key,
+    title: opts.title,
+    content: plainContent,
+    lessonType: opts.lessonType,
+    requiresPracticalEvidence: opts.requiresPracticalEvidence,
+  });
+  const requiresPracticalEvidence = opts.requiresPracticalEvidence || practicalBeautyInstruction;
 
   const userPrompt = buildSceneGenerationUserPrompt({
     lessonId: opts.lessonId,
@@ -77,8 +177,8 @@ export async function generateLessonScenes(opts: {
     stateRequirement: opts.stateRequirement,
     examDomain: opts.examDomain,
     passingScore: opts.passingScore,
-    requiresPracticalEvidence: opts.requiresPracticalEvidence,
-    lessonType: opts.lessonType ?? (opts.requiresPracticalEvidence ? 'procedure' : 'theory'),
+    requiresPracticalEvidence,
+    lessonType: opts.lessonType ?? (requiresPracticalEvidence ? 'procedure' : 'theory'),
   });
 
   let lastError: Error | null = null;
@@ -114,7 +214,9 @@ export async function generateLessonScenes(opts: {
     try {
       const parsed = JSON.parse(cleaned);
       const result = LessonRenderPlanDraftSchema.safeParse(parsed);
-      if (result.success) return result.data;
+      if (result.success) {
+        return normalizePracticalBeautyPlan(result.data, practicalBeautyInstruction);
+      }
       lastError = new Error(
         `Schema validation failed: ${JSON.stringify(result.error.issues.slice(0, 3))}`,
       );

@@ -31,7 +31,7 @@ async function _POST(req: NextRequest) {
   }
 
   const displayName = fromName ? String(fromName) : PLATFORM_DEFAULTS.orgName;
-  const fromAddress = process.env.EMAIL_FROM || process.env.MAIL_FROM || 'info@elevateforhumanity.org';
+  const fromAddress = process.env.EMAIL_FROM || process.env.MAIL_FROM || PLATFORM_DEFAULTS.emailFromAddress;
   const fromField = `${displayName} <${fromAddress}>`;
 
   const result = await sendEmail({

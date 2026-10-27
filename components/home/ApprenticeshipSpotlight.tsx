@@ -120,7 +120,7 @@ export function ApprenticeshipSpotlight() {
             {/* Funding Banner */}
             <Card className="p-6 bg-green-500/10 border-green-500/30">
               <h3 className="text-xl font-bold mb-2 text-green-400">
-                Most Students Pay $0
+                Funding May Be Available
               </h3>
               <p className="text-slate-300 mb-4">
                 WIOA, Vocational Rehabilitation, and employer sponsors may cover your full tuition, 

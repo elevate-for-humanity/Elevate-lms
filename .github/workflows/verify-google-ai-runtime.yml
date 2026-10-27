@@ -1,0 +1,39 @@
+name: Verify owned Google AI and Studio runtime
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-google-ai-runtime.yml', 'scripts/gcp/verify-ai-runtime.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch Google-trusted read-only verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-ai-runtime.yml/dispatches" -f ref=main
+  verify:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/verify-ai-runtime.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify real model, Studio, narration and deployment access without changing runtime state
+        run: node scripts/gcp/verify-ai-runtime.mjs

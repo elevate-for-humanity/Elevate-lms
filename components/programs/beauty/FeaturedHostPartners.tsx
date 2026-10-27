@@ -1,11 +1,12 @@
 import Image from 'next/image';
+import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
+import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 import Link from 'next/link';
 import { ExternalLink, MapPin, Navigation, Phone } from 'lucide-react';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
-import {
-  FEATURED_BEAUTY_HOST_PARTNERS,
-  type FeaturedHostPartnerMedia,
-} from '@/lib/apprenticeship-programs/host-partners';
 
 function programLabel(program: string) {
   return program
@@ -22,27 +23,41 @@ function phoneHref(phone: string) {
   return `tel:${phone.replace(/[^0-9+]/g, '')}`;
 }
 
-export default function FeaturedHostPartners({
+export default async function FeaturedHostPartners({
   programSlug,
   showDirectory = true,
 }: {
   programSlug?: string;
   showDirectory?: boolean;
 }) {
-  // Program enrollment is the source of truth. Some verified partners operate
-  // combined salon/barber businesses, so businessType must not hide a host that
-  // is explicitly approved for this pathway.
-  const matchingShops = programSlug
-    ? FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) => shop.programs.includes(programSlug))
-    : FEATURED_BEAUTY_HOST_PARTNERS;
-  const shops =
-    programSlug === 'barber-apprenticeship'
-      ? [...matchingShops].sort((left, right) => {
-          if (left.slug === 'razors-image-barbershop') return -1;
-          if (right.slug === 'razors-image-barbershop') return 1;
-          return 0;
-        })
-      : matchingShops;
+  // Every public pathway uses the same live directory and exact occupation filter.
+  const network = await getHostShopNetwork();
+  const shops: FeaturedHostPartner[] = network
+    .filter((shop) => !programSlug || matchesHostShopProgram(shop, programSlug))
+    .map((shop) => ({
+      slug: shop.slug,
+      name: shop.name,
+      city: shop.city,
+      state: shop.state,
+      zip: '',
+      address: shop.address,
+      programs: programSlug ? [programSlug] : shop.programs,
+      phone: shop.phone,
+      marketingBlurb: shop.description,
+      websiteUrl: shop.website,
+      bookingUrl: shop.booking,
+      socialUrl: shop.social,
+      media: (programSlug === 'nail-technician-apprenticeship'
+        ? [...(shop.gallery ?? [])].sort(
+            (a, b) => Number(/nail/i.test(b.url)) - Number(/nail/i.test(a.url)),
+          )
+        : (shop.gallery ?? [])
+      ).map((item) => ({
+        src: item.url,
+        alt: item.alt || `${shop.name} portfolio`,
+        kind: 'photo' as const,
+      })),
+    }));
 
   // Show every verified barber host in one directory, including Kountry Kutz.
   // The prior exclusion made the featured shop disappear from the network list.
@@ -50,22 +65,19 @@ export default function FeaturedHostPartners({
 
   if (!shops.length) {
     const pathway = programLabel(programSlug ?? 'beauty-apprenticeship');
-    const image =
-      programSlug === 'esthetician-apprenticeship'
-        ? '/images/beauty/esthetics-hero.webp'
-        : '/images/pages/nail-tech-hero.webp';
+    const image = getProgramHeroImage(programSlug ?? 'cosmetology-apprenticeship');
     return (
       <section
         id="host-shops"
         className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
       >
         <div className="grid lg:grid-cols-2 lg:items-stretch">
-          <div className="relative min-h-[280px] bg-slate-100 lg:min-h-[420px]">
+          <div className="relative aspect-[4/3] bg-slate-100 lg:self-center">
             <Image
               src={image}
-              alt={`${pathway} supervised workplace training`}
+              alt={getProgramImageAlt(programSlug ?? 'cosmetology-apprenticeship')}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
@@ -74,12 +86,12 @@ export default function FeaturedHostPartners({
               {pathway} Host Shops
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              Placement is matched and verified before training begins.
+              We're looking for new Host Shops.
             </h2>
             <p className="mt-4 leading-7 text-slate-700">
-              No public Host Shop is currently assigned to this pathway. Elevate confirms occupation
-              approval, supervisor qualifications, location, and available placement before
-              presenting a shop to an applicant.
+              Licensed {pathway.toLowerCase()} businesses: help the next generation build real
+              skills. Apply free to become a Host Shop and showcase your business in the Elevate
+              network. Apprentice placement and supervision are confirmed before training begins.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -89,7 +101,7 @@ export default function FeaturedHostPartners({
                 Apply for this pathway
               </Link>
               <Link
-                href="/partners/host-shops"
+                href="/partners/host-shop/apply"
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-extrabold text-brand-blue-900 hover:bg-sky-50"
               >
                 Become a Host Shop
@@ -135,134 +147,35 @@ export default function FeaturedHostPartners({
               apprenticeship opportunities.
             </p>
 
-            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            <div
+              data-mobile-grid="2"
+              className="mt-6 grid grid-cols-2 items-stretch gap-3 md:grid-cols-3 xl:grid-cols-4"
+            >
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
-                const image =
-                  shop.slug === 'razors-image-barbershop'
-                    ? {
-                        src: '/images/partners/razors-image-logo.jpg',
-                        alt: "Razor's Image Barbershop official logo",
-                        kind: 'photo' as const,
-                      }
-                    : shop.slug === 'generations-hair-llc'
-                        ? {
-                            src: '/images/partners/generations-hair/highlighted-curls-card.webp',
-                            alt: 'Highlighted dimensional curls created by Generations Hair LLC',
-                            kind: 'photo' as const,
-                          }
-                        : (stillMedia[1] ?? stillMedia[0]);
-                const video: FeaturedHostPartnerMedia | undefined =
-                  shop.slug === 'razors-image-barbershop'
-                    ? {
-                        src: '/videos/partners/razors-image-host-barbershop.mp4',
-                        alt: "Razor's Image owner describing the barber apprenticeship opportunity",
-                        kind: 'video' as const,
-                        script:
-                          "Welcome to Razor's Image Barbershop in Bloomington, Indiana, a participating Barber Apprenticeship Host Shop. In this video, the shop owner introduces the workplace and the opportunity for approved apprentices to develop barbering, sanitation, client service, grooming, and professional shop skills under qualified supervision. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.",
-                      }
-                    : shop.media?.find((media) => media.kind === 'video');
-                const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
+
+                const fullAddress = shop.address;
                 return (
                   <article
                     key={shop.slug}
-                    className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${shop.slug === 'razors-image-barbershop' ? 'lg:col-span-2' : ''}`}
+                    className="flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                   >
-                    {video ? (
-                      <div
-                        className="bg-slate-950 px-4 py-5 sm:px-6"
-                        data-scroll-narration
-                        data-narration={video.script}
-                        data-narration-rate="0.84"
-                        data-narration-style="instructor"
-                      >
-                        <div>
-                          <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
-                            {image ? (
-                              <Image
-                                src={image.src}
-                                alt=""
-                                fill
-                                sizes="(max-width: 640px) 100vw, 36vw"
-                                className="object-cover opacity-90"
-                                aria-hidden="true"
-                              />
-                            ) : null}
-                            <video
-                              controls
-                              playsInline
-                              preload="metadata"
-                              poster={image?.src}
-                              aria-label={video.alt}
-                              className="relative z-10 mx-auto aspect-[9/16] max-h-[460px] w-full bg-transparent object-contain sm:max-h-[520px]"
-                            >
-                              <source src={video.src} type="video/mp4" />
-                              Your browser does not support embedded video.
-                            </video>
-                          </div>
-                          {stillMedia.length ? (
-                            <div className="mx-auto mt-4 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-3">
-                              {stillMedia.map((media) => (
-                                <div
-                                  key={media.src}
-                                  className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/15 bg-white"
-                                >
-                                  <Image
-                                    src={media.src}
-                                    alt={media.alt}
-                                    fill
-                                    unoptimized={media.src.startsWith('http')}
-                                    sizes="(max-width: 640px) 50vw, 220px"
-                                    className="object-contain"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                        <div className="mx-auto mt-4 max-w-xl text-center text-white">
-                          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
-                            Participating host{' '}
-                            {shop.businessType === 'BarberShop' ? 'barbershop' : 'salon'}
-                          </p>
-                          <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">
-                            {shop.name} provides a supervised workplace training environment for the{' '}
-                            {programSlug ? programLabel(programSlug) : 'selected'} pathway.
-                            Enrollment, placement, wages, and licensing remain subject to the
-                            applicable program, employer, and state requirements.
-                          </p>
-                        </div>
-                        {video.script ? (
-                          <details className="mx-auto mt-4 max-w-xl rounded-xl border border-white/20 bg-slate-950/30 p-4 text-white">
-                            <summary className="cursor-pointer text-sm font-black">
-                              Read the {shop.dba ?? shop.name} video script
-                            </summary>
-                            <p className="mt-3 text-sm font-medium leading-6 text-slate-100">
-                              {video.script}
-                            </p>
-                          </details>
-                        ) : null}
-                      </div>
-                    ) : image ? (
-                      <div className="bg-white">
-                        <div className="relative aspect-[4/3] max-h-[440px] overflow-hidden bg-white sm:aspect-[16/10]">
-                          <Image
-                            src={image.src}
-                            alt={image.alt}
-                            fill
-                            unoptimized={image.src.startsWith('http')}
-                            sizes="(max-width: 1024px) 100vw, 50vw"
-                            className="object-contain bg-white"
-                          />
-                        </div>
-                      </div>
-                    ) : null}
+                    <HostShopMediaCarousel
+                      shopName={shop.dba ?? shop.name}
+                      compact
+                      items={stillMedia.map((item) => ({ url: item.src, alt: item.alt }))}
+                    />
 
-                    <div className="p-6 sm:p-7">
+                    <div className="flex flex-1 flex-col p-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-2xl font-black tracking-tight text-slate-950">
-                            {shop.dba ?? shop.name}
+                          <h3 className="text-base font-black tracking-tight text-slate-950 sm:text-base">
+                            <Link
+                              href={`/host-shops/${shop.slug}`}
+                              className="hover:text-brand-red-700"
+                            >
+                              {shop.dba ?? shop.name}
+                            </Link>
                           </h3>
                           {shop.dba ? (
                             <p className="mt-1 text-sm font-semibold text-slate-600">
@@ -275,11 +188,11 @@ export default function FeaturedHostPartners({
                         </span>
                       </div>
 
-                      <p className="mt-4 text-sm font-medium leading-6 text-slate-700">
+                      <p className="mt-3 line-clamp-2 text-xs font-medium leading-5 text-slate-700">
                         {shop.marketingBlurb ?? shop.note}
                       </p>
 
-                      <div className="mt-5 space-y-3 border-y border-slate-100 py-5">
+                      <div className="mt-3 space-y-2 border-y border-slate-100 py-3">
                         <p className="flex items-start gap-2 text-sm font-bold text-slate-800">
                           <MapPin
                             className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700"
@@ -313,7 +226,7 @@ export default function FeaturedHostPartners({
                         ))}
                       </div>
 
-                      <div className="mt-6 flex flex-wrap gap-3">
+                      <div className="mt-auto flex flex-wrap gap-3 pt-6">
                         <Link
                           href={`/host-shops/${shop.slug}`}
                           className="inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-brand-red-700"

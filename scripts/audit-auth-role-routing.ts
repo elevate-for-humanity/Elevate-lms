@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROLE_ROUTE_CONFIG } from '../lib/auth/role-destinations';
 import { PORTAL_PATHS } from '../lib/portal/router';
+import { sessionCookieOptions } from '../lib/auth/session-cookie-options';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -186,7 +187,25 @@ if (fs.existsSync(path.join(ROOT, lmsSignInRoute))) {
 const sharedServerClient = 'lib/supabase/server.ts';
 if (fs.existsSync(path.join(ROOT, sharedServerClient))) {
   const source = read(sharedServerClient);
-  if (!source.includes("domain: '.elevateforhumanity.org'")) {
+  // Authentication cookies are scoped through the shared helper rather than a
+  // literal domain assignment in this file. Verify both the integration and
+  // the helper's owned-host / preview-host behavior so secure implementations
+  // cannot be incorrectly rejected by a text-only audit.
+  const sharedDomain = sessionCookieOptions<{ secure: boolean; domain?: string }>(
+    { secure: true }, 'app.elevateforhumanity.org',
+  ).domain;
+  const previewOptions = sessionCookieOptions(
+    { secure: true, domain: '.elevateforhumanity.org' },
+    'preview-run.a.run.app',
+  );
+  if (
+    !source.includes("import { sessionCookieOptions } from '@/lib/auth/session-cookie-options'") ||
+    !source.includes("const cookieOptions = isAuthCookie") ||
+    !source.includes('sessionCookieOptions(options, hostname)') ||
+    !source.includes('cookieStore.set(name, value, cookieOptions)') ||
+    sharedDomain !== '.elevateforhumanity.org' ||
+    'domain' in previewOptions
+  ) {
     findings.push({
       severity: 'blocker',
       code: 'SHARED_AUTH_COOKIE_DOMAIN_MISSING',

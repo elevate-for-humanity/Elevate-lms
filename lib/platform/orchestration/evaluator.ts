@@ -42,6 +42,9 @@ function errorLooksRetryable(error: string): boolean {
     'temporarily unavailable',
     '503',
     '502',
+    '504',
+    'etimedout',
+    'econnreset',
     'network',
     'connection reset',
     'circuit open',
@@ -57,6 +60,22 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 function hasDurableToolEvidence(tool: string, result: unknown): string | null {
   const record = asRecord(result);
   if (!record) return null;
+
+  if (tool === 'studio.engineering.execute') {
+    const branch = asRecord(record.branch);
+    const pullRequest = asRecord(record.pull_request ?? record.pullRequest);
+    const rawChangedFiles = record.changed_files ?? record.changedFiles;
+    const changedFiles = Array.isArray(rawChangedFiles) ? rawChangedFiles : [];
+    const repositoryEvidence = Boolean(
+      changedFiles.length > 0 &&
+      typeof branch?.sha === 'string' &&
+      branch.sha.length >= 7 &&
+      (typeof pullRequest?.number === 'number' || typeof pullRequest?.url === 'string'),
+    );
+    return repositoryEvidence
+      ? 'Elevate-owned Studio returned a changed branch and pull request for CI verification.'
+      : null;
+  }
 
   if (tool === 'openhands.execute') {
     const github = asRecord(record.github_verification);
@@ -126,6 +145,52 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
     };
   }
 
+  const resultRecord = asRecord(input.result);
+  if (resultRecord?.ok === false || resultRecord?.success === false) {
+    const structuredError = asRecord(resultRecord.error);
+    const message =
+      typeof resultRecord.error === 'string' && resultRecord.error.trim()
+        ? resultRecord.error
+        : typeof structuredError?.message === 'string' && structuredError.message.trim()
+          ? structuredError.message
+        : typeof resultRecord.message === 'string' && resultRecord.message.trim()
+          ? resultRecord.message
+          : 'The tool explicitly reported an unsuccessful result.';
+    const errorCode = String(structuredError?.code ?? resultRecord.code ?? '');
+    const httpStatus = Number(
+      structuredError?.statusCode ?? resultRecord.statusCode ?? resultRecord.httpStatus,
+    );
+    const transientFailure =
+      errorLooksRetryable(`${message} ${errorCode}`) ||
+      [408, 429, 502, 503, 504].includes(httpStatus);
+    return {
+      status:
+        transientFailure && attempts < maxAttempts
+          ? 'FAIL_RETRYABLE'
+          : 'FAIL_BLOCKING',
+      reasons: [message],
+      evidence: { tool: input.tool, attempts, max_attempts: maxAttempts, error: message },
+    };
+  }
+
+  const reportedStatus = String(resultRecord?.status ?? '').toLowerCase();
+  const reportedOverall = String(resultRecord?.overall ?? '').toLowerCase();
+  if (['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'blocked'].includes(reportedStatus) ||
+      ['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'unhealthy'].includes(reportedOverall)) {
+    return {
+      status: 'FAIL_BLOCKING',
+      reasons: [`The tool reported ${reportedOverall || reportedStatus}; this is not verified success.`],
+      evidence: { tool: input.tool, status: reportedStatus, overall: reportedOverall },
+    };
+  }
+  if (['pending', 'queued', 'running', 'in_progress', 'awaiting_approval'].includes(reportedStatus)) {
+    return {
+      status: 'REQUIRES_HUMAN_REVIEW',
+      reasons: ['The operation has not returned terminal verification evidence.'],
+      evidence: { tool: input.tool, status: reportedStatus },
+    };
+  }
+
   if (!hasMeaningfulResult(input.result)) {
     reasons.push('The execution returned no verifiable result.');
     return {
@@ -153,16 +218,19 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
 
   const requiresEngineeringEvidence =
     input.verificationRule?.toLowerCase().includes('engineering runtime') ?? false;
-  if (requiresEngineeringEvidence && input.tool !== 'openhands.execute') {
+  if (
+    requiresEngineeringEvidence &&
+    !['studio.engineering.execute', 'openhands.execute'].includes(input.tool)
+  ) {
     reasons.push(
-      `Engineering verification requires openhands.execute evidence; received ${input.tool}.`,
+      `Engineering verification requires registered repository-mutation evidence; received ${input.tool}.`,
     );
     return {
       status: 'FAIL_BLOCKING',
       reasons,
       evidence: {
         tool: input.tool,
-        expected_tool: 'openhands.execute',
+        expected_tool: 'studio.engineering.execute|openhands.execute',
         verification_rule: input.verificationRule ?? null,
       },
     };

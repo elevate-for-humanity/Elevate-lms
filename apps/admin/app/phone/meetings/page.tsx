@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, CalendarPlus, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
+import { ArrowLeft, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createMeeting } from '../actions';
+import {NewMeetingForm} from './NewMeetingForm';
+import {MeetingLinks} from './MeetingLinks';
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { liveKitReadiness } from '@/lib/communications/livekit';
 
@@ -14,6 +16,9 @@ export default async function MeetingsPage() {
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const db = await requireAdminClient();
   const tenantId = auth.profile.tenant_id ?? auth.profile.organization_id ?? null;
+  const platformAdmin = auth.effectiveRoles.some(
+    (role) => role === 'admin' || role === 'super_admin',
+  );
   let workspaceQuery = db
     .from('communication_workspaces')
     .select('id,status,name,meeting_provider')
@@ -21,15 +26,26 @@ export default async function MeetingsPage() {
   workspaceQuery = tenantId
     ? workspaceQuery.eq('tenant_id', tenantId)
     : workspaceQuery.is('tenant_id', null);
-  const { data: workspace } = await workspaceQuery.maybeSingle();
+  const { data: tenantWorkspace } = await workspaceQuery.maybeSingle();
+  const { data: platformWorkspace } =
+    !tenantWorkspace && platformAdmin && tenantId
+      ? await db
+          .from('communication_workspaces')
+          .select('id,status,name,meeting_provider')
+          .is('tenant_id', null)
+          .limit(1)
+          .maybeSingle()
+      : { data: null };
+  const workspace = tenantWorkspace ?? platformWorkspace;
   const { data: rooms } = workspace?.id
     ? await db
         .from('communication_rooms')
-        .select('id,title,room_type,status,scheduled_at,max_participants,allow_screen_share')
+        .select('id,title,room_key,description,room_type,status,scheduled_at,max_participants,allow_screen_share')
         .eq('workspace_id', workspace.id)
         .order('scheduled_at', { ascending: false })
         .limit(20)
     : { data: [] };
+  await hydrateProcessEnv();
   const readiness = liveKitReadiness();
   const serviceReady = readiness.ready;
 
@@ -50,35 +66,12 @@ export default async function MeetingsPage() {
             </p>
             <h1 className="mt-1 text-3xl font-black">Team Meetings</h1>
             <p className="mt-1 text-sm text-slate-600">
-              Video meetings, team huddles, guest invitations, screen sharing, chat, and attendance
+              Video meetings, team huddles, meeting invitations, screen sharing, chat, and attendance
               inside the dashboard.
             </p>
           </div>
           {serviceReady ? (
-            <form action={createMeeting} className="flex flex-wrap items-center gap-2">
-              <input
-                name="title"
-                required
-                minLength={3}
-                maxLength={120}
-                placeholder="Meeting title"
-                className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
-              />
-              <select
-                name="roomType"
-                className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
-              >
-                <option value="meeting">Meeting</option>
-                <option value="team_huddle">Team huddle</option>
-                <option value="classroom">Classroom</option>
-                <option value="webinar">Webinar</option>
-                <option value="support">Support</option>
-              </select>
-              <button className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white">
-                <CalendarPlus className="h-4 w-4" />
-                New meeting
-              </button>
-            </form>
+            <NewMeetingForm />
           ) : null}
         </div>
       </div>
@@ -98,7 +91,7 @@ export default async function MeetingsPage() {
         {[
           [Video, 'Browser video', 'Join without leaving the Elevate dashboard.'],
           [MonitorUp, 'Screen sharing', 'Present a browser tab, application, or screen.'],
-          [Users, 'Team and guests', 'Invite employees, learners, partners, or outside guests.'],
+          [Users, 'Meeting invitations', 'Share links with employees, learners, and partners who have an Elevate account.'],
           [
             ShieldCheck,
             'Tenant isolation',
@@ -114,7 +107,7 @@ export default async function MeetingsPage() {
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-black">Meeting rooms</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-black">Meeting rooms</h2><Link href="/phone/meetings/legacy83-presentation" className="rounded-lg bg-indigo-700 px-4 py-3 font-bold text-white">Present Legacy 83</Link></div>
         {rooms?.length ? (
           <div className="mt-4 divide-y divide-slate-100">
             {rooms.map((room: any) => (
@@ -134,12 +127,14 @@ export default async function MeetingsPage() {
                 </span>
                 {room.status !== 'cancelled' ? (
                   <Link
-                    href={`/phone/meetings/${room.id}`}
+                    href={room.room_key?.startsWith('google-calendar-') && /^https:\/\/meet\.google\.com\/[a-z-]+$/.test(room.description ?? '') ? room.description : `/phone/meetings/${room.id}`}
+                    target={room.room_key?.startsWith('google-calendar-') ? '_blank' : undefined}
                     className="rounded-lg bg-indigo-700 px-3 py-2 text-sm font-black text-white"
                   >
                     Join
                   </Link>
                 ) : null}
+                {room.status !== 'cancelled' && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} externalUrl={room.room_key?.startsWith('google-calendar-') && /^https:\/\/meet\.google\.com\/[a-z-]+$/.test(room.description ?? '') ? room.description : undefined} />}
               </div>
             ))}
           </div>

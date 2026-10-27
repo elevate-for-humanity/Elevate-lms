@@ -3,10 +3,16 @@ import { apiRequireRoles } from '@/lib/admin/guards';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
+  createPortalPreviewHandoff,
   readPortalPreviewHandoffTarget,
   verifyPortalPreviewHandoff,
 } from '@/lib/admin/portal-preview-handoff';
 import { HOST_SHOP_PREVIEW_SESSION_COOKIE } from '@/lib/admin/host-shop-preview';
+import {
+  PORTAL_PREVIEW_ACTOR_COOKIE,
+  PORTAL_PREVIEW_COOKIE,
+  PORTAL_PREVIEW_SESSION_COOKIE,
+} from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -85,22 +91,34 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
     .join(' ')
     .toLowerCase();
 
-  const canOpen =
+  const canInspect =
     !partnerError &&
     Boolean(partner?.id) &&
     partner?.status === 'active' &&
-    partner?.approval_status === 'approved' &&
     partner?.is_active !== false &&
     /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(typeText);
 
-  if (!canOpen) {
+  if (!canInspect) {
     return NextResponse.json(
-      { error: 'This Host Shop is not yet connected to an active approved partnership record' },
+      { error: 'This Host Shop is not connected to an active partnership record' },
       { status: 409 },
     );
   }
 
-  const response = NextResponse.redirect(new URL('/host-shop/dashboard', APP_ORIGIN));
+  const { data: previewMember } = await db
+    .from('partner_users')
+    .select('user_id')
+    .eq('partner_id', partnerId)
+    .eq('status', 'active')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const previewUserId = previewMember?.user_id || '';
+  const previewActorId = handoff?.actorId || actor?.id || '';
+
+  const destination =
+    partner?.approval_status === 'approved' ? '/host-shop/dashboard' : '/host-shop/onboarding';
+  const response = NextResponse.redirect(new URL(destination, APP_ORIGIN));
   response.cookies.set(HOST_SHOP_ADMIN_COOKIE, partnerId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -116,6 +134,33 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
       path: '/',
       maxAge: 60 * 60,
     });
+  }
+  if (previewActorId && previewUserId) {
+    response.cookies.set(PORTAL_PREVIEW_COOKIE, previewUserId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
+    });
+    response.cookies.set(PORTAL_PREVIEW_ACTOR_COOKIE, previewActorId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
+    });
+    response.cookies.set(
+      PORTAL_PREVIEW_SESSION_COOKIE,
+      createPortalPreviewHandoff(previewActorId, previewUserId, 60 * 60 * 1000),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60,
+      },
+    );
   }
   return response;
 }

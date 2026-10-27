@@ -14,7 +14,7 @@ import type { AgentConfig, AgentCapabilities, AgentHealthStatus } from './types'
 // ============================================================
 
 const PARIS_CAPABILITIES: AgentCapabilities = {
-  intents: [AgentIntent.ADMISSION],
+  intents: [AgentIntent.ADMISSION, AgentIntent.COURSE_BUILDER, AgentIntent.OPS],
   maxConcurrentTasks: 5,
   timeout: 300000, // 5 minutes
   retryable: true,
@@ -66,7 +66,7 @@ const DEFAULT_AGENTS: AgentConfig[] = [
     status: AgentStatus.ACTIVE,
     metadata: {
       description:
-        'Handles admission interviews, eligibility assessments, and program applications',
+        'Central coordinator for admissions, Studio operations, and supervised course production; uses the shared governed tool registry',
       keywords: ['interview', 'apply', 'program', 'eligibility', 'admission', 'paris'],
     },
   },
@@ -206,7 +206,8 @@ export class AgentRegistry {
     if (capableAgents.length === 0) {
       // Fall back to router if no specific agent can handle the intent
       const router = this.getAgent(AIAgent.ROUTER);
-      if (router) {
+      if (router?.status === AgentStatus.ACTIVE &&
+          this.getAgentLoad(router.type) < router.maxConcurrentTasks) {
         return router;
       }
       throw new Error(`No agent available for intent: ${intent}`);

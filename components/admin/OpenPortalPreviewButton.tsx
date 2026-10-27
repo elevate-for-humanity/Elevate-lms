@@ -7,10 +7,12 @@ export function OpenPortalPreviewButton({
   targetUserId,
   label,
   reason,
+  hostShopPartnerId,
 }: {
   targetUserId: string;
   label: string;
   reason: string;
+  hostShopPartnerId?: string;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +24,11 @@ export function OpenPortalPreviewButton({
       const response = await fetch('/api/admin/impersonate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_user_id: targetUserId, reason }),
+        body: JSON.stringify({
+          target_user_id: targetUserId,
+          reason,
+          host_shop_partner_id: hostShopPartnerId,
+        }),
       });
       const result = await response.json();
       if (!response.ok || !result.preview_url || !result.preview_handoff) {

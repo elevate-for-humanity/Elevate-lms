@@ -13,17 +13,20 @@ type PlayOptions = {
   userControlledRate?: boolean;
   onEnded?: () => void;
   onError?: () => void;
+  /** Deprecated: production narration never switches to a device voice. */
   allowBrowserFallback?: boolean;
 };
 
 const naturalVoiceCache = new Map<string, Promise<Blob>>();
 const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
+let playbackGeneration = 0;
+let standaloneAudio: HTMLAudioElement | null = null;
 
 const DELIVERY_RATE_BY_STYLE: Record<NaturalVoiceStyle, number> = {
-  default: 1,
-  assistant: 0.98,
-  instructor: 0.95,
-  commercial: 1,
+  default: 0.88,
+  assistant: 0.94,
+  instructor: 0.84,
+  commercial: 0.96,
 };
 
 /**
@@ -40,13 +43,16 @@ export function narrationPlaybackRate(options: PlayOptions = {}) {
   const style = options.style || 'default';
   const baseline = DELIVERY_RATE_BY_STYLE[style];
   return Number.isFinite(requested)
-    ? Math.min(1.08, Math.max(0.92, requested))
+    ? Math.min(1, Math.max(0.8, requested))
     : baseline;
 }
 
 /** Stops every natural-voice hook instance, including audio created on another page section. */
 export function stopAllNaturalVoicePlayback() {
   if (typeof window === 'undefined') return;
+  playbackGeneration += 1;
+  standaloneAudio?.pause();
+  standaloneAudio = null;
   window.dispatchEvent(new Event(NATURAL_VOICE_STOP_EVENT));
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
@@ -59,20 +65,6 @@ function naturalVoiceCacheKey(text: string, options: PlayOptions) {
     narrationPlaybackRate(options),
     options.src || '',
   ]);
-}
-
-function chooseBrowserVoice(): SpeechSynthesisVoice | null {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-
-  return (
-    voices.find((voice) => /natural|neural|premium|enhanced/i.test(voice.name) && /^en(-|_)/i.test(voice.lang)) ||
-    voices.find((voice) => /^en-US$/i.test(voice.lang)) ||
-    voices.find((voice) => /^en(-|_)/i.test(voice.lang)) ||
-    voices[0] ||
-    null
-  );
 }
 
 async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Promise<Blob> {
@@ -131,46 +123,45 @@ async function requestNaturalVoice(text: string, options: PlayOptions): Promise<
   return audio;
 }
 
-function browserFallback(text: string, options: PlayOptions): SpeechSynthesisUtterance | null {
-  if (
-    typeof window === 'undefined' ||
-    !('speechSynthesis' in window) ||
-    typeof SpeechSynthesisUtterance === 'undefined'
-  ) return null;
-
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  const browserVoice = chooseBrowserVoice();
-  if (browserVoice) utterance.voice = browserVoice;
-  utterance.lang = browserVoice?.lang || 'en-US';
-  utterance.rate = narrationPlaybackRate(options);
-  utterance.pitch = options.style === 'commercial' || options.style === 'assistant' ? 1.02 : 1;
-  utterance.volume = 1;
-  window.speechSynthesis.speak(utterance);
-  return utterance;
-}
-
 /**
  * Natural-TTS-first compatibility helper for non-hook callers.
- * Browser speech is used only when the shared natural voice endpoint is unavailable.
+ * The shared natural voice endpoint is authoritative; device/browser voices are never substituted.
  */
 export async function speakNaturalVoice(text: string, options: PlayOptions = {}): Promise<boolean> {
   const clean = text.trim().slice(0, 2400);
   if (!clean || typeof window === 'undefined') return false;
 
+  stopAllNaturalVoicePlayback();
+  const generation = playbackGeneration;
   try {
     const audio = await requestNaturalVoice(clean, options);
+    if (generation !== playbackGeneration) return false;
+    document.querySelectorAll<HTMLMediaElement>('audio, video').forEach((media) => {
+      if (!media.paused && !media.muted && media.volume > 0) media.pause();
+    });
+    standaloneAudio = audio;
     await audio.play();
     return true;
   } catch {
-    if (options.allowBrowserFallback === false) return false;
-    const utterance = browserFallback(clean, options);
-    return Boolean(utterance);
+    return false;
+  }
+}
+
+/** Play PWA notification audio without pausing phone-call media or taking exclusive voice ownership. */
+export async function playNaturalVoiceNotification(text: string, volume = 1): Promise<boolean> {
+  const clean = text.trim().slice(0, 2400);
+  if (!clean || typeof window === 'undefined' || !Number.isFinite(volume) || volume <= 0) return false;
+  try {
+    const audio = await requestNaturalVoice(clean, { style: 'assistant' });
+    audio.volume = Math.min(1, Math.max(0, volume));
+    await audio.play();
+    return true;
+  } catch {
+    return false;
   }
 }
 
 export function useNaturalVoice() {
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playbackTokenRef = useRef(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -185,10 +176,6 @@ export function useNaturalVoice() {
       audioRef.current.currentTime = 0;
       audioRef.current = null;
     }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    utteranceRef.current = null;
     setIsPlaying(false);
     setIsPaused(false);
     setIsLoading(false);
@@ -200,15 +187,19 @@ export function useNaturalVoice() {
 
     stopAllNaturalVoicePlayback();
     const playbackToken = playbackTokenRef.current;
+    const generation = playbackGeneration;
     setError(null);
     setIsLoading(true);
 
     try {
       const audio = await requestNaturalVoice(clean, options);
-      if (playbackToken !== playbackTokenRef.current) {
+      if (generation !== playbackGeneration || playbackToken !== playbackTokenRef.current) {
         audio.pause();
         return false;
       }
+      document.querySelectorAll<HTMLMediaElement>('audio, video').forEach((media) => {
+        if (!media.paused && !media.muted && media.volume > 0) media.pause();
+      });
       audioRef.current = audio;
       audio.onplay = () => {
         setIsLoading(false);
@@ -234,45 +225,14 @@ export function useNaturalVoice() {
       return true;
     } catch {
       if (playbackToken !== playbackTokenRef.current) return false;
-      if (options.allowBrowserFallback === false) {
-        setIsLoading(false);
-        setError('Natural voice is temporarily unavailable.');
-        options.onError?.();
-        return false;
-      }
-      const utterance = browserFallback(clean, options);
-      if (!utterance) {
-        setIsLoading(false);
-        setError('Voice playback is not supported in this browser.');
-        options.onError?.();
-        return false;
-      }
-
-      utteranceRef.current = utterance;
-      utterance.onstart = () => {
-        setIsLoading(false);
-        setIsPlaying(true);
-        setIsPaused(false);
-        setError(null);
-      };
-      utterance.onend = () => {
-        utteranceRef.current = null;
-        setIsPlaying(false);
-        setIsPaused(false);
-        setIsLoading(false);
-        options.onEnded?.();
-      };
-      utterance.onerror = () => {
-        utteranceRef.current = null;
-        setIsPlaying(false);
-        setIsPaused(false);
-        setIsLoading(false);
-        setError('Voice playback failed.');
-        options.onError?.();
-      };
-      return true;
+      setIsLoading(false);
+      setIsPlaying(false);
+      setIsPaused(false);
+      setError('Natural voice is temporarily unavailable.');
+      options.onError?.();
+      return false;
     }
-  }, [stop]);
+  }, []);
 
   const prepare = useCallback(async (text: string, options: PlayOptions = {}) => {
     const clean = text.trim().slice(0, 2400);
@@ -292,22 +252,19 @@ export function useNaturalVoice() {
       setIsPaused(true);
       return;
     }
-    if (utteranceRef.current && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.pause();
-      setIsPlaying(false);
-      setIsPaused(true);
-    }
   }, []);
 
   const resume = useCallback(async () => {
     if (audioRef.current && audioRef.current.paused) {
-      await audioRef.current.play();
-      setIsPlaying(true);
-      setIsPaused(false);
-      return true;
-    }
-    if (utteranceRef.current && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.resume();
+      const audio = audioRef.current;
+      const position = audio.currentTime;
+      stopAllNaturalVoicePlayback();
+      audio.currentTime = position;
+      audioRef.current = audio;
+      document.querySelectorAll<HTMLMediaElement>('audio, video').forEach((media) => {
+        if (!media.paused && !media.muted && media.volume > 0) media.pause();
+      });
+      await audio.play();
       setIsPlaying(true);
       setIsPaused(false);
       return true;
@@ -318,7 +275,6 @@ export function useNaturalVoice() {
   useEffect(() => {
     const handleGlobalStop = () => stop();
     window.addEventListener(NATURAL_VOICE_STOP_EVENT, handleGlobalStop);
-    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
     return () => {
       window.removeEventListener(NATURAL_VOICE_STOP_EVENT, handleGlobalStop);
       stop();

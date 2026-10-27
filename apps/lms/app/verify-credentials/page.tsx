@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
@@ -218,13 +219,13 @@ export default function VerifyCredentialsPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px] overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/verify-credentials-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} credential verification`}
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">

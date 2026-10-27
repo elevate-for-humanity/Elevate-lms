@@ -23,8 +23,17 @@ async function _GET(request: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const { searchParams } = new URL(request.url);
+  const requestedProgram = searchParams.get('program') || searchParams.get('program_slug');
+  const requestedEnrollmentId = searchParams.get('enrollment_id');
+
   const db = await createClient();
-  const enrollment = await resolveLatestEnrollment({ client: db, userId: user.id });
+  const enrollment = await resolveLatestEnrollment({
+    client: db,
+    userId: user.id,
+    programSlug: requestedProgram ?? undefined,
+    enrollmentId: requestedEnrollmentId ?? undefined,
+  });
   if (!enrollment) {
     return NextResponse.json({
       action: 'EXPLORE_PROGRAMS',

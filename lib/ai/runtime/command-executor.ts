@@ -1,3 +1,5 @@
+import { PARIS_SYSTEM_IDENTITY } from '../paris-identity';
+import { recordParisObservation } from './supervision';
 import 'server-only';
 
 import { executeAiTask, type AITask } from '@/lib/ai/execute-ai-task';
@@ -55,7 +57,7 @@ async function synthesizeReadResult(
   const result = await executeAiTask({
     task: context.advisoryTask ?? 'general_chat',
     prompt: [
-      `You are ${context.agentLabel ?? context.agent}, an Elevate workforce/admin AI.`,
+      PARIS_SYSTEM_IDENTITY,
       'The data below came from an authenticated live platform tool.',
       'Answer only from that data. Do not invent missing records, eligibility, funding decisions, compliance conclusions, or contact information.',
       'If asked to draft an email/reminder, draft it but do not claim it was sent.',
@@ -85,6 +87,21 @@ export async function executeAICommand(
   command: string,
   context: AICommandExecutionContext,
 ): Promise<AICommandExecutionResult> {
+  const started = Date.now();
+  try {
+    const result = await executeCombinedCommand(command, {...context, agent:'PARIS', agentLabel:'PARIS'});
+    await recordParisObservation({kind:'command',operation:result.tool ?? 'ai.advisory',status:result.status,
+      actorId:context.actorId,correlationId:context.correlationId,durationMs:Date.now()-started,
+      provider:result.provider,error:result.status === 'approval_required' ? 'approval required' : result.message});
+    return result;
+  } catch (error) {
+    await recordParisObservation({kind:'command',operation:'ai.command',status:'failed',actorId:context.actorId,
+      correlationId:context.correlationId,durationMs:Date.now()-started,error});
+    throw error;
+  }
+}
+
+async function executeCombinedCommand(command: string, context: AICommandExecutionContext): Promise<AICommandExecutionResult> {
   const plannedTool = planAIToolFromCommand(command, context.commandContext ?? {});
 
   if (plannedTool) {
@@ -182,7 +199,8 @@ export async function executeAICommand(
   const result = await executeAiTask({
     task: context.advisoryTask ?? 'general_chat',
     prompt: [
-      `You are ${context.agentLabel ?? context.agent}, operating as ${context.agentRole ?? 'an authorized Elevate platform assistant'}.`,
+      PARIS_SYSTEM_IDENTITY,
+      `Current capability: ${context.agentRole ?? 'authorized platform assistance'}.`,
       'You may explain, analyze, draft, or recommend.',
       'Do not claim a business action was executed unless a registered tool actually ran.',
       'Do not invent application status, funding approval, enrollment status, payment status, compliance outcomes, or current system state.',

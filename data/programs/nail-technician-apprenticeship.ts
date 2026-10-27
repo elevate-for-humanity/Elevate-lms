@@ -1,13 +1,12 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { APPENDIX_A_STANDARDS } from '@/lib/compliance/appendix-a-standards';
-import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 const NAIL_STANDARD = APPENDIX_A_STANDARDS.manicurist;
-const TRAINING_HOURS = getApprenticeshipRequiredHours('nail-technician-apprenticeship')!;
 export const NAIL_TECH: ProgramSchema = {
   slug: 'nail-technician-apprenticeship',
   title: 'Nail Technician Apprenticeship',
-  subtitle: `Registered, competency-based Manicurist apprenticeship with a ${TRAINING_HOURS.toLocaleString()}-hour training plan: complete ${NAIL_STANDARD.competencyCount} verified occupational competencies and ${NAIL_STANDARD.relatedInstructionHours} hours of related instruction through supervised host-site training.`,
+  subtitle:
+    `Registered Indiana Manicurist apprenticeship: complete ${NAIL_STANDARD.competencyCount} verified occupational competencies and ${NAIL_STANDARD.relatedInstructionHours} RTI hours through supervised host-site training. Work hours are maintained as auditable training evidence under the competency-based standard.`,
   sector: 'personal-services',
   category: 'Nail Technology',
   programType: 'apprenticeship',
@@ -15,21 +14,15 @@ export const NAIL_TECH: ProgramSchema = {
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
-  durationWeeks: 0,
-  hoursPerWeekMin: 25,
-  hoursPerWeekMax: 30,
-  hoursBreakdown: {
-    onlineInstruction: 210,
-    handsOnLab: TRAINING_HOURS - 210,
-    examPrep: 0,
-    careerPlacement: 0,
-  },
-  schedule: `Complete a ${TRAINING_HOURS.toLocaleString()}-hour apprenticeship training plan while progressing through 19 Appendix A competencies and 210 required related-instruction hours.`,
+  durationWeeks: 50,
+  hoursPerWeekMin: 30,
+  hoursPerWeekMax: 40,
+  hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
+  schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.',
   cohortSize: '1–3 apprentices per salon',
-  fundingStatement:
-    'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
-  selfPayCost: '$5,000',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
+  selfPayCost: '$6,000',
+  fundingOptions: ['self_pay'],
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [
@@ -54,17 +47,10 @@ export const NAIL_TECH: ProgramSchema = {
   ],
   outcomes: [
     {
-      statement: `Document the full ${TRAINING_HOURS.toLocaleString()}-hour apprenticeship training plan`,
-      assessedAt: 'Throughout program',
-    },
-    {
       statement: 'Perform manicures, pedicures, and nail enhancements on live clients',
       assessedAt: 'Month 3',
     },
-    {
-      statement: 'Complete 19 verified Appendix A competencies and 210 related-instruction hours',
-      assessedAt: 'Program completion',
-    },
+    { statement: 'Complete 19 verified Appendix A competencies and 210 RTI hours with required sponsor documentation', assessedAt: 'Program completion' },
     {
       statement: 'Demonstrate readiness for the current Indiana manicurist licensing process',
       assessedAt: 'After registered-program completion',
@@ -160,12 +146,11 @@ export const NAIL_TECH: ProgramSchema = {
   complianceAlignment: [
     {
       standard: 'Indiana IPLA Nail Technology Standards',
-      description:
-        'State licensing requirements are tracked separately from registered-program completion requirements.',
+      description: 'State licensing requirements are tracked separately from registered-program completion requirements.',
     },
     {
       standard: 'DOL Registered Apprenticeship',
-      description: `Registered Manicurist occupation 2090CB: a ${TRAINING_HOURS.toLocaleString()}-hour training plan, 19 verified competencies, and 210 required RTI hours.`,
+      description: 'Registered Manicurist occupation 2090CB: 19 verified competencies plus 210 required RTI hours.',
     },
   ],
   trainingPhases: [
@@ -237,12 +222,11 @@ export const NAIL_TECH: ProgramSchema = {
     'High school diploma or GED (or actively pursuing)',
     'Interest in nail technology career',
   ],
-  equipmentIncluded: 'Basic tool kit provided. Salon supplies provided by host salon.',
+  equipmentIncluded: 'Students provide personal tools and supplies unless their written enrollment terms expressly include them.',
   modality: 'In-person — supervised training in a licensed salon',
   facilityInfo: 'Partner salons in Indianapolis area',
   employerPartners: ['Licensed nail salons in Indianapolis area'],
   pricingIncludes: [
-    `${TRAINING_HOURS.toLocaleString()} total apprenticeship hours tracked in the apprentice dashboard`,
     '19 verified occupational competencies',
     '210 required related-instruction hours',
     'Related instruction',
@@ -251,11 +235,11 @@ export const NAIL_TECH: ProgramSchema = {
     'Licensing exam prep',
   ],
   paymentTerms:
-    'Paid apprenticeship track remains available. For self-pay enrollment, start with a $600 deposit, then weekly payments or BNPL. All options available at checkout.',
+    'Tuition is self-pay only. Review the current published total, initial invoice, remaining installments, and any separately approved financing before payment.',
   faqs: [
     {
       question: 'How long does it take?',
-      answer: `The training plan totals ${TRAINING_HOURS.toLocaleString()} hours, including 210 hours of related instruction and supervised host-site training. Registered completion also requires all 19 occupational competencies; calendar time varies by apprentice and host site.`,
+      answer: 'Progress is competency-based. Completion requires 19 verified occupational competencies and 210 related-instruction hours; calendar time varies by apprentice and host site.',
     },
     {
       question: 'Do I get paid?',
@@ -271,12 +255,12 @@ export const NAIL_TECH: ProgramSchema = {
   metaDescription:
     'Registered competency-based Manicurist apprenticeship with 19 verified competencies, 210 related-instruction hours, supervised host-site practice, and Indiana licensing preparation.',
 
+
   funding: {
     wioa_eligible: false,
-    fssa_eligible: true,
+    fssa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes:
-      'Registered Manicurist occupation 2090CB. Any FSSA IMPACT, WIOA, employer, or other funding requires individual eligibility and written authorization.',
+    fundingNotes: 'Apprenticeship enrollment is self-pay only.',
   },
 };

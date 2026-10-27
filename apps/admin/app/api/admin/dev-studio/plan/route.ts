@@ -1,3 +1,4 @@
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
 /**
  * POST /api/admin/dev-studio/plan
  *
@@ -11,7 +12,8 @@ import { NextRequest } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { decomposePlan, canExecuteStep, type Plan } from '@/lib/platform/planner';
+import { canExecuteStep, type Plan } from '@/lib/platform/planner';
+import { prepareMasterStudioPlan } from '@/lib/studio/master-runtime';
 import { emitEvent } from '@/lib/platform/events';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createAiTask, runTaskExecution } from '@/lib/devstudio/os/task-runner';
@@ -23,6 +25,7 @@ import { logger } from '@/lib/logger';
 import {
   bindCanonicalTask,
   ensureCanonicalStudioRun,
+  failCanonicalStudioStep,
   startCanonicalStudioStep,
   syncCanonicalStudioRunCheckpoint,
   verifyCanonicalStudioStep,
@@ -138,7 +141,17 @@ function taskEvidence(task: Record<string, any> | null): unknown {
 function safeEvidenceSummary(value: unknown): string | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
-  const safeKeys = ['connected', 'status', 'message', 'company_name', 'last_sync', 'ok'];
+  const safeKeys = [
+    'connected',
+    'status',
+    'message',
+    'company_name',
+    'last_sync',
+    'ok',
+    'overall',
+    'summary',
+    'timestamp',
+  ];
   const summary = Object.fromEntries(
     safeKeys.filter((key) => record[key] !== undefined).map((key) => [key, record[key]]),
   );
@@ -173,6 +186,10 @@ export async function POST(req: NextRequest) {
 
   if (!goal && !resumePlanId) {
     return new Response('data: [DONE]\n\n', { headers: { 'Content-Type': 'text/event-stream' } });
+  }
+
+  if (prohibitsToolUse(goal)) {
+    return Response.json({ error: 'Tool execution is disabled by this request. Use conversational chat.' }, { status: 422 });
   }
 
   const db = await requireAdminClient();
@@ -217,10 +234,17 @@ export async function POST(req: NextRequest) {
         }
       };
 
+      let plan: Plan | null = null;
+      let canonicalRun: Awaited<ReturnType<typeof ensureCanonicalStudioRun>> | null = null;
       try {
-        let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
+        plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
+        if (plan && prohibitsToolUse(plan.goal)) {
+          write('This saved plan cannot run because its request prohibits tool execution. Start a conversational reply or a new explicitly authorized task.');
+          write('', { checkpoint: { planId: plan.id, taskId: '', status: 'failed' } });
+          return;
+        }
         if (!plan) {
-          plan = decomposePlan(effectiveGoal, params);
+          plan = prepareMasterStudioPlan(effectiveGoal, params);
           const shared = await loadSharedContext({
             goal: effectiveGoal,
             tenantId,
@@ -305,7 +329,7 @@ export async function POST(req: NextRequest) {
           await persistPlan(db, plan, auth.id, tenantId);
         }
 
-        const canonicalRun = await ensureCanonicalStudioRun(db, {
+        canonicalRun = await ensureCanonicalStudioRun(db, {
           actorId: auth.id,
           conversationId,
           organizationId: tenantId,
@@ -362,6 +386,13 @@ export async function POST(req: NextRequest) {
                   title: `[${plan.id}] ${step.title}`,
                   description: `Synthetic-intelligence plan step ${step.id} for goal: ${plan.goal}`,
                   command: step.command,
+                  // The engineering stage is explicitly bound to its registered
+                  // execution adapter. A lengthy goal mentioning PARIS must not
+                  // silently route repository work into advisory supervision.
+                  ...(step.runner === 'studio-engineering' ? {
+                    toolName: 'studio.engineering.execute',
+                    toolInput: { task: step.command },
+                  } : {}),
                   requestedBy: auth.id,
                   traceId: `${plan.id}:${step.id}`,
                   conversationId,
@@ -439,31 +470,60 @@ export async function POST(req: NextRequest) {
                 verificationRule: step.verification_rule,
               });
 
-              if (evaluation.status === 'FAIL_RETRYABLE') {
-                const tool = task.tool_name ? getAITool(String(task.tool_name)) : null;
-                const safelyRetryable = !tool || tool.idempotent;
-                if (safelyRetryable && Number(task.attempts ?? 1) < (step.max_attempts ?? 2)) {
-                  write(
-                    `${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`,
-                  );
-                  await runTaskExecution(db, step.task_id, auth.id, {
-                    actorRoles: auth.effectiveRoles,
-                    tenantId: tenantId ?? null,
-                    requestHeaders: req.headers,
-                    adminOrigin,
-                    appOrigin,
-                  });
-                  task = await currentTask(db, step.task_id);
-                  evaluation = evaluateExecution({
-                    tool: String(task?.tool_name ?? 'advisory'),
-                    result: taskEvidence(task),
-                    error: task?.error_message ?? null,
-                    attempts: Number(task?.attempts ?? 2),
-                    maxAttempts: step.max_attempts ?? 2,
-                    expectedOutput: step.expected_output,
-                    verificationRule: step.verification_rule,
-                  });
+              const retryTool = task.tool_name ? getAITool(String(task.tool_name)) : null;
+              // Retry the canonical task only when its registered tool is idempotent.
+              // Unknown tools must never be re-executed on an assumed safety contract.
+              let recoveryAttempts = Number(task.attempts ?? 1);
+              while (
+                evaluation.status === 'FAIL_RETRYABLE' &&
+                retryTool?.idempotent === true &&
+                recoveryAttempts < (step.max_attempts ?? 2)
+              ) {
+                write(
+                  `${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`,
+                );
+                await runTaskExecution(db, step.task_id, auth.id, {
+                  actorRoles: auth.effectiveRoles,
+                  tenantId: tenantId ?? null,
+                  requestHeaders: req.headers,
+                  adminOrigin,
+                  appOrigin,
+                });
+                task = await currentTask(db, step.task_id);
+                if (!task) throw new Error('Recovery task record could not be reloaded');
+                const recordedAttempts = Number(task.attempts ?? recoveryAttempts);
+                if (recordedAttempts <= recoveryAttempts) {
+                  throw new Error('Recovery did not advance the durable attempt counter');
                 }
+                recoveryAttempts = recordedAttempts;
+                if (task.status === 'running' || task.status === 'awaiting_approval') break;
+                evaluation = evaluateExecution({
+                  tool: String(task?.tool_name ?? 'advisory'),
+                  result: taskEvidence(task),
+                  error: task?.error_message ?? null,
+                  attempts: Number(task?.attempts ?? 2),
+                  maxAttempts: step.max_attempts ?? 2,
+                  expectedOutput: step.expected_output,
+                  verificationRule: step.verification_rule,
+                });
+              }
+
+              // A retry may start asynchronous work or require approval. Preserve
+              // that checkpoint instead of treating its acceptance as a failure.
+              if (task?.status === 'running' || task?.status === 'awaiting_approval') {
+                const approvalPending = task.status === 'awaiting_approval';
+                step.status = approvalPending ? 'awaiting_approval' : 'running';
+                step.evaluation = approvalPending ? 'REQUIRES_HUMAN_REVIEW' : undefined;
+                step.output = JSON.stringify({
+                  task_id: step.task_id,
+                  tool: task.tool_name ?? null,
+                  status: task.status,
+                });
+                plan.status = approvalPending ? 'awaiting_approval' : 'running';
+                awaitingApproval = approvalPending;
+                await persistPlan(db, plan, auth.id, tenantId);
+                if (approvalPending) break;
+                continue;
               }
 
               step.evaluation = evaluation.status;
@@ -499,6 +559,7 @@ export async function POST(req: NextRequest) {
               } else {
                 step.status = 'failed';
                 step.error = evaluation.reasons.join(' | ');
+                await failCanonicalStudioStep(db, canonicalRun, step, step.error);
                 failedSteps += 1;
                 write(`${FAIL} Step ${step.order} failed verification: ${step.title}`);
                 for (const dependent of plan.steps) {
@@ -514,9 +575,13 @@ export async function POST(req: NextRequest) {
                 planId: plan.id,
                 stepId: step.id,
               });
+              // A checkpoint failure after verification must not be relabeled as
+              // failed tool execution, or encourage retrying a completed write.
+              if (step.status === 'done') throw error;
               step.status = 'failed';
               step.evaluation = 'FAIL_BLOCKING';
               step.error = 'Plan step execution failed';
+              await failCanonicalStudioStep(db, canonicalRun, step, step.error);
               failedSteps += 1;
               write(`${FAIL} Step ${step.order} failed: ${step.title}`);
               for (const dependent of plan.steps) {
@@ -543,8 +608,8 @@ export async function POST(req: NextRequest) {
         else if (plan.steps.every((step) => step.status === 'done' || step.status === 'skipped'))
           plan.status = 'done';
 
-        await persistPlan(db, plan, auth.id, tenantId);
         await syncCanonicalStudioRunCheckpoint(db, canonicalRun, plan);
+        await persistPlan(db, plan, auth.id, tenantId);
 
         write('\x1b[1m── Plan Summary ─────────────────────────\x1b[0m');
         write(`${PASS} Completed and verified: ${doneCount}/${plan.steps.length}`);
@@ -587,7 +652,18 @@ export async function POST(req: NextRequest) {
         });
       } catch (error) {
         logger.error('[dev-studio/plan] planner execution failed', error);
-        write(`${FAIL} Planner execution failed`);
+        if (canonicalRun) {
+          // Task completion triggers may have projected 100% before the plan
+          // evaluator or durable checkpoint failed. Never leave that as success.
+          const { error: statusError } = await db.from('studio_runs').update({
+            status: 'failed', active_step_id: null,
+            completed_at: null,
+            failure: { message: 'Planner execution or checkpoint persistence failed. Review saved task evidence before retrying.' },
+          }).eq('id', canonicalRun.id);
+          if (statusError) logger.error('[dev-studio/plan] failure checkpoint could not be saved', statusError);
+          write('', { checkpoint: { planId: plan?.id ?? '', runId: canonicalRun.id, status: 'failed' } });
+        }
+        write(`${FAIL} Planner execution or checkpoint save failed. Review saved task evidence before retrying.`);
       } finally {
         try {
           controller.enqueue(done());

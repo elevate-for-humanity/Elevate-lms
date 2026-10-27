@@ -1,6 +1,10 @@
 // Server component. Operational Admin dashboard using canonical routes and live data only.
 
 import Link from 'next/link';
+import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
+import LogoImage from '@/components/site/LogoImage';
+import Image from 'next/image';
+import type { DashboardHeroAsset } from '@/lib/admin/dashboard/get-hero-assets';
 import {
   Activity,
   AlertTriangle,
@@ -70,6 +74,11 @@ function OperationalShortcuts() {
       href: '/applications',
     },
     {
+      title: 'Application Checker',
+      description: 'Check public application steps and record broken Continue buttons or routing. Opens your private tool in a new tab; ChatGPT sign-in is required.',
+      href: APPLICATION_CHECKER_URL,
+    },
+    {
       title: 'Students',
       description: 'Open learner records, enrollments, documents, and progress.',
       href: '/students',
@@ -100,6 +109,11 @@ function OperationalShortcuts() {
       href: '/phone',
     },
     {
+      title: 'Elevate Email',
+      description: 'Open staff, department, Program Holder, and Host Shop mailboxes.',
+      href: '/phone/email',
+    },
+    {
       title: 'Host Shops',
       description: 'Manage host shops, apprentices, verification, and compliance.',
       href: '/partners',
@@ -108,6 +122,12 @@ function OperationalShortcuts() {
       title: 'All Dashboards',
       description: 'Open every role dashboard from the canonical portal registry.',
       href: '/portals',
+    },
+    {
+      title: 'Website Traffic',
+      description:
+        'View most visited pages, traffic sources, Google Analytics, and visitor locations.',
+      href: '/analytics/traffic',
     },
     {
       title: 'Reports',
@@ -131,7 +151,7 @@ function OperationalShortcuts() {
     },
     {
       title: 'Cost Intelligence',
-      description: 'Control Northflank, GPU, retry, stale-job, and storage waste.',
+      description: 'Review Google Cloud, GPU, failed jobs, and media storage costs.',
       href: '/operations/infrastructure-costs',
     },
   ] as const;
@@ -148,6 +168,9 @@ function OperationalShortcuts() {
           <Link
             key={item.href}
             href={item.href}
+            target={item.href === APPLICATION_CHECKER_URL ? '_blank' : undefined}
+            rel={item.href === APPLICATION_CHECKER_URL ? 'noopener noreferrer' : undefined}
+            aria-label={item.href === APPLICATION_CHECKER_URL ? 'Application Checker (opens private tool in a new tab)' : undefined}
             className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
           >
             <div className="flex items-center justify-between gap-3">
@@ -241,9 +264,11 @@ function RecentActivity({ items }: { items: { id: string; title: string; timesta
 export function AdminDashboardContent({
   data,
   canAccessDevStudio = false,
+  heroAssets = [],
 }: {
   data: AdminDashboardData;
   canAccessDevStudio?: boolean;
+  heroAssets?: DashboardHeroAsset[];
 }) {
   const firstName = dashboardFirstName(data.profile);
   const today = new Date().toLocaleDateString('en-US', {
@@ -253,14 +278,22 @@ export function AdminDashboardContent({
   });
   return (
     <div className="w-full max-w-none min-w-0 px-3 pb-16 pt-4 sm:px-5 lg:px-6">
-      <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <div className="p-5 sm:p-8">
+      <section
+        className={`mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${heroAssets.length ? 'grid lg:grid-cols-[1.1fr_1fr]' : ''}`}
+      >
+        <div className="p-4 sm:p-5">
+          <LogoImage
+            alt="Elevate for Humanity"
+            width={144}
+            height={48}
+            className="mb-3 h-12 max-w-full object-contain"
+          />
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-900">
               <ShieldCheck className="h-4 w-4" /> Admin session protected
             </span>
             <span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-black text-blue-900">
-              Live Supabase data
+              {data.degradedSections.length ? 'Dashboard data incomplete' : 'Dashboard data snapshot'}
             </span>
           </div>
           <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
@@ -272,8 +305,51 @@ export function AdminDashboardContent({
             payment, compliance, and system-health data.
           </p>
         </div>
+        {heroAssets.length > 0 && (
+          <div className="grid min-h-64 grid-cols-2 gap-1 bg-slate-950 lg:min-h-80">
+            {heroAssets.slice(0, 1).map((asset, index) => (
+              <div key={asset.id} className={`relative min-h-64 col-span-2`}>
+                <Image
+                  src={asset.url}
+                  alt={asset.alt}
+                  fill
+                  unoptimized
+                  priority={index === 0}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
       <DegradedBanner data={data} />
+      {canAccessDevStudio && (
+        <section
+          aria-label="Course and media access"
+          className="mb-6 rounded-2xl border border-blue-200 bg-white p-4"
+        >
+          <h2 className="text-xl font-bold text-slate-950">Course Builder and Envato</h2>
+          <p className="mt-1 text-base text-slate-700">
+            Open these tools on your phone or desktop. Enter your Envato sign-in in the protected
+            Studio browser.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link
+              href="/studio/browser?provider=envato&signin=1"
+              className="inline-flex min-h-12 items-center rounded-lg bg-emerald-700 px-4 py-3 text-base font-bold text-white"
+            >
+              Enter Envato credentials
+            </Link>
+            <Link
+              href="/studio/courses"
+              className="inline-flex min-h-12 items-center rounded-lg bg-blue-700 px-4 py-3 text-base font-bold text-white"
+            >
+              Open Course Builder
+            </Link>
+          </div>
+        </section>
+      )}
       <StatsOverviewBar data={data} />
       <OperationalShortcuts />
       {canAccessDevStudio && (
@@ -379,8 +455,8 @@ export function AdminDashboardContent({
         <SystemHealthPanel
           health={
             data.systemHealth ?? {
-              stripeWebhookOk: false,
-              stripeIssuingOk: false,
+              quickBooksWebhookOk: false,
+              quickBooksBillingOk: false,
               buildEnvOk: false,
               staleJobs: 0,
               degraded: true,

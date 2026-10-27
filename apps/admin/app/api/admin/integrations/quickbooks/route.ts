@@ -21,6 +21,8 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { createQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { assertQuickBooksProductionEnvironment, quickBooksFailureReason } from '@/lib/integrations/quickbooks-client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,6 +36,11 @@ const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'
 const SCOPES = 'com.intuit.quickbooks.accounting';
 
 async function getQuickBooksConfig() {
+  // QuickBooks application credentials are stored in the canonical runtime
+  // secret store. Hydrate them before checking connection status or building
+  // an authorization URL so the Admin integration page can reconnect an
+  // expired company authorization without duplicating secrets in app_settings.
+  await hydrateProcessEnv();
   const db = await requireAdminClient();
   const { data } = await db
     .from('app_settings')
@@ -142,6 +149,8 @@ export async function GET(request: NextRequest) {
 
   if (action === 'auth_url') {
     const config = await getQuickBooksConfig();
+    try { assertQuickBooksProductionEnvironment(); }
+    catch { return safeError('Verify production QuickBooks credentials before reconnecting.',503); }
     const { clientId, clientSecret, redirectUri } = config;
     if (!clientId || !clientSecret) {
       return safeError('QuickBooks OAuth credentials are not configured', 503);
@@ -162,6 +171,8 @@ export async function GET(request: NextRequest) {
 
   // status
   const config = await getQuickBooksConfig();
+  try { assertQuickBooksProductionEnvironment(); }
+  catch (error) { return NextResponse.json({ connected:false, credentials_configured:!!(config.clientId&&config.clientSecret), reason:quickBooksFailureReason(error), message:'QuickBooks production configuration requires verification.' }); }
   const connected = !!(config.accessToken && config.realmId);
   if (!connected) {
     return NextResponse.json({
@@ -238,6 +249,10 @@ export async function POST(request: NextRequest) {
     return safeError('QuickBooks not connected', 503);
   }
 
+  if(action!=='disconnect'){
+    try { assertQuickBooksProductionEnvironment(); }
+    catch { return safeError('Verify production QuickBooks credentials before syncing.',503); }
+  }
   const token = config.accessToken;
   const realmId = config.realmId;
 

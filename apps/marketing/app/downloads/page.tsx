@@ -188,8 +188,8 @@ export default async function DownloadsPage() {
           <p className="text-center text-amber-800">
             <strong>Note:</strong> Documents are available upon request. Click "Call to Request" or
             call{' '}
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="font-bold underline">
-              {PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="font-bold underline">
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>{' '}
             to receive any document.
           </p>
@@ -275,7 +275,7 @@ export default async function DownloadsPage() {
                       </a>
                     ) : (
                       <a
-                        href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                        href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                         className="w-full mt-4 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         <Download className="w-4 h-4" />
@@ -320,7 +320,7 @@ export default async function DownloadsPage() {
                       </a>
                     ) : (
                       <a
-                        href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                        href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                         className="w-full mt-4 flex items-center justify-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-lg hover:bg-brand-green-700 transition-colors"
                       >
                         <Download className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default async function DownloadsPage() {
                       </a>
                     ) : (
                       <a
-                        href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                        href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                         className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm"
                       >
                         <Download className="w-4 h-4" />
@@ -405,7 +405,7 @@ export default async function DownloadsPage() {
                       </a>
                     ) : (
                       <a
-                        href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                        href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                         className="w-full mt-4 flex items-center justify-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
                       >
                         <Download className="w-4 h-4" />

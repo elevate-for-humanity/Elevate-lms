@@ -51,7 +51,7 @@ export default function PublishWebsiteDevPanel() {
         <h3 className="text-sm font-semibold text-white">Publish &amp; Update Website</h3>
       </div>
       <p className="mb-3 text-[11px] leading-relaxed" style={{ color: '#9ca3af' }}>
-        Bust ISR cache on the public LMS and trigger Northflank builds for LMS + Admin. Same flow as
+        Bust ISR cache on the public LMS and queue Google deployments for LMS + Admin. Same flow as
         the admin dashboard publish control.
       </p>
       {error && (

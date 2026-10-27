@@ -3,17 +3,30 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { AuthorizationActions } from './AuthorizationActions';
 import { CreateSchedule } from './CreateSchedule';
 import { ScheduleActions } from './ScheduleActions';
+import { PayPalSetupAction } from './PayPalSetupAction';
 
 export const dynamic = 'force-dynamic';
+
+function nextMonthlyBillingDate(dayOfMonth: number) {
+  const today = new Date();
+  const thisMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), dayOfMonth),
+  );
+  const next =
+    thisMonth >= new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))
+      ? thisMonth
+      : new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, dayOfMonth));
+  return next.toLocaleDateString('en-US', { timeZone: 'UTC' });
+}
 
 export default async function AdminBillingSubscriptionsPage() {
   await requireRole(['admin', 'super_admin']);
   const db = await requireAdminClient();
-  const [{ data: schedules }, { data: authorizations }, { data: history }] = await Promise.all([
+  const [{ data: schedules }, { data: authorizations }, { data: preferences }, { data: history }] = await Promise.all([
     db
       .from('billing_schedules')
       .select(
-        'id,customer_name,product_name,status,cadence,next_invoice_date,legacy_stripe_subscription_id',
+        'id,customer_name,product_name,status,cadence,next_invoice_date,provider,collection_mode,collection_provider,provider_status,provider_approval_url',
       )
       .order('created_at', { ascending: false })
       .limit(250),
@@ -24,10 +37,16 @@ export default async function AdminBillingSubscriptionsPage() {
       )
       .order('created_at', { ascending: false })
       .limit(250),
+    (db as any)
+      .from('billing_account_preferences')
+      .select(
+        'id,account_name,cadence,billing_day_of_month,is_apprentice_tuition,setup_status,notes',
+      )
+      .order('account_name'),
     db
       .from('organization_subscriptions')
       .select(
-        'status,billing_interval,current_period_end,stripe_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
+        'status,billing_interval,current_period_end,billing_provider,provider_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
       )
       .order('created_at', { ascending: false })
       .limit(100),
@@ -38,11 +57,47 @@ export default async function AdminBillingSubscriptionsPage() {
         <div>
           <h1 className="text-2xl font-bold">Billing schedules</h1>
           <p className="text-sm text-slate-600">
-            QuickBooks schedules, authorization reviews, and preserved Stripe history.
+            Admin subscriptions, signed-payment releases, PayPal automatic collection, and QuickBooks accounting.
           </p>
         </div>
         <CreateSchedule />
       </div>
+      {preferences?.length ? (
+        <section className="overflow-hidden rounded-xl border border-amber-300 bg-amber-50">
+          <h2 className="border-b border-amber-200 px-4 py-3 font-bold">Account billing instructions</h2>
+          <div className="divide-y divide-amber-200">
+            {preferences.map((preference: any) => (
+              <div key={preference.id} className="grid gap-2 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_2fr]">
+                <div>
+                  <p className="font-bold text-slate-950">{preference.account_name}</p>
+                  <p className="capitalize text-slate-700">{preference.cadence}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-950">
+                    {preference.cadence === 'monthly' && preference.billing_day_of_month
+                      ? `${preference.billing_day_of_month}th of each month`
+                      : 'See account notes'}
+                  </p>
+                  <p className="text-slate-700">
+                    Next date:{' '}
+                    {preference.cadence === 'monthly' && preference.billing_day_of_month
+                      ? nextMonthlyBillingDate(preference.billing_day_of_month)
+                      : 'Not calculated'}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-semibold capitalize text-amber-950">
+                    {String(preference.setup_status).replaceAll('_', ' ')}
+                  </p>
+                  <p className="text-amber-900">
+                    {preference.notes || 'Provider, amount, and authorization still need to be configured.'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <section className="overflow-x-auto rounded-xl border bg-white">
         <h2 className="border-b px-4 py-3 font-bold">Subscription authorizations</h2>
         <table className="w-full text-sm">
@@ -90,7 +145,7 @@ export default async function AdminBillingSubscriptionsPage() {
         ) : null}
       </section>
       <section className="overflow-x-auto rounded-xl border bg-white">
-        <h2 className="border-b px-4 py-3 font-bold">QuickBooks schedules</h2>
+        <h2 className="border-b px-4 py-3 font-bold">Apprentice subscriptions</h2>
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left">
             <tr>
@@ -99,6 +154,8 @@ export default async function AdminBillingSubscriptionsPage() {
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Cadence</th>
               <th className="px-4 py-3">Next invoice</th>
+              <th className="px-4 py-3">Ledger</th>
+              <th className="px-4 py-3">Automatic collection</th>
             </tr>
           </thead>
           <tbody>
@@ -111,19 +168,32 @@ export default async function AdminBillingSubscriptionsPage() {
                 </td>
                 <td className="px-4 py-3 capitalize">{s.cadence}</td>
                 <td className="px-4 py-3">{new Date(s.next_invoice_date).toLocaleDateString()}</td>
+                <td className="px-4 py-3 capitalize">{s.provider || 'quickbooks'}</td>
+                <td className="px-4 py-3">
+                  {s.collection_mode === 'automatic' ? (
+                    <PayPalSetupAction
+                      scheduleId={s.id}
+                      providerStatus={s.provider_status}
+                      approvalUrl={s.provider_approval_url}
+                    />
+                  ) : (
+                    <span className="text-xs text-slate-500">Manual invoice</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </section>
       <section className="overflow-x-auto rounded-xl border bg-white">
-        <h2 className="border-b px-4 py-3 font-bold">Stripe subscription history</h2>
+        <h2 className="border-b px-4 py-3 font-bold">Organization subscription history</h2>
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left">
             <tr>
               <th className="px-4 py-3">Organization</th>
               <th className="px-4 py-3">Plan</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Provider</th>
               <th className="px-4 py-3">Period end</th>
             </tr>
           </thead>
@@ -140,6 +210,7 @@ export default async function AdminBillingSubscriptionsPage() {
                   )?.name || '—'}
                 </td>
                 <td className="px-4 py-3">{r.status}</td>
+                <td className="px-4 py-3 capitalize">{r.billing_provider || 'quickbooks'}</td>
                 <td className="px-4 py-3">
                   {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : '—'}
                 </td>

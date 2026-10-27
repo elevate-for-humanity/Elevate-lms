@@ -43,5 +43,5 @@ export const ACCOUNT_BILLING_NAV: BillingNavItem[] = [
   { href: '/account/plan', label: 'Your plan' },
   { href: '/account/addons', label: 'Add-ons' },
   { href: '/account/invoices', label: 'Invoices' },
-  { href: '/account/payment-methods', label: 'Payment methods' },
+  { href: '/account/payment-methods', label: 'Billing and payment options' },
 ];

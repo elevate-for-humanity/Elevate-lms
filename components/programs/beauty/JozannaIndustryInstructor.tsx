@@ -36,7 +36,7 @@ export default function JozannaIndustryInstructor({ industry }: { industry: Indu
             src={content.image}
             alt={content.imageAlt}
             fill
-            className="object-cover object-top"
+            className="object-contain object-top"
             sizes="(max-width: 1024px) 100vw, 38vw"
           />
         </div>

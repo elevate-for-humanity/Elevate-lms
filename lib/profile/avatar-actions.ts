@@ -3,6 +3,7 @@
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { IMAGE_RELEASE_TEXT, IMAGE_RELEASE_VERSION } from '@/lib/profile/image-release-constants';
 
 const MAX_AVATAR_SOURCE_BYTES = 10 * 1024 * 1024;
@@ -17,7 +18,7 @@ function revalidateProfilePaths() {
   revalidatePath('/employer/dashboard');
   revalidatePath('/host-shop/dashboard');
   revalidatePath('/staff/dashboard');
-  revalidatePath('/apprentice/dashboard');
+  revalidatePath('/apprentice');
 }
 
 export async function uploadProfileAvatar(file: File) {
@@ -37,7 +38,13 @@ export async function uploadProfileAvatar(file: File) {
     const input = Buffer.from(await file.arrayBuffer());
     const metadata = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS }).metadata();
     if (!metadata.width || !metadata.height || !metadata.format) {
-      return { error: 'That file is not a readable image.' };
+      return { error: 'Image was not approved: that file is not a readable image.' };
+    }
+    if (metadata.width < 300 || metadata.height < 300) {
+      return {
+        error:
+          'Image was not approved: profile photos must be at least 300×300 pixels so authorized staff can identify you clearly.',
+      };
     }
     normalized = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS })
       .rotate()
@@ -48,20 +55,24 @@ export async function uploadProfileAvatar(file: File) {
   } catch {
     return {
       error:
-        'That image format could not be decoded. Try exporting it as JPG, PNG, WebP, GIF, AVIF, TIFF, or HEIC.',
+        'Image was not approved: that format could not be decoded. Export it as JPG, PNG, WebP, GIF, AVIF, TIFF, or HEIC and try again.',
     };
   }
 
-  const objectPath = `${user.id}/profile-${Date.now()}.jpg`;
-  const { error: uploadError } = await supabase.storage
+  // The session determines the only account that may be updated. Storage and
+  // profile writes use the server-side service client to avoid inconsistent
+  // client RLS policies leaving an uploaded image disconnected from its owner.
+  const db = await requireAdminClient();
+  const objectPath = `${user.id}/profile-${crypto.randomUUID()}.jpg`;
+  const { error: uploadError } = await db.storage
     .from('avatars')
     .upload(objectPath, normalized, { contentType: 'image/jpeg', upsert: false });
   if (uploadError) return { error: `Photo upload failed: ${uploadError.message}` };
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from('avatars').getPublicUrl(objectPath);
-  const { data: profile, error: profileError } = await supabase
+  } = db.storage.from('avatars').getPublicUrl(objectPath);
+  const { data: profile, error: profileError } = await db
     .from('profiles')
     .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
     .eq('id', user.id)
@@ -69,7 +80,7 @@ export async function uploadProfileAvatar(file: File) {
     .maybeSingle();
 
   if (profileError || !profile) {
-    await supabase.storage.from('avatars').remove([objectPath]);
+    await db.storage.from('avatars').remove([objectPath]);
     return { error: 'The photo uploaded, but the profile record could not be updated.' };
   }
 

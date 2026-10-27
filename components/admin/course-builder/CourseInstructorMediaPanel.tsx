@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 import { Bot, Loader2, Mic2, PlayCircle, RefreshCw, Sparkles } from 'lucide-react';
 import LicensedMediaLibrary from '@/components/admin/course-builder/LicensedMediaLibrary';
+import CloudBrowserWorkspace from '@/components/studio/CloudBrowserWorkspace';
 
 type Instructor = {
   id: string;
@@ -206,6 +207,23 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
               <p className="mt-4 rounded-lg bg-white/10 p-3 text-sm text-cyan-100">{message}</p>
             ) : null}
           </div>
+        </div>
+      </section>
+      <section className="mb-5 overflow-hidden rounded-2xl border border-emerald-800 bg-slate-950 text-white shadow-xl">
+        <div className="border-b border-slate-800 p-5">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">Envato assisted media workspace</p>
+          <h2 className="mt-2 text-xl font-black">Source licensed course media without leaving Course Builder</h2>
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-300">
+            Start the secure browser, sign in to Envato when required, select and download the assets for this course,
+            then save each licensed download into the Course Builder media library. Credentials are entered through the
+            secure browser handoff and are not stored in the course record.
+          </p>
+        </div>
+        <div className="h-[760px] min-h-[640px]">
+          <CloudBrowserWorkspace
+            initialTarget="https://app.envato.com"
+            initialTask={`Source licensed media for ${courseTitle || 'the selected course'} and save approved downloads to the Course Builder library.`}
+          />
         </div>
       </section>
       <LicensedMediaLibrary courseId={courseId} />

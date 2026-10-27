@@ -11,7 +11,9 @@ import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 const secretGroupId = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
 const numberId = process.env.TELNYX_PHONE_NUMBER_ID || '3050756061020554451';
-const connectionId = process.env.TELNYX_CONNECTION_ID || '3051039365166794471';
+const configuredConnectionId = process.env.TELNYX_CONNECTION_ID || '3053364749187155214';
+const obsoleteConnectionId = '3051039365166794471';
+let connectionId = configuredConnectionId;
 const expectedNumber = process.env.TELNYX_PHONE_NUMBER || '+13179999620';
 const webhookUrl =
   process.env.TELNYX_WEBHOOK_URL ||
@@ -203,12 +205,25 @@ async function main() {
     );
   }
 
-  if (String(numberBefore.data?.connection_id || '') !== connectionId) {
-    await telnyx(apiKey, `/phone_numbers/${numberId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ connection_id: connectionId }),
-    });
+  // After the one-time replacement, adopt the connection currently attached
+  // to the number so reruns are idempotent and can never delete the new route.
+  const attachedConnectionId = String(numberBefore.data?.connection_id || '');
+  if (attachedConnectionId && attachedConnectionId !== configuredConnectionId) {
+    connectionId = attachedConnectionId;
   }
+
+  // Re-assert the complete inbound route even when the connection ID already
+  // matches. This is intentionally idempotent and forces Telnyx to reconcile
+  // the carrier-side number route after a number returns a fast busy without
+  // producing a Call Control webhook.
+  await telnyx(apiKey, `/phone_numbers/${numberId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      connection_id: connectionId,
+      call_forwarding_enabled: false,
+      number_level_routing: 'disabled',
+    }),
+  });
 
   const profiles = await telnyx<Json>(
     apiKey,
@@ -239,6 +254,102 @@ async function main() {
     apiKey,
     `/call_control_applications/${connectionId}`,
   );
+  const replacementRequired = connectionId === obsoleteConnectionId;
+  if (replacementRequired) {
+    // The user explicitly approved replacing this defective, single allowed
+    // Call Control application after carrier reprovisioning still returned a
+    // fast busy and emitted no inbound webhook.
+    await telnyx(apiKey, `/phone_numbers/${numberId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ connection_id: null }),
+    });
+    await telnyx(apiKey, `/call_control_applications/${connectionId}`, {
+      method: 'DELETE',
+    });
+
+    let replacement: Json | undefined;
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= 6; attempt += 1) {
+      try {
+        replacement = await telnyx<Json>(apiKey, '/call_control_applications', {
+          method: 'POST',
+          body: JSON.stringify({
+            application_name: 'Elevate Communications Production',
+            webhook_event_url: webhookUrl,
+            webhook_event_failover_url:
+              appBefore.data?.webhook_event_failover_url || `${webhookUrl}/failover`,
+            webhook_api_version: '2',
+            active: true,
+            anchorsite_override: appBefore.data?.anchorsite_override || 'Latency',
+            dtmf_type: appBefore.data?.dtmf_type || 'RFC 2833',
+            first_command_timeout: true,
+            first_command_timeout_secs: 15,
+            outbound: { outbound_voice_profile_id: outboundProfileId },
+          }),
+        });
+        break;
+      } catch (error) {
+        lastError = error;
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
+    const replacementConnectionId = String(replacement?.data?.id || '');
+    if (!replacementConnectionId) {
+      throw lastError instanceof Error
+        ? lastError
+        : new Error('Telnyx did not create the replacement Call Control connection');
+    }
+    connectionId = replacementConnectionId;
+    await telnyx(apiKey, `/phone_numbers/${numberId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        connection_id: connectionId,
+        call_forwarding_enabled: false,
+        number_level_routing: 'disabled',
+      }),
+    });
+
+    const variables = secretGroup.secrets?.variables;
+    if (!variables || Array.isArray(variables) || typeof variables !== 'object') {
+      throw new Error('Northflank secret group variables have an unsupported shape');
+    }
+    await nfFetch(projectApiPath(projectId, `/secrets/${secretGroupId}`), {
+      method: 'POST',
+      body: JSON.stringify({
+        name: secretGroup.name || secretGroupId,
+        description:
+          secretGroup.description || 'Elevate shared production secrets/config',
+        priority: secretGroup.priority ?? 10,
+        type: secretGroup.type || 'secret',
+        secretType: secretGroup.secretType || 'environment',
+        restrictions: secretGroup.restrictions,
+        secrets: {
+          variables: { ...variables, TELNYX_CONNECTION_ID: connectionId },
+        },
+      }),
+    });
+    console.log(`TELNYX REPLACEMENT CONNECTION: ${connectionId}`);
+  }
+
+  await telnyx(apiKey, `/call_control_applications/${connectionId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      application_name:
+        appBefore.data?.application_name || 'Elevate Communications',
+      webhook_event_url: webhookUrl,
+      webhook_event_failover_url:
+        appBefore.data?.webhook_event_failover_url || `${webhookUrl}/failover`,
+      webhook_api_version: '2',
+      active: true,
+      anchorsite_override: appBefore.data?.anchorsite_override || 'Latency',
+      dtmf_type: appBefore.data?.dtmf_type || 'RFC 2833',
+      first_command_timeout: true,
+      first_command_timeout_secs: 15,
+      inbound: appBefore.data?.inbound,
+      outbound: { outbound_voice_profile_id: outboundProfileId },
+    }),
+  });
+  console.log(`TELNYX CONNECTION ACTIVE: ${connectionId}`);
   const outboundBefore = String(
     appBefore.data?.outbound?.outbound_voice_profile_id || '',
   );

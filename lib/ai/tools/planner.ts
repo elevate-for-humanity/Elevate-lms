@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getAITool } from './registry';
+import { isReadOnlyRequest } from '../command-intent';
 
 export type PlannedAITool = {
   name: string;
@@ -101,10 +102,6 @@ function isEngineeringExecutionCommand(lower: string): boolean {
 }
 
 function isLiveBrowserWork(lower: string): boolean {
-  const interactiveFormTask =
-    /\b(complete|fill(?: out)?|file|submit|finish)\b.*\b(complaint|grievance|form)\b/.test(lower) ||
-    /\b(complaint|grievance|form)\b.*\b(complete|fill(?: out)?|file|submit|finish)\b/.test(lower);
-  if (interactiveFormTask) return true;
   const browserTarget =
     /\b(live (site|website|page|homepage|dashboard)|cloud browser|browser|production (site|website|page|homepage|dashboard)|host shop dashboard)\b/.test(
       lower,
@@ -131,18 +128,22 @@ export function planAIToolFromCommand(
   }
 
   const lower = command.toLowerCase();
+  if (lower.trim() === 'inspect course builder health checks') {
+    return { name: 'courses.health', input: {} };
+  }
+  if (!isEngineeringCommand(lower) && /\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
+      /\b(status|health|monitor|failures?|errors?|working|helping)\b/.test(lower))
+    return {name:'paris.supervision', input:{}};
+
+  // The plan's platform snapshot command must resolve to a read-only tool.
+  if (
+    /^(?:get|show|inspect|check)\s+(?:(?:the|live|current)\s+)*(?:platform|system)\s+(?:state|health|status)\b/.test(lower)
+  ) {
+    return { name: 'system.health', input: {} };
+  }
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
 
-  // Route the primary requested capability before incidental domain words in long prompts.
-  if (
-    /\b(?:provider|credential|integration)\s+(?:health|status|availability|configuration)\b/.test(
-      lower,
-    ) ||
-    /\b(?:health|status)\b.*\b(?:provider|credential|integration)s?\b/.test(lower)
-  ) {
-    return { name: 'devstudio.health', input: {} };
-  }
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }
@@ -152,19 +153,44 @@ export function planAIToolFromCommand(
   if (
     /\b(workflow|pipeline|job)\b/.test(lower) &&
     /\b(inspect|check|status|progress|current step|failures?)\b/.test(lower) &&
-    /\b(read[- ]?only|do not (?:deploy|restart|cancel|modify|create))\b/.test(lower)
+    (isReadOnlyRequest(command) || /\bdo not (?:deploy|restart|cancel|modify|create)\b/.test(lower))
   ) {
     return { name: 'workflows.inspect', input: {} };
   }
+  // A read-only Course Builder investigation must never enqueue production work,
+  // even when a quoted error or historical action contains repair verbs.
+  // Preserve the explicit tool override above for trusted internal callers.
+  if (
+    (isReadOnlyRequest(command) || /\b(do not (?:start|resume|create|generate|publish|modify|change|repair)|without (?:starting|resuming|modifying))\b/.test(lower)) &&
+    /\b(course|lesson|course builder|build|worker|checkpoint)\b/.test(lower) &&
+    /\b(audit|inspect|check|status|health|review|report|verify)\b/.test(lower)
+  ) {
+    return {
+      name: 'courses.status',
+      input: {
+        ...(typeof context.courseId === 'string' ? { courseId: context.courseId } : {}),
+        ...(typeof context.buildId === 'string' ? { buildId: context.buildId } : {}),
+      },
+    };
+  }
+
   // A compound repair request may require live-browser evidence, but the
   // browser runtime cannot edit, test, commit, or deploy repository changes.
   // Route explicit engineering execution to the coding runtime; that worker
   // can use the requested browser verification as an acceptance criterion.
-  if (isEngineeringExecutionCommand(lower)) {
+  if (!isReadOnlyRequest(command) && isEngineeringExecutionCommand(lower)) {
     return {
-      name: 'openhands.execute',
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
       input: { ...asAIRecord(context.toolInput), task: command },
     };
+  }
+  // Provider readiness can be an acceptance check inside a repository repair.
+  // Only use the standalone health tool after preserving the engineering goal.
+  if (
+    /\b(?:provider|credential|integration)\s+(?:health|status|availability|configuration)\b/.test(lower) ||
+    /\b(?:health|status)\b.*\b(?:provider|credential|integration)s?\b/.test(lower)
+  ) {
+    return { name: 'devstudio.health', input: {} };
   }
   // Browser-only work stays in the isolated browser runtime. Compound repair
   // requests were already routed to engineering above.
@@ -176,7 +202,7 @@ export function planAIToolFromCommand(
   }
   if (isEngineeringCommand(lower)) {
     return {
-      name: 'openhands.execute',
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
       input: { ...asAIRecord(context.toolInput), task: command },
     };
   }
@@ -345,6 +371,12 @@ export function planAIToolFromCommand(
   if (/\b(issue|generate)\b.*\bcertificate/.test(lower)) {
     return { name: 'certificates.issue', input: asAIRecord(context.toolInput) };
   }
+  if (/\b(course|lesson|builder)\b/.test(lower) && /\b(status|monitor|progress|stalled|health|autopilot)\b/.test(lower) &&
+      !/\b(enable|disable|start|repair|fix|resume|build|create)\b/.test(lower)) {
+    return {name:'courses.status',input:{...(typeof context.courseId === 'string'?{courseId:context.courseId}:{}),
+      ...(typeof context.buildId === 'string'?{buildId:context.buildId}:{})}};
+  }
+
   // Existing course media repair is Course Builder work. Route it before the
   // generic engineering/browser rules so words such as "repair", "endpoint",
   // or "dashboard" cannot accidentally dispatch an unauthorized OpenHands job.
@@ -380,10 +412,6 @@ export function planAIToolFromCommand(
       },
     };
   }
-  if (/\b(build|generate)\b.*\b(all )?courses?\b/.test(lower)) {
-    return { name: 'workflows.buildCourses', input: asAIRecord(context.toolInput) };
-  }
-
   // OpenHands is an engineering worker, not a general platform action router.
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
@@ -396,7 +424,7 @@ export function planAIToolFromCommand(
   }
   if (isEngineeringCommand(lower)) {
     return {
-      name: 'openhands.execute',
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
       input: {
         ...asAIRecord(context.toolInput),
         task: command,

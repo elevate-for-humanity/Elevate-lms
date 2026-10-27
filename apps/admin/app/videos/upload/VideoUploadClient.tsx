@@ -2,10 +2,12 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { Upload, X, CheckCircle, Loader2, Film } from 'lucide-react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSignedUploadClient } from '@/lib/supabase/signed-upload-client';
+import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
-const MAX_FILE_SIZE = 200 * 1024 * 1024;
+const MAX_FILE_SIZE = 1024 * 1024 * 1024;
 const ACCEPTED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const ACCEPTED_LICENSED_TYPES = [...ACCEPTED_TYPES, 'image/jpeg', 'image/png', 'image/webp'];
 
 type UploadResponse = {
   success?: boolean;
@@ -21,12 +23,14 @@ export default function VideoUploadClient({
   embedded = false,
   initialLessonId = '',
   licensedMatchId = '',
+  licensedLibrary = false,
   onUploaded,
 }: {
   initialCourseId?: string;
   embedded?: boolean;
   initialLessonId?: string;
   licensedMatchId?: string;
+  licensedLibrary?: boolean;
   onUploaded?: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
@@ -40,6 +44,12 @@ export default function VideoUploadClient({
   const [assetRole, setAssetRole] = useState<
     'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference'
   >('source_broll');
+  const [providerItemId, setProviderItemId] = useState('');
+  const [sourceUrl, setSourceUrl] = useState('');
+  const [programTags, setProgramTags] = useState('');
+  const [lessonTags, setLessonTags] = useState('');
+  const [resolution, setResolution] = useState('3840x2160');
+  const [durationSeconds, setDurationSeconds] = useState('');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
@@ -85,17 +95,96 @@ export default function VideoUploadClient({
       setError('Enter a real title for this video.');
       return;
     }
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      setError('Only MP4, WebM, and QuickTime video files are accepted.');
+    const acceptedTypes = licensedLibrary ? ACCEPTED_LICENSED_TYPES : ACCEPTED_TYPES;
+    if (!acceptedTypes.includes(file.type)) {
+      setError(
+        licensedLibrary
+          ? 'Licensed media must be MP4, WebM, QuickTime, JPEG, PNG, or WebP.'
+          : 'Only MP4, WebM, and QuickTime video files are accepted.',
+      );
       return;
     }
     if (file.size <= 0 || file.size > MAX_FILE_SIZE) {
-      setError('Video must be 200 MB or smaller.');
+      setError('Video must be 1 GB or smaller.');
+      return;
+    }
+    if (licensedLibrary && !providerItemId.trim()) {
+      setError('Enter the Envato item ID so the license and source remain traceable.');
       return;
     }
 
     setUploading(true);
     try {
+      if (licensedLibrary) {
+        const common = {
+          title: title.trim(),
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          provider: 'envato',
+          providerItemId: providerItemId.trim(),
+          sourceUrl: sourceUrl.trim(),
+          resolution: resolution.trim(),
+          durationSeconds: Number(durationSeconds) || undefined,
+          programTags: programTags
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+          lessonTags: lessonTags
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+        };
+        const prepareResponse = await fetch('/api/admin/videos/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'prepare-library', ...common }),
+        });
+        const prepared = (await prepareResponse.json().catch(() => ({}))) as UploadResponse & {
+          bucket?: string;
+          storagePath?: string;
+          token?: string;
+        };
+        if (!prepareResponse.ok || !prepared.storagePath || !prepared.token || !prepared.bucket) {
+          throw new Error(
+            prepared.error || 'The secure media-library upload could not be prepared.',
+          );
+        }
+        const config = getBrowserPublicSupabaseConfig();
+        if (!config) throw new Error('Media storage configuration is unavailable.');
+        const supabase = createSignedUploadClient(config);
+        const { error: uploadError } = await supabase.storage
+          .from(prepared.bucket)
+          .uploadToSignedUrl(prepared.storagePath, prepared.token, file, {
+            contentType: file.type,
+            cacheControl: '31536000',
+          });
+        if (uploadError) throw new Error(`Secure media upload failed: ${uploadError.message}`);
+        const finalizeResponse = await fetch('/api/admin/videos/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'finalize-library',
+            storagePath: prepared.storagePath,
+            ...common,
+          }),
+        });
+        const finalized = (await finalizeResponse.json().catch(() => ({}))) as UploadResponse;
+        if (!finalizeResponse.ok || !finalized.success) {
+          throw new Error(finalized.error || 'The licensed media could not be indexed.');
+        }
+        setUploadedUrl('licensed-library');
+        setFile(null);
+        setTitle('');
+        setDescription('');
+        setProviderItemId('');
+        setSourceUrl('');
+        setProgramTags('');
+        setLessonTags('');
+        setDurationSeconds('');
+        onUploaded?.();
+        return;
+      }
       if (courseId.trim() || lessonId.trim()) {
         if (!courseId.trim() || !lessonId.trim()) {
           throw new Error('Course videos require both a Course ID and Lesson ID.');
@@ -124,7 +213,9 @@ export default function VideoUploadClient({
         if (!prepareResponse.ok || !prepared.storagePath || !prepared.token || !prepared.bucket) {
           throw new Error(prepared.error || 'The course video upload could not be prepared.');
         }
-        const supabase = createBrowserClient();
+        const config = getBrowserPublicSupabaseConfig();
+        if (!config) throw new Error('Media storage configuration is unavailable.');
+        const supabase = createSignedUploadClient(config);
         const { error: uploadError } = await supabase.storage
           .from(prepared.bucket)
           .uploadToSignedUrl(prepared.storagePath, prepared.token, file, {
@@ -195,10 +286,15 @@ export default function VideoUploadClient({
     <form onSubmit={handleSubmit} className="space-y-6">
       {embedded ? (
         <div className="rounded-2xl border border-cyan-800 bg-slate-950 p-5 text-white">
-          <h2 className="font-black">Upload a purchased scene to this course</h2>
+          <h2 className="font-black">
+            {licensedLibrary
+              ? 'Store purchased footage in the secure course library'
+              : 'Upload a purchased scene to this course'}
+          </h2>
           <p className="mt-1 text-sm text-slate-300">
-            Choose the downloaded MP4, add the lesson ID, and upload. The selected course is already
-            attached.
+            {licensedLibrary
+              ? 'Upload once. Course Builder will match and attach this licensed master to future lessons without duplicating the file.'
+              : 'Choose the downloaded MP4, add the lesson ID, and upload. The selected course is already attached.'}
           </p>
         </div>
       ) : null}
@@ -226,52 +322,118 @@ export default function VideoUploadClient({
               className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
             />
           </label>
-          <label className="text-sm font-bold text-slate-700">
-            Category
-            <input
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
-            />
-          </label>
-          <div className="rounded-xl bg-slate-50 p-3 text-xs font-semibold text-slate-600">
-            Leave Course ID and Lesson ID blank for a public production video. Add either UUID only
-            when the video belongs to course content.
-          </div>
-          <label className="text-sm font-bold text-slate-700">
-            Course ID (optional UUID)
-            <input
-              value={courseId}
-              onChange={(e) => setCourseId(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
-            />
-          </label>
-          <label className="text-sm font-bold text-slate-700">
-            Course lesson
-            {courseId.trim() && lessonOptions.length ? (
-              <select
-                value={lessonId}
-                onChange={(e) => setLessonId(e.target.value)}
-                disabled={lessonsLoading}
-                className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-950"
-              >
-                <option value="">Select the lesson for this scene</option>
-                {lessonOptions.map((lesson) => (
-                  <option key={lesson.id} value={lesson.id}>
-                    {lesson.title}
-                  </option>
-                ))}
-              </select>
-            ) : (
+          {licensedLibrary ? (
+            <>
+              <label className="text-sm font-bold text-slate-700">
+                Envato item ID
+                <input
+                  value={providerItemId}
+                  onChange={(e) => setProviderItemId(e.target.value)}
+                  required
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+                />
+              </label>
+              <label className="text-sm font-bold text-slate-700">
+                Resolution
+                <input
+                  value={resolution}
+                  onChange={(e) => setResolution(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+                />
+              </label>
+              <label className="text-sm font-bold text-slate-700 sm:col-span-2">
+                Envato source URL
+                <input
+                  value={sourceUrl}
+                  onChange={(e) => setSourceUrl(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+                />
+              </label>
+              <label className="text-sm font-bold text-slate-700">
+                Program tags
+                <input
+                  value={programTags}
+                  onChange={(e) => setProgramTags(e.target.value)}
+                  placeholder="cosmetology, nails"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+                />
+              </label>
+              <label className="text-sm font-bold text-slate-700">
+                Lesson tags
+                <input
+                  value={lessonTags}
+                  onChange={(e) => setLessonTags(e.target.value)}
+                  placeholder="manicure, shaping, safety"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+                />
+              </label>
+              <label className="text-sm font-bold text-slate-700">
+                Duration in seconds
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={durationSeconds}
+                  onChange={(e) => setDurationSeconds(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+                />
+              </label>
+            </>
+          ) : null}
+          {!licensedLibrary ? (
+            <label className="text-sm font-bold text-slate-700">
+              Category
               <input
-                value={lessonId}
-                onChange={(e) => setLessonId(e.target.value)}
-                placeholder={lessonsLoading ? 'Loading lessons…' : 'Lesson UUID (optional)'}
-                disabled={lessonsLoading}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+              />
+            </label>
+          ) : null}
+          {!licensedLibrary ? (
+            <div className="rounded-xl bg-slate-50 p-3 text-xs font-semibold text-slate-600">
+              Leave Course ID and Lesson ID blank for a public production video. Add either UUID
+              only when the video belongs to course content.
+            </div>
+          ) : null}
+          {!licensedLibrary ? (
+            <label className="text-sm font-bold text-slate-700">
+              Course ID (optional UUID)
+              <input
+                value={courseId}
+                onChange={(e) => setCourseId(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
               />
-            )}
-          </label>
+            </label>
+          ) : null}
+          {!licensedLibrary ? (
+            <label className="text-sm font-bold text-slate-700">
+              Course lesson
+              {courseId.trim() && lessonOptions.length ? (
+                <select
+                  value={lessonId}
+                  onChange={(e) => setLessonId(e.target.value)}
+                  disabled={lessonsLoading}
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-950"
+                >
+                  <option value="">Select the lesson for this scene</option>
+                  {lessonOptions.map((lesson) => (
+                    <option key={lesson.id} value={lesson.id}>
+                      {lesson.title}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  value={lessonId}
+                  onChange={(e) => setLessonId(e.target.value)}
+                  placeholder={lessonsLoading ? 'Loading lessons…' : 'Lesson UUID (optional)'}
+                  disabled={lessonsLoading}
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
+                />
+              )}
+            </label>
+          ) : null}
           {courseId.trim() && lessonId.trim() && !licensedMatchId ? (
             <label className="text-sm font-bold text-slate-700 sm:col-span-2">
               Placement in the course video
@@ -293,13 +455,21 @@ export default function VideoUploadClient({
 
       <label className="block rounded-2xl border-2 border-dashed border-slate-300 bg-white p-8 text-center">
         <Upload className="mx-auto h-10 w-10 text-slate-500" />
-        <span className="mt-3 block font-black text-slate-900">Select a real video file</span>
+        <span className="mt-3 block font-black text-slate-900">
+          {licensedLibrary ? 'Select a licensed photo or video file' : 'Select a real video file'}
+        </span>
         <span className="mt-1 block text-sm text-slate-600">
-          MP4, WebM, or QuickTime · maximum 200 MB
+          {licensedLibrary
+            ? 'MP4, WebM, QuickTime, JPEG, PNG, or WebP · maximum 1 GB'
+            : 'MP4, WebM, or QuickTime · maximum 500 MB'}
         </span>
         <input
           type="file"
-          accept="video/mp4,video/webm,video/quicktime"
+          accept={
+            licensedLibrary
+              ? 'video/mp4,video/webm,video/quicktime,image/jpeg,image/png,image/webp'
+              : 'video/mp4,video/webm,video/quicktime'
+          }
           className="mt-4 block w-full text-sm"
           onChange={(e) => setFile(e.currentTarget.files?.[0] ?? null)}
         />
@@ -316,16 +486,20 @@ export default function VideoUploadClient({
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
           <div className="flex items-center gap-2 font-black text-emerald-800">
             <CheckCircle className="h-5 w-5" />
-            Video saved and playable
+            {uploadedUrl === 'licensed-library'
+              ? 'Licensed media stored in the secure course library'
+              : 'Video saved and playable'}
           </div>
-          <a
-            href={uploadedUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 block break-all text-sm font-semibold text-emerald-800 underline"
-          >
-            {uploadedUrl}
-          </a>
+          {uploadedUrl !== 'licensed-library' ? (
+            <a
+              href={uploadedUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 block break-all text-sm font-semibold text-emerald-800 underline"
+            >
+              {uploadedUrl}
+            </a>
+          ) : null}
         </div>
       )}
 
@@ -335,7 +509,11 @@ export default function VideoUploadClient({
         className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-        {uploading ? 'Uploading…' : 'Upload production video'}
+        {uploading
+          ? 'Uploading…'
+          : licensedLibrary
+            ? 'Store in secure course library'
+            : 'Upload production video'}
       </button>
     </form>
   );

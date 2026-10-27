@@ -39,7 +39,7 @@ async function _GET(request: Request) {
   const { count: eligibleBefore, error: eligibleError } = await db
     .from('devstudio_jobs')
     .select('id', { count: 'exact', head: true })
-    .eq('tool_name', 'build_course')
+    .in('tool_name', ['build_course', 'course_build'])
     .eq('status', 'queued')
     .lte('run_at', now);
   if (eligibleError) {
@@ -67,7 +67,7 @@ async function _GET(request: Request) {
       const { data: candidate, error: candidateError } = await db
         .from('devstudio_jobs')
         .select('id, attempts, progress')
-        .eq('tool_name', 'build_course')
+        .in('tool_name', ['build_course', 'course_build'])
         .eq('status', 'queued')
         .lte('run_at', now)
         .order('run_at', { ascending: true })
@@ -117,6 +117,7 @@ async function _GET(request: Request) {
     after(async () => {
       const url = new URL('/api/cron/process-course-builder-jobs', request.url);
       await fetch(url, {
+        method: 'POST',
         headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
         cache: 'no-store',
       }).catch((cause) =>
@@ -148,3 +149,4 @@ async function _GET(request: Request) {
 }
 
 export const GET = withRuntime(withApiAudit('/api/cron/process-course-builder-jobs', _GET));
+export const POST = GET;

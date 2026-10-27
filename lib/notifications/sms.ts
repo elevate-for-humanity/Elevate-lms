@@ -1,6 +1,8 @@
-// SMS notification system using Twilio
+// SMS notification system using the platform's active Twilio business number.
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveTwilioSendingNumber, sendTwilioMessage, twilioAuthorization } from '@/lib/phone/twilio';
 
 export interface SMSNotification {
   to: string;
@@ -27,37 +29,25 @@ async function auditSMSDelivery(
     const { error } = await db.from('delivery_logs').insert({
       channel: 'sms',
       recipient,
-      status: result.success ? 'sent' : 'failed',
+      status: result.success ? 'pending' : 'failed',
       provider_message_id: result.messageId ?? null,
       error_message: result.error ?? null,
-      sent_at: result.success ? new Date().toISOString() : null,
+      sent_at: null,
       metadata: {
         provider: 'twilio',
         message_length: messageLength,
         ...metadata,
       },
     });
-    if (error) logger.warn('[SMS] delivery audit insert failed', { error: error.message });
+    if (error) logger.warn('[SMS] delivery audit insert failed');
   } catch (error) {
-    logger.warn('[SMS] delivery audit unavailable', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    logger.warn('[SMS] delivery audit unavailable');
   }
 }
 
 export class SMSService {
   private static instance: SMSService;
-  private accountSid: string | undefined;
-  private authToken: string | undefined;
-  private fromNumber: string | undefined;
-  private enabled: boolean;
-
-  private constructor() {
-    this.accountSid = process.env.TWILIO_ACCOUNT_SID;
-    this.authToken = process.env.TWILIO_AUTH_TOKEN;
-    this.fromNumber = process.env.TWILIO_PHONE_NUMBER;
-    this.enabled = !!(this.accountSid && this.authToken && this.fromNumber);
-  }
+  private constructor() {}
 
   static getInstance(): SMSService {
     if (!SMSService.instance) {
@@ -66,13 +56,22 @@ export class SMSService {
     return SMSService.instance;
   }
 
-  isEnabled(): boolean {
-    return this.enabled;
+  async sendingNumber(): Promise<string | null> {
+    await hydrateProcessEnv();
+    try { twilioAuthorization(); } catch { return null; }
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const db = await getAdminClient();
+    return db ? resolveTwilioSendingNumber(db) : null;
+  }
+
+  async isEnabled(): Promise<boolean> {
+    return Boolean(await this.sendingNumber());
   }
 
   async send(notification: SMSNotification): Promise<SMSResult> {
+    await hydrateProcessEnv();
     const cleanPhone = notification.to.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
+    if (cleanPhone.length !== 10 && !(cleanPhone.length === 11 && cleanPhone.startsWith('1'))) {
       const result = { success: false, error: 'Invalid phone number' };
       await auditSMSDelivery(notification.to, notification.message.length, result, notification.metadata);
       return result;
@@ -80,52 +79,25 @@ export class SMSService {
 
     const formattedPhone = cleanPhone.startsWith('1') ? `+${cleanPhone}` : `+1${cleanPhone}`;
 
-    if (!this.enabled) {
-      logger.error('SMS not sent — Twilio is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER.', new Error('SMS service unavailable'), {
-        to: formattedPhone,
+    const sendingNumber = await this.sendingNumber();
+    if (!sendingNumber) {
+      logger.error('SMS not sent — Twilio messaging is not configured.', new Error('SMS service unavailable'), {
         messageLength: notification.message.length,
       });
-      const result = { success: false, error: 'SMS service unavailable — Twilio not configured' };
+      const result = { success: false, error: 'SMS service unavailable — Twilio credentials or active business sender is missing.' };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }
 
     try {
-      const url = `https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}/Messages.json`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          Authorization:
-            'Basic ' + Buffer.from(`${this.accountSid}:${this.authToken}`).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          To: formattedPhone,
-          From: this.fromNumber!,
-          Body: notification.message,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        logger.error('Twilio SMS failed', new Error(data.message || 'Unknown error'), {
-          to: formattedPhone,
-          status: response.status,
-        });
-        const result = { success: false, error: data.message || 'SMS send failed' };
-        await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
-        return result;
-      }
-
-      logger.info('SMS sent successfully', { to: formattedPhone, messageId: data.sid });
-      const result = { success: true, messageId: data.sid };
+      const accepted = await sendTwilioMessage({ to: formattedPhone, from: sendingNumber, body: notification.message });
+      logger.info('SMS accepted by Twilio');
+      const result = { success: true, messageId: accepted.messageId };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     } catch (error) {
-      logger.error('SMS send exception', error as Error, { to: formattedPhone });
-      const result = { success: false, error: (error as Error).message };
+      logger.error('SMS send outcome could not be confirmed');
+      const result = { success: false, error: 'SMS send outcome could not be confirmed' };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }

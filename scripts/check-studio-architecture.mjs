@@ -22,6 +22,8 @@ for (const file of [
   'components/studio/StudioCommandWorkspace.tsx',
   'lib/devstudio/workspace-registry.ts',
   'lib/devstudio/ellie-message-router.ts',
+  'lib/studio/master-runtime.ts',
+  'lib/studio/capability-adapters.ts',
   'lib/devstudio/course-builder-controller.ts',
   'lib/course-builder/orchestrator.ts',
   'Dockerfile.studio-browser',
@@ -52,22 +54,55 @@ for (const invariant of [
   }
 }
 
-const browserDeployWorkflow = read('.github/workflows/deploy-studio-browser.yml');
+// Google Cloud Run owns Studio Browser deployment. Do not resurrect the retired
+// Northflank workflow to satisfy an obsolete source-level integrity check.
+const browserDeployWorkflow = read('.github/workflows/deploy-google-studio-browser.yml');
 for (const invariant of [
-  'resolve-studio-browser-secret.ts',
-  'verify-studio-browser-link.ts',
+  'google-github-actions/auth@v3',
+  'elegant-racer-299721',
+  'scripts/gcp/deploy-studio-browser.mjs',
+  'environment: production',
   'cancel-in-progress: false',
 ]) {
   if (!browserDeployWorkflow.includes(invariant)) {
-    fail(`Studio Browser deployment is missing credit-safe invariant: ${invariant}`);
+    fail(`Google Studio Browser deployment is missing required invariant: ${invariant}`);
   }
+}
+if (browserDeployWorkflow.includes('api.northflank.com')) {
+  fail('Studio Browser deployment must not call the legacy deployment API');
 }
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
 const browserPlanner = read('lib/devstudio/browser-planner.ts');
+for (const retired of [
+  'fly-containers/server.js',
+  'fly-containers/package.json',
+  'fly-containers/fly.toml',
+  'fly-containers/Dockerfile',
+  'cloudflare-workers/studio-ide/setup.sh',
+  'cloudflare-workers/studio-ide/package.json',
+  'cloudflare-workers/studio-ide/wrangler.toml',
+]) {
+  if (fs.existsSync(path.join(root, retired))) fail(`Retired competing Studio runtime returned: ${retired}`);
+}
+
 const browserRuntime = read('services/studio-browser/server.mjs');
 if (!browserRuntime.includes('process.env.STUDIO_BROWSER_EXECUTABLE_PATH')) {
   fail('Studio browser runtime does not use its configured system Chromium executable');
+}
+for (const unifiedRuntimeInvariant of [
+  '/workspace/files',
+  '/workspace/file',
+  '/workspace/exec',
+  'allowedExecCommands',
+  'workspaceRoot',
+  '/workspace/terminal',
+  '/workspace/repository/sync',
+  'createTerminalSession',
+  'ensureRepository',
+]) {
+  if (!browserRuntime.includes(unifiedRuntimeInvariant))
+    fail(`Unified Studio runtime is missing inherited execution capability: ${unifiedRuntimeInvariant}`);
 }
 for (const forbiddenProviderBypass of [
   'getOpenAIClient',
@@ -79,8 +114,18 @@ for (const forbiddenProviderBypass of [
     fail(`Studio browser agent bypasses the canonical AI provider: ${forbiddenProviderBypass}`);
   }
 }
-if (!browserPlanner.includes("providerPolicy: 'owned-only'")) {
-  fail('Studio browser planner is not restricted to Elevate-owned inference');
+if (!browserPlanner.includes("providerPolicy: 'canonical'")) {
+  fail('Studio browser planner is not routed through canonical configured inference');
+}
+const studioBrowserProvisioner = read('scripts/northflank/create-studio-browser-service.ts');
+for (const providerSessionInvariant of [
+  'STUDIO_BROWSER_AUTH_STATE_DIR',
+  'elevate-studio-browser-auth',
+  'volumesToAttach',
+]) {
+  if (!studioBrowserProvisioner.includes(providerSessionInvariant)) {
+    fail(`Studio Browser deployment is missing durable provider-session invariant: ${providerSessionInvariant}`);
+  }
 }
 for (const providerNeutralInvariant of ['planBrowserTurn', '/snapshot']) {
   if (!browserAgentRoute.includes(providerNeutralInvariant)) {
@@ -124,13 +169,23 @@ if (!privilegedNavigationSurfaces.some((surface) => adminLayout.includes(surface
   );
 }
 for (const sharedSurface of [
-  'BuildVersionSync',
   'AdminPwaRegister',
-  'AdminUpdateNotice',
   'SupabaseConfigBootstrap',
 ]) {
   if (!adminLayout.includes(sharedSurface))
     fail(`Admin layout is missing privileged shared surface: ${sharedSurface}`);
+}
+// Updates are shared by Marketing, LMS and Admin through canonical registration.
+// Require the complete mounted path, while preventing duplicate update pollers/UI.
+const adminPwa = read('components/pwa/AdminPwaRegister.tsx');
+const canonicalPwa = read('components/pwa/CanonicalPwaRegistration.tsx');
+const updateNotice = read('components/pwa/PwaUpdateNotice.tsx');
+if (!adminPwa.includes('<CanonicalPwaRegistration application="admin"') ||
+    !canonicalPwa.includes('<PwaUpdateNotice') || !updateNotice.includes('useBuildVersion()')) {
+  fail('Admin PWA is missing the shared update notice or loaded-build version check');
+}
+if (adminLayout.includes('<BuildVersionSync') || adminLayout.includes('<AdminUpdateNotice')) {
+  fail('Admin layout mounts duplicate PWA update/version surfaces outside canonical registration');
 }
 for (const publicSurface of ['AdminFooter', 'LiveChatWidget']) {
   if (adminLayout.includes(publicSurface))
@@ -153,6 +208,35 @@ const studioNavigation = read('apps/admin/app/studio/StudioNavigation.client.tsx
 for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
   if (studioNavigation.includes(standaloneNavigation))
     fail(`Studio navigation reintroduced a standalone sidebar: ${standaloneNavigation}`);
+}
+
+const masterRuntime = read('lib/studio/master-runtime.ts');
+for (const invariant of ['ensureCanonicalStudioRun', 'prepareMasterStudioPlan', 'selectMasterStudioSpecialist', 'recordMasterStudioArtifact']) {
+  if (!masterRuntime.includes(invariant)) fail(`Master Studio orchestration facade missing: ${invariant}`);
+}
+const workflowEngine = read('lib/workflows/engine.ts');
+if (!workflowEngine.includes('recordMasterStudioArtifact')) fail('Workflow engine is not linked to Master Studio evidence');
+const deploymentShell = read('apps/admin/app/api/admin/dev-studio/shell/route.ts');
+if (!deploymentShell.includes('recordMasterStudioArtifact')) fail('Deployment dispatch is not linked to Master Studio evidence');
+const courseAgent = read('apps/admin/app/api/admin/dev-studio/course-agent/route.ts');
+if (!courseAgent.includes('recordMasterStudioArtifact')) fail('Course agent is not linked to Master Studio evidence');
+const envatoRoute = read('apps/admin/app/api/admin/integrations/envato/route.ts');
+if (!envatoRoute.includes('upsertEnvatoWorkspaceManifest')) fail('Envato workspace batching is not linked to Master Studio');
+
+const toolRegistry = read('lib/ai/tools/registry.ts');
+for (const tool of ['courses.generate', 'browser.execute', 'studio.runtime.exec', 'studio.engineering.execute', 'video.generate', 'workflows.runTests', 'deployments.autopilot']) {
+  if (!toolRegistry.includes(`name: '${tool}'`)) fail(`Master Studio canonical tool missing: ${tool}`);
+}
+const canonicalPlan = read('apps/admin/app/api/admin/dev-studio/plan/route.ts');
+if (!canonicalPlan.includes('prepareMasterStudioPlan')) fail('Governed planner bypasses Master Studio planner');
+const taskRunner = read('lib/devstudio/os/task-runner.ts');
+for (const identity of ['studio_run_id', 'studio_run_step_id']) {
+  if (!taskRunner.includes(identity)) fail(`Canonical task runtime drops Master Studio identity: ${identity}`);
+}
+
+const capabilityAdapters = read('lib/studio/capability-adapters.ts');
+for (const capability of ['course','website','media','workflow','repository','browser','runtime','deployment','data','evaluation','memory','engineering']) {
+  if (!capabilityAdapters.includes(`id: '${capability}'`)) fail(`Master Studio capability adapter missing: ${capability}`);
 }
 
 const studioRoot = read('apps/admin/app/studio/page.tsx');
@@ -271,8 +355,8 @@ if (
   fail('public Course Factory barrel bypasses Course Builder orchestration');
 }
 const studioController = read('lib/devstudio/course-builder-controller.ts');
-if (!studioController.includes("from '../course-builder/orchestrator'"))
-  fail('Studio Course Builder controller does not delegate to canonical orchestrator');
+if (!studioController.includes('DevStudioUltimateCourseControl'))
+  fail('Studio Course Builder controller is not backed by Ultimate control plane');
 const courseOrchestrator = read('lib/course-builder/orchestrator.ts');
 if (!courseOrchestrator.includes("from '../course-factory/factory'"))
   fail('Course Builder orchestrator is not the owner of private Course Factory execution');
@@ -311,8 +395,13 @@ for (const interaction of ['Attach a file', 'selectStudioAgent', 'capabilitiesUs
     fail(`canonical Studio chat is missing intelligence interaction: ${interaction}`);
 }
 const studioWorkspace = read('components/studio/StudioCommandWorkspace.tsx');
-if (studioWorkspace.includes('StudioCapabilityRail'))
-  fail('Root Studio still exposes separate agent/capability navigation');
+// Tool navigation stays in the shared conversation; agent selection is automatic.
+for (const override of ['onSpecialistChange', 'preferredAgent', 'setSpecialist']) {
+  if (studioWorkspace.includes(override) || capabilityRail.includes(override) || unifiedChat.includes(override))
+    fail(`Root Studio reintroduced manual agent selection: ${override}`);
+}
+if (!studioWorkspace.includes('onOpenWorkspace={openCapability}'))
+  fail('Studio tools must open in the same conversation workspace');
 if (unifiedChat.includes('agentOverride'))
   fail('Canonical Studio chat still allows a user-selected agent override');
 for (const forbiddenWrite of [
@@ -326,16 +415,26 @@ for (const forbiddenWrite of [
 const buildCourseBlock =
   adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'generate_videos':/i)?.[1] ?? '';
 for (const invariant of [
-  'dryRun: false',
-  "__type: 'course_build_queued'",
-  "status: 'queued'",
-  'idempotency_key',
+  'DevStudioUltimateCourseControl',
+  "__type:'ultimate_course_build_queued'",
   'requestedCourseId',
-  'programId',
   'programSlug',
 ]) {
   if (!buildCourseBlock.includes(invariant))
     fail(`build_course is not a one-step governed Course Builder operation: ${invariant}`);
+}
+// Check persistence and standards at their canonical owners, not as duplicate
+// queries in the chat handler. Keep every governance requirement enforced.
+const ultimateControl = read('lib/devstudio/ultimate-course-control.ts');
+const ultimateProfile = read('lib/ultimate-course-builder/core/course-profile.ts');
+for (const [source, invariants] of [
+  [buildCourseBlock, ['.queueCourse({']],
+  [ultimateControl, ["from '@/lib/ultimate-course-builder/core/course-profile'", 'buildUltimateProfile(this.db', ".from('ultimate_course_builds')", 'new UltimateJobQueue(this.db).enqueue']],
+  [ultimateProfile, [".from('apprenticeship_standard_versions')", ".from('apprenticeship_standard_competencies')", 'UltimateAppendixAStandardsSource']],
+]) {
+  for (const invariant of invariants) {
+    if (!source.includes(invariant)) fail(`Canonical Course Builder governance is missing: ${invariant}`);
+  }
 }
 for (const durableFile of [
   'lib/jobs/handlers/course-build.ts',
@@ -367,18 +466,43 @@ if (
 )
   fail('pre-auth registry contains retired legacy Studio tables');
 
-const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
-for (const dependency of [
+const courseCatalog = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+for (const invariant of [
+  'UltimateBuildPanel',
+  '/api/admin/ultimate-course-builder',
+  "action: 'queue-course'",
+  'Legacy Course Factory is archived',
+]) {
+  if (!courseCatalog.includes(invariant))
+    fail(`Ultimate Course Builder surface is missing: ${invariant}`);
+}
+for (const retiredDependency of [
   'CourseProvider',
   'CourseStudioApplication',
   'StudioWorkspace',
-  'loadCourseSession',
+  'runCourseFactoryPipeline',
 ]) {
-  if (!courseApplication.includes(dependency))
-    fail(`complete course application is missing ${dependency}`);
+  if (courseCatalog.includes(retiredDependency))
+    fail(`Ultimate Course Builder reintroduced retired Course Factory UI: ${retiredDependency}`);
 }
-
-const courseCatalog = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+const ultimateCourseBuilderApi = read('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
+for (const invariant of ['UltimateJobQueue', "body.action === 'queue-course'"]) {
+  if (!ultimateCourseBuilderApi.includes(invariant))
+    fail(`Ultimate Course Builder API is missing: ${invariant}`);
+}
+const legacyCourseBuilderApi = read('apps/admin/app/api/admin/course-builder/route.ts');
+for (const invariant of ['COURSE_FACTORY_ARCHIVED', 'status: 410', 'ultimateEndpoint']) {
+  if (!legacyCourseBuilderApi.includes(invariant))
+    fail(`legacy Course Factory generation is not archived: ${invariant}`);
+}
+const legacyCourseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
+if (
+  !legacyCourseApplication.includes('redirect(') ||
+  !legacyCourseApplication.includes('/studio/courses?courseId=') ||
+  !legacyCourseApplication.includes('&tab=ultimate')
+) {
+  fail('legacy per-course builder route does not redirect to Ultimate Course Builder');
+}
 for (const forbiddenDependency of [
   '/api/admin/course-builder/course',
   'LiveCourseBuilder',

@@ -1,3 +1,5 @@
+import { DURABLE_POSTS } from './durable-posts';
+
 /**
  * Static blog posts — rendered at build time.
  * Add new posts here. They merge with any published DB posts at runtime.
@@ -21,7 +23,7 @@ export type BlogPost = {
   published: true;
 };
 
-export const STATIC_POSTS: BlogPost[] = [
+const ELEVATE_POSTS: BlogPost[] = [
   {
     id: 'static-1',
     slug: 'what-is-wioa-and-how-does-it-pay-for-your-training',
@@ -243,3 +245,5 @@ The right structure depends on the shop’s capacity, business model, legal resp
 [See approved Host Shop profiles](/partners/host-shops) or [check the Host Site requirements](/partners/host-shop/apply).`,
   },
 ];
+
+export const STATIC_POSTS: BlogPost[] = [...ELEVATE_POSTS, ...DURABLE_POSTS];

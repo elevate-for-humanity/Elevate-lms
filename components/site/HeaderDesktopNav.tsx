@@ -62,7 +62,7 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
           ) : (
             <p className="px-2 py-2 text-sm font-extrabold text-slate-950">{item.name}</p>
           )}
-          {item.subItems?.length ? <DropdownContent subItems={item.subItems} embedded /> : null}
+          
         </div>
       ))}
     </div>
@@ -76,14 +76,14 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   // Platform and Resources are public discovery surfaces, not hidden utilities.
   // Authenticated portals remain discoverable while authorization still gates data/actions.
   const primaryItems = items.filter((item) =>
-    ['programs', 'apprenticeships', 'funding', 'platform', 'employers', 'resources', 'portals'].includes(item.id ?? ''),
+    ['students', 'programs', 'apprenticeships', 'funding', 'resources'].includes(item.id ?? ''),
   );
   const secondaryItems = items.filter((item) => !primaryItems.includes(item));
 
   return (
     <nav
       aria-label="Main navigation"
-      className="flex w-full min-w-0 flex-row flex-nowrap items-center justify-between gap-0 overflow-visible whitespace-nowrap xl:gap-0.5"
+      className="flex w-full min-w-0 flex-row flex-nowrap items-center justify-center gap-2 overflow-visible whitespace-nowrap xl:gap-3"
     >
       {primaryItems.map((item) => {
         const key = item.id ?? item.name;

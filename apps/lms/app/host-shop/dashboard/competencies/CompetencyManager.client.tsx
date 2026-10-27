@@ -44,6 +44,8 @@ type Apprentice = {
   programSlug: string;
   name: string;
   email: string;
+  practiceOnly?: boolean;
+  placementId?: string;
   standard: Standard;
   completedCompetencies: number;
   competencyRecords: RecordRow[];
@@ -63,6 +65,7 @@ export default function CompetencyManager() {
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [serviceCounts,setServiceCounts]=useState<Record<string,number>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -84,7 +87,7 @@ export default function CompetencyManager() {
   }, [load]);
 
   const totalPending = useMemo(
-    () => apprentices.reduce((sum, apprentice) => sum + (apprentice.standard.competencyCount - apprentice.completedCompetencies), 0),
+    () => apprentices.reduce((sum, apprentice) => sum + (apprentice.practiceOnly ? 0 : apprentice.standard.competencyCount - apprentice.completedCompetencies), 0),
     [apprentices],
   );
 
@@ -138,6 +141,21 @@ export default function CompetencyManager() {
     }
   }
 
+  async function recordService(apprentice: Apprentice,competency:Competency){
+    const serviceName=window.prompt('Service performed (e.g. clipper cut, fade, hairstyle, color, manicure):');
+    if(!serviceName?.trim())return;
+    const subjectType=window.prompt('Performed on: patron, mannequin, or student?','patron')?.trim().toLowerCase();
+    if(!subjectType||!['patron','mannequin','student'].includes(subjectType)){setError('Select patron, mannequin, or student.');return;}
+    const performedOn=new Date().toISOString().slice(0,10);
+    const key=`${apprentice.enrollmentId}:${competency.id}`;
+    setSavingKey(key);setError(null);
+    try{
+      const response=await fetch('/api/host-shop/practical-services',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollmentId:apprentice.enrollmentId,competencyId:competency.id || null,serviceName:serviceName.trim(),subjectType,performedOn})});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not record service');
+      setServiceCounts(current=>({...current,[key]:(current[key]||0)+1}));
+    }catch(e){setError(e instanceof Error?e.message:'Unable to save practical service');}finally{setSavingKey(null);}
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[320px] items-center justify-center rounded-2xl border bg-white">
@@ -148,12 +166,13 @@ export default function CompetencyManager() {
 
   return (
     <div className="space-y-6">
+      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6"><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">Supervisor workflow</p><h2 className="mt-2 text-2xl font-black leading-tight text-slate-950">Record hands-on practice for your assigned apprentices</h2><div className="mt-4 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-white p-4"><b>1. Observe the service</b><p className="mt-1 text-sm leading-6 text-slate-600">Watch the apprentice perform the work safely and to the standard shown below.</p></div><div className="rounded-2xl bg-white p-4"><b>2. Capture evidence</b><p className="mt-1 text-sm leading-6 text-slate-600">Practical skills require the performance subject, dated evidence, and verifier license information when applicable.</p></div><div className="rounded-2xl bg-white p-4"><b>3. Check off the skill</b><p className="mt-1 text-sm leading-6 text-slate-600">Record each supervised practical service. Elevate and the registered sponsor handle formal Appendix A competency approvals.</p></div></div></section>
       <div className="flex flex-col gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-brand-blue-700">DOL Appendix A</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Competency Sign-Offs</h1>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">Practical Training Progress</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Check off only competencies you personally observed. Indiana practical services also require the performance subject, dated evidence, and your current license number before approval.
+            Record supervised services. Formal Appendix A competency sign-offs are handled by the sponsor, not Host Shops.
           </p>
         </div>
         <button
@@ -184,6 +203,20 @@ export default function CompetencyManager() {
         </div>
       </div>
 
+      {apprentices.length > 0 && <section className="rounded-2xl border border-blue-200 bg-white p-5">
+        <h2 className="text-xl font-black">Apprentice training progress chart</h2>
+        <p className="mt-1 text-sm text-slate-600">Shows verified competency progress where a registered standard is available. Practice-only placements remain visible without fabricated approvals.</p>
+        <div className="mt-4 space-y-5">{apprentices.map(apprentice => {
+          const total=apprentice.standard.competencyCount;
+          const completed=apprentice.completedCompetencies;
+          const percent=total>0?Math.round(completed/total*100):0;
+          return <div key={apprentice.enrollmentId}>
+            <div className="flex flex-wrap justify-between gap-2 text-sm"><span className="font-bold">{apprentice.name} · {apprentice.standard.occupationTitle}</span><span>{apprentice.practiceOnly?'Practical services: record below':completed+' of '+total+' competencies verified'}</span></div>
+            <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} aria-label={apprentice.name+' competency progress'} className="mt-2 h-3 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-blue-700" style={{width:percent+'%'}} /></div>
+            {apprentice.practiceOnly && <p className="mt-2 text-xs text-amber-800">Registered competency standard awaiting sponsor linkage. Logged practical services do not certify completion.</p>}
+          </div>;
+        })}</div>
+      </section>}
       {apprentices.length === 0 ? (
         <div className="rounded-2xl border bg-white px-6 py-12 text-center">
           <ShieldCheck className="mx-auto h-10 w-10 text-slate-300" />
@@ -195,7 +228,7 @@ export default function CompetencyManager() {
       {apprentices.map((apprentice) => {
         const recordById = new Map(apprentice.competencyRecords.map((row) => [row.competency_id, row]));
         const completed = apprentice.competencyRecords.filter((row) => row.completed).length;
-        const pct = Math.round((completed / apprentice.standard.competencyCount) * 100);
+        const pct = apprentice.standard.competencyCount ? Math.round((completed / apprentice.standard.competencyCount) * 100) : 0;
         const nextWage = apprentice.standard.wageMilestones.find((milestone) => milestone.completedCompetencies > completed);
 
         return (
@@ -222,6 +255,11 @@ export default function CompetencyManager() {
               </div>
             </div>
 
+            {apprentice.practiceOnly && <div className="border-t p-5">
+              <h3 className="font-black">Record supervised salon service</h3>
+              <p className="mt-1 text-sm">Choose a service, date, and person served. These are training observations, not formal competency sign-offs.</p>
+              <button type="button" disabled={Boolean(savingKey)} onClick={()=>void recordService(apprentice,{id:'',category:'Practical service',description:'Observed salon practice'})} className="mt-3 min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white">+ Record practical service</button>
+            </div>}
             <div className="divide-y">
               {apprentice.standard.competencies.map((competency, index) => {
                 const record = recordById.get(competency.id);
@@ -245,25 +283,9 @@ export default function CompetencyManager() {
                         </div>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      disabled={savingKey === key}
-                      onClick={() => void setCompetency(apprentice, competency, !isComplete)}
-                      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${
-                        isComplete
-                          ? 'border border-brand-green-300 bg-brand-green-50 text-brand-green-800 hover:bg-brand-green-100'
-                          : 'border border-slate-300 bg-white text-slate-700 hover:border-brand-blue-300 hover:bg-brand-blue-50'
-                      }`}
-                    >
-                      {savingKey === key ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : isComplete ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <Circle className="h-4 w-4" />
-                      )}
-                      {isComplete ? 'Verified' : 'Check off'}
-                    </button>
+                    <div className="flex flex-col gap-2">
+                    <button type="button" disabled={savingKey===key} onClick={()=>void recordService(apprentice,competency)} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-900 disabled:opacity-50">+ Record practical service{serviceCounts[key] ? ` (+${serviceCounts[key]} this session)` : ''}</button>
+                    <span className="text-xs font-semibold text-slate-600">{isComplete ? 'Sponsor verified' : 'Sponsor review pending'}</span></div>
                   </div>
                 );
               })}

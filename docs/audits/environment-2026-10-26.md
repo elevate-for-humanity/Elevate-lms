@@ -4,7 +4,7 @@ Source: https://chatgpt.com/share/6adff9fc-8118-83e9-a7c5-96bb8b3edf1e?ogimg=pla
 
 This preserves the original 95 findings in order. The later 55-item audit is a different register. Code/test repairs below are not production acceptance. Open items are deliberately not marked complete. Protective conditions require evidence and recovery, not removal.
 
-Validation: 676 Google infrastructure tests, 237 worker tests, and 82 focused dashboard/publication/settings-permission tests pass. Full repository ESLint passes. Admin and Marketing production builds have passed; final LMS and refreshed Admin builds remain in progress. Live health responses from older revisions do not prove deployment of these repairs.
+Validation: 676 Google infrastructure tests, 237 worker tests, and 88 focused dashboard/publication/settings-permission/photo tests pass. Full repository ESLint passes. Admin, Marketing, and LMS production builds have passed; a refreshed Admin build of the combined candidate remains in progress. Live health responses from older revisions do not prove deployment of these repairs.
 
 Database migrations `20261027031413_atomic_ultimate_publication` and `20261027031415_documented_paid_invoice_totals` are applied to the primary Elevate project. Three rollback-only SQL regressions pass against the applied functions: publication failure/rollback/idempotency/fencing, enqueue/aggregate atomicity, and a 1,001-invoice aggregate. All synthetic fixtures were rolled back. New functions deny anonymous/authenticated execution and allow service_role. Security advisory counts remain unchanged (31 informational server-only RLS tables; one existing MFA warning).
 
@@ -111,3 +111,5 @@ The later 55-item register also identified enqueue/parent-state split writes. Ne
 Financial reporting now explicitly covers paid invoices; it is not a consolidated ledger or a claim that enrollment balances equal cash receipts. Missing historical payment dates require verified accounting evidence before monthly reporting becomes available.
 
 Production acceptance still requires deployment SHA/image/revision evidence, role-specific dashboard checks, current regional image/quota inspection, checkpoint-to-published-course execution, and student playback validation.
+
+Concurrent main changes through `1470ff43ea3f2c122142f53b33b65219a85cb14b` are preserved in the merge candidate. Combined tests caught and repaired missing generated-photo resume indexing and an error-code mismatch with the repair policy. Content-addressed photo inventory now has a verified cue index, checksum readback, retained provider diagnostics, and duplicate-photo rejection. Six photo regressions pass, including zero-inference resume and corrupted-byte rejection.

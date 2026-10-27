@@ -52,7 +52,8 @@ test('Cosmetology calls the photo provider for conceptual cues and resumes from 
   expect(result.teachingPhotos.concept).toHaveLength(3);
   expect(new Set(result.teachingPhotos.concept.map((p: any) => p.sha256)).size).toBe(3);
   expect(input).toEqual(original);
-  expect(files.size).toBe(3);
+  expect([...files.keys()].filter(path => path.startsWith('approved-teaching-photos/'))).toHaveLength(3);
+  expect([...files.keys()].filter(path => path.startsWith('approved-teaching-photo-index/'))).toHaveLength(3);
   const resumed = await prepareTeachingPhotos(input, db);
   expect(generateTeachingPhoto).toHaveBeenCalledTimes(3);
   expect(resumed.teachingPhotos).toEqual(result.teachingPhotos);
@@ -97,4 +98,20 @@ test('a blocked photograph stops at the cue and retains the finding without manu
   const [path, bytes] = [...files.entries()][0];
   expect(path).toMatch(/^approved-teaching-photo-diagnostics\//);
   expect(JSON.parse(bytes.toString()).provider.blocked).toBe(true);
+});
+
+test('resume rejects changed stored image bytes without requesting replacement inference', async () => {
+  const { db, files } = storage();
+  const result = await prepareTeachingPhotos(input, db);
+  files.set(result.teachingPhotos.concept[0].storagePath, Buffer.from('changed-after-indexing'));
+  await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('TEACHING_PHOTO_HASH_MISMATCH');
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(3);
+});
+
+test('duplicate generated content cannot satisfy another cue', async () => {
+  const bytes = await sharp({ create: { width: 32, height: 18, channels: 3, background: 'red' } }).png().toBuffer();
+  vi.mocked(generateTeachingPhoto).mockReset().mockResolvedValue({ bytes, mimeType: 'image/png', provider: 'google' });
+  const { db } = storage();
+  await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('COURSE_PHOTO_ALREADY_USED');
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(2);
 });

@@ -89,20 +89,50 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       // Storage-first, generate only for missing inventory, never duplicate a hash.
       const prompt=['Professional cosmetology educational photograph, realistic, no logos or text.',
         String(input.courseTitle),String(scene.visualRequirement),String(step.narrationQuote),String(step.view)].join('\\n');
-      const generated=await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto});
-      const bytes=generated.bytes;
-      const sha256=createHash('sha256').update(bytes).digest('hex');
-      if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');
-      const mimeType=generated.mimeType;
-      const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
-      const storagePath='approved-teaching-photos/'+sha256+'.'+extension;
-      const uploaded=await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:mimeType,upsert:false});
-      if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
-      const downloaded=await db.storage.from('course_videos').download(storagePath);
+      // Keep content-addressed images while recording a durable cue-to-image
+      // index. A resumed worker must reuse the saved asset before paid inference.
+      const requestHash=createHash('sha256').update(JSON.stringify({
+        version:'storage-first-photo-cues-v3',lesson:input.lessonId,scene:scene.id,index,prompt,
+      })).digest('hex');
+      const indexPath='approved-teaching-photo-index/'+requestHash+'.json';
+      const bucket=db.storage.from('course_videos');
+      const cached=await bucket.download(indexPath);
+      if(cached.error && String((cached.error as any).statusCode)!=='404' &&
+        !/not found|does not exist/i.test(cached.error.message)) throw cached.error;
+      let saved:any;
+      if(cached.data){
+        try{saved=JSON.parse(await cached.data.text());}catch{throw new Error('TEACHING_PHOTO_INDEX_INVALID');}
+        if(!/^[a-f0-9]{64}$/.test(saved.sha256??'') ||
+          !new RegExp('^approved-teaching-photos/'+saved.sha256+'\\.(png|jpg|webp)$').test(saved.storagePath??''))
+          throw new Error('TEACHING_PHOTO_INDEX_INVALID');
+      }
+      if(!saved){
+        const generated=await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,
+          persistFailure:async(detail:any)=>{
+            const result=await bucket.upload('approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',
+              Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
+            if(result.error)throw new Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);
+          }});
+        if(!generated?.bytes)throw new Error('TEACHING_PHOTO_BYTES_REQUIRED');
+        const sha256=createHash('sha256').update(generated.bytes).digest('hex');
+        if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');
+        const mimeType=generated.mimeType;
+        if(!['image/png','image/jpeg','image/webp'].includes(mimeType))throw new Error('TEACHING_PHOTO_MIME_INVALID');
+        const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
+        saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256};
+        const uploaded=await bucket.upload(saved.storagePath,generated.bytes,{contentType:mimeType,upsert:false});
+        if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
+      }
+      const {storagePath,sha256}=saved;
+      const downloaded=await bucket.download(storagePath);
       if(downloaded.error||!downloaded.data)throw new Error('TEACHING_PHOTO_READBACK_FAILED');
       const verified=createHash('sha256').update(Buffer.from(await downloaded.data.arrayBuffer())).digest('hex');
       if(verified!==sha256)throw new Error('TEACHING_PHOTO_HASH_MISMATCH');
-      const signed=await db.storage.from('course_videos').createSignedUrl(storagePath,3600);
+      if(!cached.data){
+        const indexed=await bucket.upload(indexPath,Buffer.from(JSON.stringify(saved)),{contentType:'application/json',upsert:true});
+        if(indexed.error)throw new Error('TEACHING_PHOTO_INDEX_SAVE_FAILED');
+      }
+      const signed=await bucket.createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
         stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'google-generated'}))

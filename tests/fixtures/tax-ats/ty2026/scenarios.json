@@ -1,0 +1,116 @@
+{
+  "taxYear": 2026,
+  "processingYear": 2027,
+  "sourceIndex": "https://www.irs.gov/e-file-providers/tax-year-2026-form-1040-series-and-extensions-modernized-e-file-mef-assurance-testing-system-ats-information",
+  "reviewedAt": "2026-10-13",
+  "notes": "Core 1040 scenarios 1–6. Includes attached forms called out in the covers. IRS also publishes other scenarios; required cases depend on the registered software package and supported forms. No scenario is marked accepted without an IRS acknowledgment.",
+  "scenarios": [
+    {
+      "id": "TY2026-1040-1",
+      "scenario": 1,
+      "formFamily": "1040",
+      "sourceUrl": "https://www.irs.gov/pub/irs-efile/1040-mef-ats-scenario-1-09222026.pdf",
+      "sourceSha256": "9c50096468515ff0e46698cf24c342cf68acdf59dca6cb884e01dfa1603cf5c4",
+      "fixture": "scenario-1.pdf",
+      "requiredForms": [
+        "1040",
+        "W2",
+        "SCHEDULE_2",
+        "SCHEDULE_3",
+        "SCHEDULE_H",
+        "5695",
+        "1062",
+        "1062_SCHEDULE_A"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-2",
+      "scenario": 2,
+      "formFamily": "1040",
+      "sourceUrl": "https://www.irs.gov/pub/irs-efile/1040-mef-ats-%20scenario-2-09222026.pdf",
+      "sourceSha256": "b2d58c490b489294cb80137c5755e28f2bba806aa9329248311b81e58d932915",
+      "fixture": "scenario-2.pdf",
+      "requiredForms": [
+        "1040",
+        "W2",
+        "SCHEDULE_1",
+        "SCHEDULE_A",
+        "SCHEDULE_C",
+        "8283"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-3",
+      "scenario": 3,
+      "formFamily": "1040",
+      "sourceUrl": "https://www.irs.gov/pub/irs-efile/1040-mef-ats-scenario-3-09222026.pdf",
+      "sourceSha256": "c52160656064f83aed27b72683d3247b654f3c81b30f02a4c50ac76041c1bc79",
+      "fixture": "scenario-3.pdf",
+      "requiredForms": [
+        "1040",
+        "1099-R",
+        "SCHEDULE_1",
+        "SCHEDULE_2",
+        "SCHEDULE_D",
+        "SCHEDULE_E",
+        "SCHEDULE_F",
+        "SCHEDULE_SE",
+        "4835"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-4",
+      "scenario": 4,
+      "formFamily": "1040",
+      "sourceUrl": "https://www.irs.gov/pub/irs-efile/1040-mef-ats-scenario-4-09222026.pdf",
+      "sourceSha256": "ae8c0996690b9dc0430f2ecb86a6cf6d5f907be18a80a4c17719ee597bb1599f",
+      "fixture": "scenario-4.pdf",
+      "requiredForms": [
+        "1040",
+        "W2",
+        "SCHEDULE_1",
+        "SCHEDULE_3",
+        "SCHEDULE_3_A",
+        "2441",
+        "8862",
+        "8863",
+        "SCHEDULE_EIC",
+        "SCHEDULE_8812"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-5",
+      "scenario": 5,
+      "formFamily": "1040",
+      "sourceUrl": "https://www.irs.gov/pub/irs-efile/1040-mef-ats-scenario-5-09222026.pdf",
+      "sourceSha256": "fb94f6a34c6419243e2ca55a94e060a6664bc2730ebfc20cbaef1a893031b30b",
+      "fixture": "scenario-5.pdf",
+      "requiredForms": [
+        "1040",
+        "W2",
+        "8888"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-6",
+      "scenario": 6,
+      "formFamily": "1040",
+      "sourceUrl": "https://www.irs.gov/pub/irs-efile/1040-mef-ats-scenario-6-09222026.pdf",
+      "sourceSha256": "43e5eeb8eb511cab7eda09148c57df9cdc962b0dcdb88365236536a408ba01fa",
+      "fixture": "scenario-6.pdf",
+      "requiredForms": [
+        "1040",
+        "W2",
+        "W2G",
+        "SCHEDULE_1",
+        "SCHEDULE_E"
+      ],
+      "atsAccepted": false
+    }
+  ]
+}

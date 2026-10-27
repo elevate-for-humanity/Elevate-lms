@@ -13,6 +13,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { aiChat } from '@/lib/ai/ai-service';
+import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 import {
   executePaidInference,
   paidArtifactFingerprint,
@@ -140,9 +141,13 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const aiRuntime = await resolveAIRuntimeState();
+    if (!aiRuntime.anyConfigured) {
       return NextResponse.json(
-        { error: 'OPENAI_API_KEY is not configured. Add OPENAI_API_KEY to the Northflank production secret group.' },
+        {
+          error:
+            'No AI provider is configured. Add and validate a provider in AI Provider Keys.',
+        },
         { status: 503 },
       );
     }

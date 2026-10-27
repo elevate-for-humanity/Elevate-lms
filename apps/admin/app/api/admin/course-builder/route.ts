@@ -5,6 +5,7 @@
  * Studio controls this surface. Course Builder owns orchestration and delegates
  * execution to private/internal Course Builder capability services.
  */
+import { courseLibraryPlayback } from '@/lib/storage/course-library-playback';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,6 +30,11 @@ import {
 } from '@/lib/course-builder/edit-service';
 import { publishPersistedCourse } from '@/lib/course-builder/persisted-publish-service';
 import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-builder/review-service';
+import {
+  normalizeManualAssessmentQuestions,
+  persistAssessmentQuestions,
+  toQuizQuestion,
+} from '@/lib/course-builder/assessment-generator';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
@@ -53,6 +59,7 @@ import {
   paidArtifactFingerprint,
   reservePaidInference,
 } from '@/lib/ai/paid-inference-gateway';
+import { loadCourseSession } from '@/lib/studio/course-session';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -79,6 +86,7 @@ type CourseBuilderAction =
   | 'delete-lesson'
   | 'reorder-lessons'
   | 'link-scorm'
+  | 'save-assessment'
   | 'review-course'
   | 'review-lessons'
   | 'audit'
@@ -86,7 +94,8 @@ type CourseBuilderAction =
   | 'publish'
   | 'publish-persisted'
   | 'repair'
-  | 'generate-missing';
+  | 'generate-missing'
+  | 'start-existing';
 
 function toPipelineStage(stage: FactoryStage): PipelineStage {
   if (stage === 'enrich') return 'lessons';
@@ -139,6 +148,14 @@ export async function GET(req: NextRequest) {
 
   const action = req.nextUrl.searchParams.get('action') || 'blueprints';
   try {
+    if (action === 'session') {
+      const courseId = req.nextUrl.searchParams.get('courseId')?.trim() || '';
+      if (!courseId) {
+        return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      }
+      return NextResponse.json({ session: await loadCourseSession(courseId) });
+    }
+
     if (action === 'blueprints') {
       const id = req.nextUrl.searchParams.get('id');
       const registry = await loadAllBlueprints();
@@ -163,6 +180,27 @@ export async function GET(req: NextRequest) {
           socCode: blueprint.socCode ?? null,
         })),
       });
+    }
+
+    if (action === 'media-library') {
+      const courseId = req.nextUrl.searchParams.get('courseId');
+      if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      const db = await requireAdminClient();
+      const course = await loadCourse(courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+
+      const { data: videos, error } = await db
+        .from('course_videos')
+        .select('id,title,lesson_id,storage_path,video_url,status,asset_role,created_at')
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const rows = await Promise.all(
+        (videos ?? []).map(video => courseLibraryPlayback(db,video)),
+      );
+
+      return NextResponse.json({ ok: true, course, videos: rows });
     }
 
     if (action === 'instructor-media') {
@@ -274,8 +312,29 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
+  const archivedGenerationActions: CourseBuilderAction[] = [
+    'generate',
+    'generate-from-blueprint',
+    'queue-media',
+    'repair',
+    'generate-missing',
+    'start-existing',
+  ];
+  if (archivedGenerationActions.includes(action)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'COURSE_FACTORY_ARCHIVED',
+        message:
+          'Course Factory is archived. Start or resume production through Ultimate Course Builder.',
+        ultimateEndpoint: '/api/admin/ultimate-course-builder',
+        ultimateRoute: '/studio/courses?tab=ultimate',
+      },
+      { status: 410 },
+    );
+  }
   if (
-    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing'].includes(
+    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing', 'start-existing'].includes(
       action,
     )
   ) {
@@ -299,6 +358,24 @@ export async function POST(req: NextRequest) {
         { status: 423 },
       );
     }
+  }
+
+  if (action === 'start-existing') {
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    const course = await loadCourse(courseId);
+    if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    const result = await courseFactory(
+      {
+        courseId,
+        programSlug: course.slug,
+        mode: 'refresh',
+        contentSource: 'curriculum_lessons',
+        videoMode: 'queue',
+      },
+      () => {},
+    );
+    return NextResponse.json({ ok: result.ok, action: 'start-existing', course, result });
   }
 
   if (action === 'generate-from-blueprint') {
@@ -485,6 +562,78 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { ok: false, error: 'Failed to link SCORM package' },
         { status: 400 },
+      );
+    }
+  }
+  if (action === 'save-assessment') {
+    const lessonId = typeof body.lessonId === 'string' ? body.lessonId.trim() : '';
+    const passingScore = Number(body.passingScore);
+    if (!lessonId) {
+      return NextResponse.json({ ok: false, error: 'lessonId is required' }, { status: 400 });
+    }
+    if (!Number.isInteger(passingScore) || passingScore < 1 || passingScore > 100) {
+      return NextResponse.json(
+        { ok: false, error: 'passingScore must be an integer between 1 and 100' },
+        { status: 400 },
+      );
+    }
+    try {
+      const db = await requireAdminClient();
+      const { data: lesson, error: lessonError } = await db
+        .from('course_lessons')
+        .select('id,module_id,domain_key,competency_checks')
+        .eq('id', lessonId)
+        .maybeSingle();
+      if (lessonError) throw lessonError;
+      if (!lesson) {
+        return NextResponse.json({ ok: false, error: 'Assessment lesson not found' }, { status: 404 });
+      }
+
+      let moduleDomainKey: string | undefined;
+      if (lesson.module_id) {
+        const { data: courseModule, error: moduleError } = await db
+          .from('course_modules')
+          .select('domain_key')
+          .eq('id', lesson.module_id)
+          .maybeSingle();
+        if (moduleError) throw moduleError;
+        moduleDomainKey = courseModule?.domain_key ?? undefined;
+      }
+      const competencyKeys = Array.isArray(lesson.competency_checks)
+        ? lesson.competency_checks
+            .map((item: unknown) => {
+              if (typeof item === 'string') return item;
+              if (item && typeof item === 'object' && 'key' in item) return String(item.key);
+              return '';
+            })
+            .filter(Boolean)
+        : [];
+      const questions = normalizeManualAssessmentQuestions(lessonId, body.questions, {
+        domainKey: lesson.domain_key ?? moduleDomainKey,
+        competencyKeys,
+      });
+      const result = await persistAssessmentQuestions(db, lessonId, questions, {
+        replaceExisting: true,
+        passingScore,
+      });
+      if (result.errors.length) {
+        return NextResponse.json(
+          { ok: false, error: result.errors.join('; '), errors: result.errors },
+          { status: 422 },
+        );
+      }
+      return NextResponse.json({
+        ok: true,
+        lessonId,
+        writtenToDb: result.writtenToDb,
+        questions: result.questions.map(toQuizQuestion).filter(Boolean),
+        passingScore,
+      });
+    } catch (error) {
+      logger.error('[course-builder] Assessment save failed', error);
+      return NextResponse.json(
+        { ok: false, error: error instanceof Error ? error.message : 'Failed to save assessment' },
+        { status: 422 },
       );
     }
   }
@@ -689,18 +838,23 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const paidAuthorization = await reservePaidInference(db, {
-    scopeKey,
-    tenantId,
-    actorId: auth.id,
-    artifactFingerprint,
-    idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
-    provider: paidProvider,
-    model: paidModel,
-    operation: 'course-builder-generate',
-    projectedCostMicros,
-  });
-  if (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId) {
+  const paidAuthorization = creditOwner.operator
+    ? null
+    : await reservePaidInference(db, {
+        scopeKey,
+        tenantId,
+        actorId: auth.id,
+        artifactFingerprint,
+        idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
+        provider: paidProvider,
+        model: paidModel,
+        operation: 'course-builder-generate',
+        projectedCostMicros,
+      });
+  if (
+    paidAuthorization &&
+    (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId)
+  ) {
     return NextResponse.json(
       {
         ok: false,
@@ -765,10 +919,8 @@ export async function POST(req: NextRequest) {
       const write = (data: object) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       try {
-        const paidExecution = await executePaidInference({
-          db,
-          authorize: async () => paidAuthorization,
-          dispatch: () => courseFactory(
+        const runFactory = () =>
+          courseFactory(
             {
             title,
             topic,
@@ -794,10 +946,17 @@ export async function POST(req: NextRequest) {
             },
             (stage, message, progress) =>
               write({ stage: toPipelineStage(stage), message, progress }),
-          ),
-        });
-        if (!paidExecution.value) throw new Error('Paid generation completed without a result');
-        const result = paidExecution.value;
+          );
+        const result = creditOwner.operator
+          ? await runFactory()
+          : (
+              await executePaidInference({
+                db,
+                authorize: async () => paidAuthorization!,
+                dispatch: runFactory,
+              })
+            ).value;
+        if (!result) throw new Error('Course generation completed without a result');
 
         let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
           null;

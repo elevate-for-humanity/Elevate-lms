@@ -30,6 +30,13 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
 
     const db = await requireAdminClient();
 
+    try {
+      const {tickParisCodeRepairs}=await import('@/lib/ai/runtime/code-repair');
+      const repair=await tickParisCodeRepairs();
+      checks.push(`paris_code_repair_enabled:${repair.enabled}`);
+      if(repair.dispatched)actions.push(`paris_code_repair_dispatched:${repair.dispatched}`);
+    } catch { errors.push('paris_code_repair_tick_failed'); }
+
     const now = new Date();
     const inThreeDays = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
 

@@ -16,6 +16,7 @@ on:
       - 'lib/course-builder/**'
       - 'supabase/migrations/**'
       - 'scripts/audit-course-builder-procurement.mjs'
+      - 'scripts/check-studio-architecture.mjs'
       - '.github/workflows/course-builder-procurement-gate.yml'
   pull_request:
     paths:
@@ -31,6 +32,8 @@ on:
       - 'lib/course-builder/**'
       - 'supabase/migrations/**'
       - 'scripts/audit-course-builder-procurement.mjs'
+      - 'scripts/check-studio-architecture.mjs'
+      - '.github/workflows/course-builder-procurement-gate.yml'
 
 permissions:
   contents: read

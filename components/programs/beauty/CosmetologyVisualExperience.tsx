@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
@@ -7,14 +8,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 const slides = [
   {
-    src: '/images/partners/generations-hair/dimensional-color.webp',
+    src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
     alt: 'Dimensional color work created at Generations Hair LLC',
     title: 'Build salon-ready technique',
     copy: 'Practice texture, finishing, client consultation, and professional service inside a supervised salon environment.',
   },
   {
-    src: '/images/partners/generations-hair/extensions.webp',
-    alt: 'Professional extension work by Generations Hair Co',
+    src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
+    alt: 'Generations Hair stylist working with a client',
     title: 'Develop creative color confidence',
     copy: 'Connect classroom theory to color formulation, application, safety, and finished results.',
   },
@@ -25,8 +26,8 @@ const slides = [
     copy: 'Strengthen workplace habits, client care, time management, and documented on-the-job learning.',
   },
   {
-    src: '/images/partners/generations-hair/look-book.webp',
-    alt: 'Professional cosmetology look book by Generations Hair Co',
+    src: '/images/partners/generations-hair/dimensional-color-before-enhanced-2026.webp',
+    alt: 'Generations Hair client before color service',
     title: 'Work toward a professional standard',
     copy: 'See the range of technical outcomes apprentices build toward through structured practice and coaching.',
   },
@@ -34,17 +35,17 @@ const slides = [
 
 const supportingImages = [
   {
-    src: '/images/partners/generations-hair/cutting.webp',
-    alt: 'Professional haircut portfolio by Generations Hair Co',
+    src: '/images/partners/generations-hair/premium-curls.jpg',
+    alt: 'Finished curls by Generations Hair',
     label: 'Texture & finishing',
   },
   {
-    src: '/images/partners/generations-hair/brunettes.webp',
-    alt: 'Brunette color portfolio by Generations Hair Co',
+    src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
+    alt: 'Finished dimensional color by Generations Hair',
     label: 'Color formulation',
   },
   {
-    src: '/images/partners/generations-hair/color-transformation.webp',
+    src: '/images/partners/generations-hair/dimensional-color-before-enhanced-2026.webp',
     alt: 'Dimensional color transformation by Generations Hair LLC',
     label: 'Styling & client service',
   },
@@ -71,40 +72,39 @@ export default function CosmetologyVisualExperience() {
         aria-roledescription="carousel"
         aria-label="Cosmetology apprenticeship experience"
         data-scroll-narration
-        data-narration="The cosmetology apprenticeship combines related instruction with supervised salon training. Apply and complete intake, confirm funding or a payment option, secure an approved host salon, complete orientation, then track hours and competencies in your portal. Apprentices learn sanitation, client consultation, hair cutting, texture, color, styling, professional service, and workplace habits. Host-site availability, wages, funding, registration, and licensing are confirmed for each participant and are not guaranteed by an application."
-        data-narration-src="/audio/heroes/cosmetology.mp3"
+        data-narration="The cosmetology apprenticeship combines related instruction with supervised salon training. Apply and complete intake, confirm self-pay tuition and a payment option, secure an approved host salon, complete orientation, then track hours and competencies in your portal. Apprentices learn sanitation, client consultation, hair cutting, texture, color, styling, professional service, and workplace habits. Host-site availability, wages, registration, and licensing are confirmed for each participant and are not guaranteed by an application."
         data-narration-rate="0.84"
         data-narration-style="instructor"
       >
         <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
-          <div className="flex items-center px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+          <div className="order-2 flex items-center px-5 py-7 lg:order-1 sm:px-8 sm:py-8 lg:px-8 lg:py-10">
             <div className="max-w-2xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">
                 Cosmetology apprenticeship pathway
               </p>
-              <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight sm:text-5xl lg:text-6xl">
-                Earn your Indiana cosmetology license while getting paid.
-              </h1>
+              <h2 className="mt-4 text-2xl font-black leading-tight tracking-tight sm:text-3xl">
+                Build skills in a real salon.
+              </h2>
               <p className="mt-5 max-w-2xl text-lg font-semibold leading-8 text-slate-700">
                 {slide.title}. {slide.copy}
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/apply/student?program=cosmetology-apprenticeship"
+                  href="/programs/cosmetology-apprenticeship/apply"
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
                 >
-                  Enroll now <ArrowRight className="h-5 w-5" />
+                  Start an application <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
-                  href="/partners/host-shops"
+                  href="/partners/host-shop/apply?program=cosmetology"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-900 hover:bg-sky-50"
                 >
-                  View all Host Sites
+                  Apply as a Host Salon
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-700">
                 {[
-                  '2,000 supervised hours',
+                  '2,000–2,500-hour hybrid term + 154 RTI hours',
                   'Paid on-the-job learning',
                   'Progress tracked in your portal',
                 ].map((item) => (
@@ -116,9 +116,9 @@ export default function CosmetologyVisualExperience() {
               </div>
             </div>
           </div>
-          <div className="relative min-h-[430px] bg-white sm:min-h-[560px] lg:min-h-[680px]">
+          <div className="order-1 relative aspect-[16/10] max-h-[320px] bg-white lg:order-2">
             {slides.map((item, index) => (
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 key={item.src}
                 src={item.src}
                 alt={index === active ? item.alt : ''}
@@ -188,7 +188,7 @@ export default function CosmetologyVisualExperience() {
                     alt={item.alt}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                    className="object-contain transition duration-700 group-hover:scale-[1.03]"
                   />
                 </div>
                 <figcaption className="px-5 py-4 text-lg font-black text-slate-950">

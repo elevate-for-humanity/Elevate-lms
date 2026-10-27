@@ -68,9 +68,9 @@ export function pendingFundingFollowupHtml(params: {
 
   const html = wrap(`
     <h2 style="margin-top:0;color:#111">Hi ${firstName},</h2>
-    <p>You applied for <strong>${programName}</strong> and selected WIOA / Workforce Ready Grant funding — great choice. Most eligible students pay <strong>$0 in tuition</strong>.</p>
+    <p>You applied for <strong>${programName}</strong> and selected a workforce-funding pathway. Funding is not guaranteed; the selected program and participant must meet the applicable requirements and the responsible agency must authorize payment in writing.</p>
     ${urgency}
-    <p>To unlock your funding, you need to complete one step: <strong>visit your local WorkOne / Indiana Career Connect office</strong>. They confirm your eligibility and authorize the funding directly to us.</p>
+    <p>Your next step is to follow the instructions for the funding source shown in your application. The responsible agency—not Elevate's website—determines eligibility and authorization. Do not assume tuition is covered until written authorization is received.</p>
 
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:24px 0">
       <p style="margin:0 0 8px;font-weight:bold;color:#166534">What to do next:</p>

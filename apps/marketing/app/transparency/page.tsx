@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -58,7 +59,7 @@ export default function TransparencyPage() {
 
       {/* Hero */}
       <section className="relative h-72 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/transparency-page-1.webp"
           alt="Transparency"
           fill

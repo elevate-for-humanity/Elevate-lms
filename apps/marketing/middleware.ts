@@ -1,11 +1,12 @@
-import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
+import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 import {
   rewriteCustomDomainRequest,
   rewriteTenantAppHostRequest,
   tenantSlugFromAppHost,
 } from '@/lib/tenant/middleware-tenant-routing';
-import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+import { ADMIN_HOST, LMS_HOST, MARKETING_HOST, getPortalKeyFromPath, PORTAL_MAP } from '@/lib/routing/portal-map';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -14,6 +15,8 @@ const PROTECTED_PORTAL_PREFIXES = [
   '/case-manager',
   '/workforce-board',
   '/provider',
+  '/tax-software/self-file',
+  '/tax-software/office',
 ] as const;
 
 // Competency forms are operational apprenticeship records. They used to be
@@ -37,11 +40,12 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
   'testing.elevateforhumanity.org',
 ]);
 
-const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app'] as const;
+const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
-  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health',
+  '/privacy', '/terms-of-service', '/security-and-data-protection',
+  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/version', '/api/ping', '/api/health', '/api/ready',
 ] as const;
 
 function isProtectedPortal(pathname: string) {
@@ -60,9 +64,27 @@ function cookieOptions(name: string, options: Record<string, unknown> | undefine
   };
 }
 
+function normalizeHost(value: string | null | undefined) {
+  return (value || '').split(',')[0].trim().split(':')[0].toLowerCase();
+}
+
 function requestHost(req: NextRequest) {
-  const forwarded = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
-  return (forwarded || req.headers.get('host') || '').split(':')[0].toLowerCase();
+  const direct = normalizeHost(req.headers.get('host'));
+  const forwarded = normalizeHost(req.headers.get('x-forwarded-host'));
+
+  // Prefer an explicitly recognized Elevate public host from either header.
+  // Enterprise proxies and multi-hop CDNs can rewrite X-Forwarded-Host; treating
+  // that rewritten value as a customer custom domain can incorrectly send a
+  // normal www request through tenant routing and produce intermittent 404s.
+  if (ELEVATE_PUBLIC_HOSTS.has(direct)) return direct;
+  if (ELEVATE_PUBLIC_HOSTS.has(forwarded)) return forwarded;
+
+  // Northflank/deployment hosts remain operational surfaces and should not be
+  // mistaken for tenant custom domains when a proxy supplies both headers.
+  if (isDeploymentHost(direct)) return direct;
+  if (isDeploymentHost(forwarded)) return forwarded;
+
+  return forwarded || direct;
 }
 
 function isStaticRequest(pathname: string) {
@@ -71,6 +93,7 @@ function isStaticRequest(pathname: string) {
 
 function isCustomTenantHost(host: string) {
   if (!host || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (isDeploymentHost(host)) return false;
   if (ELEVATE_PUBLIC_HOSTS.has(host)) return false;
   if (host.endsWith('.elevateforhumanity.org')) return false;
   return true;
@@ -101,24 +124,53 @@ function isStoreRuntimeAllowed(pathname: string): boolean {
 }
 
 function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextResponse | null {
-  if (process.env.STORE_ONLY_RUNTIME !== 'true') return null;
+  if (getPublicRuntimeService() !== 'store') return null;
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/store';
     return NextResponse.redirect(url, 307);
   }
-  if (isStoreRuntimeAllowed(pathname)) return NextResponse.next();
+  // Provider callbacks must reach Store's verified handlers without a Marketing hop.
+  const commerceCallbacks = ['/api/webhooks/paypal-billing', '/api/webhooks/quickbooks'];
+  // The cart uses this authenticated billing endpoint for individual apps.
+  if (commerceCallbacks.includes(pathname) || pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
   return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
 }
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
-  if (isStaticRequest(pathname)) return NextResponse.next();
+  // Infrastructure probes use internal hosts as well as public domains. These
+  // exact service endpoints must never enter tenant, auth or canonical routing.
+  if (['/api/ping', '/api/ready', '/api/health'].includes(pathname)) {
+    const response = NextResponse.next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
+  }
+  if (isStaticRequest(pathname) && !isProtectedPortal(pathname) && !getPortalKeyFromPath(pathname) && !pathname.startsWith('/admin/') && !pathname.startsWith('/cosmetology-host-shop/')) return NextResponse.next();
 
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
   if (storeRuntimeResponse) return storeRuntimeResponse;
 
+  // Redirect unauthenticated entry at the edge: do not rely on a page render
+  // or client navigation to return the canonical login redirect status.
+  if (pathname === '/login' && getPublicRuntimeService() !== 'store') {
+    const target = new URL('/login', 'https://app.elevateforhumanity.org');
+    for (const key of ['next', 'redirect', 'reason']) {
+      const value = req.nextUrl.searchParams.get(key);
+      if (value) target.searchParams.set(key, value);
+    }
+    return NextResponse.redirect(target, 307);
+  }
+
   const host = requestHost(req);
+
+  // Marketing links to the existing Store application; it does not serve a
+  // second public storefront. Keep mutation callbacks on their existing URLs.
+  const marketingStoreHost = ['www.elevateforhumanity.org', 'elevateforhumanity.org'].includes(host) || host.endsWith('.run.app');
+  if (marketingStoreHost && ['GET', 'HEAD'].includes(req.method) && (pathname === '/store' || pathname.startsWith('/store/'))) {
+    return NextResponse.redirect(new URL(pathname + search, 'https://store.elevateforhumanity.org'), 307);
+  }
 
   if (host === 'elevateforhumanity.org') {
     return NextResponse.redirect(
@@ -138,13 +190,47 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
+  const legacyStudentPaths: Record<string, string> = {
+    '/student': '/lms/dashboard',
+    '/student-portal': '/lms/dashboard',
+    '/student/dashboard': '/lms/dashboard',
+    '/student/login': '/login',
+  };
+  const studentDestination = legacyStudentPaths[pathname];
+  if (studentDestination) {
+    const destination = new URL(studentDestination, LMS_HOST);
+    destination.search = search;
+    const response = NextResponse.redirect(destination, 307);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
+  }
+
+  // Operational portal URLs on www must never render marketing catch-all
+  // pages. Resolve ownership from the same registry used by portal links.
+  const portalKey = getPortalKeyFromPath(pathname);
+  const portal = portalKey ? PORTAL_MAP[portalKey] : null;
+  const legacyAdmin = pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/dashboard' || pathname.startsWith('/dashboard/') || pathname === '/studio' || pathname.startsWith('/studio/');
+  const legacyHostShop = pathname === '/cosmetology-host-shop' || pathname.startsWith('/cosmetology-host-shop/');
+  if ((portal && portal.subdomain !== 'marketing') || legacyAdmin || legacyHostShop) {
+    const destination = new URL(
+      legacyHostShop ? pathname.replace('/cosmetology-host-shop', '/host-shop') : pathname,
+      legacyAdmin ? ADMIN_HOST : portal?.host || LMS_HOST,
+    );
+    destination.search = search;
+    const response = NextResponse.redirect(destination, 307);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
+  }
+
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
   // Build and provider URLs are operational deployment surfaces, not public
   // websites or customer custom domains. Keep them usable for health checks
   // while preventing search engines from indexing a second copy of Marketing.
-  if (isDeploymentHost(host)) {
+  if (isDeploymentHost(host) && !isProtectedPortal(pathname)) {
     return deploymentHostResponse(pathname, search, requestHeaders);
   }
 
@@ -162,9 +248,24 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
+  const loginRedirect = () => {
+    const taxWorkspace = pathname === '/tax-software/self-file' || pathname.startsWith('/tax-software/self-file/') || pathname === '/tax-software/office' || pathname.startsWith('/tax-software/office/');
+    const loginUrl = taxWorkspace
+      ? new URL('/tax-software/login', MARKETING_HOST)
+      : new URL('/login', LMS_HOST);
+    loginUrl.searchParams.set('redirect', taxWorkspace ? `${pathname}${search}` : `${MARKETING_HOST}${pathname}${search}`);
+    const result = NextResponse.redirect(loginUrl);
+    result.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    result.headers.set('Vary', 'Cookie');
+    result.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return result;
+  };
+  if (!hasSupabaseAuthCookie(req)) return loginRedirect();
+
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
     cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+    requestHeaders.set('cookie', req.cookies.toString());
     response = NextResponse.next({ request: { headers: requestHeaders } });
     cookiesToSet.forEach(({ name, value, options }) => {
       response.cookies.set(name, value, cookieOptions(name, options as Record<string, unknown>) as any);
@@ -173,12 +274,13 @@ export async function middleware(req: NextRequest) {
 
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) {
-    const loginUrl = new URL('/login', LMS_HOST);
-    loginUrl.searchParams.set('redirect', `${MARKETING_HOST}${pathname}${search}`);
-    return NextResponse.redirect(loginUrl);
+    const redirect = loginRedirect();
+    for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+    return redirect;
   }
 
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   response.cookies.set('__efh_pathname', `${pathname}${search}`, {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
@@ -189,4 +291,4 @@ export async function middleware(req: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'] };
+export const config = { runtime: 'nodejs', matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'] };

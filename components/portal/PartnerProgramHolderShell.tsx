@@ -36,7 +36,7 @@ interface NavItem {
   section: string;
 }
 
-const PH = ['program_holder', 'admin', 'staff', 'org_admin'];
+const PH = ['program_holder', 'site_coordinator', 'admin', 'staff', 'org_admin'];
 const PA = ['partner', 'admin', 'staff', 'org_admin'];
 
 const NAV: NavItem[] = [
@@ -223,7 +223,7 @@ function PortalNav({
                   key={item.href}
                   href={item.href}
                   onClick={onNavigate}
-                  className={`mb-0.5 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`mb-0.5 flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                     active
                       ? 'bg-brand-blue-50 text-brand-blue-700'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -276,7 +276,11 @@ export function PartnerProgramHolderShell({
     : visibleNav;
 
   const isPartner = role === 'partner';
-  const portalName = isPartner ? 'Host Site Portal' : 'Program Holder Portal';
+  const portalName = isPartner
+    ? 'Host Site Portal'
+    : role === 'site_coordinator'
+      ? 'Site Coordinator Portal'
+      : 'Program Holder Portal';
   const homeHref = isPartner ? '/partner/dashboard' : '/program-holder/dashboard';
 
   return (
@@ -294,7 +298,7 @@ export function PartnerProgramHolderShell({
           <button
             type="button"
             onClick={() => setMobileOpen((value) => !value)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-slate-500 hover:bg-slate-100"
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
           >

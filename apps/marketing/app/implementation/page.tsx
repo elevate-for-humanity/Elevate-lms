@@ -1,16 +1,42 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Calendar, Users, Settings, Rocket, CheckCircle, Clock,
-  FileText, Video, MessageCircle, Phone, Mail, ArrowRight,
-  Target, Award, BarChart3, GraduationCap, HeartHandshake
+import {
+  Calendar,
+  Users,
+  Settings,
+  Rocket,
+  CheckCircle,
+  Clock,
+  FileText,
+  Video,
+  MessageCircle,
+  Phone,
+  Mail,
+  ArrowRight,
+  Target,
+  Award,
+  BarChart3,
+  GraduationCap,
+  HeartHandshake,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Implementation & Onboarding',
-  keywords: ["implementation", "onboarding", "setup", "training", "support", "launch"],
-  description: 'What happens after you purchase? Our implementation plan gets you up and running in weeks, not months.',
+  keywords: ['implementation', 'onboarding', 'setup', 'training', 'support', 'launch'],
+  description:
+    'What happens after you purchase? Our implementation plan gets you up and running in weeks, not months.',
+
+  ...publicArtworkMetadata({
+    path: '/implementation',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative team planning a software implementation',
+    title: 'Implementation & Onboarding',
+    description:
+      'What happens after you purchase? Our implementation plan gets you up and running in weeks, not months.',
+  }),
 };
 
 const timeline = [
@@ -18,58 +44,61 @@ const timeline = [
     phase: 'Day 1',
     title: 'Account Setup',
     duration: 'Day 1',
-    description: 'Your dedicated implementation manager creates your account and configures your organization settings.',
+    description:
+      'Your dedicated implementation manager creates your account and configures your organization settings.',
     tasks: [
       'Account creation and verification',
       'Organization profile setup',
       'Admin user account creation',
       'Initial configuration review',
-      'Kickoff call with your team'
+      'Kickoff call with your team',
     ],
     deliverables: [
       'Production environment access',
       'Admin credentials',
       'Implementation playbook',
-      'Kickoff meeting notes'
-    ]
+      'Kickoff meeting notes',
+    ],
   },
   {
     phase: 'Week 1',
     title: 'Configuration',
     duration: 'Days 2-7',
-    description: 'We configure the platform to match your programs, workflows, and branding requirements.',
+    description:
+      'We configure the platform to match your programs, workflows, and branding requirements.',
     tasks: [
       'Custom branding application',
       'Program structure setup',
       'User role configuration',
       'Integration setup (if applicable)',
-      'Data migration planning'
+      'Data migration planning',
     ],
     deliverables: [
       'Branded platform environment',
       'Configured programs/courses',
       'User permission structure',
-      'Integration documentation'
-    ]
+      'Integration documentation',
+    ],
   },
   {
     phase: 'Week 2',
     title: 'Staff Onboarding',
     duration: 'Days 8-14',
-    description: 'Your staff learns the platform through guided training sessions and hands-on exercises.',
+    description:
+      'Your staff learns the platform through guided training sessions and hands-on exercises.',
     tasks: [
       'Admin training session',
       'Staff training sessions',
       'Workflow configuration',
       'Test data entry',
-      'Support escalation training'
+      'Support escalation training',
     ],
     deliverables: [
       'Trained administrators',
       'Trained staff members',
       'Configured workflows',
-      'Test environment validated'
-    ]
+      'Test environment validated',
+    ],
   },
   {
     phase: 'Week 3',
@@ -81,14 +110,14 @@ const timeline = [
       'Data migration execution',
       'Student import (if applicable)',
       'Communication template setup',
-      'Launch checklist completion'
+      'Launch checklist completion',
     ],
     deliverables: [
       'UAT sign-off',
       'Migrated data verified',
       'Student accounts created',
-      'Go/No-Go decision'
-    ]
+      'Go/No-Go decision',
+    ],
   },
   {
     phase: 'Week 4',
@@ -100,15 +129,15 @@ const timeline = [
       'Real-time monitoring',
       'Issue resolution',
       'Student enrollment opening',
-      'Initial support triage'
+      'Initial support triage',
     ],
     deliverables: [
       'Live production environment',
       'Active student enrollment',
       'Support access confirmed',
-      'Launch success metrics'
-    ]
-  }
+      'Launch success metrics',
+    ],
+  },
 ];
 
 const inclusions = [
@@ -120,8 +149,8 @@ const inclusions = [
       'Staff training (up to 20 users)',
       'Training video library access',
       'Step-by-step documentation',
-      'Best practices guides'
-    ]
+      'Best practices guides',
+    ],
   },
   {
     category: 'Support',
@@ -131,8 +160,8 @@ const inclusions = [
       'Priority support during launch',
       'Weekly check-in calls',
       'Email support',
-      'Chat support'
-    ]
+      'Chat support',
+    ],
   },
   {
     category: 'Technical',
@@ -142,8 +171,8 @@ const inclusions = [
       'Data migration assistance',
       'API integration support',
       'Single Sign-On setup',
-      'Custom workflow configuration'
-    ]
+      'Custom workflow configuration',
+    ],
   },
   {
     category: 'Resources',
@@ -153,19 +182,25 @@ const inclusions = [
       'Admin user manual',
       'Quick start guides',
       'Video tutorials',
-      'FAQ documentation'
-    ]
-  }
+      'FAQ documentation',
+    ],
+  },
 ];
 
 export default function ImplementationPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative team planning a software implementation"
+        actions={[
+          { href: '/contact', label: 'Plan an implementation' },
+          { href: '/store/plans', label: 'Compare platform plans' },
+        ]}
+      />
+
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <Image src="/images/alina-smith.jpg" alt="Implementation planning - Elevate for Humanity workforce platform" fill className="object-cover" sizes="100vw" />
-        </div>
+      <section className="relative bg-slate-950 text-white py-8 sm:py-10 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -176,14 +211,20 @@ export default function ImplementationPage() {
               Implementation & Onboarding
             </h1>
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              You asked "What happens after we pay?" — here's the answer. 
-              Our proven implementation process gets you live in 4 weeks with full training and support included.
+              You asked "What happens after we pay?" — here's the answer. Our proven implementation
+              process gets you live in 4 weeks with full training and support included.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/contact"
+                className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 Start Implementation <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <Link href="/demos" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/demos"
+                className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 See Platform Demo
               </Link>
             </div>
@@ -198,15 +239,13 @@ export default function ImplementationPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               Your Journey to Launch
             </h2>
-            <p className="text-xl text-slate-600">
-              From purchase to production in 4 weeks
-            </p>
+            <p className="text-xl text-slate-600">From purchase to production in 4 weeks</p>
           </div>
 
           <div className="relative">
             {/* Timeline Line */}
             <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-brand-blue-200 -translate-y-1/2" />
-            
+
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-8">
               {timeline.map((item, index) => (
                 <div key={index} className="relative">
@@ -215,7 +254,9 @@ export default function ImplementationPage() {
                       {index + 1}
                     </div>
                     <div className="text-center">
-                      <p className="text-xs text-brand-blue-600 font-medium uppercase tracking-wide mb-1">{item.phase}</p>
+                      <p className="text-xs text-brand-blue-600 font-medium uppercase tracking-wide mb-1">
+                        {item.phase}
+                      </p>
                       <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
                       <p className="text-sm text-slate-600">{item.duration}</p>
                     </div>
@@ -243,7 +284,7 @@ export default function ImplementationPage() {
                 {index < timeline.length - 1 && (
                   <div className="absolute left-8 top-24 bottom-0 w-0.5 bg-brand-blue-200 hidden md:block" />
                 )}
-                
+
                 <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
                   <div className="bg-brand-blue-600 text-white p-6">
                     <div className="flex items-center justify-between">
@@ -257,10 +298,10 @@ export default function ImplementationPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="p-6">
                     <p className="text-slate-600 mb-6">{phase.description}</p>
-                    
+
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
                         <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
@@ -278,7 +319,7 @@ export default function ImplementationPage() {
                           ))}
                         </ul>
                       </div>
-                      
+
                       <div>
                         <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
                           <Award className="w-5 h-5 text-brand-blue-600" />
@@ -306,9 +347,7 @@ export default function ImplementationPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              What's Included
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">What's Included</h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Every implementation includes comprehensive training, support, and resources.
             </p>
@@ -344,8 +383,8 @@ export default function ImplementationPage() {
                 Support Process
               </h2>
               <p className="text-lg text-slate-700 leading-relaxed mb-8">
-                From your first login to ongoing operations, our support team is here to help 
-                you succeed. Here's how you can reach us.
+                From your first login to ongoing operations, our support team is here to help you
+                succeed. Here's how you can reach us.
               </p>
 
               <div className="space-y-6">
@@ -405,7 +444,7 @@ export default function ImplementationPage() {
 
             <div className="bg-white rounded-2xl p-8 shadow-xl">
               <h3 className="text-xl font-bold text-slate-900 mb-6">Your Implementation Team</h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
                   <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center">
@@ -464,9 +503,7 @@ export default function ImplementationPage() {
       <section className="py-20 bg-brand-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Training Included
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Training Included</h2>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto">
               We don't just hand you a platform — we make sure your team knows how to use it.
             </p>
@@ -513,10 +550,16 @@ export default function ImplementationPage() {
             Schedule a call with our implementation team to discuss your timeline and requirements.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Schedule Implementation Call <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/demos" className="inline-flex items-center border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/demos"
+              className="inline-flex items-center border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               View Demo First
             </Link>
           </div>

@@ -3,29 +3,40 @@ import { apiRequireRoles } from '@/lib/admin/guards';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
+  createPortalPreviewHandoff,
   readPortalPreviewHandoffTarget,
   verifyPortalPreviewHandoff,
 } from '@/lib/admin/portal-preview-handoff';
 import { HOST_SHOP_PREVIEW_SESSION_COOKIE } from '@/lib/admin/host-shop-preview';
+import {
+  PORTAL_PREVIEW_ACTOR_COOKIE,
+  PORTAL_PREVIEW_COOKIE,
+  PORTAL_PREVIEW_SESSION_COOKIE,
+} from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
+const APP_ORIGIN = (
+  process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org'
+).replace(/\/$/, '');
 
-export async function GET(request: NextRequest) {
-  const handoffToken = request.nextUrl.searchParams.get('handoff')?.trim() || '';
+async function selectHostShop(request: NextRequest, postedHandoff = '') {
+  const handoffToken = postedHandoff || request.nextUrl.searchParams.get('handoff')?.trim() || '';
   const handoff = verifyPortalPreviewHandoff(handoffToken);
-  const actor = handoff ? null : await apiRequireRoles(request, ['admin', 'super_admin', 'org_admin'], { adminOverride: true });
+  const actor = handoff
+    ? null
+    : await apiRequireRoles(request, ['admin', 'super_admin', 'org_admin'], {
+        adminOverride: true,
+      });
   if (actor?.error) return actor.error;
 
   // Deployments can temporarily expose Admin and LMS to different signing
   // secrets. A currently authenticated app administrator may still recover
   // the unexpired routing target; authorization comes from their live session,
   // not from the unverified token payload.
-  const authenticatedAdminTarget = !handoff && actor
-    ? readPortalPreviewHandoffTarget(handoffToken)
-    : null;
+  const authenticatedAdminTarget =
+    !handoff && actor ? readPortalPreviewHandoffTarget(handoffToken) : null;
 
   const shopId = request.nextUrl.searchParams.get('shop_id')?.trim();
   const requestedPartnerId = request.nextUrl.searchParams.get('partner_id')?.trim();
@@ -36,8 +47,15 @@ export async function GET(request: NextRequest) {
 
   const db = await requireAdminClient();
   if (handoff) {
-    const { data: handoffActor } = await db.from('profiles').select('id,role').eq('id', handoff.actorId).maybeSingle();
-    if (!handoffActor?.id || !['admin', 'super_admin', 'org_admin'].includes(String(handoffActor.role || ''))) {
+    const { data: handoffActor } = await db
+      .from('profiles')
+      .select('id,role')
+      .eq('id', handoff.actorId)
+      .maybeSingle();
+    if (
+      !handoffActor?.id ||
+      !['admin', 'super_admin', 'org_admin'].includes(String(handoffActor.role || ''))
+    ) {
       return NextResponse.json({ error: 'Invalid Host Shop handoff' }, { status: 403 });
     }
   }
@@ -58,7 +76,9 @@ export async function GET(request: NextRequest) {
 
   const { data: partner, error: partnerError } = await db
     .from('partners')
-    .select('id, status, approval_status, verification_status, is_active, partner_type, program_type, programs')
+    .select(
+      'id, status, approval_status, verification_status, is_active, partner_type, program_type, programs',
+    )
     .eq('id', partnerId)
     .maybeSingle();
 
@@ -71,22 +91,34 @@ export async function GET(request: NextRequest) {
     .join(' ')
     .toLowerCase();
 
-  const canOpen =
+  const canInspect =
     !partnerError &&
     Boolean(partner?.id) &&
     partner?.status === 'active' &&
-    partner?.approval_status === 'approved' &&
     partner?.is_active !== false &&
     /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(typeText);
 
-  if (!canOpen) {
+  if (!canInspect) {
     return NextResponse.json(
-      { error: 'This Host Shop is not yet connected to an active approved partnership record' },
+      { error: 'This Host Shop is not connected to an active partnership record' },
       { status: 409 },
     );
   }
 
-  const response = NextResponse.redirect(new URL('/host-shop/dashboard', APP_ORIGIN));
+  const { data: previewMember } = await db
+    .from('partner_users')
+    .select('user_id')
+    .eq('partner_id', partnerId)
+    .eq('status', 'active')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const previewUserId = previewMember?.user_id || '';
+  const previewActorId = handoff?.actorId || actor?.id || '';
+
+  const destination =
+    partner?.approval_status === 'approved' ? '/host-shop/dashboard' : '/host-shop/onboarding';
+  const response = NextResponse.redirect(new URL(destination, APP_ORIGIN));
   response.cookies.set(HOST_SHOP_ADMIN_COOKIE, partnerId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -95,9 +127,32 @@ export async function GET(request: NextRequest) {
     maxAge: 60 * 60,
   });
   if (handoff) {
+    response.cookies.set(HOST_SHOP_PREVIEW_SESSION_COOKIE, handoffToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
+    });
+  }
+  if (previewActorId && previewUserId) {
+    response.cookies.set(PORTAL_PREVIEW_COOKIE, previewUserId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
+    });
+    response.cookies.set(PORTAL_PREVIEW_ACTOR_COOKIE, previewActorId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
+    });
     response.cookies.set(
-      HOST_SHOP_PREVIEW_SESSION_COOKIE,
-      request.nextUrl.searchParams.get('handoff') || '',
+      PORTAL_PREVIEW_SESSION_COOKIE,
+      createPortalPreviewHandoff(previewActorId, previewUserId, 60 * 60 * 1000),
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -108,4 +163,17 @@ export async function GET(request: NextRequest) {
     );
   }
   return response;
+}
+
+export async function POST(request: NextRequest) {
+  const contentType = request.headers.get('content-type') || '';
+  const handoffToken = contentType.includes('application/json')
+    ? String((await request.json().catch(() => null))?.handoff || '').trim()
+    : String((await request.formData().catch(() => null))?.get('handoff') || '').trim();
+  if (!handoffToken) return NextResponse.json({ error: 'handoff is required' }, { status: 400 });
+  return selectHostShop(request, handoffToken);
+}
+
+export async function GET(request: NextRequest) {
+  return selectHostShop(request);
 }

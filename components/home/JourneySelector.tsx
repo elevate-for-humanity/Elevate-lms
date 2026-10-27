@@ -145,7 +145,7 @@ export function JourneySelector() {
 
                 {/* Audience badge */}
                 <div className="absolute top-4 right-4">
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
                     {option.audience.split(',')[0]}
                   </span>
                 </div>

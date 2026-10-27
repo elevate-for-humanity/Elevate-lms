@@ -8,6 +8,7 @@ import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/gener
 
 export interface CourseBuildJob {
   id: string;
+  user_id?: string | null;
   tool_args: FactoryInput;
   attempts: number;
   max_attempts: number;
@@ -24,10 +25,10 @@ const productionStageMap: Partial<Record<FactoryStage, { worker: string; state: 
   enrich: { worker: 'instructional_llm', state: 'planning' },
   assess: { worker: 'technical_verification', state: 'technical_review' },
   validate: { worker: 'technical_verification', state: 'technical_review' },
-  generating_assets: { worker: 'image', state: 'generating_assets' },
+  generating_assets: { worker: 'licensed_media', state: 'generating_assets' },
   generating_narration: { worker: 'narration', state: 'generating_narration' },
-  media: { worker: 'gpu_render', state: 'rendering' },
-  rendering: { worker: 'gpu_render', state: 'rendering' },
+  media: { worker: 'licensed_media_compositor', state: 'rendering' },
+  rendering: { worker: 'licensed_media_compositor', state: 'rendering' },
   quality_review: { worker: 'quality_control', state: 'quality_review' },
   human_review: { worker: 'publisher', state: 'human_review' },
   publish: { worker: 'publisher', state: 'human_review' },
@@ -138,6 +139,10 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     });
   } else {
     try {
+      // Course Builder is an authorized production workflow. Provider selection,
+      // metering, and quality controls belong to the individual generation/media
+      // components; the orchestrator itself must never stop on the legacy
+      // paid-inference approval gate.
       result = await courseFactory(job.tool_args, progress);
     } finally {
       clearInterval(heartbeat);

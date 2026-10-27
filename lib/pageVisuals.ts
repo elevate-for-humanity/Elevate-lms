@@ -124,7 +124,7 @@ export const cnaVisuals: PageVisualConfig = {
       id: 'cna-training-overview',
       title: 'What Your CNA Pathway Includes',
       bullets: [
-        'Core CNA training delivered through HSI / Choice Medical Institute.',
+        'Core CNA training is delivered through the currently approved training provider for the cohort.',
         'Healthcare safety and drug-free workplace modules to meet employer expectations.',
         'Soft skills, professionalism, and job readiness through Job Ready Indy and EFH modules.',
       ],

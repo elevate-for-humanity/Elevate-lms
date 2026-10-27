@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import Image from 'next/image';
+import ImageMetadata from './ImageMetadata';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -24,6 +25,7 @@ export interface HeroVideoProps {
   /** Presentation speed for the looping hero video. */
   videoPlaybackRate?: number;
   posterImage?: string;
+  posterAlt?: string;
   /** Exact first frame mounted beneath the video to prevent a poster/hydration flash. */
   mountedFrameImage?: string;
   voiceoverSrc?: string;
@@ -68,6 +70,7 @@ export default function HeroVideo({
   videoSrcMobile,
   videoPlaybackRate = 1,
   posterImage,
+  posterAlt,
   mountedFrameImage,
   voiceoverSrc,
   microLabel,
@@ -83,10 +86,9 @@ export default function HeroVideo({
   analyticsName,
   className = '',
   children,
-  mediaFit = 'cover',
+  mediaFit,
   mediaClassName = '',
-  heightClassName = 'h-[clamp(500px,72svh,820px)]',
-  overlayMode = 'default',
+  heightClassName = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]',
   soundButtonVariant = 'pill',
   showSoundControl = true,
   showTranscriptControl = true,
@@ -109,7 +111,9 @@ export default function HeroVideo({
   const sectionRef = useRef<HTMLElement>(null);
   const scrollNarrationAttemptedRef = useRef(false);
 
-  const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
+  // Preserve complete videos by default; photo-only callers can fill their frame.
+  const resolvedFit = mediaFit ?? (videoSrcDesktop || videoSrcMobile ? 'contain' : 'cover');
+  const mediaClass = resolvedFit === 'cover' ? 'object-cover' : 'object-contain';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
   const mobileSource = videoSrcMobile || videoSrcDesktop || '';
   const showVideo = Boolean(desktopSource) && !videoFailed && videoEnabled;
@@ -273,6 +277,12 @@ export default function HeroVideo({
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
+        {mountedFrameImage || posterImage ? (
+          <ImageMetadata
+            src={mountedFrameImage || posterImage || ''}
+            description={posterAlt || belowHeroHeadline || microLabel || 'Career training artwork'}
+          />
+        ) : null}
         {demoSlides?.length ? (
           demoSlides.map((slide, index) => (
             <Image
@@ -281,24 +291,24 @@ export default function HeroVideo({
               alt={slide.alt}
               fill
               priority={index < 2}
-              unoptimized
               sizes="100vw"
               aria-hidden={index !== demoActiveSlideIndex}
               className={`absolute inset-0 z-0 h-full w-full ${mediaClass} transform-gpu object-center transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${mediaClassName} ${slide.className || ''} ${
-                index === demoActiveSlideIndex ? 'scale-100 opacity-100' : 'scale-[1.015] opacity-0'
+                index === demoActiveSlideIndex ? 'opacity-100' : 'opacity-0'
               }`}
             />
           ))
         ) : mountedFrameImage || posterImage ? (
           <Image
             src={mountedFrameImage || posterImage || ''}
-            alt=""
+            alt={posterAlt || belowHeroHeadline || microLabel || 'Career training artwork'}
             fill
             priority
-            unoptimized
             sizes="100vw"
             className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center ${mediaClassName}`}
-            aria-hidden="true"
+            style={{
+              objectPosition: posterImage?.includes('/refresh-20261014/') ? 'center 30%' : 'center',
+            }}
           />
         ) : null}
 
@@ -343,12 +353,6 @@ export default function HeroVideo({
           </video>
         ) : null}
 
-        {overlayMode === 'default' ? (
-          <div className="absolute inset-0 z-20 bg-slate-950/55" aria-hidden="true" />
-        ) : overlayMode === 'soft' ? (
-          <div className="absolute inset-0 z-20 bg-slate-950/25" aria-hidden="true" />
-        ) : null}
-
         {voiceoverSrc ? (
           <audio
             ref={audioRef}
@@ -368,8 +372,26 @@ export default function HeroVideo({
           />
         ) : null}
 
+        {showSoundControl &&
+        ((voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo) ? (
+          <button
+            type="button"
+            onClick={() => void toggleSound()}
+            aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
+            className={`absolute right-4 z-40 inline-flex min-h-14 min-w-[10.5rem] touch-manipulation items-center justify-center gap-3 border-2 px-5 py-3 text-sm font-black text-white shadow-2xl transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
+              soundButtonVariant === 'prominent'
+                ? 'top-4 rounded-lg border-red-300 bg-brand-red-700 hover:bg-brand-red-800'
+                : 'bottom-4 rounded-full border-white/70 bg-slate-950/45 backdrop-blur-sm hover:bg-slate-950/70'
+            }`}
+          >
+            {muted ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
+            <span>{muted ? 'Turn sound on' : 'Turn sound off'}</span>
+          </button>
+        ) : null}
+      </section>
+      <div className="bg-slate-950 text-white">
         {hasHeroContent ? (
-          <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-9 pt-24 sm:px-8 sm:pb-12 lg:px-10 lg:pb-16">
+          <div className="relative mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
             <div className="max-w-4xl">
               {microLabel ? (
                 <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/95 sm:text-sm">
@@ -430,24 +452,7 @@ export default function HeroVideo({
             </div>
           </div>
         ) : null}
-
-        {showSoundControl &&
-        ((voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo) ? (
-          <button
-            type="button"
-            onClick={() => void toggleSound()}
-            aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
-            className={`absolute right-4 z-40 inline-flex min-h-14 min-w-[10.5rem] touch-manipulation items-center justify-center gap-3 border-2 px-5 py-3 text-sm font-black text-white shadow-2xl transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
-              soundButtonVariant === 'prominent'
-                ? 'top-4 rounded-lg border-red-300 bg-brand-red-700 hover:bg-brand-red-800'
-                : 'bottom-4 rounded-full border-white/70 bg-slate-950/45 backdrop-blur-sm hover:bg-slate-950/70'
-            }`}
-          >
-            {muted ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
-            <span>{muted ? 'Turn sound on' : 'Turn sound off'}</span>
-          </button>
-        ) : null}
-      </section>
+      </div>
 
       {transcript && showTranscriptControl ? (
         <div className="border-b border-slate-100 bg-slate-50">

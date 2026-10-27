@@ -47,9 +47,9 @@ export const PLATFORM_DEFAULTS = {
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL ?? `https://www.elevateforhumanity.org`,
   supportEmail:
-    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `support@elevateforhumanity.org`,
-  supportPhone:
-    process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? `(317) 314-3757`,
+    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `elevate4humanityedu@gmail.com`,
+  mainPhone: '(463) 240-1404' as string,
+  supportPhone: '(463) 240-1404' as string,
   emailFromName:
     process.env.NEXT_PUBLIC_EMAIL_FROM_NAME ?? `Elevate for Humanity`,
   emailFromAddress:
@@ -102,7 +102,8 @@ export const getPlatformConfig = cache(async (): Promise<PlatformConfig> => {
       orgLegalName: s['org_legal_name'] || PLATFORM_DEFAULTS.orgLegalName,
       siteUrl: s['site_url'] || PLATFORM_DEFAULTS.siteUrl,
       supportEmail: s['support_email'] || PLATFORM_DEFAULTS.supportEmail,
-      supportPhone: s['contact_phone'] || PLATFORM_DEFAULTS.supportPhone,
+      mainPhone: s['contact_phone'] || PLATFORM_DEFAULTS.mainPhone,
+      supportPhone: PLATFORM_DEFAULTS.supportPhone,
       emailFromName: s['email_from_name'] || PLATFORM_DEFAULTS.emailFromName,
       emailFromAddress: s['email_from_address'] || PLATFORM_DEFAULTS.emailFromAddress,
       certificateHolder: s['certificate_holder'] || PLATFORM_DEFAULTS.certificateHolder,

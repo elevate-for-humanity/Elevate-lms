@@ -48,12 +48,12 @@ describe('hasLmsAccess — program_enrollments', () => {
     expect(hasLmsAccess(makeEnrollment({ accessGrantedAt: '2025-01-01T00:00:00Z' }))).toBe(true);
   });
 
-  it('grants access when enrollment_state is active (backfill fallback)', () => {
-    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'active' }))).toBe(true);
+  it('denies access when active state lacks an explicit access grant', () => {
+    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'active' }))).toBe(false);
   });
 
-  it('grants access when enrollment_state is enrolled (backfill fallback)', () => {
-    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(true);
+  it('denies access when enrolled state lacks an explicit access grant', () => {
+    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(false);
   });
 
   it('denies access when enrollment is null', () => {
@@ -105,11 +105,11 @@ describe('hasLmsAccess — training_enrollments (legacy)', () => {
     }))).toBe(true);
   });
 
-  it('grants access when status is active', () => {
+  it('denies legacy active status without an explicit access grant', () => {
     expect(hasLmsAccess(makeEnrollment({
       source: 'training_enrollments',
       status: 'active',
-    }))).toBe(true);
+    }))).toBe(false);
   });
 
   it('denies access when status is pending and no access_granted_at', () => {
@@ -234,8 +234,8 @@ describe('full student LMS access path contract', () => {
     expect(layoutSrc).not.toContain('autoProvision');
   });
 
-  it('hasLmsAccess passes enrolled state without access_granted_at', () => {
-    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(true);
+  it('hasLmsAccess rejects enrolled state without access_granted_at', () => {
+    expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(false);
   });
 
   it('enforced enrollment validates eligibility before creating access records', () => {

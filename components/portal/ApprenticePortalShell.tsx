@@ -1,5 +1,7 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ApprenticeProgramGuide } from './ApprenticeProgramGuide';
 import {
   Scissors,
   Clock,
@@ -23,10 +25,7 @@ import {
 import { PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL } from '@/lib/barber/branding';
 import { RtiCourseCard } from '@/components/apprenticeship/RtiCourseCard';
 import type { RtiTrainingSummary } from '@/lib/apprenticeship/load-apprenticeship-dashboard';
-import {
-  BARBER_STUDENT_APP_HOME,
-  BARBER_STUDENT_APP_SHORT_LABEL,
-} from '@/lib/barber/student-app';
+import { BARBER_STUDENT_APP_HOME, BARBER_STUDENT_APP_SHORT_LABEL } from '@/lib/barber/student-app';
 import { BarberStudentAppDownload } from '@/components/portal/BarberStudentAppDownload';
 import { ApprenticeClockInStatus } from '@/components/portal/ApprenticeClockInStatus';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
@@ -48,6 +47,10 @@ export interface ApprenticePortalConfig {
   shopLabel: string;
   requiredOjl: number;
   requiredRti: number;
+  progressModel?: 'competency_based' | 'hybrid' | 'time_based';
+  competencyCount?: number;
+  maximumTermHours?: number;
+  probationHours?: number;
   portalPath: string; // canonical /apprentice route for this program
 }
 
@@ -60,20 +63,26 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     accentText: 'text-amber-600',
     heroImage: '/images/pages/barber-hero.webp',
     shopLabel: 'Barber Shop',
-    requiredOjl: 1500,
-    requiredRti: 500,
+    requiredOjl: 0,
+    requiredRti: 260,
+    progressModel: 'competency_based',
+    competencyCount: 14,
+    probationHours: 500,
     portalPath: '/apprentice?program=barber-apprenticeship',
   },
   'cosmetology-apprenticeship': {
     programSlug: 'cosmetology-apprenticeship',
-    label: 'Cosmetology Apprenticeship',
+    label: 'Hair Stylist / Cosmetology Apprenticeship',
     icon: Scissors,
     accentBg: 'bg-pink-500',
     accentText: 'text-pink-600',
     heroImage: '/images/pages/cosmetology-hero.webp',
     shopLabel: 'Salon',
-    requiredOjl: 1500,
-    requiredRti: 500,
+    requiredOjl: 2000,
+    requiredRti: 154,
+    progressModel: 'hybrid',
+    maximumTermHours: 2500,
+    probationHours: 500,
     portalPath: '/apprentice?program=cosmetology-apprenticeship',
   },
   'esthetician-apprenticeship': {
@@ -84,8 +93,11 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     accentText: 'text-rose-600',
     heroImage: '/images/beauty/esthetician.webp',
     shopLabel: 'Spa / Salon',
-    requiredOjl: 525,
-    requiredRti: 175,
+    requiredOjl: 0,
+    requiredRti: 300,
+    progressModel: 'competency_based',
+    competencyCount: 20,
+    probationHours: 500,
     portalPath: '/apprentice?program=esthetician-apprenticeship',
   },
   'nail-technician-apprenticeship': {
@@ -96,8 +108,11 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     accentText: 'text-fuchsia-600',
     heroImage: '/images/pages/nail-technician.webp',
     shopLabel: 'Nail Salon',
-    requiredOjl: 400,
-    requiredRti: 100,
+    requiredOjl: 0,
+    requiredRti: 210,
+    progressModel: 'competency_based',
+    competencyCount: 19,
+    probationHours: 500,
     portalPath: '/apprentice?program=nail-technician-apprenticeship',
   },
   'culinary-apprenticeship': {
@@ -112,7 +127,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     requiredRti: 500,
     portalPath: '/apprentice?program=culinary-apprenticeship',
   },
-  'electrical': {
+  electrical: {
     programSlug: 'electrical',
     label: 'Electrical Apprenticeship',
     icon: Zap,
@@ -124,7 +139,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     requiredRti: 1000,
     portalPath: '/apprentice?program=electrical',
   },
-  'plumbing': {
+  plumbing: {
     programSlug: 'plumbing',
     label: 'Plumbing Apprenticeship',
     icon: Droplets,
@@ -151,8 +166,6 @@ interface Props {
     id: string;
     enrollment_state: string;
     orientation_completed_at?: string | null;
-    stripe_subscription_id?: string | null;
-    stripe_subscription_status?: string | null;
   } | null;
   hours: { ojl: number; rti: number };
   docs: { document_type: string; status: string; verification_status: string }[];
@@ -184,16 +197,22 @@ export function ApprenticePortalShell({
   hoursRemainingDisplay,
   rti = null,
 }: Props) {
-  const ProgramIcon = config.icon as React.ComponentType<{className?: string}>;
+  const ProgramIcon = config.icon as React.ComponentType<{ className?: string }>;
 
   const requiredOjl = config.requiredOjl;
   const requiredRti = config.requiredRti;
+  const competencyBased = config.progressModel === 'competency_based';
+  const hybrid = config.progressModel === 'hybrid';
   const ojlPercent = requiredOjl > 0 ? Math.min((hours.ojl / requiredOjl) * 100, 100) : 0;
   const rtiPercent = requiredRti > 0 ? Math.min((hours.rti / requiredRti) * 100, 100) : 0;
   const totalHours = hours.ojl + hours.rti;
-  const totalRequired = requiredOjl + requiredRti;
-  const overallPercent = totalRequired > 0 ? Math.min((totalHours / totalRequired) * 100, 100) : 0;
-  const weeksComplete = Math.floor(totalHours / 40);
+  const totalRequired = competencyBased ? requiredRti : hybrid ? requiredOjl : requiredOjl + requiredRti;
+  const overallPercent = competencyBased
+    ? rtiPercent
+    : totalRequired > 0
+      ? Math.min(((hybrid ? hours.ojl : totalHours) / totalRequired) * 100, 100)
+      : 0;
+  const weeksComplete = Math.floor((hybrid ? hours.ojl : totalHours) / 40);
   const weeksTotal = Math.ceil(totalRequired / 40);
 
   const hasPhotoId = docs.some((d) => d.document_type === 'photo_id');
@@ -201,25 +220,31 @@ export function ApprenticePortalShell({
     (d) => d.document_type === 'proof_of_residency' || d.document_type === 'other',
   );
   const docsApproved =
-    docs.length > 0 && docs.every((d) => d.status === 'approved' || d.verification_status === 'verified');
-  const hasPaidEnrollment =
-    !!enrollment?.stripe_subscription_id || billing?.setupFeePaid || billing?.fullyPaid;
-  const subStatus =
-    enrollment?.stripe_subscription_status ?? billing?.paymentStatus ?? null;
+    docs.length > 0 &&
+    docs.every((d) => d.status === 'approved' || d.verification_status === 'verified');
+  const hasPaidEnrollment = Boolean(
+    billing?.setupFeePaid || billing?.fullyPaid || billing?.paymentStatus === 'active',
+  );
+  const subStatus = billing?.paymentStatus ?? null;
   const weeklyPaymentLabel =
     billing?.weeklyPaymentCents != null && billing.weeklyPaymentCents > 0
       ? (billing.weeklyPaymentCents / 100).toFixed(2)
       : '151.03';
   const needsPaymentMethod =
     !!enrollment &&
+    billing !== null &&
     !billing?.fullyPaid &&
     (subStatus === 'pending_payment_method' ||
       subStatus === 'past_due' ||
       subStatus === 'incomplete' ||
       subStatus === 'incomplete_expired' ||
-      (!enrollment.stripe_subscription_id && !billing?.setupFeePaid));
+      (!billing?.setupFeePaid && billing?.paymentStatus !== 'active'));
   const showPaymentSetupAlert =
-    !!enrollment && !billing?.fullyPaid && !enrollment.stripe_subscription_id && !billing?.setupFeePaid;
+    !!enrollment &&
+    billing !== null &&
+    !billing?.fullyPaid &&
+    !billing?.setupFeePaid &&
+    billing?.paymentStatus !== 'active';
   const transferCredit =
     transferHoursVerified != null && transferHoursVerified > 0
       ? transferHoursVerified
@@ -228,15 +253,11 @@ export function ApprenticePortalShell({
 
   const orientationHref = apprenticeshipOrientationPath(config.programSlug);
   const documentsHref = apprenticeshipDocumentsPath(config.programSlug);
-  const lmsCourseHref =
-    rti?.courseHref ?? apprenticeshipLmsCoursePath(config.programSlug);
+  const lmsCourseHref = rti?.courseHref ?? apprenticeshipLmsCoursePath(config.programSlug);
   const continueCourseHref = rti?.continueHref ?? lmsCourseHref;
-  const rtiCourseLabel =
-    apprenticeshipRtiLabel(config.programSlug) ?? 'Online Course';
-  const rtiCourseLabelShort =
-    apprenticeshipRtiLabel(config.programSlug, true) ?? 'Online Course';
-  const workbookHref =
-    rti?.workbookHref ?? apprenticeshipWorkbookHref(config.programSlug);
+  const rtiCourseLabel = apprenticeshipRtiLabel(config.programSlug) ?? 'Online Course';
+  const rtiCourseLabelShort = apprenticeshipRtiLabel(config.programSlug, true) ?? 'Online Course';
+  const workbookHref = rti?.workbookHref ?? apprenticeshipWorkbookHref(config.programSlug);
   const isBarberApprentice = config.programSlug === 'barber-apprenticeship';
 
   const onboardingItems = [
@@ -264,9 +285,11 @@ export function ApprenticePortalShell({
       : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
     { id: 'timeclock', label: 'Timeclock', href: APPRENTICE_TIMECLOCK_URL },
+    { id: 'timeclock-policy', label: 'Clock Rules', href: '/apprentice/policies/timeclock' },
     { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
     { id: 'documents', label: 'Documents', href: documentsHref },
     { id: 'billing', label: 'Billing', href: '/apprentice/billing' },
+    { id: 'payment-policy', label: 'Payment Rules', href: '/apprentice/policies/payments' },
     { id: 'handbook', label: 'Handbook', href: '/apprentice/handbook' },
     ...(isBarberApprentice
       ? [{ id: 'mobile-app', label: BARBER_STUDENT_APP_SHORT_LABEL, href: BARBER_STUDENT_APP_HOME }]
@@ -277,19 +300,20 @@ export function ApprenticePortalShell({
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-[180px] sm:h-[220px] overflow-hidden bg-slate-900">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={config.heroImage}
           alt={config.label}
           fill
           className="object-cover object-center"
           sizes="100vw"
           priority
-          placeholder="empty"
         />
         <div className="relative z-20 h-full max-w-6xl mx-auto px-4 sm:px-6 flex items-center">
           <div className="bg-black/40 rounded-xl px-4 py-3 backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-2">
-              <div className={`w-11 h-11 ${config.accentBg} rounded-xl flex items-center justify-center shadow-lg`}>
+              <div
+                className={`w-11 h-11 ${config.accentBg} rounded-xl flex items-center justify-center shadow-lg`}
+              >
                 <ProgramIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -300,9 +324,13 @@ export function ApprenticePortalShell({
               </div>
             </div>
             <p className="text-white/80 text-sm mt-2">
-              Welcome back, <strong>{firstName}</strong> · Week {weeksComplete + 1} of {weeksTotal}
+              Welcome back, <strong>{firstName}</strong>
+              {!competencyBased ? <> · Week {weeksComplete + 1} of {weeksTotal}</> : null}
               {shopName && (
-                <span className="ml-2 text-white/60">· {config.shopLabel}: <span className="text-white/90 font-medium">{shopName}</span></span>
+                <span className="ml-2 text-white/60">
+                  · {config.shopLabel}:{' '}
+                  <span className="text-white/90 font-medium">{shopName}</span>
+                </span>
               )}
             </p>
           </div>
@@ -333,15 +361,20 @@ export function ApprenticePortalShell({
       <RtiCourseCard config={config} rti={rti} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <ApprenticeProgramGuide />
         {/* Payment alert — no subscription at all */}
         {showPaymentSetupAlert && (
           <div className="rounded-xl border border-red-200 bg-red-50 overflow-hidden">
             <div className="p-4 flex items-start gap-3 border-b border-red-200">
               <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
               <div className="flex-1">
-                <p className="font-semibold text-red-800 text-sm">Action required — payment method needed</p>
+                <p className="font-semibold text-red-800 text-sm">
+                  Action required — payment method needed
+                </p>
                 <p className="text-red-700 text-xs mt-0.5">
-                  A payment method and authorization are required for an active self-pay plan. Future training access may be paused under your enrollment agreement if billing is not completed; previously approved hours remain on your record.
+                  A payment method and authorization are required for an active self-pay plan.
+                  Future training access may be paused under your enrollment agreement if billing is
+                  not completed; previously approved hours remain on your record.
                 </p>
               </div>
               <Link
@@ -353,16 +386,24 @@ export function ApprenticePortalShell({
             </div>
             <ol className="p-4 space-y-2.5">
               {[
-                { n: 1, text: 'Click "Set Up Payment" above — you\'ll be taken to a secure Stripe page.' },
-                { n: 2, text: 'Enter your debit or credit card number, expiration date, and CVC.' },
-                { n: 3, text: 'Click "Save" — Stripe will verify your card. No charge happens yet.' },
+                {
+                  n: 1,
+                  text: 'Click "Set Up Payment" above to review your PayPal authorization and current QuickBooks invoice options.',
+                },
+                { n: 2, text: 'Complete the PayPal authorization steps shown on your billing page, or use the Pay Now link on an open QuickBooks invoice.' },
+                {
+                  n: 3,
+                  text: 'Confirm the authorization only after reviewing the amount and billing schedule.',
+                },
                 {
                   n: 4,
-                  text: `Return here. Your first weekly payment of $${weeklyPaymentLabel} will process on the next billing date.`,
+                  text: `Return here after setup. Your billing page will show the next scheduled payment of ${weeklyPaymentLabel} when applicable.`,
                 },
               ].map(({ n, text }) => (
                 <li key={n} className="flex items-start gap-3 text-xs text-red-800">
-                  <span className="w-5 h-5 rounded-full bg-red-200 text-red-700 font-bold flex items-center justify-center shrink-0 text-[11px]">{n}</span>
+                  <span className="w-5 h-5 rounded-full bg-red-200 text-red-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
+                    {n}
+                  </span>
                   <span>{text}</span>
                 </li>
               ))}
@@ -397,22 +438,48 @@ export function ApprenticePortalShell({
             <ol className="p-4 space-y-2.5">
               {(subStatus === 'past_due'
                 ? [
-                    { n: 1, text: 'Click "Update Card" above — you\'ll be taken to a secure Stripe page.' },
-                    { n: 2, text: 'Under "Payment methods," add a new debit or credit card.' },
-                    { n: 3, text: 'Set it as your default payment method.' },
-                    { n: 4, text: 'Stripe will automatically retry the failed payment within 24 hours.' },
-                    { n: 5, text: 'Once the payment clears, your dashboard will update and this alert will disappear.' },
+                    {
+                      n: 1,
+                      text: 'Click the billing action above to review your PayPal authorization and current QuickBooks invoice options.',
+                    },
+                    { n: 2, text: 'Review the PayPal authorization status and complete any required provider step.' },
+                    { n: 3, text: 'If an invoice is open, use its QuickBooks Pay Now link or the approved PayPal billing flow.' },
+                    {
+                      n: 4,
+                      text: 'The billing page will show whether PayPal will retry automatically or whether the invoice requires action.',
+                    },
+                    {
+                      n: 5,
+                      text: 'Once the payment clears, your dashboard will update and this alert will disappear.',
+                    },
                   ]
                 : [
-                    { n: 1, text: 'Click "Add Card" above — you\'ll be taken to a secure Stripe page.' },
-                    { n: 2, text: 'Enter your debit or credit card number, expiration date, and CVC.' },
-                    { n: 3, text: 'Click "Save" — Stripe will verify your card. No charge happens yet.' },
-                    { n: 4, text: 'Your first weekly payment will process automatically on the next billing date.' },
-                    { n: 5, text: 'Return here — this alert will disappear once your card is on file.' },
+                    {
+                      n: 1,
+                      text: 'Click the billing action above to complete PayPal authorization or review your QuickBooks invoice.',
+                    },
+                    {
+                      n: 2,
+                      text: 'Follow the PayPal authorization steps shown on the billing page.',
+                    },
+                    {
+                      n: 3,
+                      text: 'Confirm the authorization only after reviewing the amount and billing schedule.',
+                    },
+                    {
+                      n: 4,
+                      text: 'Your billing page will show the next scheduled payment date and amount when automatic billing is active.',
+                    },
+                    {
+                      n: 5,
+                      text: 'Return here — this alert will disappear once your card is on file.',
+                    },
                   ]
               ).map(({ n, text }) => (
                 <li key={n} className="flex items-start gap-3 text-xs text-amber-800">
-                  <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-700 font-bold flex items-center justify-center shrink-0 text-[11px]">{n}</span>
+                  <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
+                    {n}
+                  </span>
                   <span>{text}</span>
                 </li>
               ))}
@@ -426,18 +493,21 @@ export function ApprenticePortalShell({
             <p className="text-sm text-amber-800 mt-1">
               {transferHoursVerified != null && transferHoursVerified > 0 ? (
                 <>
-                  <strong>{transferHoursVerified.toLocaleString()} hours</strong> verified toward your
-                  apprenticeship — about{' '}
+                  <strong>{transferHoursVerified.toLocaleString()} hours</strong> verified toward
+                  your apprenticeship — about{' '}
                   <strong>
-                    {(hoursRemainingDisplay ?? config.requiredOjl + config.requiredRti).toLocaleString()}
+                    {(
+                      hoursRemainingDisplay ?? config.requiredOjl + config.requiredRti
+                    ).toLocaleString()}
                   </strong>{' '}
                   hours remaining in the program.
                 </>
               ) : (
                 <>
-                  You reported <strong>{transferHoursClaimed.toLocaleString()} hours</strong> at enrollment.
-                  Staff will verify your documentation and apply credit. Until verified, progress is tracked
-                  against the full {(config.requiredOjl + config.requiredRti).toLocaleString()} hour requirement.
+                  You reported <strong>{transferHoursClaimed.toLocaleString()} hours</strong> at
+                  enrollment. Staff will verify your documentation and apply credit. Until verified,
+                  progress is tracked against the full{' '}
+                  {(config.requiredOjl + config.requiredRti).toLocaleString()} hour requirement.
                 </>
               )}
             </p>
@@ -450,39 +520,64 @@ export function ApprenticePortalShell({
           </div>
         )}
 
-        {billing && !billing.fullyPaid && billing.remainingBalance != null && billing.remainingBalance > 0 && (
-          <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">Tuition balance</p>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {billing.bnplProvider
-                  ? `Payment plan via ${billing.bnplProvider}`
-                  : 'Weekly payment plan'}
-                {billing.weeklyPaymentCents
-                  ? ` · $${weeklyPaymentLabel}/week`
-                  : ''}
+        {billing &&
+          !billing.fullyPaid &&
+          billing.remainingBalance != null &&
+          billing.remainingBalance > 0 && (
+            <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Tuition balance</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {billing.bnplProvider
+                    ? `Payment plan via ${billing.bnplProvider}`
+                    : 'Weekly payment plan'}
+                  {billing.weeklyPaymentCents ? ` · $${weeklyPaymentLabel}/week` : ''}
+                </p>
+              </div>
+              <p className="text-lg font-bold text-slate-900">
+                $
+                {Number(billing.remainingBalance).toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+                <span className="text-sm font-normal text-slate-500"> remaining</span>
               </p>
             </div>
-            <p className="text-lg font-bold text-slate-900">
-              $
-              {Number(billing.remainingBalance).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              <span className="text-sm font-normal text-slate-500"> remaining</span>
-            </p>
-          </div>
-        )}
+          )}
 
         {isBarberApprentice && <BarberStudentAppDownload variant="card" />}
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: Clock, label: 'Total Hours', value: totalHours.toLocaleString(), sub: `of ${totalRequired.toLocaleString()} required` },
-            { icon: CalendarDays, label: 'Weeks', value: weeksComplete.toString(), sub: `of ${weeksTotal} complete` },
-            { icon: ClipboardCheck, label: 'Onboarding', value: `${completedCount}/${onboardingItems.length}`, sub: onboardingComplete ? 'Complete' : 'In progress' },
-            { icon: TrendingUp, label: 'Progress', value: `${Math.round(overallPercent)}%`, sub: 'toward completion' },
+            {
+              icon: Clock,
+              label: competencyBased ? 'RTI Hours' : hybrid ? 'Hybrid Term Hours' : 'Total Hours',
+              value: competencyBased ? hours.rti.toLocaleString() : hybrid ? hours.ojl.toLocaleString() : totalHours.toLocaleString(),
+              sub: competencyBased
+                ? `of ${requiredRti.toLocaleString()} RTI · ${config.competencyCount ?? 0} competencies required`
+                : hybrid
+                  ? `of ${requiredOjl.toLocaleString()} minimum · ${requiredRti} RTI tracked separately`
+                  : `of ${totalRequired.toLocaleString()} required`,
+            },
+            {
+              icon: CalendarDays,
+              label: 'Weeks',
+              value: weeksComplete.toString(),
+              sub: `of ${weeksTotal} complete`,
+            },
+            {
+              icon: ClipboardCheck,
+              label: 'Onboarding',
+              value: `${completedCount}/${onboardingItems.length}`,
+              sub: onboardingComplete ? 'Complete' : 'In progress',
+            },
+            {
+              icon: TrendingUp,
+              label: 'Progress',
+              value: `${Math.round(overallPercent)}%`,
+              sub: competencyBased ? 'RTI progress only — competencies tracked separately' : hybrid ? 'toward minimum hybrid term' : 'toward completion',
+            },
           ].map(({ icon: Icon, label, value, sub }) => (
             <div key={label} className="bg-white rounded-xl border border-slate-200 p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -497,28 +592,58 @@ export function ApprenticePortalShell({
 
         {/* Progress bars */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <h2 className="text-sm font-semibold text-slate-900 mb-4">Hour Progress</h2>
+          <h2 className="text-sm font-semibold text-slate-900 mb-4">{competencyBased ? 'RTI & Work Evidence' : 'Hour Progress'}</h2>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-sm font-medium text-slate-700">On-the-Job Learning (OJL)</span>
-                <span className="text-sm font-bold text-slate-900">{hours.ojl.toLocaleString()} / {requiredOjl.toLocaleString()}</span>
+                <span className="text-sm font-medium text-slate-700">
+                  {competencyBased ? 'Supervised work evidence' : hybrid ? 'Hybrid term work hours' : 'On-the-Job Learning (OJL)'}
+                </span>
+                <span className="text-sm font-bold text-slate-900">
+                  {competencyBased
+                    ? `${hours.ojl.toLocaleString()} recorded`
+                    : `${hours.ojl.toLocaleString()} / ${requiredOjl.toLocaleString()}`}
+                </span>
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div className={`h-full ${config.accentBg} rounded-full transition-all duration-700`} style={{ width: `${ojlPercent}%` }} />
-              </div>
-              <p className="text-xs text-slate-500 mt-1">{Math.max(0, requiredOjl - hours.ojl).toLocaleString()} hours remaining</p>
+              {!competencyBased ? (
+                <>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${config.accentBg} rounded-full transition-all duration-700`}
+                      style={{ width: `${ojlPercent}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {hybrid
+                      ? `${Math.max(0, requiredOjl - hours.ojl).toLocaleString()} hours remaining to the 2,000-hour minimum term; maximum registered term is ${(config.maximumTermHours ?? 2500).toLocaleString()} hours`
+                      : `${Math.max(0, requiredOjl - hours.ojl).toLocaleString()} hours remaining`}
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500 mt-1">
+                  Work hours document supervised training. Completion is based on {config.competencyCount ?? 0} verified competencies plus {requiredRti} RTI hours. The {config.probationHours ?? 500}-hour figure is probation, not graduation.
+                </p>
+              )}
             </div>
             {requiredRti > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-medium text-slate-700">Related Technical Instruction (RTI)</span>
-                  <span className="text-sm font-bold text-slate-900">{hours.rti.toLocaleString()} / {requiredRti.toLocaleString()}</span>
+                  <span className="text-sm font-medium text-slate-700">
+                    Related Technical Instruction (RTI)
+                  </span>
+                  <span className="text-sm font-bold text-slate-900">
+                    {hours.rti.toLocaleString()} / {requiredRti.toLocaleString()}
+                  </span>
                 </div>
                 <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full transition-all duration-700" style={{ width: `${rtiPercent}%` }} />
+                  <div
+                    className="h-full bg-blue-500 rounded-full transition-all duration-700"
+                    style={{ width: `${rtiPercent}%` }}
+                  />
                 </div>
-                <p className="text-xs text-slate-500 mt-1">{Math.max(0, requiredRti - hours.rti).toLocaleString()} hours remaining</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {Math.max(0, requiredRti - hours.rti).toLocaleString()} hours remaining
+                </p>
               </div>
             )}
           </div>
@@ -533,7 +658,10 @@ export function ApprenticePortalShell({
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
             <h2 className="text-sm font-semibold text-slate-900 mb-3">Quick Actions</h2>
             <div className="grid sm:grid-cols-2 gap-2">
-              <Link href={APPRENTICE_TIMECLOCK_URL} className={`flex items-center gap-3 p-3 rounded-lg ${config.accentBg} text-white hover:opacity-90 transition`}>
+              <Link
+                href={APPRENTICE_TIMECLOCK_URL}
+                className={`flex items-center gap-3 p-3 rounded-lg ${config.accentBg} text-white hover:opacity-90 transition`}
+              >
                 <Clock className="w-5 h-5" />
                 <div>
                   <p className="font-semibold text-sm">Clock In / Out</p>
@@ -552,21 +680,30 @@ export function ApprenticePortalShell({
                   </div>
                 </Link>
               )}
-              <Link href="/apprentice/hours/log" className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+              <Link
+                href="/apprentice/hours/log"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+              >
                 <TrendingUp className={`w-5 h-5 ${config.accentText}`} />
                 <div>
                   <p className="font-semibold text-sm text-slate-900">Log Hours</p>
                   <p className="text-xs text-slate-500">Record OJL or RTI hours</p>
                 </div>
               </Link>
-              <Link href="/apprentice/competencies/log" className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+              <Link
+                href="/apprentice/competencies/log"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+              >
                 <Award aria-label="award" className={`w-5 h-5 ${config.accentText}`} />
                 <div>
                   <p className="font-semibold text-sm text-slate-900">Log Service</p>
                   <p className="text-xs text-slate-500">Record a competency</p>
                 </div>
               </Link>
-              <Link href={documentsHref} className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+              <Link
+                href={documentsHref}
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+              >
                 <FileText className={`w-5 h-5 ${config.accentText}`} />
                 <div>
                   <p className="font-semibold text-sm text-slate-900">Upload Document</p>
@@ -580,19 +717,30 @@ export function ApprenticePortalShell({
                 >
                   <FileText className={`w-5 h-5 ${config.accentText}`} />
                   <div>
-                    <p className="font-semibold text-sm text-slate-900">{PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL}</p>
+                    <p className="font-semibold text-sm text-slate-900">
+                      {PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL}
+                    </p>
                     <p className="text-xs text-slate-500">Reading &amp; study materials</p>
                   </div>
                 </Link>
               )}
-              <Link href="/apprentice/state-board" className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
-                <GraduationCap aria-label="graduationcap" className={`w-5 h-5 ${config.accentText}`} />
+              <Link
+                href="/apprentice/state-board"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+              >
+                <GraduationCap
+                  aria-label="graduationcap"
+                  className={`w-5 h-5 ${config.accentText}`}
+                />
                 <div>
                   <p className="font-semibold text-sm text-slate-900">State Board Prep</p>
                   <p className="text-xs text-slate-500">Exam preparation</p>
                 </div>
               </Link>
-              <Link href="/apprentice/billing" className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+              <Link
+                href="/apprentice/billing"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+              >
                 <CreditCard className={`w-5 h-5 ${config.accentText}`} />
                 <div>
                   <p className="font-semibold text-sm text-slate-900">Billing</p>
@@ -630,7 +778,13 @@ export function ApprenticePortalShell({
                     ) : (
                       <XCircle className="w-4 h-4 text-red-400 shrink-0" />
                     )}
-                    <span className={item.done ? 'line-through group-hover:no-underline' : 'group-hover:underline'}>
+                    <span
+                      className={
+                        item.done
+                          ? 'line-through group-hover:no-underline'
+                          : 'group-hover:underline'
+                      }
+                    >
                       {item.label}
                     </span>
                   </Link>
@@ -641,8 +795,13 @@ export function ApprenticePortalShell({
         </div>
 
         {/* Resources */}
-        <div className={`grid gap-3 ${workbookHref ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}>
-          <Link href="/apprentice/skills" className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition">
+        <div
+          className={`grid gap-3 ${workbookHref ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}
+        >
+          <Link
+            href="/apprentice/skills"
+            className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition"
+          >
             <Award aria-label="award" className={`w-5 h-5 ${config.accentText} mb-2`} />
             <p className="font-semibold text-sm text-slate-900">Skills Checklist</p>
             <p className="text-xs text-slate-500 mt-0.5">Track competency mastery</p>
@@ -657,7 +816,10 @@ export function ApprenticePortalShell({
               <p className="text-xs text-slate-500 mt-0.5">RTI lessons on Elevate LMS</p>
             </Link>
           ) : (
-            <Link href="/apprentice/handbook" className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition">
+            <Link
+              href="/apprentice/handbook"
+              className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition"
+            >
               <BookOpen className={`w-5 h-5 ${config.accentText} mb-2`} />
               <p className="font-semibold text-sm text-slate-900">Handbook</p>
               <p className="text-xs text-slate-500 mt-0.5">Rules & guidelines</p>
@@ -669,11 +831,16 @@ export function ApprenticePortalShell({
               className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition"
             >
               <FileText className={`w-5 h-5 ${config.accentText} mb-2`} />
-              <p className="font-semibold text-sm text-slate-900">{PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL}</p>
+              <p className="font-semibold text-sm text-slate-900">
+                {PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL}
+              </p>
               <p className="text-xs text-slate-500 mt-0.5">Open workbook in LMS</p>
             </Link>
           )}
-          <Link href="/apprentice/transfer-hours" className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition">
+          <Link
+            href="/apprentice/transfer-hours"
+            className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition"
+          >
             <MapPin className={`w-5 h-5 ${config.accentText} mb-2`} />
             <p className="font-semibold text-sm text-slate-900">Transfer Hours</p>
             <p className="text-xs text-slate-500 mt-0.5">Request hour transfers</p>

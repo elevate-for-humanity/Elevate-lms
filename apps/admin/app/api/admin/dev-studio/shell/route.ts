@@ -11,12 +11,13 @@
  *
  * POST { workflow: string, inputs?: Record<string, string> }
  *   → triggers workflow_dispatch on any workflow that supports it
- *   → falls back to Contents API bump if token lacks workflow scope
+ *   → fails closed when dispatch authorization is unavailable
  *
  * No hardcoded workflow allowlist — any workflow with workflow_dispatch
  * trigger in the repo can be dispatched. Repo and branch are read from env.
  */
 
+import { studioRepository } from '@/lib/devstudio/repository';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,13 +25,15 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-function repo()   { return process.env.GITHUB_REPO   ?? 'elevate-for-humanity/Elevate-lms'; }
+function repo()   { return studioRepository(); }
 function branch() { return process.env.GITHUB_BRANCH ?? 'main'; }
 const GH_API = 'https://api.github.com';
+const RETIRED_COURSE_WORKFLOWS=new Set(['dev-studio-course-builder.yml','build-cosmetology-course.yml','regenerate-barber-cosmetology.yml','build-esb-acceptance.yml','business-draft-bootstrap.yml']);
 
 /**
  * Resolve a secret: env var first, then platform_secrets table fallback.
@@ -88,58 +91,12 @@ async function listDispatchableWorkflows(): Promise<GHWorkflow[]> {
     );
     if (!res.ok) throw new Error(`GitHub API ${res.status}: ${(await res.text()).slice(0, 200)}`);
     const data = await res.json() as { workflows: GHWorkflow[]; total_count: number };
-    all.push(...data.workflows);
+    all.push(...data.workflows.filter(w=>!RETIRED_COURSE_WORKFLOWS.has(w.path.replace('.github/workflows/',''))));
     if (all.length >= data.total_count) break;
     page++;
   }
   // Return only active workflows — disabled ones can't be dispatched
   return all.filter(w => w.state === 'active');
-}
-
-/**
- * Fallback trigger: bump the retry-marker comment in a workflow file via the
- * Contents API. Used when workflow_dispatch returns 403/404 (e.g. the token
- * lacks workflow scope or the workflow has no workflow_dispatch trigger).
- *
- * Reads the current file, replaces the marker timestamp, and PUTs it back.
- * GitHub sees a push to main on a path that matches the workflow's path filter,
- * which fires the deploy job exactly as a normal push would.
- */
-async function triggerViaContentsApi(workflowFile: string): Promise<{ runUrl: string }> {
-  const token = await resolveSecret('GITHUB_TOKEN');
-  if (!token) throw new Error('GITHUB_TOKEN is not configured in platform_secrets');
-
-  const filePath = `.github/workflows/${workflowFile}`;
-  const apiBase  = `${GH_API}/repos/${repo()}/contents/${filePath}`;
-  const headers = await ghHeaders();
-
-  const getRes = await fetch(`${apiBase}?ref=${branch()}`, { headers });
-  if (!getRes.ok) throw new Error(`Could not read ${filePath}: ${getRes.status}`);
-  const { sha, content: b64 } = await getRes.json() as { sha: string; content: string };
-
-  const current  = Buffer.from(b64.replace(/\n/g, ''), 'base64').toString('utf8');
-  const ts       = new Date().toISOString().slice(0, 16) + 'Z';
-  const markerRe = /(#\s*Retry trigger marker:\s*)\S+/;
-  const updated  = markerRe.test(current)
-    ? current.replace(markerRe, `$1${ts}`)
-    : current + `\n# Retry trigger marker: ${ts}\n`;
-
-  const putRes = await fetch(apiBase, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({
-      message: `chore: trigger ${workflowFile.replace('.yml', '')}`,
-      content: Buffer.from(updated).toString('base64'),
-      sha,
-      branch: branch(),
-    }),
-  });
-
-  if (!putRes.ok) {
-    throw new Error(`Contents API PUT failed: ${putRes.status}`);
-  }
-
-  return { runUrl: `https://github.com/${repo()}/actions` };
 }
 
 // ── POST — dispatch a workflow ────────────────────────────────────────────────
@@ -156,6 +113,8 @@ export async function POST(request: NextRequest) {
   // Accept either a workflow filename (e.g. "deploy-lms.yml") or bare name ("deploy-lms")
   const workflowRaw: string = body?.workflow ?? '';
   const inputs: Record<string, string> = body?.inputs ?? {};
+  const studioRunId: string = typeof body?.studioRunId === 'string' ? body.studioRunId : '';
+  const studioRunStepId: string | undefined = typeof body?.studioRunStepId === 'string' ? body.studioRunStepId : undefined;
 
   if (!workflowRaw) return safeError('workflow is required', 400);
 
@@ -178,6 +137,7 @@ export async function POST(request: NextRequest) {
 
   // Normalise to filename
   const workflowFile = workflowAliases[workflowRaw] ?? (workflowRaw.endsWith('.yml') ? workflowRaw : `${workflowRaw}.yml`);
+  if(RETIRED_COURSE_WORKFLOWS.has(workflowFile))return safeError(`Workflow "${workflowFile}" is retired. Course production is owned by Ultimate Course Builder through Dev Studio.`,409);
 
   // Validate the workflow exists and is active in the repo
   try {
@@ -217,6 +177,17 @@ export async function POST(request: NextRequest) {
       const runsData = runsRes.ok ? await runsRes.json() : null;
       const latestRun = runsData?.workflow_runs?.[0];
 
+      if (studioRunId) {
+        const db = await requireAdminClient();
+        await recordMasterStudioArtifact(db, {
+          runId: studioRunId, stepId: studioRunStepId,
+          type: 'deployment-run', name: `GitHub workflow ${workflowFile}`,
+          uri: latestRun?.html_url ?? `https://github.com/${repo()}/actions`,
+          status: 'generated',
+          metadata: { workflow: workflowFile, github_run_id: latestRun?.id ?? null, status: latestRun?.status ?? 'queued' },
+          evidence: [{ source: 'github-actions', captured_at: new Date().toISOString() }],
+        }).catch(() => undefined);
+      }
       return NextResponse.json({
         ok: true,
         workflow: workflowFile,
@@ -227,16 +198,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Fallback: bump retry marker via Contents API
-    const fallback = await triggerViaContentsApi(workflowFile);
+    // Refuse a failed workflow dispatch. Never rewrite main as a fallback.
     return NextResponse.json({
-      ok: true,
+      ok: false,
       workflow: workflowFile,
-      method: 'contents-api',
-      runId: null,
-      runUrl: fallback.runUrl,
-      status: 'queued',
-    });
+      error: 'GitHub workflow dispatch rejected with HTTP ' + dispatchRes.status,
+    }, { status: 502 });
   } catch (err) {
     return safeInternalError(err, 'Failed to dispatch workflow');
   }

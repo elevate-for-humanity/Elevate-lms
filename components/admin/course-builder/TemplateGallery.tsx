@@ -112,7 +112,7 @@ export default function TemplateGallery() {
         );
       }
       if (!courseData.courseId) throw new Error('Course Factory completed without a course ID');
-      router.push(`/studio/courses/${courseData.courseId}`);
+      router.push(`/studio/courses?courseId=${encodeURIComponent(courseData.courseId)}&tab=workspace`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to build the course');
       setBuilding(false);

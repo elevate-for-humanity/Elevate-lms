@@ -148,7 +148,7 @@ export default function RefundPolicyPage() {
               <p className="text-black mb-2">
                 Phone:{' '}
                 <a href="/support" className="text-brand-blue-600 hover:underline">
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.mainPhone}
                 </a>
               </p>
               <p className="text-black">

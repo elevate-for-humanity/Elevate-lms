@@ -1,3 +1,4 @@
+import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
@@ -8,20 +9,41 @@ import { getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
+import { HostShopProgramGuide } from '@/components/portal/HostShopProgramGuide';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
-import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
+import {
+  HOST_SHOP_PREVIEW_SESSION_COOKIE,
+  resolveHostShopAdminPreview,
+} from '@/lib/admin/host-shop-preview';
+import {
+  PORTAL_PREVIEW_ACTOR_COOKIE,
+  PORTAL_PREVIEW_COOKIE,
+  PORTAL_PREVIEW_SESSION_COOKIE,
+} from '@/lib/admin/portal-preview';
+import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
 
 async function clearAdminPartner() {
   'use server';
   await requireRole(['super_admin', 'admin', 'org_admin']);
   const cookieStore = await cookies();
-  cookieStore.set(HOST_SHOP_ADMIN_COOKIE, '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
-  });
+  for (const name of [
+    HOST_SHOP_ADMIN_COOKIE,
+    HOST_SHOP_PREVIEW_SESSION_COOKIE,
+    PORTAL_PREVIEW_COOKIE,
+    PORTAL_PREVIEW_ACTOR_COOKIE,
+    PORTAL_PREVIEW_SESSION_COOKIE,
+  ]) {
+    cookieStore.set(name, '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0,
+    });
+  }
   redirect('/host-shop/dashboard');
 }
 
@@ -70,7 +92,7 @@ function PortalImageCard({ card }: { card: PortalCard }) {
   return (
     <Link
       href={card.href}
-      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"
+      className="group min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
         <Image
@@ -81,11 +103,11 @@ function PortalImageCard({ card }: { card: PortalCard }) {
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
       </div>
-      <div className="p-5">
+      <div className="min-w-0 p-5">
         {card.value !== undefined ? (
-          <p className="text-3xl font-black text-slate-950">{card.value}</p>
+          <p className="break-words text-2xl font-black leading-tight text-slate-950 sm:text-3xl">{card.value}</p>
         ) : null}
-        <h2 className={`${card.value !== undefined ? 'mt-1' : ''} font-black text-slate-950`}>
+        <h2 className={`${card.value !== undefined ? 'mt-1' : ''} break-words text-base font-black leading-snug text-slate-950 sm:text-lg`}>
           {card.title}
         </h2>
         <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{card.detail}</p>
@@ -130,7 +152,7 @@ export default async function HostShopDashboardView() {
     ) {
       return (
         <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-52 w-full">
               <Image
                 src="/images/pages/barber-gallery-1.webp"
@@ -147,13 +169,12 @@ export default async function HostShopDashboardView() {
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop PWA</h1>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">
-                This neutral preview confirms that the Host Shop PWA is operational without
-                attaching Admin to a business record. Select a shop from the secured Admin dashboard
-                to open its audited portal.
+                No Host Shop is selected. Select a shop from the secured Admin dashboard
+                to open its saved records in the audited portal preview.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
-                  href="https://admin.elevateforhumanity.org/dashboard"
+                  href="https://admin.elevateforhumanity.org/partners"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-black text-white"
                 >
                   Select a Host Shop in Admin
@@ -199,7 +220,9 @@ export default async function HostShopDashboardView() {
     ? board.registeredPrograms
         .map(
           (program) =>
-            `${program.rapidsCode}: ${program.competencyCount} competencies / ${program.rtiHours} RTI`,
+            program.progressModel === 'hybrid'
+              ? `${program.rapidsCode}: ${program.hours?.toLocaleString()}–${program.maxHours?.toLocaleString()} OJL hours / ${program.rtiHours} RTI hours / required work processes`
+              : `${program.rapidsCode}: ${program.competencyCount} competencies / ${program.rtiHours} RTI hours`,
         )
         .join(' · ')
     : timeBasedCount
@@ -240,11 +263,29 @@ export default async function HostShopDashboardView() {
   ];
   const toolCards: PortalCard[] = [
     {
+      href: '/host-shop/email',
+      title: 'Host Shop email',
+      detail: 'Open the shop inbox, compose official email, reply, and share attachments.',
+      image: '/images/pages/student-support-page-1.webp',
+    },
+    {
+      href: '/host-shop/dashboard/communications',
+      title: 'Host Shop communications',
+      detail: 'Use the Host Shop communication workspace for official email, apprentice messages, routed calls, and meeting access.',
+      image: '/images/pages/program-holder-page-1.webp',
+    },
+    {
+      href: '/host-shop/dashboard/communications',
+      title: 'Phone, meetings & follow-up',
+      detail: 'Open Host Shop communications for the assigned phone extension, PARIS callback intake, messages, and scheduling.',
+      image: '/images/heroes/lms-analytics.webp',
+    },
+    {
       href: '/host-shop/dashboard/resources',
       title: 'Guides, handbook & MOU',
       detail:
         'Open the Host Shop user guide, operating handbook, current MOU, orientation, and required compliance documents.',
-      image: '/images/pages/academic-integrity-hero.webp',
+      image: '/images/pages/workone-packet-1.webp',
     },
     {
       href: '/host-shop/orientation',
@@ -263,7 +304,7 @@ export default async function HostShopDashboardView() {
       href: '/host-shop/dashboard/attendance/record',
       title: 'Record attendance',
       detail: 'Record attendance against the active apprentice placement.',
-      image: '/images/pages/program-holder-page-1.webp',
+      image: '/images/pages/orientation-page-1.webp',
     },
     {
       href: '/host-shop/dashboard/wages',
@@ -276,7 +317,7 @@ export default async function HostShopDashboardView() {
       href: '/host-shop/dashboard/reports',
       title: 'Reporting center',
       detail: 'Review documented work, competencies, attendance, RTI, and compliance records.',
-      image: '/images/heroes/lms-analytics.webp',
+      image: '/images/pages/career-services-page-7.webp',
     },
     {
       href: '/host-shop/dashboard/profile',
@@ -352,68 +393,21 @@ export default async function HostShopDashboardView() {
   const { data: publicProfile } = partnerName
     ? await db
         .from('public_host_shops')
-        .select('media_gallery,video_url')
-        .ilike('display_name', `%${partnerName}%`)
+        .select('media_gallery,video_url,logo_url,flyer_url')
+        .eq('id', board.partner.id)
         .limit(1)
         .maybeSingle()
     : { data: null };
   const publicMedia = Array.isArray(publicProfile?.media_gallery)
     ? publicProfile.media_gallery.filter((item: any) => item && typeof item.url === 'string')
     : [];
-  const heroImage = /salon saloon/i.test(partnerName)
-    ? '/images/partners/salon-saloon/team-interior.webp'
-    : '/images/pages/workforce-board-page-7.webp';
+  const networkShop = (await getHostShopNetwork()).find((shop) => shop.id === board.partner.id);
+  const heroIsLogo = Boolean(publicProfile?.logo_url);
+  const heroImage = publicProfile?.logo_url || publicMedia[0]?.url || networkShop?.image || publicProfile?.flyer_url || '/images/logo.png';
 
   return (
     <main className="w-full max-w-none px-4 py-8 sm:px-6">
-      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-black text-slate-950">Host Shop app</p>
-          <p className="mt-1 text-sm font-medium text-slate-700">
-            Install this exact Host Shop dashboard for direct access to apprentices, hours,
-            attendance, competencies, and reports.
-          </p>
-        </div>
-        <PwaInstallButton
-          label="Install Host Shop App"
-          installedLabel="Host Shop App Installed"
-          className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
-        />
-      </section>
-      <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">
-              Host Shop Network launch
-            </p>
-            <h2 className="mt-2 text-2xl font-black">
-              Put your shop in front of apprentices and local customers.
-            </h2>
-            <p className="mt-2 text-sm font-medium leading-6 text-slate-200">
-              Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then
-              share your profile link from your website, Google Business Profile, and social pages.
-              Visibility and results vary; a complete, accurate profile gives people more ways to
-              discover and contact your business.
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-            <Link
-              href="/host-shop/dashboard/profile"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950"
-            >
-              Complete My Network Profile
-            </Link>
-            <a
-              href="https://www.elevateforhumanity.org/partners/host-shops"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white"
-            >
-              View the Public Network
-            </a>
-          </div>
-        </div>
-      </section>
+      <ProgramGuideResources />
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <div className="p-6 sm:p-8">
@@ -497,7 +491,7 @@ export default async function HostShopDashboardView() {
               alt={`${partnerName || 'Host Shop'} supervised apprenticeship workspace`}
               fill
               priority
-              className="object-cover"
+              className={heroIsLogo || heroImage === '/images/logo.png' ? 'bg-white object-contain p-6' : 'object-cover'}
               sizes="(max-width: 1024px) 100vw, 42vw"
             />
           </div>
@@ -538,11 +532,82 @@ export default async function HostShopDashboardView() {
           </Link>
         </section>
       ) : null}
+      <section className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">This week</p><h2 className="mt-1 text-2xl font-black text-slate-950">Host Shop weekly responsibilities</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">These checks come from this shop's live apprentices, submitted work hours, registered standards, documents, and partner record. Use the linked workspace to finish anything still open.</p></div><span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">{[board.pendingHoursCount === 0, board.documentsComplete, partnerMouSigned, board.unconfiguredPrograms.length === 0].filter(Boolean).length}/4 core checks clear</span></div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {[
+            { label: 'Review apprentice roster and progress', detail: `${board.apprentices.length} active apprentice${board.apprentices.length === 1 ? '' : 's'} assigned. Review work progress and next required skill for each apprentice.`, done: board.apprentices.length > 0, href: '/host-shop/dashboard/apprentices' },
+            { label: 'Approve submitted work hours', detail: board.pendingHoursCount ? `${board.pendingHoursCount} work entr${board.pendingHoursCount === 1 ? 'y' : 'ies'} need Host Shop review.` : 'No submitted work-hour records are waiting for review.', done: board.pendingHoursCount === 0, href: '/host-shop/dashboard/hours/pending' },
+            { label: 'Verify Appendix A skills and services', detail: board.registeredPrograms.length ? 'Open the apprentice competency record and sign only skills/services personally observed with required evidence.' : 'A registered standard must be configured before regulated competency progress can be credited.', done: board.registeredPrograms.length > 0 && board.unconfiguredPrograms.length === 0, href: '/host-shop/dashboard/competencies' },
+            { label: 'Keep compliance documents current', detail: board.documentsComplete ? 'Required Host Shop documents are accepted.' : `${board.missingDocuments.length} missing and ${board.pendingDocuments.length} awaiting review.`, done: board.documentsComplete, href: '/host-shop/dashboard/documents' },
+            { label: 'Review wage compliance and attendance', detail: 'Confirm the apprentice is being paid under the applicable registered wage schedule and that attendance/work evidence matches actual supervised work.', done: false, href: '/host-shop/dashboard/wages' },
+            { label: 'Check messages, phone, and follow-up', detail: 'Review official communications, missed calls, apprentice issues, meetings, and any follow-up that must be documented this week.', done: false, href: '/host-shop/dashboard/communications' },
+          ].map((item) => <Link key={item.label} href={item.href} className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"><span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>{item.done ? '✓' : '!'}</span><span className="min-w-0"><span className="block font-black text-slate-950">{item.label}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span><span className="mt-2 block text-xs font-black text-blue-800">{item.done ? 'Review record' : 'Open weekly action'} →</span></span></Link>)}
+        </div>
+      </section>
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {summaryCards.map((card) => (
           <PortalImageCard key={card.title} card={card} />
         ))}
       </section>
+      <div className="mt-8">
+        <PortalStartChecklist role="host-shop" />
+        <BusinessNetworkCard href="/host-shop/dashboard/community" label="Barber & Beauty Network" />
+        <HostShopProgramGuide />
+        <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-black text-slate-950">Host Shop app</p>
+            <p className="mt-1 text-sm font-medium text-slate-700">
+              Install this exact Host Shop dashboard for direct access to apprentices, hours,
+              attendance, competencies, and reports.
+            </p>
+          </div>
+          <PwaInstallButton
+            label="Install Host Shop App"
+            installedLabel="Host Shop App Installed"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
+          />
+        </section>
+        {!isPlatformAdmin ? (
+          <div className="mb-5">
+            <EmailAccountNotice href="/host-shop/email" />
+          </div>
+        ) : null}
+        <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">
+                Host Shop Network launch
+              </p>
+              <h2 className="mt-2 text-2xl font-black">
+                Put your shop in front of apprentices and local customers.
+              </h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-200">
+                Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then
+                share your profile link from your website, Google Business Profile, and social pages.
+                Visibility and results vary; a complete, accurate profile gives people more ways to
+                discover and contact your business.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
+              <Link
+                href="/host-shop/dashboard/profile"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950"
+              >
+                Complete My Network Profile
+              </Link>
+              <a
+                href="https://www.elevateforhumanity.org/partners/host-shops"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white"
+              >
+                View the Public Network
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
       {publicMedia.length || publicProfile?.video_url ? (
         <section className="mt-8">
           <h2 className="mb-4 text-2xl font-black text-slate-950">Your public Host Shop gallery</h2>

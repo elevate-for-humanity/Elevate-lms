@@ -86,7 +86,7 @@ export function ServiceHealthPanel() {
         <div className="px-5 py-4 text-sm text-red-600">{error}</div>
       ) : !snapshot ? (
         <div className="divide-y divide-slate-100">
-          {['Supabase Database', 'Supabase Config', 'SendGrid', 'Stripe', 'Redis / Queue', 'Resend (inbound)', 'AI Provider'].map((name) => (
+          {['Supabase Database', 'Supabase Config', 'SendGrid', 'QuickBooks', 'Redis / Queue', 'Resend (inbound)', 'AI Provider'].map((name) => (
             <div key={name} className="flex items-center justify-between px-5 py-3">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-slate-200 animate-pulse" />

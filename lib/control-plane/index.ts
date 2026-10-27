@@ -8,6 +8,7 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { setAuditContext } from '@/lib/audit-context';
 
 const execAsync = promisify(exec);
 
@@ -172,6 +173,12 @@ export async function checkAllHealth(tenantId: string): Promise<{
 
 // Control Actions
 const CONTROL_ACTIONS: Record<string, ControlAction> = {
+  'workflow_repair': {
+    action_type: 'workflow_repair',
+    target_service: 'devstudio',
+    description: 'Queue an approved portal workflow diagnostic for verified PARIS code repair',
+    requires_approval: true,
+  },
   'cache_clear': {
     action_type: 'cache_clear',
     target_service: 'cloudflare',
@@ -257,6 +264,7 @@ export async function executeControlAction(
       status: action.requires_approval ? 'pending' : 'running',
       triggered_by: userId,
       requires_approval: action.requires_approval,
+      ...(actionType === 'workflow_repair' ? {approval_status: 'pending'} : {}),
       ip_address: ipAddress,
     })
     .select()
@@ -479,6 +487,28 @@ export async function approveAction(
 
   if (!action) {
     return { success: false, message: 'Action not found' };
+  }
+
+  if (action.action_type === 'workflow_repair') {
+    const db = await getSupabaseClient();
+    const {data: profile, error} = await db.from('profiles').select('role,tenant_id')
+      .eq('id', approverId).maybeSingle();
+    if (error || !profile) return {success: false, message: 'Administrator identity could not be verified.'};
+    try {
+      await setAuditContext(db, { actorUserId: approverId, systemActor: 'control_plane_workflow_approval' });
+      const {approveWorkflowRepair} = await import('./workflow-repairs');
+      const repair = await approveWorkflowRepair(db, actionId, {
+        actorId: approverId, actorRoles: [profile.role], tenantId: profile.tenant_id ?? null,
+      });
+      return {
+        success: true,
+        message: repair.verified
+          ? `Code repair ${repair.repairId} was verified; the affected workflow still needs a user retry.`
+          : `Workflow repair ${repair.repairId} is ${repair.status}; completion is not yet verified.`,
+      };
+    } catch {
+      return {success: false, message: 'Workflow repair approval could not be completed.'};
+    }
   }
 
   if (action.approval_status === 'approved') {

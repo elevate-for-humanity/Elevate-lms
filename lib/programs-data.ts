@@ -23,7 +23,7 @@ export const PROGRAMS: ProgramData[] = [
       'State-Approved Earn and Learn Program! Earn IRS VITA/TCE, QuickBooks Pro Advisor, and Microsoft 365 certifications in just 10 weeks. Learn federal and state tax law, bookkeeping, and financial literacy with supervised practicum at IRS-approved VITA site. Graduate ready for Tax Preparer, Bookkeeping Assistant, and Financial Service Specialist roles.',
     funding: 'WIOA • WRG • Earn and Learn',
     duration: '10 Weeks • 150 Hours',
-    image: '/hero-images/business-hero.webp',
+    image: '/images/business-collaboration-vibrant-2026.webp',
     etplApproved: true,
     syllabusUrl: '/docs/syllabi/tax-prep-financial-services.md',
   },

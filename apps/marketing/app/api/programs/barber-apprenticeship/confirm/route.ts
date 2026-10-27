@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       message:
         response === 'yes'
           ? 'Thank you for confirming! We will contact you within 24 hours to schedule your orientation.'
-          : 'We understand. If you change your mind, contact us at ' + PLATFORM_DEFAULTS.supportPhone + '.',
+          : 'We understand. If you change your mind, contact us at ' + PLATFORM_DEFAULTS.mainPhone + '.',
     });
   } catch (err) {
     logger.error('[BarberConfirm] Error:', err);

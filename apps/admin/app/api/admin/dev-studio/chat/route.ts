@@ -1,3 +1,8 @@
+import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
+import { prohibitsToolUse } from '@/lib/ai/command-intent';
+import { recordParisObservation } from '@/lib/ai/runtime/supervision';
+import { executeStudioCommand } from '@/lib/studio/runtime-command';
+import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
  * /api/admin/dev-studio/chat
  *
@@ -11,6 +16,7 @@
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
 import { after, NextRequest, NextResponse } from 'next/server';
+import { createAdminChatClient } from '@/lib/ai/admin-chat-client';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,7 +27,7 @@ import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
+import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
 import { isXAIConfigured } from '@/lib/ai/xai-config';
 import {
   executePaidInference,
@@ -30,6 +36,7 @@ import {
 } from '@/lib/ai/paid-inference-gateway';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
+import { createMasterStudioRun } from '@/lib/studio/master-runtime';
 import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
 import { ROUTE_DEPENDENCIES, lookupRoute, lookupTable } from '@/lib/platform/knowledge-graph';
 import { PROGRAM_REGISTRY, getProgramBySlug } from '@/lib/platform/system-registry';
@@ -114,6 +121,11 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
   return [...selected];
 }
 
+async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
+  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
+  return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
+}
+
 async function recordUnifiedCapabilityUse(
   db: Awaited<ReturnType<typeof requireAdminClient>>,
   slugs: string[],
@@ -151,7 +163,7 @@ async function recordUnifiedCapabilityUse(
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
   xai: ['grok-4.6'],
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
-  openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
+  openai: ['gpt-6-luna', 'gpt-4.1-mini', 'gpt-4o-mini'],
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
   anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
 };
@@ -446,15 +458,15 @@ const TOOLS: any[] = [
     function: {
       name: 'build_course',
       description:
-        'Queue durable generation, validation, persistence, governance normalization, and automated quality-gated publishing through the canonical Course Factory. ' +
+        'Queue durable generation through the Ultimate Course Builder 20-stage production pipeline, including instructional depth, media, narration, assessment, QA, repair, and LMS release evidence. ' +
         'Use when the user says "build a course", "create a course", "make a course about", or "generate a course". ' +
-        'Returns a resumable job ID immediately; duplicate active builds for the same canonical target are suppressed.',
+        'Returns a durable Ultimate build/job identity; the Google Cloud Run Ultimate worker claims and checkpoints the build.',
       parameters: {
         type: 'object',
         properties: {
           course_id: {
             type: 'string',
-            description: 'Existing canonical course UUID to refresh in place',
+            description: 'Optional existing course UUID. Omit to create a new draft course.',
           },
           program_id: {
             type: 'string',
@@ -476,7 +488,7 @@ const TOOLS: any[] = [
           state: { type: 'string', description: 'State/jurisdiction when relevant' },
           credential: { type: 'string', description: 'Credential or license target when relevant' },
         },
-        required: ['title'],
+        required: ['program_slug', 'title'],
       },
     },
   },
@@ -485,7 +497,7 @@ const TOOLS: any[] = [
     function: {
       name: 'generate_videos',
       description:
-        'Start video generation for a saved course. Uses TTS narration (OpenAI) + Pexels b-roll + ffmpeg pipeline. ' +
+        'Inspect or repair the Ultimate course media stages. Media, Cloudflare narration, licensed Envato assets, Remotion rendering, captions and QA are owned by the Ultimate pipeline; this is not a separate video-generation authority. ' +
         'Use when user says "generate videos", "make videos for this course", "add videos", etc.',
       parameters: {
         type: 'object',
@@ -494,11 +506,6 @@ const TOOLS: any[] = [
             type: 'string',
             description: 'Canonical course ID from build_course',
           },
-          voice: {
-            type: 'string',
-            description: 'TTS voice: alloy | echo | fable | onyx | nova | shimmer (default alloy)',
-          },
-          use_pexels: { type: 'boolean', description: 'Use Pexels b-roll footage (default true)' },
         },
         required: ['course_id'],
       },
@@ -1063,7 +1070,7 @@ async function execTool(
       } catch (error) {
         return JSON.stringify(
           {
-            evidenceType: 'live-playwright-browser-audit',
+            evidenceType: 'live-cdp-browser-audit',
             status: 'failed',
             error: error instanceof Error ? error.message : 'Live browser audit failed',
             verified: false,
@@ -1198,184 +1205,73 @@ async function execTool(
       if (!isSafeCommand(cmd)) {
         return `Command not permitted: "${cmd}". Only read-only diagnostics are allowed.`;
       }
-      try {
-        const { execSync } = await import('child_process');
-        const out = execSync(cmd, {
-          encoding: 'utf8',
-          timeout: 10_000,
-          cwd: process.cwd(),
-        });
-        return out.slice(0, 4000);
-      } catch {
-        return 'Command execution failed';
-      }
+      const result = await executeStudioCommand(cmd);
+      return JSON.stringify({...result,stdout:result.stdout.slice(0,4000),stderr:result.stderr.slice(0,4000)});
+
     }
 
     // ── Course generation ──────────────────────────────────────────────────
     case 'build_course': {
       if (!actorUserId) throw new Error('Authenticated operator identity is required');
-      const requestedCourseId = String(args.course_id || '').trim();
-      let programId = String(args.program_id || '').trim() || undefined;
-      const programSlug = String(args.program_slug || '').trim() || undefined;
-      let canonicalTitle = '';
-
-      if (requestedCourseId) {
-        const db = await requireAdminClient();
-        const { data: existingCourse, error: courseLookupError } = await db
-          .from('courses')
-          .select('id, title, program_id')
-          .eq('id', requestedCourseId)
-          .maybeSingle();
-        if (courseLookupError) {
-          throw new Error(
-            `Unable to resolve canonical course ${requestedCourseId}: ${courseLookupError.message}`,
-          );
-        }
-        if (!existingCourse) return `Canonical course not found: ${requestedCourseId}`;
-        canonicalTitle = String(existingCourse.title || '').trim();
-        programId = String(existingCourse.program_id || '').trim() || programId;
-      }
-
-      const title = String(args.title || canonicalTitle).trim();
-      if (!title) return 'title or course_id is required to build a course';
-
-      const description = String(args.description || title).trim();
-      const audience = String(args.audience || 'adult workforce learners').trim();
-      const moduleCount = Math.max(1, Math.min(40, Number(args.modules || 5)));
-      const lessonsPerModule = Math.max(1, Math.min(20, Number(args.lessons_per_module || 3)));
-      const hours = Number(args.hours || 0) || undefined;
-      const state = typeof args.state === 'string' ? args.state.trim() || undefined : undefined;
-      const credential =
-        typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
-
-      const factoryInput = {
-        title,
-        topic: description,
-        ...(requestedCourseId ? { courseId: requestedCourseId } : {}),
-        ...(programId ? { programId } : {}),
-        ...(programSlug ? { programSlug } : {}),
-        audience,
-        ...(hours !== undefined ? { hours } : {}),
-        ...(state !== undefined ? { state } : {}),
-        ...(credential !== undefined ? { credential } : {}),
-        moduleCount,
-        lessonsPerModule,
-        contentSource: 'ai',
-        mode: 'refresh',
-        videoMode: 'queue',
-        dryRun: false,
-      };
-
       const db = await requireAdminClient();
-      const target = requestedCourseId || programId || programSlug || title.toLowerCase();
-      const idempotencyKey = `course_build:${target}`;
-      const { data: existing } = await db
-        .from('devstudio_jobs')
-        .select('id, status, stage, progress')
-        .eq('idempotency_key', idempotencyKey)
-        .in('status', ['queued', 'running'])
-        .maybeSingle();
-      if (existing) {
-        return JSON.stringify({
-          __type: 'course_build_queued',
-          success: true,
-          jobId: existing.id,
-          status: existing.status,
-          stage: existing.stage,
-          progress: existing.progress,
-          message: `This canonical course already has an active build. Resuming job ${existing.id}.`,
-        });
+      const requestedCourseId = String(args.course_id || '').trim();
+      const programSlug = String(args.program_slug || '').trim();
+      if (!programSlug) return 'program_slug is required for an Ultimate build';
+      const requestedTitle = String(args.title || '').trim();
+      if (!requestedTitle) return 'title is required for an Ultimate build';
+
+      let course: { id: string; title: string; program_id: string | null } | null = null;
+      if (requestedCourseId) {
+        const result = await db.from('courses').select('id,title,program_id')
+          .eq('id', requestedCourseId).maybeSingle();
+        if (result.error) throw result.error;
+        if (!result.data) return `Canonical course not found: ${requestedCourseId}`;
+        course = result.data;
+      } else {
+        // A natural-language request must create a fresh canonical draft first.
+        // Resolve program ownership from the canonical program registry, not an AI-generated UUID.
+        const { data: program, error: programError } = await db.from('programs')
+          .select('id,slug').eq('slug', programSlug).maybeSingle();
+        if (programError) throw programError;
+        if (!program) return `Canonical program not found: ${programSlug}`;
+        const { randomUUID } = await import('node:crypto');
+        const slug = `${requestedTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70)}-${randomUUID().slice(0, 8)}`;
+        const created = await db.from('courses').insert({
+          title: requestedTitle,
+          slug,
+          program_id: program.id,
+          status: 'draft',
+          created_by: actorUserId,
+          description: String(args.description || ''),
+        }).select('id,title,program_id').single();
+        if (created.error || !created.data) throw created.error ?? new Error('ULTIMATE_COURSE_CREATE_FAILED');
+        course = created.data;
       }
 
-      const { data: job, error: enqueueError } = await db
-        .from('devstudio_jobs')
-        .insert({
-          user_id: actorUserId,
-          command: `Build canonical course: ${title}`,
-          status: 'queued',
-          stage: 'queued',
-          progress: 0,
-          tool_name: 'build_course',
-          tool_args: factoryInput,
-          idempotency_key: idempotencyKey,
-          log_lines: ['Course build accepted and queued.'],
-        })
-        .select('id')
-        .single();
-      if (enqueueError || !job)
-        throw new Error(
-          `Unable to queue Course Builder: ${enqueueError?.message ?? 'no job returned'}`,
-        );
-
-      after(async () => {
-        const secret = process.env.CRON_SECRET;
-        if (!secret) return;
-        const baseUrl =
-          process.env.ADMIN_URL ||
-          process.env.NEXT_PUBLIC_ADMIN_URL ||
-          'https://admin.elevateforhumanity.org';
-        await fetch(`${baseUrl}/api/cron/process-course-builder-jobs`, {
-          headers: { authorization: `Bearer ${secret}` },
-          cache: 'no-store',
-        }).catch((error) =>
-          logger.warn('[devstudio/chat] Course Builder wake-up failed', normalizeError(error)),
-        );
+      const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
+        courseId:course.id,programSlug,actorId:actorUserId,title:String(args.title || course.title),
+        state:String(args.state || 'IN'),goal:String(args.description || ''),
       });
-
-      return JSON.stringify(
-        {
-          __type: 'course_build_queued',
-          success: true,
-          jobId: job.id,
-          courseId: requestedCourseId || null,
-          title,
-          status: 'queued',
-          stage: 'queued',
-          progress: 0,
-          url: requestedCourseId ? `/studio/courses/${requestedCourseId}` : null,
-          message: `Course "${title}" is queued for durable generation, validation, governance normalization, and automated publishing. You can leave or reload Studio without losing the run.`,
-        },
-        null,
-        2,
-      );
+      return JSON.stringify({__type:'ultimate_course_build_queued',success:true,
+        buildId:queued.build.id,jobId:queued.job.id,courseId:course.id,title:course.title,
+        status:queued.job.status,stage:queued.build.current_step,
+        message:'Command persisted in the existing Ultimate worker queue.'});
     }
 
     case 'generate_videos': {
-      const courseId = String(args.course_id || '');
-      if (!courseId) return 'course_id is required';
-
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
-        const res = await fetch(`${baseUrl}/api/admin/courses/${courseId}/generate-videos`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-internal-key': process.env.INTERNAL_API_KEY || '',
-          },
-          body: JSON.stringify({
-            provider: args.provider || 'auto',
-            voice: args.voice || 'alloy',
-            usePexels: args.use_pexels !== false,
-          }),
-        }).catch(() => null);
-
-        if (res?.ok) {
-          const data = await res.json();
-          return JSON.stringify({
-            __type: 'video_generation_started',
-            jobId: data.jobId,
-            lessonCount: data.lessonCount,
-            message: `Video generation started for ${data.lessonCount} lessons. TTS + Pexels b-roll pipeline running.`,
-          });
-        }
-        return JSON.stringify({
-          __type: 'video_generation_started',
-          courseId,
-          message: 'Video generation queued. Check /studio/courses/' + courseId + ' for progress.',
-        });
-      } catch {
-        return 'Video generation failed';
-      }
+      if (!actorUserId) throw new Error('Authenticated operator identity is required');
+      const courseId = String(args.course_id || '').trim();
+      if (!courseId) throw new Error('course_id is required');
+      const db = await requireAdminClient();
+      const { data: build, error } = await db.from('ultimate_course_builds')
+        .select('id,course_id,status,current_step').eq('course_id',courseId)
+        .neq('status','published').order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if (error) throw error;
+      if (!build) throw new Error('Create the canonical Ultimate build before requesting lesson media');
+      const queued = await new DevStudioUltimateCourseControl(db).queue(build.id,actorUserId);
+      return JSON.stringify({__type:'ultimate_course_build_queued',success:true,
+        buildId:build.id,jobId:queued.job.id,courseId,status:queued.job.status,
+        message:'Lesson media command persisted in the existing Ultimate worker queue.'});
     }
 
     case 'analyze_document': {
@@ -1523,30 +1419,241 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
+    // PARIS auto mode uses Elevate-owned inference only. Never silently
+    // select an external metered provider or activate a GPU here.
+    const effectiveProvider: ChatProvider | 'elevate' = providerPreference === 'auto' ? 'elevate' : providerPreference;
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
+    const masterDb = await requireAdminClient();
+    const conversationId = typeof body.conversationId === 'string'
+      ? body.conversationId.trim() : undefined;
+    if (conversationId) {
+      const { data: conversation, error: conversationError } = await masterDb
+        .from('studio_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', auth.userId)
+        .maybeSingle();
+      if (conversationError) {
+        return NextResponse.json({ error: 'Conversation lookup failed' }, { status: 503 });
+      }
+      if (!conversation) {
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      }
+    }
+    const toolsAllowed = !prohibitsToolUse(lastUserMessage);
+    const masterExecution = toolsAllowed && lastUserMessage.trim()
+      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage, conversationId)
+      : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
-      getRAGContext(lastUserMessage),
-      collectAutomaticEvidence(lastUserMessage),
+      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: effectiveProvider === 'elevate' ? 'owned-only' : 'configured-provider' }) : Promise.resolve(''),
+      toolsAllowed ? collectAutomaticEvidence(lastUserMessage) : Promise.resolve([]),
     ]);
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
       agent,
-      ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
+      contextProfile: effectiveProvider === 'elevate'
+        ? (!toolsAllowed && !fileContext && !documentsContext && !isOperationalDiagnosticRequest(lastUserMessage) ? 'conversation' : 'owned-cpu')
+        : 'full',
+      institutionalContext: getAiCharterContext(),
+      ragContext,
       fileContext,
       documentsContext,
       lastUserMessage,
       automaticEvidence: formatAutomaticEvidence(automaticEvidence),
-      toolInventory: TOOLS.map((tool) => tool.function.name),
+      toolInventory: toolsAllowed ? TOOLS.map((tool) => tool.function.name) : [],
     });
 
     let assistantMessage: string | null = null;
     let provider = 'none';
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
-    const providerOrder = [providerPreference === 'auto' ? canonicalProvider : providerPreference];
+
+    // True model streaming for the default Admin conversation. The response is
+    // returned immediately; OpenAI deltas are forwarded as they arrive instead
+    // of waiting for a completed answer and replaying it word-by-word.
+    if (effectiveProvider === 'openai' && isOpenAIConfigured()) {
+      const selectedModel = modelFor('openai', rawModel);
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 503 });
+      }
+      const openai = createAdminChatClient(apiKey);
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(controller) {
+          let complete = '';
+          const streamedToolCalls: Record<number, { id: string; name: string; args: string }> = {};
+          const emit = (payload: Record<string, unknown>) =>
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+          try {
+            const first = await openai.chat.completions.create({
+              model: selectedModel,
+              messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+              tools: toolsAllowed ? TOOLS : undefined,
+              tool_choice: toolsAllowed ? 'auto' : undefined,
+              temperature: 0.4,
+              max_tokens: 4096,
+              stream: true,
+            });
+            for await (const chunk of first) {
+              const delta = chunk.choices[0]?.delta;
+              if (delta?.content) {
+                complete += delta.content;
+                emit({ token: delta.content });
+              }
+              for (const tc of delta?.tool_calls ?? []) {
+                const index = tc.index ?? 0;
+                const row = streamedToolCalls[index] ?? { id: '', name: '', args: '' };
+                if (tc.id) row.id = tc.id;
+                if (tc.function?.name) row.name += tc.function.name;
+                if (tc.function?.arguments) row.args += tc.function.arguments;
+                streamedToolCalls[index] = row;
+              }
+            }
+
+            const calls = Object.values(streamedToolCalls).filter((call) => call.name);
+            if (toolsAllowed && calls.length) {
+              const toolResults = [];
+              const assistantToolCalls = [];
+              for (const call of calls) {
+                let args: Record<string, unknown> = {};
+                try { args = JSON.parse(call.args || '{}'); } catch { /* malformed args become empty */ }
+                const result = await execTool(call.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
+                toolCalls.push({ tool: call.name, args, result });
+                const id = call.id || `call_${crypto.randomUUID()}`;
+                assistantToolCalls.push({
+                  id,
+                  type: 'function' as const,
+                  function: { name: call.name, arguments: JSON.stringify(args) },
+                });
+                toolResults.push({ role: 'tool' as const, tool_call_id: id, content: result });
+                emit({ tool: call.name, toolStatus: 'completed' });
+              }
+
+              const second = await openai.chat.completions.create({
+                model: selectedModel,
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  ...toChatMessages(messages),
+                  { role: 'assistant', content: complete || null, tool_calls: assistantToolCalls },
+                  ...toolResults,
+                ],
+                temperature: 0.4,
+                max_tokens: 4096,
+                stream: true,
+              });
+              for await (const chunk of second) {
+                const token = chunk.choices[0]?.delta?.content;
+                if (token) {
+                  complete += token;
+                  emit({ token });
+                }
+              }
+            }
+
+            const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+            emit({
+              done: true,
+              provider: 'openai',
+              model: selectedModel,
+              providerPreference: effectiveProvider,
+              availableProviders: {
+                xai: isXAIConfigured(),
+                groq: isGroqConfigured(),
+                openai: isOpenAIConfigured(),
+                anthropic: isAnthropicConfigured(),
+                gemini: isGeminiConfigured(),
+              },
+              toolCalls,
+              capabilitiesUsed,
+              studioRun: masterExecution,
+            });
+            after(async () => {
+              try {
+                const db = await requireAdminClient();
+                await db.from('devstudio_chat_log').insert({
+                  user_id: auth.userId,
+                  user_message: lastUserMessage,
+                  assistant_response: complete,
+                  file_context: fileContext || null,
+                  provider: 'openai',
+                  model: selectedModel,
+                });
+                await recordUnifiedCapabilityUse(db, capabilitiesUsed, 'openai', selectedModel, toolCalls);
+              } catch (err: unknown) {
+                logger.warn('[devstudio/chat] streamed DB log failed', normalizeError(err));
+              }
+            });
+          } catch (error) {
+            logger.error('[devstudio/chat] OpenAI stream failed', error);
+            await recordParisObservation({kind:'inference',operation:'studio.openai.stream',status:'failed',durationMs:0,actorId:auth.userId,error});
+            emit({ error: normalizeError(error).message ?? String(error), done: true });
+          } finally {
+            controller.close();
+          }
+        },
+      });
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache, no-transform',
+          'X-Accel-Buffering': 'no',
+          Connection: 'keep-alive',
+        },
+      });
+    }
+
+    if (effectiveProvider === 'elevate') {
+      return studioTextStreamResponse({
+        signal: req.signal,
+        tokens: (signal) => aiChatStream({
+          providerPolicy: 'owned-only',
+          messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+          temperature: 0.4,
+          maxTokens: 2048,
+          signal,
+        }),
+        complete: async (content) => {
+          const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+          try {
+            const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
+              user_id: auth.userId,
+              user_message: lastUserMessage,
+              assistant_response: content,
+              file_context: fileContext || null,
+              provider: 'elevate',
+              model: 'elevate-local',
+            });
+            if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
+            await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
+          } catch (error) {
+            logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
+          }
+          return {
+            provider: 'elevate',
+            model: 'elevate-local',
+            providerPreference,
+            availableProviders: {
+              xai: isXAIConfigured(),
+              groq: isGroqConfigured(),
+              openai: isOpenAIConfigured(),
+              anthropic: isAnthropicConfigured(),
+              gemini: isGeminiConfigured(),
+            },
+            toolCalls,
+            capabilitiesUsed,
+            studioRun: masterExecution,
+          };
+        },
+        onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
+        errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
+      });
+    }
+
+    const providerOrder = [effectiveProvider];
 
     for (const nextProvider of providerOrder) {
       if (assistantMessage) break;
@@ -1558,8 +1665,8 @@ async function _POST(req: NextRequest) {
           const initial = await groq.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...messages],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1570,11 +1677,11 @@ async function _POST(req: NextRequest) {
             (toolCall) => toolCall.type === 'function',
           );
 
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args, auth.userId);
+                const result = await execTool(tc.function.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
                 toolCalls.push({ tool: tc.function.name, args, result });
                 return {
                   role: 'tool' as const,
@@ -1614,12 +1721,14 @@ async function _POST(req: NextRequest) {
       if (nextProvider === 'openai' && isOpenAIConfigured()) {
         try {
           const selectedModel = modelFor('openai', rawModel);
-          const openai = getOpenAIClient();
+          const apiKey = process.env.OPENAI_API_KEY;
+          if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+          const openai = createAdminChatClient(apiKey);
           const initial = await openai.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            tools: TOOLS,
-            tool_choice: 'auto',
+            tools: toolsAllowed ? TOOLS : undefined,
+            tool_choice: toolsAllowed ? 'auto' : undefined,
             temperature: 0.4,
             max_tokens: 4096,
           });
@@ -1628,7 +1737,7 @@ async function _POST(req: NextRequest) {
           const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
             (toolCall) => toolCall.type === 'function',
           );
-          if (toolCallRequests.length > 0) {
+          if (toolsAllowed && toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
@@ -1677,10 +1786,10 @@ async function _POST(req: NextRequest) {
             max_tokens: 4096,
             system: systemPrompt,
             messages: toChatMessages(messages),
-            tools: anthropicTools,
+            tools: toolsAllowed ? anthropicTools : undefined,
           });
           const toolUseBlocks = initial.content.filter((b) => b.type === 'tool_use');
-          if (toolUseBlocks.length > 0) {
+          if (toolsAllowed && toolUseBlocks.length > 0) {
             const toolResults = await Promise.all(
               toolUseBlocks.map(async (b) => {
                 if (b.type !== 'tool_use') return null;
@@ -1733,7 +1842,8 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage) {
+    // The owned Elevate stream returns above; only external providers reach this fallback.
+    if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
@@ -1770,7 +1880,7 @@ async function _POST(req: NextRequest) {
               messages: [{ role: 'system', content: systemPrompt }, ...messages],
               temperature: 0.4,
               maxTokens: 2048,
-              provider: providerPreference === 'auto' ? undefined : providerPreference,
+              provider: effectiveProvider,
             }),
         });
         if (paidExecution.decision === 'approved' && paidExecution.value) {
@@ -1799,16 +1909,18 @@ async function _POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            canonicalProvider === 'none'
-              ? 'LIZZY has no active AI provider. Configure the canonical Elevate, Cloudflare, Groq, Gemini, Anthropic, Azure, or OpenAI provider in Admin → Integrations.'
-              : `LIZZY could not reach the configured ${canonicalProvider} provider. Check that provider connection in Admin → Integrations.`,
+            effectiveProvider === 'openai' && !isOpenAIConfigured()
+              ? 'OpenAI is not configured for Admin Studio. Connect OPENAI_API_KEY in Admin → Integrations.'
+              : canonicalProvider === 'none'
+                ? 'No explicitly selected AI provider is available.'
+                : `LIZZY could not reach the selected ${effectiveProvider} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
             hasXAI: isXAIConfigured(),
             hasOpenAI: isOpenAIConfigured(),
             hasAnthropic: isAnthropicConfigured(),
             hasGemini: isGeminiConfigured(),
-            requestedProvider: providerPreference,
+            requestedProvider: effectiveProvider,
           },
         },
         { status: 503 },
@@ -1864,6 +1976,7 @@ async function _POST(req: NextRequest) {
               },
               toolCalls,
               capabilitiesUsed,
+              studioRun: masterExecution,
             })}\n\n`,
           ),
         );

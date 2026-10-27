@@ -6,7 +6,7 @@
 
 ## PART 1: VENDOR RESEARCH TASK
 
-Research vendor and dropshipping companies for barber, cosmetology, nail technology, and esthetics apprenticeship kits. **Do not complete third-party signups.** Provide step-by-step signup lists.
+Research vendor and dropshipping companies for barber, cosmetology, nail technology, and esthetics apprenticeship kits. **Current user direction (October 12, 2026): prioritize free supplier accounts with no negotiation, supplier-direct shipping, and Elevate-set retail pricing. Prepare account setup and connect approved accounts; do not substitute a signup checklist for implementation. Browser account creation and acceptance of binding terms must follow the active tool requirements.**
 
 ### For each company, provide:
 

@@ -37,12 +37,52 @@ function decodeHtml(value: string): string {
 }
 
 /**
+ * Legacy authored-course payloads sometimes flattened storyboard/LMS control
+ * metadata into the narration string. Those tokens are useful to builders but
+ * must never be spoken to learners. Only activate this cleanup when an
+ * unmistakable control marker is present so normal instructional words such as
+ * "diagram", "practice", or "summary" remain untouched in ordinary lessons.
+ */
+function stripLegacyAuthoringMetadata(value: string): string {
+  const hasLegacyMarkers =
+    /\b(?:knowledge-check-\d+|repository_blueprint|course_lessons|readingGuide\.summary|learning_objectives|preAssessment|video_url|knowledgeChecks|practicalTask|quiz_questions|pre_assessment|review_exam|original_capture|licensed_demonstration)\b/i.test(
+      value,
+    );
+  if (!hasLegacyMarkers) return value;
+
+  return value
+    // A flattened LMS step map is pure navigation metadata and is always a
+    // tail artifact, never part of the lesson's teaching script.
+    .replace(/\bIntroduction\s+readingGuide\.summary\b[\s\S]*$/gi, ' ')
+    .replace(/\bknowledge-check-\d+\b/gi, ' ')
+    .replace(/\b(?:repository_blueprint|course_lessons)\b/gi, ' ')
+    .replace(/\b(?:animated-text|technical-diagram|equipment-image|screen-demonstration)\b/gi, ' ')
+    .replace(/\bInstructor\s+Objective\b/gi, ' ')
+    .replace(/\bInstructor and lesson roadmap\b/gi, ' ')
+    .replace(/\bapproved lesson source\b/gi, ' ')
+    .replace(/\bThree sourced teaching points\b/gi, ' ')
+    .replace(/\bKey concept\b/gi, ' ')
+    .replace(/\bCorrect sequence\b/gi, ' ')
+    .replace(/\bLabeled sequence diagram\b/gi, ' ')
+    .replace(/\bCorrect\s+Needs correction\b/gi, ' ')
+    .replace(/\bSide-by-side correct and incorrect examples\b/gi, ' ')
+    .replace(/\bYour turn\b/gi, ' ')
+    .replace(/\bDecision and evidence checklist\b/gi, ' ')
+    .replace(/\bLesson recap\s+Three takeaways and completed-work evidence\b/gi, ' ')
+    // These are scene-purpose labels from the same flattened timeline. Restrict
+    // removal to cases where the next token begins a learner-facing sentence.
+    .replace(/\b(?:introduction|explanation|diagram|demonstration|practice|summary)\b(?=\s+[A-Z])/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Removes Course Builder production directions that may exist in legacy
  * reading guides or job payloads. These are authoring metadata, never learner
  * narration. The quality gate remains the final fail-closed boundary.
  */
 function sanitizeInternalInstructions(value: string): string {
-  return value
+  return stripLegacyAuthoringMetadata(value)
     .replace(
       /\bApply this to\b[\s\S]{0,1200}?\bchecking the result against the stated objective\.\s*/gi,
       ' ',
@@ -97,15 +137,58 @@ function maximumWords(input: InstructionalScriptRepairInput): number {
 }
 
 function boundNarration(value: string, maximumWordCount: number): string {
-  const tokens = value.split(/\s+/).filter(Boolean);
-  if (tokens.length <= maximumWordCount) return value;
-  const recapWords = Math.min(120, Math.floor(maximumWordCount * 0.2));
-  const teachingWords = maximumWordCount - recapWords;
+  if (words(value).length <= maximumWordCount) return value;
+
+  // Never trim learner narration at an arbitrary token boundary. The previous
+  // word-slice implementation could cut a sentence in half and then splice the
+  // recap bridge directly into the fragment (for example, "apply soothing aloe
+  // vera gel or chamomile Now, connect..."). Keep only complete sentences so
+  // production TTS, captions, and storyboard dialogue remain grammatical.
+  const sentences = value
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
+  if (sentences.length < 2) {
+    const clipped = value.split(/\s+/).filter(Boolean).slice(0, maximumWordCount).join(' ').trim();
+    return /[.!?]$/.test(clipped) ? clipped : `${clipped}.`;
+  }
+
+  const recapBudget = Math.min(120, Math.floor(maximumWordCount * 0.2));
+  const teachingBudget = maximumWordCount - recapBudget;
+  const teaching: string[] = [];
+  let teachingWords = 0;
+  let cursor = 0;
+
+  for (; cursor < sentences.length; cursor += 1) {
+    const sentence = sentences[cursor];
+    const sentenceWords = words(sentence).length;
+    if (teaching.length > 0 && teachingWords + sentenceWords > teachingBudget) break;
+    teaching.push(sentence);
+    teachingWords += sentenceWords;
+    if (teachingWords >= teachingBudget) {
+      cursor += 1;
+      break;
+    }
+  }
+
+  const recap: string[] = [];
+  let recapWords = 0;
+  for (let index = sentences.length - 1; index >= cursor; index -= 1) {
+    const sentence = sentences[index];
+    const sentenceWords = words(sentence).length;
+    if (recap.length > 0 && recapWords + sentenceWords > recapBudget) break;
+    recap.unshift(sentence);
+    recapWords += sentenceWords;
+    if (recapWords >= recapBudget) break;
+  }
+
+  if (!recap.length) return teaching.join(' ').trim();
   return [
-    tokens.slice(0, teachingWords).join(' '),
+    teaching.join(' '),
     'Now, connect those steps to the lesson objective and check your understanding.',
-    tokens.slice(-recapWords).join(' '),
-  ].join(' ');
+    recap.join(' '),
+  ].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
 function readingGuideParts(contentJson: Record<string, unknown>): string[] {
@@ -191,10 +274,11 @@ export function repairInstructionalScript(
     ...(isCheckpoint ? checkpointParts(contentJson) : []),
   ]);
 
-  // Bound repaired narration while retaining enough governed instruction to
-  // satisfy the quality contract and produce a useful lesson-sized video.
-  const repairedWords = words(parts.join(' ')).slice(0, Math.max(minimumWordCount + 80, 500));
-  const script = dedupeTeachingSegments(repairedWords.join(' '));
+  // Preserve learner-facing punctuation while expanding undersized narration.
+  // Converting the governed parts to bare word tokens here destroys sentence
+  // boundaries, which can create malformed recap splices and truncated TTS.
+  // boundNarration already enforces the maximum at complete sentence edges.
+  const script = dedupeTeachingSegments(parts.join(' '));
   const boundedScript = boundNarration(script, maximumWordCount);
   const wordCount = words(boundedScript).length;
   return {

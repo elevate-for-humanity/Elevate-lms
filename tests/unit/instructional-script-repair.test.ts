@@ -9,7 +9,20 @@ describe('instructional script repair', () => {
       lessonType: 'lesson',
       baseScript: 'Ask the client what service they need.',
       content: {
-        html: `<h2>Client consultation</h2><p>${'Assess hair history, service goals, contraindications, maintenance needs, and informed consent before selecting a safe service plan. '.repeat(24)}</p>`,
+        html: `<h2>Client consultation</h2><p>${[
+          'Ask the client to describe their desired result and explain what they expect from the appointment.',
+          'Record recent chemical services, previous reactions, and products used at home before choosing the service.',
+          'Inspect hair texture, density, elasticity, and porosity so the proposed treatment matches the observed condition.',
+          'Examine the scalp for irritation or broken skin and postpone services that would worsen the condition.',
+          'Discuss maintenance time, available tools, and realistic home care before agreeing on a finished style.',
+          'Use open questions to understand concerns and repeat the requested outcome to confirm your understanding.',
+          'Explain the planned technique, anticipated duration, limitations, and alternatives using language the client understands.',
+          'Check product directions and required patch tests before applying a chemical product to the client.',
+          'Document relevant contraindications and follow the salon procedure for referral when the service is unsuitable.',
+          'Ask permission before touching the hair and scalp and explain each assessment step as you work.',
+          'Confirm informed consent after the client has an opportunity to ask questions about the service plan.',
+          'Record the agreed service and follow up on comfort throughout the appointment, adjusting the plan when needed.',
+        ].join(' ')}</p>`,
       },
       contentJson: {},
     });
@@ -43,6 +56,28 @@ describe('instructional script repair', () => {
     expect(result.script).toContain('The correct response is Sanitize the station');
   });
 
+  it('keeps sentence punctuation while expanding undersized narration', () => {
+    const result = repairInstructionalScript({
+      lessonTitle: 'Scalp Treatments',
+      lessonType: 'lesson',
+      baseScript: 'Assess the scalp before service.',
+      content: {
+        html: Array.from(
+          { length: 90 },
+          (_, index) =>
+            `<p>Step ${index + 1} checks scalp condition, sanitation, client comfort, product choice, and observable service evidence.</p>`,
+        ).join(''),
+      },
+      contentJson: {},
+    });
+
+    expect(result.repaired).toBe(true);
+    expect(result.wordCount).toBeGreaterThanOrEqual(180);
+    expect(result.script).toMatch(/[.!?] Now, connect those steps to the lesson objective/);
+    expect(result.script).not.toMatch(/\b(?:condition|sanitation|comfort|choice|evidence) Now, connect/);
+    expect(result.script).toContain('Assess the scalp before service.');
+  });
+
   it('removes repeated teaching sentences from otherwise complete narration', () => {
     const repeated = 'Sanitize the workstation before preparing the client for service.';
     const baseScript = `${'topic instruction '.repeat(180)}. ${repeated} ${repeated}`;
@@ -56,6 +91,27 @@ describe('instructional script repair', () => {
 
     expect(result.repaired).toBe(true);
     expect(result.script.match(/Sanitize the workstation/g)).toHaveLength(1);
+  });
+
+  it('keeps complete sentence boundaries when long narration is bounded', () => {
+    const teaching = Array.from(
+      { length: 82 },
+      (_, index) =>
+        `Step ${index + 1} explains a safe service decision using sanitation, client assessment, correct tools, and observable evidence.`,
+    ).join(' ');
+    const baseScript = `${teaching} Immediately rinse the product completely using cool water and apply soothing aloe vera gel or chamomile. Finish by documenting the client response and reviewing the home-care plan.`;
+    const result = repairInstructionalScript({
+      lessonTitle: 'Scalp Treatments',
+      lessonType: 'lesson',
+      baseScript,
+      content: {},
+      contentJson: {},
+    });
+
+    expect(result.repaired).toBe(true);
+    expect(result.script).toMatch(/[.!?] Now, connect those steps to the lesson objective/);
+    expect(result.script).not.toMatch(/\b(?:gel|chamomile) Now, connect/);
+    expect(result.script).toContain('Finish by documenting the client response');
   });
 
   it('does not rewrite narration that already satisfies the minimum', () => {

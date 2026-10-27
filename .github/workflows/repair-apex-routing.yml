@@ -1,0 +1,41 @@
+name: Verify Durable apex routing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-apex-routing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: durable-apex-routing
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify elevateforhumanity.org redirect
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify apex and canonical production host
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 12); do
+            apex=$(curl -sS -o /dev/null -w '%{http_code}|%{redirect_url}' --max-time 20 https://elevateforhumanity.org/ || true)
+            www=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://www.elevateforhumanity.org/ || true)
+            echo "Attempt ${attempt}/12: apex=${apex:-failed} www=${www:-failed}"
+            apex_code="${apex%%|*}"
+            apex_target="${apex#*|}"
+            if { [ "$apex_code" = "301" ] || [ "$apex_code" = "308" ]; } &&
+               [[ "$apex_target" == https://www.elevateforhumanity.org/* ]] &&
+               [ "$www" = "200" ]; then
+              echo "Apex routing is healthy."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Durable must forward elevateforhumanity.org to https://www.elevateforhumanity.org with a permanent redirect"
+          exit 1

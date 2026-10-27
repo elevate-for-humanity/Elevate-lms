@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-describe('barber host-shop showcase', () => {
+describe('barber host-shop media governance', () => {
   const showcase = readFileSync(
     resolve(process.cwd(), 'components/programs/beauty/HostShopShowcase.tsx'),
     'utf8',
@@ -15,25 +15,32 @@ describe('barber host-shop showcase', () => {
     resolve(process.cwd(), 'apps/marketing/app/programs/barber-apprenticeship/page.tsx'),
     'utf8',
   );
+  const kountryTour = readFileSync(
+    resolve(process.cwd(), 'components/programs/beauty/KountryKutzTourSlideshow.tsx'),
+    'utf8',
+  );
+  const narrator = readFileSync(
+    resolve(process.cwd(), 'components/home/ScrollNarrator.tsx'),
+    'utf8',
+  );
 
-  it('renders one foreground video without a duplicate poster backdrop', () => {
-    const videoBranch = showcase.slice(
-      showcase.indexOf("image?.kind === 'video'"),
-      showcase.indexOf("image && !failedImages.has(image.src)"),
-    );
-    expect(videoBranch).toContain('<video');
-    expect(videoBranch).not.toContain('<Image');
+  it('uses the canonical barber hero instead of duplicating the Kountry Kutz tour video', () => {
+    expect(barberPage).toContain('videoSrcDesktop={heroBanner.videoSrcDesktop}');
+    expect(barberPage).toContain('<KountryKutzTourSlideshow />');
+    expect(barberPage).not.toContain('/videos/partners/kountry-kutz/shop-tour.mp4');
   });
 
-  it('does not run page narration over the narrated Razor video', () => {
-    expect(partners).toContain("enableNarration={programSlug !== 'barber-apprenticeship'}");
-    expect(showcase).toContain('data-scroll-narration={enableNarration ? true : undefined}');
+  it('presents Kountry Kutz as one accessible photo slideshow', () => {
+    expect(kountryTour).toContain('aria-label="Kountry Kutz photo tour"');
+    expect(kountryTour).toContain('/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp');
+    expect(kountryTour).toContain('/images/partners/kountry-kutz/interior-active-enhanced-2026.webp');
+    expect(kountryTour).toContain('object-contain');
   });
 
-  it('connects the Kountry Kutz hero and barber journey to scroll narration', () => {
-    expect(barberPage).toContain(
-      '<div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>',
-    );
-    expect(barberPage.match(/data-scroll-narration/g)?.length).toBeGreaterThanOrEqual(6);
+
+  it('allows only one audible website media source at a time', () => {
+    expect(narrator).toContain("document.addEventListener('play', governAudibleMedia, true)");
+    expect(narrator).toContain('stopAllNaturalVoicePlayback()');
+    expect(narrator).toContain('pauseOtherAudibleMedia(media)');
   });
 });

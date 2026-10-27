@@ -20,6 +20,8 @@
     {"src":"/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
   "shortcuts": [
+    {"name":"Interoffice Email","short_name":"Email","url":"/phone/email"},
+    {"name":"Text Messages","short_name":"Texts","url":"/phone/texts"},
     {"name":"Admin Dashboard","short_name":"Dashboard","url":"/dashboard","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Phone System","short_name":"Phone","url":"/phone","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Admin AI Studio","short_name":"Studio","url":"/studio","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},

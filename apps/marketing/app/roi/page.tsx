@@ -1,17 +1,52 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  TrendingUp, Users, Clock, DollarSign, Target, Award,
-  BarChart3, Shield, CheckCircle, ArrowRight, Building,
-  GraduationCap, Briefcase, FileText, PieChart, Zap,
-  HeartHandshake, Recycle, Database, AlertCircle
+import {
+  TrendingUp,
+  Users,
+  Clock,
+  DollarSign,
+  Target,
+  Award,
+  BarChart3,
+  Shield,
+  CheckCircle,
+  ArrowRight,
+  Building,
+  GraduationCap,
+  Briefcase,
+  FileText,
+  PieChart,
+  Zap,
+  HeartHandshake,
+  Recycle,
+  Database,
+  AlertCircle,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'ROI & Value',
-  keywords: ["ROI", "return on investment", "workforce development", "cost savings", "efficiency", "outcomes"],
-  description: 'See the return on investment for workforce agencies, schools, and employers using Elevate. Measurable improvements in efficiency and outcomes.',
+  keywords: [
+    'ROI',
+    'return on investment',
+    'workforce development',
+    'cost savings',
+    'efficiency',
+    'outcomes',
+  ],
+  description:
+    'See the return on investment for workforce agencies, schools, and employers using Elevate. Measurable improvements in efficiency and outcomes.',
+
+  ...publicArtworkMetadata({
+    path: '/roi',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative team reviewing business operations',
+    title: 'ROI & Value',
+    description:
+      'See the return on investment for workforce agencies, schools, and employers using Elevate. Measurable improvements in efficiency and outcomes.',
+  }),
 };
 
 const customerSegments = [
@@ -24,20 +59,20 @@ const customerSegments = [
       'Manual tracking of participant progress',
       'Complex WIOA compliance reporting',
       'Limited visibility into outcomes',
-      'Time-consuming data entry across systems'
+      'Time-consuming data entry across systems',
     ],
     solutions: [
       'Automated participant tracking',
       'Built-in WIOA reporting',
       'Real-time outcome dashboards',
-      'Single system for all data'
+      'Single system for all data',
     ],
     metrics: [
       { label: 'Time Saved Weekly', value: '15+', unit: 'hours' },
       { label: 'Reporting Time', value: '80%', unit: 'faster' },
       { label: 'Data Accuracy', value: '99%', unit: 'improved' },
-      { label: 'Participant Capacity', value: '3x', unit: 'increase' }
-    ]
+      { label: 'Participant Capacity', value: '3x', unit: 'increase' },
+    ],
   },
   {
     id: 'schools',
@@ -48,20 +83,20 @@ const customerSegments = [
       'Slow program launch processes',
       'Difficult student progress tracking',
       'Credential management complexity',
-      'Employer connection gaps'
+      'Employer connection gaps',
     ],
     solutions: [
       'Pre-built program templates',
       'Real-time student dashboards',
       'Automated credential issuance',
-      'Direct employer pipeline'
+      'Direct employer pipeline',
     ],
     metrics: [
       { label: 'Program Launch', value: '40%', unit: 'faster' },
       { label: 'Student Completion', value: '25%', unit: 'increase' },
       { label: 'Credential Issuance', value: '90%', unit: 'faster' },
-      { label: 'Employer Partners', value: '5x', unit: 'more' }
-    ]
+      { label: 'Employer Partners', value: '5x', unit: 'more' },
+    ],
   },
   {
     id: 'employers',
@@ -72,31 +107,37 @@ const customerSegments = [
       'Finding skilled talent',
       'Managing apprenticeship programs',
       'Tracking employee certifications',
-      'Compliance documentation burden'
+      'Compliance documentation burden',
     ],
     solutions: [
       'Pre-screened candidate pipeline',
       'Complete apprenticeship management',
       'Digital credential verification',
-      'Automated compliance records'
+      'Automated compliance records',
     ],
     metrics: [
       { label: 'Hiring Time', value: '50%', unit: 'reduced' },
       { label: 'Training Costs', value: '30%', unit: 'saved' },
       { label: 'Compliance Audit', value: '100%', unit: 'pass rate' },
-      { label: 'Employee Retention', value: '40%', unit: 'higher' }
-    ]
-  }
+      { label: 'Employee Retention', value: '40%', unit: 'higher' },
+    ],
+  },
 ];
 
 export default function ROIPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative team reviewing business operations"
+        actions={[
+          { href: '/contact', label: 'Discuss your requirements' },
+          { href: '/store/plans', label: 'Review published plans' },
+        ]}
+      />
+
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <Image src="/images/barber-professional.webp" alt="Return on investment - Elevate for Humanity workforce solutions" fill className="object-cover" sizes="100vw" />
-        </div>
+      <section className="relative bg-slate-950 text-white py-8 sm:py-10 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -107,14 +148,20 @@ export default function ROIPage() {
               Measure What Matters
             </h1>
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Workforce development leaders choose Elevate because they see measurable improvements 
+              Workforce development leaders choose Elevate because they see measurable improvements
               in efficiency, outcomes, and return on investment. Here's what our partners achieve.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/demos" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/demos"
+                className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 See It In Action <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/contact"
+                className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 Calculate Your ROI
               </Link>
             </div>
@@ -164,8 +211,8 @@ export default function ROIPage() {
               <button
                 key={segment.id}
                 className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                  segment.id === 'workforce' 
-                    ? 'bg-brand-blue-600 text-white' 
+                  segment.id === 'workforce'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -184,7 +231,9 @@ export default function ROIPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">For Workforce Agencies</h3>
-                  <p className="text-blue-100">Reduce manual tracking. Manage participants. Track outcomes.</p>
+                  <p className="text-blue-100">
+                    Reduce manual tracking. Manage participants. Track outcomes.
+                  </p>
                 </div>
               </div>
             </div>
@@ -222,7 +271,9 @@ export default function ROIPage() {
                 </div>
               </div>
               <div className="mt-8 pt-8 border-t border-slate-200">
-                <h4 className="text-lg font-bold text-slate-900 mb-6 text-center">Measurable Results</h4>
+                <h4 className="text-lg font-bold text-slate-900 mb-6 text-center">
+                  Measurable Results
+                </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {customerSegments[0].metrics.map((metric, i) => (
                     <div key={i} className="bg-brand-blue-50 rounded-xl p-4 text-center">
@@ -244,7 +295,9 @@ export default function ROIPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">For Schools & Colleges</h3>
-                  <p className="text-orange-100">Launch programs faster. Manage students. Connect to employers.</p>
+                  <p className="text-orange-100">
+                    Launch programs faster. Manage students. Connect to employers.
+                  </p>
                 </div>
               </div>
             </div>
@@ -282,7 +335,9 @@ export default function ROIPage() {
                 </div>
               </div>
               <div className="mt-8 pt-8 border-t border-slate-200">
-                <h4 className="text-lg font-bold text-slate-900 mb-6 text-center">Measurable Results</h4>
+                <h4 className="text-lg font-bold text-slate-900 mb-6 text-center">
+                  Measurable Results
+                </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {customerSegments[1].metrics.map((metric, i) => (
                     <div key={i} className="bg-orange-50 rounded-xl p-4 text-center">
@@ -304,7 +359,9 @@ export default function ROIPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">For Employers</h3>
-                  <p className="text-emerald-100">Track apprentices. Build talent pipeline. Reduce compliance burden.</p>
+                  <p className="text-emerald-100">
+                    Track apprentices. Build talent pipeline. Reduce compliance burden.
+                  </p>
                 </div>
               </div>
             </div>
@@ -342,7 +399,9 @@ export default function ROIPage() {
                 </div>
               </div>
               <div className="mt-8 pt-8 border-t border-slate-200">
-                <h4 className="text-lg font-bold text-slate-900 mb-6 text-center">Measurable Results</h4>
+                <h4 className="text-lg font-bold text-slate-900 mb-6 text-center">
+                  Measurable Results
+                </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {customerSegments[2].metrics.map((metric, i) => (
                     <div key={i} className="bg-emerald-50 rounded-xl p-4 text-center">
@@ -391,7 +450,9 @@ export default function ROIPage() {
                   </div>
                   <div>
                     <p className="font-medium text-slate-900">Multiple disconnected systems</p>
-                    <p className="text-sm text-slate-600">Duplicated data, sync errors, confusion</p>
+                    <p className="text-sm text-slate-600">
+                      Duplicated data, sync errors, confusion
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -415,8 +476,8 @@ export default function ROIPage() {
               </ul>
               <div className="mt-8 p-4 bg-red-50 rounded-xl border border-red-200">
                 <p className="text-sm text-red-800">
-                  <strong>Estimated annual cost:</strong> $50,000-$100,000 in staff time, 
-                  compliance risks, and missed opportunities.
+                  <strong>Estimated annual cost:</strong> $50,000-$100,000 in staff time, compliance
+                  risks, and missed opportunities.
                 </p>
               </div>
             </div>
@@ -451,7 +512,9 @@ export default function ROIPage() {
                   </div>
                   <div>
                     <p className="font-medium text-slate-900">One-click reports</p>
-                    <p className="text-sm text-slate-600">WIOA, DOL, and custom reports instantly</p>
+                    <p className="text-sm text-slate-600">
+                      WIOA, DOL, and custom reports instantly
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -466,8 +529,8 @@ export default function ROIPage() {
               </ul>
               <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-200">
                 <p className="text-sm text-green-800">
-                  <strong>Platform cost:</strong> Starting at $399/month for Small Business. 
-                  ROI achieved in the first month for most organizations.
+                  <strong>Platform cost:</strong> Starting at $399/month for Small Business. ROI
+                  achieved in the first month for most organizations.
                 </p>
               </div>
             </div>
@@ -574,17 +637,21 @@ export default function ROIPage() {
       {/* CTA Section */}
       <section className="py-20 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to See Your ROI?
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to See Your ROI?</h2>
           <p className="text-xl text-blue-100 mb-8">
             Schedule a personalized demo and get a custom ROI analysis for your organization.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/demos" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/demos"
+              className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Schedule Demo <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Contact Sales
             </Link>
           </div>

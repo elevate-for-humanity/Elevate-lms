@@ -26,7 +26,7 @@ export type AIToolDefinition = {
 
 const ADMIN_ROLES = ['admin', 'super_admin', 'staff'] as const;
 const PRIVILEGED_ADMIN_ROLES = ['admin', 'super_admin'] as const;
-const DEVSTUDIO_AGENTS = ['LIZZY', 'ZORA'] as const;
+const DEVSTUDIO_AGENTS = ['PARIS', 'LIZZY', 'ZORA'] as const;
 
 function queryPath(
   path: string,
@@ -44,6 +44,64 @@ function queryPath(
 }
 
 export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
+  {
+    name:'paris.supervision', description:'Read the combined PARIS AI execution observations, classified failures and course worker supervision.',
+    method:'GET', path:'/api/paris/supervision', classification:'read', risk:'low', scope:'platform',
+    allowedAgents:['PARIS','ELLIE','LIZZY','ZORA'], allowedRoles:PRIVILEGED_ADMIN_ROLES,
+    approvalRequired:false, idempotent:true, timeoutMs:15_000, retryAttempts:1, audit:true,
+  },
+  {
+    name: 'studio.runtime.files',
+    description: 'List files in the canonical Master Studio Linux workspace.',
+    method: 'GET',
+    path: '/api/admin/dev-studio/runtime?operation=files',
+    classification: 'read',
+    risk: 'low',
+    scope: 'platform',
+    allowedAgents: DEVSTUDIO_AGENTS,
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    approvalRequired: false,
+    idempotent: true,
+    timeoutMs: 20_000,
+    retryAttempts: 2,
+    audit: true,
+  },
+  {
+    name: 'studio.runtime.exec',
+    description: 'Execute an allowlisted command in the canonical Master Studio Linux workspace.',
+    method: 'POST',
+    path: '/api/admin/dev-studio/runtime',
+    classification: 'write',
+    risk: 'high',
+    scope: 'platform',
+    allowedAgents: DEVSTUDIO_AGENTS,
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    requiredInput: ['command'],
+    approvalRequired: true,
+    confirmationPhrase: 'CONFIRM STUDIO EXEC',
+    idempotent: false,
+    timeoutMs: 120_000,
+    retryAttempts: 1,
+    audit: true,
+  },
+  {
+    name: 'studio.engineering.execute',
+    description:
+      'Use combined PARIS to diagnose and patch repository code, then run independent tests before non-force main publication and verified deployment.',
+    method: 'POST',
+    path: '/api/admin/dev-studio/engineering',
+    classification: 'write',
+    risk: 'medium',
+    scope: 'platform',
+    allowedAgents: ['LIZZY'],
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    requiredInput: ['task'],
+    approvalRequired: false,
+    idempotent: false,
+    timeoutMs: 300_000,
+    retryAttempts: 1,
+    audit: true,
+  },
   {
     name: 'applications.search',
     description: 'Read the current application queue and application records.',
@@ -164,6 +222,23 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'courses.health',
+    description: 'Read Course Builder capability, database, and instructional integrity checks.',
+    method: 'GET', path: '/api/admin/courses/health',
+    classification: 'read', risk: 'low', scope: 'platform',
+    allowedAgents: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'], allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    approvalRequired: false, idempotent: true, timeoutMs: 30_000, retryAttempts: 1, audit: true,
+  },
+  {
+    name: 'courses.status',
+    description: 'Read canonical course worker, PARIS monitor, and checkpoint status. Never infer execution from a queue acknowledgment.',
+    method: 'GET',
+    path: input => queryPath('/api/admin/ultimate-course-builder', input, ['courseId','buildId']),
+    classification: 'read', risk: 'low', scope: 'platform',
+    allowedAgents: ['PARIS','ELLIE','LIZZY','ZORA'], allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    approvalRequired: false, idempotent: true, timeoutMs: 25000, retryAttempts: 1, audit: true,
+  },
+  {
     name: 'courses.generate',
     description:
       'Create or resume one complete governed course through the Dev Studio agent and canonical Course Builder, including assessments, lesson media, program mapping, acceptance, and publication readiness.',
@@ -172,7 +247,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     classification: 'write',
     risk: 'medium',
     scope: 'platform',
-    allowedAgents: ['ELLIE', 'LIZZY'],
+    allowedAgents: ['PARIS', 'ELLIE', 'LIZZY'],
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
     requiredInput: ['goal'],
     approvalRequired: true,
@@ -601,22 +676,6 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
-    name: 'workflows.buildCourses',
-    description: 'Run the existing course-build autopilot.',
-    method: 'POST',
-    path: '/api/autopilots/build-courses',
-    classification: 'write',
-    risk: 'medium',
-    scope: 'platform',
-    allowedAgents: ['LIZZY'],
-    allowedRoles: PRIVILEGED_ADMIN_ROLES,
-    approvalRequired: false,
-    idempotent: false,
-    timeoutMs: 120_000,
-    retryAttempts: 1,
-    audit: true,
-  },
-  {
     name: 'workflows.runTests',
     description: 'Run the existing platform/autopilot test executor.',
     method: 'POST',
@@ -634,7 +693,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   },
   {
     name: 'deployments.autopilot',
-    description: 'Trigger the existing deployment autopilot after explicit human approval.',
+    description: 'Trigger the existing deployment autopilot for an authenticated super administrator.',
     method: 'POST',
     path: '/api/autopilots/deploy',
     classification: 'write',
@@ -642,8 +701,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     scope: 'platform',
     allowedAgents: ['LIZZY'],
     allowedRoles: ['super_admin'],
-    approvalRequired: true,
-    confirmationPhrase: 'CONFIRM DEPLOY',
+    approvalRequired: false,
     idempotent: false,
     timeoutMs: 120_000,
     retryAttempts: 1,
@@ -734,9 +792,26 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'browser.launch',
+    description: 'Start an authenticated owner-scoped Studio cloud browser session. Use the returned session identity for browser.execute.',
+    method: 'POST',
+    path: '/api/admin/dev-studio/browser/session',
+    classification: 'write',
+    risk: 'medium',
+    scope: 'platform',
+    allowedAgents: DEVSTUDIO_AGENTS,
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    requiredInput: ['url'],
+    approvalRequired: false,
+    idempotent: false,
+    timeoutMs: 40_000,
+    retryAttempts: 1,
+    audit: true,
+  },
+  {
     name: 'browser.execute',
     description:
-      'Execute an interactive command in an isolated Studio browser with durable task checkpoints.',
+      'Execute an interactive command in an authenticated Studio browser. Launch an owner-scoped session first; the browser task requires its session ID and token.',
     method: 'POST',
     path: '/api/admin/dev-studio/browser/agent',
     classification: 'write',
@@ -744,7 +819,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     scope: 'platform',
     allowedAgents: DEVSTUDIO_AGENTS,
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
-    requiredInput: ['task'],
+    requiredInput: ['task', 'sessionId', 'sessionToken'],
     approvalRequired: false,
     idempotent: false,
     timeoutMs: 120_000,
@@ -800,8 +875,15 @@ export function getAITool(name: string): AIToolDefinition | null {
   return BY_NAME.get(name) ?? null;
 }
 
+export function canAgentUseTool(tool: AIToolDefinition, agent: AIAgentId): boolean {
+  // PARIS is the union of the four historical capability IDs. Actor roles,
+  // tenant scope, confirmations and tool-specific quality gates still apply.
+  return tool.allowedAgents.includes(agent) || (agent === 'PARIS' &&
+    tool.allowedAgents.some((id) => ['ELLIE', 'LIZZY', 'ZORA'].includes(id)));
+}
+
 export function listAIToolsForAgent(agent: AIAgentId): AIToolDefinition[] {
-  return AI_TOOL_REGISTRY.filter((tool) => tool.allowedAgents.includes(agent));
+  return AI_TOOL_REGISTRY.filter((tool) => canAgentUseTool(tool, agent));
 }
 
 export function getAIToolCatalogForPrompt(agent: AIAgentId): string {

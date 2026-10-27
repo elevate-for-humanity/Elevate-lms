@@ -112,6 +112,8 @@ export const CoursePackageLessonSchema = z.object({
   html: z.string().default(''),
   videoUrl: z.string().url().nullable(),
   experience: z.record(z.string(), z.unknown()).nullable(),
+  practicalRequired: z.boolean().default(false),
+  requiredArtifacts: z.array(z.string().trim().min(1)).default([]),
   storyboard: z.array(StoryboardSceneSchema).default([]),
   timeline: LessonTimelineSchema.nullable(),
   questions: z.array(CoursePackageQuestionSchema).default([]),

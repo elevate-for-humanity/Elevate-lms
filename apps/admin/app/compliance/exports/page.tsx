@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -34,7 +35,7 @@ export default async function ExportsPage() {
       {/* Hero Image */}
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/admin-grants-hero.jpg"
           alt="Exports"
           fill

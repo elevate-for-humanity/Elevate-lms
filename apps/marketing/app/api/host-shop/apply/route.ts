@@ -222,7 +222,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error: `Applications are temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
+          error: `Applications are temporarily unavailable. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
         },
         { status: 503 },
       );
@@ -380,7 +380,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error: `We could not save the application. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
+          error: `We could not save the application. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
         },
         { status: 500 },
       );

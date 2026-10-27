@@ -34,7 +34,7 @@ export function CourseStructuredData({
   url,
   image,
   duration,
-  price = 0,
+  price,
   priceCurrency = 'USD',
   rating,
   reviewCount,
@@ -60,13 +60,15 @@ export function CourseStructuredData({
         duration,
       },
     }),
-    offers: {
-      '@type': 'Offer',
-      price,
-      priceCurrency,
-      availability: 'https://schema.org/InStock',
-      url: `${SITE_URL}${url}`,
-    },
+    ...(typeof price === 'number' && price > 0 && {
+      offers: {
+        '@type': 'Offer',
+        price,
+        priceCurrency,
+        availability: 'https://schema.org/InStock',
+        url: `${SITE_URL}${url}`,
+      },
+    }),
     ...(rating &&
       reviewCount && {
         aggregateRating: {
@@ -112,7 +114,7 @@ export function ProgramStructuredData({
   url,
   image,
   duration,
-  tuition = 0,
+  tuition,
   certification,
   salaryRange,
   category,
@@ -142,13 +144,14 @@ export function ProgramStructuredData({
         name: certification,
       },
     }),
-    offers: {
-      '@type': 'Offer',
-      price: tuition,
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      category: 'WIOA Eligible - May be free for qualifying students',
-    },
+    ...(typeof tuition === 'number' && tuition > 0 && {
+      offers: {
+        '@type': 'Offer',
+        price: tuition,
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+    }),
     ...(salaryRange && {
       salaryUponCompletion: {
         '@type': 'MonetaryAmountDistribution',
@@ -159,7 +162,6 @@ export function ProgramStructuredData({
     }),
     ...(category && { programType: category }),
     applicationDeadline: 'Rolling Admissions',
-    financialAidEligible: 'Yes - WIOA, Pell Grant, State Funding',
   };
 
   return (
@@ -183,7 +185,7 @@ export function OrganizationStructuredData() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.jpg`,
     description:
-      'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business.',
+      'Workforce development institute in Indianapolis providing career training, apprenticeships, testing, and program-specific funding pathways. Funding eligibility and authorization are determined by the responsible source.',
     address: {
       '@type': 'PostalAddress',
       ...organization.postalAddress,

@@ -5,7 +5,7 @@
  * so existing enrollment/program provisioning callers do not break while their
  * imports are migrated. Do not add generation logic here.
  */
-import { courseFactory } from '@/lib/course-factory';
+import { courseFactory } from '@/lib/course-builder/orchestrator';
 
 export type ProgramAutoCourseMode = 'replace' | 'missing-only' | 'refresh';
 export type ProgramAutoCourseVideoMode = 'queue' | 'off';

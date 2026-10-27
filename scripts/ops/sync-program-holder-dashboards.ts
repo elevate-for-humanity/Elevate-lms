@@ -5,7 +5,8 @@
  *   pnpm tsx --env-file=.env.local scripts/ops/sync-program-holder-dashboards.ts
  *   pnpm tsx --env-file=.env.local scripts/ops/sync-program-holder-dashboards.ts --dry-run
  */
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { pathToFileURL } from 'node:url';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -22,15 +23,15 @@ function canonicalProgramSlugs(slugs: string[]) {
 /** contact_email → program slugs they oversee */
 const HOLDER_PROGRAMS: Record<string, string[]> = {
   'mesmerizedbybeautyl@yahoo.com': [
-    'esthetician-apprenticeship',
-    'nail-technician-apprenticeship',
     'cosmetology-apprenticeship',
     'barber-apprenticeship',
+    'esthetician-apprenticeship',
+    'nail-technician-apprenticeship',
   ],
   'info@centerofdestiny.org': [
     'business-startup',
     'bookkeeping',
-
+    
     'business-administration',
     'entrepreneurship',
   ],
@@ -50,7 +51,7 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
     'software-development',
     'graphic-design',
     'bookkeeping',
-
+    
     'office-administration',
     'business-administration',
     'entrepreneurship',
@@ -60,157 +61,88 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
   ],
 };
 
-const PRESTIGE_PARTNER = {
-  email: 'info@prestigeelevation.com',
-  partnerId: '9dffa854-1002-42e7-bad3-a8d626326d6e',
-  name: 'Elizabeth L. Greene',
-};
-
-async function main() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) process.exit(1);
-
-  const db = createClient(url, key, { auth: { persistSession: false } });
-
+export async function syncProgramHolderDashboards(db: SupabaseClient, dryRun = false) {
   const allSlugs = [...new Set(Object.values(HOLDER_PROGRAMS).flatMap(canonicalProgramSlugs))];
-  const { data: programs } = await db.from('programs').select('id, slug').in('slug', allSlugs);
+  const { data: programs } = await db.from('programs').select('id, slug').in('slug', allSlugs).throwOnError();
   const slugToId = Object.fromEntries((programs ?? []).map((p) => [p.slug, p.id]));
   const missingSlugs = allSlugs.filter((s) => !slugToId[s]);
-  if (missingSlugs.length) console.warn('⚠ Missing program slugs:', missingSlugs.join(', '));
+  if (missingSlugs.length) throw new Error('Missing program slugs: ' + missingSlugs.join(', ') + '. No holder mappings were changed.');
 
   for (const [email, configuredSlugs] of Object.entries(HOLDER_PROGRAMS)) {
     const slugs = canonicalProgramSlugs(configuredSlugs);
     const { data: holder } = await db
       .from('program_holders')
-      .select('id, organization_name')
+      .select('id, organization_name, status')
       .eq('contact_email', email)
-      .maybeSingle();
+      .maybeSingle().throwOnError();
     if (!holder) {
       console.warn(`Skip ${email} — no program_holders row`);
       continue;
     }
 
-    const programIds = slugs.map((s) => slugToId[s]).filter(Boolean);
-    console.log(`\n${holder.organization_name} (${email}) → ${slugs.length} programs`);
+    if (!['active', 'approved', 'approved_pending_mou'].includes(holder.status)) {
+      console.info(`Skip ${holder.organization_name} — holder is ${holder.status}`);
+      continue;
+    }
 
-    if (!DRY_RUN) {
-      await db
-        .from('program_holders')
-        .update({ teaches_multiple: slugs.length > 1 })
-        .eq('id', holder.id);
+    const programIds = slugs.map((s) => slugToId[s]).filter(Boolean);
+    console.info(`\n${holder.organization_name} (${email}) → ${slugs.length} programs`);
+
+    if (!dryRun) {
+      await db.from('program_holders').update({ teaches_multiple: slugs.length > 1 }).eq('id', holder.id).throwOnError();
       if (programIds[0]) {
-        await db
-          .from('program_holders')
-          .update({ primary_program_id: programIds[0] })
-          .eq('id', holder.id);
+        await db.from('program_holders').update({ primary_program_id: programIds[0] }).eq('id', holder.id).throwOnError();
       }
     }
 
     for (const programId of programIds) {
       const slug = programs?.find((p) => p.id === programId)?.slug ?? programId;
-      if (DRY_RUN) {
-        console.log(`  [dry-run] link ${slug}`);
+      if (dryRun) {
+        console.info(`  [dry-run] link ${slug}`);
         continue;
       }
-      const { error } = await db
-        .from('program_holder_programs')
-        .upsert(
-          { program_holder_id: holder.id, program_id: programId, status: 'active' },
-          { onConflict: 'program_holder_id,program_id' },
-        );
-      if (error) console.warn(`  ⚠ ${slug}:`, error.message);
-      else console.log(`  ✅ ${slug}`);
+      const { error } = await db.from('program_holder_programs').upsert(
+        { program_holder_id: holder.id, program_id: programId, status: 'active' },
+        { onConflict: 'program_holder_id,program_id' },
+      );
+      if (error) throw new Error(`Program link failed for ${slug}: ${error.message}`);
+      else console.info(`  ✅ ${slug}`);
     }
   }
 
-  // Prestige — barber host partner dashboard (Elizabeth Greene)
-  console.log('\n=== Prestige barber partner ===');
-  const { data: prestigeUser } = await db
-    .from('profiles')
-    .select('id, role')
-    .eq('email', PRESTIGE_PARTNER.email)
-    .maybeSingle();
-  let userId = prestigeUser?.id;
-  if (!userId) {
-    const { data: listed } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    userId = listed?.users?.find((u) => u.email?.toLowerCase() === PRESTIGE_PARTNER.email)?.id;
-  }
-  if (!userId) {
-    console.warn('Prestige auth user not found');
-  } else if (!DRY_RUN) {
-    await db.from('profiles').upsert(
-      {
-        id: userId,
-        email: PRESTIGE_PARTNER.email,
-        full_name: PRESTIGE_PARTNER.name,
-        role: 'partner',
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'id' },
-    );
-    await db.auth.admin.updateUserById(userId, {
-      app_metadata: { role: 'partner' },
-      email_confirm: true,
-    });
-    await db
-      .from('partners')
-      .update({ partner_type: 'barber', type: 'barber' })
-      .eq('id', PRESTIGE_PARTNER.partnerId);
-    const { data: existingPu } = await db
-      .from('partner_users')
+  // Archived Prestige remains untouched. Holder mapping repair must never
+  // provision partner access or replace an existing administrator role.
+
+  // A legacy signed flag is not a digital signature. Report missing evidence;
+  // never invent signer data, consent, or a signing timestamp during account repair.
+  const { data: signedHolders } = await db
+    .from('program_holders')
+    .select('id, user_id, contact_email')
+    .eq('mou_signed', true)
+    .throwOnError();
+  for (const holder of signedHolders ?? []) {
+    if (!holder.user_id) continue;
+    const { data: signature } = await db
+      .from('mou_signatures')
       .select('id')
-      .eq('user_id', userId)
-      .eq('partner_id', PRESTIGE_PARTNER.partnerId)
-      .maybeSingle();
-    if (!existingPu) {
-      await db.from('partner_users').insert({
-        user_id: userId,
-        partner_id: PRESTIGE_PARTNER.partnerId,
-        role: 'owner',
-        status: 'active',
-      });
-    }
-    console.log('✅ Prestige partner wired for', PRESTIGE_PARTNER.email);
-  } else {
-    console.log('[dry-run] Would wire Prestige partner');
+      .eq('program_holder_id', holder.id)
+      .eq('user_id', holder.user_id)
+      .limit(1)
+      .maybeSingle()
+      .throwOnError();
+    if (!signature) console.warn(`MOU evidence missing for ${holder.contact_email}; obtain the original signed document or a new signature.`);
   }
 
-  // Backfill mou_signatures for holders with mou_signed but no digital row
-  if (!DRY_RUN) {
-    const { data: holders } = await db
-      .from('program_holders')
-      .select('id, user_id, contact_email, mou_signed, mou_signed_at')
-      .eq('mou_signed', true);
-    for (const h of holders ?? []) {
-      if (!h.user_id) continue;
-      const { data: sig } = await db
-        .from('mou_signatures')
-        .select('id')
-        .eq('user_id', h.user_id)
-        .maybeSingle();
-      if (sig) continue;
-      const { error: sigErr } = await db.from('mou_signatures').insert({
-        user_id: h.user_id,
-        program_holder_id: h.id,
-        signed_at: h.mou_signed_at ?? new Date().toISOString(),
-        agreed_at: h.mou_signed_at ?? new Date().toISOString(),
-        signer_name: h.contact_email,
-        contact_email: h.contact_email,
-        signature_data: 'admin-backfill-mou-signed',
-        partner_type: 'program_holder',
-        agreed: true,
-        mou_version: 'admin-backfill',
-      });
-      if (sigErr) console.warn(`  ⚠ mou_signatures backfill ${h.contact_email}:`, sigErr.message);
-      else console.log(`✅ mou_signatures backfill: ${h.contact_email}`);
-    }
-  }
-
-  console.log('\nDone.');
+  console.info('\nDone.');
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+async function main() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error('Supabase URL and service-role credential are required');
+  const db = createClient(url, key, { auth: { persistSession: false } });
+  await syncProgramHolderDashboards(db, DRY_RUN);
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => { console.error(error); process.exitCode = 1; });
+}

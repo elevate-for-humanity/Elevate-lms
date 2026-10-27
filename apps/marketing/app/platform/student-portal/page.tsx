@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -77,14 +78,14 @@ export default function StudentPortalPage() {
           <div className="max-w-7xl mx-auto px-4 py-20 relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <div className="inline-flex items-center gap-2 bg-blue-900/40 backdrop-blur px-4 py-2 rounded-full text-sm font-medium mb-6">
                   <BookOpen className="w-4 h-4" />
                   <span>Learning Management System</span>
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
                   Student Portal
                 </h1>
-                <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+                <p className="text-xl text-white mb-8 leading-relaxed">
                   Your personalized learning hub. Access courses, track progress, complete assignments, 
                   earn certificates, and connect with instructors—all from one powerful dashboard.
                 </p>
@@ -98,7 +99,7 @@ export default function StudentPortalPage() {
                   </Link>
                   <Link
                     href="/apply"
-                    className="inline-flex items-center gap-2 bg-blue-500/30 backdrop-blur text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-500/40 transition border border-white/30"
+                    className="inline-flex items-center gap-2 bg-blue-900/30 backdrop-blur text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-900/40 transition border border-white/30"
                   >
                     Apply Now
                   </Link>
@@ -106,7 +107,7 @@ export default function StudentPortalPage() {
               </div>
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                  <Image
+                  <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                     src="/images/pages/student-portal-page-1.webp"
                     alt="Student Portal Dashboard"
                     fill

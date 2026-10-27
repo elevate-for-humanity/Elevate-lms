@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -69,8 +70,8 @@ export default async function CalendarPage() {
       {/* Hero with image */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
-          <Image
+        <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/hero/hero-tech-careers.webp"
             alt="Calendar and Schedule"
             fill

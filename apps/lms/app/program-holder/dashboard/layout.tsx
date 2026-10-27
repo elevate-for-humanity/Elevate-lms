@@ -10,5 +10,18 @@ export const dynamic = 'force-dynamic';
  */
 export default async function ProgramHolderDashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, profile } = await requireProgramHolder();
-  return <PlatformShell user={{ id: profile.id, email: user.email || '', full_name: profile.full_name || undefined }} role="program_holder">{children}</PlatformShell>;
+  return (
+    <PlatformShell
+      user={{
+        id: profile.id,
+        email: user.email || '',
+        full_name: profile.full_name || undefined,
+        avatar_url: profile.avatar_url || undefined,
+      }}
+      role="program_holder"
+      paris={{ personName: profile.full_name || undefined }}
+    >
+      {children}
+    </PlatformShell>
+  );
 }

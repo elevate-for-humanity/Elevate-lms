@@ -1,6 +1,8 @@
 import 'server-only';
 
 import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { assertQuickBooksProductionEnvironment } from './quickbooks-client';
 
 const QB_BASE = 'https://quickbooks.api.intuit.com/v3/company';
 const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
@@ -17,6 +19,7 @@ type ContractorPayment = {
 };
 
 async function loadConfig(db: Database) {
+  await hydrateProcessEnv();
   const keys = [
     'QB_CLIENT_ID',
     'QB_CLIENT_SECRET',
@@ -98,6 +101,8 @@ const escapeQuery = (value: string) => value.replaceAll("'", "\\'");
 
 export async function recordContractorPaymentInQuickBooks(db: Database, input: ContractorPayment) {
   const config = await loadConfig(db);
+  try { assertQuickBooksProductionEnvironment(); }
+  catch { return {synced:false as const,reason:'QuickBooks production configuration is unverified.'}; }
   if (!config.accessToken || !config.realmId) {
     return { synced: false as const, reason: 'QuickBooks is not connected.' };
   }

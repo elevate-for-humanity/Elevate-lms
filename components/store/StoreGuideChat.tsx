@@ -83,7 +83,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   return (
     <section
       aria-label="PARIS Store Advisor"
-      className="fixed inset-x-2 bottom-2 z-[51] max-h-[calc(100dvh-1rem)] overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[calc(100%-2rem)] sm:max-w-sm sm:rounded-3xl"
+      className="fixed inset-x-2 bottom-2 z-[51] flex max-h-[min(78dvh,680px)] flex-col overflow-hidden rounded-2xl border border-orange-200 bg-white font-sans shadow-2xl shadow-orange-950/20 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[calc(100%-2rem)] sm:max-w-md sm:rounded-3xl"
     >
         <header className="flex items-center gap-2 bg-gradient-to-r from-cyan-50 via-white to-orange-50 p-3 sm:gap-3 sm:p-4">
           <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-600 to-orange-400 text-lg font-black text-white ring-2 ring-white shadow-lg sm:h-14 sm:w-14 sm:text-xl sm:ring-4" aria-label="PARIS avatar">P<span className="absolute -right-0.5 -top-0.5 h-3 w-3 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></div>
@@ -108,9 +108,9 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
           </button>
         </div>
         {mode === 'chat' ? (
-          <ParisChat surface="store" showHeader={false} voiceEnabled={!muted} className="h-[44dvh] min-h-[280px] max-h-[430px] sm:h-[52vh] sm:min-h-[360px]" />
+          <ParisChat surface="store" showHeader={false} voiceEnabled={!muted} className="min-h-0 flex-1 h-[46dvh] max-h-[430px] sm:h-[52vh] sm:min-h-[360px]" />
         ) : (
-        <div className="max-h-[52vh] overflow-y-auto p-4 sm:p-5">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
           {!confirmed ? (
             <>
               <p className="mb-3 rounded-xl bg-cyan-50 px-3 py-2 text-sm font-semibold leading-6 text-slate-800">

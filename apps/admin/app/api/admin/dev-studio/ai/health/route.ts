@@ -1,25 +1,40 @@
 import { NextRequest } from 'next/server';
 
+
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
-import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
-    const { providers, anyConfigured: aiConfigured } = await resolveAIRuntimeState();
+    const [{ providers, anyConfigured: aiConfigured, ownedModel }, cloudflare] = await Promise.all([
+      resolveAIRuntimeState(),
+      probeCloudflareWorkersAI(),
+    ]);
     const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = providers;
+
+    const ownedConfigured = ownedModel.configured;
+    const ownedReady = ownedModel.verified;
 
     return buildCapabilityHealth('ai', [
       {
-        name: 'ai-provider-configured',
-        passed: aiConfigured,
+        name: 'paris-owned-inference',
+        passed: ownedReady,
         required: true,
-        message: aiConfigured
-          ? 'At least one AI provider is configured.'
-          : 'No AI provider keys are configured.',
+        message: ownedReady ? 'PARIS private model responded to authenticated model discovery.'
+          : ownedConfigured ? 'PARIS private model configured but not verified reachable.'
+          : 'PARIS private model is not configured; GPU has not been activated.',
+      },
+      {
+        name: 'ai-provider-configured',
+        passed: ownedReady || aiConfigured,
+        required: false,
+        message: ownedReady ? 'Elevate-owned inference is verified.' : aiConfigured
+          ? 'An external AI provider is configured; owned PARIS readiness is reported separately.'
+          : 'No AI provider is verified or configured.',
       },
       {
         name: 'xai',
@@ -50,6 +65,12 @@ export async function GET(request: NextRequest) {
         passed: hasAnthropic,
         required: false,
         message: hasAnthropic ? 'Anthropic is configured.' : 'Anthropic is not configured.',
+      },
+      {
+        name: 'cloudflare-workers-ai',
+        passed: cloudflare.reachable,
+        required: false,
+        message: cloudflare.detail,
       },
     ]);
   });

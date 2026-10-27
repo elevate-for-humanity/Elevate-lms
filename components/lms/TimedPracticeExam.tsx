@@ -35,9 +35,9 @@ interface Props {
   timeMinutes?: number; // default 30
   passingScore?: number; // default 70
   onComplete?: (score: number, passed: boolean, missed: ExamQuestion[]) => void;
+  storageKey?: string;
+  sourceLabel?: string;
 }
-
-const STORAGE_KEY = 'hvac-missed-questions';
 
 function formatTime(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -55,6 +55,8 @@ export default function TimedPracticeExam({
   timeMinutes = 30,
   passingScore = 70,
   onComplete,
+  storageKey = 'elevate-practice-missed-questions',
+  sourceLabel,
 }: Props) {
   const [state, setState] = useState<ExamState>('intro');
   const [current, setCurrent] = useState(0);
@@ -99,20 +101,20 @@ export default function TimedPracticeExam({
     const missed = exam.filter((_, i) => answers[i] !== exam[i].answer);
     if (!missed.length) return;
     try {
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
       const now = Date.now();
       const newEntries = missed.map((q) => ({
         ...q,
         missedAt: now,
         reviewAfter: now + 24 * 60 * 60 * 1000, // 24 hours
-        source: `EPA 608 ${sectionName}`,
+        source: sourceLabel ?? `Elevate Practice — ${sectionName}`,
       }));
       // Deduplicate by question text
       const merged = [
         ...existing.filter((e: any) => !newEntries.some((n) => n.question === e.question)),
         ...newEntries,
       ];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      localStorage.setItem(storageKey, JSON.stringify(merged));
     } catch {
       /* localStorage unavailable */
     }
@@ -121,7 +123,7 @@ export default function TimedPracticeExam({
       (exam.filter((_, i) => answers[i] === exam[i].answer).length / exam.length) * 100,
     );
     onComplete?.(score, score >= passingScore, missed);
-  }, [state, exam, answers, onComplete, passingScore, sectionName]);
+  }, [state, exam, answers, onComplete, passingScore, sectionName, sourceLabel, storageKey]);
 
   const selectAnswer = (qi: number, oi: number) => {
     if (state !== 'active') return;
@@ -151,8 +153,8 @@ export default function TimedPracticeExam({
             <Clock className="w-5 h-5 text-brand-blue-600" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-900">EPA 608 Practice Exam — {sectionName}</h3>
-            <p className="text-sm text-slate-500">ESCO exam format</p>
+            <h3 className="font-bold text-slate-900">Elevate Practice Exam — {sectionName}</h3>
+            <p className="text-sm text-slate-500">Original Elevate readiness assessment</p>
           </div>
         </div>
 
@@ -176,7 +178,7 @@ export default function TimedPracticeExam({
           <p>• The timer starts immediately when you click Begin.</p>
           <p>• You can flag questions to review before submitting.</p>
           <p>• Missed questions are saved for review tomorrow.</p>
-          <p>• The real ESCO exam is also 25 questions, 70% to pass.</p>
+          <p>• This is an original Elevate readiness assessment, not an official certification examination.</p>
         </div>
 
         <button

@@ -171,7 +171,7 @@ export function LessonInlineInput({
 
   const saveIcon = {
     idle: null,
-    saving: <Clock className="w-3.5 h-3.5 text-slate-400 animate-spin" aria-hidden />,
+    saving: <Clock className="w-3.5 h-3.5 text-slate-600 animate-spin" aria-hidden />,
     saved: <CheckCircle className="w-3.5 h-3.5 text-emerald-500" aria-hidden />,
     error: <AlertCircle className="w-3.5 h-3.5 text-red-500" aria-hidden />,
   }[saveState];
@@ -211,7 +211,7 @@ export function LessonInlineInput({
           aria-describedby={statusId}
           aria-required={required}
           disabled={!loaded}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-400 focus:border-transparent disabled:opacity-50 transition"
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-blue-400 focus:border-transparent disabled:opacity-50 transition"
         />
       ) : (
         <textarea
@@ -229,7 +229,7 @@ export function LessonInlineInput({
           aria-multiline="true"
           disabled={!loaded}
           rows={4}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-400 focus:border-transparent disabled:opacity-50 resize-none overflow-hidden transition leading-relaxed"
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-blue-400 focus:border-transparent disabled:opacity-50 resize-none overflow-hidden transition leading-relaxed"
           style={{ minHeight: '96px' }}
         />
       )}
@@ -258,7 +258,7 @@ export function LessonInlineInput({
           {saveIcon}
           <span>{saveLabel}</span>
           {variant !== 'short' && saveState === 'idle' && value.trim() && (
-            <span className="text-slate-400">Ctrl+Enter to save</span>
+            <span className="text-slate-600">Ctrl+Enter to save</span>
           )}
         </div>
       </div>

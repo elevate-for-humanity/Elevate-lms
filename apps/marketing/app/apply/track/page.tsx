@@ -251,7 +251,7 @@ export default function TrackApplicationPage() {
             </dl>
 
             <div className="mt-6 border-t border-slate-200 pt-5 text-sm text-slate-700">
-              Need help interpreting this status? <Link href="/contact" className="font-black text-brand-blue-700 hover:underline">Contact admissions</Link> or call {PLATFORM_DEFAULTS.supportPhone}.
+              Need help interpreting this status? <Link href="/contact" className="font-black text-brand-blue-700 hover:underline">Contact admissions</Link> or call {PLATFORM_DEFAULTS.mainPhone}.
             </div>
           </section>
         ) : null}

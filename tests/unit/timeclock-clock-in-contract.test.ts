@@ -50,6 +50,29 @@ describe('timeclock clock-in persistence contract', () => {
     expect(route).toContain('already_clocked_in: true');
   });
 
+  it('notifies the apprentice when a geofence blocks a timeclock action', () => {
+    expect(route).toContain("to: user.email");
+    expect(route).toContain("Timeclock ${actionLabel[action]} blocked");
+    expect(route).toContain('You must clock out at your school or assigned site before leaving');
+    expect(route).toContain('No time was recorded');
+    expect(route).toContain("type: 'timeclock'");
+    expect(route).toContain("message: studentText");
+  });
+
+  it('notifies administrators for successful and failed clock-in attempts', () => {
+    expect(route).toContain('notifyAdminsOfClockAttempt');
+    expect(route).toContain('Successful ${label}');
+    expect(route).toContain('${label} blocked');
+    expect(route).toContain("code: 'OUTSIDE_GEOFENCE'");
+    expect(route).toContain("code: 'IDENTITY_VERIFICATION_REQUIRED'");
+    expect(route).toContain("code: 'THEORY_SESSION_ACTIVE'");
+    expect(route).toContain("code: 'ALREADY_CLOCKED_IN'");
+    expect(route).toContain('successful: true');
+    expect(route).toContain('successful: false');
+    expect(route).toContain("db.from('notifications').insert(rows)");
+    expect(route).toContain('to: ADMIN_EMAIL');
+  });
+
   it('shows and enforces the weekly apprenticeship time policy', () => {
     expect(policy).toContain('weeklyOjlMaxHours: 40');
     expect(policy).toContain('weeklyTheoryTargetHours: 3');

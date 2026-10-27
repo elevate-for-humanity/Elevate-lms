@@ -14,7 +14,7 @@ export default async function MeetingRoomPage({ params }: { params: Promise<{ ro
   const db = await requireAdminClient();
   const { data: room } = await db
     .from('communication_rooms')
-    .select('id,title,status,communication_workspaces!inner(tenant_id)')
+    .select('id,title,status,allow_screen_share,communication_workspaces!inner(tenant_id)')
     .eq('id', roomId)
     .maybeSingle();
   const workspace = Array.isArray((room as any)?.communication_workspaces)
@@ -23,13 +23,11 @@ export default async function MeetingRoomPage({ params }: { params: Promise<{ ro
   const platformAdmin = auth.effectiveRoles.some(
     (role) => role === 'admin' || role === 'super_admin',
   );
-  if (
-    !room ||
-    (workspace?.tenant_id ?? null) !== tenantId ||
-    (!tenantId && !platformAdmin) ||
-    room.status === 'cancelled'
-  )
-    notFound();
+  const workspaceTenantId = workspace?.tenant_id ?? null;
+  const canAccessWorkspace =
+    Boolean(tenantId || platformAdmin) &&
+    (workspaceTenantId === tenantId || (platformAdmin && workspaceTenantId === null));
+  if (!room || !canAccessWorkspace || room.status === 'cancelled') notFound();
 
   return (
     <main className="space-y-4 bg-slate-50 p-4 sm:p-6">
@@ -42,7 +40,7 @@ export default async function MeetingRoomPage({ params }: { params: Promise<{ ro
         </p>
         <h1 className="text-2xl font-black">{room.title}</h1>
       </div>
-      <MeetingRoom roomId={room.id} />
+      <MeetingRoom roomId={room.id} allowScreenShare={room.allow_screen_share} />
     </main>
   );
 }

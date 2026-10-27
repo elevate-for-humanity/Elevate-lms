@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, createContext, useContext, ReactNode } from 'react';
-import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard, Check } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import Link from 'next/link';
+import { ShoppingCart, X, Check, CalendarDays } from 'lucide-react';
 import { useCart } from '@/lib/store/use-cart';
-import { addToCart } from '@/lib/store/cart';
+import { addToCart, getCart } from '@/lib/store/cart';
 
-// Provider implementation
-export const TestingCartProvider = ({ children }: { children: ReactNode }) => {
-  return <>{children}</>;
-};
+export const TestingCartProvider = ({ children }: { children: ReactNode }) => <>{children}</>;
+const PROVIDERS = ['certiport', 'careersafe', 'workkeys', 'midland', 'esco', 'nrf', 'nha'];
+const money = (amount: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
 interface AddExamToCartButtonProps {
   examType: string;
@@ -18,143 +19,158 @@ interface AddExamToCartButtonProps {
   className?: string;
 }
 
-// Add to cart button
-export const AddExamToCartButton = ({ examType, examName, amountCents, active, className }: AddExamToCartButtonProps) => {
+export function AddExamToCartButton({
+  examType,
+  examName,
+  amountCents,
+  active,
+  className,
+}: AddExamToCartButtonProps) {
   const [added, setAdded] = useState(false);
-
-  const handleAddToCart = () => {
-    const product = {
-      id: `testing-${examType}-${examName}`.replace(/\s+/g, '-').toLowerCase(),
-      name: examName,
-      slug: `testing-${examType}-${examName}`.replace(/\s+/g, '-').toLowerCase(),
-      category: 'certification-prep' as const,
-      price: amountCents / 100,
-      description: `${examName} exam at Elevate Testing Center`,
-      image: '/images/pages/testing-page-1.webp',
-      inStock: true,
-      featured: false,
-      digital: false,
-    };
-    addToCart(product);
+  const id = `testing-${examType}-${examName}`.replace(/\s+/g, '-').toLowerCase();
+  useEffect(() => {
+    const sync = () => setAdded(getCart().items.some((item) => item.product.id === id));
+    sync();
+    window.addEventListener('cartUpdated', sync);
+    return () => window.removeEventListener('cartUpdated', sync);
+  }, [id]);
+  if (!active || amountCents <= 0) return null;
+  function add() {
+    if (!getCart().items.some((item) => item.product.id === id)) {
+      addToCart({
+        id,
+        name: examName,
+        slug: id,
+        category: 'certification-prep',
+        price: amountCents / 100,
+        description: `${examName} exam at Elevate Testing Center`,
+        image: '/images/pages/testing-page-1.webp',
+        inStock: true,
+        featured: false,
+        digital: false,
+      });
+    }
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 1800);
-  };
-
-  if (!active) return null;
-
+    const cart = document.getElementById('testing-cart');
+    cart?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'start',
+    });
+    cart?.focus({ preventScroll: true });
+  }
   return (
     <button
-      onClick={handleAddToCart}
-      className={className ?? 'inline-flex items-center gap-1 border border-brand-red-300 text-brand-red-700 hover:border-brand-red-400 hover:bg-brand-red-50 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition-colors'}
+      type="button"
+      onClick={add}
+      aria-label={`${added ? 'View cart for' : 'Add to cart:'} ${examName}`}
+      className={
+        className ??
+        'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-red-300 px-3 py-2 text-sm font-bold text-brand-red-700 hover:bg-brand-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
+      }
     >
-      {added ? <Check className="w-3 h-3" /> : <CreditCard className="w-3 h-3" />}
-      {added ? 'Added to Cart' : 'Add to Cart'}
+      {added ? (
+        <Check className="h-4 w-4" aria-hidden="true" />
+      ) : (
+        <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+      )}
+      {added ? 'Added — View cart' : 'Add to Cart'}
     </button>
   );
-};
+}
 
 export default function TestingCart() {
-  const { items, removeItem, updateQuantity, total, clearCart } = useCart();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleCheckout = async () => {
-    setError(null);
-    if (items.length !== 1) {
-      setError('Book one exam at a time so each exam has the correct appointment.');
-      return;
-    }
-
-    const item = items[0];
-    const providerKeys = ['certiport', 'careersafe', 'workkeys', 'midland', 'esco', 'nrf', 'nha'];
-    const provider = providerKeys.find((key) => item.id.startsWith(`testing-${key}-`));
-    if (!provider) {
-      setError('This exam could not be matched to a testing provider. Remove it and add it again.');
-      return;
-    }
-
-    setLoading(true);
-    window.location.href = `/testing/checkout?provider=${encodeURIComponent(provider)}&exam=${encodeURIComponent(item.name)}`;
-  };
-
-  if (items.length === 0) {
-    return (
-      <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
-        <ShoppingCart className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
-        <p className="text-slate-700">Your cart is empty.</p>
-      </div>
-    );
-  }
-
+  const { items: allItems, removeItem } = useCart();
+  const items = allItems.filter((item) => item.id.startsWith('testing-'));
+  const total = items.reduce((sum, item) => sum + item.price, 0);
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col h-full max-h-[600px]">
-      <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <h3 className="font-bold text-slate-950 flex items-center gap-2 text-sm uppercase tracking-wider">
-          <ShoppingCart className="w-4 h-4" />
-          Test Checkout
-        </h3>
-        <button onClick={clearCart} className="text-[10px] text-slate-500 hover:text-slate-950 uppercase font-bold">
-          Clear All
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-white/5">
-            <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold text-slate-950 truncate">{item.name}</h4>
-              <p className="text-xs text-slate-500">${item.price}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                className="w-6 h-6 rounded bg-slate-200 flex items-center justify-center hover:bg-slate-300"
-              >
-                <Minus className="w-3 h-3 text-slate-950" />
-              </button>
-              <span className="text-sm font-bold text-slate-950 min-w-[20px] text-center">{item.quantity}</span>
-              <button
-                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                className="w-6 h-6 rounded bg-slate-200 flex items-center justify-center hover:bg-slate-300"
-              >
-                <Plus className="w-3 h-3 text-slate-950" />
-              </button>
-              <button
-                onClick={() => removeItem(item.id)}
-                className="ml-2 text-slate-500 hover:text-brand-red-500"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="p-4 bg-slate-50 border-t border-slate-200">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-slate-700 text-sm">Total</span>
-          <span className="text-xl font-black text-slate-950">${total.toFixed(2)}</span>
-        </div>
-        
-        <button
-          onClick={handleCheckout}
-          disabled={loading}
-          className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:opacity-50 text-white font-black py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
+    <aside
+      id="testing-cart"
+      tabIndex={-1}
+      aria-labelledby="testing-cart-heading"
+      className="scroll-mt-24 rounded-2xl border-2 border-brand-blue-200 bg-white p-5 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-600"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2
+          id="testing-cart-heading"
+          className="flex items-center gap-2 text-xl font-black text-slate-950"
         >
-          {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <>
-              <CreditCard className="w-5 h-5" />
-              Pay & Checkout
-            </>
-          )}
-        </button>
-
-        {error && (
-          <p className="mt-3 text-xs text-red-400 text-center font-medium">{error}</p>
-        )}
+          <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+          Your testing cart
+        </h2>
+        <span
+          role="status"
+          aria-live="polite"
+          className="rounded-full bg-brand-blue-50 px-3 py-1 text-sm font-bold text-brand-blue-900"
+        >
+          {items.length} {items.length === 1 ? 'exam' : 'exams'}
+        </span>
       </div>
-    </div>
+      {items.length === 0 ? (
+        <p className="mt-4 leading-6 text-slate-700">
+          Choose an exam below and select Add to Cart. Your selected exams will appear here.
+        </p>
+      ) : (
+        <>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Choose a date for each exam before payment. Each exam has its own appointment and
+            checkout. Group participant counts are selected during checkout.
+          </p>
+          <ul className="mt-4 space-y-3">
+            {items.map((item) => {
+              const provider = PROVIDERS.find((key) => item.id.startsWith(`testing-${key}-`));
+              return (
+                <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-bold text-slate-950">{item.name}</h3>
+                      <p className="mt-1 text-sm text-slate-700">{money(item.price)}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeItem(item.id)}
+                      aria-label={`Remove ${item.name} from testing cart`}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-700 hover:bg-red-50 hover:text-red-700"
+                    >
+                      <X className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  </div>
+                  {provider ? (
+                    <Link
+                      href={`/testing/checkout?provider=${encodeURIComponent(provider)}&exam=${encodeURIComponent(item.name)}`}
+                      className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-600 px-4 py-3 text-sm font-bold text-white hover:bg-brand-red-700"
+                    >
+                      <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                      Choose date & checkout
+                    </Link>
+                  ) : (
+                    <p role="alert" className="mt-3 text-sm text-red-700">
+                      Remove this exam and select it again from the provider list.
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-4 flex justify-between gap-3 font-bold text-slate-950">
+            <span>Selected exam prices</span>
+            <span>{money(total)}</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => items.forEach((item) => removeItem(item.id))}
+            className="mt-3 min-h-11 text-sm font-bold text-slate-700 underline"
+          >
+            Clear testing exams
+          </button>
+        </>
+      )}
+      <Link
+        href="/testing/checkout"
+        className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand-blue-700 underline"
+      >
+        See available testing dates
+        <CalendarDays className="h-4 w-4" aria-hidden="true" />
+      </Link>
+    </aside>
   );
 }

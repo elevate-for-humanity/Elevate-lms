@@ -144,7 +144,7 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
             .select('role')
             .eq('id', currentUser.id)
             .single();
-          if (prof?.role === 'program_holder') {
+          if (['program_holder', 'site_coordinator'].includes(String(prof?.role || ''))) {
             dest = '/program-holder/documents';
             fetch('/api/program-holder/onboarding-complete', { method: 'POST' }).catch(() => {});
           } else if (prof?.role === 'employer') {

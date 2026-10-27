@@ -13,4 +13,16 @@ describe('Admin Studio runtime headers', () => {
       ]),
     );
   });
+
+  it('allows the master Course Builder to embed the authenticated LMS lesson browser', async () => {
+    const rules = await adminConfig.headers?.();
+    const courseBuilder = rules?.find((rule) => rule.source === '/studio/courses/:path*');
+    expect(courseBuilder?.headers).toEqual(
+      expect.arrayContaining([
+        { key: 'Cross-Origin-Embedder-Policy', value: 'unsafe-none' },
+        { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+        { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+      ]),
+    );
+  });
 });

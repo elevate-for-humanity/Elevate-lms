@@ -10,7 +10,9 @@ import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 import { ProgramsExplorer } from './ProgramsExplorer';
 import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 
-// Cache the public catalog briefly so every visit does not block on a fresh database query.\n// Published changes still reach the page within one minute.\nexport const revalidate = 60;
+// Cache the public catalog briefly so every visit does not block on a fresh database query.
+// Published changes still reach the page within one minute.
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildProgramsListingMetadata();
@@ -31,6 +33,7 @@ export default async function ProgramsPage() {
     <main className="min-h-screen bg-white">
       <div
         data-scroll-narration
+        data-narration-src="/audio/heroes/home.mp3"
         data-narration="Welcome. Let's find the training path that fits where you want to go. First, think about the kind of work you want to do. If you want career training, you can explore hands-on options such as HVAC and commercial driving, or business-focused options such as Bookkeeping and Business. Some programs may be free if you qualify for workforce funding and receive written approval before training begins. If you want to earn while you learn, choose an apprenticeship. That path combines instruction with paid, supervised training at an approved employer or Host Site. You do not need to decide everything at once. Open the program that interests you, listen to what it prepares you to do, and review the schedule and requirements. Then complete the application. Elevate will help you understand the correct funding, apprenticeship, or payment step from there."
         data-narration-rate="0.82"
         data-narration-style="instructor"
@@ -58,7 +61,7 @@ export default async function ProgramsPage() {
             <div className="max-w-3xl">
               <p className="text-sm font-extrabold uppercase tracking-widest text-brand-blue-800">Earn While You Learn</p>
               <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Registered apprenticeships are a separate pathway</h2>
-              <p className="mt-4 text-lg leading-relaxed text-slate-700">Apprenticeships combine related instruction with paid, supervised work at an approved employer or Host Site. Program participation may be no-cost to eligible apprentices, but employment, placement, funding, and enrollment approval must be confirmed before training begins.</p>
+              <p className="mt-4 text-lg leading-relaxed text-slate-700">Apprenticeships combine related instruction with paid, supervised work at an approved employer or Host Site. Apprenticeship tuition is self-pay unless an exact program page documents another approved payment source. Employment, placement, and enrollment approval must be confirmed before training begins.</p>
             </div>
             <Link href="/apprenticeships" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-6 py-3.5 text-base font-extrabold text-white hover:bg-brand-blue-900">How Apprenticeships Work <ArrowRight className="h-4 w-4" /></Link>
           </div>

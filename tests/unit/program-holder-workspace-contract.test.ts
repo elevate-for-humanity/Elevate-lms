@@ -8,12 +8,12 @@ describe('Program Holder workspace contract', () => {
   it('uses canonical program enrollments for the enrolled roster', () => {
     expect(workspace).toContain("from('program_enrollments')");
     expect(workspace).toContain("eq('program_holder_id', holderId)");
-    expect(workspace).toContain("in('status', ['active', 'enrolled', 'completed', 'graduated'])");
+    expect(workspace).toContain("in('status', ['active', 'enrolled', 'in_progress', 'completed', 'graduated'])");
   });
 
   it('keeps applicants separate from enrolled students', () => {
     expect(workspace).toContain("from('program_holder_students')");
-    expect(workspace).toContain("in('status', ['applied', 'pending'])");
+    expect(workspace).toContain("in('status', ['applicant', 'applied', 'pending'])");
   });
 
   it.each(['students', 'programs', 'hours', 'compliance', 'documents', 'reports', 'settings'])(

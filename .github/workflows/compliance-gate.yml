@@ -18,7 +18,7 @@ env:
 jobs:
   security:
     name: Security Audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +34,14 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Bounded brace parser security regression
+        run: node --test tests/security/bounded-braces.test.cjs
       - name: Dependency security audit
         run: pnpm audit --audit-level high
 
   registered-apprenticeship:
     name: Registered Apprenticeship Architecture
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +53,7 @@ jobs:
 
   e2e-enrollment:
     name: E2E Enrollment Flow
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -126,7 +128,7 @@ jobs:
 
   accessibility:
     name: Accessibility Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -206,7 +208,7 @@ jobs:
 
   compliance-files:
     name: Compliance Files Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Verify compliance components exist

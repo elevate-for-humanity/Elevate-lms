@@ -1,0 +1,86 @@
+import 'server-only';
+
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { normalizeRoles } from '@/lib/rbac/role-matrix';
+
+const COMMUNICATION_ROLES = new Set([
+  'super_admin','admin','org_admin','staff','program_holder','programholder',
+  'site_coordinator','provider_admin','host_shop','host_shop_admin','hostshop','partner','employer','instructor','case_manager','counselor','advisor'
+]);
+
+export async function requireCommunicationActor() {
+  const db = await requireAdminClient();
+
+  // Cross-domain Admin previews use a short-lived signed handoff and may not
+  // carry the LMS Supabase session. Resolve that verified subject first, then
+  // fall back to the authenticated actor for ordinary holder sessions.
+  const handoffPreview = await resolvePortalPreviewSubject(db, null);
+  const auth = await createClient();
+  const {
+    data: { user: authenticatedUser },
+    error,
+  } = await auth.auth.getUser();
+  if ((error || !authenticatedUser) && !handoffPreview.previewing) {
+    throw new Error('COMMUNICATIONS_UNAUTHENTICATED');
+  }
+
+  const preview = handoffPreview.previewing
+    ? handoffPreview
+    : await resolvePortalPreviewSubject(db, authenticatedUser?.id);
+  const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser!.id;
+
+  const [profileResult, rolesResult] = await Promise.all([
+    db.from('profiles').select('id,email,full_name,role,is_active,suspended').eq('id', effectiveUserId).maybeSingle(),
+    db.from('user_roles').select('roles(name)').eq('user_id', effectiveUserId),
+  ]);
+  if (profileResult.error || rolesResult.error) throw new Error('COMMUNICATIONS_LOOKUP_UNAVAILABLE');
+  const profile = profileResult.data;
+  const roleRows = rolesResult.data;
+  if (!profile || profile.is_active === false || profile.suspended === true) {
+    throw new Error('COMMUNICATIONS_FORBIDDEN');
+  }
+  const roles = normalizeRoles([
+    profile?.role,
+    ...(roleRows ?? []).map((row: any) => row?.roles?.name),
+  ]).filter(Boolean);
+  if (!roles.some((role) => COMMUNICATION_ROLES.has(role))) {
+    throw new Error('COMMUNICATIONS_FORBIDDEN');
+  }
+
+  // A holder role alone does not authorize phone/email after its agreement or
+  // approval has been withdrawn. Independent staff roles retain staff access.
+  const holderRoles = new Set(['program_holder', 'site_coordinator', 'provider_admin']);
+  if (roles.some(role => holderRoles.has(role)) && !roles.some(role => COMMUNICATION_ROLES.has(role) && !holderRoles.has(role))) {
+    const { data: holder, error: holderError } = await db.from('program_holders')
+      .select('status,approved_at,mou_terminated,suspended_at,terminated_at')
+      .eq('user_id', effectiveUserId).maybeSingle();
+    if (holderError) throw new Error('COMMUNICATIONS_LOOKUP_UNAVAILABLE');
+    if (!holder?.approved_at || !['approved','active','approved_pending_mou'].includes(holder.status) || holder.mou_terminated || holder.suspended_at || holder.terminated_at) {
+      throw new Error('COMMUNICATIONS_FORBIDDEN');
+    }
+  }
+
+  const { data: extension } = await db
+    .from('communication_extensions')
+    .select('*,communication_workspaces!inner(id,phone_system_id)')
+    .eq('profile_id', effectiveUserId)
+    .eq('enabled', true)
+    .maybeSingle();
+  const systemId = extension?.communication_workspaces?.phone_system_id;
+  const { data: system } = systemId
+    ? await db.from('phone_systems').select('*').eq('id', systemId).maybeSingle()
+    : { data: null };
+
+  return {
+    user: { id: effectiveUserId, email: profile?.email || authenticatedUser?.email },
+    authenticatedUser,
+    previewing: preview.previewing,
+    profile,
+    roles,
+    db,
+    extension,
+    system,
+  };
+}

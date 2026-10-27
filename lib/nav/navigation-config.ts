@@ -242,7 +242,7 @@ export const socialLinks = {
 export const contactInfo = {
   phone: {
     display: PLATFORM_DEFAULTS.supportPhone,
-    tel: '+13173143757',
+    tel: '+14632401404',
   },
   email: {
     general: 'info@elevateforhumanity.org',

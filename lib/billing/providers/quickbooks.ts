@@ -131,14 +131,8 @@ export async function recordQuickBooksInvoiceExternalPayment(
 
   const state = await getQuickBooksInvoiceCollectionState(db, input.billingInvoiceId);
   const config = await loadQuickBooksConfig(db);
-  const paymentResult = await quickBooksRequest<any>(db, config, 'payment', {
+  const paymentResult = await quickBooksRequest<any>(db, config, `payment?requestid=${createHash('sha256').update(`${input.collectionProvider}-payment:${input.providerPaymentId}`).digest('hex').slice(0, 50)}`, {
     method: 'POST',
-    headers: {
-      'Request-Id': createHash('sha256')
-        .update(`${input.collectionProvider}-payment:${input.providerPaymentId}`)
-        .digest('hex')
-        .slice(0, 50),
-    },
     body: JSON.stringify({
       CustomerRef: { value: state.invoice.CustomerRef.value },
       TotalAmt: state.amountCents / 100,
@@ -153,6 +147,7 @@ export async function recordQuickBooksInvoiceExternalPayment(
       ],
     }),
   });
+  if (!paymentResult.Payment?.Id) throw new Error('QuickBooks did not confirm a payment record.');
   const updatedPayload = { ...state.invoice, externalPayment: paymentResult.Payment };
   const saved = await db
     .from('billing_invoices')
@@ -296,14 +291,8 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
         const lineItems = await Promise.all(
           input.lines.map(async (line) => ({ line, item: await ensureItem(db, line) })),
         );
-        const result = await quickBooksRequest<any>(db, config, 'invoice', {
+        const result = await quickBooksRequest<any>(db, config, `invoice?requestid=${createHash('sha256').update(input.idempotencyKey).digest('hex').slice(0, 50)}`, {
           method: 'POST',
-          headers: {
-            'Request-Id': createHash('sha256')
-              .update(input.idempotencyKey)
-              .digest('hex')
-              .slice(0, 50),
-          },
           body: JSON.stringify({
             CustomerRef: { value: customer.Id },
             DueDate: input.dueDate,
@@ -414,14 +403,8 @@ export async function recordQuickBooksExternalPayment(
   if (!customerId) throw new Error('QuickBooks invoice is missing its customer reference.');
 
   const config = await loadQuickBooksConfig(db);
-  const paymentResult = await quickBooksRequest<any>(db, config, 'payment', {
+  const paymentResult = await quickBooksRequest<any>(db, config, `payment?requestid=${createHash('sha256').update(`paypal-payment:${input.providerPaymentId}`).digest('hex').slice(0, 50)}`, {
     method: 'POST',
-    headers: {
-      'Request-Id': createHash('sha256')
-        .update(`paypal-payment:${input.providerPaymentId}`)
-        .digest('hex')
-        .slice(0, 50),
-    },
     body: JSON.stringify({
       CustomerRef: { value: customerId },
       TotalAmt: Number(existing.data.provider_payload?.TotalAmt || 0),
@@ -436,6 +419,7 @@ export async function recordQuickBooksExternalPayment(
       ],
     }),
   });
+  if (!paymentResult.Payment?.Id) throw new Error('QuickBooks did not confirm a payment record.');
   const updatedPayload = { ...invoice, externalPayment: paymentResult.Payment };
   const saved = await db
     .from('billing_invoices')

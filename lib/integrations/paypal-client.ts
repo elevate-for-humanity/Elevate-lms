@@ -41,6 +41,7 @@ async function payPalAccessToken(config: PayPalConfig): Promise<string> {
   }
   const response = await fetch(`${payPalApiBase(config)}/v1/oauth2/token`, {
     method: 'POST',
+    signal: AbortSignal.timeout(10_000),
     headers: {
       authorization: `Basic ${Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64')}`,
       'content-type': 'application/x-www-form-urlencoded',
@@ -68,6 +69,7 @@ export async function payPalRequest<T>(
   const token = await payPalAccessToken(config);
   const response = await fetch(`${payPalApiBase(config)}${path}`, {
     ...init,
+    signal: init.signal ? AbortSignal.any([init.signal, AbortSignal.timeout(10_000)]) : AbortSignal.timeout(10_000),
     headers: {
       authorization: `Bearer ${token}`,
       accept: 'application/json',

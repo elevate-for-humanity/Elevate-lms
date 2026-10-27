@@ -10,11 +10,13 @@ export function CreateSchedule() {
     event.preventDefault();
     setSaving(true);
     setMessage('');
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const email = String(data.get('email') || '')
       .trim()
       .toLowerCase();
     const remaining = String(data.get('remaining') || '').trim();
+    try {
     const response = await fetch('/api/admin/billing/schedules', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -37,8 +39,12 @@ export function CreateSchedule() {
         ? 'Subscription saved. Approve the signed release, then connect its PayPal billing agreement.'
         : result.error || 'Schedule could not be saved.',
     );
-    setSaving(false);
-    if (response.ok) event.currentTarget.reset();
+    if (response.ok) form.reset();
+    } catch {
+      setMessage('The schedule could not be saved. Check your connection and retry.');
+    } finally {
+      setSaving(false);
+    }
   }
   return (
     <div>

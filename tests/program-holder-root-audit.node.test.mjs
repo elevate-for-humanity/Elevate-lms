@@ -247,3 +247,41 @@ test('contractor mapping is company scoped and cannot mark banking verified',asy
  const api=load('lib/integrations/quickbooks-program-holder-contractor.ts',{'./quickbooks-client':{loadQuickBooksConfig:async()=>({realmId:'realm'}),assertQuickBooksProductionEnvironment(){},quickBooksRequest:async()=>{throw Error('Already mapped')}}});assert.equal((await api.ensureProgramHolderQuickBooksContractor(db,'holder')).vendorId,'vendor');
  const source=readFileSync(new URL('../lib/integrations/quickbooks-program-holder-contractor.ts',import.meta.url),'utf8');assert.doesNotMatch(source,/payouts_enabled|transfers_enabled|verification_status|sendEmail|TaxIdentifier/);
 });
+
+test('QuickBooks payment retries use the provider requestid and require a returned payment ID', async()=>{
+ for(const providerConfirmed of [false,true]) {
+  const paths=[];let writes=0;let failSave=true;
+  const db=dbFor(q=>{if(q.operation==='update'){writes++;return{error:failSave?{message:'temporarily unavailable'}:null}}return{data:{id:'invoice',provider_invoice_id:'qb-invoice',provider_payload:{CustomerRef:{value:'customer'},TotalAmt:75}},error:null}});
+  const api=load('lib/billing/providers/quickbooks.ts',{'node:crypto':{createHash},'@/lib/integrations/quickbooks-client':{loadQuickBooksConfig:async()=>({}),quickBooksRequest:async(_db,_config,path)=>{paths.push(path);return providerConfirmed?{Payment:{Id:'paid-record'}}:{}}}});
+  const input={idempotencyKey:'payment-key',billingScheduleId:'schedule',collectionProvider:'paypal',providerPaymentId:'capture',paidAt:'2026-10-27T12:00:00Z'};
+  await assert.rejects(api.recordQuickBooksExternalPayment(db,input),providerConfirmed?/local ledger update failed/:/did not confirm/);
+  failSave=false;
+  if(providerConfirmed){assert.equal((await api.recordQuickBooksExternalPayment(db,input)).quickBooksPaymentId,'paid-record');assert.equal(paths[0],paths[1]);}else assert.equal(writes,0);
+  assert.match(paths[0],/^payment\?requestid=[a-f0-9]{50}$/);
+ }
+});
+
+test('pause/cancel changes automatic collection in PayPal before updating local records', async()=>{
+ for(const next of ['paused','canceled']) {
+  const calls=[];let providerState='ACTIVE';
+  const db=dbFor(q=>{if(q.operation==='update'){calls.push('save');assert.equal(providerState,next==='paused'?'SUSPENDED':'CANCELLED');return{data:{id:'schedule'},error:null}}return{data:{id:'schedule',status:'active',collection_mode:'automatic',collection_provider:'paypal',provider_subscription_id:'subscription',updated_at:'revision'},error:null}});
+  const api=load('lib/billing/change-schedule-status.ts',{'node:crypto':{createHash},'@/lib/integrations/paypal-client':{payPalRequest:async(path,options)=>{calls.push(options.method);if(options.method==='POST')providerState=next==='paused'?'SUSPENDED':'CANCELLED';return{status:providerState}}}});
+  assert.equal((await api.changeBillingScheduleStatus(db,'schedule',next)).ok,true);assert.deepEqual(calls,['GET','POST','GET','save']);
+ }
+});
+
+test('provider failures and missing release cannot falsely pause or resume billing', async()=>{
+ for(const next of ['active','paused']) {
+  let writes=0;let providerCalls=0;
+  const db=dbFor(q=>{if(q.operation==='update')writes++;return{data:q.table==='billing_migration_authorizations'?null:{id:'schedule',collection_mode:'automatic',collection_provider:'paypal',provider_subscription_id:'subscription',updated_at:'revision'},error:null}});
+  const api=load('lib/billing/change-schedule-status.ts',{'./recurring-release':{hasVerifiedRecurringRelease:async()=>false},'node:crypto':{createHash},'@/lib/integrations/paypal-client':{payPalRequest:async()=>{providerCalls++;throw Error('Provider unavailable')}}});
+  await assert.rejects(api.changeBillingScheduleStatus(db,'schedule',next),next==='active'?/approved signed/:/Provider unavailable/);assert.equal(writes,0);assert.equal(providerCalls,next==='active'?0:1);
+ }
+});
+
+test('billing history queries the actual organization relationship and surfaces lookup failures',async()=>{
+ let organizationQuery=false;
+ const db=dbFor(q=>{if(q.table==='organization_subscriptions'){assert.match(q.columns,/organizations\(name,slug\)/);assert.doesNotMatch(q.columns,/tenants\(/);organizationQuery=true;return{data:null,error:{message:'Unavailable'}}}return{data:[],error:null}});
+ const page=load('apps/admin/app/billing/subscriptions/page.tsx',{'@/lib/auth/require-role':{requireRole:async()=>{}},'@/lib/supabase/admin':{requireAdminClient:async()=>db}});
+ const tree=await page.default();assert.equal(organizationQuery,true);assert.equal(tree.props.children.flat().find(x=>x?.props?.role==='alert')?.props.role,'alert');
+});

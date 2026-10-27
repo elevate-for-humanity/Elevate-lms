@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import QuickBooksClient from '../../integrations/quickbooks/QuickBooksClient';
 import Link from 'next/link';
 import {
   DollarSign,
@@ -191,48 +192,10 @@ function statusBadge(status: string) {
 }
 
 export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queue = [], pendingW9Count = 0 }: Props) {
-  const [runs, setRuns] = useState<PayrollRun[]>(initial);
+  const runs = initial;
   const [showModal, setShowModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  // Default to current bi-weekly period
-  const today = new Date();
-  const periodStart = new Date(today);
-  periodStart.setDate(today.getDate() - 14);
-  const payDate = new Date(today);
-  payDate.setDate(today.getDate() + 3);
-
-  const [form, setForm] = useState({
-    pay_period_start: periodStart.toISOString().split('T')[0],
-    pay_period_end: today.toISOString().split('T')[0],
-    pay_date: payDate.toISOString().split('T')[0],
-  });
-
   const ytd = runs.reduce((s, r) => s + (r.total_gross ?? 0), 0);
   const lastRun = runs[0];
-
-  async function runPayroll() {
-    setSubmitting(true);
-    setError('');
-    try {
-      const res = await fetch('/api/admin/payouts/mark-paid', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to run payroll');
-      setRuns([data.payrollRun, ...runs]);
-      setSuccess(`Payroll run created — ${data.summary?.employeeCount ?? 0} employees processed.`);
-      setShowModal(false);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSubmitting(false);
-    }
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -251,23 +214,26 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
             <span className="text-slate-900 font-medium">Payroll</span>
           </nav>
           <h1 className="text-3xl font-bold text-slate-900">Payroll Management</h1>
-          <p className="text-slate-500 mt-1">Process payroll runs and manage pay stubs</p>
+          <p className="text-slate-500 mt-1">QuickBooks payroll setup and recorded pay runs</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700 font-semibold transition"
         >
           <Play className="w-4 h-4" />
-          Run Payroll
+          QuickBooks Payroll Setup
         </button>
       </div>
 
-      {success && (
-        <div className="mb-6 flex items-center gap-3 bg-brand-green-50 border border-brand-green-200 text-brand-green-800 rounded-lg px-4 py-3">
-          <CheckCircle className="w-5 h-5 flex-shrink-0" />
-          {success}
+      <section className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <p className="font-semibold">Employee payroll and contractor payments have separate setup.</p>
+        <p className="mt-2 text-sm">The accounting connection can verify employee records. Payroll enrollment, taxes, direct deposit, and pay-run approval must be completed in Intuit's payroll service. The records below do not confirm money was sent.</p>
+        <div className="mt-3 flex flex-wrap gap-4 text-sm font-semibold">
+          <a href="https://qbo.intuit.com/" target="_blank" rel="noopener noreferrer" className="underline">Open QuickBooks</a>
+          <Link href="/program-holders" className="underline">Review Program Holder contractors</Link>
+          <Link href="/billing/subscriptions" className="underline">Review student tuition collection</Link>
         </div>
-      )}
+      </section>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -296,7 +262,7 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
             Next Pay Date
           </p>
-          <p className="text-lg font-bold text-slate-900">{fmtDate(form.pay_date)}</p>
+          <p className="text-lg font-bold text-slate-900">{runs.find(run => run.pay_date >= new Date().toISOString().slice(0, 10) && !['paid', 'failed', 'canceled'].includes(run.status))?.pay_date ? fmtDate(runs.find(run => run.pay_date >= new Date().toISOString().slice(0, 10) && !['paid', 'failed', 'canceled'].includes(run.status))!.pay_date) : 'Not scheduled'}</p>
         </div>
       </div>
 
@@ -335,7 +301,7 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
           <div className="px-6 py-12 text-center text-slate-400">
             <DollarSign className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p>
-              No payroll runs yet. Click <strong>Run Payroll</strong> to get started.
+              No payroll runs recorded. Complete setup in QuickBooks before processing payroll.
             </p>
           </div>
         ) : (
@@ -476,84 +442,11 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
         </div>
       </div>
 
-      {/* Run Payroll Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between px-6 py-4 border-b">
-              <h2 className="text-lg font-bold text-slate-900">Run Payroll</h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="px-6 py-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Pay Period Start
-                </label>
-                <input
-                  type="date"
-                  value={form.pay_period_start}
-                  onChange={(e) => setForm((f) => ({ ...f, pay_period_start: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Pay Period End
-                </label>
-                <input
-                  type="date"
-                  value={form.pay_period_end}
-                  onChange={(e) => setForm((f) => ({ ...f, pay_period_end: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Pay Date</label>
-                <input
-                  type="date"
-                  value={form.pay_date}
-                  onChange={(e) => setForm((f) => ({ ...f, pay_date: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
-                />
-              </div>
-              {error && (
-                <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
-                </div>
-              )}
-              <div className="bg-slate-50 rounded-lg px-4 py-3 text-xs text-slate-500">
-                This will calculate gross pay, taxes, and net pay for all active employees with
-                approved time entries in the selected period.
-              </div>
-            </div>
-            <div className="px-6 py-4 border-t flex gap-3 justify-end">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 border rounded-lg hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={runPayroll}
-                disabled={submitting}
-                className="flex items-center gap-2 px-5 py-2 text-sm font-semibold bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
-              >
-                {submitting ? (
-                  <>
-                    <Clock className="w-4 h-4 animate-spin" /> Processing…
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4" /> Run Payroll
-                  </>
-                )}
-              </button>
-            </div>
+          <div role="dialog" aria-modal="true" aria-label="QuickBooks payroll setup" className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="flex justify-end p-3"><button aria-label="Close QuickBooks setup" onClick={() => setShowModal(false)} className="rounded border p-2"><X className="h-5 w-5" /></button></div>
+            <QuickBooksClient />
           </div>
         </div>
       )}

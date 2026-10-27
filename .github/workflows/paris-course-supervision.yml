@@ -9,6 +9,9 @@ on:
       - 'lib/ultimate-course-builder/worker/paris-monitor.mjs'
       - '.github/workflows/paris-course-supervision.yml'
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Dispatch and recover Google course work']
+    types: [completed]
   schedule:
     - cron: '2-59/5 * * * *'
 permissions:
@@ -19,6 +22,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   supervise:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 5

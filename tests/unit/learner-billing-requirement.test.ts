@@ -56,13 +56,13 @@ describe('learner recurring-payment requirement', () => {
     const approved = resolveLearnerBillingRequirement({
       role: 'student',
       enrollments: [baseEnrollment],
-      authorization: { id: 'auth-1', status: 'approved' },
+      authorization: { id: 'auth-1', status: 'approved', document_path: 'signed.pdf', reviewed_by: 'reviewer' },
       schedule: { status: 'paused', provider_status: 'approval_pending' },
     });
     const active = resolveLearnerBillingRequirement({
       role: 'student',
       enrollments: [baseEnrollment],
-      authorization: { id: 'auth-1', status: 'approved' },
+      authorization: { id: 'auth-1', status: 'approved', document_path: 'signed.pdf', reviewed_by: 'reviewer' },
       schedule: {
         status: 'active',
         provider_status: 'active',
@@ -99,4 +99,18 @@ describe('learner recurring-payment requirement', () => {
     });
     expect(result.affirmInvoice?.id).toBe('invoice-eligible');
   });
+});
+
+for (const funding of ['WIOA ITA', 'WIOA_ITA', 'WRG State 7.0', 'WRG', 'wioa-ita']) {
+  it(`exempts ${funding} funded apprentices from personal payment setup`, () => {
+    const result = resolveLearnerBillingRequirement({ role: 'apprentice', enrollments: [{ ...baseEnrollment, funding_source: funding, program_slug: 'barber-apprenticeship' }] });
+    expect(result.required).toBe(false);
+    expect(result.status).toBe('not_required');
+  });
+}
+
+it('does not treat an approved label without its signed release as verified autopay consent', () => {
+  const result = resolveLearnerBillingRequirement({ role: 'student', enrollments: [baseEnrollment], authorization: { id: 'unproven', status: 'approved' }, schedule: { status: 'active', provider_status: 'active', provider_subscription_id: 'agreement', provider_approval_url: 'https://www.paypal.com/approve' } });
+  expect(result.status).toBe('release_required');
+  expect(result.paypalApprovalUrl).toBeNull();
 });

@@ -18,6 +18,10 @@ function clean(value: unknown, max = 500): string {
     .slice(0, max);
 }
 
+function escapeHtml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+
 function validEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
   const limited = await applyRateLimit(request, 'contact');
   if (limited) return limited;
 
+  let savedApplicationId: string | null = null;
   try {
     const body = await request.json();
     const legalBusinessName = clean(body.legalBusinessName || body.businessName, 255);
@@ -93,20 +98,30 @@ export async function POST(request: Request) {
     }
 
     const db = await requireAdminClient();
+    const emailPattern = email.replace(/[\\%_]/g, '\\$&');
     const fullAddress = [address1, address2, city, state, zip].filter(Boolean).join(', ');
     const now = new Date().toISOString();
     const { data: existing, error: lookupError } = await db
       .from('host_shop_applications')
       .select('id,status,intake')
-      .eq('email', email)
+      .ilike('email', emailPattern)
       .not('status', 'in', '("rejected")')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     if (lookupError) throw lookupError;
 
+    const { data: existingPartner, error: partnerLookupError } = await db
+      .from('partners').select('id').ilike('contact_email', emailPattern).limit(1).maybeSingle();
+    if (partnerLookupError) throw partnerLookupError;
+    if (existing || existingPartner) {
+      return NextResponse.json({
+        ok: false,
+        error: 'An application or Host Shop account already exists. Sign in to finish your saved onboarding. Use password setup or a secure magic link if you do not have a password.',
+      }, { status: 409 });
+    }
+
     const intake = {
-      ...((existing?.intake as Record<string, unknown> | null) || {}),
       legalBusinessName,
       dbaName: businessName === legalBusinessName ? null : businessName,
       contactName,
@@ -131,29 +146,18 @@ export async function POST(request: Request) {
       address: fullAddress,
       contact_email: email,
       business_name: legalBusinessName,
-      status: existing?.status === 'submitted' ? 'submitted' : 'drafted',
+      status: 'drafted',
       license_info: {},
       intake,
       updated_at: now,
     };
 
-    let applicationId = existing?.id as string | undefined;
-    if (applicationId) {
-      const { error } = await db
-        .from('host_shop_applications')
-        .update(applicationPayload)
-        .eq('id', applicationId);
-      if (error) throw error;
-    } else {
-      const { data, error } = await db
-        .from('host_shop_applications')
-        .insert(applicationPayload)
-        .select('id')
-        .single();
-      if (error || !data?.id) throw error || new Error('HOST_SHOP_DRAFT_NOT_CREATED');
-      applicationId = data.id;
-    }
+    const { data: saved, error: saveError } = await db
+      .from('host_shop_applications').insert(applicationPayload).select('id').single();
+    if (saveError || !saved?.id) throw saveError || new Error('HOST_SHOP_DRAFT_NOT_CREATED');
+    const applicationId = saved.id as string;
 
+    savedApplicationId = applicationId;
     const provisioned = await provisionHostShopDraft({
       db,
       applicationId,
@@ -173,17 +177,17 @@ export async function POST(request: Request) {
     });
 
     const accessLink = provisioned.accessLink || provisioned.portalUrl;
-    await Promise.allSettled([
+    const deliveryResults = await Promise.allSettled([
       sendEmail({
         to: email,
         subject: 'Finish Your Host Shop Application | Elevate for Humanity',
-        html: `<p>Hello ${contactName},</p><p>Your Host Shop application for <strong>${businessName}</strong> is saved.</p><p><strong>Reference:</strong> ${applicationId}</p><p>Your conditional Host Shop portal is ready. Use the secure link below to continue onboarding and upload the remaining compliance items.</p><p><a href="${accessLink}">Open Host Shop Onboarding</a></p><p>Your shop is not approved and no apprentice can be assigned until Elevate verifies the required licenses, insurance, workers' compensation/exemption, supervisor credential, EIN/W-9 record, acknowledgements, and signature.</p>`,
+        html: `<p>Hello ${escapeHtml(contactName)},</p><p>Your Host Shop application for <strong>${escapeHtml(businessName)}</strong> is saved.</p><p><strong>Reference:</strong> ${applicationId}</p><p>Your conditional Host Shop portal is ready. Use the secure link below to continue onboarding and upload the remaining compliance items.</p><p><a href="${accessLink}">Open Host Shop Onboarding</a></p><p>Your shop is not approved and no apprentice can be assigned until Elevate verifies the required licenses, insurance, workers' compensation/exemption, supervisor credential, EIN/W-9 record, acknowledgements, and signature.</p>`,
       }),
       // Drafts require an administrative inbox alert as well as dashboard visibility.
       sendEmail({
         to: 'elevate4humanityedu@gmail.com',
         subject: `[HOST SHOP DRAFT] ${businessName} — follow-up required`,
-        html: `<p>A host shop application draft was saved but not submitted.</p><p><strong>${businessName}</strong> — ${contactName}</p><p>Application reference: ${applicationId}</p><p>Review in the Admin host shop application queue and follow up on missing documents.</p>`,
+        html: `<p>A host shop application draft was saved but not submitted.</p><p><strong>${escapeHtml(businessName)}</strong> — ${escapeHtml(contactName)}</p><p>Application reference: ${applicationId}</p><p>Review in the Admin host shop application queue and follow up on missing documents.</p>`,
       }),
       db.from('staff_notifications').insert({
         type: 'host_shop_draft_saved',
@@ -194,23 +198,34 @@ export async function POST(request: Request) {
       }),
     ]);
 
+    const applicantDelivery = deliveryResults[0];
+    const accessEmailSent = applicantDelivery.status === 'fulfilled' && applicantDelivery.value.success === true;
+    if (!accessEmailSent) logger.warn('[host-shop/draft] Applicant access email was not confirmed', { applicationId });
+
     return NextResponse.json(
       {
         ok: true,
+        accessEmailSent,
         applicationId,
         referenceNumber: applicationId,
         status: applicationPayload.status,
         portalUrl: provisioned.portalUrl,
-        nextStepUrl: '/partners/host-shop/apply?resume=1',
+        nextStepUrl: provisioned.portalUrl,
       },
-      { status: existing ? 200 : 201 },
+      { status: 201 },
     );
   } catch (error) {
     logger.error('[host-shop/draft] failed', error instanceof Error ? error : undefined);
+    if (savedApplicationId) {
+      try {
+        const db = await requireAdminClient();
+        await db.from('staff_notifications').insert({ type: 'host_shop_provisioning_failed', title: 'Saved Host Shop draft needs portal setup', message: `Application ${savedApplicationId} is saved, but portal setup did not complete. Resolve owner access and contact the applicant.`, severity: 'error', metadata: { application_id: savedApplicationId } });
+      } catch (notificationError) { logger.error('[host-shop/draft] Follow-up alert failed', notificationError); }
+    }
     return NextResponse.json(
       {
         ok: false,
-        error: `We could not save the Host Shop draft. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
+        error: savedApplicationId ? `Your application is saved (reference ${savedApplicationId}), but portal setup needs assistance. Please call ${PLATFORM_DEFAULTS.mainPhone}; do not submit another application.` : `We could not save the Host Shop draft. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
       },
       { status: 500 },
     );

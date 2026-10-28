@@ -173,7 +173,14 @@ export async function provisionHostShopDraft(
       email,
       options: { redirectTo: onboardingUrl },
     });
-    if (!error) accessLink = data?.properties?.action_link || null;
+    if (!error) {
+      if (identity.isNewUser && data?.properties?.hashed_token) {
+        const recovery = new URL('/api/auth/recovery-callback', appUrl);
+        recovery.searchParams.set('token_hash', data.properties.hashed_token);
+        recovery.searchParams.set('next', '/reset-password?portal=host-shop&mode=recovery');
+        accessLink = recovery.toString();
+      } else accessLink = data?.properties?.action_link || null;
+    }
   } catch {
     accessLink = null;
   }

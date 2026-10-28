@@ -70,9 +70,12 @@ export default function UniversalHostSiteApplyPage() {
     const form = new FormData(formElement);
     const value = (name: string) => String(form.get(name) || '').trim();
     setSavingDraft(true);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 60_000);
     try {
       const response = await fetch('/api/host-shop/draft', {
         method: 'POST',
+        signal: controller.signal,
         credentials: 'same-origin',
         cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
@@ -96,14 +99,16 @@ export default function UniversalHostSiteApplyPage() {
         ok?: boolean;
         error?: string;
         referenceNumber?: string;
+        accessEmailSent?: boolean;
       };
       if (!response.ok || !data.ok) throw new Error(data.error || 'Unable to save the draft.');
       setDraftMessage(
-        `Application saved. Reference ${data.referenceNumber}. We emailed secure Host Shop access so you can finish the remaining compliance items.`,
+        `Application saved. Reference ${data.referenceNumber}. ${data.accessEmailSent ? 'We emailed secure Host Shop access.' : 'Email delivery was not confirmed. Use the Host Shop sign-in link above and choose password setup or a secure magic link.'} Finish the remaining compliance items in your portal.`,
       );
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to save the draft.');
     } finally {
+      window.clearTimeout(timeout);
       setSavingDraft(false);
     }
   }
@@ -116,7 +121,8 @@ export default function UniversalHostSiteApplyPage() {
       return;
     }
 
-    setSubmitting(true);
+    const controller = new AbortController();
+    let timeout: number | undefined;
     try {
       const formElement = event.currentTarget;
       const firstInvalid = formElement.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(':invalid');
@@ -127,12 +133,12 @@ export default function UniversalHostSiteApplyPage() {
         setError('Please complete the highlighted required field before submitting.');
         return;
       }
+      setSubmitting(true);
       const form = new FormData(formElement);
       form.delete('programs');
       programs.forEach((program) => form.append('programs', program));
 
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 60000);
+      timeout = window.setTimeout(() => controller.abort(), 60000);
       const response = await fetch('/api/host-shop/apply-multipart', {
         method: 'POST',
         body: form,
@@ -147,6 +153,7 @@ export default function UniversalHostSiteApplyPage() {
         error?: string;
         referenceNumber?: string;
         applicationId?: string;
+        portalProvisioned?: boolean;
       };
       if (!response.ok || !data.ok) {
         throw new Error(data.error || 'The Host Site application could not be submitted.');
@@ -155,6 +162,7 @@ export default function UniversalHostSiteApplyPage() {
       const ref = data.referenceNumber || data.applicationId || '';
       const query = new URLSearchParams({ type: 'host-shop' });
       if (ref) query.set('ref', ref);
+      if (data.portalProvisioned === false) query.set('portal', 'needs-help');
       router.push(`/apply/success?${query.toString()}`);
     } catch (caught) {
       setError(
@@ -164,6 +172,8 @@ export default function UniversalHostSiteApplyPage() {
             ? caught.message
             : 'Unable to submit the Host Site application. Please try again.',
       );
+    } finally {
+      window.clearTimeout(timeout);
       setSubmitting(false);
     }
   }
@@ -194,6 +204,7 @@ export default function UniversalHostSiteApplyPage() {
       </section>
 
       <div className="mx-auto min-w-0 max-w-4xl space-y-5 px-3 py-6 sm:space-y-6 sm:px-4 sm:py-8">
+        <p className="rounded-xl border border-slate-300 bg-white p-4 text-slate-800">Already started? <a className="font-bold underline" href="https://app.elevateforhumanity.org/host-shop/login">Sign in to finish your Host Shop onboarding</a>. No password yet? Use the password setup link on the sign-in page.</p>
         <div className="min-w-0 break-words rounded-xl border-2 border-emerald-300 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950 sm:p-5">
           <strong>No-cost Host Site application:</strong> Elevate charges no application or
           placement fee. The Host Site is still responsible for apprentice wages, payroll
@@ -534,7 +545,7 @@ export default function UniversalHostSiteApplyPage() {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || savingDraft}
             className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 text-base font-black text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-500 sm:w-auto"
           >
             {submitting ? 'Uploading and submitting…' : 'Submit Host Site Application'}

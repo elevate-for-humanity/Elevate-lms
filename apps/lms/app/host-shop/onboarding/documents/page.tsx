@@ -26,7 +26,8 @@ async function loadContext() {
   }
 }
 
-function statusBadge(status: string) {
+function statusBadge(status: string, required: boolean) {
+  if (!required && status === 'missing') return <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">If applicable</span>;
   if (status === 'accepted') {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-black text-green-800">
@@ -65,7 +66,7 @@ export default async function HostShopDocumentsPage({
       : params.error === 'file_too_large'
         ? 'That file is larger than 10 MB.'
         : params.error === 'file_type'
-          ? 'Upload PDF, JPG, or PNG files only.'
+          ? 'Upload PDF, JPG, PNG, or WEBP files only.'
           : params.error === 'upload_failed'
             ? 'The file could not be uploaded. Your existing records are safe. Please try again.'
             : params.error === 'record_failed'
@@ -117,7 +118,7 @@ export default async function HostShopDocumentsPage({
             const status = String(requirement.status || 'missing');
             // Permit a corrected replacement even while an earlier submission is under review.
             const needsUpload = true;
-            const needsAttention = status !== 'accepted' && status !== 'pending';
+            const needsAttention = requirement.is_required !== false && status !== 'accepted' && status !== 'pending';
             return (
               <section
                 key={requirement.document_type}
@@ -142,7 +143,7 @@ export default async function HostShopDocumentsPage({
                       </p>
                     ) : null}
                   </div>
-                  {statusBadge(status)}
+                  {statusBadge(status, requirement.is_required !== false)}
                 </div>
 
                 {needsUpload ? (

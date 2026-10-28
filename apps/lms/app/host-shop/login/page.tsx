@@ -120,7 +120,7 @@ export default function HostShopLoginPage() {
               <Building2 className="h-6 w-6" />
             </div>
             <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950">Host Shop Sign In</h1>
-            <p className="mt-2 text-base leading-7 text-slate-700">Secure access for approved host-shop users linked to an active partner record.</p>
+            <p className="mt-2 text-base leading-7 text-slate-700">Sign in to complete Host Shop onboarding or manage your approved shop.</p>
 
             {error && (
               <div role="alert" className="mt-5 flex items-start gap-2 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-900">
@@ -147,7 +147,7 @@ export default function HostShopLoginPage() {
               </label>
 
               <div className="flex justify-end">
-                <Link href="/reset-password" className="text-sm font-bold text-brand-red-700 hover:underline">Forgot password?</Link>
+                <Link href="/reset-password?portal=host-shop" className="text-sm font-bold text-brand-red-700 hover:underline">Create or reset your password</Link>
               </div>
 
               <button type="submit" disabled={isLoading} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-400">

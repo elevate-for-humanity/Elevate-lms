@@ -13,10 +13,11 @@ const HOST_SHOP_LOGIN = 'https://app.elevateforhumanity.org/host-shop/login';
 export default async function HostSiteConfirmationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string }>;
+  searchParams: Promise<{ ref?: string; portal?: string }>;
 }) {
   const params = await searchParams;
   const reference = params?.ref?.trim() || null;
+  const setupNeedsHelp = params?.portal === 'needs-help';
 
   return (
     <main className="min-h-[75vh] bg-slate-50 px-4 py-12 text-slate-950">
@@ -27,11 +28,12 @@ export default async function HostSiteConfirmationPage({
         </p>
         <h1 className="mt-3 text-3xl font-black sm:text-4xl">Your application is saved and onboarding can begin</h1>
         <p className="mt-4 text-base leading-7 text-slate-700">
-          Elevate received your Host Site application and compliance documents. Your Host Shop account
-          is provisioned for conditional onboarding while authorized staff verify licensing, insurance,
+          Elevate received your Host Site application and compliance documents. Authorized staff verify licensing, insurance,
           workers&apos; compensation/exemption records, supervising professional credentials, worksite
           capacity, and program fit.
         </p>
+
+        {setupNeedsHelp ? <p role="status" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 font-semibold text-amber-950">Your application and uploaded documents are saved. Portal setup or email delivery needs staff follow-up. Do not reapply. Contact support with the reference below if you cannot sign in.</p> : null}
 
         {reference ? (
           <div className="mt-6 rounded-xl border border-slate-300 bg-slate-50 p-4">

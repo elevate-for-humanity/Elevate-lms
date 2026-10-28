@@ -8,6 +8,7 @@ import { normalizeRoles } from '@/lib/rbac/role-matrix';
 
 export type CurrentHostShopPartner = {
   id: string;
+  partner_application_id?: string | null;
   name: string;
   dba?: string | null;
   contact_email?: string | null;
@@ -43,7 +44,7 @@ export type CurrentHostShopPartner = {
 };
 
 const PARTNER_SELECT =
-  'id, name, dba, contact_email, contact_phone, phone, website, website_url, address_line1, address_line2, city, state, zip, partner_type, program_type, programs, approval_status, account_status, status, is_active, mou_signed, mou_signed_at, mou_version, onboarding_completed, onboarding_step, documents_verified, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify';
+  'id, partner_application_id, name, dba, contact_email, contact_phone, phone, website, website_url, address_line1, address_line2, city, state, zip, partner_type, program_type, programs, approval_status, account_status, status, is_active, mou_signed, mou_signed_at, mou_version, onboarding_completed, onboarding_step, documents_verified, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify';
 
 /**
  * Resolve the signed-in Host Shop context once for every Host Shop surface.

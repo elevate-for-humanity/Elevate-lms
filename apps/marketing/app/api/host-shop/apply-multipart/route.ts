@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
 
   let db: Awaited<ReturnType<typeof requireAdminClient>> | null = null;
   const uploadedPaths: string[] = [];
+  let savedApplicationId: string | null = null;
 
   try {
     const form = await request.formData();
@@ -126,13 +127,17 @@ export async function POST(request: NextRequest) {
       .filter(Boolean)
       .slice(0, 10);
 
+    if (programs.some((program) => !['barber', 'cosmetology', 'esthetician', 'nail'].includes(program))) {
+      return NextResponse.json({ ok: false, error: 'Choose one of the listed apprenticeship programs.' }, { status: 400 });
+    }
+
     if (!legalBusinessName || !ownerName || !contactName || !email || !phone || !address1 || !city || !state || !zip || programs.length === 0) {
       return NextResponse.json({ ok: false, error: 'Complete the business identity, contact, address, and select at least one apprenticeship program.' }, { status: 400 });
     }
     if (!validEmail(email)) {
       return NextResponse.json({ ok: false, error: 'Enter a valid email address.' }, { status: 400 });
     }
-    if (!licenseNumber || !supervisorName || !supervisorLicenseNumber || !supervisorYearsLicensed) {
+    if (!licenseNumber || !supervisorName || !supervisorLicenseNumber || !supervisorYearsLicensed || !Number.isFinite(Number(supervisorYearsLicensed)) || Number(supervisorYearsLicensed) < 0) {
       return NextResponse.json({ ok: false, error: 'Business license and supervising professional license information are required.' }, { status: 400 });
     }
     if (text(form, 'canSuperviseAndVerify', 10) !== 'yes') {
@@ -163,16 +168,15 @@ export async function POST(request: NextRequest) {
 
     db = await requireAdminClient();
 
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: recent } = await db
-      .from('host_shop_applications')
-      .select('id')
-      .eq('contact_email', email)
-      .gte('created_at', oneDayAgo)
-      .limit(1)
-      .maybeSingle();
-    if (recent) {
-      return NextResponse.json({ ok: false, error: 'A Host Site application from this email was already received in the last 24 hours.' }, { status: 409 });
+    const emailPattern = email.replace(/[\\%_]/g, '\\$&');
+    const { data: existingApplication, error: applicationLookupError } = await db
+      .from('host_shop_applications').select('id').ilike('email', emailPattern).limit(1).maybeSingle();
+    if (applicationLookupError) throw applicationLookupError;
+    const { data: existingPartner, error: partnerLookupError } = await db
+      .from('partners').select('id').ilike('contact_email', emailPattern).limit(1).maybeSingle();
+    if (partnerLookupError) throw partnerLookupError;
+    if (existingApplication || existingPartner) {
+      return NextResponse.json({ ok: false, error: 'Your application or Host Shop account already exists. Use the sign-in link above to finish your saved onboarding, upload documents, or request help. Do not submit another application.' }, { status: 409 });
     }
 
     const uploaded: Record<string, string> = {};
@@ -254,6 +258,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'We could not save the Host Site application. Please try again.' }, { status: 500 });
     }
 
+    savedApplicationId = data.id;
     let provisioned: Awaited<ReturnType<typeof provisionHostShopApplication>> | null = null;
     let provisioningError: string | null = null;
     try {
@@ -383,6 +388,15 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    // Once the application owns these uploads, a later notification/provider
+    // failure must never delete its evidence or encourage duplicate submission.
+    if (savedApplicationId) {
+      logger.error('[host-shop/apply-multipart] Post-save follow-up failed', error instanceof Error ? error : undefined, { applicationId: savedApplicationId });
+      try {
+        if (db) await db.from('staff_notifications').insert({ type: 'host_shop_provisioning_failed', title: 'Saved Host Shop application needs follow-up', message: `Application ${savedApplicationId} is saved. Verify portal access and acknowledgment delivery.`, severity: 'error', metadata: { application_id: savedApplicationId } });
+      } catch (notificationError) { logger.error('[host-shop/apply-multipart] Follow-up alert failed', notificationError); }
+      return NextResponse.json({ ok: true, applicationId: savedApplicationId, referenceNumber: savedApplicationId, portalProvisioned: false, notificationStatus: 'unconfirmed' }, { status: 201 });
+    }
     if (db) await cleanup(db, uploadedPaths);
     logger.error('[host-shop/apply-multipart] unexpected error', error instanceof Error ? error : undefined);
     return NextResponse.json({ ok: false, error: 'Unable to submit the Host Site application. Please try again.' }, { status: 500 });

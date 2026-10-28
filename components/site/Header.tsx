@@ -55,7 +55,7 @@ export default function Header() {
               Sign In
             </Link>
             <Link
-              href={ROUTES.apply}
+              href={ROUTES.applicationOptions}
               className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-2.5 py-2 text-[13px] font-bold text-white hover:bg-brand-red-700 xl:px-3 xl:text-sm"
             >
               Apply

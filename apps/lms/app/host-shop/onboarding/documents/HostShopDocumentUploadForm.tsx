@@ -38,7 +38,7 @@ export default function HostShopDocumentUploadForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="font-bold">
           File *
-          <input type="file" name="file" required disabled={working} accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" className="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:font-bold file:text-white" />
+          <input type="file" name="file" required disabled={working} accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:font-bold file:text-white" />
         </label>
         {requiresExpiration ? (
           <label className="font-bold">

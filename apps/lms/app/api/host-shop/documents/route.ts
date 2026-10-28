@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
+const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
 
 function safeFileName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/-+/g, '-').slice(-120);
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'That file is larger than 10 MB.' }, { status: 400 });
     }
     if (!ALLOWED_TYPES.has(fileEntry.type)) {
-      return NextResponse.json({ ok: false, error: 'Upload PDF, JPG, or PNG files only.' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Upload PDF, JPG, PNG, or WEBP files only.' }, { status: 400 });
     }
 
     const fileName = safeFileName(fileEntry.name || `${documentType}.bin`);

@@ -1,3 +1,4 @@
+import { missingHostShopRegisteredStandards } from '@/lib/partners/host-shop-orientation-readiness';
 import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import Link from 'next/link';
 import { createHash } from 'node:crypto';
@@ -68,7 +69,7 @@ async function completeOrientation(formData: FormData) {
   const contracts = await loadRegisteredContracts(db, board);
   const primaryContract = contracts[0];
   if (!primaryContract) redirect('/host-shop/orientation?error=registered_standard');
-  if (board.unconfiguredPrograms.length > 0) redirect('/host-shop/orientation?error=registered_standard');
+  if (board.unconfiguredPrograms.length > 0 || missingHostShopRegisteredStandards(board).length > 0) redirect('/host-shop/orientation?error=registered_standard');
 
   const { data: profile } = await db.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
   const signerName = String(formData.get('signerName') || '').trim();
@@ -145,7 +146,8 @@ export default async function HostShopOrientationPage({ searchParams }: { search
   const db = await requireAdminClient();
   const contracts = await loadRegisteredContracts(db, board);
   const params = searchParams ? await searchParams : {};
-  const canSign = Boolean(board.partner?.mou_signed) && board.missingDocuments.length === 0 && board.pendingDocuments.length === 0 && contracts.length > 0 && board.unconfiguredPrograms.length === 0;
+  const missingStandards = missingHostShopRegisteredStandards(board);
+  const canSign = missingStandards.length === 0 && Boolean(board.partner?.mou_signed) && board.missingDocuments.length === 0 && board.pendingDocuments.length === 0 && contracts.length > 0 && board.unconfiguredPrograms.length === 0;
   const orientations = contracts.map((contract) => ({ contract, course: buildHostShopApprenticeshipOrientation(contract.canonicalProgramSlug) }));
   const orientationMedia = contracts.some((contract) => contract.canonicalProgramSlug === 'barber-apprenticeship')
     ? { src: '/videos/barber-lessons/barber-apprenticeship-intro.mp4', poster: '/images/pages/barber-gallery-1.webp', label: 'Barber apprenticeship orientation' }
@@ -164,6 +166,7 @@ export default async function HostShopOrientationPage({ searchParams }: { search
       </div>
     </section>
 
+    {missingStandards.length > 0 ? <section role="status" className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950"><h2 className="font-black">Elevate must finish program-standard configuration</h2><p className="mt-2 text-sm leading-6">Your saved Host Shop application, profile, MOU, and document uploads can continue. Final registered-program orientation certification requires the approved signed Appendix A to be represented in the canonical standards registry for: {missingStandards.join(', ')}. Staff must resolve this configuration; you do not need to submit a second application.</p><Link href="/host-shop/onboarding" className="mt-3 inline-flex min-h-11 items-center font-bold underline">Return to your application and review checklist</Link></section> : null}
     {params?.error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">Complete the MOU and required documents, ensure every hosted occupation has an active registered standard, accept every acknowledgment, and sign with the exact account name before continuing.</div> : null}
     {board.unconfiguredPrograms.length ? <div role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-950">Orientation cannot be certified while these hosted occupations lack an active registered-program standard: {board.unconfiguredPrograms.map((item) => item.programSlug || 'unknown').join(', ')}.</div> : null}
 

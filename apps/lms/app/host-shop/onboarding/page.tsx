@@ -1,3 +1,7 @@
+import { submitHostShopForReview } from './actions';
+import { hostShopReadyForReview } from '@/lib/partners/host-shop-review';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import StudentOnboardingLinks from '@/components/host-shop/StudentOnboardingLinks';
 import Link from 'next/link';
 import { HostShopHandbook } from '@/components/partners/HostShopHandbook';
 import { redirect } from 'next/navigation';
@@ -9,7 +13,10 @@ import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 
 export const dynamic = 'force-dynamic';
 
-export default async function HostShopOnboardingPage() {
+export default async function HostShopOnboardingPage({ searchParams }: {
+  searchParams?: Promise<{ review?: string }>;
+}) {
+  const params = await searchParams;
   await requireRole(HOST_SHOP_ROLES);
   const supabase = await createClient();
   const {
@@ -29,6 +36,13 @@ export default async function HostShopOnboardingPage() {
   }
 
   const steps = [
+    {
+      title: 'Business and supervisor profile',
+      complete: Boolean(board.partner?.supervisor_name && board.partner?.supervisor_license_number && board.partner?.phone && board.partner?.compensation_model && board.partner?.workers_comp_status && board.partner?.has_general_liability && board.partner?.can_supervise_and_verify),
+      detail: 'Confirm your contact information, licensed supervisor, and employment details.',
+      href: board.onboardingPaths.forms,
+      icon: FileText,
+    },
     {
       title: 'Host Site approval',
       complete: board.partner?.approval_status === 'approved',
@@ -57,9 +71,22 @@ export default async function HostShopOnboardingPage() {
       href: board.onboardingPaths.documents,
       icon: FileText,
     },
+    {
+      title: 'Host Shop orientation',
+      complete: board.partner?.onboarding_completed === true,
+      detail: 'Review the dashboard and program instructions. Sign your own orientation after your MOU and required documents are accepted.',
+      href: '/host-shop/orientation',
+      icon: FileText,
+    },
   ];
 
   const complete = steps.every((step) => step.complete);
+  const db = await requireAdminClient();
+  const application = board.partner.partner_application_id
+    ? await db.from('host_shop_applications').select('status').eq('id', board.partner.partner_application_id).maybeSingle()
+    : null;
+  if (application?.error) throw new Error('HOST_SHOP_APPLICATION_STATUS_UNAVAILABLE');
+  const readyForReview = hostShopReadyForReview({ ...board.partner, name: board.partner.name || 'Host Shop' }, board);
 
   return (
     <main className="min-h-screen bg-slate-50 py-10">
@@ -91,7 +118,17 @@ export default async function HostShopOnboardingPage() {
             Read handbook and program responsibilities
           </a>
         </section>
+        <StudentOnboardingLinks shopName={board.partner?.name || 'Host Shop'} />
         <HostShopHandbook />
+        {params?.review === 'incomplete' ? <p role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 font-bold text-red-900">Complete your business/supervisor profile, sign the MOU, and upload every required document before submitting for review.</p> : null}
+        {application?.data?.status === 'drafted' ? (
+          <section className="rounded-2xl border border-slate-300 bg-white p-6">
+            <h2 className="text-xl font-black text-slate-950">Submit your saved application for review</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">After completing your profile, signing your MOU, and uploading all required documents, send your application to Elevate. Documents may still be pending staff review; submission does not approve your shop.</p>
+            <form action={submitHostShopForReview}><button disabled={!readyForReview} className="mt-4 min-h-12 rounded-xl bg-slate-950 px-5 py-3 font-bold text-white disabled:bg-slate-500">Submit for review</button></form>
+            {!readyForReview ? <p className="mt-2 text-sm text-slate-700">Complete the linked profile, MOU, and required uploads below to enable submission.</p> : null}
+          </section>
+        ) : application?.data?.status === 'submitted' ? <p role="status" className="rounded-xl border border-green-300 bg-green-50 p-4 font-semibold text-green-950">Your application is submitted for Elevate review. Pending document reviews remain visible below.</p> : null}
 
         <section className="space-y-3">
           {steps.map(({ title, complete: isComplete, detail, href, icon: Icon }) => (

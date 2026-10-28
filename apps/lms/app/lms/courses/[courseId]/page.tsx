@@ -48,7 +48,8 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
   const readiness = (readinessData ?? []) as ReadinessRow[];
   const publishedModules = modules ?? [];
   const publishedLessons = lessons ?? [];
-  const syllabusLessons = pacing?.lessons ?? publishedLessons.map(lesson => ({...lesson, published: lesson.is_published, releaseWeek: null, opensAt: null, available: true}));
+  const objectivesByLesson = new Map(publishedLessons.map(lesson => [lesson.id, lesson.learning_objectives]));
+  const syllabusLessons = pacing ? pacing.lessons.map(lesson => ({ ...lesson, learning_objectives: objectivesByLesson.get(lesson.id) })) : publishedLessons.map(lesson => ({...lesson, published: lesson.is_published, releaseWeek: null, opensAt: null, available: true}));
   const firstLesson = publishedLessons[0] ?? null;
   const heroMetadata = heroVisual?.metadata && typeof heroVisual.metadata === 'object' && !Array.isArray(heroVisual.metadata) ? heroVisual.metadata as Record<string, unknown> : {};
   const heroCtaLabel = typeof heroMetadata.cta_label === 'string' && heroMetadata.cta_label.trim() ? heroMetadata.cta_label : null;

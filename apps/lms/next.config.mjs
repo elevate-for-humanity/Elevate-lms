@@ -50,6 +50,25 @@ const nextConfig = {
     const noStore = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
     return [
       {
+        source: '/workbooks/:path*',
+        headers: [
+          { key: 'Cache-Control', value: noStore },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
+        ],
+      },
+      {
+        source: '/apprentice/workbook/:path*',
+        headers: [
+          { key: 'Cache-Control', value: noStore },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+        ],
+      },
+      {
         source: '/sw-lms.js',
         headers: [
           { key: 'Cache-Control', value: noStore },

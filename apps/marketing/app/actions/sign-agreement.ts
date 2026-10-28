@@ -34,6 +34,9 @@ export async function signAgreement(data: {
   if (data.agreementType === 'program_holder_mou') {
     const context = await requireProgramHolder();
     if (context.mode !== 'holder' || context.user.id !== user.id || data.agreementVersion !== `3.0-${context.holderId}`) return { success: false, error: 'Sign the current Program Holder agreement from your own portal.' };
+    const { data: agreementHolder, error: agreementError } = await context.db.from('program_holders').select('features').eq('id', context.holderId).maybeSingle();
+    if (agreementError || !agreementHolder) return { success: false, error: 'Agreement readiness could not be checked. Please retry.' };
+    if (agreementHolder.features?.full_forms_status === 'review_pending') return { success: false, error: 'The full agreement requires completed legal entities and payment terms before signature.' };
   }
   const requestHeaders = await headers();
   const ipAddress =

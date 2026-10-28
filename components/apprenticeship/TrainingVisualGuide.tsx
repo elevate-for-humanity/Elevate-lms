@@ -122,7 +122,7 @@ export function TrainingVisualGuide({ courseHref }: { courseHref?: string }) {
             width={1280}
             height={720}
             loading="lazy"
-            className="max-h-64 w-full object-cover"
+            className="max-h-64 w-full object-cover object-top"
           />
           <figcaption className="p-4 font-semibold">
             One training plan. Two separate clocks. Shop practice and online theory each have their

@@ -93,14 +93,14 @@ const cloneCourseSchema = z.object({
     .order('order_index');
   if (moduleLoadError) throw moduleLoadError;
 
-  for (const module of modules ?? []) {
-    const { course_lessons: lessons, id: _moduleId, course_id: _courseId, created_at: _moduleCreated, updated_at: _moduleUpdated, ...moduleRest } = module as any;
+  for (const sourceModule of modules ?? []) {
+    const { course_lessons: lessons, id: _moduleId, course_id: _courseId, created_at: _moduleCreated, updated_at: _moduleUpdated, ...moduleRest } = sourceModule as any;
     const { data: newModule, error: moduleError } = await db
       .from('course_modules')
       .insert({ ...moduleRest, course_id: newCourse.id, updated_at: new Date().toISOString() })
       .select('id')
       .single();
-    if (moduleError || !newModule) throw moduleError ?? new Error(`Unable to clone module ${module.title}`);
+    if (moduleError || !newModule) throw moduleError ?? new Error(`Unable to clone module ${sourceModule.title}`);
 
     if (lessons?.length) {
       const lessonRows = lessons.map((lesson: Record<string, any>) => {
@@ -161,7 +161,7 @@ export async function cloneEditedCourseRevision({db,sourceCourse,sourceLessons,s
    const fields=['title','slug','order_index','lesson_type','content','content_json','rendered_html','duration_minutes','learning_objectives','quiz_questions','passing_score','competency_checks','instructor_notes','practical_required','activities','is_required','required_artifacts','domain_key','hour_category','evidence_type','delivery_method','requires_instructor_signoff','instructor_requirement','minimum_seat_time_minutes','fieldwork_eligible','video_url','script_text'];
    const lessons=sourceLessons.map((row: any)=>{
     const id=uuid();if(row.id===lessonId)newLessonId=id;
-    const copy={...pick(row,fields),id,course_id:courseId,module_id:moduleIds.get(row.module_id)??null,
+    const copy: Record<string, any>={...pick(row,fields),id,course_id:courseId,module_id:moduleIds.get(row.module_id)??null,
       status:'draft',is_published:false,approved:false,media_quality_status:'unverified'};
     if(row.id===lessonId){
       Object.assign(copy,patch.lesson);

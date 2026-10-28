@@ -62,7 +62,13 @@ describe('apprentice self-service portal contracts', () => {
     expect(apprenticeDashboard).toContain("automaticBillingSchedule?.provider_status === 'active'");
     expect(apprenticeDashboard).toContain('automaticBillingSchedule?.provider_subscription_id');
     expect(apprenticeDashboard).toContain('loadLearnerBillingRequirement(db, subject.userId)');
-    expect(apprenticeDashboard).toContain('href="/apprentice/billing"');
+    const apprenticeLayout = source('apps/lms/app/apprentice/layout.tsx');
+    const platformShell = source('components/platform/PlatformShell.tsx');
+    const apprenticeNavigation = source('lib/navigation/navigation-config.ts').split('  apprentice: [')[1]?.split('  host_shop: [')[0];
+    expect(apprenticeLayout).toContain('<PlatformShell');
+    expect(apprenticeLayout).toContain('role="apprentice"');
+    expect(platformShell).toContain('getNavigationForRole(role)');
+    expect(apprenticeNavigation).toMatch(/id: 'billing',\s*label: 'Billing & Payments',\s*href: p\('apprentice', 'billing'\)/);
     expect(billingCard).not.toContain('Stripe');
     expect(apprenticeDashboard).not.toContain('stripe_subscription_id');
     const legacyLoader = source('lib/portal/load-apprentice-portal.ts');

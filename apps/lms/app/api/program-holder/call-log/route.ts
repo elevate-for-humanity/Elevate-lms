@@ -152,6 +152,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     commissionEligible,
-    commissionRatePercent: commissionEligible ? agreement.commission_rate_bps / 100 : null,
+    commissionRatePercent: commissionEligible && Number.isSafeInteger(agreement.commission_rate_bps) && agreement.commission_rate_bps >= 0 && agreement.commission_rate_bps <= 10000 ? agreement.commission_rate_bps / 100 : null,
   });
 }

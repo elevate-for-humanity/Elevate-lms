@@ -13,4 +13,4 @@ where id = 'documents' and allowed_mime_types is not null;
 create unique index if not exists program_holder_testing_report_in_review
 on public.program_holder_reports (program_holder_id, (metadata->>'enrollment_id'))
 where report_type = 'general' and metadata->>'report_kind' = 'testing_readiness'
-  and status in ('submitted', 'under_review');
+  and status in ('submitted', 'under_review', 'approved');

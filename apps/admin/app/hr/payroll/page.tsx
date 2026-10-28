@@ -15,33 +15,31 @@ export default async function PayrollPage() {
   await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const [
-    { count: staffCount },
-    { data: payrollRuns },
-    { data: w9Queue, count: pendingW9Count },
-  ] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .in('role', ['admin', 'instructor', 'staff']),
-    supabase
-      .from('payroll_runs')
-      .select('id, pay_period_start, pay_period_end, pay_date, status, total_gross, total_net, total_taxes, employee_count, created_at')
-      .order('pay_date', { ascending: false })
-      .limit(50),
-    supabase
-      .from('w9_submissions')
-      .select('id, legal_name, ein, file_url, submitted_at, verified, provider_app_id', { count: 'exact' })
-      .eq('verified', false)
-      .order('submitted_at', { ascending: false })
-      .limit(20),
-  ]);
+  const [{ count: staffCount }, { data: payrollRuns }, { data: w9Queue, count: pendingW9Count }] =
+    await Promise.all([
+      supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .in('role', ['admin', 'instructor', 'staff']),
+      supabase
+        .from('payroll_runs')
+        .select(
+          'id, pay_period_start, pay_period_end, pay_date, status, total_gross, total_net, total_taxes, employee_count, created_at',
+        )
+        .order('pay_date', { ascending: false })
+        .limit(50),
+      supabase
+        .from('w9_submissions')
+        .select('id, legal_name, ein, file_url, submitted_at, verified, provider_app_id', {
+          count: 'exact',
+        })
+        .eq('verified', false)
+        .order('submitted_at', { ascending: false })
+        .limit(20),
+    ]);
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-900 px-6 py-5">
-        <h1 className="text-2xl font-bold text-white">Payroll Management</h1>
-      </div>
       <PayrollClient
         staffCount={staffCount ?? 0}
         payrollRuns={payrollRuns ?? []}

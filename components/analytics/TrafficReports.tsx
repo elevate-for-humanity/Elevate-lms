@@ -9,7 +9,7 @@ export default async function TrafficReports({
   return (
     <section className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Google Analytics Traffic</h1>
+        <h2 className="text-xl font-bold">Google Analytics</h2>
         <p className="text-sm text-slate-600">
           Google Analytics · Last 30 complete days · Reports may be delayed.
         </p>

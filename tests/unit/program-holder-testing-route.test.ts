@@ -1,3 +1,4 @@
+vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: async () => null }));
 import { beforeEach, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({ context: null as any, saved: null as any, mismatch: false, mode: 'holder', missingTerms: false, transactions: [] as any[], existing: false, failure: '', unsigned: false, features: {} as any, signed: false }));
 vi.mock('@/lib/auth/require-program-holder', () => ({ requireProgramHolder: async () => ({ ...state.context, mode: state.mode }) }));
@@ -48,4 +49,14 @@ it('checks acceptance of the exact payment addendum version', async () => {
 });
 it('does not ignore historical manual or bank payments outside the normalized ledger', async () => {
  state.features.student_payment_review={students:[{enrollment_id:studentId,status:'Paid — bank verified'}]};await POST(request());expect(state.saved.metadata.completion_invoice.amount_cents).toBeNull();
+});
+
+it('rejects malformed record IDs before reading student data', async () => {
+ const result=await POST({json:async()=>({...body,enrollmentId:'-'.repeat(36)})} as Request);expect(result.status).toBe(400);expect(state.saved).toBeNull();
+});
+it('does not calculate a request from a malformed unversioned addendum', async () => {
+ state.features={payment_addendum:{total_cents:120000,start_cents:60000,completion_cents:60000}};await POST(request());expect(state.saved.metadata.completion_invoice.amount_cents).toBeNull();
+});
+it('holds pending individual terms when no versioned acceptance can be checked', async () => {
+ state.features={compensation_terms:{per_student_total_cents:120000,start_installment_cents:60000,completion_installment_cents:60000,effective_status:'pending signed payment addendum'}};await POST(request());expect(state.saved.metadata.completion_invoice.amount_cents).toBeNull();
 });

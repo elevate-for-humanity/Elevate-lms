@@ -34,14 +34,16 @@ export default async function CompliancePage() {
   // Keep user-session client for WIOA/other tables that need RLS context
   const supabase = await createClient();
 
-  const [
-    totalResult,
-    compliantResult,
-    nonCompliantResult,
-  ] = await Promise.all([
+  const [totalResult, compliantResult, nonCompliantResult] = await Promise.all([
     db.from('compliance_items').select('*', { count: 'exact', head: true }),
-    db.from('compliance_items').select('*', { count: 'exact', head: true }).eq('status', 'compliant'),
-    db.from('compliance_items').select('*', { count: 'exact', head: true }).eq('status', 'non_compliant'),
+    db
+      .from('compliance_items')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'compliant'),
+    db
+      .from('compliance_items')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'non_compliant'),
   ]);
 
   const totalItems = totalResult.error ? null : totalResult.count;
@@ -67,7 +69,7 @@ export default async function CompliancePage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
+      <section className="relative aspect-video overflow-hidden">
         <Image
           src="/images/pages/admin-compliance-detail.webp"
           alt="Compliance dashboard overview"
@@ -87,20 +89,28 @@ export default async function CompliancePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h3 className="text-sm font-medium text-slate-600 mb-2">Total Items</h3>
-                <p className="text-3xl font-bold text-brand-blue-600">{totalItems ?? 'Unavailable'}</p>
+                <p className="text-3xl font-bold text-brand-blue-600">
+                  {totalItems ?? 'Unavailable'}
+                </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h3 className="text-sm font-medium text-slate-600 mb-2">Compliant</h3>
-                <p className="text-3xl font-bold text-brand-green-600">{compliantItems ?? 'Unavailable'}</p>
+                <p className="text-3xl font-bold text-brand-green-600">
+                  {compliantItems ?? 'Unavailable'}
+                </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h3 className="text-sm font-medium text-slate-600 mb-2">Non-Compliant</h3>
-                <p className="text-3xl font-bold text-brand-red-600">{nonCompliantItems ?? 'Unavailable'}</p>
+                <p className="text-3xl font-bold text-brand-red-600">
+                  {nonCompliantItems ?? 'Unavailable'}
+                </p>
               </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-2">WIOA / INTraining ETPL forms</h2>
+              <h2 className="text-lg font-bold text-slate-900 mb-2">
+                WIOA / INTraining ETPL forms
+              </h2>
               <p className="text-sm text-slate-600 mb-4">
                 Initial Eligibility Aggregate Performance (new programs) and Section 188 Equal
                 Opportunity checklist — one set per program.
@@ -233,9 +243,15 @@ export default async function CompliancePage() {
       {/* WIOA Compliance Dashboard */}
       <section className="py-8 px-6">
         <div className="max-w-7xl mx-auto">
-          {wioaData ? <WIOAComplianceDashboard {...wioaData} /> : (
-            <p role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-amber-900">
-              WIOA data could not be loaded. Refresh this page to try again; participant counts and reports are unavailable.
+          {wioaData ? (
+            <WIOAComplianceDashboard {...wioaData} />
+          ) : (
+            <p
+              role="alert"
+              className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-amber-900"
+            >
+              WIOA data could not be loaded. Refresh this page to try again; participant counts and
+              reports are unavailable.
             </p>
           )}
         </div>

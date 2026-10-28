@@ -457,6 +457,7 @@ export function PlatformShell({
       {paris !== false ? (
         /* PlatformShell is the single PARIS owner for authenticated dashboards. */
         <ParisFloatingWrapper
+          key={role}
           surface={
             paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')
           }
@@ -464,7 +465,7 @@ export function PlatformShell({
           personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}
           courseTitle={paris?.courseTitle}
           nextLessonTitle={paris?.nextLessonTitle}
-          autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}
+          autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? false}
         />
       ) : null}
     </div>

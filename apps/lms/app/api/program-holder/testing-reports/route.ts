@@ -1,3 +1,4 @@
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { completionTerms } from '@/lib/program-holder/completion-terms';
 // pre-auth-registry: exempt - holder context, enrollment ownership, and evidence ownership authorize submission.
 import { NextResponse } from 'next/server';
@@ -8,16 +9,20 @@ import {
   TESTING_REPORT_FIELDS,
   validateTestingReport,
   evidenceEnrollment,
+  isHolderRecordId,
+  testingReportToday,
 } from '@/lib/program-holder/testing-report';
 export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   const ctx = await requireProgramHolder();
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
+  const limited = await applyRateLimit(request, 'strict', { key: `holder-testing:${ctx.user.id}` });
+  if (limited) return limited;
   const body = await request.json().catch(() => null);
-  if (!body || !/^[a-f0-9-]{36}$/i.test(String(body.enrollmentId || '')))
+  if (!body || !isHolderRecordId(body.enrollmentId))
     return NextResponse.json({ error: 'Select an enrolled student.' }, { status: 400 });
-  const validation = validateTestingReport(body, new Date().toISOString().slice(0, 10));
+  const validation = validateTestingReport(body, testingReportToday());
   if (validation) return NextResponse.json({ error: validation }, { status: 400 });
   const { data: student, error: studentError } = await ctx.db
     .from('program_enrollments')
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
     .eq('program_holder_id', ctx.holderId)
     .eq('report_type', 'general')
     .contains('metadata', { enrollment_id: student.id, report_kind: 'testing_readiness' })
-    .in('status', ['submitted', 'under_review'])
+    .in('status', ['submitted', 'under_review', 'approved'])
     .limit(1)
     .maybeSingle();
   if (existingError)
@@ -139,11 +144,34 @@ export async function POST(request: Request) {
     (row: any) => row.enrollment_id === student.id,
   );
   const terms = completionTerms(holder.features);
-  const termsMismatch = schedule && terms && (terms.total !== schedule.total_payout_cents ||
-    terms.first !== undefined && (terms.first !== schedule.increment_1_cents || terms.second !== schedule.increment_2_cents));
-  if (!terms || !holder.mou_signed || addendum && !signatures?.length || historicalReview || termsMismatch) {
-    invoice = { ...invoice, status: 'requires_agreement_review', amount_cents: null,
-      reason: historicalReview ? 'Historical bank or manual payment review exists. Reconcile those records and documented exceptions before calculating another payment.' : 'Signed individual terms, documented student exceptions, and this schedule require Admin verification.' };
+  const termsMismatch =
+    schedule &&
+    terms &&
+    (terms.total !== schedule.total_payout_cents ||
+      (terms.first !== undefined &&
+        (terms.first !== schedule.increment_1_cents ||
+          terms.second !== schedule.increment_2_cents)));
+  const invalidAddendum = Boolean(holder.features?.payment_addendum) && !addendum;
+  const pendingUnversionedTerms =
+    !addendum &&
+    /pending/i.test(String(holder.features?.compensation_terms?.effective_status || ''));
+  if (
+    !terms ||
+    !holder.mou_signed ||
+    invalidAddendum ||
+    pendingUnversionedTerms ||
+    (addendum && !signatures?.length) ||
+    historicalReview ||
+    termsMismatch
+  ) {
+    invoice = {
+      ...invoice,
+      status: 'requires_agreement_review',
+      amount_cents: null,
+      reason: historicalReview
+        ? 'Historical bank or manual payment review exists. Reconcile those records and documented exceptions before calculating another payment.'
+        : 'Signed individual terms, documented student exceptions, and this schedule require Admin verification.',
+    };
   }
   const content = [
     `Student: ${student.full_name || 'Enrolled student'}`,
@@ -174,6 +202,10 @@ export async function POST(request: Request) {
         program_id: student.program_id,
         student_name: student.full_name,
         evidence_ids: ids,
+        submitted_fields: Object.fromEntries(
+          TESTING_REPORT_FIELDS.map(([key]) => [key, body[key]]),
+        ),
+        certified: true,
         exam: body.exam.trim(),
         certified_by: ctx.user.id,
         reported_hours_unverified: true,
@@ -187,7 +219,11 @@ export async function POST(request: Request) {
     })
     .select('id')
     .single();
-  if (error?.code === '23505') return NextResponse.json({ error: 'A testing report for this student is already awaiting review. Reload to view it.' }, { status: 409 });
+  if (error?.code === '23505')
+    return NextResponse.json(
+      { error: 'A testing report for this student is already awaiting review. Reload to view it.' },
+      { status: 409 },
+    );
   if (error || !report)
     return NextResponse.json({ error: 'Testing report could not be saved.' }, { status: 500 });
   const { error: noticeError } = await ctx.db.from('staff_notifications').insert({

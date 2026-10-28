@@ -1,3 +1,5 @@
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
+
 /**
  * Elevate for Humanity — Locked Page Design Tokens
  *
@@ -26,8 +28,7 @@ export const layout = {
 } as const;
 
 export const hero = {
-  imageWrap:
-    'relative aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)] w-full overflow-hidden',
+  imageWrap: HERO_IMAGE_FRAME,
   contentPanel: 'bg-white border-b border-slate-100',
 } as const;
 

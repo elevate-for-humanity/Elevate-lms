@@ -1,3 +1,4 @@
+import { loadHolderExitReports } from './exit-reports';
 import { curriculumProgress } from './curriculum-progress';
 import { hasRecruitingAssignment } from './recruiting-access';
 import { loadApprovedSchoolApplicants } from './school-applicants';
@@ -25,6 +26,7 @@ export type ProgramHolderWorkspace = {
   hours: any[];
   documents: any[];
   reports: any[];
+  testingReports?: any[];
   courseAssignments: any[];
   payoutProfile: any | null;
   payoutSchedules: any[];
@@ -112,6 +114,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       hours: [],
       documents: [],
       reports: [],
+      testingReports: [],
       courseAssignments: [],
       payoutProfile: null,
       payoutSchedules: [],
@@ -696,6 +699,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
+    testingReports: await loadHolderExitReports(db, holderId),
     courseAssignments: deliveryAssignments,
     payoutProfile: payoutRes.data ?? null,
     payoutSchedules: schedulesRes.data ?? [],

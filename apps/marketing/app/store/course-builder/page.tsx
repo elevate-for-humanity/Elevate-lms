@@ -91,7 +91,6 @@ export default function CourseBuilderPage() {
         ]}
         transcript="Elevate Course Builder turns authored curriculum into colorful, narrated, interactive lessons with assessments, practice activities, media, LMS delivery, and progress tracking."
         analyticsName="course-builder-store"
-        heightClassName="h-[clamp(260px,42svh,480px)]"
       />
 
       <section className="border-b border-slate-200 bg-white px-4 py-10">

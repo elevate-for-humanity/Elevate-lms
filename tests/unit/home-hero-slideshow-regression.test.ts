@@ -11,10 +11,17 @@ describe('homepage hero slideshow rendering', () => {
     expect(image).toMatch(/^\/images\/.+\.webp$/);
     expect(fs.existsSync(path.resolve('public', image!.slice(1)))).toBe(true);
     expect(hero).toContain('priority');
-    expect(hero).toContain('aspect-video');
-    expect(hero).toContain('38svh,480px');
+    expect(hero).toContain('HERO_IMAGE_FRAME');
+    const frame = fs.readFileSync(path.resolve('lib/images/hero-layout.ts'), 'utf8');
+    expect(frame).toContain('aspect-video');
+    expect(frame).not.toContain('svh');
     expect(hero).toContain('object-cover');
-    for (const href of ['/programs', '/check-eligibility', '/employers', '/store/apps/website-builder']) {
+    for (const href of [
+      '/programs',
+      '/check-eligibility',
+      '/employers',
+      '/store/apps/website-builder',
+    ]) {
       expect(hero).toContain(`href="${href}"`);
     }
     expect(hero).not.toContain('SafeHeroVideo');

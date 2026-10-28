@@ -1,3 +1,6 @@
+export function isHolderRecordId(value: unknown): value is string {
+  return typeof value === 'string' && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value);
+}
 export const TESTING_REPORT_FIELDS = [
   ['exam', 'Requested exam or credential'],
   ['coursework', 'Coursework and lessons completed'],
@@ -34,7 +37,7 @@ export function validateTestingReport(body: Record<string, unknown>, today: stri
     !Array.isArray(body.evidenceIds) ||
     !body.evidenceIds.length ||
     body.evidenceIds.length > 20 ||
-    body.evidenceIds.some((id) => typeof id !== 'string' || !/^[a-f0-9-]{36}$/i.test(id))
+    body.evidenceIds.some((id) => !isHolderRecordId(id))
   )
     return 'Select at least one uploaded supporting record.';
   return null;
@@ -48,4 +51,18 @@ export function evidenceEnrollment(description: unknown): string | null {
   } catch {
     return null;
   }
+}
+
+export function testingReportToday(now = new Date()): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+      .formatToParts(now)
+      .map((part) => [part.type, part.value]),
+  );
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }

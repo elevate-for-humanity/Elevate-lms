@@ -377,7 +377,7 @@ export async function ProgramHolderWorkspaceView({
         <TestingReadinessForm students={data.enrollments} documents={data.documents} />
         <section className="rounded-2xl border bg-white p-5">
           <h2 className="text-xl font-black">Submitted exit reports</h2>
-          {data.reports
+          {(data.testingReports ?? data.reports)
             .filter((row) => row.metadata?.report_kind === 'testing_readiness')
             .map((row) => (
               <article key={row.id} className="mt-4 min-w-0 rounded-xl border p-4">
@@ -406,7 +406,7 @@ export async function ProgramHolderWorkspaceView({
                 </details>
               </article>
             ))}
-          {!data.reports.some((row) => row.metadata?.report_kind === 'testing_readiness') && (
+          {!(data.testingReports ?? data.reports).some((row) => row.metadata?.report_kind === 'testing_readiness') && (
             <p className="mt-3 text-sm">No exit reports submitted yet.</p>
           )}
         </section>

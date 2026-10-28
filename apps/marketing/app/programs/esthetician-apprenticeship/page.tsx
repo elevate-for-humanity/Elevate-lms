@@ -94,9 +94,13 @@ export default async function EstheticianApprenticeshipPage() {
 
   const structuredData = buildBeautyProgramStructuredData(program);
   const heroOverride = (
-    <HeroPicture src={getProgramHeroImage('esthetician-apprenticeship')}
-      alt={getProgramImageAlt('esthetician-apprenticeship')} imageFit="contain"
-      heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="esthetician-apprenticeship" transcript={SAFE_HERO_COPY.transcript} />
+    <HeroPicture
+      src={getProgramHeroImage('esthetician-apprenticeship')}
+      alt={getProgramImageAlt('esthetician-apprenticeship')}
+      imageFit="contain"
+      analyticsName="esthetician-apprenticeship"
+      transcript={SAFE_HERO_COPY.transcript}
+    />
   );
 
   return (
@@ -111,7 +115,13 @@ export default async function EstheticianApprenticeshipPage() {
         program={program}
         banner={safeBanner}
         heroOverride={heroOverride}
-        afterHero={<BeautyEnrollmentPromotion compact programSlug="esthetician-apprenticeship" programLabel={program.title} />}
+        afterHero={
+          <BeautyEnrollmentPromotion
+            compact
+            programSlug="esthetician-apprenticeship"
+            programLabel={program.title}
+          />
+        }
         featuredContent={
           <>
             <ApprenticeshipExperienceGuide
@@ -149,7 +159,6 @@ export default async function EstheticianApprenticeshipPage() {
                 >
                   Become a Host Shop — Free
                 </a>
-
               </div>
             </div>
           </section>

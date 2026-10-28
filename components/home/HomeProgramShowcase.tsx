@@ -82,9 +82,9 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
           </p>
           <Heading
             id="program-showcase-heading"
-            className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl"
+            className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-5xl"
           >
-            Train for an in-demand career. Review the verified payment path for your program.
+            Train for your next career.
           </Heading>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
             Explore HVAC, CDL, business, bookkeeping, technology, healthcare, and more. Funding is
@@ -97,7 +97,8 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
               <BadgeDollarSign className="h-6 w-6 text-emerald-700" />
               <p className="mt-2 font-black">Verified funding exists for selected programs</p>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Open the exact program record first. Where workforce funding is verified, complete agency intake and receive written authorization before training begins.
+                Open the exact program record first. Where workforce funding is verified, complete
+                agency intake and receive written authorization before training begins.
               </p>
             </div>
             <div className="rounded-2xl border border-blue-200 bg-white p-4">
@@ -150,7 +151,11 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-700">{program.summary}</p>
           </div>
-          <div role="group" aria-label="Featured programs" className="flex flex-wrap justify-center gap-0 pb-4 sm:gap-1">
+          <div
+            role="group"
+            aria-label="Featured programs"
+            className="flex flex-wrap justify-center gap-0 pb-4 sm:gap-1"
+          >
             {PROGRAMS.map((item, index) => (
               <button
                 key={item.href}
@@ -161,7 +166,10 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
                 onClick={() => setActive(index)}
                 className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700 disabled:cursor-wait disabled:opacity-50"
               >
-                <span aria-hidden="true" className={`h-2 rounded-full transition-all ${index === active ? 'w-6 bg-brand-red-700' : 'w-2 bg-slate-400'}`} />
+                <span
+                  aria-hidden="true"
+                  className={`h-2 rounded-full transition-all ${index === active ? 'w-6 bg-brand-red-700' : 'w-2 bg-slate-400'}`}
+                />
               </button>
             ))}
           </div>

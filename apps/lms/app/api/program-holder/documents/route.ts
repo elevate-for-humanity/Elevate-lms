@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { isHolderRecordId } from '@/lib/program-holder/testing-report';
 import { materialUploadPolicy } from '@/lib/program-holder/material-upload';
 import {
   CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
@@ -32,11 +33,20 @@ export async function POST(request: NextRequest) {
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
 
-  const form = await request.formData();
+  const form = await request.formData().catch(() => null);
+  if (!form) return NextResponse.json({ error: 'Submit a valid file upload.' }, { status: 400 });
   const file = form.get('file');
   const documentType = String(form.get('documentType') || '');
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
+  if (
+    documentType === 'testing_evidence' &&
+    !['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)
+  )
+    return NextResponse.json(
+      { error: 'Upload testing evidence as a PDF, JPG, or PNG.' },
+      { status: 400 },
+    );
   if (documentType === 'profile_photo' && !['image/jpeg', 'image/png'].includes(file.type))
     return NextResponse.json({ error: 'Upload a JPG or PNG profile picture.' }, { status: 400 });
   if (documentType === 'provider_invoice') {
@@ -62,6 +72,8 @@ export async function POST(request: NextRequest) {
       { error: 'Select the student whose evidence you are uploading.' },
       { status: 400 },
     );
+  if (enrollmentId && !isHolderRecordId(enrollmentId))
+    return NextResponse.json({ error: 'Select a valid student.' }, { status: 400 });
   if (enrollmentId) {
     const { data: student, error } = await ctx.db
       .from('program_enrollments')
@@ -69,6 +81,7 @@ export async function POST(request: NextRequest) {
       .eq('id', enrollmentId)
       .eq('program_holder_id', ctx.holderId)
       .is('revoked_at', null)
+      .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'graduated'])
       .maybeSingle();
     if (error)
       return NextResponse.json({ error: 'Student verification unavailable.' }, { status: 503 });

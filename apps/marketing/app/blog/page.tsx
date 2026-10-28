@@ -1,3 +1,4 @@
+import { getBlogImage } from '@/lib/blog/images';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import Image from 'next/image';
@@ -6,7 +7,7 @@ import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -94,7 +95,7 @@ export default async function BlogPage() {
             >
               <div className="md:w-1/2 relative h-64 md:h-auto bg-white overflow-hidden">
                 <Image
-                  src={featured.image}
+                  src={getBlogImage(featured)}
                   alt={featured.title}
                   fill
                   priority
@@ -144,7 +145,7 @@ export default async function BlogPage() {
                 >
                   <div className="relative h-48 bg-white overflow-hidden">
                     <Image
-                      src={post.image}
+                      src={getBlogImage(post)}
                       alt={post.title}
                       fill
                       className="object-cover group-hover:scale-[1.02] transition-transform duration-300"

@@ -94,6 +94,19 @@ const platformPlans: CommerceCatalogItem[] = Object.values(BASE_PLANS).map((plan
 
 const platformProducts: CommerceCatalogItem[] = [
   {
+    id: 'prestige-elevation-cosmetology',
+    name: 'Prestige Elevation Cosmetology Course',
+    description: '40 video lessons, assessments and a matching digital workbook for your organization.',
+    category: 'education',
+    href: '/store/courses/prestige-elevation-cosmetology',
+    priceLabel: '$275 per student',
+    billingType: 'license',
+    status: 'enterprise',
+    keywords: ['cosmetology', 'prestige', 'organization', 'student seats', 'workbook'],
+    proofFeatureKeys: [],
+    proofProductId: 'course-licensing',
+  },
+  {
     id: 'standalone-platform-builds',
     name: 'Standalone Website & Learning Platform Builds',
     description:

@@ -27,6 +27,23 @@ export function completionInvoiceDraft(schedule: any, transactions: any[], refer
     first + second !== total
   )
     return { ...base, reason: 'Individual payment terms require review.' };
+  if (
+    [schedule.increment_1_status, schedule.increment_2_status].some((status) =>
+      ['released', 'processing'].includes(status),
+    )
+  )
+    return {
+      ...base,
+      status: 'payment_in_progress',
+      reason:
+        'A scheduled installment has been released or is processing. Reconcile it before calculating another request.',
+    };
+  if ([schedule.increment_1_status, schedule.increment_2_status].includes('held'))
+    return {
+      ...base,
+      reason:
+        'An installment is on hold. Admin must resolve the hold before calculating another request.',
+    };
   // Any unresolved transfer can consume the remaining balance, including a full upfront exception.
   if (transactions.some((row) => ['processing', 'pending'].includes(row.status)))
     return {

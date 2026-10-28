@@ -172,8 +172,8 @@ export default function DigitalWorkbook({
         </p>
         {readOnly && (
           <p role="status" className="my-4 rounded-lg border border-amber-400 p-4">
-            Read-only preview. Saving requires an active program enrollment or a verified workbook
-            purchase.
+            Read-only preview. Learners with an active enrollment or verified workbook purchase
+            can save answers in their own accounts.
           </p>
         )}
         {sections.length ? (
@@ -194,8 +194,8 @@ export default function DigitalWorkbook({
               ))}
             </select>
             <p className="mb-6 leading-relaxed text-slate-600">
-              Course-linked sections follow your lesson release schedule. Sections that are not yet
-              available will appear when unlocked.
+              Use these published exercises alongside your course. Workbook study is available outside
+              video study windows. Saving answers does not complete lessons or award training hours.
             </p>
             {sections.map((section) => (
               <SectionEditor

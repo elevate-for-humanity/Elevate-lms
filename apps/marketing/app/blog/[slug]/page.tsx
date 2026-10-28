@@ -1,3 +1,4 @@
+import { getBlogImage } from '@/lib/blog/images';
 import { Metadata } from 'next';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -40,7 +41,7 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
       .eq('id', post.id)
       .then(() => {});
 
-    return post as BlogPost;
+    return { ...post, image: getBlogImage(post) } as BlogPost;
   } catch {
     return null;
   }
@@ -64,7 +65,7 @@ async function getRelatedPosts(
     const staticSlugs = staticRelated.map((p) => p.slug);
     const { data: posts } = await supabase
       .from('blog_posts')
-      .select('title, slug, excerpt, image, published_at')
+      .select('title, slug, excerpt, image, featured_image, published_at')
       .eq('published', true)
       .eq('category', category)
       .neq('slug', currentSlug)
@@ -72,7 +73,10 @@ async function getRelatedPosts(
       .limit(3 - staticRelated.length);
 
     const dbRelated = (posts || []).filter((p: any) => !staticSlugs.includes(p.slug));
-    return [...staticRelated, ...dbRelated].slice(0, 3);
+    return [
+      ...staticRelated,
+      ...dbRelated.map((post) => ({ ...post, image: getBlogImage(post) })),
+    ].slice(0, 3);
   } catch {
     return staticRelated;
   }
@@ -103,7 +107,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       authors: [post.author_name],
       images: [
         {
-          url: post.image || '/images/pages/social-media-1.webp',
+          url: getBlogImage(post),
           width: 1200,
           height: 630,
           alt: post.title,
@@ -114,7 +118,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.image || '/images/pages/social-media-1.webp'],
+      images: [getBlogImage(post)],
     },
   };
 }
@@ -146,10 +150,10 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 flex items-end overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src={post.image || '/images/pages/social-media-1.webp'}
+        <Image
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+          src={getBlogImage(post)}
           alt={post.title}
           fill
           className="object-cover"
@@ -168,8 +172,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           </p>
           {post.id.startsWith('durable-') && (
             <p className="mt-4 text-sm text-slate-600">
-              Originally published on our previous website. Program details and funding
-              availability may have changed; consult current program and funding guidance.
+              Originally published on our previous website. Program details and funding availability
+              may have changed; consult current program and funding guidance.
             </p>
           )}
         </header>
@@ -238,8 +242,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Career Journey?</h2>
           <p className="text-xl text-white mb-8">
-            Join hundreds of students who have transformed their careers through our workforce training
-            programs.
+            Join hundreds of students who have transformed their careers through our workforce
+            training programs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

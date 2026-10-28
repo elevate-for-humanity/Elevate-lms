@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { completionInvoiceDraft } from '@/lib/program-holder/completion-invoice';
 import { hasRecruitingAssignment } from '@/lib/program-holder/recruiting-access';
 import { curriculumProgress } from '@/lib/program-holder/curriculum-progress';
-import { evidenceEnrollment } from '@/lib/program-holder/testing-report';
+import { evidenceEnrollment, testingReportToday, isHolderRecordId } from '@/lib/program-holder/testing-report';
 import { materialUploadPolicy } from '@/lib/program-holder/material-upload';
 const terms = { id: 'schedule', total_payout_cents: 120000, increment_1_cents: 60000, increment_2_cents: 60000, increment_1_status: 'paid', increment_2_status: 'pending' };
 describe('Holder agreement and payment safeguards', () => {
@@ -39,4 +39,13 @@ describe('Scoped holder workspace', () => {
     expect(materialUploadPolicy('lab_tracker', { name: 'lab.xlsx', type: 'text/html', size: 50 })?.allowed).toBe(false);
     expect(materialUploadPolicy('textbook', { name: 'book.docx', type: '', size: 51 * 1024 * 1024 })?.allowed).toBe(false);
   });
+});
+
+it.each(['released','processing','held'])('blocks a %s schedule even without a matching transaction row', status => {
+ expect(completionInvoiceDraft({...terms,increment_1_status:status},[],'r').amount_cents).toBeNull();
+});
+
+it('uses the reporting timezone at the UTC date boundary', () => {
+ expect(testingReportToday(new Date('2026-10-29T01:00:00Z'))).toBe('2026-10-28');
+ expect(isHolderRecordId('-'.repeat(36))).toBe(false);
 });

@@ -55,8 +55,21 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="cosmetology-apprenticeship" />}
-        afterHero={<BeautyEnrollmentPromotion compact programSlug="cosmetology-apprenticeship" programLabel={program.title} />}
+        heroOverride={
+          <HeroPicture
+            src={getProgramHeroImage('cosmetology-apprenticeship')}
+            alt="Salon Saloon team inside their South Bend salon"
+            imagePosition="top"
+            analyticsName="cosmetology-apprenticeship"
+          />
+        }
+        afterHero={
+          <BeautyEnrollmentPromotion
+            compact
+            programSlug="cosmetology-apprenticeship"
+            programLabel={program.title}
+          />
+        }
         visualContent={<CosmetologyVisualExperience />}
         featuredContent={
           <>

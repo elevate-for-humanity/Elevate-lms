@@ -76,9 +76,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-marketing-trigger.yml/dispatches" -f ref=main
-  deploy:
+  build-marketing:
+    name: Build and upload Marketing image
+    outputs:
+      digest: ${{ steps.upload.outputs.digest }}
     concurrency:
-      group: google-runtime-us-central1
+      group: google-marketing-build-main
       cancel-in-progress: false
       queue: max
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
@@ -224,6 +227,7 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Push Marketing image
+        id: upload
         shell: bash
         run: |
           set -euo pipefail
@@ -231,7 +235,47 @@ jobs:
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing:$GITHUB_SHA"
           docker tag "elevate-marketing:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
+  deploy:
+    name: Deploy and verify Marketing on Google
+    needs: build-marketing
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 120
+    env:
+      IMAGE_DIGEST: ${{ needs.build-marketing.outputs.digest }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Authenticate immutable image rollout
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: { skip_install: true }
+      - name: Admit the tested image without reverting a newer rollout
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-google-marketing-trigger.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-tested-web-rollout
+      - name: Verify rollout SDK and billing admission
+        run: |
+          node scripts/gcp/verify-sdk.mjs
+          node scripts/gcp/preflight-billing.mjs
       - name: Prepare encrypted taxpayer storage
         id: tax_key
         shell: bash
@@ -256,6 +300,7 @@ jobs:
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          test "$DIGEST" = "$IMAGE_DIGEST"
           TAX_ARGS=()
           if [[ -n "$TAX_ENCRYPTION_BINDING" ]]; then TAX_ARGS+=(--update-secrets="$TAX_ENCRYPTION_BINDING"); fi
           SUFFIX="r${GITHUB_SHA:0:8}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
@@ -446,9 +491,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with: {persist-credentials: false}
+        with: { persist-credentials: false }
       - uses: actions/setup-node@v4
-        with: {node-version: '22'}
+        with: { node-version: '22' }
       - name: Explicitly hand the verified Marketing release to production acceptance
         env:
           GH_TOKEN: ${{ github.token }}

@@ -1,5 +1,7 @@
 # Studio integration verification — 2026-10-28
 
+**Final release status: blocked by an absent required GitHub App private-key secret.** The Studio repairs are published and tested, but Admin still serves `34fb71e`. The tested image rollout stopped before changing traffic with `PARIS_APP_SECRET_NOT_FOUND`.
+
 This records a targeted source review and live integration audit. It is not a certification of every repository line, every RLS policy, or IRS filing readiness. No credentials or customer data were included in the test fixture.
 
 ## Live/source comparison
@@ -62,3 +64,24 @@ The live Admin version endpoint reported commit `34fb71e516617cb97b2dbe32687e994
 - The Admin rollout guard also rejected successfully built/uploaded images whenever a newer request existed. Its replacement still requires the trusted Admin build/upload job to have succeeded, binds the exact run SHA, fails closed on unreadable job history, and refuses an older image if any newer Admin rollout has begun. Immutable image-digest verification, zero-traffic candidate testing, live exact-version acceptance, and the latest-request check before expensive builds remain in place.
 - Release guard/activation/concurrency tests: 48 passed. Workflow syntax tests: 2 passed. The release-policy change itself does not require recompiling application source.
 - At the last live check, Admin still reported `34fb71e`; no new source revision is claimed live until the deployed version confirms it.
+
+## Final verified state and owner action
+
+| Public service | Observed live commit | Build timestamp |
+| --- | --- | --- |
+| marketing | `818d274c` | 2026-10-28T04:43:54Z |
+| lms | `293130a9` | 2026-10-28T04:46:18Z |
+| admin | `34fb71e5` | 2026-10-26T11:25:42Z |
+| store | `4e4b064e` | 2026-10-28T04:39:11Z |
+
+- The full required CI gate passed for `4f81559e`: lint, TypeScript for Admin/LMS/Marketing, functional tests, enrollment database checks, and repository hygiene.
+- Google built and uploaded the core Admin image at `4f81559e` and the responsive-header image at `293130a9`. The latter preserves access to the enlarged title, upload, and navigation controls on narrow screens; its five targeted UI tests and lint passed.
+- A duplicate `completed_at` property in a concurrent course-persistence change caused TS1117. Commit `4f81559e` removes only the duplicate; latest-main Admin typechecking passed afterward.
+- The revised tested-image rollout gate passed in the real deployment. Google capacity preflight also passed. Rollout then stopped at the missing App-key secret, before creating a new Admin revision or moving traffic.
+- Read-only credential inventory completed at 05:06 UTC. Runtime configuration and Secret Manager names were readable. Admin has a repository token, but no configured App private key, key-file binding, or key-file content. The expected dedicated App-key secret was absent. Supabase's canonical and legacy stores also had no App private-key entry. OAuth client credentials are a separate integration.
+- The inventory emitted only binding names and presence flags; six metadata-redaction/workflow-syntax tests passed. It did not expose credential payloads or change production configuration.
+- Additional schema comparison: 170 literal select expressions across 63 tables had no missing selected root columns. Both directly referenced RPCs exist and their argument names match the callers. Dynamic expressions, related-resource embedding, and destructive RPC execution were not certified.
+
+**Required owner action:** restore the existing RSA private key for GitHub App `5477907` to Secret Manager secret `paris-engineer-github-private-key` in Google project `elegant-racer-299721`, or set `PARIS_GITHUB_APP_SECRET` to the correct existing App-key secret name. Use the protected secret store for the value. Once available, rerun the failed deployment job for the already tested image; its digest, candidate health, and exact live-version checks remain enabled.
+
+The new Studio frontend walkthrough remains pending deployment. Optional GPU readiness and Cloudflare control-plane configuration remain incomplete. A complete automated Studio engineering workflow and IRS test acceptance have not been established. The attempted tax self-file flow stopped at account/MFA verification before dependents and filing.

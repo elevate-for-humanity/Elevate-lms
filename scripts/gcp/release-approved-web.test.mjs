@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { releaseApprovedWeb, resolveReleaseCredential } from './release-approved-web.mjs';
+import { releaseApprovedWeb, releaseCurrentWorkflow, resolveReleaseCredential } from './release-approved-web.mjs';
 const sha = 'a'.repeat(40);
 function setup({ green = true, current = sha, active = false, readback = 'false' } = {}) {
   const calls = []; let holdReads = 0;
@@ -41,6 +41,31 @@ test('an existing active release is not dispatched again', async () => {
   const s = setup({ active: true }); const result = await releaseApprovedWeb({ sha, token: 'test', request: s.request });
   assert.ok(result.workflows.every(w => w.status === 'already_active'));
   assert.equal(s.calls.filter(c => c.path.endsWith('/dispatches')).length, 0);
+});
+
+const workflowEnv = { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GITHUB_REF: 'refs/heads/main', GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_SHA: sha, GH_TOKEN: 'scoped-job-token', GOOGLE_RELEASE_HOLD: 'false' };
+test('trusted main dispatch uses only its scoped job token and never edits repository variables', async () => {
+  const s = setup();
+  const result = await releaseCurrentWorkflow(workflowEnv, async (url, init) => {
+    assert.equal(init.headers.Authorization, 'Bearer scoped-job-token');
+    assert.ok(!url.includes('/variables/'));
+    return s.request(url, init);
+  });
+  assert.equal(result.workflows.length, 4);
+  assert.equal(s.calls.filter(c => c.path.endsWith('/dispatches')).length, 4);
+  assert.ok(s.calls.every(c => c.method !== 'PATCH'));
+});
+test('a held, absent, or untrusted workflow cannot dispatch or seek another credential', async () => {
+  for (const change of [{ GOOGLE_RELEASE_HOLD: 'true' }, { GOOGLE_RELEASE_HOLD: '' }, { GOOGLE_RELEASE_HOLD: undefined }, { GH_TOKEN: '' }, { GITHUB_REF: 'refs/heads/repair' }, { GITHUB_EVENT_NAME: 'pull_request' }, { GITHUB_REPOSITORY: 'other/repo' }]) {
+    let calls = 0;
+    await assert.rejects(releaseCurrentWorkflow({ ...workflowEnv, ...change }, async () => { calls++; throw Error('unexpected request'); }));
+    assert.equal(calls, 0);
+  }
+});
+test('workflow permission denial remains a failure without a runtime-token fallback', async () => {
+  let calls = 0;
+  await assert.rejects(releaseCurrentWorkflow({ ...workflowEnv, GITHUB_TOKEN: 'legacy-token' }, async () => { calls++; return new Response('{}', { status: 403 }); }), /HTTP_403/);
+  assert.equal(calls, 1);
 });
 
 const legacyEnv = { GITHUB_TOKEN: 'expired-token', NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'private-database-key' };

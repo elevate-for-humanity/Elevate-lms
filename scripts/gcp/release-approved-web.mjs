@@ -1,10 +1,10 @@
 import { pathToFileURL } from 'node:url';
-import { loadGoogleConfig } from './runtime-config.mjs';
 const repository = 'elevate-for-humanity/Elevate-lms';
 const workflows = ['deploy-admin.yml', 'deploy-google-lms-trigger.yml', 'deploy-google-marketing-trigger.yml', 'deploy-google-store-runtime.yml'];
 
-export async function releaseApprovedWeb({ sha, token, request = fetch }) {
+export async function releaseApprovedWeb({ sha, token, releaseHold, request = fetch }) {
   if (!/^[a-f0-9]{40}$/.test(sha || '') || typeof token !== 'string' || !token.trim()) throw Error('RELEASE_IDENTITY_REQUIRED');
+  if (releaseHold !== undefined && releaseHold !== 'false') throw Error('RELEASE_HOLD_NOT_CLEARED');
   async function api(path, method = 'GET', body) {
     const response = await request(`https://api.github.com/repos/${repository}/${path}`, {
       method, headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' },
@@ -23,10 +23,15 @@ export async function releaseApprovedWeb({ sha, token, request = fetch }) {
     if (jobs.jobs?.some(job => job.name === 'CI Required Gate' && job.status === 'completed' && job.conclusion === 'success')) approved = true;
   }
   if (!approved) throw Error('RELEASE_REQUIRED_CI_NOT_GREEN');
-  const hold = await api('actions/variables/GOOGLE_RELEASE_HOLD');
-  if (hold.value === 'true') await api('actions/variables/GOOGLE_RELEASE_HOLD', 'PATCH', { name: 'GOOGLE_RELEASE_HOLD', value: 'false' });
-  const verified = await api('actions/variables/GOOGLE_RELEASE_HOLD');
-  if (verified.value !== 'false') throw Error('RELEASE_HOLD_READBACK_FAILED');
+  // The main-only workflow supplies GitHub's trusted variable context. Its
+  // scoped Actions token must not need administrator-level variable access.
+  // Legacy explicit hold management retains its original write/readback gate.
+  if (releaseHold === undefined) {
+    const hold = await api('actions/variables/GOOGLE_RELEASE_HOLD');
+    if (hold.value === 'true') await api('actions/variables/GOOGLE_RELEASE_HOLD', 'PATCH', { name: 'GOOGLE_RELEASE_HOLD', value: 'false' });
+    const verified = await api('actions/variables/GOOGLE_RELEASE_HOLD');
+    if (verified.value !== 'false') throw Error('RELEASE_HOLD_READBACK_FAILED');
+  }
   const dispatched = [];
   for (const workflow of workflows) {
     const active = await api(`actions/workflows/${workflow}/runs?head_sha=${sha}&event=workflow_dispatch&per_page=30`);
@@ -70,11 +75,16 @@ export async function resolveReleaseCredential(env, request = fetch) {
   throw Error('RELEASE_REPOSITORY_CREDENTIAL_UNAVAILABLE');
 }
 
+export async function releaseCurrentWorkflow(env = process.env, request = fetch) {
+  if (env.GITHUB_REPOSITORY !== repository || env.GITHUB_REF !== 'refs/heads/main' || env.GITHUB_EVENT_NAME !== 'workflow_dispatch') throw Error('RELEASE_WORKFLOW_IDENTITY_REQUIRED');
+  if (!env.GH_TOKEN?.trim()) throw Error('RELEASE_WORKFLOW_TOKEN_REQUIRED');
+  if (env.GOOGLE_RELEASE_HOLD !== 'false') throw Error('RELEASE_HOLD_NOT_CLEARED');
+  return releaseApprovedWeb({ sha: env.GITHUB_SHA, token: env.GH_TOKEN, releaseHold: env.GOOGLE_RELEASE_HOLD, request });
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const credential = await resolveReleaseCredential(loadGoogleConfig('admin').runtimeEnvironment);
-    console.log(JSON.stringify({ credentialSource: credential.source }));
-    console.log(JSON.stringify(await releaseApprovedWeb({ sha: process.env.GITHUB_SHA, token: credential.token })));
+    console.log(JSON.stringify(await releaseCurrentWorkflow()));
   }
   catch (error) { console.error(JSON.stringify({ error: /^RELEASE_[A-Z0-9_]+$/.test(error?.message || '') ? error.message : 'RELEASE_CONTROLLER_FAILED' })); process.exitCode = 1; }
 }

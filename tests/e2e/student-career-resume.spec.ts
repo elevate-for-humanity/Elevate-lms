@@ -31,7 +31,7 @@ test('student can access Career Services, save, reopen, preview and download res
   await page.getByPlaceholder('Email').fill('qa-career@example.invalid');
   await page.getByPlaceholder('Write a brief summary of your professional background and career goals...').fill('Verified student resume persistence test.');
   await page.getByRole('button', { name: 'Save Resume' }).click();
-  await expect(page.getByRole('status')).toContainText('Resume saved.');
+  await expect(page.getByRole('status').filter({ hasText: 'Resume saved.' })).toBeVisible();
   await page.reload({waitUntil:'domcontentloaded'});
   await expect(page.getByPlaceholder('Full Name')).toHaveValue('QA Career Resume');
   await page.getByRole('button', { name: 'Preview' }).click();
@@ -75,11 +75,14 @@ test('learner can launch Job Ready and reopen saved SCORM state', async ({ page 
   }).length, { timeout: 45000 }).toBeGreaterThan(0);
   expect(providerFailures, 'Provider document requests must succeed').toEqual([]);
   const marker = 'Disposable QA state persistence check';
+  const savedResponse = page.waitForResponse(response => response.url().includes('/api/learner/job-ready/introduction') && (response.request().postData() || '').includes(marker));
   expect(await page.evaluate(value => {
     const api = (window as any).API_1484_11;
     if (api.SetValue('cmi.comments_from_learner.0.comment', value) !== 'true') return 'false';
     return api.Commit('');
   }, marker)).toBe('true');
+  const saved = await savedResponse;
+  expect(saved.status(), await saved.text()).toBe(200);
   await expect(page.getByText('Progress saved. You can return to this module later.', { exact: true })).toBeVisible({ timeout: 30000 });
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect.poll(() => page.evaluate(() => (window as any).API_1484_11?.GetValue('cmi.comments_from_learner.0.comment') || ''), { timeout: 45000 }).toBe(marker);

@@ -20,11 +20,11 @@ export default function CosmetologyCourseLicensePage() {
      <span className="rounded-full border bg-white px-4 py-2">Lesson assessments</span>
      <span className="rounded-full border bg-white px-4 py-2">40 workbook sections</span>
     </div>
-    <div className="relative mt-8 aspect-[4/3] overflow-hidden rounded-2xl">
-     <Image src={course.image} alt="Cosmetology professional teaching at a salon workstation" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover object-top" />
+    <div className="relative mt-8 aspect-[2/3] overflow-hidden rounded-2xl">
+     <Image src={course.image} alt="Prestige Cosmetology course cover" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" />
     </div>
    </div>
-   <div className="lg:pt-16"><CosmetologySeatQuote /><figure className="mt-8 rounded-2xl border border-slate-200 bg-white p-4"><Image src="/images/courses/prestige-elevation-cosmetology-workbook-cover.jpg" alt="Original Prestige Elevation cosmetology workbook cover" width={1237} height={1600} className="h-auto w-full rounded-lg" /><figcaption className="mt-3 text-sm text-slate-600">The matching Prestige Elevation digital workbook.</figcaption></figure></div>
+   <div className="lg:pt-16"><CosmetologySeatQuote /></div>
   </section>
   <section className="mx-auto max-w-6xl px-5 pb-16">
    <h2 className="text-2xl font-bold">A connected learning experience</h2>

@@ -1,3 +1,5 @@
+import { PRESTIGE_COURSE_COVERS } from '@/lib/lms/prestige-course-covers';
+
 export const COSMETOLOGY_COURSE_LICENSE = {
   slug: 'prestige-elevation-cosmetology',
   name: 'Prestige Elevation Cosmetology Course',
@@ -5,7 +7,7 @@ export const COSMETOLOGY_COURSE_LICENSE = {
   pricePerStudentCents: 27500,
   lessons: 40,
   workbookSections: 40,
-  image: '/images/partners/generations-hair/premium-stylist-at-work.jpg',
+  image: PRESTIGE_COURSE_COVERS.cosmetology,
 } as const;
 
 export function cosmetologyLicenseTotal(seats: number): number {

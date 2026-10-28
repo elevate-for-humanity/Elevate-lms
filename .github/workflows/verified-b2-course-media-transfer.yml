@@ -1,5 +1,11 @@
 name: Verified B2 Course Media Transfer
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verified-b2-course-media-transfer.yml
+      - scripts/gcp/run-runtime-b2-transfer*
+      - scripts/gcp/resolve-owner-preview-b2.mjs
   workflow_dispatch:
     inputs:
       mode:

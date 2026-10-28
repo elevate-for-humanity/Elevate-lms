@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { readFileSync } from 'node:fs';
 
-const paths = ["apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx","apps/lms/app/api/program-holder/student-invitations/route.ts","components/pwa/CanonicalPwaRegistration.tsx"];
+const paths = ["components/communications/PlatformVideoRoom.tsx","apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx","apps/lms/app/api/program-holder/student-invitations/route.ts","components/pwa/CanonicalPwaRegistration.tsx"];
 const candidateFiles = Object.fromEntries(paths.map(path => [path, readFileSync(new URL('../' + path, import.meta.url), 'utf8')]));
 const jsx = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) };
 
@@ -22,7 +22,7 @@ async function commCase(source,kind){let states=[],resets=0;let react={useState:
 const meetingRouteTest = async(source,{method='video',delivery='ok',mode='holder',assigned=true,ready=true}={})=>{let emails=[],updates=[],filters=[];let logger={error(){},warn(){}};let ctx={mode,holderId:'holder-one',tenantId:null,user:{id:'host'},profile:{full_name:'Host',email:'host@example.test'},db:{from(table){let operation='select';let q={select(){return q},eq(k,v){filters.push([table,k,v]);return q},is(){return q},in(){return q},limit(){return q},order(){return q},insert(){operation='insert';return q},update(v){operation='update';updates.push([table,v]);return q},delete(){operation='delete';return q},maybeSingle(){return q},single(){return q},then(resolve){let data=table==='program_holder_students'?(assigned?{id:'holder-student',user_id:'student',applicant_name:'Test learner'}:null):table==='communication_workspaces'?{id:'workspace',status:'active'}:table==='communication_rooms'?{id:'room-one'}:table==='program_holder_meetings'?{id:'meeting-one'}:table==='profiles'?(delivery==='missing'?null:{email:'student@example.test'}):{};return Promise.resolve({data,error:null}).then(resolve)}};return q}}};
 let scope={exports:{},crypto:{randomUUID:()=> 'room-key'},URL,require:n=>n==='next/server'?{NextResponse:{json:(body,options)=>({body,status:options?.status||200})}}:n.includes('require-program-holder')?{requireProgramHolder:async()=>ctx}:n.includes('livekit')?{liveKitReadiness:()=>({ready}),ensureLiveKitRoom:async()=>{}}:n.includes('sendgrid')?{sendEmail:async input=>{emails.push(input);if(delivery==='throw')throw Error('Provider unavailable');return {success:delivery==='ok'}}}:n.includes('logger')?{logger}:{hydrateProcessEnv:async()=>{}}};
 vm.runInNewContext(compile(source,'route.ts'),scope);let result=await scope.exports.POST({json:async()=>({programHolderStudentId:'holder-student',startsAt:'2026-11-01T16:00:00Z',meetingMethod:method,durationMinutes:30,title:'Course support'})});return{result,emails,updates,filters};};
-function roomCase(source,initialError=''){let changes=[],index=0;let react={useState:v=>{let i=index++;return[i===0?{token:'test',serverUrl:'wss://test.invalid'}:i===1?initialError:v,n=>changes.push([i,n])]},useEffect(){}};let scope={exports:{},require:n=>n==='react'?react:n==='react/jsx-runtime'?jsx:{LiveKitRoom:'LiveKitRoom',RoomAudioRenderer:'Audio',VideoConference:'Conference'}};vm.runInNewContext(compile(source,'room.tsx'),scope);return{tree:scope.exports.ProgramHolderMeetingRoom({roomId:'test'}),changes};}
+function roomCase(source,initialError=''){let changes=[],index=0;let react={useState:v=>{let i=index++;return[i===0?true:i===2?{token:'test',serverUrl:'wss://test.invalid'}:i===3?initialError:v,n=>changes.push([i,n])]},useEffect(){}};let scope={exports:{},require:n=>n==='react'?react:n==='react/jsx-runtime'?jsx:{LiveKitRoom:'LiveKitRoom',RoomAudioRenderer:'Audio',VideoConference:'Conference'}};vm.runInNewContext(compile(source,'room.tsx'),scope);return{tree:scope.exports.PlatformVideoRoom({tokenEndpoint:'/api/program-holder/meetings/test/token'}),changes};}
 
 test('enrollment labels separate admission from course access', () => {
   const source = candidateFiles['apps/admin/app/students/page.tsx'];
@@ -96,18 +96,25 @@ test('meeting invitation uses the student route and reports transport outcomes',
 });
 
 test('meeting room exposes connection failures, device feedback, and retry', () => {
-  const source = candidateFiles['components/program-holder/ProgramHolderMeetingRoom.tsx'];
+  const wrapper = candidateFiles['components/program-holder/ProgramHolderMeetingRoom.tsx'];
+  const wrapperScope = {exports:{},require:n=>n==='react/jsx-runtime'?jsx:{PlatformVideoRoom:'PlatformVideoRoom'}};
+  vm.runInNewContext(compile(wrapper,'holder-room.tsx'),wrapperScope);
+  const delegated = wrapperScope.exports.ProgramHolderMeetingRoom({roomId:'test'});
+  assert.equal(delegated.type,'PlatformVideoRoom');
+  assert.equal(delegated.props.tokenEndpoint,'/api/program-holder/meetings/test/token');
+  assert.equal(wrapperScope.exports.ProgramHolderMeetingRoom({roomId:'test',tokenEndpoint:'/custom/token'}).props.tokenEndpoint,'/custom/token');
+  const source = candidateFiles['components/communications/PlatformVideoRoom.tsx'];
   const result = roomCase(source);
   const room = result.tree.props.children;
   room.props.onError(Error('Connection unavailable'));
-  assert.ok(result.changes.some(([index, value]) => index === 1 && value === 'Connection unavailable'));
+  assert.ok(result.changes.some(([index, value]) => index === 3 && value === 'Connection unavailable'));
   room.props.onMediaDeviceFailure();
-  assert.ok(result.changes.some(([index, value]) => index === 3 && String(value).includes('permissions')));
+  assert.ok(result.changes.some(([index, value]) => index === 4 && String(value).includes('permissions')));
   const retry = roomCase(source, 'Connection unavailable');
   assert.equal(retry.tree.props.role, 'alert');
   retry.tree.props.children.find(node => node.type === 'button').props.onClick();
-  assert.ok(retry.changes.some(([index, value]) => index === 0 && value === null));
-  assert.ok(retry.changes.some(([index, value]) => index === 2 && typeof value === 'function'));
+  assert.ok(retry.changes.some(([index, value]) => index === 2 && value === null));
+  assert.ok(retry.changes.some(([index, value]) => index === 1 && typeof value === 'function'));
 });
 
 test('all changed TSX and route files transpile', () => {

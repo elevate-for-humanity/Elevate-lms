@@ -261,7 +261,18 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     };
   }
   async storyboard(input: unknown) {
-    const b = await this.blueprint(input);
+    const evidence = input as Evidence;
+    const directive = evidence.repairDirective;
+    // A strict-audio mismatch routed here has a recording already verified
+    // against the approved instructor script. Restore its canonical storyboard;
+    // a new authoring call would change speech and reproduce the mismatch.
+    const restoreRecordedSource = directive?.target === 'storyboard' &&
+      Array.isArray(directive.requirements) && directive.requirements.length > 0 &&
+      directive.requirements.every((finding: any) =>
+        finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        finding.message === 'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED');
+    const b = await this.blueprint(restoreRecordedSource
+      ? {...evidence, repairDirective: undefined} : input);
     return {
       version: ULTIMATE_LESSON_CONTRACT_VERSION,
       scenes: storyboardSegments(b.segments).map((s) => ({

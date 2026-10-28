@@ -82,6 +82,37 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
         },
       };
     }
+    // Strict rendering compares the recording with its storyboard. If the
+    // saved recording already matches every approved script segment, repeating
+    // synthesis cannot repair a divergent storyboard. Rebuild only that
+    // upstream producer from the canonical blueprint, with normal validation.
+    const audioDirective = (artifacts.__repairState as any)?.directive;
+    const approvedScript = (artifacts.instructor_script as any)?.script?.segments;
+    const recordedScript = (artifacts.natural_narration as any)?.narration?.segments;
+    const recordedBoard = (artifacts.storyboard as any)?.storyboard?.scenes;
+    const storyboardAudioRetry = audioDirective?.failedStep === 'lesson_film_render' &&
+      audioDirective?.target === 'natural_narration' &&
+      Array.isArray(audioDirective.requirements) && audioDirective.requirements.length > 0 &&
+      audioDirective.requirements.every((finding: any) =>
+        finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        finding.message === 'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED') &&
+      currentEvidence(artifacts.instructor_script as any) &&
+      currentEvidence(artifacts.natural_narration as any) &&
+      currentEvidence(artifacts.storyboard as any) &&
+      Array.isArray(approvedScript) && approvedScript.length > 0 &&
+      Array.isArray(recordedScript) && approvedScript.length === recordedScript.length &&
+      approvedScript.every((segment: any, index: number) =>
+        segment.text === recordedScript[index]?.text) &&
+      Array.isArray(recordedBoard) &&
+      (recordedBoard.length !== approvedScript.length || recordedBoard.some((scene: any, index: number) =>
+        String(scene.dialogue ?? '').trim() !== String(approvedScript[index]?.text ?? '').trim()));
+    if (storyboardAudioRetry) {
+      artifacts.__repairState = {
+        ...(artifacts.__repairState as any), status: 'diagnosed',
+        directive: {...audioDirective, target: 'storyboard',
+          previousTarget: audioDirective.target, previous: artifacts.storyboard},
+      };
+    }
     // A legacy ASR finding was routed to a deterministic timeline producer.
     // Recover its exact certified timeline and already encoded film; the new
     // independent decoded-audio QA still has to pass before acceptance.

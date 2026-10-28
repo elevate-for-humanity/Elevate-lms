@@ -77,3 +77,34 @@ test('repaired safety classifier retries the render gate without re-authoring ce
   requirements.splice(1);rows.splice(0,rows.length,...oldRows);
  }
 });
+
+test('an audio mismatch repairs the storyboard only when saved narration matches the approved script', async () => {
+ const script={certified:true,script:{segments:[{text:'Approved instruction'}]}};
+ const narration={certified:true,narration:{segments:[{text:'Approved instruction'}]}};
+ const board={certified:true,storyboard:{scenes:[{dialogue:'Divergent instruction'}]}};
+ const directive={failedStep:'lesson_film_render',target:'natural_narration',requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]};
+ const artifacts={instructor_script:script,natural_narration:narration,storyboard:board,__repairState:{status:'producer-validated',directive}};
+ const rows=[['instructor_script',script],['natural_narration',narration],['storyboard',board]].map(([step,artifacts])=>({step,state:'passed',artifacts}));
+ const db={from:()=>{const q={select:()=>q,eq:()=>q,single:async()=>({data:{artifacts,findings:[]}}),then:resolve=>resolve({data:rows})};return q;}};
+ const result=await new Persistence(db).loadLessonCheckpoint({lessonBuildId:'lesson'});
+ assert.equal(result.artifacts.__repairState.directive.target,'storyboard');
+ assert.equal(result.artifacts.__repairState.status,'diagnosed');
+ assert.equal(result.artifacts.natural_narration,narration);
+ assert.equal(result.artifacts.__repairState.directive.previous,board);
+ narration.narration.segments[0].text='Stale recording';
+ assert.equal((await new Persistence(db).loadLessonCheckpoint({lessonBuildId:'lesson'})).artifacts.__repairState.directive.target,'natural_narration');
+ narration.narration.segments[0].text='Approved instruction';script.certified=false;
+ assert.equal((await new Persistence(db).loadLessonCheckpoint({lessonBuildId:'lesson'})).artifacts.__repairState.directive.target,'natural_narration');
+});
+test('storyboard audio repair restores the approved blueprint without independent re-authoring',async()=>{
+ const generatorSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/adapters/platform-instructional-generator.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
+ const Generator=new Function('sceneRole','ULTIMATE_LESSON_CONTRACT_VERSION','produceTeachingVisual',generatorSource+';return UltimatePlatformInstructionalGenerator;')((stage,fallback)=>fallback,'test',()=>({kind:'sequence'}));
+ const generator=new Generator();let requested;
+ generator.blueprint=async input=>{requested=input;return {segments:[{id:'approved',stage:'concept_explanation',text:'Approved instruction',recapText:'Fresh recap',objectiveIds:['o'],sourceRequirementIds:['s'],visualRequirement:'Assigned visual',sceneType:'mental_model'}]};};
+ const directive={target:'storyboard',requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]};
+ const board=await generator.storyboard({repairDirective:directive,prior:{saved:'canonical'}});
+ assert.equal(requested.repairDirective,undefined);assert.equal(requested.prior.saved,'canonical');
+ assert.equal(board.scenes[0].dialogue,'Approved instruction\n\nFresh recap');
+ await generator.storyboard({repairDirective:{...directive,requirements:[{code:'OTHER_FAILURE',message:'genuine source defect'}]}});
+ assert.equal(requested.repairDirective.requirements[0].code,'OTHER_FAILURE');
+});

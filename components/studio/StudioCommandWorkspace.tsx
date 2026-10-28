@@ -5,7 +5,7 @@ import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import '@/apps/admin/styles/studio-mobile-safety.css';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import {
   Bot,
   Eye,
@@ -90,6 +90,7 @@ export default function StudioCommandWorkspace({
   workspaces: Array<{ id: string; label: string; route: string }>;
   initialWorkspace?: string;
 }) {
+  const attachmentInputId = useId();
   const [conversationKey, setConversationKey] = useState(0);
   const [surface, setSurface] = useState<StudioSurface>(
     initialWorkspace === 'browser'
@@ -274,15 +275,23 @@ export default function StudioCommandWorkspace({
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-black tracking-tight">Elevate Studio</span>
-            <span className="hidden text-[10px] font-semibold text-slate-500 sm:block">
+            <span className="block truncate text-xl font-black tracking-tight sm:text-2xl">
+              Elevate Studio
+            </span>
+            <span className="hidden text-sm font-semibold text-slate-500 sm:block">
               Build, inspect, and operate
             </span>
           </div>
+          <label
+            htmlFor={attachmentInputId}
+            className="inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-lg border border-slate-300 bg-white px-3 text-base font-bold text-slate-900 hover:bg-slate-100"
+          >
+            Upload files
+          </label>
           <div className="ml-auto flex shrink-0 items-center gap-1">
             <Link
               href="/dashboard"
-              className="inline-flex min-h-11 min-w-11 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
+              className="inline-flex min-h-11 min-w-11 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-base font-bold hover:bg-slate-100 sm:px-3"
               aria-label="Open admin dashboard"
             >
               <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
@@ -290,7 +299,7 @@ export default function StudioCommandWorkspace({
             </Link>
             <Link
               href="/phone"
-              className="inline-flex min-h-11 min-w-11 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
+              className="inline-flex min-h-11 min-w-11 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-base font-bold hover:bg-slate-100 sm:px-3"
               aria-label="Open phone system"
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
@@ -310,7 +319,7 @@ export default function StudioCommandWorkspace({
               setBrowserTarget('');
               setSurface('commands');
             }}
-            className="inline-flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
+            className="inline-flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-base font-bold hover:bg-slate-100 sm:px-3"
           >
             <Plus className="h-4 w-4" aria-hidden="true" />{' '}
             <span className="hidden min-[430px]:inline">New task</span>
@@ -327,7 +336,7 @@ export default function StudioCommandWorkspace({
               setSurface('commands');
             }}
             aria-pressed={surface === 'commands'}
-            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
+            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-base font-bold ${surface === 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
           </button>
@@ -337,7 +346,7 @@ export default function StudioCommandWorkspace({
               setSurface(lastSurface);
             }}
             aria-pressed={surface !== 'commands'}
-            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface !== 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
+            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-base font-bold ${surface !== 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Work
           </button>
@@ -346,11 +355,11 @@ export default function StudioCommandWorkspace({
             aria-expanded={toolsOpen}
             aria-controls="studio-tool-navigation"
             onClick={() => setToolsOpen((open) => !open)}
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-100"
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-base font-bold text-slate-700 hover:bg-slate-100"
           >
             <Menu className="h-4 w-4" aria-hidden="true" /> Tools
           </button>
-          <span className="ml-2 hidden text-[11px] font-semibold text-slate-500 sm:inline">
+          <span className="ml-2 hidden text-sm font-semibold text-slate-500 sm:inline">
             One workspace · governed workflow · verified evidence
           </span>
         </nav>
@@ -358,17 +367,20 @@ export default function StudioCommandWorkspace({
           hidden={!toolsOpen}
           id="studio-tool-navigation"
           aria-label="Studio tools"
-          className={`${toolsOpen ? 'flex' : 'hidden'} min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-blue-100 bg-blue-50 px-2 py-1 [scrollbar-width:thin]`}
+          className={`${toolsOpen ? 'flex' : 'hidden'} min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-white px-2 py-1 [scrollbar-width:thin]`}
         >
           {workspaces.map((workspace) => (
             <button
               type="button"
               key={workspace.id}
-              onClick={() => { openCapability(workspace.id); setToolsOpen(false); }}
+              onClick={() => {
+                openCapability(workspace.id);
+                setToolsOpen(false);
+              }}
               aria-pressed={
                 currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course')
               }
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-xs font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-blue-700 text-white' : 'text-blue-950 hover:bg-blue-100'}`}
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-base font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-slate-900 text-white' : 'text-slate-800 hover:bg-slate-100'}`}
             >
               {workspace.label}
             </button>
@@ -381,13 +393,19 @@ export default function StudioCommandWorkspace({
           className={
             sidebarOpen
               ? 'absolute inset-y-0 left-0 z-20 h-full shadow-xl md:relative md:shadow-none'
-              : 'hidden h-full'
+              : 'hidden h-full md:block'
           }
         >
           <StudioCapabilityRail
             workspaces={workspaces}
             mobile={sidebarOpen}
-            activeWorkspaceId={surface === 'course' ? 'courses' : activeCapability}
+            activeWorkspaceId={
+              surface === 'course'
+                ? 'courses'
+                : surface === 'browser'
+                  ? 'browser'
+                  : activeCapability
+            }
             onNavigate={() => setSidebarOpen(false)}
             onOpenWorkspace={openCapability}
           >
@@ -440,7 +458,7 @@ export default function StudioCommandWorkspace({
                 aria-label="Active Studio tool"
               >
                 <header className="flex min-h-12 shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-2 text-slate-950 sm:flex-nowrap sm:gap-2 sm:px-3">
-                  <span className="min-w-0 basis-full truncate text-xs font-black sm:mr-auto sm:basis-auto">
+                  <span className="min-w-0 basis-full truncate text-base font-black sm:mr-auto sm:basis-auto">
                     {activeWorkspace?.label ??
                       (surface === 'course' ? 'Course Builder' : 'Active run tools')}
                   </span>
@@ -451,7 +469,7 @@ export default function StudioCommandWorkspace({
                       setActiveCapability(null);
                       setSurface(previewUrl ? 'preview' : 'course');
                     }}
-                    className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold sm:min-h-0 sm:flex-none sm:px-3 ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
+                    className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-base font-bold sm:min-h-0 sm:flex-none sm:px-3 ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
                   >
                     <Eye className="h-4 w-4" aria-hidden="true" />{' '}
                     {previewUrl ? 'Preview' : 'Course Builder'}
@@ -463,14 +481,14 @@ export default function StudioCommandWorkspace({
                       setActiveCapability(null);
                       setSurface('browser');
                     }}
-                    className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
+                    className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-base font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
                   >
                     <Globe2 className="h-4 w-4" aria-hidden="true" /> Browser
                   </button>
                   <button
                     type="button"
                     onClick={() => setFocusMode((value) => !value)}
-                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
+                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-base font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
                     aria-label={
                       focusMode ? 'Exit full screen workspace' : 'Expand workspace to full screen'
                     }
@@ -487,7 +505,7 @@ export default function StudioCommandWorkspace({
                   <button
                     type="button"
                     onClick={() => setSurface('commands')}
-                    className="min-h-11 flex-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
+                    className="min-h-11 flex-1 rounded-md px-2 py-2 text-base font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
                   >
                     Chat
                   </button>
@@ -531,7 +549,14 @@ export default function StudioCommandWorkspace({
                         : 'hidden'
                     }
                   >
-                    {activeCapability === 'health' && <details className="border-b border-slate-200 p-3"><summary className="cursor-pointer font-semibold">PARIS execution and recovery evidence</summary><ParisSupervisionPanel active={surface === 'capability'} /></details>}
+                    {activeCapability === 'health' && (
+                      <details className="border-b border-slate-200 p-3">
+                        <summary className="cursor-pointer font-semibold">
+                          PARIS execution and recovery evidence
+                        </summary>
+                        <ParisSupervisionPanel active={surface === 'capability'} />
+                      </details>
+                    )}
                     {mountedWorkspaceUrl ? (
                       <RepositoryLivePreview
                         filePath={null}
@@ -583,6 +608,7 @@ export default function StudioCommandWorkspace({
               <UnifiedEllieChat
                 key={conversationKey}
                 embedded
+                attachmentInputId={attachmentInputId}
                 onOpenPreview={() => openPreview()}
                 onPreviewTarget={openPreview}
                 onTaskCheckpoint={setActiveTask}

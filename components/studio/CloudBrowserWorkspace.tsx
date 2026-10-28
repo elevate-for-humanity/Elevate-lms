@@ -77,7 +77,7 @@ export default function CloudBrowserWorkspace({
   const draggedRef = useRef(false);
   const [imageZoom, setImageZoom] = useState(1);
   const [signInView, setSignInView] = useState(initialSignIn);
-  const [controlsOpen, setControlsOpen] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(true);
   const [mobilePane, setMobilePane] = useState<'browser' | 'tools' | 'signin'>(
     initialSignIn ? 'signin' : 'browser',
   );
@@ -296,6 +296,7 @@ export default function CloudBrowserWorkspace({
     launchTargetRef.current = startingTarget;
     setError('');
     setStatus('Starting isolated Chromium…');
+    setCdpConnected(false);
     const response = await fetch('/api/admin/dev-studio/browser/session', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -431,6 +432,12 @@ export default function CloudBrowserWorkspace({
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
+        setCdpConnected(false);
+        setStatus(
+          response.status === 401 || response.status === 403
+            ? 'Studio sign-in required'
+            : 'Browser controls interrupted',
+        );
         setError(body.error || 'Browser action failed');
         return false;
       }
@@ -442,6 +449,8 @@ export default function CloudBrowserWorkspace({
       }
       return true;
     } catch (cause) {
+      setCdpConnected(false);
+      setStatus('Browser controls interrupted');
       setError(cause instanceof Error ? cause.message : 'Browser action failed');
       return false;
     } finally {
@@ -752,65 +761,107 @@ export default function CloudBrowserWorkspace({
     const headers = { 'x-studio-session-token': session.token };
     const sessionProxy =
       '/api/admin/dev-studio/browser/action?sessionId=' + encodeURIComponent(session.id);
+    let inFlight = false;
+    let cancelled = false;
+    let blocked = false;
     const timer = window.setInterval(
       async () => {
-        const revision = navigationRevisionRef.current;
-        const response = await fetch(`${sessionProxy}&resource=events`, {
-          headers,
-          signal: AbortSignal.timeout(8000),
-        }).catch(() => null);
-        if (response?.status === 410 && !reconnectingRef.current) {
-          reconnectingRef.current = true;
-          const reconnectTarget = target.includes('accounts.google.com')
-            ? launchTargetRef.current
-            : target;
-          setSession(null);
-          setStatus('Reconnecting the existing browser account…');
-          try {
-            await start(reconnectTarget);
-            if (activeTaskId) setContinuationTaskId(activeTaskId);
-          } catch (cause) {
-            setError(cause instanceof Error ? cause.message : 'Browser reconnect failed');
-          } finally {
-            reconnectingRef.current = false;
+        if (inFlight || cancelled || blocked) return;
+        inFlight = true;
+        try {
+          const revision = navigationRevisionRef.current;
+          const response = await fetch(`${sessionProxy}&resource=events`, {
+            headers,
+            signal: AbortSignal.timeout(8000),
+          }).catch(() => null);
+          if (cancelled) return;
+          if (response?.status === 401 || response?.status === 403) {
+            blocked = true;
+            setCdpConnected(false);
+            setStatus('Studio sign-in required');
+            setError('Studio could not authorize browser controls. Sign in again to reconnect.');
+            return;
           }
-          return;
-        }
-        if (response?.ok) {
-          const payload = await response.json();
-          setEvents(payload.events || []);
-          if (payload.viewport)
-            setSession((current) =>
-              current &&
-              (current.viewport.width !== payload.viewport.width ||
-                current.viewport.height !== payload.viewport.height)
-                ? { ...current, viewport: payload.viewport }
-                : current,
+          if (!response?.ok && response?.status !== 410) {
+            setCdpConnected(false);
+            setStatus('Browser controls interrupted');
+            return;
+          }
+          if (response?.status === 410 && !reconnectingRef.current) {
+            reconnectingRef.current = true;
+            const reconnectTarget = target.includes('accounts.google.com')
+              ? launchTargetRef.current
+              : target;
+            setSession(null);
+            setStatus('Reconnecting the existing browser account…');
+            try {
+              await start(reconnectTarget);
+              if (activeTaskId) setContinuationTaskId(activeTaskId);
+            } catch (cause) {
+              setError(cause instanceof Error ? cause.message : 'Browser reconnect failed');
+            } finally {
+              reconnectingRef.current = false;
+            }
+            return;
+          }
+          if (response?.ok) {
+            const payload = await response.json();
+            setStatus((current) =>
+              current === 'Browser controls interrupted' ? 'Connected' : current,
             );
-          setBrowserTabs(payload.tabs || []);
-          setActiveTabId(payload.activeTabId || '');
-          setFilePicker(Boolean(payload.filePicker));
-          setBrowserDialog(payload.dialog || null);
-          if (
-            payload.url &&
-            targetDraftRef.current === null &&
-            !navigatingRef.current &&
-            revision === navigationRevisionRef.current
-          )
-            setTarget(payload.url);
-        }
-        const downloadsResponse = await fetch(`${sessionProxy}&resource=downloads`, {
-          headers,
-          signal: AbortSignal.timeout(8000),
-        }).catch(() => null);
-        if (downloadsResponse?.ok) {
-          const payload = await downloadsResponse.json();
-          setDownloads(payload.downloads || []);
+            setEvents(payload.events || []);
+            if (payload.viewport)
+              setSession((current) =>
+                current &&
+                (current.viewport.width !== payload.viewport.width ||
+                  current.viewport.height !== payload.viewport.height)
+                  ? { ...current, viewport: payload.viewport }
+                  : current,
+              );
+            setBrowserTabs(payload.tabs || []);
+            setActiveTabId(payload.activeTabId || '');
+            setFilePicker(Boolean(payload.filePicker));
+            setBrowserDialog(payload.dialog || null);
+            if (
+              payload.url &&
+              targetDraftRef.current === null &&
+              !navigatingRef.current &&
+              revision === navigationRevisionRef.current
+            )
+              setTarget(payload.url);
+          }
+          const downloadsResponse = await fetch(`${sessionProxy}&resource=downloads`, {
+            headers,
+            signal: AbortSignal.timeout(8000),
+          }).catch(() => null);
+          if (cancelled) return;
+          if (downloadsResponse?.status === 401 || downloadsResponse?.status === 403) {
+            blocked = true;
+            setCdpConnected(false);
+            setStatus('Studio sign-in required');
+            setError('Studio could not authorize browser controls. Sign in again to reconnect.');
+            return;
+          }
+          if (downloadsResponse?.ok) {
+            const payload = await downloadsResponse.json();
+            setDownloads(payload.downloads || []);
+          }
+        } catch (cause) {
+          if (!cancelled) {
+            setCdpConnected(false);
+            setStatus('Browser controls interrupted');
+            setError(cause instanceof Error ? cause.message : 'Browser status could not be read');
+          }
+        } finally {
+          inFlight = false;
         }
       },
       agentRunning ? 1000 : 3000,
     );
-    return () => window.clearInterval(timer);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
     // Polling reconnects the verified account and exact existing task after worker restart.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agentRunning, endpoint, session, activeTaskId]);
@@ -885,6 +936,10 @@ export default function CloudBrowserWorkspace({
           <button
             type="button"
             onClick={() => {
+              if (!signInView) {
+                setImageZoom(1);
+                return;
+              }
               const image = imageRef.current;
               const viewport = image?.parentElement;
               if (!image || !viewport || !image.naturalWidth || !image.naturalHeight) return;
@@ -893,11 +948,13 @@ export default function CloudBrowserWorkspace({
                 signInView ? 480 : viewport.clientWidth,
               );
               const baseHeight = (baseWidth * image.naturalHeight) / image.naturalWidth;
-              setImageZoom(Math.max(0.25, Math.min(1, viewport.clientHeight / baseHeight)));
+              setImageZoom(
+                signInView ? Math.max(0.25, Math.min(1, viewport.clientHeight / baseHeight)) : 1,
+              );
             }}
             className="min-h-11 rounded border border-slate-300 px-3 text-base"
           >
-            Fit screen
+            {signInView ? 'Fit screen' : 'Fit width'}
           </button>
           <button
             type="button"
@@ -1046,7 +1103,7 @@ export default function CloudBrowserWorkspace({
               key={tab.id}
               aria-pressed={tab.id === activeTabId}
               onClick={() => action({ type: 'switch_tab', tabId: tab.id })}
-              className="min-h-12 max-w-64 truncate rounded-lg border border-slate-300 px-3 text-sm aria-pressed:bg-cyan-100"
+              className="min-h-12 max-w-64 truncate rounded-lg border border-slate-300 px-3 text-sm aria-pressed:bg-slate-200"
             >
               {tab.url || 'New tab'}
             </button>
@@ -1122,7 +1179,12 @@ export default function CloudBrowserWorkspace({
       {error && (
         <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 max-h-[15dvh] shrink-0 overflow-auto px-3 py-2 text-base text-rose-800">
           <AlertTriangle className="h-4 w-4" />
-          {error}
+          <span>{error}</span>
+          {status === 'Studio sign-in required' ? (
+            <a href="/login?redirect=%2Fstudio" className="shrink-0 font-bold underline">
+              Sign in to Studio
+            </a>
+          ) : null}
         </div>
       )}
       <nav
@@ -1133,7 +1195,7 @@ export default function CloudBrowserWorkspace({
           type="button"
           aria-pressed={mobilePane === 'browser'}
           onClick={() => setMobilePane('browser')}
-          className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-cyan-100"
+          className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-slate-200"
         >
           Browser
         </button>
@@ -1141,7 +1203,7 @@ export default function CloudBrowserWorkspace({
           type="button"
           aria-pressed={mobilePane === 'signin'}
           onClick={() => setMobilePane('signin')}
-          className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-cyan-100"
+          className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-slate-200"
         >
           Email / password
         </button>
@@ -1158,7 +1220,7 @@ export default function CloudBrowserWorkspace({
         className={`${styles.workspace} min-h-0 min-w-0 flex-1 ${mobilePane === 'signin' ? styles.signInStack : ''}`}
       >
         <div
-          className={`${mobilePane !== 'tools' ? 'flex' : styles.desktopFlex} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-slate-100`}
+          className={`${mobilePane !== 'tools' ? 'flex' : styles.desktopFlex} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-white`}
         >
           {session ? (
             <img

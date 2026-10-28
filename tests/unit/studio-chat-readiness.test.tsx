@@ -29,7 +29,9 @@ it('never claims runtime connection before a probe and keeps the composer usable
   render(<UnifiedEllieChat embedded restoreLatest={false} />);
   expect(screen.getByText('AI configuration: checking…')).toBeInTheDocument();
   expect(screen.queryByText(/runtime: connected/)).not.toBeInTheDocument();
-  expect(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' })).toHaveClass('text-xl');
+  expect(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' })).toHaveClass(
+    'text-xl',
+  );
   fireEvent.change(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' }), {
     target: { value: 'Inspect current jobs' },
   });
@@ -78,4 +80,15 @@ it('surfaces a failed restore and retries the same conversation without creating
     '/api/admin/dev-studio/conversations?id=owned',
     '/api/admin/dev-studio/conversations?id=owned',
   ]);
+});
+
+it('exposes the real attachment input to the workspace upload control', () => {
+  render(
+    <>
+      <label htmlFor="studio-files">Upload files</label>
+      <UnifiedEllieChat embedded restoreLatest={false} attachmentInputId="studio-files" />
+    </>,
+  );
+  expect(screen.getByLabelText('Upload files')).toHaveAttribute('type', 'file');
+  expect(screen.getByRole('button', { name: 'Attach a file', exact: true })).not.toHaveClass('hidden');
 });

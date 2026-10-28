@@ -105,6 +105,7 @@ const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
 };
 
 interface UnifiedEllieChatProps {
+  attachmentInputId?: string;
   onOpenDeploy?: () => void;
   onOpenPreview?: () => void;
   embedded?: boolean;
@@ -648,6 +649,7 @@ function ActionCard({
 }
 
 export default function UnifiedEllieChat({
+  attachmentInputId,
   onOpenDeploy,
   onOpenPreview,
   embedded = false,
@@ -1159,7 +1161,7 @@ export default function UnifiedEllieChat({
   const shellClass = embedded ? 'bg-white text-gray-950' : 'bg-gray-950 text-gray-100';
   const headerClass = embedded ? 'border-gray-200 bg-white' : 'border-gray-800 bg-gray-900';
   const assistantClass = embedded
-    ? 'border border-brand-blue-100 bg-brand-blue-50/70 text-slate-950 shadow-sm'
+    ? 'border border-slate-200 bg-slate-50 text-slate-950 shadow-sm'
     : 'border border-gray-800 bg-gray-900 text-gray-100';
   const mutedTextClass = embedded ? 'text-gray-500' : 'text-gray-400';
   const inputAreaClass = embedded ? 'border-gray-200 bg-white' : 'border-gray-800 bg-gray-900';
@@ -1176,9 +1178,7 @@ export default function UnifiedEllieChat({
           <Sparkles className="h-4 w-4 shrink-0 text-blue-500" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">PARIS</p>
-            <p className={`truncate text-[11px] ${mutedTextClass}`}>
-              Platform tools · {health}
-            </p>
+            <p className={`truncate text-[11px] ${mutedTextClass}`}>Platform tools · {health}</p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             {onOpenPreview && (
@@ -1464,6 +1464,7 @@ export default function UnifiedEllieChat({
           ) : null}
           <div className="flex w-full min-w-0 flex-wrap items-end gap-2 rounded-2xl border border-brand-blue-200 bg-white p-2 shadow-lg shadow-slate-900/5 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-100">
             <input
+              id={attachmentInputId}
               ref={attachmentInputRef}
               type="file"
               className="sr-only"
@@ -1489,7 +1490,7 @@ export default function UnifiedEllieChat({
               aria-label="Attach a file"
               disabled={uploading}
               onClick={() => attachmentInputRef.current?.click()}
-              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
+              className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
             >
               {uploading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
@@ -1503,7 +1504,7 @@ export default function UnifiedEllieChat({
               aria-label="Take a photo"
               disabled={uploading}
               onClick={() => cameraInputRef.current?.click()}
-              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
+              className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
             >
               <Camera className="h-5 w-5" aria-hidden="true" />
               <span className="text-xs font-semibold">Camera</span>
@@ -1563,7 +1564,7 @@ export default function UnifiedEllieChat({
                   return !enabled;
                 });
               }}
-              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50`}
+              className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50`}
             >
               {voiceOutputEnabled ? (
                 <Volume2 className="h-5 w-5" aria-hidden="true" />

@@ -71,6 +71,14 @@ describe('One Studio conversation workspace', () => {
         ]}
       />,
     );
+    expect(
+      screen.getByRole('navigation', { name: 'Studio environments and tools' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Environment variables' })).toHaveAttribute(
+      'href',
+      '/integrations/env-manager',
+    );
+    expect(screen.getByText('Upload files', { selector: 'label' })).toHaveAttribute('for');
     expect(screen.queryByTestId('studio-browser-panel')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Work', exact: true }));
     expect(screen.getAllByTestId('studio-browser-panel')).toHaveLength(1);

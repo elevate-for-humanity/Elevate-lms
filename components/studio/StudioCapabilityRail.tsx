@@ -88,7 +88,6 @@ export default function StudioCapabilityRail({
               : 'healthy',
         );
         setPluginChecks(Array.isArray(pluginResult.body.checks) ? pluginResult.body.checks : []);
-
       })
       .catch(() => {
         if (active) setPlugins('blocked');
@@ -102,12 +101,12 @@ export default function StudioCapabilityRail({
 
   return (
     <aside
-      className={`${expanded ? 'w-64' : 'w-16'} ${mobile ? 'flex h-full' : 'hidden md:flex'} shrink-0 flex-col border-r border-slate-200 bg-slate-50 text-slate-950 transition-[width] duration-200`}
+      className={`${expanded ? 'w-64' : 'w-16'} ${mobile ? 'flex h-full' : 'hidden md:flex'} shrink-0 flex-col border-r border-slate-200 bg-white text-slate-950 transition-[width] duration-200`}
       aria-label="Studio capabilities"
     >
       <div className="flex h-12 items-center border-b border-slate-200 px-3">
         {expanded ? (
-          <span className="text-sm font-black uppercase tracking-[0.16em] text-slate-700">
+          <span className="text-base font-black uppercase tracking-[0.16em] text-slate-700">
             Workspace
           </span>
         ) : null}
@@ -129,11 +128,23 @@ export default function StudioCapabilityRail({
             Tools
           </p>
         ) : null}
-        <nav className="space-y-1">
+        <nav aria-label="Studio environments and tools" className="space-y-1">
+          <Link
+            href="/integrations/env-manager"
+            className="flex min-h-11 items-center gap-3 rounded-xl px-2 py-2 text-base font-semibold text-slate-800 hover:bg-slate-100"
+          >
+            <Cable className="h-5 w-5 shrink-0" aria-hidden="true" />
+            {expanded ? <span>Environment variables</span> : null}
+          </Link>
           {visible.map((workspace) => {
             const Icon = ICONS[workspace.id] ?? CircleDot;
             const href = workspace.id === 'media' ? '/studio/media?tab=library' : workspace.route;
-            const label = workspace.id === 'media' ? 'Library & Media' : workspace.label;
+            const label =
+              workspace.id === 'media'
+                ? 'Library & Media'
+                : workspace.id === 'containers'
+                  ? 'Environments & containers'
+                  : workspace.label;
             return (
               <Link
                 key={workspace.id}
@@ -149,7 +160,9 @@ export default function StudioCapabilityRail({
                 className={`flex items-center gap-3 rounded-xl px-2 py-2 transition ${activeWorkspaceId === workspace.id || pathname === workspace.route || pathname.startsWith(`${workspace.route}/`) ? 'bg-slate-200 text-slate-950' : 'text-slate-700 hover:bg-slate-200 hover:text-slate-950'}`}
               >
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                {expanded ? <span className="truncate text-sm font-semibold">{label}</span> : null}
+                {expanded ? (
+                  <span className="truncate text-base font-semibold">{label}</span>
+                ) : null}
               </Link>
             );
           })}

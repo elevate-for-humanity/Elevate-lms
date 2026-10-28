@@ -34,7 +34,7 @@ export interface MediaQualityEvidence {
   mediaSha256?: string;
   actualTranscript?: string;
   readability?: Array<{ scene: number; width: number; wordCoverage: number; ocrMode?: 'full-frame' | 'title-region' }>;
-  teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'sparse'|'block'}>;
+  teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'sparse'|'block'|'block-upscaled'}>;
   narrationCoverageAdvisory?: boolean;
   warnings?: string[];
   sceneNarrationEvidence?: Array<{sceneId:string;startSeconds:number;endSeconds:number;actualTranscript:string;coverage:number}>;
@@ -694,7 +694,7 @@ export async function enforceMediaQuality(input: {
           const frame=join(workDir,`teaching-${index}-${stepIndex}-${width}.png`);
           await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',premium?`scale=${width}:-1,crop=${Math.floor(width*646/1920)}:${Math.floor(width*640/1920)}:${Math.floor(width*1220/1920)}:${Math.floor(width*225/1920)}`:`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
           let {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
-          let ocrMode: 'sparse' | 'block' = 'sparse';
+          let ocrMode: 'sparse' | 'block' | 'block-upscaled' = 'sparse';
           const expected=premium?state.step.label+' '+state.step.value:teachingPresentation(scene.teachingVisual!, time-sceneStart, scene.durationSeconds).expectedText;
           const words=[...new Set(normalizedWords(expected).filter(w=>w.length>2))];
           const coverageOf = (text: string) => {
@@ -709,6 +709,16 @@ export async function enforceMediaQuality(input: {
             const block = await execFileAsync('tesseract', [frame, 'stdout', '--psm', '6'], {timeout:30000,maxBuffer:1000000});
             const blockCoverage = coverageOf(block.stdout);
             if (blockCoverage > wordCoverage) { decoded = block.stdout; wordCoverage = blockCoverage; ocrMode = 'block'; }
+          }
+          // Small encoded glyphs can confuse l/i in OCR even when legible.
+          // Re-read only the same decoded pixels at a larger sampling scale.
+          // Never substitute authored text or lower the required coverage.
+          if (wordCoverage < 0.85) {
+            const enlarged = join(workDir, `teaching-${index}-${stepIndex}-${width}-ocr.png`);
+            await execFileAsync('ffmpeg', ['-v','error','-y','-i',frame,'-vf','scale=iw*4:ih*4:flags=lanczos',enlarged], {timeout:30000,maxBuffer:1000000});
+            const block = await execFileAsync('tesseract', [enlarged,'stdout','--psm','6'], {timeout:30000,maxBuffer:1000000});
+            const enlargedCoverage = coverageOf(block.stdout);
+            if (enlargedCoverage > wordCoverage) { decoded = block.stdout; wordCoverage = enlargedCoverage; ocrMode = 'block-upscaled'; }
           }
           teachingVisualEvidence.push({sceneId:scene.id,step:stepIndex,width,time,expected,decoded,wordCoverage,ocrMode});
           if (wordCoverage<0.85) throw new Error(`MEDIA_TEACHING_STATE_NOT_VISIBLE:${scene.id}:${stepIndex}:${width}`);

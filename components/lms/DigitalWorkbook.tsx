@@ -146,7 +146,7 @@ export default function DigitalWorkbook({
           <p>This workbook is licensed only to the authorized learner. Unauthorized copying, recording, resale, scraping, and redistribution are prohibited.</p>
           <p className="mt-2 break-all text-xs">Licensed account: {accountId}</p>
         </aside>
-        <a className="my-4 inline-flex min-h-12 items-center rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white" href={`/api/workbooks/${workbook.slug}/download`}>Download full illustrated workbook (PDF)</a>
+        <p className="my-4 rounded-lg border border-slate-300 bg-white p-3 text-sm">Protected workbook: complete and save your answers here. Source PDF downloads are disabled.</p>
         <p className="my-4 text-lg leading-relaxed">
           Write directly in the boxes below. Your answers save to your LMS account and reopen when
           you return.

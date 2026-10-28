@@ -261,7 +261,7 @@ export default function StudioCommandWorkspace({
       }
     >
       <header className="shrink-0 border-b border-slate-200 bg-white text-slate-950">
-        <div className="flex min-h-14 min-w-0 items-center gap-1 px-2 sm:gap-2 sm:px-5">
+        <div className="flex min-h-14 min-w-0 flex-wrap items-center gap-1 px-2 sm:gap-2 sm:px-5">
           <button
             type="button"
             onClick={() => setSidebarOpen((value) => !value)}
@@ -274,7 +274,7 @@ export default function StudioCommandWorkspace({
           <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-blue-50 sm:flex text-brand-blue-700">
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 basis-3/4 sm:basis-auto">
             <span className="block truncate text-xl font-black tracking-tight sm:text-2xl">
               Elevate Studio
             </span>

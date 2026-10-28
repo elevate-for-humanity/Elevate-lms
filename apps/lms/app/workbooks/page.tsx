@@ -6,7 +6,7 @@ import { loadMyDigitalWorkbooks } from '@/lib/lms/digital-workbooks';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'My Workbooks | Elevate for Humanity',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: false, noarchive: true },
 };
 
 export default async function WorkbooksPage() {
@@ -19,6 +19,10 @@ export default async function WorkbooksPage() {
           My learning dashboard
         </Link>
         <h1 className="mt-4 text-3xl font-bold">My Workbooks</h1>
+        <p className="my-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
+          © 2026 Elevate for Humanity. All rights reserved. Workbooks are licensed to the authorized learner only. Copying, recording, scraping, resale, and redistribution are prohibited.
+          <span className="mt-1 block break-all text-xs">Licensed account: {user.id}</span>
+        </p>
         <p className="my-5 max-w-prose text-lg leading-relaxed">
           Open your assigned or purchased apprenticeship workbook. Type your answers and save them to your
           account so you can continue on another device.

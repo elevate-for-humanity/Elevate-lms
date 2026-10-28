@@ -23,17 +23,18 @@ async function _GET(request: Request) {
     if (auth.error) return auth.error;
 
     const db = await requireAdminClient();
-    const { data: quickBooksRows } = await db
+    const { data: quickBooksRows, error: quickBooksError } = await db
       .from('app_settings')
       .select('key, value')
       .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']);
+    if (quickBooksError) return NextResponse.json({ error: 'Billing configuration unavailable' }, { status: 503, headers: { 'Cache-Control': 'private, no-store' } });
     const quickBooksStored = Object.fromEntries(
       (quickBooksRows ?? []).map((row) => [row.key, row.value ?? '']),
     );
     const hasQuickBooksValue = (key: string) => Boolean(process.env[key] || quickBooksStored[key]);
     const quickBooksCredentialsConfigured =
       hasQuickBooksValue('QB_CLIENT_ID') && hasQuickBooksValue('QB_CLIENT_SECRET');
-    const quickBooksConnected =
+    const quickBooksAuthorizationConfigured =
       quickBooksCredentialsConfigured &&
       hasQuickBooksValue('QB_REFRESH_TOKEN') &&
       hasQuickBooksValue('QB_REALM_ID');
@@ -51,7 +52,9 @@ async function _GET(request: Request) {
         dashboardPath: '/billing/subscriptions',
         automaticCollection: 'paypal',
         invoiceLedger: 'quickbooks',
-        configured: payPalConfigured && quickBooksConnected,
+        configured: payPalConfigured && quickBooksAuthorizationConfigured,
+        verification: 'not_performed',
+        verificationPath: '/api/admin/service-health',
       },
       paypal: {
         configured: payPalConfigured,
@@ -64,7 +67,9 @@ async function _GET(request: Request) {
       },
       quickbooks: {
         configured: quickBooksCredentialsConfigured,
-        connected: quickBooksConnected,
+        authorizationConfigured: quickBooksAuthorizationConfigured,
+        connected: null,
+        verification: 'not_performed',
         envVars: {
           QB_CLIENT_ID: hasQuickBooksValue('QB_CLIENT_ID'),
           QB_CLIENT_SECRET: hasQuickBooksValue('QB_CLIENT_SECRET'),

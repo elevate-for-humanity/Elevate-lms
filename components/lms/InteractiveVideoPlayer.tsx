@@ -96,6 +96,7 @@ interface InteractiveVideoPlayerProps {
   transcript?: TranscriptSegment[];
   validationErrors?: string[];
   readOnly?: boolean;
+  learnerId?: string;
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
 }
@@ -105,6 +106,7 @@ export default function InteractiveVideoPlayer({
   captionsUrl,
   initialPositionSeconds = 0,
   title,
+  learnerId,
   lessonId: lessonRecordId,
   courseId,
   checkpoints = [],
@@ -538,7 +540,7 @@ export default function InteractiveVideoPlayer({
       if (document.fullscreenElement) {
         document.exitFullscreen();
       } else {
-        videoRef.current.requestFullscreen();
+        videoRef.current.parentElement?.requestFullscreen();
       }
     }
   };
@@ -763,6 +765,10 @@ export default function InteractiveVideoPlayer({
           <video
             ref={videoRef}
             src={videoUrl}
+            controlsList="nodownload noremoteplayback"
+            disablePictureInPicture
+            disableRemotePlayback
+            onContextMenu={event => event.preventDefault()}
             crossOrigin={captionsUrl ? 'anonymous' : undefined}
             aria-label={title}
             className="w-full aspect-video"
@@ -790,6 +796,10 @@ export default function InteractiveVideoPlayer({
             ) : null}
           </video>
         )}
+
+        {learnerId && <div aria-label="Licensed learner" className="pointer-events-none absolute right-3 top-3 z-10 rounded bg-black/60 px-2 py-1 text-xs text-white">
+          Elevate for Humanity · Licensed learner {learnerId}
+        </div>}
 
         {/* Captions Overlay */}
         {!captionsUrl && showCaptions && currentCaption && (

@@ -50,6 +50,16 @@ const nextConfig = {
     const noStore = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
     return [
       {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+        ],
+      },
+      {
         source: '/workbooks/:path*',
         headers: [
           { key: 'Cache-Control', value: noStore },

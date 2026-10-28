@@ -22,3 +22,15 @@ it('admin preview playback never loads or writes learner progress, notes, answer
  expect(screen.getByPlaceholderText('Notes are disabled in preview')).toBeDisabled();
  expect(screen.getByRole('button',{name:'Add Note'})).toBeDisabled();
 });
+it('keeps the learner watermark in the fullscreen container and suppresses download and remote-play controls',async()=>{
+ const {container}=render(<InteractiveVideoPlayer videoUrl="/api/courses/c/lessons/l/playback" title="Protected lesson" learnerId="learner-id" readOnly/>);
+ const video=container.querySelector('video')!;
+ expect(video.getAttribute('controlslist')).toContain('nodownload');
+ expect(video.hasAttribute('disablepictureinpicture')).toBe(true);
+ expect(video.hasAttribute('disableremoteplayback')).toBe(true);
+ expect(screen.getByLabelText('Licensed learner')).toHaveTextContent('learner-id');
+ const requestFullscreen=vi.fn().mockResolvedValue(undefined);
+ video.parentElement!.requestFullscreen=requestFullscreen;
+ fireEvent.click(screen.getByRole('button',{name:/fullscreen/i}));
+ expect(requestFullscreen).toHaveBeenCalledTimes(1);
+});

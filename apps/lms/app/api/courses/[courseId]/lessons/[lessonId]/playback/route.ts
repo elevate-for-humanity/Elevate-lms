@@ -5,6 +5,7 @@ import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-contro
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { signedLessonPlayback } from '@/lib/storage/lesson-playback';
 import { renderMediaUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' };
@@ -15,6 +16,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{cour
     const preview = await resolveCoursePreview(courseId);
     const user = await getCurrentUser();
     if (!preview.active && !user) return NextResponse.json({error:'Unauthorized'}, {status:401, headers});
+    const limited = await applyRateLimit(_request, 'api', { key: `lesson-playback:${user?.id || `preview:${courseId}`}` });
+    if (limited) {
+      for (const [key, value] of Object.entries(headers)) limited.headers.set(key, value);
+      return limited;
+    }
     if (!preview.active) {
       try { await assertLessonAccess(user!.id, lessonId); }
       catch(error) { const denied = accessErrorResponse(error); return NextResponse.json(denied.body, {status:denied.status, headers}); }

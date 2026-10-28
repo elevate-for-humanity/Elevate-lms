@@ -50,3 +50,19 @@ describe('server-bound lesson playback delivery', () => {
     expect(managedLessonPlaybackUrl('https://external.example/player','course','lesson')).toBe('https://external.example/player');
   });
 });
+
+it('renews signed and authenticated Supabase references through lesson authorization', async () => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://project.supabase.co';
+  const createSignedUrl = vi.fn().mockResolvedValue({ data: { signedUrl: 'https://signed.example/fresh' }, error: null });
+  const db = { storage: { from: vi.fn(() => ({ createSignedUrl })) } };
+  for (const mode of ['sign', 'authenticated']) {
+    const source = `https://project.supabase.co/storage/v1/object/${mode}/course-videos/course/lesson.mp4?token=expired`;
+    expect(managedLessonPlaybackUrl(source, 'course', 'lesson')).toBe('/api/courses/course/lessons/lesson/playback');
+    expect(await signedLessonPlayback(db, source)).toBe('https://signed.example/fresh');
+  }
+  expect(createSignedUrl).toHaveBeenCalledWith('course/lesson.mp4', 3600);
+});
+it('does not expose saved S3 signed references directly to the player', () => {
+  expect(managedLessonPlaybackUrl('https://elevate-course-media.s3.us-east-005.backblazeb2.com/film.mp4?X-Amz-Signature=old', 'course', 'lesson'))
+    .toBe('/api/courses/course/lessons/lesson/playback');
+});

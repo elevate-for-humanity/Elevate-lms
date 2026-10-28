@@ -349,6 +349,7 @@ export default async function LessonPage({
                 transcript={videoTranscript}
                 captionsUrl={captionsUrl}
                 readOnly={preview.active}
+                learnerId={preview.active ? undefined : user?.id}
               />
             </div>
           </section>

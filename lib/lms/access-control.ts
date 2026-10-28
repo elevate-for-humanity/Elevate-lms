@@ -30,7 +30,7 @@ export async function assertLessonAccess(userId: string, lessonId: string): Prom
 
   if (error) throw error;
   if (data === null) throw new Error('LESSON_NOT_FOUND');
-  if (data === false) throw new Error('ACCESS_DENIED');
+  if (data !== true) throw new Error('ACCESS_DENIED');
 }
 
 /**

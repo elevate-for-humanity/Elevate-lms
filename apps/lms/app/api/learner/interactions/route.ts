@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';
 import { createClient } from '@/lib/supabase/server';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import {
   resolveLessonMasteryPolicy,
   resolveStoredLessonExperience,
@@ -18,6 +20,21 @@ import {
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+function privateJson(body: unknown, init?: ResponseInit) {
+  const headers = new Headers(init?.headers);
+  headers.set('Cache-Control', 'private, no-store');
+  headers.set('Referrer-Policy', 'no-referrer');
+  return NextResponse.json(body, { ...init, headers });
+}
+
+async function authorizeLesson(request: Request, userId: string, lessonId: string) {
+  const limited = await applyRateLimit(request, 'api', { key: `lesson-interactions:${userId}` });
+  if (limited) { limited.headers.set('Cache-Control', 'private, no-store'); return limited; }
+  try { await assertLessonAccess(userId, lessonId); return null; }
+  catch (error) { const denied = accessErrorResponse(error); return privateJson(denied.body, { status: denied.status }); }
+}
+
 
 const AttemptSchema = z.object({
   courseId: z.string().uuid(),
@@ -35,11 +52,14 @@ const LearningObjectCompletionSchema = z.object({
 
 export async function GET(request: NextRequest) {
   const { user, error: authError } = await requireAuth(request);
-  if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (authError || !user) return privateJson({ error: 'Unauthorized' }, { status: 401 });
   const courseId = request.nextUrl.searchParams.get('courseId');
   const lessonId = request.nextUrl.searchParams.get('lessonId');
   if (!courseId || !lessonId)
-    return NextResponse.json({ error: 'courseId and lessonId required' }, { status: 400 });
+    return privateJson({ error: 'courseId and lessonId required' }, { status: 400 });
+
+  const denied = await authorizeLesson(request, user.id, lessonId);
+  if (denied) return denied;
 
   try {
     const db = await createClient();
@@ -52,7 +72,7 @@ export async function GET(request: NextRequest) {
       .eq('course_id', courseId)
       .maybeSingle();
     if (lessonError) throw lessonError;
-    if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    if (!lesson) return privateJson({ error: 'Lesson not found' }, { status: 404 });
 
     const lessonSlug = lesson.slug;
     const contentJson =
@@ -89,7 +109,7 @@ export async function GET(request: NextRequest) {
         ...object,
         completed: completedIds.has(object.id),
       }));
-      return NextResponse.json({
+      return privateJson({
         success: true,
         source: 'lesson-experience',
         lessonSlug,
@@ -110,7 +130,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    return privateJson({
       success: true,
       source: 'none',
       lessonSlug,
@@ -119,25 +139,29 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('[learner/interactions]', error);
-    return NextResponse.json({ error: 'Failed to load interactions' }, { status: 500 });
+    return privateJson({ error: 'Failed to load interactions' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   const { user, error: authError } = await requireAuth(request);
-  if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (authError || !user) return privateJson({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json().catch(() => null);
   const objectCompletion = LearningObjectCompletionSchema.safeParse(body);
   if (objectCompletion.success) {
+    const denied = await authorizeLesson(request, user.id, objectCompletion.data.lessonId);
+    if (denied) return denied;
     return completeLearningObject(user.id, objectCompletion.data);
   }
   const parsed = AttemptSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid interaction attempt' }, { status: 400 });
+    return privateJson({ error: 'Invalid interaction attempt' }, { status: 400 });
   }
 
   const { courseId, lessonId, interactionId, interactionType, responses } = parsed.data;
+  const denied = await authorizeLesson(request, user.id, lessonId);
+  if (denied) return denied;
 
   try {
     const db = await createClient();
@@ -149,7 +173,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (lessonError) throw lessonError;
-    if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    if (!lesson) return privateJson({ error: 'Lesson not found' }, { status: 404 });
 
     const contentJson =
       lesson.content_json && typeof lesson.content_json === 'object'
@@ -157,7 +181,7 @@ export async function POST(request: NextRequest) {
         : {};
     const experience = resolveStoredLessonExperience(contentJson, lesson.content);
     if (!experience) {
-      return NextResponse.json(
+      return privateJson(
         { error: 'This lesson has not passed the interactive Course Builder gate' },
         { status: 409 },
       );
@@ -174,7 +198,7 @@ export async function POST(request: NextRequest) {
           ? `${lesson.slug}-case`
           : `${lesson.slug}-scenario`;
     if (interactionId !== expectedId) {
-      return NextResponse.json(
+      return privateJson(
         { error: 'Interaction does not belong to this lesson' },
         { status: 400 },
       );
@@ -188,7 +212,7 @@ export async function POST(request: NextRequest) {
         : experience,
     );
     if (!scored) {
-      return NextResponse.json(
+      return privateJson(
         { error: 'Interaction is not configured for scoring' },
         { status: 409 },
       );
@@ -226,10 +250,10 @@ export async function POST(request: NextRequest) {
       .single();
     if (saveError) throw saveError;
 
-    return NextResponse.json({ success: true, attempt: saved });
+    return privateJson({ success: true, attempt: saved });
   } catch (error) {
     console.error('[learner/interactions/attempt]', error);
-    return NextResponse.json({ error: 'Failed to save interaction attempt' }, { status: 500 });
+    return privateJson({ error: 'Failed to save interaction attempt' }, { status: 500 });
   }
 }
 
@@ -246,12 +270,12 @@ async function completeLearningObject(
       .eq('course_id', input.courseId)
       .maybeSingle();
     if (error) throw error;
-    if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    if (!lesson) return privateJson({ error: 'Lesson not found' }, { status: 404 });
 
     const contentJson = (lesson.content_json ?? {}) as Record<string, any>;
     const experience = resolveStoredLessonExperience(contentJson, lesson.content);
     if (!experience)
-      return NextResponse.json({ error: 'Lesson is not publishable' }, { status: 409 });
+      return privateJson({ error: 'Lesson is not publishable' }, { status: 409 });
     const objects = Array.isArray(contentJson.learning_objects)
       ? (contentJson.learning_objects as LearningObject[])
       : buildLessonLearningObjects({
@@ -259,9 +283,9 @@ async function completeLearningObject(
           experience,
         });
     const object = objects.find((item) => item.id === input.learningObjectId);
-    if (!object) return NextResponse.json({ error: 'Learning object not found' }, { status: 404 });
+    if (!object) return privateJson({ error: 'Learning object not found' }, { status: 404 });
     if (!['view', 'conditional'].includes(object.completion)) {
-      return NextResponse.json(
+      return privateJson(
         {
           error: 'This object must be completed through its assessment, submission, or media flow',
         },
@@ -293,10 +317,10 @@ async function completeLearningObject(
       .select('interaction_id,completed,updated_at')
       .single();
     if (saveError) throw saveError;
-    return NextResponse.json({ success: true, learningObject: saved });
+    return privateJson({ success: true, learningObject: saved });
   } catch (error) {
     console.error('[learner/interactions/learning-object]', error);
-    return NextResponse.json({ error: 'Failed to save learning-object progress' }, { status: 500 });
+    return privateJson({ error: 'Failed to save learning-object progress' }, { status: 500 });
   }
 }
 

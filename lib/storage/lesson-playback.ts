@@ -3,9 +3,18 @@ import { getSignedElevateMediaUrl, getElevateMediaStorageConfig } from './elevat
 
 export function managedLessonPlaybackUrl(source: string, courseId: string, lessonId: string) {
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
-  const media = getElevateMediaStorageConfig().publicUrl.replace(/\/$/, '');
-  return (supabase && ['course-videos', 'course_videos'].some(bucket => source.startsWith(`${supabase}/storage/v1/object/public/${bucket}/`))) ||
-    (media && source.startsWith(`${media}/`))
+  const config = getElevateMediaStorageConfig();
+  const media = config.publicUrl.replace(/\/$/, '');
+  const privatePrefixes: string[] = [];
+  if (config.endpoint && config.bucket) {
+    const endpoint = new URL(config.endpoint);
+    const virtual = new URL(endpoint);
+    virtual.hostname = `${config.bucket}.${endpoint.hostname}`;
+    privatePrefixes.push(`${virtual.origin}/`, `${endpoint.origin}/${encodeURIComponent(config.bucket)}/`);
+  }
+  return (supabase && ['course-videos', 'course_videos'].some(bucket =>
+    ['public', 'sign', 'authenticated'].some(mode => source.startsWith(`${supabase}/storage/v1/object/${mode}/${bucket}/`)))) ||
+    (media && source.startsWith(`${media}/`)) || privatePrefixes.some(prefix => source.startsWith(prefix))
     ? `/api/courses/${encodeURIComponent(courseId)}/lessons/${encodeURIComponent(lessonId)}/playback`
     : source;
 }
@@ -17,8 +26,11 @@ export async function signedLessonPlayback(db: any, source: string) {
   const validKey = (key: string) => key && !key.split('/').some(part => part === '..' || part === '.') &&
     ![...key].some(character => character.charCodeAt(0) < 32 || character === '\\');
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
-  const bucket = supabase ? ['course-videos', 'course_videos'].find(value => source.startsWith(`${supabase}/storage/v1/object/public/${value}/`)) : undefined;
-  const prefix = bucket ? `${supabase}/storage/v1/object/public/${bucket}/` : '';
+  const reference = supabase ? ['course-videos', 'course_videos'].flatMap(bucket =>
+    ['public', 'sign', 'authenticated'].map(mode => ({ bucket, prefix: `${supabase}/storage/v1/object/${mode}/${bucket}/` })))
+    .find(value => source.startsWith(value.prefix)) : undefined;
+  const bucket = reference?.bucket;
+  const prefix = reference?.prefix;
   if (prefix && bucket) {
     const key = decodeURIComponent(source.slice(prefix.length).split('?')[0]);
     if (!validKey(key)) throw new Error('LESSON_MEDIA_REFERENCE_INVALID');

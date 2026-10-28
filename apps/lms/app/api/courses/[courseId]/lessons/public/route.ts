@@ -16,7 +16,8 @@ export const dynamic = 'force-dynamic';
  *
  * Access tiers:
  *   anonymous / not enrolled -> syllabus metadata only
- *   authenticated + enrolled -> learner content fields
+ *   authenticated + enrolled -> syllabus metadata plus enrollment status
+ * Lesson bodies and media are served only by per-lesson authorization boundaries.
  *
  * There is intentionally no file-system or hardcoded UUID fallback here. A
  * missing database course is an integrity error, not permission to expose a
@@ -94,32 +95,10 @@ async function _GET(request: NextRequest, { params }: { params: Promise<{ course
   };
 
   if (!isEnrolled) {
-    return NextResponse.json(stripSensitiveFields(payload));
+    return NextResponse.json(stripSensitiveFields(payload), { headers: { 'Cache-Control': 'private, no-store' } });
   }
 
-  const lessonIds = payload.lessons.map((lesson) => lesson.id);
-  if (lessonIds.length === 0) return NextResponse.json(payload);
-
-  const { data: protectedFields, error: protectedError } = await supabase
-    .from('course_lessons')
-    .select('id, content, video_url, quiz_questions, passing_score, topics:key_terms, resources')
-    .in('id', lessonIds);
-
-  if (protectedError) {
-    return NextResponse.json({ error: 'Failed to load learner content' }, { status: 500 });
-  }
-
-  const protectedMap = new Map(
-    (protectedFields ?? []).map((row) => [String(row.id), row]),
-  );
-
-  return NextResponse.json({
-    ...payload,
-    lessons: payload.lessons.map((lesson) => ({
-      ...lesson,
-      ...(protectedMap.get(String(lesson.id)) ?? {}),
-    })),
-  });
+  return NextResponse.json(payload, { headers: { 'Cache-Control': 'private, no-store' } });
 }
 
 function stripSensitiveFields(data: {

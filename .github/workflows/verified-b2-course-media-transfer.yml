@@ -24,13 +24,22 @@ on:
         default: '0'
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
   group: course-media-b2-transfer
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch the read-only audit through the existing trusted main identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verified-b2-course-media-transfer.yml/dispatches" -f ref=main -f 'inputs[mode]=audit' -f 'inputs[limit]=1' -f 'inputs[skip]=0'
   transfer:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     environment: production

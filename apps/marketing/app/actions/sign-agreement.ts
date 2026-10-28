@@ -9,6 +9,7 @@ import {
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
+import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
 
 export async function signAgreement(data: {
   agreementType: string;
@@ -31,11 +32,16 @@ export async function signAgreement(data: {
     .eq('id', user.id)
     .maybeSingle();
 
+  let signingPaymentAddendum = false;
   if (data.agreementType === 'program_holder_mou') {
     const context = await requireProgramHolder();
-    if (context.mode !== 'holder' || context.user.id !== user.id || data.agreementVersion !== `3.0-${context.holderId}`) return { success: false, error: 'Sign the current Program Holder agreement from your own portal.' };
+    if (context.mode !== 'holder' || context.user.id !== user.id) return { success: false, error: 'Sign the current Program Holder agreement from your own portal.' };
     const { data: agreementHolder, error: agreementError } = await context.db.from('program_holders').select('features').eq('id', context.holderId).maybeSingle();
     if (agreementError || !agreementHolder) return { success: false, error: 'Agreement readiness could not be checked. Please retry.' };
+    const addendum = paymentAddendum(agreementHolder.features, context.holderId);
+    signingPaymentAddendum = Boolean(addendum && data.agreementVersion === addendum.version);
+    if (!signingPaymentAddendum && data.agreementVersion !== `3.0-${context.holderId}`)
+      return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
     if (agreementHolder.features?.full_forms_status === 'review_pending') return { success: false, error: 'The full agreement requires completed legal entities and payment terms before signature.' };
   }
   const requestHeaders = await headers();
@@ -69,7 +75,7 @@ export async function signAgreement(data: {
   if (!result.success)
     return { success: false, error: result.error || 'Agreement could not be recorded.' };
 
-  if (data.agreementType === 'program_holder_mou' && profile?.program_holder_id) {
+  if (data.agreementType === 'program_holder_mou' && !signingPaymentAddendum && profile?.program_holder_id) {
     const db = await requireAdminClient();
     const signedAt = new Date().toISOString();
     const { error: holderError } = await db

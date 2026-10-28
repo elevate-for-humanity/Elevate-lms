@@ -12,6 +12,7 @@ vi.mock('@/lib/legal/recordAgreementAcceptance', () => ({ recordAgreementAccepta
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: vi.fn() }));
 vi.mock('@/lib/program-holder/onboarding-complete', () => ({ checkAndSendOnboardingCompleteEmail: vi.fn() }));
 import { signAgreement } from '@/apps/marketing/app/actions/sign-agreement';
+import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
 beforeEach(() => { vi.clearAllMocks(); mocks.error = null; mocks.holder = { features: { full_forms_status: 'review_pending' } }; });
 it.each(['checkbox','typed','drawn'] as const)('blocks %s acceptance while full contract details are incomplete', async method => {
   const result = await signAgreement({ agreementType: 'program_holder_mou', agreementVersion: '3.0-holder-id', method, typedName: 'Holder Signer' });
@@ -22,4 +23,17 @@ it('fails closed if agreement readiness cannot be read', async () => {
   mocks.error = { message: 'database unavailable' }; mocks.holder = null;
   const result = await signAgreement({ agreementType: 'program_holder_mou', agreementVersion: '3.0-holder-id', method: 'typed' });
   expect(result).toMatchObject({ success: false }); expect(mocks.record).not.toHaveBeenCalled();
+});
+it('records a fresh payment acceptance without replacing the original MOU or activating payouts', async () => {
+  mocks.holder = { features: { payment_addendum: { title: 'Payment', total_cents: 120000, start_cents: 60000,
+    completion_cents: 60000, paragraphs: ['Payment terms'], checklist: ['Verified completion'] } } };
+  mocks.record.mockResolvedValue({ success: true, id: 'new-acceptance' });
+  const version = paymentAddendum(mocks.holder.features, 'holder-id')!.version;
+  expect(await signAgreement({ agreementType: 'program_holder_mou', agreementVersion: version, method: 'typed', typedName: 'Holder Signer' })).toMatchObject({ success: true });
+  expect(mocks.record).toHaveBeenCalledWith(expect.objectContaining({ documentVersion: version, userId: 'holder-user' }));
+});
+it('rejects an addendum signature for stale terms', async () => {
+  mocks.holder = { features: {} };
+  expect(await signAgreement({ agreementType: 'program_holder_mou', agreementVersion: 'payment-addendum-old', method: 'typed' })).toMatchObject({ success: false });
+  expect(mocks.record).not.toHaveBeenCalled();
 });

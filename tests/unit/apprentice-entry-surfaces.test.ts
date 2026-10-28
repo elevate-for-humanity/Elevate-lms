@@ -26,11 +26,12 @@ describe('apprenticeship entry surfaces', () => {
       'apps/marketing/app/programs/cosmetology-apprenticeship/page.tsx',
       'utf8',
     );
-    expect(page).toContain("heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')}");
-    expect(page).toContain('afterHero={<BeautyEnrollmentPromotion compact');
-    expect(page.indexOf('heroOverride={<HeroPicture')).toBeLessThan(
-      page.indexOf('afterHero={<BeautyEnrollmentPromotion'),
-    );
+    expect(page).toMatch(/heroOverride=\{\s*<HeroPicture\s+src=\{getProgramHeroImage\('cosmetology-apprenticeship'\)\}/);
+    expect(page).toMatch(/afterHero=\{\s*<BeautyEnrollmentPromotion\s+compact\b/);
+    const template = readFileSync('components/programs/ProgramDetailPage.tsx', 'utf8');
+    const heroPosition = template.indexOf('{heroOverride ??');
+    expect(heroPosition).toBeGreaterThanOrEqual(0);
+    expect(template.indexOf('{afterHero ?')).toBeGreaterThan(heroPosition);
   });
 
   it('keeps applicant and Host Site choices usable at narrow widths', () => {

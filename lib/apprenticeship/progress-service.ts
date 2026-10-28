@@ -2,6 +2,7 @@ import 'server-only';
 
 import { recordedHours, isOjlEntry } from '@/lib/apprenticeship/recorded-hours';
 import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
+import { practicalServiceProgress } from '@/lib/apprenticeship/practical-service-progress.mjs';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
@@ -28,6 +29,7 @@ export type RegisteredApprenticeshipProgress = {
     transferHoursVerified: boolean;
     totalCreditedHours: number;
   };
+  practicalServices: ReturnType<typeof practicalServiceProgress>;
   completionReady: boolean;
 };
 
@@ -43,7 +45,7 @@ export async function loadRegisteredApprenticeshipProgress(
   const contract = context.contract;
   if (!contract) throw new Error(`REGISTERED_PROGRAM_CONTRACT_MISSING:${context.programSlug}`);
 
-  const [competencyRows, rtiRows, hourRows] = await Promise.all([
+  const [competencyRows, rtiRows, hourRows, practicalRequirements, practicalProgressRows] = await Promise.all([
     readHoursPages<any>((from, to) => db
       .from('apprentice_competency_records')
       .select('id,enrollment_id,competency_id,completed,date_completed,verified_by,verified_by_name,notes,requires_practical_evidence,performance_subject,evidence_type,evidence_url,practical_performed_at,evidence_review_status,verified_by_license_number,state_standard_version,updated_at')
@@ -58,6 +60,8 @@ export async function loadRegisteredApprenticeshipProgress(
       .select('id,status,approval_status,accepted_hours,hours,hours_claimed,source_type,category,host_shop_id,program_slug')
       .eq('user_id', context.studentId)
       .eq('program_slug', context.programSlug).order('id').range(from, to)),
+    db.from('apprenticeship_practical_service_requirements').select('id,service_name,exercise_title,instructions,required_count,counts_for_completion,authority').eq('program_slug',context.programSlug).then(({data,error})=>{if(error)throw error;return data||[];}),
+    db.from('host_shop_practical_service_progress').select('service_name,recorded_count,last_verified_at').eq('enrollment_id',context.enrollment.id).then(({data,error})=>{if(error)throw error;return data||[];}),
   ]);
 
   const allowedCompetencyIds = new Set(contract.standard.competencies.map((item) => item.id));
@@ -111,9 +115,11 @@ export async function loadRegisteredApprenticeshipProgress(
     ? Math.min(100, Math.round((verifiedRtiHours / requiredRtiHours) * 100))
     : 0;
 
+  const practicalServices=practicalServiceProgress(practicalRequirements,practicalProgressRows);
   const completionReady =
     completedCompetencies >= requiredCompetencies &&
     verifiedRtiHours >= requiredRtiHours &&
+    practicalServices.complete &&
     Boolean(context.placement?.id && context.placement.supervisor_user_id);
 
   return {
@@ -138,6 +144,7 @@ export async function loadRegisteredApprenticeshipProgress(
       transferHoursVerified,
       totalCreditedHours: Math.round(totalCreditedHours * 100) / 100,
     },
+    practicalServices,
     completionReady,
   };
 }

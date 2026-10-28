@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
 import { canOwnerRecordService, validPracticalServiceDate } from '@/lib/apprenticeship/practical-service-policy.mjs';
+import { practicalServiceProgress } from '@/lib/apprenticeship/practical-service-progress.mjs';
 export const dynamic='force-dynamic';
 async function context(){
  const auth=await createClient();const {data:{user}}=await auth.auth.getUser();if(!user)return null;
@@ -15,7 +16,7 @@ async function authorize(ctx:NonNullable<Awaited<ReturnType<typeof context>>>,en
  const runtime=await resolveApprenticeshipRuntimeContext(ctx.db,{enrollmentId,requireRegisteredStandard:false});
  if(!runtime?.placement || !['active','enrolled','in_progress','confirmed'].includes(runtime.enrollment.status))return null;
  const {data:shop}=await ctx.db.from('shops').select('partner_id,owner_id,active').eq('id',runtime.placement.shop_id).maybeSingle();
- const allowed=ctx.admin||ctx.members.some((m:any)=>m.partner_id===shop?.partner_id&&['owner','partner_admin','admin','supervisor','mentor','manager'].includes(m.role));
+ const allowed=shop?.owner_id===ctx.user.id||ctx.admin||ctx.members.some((m:any)=>m.partner_id===shop?.partner_id&&['owner','partner_admin','admin','supervisor','mentor','manager'].includes(m.role));
  if(!allowed || !shop?.active)return null;
  (runtime as any).canRecord=canOwnerRecordService({userId:ctx.user.id,studentId:runtime.studentId,shop,members:ctx.members});
  return runtime;
@@ -24,8 +25,13 @@ export async function GET(req:NextRequest){
  const ctx=await context();if(!ctx)return NextResponse.json({error:'Unauthorized'},{status:401});
  const id=req.nextUrl.searchParams.get('enrollmentId')||'';
  const runtime=await authorize(ctx,id);if(!runtime)return NextResponse.json({error:'Not authorized for enrollment'},{status:403});
- const {data,error}=await ctx.db.from('host_shop_practical_service_entries').select('id,competency_id,service_name,performed_on,subject_type,mentor_notes,verified_at').eq('enrollment_id',id).is('voided_at',null).order('performed_on',{ascending:false}).limit(500);
- return error?NextResponse.json({error:error.message},{status:500}):NextResponse.json({entries:data||[],canRecord:(runtime as any).canRecord});
+ const [{data,error},{data:requirements,error:requirementError},{data:progressRows,error:progressError}]=await Promise.all([
+  ctx.db.from('host_shop_practical_service_entries').select('id,competency_id,service_name,performed_on,subject_type,mentor_notes,verified_at').eq('enrollment_id',id).is('voided_at',null).order('performed_on',{ascending:false}).limit(500),
+  ctx.db.from('apprenticeship_practical_service_requirements').select('id,lesson_id,service_name,exercise_title,instructions,required_count,allowed_subject_types,counts_for_completion,authority').eq('program_slug',runtime.programSlug).order('exercise_title'),
+  ctx.db.from('host_shop_practical_service_progress').select('service_name,recorded_count,last_verified_at').eq('enrollment_id',id),
+ ]);
+ if(error||requirementError||progressError)return NextResponse.json({error:(error||requirementError||progressError)?.message},{status:500});
+ return NextResponse.json({entries:data||[],canRecord:(runtime as any).canRecord,practice:practicalServiceProgress(requirements||[],progressRows||[])});
 }
 export async function POST(req:NextRequest){
  const ctx=await context();if(!ctx)return NextResponse.json({error:'Unauthorized'},{status:401});

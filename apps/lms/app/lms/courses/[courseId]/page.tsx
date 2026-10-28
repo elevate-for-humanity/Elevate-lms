@@ -9,7 +9,7 @@ import { resolveCoursePreview } from '@/lib/admin/course-preview';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Course | Elevate LMS', robots: { index: false, follow: false } };
 
-function isUuid(value: string) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value); }
+function isUuid(value: string) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value); }
 function humanizeDomain(value: string) { return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()); }
 
 type ReadinessRow = {

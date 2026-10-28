@@ -7,14 +7,17 @@ vi.mock('next/navigation',()=>({notFound:()=>{throw Error('NOT_FOUND');},redirec
 import CourseLandingPage from '@/apps/lms/app/lms/courses/[courseId]/page';
 beforeEach(()=>{vi.clearAllMocks();mocks.redirect.mockImplementation(()=>{throw Error('LOGIN_REDIRECT');});});
 it('a signed admin preview can return to the course without learner login or learner pacing RPCs',async()=>{
- const rpc=vi.fn();
+ const rpc=vi.fn(),eq=vi.fn();
+ const courseId='a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
  const db={rpc,auth:{getUser:async()=>({data:{user:null}})},from(table:string){
-  const q:any={select:()=>q,eq:()=>q,match:()=>q,order:()=>q,limit:()=>q,
+  const q:any={select:()=>q,eq:(column:string,value:string)=>{eq(table,column,value);return q;},match:()=>q,order:()=>q,limit:()=>q,
    maybeSingle:async()=>({data:table==='courses'?{id:'course',title:'Course',slug:'course'}:null,error:null}),
    then:(resolve:any)=>resolve({data:[],error:null})};return q;
  }};
  mocks.client.mockResolvedValue(db);mocks.preview.mockResolvedValue({active:true,db});
- expect(await CourseLandingPage({params:Promise.resolve({courseId:'course'})})).toBeTruthy();
+ expect(await CourseLandingPage({params:Promise.resolve({courseId})})).toBeTruthy();
+ expect(eq).toHaveBeenCalledWith('courses','id',courseId);
+ expect(eq).not.toHaveBeenCalledWith('courses','slug',courseId);
  expect(mocks.redirect).not.toHaveBeenCalled();expect(rpc).not.toHaveBeenCalled();
 });
 it('a visitor without an active signed preview still requires learner login',async()=>{
@@ -22,3 +25,4 @@ it('a visitor without an active signed preview still requires learner login',asy
  mocks.preview.mockResolvedValue({active:false,db:null});
  await expect(CourseLandingPage({params:Promise.resolve({courseId:'course'})})).rejects.toThrow('LOGIN_REDIRECT');
 });
+

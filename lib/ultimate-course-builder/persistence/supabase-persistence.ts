@@ -97,7 +97,6 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
           state: 'passed',
           artifacts: pictureCueDirective.previous,
           completed_at: null,
-          completed_at: null,
         });
       }
 

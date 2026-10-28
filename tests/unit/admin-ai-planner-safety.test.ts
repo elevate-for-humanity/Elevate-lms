@@ -39,7 +39,7 @@ describe('Admin AI operational planner safety', () => {
   it('still routes an affirmative deployment request to the governed deployment tool', () => {
     const planned = planAIToolFromCommand('Deploy the latest approved Admin build.');
 
-    expect(planned).toEqual({ name: 'deployments.autopilot', input: {} });
+    expect(planned).toEqual({ name: 'deployments.autopilot', input: { workflow: 'deploy-admin', confirmation: 'CONFIRM DEPLOY' } });
   });
 
   it('keeps an explicit read-only Studio diagnostic on read-only tools', () => {

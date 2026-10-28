@@ -2,6 +2,8 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { UltimateBuildPanel } from '@/components/admin/course-builder/UnifiedCourseBuilder';
+vi.mock('@/components/studio/UnifiedEllieChat',()=>({default:()=>null}));
+vi.mock('@/components/studio/DeployPanel',()=>({default:()=>null}));
 vi.mock('@/components/admin/course-builder/CredentialRegistryPanel', () => ({
   default: () => null,
 }));
@@ -48,8 +50,8 @@ function show(jobStatus: string, buildStatus = 'running', expired = false) {
 }
 
 async function openOperations() {
-  // JSDOM has zero layout width: use the compact workspace navigation.
-  fireEvent.click(await screen.findByRole('button', { name: 'Operations', exact: true }));
+  // Build controls remain on the left, inside the status details.
+  fireEvent.click(await screen.findByText('Build status and publishing', { exact: true }));
 }
 
 it('shows a failed durable job and allows resuming an existing build whose aggregate state still says running', async () => {
@@ -84,9 +86,7 @@ it('does not present a completed worker job as a completed course or offer publi
   show('completed');
   expect(await screen.findByText(/This worker job finished/)).toBeInTheDocument();
   await openOperations();
-  expect(
-    screen.queryByRole('button', { name: 'Publish Ultimate release' }),
-  ).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Publish course', exact: true })).toBeDisabled();
 });
 
 it('shows an expired running job as stalled and enables recovery instead of falsely confirming a worker', async()=>{

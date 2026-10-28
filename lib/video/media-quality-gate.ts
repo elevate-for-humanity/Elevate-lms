@@ -691,8 +691,11 @@ export async function enforceMediaQuality(input: {
         const localTime=state.start+Math.min(1,(states[stateIndex+1]?.start??scene.durationSeconds)-state.start>0 ? ((states[stateIndex+1]?.start??scene.durationSeconds)-state.start)/2 : 0);
         const time = sceneStart + localTime;
         for (const width of [1280,390]) {
+          // Centered flex text can extend above its nominal 225px panel when
+          // a long value wraps. Inspect the full teaching column below the
+          // heading and above bottom captions, including its visible label.
           const frame=join(workDir,`teaching-${index}-${stepIndex}-${width}.png`);
-          await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',premium?`scale=${width}:-1,crop=${Math.floor(width*646/1920)}:${Math.floor(width*640/1920)}:${Math.floor(width*1220/1920)}:${Math.floor(width*225/1920)}`:`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
+          await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',premium?`scale=${width}:-1,crop=${Math.floor(width*646/1920)}:${Math.floor(width*720/1920)}:${Math.floor(width*1220/1920)}:${Math.floor(width*160/1920)}`:`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
           let {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
           let ocrMode: 'sparse' | 'block' | 'block-upscaled' = 'sparse';
           const expected=premium?state.step.label+' '+state.step.value:teachingPresentation(scene.teachingVisual!, time-sceneStart, scene.durationSeconds).expectedText;

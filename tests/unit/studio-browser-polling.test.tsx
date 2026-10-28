@@ -76,7 +76,7 @@ it('stops background polling after authorization fails instead of hammering the 
     await fixture.poll();
     await fixture.poll();
   });
-  expect(screen.getByText('Studio sign-in required')).toBeInTheDocument();
+  expect(screen.getByText('Admin session expired')).toBeInTheDocument();
   expect(
     fixture.fetcher.mock.calls.filter(([url]) => url.includes('resource=events')),
   ).toHaveLength(1);
@@ -104,10 +104,10 @@ it('stops polling when download authorization expires after events succeeded', a
     await fixture.poll();
     await fixture.poll();
   });
-  expect(screen.getByText('Studio sign-in required')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Sign in to Studio' })).toHaveAttribute(
+  expect(screen.getByText('Admin session expired')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Return to Admin sign-in' })).toHaveAttribute(
     'href',
-    '/login?redirect=%2Fstudio',
+    '/login?redirect=%2Fadmin',
   );
   expect(
     fixture.fetcher.mock.calls.filter(([url]) => url.includes('resource=events')),

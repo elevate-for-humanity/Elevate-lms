@@ -41,5 +41,5 @@ jobs:
         with: {skip_install: true}
       - name: Verify existing Admin credential and destination before writing
         run: node scripts/gcp/sync-admin-github-token.mjs
-      - name: Bind existing verified Admin token using numeric Google secret versions
+      - name: Replace stale literal with a verified numeric Google secret binding
         run: node scripts/gcp/sync-admin-github-token.mjs --apply

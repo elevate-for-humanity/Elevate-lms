@@ -5,15 +5,19 @@ import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 export function CommunicationTodos({
   inboxPath = '/communications/email',
+  embedded = false,
 }: {
   inboxPath?: string;
+  embedded?: boolean;
 }) {
   const pathname = usePathname();
+  const holderPage = /^\/program-holder(\/|$)/.test(pathname);
   const learnerPage = /^\/(lms|learner|student)(\/|$)/.test(pathname);
   const [signedIn, setSignedIn] = useState(false);
   const [activeUserId, setActiveUserId] = useState('');
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
+    if (holderPage && !embedded) return;
     let active = true;
     const db = createClient();
     let channel: any;
@@ -71,29 +75,31 @@ export function CommunicationTodos({
       if (authTimer) clearTimeout(authTimer);
       if (channel) void db.removeChannel(channel);
     };
-  }, []);
+  }, [holderPage, embedded]);
   const content = (
     <>
-      <nav aria-label="Interoffice communications">
-        <a
-          href={inboxPath}
-          className="inline-flex min-h-11 items-center rounded-xl border border-blue-200 bg-white px-4 font-bold text-blue-900"
-        >
-          Interoffice email
-        </a>
-        {
+      {!embedded && (
+        <nav aria-label="Interoffice communications">
           <a
-            href={
-              inboxPath === '/phone/email'
-                ? '/settings/notifications'
-                : '/account/settings/notifications'
-            }
-            className="ml-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-900"
+            href={inboxPath}
+            className="inline-flex min-h-11 items-center rounded-xl border border-blue-200 bg-white px-4 font-bold text-blue-900"
           >
-            Alert settings
+            Interoffice email
           </a>
-        }
-      </nav>
+          {
+            <a
+              href={
+                inboxPath === '/phone/email'
+                  ? '/settings/notifications'
+                  : '/account/settings/notifications'
+              }
+              className="ml-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-900"
+            >
+              Alert settings
+            </a>
+          }
+        </nav>
+      )}
       {items.map((item) => (
         <article
           key={item.id}
@@ -131,13 +137,14 @@ export function CommunicationTodos({
       ))}
     </>
   );
+  if (holderPage && !embedded) return <PwaAlertListener />;
   if (!signedIn) return null;
   return (
     <section
       aria-label="New email and communication to-dos"
       className="mx-auto my-3 w-full min-w-0 max-w-7xl space-y-2 overflow-x-hidden px-4"
     >
-      <PwaAlertListener key={activeUserId} />
+      {!embedded && <PwaAlertListener key={activeUserId} />}
       {learnerPage ? (
         <details className="rounded-xl border border-slate-200 bg-white p-3">
           <summary className="cursor-pointer text-sm font-bold text-slate-700">

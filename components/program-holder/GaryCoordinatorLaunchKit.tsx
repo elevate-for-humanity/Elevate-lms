@@ -1,4 +1,4 @@
-import { ProgramHolderDashboardGuide } from './ProgramHolderDashboardGuide';
+import { ImpactPartnershipBrief } from './ImpactPartnershipBrief';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -79,7 +79,7 @@ export function GaryCoordinatorLaunchKit({ name, phone, email, agreementSigned, 
         </div>
       </section>
 
-      <ProgramHolderDashboardGuide audience="site-coordinator" />
+      <ImpactPartnershipBrief name={name} />
       <details className="rounded-2xl border bg-white p-5"><summary className="min-h-11 cursor-pointer text-lg font-bold">Regional contacts, outreach drafts and detailed launch reference</summary><div className="mt-5 space-y-6">
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-2xl border bg-white p-5 sm:p-7">

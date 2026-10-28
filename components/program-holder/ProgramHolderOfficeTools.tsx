@@ -1,10 +1,10 @@
 'use client';
+import { MeetingDeviceCheck } from './MeetingDeviceCheck';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { CalendarWidget } from '@/components/CalendarWidget';
 import Link from 'next/link';
-import { CalendarDays, MessageSquare, MonitorUp, Video } from 'lucide-react';
+import { CalendarDays, Video } from 'lucide-react';
 
 export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }) {
   const endpoint =
@@ -104,37 +104,8 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
   if (mode === 'meetings') {
     return (
       <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
-        <section className="relative min-h-[300px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
-          <Image
-            src="/images/business-collaboration-vibrant-2026.webp"
-            alt="Team members collaborating in a video meeting"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover opacity-55"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-blue-950/95 to-indigo-900/45" />
-          <div className="relative max-w-3xl p-7 sm:p-10">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">
-              Video · Screen share · Dashboard chat
-            </p>
-            <h1 className="mt-3 text-3xl font-black sm:text-5xl">Meet inside your Elevate PWA</h1>
-            <p className="mt-4 text-base leading-7 text-slate-100">
-              {!loaded
-                ? 'Checking the meeting connection…'
-                : preview
-                  ? 'This support preview cannot check the holder meeting connection. Sign in as the Program Holder to use video and screen sharing.'
-                  : data.videoReady
-                    ? 'Create secure browser video rooms with camera, microphone, participant chat, and screen sharing.'
-                    : 'Video and screen sharing require the meeting service to be connected. Phone and in-person meetings are available while it is being activated.'}
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2 text-sm font-black">
-              <span className="rounded-full bg-white/15 px-3 py-2">Camera and microphone</span>
-              <span className="rounded-full bg-white/15 px-3 py-2">Share tab or screen</span>
-              <span className="rounded-full bg-white/15 px-3 py-2">Up to 20 participants</span>
-            </div>
-          </div>
-        </section>
+        <header><h1 className="text-2xl font-black text-slate-950">Calendar and meetings</h1><p className="mt-2 text-sm text-slate-600">Schedule, confirm and join your appointments here.</p></header>
+        <MeetingDeviceCheck />
 
         {loaded && !preview && !data.videoReady && !status ? (
           <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
@@ -150,23 +121,6 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
             {status}
           </p>
         )}
-
-        <section className="grid gap-4 sm:grid-cols-3">
-          {[
-            [Video, 'Dashboard video', 'See and hear participants without leaving the PWA.'],
-            [MonitorUp, 'Screen sharing', 'Present a browser tab, application, or entire screen.'],
-            [MessageSquare, 'Room chat', 'Keep live meeting notes and links beside the video.'],
-          ].map(([Icon, title, body]: any) => (
-            <article
-              key={title}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <Icon className="h-6 w-6 text-indigo-700" />
-              <h2 className="mt-3 font-black">{title}</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{body}</p>
-            </article>
-          ))}
-        </section>
 
         {loaded ? (
           <section aria-label="Meeting calendar">

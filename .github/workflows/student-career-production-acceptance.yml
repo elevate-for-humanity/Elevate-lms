@@ -47,7 +47,7 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install chromium --with-deps
       - name: Verify live authenticated student resume lifecycle
-        run: pnpm exec playwright test tests/e2e/student-career-resume.spec.ts --project=desktop-chrome --config playwright.config.ts --grep "learner can launch Job Ready" --retries=0
+        run: pnpm exec playwright test tests/e2e/student-career-resume.spec.ts --project=desktop-chrome --config playwright.config.ts --retries=0
       - name: Remove disposable learner and program holder
         if: always()
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup

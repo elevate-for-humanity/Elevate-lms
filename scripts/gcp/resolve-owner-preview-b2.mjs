@@ -48,7 +48,7 @@ export async function resolveOwnerPreviewB2(env,request=fetch){
   if(!buckets.ok)throw Error('OWNER_PREVIEW_B2_BUCKET_HTTP_'+buckets.status);
   const bucket=(await buckets.json()).buckets?.find(b=>b.bucketName==='elevate-course-media');
   if(!['allPublic','allPrivate'].includes(bucket?.bucketType))throw Error('OWNER_PREVIEW_B2_APPROVED_BUCKET_REQUIRED');
-  return {connectionSource,environment:courseB2Environment({ELEVATE_MEDIA_ENDPOINT:endpoint,
+  return {connectionSource,bucketType:bucket.bucketType,environment:courseB2Environment({ELEVATE_MEDIA_ENDPOINT:endpoint,
     ELEVATE_MEDIA_ACCESS_KEY_ID:keyId,ELEVATE_MEDIA_SECRET_ACCESS_KEY:secret,
     ELEVATE_MEDIA_BUCKET:'elevate-course-media',ELEVATE_MEDIA_PUBLIC_URL:download+'/file/elevate-course-media'})};
 }

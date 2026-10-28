@@ -2,61 +2,52 @@ name: Verified B2 Course Media Transfer
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Inspect the existing connection or copy a verified private batch
+        required: true
+        type: choice
+        default: audit
+        options: [audit, copy]
       limit:
-        description: "Number of objects in this batch (1-25)"
+        description: Number of objects in this batch (1-25)
         required: true
-        default: "1"
+        default: '1'
       skip:
-        description: "Number of source objects already examined"
+        description: Number of source objects already examined
         required: true
-        default: "0"
+        default: '0'
 permissions:
   contents: read
+  id-token: write
 concurrency:
   group: course-media-b2-transfer
   cancel-in-progress: false
 jobs:
   transfer:
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     timeout-minutes: 50
     environment: production
     steps:
       - uses: actions/checkout@v4
+        with: {persist-credentials: false}
       - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install locked dependencies
+        run: corepack enable && corepack pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify the runtime transfer boundary
+        run: node --test scripts/gcp/run-runtime-b2-transfer.test.mjs scripts/gcp/resolve-owner-preview-b2.test.mjs scripts/gcp/course-media-transfer-retry.test.mjs
+      - uses: google-github-actions/auth@v3
         with:
-          node-version: '22'
-      - name: Enable pnpm from packageManager
-        run: corepack enable
-      - name: Install workspace dependencies using pnpm lockfile
-        run: corepack pnpm install --frozen-lockfile --ignore-scripts
-      - name: Validate migration inputs and credentials
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Use the existing Google worker connection without logging credentials
         env:
-          INPUT_LIMIT: ${{ inputs.limit }}
-          INPUT_SKIP: ${{ inputs.skip }}
-          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
-          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
-          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
-          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
-          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
-          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
-        run: |
-          node --input-type=module -e '
-            const n=Number(process.env.INPUT_LIMIT),s=Number(process.env.INPUT_SKIP);
-            if(!Number.isInteger(n)||n<1||n>25||!Number.isSafeInteger(s)||s<0)throw Error("Invalid batch inputs");
-            for(const key of ["SUPABASE_URL","SUPABASE_SERVICE_ROLE_KEY","ELEVATE_MEDIA_ENDPOINT","ELEVATE_MEDIA_REGION","ELEVATE_MEDIA_BUCKET","ELEVATE_MEDIA_ACCESS_KEY_ID","ELEVATE_MEDIA_SECRET_ACCESS_KEY"]){if(!process.env[key])throw Error("Required migration credential unavailable: "+key)}
-            const u=new URL(process.env.ELEVATE_MEDIA_ENDPOINT);
-            if(u.protocol!=="https:"||!u.hostname.endsWith(".backblazeb2.com"))throw Error("Destination must be Backblaze B2");
-          '
-      - name: Copy and SHA256-verify a bounded batch (never delete)
-        env:
+          COURSE_MEDIA_TRANSFER_MODE: ${{ inputs.mode }}
           MIGRATION_LIMIT: ${{ inputs.limit }}
           MIGRATION_SKIP: ${{ inputs.skip }}
-          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
-          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
-          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
-          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
-          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
-          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
-        run: node scripts/gcp/migrate-course-media-to-b2.mjs
+        run: |
+          set -euo pipefail
+          gcloud run jobs describe elevate-course-builder --project=elegant-racer-299721 --region=us-central1 --format=json | node scripts/gcp/run-runtime-b2-transfer.mjs

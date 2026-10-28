@@ -40,6 +40,21 @@ it('retains full-object size metadata for HEAD without downloading the movie',as
 it.each(['bytes=0-1,3-4','invalid','bytes=-','bytes=abc-3'])('rejects unsupported range %s before any upstream request',async range=>{
  expect((await streamLessonMedia(new Request('https://app.example/playback',{headers:{range}}),'https://private.example/film')).status).toBe(416);expect(fetcher).not.toHaveBeenCalled();
 });
+it.each([
+ ['bytes=0-','bytes=0-8388607'],
+ ['bytes=100-99999999','bytes=100-8388707'],
+ ['bytes=-99999999','bytes=-8388608'],
+ ['bytes=100-199','bytes=100-199'],
+])('bounds browser range %s without changing the movie or exposing its URL',async(input,expected)=>{
+ fetcher.mockResolvedValue(new Response('chunk',{status:206,headers:{'content-type':'video/mp4','content-range':'bytes 0-4/43348093','content-length':'5'}}));
+ const response=await streamLessonMedia(new Request('https://app.example/playback',{headers:{Range:input}}),'https://private.example/film');
+ expect(fetcher.mock.calls[0][1].headers.Range).toBe(expected);expect(await response.text()).toBe('chunk');
+ expect(response.headers.get('location')).toBeNull();
+});
+it.each(['bytes=10-9','bytes=-0','bytes=99999999999999999999-'])('rejects invalid numeric range %s',async range=>{
+ expect((await streamLessonMedia(new Request('https://app.example/playback',{headers:{range}}),'https://private.example/film')).status).toBe(416);
+ expect(fetcher).not.toHaveBeenCalled();
+});
 it('serves private caption tracks from the same origin as the player',async()=>{
  fetcher.mockResolvedValue(new Response('WEBVTT\n',{headers:{'content-type':'text/plain'}}));
  const response=await streamLessonMedia(new Request('https://app.example/playback?asset=captions'),'https://private.example/captions','captions');

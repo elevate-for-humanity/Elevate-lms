@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const m=vi.hoisted(()=>({user:null as null|{id:string},preview:false,access:vi.fn(),sign:vi.fn(),rate:vi.fn(),admin:vi.fn(),lesson:{video_url:'saved-source.mp4',content_json:{}} as null|{video_url:string;content_json:Record<string,unknown>;film_duration?:number;film_cues?:unknown;film_transcript?:string}}));
 vi.mock('@/lib/auth',()=>({getCurrentUser:async()=>m.user}));
-vi.mock('@/lib/admin/course-preview',()=>({resolveCoursePreview:async()=>({active:m.preview,db:null})}));
+vi.mock('@/lib/admin/course-preview',()=>({resolveCoursePreview:async()=>({active:m.preview,db:m.preview?await m.admin():null})}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:m.admin}));
 vi.mock('@/lib/storage/lesson-playback',()=>({signedLessonPlayback:m.sign}));
 vi.mock('@/lib/api/withRateLimit',()=>({applyRateLimit:m.rate}));
@@ -15,6 +15,16 @@ beforeEach(()=>{vi.clearAllMocks();m.user={id:'student'};m.preview=false;m.lesso
 it('does not sign or query storage for anonymous requests',async()=>{m.user=null;expect((await run()).status).toBe(401);expect(m.sign).not.toHaveBeenCalled();expect(m.admin).not.toHaveBeenCalled();});
 it('rejects locked lessons before signing or privileged database access',async()=>{m.access.mockRejectedValue(new Error('ACCESS_DENIED'));expect((await run()).status).toBe(403);expect(m.sign).not.toHaveBeenCalled();expect(m.admin).not.toHaveBeenCalled();});
 afterEach(()=>vi.unstubAllGlobals());
+it('restricts transport diagnostics to signed admin previews and never returns the signed URL',async()=>{
+ const request=()=>GET(new Request('https://app.example/playback?diagnostic=1'),{params:Promise.resolve({courseId:'course',lessonId:'lesson'})});
+ expect((await request()).status).toBe(403);expect(m.sign).not.toHaveBeenCalled();
+ m.preview=true;
+ const response=await request();const value=await response.json();
+ expect(value.firstChunkBytes).toBe(4);expect(value.fileSignature).toBe('66696c6d');
+ expect(JSON.stringify(value)).not.toContain('storage.example');
+ expect(m.access).not.toHaveBeenCalled();
+ expect(vi.mocked(fetch).mock.calls[0][1]?.headers).toEqual({'Accept-Encoding':'identity',Range:'bytes=0-1023'});
+});
 it('streams media privately after verifying access without revealing the bearer URL',async()=>{const response=await run();expect(response.status).toBe(200);expect(response.headers.get('location')).toBeNull();expect(await response.text()).toBe('film');expect(response.headers.get('cache-control')).toBe('private, no-store');expect(m.access).toHaveBeenCalledWith('student','lesson');expect(m.sign).toHaveBeenCalledWith(expect.any(Object),'saved-source.mp4');});
 it('does not sign when the lesson does not belong to the requested course',async()=>{m.lesson=null;expect((await run()).status).toBe(404);expect(m.sign).not.toHaveBeenCalled();});
 it('stops rate-limited requests before database reads or signing',async()=>{m.rate.mockResolvedValue(new Response('{}',{status:429}));expect((await run()).status).toBe(429);expect(m.admin).not.toHaveBeenCalled();expect(m.sign).not.toHaveBeenCalled();});

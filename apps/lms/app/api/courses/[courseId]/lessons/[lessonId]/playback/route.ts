@@ -7,7 +7,7 @@ import { signedLessonPlayback } from '@/lib/storage/lesson-playback';
 import { renderMediaUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { measuredLessonAsset } from '@/lib/video/measured-lesson-assets';
-import { streamLessonMedia } from '@/lib/storage/lesson-stream';
+import { streamLessonMedia, inspectLessonMedia } from '@/lib/storage/lesson-stream';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' };
@@ -20,6 +20,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{cour
     const preview = await resolveCoursePreview(courseId);
     const user = await getCurrentUser();
     if (!preview.active && !user) return NextResponse.json({error:'Unauthorized'}, {status:401, headers});
+    const diagnostic = new URL(_request.url).searchParams.get('diagnostic') === '1';
+    if (diagnostic && !preview.active) return NextResponse.json({error:'Signed administrative course preview required'}, {status:403, headers});
     const limited = await applyRateLimit(_request, 'api', { key: `lesson-playback:${user?.id || `preview:${courseId}`}` });
     if (limited) {
       for (const [key, value] of Object.entries(headers)) limited.headers.set(key, value);
@@ -45,6 +47,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{cour
       : renderMediaUrl({mediaUrl:lesson.film_media_url,videoUrl:lesson.film_video_url,playbackUrl:lesson.film_playback_url}) || lesson.video_url;
     if (!source) return NextResponse.json({error:'Video unavailable'}, {status:404, headers});
     const location = await signedLessonPlayback(db, source);
+    if (diagnostic) return NextResponse.json(await inspectLessonMedia(_request, location), { headers });
     return await streamLessonMedia(_request, location, asset as 'video' | 'captions');
   } catch (error) {
     const message = error instanceof Error ? error.message : '';

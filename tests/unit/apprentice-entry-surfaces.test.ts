@@ -26,8 +26,11 @@ describe('apprenticeship entry surfaces', () => {
       'apps/marketing/app/programs/cosmetology-apprenticeship/page.tsx',
       'utf8',
     );
-    expect(page).toMatch(/heroOverride=\{\s*<HeroPicture\s+src=\{getProgramHeroImage\('cosmetology-apprenticeship'\)\}/);
-    expect(page).toMatch(/afterHero=\{\s*<BeautyEnrollmentPromotion\s+compact\b/);
+    const hero = page.match(/heroOverride=\{\s*<HeroPicture\s+src=\{getProgramHeroImage\('cosmetology-apprenticeship'\)\}/);
+    const promotion = page.match(/afterHero=\{\s*<BeautyEnrollmentPromotion\s+compact\b/);
+    expect(hero).not.toBeNull();
+    expect(promotion).not.toBeNull();
+    expect(hero!.index).toBeLessThan(promotion!.index!);
     const template = readFileSync('components/programs/ProgramDetailPage.tsx', 'utf8');
     const heroPosition = template.indexOf('{heroOverride ??');
     expect(heroPosition).toBeGreaterThanOrEqual(0);

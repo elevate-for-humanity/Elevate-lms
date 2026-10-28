@@ -35,9 +35,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify deployed LMS readiness
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --max-time 15 https://app.elevateforhumanity.org/api/health >/dev/null
+          for attempt in $(seq 1 60); do
+            deployed="$(curl --fail --silent --show-error --max-time 15 https://app.elevateforhumanity.org/api/version | jq -r '.commit // empty')" || deployed=""
+            if [[ "$deployed" =~ ^[a-f0-9]{40}$ ]]; then
+              relation="$(gh api "repos/$GITHUB_REPOSITORY/compare/41a46ef98a515fd7de13a4bb632a110f82f651cb...$deployed" --jq .status 2>/dev/null)" || relation=""
+              if [[ "$relation" == "ahead" || "$relation" == "identical" ]]; then
+                echo "Deployed LMS includes the career plan fixes."
+                exit 0
+              fi
+            fi
+            echo "Waiting for the career plan release ($attempt/60)."
+            sleep 20
+          done
+          echo "Career plan release did not become ready within 20 minutes."
+          exit 1
       - name: Require isolated QA account provisioning
         run: |
           test -n "$NEXT_PUBLIC_SUPABASE_URL" || exit 1

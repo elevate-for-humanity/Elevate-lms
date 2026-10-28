@@ -59,11 +59,15 @@ describe('PARIS dashboard introduction', () => {
     );
   });
 
-  it('keeps one authoritative compliance summary on the dashboard', () => {
+  it('keeps Home focused on tasks and compliance alerts', () => {
     expect(
       workspace.match(/<h2 className="font-black">Compliance Score<\/h2>/g) || [],
     ).toHaveLength(0);
-    expect(workspace).toContain('Compliance {complianceScore}%');
+    const home = workspace.slice(workspace.indexOf("// Home is an action queue."));
+    expect(home).toContain('To-dos');
+    expect(home).toContain('Alerts');
+    expect(home).toContain('compliance');
+    expect(home).not.toContain('Compliance {complianceScore}%');
     expect(workspace).not.toContain('title="Program readiness"');
   });
 });

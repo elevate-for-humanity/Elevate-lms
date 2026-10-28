@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { FolderOpen, GitBranch, Loader2, Save, Upload } from 'lucide-react';
+import { FolderOpen, GitBranch, Loader2, RefreshCw, Save, Upload } from 'lucide-react';
 
 const CodeEditor = dynamic(
   () => import('@/components/studio/CodeEditor').then((m) => m.default || m),
@@ -43,6 +43,9 @@ export default function DevStudioEditorWorkspace({
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [branch, setBranch] = useState('');
+  const [commitSha, setCommitSha] = useState('');
+  const [remoteCommitSha, setRemoteCommitSha] = useState<string | null>(null);
+  const [savedContent, setSavedContent] = useState('');
   const [confirmMainCommit, setConfirmMainCommit] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,8 +58,12 @@ export default function DevStudioEditorWorkspace({
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setFiles(walkFiles(data.tree ?? []));
       setBranch(String(data.branch ?? ''));
+      setCommitSha(String(data.commitSha ?? ''));
+      setRemoteCommitSha(typeof data.remoteCommitSha === 'string' ? data.remoteCommitSha : null);
+      return true;
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'File tree unavailable');
+      return false;
     }
   }, []);
 
@@ -67,6 +74,32 @@ export default function DevStudioEditorWorkspace({
   useEffect(() => {
     onFileContextChange?.(selected || null, content);
   }, [selected, content, onFileContextChange]);
+
+  async function syncRepository() {
+    setLoading(true);
+    setStatus('Synchronizing the container with repository main…');
+    try {
+      const response = await fetch('/api/admin/dev-studio/runtime', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'repository-sync',
+          repoUrl: 'https://github.com/elevate-for-humanity/Elevate-lms.git',
+          branch: 'main',
+        }),
+        signal: AbortSignal.timeout(120000),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok)
+        throw new Error(result.error || 'Repository synchronization failed');
+      if (!(await refreshFiles())) return;
+      setStatus('Container synchronized. Reopen a file to read its latest content.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Repository synchronization failed');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function saveContainerFile() {
     if (!selected) return;
@@ -80,6 +113,7 @@ export default function DevStudioEditorWorkspace({
       });
       const result = await response.json();
       if (!response.ok || !result.ok) throw Error(result.error ?? 'Container save failed');
+      setSavedContent(content);
       setStatus('Saved in your Studio container. Commit separately to publish.');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Container save failed');
@@ -103,6 +137,7 @@ export default function DevStudioEditorWorkspace({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setContent(data.content ?? '');
+      setSavedContent(data.content ?? '');
       setSha(data.sha ?? '');
       setMessage(`chore: update ${path} via Dev Studio`);
     } catch (error) {
@@ -137,6 +172,7 @@ export default function DevStudioEditorWorkspace({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setSha(data.sha ?? sha);
+      setSavedContent(content);
       setStatus(data.commit ? 'Committed to GitHub' : 'Committed');
       setConfirmMainCommit(false);
       await refreshFiles();
@@ -149,6 +185,44 @@ export default function DevStudioEditorWorkspace({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[#1e1e1e] text-[#cccccc]">
+      <div
+        className="shrink-0 border-b border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
+        role="status"
+        aria-label="Repository connection"
+      >
+        <p>
+          Container checkout · {branch || 'branch unknown'} ·{' '}
+          {commitSha ? commitSha.slice(0, 12) : 'revision unverified'}
+        </p>
+        <p>
+          {remoteCommitSha
+            ? `Repository main · ${remoteCommitSha.slice(0, 12)} · ${commitSha === remoteCommitSha ? 'matches container' : 'differs from container'}`
+            : 'Repository main revision could not be verified.'}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void refreshFiles()}
+            disabled={loading}
+            className="rounded border border-slate-500 px-3 py-2 disabled:opacity-50"
+          >
+            <RefreshCw className="mr-1 inline h-4 w-4" />
+            Refresh repository status
+          </button>
+          <button
+            type="button"
+            onClick={() => void syncRepository()}
+            disabled={loading || content !== savedContent}
+            className="rounded border border-slate-500 px-3 py-2 disabled:opacity-50"
+          >
+            Sync container with main
+          </button>
+        </div>
+        <p className="mt-1 text-xs text-slate-300">
+          Save pending editor changes before syncing. Synchronization uses a fast-forward merge and
+          refuses conflicting or divergent work.
+        </p>
+      </div>
       <div className="flex shrink-0 items-center gap-2 border-b border-[#3c3c3c] bg-[#252526] px-3 py-2">
         <button
           type="button"

@@ -29,11 +29,11 @@ The live Admin version endpoint reported commit `34fb71e516617cb97b2dbe32687e994
 
 ## Validation
 
-- Studio/devstudio unit suite: **39 files, 187 tests passed**.
+- Studio/devstudio unit suite: **42 files, 195 tests passed**.
 - Changed production components: targeted ESLint passed.
 - Initial Admin typecheck passed. Production compilation and all 145 static routes passed; build trace collection was still running when this record was written. Final generated-route typecheck/build status must be checked separately rather than inferred from successful compilation. The build wrapper runs TypeScript after Next completes.
 - Browser runtime release/configuration checks: 5 passed.
-- No schema migrations, RLS changes, credential changes, or auth bypasses were made.
+- No schema migrations, RLS changes, credential changes, or auth bypasses were made. The repository metadata index was populated as described below.
 
 ## Outstanding acceptance gates
 
@@ -41,3 +41,15 @@ The live Admin version endpoint reported commit `34fb71e516617cb97b2dbe32687e994
 2. Run a complete Studio task through save, execution, repository write, deployment, and exact live-version verification. Current canonical health explicitly says this is unverified.
 3. Investigate recurring provider refresh throttling with correlated server/provider logs if it persists; reducing browser poll overlap is not proof of a full authentication fix.
 4. Tax self-filing remains a separate gate: the live attempted return stopped at administrator MFA/account verification, before dependents and filing. IRS test acceptance and real filing readiness have not been established by this Studio audit.
+
+## Follow-up findings and repairs
+
+- The editor initially did not list the newly published audit. Opening Runtime + Terminal synchronized its checkout; the terminal then verified `84c40749a4bfdae5072cc0c97052763447ffaa28`, which also matched repository main at that check. A saved terminal can reconnect without synchronizing, and the editor itself previously provided neither revision comparison nor sync control. The repair exposes both revisions, a status refresh, and the existing safe fast-forward synchronization action. Pending editor changes disable synchronization.
+- `ai_repo_index` existed but contained zero records. Its schema uses `file_path`, `file_type`, and `metadata`; the old live `34fb71e` search queried nonexistent `language` and `symbols` columns and swallowed errors as empty results. Main already repairs that column contract, but it still must deploy.
+- Production Admin images contain compiled bundles, so indexing the local server filesystem is not authoritative. The follow-up indexer reads GitHub at one pinned main commit, rejects truncated trees, bounds the request to 1–2000 files, and writes path metadata in batches. Metadata explicitly records `content_indexed: false`; this is path search, not semantic/content indexing. Explicit local `roots` workflows retain content/symbol extraction.
+- To restore the empty data source immediately, 400 path records from verified repository commit `84c40749a4bfdae5072cc0c97052763447ffaa28` were inserted without overwriting existing records. A subsequent count verified all 400 snapshot records. The live old search still returned empty because of its column mismatch; deployment is required to expose the corrected query. An empty index will report degraded after the route repair.
+- Plugins panel: GPU renderer is configured but not ready; Cloudflare control-plane credentials are not configured. Cloudflare Workers AI is a separate, authenticated working connection. These optional capabilities were not relabelled healthy.
+- Provider logs in the 03:36–03:38 UTC window recorded three HTTP 429 authentication responses. Console refresh throttling was also observed. These are real reliability findings, not evidence of a missing Supabase database.
+- Supabase advisor results include existing policy/performance notices. Missing-policy informational notices on three Ultimate build tables were not automatically fixed: service-only access can intentionally use RLS without browser policies. No unused indexes were removed based solely on advisory labels. MFA options and one unrelated pacing function require separate security review ([MFA guidance](https://supabase.com/docs/guides/auth/auth-mfa), [function guidance](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)).
+- Fast-forward runtime synchronization tests: 2 passed, including preservation of tracked/untracked changes and refusal of conflicts or a mismatched repository origin.
+- First repair production Admin build and generated-route typecheck passed. Follow-up compilation/static generation passed; final build trace/typecheck verification remains in progress at this report update.

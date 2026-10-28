@@ -80,11 +80,85 @@ export interface RepoIndexResult {
   paths: string[];
 }
 
+/** Production images contain compiled bundles, not a complete repository checkout.
+ * Index authoritative GitHub path metadata at one pinned commit. Content/symbol
+ * indexing remains explicit for local source workflows using `roots`.
+ */
+async function indexGitHubRepository(
+  db: SupabaseClient,
+  maxFiles: number,
+): Promise<RepoIndexResult> {
+  const { getGitHubHeaders } = await import('@/lib/devstudio/github-token');
+  const { studioRepository } = await import('@/lib/devstudio/repository');
+  const base = `https://api.github.com/repos/${studioRepository()}`;
+  const headers = await getGitHubHeaders();
+  async function read(endpoint: string) {
+    const response = await fetch(base + endpoint, {
+      headers,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!response.ok) throw new Error(`Repository metadata read failed (HTTP ${response.status})`);
+    return response.json();
+  }
+  const ref = await read('/git/ref/heads/main');
+  const commitSha = ref.object?.sha;
+  if (typeof commitSha !== 'string' || !/^[a-f0-9]{40}$/.test(commitSha))
+    throw new Error('Repository main revision is invalid');
+  const commit = await read(`/git/commits/${commitSha}`);
+  const treeSha = commit.tree?.sha;
+  if (typeof treeSha !== 'string' || !/^[a-f0-9]{40}$/.test(treeSha))
+    throw new Error('Repository tree revision is invalid');
+  const tree = await read(`/git/trees/${treeSha}?recursive=1`);
+  if (tree.truncated || !Array.isArray(tree.tree))
+    throw new Error('Repository tree is incomplete; indexing was not performed');
+  const files = (tree.tree as Array<{ type: string; path: string; sha: string; size?: number }>)
+    .filter(
+      (file) =>
+        file.type === 'blob' &&
+        typeof file.path === 'string' &&
+        INDEX_ROOTS.some((root) => file.path.startsWith(root + '/')) &&
+        !file.path.split('/').some((part) => SKIP_DIRS.has(part) || part.startsWith('.env')),
+    )
+    .slice(0, maxFiles);
+  if (!files.length) throw new Error('Repository index source contains no matching files');
+  const timestamp = new Date().toISOString();
+  const rows = files.map((file) => {
+    const ext = file.path.split('.').pop()?.toLowerCase() ?? '';
+    return {
+      repo_path: file.path,
+      file_path: file.path,
+      file_hash: file.sha,
+      file_type: EXT_LANG[ext] ?? ext,
+      last_indexed_at: timestamp,
+      updated_at: timestamp,
+      metadata: {
+        source: 'github-tree',
+        commit_sha: commitSha,
+        size: file.size ?? null,
+        content_indexed: false,
+        file_hash_algorithm: 'git-blob-sha',
+      },
+    };
+  });
+  for (let offset = 0; offset < rows.length; offset += 100) {
+    const { error } = await db
+      .from('ai_repo_index')
+      .upsert(rows.slice(offset, offset + 100), { onConflict: 'repo_path' });
+    if (error) throw new Error(`Repository index write failed: ${error.code ?? 'unknown'}`);
+  }
+  return { indexed: rows.length, skipped: 0, paths: files.map((file) => file.path) };
+}
+
 export async function indexRepository(
   db: SupabaseClient,
   options?: { roots?: string[]; maxFiles?: number },
 ): Promise<RepoIndexResult> {
-  const roots = options?.roots ?? INDEX_ROOTS;
+  const requested = options?.maxFiles ?? 400;
+  if (!Number.isInteger(requested) || requested < 1 || requested > 2000)
+    throw new Error('Repository index file limit must be an integer between 1 and 2000');
+  if (!options?.roots) return indexGitHubRepository(db, requested);
+  const roots = options.roots;
   const maxFiles = options?.maxFiles ?? 400;
   const paths: string[] = [];
 

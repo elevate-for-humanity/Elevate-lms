@@ -1,4 +1,5 @@
 import { ReadingDashboard } from './ReadingDashboard';
+import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
@@ -91,7 +92,7 @@ export async function ProgramHolderWorkspaceView({
 }) {
   const data = await getProgramHolderWorkspace();
   if (section === 'dashboard' && data.holder?.features?.reading_support === true) {
-    return <ReadingDashboard data={data} />;
+    return <><ProgramHolderPaymentAddendum /><ReadingDashboard data={data} /></>;
   }
   const coordinatorRole =
     data.mode === 'holder'
@@ -424,6 +425,7 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <main className="w-full min-w-0 space-y-6 px-3 pb-24 sm:px-6">
+      <ProgramHolderPaymentAddendum />
       <DashboardHero
         title={data.holder?.organization_name || data.holder?.name || 'Program Holder'}
         programLabel={primaryProgramLabel}

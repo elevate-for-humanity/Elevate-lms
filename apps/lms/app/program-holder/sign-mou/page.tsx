@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { DocumentSignatureBlock } from '@/components/documents';
+import { ProgramHolderPaymentAddendum } from '@/components/program-holder/ProgramHolderPaymentAddendum';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -37,6 +38,7 @@ export default async function SignMouPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-950">
       <div className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-9">
+        <ProgramHolderPaymentAddendum full />
         <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">
           Program Holder onboarding
         </p>

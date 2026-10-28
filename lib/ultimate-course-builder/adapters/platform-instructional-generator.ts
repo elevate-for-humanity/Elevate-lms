@@ -49,6 +49,31 @@ export function storyboardSegments(
     throw new Error('ULTIMATE_STORYBOARD_STAGE_CONSOLIDATION_REQUIRED');
   return grouped;
 }
+/** Clarify repeated source quotations with the shortest unique neighbouring
+ * words from the same approved narration. Never rewrite speech or guess time;
+ * the independent measured-alignment check still resolves this exact quote. */
+function uniqueSourceQuote(quote: string, narration: string): string {
+  const tokens = [...narration.matchAll(/[a-z0-9]+/gi)];
+  const target = quote.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  if (!target.length) return quote;
+  const words = tokens.map(token => token[0].toLowerCase());
+  const positions = (needle: string[]) => words.flatMap((_, index) =>
+    needle.every((word, offset) => words[index + offset] === word) ? [index] : []);
+  const hits = positions(target);
+  if (hits.length < 2) return quote;
+  // The first authored occurrence owns this teaching point; make that choice
+  // explicit in the producer data instead of accepting ambiguous QA matches.
+  for (let context = 1; context <= 12; context++) {
+    for (let before = context; before >= 0; before--) {
+      const start = Math.max(0, hits[0] - before);
+      const end = Math.min(words.length, hits[0] + target.length + context - before);
+      if (positions(words.slice(start, end)).length === 1)
+        return narration.slice(tokens[start].index!, tokens[end - 1].index! + tokens[end - 1][0].length);
+    }
+  }
+  return quote; // Unresolved ambiguity still fails measured alignment.
+}
+
 /** One source-bound blueprint owns all content. No independent shortened storyboard script. */
 export class UltimatePlatformInstructionalGenerator implements UltimateInstructionalGenerator {
   private drafts = new Map<string, Promise<LessonBlueprint>>();
@@ -263,23 +288,26 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
   async storyboard(input: unknown) {
     const evidence = input as Evidence;
     const directive = evidence.repairDirective;
-    // A strict-audio mismatch routed here has a recording already verified
-    // against the approved instructor script. Restore its canonical storyboard;
-    // a new authoring call would change speech and reproduce the mismatch.
+    // Speech and picture-cue repairs must retain the approved source.
+    // Independent re-authoring here would change the narration instead of
+    // correcting its storyboard binding.
     const restoreRecordedSource = directive?.target === 'storyboard' &&
       Array.isArray(directive.requirements) && directive.requirements.length > 0 &&
       directive.requirements.every((finding: any) =>
         finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
-        finding.message === 'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED');
+        /^(?:ULTIMATE_VIDEO_RENDER_FAILED:)?(?:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED|PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED)$/.test(finding.message));
     const b = await this.blueprint(restoreRecordedSource
       ? {...evidence, repairDirective: undefined} : input);
     return {
       version: ULTIMATE_LESSON_CONTRACT_VERSION,
-      scenes: storyboardSegments(b.segments).map((s) => ({
+      scenes: storyboardSegments(b.segments).map((s) => {
+        const dialogue = (s as any).recapText ? s.text+'\n\n'+(s as any).recapText : s.text;
+        const visual = s.teachingVisual ?? produceTeachingVisual(s.text, s.stage);
+        return {
         id: `scene:${s.id}`,
         scriptSegmentId: s.id,
-        dialogue: (s as any).recapText ? s.text+'\n\n'+(s as any).recapText : s.text,
-        teachingPoint: (s as any).recapText ? s.text+'\n\n'+(s as any).recapText : s.text,
+        dialogue,
+        teachingPoint: dialogue,
         recapText: (s as any).recapText,
         title: s.stage.replace(/_/g, ' '),
         stage: s.stage,
@@ -287,8 +315,10 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,
         sceneType: sceneRole(s.stage,s.sceneType,s.id,s.text),
-        teachingVisual: s.teachingVisual ?? produceTeachingVisual(s.text, s.stage),
-      })),
+        teachingVisual: {...visual, steps: visual.steps.map(step => ({...step,
+          narrationQuote: uniqueSourceQuote(step.narrationQuote, dialogue)}))},
+        };
+      }),
     };
   }
 }

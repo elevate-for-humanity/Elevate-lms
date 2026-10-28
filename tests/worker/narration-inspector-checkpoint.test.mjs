@@ -98,7 +98,7 @@ test('an audio mismatch repairs the storyboard only when saved narration matches
 });
 test('storyboard audio repair restores the approved blueprint without independent re-authoring',async()=>{
  const generatorSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/adapters/platform-instructional-generator.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
- const Generator=new Function('sceneRole','ULTIMATE_LESSON_CONTRACT_VERSION','produceTeachingVisual',generatorSource+';return UltimatePlatformInstructionalGenerator;')((stage,fallback)=>fallback,'test',()=>({kind:'sequence'}));
+ const Generator=new Function('sceneRole','ULTIMATE_LESSON_CONTRACT_VERSION','produceTeachingVisual',generatorSource+';return UltimatePlatformInstructionalGenerator;')((stage,fallback)=>fallback,'test',()=>({kind:'sequence',steps:[]}));
  const generator=new Generator();let requested;
  generator.blueprint=async input=>{requested=input;return {segments:[{id:'approved',stage:'concept_explanation',text:'Approved instruction',recapText:'Fresh recap',objectiveIds:['o'],sourceRequirementIds:['s'],visualRequirement:'Assigned visual',sceneType:'mental_model'}]};};
  const directive={target:'storyboard',requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]};
@@ -107,4 +107,21 @@ test('storyboard audio repair restores the approved blueprint without independen
  assert.equal(board.scenes[0].dialogue,'Approved instruction\n\nFresh recap');
  await generator.storyboard({repairDirective:{...directive,requirements:[{code:'OTHER_FAILURE',message:'genuine source defect'}]}});
  assert.equal(requested.repairDirective.requirements[0].code,'OTHER_FAILURE');
+});
+
+test('repeated Client Consultation question gets a unique exact source quotation without changing speech',async()=>{
+ const generatorSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/adapters/platform-instructional-generator.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
+ const clarify=new Function(generatorSource+';return uniqueSourceQuote;')();
+ const {quoteStartSeconds}=await import('../../lib/ultimate-course-builder/instructional/picture-timeline.mjs');
+ const text="Which question best gathers detailed information: Do you use gel or How do you typically style your hair? Choosing How do you typically style your hair invites the client to describe tools.";
+ const quote='How do you typically style your hair?';
+ const cues=text.toLowerCase().match(/[a-z0-9]+/g).map((text,index)=>({text,startSeconds:index/2}));
+ assert.throws(()=>quoteStartSeconds(quote,cues),/NOT_ALIGNED/);
+ const clarified=clarify(quote,text);
+ assert.ok(text.includes(clarified));
+ assert.ok(clarified.toLowerCase().includes('how do you typically style your hair'));
+ assert.ok(Number.isFinite(quoteStartSeconds(clarified,cues)));
+ assert.equal(clarify('unsupported invented words',text),'unsupported invented words');
+ assert.throws(()=>quoteStartSeconds(clarify('unsupported invented words',text),cues),/NOT_ALIGNED/);
+ assert.equal(clarify('Choosing How do you typically style your hair',text),'Choosing How do you typically style your hair');
 });

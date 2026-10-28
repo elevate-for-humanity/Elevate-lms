@@ -57,7 +57,8 @@ export const ASSETS=[
 ];
 // Boundaries measured from the preserved encoded film's actual scene changes.
 // These are contextual examples, never proof of a complete disinfection or emergency procedure.
-export const CONTEXT_PANEL_FILTER='scale=850:474:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=850:474:(ow-iw)/2:(oh-ih)/2:color=0x131c21,setsar=1,fps=24';
+export const CONTEXT_PANEL_FILTER='scale=850:450:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=850:450:(ow-iw)/2:(oh-ih)/2:color=0x131c21,setsar=1,fps=24';
+export const TITLES=["A safe service starts\nbefore the client sits down","Cleaning and disinfection\nare different jobs","Read the label and\nprotect the clean area","Case practice: a used comb\non a clean tray","Observation and\nsafe service decisions","Emergency readiness: call for help\nand stay within training","Three decisions to\ncarry into the salon"];
 export const SECTIONS=[
  {start:0,end:935/24,asset:0,note:'Salon readiness | Contextual training footage'},
  {start:935/24,end:1948/24,asset:4,note:'Tool handling | Spraying alone does not prove disinfection'},
@@ -114,8 +115,9 @@ export async function main(){
  // Source clips may repeat within a long discussion; they are explicitly contextual.
  for(const [i,s]of SECTIONS.entries()){
  await writeFile(dir+'/motion/note-'+i+'.txt',s.note);
+ await writeFile(dir+'/motion/title-'+i+'.txt',TITLES[i]);
  const duration=s.end-s.start;
- const filters="[1:v]"+CONTEXT_PANEL_FILTER+"[m];[0:v][m]overlay=215:130:enable='gte(t,"+(i===0?2:0)+")',drawbox=x=0:y=606:w=iw:h=114:color=0x131c21:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:textfile=motion/note-"+i+".txt:fontcolor=white:fontsize=25:x=(w-tw)/2:y=613,format=yuv420p[v]";
+ const filters="[1:v]"+CONTEXT_PANEL_FILTER+"[m];[0:v]drawbox=x=0:y=45:w=iw:h=109:color=0x131c21:t=fill[base];[base][m]overlay=215:154:enable='gte(t,"+(i===0?2:0)+")',drawbox=x=0:y=606:w=iw:h=114:color=0x131c21:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:textfile=motion/title-"+i+".txt:fontcolor=white:fontsize=48:line_spacing=2:x=32:y=50,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:textfile=motion/note-"+i+".txt:fontcolor=white:fontsize=32:x=(w-tw)/2:y=613,format=yuv420p[v]";
  await run('ffmpeg',['-hide_banner','-loglevel','error','-ss',String(s.start),'-i',source,'-stream_loop','-1','-i',dir+'/motion/source-'+s.asset+'.mp4','-filter_complex_threads','1','-filter_complex',filters,'-map','[v]','-an','-t',String(duration),'-r','24','-c:v','libx264','-threads','2','-preset','fast','-crf','18','-y','motion/section-'+i+'.mp4'],{cwd:dir,timeout:180000,maxBuffer:2*1024*1024});
  }
  await writeFile(dir+'/motion/concat.txt',SECTIONS.map((s,i)=>"file 'section-"+i+".mp4'").join('\n'));

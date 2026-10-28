@@ -347,7 +347,8 @@ export default async function LessonPage({
                 courseId={course.id}
                 checkpoints={videoCheckpoints}
                 transcript={videoTranscript}
-                captionsUrl={captionsUrl}
+                captionsUrl={captionsUrl && managedLessonPlaybackUrl(captionsUrl, course.id, lesson.id) !== captionsUrl
+                  ? `/api/courses/${course.id}/lessons/${lesson.id}/playback?asset=captions` : captionsUrl}
                 readOnly={preview.active}
                 learnerId={preview.active ? undefined : user?.id}
               />

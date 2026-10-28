@@ -1,5 +1,21 @@
 import 'server-only';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { getSignedElevateMediaUrl, getElevateMediaStorageConfig } from './elevate-media-storage';
+
+function ownedB2ObjectKey(source: string, bucket: string): string | null {
+  if (!bucket) return null;
+  try {
+    const url = new URL(source);
+    if (url.protocol !== 'https:' || url.username || url.password || url.port) return null;
+    let prefix = '';
+    const virtual = url.hostname.match(/^(.+)\.s3\.([a-z0-9-]+)\.backblazeb2\.com$/);
+    if (virtual?.[1] === bucket) prefix = `${url.origin}/`;
+    else if (/^s3\.[a-z0-9-]+\.backblazeb2\.com$/.test(url.hostname)) prefix = `${url.origin}/${encodeURIComponent(bucket)}/`;
+    else if (/^f[0-9]+\.backblazeb2\.com$/.test(url.hostname)) prefix = `${url.origin}/file/${encodeURIComponent(bucket)}/`;
+    if (!prefix || !source.startsWith(prefix)) return null;
+    return decodeURIComponent(source.slice(prefix.length).split(/[?#]/)[0]);
+  } catch { return null; }
+}
 
 export function managedLessonPlaybackUrl(source: string, courseId: string, lessonId: string) {
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
@@ -14,7 +30,8 @@ export function managedLessonPlaybackUrl(source: string, courseId: string, lesso
   }
   return (supabase && ['course-videos', 'course_videos'].some(bucket =>
     ['public', 'sign', 'authenticated'].some(mode => source.startsWith(`${supabase}/storage/v1/object/${mode}/${bucket}/`)))) ||
-    (media && source.startsWith(`${media}/`)) || privatePrefixes.some(prefix => source.startsWith(prefix))
+    (media && source.startsWith(`${media}/`)) || privatePrefixes.some(prefix => source.startsWith(prefix)) ||
+    ownedB2ObjectKey(source, config.bucket || 'elevate-course-media') !== null
     ? `/api/courses/${encodeURIComponent(courseId)}/lessons/${encodeURIComponent(lessonId)}/playback`
     : source;
 }
@@ -23,6 +40,7 @@ export function managedLessonPlaybackUrl(source: string, courseId: string, lesso
  * object key supplied in the playback request. Preserve existing immutable media.
  */
 export async function signedLessonPlayback(db: any, source: string) {
+  await hydrateProcessEnv();
   const validKey = (key: string) => key && !key.split('/').some(part => part === '..' || part === '.') &&
     ![...key].some(character => character.charCodeAt(0) < 32 || character === '\\');
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
@@ -44,6 +62,16 @@ export async function signedLessonPlayback(db: any, source: string) {
     const key = decodeURIComponent(source.slice(base.length + 1).split('?')[0]);
     if (!validKey(key)) throw new Error('LESSON_MEDIA_REFERENCE_INVALID');
     const url = await getSignedElevateMediaUrl(key, 3600);
+    if (!url) throw new Error('LESSON_MEDIA_SIGNING_FAILED');
+    return url;
+  }
+  // The B2 bucket name is globally unique. Renew older regional/native
+  // references against the currently verified connection to this exact bucket.
+  const b2 = config.provider === 'backblaze-b2' || /\.backblazeb2\.com\/?$/.test(config.endpoint || '');
+  const b2Key = b2 ? ownedB2ObjectKey(source, config.bucket) : null;
+  if (b2Key !== null) {
+    if (!validKey(b2Key)) throw new Error('LESSON_MEDIA_REFERENCE_INVALID');
+    const url = await getSignedElevateMediaUrl(b2Key, 3600);
     if (!url) throw new Error('LESSON_MEDIA_SIGNING_FAILED');
     return url;
   }

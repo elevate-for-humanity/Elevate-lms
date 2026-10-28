@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 const signed = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn() }));
 vi.mock('@/lib/storage/elevate-media-storage', () => ({
   getElevateMediaStorageConfig: () => ({publicUrl:'https://media.example/course-media',endpoint:'https://s3.us-east-005.backblazeb2.com',bucket:'elevate-course-media'}),
   getSignedElevateMediaUrl: signed,

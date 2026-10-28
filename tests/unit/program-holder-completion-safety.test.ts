@@ -19,10 +19,12 @@ describe('Holder agreement and payment safeguards', () => {
   it('never authorizes a transfer from report submission', () => expect(completionInvoiceDraft(terms, [], 'r').transfer_allowed).toBe(false));
 });
 describe('Scoped holder workspace', () => {
-  it('does not grant recruiting from a role label or all-applicant flag', () => {
+  it('requires an explicit recruiting flag rather than role, territory, or instructions', () => {
     expect(hasRecruitingAssignment({ approved_role: 'Program Holder', all_applicant_access: true })).toBe(false);
     expect(hasRecruitingAssignment({ recruiting_enabled: true })).toBe(true);
-    expect(hasRecruitingAssignment({ regional_assignment: { all_programs_in_region: true } })).toBe(true);
+    expect(hasRecruitingAssignment({ regional_assignment: { all_programs_in_region: true } })).toBe(false);
+    expect(hasRecruitingAssignment({ cdl_dashboard_instructions: ['Call assigned students'] })).toBe(false);
+    expect(hasRecruitingAssignment({ recruiting_enabled: 'true' })).toBe(false);
   });
   it('keeps completed build distinct from publication', () => {
     expect(curriculumProgress({ generation_status: 'completed', generation_progress: 100, status: 'draft' })).toMatchObject({ percent: 100, published: false });

@@ -6,10 +6,7 @@ const migration = readFileSync(
   'utf8',
 );
 const sessionRoute = readFileSync('apps/lms/app/api/theory/session/route.ts', 'utf8');
-const lessonClient = readFileSync(
-  'apps/lms/app/lms/courses/[courseId]/lessons/[lessonId]/LessonProgressClient.tsx',
-  'utf8',
-);
+const theoryClock = readFileSync('lib/lms/useTheoryTimeclock.ts', 'utf8');
 const completionRoute = readFileSync(
   'apps/lms/app/api/lessons/[lessonId]/complete/route.ts',
   'utf8',
@@ -34,10 +31,10 @@ describe('apprenticeship theory activity tracking contract', () => {
   });
 
   it('pauses hidden and inactive lesson sessions', () => {
-    expect(lessonClient).toContain("document.addEventListener('visibilitychange'");
-    expect(lessonClient).toContain('Date.now() - lastActivityAt.current > 90_000');
-    expect(lessonClient).toContain("action: 'heartbeat'");
-    expect(lessonClient).toContain('Active lesson time is being recorded');
+    expect(theoryClock).toContain("document.addEventListener('visibilitychange'");
+    expect(theoryClock).toContain('Date.now() - lastActivityAt.current > 90_000');
+    expect(theoryClock).toContain("action: 'heartbeat'");
+    expect(theoryClock).toContain('Active lesson time is being recorded');
   });
 
   it('prevents theory and OJL from overlapping in both directions', () => {

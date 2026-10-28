@@ -13,6 +13,8 @@ import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
 import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
+import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
+import { TheoryWindowBoundary } from '@/components/apprenticeship/TheoryWindowBoundary';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -173,9 +175,7 @@ export default async function LessonPage({
     );
   const db = preview.active ? preview.db : supabase;
 
-  let courseQuery = db
-    .from('courses')
-    .select('id,title,slug,is_active');
+  let courseQuery = db.from('courses').select('id,title,slug,is_active');
   if (!preview.active) courseQuery = courseQuery.eq('is_active', true);
   courseQuery = isUuid(courseId)
     ? courseQuery.eq('id', courseId)
@@ -184,10 +184,38 @@ export default async function LessonPage({
   if (!course) notFound();
 
   if (!preview.active && user) {
-    const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', { p_course_id: course.id });
+    const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', {
+      p_course_id: course.id,
+    });
     if (pacingError) throw new Error('Unable to verify lesson release');
+    if ((pacing as any)?.theoryWindow?.allowed === false)
+      return (
+        <main className="mx-auto max-w-4xl p-6">
+          <Link href="/apprentice" className="font-bold underline">
+            Back to dashboard
+          </Link>
+          <TheoryWindowNotice access={(pacing as any).theoryWindow} />
+        </main>
+      );
     const scheduled = (pacing as any)?.lessons?.find((item: any) => item.id === lessonId);
-    if (scheduled && !scheduled.available) return <main className="mx-auto max-w-3xl space-y-5 p-8"><Link href={`/lms/courses/${course.id}`} className="font-bold text-cyan-800">Back to course schedule</Link><h1 className="text-3xl font-extrabold">{scheduled.title}</h1><p className="rounded-xl border border-amber-300 bg-amber-50 p-5 font-semibold">{scheduled.published ? `This lesson opens in training week ${scheduled.releaseWeek}. Complete earlier required lessons before continuing.` : 'This lesson is still being produced and verified.'}</p><p>Follow your {pacing.totalWeeks}-week plan. Assessment and supervised practical requirements still apply.</p></main>;
+    if (scheduled && !scheduled.available)
+      return (
+        <main className="mx-auto max-w-3xl space-y-5 p-8">
+          <Link href={`/lms/courses/${course.id}`} className="font-bold text-cyan-800">
+            Back to course schedule
+          </Link>
+          <h1 className="text-3xl font-extrabold">{scheduled.title}</h1>
+          <p className="rounded-xl border border-amber-300 bg-amber-50 p-5 font-semibold">
+            {scheduled.published
+              ? `This lesson opens in training week ${scheduled.releaseWeek}. Complete earlier required lessons before continuing.`
+              : 'This lesson is still being produced and verified.'}
+          </p>
+          <p>
+            Follow your {pacing.totalWeeks}-week plan. Assessment and supervised practical
+            requirements still apply.
+          </p>
+        </main>
+      );
     await assertLessonAccess(user.id, lessonId);
   }
 
@@ -251,14 +279,20 @@ export default async function LessonPage({
   const videoCheckpoints = authoredVideoCheckpoints.length
     ? authoredVideoCheckpoints
     : checkpointsFromTimeline(instructionalTimeline, experience);
-  const videoTranscript = Array.isArray(interactiveVideo?.transcript) && interactiveVideo.transcript.length
-    ? interactiveVideo.transcript
-    : Array.isArray(instructionalTimeline?.captions) && instructionalTimeline.captions.length
-      ? instructionalTimeline.captions
-      : measuredLessonCues((lesson.content_json as any)?.film);
-  const captionsUrl = [interactiveVideo?.captionsUrl, (lesson.content_json as any)?.film?.captionsUrl, (lesson.content_json as any)?.film?.sceneData?.captionUrl, experience?.film?.captionsUrl,
-    experience?.film?.sceneData?.captionUrl, experience?.media?.caption_url]
-    .find((value): value is string => typeof value === 'string' && /^https:\/\//.test(value));
+  const videoTranscript =
+    Array.isArray(interactiveVideo?.transcript) && interactiveVideo.transcript.length
+      ? interactiveVideo.transcript
+      : Array.isArray(instructionalTimeline?.captions) && instructionalTimeline.captions.length
+        ? instructionalTimeline.captions
+        : measuredLessonCues((lesson.content_json as any)?.film);
+  const captionsUrl = [
+    interactiveVideo?.captionsUrl,
+    (lesson.content_json as any)?.film?.captionsUrl,
+    (lesson.content_json as any)?.film?.sceneData?.captionUrl,
+    experience?.film?.captionsUrl,
+    experience?.film?.sceneData?.captionUrl,
+    experience?.media?.caption_url,
+  ].find((value): value is string => typeof value === 'string' && /^https:\/\//.test(value));
   const slides = teachingSlidesFromExperience(lesson.title, lessonHtml, experience);
   const videoConfig =
     lesson.video_config && typeof lesson.video_config === 'object'
@@ -312,139 +346,198 @@ export default async function LessonPage({
 
   return (
     <LessonFocusShell header={lessonHeader}>
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
-        {preview.active ? <div className="rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm font-black text-amber-950">Admin draft preview · Completion, assessment, and progress writes are disabled.</div> : null}
-        {lessonVisual?.media_type === 'image' ? (
-          <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
-            <img
-              src={lessonVisual.asset_url}
-              alt={lessonVisual.alt_text || lesson.title}
-              className="aspect-video w-full object-contain bg-slate-50"
-            />
-            {lessonVisual.caption ? (
-              <figcaption className="border-t border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700">
-                {lessonVisual.caption}
-              </figcaption>
-            ) : null}
-          </figure>
-        ) : null}
-
-        {!lesson.video_url ? <AITeachingPlayer
-          courseTitle={course.title}
-          lessonTitle={lesson.title}
-          instructorName={instructorName}
-          instructorImage={instructorImage}
-          visualImage={lessonVisual?.asset_url ?? lessonVisual?.poster_url ?? undefined}
-          slides={slides}
-        /> : null}
-
-        {lesson.video_url ? (
-          <section aria-label="Instructional lesson video" className="overflow-hidden rounded-3xl border border-neutral-700 bg-neutral-900 shadow-lg">
-            <div className="p-3">
-              <InteractiveVideoPlayer
-                videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
-                title={lesson.title}
-                lessonId={lesson.id}
-                courseId={course.id}
-                checkpoints={videoCheckpoints}
-                transcript={videoTranscript}
-                captionsUrl={captionsUrl && managedLessonPlaybackUrl(captionsUrl, course.id, lesson.id) !== captionsUrl
-                  ? `/api/courses/${course.id}/lessons/${lesson.id}/playback?asset=captions` : captionsUrl}
-                readOnly={preview.active}
-                learnerId={preview.active ? undefined : user?.id}
+      <TheoryWindowBoundary courseId={course.id} readOnly={preview.active}>
+        <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+          {preview.active ? (
+            <div className="rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm font-black text-amber-950">
+              Admin draft preview · Completion, assessment, and progress writes are disabled.
+            </div>
+          ) : null}
+          {lessonVisual?.media_type === 'image' ? (
+            <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
+              <img
+                src={lessonVisual.asset_url}
+                alt={lessonVisual.alt_text || lesson.title}
+                className="aspect-video w-full object-contain bg-slate-50"
               />
-            </div>
-          </section>
-        ) : null}
+              {lessonVisual.caption ? (
+                <figcaption className="border-t border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700">
+                  {lessonVisual.caption}
+                </figcaption>
+              ) : null}
+            </figure>
+          ) : null}
 
-        {objectives.length ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="flex items-center gap-2 text-xl font-extrabold">
-              <BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives
-            </h2>
-            <ul className="mt-4 space-y-2 text-base font-medium leading-7 text-slate-800">
-              {objectives.map((objective, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="font-extrabold text-cyan-700">•</span>
-                  <span>{String(objective)}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {lessonHtml ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div
-              className="prose prose-slate max-w-none prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium"
-              dangerouslySetInnerHTML={{ __html: lessonHtml }}
+          {!lesson.video_url ? (
+            <AITeachingPlayer
+              courseTitle={course.title}
+              lessonTitle={lesson.title}
+              instructorName={instructorName}
+              instructorImage={instructorImage}
+              visualImage={lessonVisual?.asset_url ?? lessonVisual?.poster_url ?? undefined}
+              slides={slides}
             />
-          </section>
-        ) : (
-          <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 font-semibold text-amber-950">
-            Lesson content is not available. Contact your instructor before marking this lesson
-            complete.
-          </section>
-        )}
+          ) : null}
 
-        {keyTerms.length ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-extrabold">Key terms</h2>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {keyTerms.map((term, index) => (
-                <span
-                  key={index}
-                  className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800"
-                >
-                  {typeof term === 'string' ? term : JSON.stringify(term)}
-                </span>
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {!preview.active ? <><InteractiveLessonExperience
-          courseId={course.id}
-          lessonSlug={lesson.slug}
-          lessonId={lesson.id}
-        />
-        <LessonProgressClient
-          courseId={course.id}
-          lessonId={lesson.id}
-          lessonType={lessonType}
-          moduleOrder={moduleOrder}
-          passingScore={passingScore}
-          questions={questions as any[]}
-        /></> : null}
-
-        <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
-          {previous ? (
-            <Link
-              href={`/lms/courses/${course.id}/lessons/${previous.id}`}
-              className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100"
+          {lesson.video_url ? (
+            <section
+              aria-label="Instructional lesson video"
+              className="overflow-hidden rounded-3xl border border-neutral-700 bg-neutral-900 shadow-lg"
             >
-              ← {previous.title}
-            </Link>
+              <div className="p-3">
+                <InteractiveVideoPlayer
+                  videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
+                  title={lesson.title}
+                  lessonId={lesson.id}
+                  courseId={course.id}
+                  checkpoints={videoCheckpoints}
+                  transcript={videoTranscript}
+                  captionsUrl={
+                    captionsUrl &&
+                    managedLessonPlaybackUrl(captionsUrl, course.id, lesson.id) !== captionsUrl
+                      ? `/api/courses/${course.id}/lessons/${lesson.id}/playback?asset=captions`
+                      : captionsUrl
+                  }
+                  readOnly={preview.active}
+                  learnerId={preview.active ? undefined : user?.id}
+                />
+                <div className="mt-4 rounded-xl bg-white p-4 text-slate-950">
+                  <p className="font-bold">Finished watching?</p>
+                  <p className="mt-1 text-sm">
+                    Complete the required lesson activities and questions, then save your completion
+                    below. Watching the video alone does not complete the lesson.
+                  </p>
+                  <a
+                    href="#lesson-completion"
+                    className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-4 py-2 font-bold text-white"
+                  >
+                    Go to lesson completion
+                  </a>
+                </div>
+                {!preview.active ? (
+                  <div id="theory-timeclock-slot" className="mt-4" />
+                ) : (
+                  <p className="mt-3 rounded-xl bg-amber-50 p-4 font-bold text-amber-950">
+                    Theory Timeclock — Start and Stop are available in the learner's own lesson
+                    session. Clocking is disabled in this read-only preview.
+                  </p>
+                )}
+              </div>
+            </section>
+          ) : null}
+
+          {objectives.length ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="flex items-center gap-2 text-xl font-extrabold">
+                <BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives
+              </h2>
+              <ul className="mt-4 space-y-2 text-base font-medium leading-7 text-slate-800">
+                {objectives.map((objective, index) => (
+                  <li key={index} className="flex gap-3">
+                    <span className="font-extrabold text-cyan-700">•</span>
+                    <span>{String(objective)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {lessonHtml ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <div
+                className="prose prose-slate max-w-none prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium"
+                dangerouslySetInnerHTML={{ __html: lessonHtml }}
+              />
+            </section>
           ) : (
-            <span />
+            <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 font-semibold text-amber-950">
+              Lesson content is not available. Contact your instructor before marking this lesson
+              complete.
+            </section>
           )}
-          {next ? (
-            <Link
-              href={`/lms/courses/${course.id}/lessons/${next.id}`}
-              className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800"
+
+          {keyTerms.length ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-extrabold">Key terms</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {keyTerms.map((term, index) => (
+                  <span
+                    key={index}
+                    className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800"
+                  >
+                    {typeof term === 'string' ? term : JSON.stringify(term)}
+                  </span>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {preview.active ? (
+            <section
+              id="lesson-completion"
+              className="rounded-2xl border border-amber-300 bg-amber-50 p-6"
             >
-              {next.title} →
-            </Link>
+              <h2 className="text-xl font-bold">Lesson completion — read-only preview</h2>
+              <p className="mt-2">
+                The learner completes required activities, passes any assessment, and selects Mark
+                lesson complete or Submit assessment here. Enrollment, engagement, sequencing and
+                instructor sign-off checks still apply.
+              </p>
+              <button
+                type="button"
+                disabled
+                className="mt-4 rounded-lg bg-slate-300 px-4 py-3 font-bold text-slate-700"
+              >
+                Completion disabled in admin preview
+              </button>
+            </section>
           ) : (
-            <Link
-              href={`/lms/courses/${course.id}`}
-              className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800"
-            >
-              Return to course
-            </Link>
+            <>
+              <InteractiveLessonExperience
+                courseId={course.id}
+                lessonSlug={lesson.slug}
+                lessonId={lesson.id}
+              />
+              <LessonProgressClient
+                courseId={course.id}
+                lessonId={lesson.id}
+                lessonType={lessonType}
+                moduleOrder={moduleOrder}
+                passingScore={passingScore}
+                questions={questions as any[]}
+              />
+            </>
           )}
-        </nav>
-      </div>
+
+          <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
+            {previous ? (
+              <Link
+                href={`/lms/courses/${course.id}/lessons/${previous.id}`}
+                className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100"
+              >
+                ← {previous.title}
+              </Link>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <Link
+                href={`/lms/courses/${course.id}/lessons/${next.id}`}
+                className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800"
+              >
+                {next.title} →
+              </Link>
+            ) : (
+              <Link
+                href={`/lms/courses/${course.id}`}
+                className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800"
+              >
+                Return to course
+              </Link>
+            )}
+          </nav>
+        </div>
+      </TheoryWindowBoundary>
     </LessonFocusShell>
   );
 }

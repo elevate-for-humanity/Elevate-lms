@@ -1,5 +1,7 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export type Workbook = {
   id: string;
@@ -17,6 +19,7 @@ export type WorkbookSection = {
   pdf_page: number;
   prompts: string[];
   lesson_id: string | null;
+  course_id?: string | null;
 };
 export type WorkbookResponse = {
   section_id: string;
@@ -33,28 +36,77 @@ export async function loadMyDigitalWorkbooks() {
     data: { user },
     error: authError,
   } = await db.auth.getUser();
-  if (authError || !user) return { user: null, workbooks: [] as Workbook[] };
-  const { data, error } = await db
+  const admin = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(admin, user?.id);
+  if ((!user || authError) && !subject.previewing)
+    return { user: null, workbooks: [] as Workbook[], previewing: false };
+  let reader = db;
+  let programIds: string[] = [];
+  if (subject.previewing) {
+    const result = await admin
+      .from('program_enrollments')
+      .select('program_id')
+      .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
+      .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+      .is('revoked_at', null);
+    if (result.error) throw new Error('Workbook enrollment could not be verified.');
+    programIds = [
+      ...new Set((result.data || []).map((row) => row.program_id).filter(Boolean)),
+    ] as string[];
+    if (!programIds.length)
+      return { user: { id: subject.userId }, workbooks: [] as Workbook[], previewing: true };
+    reader = admin;
+  }
+  let query = reader
     .from('digital_workbooks')
     .select('id,slug,title,program_id,cover_image')
-    .eq('is_active', true)
-    .order('title');
+    .eq('is_active', true);
+  if (subject.previewing) query = query.in('program_id', programIds);
+  const { data, error } = await query.order('title');
   if (error) throw new Error('Your workbooks could not be loaded. Please try again.');
-  return { user, workbooks: (data ?? []) as Workbook[] };
+  return {
+    user: subject.previewing ? { id: subject.userId } : user,
+    workbooks: (data ?? []) as Workbook[],
+    previewing: subject.previewing,
+  };
 }
 
 export async function loadMyDigitalWorkbook(slug: string) {
-  const { user, workbooks } = await loadMyDigitalWorkbooks();
+  const { user, workbooks, previewing } = await loadMyDigitalWorkbooks();
   const workbook = workbooks.find((book) => book.slug === slug);
   if (!user || !workbook) return null;
-  const db = await createClient();
+  const db = previewing ? await requireAdminClient() : await createClient();
   const { data: sections, error } = await db
     .from('digital_workbook_sections')
     .select('id,workbook_id,section_number,title,unit,pdf_page,prompts,lesson_id')
     .eq('workbook_id', workbook.id)
     .order('section_number');
   if (error) throw new Error('Workbook sections could not be loaded. Please try again.');
-  const typedSections = (sections ?? []) as WorkbookSection[];
+  let typedSections = (sections ?? []) as WorkbookSection[];
+  if (previewing) {
+    const visible = await Promise.all(
+      typedSections.map(async (section) => {
+        if (!section.lesson_id) return section;
+        const access = await db.rpc('can_access_lesson', {
+          p_user_id: user.id,
+          p_lesson_id: section.lesson_id,
+        });
+        if (access.error) throw new Error('Workbook lesson release could not be verified.');
+        return access.data === true ? section : null;
+      }),
+    );
+    typedSections = visible.filter((section): section is WorkbookSection => section !== null);
+  }
+  const lessonIds = typedSections.map((section) => section.lesson_id).filter(Boolean) as string[];
+  if (lessonIds.length) {
+    const lessons = await db.from('course_lessons').select('id,course_id').in('id', lessonIds);
+    if (lessons.error) throw new Error('Workbook theory links could not be loaded.');
+    const courses = new Map((lessons.data || []).map((lesson) => [lesson.id, lesson.course_id]));
+    typedSections = typedSections.map((section) => ({
+      ...section,
+      course_id: section.lesson_id ? courses.get(section.lesson_id) || null : null,
+    }));
+  }
   const ids = typedSections.map((section) => section.id);
   let responses: WorkbookResponse[] = [];
   if (ids.length) {
@@ -67,7 +119,9 @@ export async function loadMyDigitalWorkbook(slug: string) {
     responses = (result.data ?? []) as WorkbookResponse[];
   }
   // The database checks enrollment or this buyer's paid workbook entitlement.
-  const access = await db.rpc('can_edit_digital_workbook', { p_workbook_id: workbook.id });
+  const access = previewing
+    ? { data: false, error: null }
+    : await db.rpc('can_edit_digital_workbook', { p_workbook_id: workbook.id });
   if (access.error) throw new Error('Workbook access could not be verified.');
   return {
     workbook,

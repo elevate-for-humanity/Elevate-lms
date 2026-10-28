@@ -39,7 +39,8 @@ async function _POST(request: NextRequest) {
       p_session_id: body.sessionId,
       p_user_id: user.id,
     });
-    if (error) return NextResponse.json({ error: 'Unable to record theory activity' }, { status: 409 });
+    if (error)
+      return NextResponse.json({ error: 'Unable to record theory activity' }, { status: 409 });
     const result = Array.isArray(data) ? data[0] : data;
     return NextResponse.json({
       tracked: true,
@@ -54,17 +55,31 @@ async function _POST(request: NextRequest) {
   if (body.action === 'stop') {
     if (!body.sessionId) return NextResponse.json({ tracked: false });
     if (body.creditFinal) {
-      await db.rpc('record_theory_activity_heartbeat', {
+      const finalHeartbeat = await db.rpc('record_theory_activity_heartbeat', {
         p_session_id: body.sessionId,
         p_user_id: user.id,
       });
+      if (finalHeartbeat.error)
+        return NextResponse.json(
+          { error: 'Theory time could not be finalized. Please try again.' },
+          { status: 409 },
+        );
     }
-    await db
+    const stopped = await db
       .from('theory_activity_sessions')
-      .update({ status: 'completed', ended_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .update({
+        status: 'completed',
+        ended_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', body.sessionId)
       .eq('user_id', user.id)
       .eq('status', 'active');
+    if (stopped.error)
+      return NextResponse.json(
+        { error: 'Theory timeclock could not be stopped. Please try again.' },
+        { status: 409 },
+      );
     return NextResponse.json({ tracked: true, stopped: true });
   }
 
@@ -80,22 +95,30 @@ async function _POST(request: NextRequest) {
 
   const [{ data: apprentice }, { data: lesson }, enrollment] = await Promise.all([
     db.from('apprentices').select('id').eq('user_id', user.id).eq('status', 'active').maybeSingle(),
-    db.from('course_lessons').select('id,course_id').eq('id', body.lessonId).eq('course_id', body.courseId).maybeSingle(),
+    db
+      .from('course_lessons')
+      .select('id,course_id')
+      .eq('id', body.lessonId)
+      .eq('course_id', body.courseId)
+      .maybeSingle(),
     resolveCourseEnrollment(user.id, body.courseId),
   ]);
   if (!apprentice) return NextResponse.json({ tracked: false, reason: 'NOT_APPRENTICE' });
-  if (!lesson || !enrollment || !['active', 'enrolled', 'in_progress', 'completed', 'confirmed'].includes(String(enrollment.status).toLowerCase())) {
+  if (
+    !lesson ||
+    !enrollment ||
+    !['active', 'enrolled', 'in_progress', 'completed', 'confirmed'].includes(
+      String(enrollment.status).toLowerCase(),
+    )
+  ) {
     return NextResponse.json({ error: 'Active lesson enrollment required' }, { status: 403 });
   }
 
-  const { data: openShift } = await db
-    .from('progress_entries')
-    .select('id')
-    .eq('apprentice_id', apprentice.id)
-    .not('clock_in_at', 'is', null)
-    .is('clock_out_at', null)
-    .limit(1)
-    .maybeSingle();
+  const { data: openShift, error: openShiftError } = await db.rpc('has_active_ojl_session', {
+    p_user: user.id,
+  });
+  if (openShiftError)
+    return NextResponse.json({ error: 'Unable to verify live OJL clock status.' }, { status: 503 });
   if (openShift) {
     return NextResponse.json(
       { error: 'Clock out of OJL before starting theory.', code: 'OJL_OVERLAP' },
@@ -116,14 +139,21 @@ async function _POST(request: NextRequest) {
   );
   if (weeklyActiveSeconds >= APPRENTICE_TIME_POLICY.weeklyTheoryMaxHours * 3600) {
     return NextResponse.json(
-      { error: 'The weekly 10-hour theory limit has been reached.', code: 'WEEKLY_THEORY_LIMIT_REACHED' },
+      {
+        error: 'The weekly 10-hour theory limit has been reached.',
+        code: 'WEEKLY_THEORY_LIMIT_REACHED',
+      },
       { status: 409 },
     );
   }
 
   await db
     .from('theory_activity_sessions')
-    .update({ status: 'completed', ended_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .update({
+      status: 'completed',
+      ended_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
     .eq('user_id', user.id)
     .eq('status', 'active');
   const { data: session, error } = await db
@@ -137,7 +167,8 @@ async function _POST(request: NextRequest) {
     })
     .select('id,active_seconds')
     .single();
-  if (error || !session) return NextResponse.json({ error: 'Unable to start theory tracking' }, { status: 500 });
+  if (error || !session)
+    return NextResponse.json({ error: 'Unable to start theory tracking' }, { status: 500 });
 
   return NextResponse.json({
     tracked: true,

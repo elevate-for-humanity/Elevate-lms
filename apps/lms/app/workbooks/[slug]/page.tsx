@@ -1,6 +1,5 @@
-import { redirect, notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { loadMyDigitalWorkbook } from '@/lib/lms/digital-workbooks';
+import { notFound, redirect } from 'next/navigation';
+import { loadMyDigitalWorkbook, loadMyDigitalWorkbooks } from '@/lib/lms/digital-workbooks';
 import DigitalWorkbook from '@/components/lms/DigitalWorkbook';
 
 export const dynamic = 'force-dynamic';
@@ -15,12 +14,11 @@ export default async function DigitalWorkbookPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const db = await createClient();
-  const {
-    data: { user },
-  } = await db.auth.getUser();
-  if (!user) redirect(`/login?redirect=${encodeURIComponent(`/workbooks/${slug}`)}`);
   const result = await loadMyDigitalWorkbook(slug);
-  if (!result) notFound();
+  if (!result) {
+    const { user } = await loadMyDigitalWorkbooks();
+    if (!user) redirect(`/login?redirect=${encodeURIComponent(`/workbooks/${slug}`)}`);
+    notFound();
+  }
   return <DigitalWorkbook key={result.accountId} {...result} />;
 }

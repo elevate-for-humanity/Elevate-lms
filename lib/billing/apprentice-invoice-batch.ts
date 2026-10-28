@@ -1,4 +1,5 @@
 import { nextInvoiceDate } from './schedule';
+import { isIssuedStudentInvoice } from './invoice-display';
 
 export type ApprenticeInvoiceEmailInput = {
   customerName: string;
@@ -32,7 +33,8 @@ export async function listApprenticeInvoices(
   if (profile.error)
     throw new Error(`Could not resolve apprentice billing identity: ${profile.error.message}`);
 
-  const select = 'id,invoice_number,total_cents,status,due_at,paid_at,payment_url,created_at';
+  const select =
+    'id,provider,provider_invoice_id,invoice_number,total_cents,status,due_at,paid_at,payment_url,created_at';
   const byUserKey = db
     .from('billing_invoices')
     .select(select)
@@ -56,6 +58,7 @@ export async function listApprenticeInvoices(
   const rows = new Map<string, any>();
   for (const row of [...(keyResult.data || []), ...(emailResult.data || [])]) rows.set(row.id, row);
   return [...rows.values()]
+    .filter(isIssuedStudentInvoice)
     .sort((left, right) =>
       String(right.created_at || '').localeCompare(String(left.created_at || '')),
     )

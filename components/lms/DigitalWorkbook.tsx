@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import TheoryTimeclock from './TheoryTimeclock';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
@@ -33,6 +34,15 @@ function SectionEditor({
   ];
   return (
     <section hidden={hidden} aria-labelledby={`section-${section.id}`}>
+      {!hidden && !readOnly && section.course_id && section.lesson_id ? (
+        <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
+      ) : null}
+      {!hidden && readOnly && section.course_id ? (
+        <p className="my-4 rounded-xl border border-amber-300 bg-amber-50 p-4 font-bold text-amber-950">
+          Theory Timeclock is available for this section in the learner's own account. Clocking and
+          saving are disabled in admin preview.
+        </p>
+      ) : null}
       <p className="text-sm text-slate-600">
         Workbook pages {section.pdf_page}–{section.pdf_page + 1} · {section.unit}
       </p>
@@ -141,19 +151,29 @@ export default function DigitalWorkbook({
           ELEVATE FOR HUMANITY · APPRENTICESHIP PROGRAM
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
-        <aside aria-label="Workbook copyright and licensed access" className="my-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-slate-900">
+        <aside
+          aria-label="Workbook copyright and licensed access"
+          className="my-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-slate-900"
+        >
           <strong>© 2026 Elevate for Humanity. All rights reserved.</strong>
-          <p>This workbook is licensed only to the authorized learner. Unauthorized copying, recording, resale, scraping, and redistribution are prohibited.</p>
+          <p>
+            This workbook is licensed only to the authorized learner. Unauthorized copying,
+            recording, resale, scraping, and redistribution are prohibited.
+          </p>
           <p className="mt-2 break-all text-xs">Licensed account: {accountId}</p>
         </aside>
-        <p className="my-4 rounded-lg border border-slate-300 bg-white p-3 text-sm">Protected workbook: complete and save your answers here. Source PDF downloads are disabled.</p>
+        <p className="my-4 rounded-lg border border-slate-300 bg-white p-3 text-sm">
+          Protected workbook: complete and save your answers here. Source PDF downloads are
+          disabled.
+        </p>
         <p className="my-4 text-lg leading-relaxed">
           Write directly in the boxes below. Your answers save to your LMS account and reopen when
           you return.
         </p>
         {readOnly && (
           <p role="status" className="my-4 rounded-lg border border-amber-400 p-4">
-            Read-only preview. Saving requires an active program enrollment or a verified workbook purchase.
+            Read-only preview. Saving requires an active program enrollment or a verified workbook
+            purchase.
           </p>
         )}
         {sections.length ? (

@@ -44,6 +44,7 @@ import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-bat
 import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
+import { TrainingReadyNotice } from '@/components/apprenticeship/TrainingReadyNotice';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -293,7 +294,9 @@ export default async function ApprenticePortalPage() {
     ]);
     if (courseRes.error) throw courseRes.error;
     courseTitle = courseRes.data?.title || courseTitle;
-    courseHref = courseOverviewPath(runtime.enrollment.course_id);
+    courseHref = subject.previewing
+      ? `https://admin.elevateforhumanity.org/api/admin/course-builder/preview?courseId=${runtime.enrollment.course_id}`
+      : courseOverviewPath(runtime.enrollment.course_id);
     totalLessons = lessonProgress.totalLessons;
     completedLessons = lessonProgress.completedLessons;
   }
@@ -304,7 +307,10 @@ export default async function ApprenticePortalPage() {
     .select('ojl_hours,hours_completed')
     .eq('user_id', subject.userId)
     .maybeSingle();
-  const recordedOjlHours = Math.max(0, Number(apprenticeHours?.ojl_hours ?? apprenticeHours?.hours_completed ?? 0) || 0);
+  const recordedOjlHours = Math.max(
+    0,
+    Number(apprenticeHours?.ojl_hours ?? apprenticeHours?.hours_completed ?? 0) || 0,
+  );
 
   const digitalCoursePercent = totalLessons
     ? Math.min(100, Math.round((completedLessons / totalLessons) * 100))
@@ -424,10 +430,14 @@ export default async function ApprenticePortalPage() {
   );
 
   if (!runtime.contract) {
-    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || automaticBillingActive || invoiceAccess.accessExemptUntil);
+    const billingConfigured = Boolean(
+      cosmetologyBilling?.fully_paid || automaticBillingActive || invoiceAccess.accessExemptUntil,
+    );
     const todoItems = [
       {
-        label: invoiceAccess.accessExemptUntil ? 'Billing access approved by sponsor' : 'Choose a payment method or financing option',
+        label: invoiceAccess.accessExemptUntil
+          ? 'Billing access approved by sponsor'
+          : 'Choose a payment method or financing option',
         done: billingConfigured,
         href: '/account/payment-methods',
         icon: CreditCard,
@@ -482,10 +492,15 @@ export default async function ApprenticePortalPage() {
     return (
       <main className="space-y-7 pb-10">
         <TimeclockAttendanceNotice />
+        {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
+          <TrainingReadyNotice courseHref={courseHref} />
+        ) : null}
         <ProgramGuideResources />
         <VisualDashboardOrientation audience="apprentice" compact />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
-          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+          <Image
+            placeholder="blur"
+            blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
             alt={`${displayProgram} apprentice training`}
             fill
@@ -532,8 +547,9 @@ export default async function ApprenticePortalPage() {
                 Required to-do — {incompleteCount} incomplete
               </h2>
               <p className="mt-1 text-sm font-semibold text-red-900">
-                PARIS will walk you through these items in order. Items marked Open still need attention,
-                but sponsor-approved access remains available while an active access exception is in place.
+                PARIS will walk you through these items in order. Items marked Open still need
+                attention, but sponsor-approved access remains available while an active access
+                exception is in place.
               </p>
               <div className="mt-5 grid gap-3">
                 {todoItems.map(({ label, done, href, icon: Icon }, index) => (
@@ -560,10 +576,7 @@ export default async function ApprenticePortalPage() {
             </div>
           </div>
         </section>
-        <MandatoryBillingSetup
-          requirement={billingRequirement}
-          readOnly={subject.previewing}
-        />
+        <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
         {requiredPolicyPanel}
         <section className="grid gap-4 sm:grid-cols-3">
           <Metric
@@ -629,7 +642,12 @@ export default async function ApprenticePortalPage() {
   );
 
   const actions = [
-    { title: 'My Website Traffic', text: 'See views, visitor sources, and locations for your connected website.', href: '/apprentice/analytics', image: '/images/pages/admin-analytics-hero.webp' },
+    {
+      title: 'My Website Traffic',
+      text: 'See views, visitor sources, and locations for your connected website.',
+      href: '/apprentice/analytics',
+      image: '/images/pages/admin-analytics-hero.webp',
+    },
     {
       title: 'Clock work hours',
       text: 'Record geofenced supervised work time for Host Shop review. OJL hours remain evidence; competency verification controls competency-based progression.',
@@ -659,8 +677,11 @@ export default async function ApprenticePortalPage() {
   return (
     <main className="space-y-7 pb-10">
       <TimeclockAttendanceNotice />
-        <ProgramGuideResources />
-        <VisualDashboardOrientation audience="apprentice" compact />
+      {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
+        <TrainingReadyNotice courseHref={courseHref} />
+      ) : null}
+      <ProgramGuideResources />
+      <VisualDashboardOrientation audience="apprentice" compact />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">
@@ -743,10 +764,7 @@ export default async function ApprenticePortalPage() {
         </div>
       </section>
 
-      <MandatoryBillingSetup
-        requirement={billingRequirement}
-        readOnly={subject.previewing}
-      />
+      <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
 
       {requiredPolicyPanel}
 
@@ -1134,28 +1152,44 @@ function TheorySchedulePanel({
           </p>
           {formatTheoryStartDate(schedule.starts_on) ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
-              Theory/RTI begins{' '}
-              {formatTheoryStartDate(schedule.starts_on)}
-              .
+              Theory/RTI begins {formatTheoryStartDate(schedule.starts_on)}.
             </p>
           ) : null}
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
             Complete <strong>{schedule.weekly_target_minutes / 60} theory hours each week</strong>.
             Do not exceed{' '}
-            <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You
-            will receive automatic alerts when each scheduled block starts and stops.
+            <strong>
+              {Math.min(schedule.weekly_max_minutes, 600) / 60} theory hours in a full week
+            </strong>
+            . You will receive automatic alerts when each scheduled block starts and stops.
           </p>
           <div className="mt-4 rounded-xl border border-fuchsia-200 bg-white p-4 text-sm text-slate-800">
             <p className="font-black">Theory schedule and eligibility</p>
-            <p className="mt-1">Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours.</p>
-            <p className="mt-1">Scheduled theory: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')} hours weekly, up to {(schedule.weekly_max_minutes / 60).toLocaleString('en-US')} hours weekly.</p>
-            <p className="mt-1">Any minimum work-hour requirement for unlocking theory must be confirmed by your program administrator. This dashboard does not impose an unverified hour threshold.</p>
+            <p className="mt-1">
+              Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours.
+            </p>
+            <p className="mt-1">
+              Scheduled theory: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')}{' '}
+              hours weekly, up to{' '}
+              {(Math.min(schedule.weekly_max_minutes, 600) / 60).toLocaleString('en-US')} hours
+              weekly.
+            </p>
+            <p className="mt-1">
+              Any minimum work-hour requirement for unlocking theory must be confirmed by your
+              program administrator. This dashboard does not impose an unverified hour threshold.
+            </p>
           </div>
           <p className="mt-2 text-sm font-semibold text-slate-700">
             Course progress: {completedLessons} of {totalLessons} published lessons complete.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <Link
+            href="/apprentice/theory-schedule"
+            className="inline-flex min-h-12 items-center rounded-xl border border-fuchsia-700 bg-white px-5 py-3 font-black text-fuchsia-950"
+          >
+            Choose my theory study times
+          </Link>
           <Link
             href={courseHref}
             className="inline-flex min-h-12 items-center justify-center rounded-xl bg-fuchsia-800 px-5 py-3 font-black text-white"

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { TuitionTermsNotice } from '@/components/learner/TuitionTermsNotice';
 import { AlertCircle, FileText } from 'lucide-react';
-import { TIER3_INTERNAL_PLAN, REFUND_POLICY } from '@/lib/billing/tuition-config';
+import { REFUND_POLICY } from '@/lib/billing/tuition-config';
 
 interface PaymentDisclosureProps {
   programName: string;
@@ -86,11 +87,7 @@ export function PaymentDisclosure({
         </div>
       </div>
 
-      <section className="mb-6 rounded-lg border border-blue-300 bg-blue-50 p-4">
-        <h3 className="font-bold text-blue-950">New enrollment tuition late-fee policy (October 16, 2026)</h3>
-        <p className="mt-2 text-sm text-blue-950">For new self-pay internal payment agreements that expressly include this policy: payments have a three-calendar-day grace period. Starting on the fourth overdue day, a $10 daily late fee is proposed for each day the qualifying installment remains unpaid. After seven overdue days, designated instructional access may be reviewed for suspension under the signed agreement. If instructional access is actually suspended for nonpayment, a one-time $50 reactivation fee is proposed before eligible instructional access resumes; this fee is not charged repeatedly for the same suspension. Billing, support, wage records, timekeeping, and required apprenticeship records remain accessible. This notice does not amend existing agreements or apply to funded or externally financed payments.</p>
-        <p className="mt-2 text-xs font-semibold text-blue-900">The updated terms must be incorporated into the signed enrollment agreement before fees may be assessed. Existing payment-plan terms continue to govern until a valid new agreement is executed.</p>
-      </section>
+      <TuitionTermsNotice />
       {/* Acknowledgments */}
       <div className="space-y-4 mb-6">
         <h3 className="font-semibold text-slate-900">Required Acknowledgments</h3>
@@ -149,12 +146,10 @@ export function PaymentDisclosure({
               I understand the consequences of missed payments
             </p>
             <p className="text-sm text-slate-600">
-              If a payment fails, I have {TIER3_INTERNAL_PLAN.rules.gracePeriodDays} days to resolve
-              it. After that,{' '}
-              <strong>my access to courses and labs will be paused immediately</strong>. A $
-              {TIER3_INTERNAL_PLAN.rules.lateFee} late fee may apply. After{' '}
-              {TIER3_INTERNAL_PLAN.enforcement.missedPaymentsBeforeTermination} missed payments, my
-              enrollment may be terminated.
+              Payments have a three-calendar-day grace period. A $10 daily late fee starts on day 4.
+              At day 7, instructional access is suspended under this agreement; a one-time $25
+              reactivation fee applies after the balance is resolved. Billing, support, timekeeping,
+              and required training records remain available.
             </p>
           </div>
         </label>

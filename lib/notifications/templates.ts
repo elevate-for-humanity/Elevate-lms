@@ -16,6 +16,7 @@ export type TemplateKey =
   | 'enrollment_welcome'
   | 'theory_schedule_start'
   | 'theory_schedule_stop'
+  | 'theory_schedule_due'
   | 'inquiry_received'
   | 'apprentice_submission_received'
   | 'hostshop_submission_received'
@@ -101,6 +102,17 @@ export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailT
       };
     }
 
+    case 'theory_schedule_due': {
+      const dashboardUrl =
+        data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice/theory-schedule`;
+      return {
+        subject: 'Your assigned theory is due by the end of this week',
+        html: baseTemplate(
+          `<h2>Finish this week's assigned theory</h2><p>Your assigned theory is due tonight by 11:59 PM (${data.timezone}).</p><p>Weekly target: ${data.weekly_target_hours} hours. Active time recorded: ${data.recorded_hours} hours. Use your saved study windows, keep theory separate from OJL, and save the required lesson and workbook activities. Recorded activity remains subject to RTI review.</p>${button('Review my theory plan', dashboardUrl)}`,
+        ),
+        text: `Your assigned theory is due tonight by 11:59 PM (${data.timezone}). Weekly target: ${data.weekly_target_hours} hours. Active time recorded: ${data.recorded_hours} hours. Work only in your saved study windows and keep theory separate from OJL. Save required lesson and workbook activities. Review your plan: ${dashboardUrl}`,
+      };
+    }
     case 'theory_schedule_stop': {
       const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice`;
       return {
@@ -119,8 +131,10 @@ export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailT
     case 'enrollment_welcome': {
       const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/lms/dashboard`;
       const loginUrl = data.login_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;
-      const passwordSetupUrl = data.password_setup_url || `${PLATFORM_DEFAULTS.siteUrl}/forgot-password`;
-      const securityUrl = data.security_url || `${PLATFORM_DEFAULTS.siteUrl}/account/settings/security`;
+      const passwordSetupUrl =
+        data.password_setup_url || `${PLATFORM_DEFAULTS.siteUrl}/forgot-password`;
+      const securityUrl =
+        data.security_url || `${PLATFORM_DEFAULTS.siteUrl}/account/settings/security`;
       return {
         subject: `Welcome to ${data.program_name || 'your Elevate program'} — start here`,
         html: baseTemplate(`

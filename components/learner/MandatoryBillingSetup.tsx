@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TuitionTermsNotice } from './TuitionTermsNotice';
 import { AlertCircle, BadgeCheck, CreditCard } from 'lucide-react';
 import { AffirmInvoiceButton } from '@/components/payments/AffirmInvoiceButton';
 import type { LearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
@@ -57,6 +58,7 @@ export function MandatoryBillingSetup({
           >
             {copy}
           </p>
+          <TuitionTermsNotice />
           <div className="mt-4 flex flex-wrap items-center gap-3">
             {!complete && requirement.status === 'configuration_required' ? (
               <Link
@@ -66,8 +68,7 @@ export function MandatoryBillingSetup({
                 Contact billing setup
               </Link>
             ) : null}
-            {!complete &&
-            ['release_required', 'release_submitted'].includes(requirement.status) ? (
+            {!complete && ['release_required', 'release_submitted'].includes(requirement.status) ? (
               <Link
                 href="/lms/documents#billing-authorization"
                 className="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-black text-white"
@@ -85,8 +86,7 @@ export function MandatoryBillingSetup({
                 Approve automatic payments in PayPal
               </a>
             ) : null}
-            {requirement.status === 'paypal_approval_required' &&
-            !requirement.paypalApprovalUrl ? (
+            {requirement.status === 'paypal_approval_required' && !requirement.paypalApprovalUrl ? (
               <Link
                 href="/lms/documents#billing-authorization"
                 className="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-black text-white"

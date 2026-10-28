@@ -12,12 +12,17 @@ export function TimeclockAttendanceNotice() {
         clock-out succeeded before leaving its perimeter. An off-site clock-out is blocked. Without
         an accepted on-site clock-out, your day’s hours are not automatically activated or credited;
         attendance must be reviewed before hours can be approved. Leaving the clock running while
-        you are away does not earn training hours.
+        you are away does not earn training hours. Location checks enforce your assigned site's
+        configured radius. Remaining outside the approved geofence triggers automatic clock-out
+        after the configured grace period; flagged time is blocked from automatic credit pending
+        review.
       </p>
       <p className="mt-2 text-sm leading-6">
-        Use Start Lunch before your break and End Lunch when training resumes. Record lunch before
-        leaving and after returning if you go off-site. Lunch is excluded from training hours.
-        Weekly maximums are {APPRENTICE_TIME_POLICY.weeklyOjlMaxHours} OJL hours and{' '}
+        Take a one-hour lunch each training day. Use Start Lunch before your break and End Lunch
+        when training resumes. Record lunch before leaving and after returning if you go off-site.
+        The one-hour lunch does not count toward daily or weekly training hours. Actual recorded
+        break time is excluded; missing or incorrect breaks require review. Weekly maximums are{' '}
+        {APPRENTICE_TIME_POLICY.weeklyOjlMaxHours} OJL hours and{' '}
         {APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours} combined OJL/RTI hours; follow any lower
         limit in your approved schedule.
       </p>

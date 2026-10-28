@@ -79,3 +79,27 @@ test('deployment retries retain the verified image from an earlier attempt',asyn
  await pruneWebReleaseRequests({api,repository,execute:true});
  assert.equal(historyRead,true);assert.deepEqual(f.writes,[]);
 });
+
+test('tested Admin rollout completes while newer requests are only building',async()=>{
+ const {assertTestedAdminRollout}=await import('./prune-web-release-requests.mjs');
+ const sha='a'.repeat(40);
+ const api=async path=>path.includes('/workflows/')?{workflow_runs:[row(1,'in_progress',{head_sha:sha}),row(2,'in_progress',{head_sha:'b'.repeat(40)})]}:{total_count:1,jobs:path.includes('/runs/1/')?[{name:'Build and upload Admin image',status:'completed',conclusion:'success'}]:[{name:'Build and upload Admin image',status:'in_progress'}]};
+ assert.equal((await assertTestedAdminRollout({api,repository,runId:1,commitSha:sha})).status,'tested_admin_image_allowed');
+ await assert.rejects(assertTestedAdminRollout({api,repository,runId:1,commitSha:'b'.repeat(40)}),/COMMIT_MISMATCH/);
+});
+test('Admin rollout requires a successful trusted image build and fails closed on job history',async()=>{
+ const {assertTestedAdminRollout}=await import('./prune-web-release-requests.mjs');
+ const sha='a'.repeat(40);
+ for(const jobs of [{total_count:0,jobs:[]},{total_count:1,jobs:[{name:'Build and upload Admin image',status:'completed',conclusion:'failure'}]},{total_count:101,jobs:[]},{}]){
+  const api=async path=>path.includes('/workflows/')?{workflow_runs:[row(1,'in_progress',{head_sha:sha})]}:jobs;
+  await assert.rejects(assertTestedAdminRollout({api,repository,runId:1,commitSha:sha}),/TESTED_IMAGE_REQUIRED|INVENTORY_UNAVAILABLE/);
+ }
+});
+test('Admin rollout never overwrites a newer started or completed rollout',async()=>{
+ const {assertTestedAdminRollout}=await import('./prune-web-release-requests.mjs');
+ const sha='a'.repeat(40);
+ for(const newer of [{status:'in_progress'},{status:'completed',conclusion:'success'},{status:'completed',conclusion:'failure'},{status:'pending',steps:[{status:'completed'}]}]){
+  const api=async path=>path.includes('/workflows/')?{workflow_runs:[row(1,'in_progress',{head_sha:sha}),row(2)]}:{total_count:1,jobs:path.includes('/runs/1/')?[{name:'Build and upload Admin image',status:'completed',conclusion:'success'}]:[{name:'Deploy and verify Admin on Google',...newer}]};
+  await assert.rejects(assertTestedAdminRollout({api,repository,runId:1,commitSha:sha}),/NEWER_ADMIN_ROLLOUT_STARTED/);
+ }
+});

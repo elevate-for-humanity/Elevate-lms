@@ -28,6 +28,35 @@ export async function assertLatestWebReleaseRequest({api,repository,workflow,run
   return {workflow,runId:current.id,status:'latest_requested_release'};
 }
 
+/** An Admin image that completed its trusted build/upload may finish rollout
+ * while newer requests are still building. Never roll back a newer rollout.
+ * The workflow separately verifies the immutable image digest and exact health.
+ */
+export async function assertTestedAdminRollout({api,repository,runId,commitSha}) {
+  if(repository!=='elevate-for-humanity/Elevate-lms')throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
+  if(!/^[a-f0-9]{40}$/.test(commitSha||''))throw Error('RELEASE_COMMIT_INVALID');
+  const inventory=await api(`repos/${repository}/actions/workflows/deploy-admin.yml/runs?event=workflow_dispatch&branch=main&per_page=100`);
+  if(!Array.isArray(inventory.workflow_runs))throw Error('RELEASE_INVENTORY_UNAVAILABLE');
+  const runs=inventory.workflow_runs.filter(eligible);
+  if(runs.some(r=>!Number.isSafeInteger(r.id)||!Number.isSafeInteger(r.run_number)))throw Error('RELEASE_INVENTORY_INVALID');
+  const current=runs.find(r=>String(r.id)===String(runId));
+  if(!current||current.head_sha!==commitSha)throw Error('RELEASE_COMMIT_MISMATCH');
+  const jobsFor=async id=>{
+    const result=await api(`repos/${repository}/actions/runs/${id}/jobs?filter=all&per_page=100`);
+    if(!Array.isArray(result.jobs)||!Number.isSafeInteger(result.total_count)||result.total_count>100)throw Error('RELEASE_JOB_INVENTORY_UNAVAILABLE');
+    return result.jobs;
+  };
+  const jobs=await jobsFor(current.id);
+  if(!jobs.some(j=>j.name==='Build and upload Admin image'&&j.status==='completed'&&j.conclusion==='success'))throw Error('ADMIN_TESTED_IMAGE_REQUIRED');
+  for(const newer of runs.filter(r=>r.run_number>current.run_number)){
+    const newerJobs=await jobsFor(newer.id);
+    if(newerJobs.some(j=>j.name==='Deploy and verify Admin on Google'&&
+      (j.status==='in_progress'||j.status==='completed'&&j.conclusion!=='skipped'||j.steps?.some(step=>step.status==='in_progress'||step.status==='completed'))))
+      throw Error('NEWER_ADMIN_ROLLOUT_STARTED');
+  }
+  return {workflow:'deploy-admin.yml',runId:current.id,commitSha,status:'tested_admin_image_allowed'};
+}
+
 /** Cancel only unstarted requests superseded by a newer request for the SAME app.
  * Never cancel an active build/deployment, course execution, or another branch. */
 export async function pruneWebReleaseRequests({api, repository, execute=false}) {
@@ -63,7 +92,9 @@ export async function pruneWebReleaseRequests({api, repository, execute=false}) 
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
   const api=(path,method='GET')=>releaseApi(path,method);
   const repository=process.env.GITHUB_REPOSITORY;
-  const result=process.argv.includes('--assert-latest')
+  const result=process.argv.includes('--assert-tested-admin-rollout')
+    ? await assertTestedAdminRollout({api,repository,runId:process.env.GITHUB_RUN_ID,commitSha:process.env.GITHUB_SHA})
+    : process.argv.includes('--assert-latest')
     ? await assertLatestWebReleaseRequest({api,repository,workflow:process.env.RELEASE_WORKFLOW,runId:process.env.GITHUB_RUN_ID})
     : await pruneWebReleaseRequests({api,repository,execute:process.env.PRUNE_SUPERSEDED_RELEASES==='true'});
   console.log(JSON.stringify(result));

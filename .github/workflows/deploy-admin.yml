@@ -199,11 +199,11 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Reject superseded deployment requests before rollout
+      - name: Admit the tested Admin image without rolling back a newer rollout
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_WORKFLOW: deploy-admin.yml
-        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-tested-admin-rollout
       - name: Upload and deploy the exact Admin image
         env:
           PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}

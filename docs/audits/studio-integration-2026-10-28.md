@@ -53,3 +53,12 @@ The live Admin version endpoint reported commit `34fb71e516617cb97b2dbe32687e994
 - Supabase advisor results include existing policy/performance notices. Missing-policy informational notices on three Ultimate build tables were not automatically fixed: service-only access can intentionally use RLS without browser policies. No unused indexes were removed based solely on advisory labels. MFA options and one unrelated pacing function require separate security review ([MFA guidance](https://supabase.com/docs/guides/auth/auth-mfa), [function guidance](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)).
 - Fast-forward runtime synchronization tests: 2 passed, including preservation of tracked/untracked changes and refusal of conflicts or a mismatched repository origin.
 - First repair production Admin build and generated-route typecheck passed. Follow-up compilation/static generation passed; final build trace/typecheck verification remains in progress at this report update.
+
+## Final local validation and release queue repair
+
+- Both Admin production builds completed successfully, including generated-route TypeScript analysis. The follow-up bundles were inspected for the new GitHub indexer and checkout synchronization controls.
+- AST-based comparison of 99 literal Studio insert/update/upsert objects across 26 tables found no missing write columns. This does not cover dynamic objects, every select expression, or RPC signatures.
+- GitHub rejected the follow-up request with `SUPERSEDED_RELEASE_REQUEST` before its build because newer main requests existed. Newer resume changes were confirmed descendants of the Studio repairs.
+- The Admin rollout guard also rejected successfully built/uploaded images whenever a newer request existed. Its replacement still requires the trusted Admin build/upload job to have succeeded, binds the exact run SHA, fails closed on unreadable job history, and refuses an older image if any newer Admin rollout has begun. Immutable image-digest verification, zero-traffic candidate testing, live exact-version acceptance, and the latest-request check before expensive builds remain in place.
+- Release guard/activation/concurrency tests: 48 passed. Workflow syntax tests: 2 passed. The release-policy change itself does not require recompiling application source.
+- At the last live check, Admin still reported `34fb71e`; no new source revision is claimed live until the deployed version confirms it.

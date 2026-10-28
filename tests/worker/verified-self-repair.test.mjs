@@ -167,3 +167,30 @@ test('authored safety scene survives stage normalization without rewriting its i
   assert.equal(view.scenes[0].dialogue,dialogue);
  }
 });
+
+test('real sanitation procedures and allergy contraindications survive neutral stage titles',()=>{
+ const examples=[
+  ['concept_explanation','Perform a skin allergy test. Do not proceed after a reaction or on an irritated scalp.'],
+  ['concept_explanation','Before service, apply safety and sanitation standards. Sanitize tools and wear clean gloves.'],
+  ['demonstration','Prepare supplies hygienically and check comfort. Stop immediately if irritation occurs.'],
+  ['activate_prior_knowledge','Recall sanitation standards. Prepare clean hands and clean linens; dispense products hygienically.'],
+ ];
+ for(const [stage,dialogue] of examples){
+  const view=instructionView({scenes:[{id:'scene:neutral',stage,sceneType:'worked_example',dialogue}]});
+  assert.equal(view.scenes[0].sceneType,'safety_warning');
+  assert.equal(view.scenes[0].dialogue,dialogue);
+ }
+});
+test('testing vocabulary and a safety-protocol mention alone cannot invent protective teaching',()=>{
+ for(const dialogue of ['Skin allergy tests and strand tests are different terms.','Safety protocols are part of this course.','A client asks about skin testing after a previous reaction.']){
+  assert.equal(instructionView({scenes:[{id:'neutral',stage:'concept_explanation',dialogue}]}).scenes[0].sceneType,'mental_model');
+ }
+});
+
+test('safety-related recaps and checks retain their distinct teaching roles',()=>{
+ const dialogue='Follow safety protocols: sanitize tools, wear protective gloves, and stop for burning.';
+ for(const stage of ['recap','knowledge_check','assessment','reassessment']){
+  const result=instructionView({scenes:[{id:'safety-summary',stage,dialogue}]}).scenes[0];
+  assert.equal(result.sceneType,stage==='recap'?'memory_recap':'knowledge_check');
+ }
+});

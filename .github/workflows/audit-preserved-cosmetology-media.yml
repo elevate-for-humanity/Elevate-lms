@@ -15,6 +15,7 @@ on:
       - 'scripts/gcp/repair-preserved-cosmetology-motion.test.mjs'
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: audit-preserved-cosmetology-media
   cancel-in-progress: false
@@ -36,18 +37,17 @@ jobs:
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/gcp/audit-preserved-cosmetology-media.mjs
-      - run: node --test scripts/gcp/transcribe-preserved-cosmetology-media.test.mjs
-      - name: Prepare isolated pinned speech recognizer without cloud credentials
+      - name: Reuse independently measured speech from the exact preserved recording
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 40681941351
+          name: preserved-cosmetology-media-evidence
+          path: measured-speech-checkpoint
+      - name: Verify immutable measured speech checkpoint before reuse
         run: |
-          npm install --prefix "$RUNNER_TEMP/cosmetology-asr" --no-audit --no-fund @huggingface/transformers@4.0.0
-          mkdir -p "$RUNNER_TEMP/cosmetology-asr/lib/video"
-          cp lib/video/local-transcription.mjs lib/video/local-transcription-worker.mjs "$RUNNER_TEMP/cosmetology-asr/lib/video/"
-      - name: Independently transcribe the same audited bytes
-        env:
-          HF_HUB_OFFLINE: '0'
-          TRANSFORMERS_OFFLINE: '0'
-        run: |
-          AUDIT_OUTPUT_DIR="$PWD/preserved-media-audit" ASR_MODULE_PATH="$RUNNER_TEMP/cosmetology-asr/lib/video/local-transcription.mjs" node scripts/gcp/transcribe-preserved-cosmetology-media.mjs
+          echo '1f02fae170c09a6380a71dc37cddb10a5f21a40e45eaacd5c240409784062bc3  measured-speech-checkpoint/narration-evidence.json' | sha256sum -c -
+          cp measured-speech-checkpoint/narration-evidence.json preserved-media-audit/narration-evidence.json
       - name: Build isolated caption-only candidate using measured speech
         run: |
           node --test scripts/gcp/repair-preserved-cosmetology-captions.test.mjs

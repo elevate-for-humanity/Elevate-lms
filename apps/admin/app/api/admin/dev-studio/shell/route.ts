@@ -1,3 +1,4 @@
+import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 /**
  * /api/admin/dev-studio/shell
  *
@@ -31,41 +32,11 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 function repo()   { return studioRepository(); }
-function branch() { return process.env.GITHUB_BRANCH ?? 'main'; }
+function branch() { return 'main'; }
 const GH_API = 'https://api.github.com';
 const RETIRED_COURSE_WORKFLOWS=new Set(['dev-studio-course-builder.yml','build-cosmetology-course.yml','regenerate-barber-cosmetology.yml','build-esb-acceptance.yml','business-draft-bootstrap.yml']);
 
-/**
- * Resolve a secret: env var first, then platform_secrets table fallback.
- * This loads credentials pre-configured in the platform, not from user input.
- */
-async function resolveSecret(key: string): Promise<string | null> {
-  const envVal = process.env[key];
-  if (envVal && envVal.trim()) return envVal.trim();
-  try {
-    const db = await requireAdminClient();
-    const { data } = await db
-      .from('platform_secrets')
-      .select('value_enc')
-      .eq('key', key)
-      .maybeSingle();
-    const val = data?.value_enc;
-    return val && val.trim() ? val.trim() : null;
-  } catch {
-    return null;
-  }
-}
-
-async function ghHeaders(): Promise<HeadersInit> {
-  const token = await resolveSecret('GITHUB_TOKEN');
-  if (!token) throw new Error('GITHUB_TOKEN is not configured in platform_secrets');
-  return {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'Content-Type': 'application/json',
-  };
-}
+async function ghHeaders():Promise<HeadersInit>{return getGitHubHeaders();}
 
 // ── Workflow discovery ────────────────────────────────────────────────────────
 
@@ -84,6 +55,7 @@ interface GHWorkflow {
 async function listDispatchableWorkflows(): Promise<GHWorkflow[]> {
   const all: GHWorkflow[] = [];
   let page = 1;
+  let seen = 0;
   while (true) {
     const res = await fetch(
       `${GH_API}/repos/${repo()}/actions/workflows?per_page=100&page=${page}`,
@@ -92,7 +64,8 @@ async function listDispatchableWorkflows(): Promise<GHWorkflow[]> {
     if (!res.ok) throw new Error(`GitHub API ${res.status}: ${(await res.text()).slice(0, 200)}`);
     const data = await res.json() as { workflows: GHWorkflow[]; total_count: number };
     all.push(...data.workflows.filter(w=>!RETIRED_COURSE_WORKFLOWS.has(w.path.replace('.github/workflows/',''))));
-    if (all.length >= data.total_count) break;
+    seen += data.workflows.length;
+    if (data.workflows.length < 100 || seen >= data.total_count) break;
     page++;
   }
   // Return only active workflows — disabled ones can't be dispatched
@@ -159,6 +132,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const dispatchedAt=Date.now();
     const dispatchRes = await fetch(
       `${GH_API}/repos/${repo()}/actions/workflows/${workflowFile}/dispatches`,
       {
@@ -175,7 +149,9 @@ export async function POST(request: NextRequest) {
         { headers: await ghHeaders() },
       );
       const runsData = runsRes.ok ? await runsRes.json() : null;
-      const latestRun = runsData?.workflow_runs?.[0];
+      const latestRun = runsData?.workflow_runs?.find((run:any)=>
+        run.event==='workflow_dispatch' && run.head_branch==='main' &&
+        Number.isFinite(Date.parse(run.created_at)) && Date.parse(run.created_at)>=dispatchedAt-1000);
 
       if (studioRunId) {
         const db = await requireAdminClient();

@@ -12,6 +12,21 @@ export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req); if (auth.error) return auth.error;
   const buildId = req.nextUrl.searchParams.get('buildId');
   const lessonBuildId = req.nextUrl.searchParams.get('lessonBuildId');
+  const canonicalLessonId=req.nextUrl.searchParams.get('canonicalLessonId');
+  if(canonicalLessonId){
+    if(![buildId,canonicalLessonId].every(value=>/^[a-f0-9-]{36}$/i.test(value??'')))
+      return NextResponse.json({error:'Select a saved lesson.'},{status:400,headers});
+    try{
+      const db=await requireAdminClient();
+      const build=await db.from('ultimate_course_builds').select('course_id').eq('id',buildId).maybeSingle();
+      if(build.error)throw build.error;
+      if(!build.data)return NextResponse.json({error:'Build not found'},{status:404,headers});
+      const lesson=await db.from('course_lessons').select('id,video_url').eq('id',canonicalLessonId).eq('course_id',build.data.course_id).maybeSingle();
+      if(lesson.error)throw lesson.error;
+      if(!lesson.data?.video_url)return NextResponse.json({error:'No saved video yet'},{status:404,headers});
+      return new NextResponse(null,{status:307,headers:{...headers,Location:await signedLessonPlayback(db,lesson.data.video_url)}});
+    }catch{return NextResponse.json({error:'Saved video access could not be renewed'},{status:503,headers});}
+  }
   if (![buildId, lessonBuildId].every(value => /^[a-f0-9-]{36}$/i.test(value ?? '')))
     return NextResponse.json({error:'Select a saved lesson.'}, {status:400, headers});
   try {

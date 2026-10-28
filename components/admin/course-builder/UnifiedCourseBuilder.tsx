@@ -1,11 +1,13 @@
 'use client';
-import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
+import UnifiedEllieChat from '@/components/studio/UnifiedEllieChat';
+import DeployPanel from '@/components/studio/DeployPanel';
+import {CourseWorkspaceContext, type CourseSelection} from './CourseWorkspaceContext';
 
 import dynamic from 'next/dynamic';
 import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
-import CourseSidePreview from './CourseSidePreview';
+
 import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
@@ -18,9 +20,7 @@ import ParallelLessonAutopilots from './ParallelLessonAutopilots';
 const MediaStudioPanel = dynamic(() => import('@/components/studio/MediaStudioPanel'), {
   ssr: false,
 });
-const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), {
-  ssr: false,
-});
+
 
 type Tab = 'courses' | 'ultimate' | 'registry' | 'media';
 type CourseRow = {
@@ -142,7 +142,6 @@ export default function UnifiedCourseBuilder({
   initialCourseId = '',
   initialTab = 'ultimate',
   embedded = false,
-  initialBrowserTarget = '',
   syncLocationWithUrl = !embedded,
 }: {
   initialCourseId?: string;
@@ -152,8 +151,24 @@ export default function UnifiedCourseBuilder({
   syncLocationWithUrl?: boolean;
 }) {
   const [browserOpen, setBrowserOpen] = useState(true);
-  const [sidePanel, setSidePanel] = useState<'lesson' | 'browser'>('lesson');
-  const [browserVisited, setBrowserVisited] = useState(false);
+  const [previewTarget,setPreviewTarget]=useState<HTMLDivElement|null>(null);
+  const [lessonSelection,setLessonSelection]=useState<CourseSelection|null>(null);
+  const [deployOpen,setDeployOpen]=useState(false);
+  const [suggestedPrompt,setSuggestedPrompt]=useState('');
+  const [currentBuildId,setCurrentBuildId]=useState('');
+  const [requestedLessonId,setRequestedLessonId]=useState('');
+  const onBuild=useCallback((id:string,courseId?:string,status?:string)=>{
+    setCurrentBuildId(id);
+    if(courseId && status==='published')setCourses(previous=>
+      previous.some(row=>row.id===courseId && row.status!=='published')
+        ? previous.map(row=>row.id===courseId?{...row,status:'published'}:row) : previous);
+  },[]);
+  const [taskStatus,setTaskStatus]=useState('');
+  const onLessonSelection=useCallback((selection:CourseSelection)=>{
+    setLessonSelection(previous=>previous?.lessonKey===selection.lessonKey && previous?.lessonId===selection.lessonId
+      && previous?.title===selection.title ? previous : selection);
+  },[]);
+  const previewContext=useMemo(()=>({previewTarget,onSelection:onLessonSelection,onBuild,requestedLessonId}),[previewTarget,onLessonSelection,onBuild,requestedLessonId]);
   const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [programs, setPrograms] = useState<ProgramRow[]>([]);
@@ -183,6 +198,8 @@ export default function UnifiedCourseBuilder({
 
   function selectCourse(id: string) {
     setCourseId(id);
+    setLessonSelection(null);
+    setCurrentBuildId('');setRequestedLessonId('');
     syncLocation(id, tab);
   }
 
@@ -192,6 +209,7 @@ export default function UnifiedCourseBuilder({
   }
 
   function openUltimate(id: string) {
+    setCurrentBuildId('');setLessonSelection(null);
     setCourseId(id);
     setTab('ultimate');
     syncLocation(id, 'ultimate');
@@ -294,9 +312,34 @@ export default function UnifiedCourseBuilder({
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[1600px] px-3 sm:px-5">
-        <PodcastProgramGuideReview authorized />
-      </div>
+      <section aria-label="Course AI controls" className="space-y-3 border-b border-slate-700 p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="flex-1 font-bold">Tell PARIS what to build or change</h2>
+          <button type="button" className="min-h-11 rounded-lg border border-cyan-600 px-3"
+            onClick={()=>{setTab('ultimate');setSuggestedPrompt('Help me plan a new course. Ask for its topic, learner, credential and program. Do not use tools or start a build yet.');}}>Build a course</button>
+          <button type="button" aria-expanded={deployOpen} className="min-h-11 rounded-lg border border-cyan-600 px-3"
+            onClick={()=>setDeployOpen(value=>!value)}>Deploy</button>
+        </div>
+        <p className="text-sm text-slate-300">Speak or type your instructions here. Select courses and lessons below; previews stay on the right.</p>
+        <p className="text-xs text-slate-300">Deploy updates the platform. Publish course releases accepted lessons to learners.</p>
+        <div className="h-[32rem] min-w-0 overflow-hidden rounded-xl border border-slate-700">
+          <UnifiedEllieChat embedded restoreLatest={false}
+            fileContext={JSON.stringify({workspace:'course',courseId:selectedCourse?.id,title:selectedCourse?.title,
+              programSlug:selectedProgram?.slug||selectedCourse?.slug,
+              lessonId:lessonSelection?.canonicalLessonId||requestedLessonId,lessonTitle:lessonSelection?.title,buildId:currentBuildId})}
+            suggestedPrompt={suggestedPrompt}
+            onOpenDeploy={()=>setDeployOpen(true)} onOpenPreview={()=>setBrowserOpen(true)}
+            onCommandStart={()=>{setBrowserOpen(true);setTaskStatus('AI request submitted. Waiting for saved execution evidence.');}}
+            onTaskCheckpoint={checkpoint=>{
+              setTaskStatus(checkpoint ? (checkpoint.title||'Course task')+' · '+checkpoint.status.replaceAll('_',' ') : '');
+              if(checkpoint?.status==='done')void loadCourses();
+            }}
+            onCourseResult={(id,lessonId)=>{setCurrentBuildId('');setRequestedLessonId(lessonId??'');void loadCourses(id);openUltimate(id);setBrowserOpen(true);}}
+          />
+        </div>
+        {taskStatus && <p role="status" className="text-sm text-cyan-200">{taskStatus}</p>}
+        {deployOpen && <div className="h-[34rem] overflow-hidden rounded-xl border border-slate-700"><DeployPanel /></div>}
+      </section>
       <div className="overflow-x-auto border-b border-slate-800 bg-slate-950 px-4 py-3">
         <div className="mx-auto flex max-w-[1600px] gap-2">
           {TABS.map(({ id, label, icon: Icon }) => (
@@ -366,62 +409,25 @@ export default function UnifiedCourseBuilder({
     </div>
   );
   return (
-    <ResizableWorkspace
-      className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
-      title="Course side panel"
-      stackedTabs
-      primaryLabel="Build course"
-      panelLabel="Lesson preview"
-      open={browserOpen}
-      onOpenChange={(open) => {
-        setBrowserOpen(open);
-        if (open) setBrowserVisited(true);
-      }}
-      panel={
-        <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
-          <nav
-            aria-label="Course side panel views"
-            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-1.5"
-          >
-            <button
-              type="button"
-              aria-pressed={sidePanel === "lesson"}
-              onClick={() => setSidePanel("lesson")}
-              className="min-h-11 rounded-lg border border-slate-600 px-3"
-            >
-              Lesson video
-            </button>
-            <button
-              type="button"
-              aria-pressed={sidePanel === "browser"}
-              onClick={() => {
-                setSidePanel("browser");
-                setBrowserVisited(true);
-              }}
-              className="min-h-11 rounded-lg border border-slate-600 px-3"
-            >
-              Web browser
-            </button>
-          </nav>
-          <div
-            hidden={sidePanel !== "lesson"}
-            className="min-h-0 flex-1 overflow-hidden"
-          >
-            <CourseSidePreview courseId={courseId} />
+    <CourseWorkspaceContext.Provider value={previewContext}>
+      <ResizableWorkspace
+        className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
+        title="Course previews" initialPanelSize={60}
+        stackedTabs primaryLabel="Courses, lessons & AI" panelLabel="Preview"
+        open={browserOpen} onOpenChange={setBrowserOpen}
+        panel={<section aria-label="Course preview pane" className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
+          <header className="shrink-0 border-b border-slate-700 px-4 py-3">
+            <h2 className="font-bold">Preview</h2>
+            <p className="text-sm text-slate-300">{lessonSelection?.title || selectedCourse?.title || 'Choose a course and lesson on the left.'}</p>
+          </header>
+          <div ref={setPreviewTarget} className="min-h-0 flex-1 overflow-auto">
+            {!currentBuildId && selectedCourse && <iframe title={selectedCourse.title+' — learner preview'}
+              src={'/api/admin/course-builder/preview?'+new URLSearchParams({courseId:selectedCourse.id,...(requestedLessonId?{lessonId:requestedLessonId}:{})})}
+              className="h-full min-h-[36rem] w-full border-0 bg-white" allow="autoplay; fullscreen" />}
           </div>
-          <div hidden={sidePanel !== "browser"} className="min-h-0 flex-1">
-            {browserVisited && (
-              <CloudBrowserWorkspace
-                autoStart={browserOpen && sidePanel === "browser"}
-                initialTarget={initialBrowserTarget}
-              />
-            )}
-          </div>
-        </div>
-      }
-    >
-      {workspace}
-    </ResizableWorkspace>
+        </section>}
+      >{workspace}</ResizableWorkspace>
+    </CourseWorkspaceContext.Provider>
   );
 }
 
@@ -910,6 +916,7 @@ export function UltimateBuildPanel({
   programSlug: string;
   compact?: boolean;
 }) {
+  const courseWorkspace=useContext(CourseWorkspaceContext);
   const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
   const [acquisitions, setAcquisitions] = useState<Array<{ id: string; goal: string | null }>>([]);
   const [buildsCourseId, setBuildsCourseId] = useState('');
@@ -920,6 +927,7 @@ export function UltimateBuildPanel({
   const refreshToken = useRef(0);
   const refreshController = useRef<AbortController | null>(null);
   const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
+  useEffect(()=>{courseWorkspace.onBuild?.(latest?.id??'',course.id,latest?.status);},[latest?.id,latest?.status,course.id,courseWorkspace.onBuild]);
   const statusLoading = loading;
   const statusLoaded = buildsCourseId === course.id;
   const [lastStatusAt, setLastStatusAt] = useState<string | null>(null);
@@ -1501,7 +1509,7 @@ export function UltimateBuildPanel({
           type="button"
           onClick={() => void startBuild()}
           disabled={
-            busy || statusLoading || !statusLoaded || Boolean(statusError) || execution.active
+            busy || statusLoading || !statusLoaded || Boolean(statusError) || execution.active || latest?.status === 'published'
           }
           className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
         >
@@ -1510,7 +1518,9 @@ export function UltimateBuildPanel({
           ) : (
             <Rocket className="h-4 w-4" />
           )}
-          {statusLoading
+          {latest?.status === 'published'
+            ? 'Course published'
+            : statusLoading
             ? 'Loading build status…'
             : !statusLoaded
               ? 'Build status unavailable'
@@ -1569,6 +1579,13 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button type="button" onClick={()=>void publish()} disabled={busy || latest?.status!=='built'}
+          className="min-h-11 rounded-lg bg-emerald-600 px-4 py-2 font-bold disabled:opacity-50">
+          {latest?.status==='published' ? 'Published' : 'Publish course'}
+        </button>
+        <p className="text-sm text-slate-300">{latest?.status==='built' ? 'Ready for the release checks.' : latest?.status==='published' ? 'This course is live.' : 'Publication becomes available after build acceptance.'}</p>
+      </div>
       <details
         aria-label="Syllabus instructional source"
         className="mt-5 rounded-xl border border-cyan-800 bg-slate-950 p-4 text-white"

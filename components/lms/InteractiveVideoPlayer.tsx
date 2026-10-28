@@ -95,6 +95,7 @@ interface InteractiveVideoPlayerProps {
   quizzes?: VideoQuiz[];
   transcript?: TranscriptSegment[];
   validationErrors?: string[];
+  readOnly?: boolean;
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
 }
@@ -110,6 +111,7 @@ export default function InteractiveVideoPlayer({
   quizzes = [],
   transcript = [],
   validationErrors = [],
+  readOnly = false,
   onProgress,
   onComplete,
 }: InteractiveVideoPlayerProps) {
@@ -167,6 +169,7 @@ export default function InteractiveVideoPlayer({
   // Load saved notes from database
   useEffect(() => {
     const loadNotes = async () => {
+      if(readOnly)return;
       const supabase = createClient();
       const {
         data: { user },
@@ -200,11 +203,12 @@ export default function InteractiveVideoPlayer({
       }
     };
     void loadNotes();
-  }, [courseId, lessonRecordId]);
+  }, [courseId, lessonRecordId, readOnly]);
 
   // Restore durable playback and checkpoint state before allowing completion.
   useEffect(() => {
     const loadPlaybackState = async () => {
+      if(readOnly)return;
       const supabase = createClient();
       const {
         data: { user },
@@ -251,11 +255,11 @@ export default function InteractiveVideoPlayer({
       );
     };
     void loadPlaybackState();
-  }, [courseId, lessonRecordId]);
+  }, [courseId, lessonRecordId, readOnly]);
 
   // Save note to database
   const saveNote = async () => {
-    if (!newNote.trim()) return;
+    if (readOnly || !newNote.trim()) return;
 
     const supabase = createClient();
     const {
@@ -302,6 +306,7 @@ export default function InteractiveVideoPlayer({
 
   // Save progress to database
   const saveProgress = async (progress: number) => {
+    if(readOnly)return;
     const supabase = createClient();
     const {
       data: { user },
@@ -443,7 +448,7 @@ export default function InteractiveVideoPlayer({
       // Only notify when the rounded percentage actually changes
       if (pct !== lastProgressRef.current) {
         lastProgressRef.current = pct;
-        onProgressRef.current?.(pct);
+        if(!readOnly)onProgressRef.current?.(pct);
 
         // Save to DB every 10%
         if (pct % 10 === 0) {
@@ -452,7 +457,7 @@ export default function InteractiveVideoPlayer({
       }
 
       // Fire onComplete once when 95%+ reached
-      if (pct >= 95 && allCheckpointsComplete && !completeFiredRef.current) {
+      if (!readOnly && pct >= 95 && allCheckpointsComplete && !completeFiredRef.current) {
         completeFiredRef.current = true;
         onCompleteRef.current?.();
       }
@@ -478,7 +483,7 @@ export default function InteractiveVideoPlayer({
         videoRef.current.currentTime = resumeAt;
         setCurrentTime(resumeAt);
       }
-      onProgressRef.current?.(
+      if(!readOnly)onProgressRef.current?.(
         videoRef.current.duration > 0
           ? Math.round((videoRef.current.currentTime / videoRef.current.duration) * 100)
           : 0,
@@ -542,6 +547,7 @@ export default function InteractiveVideoPlayer({
     if (quizAnswer !== null && currentQuiz) {
       const isCorrect = quizAnswer === currentQuiz.correctAnswer;
       setShowQuizResult(true);
+      if(!readOnly){
       const response = await fetch('/api/video-quiz-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -562,6 +568,8 @@ export default function InteractiveVideoPlayer({
         return;
       }
       setPersistenceError(null);
+
+      }
 
       if (!isCorrect) return;
       setCompletedCheckpointKeys((current) =>
@@ -612,6 +620,11 @@ export default function InteractiveVideoPlayer({
     setCheckpointFeedback(feedback);
     if (!valid) return;
 
+    if(readOnly){
+      setCompletedCheckpointKeys(current=>new Set(current).add(getCheckpointKey(activeCheckpoint)));
+      setActiveCheckpoint(null);setCheckpointChoice(null);setCheckpointResponse('');setCheckpointFeedback('');
+      return;
+    }
     if (!lessonRecordId || !courseId) {
       setPersistenceError(
         'Open this video from your enrolled course before completing checkpoints.',
@@ -687,6 +700,7 @@ export default function InteractiveVideoPlayer({
 
   return (
     <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
+      {readOnly && <p role="status" className="bg-amber-100 p-3 text-sm text-amber-950">Read-only preview. Playback, notes and answers do not change learner records.</p>}
       {validationErrors.length > 0 && (
         <div
           className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
@@ -741,7 +755,7 @@ export default function InteractiveVideoPlayer({
               onError={() => setLoadError(true)}
               onEnded={() => {
                 setIsPlaying(false);
-                if (allCheckpointsComplete && onComplete) onComplete();
+                if (!readOnly && allCheckpointsComplete && onComplete) onComplete();
               }}
             />
           </div>
@@ -760,7 +774,7 @@ export default function InteractiveVideoPlayer({
             onError={() => setLoadError(true)}
             onEnded={() => {
               setIsPlaying(false);
-              if (allCheckpointsComplete && onComplete) onComplete();
+              if (!readOnly && allCheckpointsComplete && onComplete) onComplete();
             }}
           >
             {captionsUrl ? (
@@ -1161,11 +1175,13 @@ export default function InteractiveVideoPlayer({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') void saveNote();
                     }}
-                    placeholder="Add a note at current timestamp..."
+                    disabled={readOnly}
+                    placeholder={readOnly ? "Notes are disabled in preview" : "Add a note at current timestamp..."}
                     className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white"
                   />
                   <button
                     onClick={() => void saveNote()}
+                    disabled={readOnly}
                     className="px-4 py-2 bg-brand-blue-600 rounded hover:bg-brand-blue-700"
                   >
                     Add Note

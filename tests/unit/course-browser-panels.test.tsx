@@ -11,6 +11,10 @@ import UnifiedCourseBuilder from "@/components/admin/course-builder/UnifiedCours
 import CourseProductionWorkspace from "@/components/admin/course-builder/CourseProductionWorkspace";
 import { CourseStudioApplication } from "@/components/studio/CourseStudioApplication";
 
+vi.mock("@/components/studio/UnifiedEllieChat",()=>({
+  default:()=> <label>AI course instruction<input defaultValue=""/></label>,
+}));
+vi.mock("@/components/studio/DeployPanel",()=>({default:()=> <button>Deploy Admin</button>}));
 vi.mock("@/components/admin/course-builder/UltimateStageInspector", () => ({
   default: () => null,
 }));
@@ -51,27 +55,23 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-it("opens the live course preview by default and launches the web browser only on request", async () => {
+it("keeps course selection, AI instructions and deployment controls on the left with previews only on the right",async()=>{
   render(<UnifiedCourseBuilder />);
-  await waitFor(() => expect(fetch).toHaveBeenCalled());
-  expect(
-    screen.getByRole("region", { name: "Saved course video preview" }),
-  ).toBeVisible();
-  expect(screen.queryByTitle("Cloud browser session")).toBeNull();
-  fireEvent.click(
-    screen.getByRole("button", { name: "Web browser", exact: true }),
-  );
-  const frame = screen.getByTitle("Cloud browser session");
-  fireEvent.click(
-    screen.getByRole("button", { name: "Close Course side panel" }),
-  );
-  fireEvent.click(
-    screen.getByRole("button", { name: "Open Course side panel" }),
-  );
-  expect(screen.getByTitle("Cloud browser session")).toBe(frame);
-  expect(
-    screen.getByRole("separator", { name: "Resize Course side panel" }),
-  ).toBeInTheDocument();
+  await waitFor(()=>expect(fetch).toHaveBeenCalled());
+  const preview=screen.getByRole("region",{name:"Course preview pane"});
+  const controls=screen.getByRole("region",{name:"Course AI controls"});
+  expect(preview).toBeVisible();expect(controls).toBeVisible();
+  expect(preview).not.toContainElement(screen.getByRole("textbox",{name:"AI course instruction"}));
+  expect(screen.queryByRole("button",{name:"Web browser",exact:true})).toBeNull();
+  expect(screen.queryByText(/Podcast & program guide/)).toBeNull();
+  const input=screen.getByRole("textbox",{name:"AI course instruction"});
+  fireEvent.change(input,{target:{value:"Change the introduction"}});
+  fireEvent.click(screen.getByRole("button",{name:"Deploy",exact:true}));
+  expect(controls).toContainElement(screen.getByRole("button",{name:"Deploy Admin"}));
+  fireEvent.click(screen.getByRole("button",{name:"Close Course previews"}));
+  fireEvent.click(screen.getByRole("button",{name:"Open Course previews"}));
+  expect(input).toHaveValue("Change the introduction");
+  expect(screen.getByRole("separator",{name:"Resize Course previews"})).toBeInTheDocument();
 });
 
 it("keeps the lesson editor, learner preview and browser mounted when changing side panels", async () => {
@@ -109,7 +109,7 @@ it("provides the course preview without launching a homepage browser on the stan
   );
   await waitFor(() => expect(fetch).toHaveBeenCalled());
   expect(
-    screen.getByRole("region", { name: "Saved course video preview" }),
+    screen.getByRole("region", { name: "Course preview pane" }),
   ).toBeVisible();
   expect(screen.queryByTitle("Cloud browser session")).toBeNull();
   expect(screen.getAllByRole("separator")).toHaveLength(1);

@@ -65,3 +65,20 @@ it('pins preview playback to the displayed immutable artifact version and scopes
  expect(reads).toContainEqual(['ultimate_artifact_versions','id',lessonId]);
  expect(mocks.sign).toHaveBeenCalledWith(expect.anything(),expired);
 });
+
+it('loads canonical published video using only the build/course/lesson scope and ignores caller media sources',async()=>{
+ mocks.auth.mockResolvedValue({id:'admin'});mocks.sign.mockClear();mocks.sign.mockResolvedValue('https://media.example/scoped');
+ const reads:unknown[]=[],selections:string[]=[];
+ mocks.db.mockResolvedValue({from:(table:string)=>{const q={select:(fields:string)=>{selections.push(fields);return q;},eq:(...args:unknown[])=>{reads.push([table,...args]);return q;},
+  maybeSingle:async()=>({data:table==='ultimate_course_builds'?{course_id:buildId}:{id:lessonId,video_url:expired},error:null})};return q;}});
+ const req=new NextRequest('https://admin.example/api/admin/ultimate-course-builder/preview?'+new URLSearchParams({buildId,canonicalLessonId:lessonId,source:'https://attacker.example'}));
+ expect((await GET(req)).status).toBe(307);expect(mocks.sign.mock.calls[0][1]).toBe(expired);
+ expect(reads).toContainEqual(['course_lessons','course_id',buildId]);expect(reads).toContainEqual(['course_lessons','id',lessonId]);
+ expect(selections.every(value=>!value.includes('artifacts'))).toBe(true);
+});
+it('cannot sign a canonical video outside the selected course',async()=>{
+ mocks.auth.mockResolvedValue({id:'admin'});mocks.sign.mockClear();
+ mocks.db.mockResolvedValue({from:(table:string)=>{const q={select:()=>q,eq:()=>q,maybeSingle:async()=>({data:table==='ultimate_course_builds'?{course_id:buildId}:null,error:null})};return q;}});
+ const req=new NextRequest('https://admin.example/api/admin/ultimate-course-builder/preview?'+new URLSearchParams({buildId,canonicalLessonId:lessonId}));
+ expect((await GET(req)).status).toBe(404);expect(mocks.sign).not.toHaveBeenCalled();
+});

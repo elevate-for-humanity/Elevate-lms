@@ -348,6 +348,7 @@ export default async function LessonPage({
                 checkpoints={videoCheckpoints}
                 transcript={videoTranscript}
                 captionsUrl={captionsUrl}
+                readOnly={preview.active}
               />
             </div>
           </section>

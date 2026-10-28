@@ -2,11 +2,12 @@
 
 import ProgressiveLessonVideo from './ProgressiveLessonVideo';
 import LessonVideoReview from './LessonVideoReview';
-import ProductionPanelLayout from './ProductionPanelLayout';
+import {createPortal} from 'react-dom';
+import {CourseWorkspaceContext} from './CourseWorkspaceContext';
 import type { ReactNode } from 'react';
 import AssessmentPreview from './AssessmentPreview';
 import { checkpointNeedsRecheck } from '@/lib/ultimate-course-builder/core/job-observation.mjs';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   ULTIMATE_BUILD_STEPS,
   type UltimateBuildStep,
@@ -20,6 +21,8 @@ type Lesson = {
   status: string;
   saved?: boolean;
   preview?: any;
+  canonicalLessonId?: string;
+  hasCheckpoint?: boolean;
   ultimate_lesson_steps?: Step[];
 };
 type Check = { name: string; passed: boolean; message: string };
@@ -139,6 +142,7 @@ export default function UltimateStageInspector({
   updatedAt?: string | null;
   operations?: ReactNode;
 }) {
+  const workspace = useContext(CourseWorkspaceContext);
   const [selected, setSelected] = useState<UltimateBuildStep | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [selectedLesson, setSelectedLesson] = useState('');
@@ -150,6 +154,8 @@ export default function UltimateStageInspector({
   const [checking, setChecking] = useState(false);
   const [healthError, setHealthError] = useState('');
   const requestToken = useRef(0);
+  const appliedRequestedLesson=useRef('');
+  const [learnerView,setLearnerView]=useState(false);
   const [preferApproved, setPreferApproved] = useState(true);
   const [actionBusy, setActionBusy] = useState('');
   const [actionResults, setActionResults] = useState<
@@ -202,7 +208,7 @@ export default function UltimateStageInspector({
               ...(lesson ?? { id: c.id, status: 'planned' }),
               preview,
               lesson_key: c.id,
-              saved: Boolean(lesson),
+              saved: Boolean(lesson && lesson.hasCheckpoint !== false),
               title: c.title ?? c.description ?? `Lesson ${index + 1}`,
             };
           }),
@@ -236,6 +242,35 @@ export default function UltimateStageInspector({
     const timer = window.setInterval(() => setRetry((value) => value + 1), 15000);
     return () => window.clearInterval(timer);
   }, [buildId]);
+
+  useEffect(() => {
+    const lesson=lessons.find(row=>row.lesson_key===selectedLesson);
+    if(lesson)workspace.onSelection?.({lessonKey:lesson.lesson_key,lessonId:lesson.id,
+      canonicalLessonId:lesson.canonicalLessonId,title:lesson.title});
+  },[selectedLesson,lessons,workspace.onSelection]);
+
+  useEffect(()=>{
+    if(!selectedLesson)return;
+    const controller=new AbortController();
+    const lesson=lessons.find(row=>row.lesson_key===selectedLesson);
+    if(!lesson?.saved || lesson.preview?.videoUrl)return;
+    void fetch('/api/admin/ultimate-course-builder?view=checkpoints&buildId='+encodeURIComponent(buildId)+'&lessonId='+encodeURIComponent(lesson.id),
+      {cache:'no-store',signal:controller.signal})
+      .then(async response=>{const payload=await response.json();if(!response.ok)throw Error(payload.error||'Preview unavailable');return payload;})
+      .then(payload=>{
+        const detail=payload.build?.ultimate_lesson_builds?.find((row:any)=>row.id===lesson.id);
+        if(detail?.preview)setLessons(previous=>previous.map(row=>row.id===lesson.id?{...row,preview:detail.preview}:row));
+      }).catch(reason=>{if(!controller.signal.aborted)setError(reason instanceof Error?reason.message:'Preview unavailable');});
+    return()=>controller.abort();
+  },[buildId,selectedLesson,updatedAt,retry]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(()=>{
+    const requested=workspace.requestedLessonId;
+    const key=buildId+':'+requested;
+    if(!requested || appliedRequestedLesson.current===key)return;
+    const row=lessons.find(lesson=>lesson.canonicalLessonId===requested);
+    if(row){appliedRequestedLesson.current=key;setFollowActive(false);setSelectedLesson(row.lesson_key);}
+  },[workspace.requestedLessonId,buildId,lessons]);
 
   async function checkHealth() {
     setChecking(true);
@@ -295,6 +330,7 @@ export default function UltimateStageInspector({
     }
   }
 
+  const previewLesson=lessons.find(row=>row.lesson_key===selectedLesson);
   const outline = (
     <nav aria-label="Course lesson outline" className="space-y-2 p-3 text-white">
       <h3 className="font-bold">Course outline</h3>
@@ -332,17 +368,24 @@ export default function UltimateStageInspector({
     </nav>
   );
   return (
-    <ProductionPanelLayout outline={outline} operations={operations}>
+    <>
+      <details className="my-3 rounded-xl border border-slate-700">
+        <summary className="cursor-pointer p-3 font-bold">All lessons</summary>
+        {outline}
+      </details>
+      <details className="my-3 rounded-xl border border-slate-700 p-3">
+        <summary className="cursor-pointer font-bold">Build status and publishing</summary>
+        {operations}
+      </details>
       <section
-        className="mt-2 min-w-0 overflow-x-hidden rounded-xl bg-slate-950 p-2 text-white sm:p-4"
+        className="mt-2 min-w-0 rounded-xl bg-slate-950 p-2 text-white sm:p-4"
         aria-label="Course Builder checkpoints"
       >
         <div data-course-lesson-panes className="grid min-w-0 grid-cols-1 items-start gap-4">
           <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 ">
             <h3 className="font-bold text-white">Lesson checkpoints</h3>
             <p className="text-sm text-slate-200">
-              Choose a checkpoint and preview any saved lesson. On smaller screens, the lesson
-              preview appears first.
+              Select a lesson or checkpoint here. Its preview appears in the right pane.
             </p>
             <button
               type="button"
@@ -355,7 +398,7 @@ export default function UltimateStageInspector({
           </div>
           <div className="min-w-0 rounded-xl border border-slate-600 bg-slate-950 p-2 text-white sm:p-4 ">
             <label htmlFor="lesson-preview-selection" className="block font-bold">
-              Lesson previews
+              Selected lesson
             </label>
             <select
               id="lesson-preview-selection"
@@ -382,89 +425,7 @@ export default function UltimateStageInspector({
               />
               Follow the lesson being built
             </label>
-            {lessons
-              .filter((lesson) => lesson.lesson_key === selectedLesson)
-              .map((lesson) => (
-                <div key={lesson.lesson_key} className="mt-4 space-y-3">
-                  <h4 className="text-lg font-bold">{lesson.title}</h4>
-                  <p>
-                    Saved lesson status: {lesson.status.replaceAll('_', ' ')}. Draft content updates
-                    as checkpoints are saved.
-                  </p>
-                  {lesson.preview?.approvedVideoUrl && (
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={preferApproved}
-                        onChange={(event) => setPreferApproved(event.target.checked)}
-                      />
-                      Show previously approved published video (uncheck to review current draft)
-                    </label>
-                  )}
-                  <SavedVideo
-                    buildId={buildId}
-                    preferApproved={preferApproved}
-                    lesson={lesson}
-                    diagnostic={
-                      lesson.preview?.videoUrl
-                        ? lesson.preview
-                        : actionResults[`${lesson.id}:${selected}`]?.diagnostic
-                    }
-                  />
-                  {lesson.preview?.review &&
-                    (!lesson.preview?.approvedVideoUrl || !preferApproved) && (
-                      <LessonVideoReview
-                        key={lesson.preview.review.artifactVersionId}
-                        buildId={buildId}
-                        lessonBuildId={lesson.id}
-                        review={lesson.preview.review}
-                        onSaved={() => setRetry((value) => value + 1)}
-                      />
-                    )}
-                  {!lesson.saved && (
-                    <p>This lesson has not been built. No saved video is available yet.</p>
-                  )}
-                  {lesson.preview?.objectives?.length > 0 && (
-                    <div>
-                      <h5 className="font-bold">Learning objectives</h5>
-                      <ul className="list-disc pl-5">
-                        {lesson.preview.objectives.map((text: string, i: number) => (
-                          <li key={i}>{text}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {lesson.preview?.segments?.map((segment: any, i: number) => (
-                    <article key={i} className="rounded-lg border border-slate-600 p-3">
-                      <h5 className="font-bold">{segment.title}</h5>
-                      <p className="mt-2 whitespace-pre-wrap">{segment.text}</p>
-                    </article>
-                  ))}
-                  <AssessmentPreview key={lesson.id} assessment={lesson.preview?.assessment} />
-                  {lesson.preview?.scenes?.map((scene: any, i: number) => (
-                    <details key={i} className="rounded-lg border border-slate-600 p-3">
-                      <summary className="cursor-pointer font-bold">
-                        Scene {i + 1}: {scene.title}
-                      </summary>
-                      <p className="mt-2 whitespace-pre-wrap">{scene.narration}</p>
-                      <p className="mt-2">Visual: {scene.visual}</p>
-                      {scene.recap && <p className="mt-2">Recap: {scene.recap}</p>}
-                    </details>
-                  ))}
-                  {lesson.saved &&
-                    !lesson.preview?.segments?.length &&
-                    !lesson.preview?.scenes?.length && (
-                      <p>
-                        The lesson is being prepared. Saved instruction will appear here before its
-                        final video is ready.
-                      </p>
-                    )}
-                  <p>
-                    Select a checkpoint below to inspect this lesson’s saved evidence and rendered
-                    video.
-                  </p>
-                </div>
-              ))}
+
           </div>
           {healthError ? (
             <p role="alert" className="min-w-0 text-sm text-red-200 ">
@@ -641,7 +602,104 @@ export default function UltimateStageInspector({
           ) : null}
         </div>
       </section>
-    </ProductionPanelLayout>
+      {workspace.previewTarget && createPortal(
+        <section aria-label="Selected lesson preview" className="h-full overflow-auto bg-slate-950 p-4 text-white">
+          <nav aria-label="Preview display" className="mb-3 flex flex-wrap gap-2">
+            <button type="button" aria-pressed={!learnerView} onClick={()=>setLearnerView(false)} className="min-h-11 rounded-lg border border-slate-600 px-3">Lesson video & content</button>
+            <button type="button" aria-pressed={learnerView} onClick={()=>setLearnerView(true)} disabled={!previewLesson?.preview?.learnerPreviewUrl} className="min-h-11 rounded-lg border border-slate-600 px-3 disabled:opacity-50">Learner view</button>
+          </nav>
+          {loading && !lessons.length && <p role="status">Loading lesson preview…</p>}
+          {error && <p role="alert" className="text-red-200">{error}</p>}
+          {!selectedLesson && !loading && !error && <p>Choose a lesson on the left to preview it here.</p>}
+          {learnerView && previewLesson?.preview?.learnerPreviewUrl
+            ? <iframe title={previewLesson.title+' — learner preview'} src={previewLesson.preview.learnerPreviewUrl}
+                className="h-[75dvh] min-h-[36rem] w-full rounded-xl border border-slate-700 bg-white" allow="autoplay; fullscreen" />
+            : <>            {lessons
+              .filter((lesson) => lesson.lesson_key === selectedLesson)
+              .map((lesson) => (
+                <div key={lesson.lesson_key} className="mt-4 space-y-3">
+                  <h4 className="text-lg font-bold">{lesson.title}</h4>
+                  <p>
+                    Saved lesson status: {lesson.status.replaceAll('_', ' ')}. Draft content updates
+                    as checkpoints are saved.
+                  </p>
+                  {lesson.preview?.approvedVideoUrl && (
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={preferApproved}
+                        onChange={(event) => setPreferApproved(event.target.checked)}
+                      />
+                      Show previously approved published video (uncheck to review current draft)
+                    </label>
+                  )}
+                  <SavedVideo
+                    buildId={buildId}
+                    preferApproved={preferApproved}
+                    lesson={lesson}
+                    diagnostic={
+                      lesson.preview?.videoUrl
+                        ? lesson.preview
+                        : actionResults[`${lesson.id}:${selected}`]?.diagnostic
+                    }
+                  />
+                  {lesson.preview?.review &&
+                    (!lesson.preview?.approvedVideoUrl || !preferApproved) && (
+                      <LessonVideoReview
+                        key={lesson.preview.review.artifactVersionId}
+                        buildId={buildId}
+                        lessonBuildId={lesson.id}
+                        review={lesson.preview.review}
+                        onSaved={() => setRetry((value) => value + 1)}
+                      />
+                    )}
+                  {!lesson.saved && (
+                    <p>This lesson has not been built. No saved video is available yet.</p>
+                  )}
+                  {lesson.preview?.objectives?.length > 0 && (
+                    <div>
+                      <h5 className="font-bold">Learning objectives</h5>
+                      <ul className="list-disc pl-5">
+                        {lesson.preview.objectives.map((text: string, i: number) => (
+                          <li key={i}>{text}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {lesson.preview?.segments?.map((segment: any, i: number) => (
+                    <article key={i} className="rounded-lg border border-slate-600 p-3">
+                      <h5 className="font-bold">{segment.title}</h5>
+                      <p className="mt-2 whitespace-pre-wrap">{segment.text}</p>
+                    </article>
+                  ))}
+                  <AssessmentPreview key={lesson.id} assessment={lesson.preview?.assessment} />
+                  {lesson.preview?.scenes?.map((scene: any, i: number) => (
+                    <details key={i} className="rounded-lg border border-slate-600 p-3">
+                      <summary className="cursor-pointer font-bold">
+                        Scene {i + 1}: {scene.title}
+                      </summary>
+                      <p className="mt-2 whitespace-pre-wrap">{scene.narration}</p>
+                      <p className="mt-2">Visual: {scene.visual}</p>
+                      {scene.recap && <p className="mt-2">Recap: {scene.recap}</p>}
+                    </details>
+                  ))}
+                  {lesson.saved &&
+                    !lesson.preview?.segments?.length &&
+                    !lesson.preview?.scenes?.length && (
+                      <p>
+                        The lesson is being prepared. Saved instruction will appear here before its
+                        final video is ready.
+                      </p>
+                    )}
+                  <p>
+                    Select a checkpoint below to inspect this lesson’s saved evidence and rendered
+                    video.
+                  </p>
+                </div>
+              ))}</>}
+
+        </section>, workspace.previewTarget)}
+    </>
   );
 }
 

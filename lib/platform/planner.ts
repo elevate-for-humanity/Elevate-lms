@@ -405,6 +405,10 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
   if (prohibitsToolUse(goal)) throw new Error('Tool execution is disabled by this request. Use conversational chat.');
+  const scopedCourseGoal = goal.split('\n').some(line=>{
+    try{return JSON.parse(line)?.workspace==='course';}catch{return false;}
+  }) && !/\b(code|repository|github|component|typescript|route|layout|api endpoint)\b/i.test(
+    goal.split('\n').filter(line=>{try{return JSON.parse(line)?.workspace!=='course';}catch{return true;}}).join('\n'));
   const g = affirmativeActionText(goal).toLowerCase();
   const explicitReadOnly = isReadOnlyRequest(goal);
   const explicitReadOnlyStudioDiagnostic =
@@ -418,7 +422,7 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
   // Product mentions inside a repository repair must not replace the owner's
   // complete engineering goal with a single product's operational template.
   const compoundEngineeringExecution =
-    !explicitReadOnly &&
+    !scopedCourseGoal && !explicitReadOnly &&
     /\b(code|codebase|repo|repository|commit|source|files? changed|regression tests?|typecheck|build)\b/.test(
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
@@ -428,7 +432,9 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       ? /\b(audit|inspect|diagnostic|status|health)\b/.test(g)
       : /\b(audit|inspect|diagnose)\b/.test(g) &&
         !/\b(fix|repair|start|resume|publish|generate|create|build)\b/.test(g));
-  if (courseAudit) {
+  if (courseAudit && scopedCourseGoal) {
+    steps=[{id:'s1',order:1,title:'Inspect selected course',command:goal,status:'pending',expected_output:'Selected course execution evidence',max_attempts:1}];
+  } else if (courseAudit) {
     steps = GOAL_TEMPLATES.read_only_course_audit!({});
   } else if (explicitReadOnlyStudioDiagnostic) {
     steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});

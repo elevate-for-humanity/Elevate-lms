@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import {courseResultId,courseResultLessonId} from '@/lib/course-builder/workspace-receipt.mjs';
 import {
   Activity,
   AlertTriangle,
@@ -119,6 +120,7 @@ interface UnifiedEllieChatProps {
   onCommandStart?: (command: string) => void;
   selectedConversationId?: string | null;
   restoredCheckpoint?: OrchestratedPlanCheckpoint | null;
+  onCourseResult?: (courseId:string,lessonId?:string)=>void;
 }
 
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
@@ -663,11 +665,38 @@ export default function UnifiedEllieChat({
   onCommandStart,
   selectedConversationId,
   restoredCheckpoint,
+  onCourseResult,
 }: UnifiedEllieChatProps) {
+  const courseResultCallback=useRef(onCourseResult);
+  courseResultCallback.current=onCourseResult;
+  const observedCourseTasks=useRef(new Set<string>());
   const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [restoreError, setRestoreError] = useState('');
+  useEffect(()=>{
+    if(!conversationId || !courseResultCallback.current)return;
+    let cancelled=false,pending=false;
+    const controller=new AbortController();
+    const refresh=async()=>{
+      if(pending)return;pending=true;
+      try{
+        const response=await fetch('/api/admin/dev-studio/tasks?conversationId='+encodeURIComponent(conversationId)+'&limit=20',
+          {cache:'no-store',signal:controller.signal});
+        if(!response.ok)return;
+        const body=await response.json();
+        for(const task of body.tasks??[]){
+          if(cancelled || !['completed','running','queued'].includes(task.status) || observedCourseTasks.current.has(task.id) ||
+            !['courses.generate','courses.edit','build_course','edit_course'].includes(task.tool_name))continue;
+          const id=courseResultId(task.tool_output??task.result_json);
+          if(id){observedCourseTasks.current.add(task.id);courseResultCallback.current?.(id,courseResultLessonId(task.tool_output??task.result_json)??undefined);}
+        }
+      }catch{}finally{pending=false;}
+    };
+    void refresh();const timer=window.setInterval(()=>void refresh(),5000);
+    return()=>{cancelled=true;controller.abort();window.clearInterval(timer);};
+  },[conversationId]);
+
   const [restoringConversation, setRestoringConversation] = useState(false);
   const [restoreAttempt, setRestoreAttempt] = useState(0);
   const [input, setInput] = useState('');
@@ -1115,6 +1144,10 @@ export default function UnifiedEllieChat({
                 });
               },
               onDone: (meta) => {
+                for(const call of meta.toolCalls??[]){
+                  if(!['build_course','edit_course'].includes(call.tool))continue;
+                  const id=courseResultId(call.result);if(id)courseResultCallback.current?.(id,courseResultLessonId(call.result)??undefined);
+                }
                 setMessages((prev) => {
                   const next = [...prev];
                   const row = next[assistantIdx];

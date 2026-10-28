@@ -25,8 +25,8 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
   const { courseId } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}`)}`);
   const preview = await resolveCoursePreview(courseId);
+  if (!user && !preview.active) redirect(`/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}`)}`);
   const db = preview.active ? preview.db : supabase;
 
   let courseQuery = db.from('courses').select('id,title,slug,description,status,is_active,duration_hours,governing_standard_version');
@@ -42,7 +42,9 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
     preview.active ? Promise.resolve({ data: [] }) : supabase.rpc('get_my_course_readiness', { p_course_id: course.id }),
   ]);
 
-  const { data: pacingData, error: pacingError } = await supabase.rpc('get_my_course_pacing', { p_course_id: course.id });
+  const { data: pacingData, error: pacingError } = preview.active
+    ? {data:null,error:null}
+    : await supabase.rpc('get_my_course_pacing', { p_course_id: course.id });
   if (pacingError) throw new Error('Unable to verify the course release schedule');
   const pacing = pacingData as { totalWeeks: number; startAt: string | null; progressive: boolean; lessons: Array<{id: string; module_id: string; title: string; order_index: number; lesson_type: string; duration_minutes: number; published: boolean; releaseWeek: number; opensAt: string | null; available: boolean}> } | null;
   const readiness = (readinessData ?? []) as ReadinessRow[];

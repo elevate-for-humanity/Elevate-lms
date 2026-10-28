@@ -1,7 +1,7 @@
+import {loadCheckpointPage} from '@/lib/ultimate-course-builder/queries/checkpoint-page.mjs';
 import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
 import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
 import { applySyllabusPlan, validateSyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
-import { renderReview } from '@/lib/ultimate-course-builder/authoring/render-review';
 import { logger } from '@/lib/logger';
 import { ULTIMATE_LESSON_CONTRACT_VERSION } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { validateLessonBlueprint } from '@/lib/ultimate-course-builder/instructional/lesson-blueprint';
@@ -13,14 +13,6 @@ import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
-import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
-import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
-import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
-import { checkpointPreviewArtifacts } from '@/lib/ultimate-course-builder/core/checkpoint-preview.mjs';
-import {
-  renderMediaUrl,
-  renderPlaybackUrl,
-} from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -53,85 +45,13 @@ export async function GET(req: NextRequest) {
   const courseId = req.nextUrl.searchParams.get('courseId')?.trim();
 
   if (buildId) {
-    const checkpoints = req.nextUrl.searchParams.get('view') === 'checkpoints';
-    // Keep each selection literal so the Supabase parser infers its actual shape.
-    const result = checkpoints
-      ? await db
-          .from('ultimate_course_builds')
-          .select(
-            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,preview_objectives:artifacts->learning_objectives->objectives,preview_assessment:artifacts->assessment_alignment->assessment,preview_script:artifacts->instructor_script->script,preview_scenes:artifacts->storyboard->storyboard->scenes,preview_media_url:artifacts->lesson_film_render->render->mediaUrl,preview_video_url:artifacts->lesson_film_render->render->videoUrl,preview_playback_url:artifacts->lesson_film_render->render->playbackUrl,preview_media_approved:artifacts->finished_media_qa->mediaQA->pass,ultimate_lesson_steps(step,state,findings,completed_at))',
-          )
-          .eq('id', buildId)
-          .single()
-      : await db
-          .from('ultimate_course_builds')
-          .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
-          .eq('id', buildId)
-          .single();
-    const { data, error } = result;
-    if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
-      const lessons = await Promise.all(
-        (data.ultimate_lesson_builds ?? []).map(async (lesson: any) => {
-          const {preview_objectives,preview_assessment,preview_script,preview_scenes,
-            preview_media_url,preview_video_url,preview_playback_url,preview_media_approved,...saved} = lesson;
-          const artifacts = checkpointPreviewArtifacts(lesson);
-          const preview = {
-            ...lessonPreview(artifacts),
-            historicalVersion: null as number | null,
-            previousRender: false,
-          };
-          // Repairs invalidate dependent checkpoints, not the saved film. Recover its
-          // immutable version on initial load as well as on explicit diagnostics.
-          if (!preview.videoUrl) {
-            const artifact = await db
-              .from('ultimate_artifacts')
-              .select('id')
-              .eq('build_id', buildId)
-              .eq('lesson_build_id', lesson.id)
-              .eq('stage', 'lesson_film_render')
-              .eq('artifact_type', 'stage_output')
-              .maybeSingle();
-            if (artifact.error) throw artifact.error;
-            if (artifact.data?.id) {
-              const versions = await db
-                .from('ultimate_artifact_versions')
-                .select('version,content')
-                .eq('artifact_id', artifact.data.id)
-                .order('version', { ascending: false })
-                .limit(20);
-              if (versions.error) throw versions.error;
-              for (const version of versions.data ?? []) {
-                const videoUrl =
-                  renderMediaUrl(version.content?.render) ??
-                  renderPlaybackUrl(version.content?.render);
-                if (videoUrl) {
-                  Object.assign(preview, {
-                    videoUrl,
-                    historicalVersion: version.version,
-                    previousRender: true,
-                    mediaApproved: false,
-                  });
-                  break;
-                }
-              }
-            }
-          }
-          const review = preview.videoUrl ? await renderReview(db, buildId, lesson.id, preview.videoUrl) : null;
-          const approved = await ownerApprovedPreview(db,data,lesson);
-          if (preview.videoUrl) preview.videoUrl = adminPreviewPlaybackUrl(buildId, lesson.id, preview.videoUrl) + (review ? '&artifactVersionId=' + encodeURIComponent(review.artifactVersionId) : '');
-          return { ...saved, preview: {...preview,review,...(approved?{
-            approvedVideoUrl:adminPreviewPlaybackUrl(buildId,lesson.id,approved.videoUrl)+'&kind=approved',
-            approvedVersion:approved.version,
-          }:{})} };
-        }),
-      ).catch((error) => {
-        logger.error('Saved lesson preview recovery failed', error);
-        return null;
-      });
-      if (!lessons) return databaseFailure(new Error('Saved preview recovery failed'));
-      return NextResponse.json({ build: { ...data, ultimate_lesson_builds: lessons } });
+    if(req.nextUrl.searchParams.get('view')==='checkpoints'){
+      try{return NextResponse.json({build:await loadCheckpointPage(db,buildId,req.nextUrl.searchParams.get('lessonId')??'')});}
+      catch(error){return databaseFailure(error);}
     }
-    return error ? databaseFailure(error) : NextResponse.json({ build: data });
+    const {data,error}=await db.from('ultimate_course_builds')
+      .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))').eq('id',buildId).single();
+    return error?databaseFailure(error):NextResponse.json({build:data});
   }
 
   const page = parseBuildListPage(req.nextUrl.searchParams.get('page'));

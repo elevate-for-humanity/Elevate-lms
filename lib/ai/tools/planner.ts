@@ -127,6 +127,14 @@ export function planAIToolFromCommand(
     return { name: explicitTool, input: asAIRecord(context.toolInput) };
   }
 
+  const workspace = command.split('\n').map(line=>{
+    try{return JSON.parse(line);}catch{return null;}
+  }).find(value=>value?.workspace==='course');
+  if(workspace){
+    const validId=(value:unknown)=>typeof value==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value)?value:undefined;
+    context={...context,courseId:context.courseId??validId(workspace.courseId),
+      lessonId:context.lessonId??validId(workspace.lessonId),buildId:context.buildId??validId(workspace.buildId)};
+  }
   const lower = command.toLowerCase();
   if (lower.trim() === 'inspect course builder health checks') {
     return { name: 'courses.health', input: {} };
@@ -173,6 +181,21 @@ export function planAIToolFromCommand(
       },
     };
   }
+
+  // The workspace provides explicit selected identities in its context line.
+  // Course text edits belong to the course service, not the coding runtime.
+  const selectedCourseId = typeof context.courseId==='string' ? context.courseId : workspace?.courseId;
+  const selectedLessonId = typeof context.lessonId==='string' ? context.lessonId : workspace?.lessonId;
+  const selectedBuildId = typeof context.buildId==='string' ? context.buildId : workspace?.buildId;
+  const instruction=command.split('\n').filter(line=>{try{return JSON.parse(line)?.workspace!=='course';}catch{return true;}}).join('\n');
+  if(selectedCourseId && !isReadOnlyRequest(instruction) &&
+    /\b(change|update|edit|rewrite|revise|improve)\b/i.test(instruction) &&
+    !/\b(code|repository|github|component|typescript|route|layout|api endpoint)\b/i.test(instruction)) {
+    return {name:'courses.edit',input:{courseId:selectedCourseId,
+      ...(selectedLessonId?{lessonId:selectedLessonId}:{}),goal:instruction}};
+  }
+  if(selectedBuildId && /\bpublish\b.*\bcourse\b/i.test(instruction) && !isReadOnlyRequest(instruction))
+    return {name:'courses.publish',input:{buildId:selectedBuildId}};
 
   // A compound repair request may require live-browser evidence, but the
   // browser runtime cannot edit, test, commit, or deploy repository changes.
@@ -392,8 +415,8 @@ export function planAIToolFromCommand(
       input: {
         ...asAIRecord(context.toolInput),
         action: 'start',
-        goal: command,
-        ...(id ? { courseId: id } : {}),
+        goal: instruction,
+        ...((selectedCourseId ?? id) ? { courseId: selectedCourseId ?? id } : {}),
       },
     };
   }
@@ -401,7 +424,7 @@ export function planAIToolFromCommand(
     return { name: 'communications.remind', input: asAIRecord(context.toolInput) };
   }
   // Domain generation stays inside Elevate's canonical Course Builder, never OpenHands.
-  if (/\b(generate|build|create|finish|complete|resume)\b.*\bcourse\b/.test(lower)) {
+  if (/\b(generate|build|create|finish|complete|resume|make)\b.*\bcourse\b/.test(lower)) {
     return {
       name: 'courses.generate',
       input: {
@@ -439,7 +462,7 @@ export function planAIToolFromCommand(
     /\bdeploy\b/.test(lower) &&
     !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,2}deploy\b/.test(lower)
   ) {
-    return { name: 'deployments.autopilot', input: asAIRecord(context.toolInput) };
+    return { name: 'deployments.autopilot', input: {workflow:'deploy-admin',confirmation:'CONFIRM DEPLOY',...asAIRecord(context.toolInput)} };
   }
   if (/\bapply\b.*\bmigrations?\b|\brun\b.*\bmigrations?\b/.test(lower)) {
     return { name: 'migrations.applyAll', input: asAIRecord(context.toolInput) };

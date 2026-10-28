@@ -3,7 +3,7 @@ import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
 import { DocumentSignatureBlock } from '@/components/documents';
 
-export async function ProgramHolderPaymentAddendum({ full = false }: { full?: boolean }) {
+export async function ProgramHolderPaymentAddendum({ full = false, alertOnly = false }: { full?: boolean; alertOnly?: boolean }) {
   const ctx = await requireProgramHolder();
   if (ctx.mode === 'admin') return null;
   const { data: holder, error } = await ctx.db.from('program_holders').select('features,user_id')
@@ -15,6 +15,7 @@ export async function ProgramHolderPaymentAddendum({ full = false }: { full?: bo
     .select('id').eq('user_id', holder.user_id).eq('agreement_type', 'program_holder_mou')
     .eq('document_version', terms.version).maybeSingle();
   if (acceptanceError) throw new Error('Payment addendum signature status could not load.');
+  if (alertOnly) return acceptance ? null : <p className="mt-4"><Link className="inline-flex min-h-11 items-center font-bold text-blue-900 underline" href="/program-holder/sign-mou">New payment addendum: review and sign your assigned terms</Link></p>;
   const usd = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n / 100);
   return <section aria-label="Payment addendum" className="space-y-4 rounded-2xl border border-blue-300 bg-white p-6">
     <h2 className="text-2xl font-bold">{terms.title}</h2>

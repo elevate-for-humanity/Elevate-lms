@@ -17,17 +17,18 @@ const closeout = fs.readFileSync(
 );
 
 describe('program-holder dashboard hero', () => {
-  it('uses the account image before a program-specific fallback', () => {
-    expect(workspace).toContain(
-      'if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true }',
-    );
-    expect(workspace).toContain('getProgramHeroImage(program.slug)');
-    expect(workspace).toContain("src: '/images/pages/community-page-2.webp'");
+  it('keeps the long program list and decorative hero out of the home queue', () => {
+    expect(workspace).not.toContain('function DashboardHero(');
+    expect(workspace).not.toContain(".filter(Boolean).join(', ')");
+    expect(workspace).toContain('id="holder-todos"');
+    expect(workspace).toContain('id="holder-alerts"');
   });
 
-  it('uses the holder profile image without hard-coded account identities', () => {
-    expect(workspace).toContain('resolveDashboardHero(data.profile?.avatar_url');
-    expect(workspace).toContain('if (avatarUrl?.trim())');
+  it('provides task-specific imagery rather than using a profile photo as a banner', () => {
+    const lessons = fs.readFileSync(path.resolve('lib/program-holder/task-lessons.ts'), 'utf8');
+    expect(lessons).toContain("title: 'Training hours'");
+    expect(lessons).toContain("title: 'Students'");
+    expect(lessons).not.toContain('avatar_url');
     expect(workspace).not.toContain('4bc589d3-bd39-4a50-a724-73e50506c1f1');
   });
 

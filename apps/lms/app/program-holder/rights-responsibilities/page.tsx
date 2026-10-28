@@ -1,3 +1,4 @@
+import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';
 import Link from 'next/link';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
@@ -9,6 +10,12 @@ export const metadata = {
 
 export default async function RightsResponsibilitiesPage() {
   await requireProgramHolder();
+  const workspace = await getProgramHolderWorkspace();
+  const features = workspace.holder?.features || {};
+  const assignedRequirements = [
+    ...(Array.isArray(features.custom_mou?.requirements) ? features.custom_mou.requirements : []),
+    ...(Array.isArray(features.training_topics) ? features.training_topics : []),
+  ];
   const responsibilities = [
     [
       'Contact assigned applicants',
@@ -41,6 +48,18 @@ export default async function RightsResponsibilitiesPage() {
         These duties follow the live portal workflow and apply only to programs assigned to this
         Program Holder.
       </p>
+      {assignedRequirements.length > 0 && (
+        <details className="mt-6 rounded-2xl border bg-white p-5">
+          <summary className="min-h-11 cursor-pointer text-lg font-bold">
+            Your assigned role and training requirements
+          </summary>
+          <ul className="mt-4 list-disc space-y-2 pl-5">
+            {assignedRequirements.map((item, index) => (
+              <li key={index}>{String(item)}</li>
+            ))}
+          </ul>
+        </details>
+      )}
       <div className="mt-6 grid gap-4">
         {responsibilities.map(([title, body]) => (
           <section key={title} className="rounded-2xl border bg-white p-5">

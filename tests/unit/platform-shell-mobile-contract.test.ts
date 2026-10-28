@@ -12,7 +12,7 @@ const canonicalConsumers = [
   'apps/lms/app/employer/layout.tsx',
   'apps/lms/app/workforce/layout.tsx',
   'apps/lms/app/host-shop/dashboard/layout.tsx',
-  'apps/lms/app/program-holder/dashboard/layout.tsx',
+  'apps/lms/app/program-holder/layout.tsx',
   'apps/lms/app/parent-portal/dashboard/layout.tsx',
   'apps/lms/app/parent-portal/student/layout.tsx',
 ];

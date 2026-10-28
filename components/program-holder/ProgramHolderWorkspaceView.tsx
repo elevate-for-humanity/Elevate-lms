@@ -1,4 +1,5 @@
-import { ReadingDashboard } from './ReadingDashboard';
+import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
@@ -32,39 +33,11 @@ import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificatio
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
 import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
-import { getProgramCardImage, getProgramHeroImage } from '@/lib/images/programImages';
+import { getProgramCardImage } from '@/lib/images/programImages';
 import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 import { CallListPanel } from './CallListPanel';
 import { StudentReadyForTestingButton } from './StudentReadyForTestingButton';
-import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
-import { ProgramHolderOperationsGuide } from './ProgramHolderOperationsGuide';
-import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
-
-function resolveDashboardHero(
-  avatarUrl: string | null | undefined,
-  program:
-    | {
-        hero_image_url?: string | null;
-        image_url?: string | null;
-        cover_image_url?: string | null;
-        slug?: string;
-      }
-    | undefined,
-) {
-  if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
-  const programPhoto = program?.hero_image_url || program?.image_url || program?.cover_image_url;
-  // Some legacy database image paths point to files that were never published.
-  // Use the maintained program image map for local paths; keep hosted program photos.
-  if (programPhoto?.trim() && /^https:\/\//.test(programPhoto.trim())) {
-    return { src: programPhoto.trim(), isPortrait: false };
-  }
-  if (program?.slug) return { src: getProgramHeroImage(program.slug), isPortrait: false };
-  return {
-    src: '/images/pages/community-page-2.webp',
-    isPortrait: false,
-  };
-}
 
 type Section =
   | 'dashboard'
@@ -91,9 +64,6 @@ export async function ProgramHolderWorkspaceView({
   studentStatus?: string;
 }) {
   const data = await getProgramHolderWorkspace();
-  if (section === 'dashboard' && data.holder?.features?.reading_support === true) {
-    return <><ProgramHolderPaymentAddendum /><ReadingDashboard data={data} /></>;
-  }
   const coordinatorRole =
     data.mode === 'holder'
       ? String(
@@ -104,15 +74,6 @@ export async function ProgramHolderWorkspaceView({
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
   const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
-  const texasLaunchKit =
-    section === 'dashboard' && isTexasStateCoordinator ? (
-      <TexasCoordinatorLaunchKit
-        coordinatorName={data.profile?.full_name || undefined}
-        coordinatorPhone={data.profile?.phone || data.holder?.contact_phone || undefined}
-        coordinatorEmail={data.profile?.email || data.holder?.contact_email || undefined}
-      />
-    ) : null;
-
   const active = data.enrollments.filter((row) =>
     ['active', 'enrolled', 'in_progress'].includes(row.enrollment_state || row.status),
   );
@@ -337,14 +298,13 @@ export async function ProgramHolderWorkspaceView({
   const completedRequirements = requiredComplianceItems.filter((item) => item.complete).length;
   const missingRequirements = requiredComplianceItems.length - completedRequirements;
   const primaryProgramLabel =
-    data.programs.map(program => program.title || program.name).filter(Boolean).join(', ') || 'Assigned program';
+    data.programs.length === 1 ? (data.programs[0].title || data.programs[0].name || 'Assigned program') : `${data.programs.length} assigned programs`;
   const callQueue = data.applicants.filter((row) => !row.call_date || !row.call_outcome);
   const payoutReady = Boolean(
     data.payoutProfile?.payouts_enabled &&
     data.payoutProfile?.transfers_enabled &&
     data.payoutProfile?.verification_status === 'active',
   );
-  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]);
 
   if (section === 'students')
     return (
@@ -423,237 +383,157 @@ export async function ProgramHolderWorkspaceView({
       />
     );
 
+  // Home is an action queue. Rosters, guides and office tools live in their own tabs.
+  const todos = [
+    ...(callQueue.length
+      ? [
+          {
+            title: `Contact ${callQueue.length} new applicant${callQueue.length === 1 ? '' : 's'}`,
+            detail: 'Record the outcome and next follow-up.',
+            href: '/program-holder/students/pending',
+          },
+        ]
+      : []),
+    ...(pendingHours.length
+      ? [
+          {
+            title: `Review ${pendingHours.length} training-hour submission${pendingHours.length === 1 ? '' : 's'}`,
+            detail: 'Check the dates and evidence before verifying.',
+            href: '/program-holder/hours',
+          },
+        ]
+      : []),
+    ...(atRisk.length
+      ? [
+          {
+            title: `Follow up with ${atRisk.length} student${atRisk.length === 1 ? '' : 's'} needing support`,
+            detail: 'Document the barrier and next action.',
+            href: '/program-holder/students/at-risk',
+          },
+        ]
+      : []),
+    ...(missingRequirements
+      ? [
+          {
+            title: `Resolve ${missingRequirements} compliance requirement${missingRequirements === 1 ? '' : 's'}`,
+            detail: 'Read the missing-item or correction notes.',
+            href: '/program-holder/compliance',
+          },
+        ]
+      : []),
+    ...(!data.holder?.mou_signed
+      ? [
+          {
+            title: 'Review and sign your agreement',
+            detail: 'Read your assigned terms before signing.',
+            href: '/program-holder/sign-mou',
+          },
+        ]
+      : []),
+  ];
   return (
-    <main className="w-full min-w-0 space-y-6 px-3 pb-24 sm:px-6">
-      <ProgramHolderPaymentAddendum />
-      <DashboardHero
-        title={data.holder?.organization_name || data.holder?.name || 'Program Holder'}
-        programLabel={primaryProgramLabel}
-        status={data.holder?.status || 'active'}
-        complianceScore={complianceScore}
-        heroImage={dashboardHero.src}
-        isPortrait={dashboardHero.isPortrait}
-      />
-      <section aria-label="Program overview" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Metric
-          value={data.enrollments.length}
-          label="Enrolled students"
-          helper="Your assigned roster"
-        />
-        <Metric value={active.length} label="Active students" helper="Currently enrolled" />
-        <Metric
-          value={callQueue.length}
-          label="Applicants to contact"
-          helper="Need a recorded outcome"
-        />
-        <Metric
-          value={pendingHours.length}
-          label="Hours to review"
-          helper="Submitted for verification"
-        />
-      </section>
-      <ProgramHolderOperationsGuide
-        holderName={data.profile?.full_name}
-        programs={data.programs}
-        role={coordinatorRole}
-      />
+    <div
+      className={`mx-auto max-w-5xl space-y-6 p-4 pb-24 sm:p-6 ${holderFeatures.reading_support === true ? 'text-lg' : ''}`}
+    >
       <section
-        aria-labelledby="program-holder-actions-heading"
-        className="rounded-2xl border bg-white p-5"
+        aria-labelledby="holder-todos"
+        className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"
       >
-        <h2 id="program-holder-actions-heading" className="text-xl font-black">
-          Choose your next task
-        </h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <ActionLink
-            href="/program-holder/students/pending"
-            icon={<Users className="h-5 w-5" />}
-            title="Review applicants"
-            detail={`${callQueue.length} need follow-up`}
-            tone="blue"
-          />
-          <ActionLink
-            href="/program-holder/students"
-            icon={<Users className="h-5 w-5" />}
-            title="Manage students"
-            detail="Dates, progress, notes and completion"
-            tone="blue"
-          />
-          <ActionLink
-            href="/program-holder/hours"
-            icon={<Clock className="h-5 w-5" />}
-            title="Record training"
-            detail={`${pendingHours.length} logs awaiting verification`}
-            tone="emerald"
-          />
-          <ActionLink
-            href="/program-holder/documents"
-            icon={<FileText className="h-5 w-5" />}
-            title="Documents and agreements"
-            detail={`${missingRequirements} requirements incomplete`}
-            tone="emerald"
-          />
-          <ActionLink
-            href="/program-holder/programs"
-            icon={<BookOpen className="h-5 w-5" />}
-            title="Open program delivery"
-            detail={`${data.courseAssignments.length} course assignments`}
-            tone="blue"
-          />
-          <ActionLink
-            href="/program-holder/reports"
-            icon={<FileText className="h-5 w-5" />}
-            title="Weekly progress reports"
-            detail="Review evidence and submit each Friday"
-            tone="emerald"
-          />
-        </div>
-      </section>
-      {(missingRequirements > 0 || !data.holder?.mou_signed || atRisk.length > 0) && (
-        <section
-          aria-label="Needs attention"
-          className="rounded-2xl border border-amber-300 bg-amber-50 p-5"
-        >
-          <h2 className="text-xl font-black">Needs attention</h2>
-          <ul className="mt-3 space-y-3 text-sm">
-            {!data.holder?.mou_signed && (
-              <li>
-                <Link className="font-bold underline" href="/program-holder/sign-mou">
-                  Review and sign your MOU
-                </Link>
-              </li>
-            )}
-            {missingRequirements > 0 && (
-              <li>
-                <Link className="font-bold underline" href="/program-holder/compliance">
-                  Review {missingRequirements} incomplete requirements
-                </Link>
-                <span className="block mt-1">
-                  Open Compliance for the exact records and correction notes.
-                </span>
-              </li>
-            )}
-            {atRisk.length > 0 && (
-              <li>
-                <Link className="font-bold underline" href="/program-holder/students/at-risk">
-                  Follow up with {atRisk.length} students needing attention
-                </Link>
-              </li>
-            )}
-          </ul>
-        </section>
-      )}
-      <section
-        className="rounded-2xl border bg-white p-5"
-        aria-labelledby="student-snapshot-heading"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="student-snapshot-heading" className="text-xl font-black">
-            Student snapshot
-          </h2>
-          <Link
-            href="/program-holder/students"
-            className="min-h-11 inline-flex items-center font-bold underline"
-          >
-            Open all {data.enrollments.length} students →
-          </Link>
-        </div>
-        <p className="mt-2 text-sm text-slate-600">
-          Start and scheduled end dates are separate from actual completion. Report a mismatch to
-          Administration with the source document.
+        <h1 id="holder-todos" className="text-3xl font-black text-slate-950">
+          To-dos
+        </h1>
+        <p className="mt-2 text-slate-600">
+          Choose one task. Your tools and PARIS guide open in that tab.
         </p>
-        <ul className="mt-4 divide-y">
-          {active.slice(0, 5).map((row) => (
-            <li key={row.id} className="flex flex-wrap items-start justify-between gap-2 py-3">
-              <strong>{row.full_name || row.applicant_name || 'Student'}</strong>
-              <span className="text-sm">
-                Start: {row.training_start_date || 'Not recorded'} · Scheduled end:{' '}
-                {row.expected_end_date || row.training_end_date || 'Not recorded'}
-              </span>
-            </li>
-          ))}
-        </ul>
-        {!active.length && (
-          <p className="mt-4 text-sm">
-            No active enrollments. Completed learners remain in Students.
+        {todos.length ? (
+          <ul className="mt-5 divide-y divide-slate-200">
+            {todos.map((task, i) => (
+              <li key={task.href}>
+                <Link
+                  href={task.href}
+                  className="flex min-h-20 items-center gap-4 rounded-xl py-4 pr-3 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 font-black text-blue-800">
+                    {i + 1}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <strong className="block text-lg text-slate-950">{task.title}</strong>
+                    <span className="mt-1 block text-sm text-slate-600">{task.detail}</span>
+                  </span>
+                  <span aria-hidden="true" className="text-xl text-blue-800">
+                    →
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-5 rounded-xl bg-emerald-50 p-4 font-semibold text-emerald-900">
+            No outstanding items in this queue. Use the navigation for your routine work.
           </p>
         )}
       </section>
-      <section aria-label="Office tools" className="rounded-2xl border bg-white p-5">
-        <h2 className="text-xl font-black">Your office</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {[
-            ['Email', '/program-holder/email'],
-            ['Phone', '/program-holder/phone'],
-            ['Calendar and meetings', '/program-holder/meetings'],
-            ['Community', '/program-holder/community'],
-            ['Career services', '/program-holder/career'],
-            ['Payouts', '/program-holder/payouts'],
-          ].map(([label, href]) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex min-h-12 items-center rounded-xl border px-4 py-3 text-sm font-bold hover:bg-slate-50"
-            >
-              {label} →
-            </Link>
-          ))}
-        </div>
-        <details className="mt-5 border-t pt-4">
-          <summary className="min-h-11 cursor-pointer font-bold">
-            Office setup and communication preferences
-          </summary>
-          <div className="mt-4 space-y-5">
-            <PortalStartChecklist role="program-holder" />
-            <Link
-              href="/program-holder/settings"
-              className="inline-flex min-h-11 items-center font-bold underline"
-            >
-              Change communication preferences →
-            </Link>
-          </div>
-        </details>
+      <section
+        aria-labelledby="holder-alerts"
+        className="rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:p-7"
+      >
+        <h2 id="holder-alerts" className="text-2xl font-black text-slate-950">
+          Alerts
+        </h2>
+        <ProgramHolderPaymentAddendum alertOnly />
+        <CommunicationTodos embedded inboxPath="/program-holder/email" />
+        <ul className="mt-4 space-y-4 text-slate-800">
+          {active.length > 0 && (
+            <li>
+              <Link
+                className="inline-flex min-h-11 items-center font-bold text-blue-900 underline"
+                href="/program-holder/reports"
+              >
+                Weekly progress reports are due each Friday
+              </Link>
+              <p className="text-sm">
+                Review and submit a report for each active student in Reports.
+              </p>
+            </li>
+          )}
+          {(coordinatorRequirements.length > 0 || coordinatorTrainingTopics.length > 0) && (
+            <li>
+              <Link
+                className="inline-flex min-h-11 items-center font-bold text-blue-900 underline"
+                href="/program-holder/rights-responsibilities"
+              >
+                Review your assigned role and training requirements
+              </Link>
+            </li>
+          )}
+          {isGaryRegionalCoordinator && (
+            <li>
+              <Link
+                className="inline-flex min-h-11 items-center font-bold text-blue-900 underline"
+                href="/program-holder/gary-launch"
+              >
+                Review your Gary coordinator launch assignment
+              </Link>
+            </li>
+          )}
+          {isTexasStateCoordinator && (
+            <li>
+              <Link
+                className="inline-flex min-h-11 items-center font-bold text-blue-900 underline"
+                href="/program-holder/how-to-use"
+              >
+                Review your Texas coordinator launch assignment
+              </Link>
+            </li>
+          )}
+          {!active.length &&
+            !coordinatorRequirements.length &&
+            !coordinatorTrainingTopics.length &&
+            !isGaryRegionalCoordinator &&
+            !isTexasStateCoordinator && <li>No additional alerts from your current records.</li>}
+        </ul>
       </section>
-      {(coordinatorRole ||
-        coordinatorRequirements.length > 0 ||
-        coordinatorTrainingTopics.length > 0) && (
-        <details className="rounded-2xl border bg-white p-5">
-          <summary className="min-h-11 cursor-pointer font-bold">
-            Your assigned role and required training
-          </summary>
-          <div className="mt-4 space-y-3">
-            <p className="font-bold">{coordinatorRole || 'Program Holder'}</p>
-            <ul className="list-disc space-y-2 pl-5">
-              {[...coordinatorRequirements, ...coordinatorTrainingTopics].map((topic, index) => (
-                <li key={index}>{topic}</li>
-              ))}
-            </ul>
-            <Link
-              href="/program-holder/rights-responsibilities"
-              className="inline-flex min-h-11 items-center font-bold underline"
-            >
-              Review your agreement and responsibilities →
-            </Link>
-          </div>
-        </details>
-      )}
-      {isGaryRegionalCoordinator && (
-        <Link
-          href="/program-holder/gary-launch"
-          className="flex min-h-12 items-center rounded-xl border bg-white p-4 font-bold"
-        >
-          Open the Gary coordinator launch guide →
-        </Link>
-      )}
-      {texasLaunchKit && (
-        <details className="rounded-2xl border bg-white p-5">
-          <summary className="min-h-11 cursor-pointer font-bold">
-            Texas coordinator launch guide
-          </summary>
-          {texasLaunchKit}
-        </details>
-      )}
-    </main>
+    </div>
   );
 }
 
@@ -677,120 +557,6 @@ function Hero({
   );
 }
 
-function DashboardHero({
-  title,
-  programLabel,
-  status,
-  complianceScore,
-  heroImage,
-  isPortrait,
-}: {
-  title: string;
-  programLabel: string;
-  status: string;
-  complianceScore: number;
-  heroImage: string;
-  isPortrait: boolean;
-}) {
-  return (
-    <section className="relative min-h-[300px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:min-h-[380px] sm:rounded-3xl">
-      <Image
-        src={heroImage}
-        alt={`${title} dashboard`}
-        fill
-        priority
-        sizes="100vw"
-        className={`object-cover opacity-90 ${isPortrait ? 'object-top' : 'object-center'}`}
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/72 via-slate-950/42 to-transparent" />
-      <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
-        <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">
-            Program Holder Command Center
-          </p>
-          <h1 className="mt-2 break-words text-2xl font-black leading-tight sm:text-4xl">
-            {title}
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-200 sm:text-base">
-            Manage enrollment, instruction, compliance, records, reporting, and payouts for{' '}
-            {programLabel}.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
-            <span className="rounded-full bg-emerald-400/20 px-3 py-1.5 text-emerald-100">
-              Account {status.replaceAll('_', ' ')}
-            </span>
-            <span className="rounded-full bg-white/15 px-3 py-1.5 text-white">{programLabel}</span>
-            <span className="rounded-full bg-blue-400/20 px-3 py-1.5 text-blue-100">
-              Compliance {complianceScore}%
-            </span>
-          </div>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          {isPortrait ? (
-            <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white/80 bg-white shadow-xl">
-              <Image
-                src={heroImage}
-                alt={title}
-                fill
-                sizes="96px"
-                className="object-cover object-top"
-              />
-            </div>
-          ) : null}
-          <Link
-            href="/program-holder/hours"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto"
-          >
-            Record training hours
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ActionLink({
-  href,
-  icon,
-  title,
-  detail,
-  tone,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  detail: string;
-  tone: 'amber' | 'blue' | 'violet' | 'emerald';
-}) {
-  const colors = {
-    amber: 'bg-amber-50 text-amber-800',
-    blue: 'bg-blue-50 text-blue-800',
-    violet: 'bg-violet-50 text-violet-800',
-    emerald: 'bg-emerald-50 text-emerald-800',
-  };
-  return (
-    <Link
-      href={href}
-      className="group flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
-    >
-      <span
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${colors[tone]}`}
-      >
-        {icon}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-black text-slate-950">{title}</span>
-        <span className="block truncate text-sm text-slate-600">{detail}</span>
-      </span>
-      <span
-        aria-hidden="true"
-        className="text-xl text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-700"
-      >
-        →
-      </span>
-    </Link>
-  );
-}
 function Metric({
   label,
   value,
@@ -1755,6 +1521,7 @@ function Settings({
         name={profile?.full_name || holder?.organization_name || holder?.name || 'Program Holder'}
       />
       <ProgramHolderNotificationPreferences initial={notificationPreferences} phone={phone} />
+      <details className="rounded-2xl border bg-white p-5"><summary className="min-h-11 cursor-pointer text-lg font-bold">First-time office setup checklist</summary><PortalStartChecklist role="program-holder" /></details>
     </div>
   );
 }

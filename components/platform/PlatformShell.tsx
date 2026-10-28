@@ -12,10 +12,7 @@ import {
   ChevronDown,
   LogOut,
   ShieldCheck,
-  Users,
   Download,
-  CalendarDays,
-  Mail,
   ArrowLeft,
   Home,
 } from 'lucide-react';
@@ -74,41 +71,28 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
   const drawerRef = useRef<HTMLElement>(null);
 
   const baseSections = getNavigationForRole(role);
-  const sections =
-    ['program_holder', 'site_coordinator'].includes(role)
-      ? baseSections.map((section) => ({
-          ...section,
-          items: [
-            ...section.items,
-            {
-              id: 'at-risk',
-              label: 'At-Risk Students',
-              href: '/program-holder/students/at-risk',
-              icon: Users,
-            },
-            {
-              id: 'onboarding',
-              label: 'Onboarding',
-              href: '/program-holder/onboarding',
-              icon: ShieldCheck,
-            },
-            {
-              id: 'agreement',
-              label: 'MOU & Agreement',
-              href: '/program-holder/rights-responsibilities',
-              icon: ShieldCheck,
-            },
-            {
-              id: 'meetings',
-              label: 'Meetings',
-              href: '/program-holder/meetings',
-              icon: CalendarDays,
-            },
-            { id: 'office-mail', label: 'Office Mail', href: '/program-holder/inbox', icon: Mail },
-            { id: 'install-app', label: 'Install App', href: installHref, icon: Download },
-          ],
-        }))
-      : baseSections;
+  // Role navigation owns every tool exactly once. Add install only to the setup group.
+  const sections = ['program_holder', 'site_coordinator'].includes(role)
+    ? baseSections.map((section, index) =>
+        index === baseSections.length - 1
+          ? {
+              ...section,
+              items: [
+                ...section.items,
+                { id: 'install-app', label: 'Install App', href: installHref, icon: Download },
+              ],
+            }
+          : section,
+      )
+    : baseSections;
+  const activeHref = sections
+    .flatMap((section) => section.items)
+    .filter((item) => isActiveHref(item.href, pathname))
+    .sort(
+      (a, b) =>
+        new URL(b.href, 'https://local.invalid').pathname.length -
+        new URL(a.href, 'https://local.invalid').pathname.length,
+    )[0]?.href;
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -362,7 +346,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
                   )}
                   {section.items.map((item) => {
                     const Icon = item.icon;
-                    const active = isActiveHref(item.href, pathname);
+                    const active = item.href === activeHref;
                     return (
                       <Link
                         key={item.id}

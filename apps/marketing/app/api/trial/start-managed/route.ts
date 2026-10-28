@@ -29,7 +29,17 @@ function normalizeExistingUrl(value: unknown): string | null {
 
 async function allowed(email: string) {
   const limiter = strictRateLimit.get();
-  if (limiter) return (await limiter.limit(`trial:${email}`)).success;
+  if (limiter) {
+    try {
+      return (await limiter.limit(`trial:${email}`)).success;
+    } catch (error) {
+      // Match the shared API limiter's outage behavior. Keep the existing
+      // three-per-hour email limit below; a Redis failure is not an allow-all.
+      logger.warn('[trial] distributed rate limiter unavailable; using bounded local limit', {
+        errorType: error instanceof Error ? error.name : 'unknown',
+      });
+    }
+  }
   const now = Date.now();
   const current = fallbackLimiter.get(email);
   if (!current || current.reset < now) {

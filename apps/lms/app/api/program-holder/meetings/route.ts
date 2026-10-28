@@ -1,4 +1,5 @@
 // pre-auth-registry: exempt - requireProgramHolder and holder filters authorize every operation.
+import { assertGoogleCalendarAvailable, CalendarConflictError } from '@/lib/calendar/google-calendar';
 import { studentContactHolderIds } from '@/lib/email/assigned-student-directory';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
@@ -116,6 +117,20 @@ export async function POST(request: Request) {
       { error: 'Applicant is not assigned to this Program Holder.' },
       { status: 404 },
     );
+  }
+
+  const endsAt = new Date(Date.parse(startsAt) + duration * 60000).toISOString();
+  try {
+    await assertGoogleCalendarAvailable(ctx.user.id, new Date(startsAt).toISOString(), endsAt);
+    const { data: scheduled, error: scheduleError } = await ctx.db.from('program_holder_meetings')
+      .select('starts_at,duration_minutes').eq('program_holder_id', ctx.holderId).eq('status', 'scheduled')
+      .lt('starts_at', endsAt).gte('starts_at', new Date(Date.parse(startsAt) - 240 * 60000).toISOString());
+    if (scheduleError) throw new Error('Existing appointments could not be checked. Try again before booking.');
+    if ((scheduled || []).some((meeting: any) => Date.parse(meeting.starts_at) + meeting.duration_minutes * 60000 > Date.parse(startsAt))) {
+      throw new CalendarConflictError('This time overlaps an existing dashboard meeting. Choose another time.');
+    }
+  } catch (cause) {
+    return NextResponse.json({ error: cause instanceof Error ? cause.message : 'Calendar availability could not be checked.' }, { status: cause instanceof CalendarConflictError ? 409 : 503 });
   }
 
   const title = String(

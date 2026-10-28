@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { GoogleCalendarConnection } from './GoogleCalendarConnection';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 
 type CalendarEvent = {
@@ -11,6 +12,8 @@ type CalendarEvent = {
   course?: string;
   time?: string;
   startsAt?: string;
+  endsAt?: string;
+  source?: 'google';
 };
 
 export function CalendarWidget({
@@ -23,12 +26,24 @@ export function CalendarWidget({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [error, setError] = useState('');
+  const [googleEvents, setGoogleEvents] = useState<CalendarEvent[]>([]);
+  const [googleError, setGoogleError] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const loadEvents = useCallback(async () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
     setError('');
+    setGoogleError('');
+    const google = (async () => {
+      try {
+        const range = new URLSearchParams({ start: new Date(year, month - 1, 1).toISOString(), end: new Date(year, month, 1).toISOString() });
+        const response = await fetch(`/api/calendar/google?${range}`, { cache: 'no-store' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Google Calendar could not be checked.');
+        setGoogleEvents(Array.isArray(result.events) ? result.events : []);
+      } catch { setGoogleEvents([]); setGoogleError('Google busy times could not be checked. Refresh or reconnect Google Calendar before booking.'); }
+    })();
     try {
       const res = await fetch(
         `/api/calendar/events?year=${year}&month=${month}&userId=${encodeURIComponent(userId)}`,
@@ -42,10 +57,14 @@ export function CalendarWidget({
         'Calendar events could not be loaded. Try another month or contact learner support.',
       );
     }
+    await google;
   }, [currentDate, userId]);
 
   useEffect(() => {
     void loadEvents();
+    const refresh = () => void loadEvents();
+    window.addEventListener('focus', refresh);
+    return () => window.removeEventListener('focus', refresh);
   }, [loadEvents]);
 
   const year = currentDate.getFullYear();
@@ -57,7 +76,7 @@ export function CalendarWidget({
   const dateEvents = (date: Date) =>
     [
       ...events,
-      ...additionalEvents.map((event) =>
+      ...[...additionalEvents, ...googleEvents].map((event) =>
         event.startsAt
           ? {
               ...event,
@@ -69,7 +88,9 @@ export function CalendarWidget({
             }
           : event,
       ),
-    ].filter((event) => event.date === dateKey(date));
+    ].filter((event) => event.startsAt && event.endsAt
+      ? Date.parse(event.startsAt) < new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime() && Date.parse(event.endsAt) > date.getTime()
+      : event.date === dateKey(date));
   const eventColor = (type: CalendarEvent['type']) =>
     ({
       assignment: 'bg-blue-500',
@@ -82,6 +103,8 @@ export function CalendarWidget({
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+      <GoogleCalendarConnection onRefresh={loadEvents} />
+      {googleError ? <p role="alert" className="mb-4 text-sm font-bold text-amber-900">{googleError}</p> : null}
       {error ? (
         <p role="alert" className="mb-4 text-sm text-red-800">
           {error}

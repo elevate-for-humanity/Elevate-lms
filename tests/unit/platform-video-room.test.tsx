@@ -19,7 +19,7 @@ it('joins only after a user action and does not require camera or microphone to 
   await screen.findByText('Video controls');
   expect(mocks.props).toMatchObject({ audio: false, video: false, connect: true });
   expect((screen.getByRole('button', { name: 'Share screen' }) as HTMLButtonElement).disabled).toBe(true);
-  expect(screen.getByRole('status').textContent).toContain('connected');
+  expect(screen.getByText('Meeting connection: connected')).toBeTruthy();
 });
 
 it('shows token failures and retries the authorized endpoint', async () => {

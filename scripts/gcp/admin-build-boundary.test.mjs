@@ -48,3 +48,14 @@ test('Admin compilation does not hold the shared production runtime lock',()=>{
  assert.ok(deploy.includes('activate-tested-public-revision.mjs'));
  assert.ok(deploy.includes('verify-admin-revision.mjs'));
 });
+
+
+test('new requests queue behind active Admin image builds without cancelling their upload',()=>{
+ const s=workflow();const build=s.slice(s.indexOf('  build-admin:'),s.indexOf('  deploy-admin:'));
+ const policy=build.slice(build.indexOf('    concurrency:'),build.indexOf('    name:'));
+ assert.match(policy,/group: google-admin-build-main/);
+ assert.match(policy,/cancel-in-progress: false/);
+ assert.match(policy,/queue: max/);
+ assert.ok(build.includes('Reject superseded deployment requests before building'));
+ assert.ok(build.includes('Upload tested Admin image'));
+});

@@ -75,7 +75,9 @@ jobs:
   build-admin:
     concurrency:
       group: google-admin-build-main
-      cancel-in-progress: true
+      # Finish an active tested image; do not restart it on every main update.
+      cancel-in-progress: false
+      queue: max
     name: Build and upload Admin image
     outputs:
       digest: ${{ steps.upload.outputs.digest }}

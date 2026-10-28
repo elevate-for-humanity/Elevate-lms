@@ -46,6 +46,10 @@ export default async function AdminDashboardPage() {
     <>
       <div className="px-3 pt-4 sm:px-5 lg:px-6">
         <EmailAccountNotice href="/phone/email" />
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link href="/calendar" className="rounded-lg bg-blue-700 px-4 py-3 font-bold text-white">Calendar and Google appointments</Link>
+          <Link href="/settings/notifications" className="rounded-lg border bg-white px-4 py-3 font-bold">Cellphone email alerts</Link>
+        </div>
       </div>
       <nav aria-label="Separate training dashboard management" className="grid gap-3 px-3 pt-4 sm:grid-cols-2 sm:px-5 lg:px-6">
         <Link href="/students" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:border-blue-500">

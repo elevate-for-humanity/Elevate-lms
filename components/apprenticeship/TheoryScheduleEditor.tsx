@@ -16,9 +16,9 @@ export default function TheoryScheduleEditor() {
         if (!r.ok) throw new Error(d.error);
         if (!active) return;
         setData(d);
-        setDays(d.schedule.days_of_week);
-        setStart(d.schedule.start_time.slice(0, 5));
-        setEnd(d.schedule.end_time.slice(0, 5));
+        setDays(d.schedule.learner_confirmed_at ? d.schedule.days_of_week : []);
+        setStart(d.schedule.learner_confirmed_at ? d.schedule.start_time.slice(0, 5) : '');
+        setEnd(d.schedule.learner_confirmed_at ? d.schedule.end_time.slice(0, 5) : '');
       })
       .catch((e) => {
         if (active) setError(e.message);
@@ -27,6 +27,11 @@ export default function TheoryScheduleEditor() {
       active = false;
     };
   }, []);
+  const minutes = (value: string) => {
+    const [hour, minute] = value.split(':').map(Number);
+    return Number.isFinite(hour) && Number.isFinite(minute) ? hour * 60 + minute : 0;
+  };
+  const selectedMinutes = Math.max(0, minutes(endTime) - minutes(startTime)) * days.length;
   async function save(event: React.FormEvent) {
     event.preventDefault();
     setError('');
@@ -44,13 +49,10 @@ export default function TheoryScheduleEditor() {
     setSaved(true);
   }
   return (
-    <section className="rounded-2xl border border-slate-300 bg-white p-6">
-      <h1 className="text-2xl font-black">Choose your theory study times</h1>
-      <p className="mt-3">
-        Choose downtime when you are not clocked into supervised shop/OJL work. Theory and OJL time
-        are separate. Complete this week's assigned work by Sunday at 11:59 PM in your schedule's
-        time zone.
-      </p>
+    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+      <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">Build your study week</p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">When works for you?</h1>
+      <p className="mt-3 text-slate-600">Pick downtime outside your shop hours. You can study during these saved windows.</p>
       {error ? (
         <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-red-900">
           {error}
@@ -59,32 +61,27 @@ export default function TheoryScheduleEditor() {
       {!data && !error ? <p>Loading your assigned schedule…</p> : null}
       {data ? (
         <>
-          <p className="mt-4 font-bold">
-            Weekly target: {data.schedule.weekly_target_minutes / 60} hours · Maximum:{' '}
-            {Math.min(data.schedule.weekly_max_minutes, 600) / 60} hours · {data.schedule.timezone}
-          </p>
-          <p className="mt-2">
-            These are Elevate scheduling limits, not a statement that Indiana law sets a universal
-            weekly theory allowance. Required program totals and approved instruction still apply.
-            Do not try to finish all 40 lessons in one sitting. Future lessons and access outside
-            your study windows are locked; inactive time does not earn hours.
-          </p>
-          <p className="mt-2">
-            You will receive start/stop reminders and an end-of-week reminder when your weekly
-            theory target is still outstanding.
-          </p>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl bg-slate-50 p-5"><p className="text-sm text-slate-500">Your weekly target</p><p className="mt-2 text-3xl font-semibold text-slate-950">{data.schedule.weekly_target_minutes / 60}<span className="text-base"> hours</span></p></div>
+            <div className="rounded-2xl bg-slate-50 p-5"><p className="text-sm text-slate-500">Your selected time</p><p className="mt-2 text-3xl font-semibold text-teal-800">{(selectedMinutes / 60).toLocaleString('en-US', { maximumFractionDigits: 2 })}<span className="text-base"> hours</span></p></div>
+          </div>
+          <details className="mt-4 rounded-xl border border-slate-200 p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-800">Weekly limits &amp; reminders</summary>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Maximum: {Math.min(data.schedule.weekly_max_minutes, 600) / 60} theory hours weekly. These are Elevate scheduling limits. Approved program totals apply. Lessons follow your release plan; future lessons and access outside study windows stay locked. Inactive time earns no hours.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">After saving your schedule, start/stop reminders follow your study blocks. If your weekly target remains unfinished, you receive an end-of-week reminder. Finish by Sunday at 11:59 PM ({data.schedule.timezone}).</p>
+          </details>
           {data.readOnly ? (
-            <p className="mt-4 font-bold text-amber-900">
+            <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
               This is a read-only administrator preview. The learner chooses and saves their own
               study times.
             </p>
           ) : null}
-          <form onSubmit={save} className="mt-5 space-y-4">
+          <form onSubmit={save} className="mt-6 space-y-5">
             <fieldset disabled={data.readOnly}>
-              <legend className="font-bold">My available days</legend>
-              <div className="mt-2 flex flex-wrap gap-3">
+              <legend className="font-semibold text-slate-950">1. Choose your days</legend>
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {labels.map((label, i) => (
-                  <label key={label} className="flex items-center gap-2 rounded border p-3">
+                  <label key={label} className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm font-semibold ${days.includes(i + 1) ? 'border-teal-800 bg-teal-50 text-teal-950' : 'border-slate-200 text-slate-600'}`}>
                     <input
                       type="checkbox"
                       checked={days.includes(i + 1)}
@@ -99,7 +96,8 @@ export default function TheoryScheduleEditor() {
                 ))}
               </div>
             </fieldset>
-            <div className="flex flex-wrap gap-4">
+            <p className="font-semibold text-slate-950">2. Set your study window</p>
+            <div className="grid gap-4 sm:grid-cols-2">
               <label className="font-bold">
                 Start time
                 <input
@@ -109,7 +107,7 @@ export default function TheoryScheduleEditor() {
                   disabled={data.readOnly}
                   value={startTime}
                   onChange={(e) => setStart(e.target.value)}
-                  className="ml-3 rounded border p-3"
+                  className="mt-2 block min-h-12 w-full rounded-xl border border-slate-300 p-3 font-normal"
                 />
               </label>
               <label className="font-bold">
@@ -121,13 +119,13 @@ export default function TheoryScheduleEditor() {
                   disabled={data.readOnly}
                   value={endTime}
                   onChange={(e) => setEnd(e.target.value)}
-                  className="ml-3 rounded border p-3"
+                  className="mt-2 block min-h-12 w-full rounded-xl border border-slate-300 p-3 font-normal"
                 />
               </label>
             </div>
             <button
-              disabled={data.readOnly}
-              className="rounded-lg bg-cyan-900 px-5 py-3 font-bold text-white disabled:opacity-50"
+              disabled={data.readOnly || !days.length || !startTime || !endTime}
+              className="min-h-12 w-full rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               Save my theory schedule
             </button>

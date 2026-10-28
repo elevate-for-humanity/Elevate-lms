@@ -33,6 +33,14 @@ export async function POST(
       error: authError,
     } = await db.auth.getUser();
     if (authError || !user) return reply({ error: 'Please sign in to save your answers.' }, 401);
+    if (request.headers.get('x-workbook-owner') !== user.id)
+      return reply(
+        {
+          error:
+            'Your sign-in changed. Copy any unsaved answers, then reopen the workbook in the correct account.',
+        },
+        409,
+      );
     const text = await request.text();
     if (new TextEncoder().encode(text).byteLength > 65000)
       return reply({ error: 'Response is too large.' }, 413);

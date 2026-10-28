@@ -9,13 +9,20 @@ function SectionEditor({
   initial,
   hidden,
   readOnly,
+  accountId,
 }: {
   section: WorkbookSection;
   initial?: WorkbookResponse;
   hidden: boolean;
   readOnly: boolean;
+  accountId: string;
 }) {
-  const { draft, edit, save, status, error } = useWorkbookSave(section.id, initial, readOnly);
+  const { draft, edit, save, status, error } = useWorkbookSave(
+    section.id,
+    initial,
+    readOnly,
+    accountId,
+  );
   const fields: { key: keyof WorkbookAnswers; label: string }[] = [
     { key: 'notes', label: 'My key ideas, words to define, and questions for my instructor' },
     ...section.prompts.map((label, index) => ({
@@ -115,11 +122,13 @@ export default function DigitalWorkbook({
   sections,
   responses,
   readOnly,
+  accountId,
 }: {
   workbook: Workbook;
   sections: WorkbookSection[];
   responses: WorkbookResponse[];
   readOnly: boolean;
+  accountId: string;
 }) {
   const [active, setActive] = useState(sections[0]?.id ?? '');
   return (
@@ -169,6 +178,7 @@ export default function DigitalWorkbook({
                 initial={responses.find((row) => row.section_id === section.id)}
                 hidden={section.id !== active}
                 readOnly={readOnly}
+                accountId={accountId}
               />
             ))}
           </>

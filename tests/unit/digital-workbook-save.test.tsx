@@ -21,7 +21,7 @@ describe('Account workbook saving', () => {
   it('flushes the final edit when dashboard navigation unmounts the editor', async () => {
     const fetchMock = vi.fn().mockResolvedValue(ok(4));
     vi.stubGlobal('fetch', fetchMock);
-    const view = renderHook(() => useWorkbookSave('section-one', initial));
+    const view = renderHook(() => useWorkbookSave('section-one', initial, false, 'current-user'));
     act(() =>
       view.result.current.edit({
         ...view.result.current.draft,
@@ -35,7 +35,9 @@ describe('Account workbook saving', () => {
   it('loads saved answers and persists clearing an answer, using its current version', async () => {
     const fetchMock = vi.fn().mockResolvedValue(ok(4));
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(() => useWorkbookSave('section-one', initial));
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
     expect(result.current.draft.answers.notes).toBe('Previously saved');
     act(() => result.current.edit({ answers: emptyWorkbookAnswers(), reviewed: true }));
     await act(async () => {
@@ -46,6 +48,7 @@ describe('Account workbook saving', () => {
       reviewed: true,
       expectedVersion: 3,
     });
+    expect(fetchMock.mock.calls[0][1].headers['x-workbook-owner']).toBe('current-user');
     expect(result.current.status).toBe('Saved to your account');
   });
   it('serializes changes made while an earlier request is still saving', async () => {
@@ -60,7 +63,9 @@ describe('Account workbook saving', () => {
       )
       .mockResolvedValueOnce(ok(5));
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(() => useWorkbookSave('section-one', initial));
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
     act(() =>
       result.current.edit({
         ...result.current.draft,
@@ -87,6 +92,7 @@ describe('Account workbook saving', () => {
       expectedVersion: 4,
       answers: { notes: 'Latest edit' },
     });
+    expect(fetchMock.mock.calls[0][1].headers['x-workbook-owner']).toBe('current-user');
     expect(result.current.status).toBe('Saved to your account');
   });
   it('retains the draft and never claims saved on a failed connection; retry succeeds', async () => {
@@ -95,7 +101,9 @@ describe('Account workbook saving', () => {
       .mockRejectedValueOnce(new Error('Connection lost'))
       .mockResolvedValueOnce(ok(4));
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(() => useWorkbookSave('section-one', initial));
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
     act(() =>
       result.current.edit({
         ...result.current.draft,
@@ -111,6 +119,7 @@ describe('Account workbook saving', () => {
     await act(async () => {
       expect(await result.current.save()).toBe(true);
     });
+    expect(fetchMock.mock.calls[0][1].headers['x-workbook-owner']).toBe('current-user');
     expect(result.current.status).toBe('Saved to your account');
   });
   it('does not retry over newer work after a conflict', async () => {
@@ -120,7 +129,9 @@ describe('Account workbook saving', () => {
         new Response(JSON.stringify({ error: 'Newer answers exist' }), { status: 409 }),
       );
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(() => useWorkbookSave('section-one', initial));
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
     act(() =>
       result.current.edit({
         ...result.current.draft,
@@ -139,7 +150,9 @@ describe('Account workbook saving', () => {
   it('autosaves after typing and leaves read-only previews unchanged', async () => {
     const fetchMock = vi.fn().mockResolvedValue(ok(4));
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(() => useWorkbookSave('section-one', initial));
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
     act(() =>
       result.current.edit({
         ...result.current.draft,
@@ -149,7 +162,7 @@ describe('Account workbook saving', () => {
     await waitFor(() => expect(result.current.status).toBe('Saved to your account'), {
       timeout: 3000,
     });
-    const preview = renderHook(() => useWorkbookSave('section-one', initial, true));
+    const preview = renderHook(() => useWorkbookSave('section-one', initial, true, 'current-user'));
     act(() => preview.result.current.edit({ answers: emptyWorkbookAnswers(), reviewed: true }));
     expect(preview.result.current.draft.answers.notes).toBe('Previously saved');
   });

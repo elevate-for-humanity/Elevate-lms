@@ -4,7 +4,12 @@ import { emptyWorkbookAnswers, type WorkbookAnswers } from '@/lib/lms/workbook-v
 import type { WorkbookResponse } from '@/lib/lms/digital-workbooks';
 
 type Draft = { answers: WorkbookAnswers; reviewed: boolean };
-export function useWorkbookSave(sectionId: string, initial?: WorkbookResponse, readOnly = false) {
+export function useWorkbookSave(
+  sectionId: string,
+  initial?: WorkbookResponse,
+  readOnly = false,
+  ownerId = '',
+) {
   const [draft, setDraft] = useState<Draft>(() => ({
     answers: { ...emptyWorkbookAnswers(), ...initial?.answers },
     reviewed: initial?.reviewed ?? false,
@@ -31,7 +36,7 @@ export function useWorkbookSave(sectionId: string, initial?: WorkbookResponse, r
             method: 'POST',
             credentials: 'same-origin',
             keepalive: true,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-workbook-owner': ownerId },
             body: JSON.stringify({ ...current.current, expectedVersion: version.current }),
             signal: AbortSignal.timeout(15000),
           });
@@ -61,7 +66,7 @@ export function useWorkbookSave(sectionId: string, initial?: WorkbookResponse, r
       }
     });
     return running.current;
-  }, [sectionId, readOnly]);
+  }, [sectionId, readOnly, ownerId]);
   const edit = useCallback(
     (next: Draft) => {
       if (readOnly) return;

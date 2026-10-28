@@ -22,5 +22,5 @@ export default async function DigitalWorkbookPage({
   if (!user) redirect(`/login?redirect=${encodeURIComponent(`/workbooks/${slug}`)}`);
   const result = await loadMyDigitalWorkbook(slug);
   if (!result) notFound();
-  return <DigitalWorkbook {...result} />;
+  return <DigitalWorkbook key={result.accountId} {...result} />;
 }

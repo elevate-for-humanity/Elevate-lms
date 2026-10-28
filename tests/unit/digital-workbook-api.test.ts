@@ -12,7 +12,11 @@ const section = '11111111-1111-4111-8111-111111111111';
 const request = (body: unknown, origin?: string) =>
   new NextRequest('https://app.elevateforhumanity.org/api/workbooks/sections/' + section, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(origin ? { origin } : {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-workbook-owner': 'current-user',
+      ...(origin ? { origin } : {}),
+    },
     body: JSON.stringify(body),
   });
 const save = { answers: emptyWorkbookAnswers(), reviewed: false, expectedVersion: 0 };
@@ -21,11 +25,24 @@ beforeEach(() => {
   mocks.getUser.mockResolvedValue({ data: { user: { id: 'current-user' } }, error: null });
 });
 describe('Workbook API', () => {
+  it('rejects a workbook left open under a different signed-in account', async () => {
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    const stale = request(save);
+    stale.headers.set('x-workbook-owner', 'previous-account');
+    expect((await POST(stale, { params: Promise.resolve({ sectionId: section }) })).status).toBe(
+      409,
+    );
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
   it('accepts the canonical LMS origin behind the Google service proxy', async () => {
     mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
     const forwarded = new NextRequest('http://localhost:8080/api/workbooks/sections/' + section, {
       method: 'POST',
-      headers: { origin: 'https://app.elevateforhumanity.org', 'Content-Type': 'application/json' },
+      headers: {
+        origin: 'https://app.elevateforhumanity.org',
+        'Content-Type': 'application/json',
+        'x-workbook-owner': 'current-user',
+      },
       body: JSON.stringify(save),
     });
     expect(

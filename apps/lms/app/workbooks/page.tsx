@@ -15,7 +15,7 @@ export default async function WorkbooksPage() {
   return (
     <main className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
       <div className="mx-auto max-w-4xl">
-        <Link href="/lms" className="inline-block py-3 underline">
+        <Link href="/lms/dashboard" className="inline-block py-3 underline">
           My learning dashboard
         </Link>
         <h1 className="mt-4 text-3xl font-bold">My Workbooks</h1>

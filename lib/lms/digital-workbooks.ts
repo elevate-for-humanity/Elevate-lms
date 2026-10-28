@@ -76,5 +76,11 @@ export async function loadMyDigitalWorkbook(slug: string) {
     .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
     .limit(1);
   if (enrollment.error) throw new Error('Workbook access could not be verified.');
-  return { workbook, sections: typedSections, responses, readOnly: !enrollment.data?.length };
+  return {
+    workbook,
+    sections: typedSections,
+    responses,
+    readOnly: !enrollment.data?.length,
+    accountId: user.id,
+  };
 }

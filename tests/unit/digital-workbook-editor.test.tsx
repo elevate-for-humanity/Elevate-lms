@@ -37,7 +37,13 @@ it('shows one section at a time and restores saved answers on reopening', async 
     );
   vi.stubGlobal('fetch', fetchMock);
   const view = render(
-    <DigitalWorkbook workbook={workbook} sections={sections} responses={[]} readOnly={false} />,
+    <DigitalWorkbook
+      accountId="current-user"
+      workbook={workbook}
+      sections={sections}
+      responses={[]}
+      readOnly={false}
+    />,
   );
   const region = screen.getByRole('region', { name: '1. Study topic 1' });
   fireEvent.change(within(region).getAllByRole('textbox')[0], {
@@ -75,7 +81,15 @@ it('shows one section at a time and restores saved answers on reopening', async 
 });
 
 it('keeps administrator previews read-only', () => {
-  render(<DigitalWorkbook workbook={workbook} sections={sections} responses={[]} readOnly />);
+  render(
+    <DigitalWorkbook
+      accountId="current-user"
+      workbook={workbook}
+      sections={sections}
+      responses={[]}
+      readOnly
+    />,
+  );
   expect(screen.getByText(/Read-only preview/)).toBeVisible();
   for (const input of screen.getAllByRole('textbox')) expect(input).toBeDisabled();
   for (const button of screen.getAllByRole('button', { name: 'Save answers' }))

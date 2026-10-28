@@ -1,3 +1,4 @@
+import { narrationRateForRepair } from '../instructional/narration-pace.mjs';
 import { alignRecordedNarration } from '@/lib/video/forced-alignment.mjs';
 import { measureNarrationCaptions } from '@/lib/video/media-quality-gate';
 import type { UltimateNarrationPort } from '../core/ports';
@@ -14,6 +15,8 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
  async generate(input:any){
   const approved=input.artifacts?.instructor_script?.script?.segments;
   if(!approved?.length||!input.lessonId)throw Error('ULTIMATE_APPROVED_NARRATION_SEGMENTS_REQUIRED');
+  const rate=narrationRateForRepair(input.repairDirective,input.targetWpm);
+  if(rate!=='0%'&&configuredNarrationProvider()!=='kokoro')throw Error('NARRATION_NATIVE_PACE_PROVIDER_UNSUPPORTED');
   const directory=await mkdtemp(join(tmpdir(),'ultimate-narration-'));
   try{
    const segments=[];
@@ -25,7 +28,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     const files=[];
     for(const [partIndex,recording] of recordings.entries()){
      if(!recording.text?.trim())throw Error('BLANK_NARRATION_PART_PROHIBITED');
-     const audio=await generateEdgeTTS(recording.text,{voice:EDGE_TTS_VOICES.warm,rate:'0%'});
+     const audio=await generateEdgeTTS(recording.text,{voice:EDGE_TTS_VOICES.warm,rate});
      reportCourseProgress('narration:recording:'+index,partIndex+1,recordings.length);
      const source=join(directory,index+'-'+partIndex+'.mp3'),pcm=join(directory,index+'-'+partIndex+'.wav');
      await writeFile(source,audio);
@@ -82,7 +85,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     segments.push({segmentId:segment.id,text:parts.map(p=>p.text).join('\n\n'),audioUrl,durationSeconds:cursor,captions,wordAlignment,parts});
     reportCourseProgress('narration:stored-segments',index+1,approved.length);
    }
-   return {provider:configuredNarrationProvider(),voice:EDGE_TTS_VOICES.warm,rate:'0%',deliverySampleRate:24000,segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};
+   return {provider:configuredNarrationProvider(),voice:EDGE_TTS_VOICES.warm,rate,deliverySampleRate:24000,segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};
   }finally{await rm(directory,{recursive:true,force:true});}
  }
 }

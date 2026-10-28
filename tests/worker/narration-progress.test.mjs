@@ -1,3 +1,4 @@
+import { narrationRateForRepair } from '../../lib/ultimate-course-builder/instructional/narration-pace.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -7,16 +8,16 @@ import {fileURLToPath} from 'node:url';
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/adapters/platform-narration.ts',import.meta.url),'utf8'),{mode:'transform'})
  .replace(/^import .*;\n/gm,'').replace('const execute = promisify(execFile);','').replace('const execute=promisify(execFile);','').replace('export class ','class ');
 function harness(fail=false,{alignmentError,recognizerError}={}){
- const progress=[],recognitions=[];let cleaned=false;
- const Provider=new Function('alignRecordedNarration','measureNarrationCaptions','configuredNarrationProvider','EDGE_TTS_VOICES','generateEdgeTTS','uploadLessonMediaBuffer','execute','mkdtemp','writeFile','readFile','rm','tmpdir','join','reportCourseProgress',source+'\nreturn UltimatePlatformNarration;')(
-  async(_file,text)=>{if(alignmentError)throw alignmentError;return text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2}));},
+ const progress=[],recognitions=[],rates=[];let cleaned=false;
+ const Provider=new Function('narrationRateForRepair','alignRecordedNarration','measureNarrationCaptions','configuredNarrationProvider','EDGE_TTS_VOICES','generateEdgeTTS','uploadLessonMediaBuffer','execute','mkdtemp','writeFile','readFile','rm','tmpdir','join','reportCourseProgress',source+'\nreturn UltimatePlatformNarration;')(
+  narrationRateForRepair,async(_file,text)=>{if(alignmentError)throw alignmentError;return text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2}));},
   async(bytes,text,duration,receive)=>{recognitions.push({bytes,text,duration});if(recognizerError)throw recognizerError;
    const words=text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2}));receive(words);
    return [{text,startSeconds:words[0].start,endSeconds:words.at(-1).end}];
-  },()=> 'configured',{warm:'test-warm-voice'},async(_text,options)=>{assert.equal(options.voice,'test-warm-voice');if(fail)throw Error('TTS_FAILED');return Buffer.alloc(10);},async()=> 'https://media.example/audio.mp3',
+  },()=> 'kokoro',{warm:'test-warm-voice'},async(_text,options)=>{assert.equal(options.voice,'test-warm-voice');rates.push(options.rate);if(fail)throw Error('TTS_FAILED');return Buffer.alloc(10);},async()=> 'https://media.example/audio.mp3',
   async()=>({stdout:'1'}),async()=>'/tmp/narration',async()=>{},async()=>Buffer.alloc(10),async()=>{cleaned=true;},()=>'/tmp',(...parts)=>parts.join('/'),
   (phase,completed,total)=>progress.push({phase,completed,total}));
- return{provider:new Provider(),progress,recognitions,cleaned:()=>cleaned};
+ return{provider:new Provider(),progress,recognitions,rates,cleaned:()=>cleaned};
 }
 const input={lessonId:'lesson',artifacts:{instructor_script:{script:{segments:[{id:'scene',narrationParts:[{text:'Primary recording',isRecap:false},{text:'Fresh recap',isRecap:true}]}]}}}};
 test('long narration exposes real recording, alignment, and stored-segment progress',async()=>{
@@ -105,4 +106,13 @@ test('grammar mismatch cannot hide a failed independent speech measurement',asyn
  const h=harness(false,{alignmentError:new Error('FORCED_ALIGNMENT_SCRIPT_MISMATCH'),recognizerError:new Error('ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED')});
  await assert.rejects(h.provider.generate(input),/RECOGNIZED_WORD_TIMINGS_REQUIRED/);
  assert.ok(!h.progress.some(p=>p.phase==='narration:stored-segments'));
+});
+
+test('measured slow speech regenerates every part at a bounded native rate and realigns it',async()=>{
+ const h=harness();
+ const repairDirective={target:'natural_narration',previous:{narration:{rate:'0%'}},requirements:[{code:'PACE_OUT_OF_RANGE',message:'Delivered narration failed PACE_OUT_OF_RANGE: '+JSON.stringify({metrics:{wordsPerMinute:{value:107.988,measured:true}}})}]};
+ const result=await h.provider.generate({...input,targetWpm:135,repairDirective});
+ assert.deepEqual(h.rates,['+15%','+15%']);
+ assert.equal(result.rate,'+15%');
+ assert.equal(h.progress.filter(p=>p.phase.startsWith('narration:alignment')).length,2);
 });

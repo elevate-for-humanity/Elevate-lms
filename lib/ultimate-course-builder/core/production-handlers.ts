@@ -225,6 +225,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             artifacts: ctx.artifacts,
             tone: 'neutral-calm',
             targetWpm: 135,
+            repairDirective: ctx.repairDirective,
           }),
         },
       };

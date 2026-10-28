@@ -429,7 +429,16 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         source: 'delivered-mp4',
         mediaSha256: inspection.mediaSha256,
       };
-      return { passed: narrationQA.pass, artifacts: { narrationQA } };
+      return {
+        passed: narrationQA.pass,
+        findings: narrationQA.failures.map((code) => ({
+          step: 'narration_qa' as const,
+          severity: 'error' as const,
+          code,
+          message: `Delivered narration failed ${code}: ${JSON.stringify({ metrics, unknown: narrationQA.unknown })}`,
+        })),
+        artifacts: { narrationQA },
+      };
     },
     learner_runthrough: async (ctx) => {
       const render: any = ctx.artifacts.lesson_film_render?.render;

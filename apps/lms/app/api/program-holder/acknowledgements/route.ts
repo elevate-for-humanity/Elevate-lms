@@ -13,6 +13,13 @@ export async function POST(request: Request) {
   const types = allowedTypes.filter((type) => body[type] === true);
   if (!types.length)
     return NextResponse.json({ error: 'Select at least one agreement to sign.' }, { status: 400 });
+  if (types.some(type => ['nda', 'non_compete'].includes(type))) {
+    const { data: holder, error } = await ctx.db.from('program_holders')
+      .select('features').eq('id', ctx.holderId).maybeSingle();
+    if (error || !holder) return NextResponse.json({ error: 'Agreement readiness could not be checked. Please retry.' }, { status: 503 });
+    if (holder.features?.full_forms_status === 'review_pending')
+      return NextResponse.json({ error: 'Review your full MOU, NDA, and 12-month restriction forms. Signature is pending completed agreement details.', reviewUrl: '/program-holder/agreements' }, { status: 409 });
+  }
   const requestHeaders = await headers();
   for (const documentType of types) {
     const { data: existing, error: lookupError } = await ctx.db

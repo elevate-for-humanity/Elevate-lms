@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,13 @@ export const metadata = {
 };
 
 export default async function NonCompetePage() {
-  await requireProgramHolder();
+  const context = await requireProgramHolder();
+  if (context.holderId === 'acc9f5ab-8804-432e-9b12-aac1a6c86426') {
+    const { data: holder, error } = await context.db.from('program_holders')
+      .select('features').eq('id', context.holderId).maybeSingle();
+    if (error || !holder) throw new Error('Agreement readiness could not be checked.');
+    if (holder.features?.full_forms_status === 'review_pending') redirect('/program-holder/agreements');
+  }
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <p className="text-xs font-black uppercase tracking-widest text-amber-700">

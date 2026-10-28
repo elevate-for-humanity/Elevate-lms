@@ -111,10 +111,10 @@ export default async function ApprenticePortalPage() {
     return (
       <main className="mx-auto max-w-5xl space-y-6 pb-10">
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-red-700">
             Administrator portal preview
           </p>
-          <h1 className="mt-2 text-3xl font-black text-slate-950">Apprentice PWA</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-950">Apprentice PWA</h1>
           <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">
             This neutral preview confirms that the Apprentice PWA is available without attaching an
             administrator to a learner record. Select a learner from secured Admin student
@@ -123,13 +123,13 @@ export default async function ApprenticePortalPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <a
               href="https://admin.elevateforhumanity.org/students"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
             >
               Select a learner in Admin
             </a>
             <a
               href="https://admin.elevateforhumanity.org/dashboard"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-950"
             >
               Return to Admin dashboard
             </a>
@@ -152,7 +152,7 @@ export default async function ApprenticePortalPage() {
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
               <ShieldCheck className="h-5 w-5 text-brand-red-700" />
-              <h2 className="mt-3 font-black text-slate-950">{label}</h2>
+              <h2 className="mt-3 font-semibold text-slate-950">{label}</h2>
               <p className="mt-1 text-sm text-slate-600">
                 Available after an authorized learner is selected.
               </p>
@@ -384,41 +384,41 @@ export default async function ApprenticePortalPage() {
     automaticBillingSchedule?.provider_subscription_id,
   );
   const requiredPolicyPanel = (
-    <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
+    <section className="rounded-3xl border-2 border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm sm:p-8">
       <div className="flex gap-3">
         <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-amber-800" />
         <div className="w-full">
-          <h2 className="text-xl font-black text-amber-950">Required apprentice policies</h2>
-          <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">
+          <h2 className="text-xl font-semibold text-slate-950">Required apprentice policies</h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">
             Every apprentice must read and sign both policies. These pages remain in every new
             apprentice dashboard.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Link
               href="/apprentice/policies/timeclock"
-              className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:shadow-md"
+              className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:shadow-md"
             >
-              <p className="font-black text-slate-950">Timeclock & geofence</p>
+              <p className="font-semibold text-slate-950">Timeclock & geofence</p>
               <p className="mt-1 text-sm text-slate-700">
                 When and where to clock in and out, weekly limits, and automatic clock-out.
               </p>
               <p
-                className={`mt-3 text-xs font-black uppercase ${timeclockPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
+                className={`mt-3 text-xs font-semibold uppercase ${timeclockPolicyAccepted ? 'text-green-700' : 'text-slate-600'}`}
               >
                 {timeclockPolicyAccepted ? '✓ Signed' : 'Signature required'}
               </p>
             </Link>
             <Link
               href="/apprentice/policies/payments"
-              className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:shadow-md"
+              className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:shadow-md"
             >
-              <p className="font-black text-slate-950">Payments & communication</p>
+              <p className="font-semibold text-slate-950">Payments & communication</p>
               <p className="mt-1 text-sm text-slate-700">
                 Call before the due date if there is a problem; nonpayment without communication is
                 enforced.
               </p>
               <p
-                className={`mt-3 text-xs font-black uppercase ${paymentPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
+                className={`mt-3 text-xs font-semibold uppercase ${paymentPolicyAccepted ? 'text-green-700' : 'text-slate-600'}`}
               >
                 {paymentPolicyAccepted ? '✓ Signed' : 'Signature required'}
               </p>
@@ -491,62 +491,40 @@ export default async function ApprenticePortalPage() {
       (runtime.placement?.id ? beautyProgram?.hostLabel || 'Assigned Host Shop' : 'Not connected');
     return (
       <main className="space-y-7 pb-10">
-        <TimeclockAttendanceNotice />
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="grid lg:grid-cols-[1.2fr_1fr]">
+            <div className="flex flex-col justify-center p-7 sm:p-10">
+              <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">{beautyProgram?.portalLabel || 'Apprentice Portal'}</p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">Welcome, {firstName}</h1>
+              <p className="mt-3 text-xl text-slate-600">{displayProgram}</p>
+              <p className="mt-4 max-w-lg text-slate-600">Your lessons, workbook, shop training, and progress. All in one place.</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href={courseHref} className="rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900">My training →</Link>
+                <Link href="/apprentice/documents" className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800">My documents</Link>
+              </div>
+            </div>
+            <div className="relative min-h-64 lg:min-h-80">
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={heroImage} alt={`${displayProgram} apprentice training`} fill priority className="object-cover object-top" sizes="(max-width: 1024px) 100vw, 45vw" />
+            </div>
+          </div>
+        </section>
         {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
           <TrainingReadyNotice courseHref={courseHref} />
         ) : null}
         <ProgramGuideResources />
         <VisualDashboardOrientation audience="apprentice" compact />
-        <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
-          <Image
-            placeholder="blur"
-            blurDataURL={IMAGE_LOADING_BLUR}
-            src={heroImage}
-            alt={`${displayProgram} apprentice training`}
-            fill
-            priority
-            className="object-cover object-center"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/70 to-transparent" />
-          <div className="relative z-10 flex min-h-[390px] max-w-3xl flex-col justify-center p-7 text-white sm:p-10 lg:p-12">
-            <span className="w-fit rounded-full border border-pink-300/50 bg-pink-500/20 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-pink-100 backdrop-blur">
-              {beautyProgram?.portalLabel || 'Apprentice Portal'}
-            </span>
-            <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              Welcome, {firstName}
-            </h1>
-            <p className="mt-3 text-xl font-bold text-pink-100">{displayProgram}</p>
-            <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-slate-100 sm:text-base">
-              Track training with your {beautyProgram?.hostLabel || 'Host Shop'},{' '}
-              {registeredStandard?.completion.requiredRtiHours || 'required'} RTI hours, tuition
-              progress, documents, competencies, and State Board readiness in one place.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/apprentice/billing"
-                className="rounded-xl bg-pink-600 px-5 py-3 font-black text-white shadow-lg hover:bg-pink-500"
-              >
-                {invoiceAccess.accessExemptUntil ? 'Review billing' : 'Complete payment setup'}
-              </Link>
-              <Link
-                href="/apprentice/documents"
-                className="rounded-xl border border-white/50 bg-white/10 px-5 py-3 font-black text-white backdrop-blur hover:bg-white/20"
-              >
-                Required documents
-              </Link>
-            </div>
-          </div>
-        </section>
-        <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-6 shadow-sm">
+
+        <TimeclockAttendanceNotice />
+
+        <details className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <summary className="cursor-pointer text-lg font-semibold text-slate-950">My setup checklist · {incompleteCount} remaining</summary>
           <div className="flex gap-3">
-            <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700" />
+            <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-slate-600" />
             <div className="w-full">
-              <h2 className="text-xl font-black text-red-950">
+              <h2 className="text-xl font-semibold text-slate-950">
                 Required to-do — {incompleteCount} incomplete
               </h2>
-              <p className="mt-1 text-sm font-semibold text-red-900">
+              <p className="mt-1 text-sm font-semibold text-slate-600">
                 PARIS will walk you through these items in order. Items marked Open still need
                 attention, but sponsor-approved access remains available while an active access
                 exception is in place.
@@ -556,18 +534,18 @@ export default async function ApprenticePortalPage() {
                   <Link
                     key={label}
                     href={href}
-                    className={`flex items-center justify-between gap-4 rounded-xl border p-4 ${done ? 'border-green-300 bg-green-50 text-green-950' : 'border-red-300 bg-white text-red-950'}`}
+                    className={`flex items-center justify-between gap-4 rounded-xl border p-4 ${done ? 'border-green-300 bg-green-50 text-green-950' : 'border-slate-200 bg-white text-slate-900'}`}
                   >
                     <span className="flex items-center gap-3">
                       <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-black ${done ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${done ? 'bg-green-700 text-white' : 'bg-slate-800 text-white'}`}
                       >
                         {done ? '✓' : index + 1}
                       </span>
                       <Icon className="h-5 w-5 shrink-0" />
-                      <span className="font-black">{label}</span>
+                      <span className="font-semibold">{label}</span>
                     </span>
-                    <span className="text-xs font-black uppercase">
+                    <span className="text-xs font-semibold uppercase">
                       {done ? 'Complete' : 'Open'}
                     </span>
                   </Link>
@@ -575,7 +553,7 @@ export default async function ApprenticePortalPage() {
               </div>
             </div>
           </div>
-        </section>
+        </details>
         <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
         {requiredPolicyPanel}
         <section className="grid gap-4 sm:grid-cols-3">
@@ -690,7 +668,7 @@ export default async function ApprenticePortalPage() {
                 <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
                   Apprentice Dashboard
                 </p>
-                <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                   Welcome, {firstName}
                 </h1>
                 <p className="mt-3 text-lg font-bold text-slate-800">
@@ -736,12 +714,12 @@ export default async function ApprenticePortalPage() {
       </section>
 
       <section
-        className={`rounded-2xl border p-5 ${placementReady ? 'border-cyan-200 bg-cyan-50 text-cyan-950' : 'border-amber-300 bg-amber-50 text-amber-950'}`}
+        className={`rounded-2xl border p-5 ${placementReady ? 'border-cyan-200 bg-cyan-50 text-cyan-950' : 'border-slate-200 bg-slate-50 text-slate-950'}`}
       >
         <div className="flex gap-3">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
-            <h2 className="font-black">Registered-program contract</h2>
+            <h2 className="font-semibold">Registered-program contract</h2>
             <p className="mt-1 text-sm font-semibold leading-6">
               Completion requires {runtime.contract.completion.competencyCount} verified
               competencies and {runtime.contract.completion.requiredRtiHours} verified RTI hours
@@ -755,7 +733,7 @@ export default async function ApprenticePortalPage() {
               {runtime.contract.standardVersionKey}
             </p>
             {!placementReady ? (
-              <p className="mt-2 text-sm font-black">
+              <p className="mt-2 text-sm font-semibold">
                 Regulated activity remains blocked until the Host Shop and assigned supervisor are
                 fully operational.
               </p>
@@ -771,10 +749,10 @@ export default async function ApprenticePortalPage() {
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-red-700">
               Your employer placement
             </p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">{shopName}</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">{shopName}</h2>
             <p className="mt-2 text-sm font-semibold text-slate-700">
               Supervisor: {supervisorName}
             </p>
@@ -798,7 +776,7 @@ export default async function ApprenticePortalPage() {
           </div>
           <Link
             href="/apprentice/documents"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
           >
             Open my forms and documents
           </Link>
@@ -892,7 +870,7 @@ export default async function ApprenticePortalPage() {
       />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="text-xl font-black text-slate-950">Progressive wage checkpoint</h2>
+        <h2 className="text-xl font-semibold text-slate-950">Progressive wage checkpoint</h2>
         <p className="mt-2 text-sm font-medium leading-6 text-slate-700">
           The applicable wage floor resolves the immutable occupation baseline and any
           employer-specific RAPIDS wage schedule without flattening one employer&apos;s schedule
@@ -903,7 +881,7 @@ export default async function ApprenticePortalPage() {
             Current registered floor: ${wage.requiredRegisteredRate.toFixed(2)}/hr
           </span>
           {nextWageMilestone ? (
-            <span className="rounded-full bg-amber-100 px-3 py-2 text-amber-950">
+            <span className="rounded-full bg-slate-100 px-3 py-2 text-slate-950">
               Next baseline milestone: {nextWageMilestone.completedCompetencies} competencies → $
               {nextWageMilestone.hourlyRate.toFixed(2)}/hr
             </span>
@@ -917,7 +895,7 @@ export default async function ApprenticePortalPage() {
 
       <section>
         <div className="mb-4">
-          <h2 className="text-2xl font-black text-slate-950">Apprentice tools</h2>
+          <h2 className="text-2xl font-semibold text-slate-950">Apprentice tools</h2>
           <p className="mt-1 text-sm font-medium text-slate-700">
             All tools use the same enrollment, placement, Host Shop, registered standard, and audit
             records.
@@ -940,7 +918,7 @@ export default async function ApprenticePortalPage() {
                 />
               </div>
               <div className="p-5">
-                <h3 className="font-black text-slate-950">{action.title}</h3>
+                <h3 className="font-semibold text-slate-950">{action.title}</h3>
                 <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{action.text}</p>
               </div>
             </Link>
@@ -966,7 +944,7 @@ function Metric({
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <Icon className="h-5 w-5 text-brand-red-700" />
       <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-600">{label}</p>
-      <p className="mt-1 text-2xl font-black text-slate-950">{value}</p>
+      <p className="mt-1 text-2xl font-semibold text-slate-950">{value}</p>
       <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">{detail}</p>
     </article>
   );
@@ -976,8 +954,8 @@ function ProgressPanel({ title, value, detail }: { title: string; value: number;
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between gap-4">
-        <h3 className="font-black text-slate-950">{title}</h3>
-        <span className="text-sm font-black text-slate-800">{value}%</span>
+        <h3 className="font-semibold text-slate-950">{title}</h3>
+        <span className="text-sm font-semibold text-slate-800">{value}%</span>
       </div>
       <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
         <div
@@ -1010,10 +988,10 @@ function PriorLearningPanel({
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-800">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-800">
             Progress carried forward
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-950">
+          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
             {priorLearning.overall_percent}% of prior online learning preserved
           </h2>
           <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
@@ -1022,7 +1000,7 @@ function PriorLearningPanel({
             credit remains subject to sponsor review and supporting evidence.
           </p>
         </div>
-        <span className="w-fit rounded-full bg-white px-3 py-2 text-xs font-black uppercase tracking-wide text-cyan-900 ring-1 ring-cyan-200">
+        <span className="w-fit rounded-full bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-cyan-900 ring-1 ring-cyan-200">
           {reviewLabel}
         </span>
       </div>
@@ -1031,8 +1009,8 @@ function PriorLearningPanel({
           {priorLearning.modules.map((module) => (
             <article key={module.title} className="rounded-2xl border border-cyan-200 bg-white p-4">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-black text-slate-950">{module.title}</h3>
-                <span className="text-sm font-black text-cyan-900">{module.percent}%</span>
+                <h3 className="text-sm font-semibold text-slate-950">{module.title}</h3>
+                <span className="text-sm font-semibold text-cyan-900">{module.percent}%</span>
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
                 <div
@@ -1065,10 +1043,10 @@ function LearningCenter({
   return (
     <section aria-label="Learning center">
       <div className="mb-4">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-red-700">
           One learning center
         </p>
-        <h2 className="mt-1 text-2xl font-black text-slate-950">Everything you need for class</h2>
+        <h2 className="mt-1 text-2xl font-semibold text-slate-950">Everything you need for class</h2>
         <p className="mt-1 text-sm font-medium text-slate-700">
           Lessons, assessments, grades, calendar, resources, and portfolio evidence stay connected
           to the same Elevate enrollment.
@@ -1084,9 +1062,9 @@ function LearningCenter({
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-brand-red-700 transition group-hover:bg-brand-red-50">
               <Icon className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 font-black text-slate-950">{title}</h3>
+            <h3 className="mt-4 font-semibold text-slate-950">{title}</h3>
             <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{text}</p>
-            <span className="mt-4 inline-flex text-sm font-black text-brand-red-700">Open →</span>
+            <span className="mt-4 inline-flex text-sm font-semibold text-brand-red-700">Open →</span>
           </Link>
         ))}
       </div>
@@ -1121,9 +1099,9 @@ function TheorySchedulePanel({
 }) {
   if (!schedule)
     return (
-      <section className="rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm">
-        <h2 className="text-xl font-black text-amber-950">Theory schedule is being assigned</h2>
-        <p className="mt-2 text-sm font-semibold leading-6 text-amber-900">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-slate-950">Theory schedule is being assigned</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
           Your recurring theory schedule is created automatically from your active Host Shop
           placement. Return here after the placement record finishes syncing.
         </p>
@@ -1131,45 +1109,27 @@ function TheorySchedulePanel({
     );
   if (!schedule.learner_confirmed_at)
     return (
-      <section className="rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm sm:p-8">
-        <p className="text-xs font-black uppercase tracking-[0.15em] text-amber-800">
-          Theory schedule setup required
-        </p>
-        <h2 className="mt-2 text-2xl font-black text-amber-950">
-          Choose your study days and times
-        </h2>
-        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-amber-900">
-          Your online course and workbook are ready, but theory access remains blocked until you
-          save your own recurring study windows outside OJL. The old placement default is not an
-          active learner schedule and will not send start or stop reminders.
-        </p>
-        <div className="mt-4 rounded-xl border border-amber-300 bg-white p-4 text-sm text-slate-800">
-          <p className="font-black">Your weekly allowance</p>
-          <p className="mt-1">
-            Target: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')} theory hours.
-            Maximum: {(Math.min(schedule.weekly_max_minutes, 600) / 60).toLocaleString('en-US')}{' '}
-            theory hours.
-          </p>
-          <p className="mt-1">
-            Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours. Course
-            progress: {completedLessons} of {totalLessons} published lessons complete.
-          </p>
-        </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link
-            href="/apprentice/theory-schedule"
-            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-amber-900 px-5 py-3 font-black text-white"
-          >
-            Choose my theory study times
-          </Link>
-          <a
-            href={syllabusHref}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-amber-400 bg-white px-5 py-3 font-black text-amber-950"
-          >
-            Open syllabus
-          </a>
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="grid md:grid-cols-[1.4fr_1fr]">
+          <div className="p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">Your next step</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Make time for your goals.</h2>
+            <p className="mt-3 max-w-lg text-slate-600">Choose study times outside your shop hours to open your online training.</p>
+            <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
+              <div><p className="text-2xl font-semibold text-slate-950">{(schedule.weekly_target_minutes / 60).toLocaleString('en-US')}h</p><p className="mt-1 text-slate-500">Weekly target</p></div>
+              <div><p className="text-2xl font-semibold text-slate-950">{(Math.min(schedule.weekly_max_minutes, 600) / 60).toLocaleString('en-US')}h</p><p className="mt-1 text-slate-500">Weekly limit</p></div>
+              <div><p className="text-2xl font-semibold text-slate-950">{completedLessons}/{totalLessons}</p><p className="mt-1 text-slate-500">Lessons complete</p></div>
+            </div>
+            <Link href="/apprentice/theory-schedule" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900">Set my study times →</Link>
+            <details className="mt-5 border-t border-slate-200 pt-4 text-sm text-slate-600">
+              <summary className="cursor-pointer font-semibold text-slate-800">Plan details &amp; syllabus</summary>
+              <p className="mt-3 leading-6">Your schedule needs your confirmation before theory opens. Save your available days and times to activate study windows and reminders. Recorded OJL: {recordedOjlHours.toLocaleString('en-US')} hours.</p>
+              <a href={syllabusHref} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center font-semibold text-teal-800 underline">Open syllabus</a>
+            </details>
+          </div>
+          <div className="relative min-h-56 bg-slate-100">
+            <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp" alt="Cosmetology professional preparing a salon workstation" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover object-top" />
+          </div>
         </div>
       </section>
     );
@@ -1185,18 +1145,18 @@ function TheorySchedulePanel({
     );
   };
   return (
-    <section className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-4 shadow-sm sm:p-8">
+    <section className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm sm:p-8">
       <div className="flex min-w-0 flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-teal-800">
             Your weekly theory plan
           </p>
-          <h2 className="mt-2 break-words text-2xl font-black text-slate-950">{days}</h2>
+          <h2 className="mt-2 break-words text-2xl font-semibold text-slate-950">{days}</h2>
           <p className="mt-2 font-bold text-slate-800">
             {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>
           {formatTheoryStartDate(schedule.starts_on) ? (
-            <p className="mt-2 text-sm font-black text-fuchsia-950">
+            <p className="mt-2 text-sm font-semibold text-slate-950">
               Theory/RTI begins {formatTheoryStartDate(schedule.starts_on)}.
             </p>
           ) : null}
@@ -1208,8 +1168,8 @@ function TheorySchedulePanel({
             </strong>
             . You will receive automatic alerts when each scheduled block starts and stops.
           </p>
-          <div className="mt-4 rounded-xl border border-fuchsia-200 bg-white p-4 text-sm text-slate-800">
-            <p className="font-black">Theory schedule and eligibility</p>
+          <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-800">
+            <p className="font-semibold">Theory schedule and eligibility</p>
             <p className="mt-1">
               Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours.
             </p>
@@ -1231,13 +1191,13 @@ function TheorySchedulePanel({
         <div className="flex flex-wrap gap-3">
           <Link
             href="/apprentice/theory-schedule"
-            className="inline-flex min-h-12 items-center rounded-xl border border-fuchsia-700 bg-white px-5 py-3 font-black text-fuchsia-950"
+            className="inline-flex min-h-12 items-center rounded-xl border border-teal-800 bg-white px-5 py-3 font-semibold text-slate-950"
           >
             Choose my theory study times
           </Link>
           <Link
             href={courseHref}
-            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-fuchsia-800 px-5 py-3 font-black text-white"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white"
           >
             Start theory course
           </Link>
@@ -1245,7 +1205,7 @@ function TheorySchedulePanel({
             href={syllabusHref}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-fuchsia-300 bg-white px-5 py-3 font-black text-fuchsia-950"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-950"
           >
             Open syllabus
           </a>
@@ -1254,3 +1214,4 @@ function TheorySchedulePanel({
     </section>
   );
 }
+

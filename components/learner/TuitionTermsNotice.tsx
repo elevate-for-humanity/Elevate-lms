@@ -1,11 +1,11 @@
 import { PROSPECTIVE_TUITION_LATE_FEE_POLICY as terms } from '@/lib/billing/tuition-late-fee-policy';
 export function TuitionTermsNotice() {
   return (
-    <aside
+    <details
       aria-label="Automatic payment and late-fee terms"
-      className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950"
+      className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600"
     >
-      <h3 className="font-black">Automatic payments and due dates</h3>
+      <summary className="cursor-pointer font-semibold text-slate-900">Payment dates &amp; agreement terms</summary>
       <p>
         Keep your payment information on file with the secure payment provider and complete the
         signed recurring-payment authorization and provider agreement. Automatic payments begin only
@@ -24,6 +24,7 @@ export function TuitionTermsNotice() {
         and externally financed payments follow their own terms. Billing, support, timekeeping and
         required records remain available.
       </p>
-    </aside>
+    </details>
   );
 }
+

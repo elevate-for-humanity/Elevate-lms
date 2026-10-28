@@ -2,11 +2,14 @@ import { APPRENTICE_TIME_POLICY } from '@/lib/timeclock/policy';
 
 export function TimeclockAttendanceNotice() {
   return (
-    <section
+    <details
       aria-label="Required attendance rules"
-      className="mb-4 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-amber-950"
+      className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 text-slate-700"
     >
-      <h2 className="text-sm font-black">Clock out at the school before leaving</h2>
+      <summary className="cursor-pointer font-semibold text-slate-950">My daily routine · clock, lunch &amp; location</summary>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {[['01', 'Clock in onsite'], ['02', 'One-hour lunch'], ['03', 'Clock out before leaving']].map(([step, title]) => <div key={step} className="flex items-center gap-3 rounded-xl bg-slate-50 p-4"><span className="font-semibold text-teal-800">{step}</span><span className="text-sm font-semibold">{title}</span></div>)}
+      </div>
       <p className="mt-2 text-sm font-semibold leading-6">
         Clock in and clock out only at your approved school or assigned training site. Confirm that
         clock-out succeeded before leaving its perimeter. An off-site clock-out is blocked. Without
@@ -30,6 +33,7 @@ export function TimeclockAttendanceNotice() {
         If a clock action fails while you are onsite, contact your supervisor and Elevate
         immediately with the date, actual times, and error shown.
       </p>
-    </section>
+    </details>
   );
 }
+

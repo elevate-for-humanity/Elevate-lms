@@ -14,7 +14,7 @@ export function MandatoryBillingSetup({
   if (!requirement.required) return null;
 
   const complete = requirement.status === 'active';
-  const heading = complete ? 'Billing setup complete' : 'Mandatory billing to-do';
+  const heading = complete ? 'Billing setup complete' : 'Your payment setup';
   const copy = {
     configuration_required:
       'Your self-pay enrollment requires a recurring-payment release. Elevate must finish your payment terms before the release can be issued; this task stays open until the release is approved.',
@@ -33,28 +33,28 @@ export function MandatoryBillingSetup({
 
   return (
     <section
-      role={complete ? undefined : 'alert'}
-      className={`rounded-2xl border-2 p-5 shadow-sm ${complete ? 'border-emerald-300 bg-emerald-50' : 'border-red-400 bg-red-50'}`}
+      role={complete ? 'status' : undefined}
+      className={`rounded-2xl border-2 p-5 shadow-sm ${complete ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}`}
     >
       <div className="flex gap-3">
         {complete ? (
           <BadgeCheck className="mt-0.5 h-6 w-6 shrink-0 text-emerald-700" />
         ) : (
-          <AlertCircle className="mt-0.5 h-6 w-6 shrink-0 text-red-700" />
+          <AlertCircle className="mt-0.5 h-6 w-6 shrink-0 text-slate-600" />
         )}
         <div className="min-w-0 flex-1">
           <p
-            className={`text-xs font-black uppercase tracking-widest ${complete ? 'text-emerald-800' : 'text-red-800'}`}
+            className={`text-xs font-black uppercase tracking-widest ${complete ? 'text-emerald-800' : 'text-slate-600'}`}
           >
             {requirement.programName || 'Self-pay program'}
           </p>
           <h2
-            className={`mt-1 text-xl font-black ${complete ? 'text-emerald-950' : 'text-red-950'}`}
+            className={`mt-1 text-xl font-black ${complete ? 'text-emerald-950' : 'text-slate-950'}`}
           >
             {heading}
           </h2>
           <p
-            className={`mt-2 text-sm font-semibold leading-6 ${complete ? 'text-emerald-900' : 'text-red-900'}`}
+            className={`mt-2 text-sm font-semibold leading-6 ${complete ? 'text-emerald-900' : 'text-slate-600'}`}
           >
             {copy}
           </p>
@@ -63,7 +63,7 @@ export function MandatoryBillingSetup({
             {!complete && requirement.status === 'configuration_required' ? (
               <Link
                 href="/lms/support?topic=billing-setup"
-                className="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-black text-white"
+                className="rounded-xl bg-teal-800 px-4 py-2.5 text-sm font-black text-white"
               >
                 Contact billing setup
               </Link>
@@ -71,7 +71,7 @@ export function MandatoryBillingSetup({
             {!complete && ['release_required', 'release_submitted'].includes(requirement.status) ? (
               <Link
                 href="/lms/documents#billing-authorization"
-                className="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-black text-white"
+                className="rounded-xl bg-teal-800 px-4 py-2.5 text-sm font-black text-white"
               >
                 Open recurring-payment release
               </Link>
@@ -89,7 +89,7 @@ export function MandatoryBillingSetup({
             {requirement.status === 'paypal_approval_required' && !requirement.paypalApprovalUrl ? (
               <Link
                 href="/lms/documents#billing-authorization"
-                className="rounded-xl bg-red-800 px-4 py-2.5 text-sm font-black text-white"
+                className="rounded-xl bg-teal-800 px-4 py-2.5 text-sm font-black text-white"
               >
                 Finish PayPal setup
               </Link>
@@ -102,13 +102,13 @@ export function MandatoryBillingSetup({
             ) : (
               <Link
                 href="/billing"
-                className={`inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-2.5 text-sm font-black ${complete ? 'border-emerald-300 text-emerald-950' : 'border-red-300 text-red-950'}`}
+                className={`inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-2.5 text-sm font-black ${complete ? 'border-emerald-300 text-emerald-950' : 'border-slate-300 text-slate-950'}`}
               >
                 <CreditCard className="h-4 w-4" /> View invoices &amp; Affirm options
               </Link>
             )}
           </div>
-          <p className={`mt-3 text-xs ${complete ? 'text-emerald-800' : 'text-red-800'}`}>
+          <p className={`mt-3 text-xs ${complete ? 'text-emerald-800' : 'text-slate-600'}`}>
             Affirm appears on eligible open QuickBooks invoices. Approval, APR, and terms are set by
             Affirm.
           </p>
@@ -117,3 +117,4 @@ export function MandatoryBillingSetup({
     </section>
   );
 }
+

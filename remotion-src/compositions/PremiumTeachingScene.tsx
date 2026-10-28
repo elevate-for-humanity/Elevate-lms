@@ -50,7 +50,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
    </div>
   </div>
   <div style={{position:'absolute',left:1220,right:54,top:225,height:640,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(textStart,scene.teachingVisual?.transitionSeconds??.75)}}>
-   <div style={{fontSize:!recap&&(step?.label?.length??0)>30?40:48,color:'#cdb795',lineHeight:1.25}}>{recap?'Fresh recap':String(stepIndex+1).padStart(2,'0')+'  '+step?.label}</div>
+   <div style={{fontSize:!recap&&(step?.label?.length??0)>30?56:64,color:'#cdb795',lineHeight:1.25}}>{recap?'Fresh recap':String(stepIndex+1).padStart(2,'0')+'  '+step?.label}</div>
    <div style={{fontSize:recap?56:(step?.value?.length??0)>100?52:64,lineHeight:1.25}}>{recap?scene.recapText:step?.value}</div>
    <div style={{fontSize:22,color:'#cdb795'}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>
   </div>

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessibility/lms-runtime-accessibility';
 
 import React from 'react';
+import { sendPlaybackEvent } from '@/lib/video/send-playback-event.mjs';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import {
@@ -135,6 +136,7 @@ export default function InteractiveVideoPlayer({
   const [currentCaption, setCurrentCaption] = useState('');
   const [loadError, setLoadError] = useState(false);
   const [persistenceError, setPersistenceError] = useState<string | null>(null);
+  const [playbackEvidenceError, setPlaybackEvidenceError] = useState<string | null>(null);
   const [activeCheckpoint, setActiveCheckpoint] = useState<Checkpoint | null>(null);
   const [checkpointResponse, setCheckpointResponse] = useState('');
   const [checkpointChoice, setCheckpointChoice] = useState<number | null>(null);
@@ -154,10 +156,7 @@ export default function InteractiveVideoPlayer({
     if (!playbackSessionRef.current) {
       playbackSessionRef.current = crypto.randomUUID();
     }
-    await fetch('/api/video-playback-events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const result = await sendPlaybackEvent({
         courseId,
         lessonId: lessonRecordId,
         eventType,
@@ -171,9 +170,8 @@ export default function InteractiveVideoPlayer({
             : null,
         sessionId: playbackSessionRef.current,
         errorMessage,
-      }),
-      keepalive: eventType === 'pause' || eventType === 'ended',
-    }).catch(() => null);
+    });
+    setPlaybackEvidenceError(result.saved ? null : result.error || 'Playback could not be recorded.');
   };
 
   const effectiveQuizzes = useMemo(() => {
@@ -759,6 +757,11 @@ export default function InteractiveVideoPlayer({
           {validationErrors.length === 1 ? '' : 's'}. An instructor has been notified.
         </div>
       )}
+      {playbackEvidenceError && (
+        <div role="alert" className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+          {playbackEvidenceError}
+        </div>
+      )}
       {persistenceError && (
         <div className="border-b border-red-300 bg-red-50 p-3 text-sm text-red-900" role="alert">
           {persistenceError}
@@ -1338,3 +1341,4 @@ export default function InteractiveVideoPlayer({
     </div>
   );
 }
+

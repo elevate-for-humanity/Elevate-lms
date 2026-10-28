@@ -6,11 +6,11 @@ const route = readFileSync('apps/lms/app/api/video-playback-events/route.ts', 'u
 
 describe('learner playback evidence contract', () => {
   it('records genuine learner play and bounded heartbeat evidence', () => {
-    expect(player).toContain("fetch('/api/video-playback-events'");
+    expect(player).toContain('await sendPlaybackEvent({');
     expect(player).toContain("Math.floor(ct / 30)");
-    expect(player).toContain("recordPlaybackEvent('play'");
+    expect(player).toMatch(/recordPlaybackEvent\(\s*'play'/);
     expect(player).toContain("recordPlaybackEvent('heartbeat'");
-    expect(player).toContain("recordPlaybackEvent('ended'");
+    expect(player).toMatch(/recordPlaybackEvent\(\s*'ended'/);
   });
 
   it('never writes playback evidence from read-only administrator preview', () => {
@@ -18,7 +18,9 @@ describe('learner playback evidence contract', () => {
   });
 
   it('revalidates authenticated lesson access before the service insert', () => {
-    expect(route).toContain('const user = await getCurrentUser()');
+    expect(route).toContain('await supabase.auth.getUser()');
+    expect(route).toContain("code: 'PREVIEW_READ_ONLY'");
+    expect(route).toContain("supabase.rpc('get_my_course_pacing'");
     expect(route).toContain('await assertLessonAccess(user.id, lessonId)');
     expect(route).toContain("lesson.status !== 'published'");
     expect(route).toContain(".from('video_playback_events').insert");
@@ -27,3 +29,4 @@ describe('learner playback evidence contract', () => {
     expect(route).not.toContain("from('course_progress')");
   });
 });
+

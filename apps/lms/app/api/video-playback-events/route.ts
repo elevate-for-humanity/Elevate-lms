@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { getCurrentUser } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
+import { resolveCoursePreview } from '@/lib/admin/course-preview';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -31,8 +34,9 @@ export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, 'api');
   if (limited) return limited;
 
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = (await request.json().catch(() => null)) as PlaybackEventBody | null;
   const courseId = typeof body?.courseId === 'string' ? body.courseId.trim() : '';
@@ -57,6 +61,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid playback event.' }, { status: 400 });
   }
 
+  const db = await requireAdminClient();
+  const [coursePreview, portalSubject, profileResult] = await Promise.all([
+    resolveCoursePreview(courseId),
+    resolvePortalPreviewSubject(db, user.id),
+    db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+  ]);
+  if (profileResult.error) {
+    return NextResponse.json({ error: 'Unable to verify learner identity.' }, { status: 503 });
+  }
+  if (coursePreview.active || portalSubject.previewing ||
+      ['admin', 'super_admin', 'staff', 'instructor'].includes(String(profileResult.data?.role || ''))) {
+    return NextResponse.json({ error: 'Playback records are disabled in administrator preview.', code: 'PREVIEW_READ_ONLY' }, { status: 403 });
+  }
+  const enrollment = await resolveCourseEnrollment(user.id, courseId);
+  if (!enrollment || !['active', 'enrolled', 'in_progress', 'completed', 'confirmed'].includes(String(enrollment.status).toLowerCase())) {
+    return NextResponse.json({ error: 'Active course enrollment required.', code: 'ENROLLMENT_REQUIRED' }, { status: 403 });
+  }
+  const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', {
+    p_course_id: courseId,
+  });
+  if (pacingError) {
+    return NextResponse.json({ error: 'Unable to verify study access.' }, { status: 503 });
+  }
+  if (pacing?.theoryWindow?.allowed === false) {
+    return NextResponse.json({
+      error: 'Playback tracking is unavailable outside your saved theory study times.',
+      code: pacing.theoryWindow.reason || 'THEORY_WINDOW_CLOSED',
+    }, { status: 403 });
+  }
+  const scheduled = pacing?.lessons?.find((lesson: { id: string }) => lesson.id === lessonId);
+  if (scheduled && !scheduled.available) {
+    return NextResponse.json({ error: 'This lesson is not yet available.', code: 'LESSON_LOCKED' }, { status: 403 });
+  }
   try {
     await assertLessonAccess(user.id, lessonId);
   } catch (error) {
@@ -64,7 +101,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(errorBody, { status });
   }
 
-  const db = await requireAdminClient();
   const { data: lesson, error: lessonError } = await db
     .from('course_lessons')
     .select('course_id,status,is_published')
@@ -95,7 +131,8 @@ export async function POST(request: NextRequest) {
       courseId,
       lessonId,
       source: 'interactive-video-player',
-      verifiedLearnerSession: true,
+      authenticatedLearnerSession: true,
+      evidenceType: 'client_media_event',
     },
   });
 
@@ -111,3 +148,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ saved: true });
 }
+

@@ -7,6 +7,10 @@ const file =
     ? 'apps/marketing/app/api/tax/w2/confirm/route.ts'
     : 'app/api/tax/w2/confirm/route.ts');
 const source = compileTaxRoute(file);
+const jsonResponse = (body, options) => ({ body, status: options?.status || 200, headers: options?.headers });
+const taxJson = loadTaxRoute(compileTaxRoute('lib/tax-software/server/response.ts'), {
+  'next/server': { NextResponse: { json: jsonResponse } },
+}, 'taxJson');
 async function run(body, user = true, owns = true) {
   const inserts = [];
   const filters = [];
@@ -42,7 +46,8 @@ async function run(body, user = true, owns = true) {
     },
   };
   const handler = loadTaxRoute(source, {
-    'next/server': { NextResponse: { json: (body, o) => ({ body, status: o?.status || 200 }) } },
+    'next/server': { NextResponse: { json: jsonResponse } },
+    '@/lib/tax-software/server/response': { taxJson },
     '@/lib/supabase/server': { createClient: async () => db },
     '@/lib/api/withRateLimit': { applyRateLimit: async () => null },
   });
@@ -68,10 +73,17 @@ for (const [label, body, user, owns, status] of [
   ['invalid wages rejected', { ...base, wages: 'NaN' }, true, true, 400],
   ['negative withholding rejected', { ...base, federalWithholding: '-1' }, true, true, 400],
   ['invalid EIN rejected', { ...base, employerEin: 'oops' }, true, true, 400],
+  ['invalid value types rejected', { ...base, wages: true }, true, true, 400],
+  ['blank optional amount stays unset', { ...base, stateWages: '' }, true, true, 200],
+  ['explicit zero amount persists', { ...base, stateWages: 0 }, true, true, 200],
   ['confirmed values persist', base, true, true, 200],
 ]) {
   const r = await run(body, user, owns);
   assert.equal(r.res.status, status);
+  assert.equal(r.res.headers.get('Cache-Control'), 'private, no-store');
+  assert.equal(r.res.headers.get('Vary'), 'Cookie');
+  if (label === 'blank optional amount stays unset') assert.equal(r.inserts[0].row.state_wages, null);
+  if (label === 'explicit zero amount persists') assert.equal(r.inserts[0].row.state_wages, 0);
   if (status !== 200) assert.equal(r.inserts.length, 0);
   if (status === 200) {
     assert.ok(r.filters.some(([k, v]) => k === 'created_by_user_id' && v === 'owner'));

@@ -10,8 +10,15 @@ const path =
     ? 'apps/marketing/app/api/tax/returns/calculate/route.ts'
     : 'app/api/tax/returns/calculate/route.ts');
 const source = compileTaxRoute(path);
+const jsonResponse = (body, options) => ({ body, status: options?.status || 200, headers: options?.headers });
+// Load the real private-response wrapper so the release check verifies its
+// privacy headers as well as the route's database-failure behavior.
+const taxJson = loadTaxRoute(compileTaxRoute('lib/tax-software/server/response.ts'), {
+  'next/server': { NextResponse: { json: jsonResponse } },
+}, 'taxJson');
 async function invoke(fault, malformed = false) {
   const writes = [];
+  const filters = [];
   const savedCalculations = [];
   const db = {
     auth: {
@@ -23,7 +30,8 @@ async function invoke(fault, malformed = false) {
         select() {
           return query;
         },
-        eq() {
+        eq(key, value) {
+          filters.push([table, operation, key, value]);
           return query;
         },
         insert(value) {
@@ -50,6 +58,7 @@ async function invoke(fault, malformed = false) {
               ? {
                   id: 'return-1',
                   tax_year: 2026,
+                  updated_at: '2026-10-27T12:00:00.000Z',
                   filing_status: fault === 'status' ? 'invalid' : 'single',
                   return_json: {
                     interview: {
@@ -79,11 +88,12 @@ async function invoke(fault, malformed = false) {
   };
   const handler = loadTaxRoute(source, {
     'node:crypto': { createHash },
+    '@/lib/tax-software/server/response': { taxJson },
     '@/lib/tax-software/security/return-digest': {
       taxReturnSourceDigest: (v) => createHash('sha256').update(JSON.stringify(v)).digest('hex'),
     },
     'next/server': {
-      NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
+      NextResponse: { json: jsonResponse },
     },
     '@/lib/supabase/server': { createClient: async () => db },
     '@/lib/api/withRateLimit': { applyRateLimit: async () => null },
@@ -126,7 +136,7 @@ async function invoke(fault, malformed = false) {
       return { returnId: 'return-1' };
     },
   });
-  return { response, writes, savedCalculations };
+  return { response, writes, savedCalculations, filters };
 }
 const cases = [
   ['malformed JSON', null, true, 400],
@@ -144,15 +154,21 @@ const cases = [
   ['deductions read failed', 'tax_itemized_deductions', false, 500],
   ['calculation save failed', 'tax_calculations', false, 500],
   ['return save failed', 'tax_returns:update', false, 500],
-  ['return update matched no row', 'missing-update', false, 500],
+  ['concurrent return edit rejects stale calculation', 'missing-update', false, 409],
   ['successful persistence', null, false, 200],
   ['additional federal withholding persists', 'extra-withholding', false, 200],
 ];
 let failures = 0;
 for (const [name, fault, malformed, status] of cases) {
   try {
-    const { response, writes, savedCalculations } = await invoke(fault, malformed);
+    const { response, writes, savedCalculations, filters } = await invoke(fault, malformed);
     assert.equal(response.status, status);
+    assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+    assert.equal(response.headers.get('Vary'), 'Cookie');
+    if (status === 200 || status === 409)
+      assert.ok(filters.some(([table, operation, key, value]) =>
+        table === 'tax_returns' && operation === 'update' && key === 'updated_at' && value === '2026-10-27T12:00:00.000Z'));
+    if (status === 409) assert.match(response.body.error, /return changed/i);
     assert.equal(response.body.success === true, status === 200);
     if (status === 400 || name.includes('read failed')) assert.equal(writes.length, 0);
     if (fault === 'extra-withholding') assert.equal(savedCalculations[0].federal_withholding, 500);

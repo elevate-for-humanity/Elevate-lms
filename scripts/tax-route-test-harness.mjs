@@ -19,10 +19,11 @@ export function compileTaxRoute(file) {
   return result.outputText;
 }
 
-export function loadTaxRoute(source, imports) {
+export function loadTaxRoute(source, imports, exportName = 'POST') {
   const module = { exports: {} };
   vm.runInNewContext(source, {
     module,
+    Headers,
     exports: module.exports,
     require(specifier) {
       if (!Object.hasOwn(imports, specifier))
@@ -30,6 +31,6 @@ export function loadTaxRoute(source, imports) {
       return imports[specifier];
     },
   });
-  if (typeof module.exports.POST !== 'function') throw new Error('Route has no POST handler');
-  return module.exports.POST;
+  if (typeof module.exports[exportName] !== 'function') throw new Error(`Module has no ${exportName} handler`);
+  return module.exports[exportName];
 }

@@ -3,6 +3,8 @@
  * Operational checks run in parallel with bounded timeouts.
  */
 
+import { getElevateMediaStorageConfig, isElevateMediaStorageConfigured } from '@/lib/storage/elevate-media-storage';
+import { checkLessonMediaStorage } from '@/lib/storage/lesson-media-health';
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -244,42 +246,6 @@ async function checkEmail(): Promise<ServiceCheck> {
   }
 }
 
-async function checkStorage(): Promise<ServiceCheck> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  const configured = Boolean(url && serviceKey);
-  if (!configured) {
-    return {
-      name: 'Storage (Supabase)',
-      status: 'unknown',
-      configured: false,
-      message: 'Supabase URL or service-role key not configured',
-    };
-  }
-
-  const start = Date.now();
-  try {
-    const db = createAdminClient();
-    const { error } = await db.storage.listBuckets();
-    if (error) throw error;
-    const latencyMs = Date.now() - start;
-    return {
-      name: 'Storage (Supabase)',
-      status: latencyMs > 3000 ? 'degraded' : 'healthy',
-      latencyMs,
-      configured: true,
-    };
-  } catch (err) {
-    return {
-      name: 'Storage (Supabase)',
-      status: 'down',
-      latencyMs: Date.now() - start,
-      configured: true,
-      message: err instanceof Error ? err.message : 'Storage API probe failed',
-    };
-  }
-}
-
 async function checkStudioBrowser(): Promise<ServiceCheck> {
   const url = process.env.STUDIO_BROWSER_URL?.trim().replace(/\/$/, '');
   const publicUrl = (
@@ -405,7 +371,7 @@ const DOWN_DB: ServiceCheck = { name: 'Database', status: 'down', configured: tr
 const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_BILLING: ServiceCheck = { name: 'Billing (QuickBooks + PayPal)', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_EMAIL: ServiceCheck = { name: 'Email (SendGrid)', status: 'down', configured: true, message: 'Timed out' };
-const DOWN_STORAGE: ServiceCheck = { name: 'Storage (Supabase)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STORAGE: ServiceCheck = { name: 'Lesson media (Backblaze B2)', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_STUDIO_BROWSER: ServiceCheck = { name: 'Studio Browser', status: 'down', configured: true, message: 'Timed out' };
 
 export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
@@ -421,7 +387,7 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
       withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
       withTimeout(checkBilling(), TIMEOUT_MS, DOWN_BILLING),
       withTimeout(checkEmail(), TIMEOUT_MS, DOWN_EMAIL),
-      withTimeout(checkStorage(), TIMEOUT_MS, DOWN_STORAGE),
+      withTimeout(checkLessonMediaStorage(), TIMEOUT_MS, DOWN_STORAGE),
       withTimeout(checkStudioBrowser(), TIMEOUT_MS, DOWN_STUDIO_BROWSER),
     ]);
 
@@ -472,9 +438,7 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
       process.env.QB_REALM_ID,
   );
   const emailConfigured = Boolean(process.env.SENDGRID_API_KEY?.startsWith('SG.'));
-  const storageConfigured = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
-  );
+  const storageConfigured = isElevateMediaStorageConfigured() && getElevateMediaStorageConfig().provider === 'backblaze-b2';
   const ai = checkAIProviders();
   const redisConfigured = Boolean(
     process.env.REDIS_URL ||
@@ -506,10 +470,10 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
         message: emailConfigured ? 'Not probed' : 'SENDGRID_API_KEY not set',
       },
       storage: {
-        name: 'Storage (Supabase)',
+        name: 'Lesson media (Backblaze B2)',
         status: 'unknown',
         configured: storageConfigured,
-        message: storageConfigured ? 'Not probed' : 'Supabase URL or service-role key not configured',
+        message: storageConfigured ? 'Backblaze bucket privacy not probed' : 'Backblaze lesson-media connection not configured',
       },
       studioBrowser: {
         name: 'Studio Browser',

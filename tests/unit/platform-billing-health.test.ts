@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 
 const state = vi.hoisted(() => ({ settingsError: false, configured: true }));
+vi.mock('@/lib/storage/lesson-media-health', () => ({ checkLessonMediaStorage: async () => ({name:'Lesson media (Backblaze B2)',status:'healthy',configured:true}) }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn() } }));
 vi.mock('@/lib/supabase/admin', () => ({

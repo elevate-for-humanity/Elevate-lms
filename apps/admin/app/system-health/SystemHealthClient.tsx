@@ -43,7 +43,7 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   Redis: Zap,
   'Billing (QuickBooks + PayPal)': Shield,
   'Email (SendGrid)': Mail,
-  'Storage (Supabase)': Server,
+  'Lesson media (Backblaze B2)': Server,
   'Studio Browser': Wifi,
 };
 

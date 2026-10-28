@@ -1,0 +1,28 @@
+name: Approve authorized Achieve CNA onboarding
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/ops/approve-achieve-cna.mjs', '.github/workflows/approve-achieve-cna.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: approve-achieve-cna
+  cancel-in-progress: false
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      SENDGRID_FROM_EMAIL: ${{ secrets.SENDGRID_FROM_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check scripts/ops/approve-achieve-cna.mjs
+      - name: Provision CNA onboarding and send secure welcome
+        run: node scripts/ops/approve-achieve-cna.mjs

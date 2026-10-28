@@ -137,6 +137,15 @@ test('hygiene labels alone cannot satisfy the safety-scene requirement',()=>{
  assert.ok(view.scenes.every(scene=>scene.sceneType!=='safety_warning'));
 });
 
+test('an unnamed chemical demonstration with protective setup and a real stop response is safety teaching',()=>{
+ const text='First, prepare clean supplies, appropriate gloves and protective draping. Stop for discomfort or an unsafe response and follow product safety directions.';
+ const view=instructionView({scenes:[{id:'scene:seg-demonstration',title:'demonstration',stage:'demonstration',text}]});
+ assert.equal(view.scenes[0].sceneType,'safety_warning');
+ assert.equal(view.scenes[0].dialogue,text);
+ const incidental=instructionView({scenes:[{id:'scene:seg-demonstration',title:'demonstration',stage:'demonstration',text:'Wear gloves while applying color evenly.'}]});
+ assert.equal(incidental.scenes[0].sceneType,'worked_example');
+});
+
 
 test('errors crossing worker realms retain their message and external-blocker classification', async () => {
  const error=runInNewContext("new Error('MEDIA_LICENSE_REQUIRED: actual entitlement unavailable')");

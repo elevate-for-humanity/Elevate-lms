@@ -21,3 +21,16 @@ test('rejected source token and wrong secret owner fail before any write',async(
 test('sync preserves other settings, image and App configuration, pins a version, then verifies activation',async()=>{const f=fixture();const result=await syncAdminGitHubToken({...f.deps,apply:true});assert.equal(f.writes.length,3);assert.equal(f.writes[0].input,token);const config=JSON.parse(f.writes[1].input);assert.equal(config.runtimeEnvironment.GITHUB_TOKEN,token);assert.equal(config.runtimeEnvironment.UNCHANGED,'preserved');assert.deepEqual(config.runtimeFiles,{});assert.ok(f.writes[2].args.includes('--no-traffic'));assert.ok(f.writes[2].args.includes('--update-secrets=GITHUB_TOKEN=elevate-admin-github-token:7'));assert.ok(!f.writes[2].args.some(a=>a.startsWith('--image')||a.includes(token)));assert.equal(f.activations[0].commit,'a'.repeat(40));assert.equal(result.appSigningKeyChanged,false);assert.ok(!JSON.stringify(result).includes(token));});
 test('denied secret writes cannot update configuration or runtime traffic',async()=>{const f=fixture({deny:true});await assert.rejects(syncAdminGitHubToken({...f.deps,apply:true}),{code:'permission_denied'});assert.equal(f.writes.length,1);assert.equal(f.activations.length,0);});
 test('concurrent config updates are preserved and stop the runtime change',async()=>{const f=fixture({concurrent:true});await assert.rejects(syncAdminGitHubToken({...f.deps,apply:true}),/CONFIG_CHANGED_CONCURRENTLY/);assert.equal(f.writes.length,1);assert.equal(f.activations.length,0);});
+
+test('an already verified binding is idempotent and creates no secret versions or revisions',async()=>{
+ const f=fixture();const original=f.deps.run;f.cfg.runtimeEnvironment.GITHUB_TOKEN=token;
+ f.deps.run=(args,input)=>{
+  if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return token;
+  const raw=original(args,input);
+  if(args[0]==='run'&&args[2]==='describe'){
+   const state=JSON.parse(raw);state.spec.template.spec.containers[0].env=[{name:'GITHUB_TOKEN',valueFrom:{secretKeyRef:{name:'elevate-admin-github-token',key:'7'}}}];return JSON.stringify(state);
+  }
+  return raw;
+ };
+ const result=await syncAdminGitHubToken({...f.deps,apply:true});assert.equal(result.alreadySynchronized,true);assert.equal(f.writes.length,0);assert.equal(f.activations.length,0);
+});

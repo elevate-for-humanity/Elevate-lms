@@ -102,6 +102,7 @@ export default function StudentSupportPage() {
 
       {/* Video Hero */}
       <HeroVideo
+        contentTheme="light"
         videoSrcDesktop="/videos/student-portal-hero.mp4"
         posterImage="/images/pages/student-support-hero.webp"
         voiceoverSrc="/audio/heroes/programs.mp3"
@@ -202,7 +203,9 @@ export default function StudentSupportPage() {
               <MessageSquare className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Live Chat</h3>
               <p className="text-slate-600">Chat availability varies by staffing</p>
-              <p className="text-sm text-slate-500 mt-1">For urgent matters, use the published phone or emergency resources.</p>
+              <p className="text-sm text-slate-500 mt-1">
+                For urgent matters, use the published phone or emergency resources.
+              </p>
               <Link
                 href="/support/chat"
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
@@ -214,7 +217,9 @@ export default function StudentSupportPage() {
               <Calendar className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Schedule Meeting</h3>
               <p className="text-slate-600">Request a one-on-one appointment</p>
-              <p className="text-sm text-slate-500 mt-1">Available formats are shown during scheduling.</p>
+              <p className="text-sm text-slate-500 mt-1">
+                Available formats are shown during scheduling.
+              </p>
               <Link
                 href="/student-support/schedule"
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
@@ -240,7 +245,8 @@ export default function StudentSupportPage() {
             Ready to Start Your Career?
           </h2>
           <p className="text-white text-lg mb-8">
-            Review possible funding pathways for your selected program. Funding is program- and participant-specific and requires approval from the responsible source.
+            Review possible funding pathways for your selected program. Funding is program- and
+            participant-specific and requires approval from the responsible source.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

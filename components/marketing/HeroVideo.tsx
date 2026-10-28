@@ -1,5 +1,7 @@
 'use client';
 
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
+
 import { useEffect, useId, useRef, useState } from 'react';
 import Image from 'next/image';
 import ImageMetadata from './ImageMetadata';
@@ -47,6 +49,7 @@ export interface HeroVideoProps {
   analyticsName?: string;
   className?: string;
   children?: React.ReactNode;
+  contentTheme?: 'light' | 'dark';
   mediaFit?: 'cover' | 'contain';
   /** Optional shared color treatment for a coordinated media set. */
   mediaClassName?: string;
@@ -86,9 +89,10 @@ export default function HeroVideo({
   analyticsName,
   className = '',
   children,
+  contentTheme = 'dark',
   mediaFit,
   mediaClassName = '',
-  heightClassName = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]',
+  heightClassName = HERO_IMAGE_FRAME,
   soundButtonVariant = 'pill',
   showSoundControl = true,
   showTranscriptControl = true,
@@ -389,12 +393,16 @@ export default function HeroVideo({
           </button>
         ) : null}
       </section>
-      <div className="bg-slate-950 text-white">
+      <div
+        className={contentTheme === 'light' ? 'bg-white text-slate-950' : 'bg-slate-950 text-white'}
+      >
         {hasHeroContent ? (
           <div className="relative mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
             <div className="max-w-4xl">
               {microLabel ? (
-                <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/95 sm:text-sm">
+                <p
+                  className={`mb-4 text-xs font-extrabold uppercase tracking-[0.18em] sm:text-sm ${contentTheme === 'light' ? 'text-slate-600' : 'text-white/95'}`}
+                >
                   {microLabel}
                 </p>
               ) : null}

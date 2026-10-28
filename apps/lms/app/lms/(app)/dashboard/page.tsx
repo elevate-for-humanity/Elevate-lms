@@ -92,7 +92,15 @@ function isBlockedExternalTraining(course: {
 }
 
 export default async function StudentDashboard() {
-  const { user, profile } = await requireRole(['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole([
+    'student',
+    'learner',
+    'apprentice',
+    'barber_apprentice',
+    'cosmetology_apprentice',
+    'admin',
+    'super_admin',
+  ]);
   const actorDb = await createClient();
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user.id);
@@ -140,14 +148,21 @@ export default async function StudentDashboard() {
           .maybeSingle()
       : { data: null };
   const [{ data: courseAccessNotice }, { data: syllabusHolder }] = await Promise.all([
-    supabase.from('notifications').select('title,message,created_at')
-      .eq('user_id', subjectId).eq('metadata->>kind', 'course_access_notice')
-      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    supabase
+      .from('notifications')
+      .select('title,message,created_at')
+      .eq('user_id', subjectId)
+      .eq('metadata->>kind', 'course_access_notice')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     bookkeeping && linkedToWilkes
       ? db.from('program_holders').select('features').eq('id', wilkesHolderId).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
-  const courseSyllabus = syllabusHolder?.features?.course_syllabus as CourseSyllabusRecord | undefined;
+  const courseSyllabus = syllabusHolder?.features?.course_syllabus as
+    | CourseSyllabusRecord
+    | undefined;
   const holderStudentIds = (holderStudentRows ?? []).map((row) => row.id);
   const { data: meetingRows } = holderStudentIds.length
     ? await db
@@ -480,21 +495,22 @@ export default async function StudentDashboard() {
 
       <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6">
         {activeWorkspaceEnrollment ? (
-          <section className="relative isolate min-h-[260px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
-            <Image
-              src={studentHeroImage}
-              alt={
-                bookkeeping
-                  ? 'Bookkeeping and accounting training'
-                  : 'Students building career skills in class'
-              }
-              fill
-              priority
-              sizes="100vw"
-              className="-z-20 object-cover object-center"
-            />
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-slate-950/65 to-transparent" />
-            <div className="p-6 sm:p-8 lg:max-w-[60%] lg:p-8">
+          <section className="overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+            <div className="relative aspect-video">
+              <Image
+                src={studentHeroImage}
+                alt={
+                  bookkeeping
+                    ? 'Bookkeeping and accounting training'
+                    : 'Students building career skills in class'
+                }
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-top"
+              />
+            </div>
+            <div className="p-6 sm:p-8">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-300">
                 {activeCourse?.title ??
                   activeWorkspaceEnrollment.program_title ??
@@ -566,52 +582,73 @@ export default async function StudentDashboard() {
             </div>
           </section>
         ) : (
-          <section className="relative isolate min-h-[340px] overflow-hidden rounded-3xl bg-slate-950 p-7 text-white shadow-xl sm:p-9 lg:p-6">
-            <Image
-              src="/images/pages/for-students-hero.webp"
-              alt="Elevate students learning together"
-              fill
-              priority
-              sizes="100vw"
-              className="-z-20 object-cover object-center"
-            />
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/30" />
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-200">
-              Welcome, {firstName}
-            </p>
-            <h1 className="mt-2 max-w-2xl text-3xl font-black text-white sm:text-4xl">
-              Choose your next training step
-            </h1>
-            <p className="mt-3 max-w-2xl font-medium leading-7 text-slate-100">
-              You do not currently have an active course enrollment. Review your programs,
-              application status, and funding options before starting training.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/lms/courses"
-                className="rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800"
-              >
-                Browse Courses
-              </Link>
-              <Link
-                href="/lms/apply/status"
-                className="rounded-xl border border-white/60 bg-white/10 px-5 py-3 font-bold text-white backdrop-blur hover:bg-white/20"
-              >
-                Application Status
-              </Link>
+          <section className="overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+            <div className="relative aspect-video">
+              <Image
+                src="/images/pages/for-students-hero.webp"
+                alt="Elevate students learning together"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-top"
+              />
+            </div>
+            <div className="p-6 sm:p-8">
+              <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-200">
+                Welcome, {firstName}
+              </p>
+              <h1 className="mt-2 max-w-2xl text-3xl font-black text-white sm:text-4xl">
+                Choose your next training step
+              </h1>
+              <p className="mt-3 max-w-2xl font-medium leading-7 text-slate-100">
+                You do not currently have an active course enrollment. Review your programs,
+                application status, and funding options before starting training.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href="/lms/courses"
+                  className="rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800"
+                >
+                  Browse Courses
+                </Link>
+                <Link
+                  href="/lms/apply/status"
+                  className="rounded-xl border border-white/60 bg-white/10 px-5 py-3 font-bold text-white backdrop-blur hover:bg-white/20"
+                >
+                  Application Status
+                </Link>
+              </div>
             </div>
           </section>
         )}
 
-        {workspace.enrollments.some((row) => row.program_slug === 'hvac-technician') ? <HvacStartHere /> : null}
-        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Documents and agreements">
+        {workspace.enrollments.some((row) => row.program_slug === 'hvac-technician') ? (
+          <HvacStartHere />
+        ) : null}
+        <section
+          className="rounded-2xl border border-slate-200 bg-white p-5"
+          aria-label="Documents and agreements"
+        >
           <h2 className="text-xl font-black">Your documents & agreements</h2>
-          <p className="mt-2 text-sm text-slate-700">Read your handbook, MOU, and enrollment documents anytime, including after signing.</p>
+          <p className="mt-2 text-sm text-slate-700">
+            Read your handbook, MOU, and enrollment documents anytime, including after signing.
+          </p>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link href="/lms/documents" className="rounded-xl bg-slate-950 px-4 py-3 font-bold text-white">Documents & uploads</Link>
-            <Link href="/lms/handbook" className="rounded-xl border px-4 py-3 font-bold">Student handbook</Link>
-            <Link href="/lms/legal/student-mou" className="rounded-xl border px-4 py-3 font-bold">Participation MOU</Link>
-            <Link href="/lms/agreements" className="rounded-xl border px-4 py-3 font-bold">All agreements & signatures</Link>
+            <Link
+              href="/lms/documents"
+              className="rounded-xl bg-slate-950 px-4 py-3 font-bold text-white"
+            >
+              Documents & uploads
+            </Link>
+            <Link href="/lms/handbook" className="rounded-xl border px-4 py-3 font-bold">
+              Student handbook
+            </Link>
+            <Link href="/lms/legal/student-mou" className="rounded-xl border px-4 py-3 font-bold">
+              Participation MOU
+            </Link>
+            <Link href="/lms/agreements" className="rounded-xl border px-4 py-3 font-bold">
+              All agreements & signatures
+            </Link>
           </div>
         </section>
 
@@ -620,15 +657,36 @@ export default async function StudentDashboard() {
             <h2 className="text-xl font-black text-blue-950">{courseAccessNotice.title}</h2>
             <p className="mt-3 text-sm leading-7 text-blue-950">{courseAccessNotice.message}</p>
             <div className="mt-4 flex flex-wrap gap-4">
-              <Link href="/lms/documents" className="font-bold underline">Review documents & agreements</Link>
-              <Link href="/lms/messages" className="font-bold underline">Contact your instructor</Link>
+              <Link href="/lms/documents" className="font-bold underline">
+                Review documents & agreements
+              </Link>
+              <Link href="/lms/messages" className="font-bold underline">
+                Contact your instructor
+              </Link>
             </div>
           </section>
         ) : null}
-        <CourseSyllabus syllabus={workspace.enrollments.some((row) => row.program_id === courseSyllabus?.program_id) ? courseSyllabus : null} />
+        <CourseSyllabus
+          syllabus={
+            workspace.enrollments.some((row) => row.program_id === courseSyllabus?.program_id)
+              ? courseSyllabus
+              : null
+          }
+        />
         <ProgramGuideResources />
         <DashboardOrientationPanel
-          hvac={workspace.enrollments.some(row => row.program_slug === 'hvac-technician' && ['active','enrolled','in_progress','onboarding','orientation','pending'].includes(String(row.status)))}
+          hvac={workspace.enrollments.some(
+            (row) =>
+              row.program_slug === 'hvac-technician' &&
+              [
+                'active',
+                'enrolled',
+                'in_progress',
+                'onboarding',
+                'orientation',
+                'pending',
+              ].includes(String(row.status)),
+          )}
           bookkeeping={bookkeeping}
           instructorEmail={instructorMailbox?.address}
         />
@@ -786,16 +844,17 @@ export default async function StudentDashboard() {
 
             <section className="overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-violet-50 shadow-sm">
               <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
-                <div className="relative min-h-64 overflow-hidden lg:min-h-full">
-                  <Image
-                    src="/images/pages/community-page-2.webp"
-                    alt="Elevate school community members collaborating"
-                    fill
-                    sizes="(min-width: 1024px) 40vw, 100vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <div className="overflow-hidden bg-slate-950">
+                  <div className="relative aspect-video">
+                    <Image
+                      src="/images/pages/community-page-2.webp"
+                      alt="Elevate school community members collaborating"
+                      fill
+                      sizes="(min-width: 1024px) 40vw, 100vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-6 text-white">
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-200">
                       School &amp; Community Hub
                     </p>

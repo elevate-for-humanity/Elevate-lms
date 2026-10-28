@@ -4,21 +4,26 @@ import { describe, expect, it } from 'vitest';
 
 const button = fs.readFileSync(path.resolve('components/paris/ParisFloatingButton.tsx'), 'utf8');
 const chat = fs.readFileSync(path.resolve('components/paris/ParisChat.tsx'), 'utf8');
-const platformShell = fs.readFileSync(path.resolve('components/platform/PlatformShell.tsx'), 'utf8');
+const platformShell = fs.readFileSync(
+  path.resolve('components/platform/PlatformShell.tsx'),
+  'utf8',
+);
 const workspace = fs.readFileSync(
   path.resolve('components/program-holder/ProgramHolderWorkspaceView.tsx'),
   'utf8',
 );
 
 describe('PARIS dashboard introduction', () => {
-  it('mounts and opens PARIS on the Program Holder dashboard', () => {
+  it('keeps PARIS available without covering the dashboard on arrival', () => {
     expect(platformShell).toContain('<ParisFloatingWrapper');
-    expect(platformShell).toContain('autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}');
+    expect(platformShell).toContain('autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? false}');
     expect(button).toContain("pathname.endsWith('/dashboard')");
   });
 
   it('greets the authenticated program holder by name', () => {
-    expect(platformShell).toContain('personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}');
+    expect(platformShell).toContain(
+      'personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}',
+    );
     expect(chat).toContain("Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS");
   });
 
@@ -63,7 +68,7 @@ describe('PARIS dashboard introduction', () => {
     expect(
       workspace.match(/<h2 className="font-black">Compliance Score<\/h2>/g) || [],
     ).toHaveLength(0);
-    const home = workspace.slice(workspace.indexOf("// Home is an action queue."));
+    const home = workspace.slice(workspace.indexOf('// Home is an action queue.'));
     expect(home).toContain('To-dos');
     expect(home).toContain('Alerts');
     expect(home).toContain('compliance');

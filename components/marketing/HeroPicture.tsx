@@ -1,5 +1,7 @@
 'use client';
 
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
+
 /**
  * HeroPicture — picture-based hero banner.
  *
@@ -41,6 +43,7 @@ export interface HeroPictureProps {
   preserveAspectRatio?: boolean;
   priority?: boolean;
   imageFit?: 'cover' | 'contain';
+  imagePosition?: string;
 }
 
 export default function HeroPicture({
@@ -60,10 +63,11 @@ export default function HeroPicture({
   preserveAspectRatio = false,
   priority = true,
   imageFit = 'cover',
+  imagePosition = 'center',
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]';
+  const canonicalHeight = HERO_IMAGE_FRAME;
 
   return (
     <div className={`w-full ${className}`}>
@@ -75,7 +79,9 @@ export default function HeroPicture({
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
         {preserveAspectRatio ? (
-          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+          <Image
+            placeholder="blur"
+            blurDataURL={IMAGE_LOADING_BLUR}
             src={src}
             alt={alt}
             width={1536}
@@ -85,10 +91,13 @@ export default function HeroPicture({
             priority={priority}
           />
         ) : (
-          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+          <Image
+            placeholder="blur"
+            blurDataURL={IMAGE_LOADING_BLUR}
             src={src}
             alt={alt}
             fill
+            style={{ objectPosition: imagePosition }}
             sizes="100vw"
             className={
               imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'

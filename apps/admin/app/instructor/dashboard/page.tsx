@@ -15,9 +15,13 @@ export const metadata: Metadata = {
 };
 
 export default async function InstructorDashboard() {
-  const { user, profile, effectiveRoles } = await requireRole(['instructor', 'admin', 'super_admin']);
+  const { user, profile, effectiveRoles } = await requireRole([
+    'instructor',
+    'admin',
+    'super_admin',
+  ]);
   const supabase = await createClient();
-  const isAdmin = effectiveRoles.some(role => ['admin', 'super_admin'].includes(role));
+  const isAdmin = effectiveRoles.some((role) => ['admin', 'super_admin'].includes(role));
 
   let assignedProgramIds: string[] = [];
   if (!isAdmin) {
@@ -165,17 +169,30 @@ export default async function InstructorDashboard() {
           .limit(10)
       : { data: [] };
   const pendingSignoffRows = pendingSignoffsResult.data ?? [];
-  if (('error' in pendingOjtResult && pendingOjtResult.error) || ('error' in pendingSignoffsResult && pendingSignoffsResult.error)) {
+  if (
+    ('error' in pendingOjtResult && pendingOjtResult.error) ||
+    ('error' in pendingSignoffsResult && pendingSignoffsResult.error)
+  ) {
     throw new Error('Unable to load pending instructor reviews');
   }
-  const reviewUserIds = [...new Set([...pendingOjtRows, ...pendingSignoffRows].map(row => row.student_id).filter(Boolean))];
+  const reviewUserIds = [
+    ...new Set(
+      [...pendingOjtRows, ...pendingSignoffRows].map((row) => row.student_id).filter(Boolean),
+    ),
+  ];
   const { data: reviewProfiles, error: reviewProfileError } = reviewUserIds.length
     ? await supabase.from('profiles').select('id, full_name, email').in('id', reviewUserIds)
     : { data: [], error: null };
   if (reviewProfileError) throw new Error('Unable to load pending review students');
-  const reviewProfileMap = new Map((reviewProfiles ?? []).map(row => [row.id, row]));
-  const pendingOjtReps = pendingOjtRows.map(row => ({ ...row, profiles: reviewProfileMap.get(row.student_id) }));
-  const pendingSignoffs = pendingSignoffRows.map(row => ({ ...row, profiles: reviewProfileMap.get(row.student_id) }));
+  const reviewProfileMap = new Map((reviewProfiles ?? []).map((row) => [row.id, row]));
+  const pendingOjtReps = pendingOjtRows.map((row) => ({
+    ...row,
+    profiles: reviewProfileMap.get(row.student_id),
+  }));
+  const pendingSignoffs = pendingSignoffRows.map((row) => ({
+    ...row,
+    profiles: reviewProfileMap.get(row.student_id),
+  }));
 
   const hourSummaryResult = isAdmin
     ? await supabase
@@ -211,7 +228,7 @@ export default async function InstructorDashboard() {
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
+      <section className="relative aspect-video overflow-hidden">
         <Image
           src="/images/pages/instructor-page-8.webp"
           alt="Instructor portal"

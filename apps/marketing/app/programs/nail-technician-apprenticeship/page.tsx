@@ -35,7 +35,6 @@ export default async function NailTechnicianApprenticeshipPage() {
       analyticsName={banner.analyticsName}
       overlayMode="none"
       mediaFit="contain"
-      heightClassName="h-[clamp(220px,32svh,360px)]"
       transcript={banner.transcript}
       narrateTranscript
     />
@@ -53,7 +52,13 @@ export default async function NailTechnicianApprenticeshipPage() {
         program={program}
         banner={banner}
         heroOverride={heroOverride}
-        afterHero={<BeautyEnrollmentPromotion compact programSlug="nail-technician-apprenticeship" programLabel={program.title} />}
+        afterHero={
+          <BeautyEnrollmentPromotion
+            compact
+            programSlug="nail-technician-apprenticeship"
+            programLabel={program.title}
+          />
+        }
         visualContent={<NailDesignShowcase program="nail-technician" />}
         featuredContent={
           <>
@@ -61,7 +66,10 @@ export default async function NailTechnicianApprenticeshipPage() {
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <FeaturedHostPartners programSlug="nail-technician-apprenticeship" showDirectory={false} />
+            <FeaturedHostPartners
+              programSlug="nail-technician-apprenticeship"
+              showDirectory={false}
+            />
             <HostShopPlacementGuide programSlug="nail-technician-apprenticeship" />
           </>
         }
@@ -91,7 +99,6 @@ export default async function NailTechnicianApprenticeshipPage() {
                 >
                   Become a Host Shop — Free
                 </a>
-
               </div>
             </div>
           </section>

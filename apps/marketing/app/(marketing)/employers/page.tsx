@@ -52,7 +52,6 @@ export default function EmployerJourneyPage() {
         src="/images/pages/employer-page-1.webp"
         alt="Employer reviewing workforce training and hiring information"
         microLabel="Employer Partnerships"
-        heightStyle="h-[clamp(280px,42svh,460px)]"
         belowHeroHeadline="Build a documented workforce partnership"
         belowHeroSubheadline="Elevate supports hiring, work-based learning, training coordination, and registered apprenticeship activity through documented program and employer workflows."
         ctas={[
@@ -67,7 +66,10 @@ export default function EmployerJourneyPage() {
       <section className="bg-white px-6 py-14">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
           {services.map((service) => (
-            <div key={service.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-7 shadow-sm">
+            <div
+              key={service.title}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-7 shadow-sm"
+            >
               <service.icon className="w-7 h-7 text-brand-blue-700" />
               <h2 className="mt-4 text-xl font-bold text-slate-950">{service.title}</h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-700">{service.description}</p>
@@ -89,7 +91,10 @@ export default function EmployerJourneyPage() {
               'Employer participation does not itself guarantee a tax credit, grant, reimbursement, candidate volume, placement result, or retention outcome.',
               'Material enrollment, funding, apprenticeship, credential, and outcome records are maintained through controlled platform workflows and audit records.',
             ].map((text) => (
-              <div key={text} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-5">
+              <div
+                key={text}
+                className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-5"
+              >
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 mt-0.5 flex-none" />
                 <p className="text-sm text-slate-700 leading-relaxed">{text}</p>
               </div>
@@ -100,13 +105,18 @@ export default function EmployerJourneyPage() {
 
       <section className="bg-white px-6 py-14">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-extrabold text-slate-950">Start with the exact employer need</h2>
+          <h2 className="text-3xl font-extrabold text-slate-950">
+            Start with the exact employer need
+          </h2>
           <p className="mt-4 text-slate-700">
             Tell us the occupation, location, hiring need, training requirement, and whether you are
             asking about a specific public funding or apprenticeship pathway. We will match the
             request to the applicable documented program record.
           </p>
-          <Link href="/contact" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-brand-red-700 px-7 py-3.5 font-bold text-white hover:bg-brand-red-800">
+          <Link
+            href="/contact"
+            className="mt-7 inline-flex items-center gap-2 rounded-lg bg-brand-red-700 px-7 py-3.5 font-bold text-white hover:bg-brand-red-800"
+          >
             Contact Employer Partnerships <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

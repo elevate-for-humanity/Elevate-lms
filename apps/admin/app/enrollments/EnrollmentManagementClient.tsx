@@ -256,10 +256,7 @@ export default function EnrollmentManagementClient({
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Enrollment Management</h1>
-          <p className="text-slate-700 mt-2">Manage student course enrollments</p>
-        </div>
+        <p className="text-slate-700">Create or update a course enrollment.</p>
         <button
           onClick={openCreateModal}
           className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium flex items-center gap-2"

@@ -187,7 +187,6 @@ export default async function BarberApprenticeshipPage() {
               transcript={heroBanner.transcript}
               narrateTranscript={false}
               analyticsName="barber-apprenticeship"
-              heightClassName="aspect-video h-auto max-h-[360px]"
               mediaFit="contain"
               overlayMode="none"
             />

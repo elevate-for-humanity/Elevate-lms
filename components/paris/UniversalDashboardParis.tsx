@@ -22,7 +22,11 @@ export function UniversalDashboardParis() {
     const controller = new AbortController();
     void fetch('/api/auth/me', { credentials: 'same-origin', signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
-      .then((body) => setPersonName(body?.profile?.full_name || body?.user?.full_name || body?.user?.name || null))
+      .then((body) =>
+        setPersonName(
+          body?.profile?.full_name || body?.user?.full_name || body?.user?.name || null,
+        ),
+      )
       .catch(() => undefined);
     return () => controller.abort();
   }, [pathname]);
@@ -36,7 +40,15 @@ export function UniversalDashboardParis() {
     pathname.startsWith('/learner/');
 
   if (portal) {
-    return <ParisFloatingWrapper surface="portal" portalRole={portal.role} personName={personName} autoOpenOnDashboard />;
+    return (
+      <ParisFloatingWrapper
+        key={portal.role}
+        surface="portal"
+        portalRole={portal.role}
+        personName={personName}
+        autoOpenOnDashboard={false}
+      />
+    );
   }
   if (learner) {
     return <ParisFloatingWrapper surface="learner" portalRole="Learner" />;

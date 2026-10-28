@@ -1,3 +1,4 @@
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,14 +19,16 @@ export function PlatformHubHero() {
         src={HOME_IMAGE}
         description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
       />
-      <div className="relative aspect-video sm:aspect-auto sm:h-[clamp(240px,38svh,480px)] w-full overflow-hidden bg-sky-100">
-        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+      <div className={`${HERO_IMAGE_FRAME} bg-sky-100`}>
+        <Image
+          placeholder="blur"
+          blurDataURL={IMAGE_LOADING_BLUR}
           src={HOME_IMAGE}
           alt="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[center_74%]"
+          className="object-cover object-center"
         />
       </div>
       <div className="relative mx-auto flex max-w-6xl items-center px-5 py-6 sm:px-8 sm:py-8">

@@ -53,18 +53,35 @@ function isActiveHref(href: string, pathname: string): boolean {
   }
 }
 
-export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = true }: PlatformShellProps) {
+export function PlatformShell({
+  user,
+  role,
+  actions = [],
+  children,
+  paris,
+  showLanguageSwitcher = true,
+}: PlatformShellProps) {
   const pathname = usePathname();
-  const dashboardHref = role === 'host_shop' ? '/host-shop/dashboard' : role === 'program_holder' || role === 'site_coordinator' ? '/program-holder/dashboard' : role === 'apprentice' ? '/apprentice' : role === 'student' ? '/learner/dashboard' : '/';
-  const installHref = role === 'host_shop'
-    ? '/install/host-shop'
-    : role === 'program_holder' || role === 'site_coordinator'
-      ? '/install/program-holder'
-      : role === 'apprentice'
-        ? '/install/apprentice'
-        : role === 'student'
-          ? '/install/learner'
-          : '/mobile-app';
+  const dashboardHref =
+    role === 'host_shop'
+      ? '/host-shop/dashboard'
+      : role === 'program_holder' || role === 'site_coordinator'
+        ? '/program-holder/dashboard'
+        : role === 'apprentice'
+          ? '/apprentice'
+          : role === 'student'
+            ? '/learner/dashboard'
+            : '/';
+  const installHref =
+    role === 'host_shop'
+      ? '/install/host-shop'
+      : role === 'program_holder' || role === 'site_coordinator'
+        ? '/install/program-holder'
+        : role === 'apprentice'
+          ? '/install/apprentice'
+          : role === 'student'
+            ? '/install/learner'
+            : '/mobile-app';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -190,8 +207,22 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
           </div>
 
           <div className="hidden items-center gap-1 sm:flex">
-            {pathname !== dashboardHref ? <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100" aria-label="Go back"><ArrowLeft className="h-4 w-4" /> Back</button> : null}
-            <Link href={dashboardHref} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"><Home className="h-4 w-4" /> Dashboard</Link>
+            {pathname !== dashboardHref ? (
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+            ) : null}
+            <Link
+              href={dashboardHref}
+              className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <Home className="h-4 w-4" /> Dashboard
+            </Link>
           </div>
 
           <div className="mx-4 hidden max-w-md flex-1 md:flex">
@@ -421,6 +452,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
       {paris !== false ? (
         /* PlatformShell is the single PARIS owner for authenticated dashboards. */
         <ParisFloatingWrapper
+          key={role}
           surface={
             paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')
           }
@@ -428,7 +460,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
           personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}
           courseTitle={paris?.courseTitle}
           nextLessonTitle={paris?.nextLessonTitle}
-          autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}
+          autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? false}
         />
       ) : null}
     </div>

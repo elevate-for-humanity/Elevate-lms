@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 const root = process.cwd();
 const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
 
-const guardedPortals: Array<{ path: string; required: string[] }> = [
+const guardedPortals: Array<{ path: string; required: string[]; shellPath?: string }> = [
   {
     path: 'components/lms/LearnerWorkspaceLayout.tsx',
     required: ["requireRole([", "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
@@ -38,6 +38,7 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
   {
     path: 'apps/lms/app/program-holder/dashboard/layout.tsx',
     required: ['requireProgramHolder()'],
+    shellPath: 'apps/lms/app/program-holder/layout.tsx',
   },
   {
     path: 'apps/lms/app/parent-portal/dashboard/layout.tsx',
@@ -72,9 +73,13 @@ describe('portal authorization boundaries', () => {
       for (const token of portal.required) {
         expect(source, `${portal.path} must contain ${token}`).toContain(token);
       }
+      const shellSource = portal.shellPath ? read(portal.shellPath) : source;
+      if (portal.shellPath) {
+        expect(shellSource).toContain('requireProgramHolder({ allowPendingApproval: true })');
+      }
       expect(
-        source.includes('@/components/platform/PlatformShell') ||
-          source.includes('@/components/platform/OperationalPortalShell'),
+        shellSource.includes('@/components/platform/PlatformShell') ||
+          shellSource.includes('@/components/platform/OperationalPortalShell'),
       ).toBe(true);
     });
   }

@@ -12,6 +12,11 @@ import {
 } from '@/lib/admin/portal-preview-handoff';
 import { portalPreviewDestination } from '@/lib/admin/portal-preview-destination';
 
+import {
+  clearHostShopPreviewCookies,
+  clearUserPreviewCookies,
+} from '@/lib/admin/preview-cookie-cleanup';
+
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 
 async function startHandoffPreview(handoffToken: string) {
@@ -46,7 +51,7 @@ async function startHandoffPreview(handoffToken: string) {
     maxAge: 60 * 60,
     path: '/',
   });
-  response.cookies.set('elevate_portal_preview_actor', actor.id, {
+  response.cookies.set(PORTAL_PREVIEW_ACTOR_COOKIE, actor.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -64,6 +69,7 @@ async function startHandoffPreview(handoffToken: string) {
       path: '/',
     },
   );
+  clearHostShopPreviewCookies(response);
   return response;
 }
 
@@ -110,9 +116,8 @@ export async function GET(request: NextRequest) {
 
   if (request.nextUrl.searchParams.get('end') === '1') {
     const response = NextResponse.redirect('https://admin.elevateforhumanity.org/impersonate');
-    response.cookies.set(PORTAL_PREVIEW_COOKIE, '', { expires: new Date(0), path: '/' });
-    response.cookies.set(PORTAL_PREVIEW_ACTOR_COOKIE, '', { expires: new Date(0), path: '/' });
-    response.cookies.set(PORTAL_PREVIEW_SESSION_COOKIE, '', { expires: new Date(0), path: '/' });
+    clearUserPreviewCookies(response);
+    clearHostShopPreviewCookies(response);
     return response;
   }
 
@@ -128,21 +133,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Eligible preview user not found' }, { status: 404 });
   }
 
-  const response = NextResponse.redirect(`${appUrl}${portalPreviewDestination(target.role)}`);
-  response.cookies.set(PORTAL_PREVIEW_COOKIE, target.id, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60,
-    path: '/',
-  });
-  return response;
+  // All entry points replace the complete signed identity, not just its selector.
+  return startHandoffPreview(createPortalPreviewHandoff(user.id, target.id));
 }
 
 export async function DELETE() {
   const response = NextResponse.json({ success: true });
-  response.cookies.set(PORTAL_PREVIEW_COOKIE, '', { expires: new Date(0), path: '/' });
-  response.cookies.set(PORTAL_PREVIEW_ACTOR_COOKIE, '', { expires: new Date(0), path: '/' });
-  response.cookies.set(PORTAL_PREVIEW_SESSION_COOKIE, '', { expires: new Date(0), path: '/' });
+  clearUserPreviewCookies(response);
+  clearHostShopPreviewCookies(response);
   return response;
 }

@@ -1,0 +1,39 @@
+name: Audit preserved cosmetology media
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gcp/audit-preserved-cosmetology-media.mjs'
+      - 'scripts/gcp/audit-preserved-cosmetology-media.test.mjs'
+      - '.github/workflows/audit-preserved-cosmetology-media.yml'
+permissions:
+  contents: read
+concurrency:
+  group: audit-preserved-cosmetology-media
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/gcp/audit-preserved-cosmetology-media.test.mjs
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg tesseract-ocr
+      - name: Measure exact preserved private film without modifying course records
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/gcp/audit-preserved-cosmetology-media.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: preserved-cosmetology-media-evidence
+          path: preserved-media-audit/
+          retention-days: 30
+          if-no-files-found: error

@@ -122,22 +122,24 @@
     {
       "source": "app/api/tax/returns/calculate/route.ts",
       "target": "apps/marketing/app/api/tax/returns/calculate/route.ts",
-      "sha256": "6287b7e96fb4ef6b88af52bbe0889a64c5a5044e6fffe2bd01b292e226bbe804",
+      "sha256": "4c646bc87629d9b151311b1d33308348f454cc6cca5791f81ec926bafbb707c4",
       "sourceSha256": "4abe0d40e8551ecb71e3ef731fe56f27c3af6a93e7c929c9e4a4ce77de732bd1",
-      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
+      "localRevisionReason": "Reviewed Oct 27 consolidation of tax repair 4005e98e: use private responses and reject saving a calculation against a concurrently changed return; four tax save/W-2 regression tests passed.",
       "changeReason": "Connect owned Schedule C records and complete business-source snapshots to federal calculations and exports."
     },
     {
       "source": "app/api/tax/returns/route.ts",
       "target": "apps/marketing/app/api/tax/returns/route.ts",
-      "sha256": "d8c5413e56a596c6ab7a9c8e0742a02519d98bb00519ee3af16c51c370c7d755"
+      "sha256": "b345383ba381589b431f1f05587470ae12bf4c69ed914972115c0fcb14ee961b",
+      "sourceSha256": "d8c5413e56a596c6ab7a9c8e0742a02519d98bb00519ee3af16c51c370c7d755",
+      "localRevisionReason": "Reviewed Oct 27 consolidation of tax repair 4005e98e: private, no-store tax-return responses without changing ownership or MFA checks."
     },
     {
       "source": "app/api/tax/w2/confirm/route.ts",
       "target": "apps/marketing/app/api/tax/w2/confirm/route.ts",
-      "sha256": "2ac78a774ef2e43dab742b7aa3c4ee80fdaf9d43e5ae3c727d307e831356a3d5",
+      "sha256": "1c6e8efb0804e97dde5ae145c09d78e247c5f2733f10770da74965d833a6e1da",
       "sourceSha256": "4747d469384b4bad80336f73f855d70e409ac966a62aa65e253be67811a904bf",
-      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
+      "localRevisionReason": "Reviewed Oct 27 consolidation of tax repair 4005e98e: distinguish blank optional W-2 amounts from zero, reject invalid value types and keep responses private; tax W-2 regressions passed."
     },
     {
       "source": "app/api/ocr/extract/route.ts",

@@ -27,6 +27,11 @@ export async function syncAdminGitHubToken({run=google,request=fetch,config=()=>
  const metadata=read(['secrets','describe',SECRET]);
  if(metadata.labels?.elevate_component!=='admin'||metadata.labels?.elevate_key!=='github_token')failure('ADMIN_GITHUB_SECRET_OWNER_MISMATCH');
  const evidence={source:'admin-encrypted-platform-secrets:GITHUB_TOKEN',destination:SECRET,key:'GITHUB_TOKEN',repositoryHttp:check.status,appSigningKeyChanged:false};
+ const existingBinding=state.spec.template.spec.containers[0].env?.find(e=>e.name==='GITHUB_TOKEN')?.valueFrom?.secretKeyRef;
+ if(env.GITHUB_TOKEN?.trim()===token.trim()&&existingBinding?.name===SECRET&&/^[1-9][0-9]*$/.test(String(existingBinding.key))){
+  const stored=run(['secrets','versions','access',String(existingBinding.key),'--secret',SECRET,'--project='+PROJECT]);
+  if(stored.trim()===token.trim())return {...evidence,stateChanged:false,alreadySynchronized:true,revision:body.revision,secretVersion:String(existingBinding.key)};
+ }
  if(!apply)return {...evidence,stateChanged:false};
  const add=(name,value)=>{
   const result=readVersion(run(['secrets','versions','add',name,'--project='+PROJECT,'--data-file=-','--format=json(name,state)'],value),name);

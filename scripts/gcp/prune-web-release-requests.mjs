@@ -46,6 +46,9 @@ export async function pruneWebReleaseRequests({api, repository, execute=false}) 
       if(!eligible(current)||current.id!==run.id||current.run_number!==run.run_number||!waiting.has(current.status))continue;
       const jobs=await api(endpoint+'/jobs?per_page=100');
       if(!Array.isArray(jobs.jobs)||jobs.total_count>100)throw Error('RELEASE_JOB_INVENTORY_UNAVAILABLE');
+      // A verified, uploaded image must reach deployment and acceptance even when main advances.
+      // Otherwise continuous course commits can repeatedly discard a ready LMS release.
+      if(jobs.jobs.some(j=>j.name==='build / image' && j.status==='completed' && j.conclusion==='success'))continue;
       // A started deployment must finish its own acceptance/rollback sequence.
       if(jobs.jobs.some(j=>j.status==='in_progress' || (!preparationJobs.has(j.name) && (j.status==='completed' && j.conclusion!=='skipped' || j.steps?.some(step=>step.status==='in_progress'||step.status==='completed')))))continue;
       const beforeCancel=await api(endpoint);

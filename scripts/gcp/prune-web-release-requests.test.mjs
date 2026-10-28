@@ -56,3 +56,11 @@ test('completed preparation does not trap a superseded release in the deployment
   await pruneWebReleaseRequests({...protectedRun,repository,execute:true});assert.deepEqual(protectedRun.writes,[]);
  }
 });
+
+
+test('an uploaded image awaiting deployment survives a newer release request',async()=>{
+ const jobs=[{name:'validate',status:'completed',conclusion:'success'},{name:'build / image',status:'completed',conclusion:'success'},{name:'deploy / deploy (lms)',status:'pending',steps:[]}];
+ const f=fixture({rows:[row(1,'in_progress'),row(2)],jobs});
+ const result=await pruneWebReleaseRequests({...f,repository,execute:true});
+ assert.deepEqual(f.writes,[]);assert.deepEqual(result,[]);
+});

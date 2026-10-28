@@ -6,7 +6,6 @@ const actorId = '8e352e99-d552-4690-b8e7-8a560bb1f873';
 const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (base !== 'https://cuxzzpsyufcewtmicszk.supabase.co' || !key) throw Error('Expected production connection unavailable');
-if (!process.env.SENDGRID_API_KEY) throw Error('Email provider unavailable; no changes made');
 const headers = {apikey:key, Authorization:`Bearer ${key}`, 'Content-Type':'application/json'};
 async function api(path, method='GET', body, prefer='return=representation') {
   const response = await fetch(`${base}${path}`, {method, headers:{...headers, Prefer:prefer}, ...(body ? {body:JSON.stringify(body)} : {})});
@@ -15,6 +14,15 @@ async function api(path, method='GET', body, prefer='return=representation') {
   return result ? JSON.parse(result) : null;
 }
 const rest = '/rest/v1/';
+// Match the application's canonical runtime secret source; never log secrets.
+if (!process.env.SENDGRID_API_KEY) {
+  const configured = await api(`${rest}platform_secrets?key=eq.SENDGRID_API_KEY&scope=eq.runtime&select=key`);
+  if (configured.length) process.env.SENDGRID_API_KEY = await api(`${rest}rpc/get_platform_secret`,'POST',{p_key:'SENDGRID_API_KEY'});
+}
+if (!process.env.SENDGRID_API_KEY) throw Error('Email provider unavailable; no changes made');
+const senderRows = await api(`${rest}platform_secrets?key=eq.EMAIL_FROM&scope=eq.runtime&select=key`);
+const senderSetting = senderRows.length ? await api(`${rest}rpc/get_platform_secret`,'POST',{p_key:'EMAIL_FROM'}) : '';
+const senderEmail = process.env.SENDGRID_FROM_EMAIL || senderSetting?.match(/<([^>]+)>/)?.[1] || senderSetting || 'info@elevateforhumanity.org';
 const [app] = await api(`${rest}program_holder_applications?id=eq.${applicationId}&select=*`);
 if (!app || app.email?.toLowerCase() !== email || app.organization_name !== 'Achieve Training Institute' || !['pending','approved'].includes(app.status)) throw Error('Application identity/state mismatch');
 if (JSON.stringify(app.data?.requested_program_slugs) !== '["cna"]') throw Error('Unexpected requested programs');
@@ -70,7 +78,7 @@ if (!sent.length && !verifiedHolder.welcome_email_sent) {
   if(!link.action_link) throw Error('Secure setup link unavailable');
   const html = `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;line-height:1.6;color:#172554"><h2>Welcome to the Elevate team!</h2><p>Hello Achieve Training Institute Team,</p><p>Welcome to Elevate for Humanity. Achieve Training Institute's Program Holder application for <strong>Certified Nursing Assistant (CNA)</strong> is approved for onboarding. We are glad to have you join the team.</p><p><strong>Username:</strong> ${email}<br><strong>Password:</strong> Use the secure button below to create your own password.</p><p><a href="${link.action_link}" style="display:inline-block;padding:14px 20px;background:#1d4ed8;color:white;border-radius:8px;text-decoration:none">Set your password and begin onboarding</a></p><p>After setting your password, complete the onboarding checklist in your dashboard:</p><ol><li>Review and sign your assigned Program Holder MOU.</li><li>Complete your profile and confirm the correct Program Director/contact name.</li><li>Submit the documents requested in your checklist, including applicable organization, tax, and CNA approval/instructor records. Previously submitted documents do not need to be uploaded again if they are already on file.</li><li>Open Payouts and complete your available secure provider setup. Never send banking credentials or account details by email.</li></ol><p>Approval and dashboard access do not mean banking is verified or payments are active. Required agreements, document reviews, and payment verification remain separate steps.</p><p>For future sign-ins: <a href="https://app.elevateforhumanity.org/login?portal=program-holder&redirect=%2Fprogram-holder%2Fdashboard">Open your Program Holder dashboard</a>. If your setup link expires, select Forgot password using the username above.</p><p>Please reply if you need assistance getting started.</p><p>Elizabeth Greene<br>Elevate for Humanity</p></div>`;
   const response = await fetch('https://api.sendgrid.com/v3/mail/send',{method:'POST',headers:{Authorization:`Bearer ${process.env.SENDGRID_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({
-    personalizations:[{to:[{email,name}]}],from:{email:process.env.SENDGRID_FROM_EMAIL||'info@elevateforhumanity.org',name:'Elevate for Humanity'},
+    personalizations:[{to:[{email,name}]}],from:{email:senderEmail,name:'Elevate for Humanity'},
     reply_to:{email:'elevateforhumanity@www.elevateforhumanity.org',name:'Elizabeth Greene'},subject,
     content:[{type:'text/html',value:html}],tracking_settings:{click_tracking:{enable:false,enable_text:false}},
   })});

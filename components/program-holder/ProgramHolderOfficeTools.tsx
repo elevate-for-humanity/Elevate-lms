@@ -1,4 +1,5 @@
 'use client';
+import { VideoCallingGuide } from '@/components/communications/VideoCallingGuide';
 import { MeetingDeviceCheck } from './MeetingDeviceCheck';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
@@ -105,6 +106,7 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
     return (
       <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
         <header><h1 className="text-2xl font-black text-slate-950">Calendar and meetings</h1><p className="mt-2 text-sm text-slate-600">Schedule, confirm and join your appointments here.</p></header>
+        <VideoCallingGuide />
         <MeetingDeviceCheck />
 
         {loaded && !preview && !data.videoReady && !status ? (

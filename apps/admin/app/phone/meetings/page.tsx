@@ -1,3 +1,5 @@
+import { CalendarWidget } from '@/components/CalendarWidget';
+import { VideoCallingGuide } from '@/components/communications/VideoCallingGuide';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
@@ -75,6 +77,9 @@ export default async function MeetingsPage() {
           ) : null}
         </div>
       </div>
+
+      <VideoCallingGuide />
+      <CalendarWidget userId={auth.profile.id} additionalEvents={(rooms || []).filter((room: any) => room.scheduled_at && !['cancelled', 'ended'].includes(room.status)).map((room: any) => ({ id: room.id, title: room.title, date: room.scheduled_at.slice(0, 10), startsAt: room.scheduled_at, type: 'event' as const }))} />
 
       {!serviceReady ? (
         <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950">

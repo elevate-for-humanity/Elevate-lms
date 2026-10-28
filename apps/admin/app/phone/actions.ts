@@ -1,4 +1,5 @@
 'use server';
+import { assertGoogleCalendarAvailable } from '@/lib/calendar/google-calendar';
 
 import { revalidatePath } from 'next/cache';
 import { requireRole, type AuthResult } from '@/lib/auth/require-role';
@@ -108,6 +109,8 @@ export async function createMeeting(formData: FormData): Promise<void> {
     throw new Error(`Meeting service is not configured: ${readiness.missing.join(', ')}`);
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const { db, workspace } = await requireWorkspace();
+  const meetingStart = scheduledAt || new Date();
+  await assertGoogleCalendarAvailable(auth.profile.id, meetingStart.toISOString(), new Date(meetingStart.getTime() + 60 * 60000).toISOString());
   const roomKey = `elevate-${workspace.id}-${crypto.randomUUID()}`;
   await ensureLiveKitRoom(roomKey, 50);
   const { error } = await db.from('communication_rooms').insert({

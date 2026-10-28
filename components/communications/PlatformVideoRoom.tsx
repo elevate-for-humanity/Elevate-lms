@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LiveKitRoom, RoomAudioRenderer, StartAudio, VideoConference, useConnectionState } from '@livekit/components-react';
+import { VideoCallingGuide } from './VideoCallingGuide';
 import { MeetingScreenShare } from './MeetingScreenShare';
 
 function ConnectionStatus() {
@@ -10,7 +11,7 @@ function ConnectionStatus() {
 }
 
 /** All portals use the same connection lifecycle; authorization stays in their token endpoints. */
-export function PlatformVideoRoom({ tokenEndpoint, allowScreenShare = true }: { tokenEndpoint: string; allowScreenShare?: boolean }) {
+function VideoRoomConnection({ tokenEndpoint, allowScreenShare = true }: { tokenEndpoint: string; allowScreenShare?: boolean }) {
   const [joined, setJoined] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [connection, setConnection] = useState<{ token: string; serverUrl: string; canShare?: boolean } | null>(null);
@@ -54,4 +55,8 @@ export function PlatformVideoRoom({ tokenEndpoint, allowScreenShare = true }: { 
       <RoomAudioRenderer />
     </LiveKitRoom>
   </div>;
+}
+
+export function PlatformVideoRoom(props: Parameters<typeof VideoRoomConnection>[0]) {
+  return <div className="space-y-4"><VideoCallingGuide compact /><VideoRoomConnection {...props} /></div>;
 }

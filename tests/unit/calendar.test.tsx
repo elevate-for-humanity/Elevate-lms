@@ -39,7 +39,7 @@ describe('Calendar events API', () => {
 
   it('exists and scopes data to the authenticated learner', () => {
     expect(fs.existsSync(apiPath)).toBe(true);
-    const src = fs.readFileSync(apiPath, 'utf-8');
+    const src = fs.readFileSync(path.resolve('lib/calendar/events-route.ts'), 'utf-8');
     expect(src).toContain("from('calendar_events')");
     expect(src).toContain('requestedUserId !== user.id');
     expect(src).toContain('Authentication required');

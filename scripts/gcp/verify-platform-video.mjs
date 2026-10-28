@@ -5,6 +5,7 @@ import { loadGoogleConfig } from './runtime-config.mjs';
 const configurations = ['admin', 'lms'].map(component => ({ component, env: loadGoogleConfig(component).runtimeEnvironment }));
 let failed = false;
 for (const { component, env } of configurations) {
+  console.log(JSON.stringify({ component, googleCalendarOAuthConfigured: Boolean((env.GOOGLE_CALENDAR_CLIENT_ID || env.GOOGLE_CLIENT_ID) && (env.GOOGLE_CALENDAR_CLIENT_SECRET || env.GOOGLE_CLIENT_SECRET)) }));
   const missing = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'].filter(key => !env[key]);
   if (missing.length) { console.log(JSON.stringify({ component, ready: false, missing })); failed = true; continue; }
   try {
@@ -25,4 +26,6 @@ for (const { component, env } of configurations) {
 }
 const matching = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'].every(key => configurations[0].env[key] && configurations[0].env[key] === configurations[1].env[key]);
 console.log(JSON.stringify({ sharedProviderConfiguration: matching, browserMediaAcceptance: 'requires two real devices' }));
+const calendarCredentials = configurations.map(({ env }) => [env.GOOGLE_CALENDAR_CLIENT_ID || env.GOOGLE_CLIENT_ID, env.GOOGLE_CALENDAR_CLIENT_SECRET || env.GOOGLE_CLIENT_SECRET]);
+console.log(JSON.stringify({ sharedGoogleCalendarOAuthConfiguration: calendarCredentials[0].every((value, index) => Boolean(value) && value === calendarCredentials[1][index]) }));
 if (!matching || failed) process.exitCode = 1;

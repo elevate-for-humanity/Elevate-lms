@@ -88,7 +88,7 @@ function readyLessonDatabase({published=false,broken=false,buildStatus='running'
   const lessons=[{id:'build-19',competency_id:competency,lesson_key:'color-theory',status:'built',artifacts}];
   const canonical=[{id:'canonical-19',status:published?'published':'draft',is_published:published}];
   const filters=[];
-  const db={from(table){let requestedId,requestedIds;const q={select(){return q;},eq(k,v){filters.push([table,k,v]);if(k==='id')requestedId=v;return q;},in(_key,values){requestedIds=values;return q;},order(){return q;},single:async()=>({data:build,error:null}),then(resolve,reject){const data=table==='ultimate_lesson_builds'?lessons.filter(l=>!requestedId||l.id===requestedId):canonical.filter(row=>!requestedIds||requestedIds.includes(row.id));return Promise.resolve({data,error:null}).then(resolve,reject);}};return q;}};
+  const db={from(table){let requestedId,requestedIds;const q={select(){return q;},eq(k,v){filters.push([table,k,v]);if(k==='id')requestedId=v;return q;},in(_key,values){requestedIds=values;return q;},order(){return q;},single:async()=>({data:table==='ultimate_lesson_builds'?lessons.find(l=>l.id===requestedId):build,error:null}),then(resolve,reject){const data=table==='ultimate_lesson_builds'?lessons.filter(l=>!requestedId||l.id===requestedId):canonical.filter(row=>!requestedIds||requestedIds.includes(row.id));return Promise.resolve({data,error:null}).then(resolve,reject);}};return q;}};
   return {db,filters,build,lessons,canonical};
 }
 test('publishes a completed lesson at its course position while remaining lessons are unfinished',async()=>{

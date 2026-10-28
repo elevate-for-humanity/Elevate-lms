@@ -38,7 +38,7 @@ export class UltimateReleaseService {
     }
     let lessonQuery = this.db
       .from('ultimate_lesson_builds')
-      .select('id,lesson_key,competency_id,status,artifacts')
+      .select('id,lesson_key,competency_id,status')
       .eq('build_id', buildId)
       .order('created_at');
     if (lessonBuildId) lessonQuery = lessonQuery.eq('id', lessonBuildId);
@@ -50,6 +50,16 @@ export class UltimateReleaseService {
       return prior ? {competency_id:competency.id,preservedPublication:prior}
         : ls.find(row => row.competency_id === competency.id);
     }).filter(Boolean);
+    // Preserved publications need no artifact payload. Load each remaining
+    // lesson separately rather than one course-sized JSON response.
+    for (const lesson of ls) {
+      if (lesson.preservedPublication) continue;
+      const loaded = await this.db.from('ultimate_lesson_builds').select('artifacts')
+        .eq('build_id',buildId).eq('id',lesson.id).single();
+      if (loaded.error) throw loaded.error;
+      if (!loaded.data) throw new Error('ULTIMATE_LESSONS_NOT_RELEASE_READY');
+      lesson.artifacts = loaded.data.artifacts;
+    }
     if (
       !ls?.length ||
       ls.some(

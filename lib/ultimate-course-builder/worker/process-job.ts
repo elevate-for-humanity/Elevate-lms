@@ -1,3 +1,4 @@
+import {verifySavedCourseLessons} from './verify-saved-course.mjs';
 import { checkpointContinuousLesson, continuousCourseLease } from './continuous-course-lease.mjs';
 import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
 import { preservedCourseCursor } from './preserve-completed.mjs';
@@ -284,17 +285,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (!targeted) {
       // Completion is the current contract for every competency plus canonical
       // publication readback, never the last lesson's status or legacy flags.
-      const { data: lessons, error: lessonError } = await db.from('ultimate_lesson_builds')
-        .select('competency_id,status,artifacts').eq('build_id', build.id);
-      if (lessonError) throw lessonError;
-      for (const competency of profile.competencies) {
-        // The release service rechecks these existing publications without
-        // replacing their films or claiming the new contract was run on them.
-        if (profile.publishCompletedLessons === true && profile.preservedPublishedLessonIds?.includes(
-          profile.canonicalLessonIds?.[competency.id] ?? '')) continue;
-        const lesson = lessons?.find(l => l.competency_id === competency.id);
-        if (!lesson || lesson.status !== 'built') throw new Error(`ULTIMATE_COMPETENCY_NOT_COMPLETE:${competency.id}`);
-        assertCompleteLesson(lesson.artifacts, profile);
+      const verifiedProfile = await verifySavedCourseLessons({db,build,profile,
+        validate:assertCompleteLesson,assertActive});
+      if (JSON.stringify(verifiedProfile) !== JSON.stringify(profile)) {
+        assertActive();
+        const savedProfile = await db.rpc('ultimate_fenced_write', {
+          p_job:job.id,p_worker:workerId,p_generation:generation,
+          p_action:'update_profile',p_target:build.id,p_data:{profile:verifiedProfile},
+        });
+        if (savedProfile.error) throw savedProfile.error;
+        Object.assign(profile,verifiedProfile);
       }
       if ((profile as any).newCourseContract === 'owner-approved-lesson-v1') {
         // Check the actual published-course lesson records, not a fabricated exam.
@@ -345,7 +345,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     return { claimed: true, completed: true, jobId: job.id, result };
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error ? error.message :
+      error && typeof error === 'object' && 'message' in error
+        ? String(error.message) : String(error);
     if (leaseLost || message.startsWith('ULTIMATE_JOB_LEASE_LOST')) {
       console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
       return {claimed:true,completed:false,jobId:job.id,error:message};

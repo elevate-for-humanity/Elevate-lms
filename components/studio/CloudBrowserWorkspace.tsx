@@ -368,7 +368,7 @@ export default function CloudBrowserWorkspace({
     else if (runtimeReady === true && target.trim()) await start(target, true);
     else {
       setControlsOpen(true);
-      setError('Enter the website address and start the browser before signing in.');
+      setError('Enter the external website address and start the browser before using its login.');
     }
   }
 
@@ -882,14 +882,6 @@ export default function CloudBrowserWorkspace({
         <strong className="flex-1 text-lg">Studio browser</strong>
         <button
           type="button"
-          onClick={() => void openSignIn()}
-          aria-pressed={signInView}
-          className="min-h-12 rounded-lg bg-emerald-700 px-4 text-lg font-bold text-white"
-        >
-          Sign in
-        </button>
-        <button
-          type="button"
           aria-expanded={controlsOpen}
           onClick={() => setControlsOpen(!controlsOpen)}
           className="min-h-12 rounded-lg border border-slate-300 px-3 text-base"
@@ -1207,7 +1199,7 @@ export default function CloudBrowserWorkspace({
           onClick={() => setMobilePane('signin')}
           className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-slate-200"
         >
-          Email / password
+          Website login
         </button>
         <button
           type="button"

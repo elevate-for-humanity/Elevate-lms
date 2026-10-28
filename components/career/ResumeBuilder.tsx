@@ -59,7 +59,6 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
     certifications: initialData?.certifications || [],
   });
 
-  const [skillDraft, setSkillDraft] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -74,47 +73,21 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       doc.setFont('helvetica', heading ? 'bold' : 'normal');
       doc.setFontSize(heading ? 12 : 10);
       for (const line of doc.splitTextToSize(text, pageWidth) as string[]) {
-        if (y > 738) {
-          doc.addPage();
-          y = 54;
-        }
+        if (y > 738) { doc.addPage(); y = 54; }
         doc.text(line, left, y);
         y += heading ? 18 : 15;
       }
       y += 5;
     };
     write(resumeData.personal_info.full_name || 'Resume', true);
-    write(
-      [
-        resumeData.personal_info.email,
-        resumeData.personal_info.phone,
-        resumeData.personal_info.location,
-      ]
-        .filter(Boolean)
-        .join(' | '),
-    );
-    write('PROFESSIONAL SUMMARY', true);
-    write(resumeData.summary);
+    write([resumeData.personal_info.email, resumeData.personal_info.phone, resumeData.personal_info.location].filter(Boolean).join(' | '));
+    write('PROFESSIONAL SUMMARY', true); write(resumeData.summary);
     write('WORK EXPERIENCE', true);
-    resumeData.work_experience.forEach((exp) => {
-      write([exp.title, exp.company, exp.location].filter(Boolean).join(' | '), true);
-      write(`${exp.start_date} - ${exp.current ? 'Present' : exp.end_date}`);
-      write(exp.description);
-    });
-    write('EDUCATION', true);
-    resumeData.education.forEach((e) =>
-      write([e.degree, e.school, e.graduation_date].filter(Boolean).join(' | ')),
-    );
-    write('SKILLS', true);
-    write(resumeData.skills.join(', '));
-    write('CERTIFICATIONS', true);
-    resumeData.certifications.forEach((cert) =>
-      write([cert.name, cert.issuer, cert.date].filter(Boolean).join(' | ')),
-    );
-    const filename = (resumeData.personal_info.full_name || 'resume').replace(
-      /[^a-z0-9_-]+/gi,
-      '-',
-    );
+    resumeData.work_experience.forEach(exp => { write([exp.title, exp.company, exp.location].filter(Boolean).join(' | '), true); write(`${exp.start_date} - ${exp.current ? 'Present' : exp.end_date}`); write(exp.description); });
+    write('EDUCATION', true); resumeData.education.forEach(e => write([e.degree, e.school, e.graduation_date].filter(Boolean).join(' | ')));
+    write('SKILLS', true); write(resumeData.skills.join(', '));
+    write('CERTIFICATIONS', true); resumeData.certifications.forEach(cert => write([cert.name, cert.issuer, cert.date].filter(Boolean).join(' | ')));
+    const filename = (resumeData.personal_info.full_name || 'resume').replace(/[^a-z0-9_-]+/gi, '-');
     doc.save(`${filename}-resume.pdf`);
   };
 
@@ -127,13 +100,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
-        .from('resumes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const { data } = await supabase.from('resumes').select('*').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(1).maybeSingle();
 
       if (data?.resume_data) {
         setResumeData(data.resume_data);
@@ -152,11 +119,13 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { error } = await supabase.from('resumes').upsert({
-      user_id: user.id,
-      resume_data: data,
-      updated_at: new Date().toISOString(),
-    });
+    const { error } = await supabase
+      .from('resumes')
+      .upsert({
+        user_id: user.id,
+        resume_data: data,
+        updated_at: new Date().toISOString(),
+      });
     if (error) throw error;
   };
 
@@ -212,19 +181,11 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
           Resume Builder
         </h2>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setIsPreviewOpen((value) => !value)}
-            className="px-4 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-600 transition-colors flex items-center gap-2"
-          >
+          <button type="button" onClick={() => setIsPreviewOpen(value => !value)} className="px-4 py-2 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-600 transition-colors flex items-center gap-2">
             <Eye className="w-4 h-4" />
             Preview
           </button>
-          <button
-            type="button"
-            onClick={() => void downloadPdf()}
-            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors flex items-center gap-2"
-          >
+          <button type="button" onClick={() => void downloadPdf()} className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             Download PDF
           </button>
@@ -232,50 +193,14 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       </div>
 
       {isPreviewOpen && (
-        <section
-          aria-label="Resume preview"
-          className="rounded-lg border bg-white p-6 text-slate-900 space-y-3"
-        >
-          <h3 className="text-2xl font-bold">
-            {resumeData.personal_info.full_name || 'Your Name'}
-          </h3>
-          <p>
-            {[
-              resumeData.personal_info.email,
-              resumeData.personal_info.phone,
-              resumeData.personal_info.location,
-            ]
-              .filter(Boolean)
-              .join(' | ')}
-          </p>
-          <h4 className="font-bold">Professional Summary</h4>
-          <p className="whitespace-pre-wrap">{resumeData.summary}</p>
-          <h4 className="font-bold">Experience</h4>
-          {resumeData.work_experience.map((exp, i) => (
-            <div key={i}>
-              <strong>
-                {exp.title} — {exp.company}
-              </strong>
-              <p>
-                {exp.start_date}–{exp.current ? 'Present' : exp.end_date}
-              </p>
-              <p className="whitespace-pre-wrap">{exp.description}</p>
-            </div>
-          ))}
-          <h4 className="font-bold">Education</h4>
-          {resumeData.education.map((ed, i) => (
-            <p key={i}>
-              {ed.degree} — {ed.school} ({ed.graduation_date})
-            </p>
-          ))}
-          <h4 className="font-bold">Skills</h4>
-          <p>{resumeData.skills.join(', ')}</p>
-          <h4 className="font-bold">Certifications</h4>
-          {resumeData.certifications.map((cert, i) => (
-            <p key={i}>
-              {cert.name} — {cert.issuer} ({cert.date})
-            </p>
-          ))}
+        <section aria-label="Resume preview" className="rounded-lg border bg-white p-6 text-slate-900 space-y-3">
+          <h3 className="text-2xl font-bold">{resumeData.personal_info.full_name || 'Your Name'}</h3>
+          <p>{[resumeData.personal_info.email, resumeData.personal_info.phone, resumeData.personal_info.location].filter(Boolean).join(' | ')}</p>
+          <h4 className="font-bold">Professional Summary</h4><p className="whitespace-pre-wrap">{resumeData.summary}</p>
+          <h4 className="font-bold">Experience</h4>{resumeData.work_experience.map((exp, i) => <div key={i}><strong>{exp.title} — {exp.company}</strong><p>{exp.start_date}–{exp.current ? 'Present' : exp.end_date}</p><p className="whitespace-pre-wrap">{exp.description}</p></div>)}
+          <h4 className="font-bold">Education</h4>{resumeData.education.map((ed, i) => <p key={i}>{ed.degree} — {ed.school} ({ed.graduation_date})</p>)}
+          <h4 className="font-bold">Skills</h4><p>{resumeData.skills.join(', ')}</p>
+          <h4 className="font-bold">Certifications</h4>{resumeData.certifications.map((cert, i) => <p key={i}>{cert.name} — {cert.issuer} ({cert.date})</p>)}
         </section>
       )}
 
@@ -411,9 +336,9 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     type="month"
                     placeholder="Start Date"
                     value={exp.start_date}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      updateWorkExperience(index, { start_date: e.target.value })
-                    }
+                    onChange={(
+                      e: React.ChangeEvent<HTMLInputElement>,
+                    ) => updateWorkExperience(index, { start_date: e.target.value })}
                     className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                   />
                   <input
@@ -457,241 +382,8 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
         </div>
       </div>
 
-      <section
-        className="space-y-4 rounded-lg bg-white p-6"
-        aria-labelledby="resume-training-heading"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 id="resume-training-heading" className="text-lg font-semibold text-slate-900">
-            Education and training
-          </h3>
-          <button
-            type="button"
-            className="min-h-12 rounded-lg border border-slate-300 px-4 py-2 font-semibold"
-            onClick={() =>
-              setResumeData((current) => ({
-                ...current,
-                education: [...current.education, { degree: '', school: '', graduation_date: '' }],
-              }))
-            }
-          >
-            Add training
-          </button>
-        </div>
-        {resumeData.education.map((entry, index) => (
-          <fieldset key={index} className="space-y-3 rounded-xl border border-slate-200 p-4">
-            <legend className="px-1 font-semibold">Training {index + 1}</legend>
-            <label className="block space-y-1">
-              <span>Program or qualification</span>
-              <input
-                className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-                value={entry.degree}
-                onChange={(event) =>
-                  setResumeData((current) => ({
-                    ...current,
-                    education: current.education.map((item, i) =>
-                      i === index ? { ...item, degree: event.target.value } : item,
-                    ),
-                  }))
-                }
-              />
-            </label>
-            <label className="block space-y-1">
-              <span>School or training provider</span>
-              <input
-                className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-                value={entry.school}
-                onChange={(event) =>
-                  setResumeData((current) => ({
-                    ...current,
-                    education: current.education.map((item, i) =>
-                      i === index ? { ...item, school: event.target.value } : item,
-                    ),
-                  }))
-                }
-              />
-            </label>
-            <label className="block space-y-1">
-              <span>Training completion date</span>
-              <input
-                type="month"
-                className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-                value={entry.graduation_date}
-                onChange={(event) =>
-                  setResumeData((current) => ({
-                    ...current,
-                    education: current.education.map((item, i) =>
-                      i === index ? { ...item, graduation_date: event.target.value } : item,
-                    ),
-                  }))
-                }
-              />
-            </label>
-            <button
-              type="button"
-              className="min-h-12 font-semibold text-red-800 underline"
-              onClick={() =>
-                setResumeData((current) => ({
-                  ...current,
-                  education: current.education.filter((_, i) => i !== index),
-                }))
-              }
-            >
-              Remove training {index + 1}
-            </button>
-          </fieldset>
-        ))}
-      </section>
-
-      <section
-        className="space-y-4 rounded-lg bg-white p-6"
-        aria-labelledby="resume-skills-heading"
-      >
-        <h3 id="resume-skills-heading" className="text-lg font-semibold text-slate-900">
-          Skills
-        </h3>
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="min-w-0 flex-1 space-y-1">
-            <span>Skill to add</span>
-            <input
-              className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-              value={skillDraft}
-              onChange={(event) => setSkillDraft(event.target.value)}
-            />
-          </label>
-          <button
-            type="button"
-            disabled={!skillDraft.trim()}
-            className="min-h-12 rounded-lg border border-slate-300 px-4 py-2 font-semibold disabled:opacity-50"
-            onClick={() => {
-              const skill = skillDraft.trim();
-              if (skill)
-                setResumeData((current) => ({
-                  ...current,
-                  skills: current.skills.includes(skill)
-                    ? current.skills
-                    : [...current.skills, skill],
-                }));
-              setSkillDraft('');
-            }}
-          >
-            Add skill
-          </button>
-        </div>
-        <ul className="flex flex-wrap gap-3">
-          {resumeData.skills.map((skill, index) => (
-            <li key={index} className="flex items-center gap-3 rounded-lg bg-slate-100 px-3 py-1">
-              <span>{skill}</span>
-              <button
-                type="button"
-                aria-label={`Remove skill ${skill}`}
-                className="min-h-12 px-2 font-semibold text-red-800"
-                onClick={() =>
-                  setResumeData((current) => ({
-                    ...current,
-                    skills: current.skills.filter((_, i) => i !== index),
-                  }))
-                }
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section
-        className="space-y-4 rounded-lg bg-white p-6"
-        aria-labelledby="resume-credentials-heading"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 id="resume-credentials-heading" className="text-lg font-semibold text-slate-900">
-            Licenses and credentials
-          </h3>
-          <button
-            type="button"
-            className="min-h-12 rounded-lg border border-slate-300 px-4 py-2 font-semibold"
-            onClick={() =>
-              setResumeData((current) => ({
-                ...current,
-                certifications: [...current.certifications, { name: '', issuer: '', date: '' }],
-              }))
-            }
-          >
-            Add credential
-          </button>
-        </div>
-        <p className="leading-7 text-slate-700">
-          Include credentials you have earned. Your official credential verification records remain
-          separate from your résumé.
-        </p>
-        {resumeData.certifications.map((entry, index) => (
-          <fieldset key={index} className="space-y-3 rounded-xl border border-slate-200 p-4">
-            <legend className="px-1 font-semibold">Credential {index + 1}</legend>
-            <label className="block space-y-1">
-              <span>Credential name</span>
-              <input
-                className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-                value={entry.name}
-                onChange={(event) =>
-                  setResumeData((current) => ({
-                    ...current,
-                    certifications: current.certifications.map((item, i) =>
-                      i === index ? { ...item, name: event.target.value } : item,
-                    ),
-                  }))
-                }
-              />
-            </label>
-            <label className="block space-y-1">
-              <span>Issued by</span>
-              <input
-                className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-                value={entry.issuer}
-                onChange={(event) =>
-                  setResumeData((current) => ({
-                    ...current,
-                    certifications: current.certifications.map((item, i) =>
-                      i === index ? { ...item, issuer: event.target.value } : item,
-                    ),
-                  }))
-                }
-              />
-            </label>
-            <label className="block space-y-1">
-              <span>Date earned</span>
-              <input
-                type="date"
-                className="min-h-12 w-full rounded-lg border border-slate-300 p-3"
-                value={entry.date}
-                onChange={(event) =>
-                  setResumeData((current) => ({
-                    ...current,
-                    certifications: current.certifications.map((item, i) =>
-                      i === index ? { ...item, date: event.target.value } : item,
-                    ),
-                  }))
-                }
-              />
-            </label>
-            <button
-              type="button"
-              className="min-h-12 font-semibold text-red-800 underline"
-              onClick={() =>
-                setResumeData((current) => ({
-                  ...current,
-                  certifications: current.certifications.filter((_, i) => i !== index),
-                }))
-              }
-            >
-              Remove credential {index + 1}
-            </button>
-          </fieldset>
-        ))}
-      </section>
-
-      {/* Save Button */}
-      <div className="flex justify-start pb-40">
+      {/* Leave room below the last action for the floating PARIS help control. */}
+      <div className="flex justify-end pb-40 md:pb-24">
         <button
           onClick={handleSave}
           disabled={isSaving}

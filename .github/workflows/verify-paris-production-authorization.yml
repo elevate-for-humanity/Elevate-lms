@@ -6,6 +6,12 @@ on:
         description: Exact deployed main SHA to verify
         required: false
         type: string
+      credential_source:
+        description: Explicit runtime credential to verify; no workflow-token override
+        type: choice
+        options: [runtime-token, github-app-installation]
+        default: runtime-token
+        required: false
 permissions:
   contents: read
   actions: read
@@ -48,7 +54,7 @@ jobs:
           print(json.dumps({'type':'admin_traffic','revision':revision,'percent':100,'labels':{k:v for k,v in labels.items() if 'commit' in k or 'sha' in k}}))
           # Actual revision health/commit is verified separately through public health.
           PY
-      - name: Verify public serving Admin commit contains PR 1927
+      - name: Verify public serving Admin commit matches the requested release
         env:
           EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
         run: |
@@ -66,12 +72,7 @@ jobs:
             raise SystemExit('ADMIN_PRODUCTION_COMMIT_MISSING')
           if sha!=os.environ['EXPECTED_SHA']:
             raise SystemExit('ADMIN_PRODUCTION_COMMIT_DIFFERS_FROM_REQUESTED_RELEASE')
-          subprocess.run(['git','fetch','--no-tags','--depth=150','origin','main'],check=True,stdout=subprocess.DEVNULL)
-          merge='ccbdda8d8201fe551bcf4eaa5d6a213d13abf34c'
-          subprocess.run(['git','cat-file','-e',sha+'^{commit}'],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-          included=subprocess.run(['git','merge-base','--is-ancestor',merge,sha]).returncode==0
-          print(json.dumps({'type':'admin_live_version','commit':sha,'contains_paris_diagnostic_merge':included}))
-          if not included: raise SystemExit('ADMIN_REVISION_PRE_DATES_PARIS_DIAGNOSTIC')
+          print(json.dumps({'type':'admin_live_version','commit':sha,'exactRequestedRelease':True}))
           PY
       - name: Obtain short-lived PARIS workflow identity
         env:
@@ -90,17 +91,20 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
-      - name: Verify PARIS GitHub credential via protected read-only diagnostic
+      - name: Verify the runtime credential through the protected read-only diagnostic
         env:
-          # The runtime must use its own App binding, not a workflow token.
-          VERIFICATION_SOURCE: github-app-installation
+          # OIDC authorizes this read-only request. No job token is forwarded.
+          VERIFICATION_SOURCE: ${{ inputs.credential_source || 'runtime-token' }}
         run: |
           python3 - <<'PY'
           import os,json,urllib.request,urllib.error,sys
           secret=os.environ.get('PARIS_ID_TOKEN','')
           if not secret: raise SystemExit('PARIS_WORKFLOW_IDENTITY_UNAVAILABLE')
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
-          req=urllib.request.Request(endpoint,data=b'{"phase":"app-auth-diagnostic"}',headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
+          source=os.environ['VERIFICATION_SOURCE']
+          if source not in ['runtime-token','github-app-installation']: raise SystemExit('INVALID_CREDENTIAL_SOURCE')
+          phase='app-auth-diagnostic' if source=='github-app-installation' else 'auth-diagnostic'
+          req=urllib.request.Request(endpoint,data=json.dumps({'phase':phase}).encode(),headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
           try:
             with urllib.request.urlopen(req,timeout=30) as response:
               body=json.load(response)
@@ -114,6 +118,7 @@ jobs:
           workflow=body.get('workflow',{})
           safe={'type':'paris_diagnostic','diagnostic_version':body.get('diagnosticVersion'),'repo_status':repo.get('status'),'repo_ok':repo.get('ok') is True,'contents_ok':contents.get('ok') is True,'workflow_ok':workflow.get('ok') is True,'write_authority':'not_exercised'}
           print(json.dumps(safe))
-          if body.get('credentialSource')!='github-app-installation' or safe['diagnostic_version']!=2 or not safe['repo_ok'] or not safe['contents_ok'] or not safe['workflow_ok']:
+          source_ok=source=='runtime-token' or body.get('credentialSource')=='github-app-installation'
+          if not source_ok or safe['diagnostic_version']!=2 or not safe['repo_ok'] or not safe['contents_ok'] or not safe['workflow_ok']:
             raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
           PY

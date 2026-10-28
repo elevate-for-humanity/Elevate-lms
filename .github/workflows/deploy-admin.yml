@@ -29,8 +29,8 @@ on:
       - 'components/analytics/**'
       - 'instrumentation.ts'
       - 'Dockerfile.admin'
-      - 'scripts/gcp/paris-github-app-binding.mjs'
-      - 'scripts/gcp/paris-github-app-binding.test.mjs'
+      - 'scripts/gcp/github-runtime-binding.mjs'
+      - 'scripts/gcp/github-runtime-binding.test.mjs'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - '.github/workflows/build-google-migration-images.yml'
@@ -205,8 +205,6 @@ jobs:
           RELEASE_WORKFLOW: deploy-admin.yml
         run: node scripts/gcp/prune-web-release-requests.mjs --assert-tested-admin-rollout
       - name: Upload and deploy the exact Admin image
-        env:
-          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -216,18 +214,18 @@ jobs:
           test "$DIGEST" = "$IMAGE_DIGEST"
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
-          # Validate the stored key/App installation and pin its Secret Manager
-          # version before rollout. The flags file contains no secret payload.
-          node scripts/gcp/paris-github-app-binding.mjs > "$RUNNER_TEMP/paris-app-flags"
-          mapfile -t PARIS_APP_FLAGS < "$RUNNER_TEMP/paris-app-flags"
-          PARIS_APP_FLAGS[0]="${PARIS_APP_FLAGS[0]},AI_NARRATION_PROVIDER=kokoro"
+          # Admin repository reads use the one verified saved token. Writes and
+          # dispatches stay with the existing signed, scoped Actions job identity.
+          node --test scripts/gcp/github-runtime-binding.test.mjs
+          node scripts/gcp/github-runtime-binding.mjs > "$RUNNER_TEMP/github-runtime-flags"
+          mapfile -t GITHUB_RUNTIME_FLAGS < "$RUNNER_TEMP/github-runtime-flags"
           # Reserve rollout headroom before creating a replacement revision.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            "${PARIS_APP_FLAGS[@]}" --quiet
+            --update-env-vars=AI_NARRATION_PROVIDER=kokoro "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         run: |
@@ -241,10 +239,10 @@ jobs:
           set -euo pipefail
           export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
           node scripts/gcp/verify-admin-revision.mjs
-      - name: Dispatch read-only live PARIS verification using the App credential
+      - name: Dispatch read-only runtime verification using the scoped Actions identity
         env:
-          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET || 'paris-engineer-github-private-key' }}
-        run: node scripts/gcp/paris-github-app-binding.mjs --verify-live "$GITHUB_SHA"
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-paris-production-authorization.yml/dispatches" -f ref=main -f "inputs[expected_sha]=$GITHUB_SHA" -f 'inputs[credential_source]=runtime-token'
 
   acceptance:
     needs: deploy-admin

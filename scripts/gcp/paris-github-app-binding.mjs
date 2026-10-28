@@ -87,7 +87,7 @@ export async function parisGitHubAppBinding({ run = google, request = fetch, dis
   if (workflow.state !== 'active') throw Error('PARIS_APP_REPAIR_WORKFLOW_INACTIVE');
   if (dispatchSha) {
     await api(`/repos/${REPO}/actions/workflows/verify-paris-production-authorization.yml/dispatches`, issued.token,
-      { ref: 'main', inputs: { expected_sha: dispatchSha } });
+      { ref: 'main', inputs: { expected_sha: dispatchSha, credential_source: 'github-app-installation' } });
   }
   return [
     `--update-env-vars=GITHUB_APP_ID=${APP_ID},GITHUB_APP_INSTALLATION_ID=${installation.id},GITHUB_APP_PRIVATE_KEY_FILE=${KEY_PATH}`,

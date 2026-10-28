@@ -57,7 +57,7 @@ test('post-release dispatch uses the App token and only the read-only verificati
   const dispatch = f.requests.at(-1);
   assert.equal(dispatch.url, 'https://api.github.com/repos/elevate-for-humanity/Elevate-lms/actions/workflows/verify-paris-production-authorization.yml/dispatches');
   assert.equal(dispatch.init.headers.Authorization, 'Bearer ghs_fixture_installation_token');
-  assert.deepEqual(JSON.parse(dispatch.init.body), { ref: 'main', inputs: { expected_sha: 'a'.repeat(40) } });
+  assert.deepEqual(JSON.parse(dispatch.init.body), { ref: 'main', inputs: { expected_sha: 'a'.repeat(40), credential_source: 'github-app-installation' } });
 });
 test('invalid release SHA or secret reference is rejected before secret access', async () => {
   const f = fixture();

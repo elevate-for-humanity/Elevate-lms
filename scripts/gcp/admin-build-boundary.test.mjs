@@ -54,8 +54,11 @@ test('ordinary Admin releases retain the current browser workspace binding until
     s.indexOf('gcloud run services update elevate-admin-migration'),
     s.indexOf('      - name: Health-check and activate'),
   );
-  assert.ok(s.includes('PARIS_APP_FLAGS[0]="${PARIS_APP_FLAGS[0]},AI_NARRATION_PROVIDER=kokoro"'));
-  assert.ok(update.includes('"${PARIS_APP_FLAGS[@]}"'));
+  assert.ok(update.includes('--update-env-vars=AI_NARRATION_PROVIDER=kokoro'));
+  assert.ok(s.includes('node scripts/gcp/github-runtime-binding.mjs'));
+  assert.ok(!s.includes('paris-engineer-github-private-key'));
+  assert.ok(!s.includes('PARIS_GITHUB_APP_SECRET'));
+  assert.ok(update.includes('"${GITHUB_RUNTIME_FLAGS[@]}"'));
   assert.ok(!update.includes('STUDIO_BROWSER_URL='));
   assert.ok(!update.includes('STUDIO_BROWSER_PUBLIC_URL='));
 });

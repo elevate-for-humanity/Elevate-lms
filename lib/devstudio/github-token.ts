@@ -1,6 +1,6 @@
 /**
  * Resolve GITHUB_TOKEN for Dev Studio GitHub API routes.
- * Verify deployment credentials before falling back to canonical platform secrets.
+ * Signed workflow identity, explicitly configured App, then the one saved runtime token.
  */
 
 import { currentWorkflowGitHubToken } from './workflow-github-context';
@@ -53,24 +53,13 @@ export async function getGitHubToken(): Promise<string | null> {
   if(workflowToken)return workflowToken;
   const appToken = await getGitHubAppToken();
   if (appToken) return appToken;
-  // Capture the deployment value before hydration. hydrateProcessEnv may load
-  // a canonical fallback into process.env, but must not replace a valid token
-  // supplied directly by the production service.
-  // Check the canonical rotating credential first. Never pin it in process.env.
-  const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
-  if (storedToken) return storedToken;
-  const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
-  if (deployedToken && await acceptedByGitHub(deployedToken)) return deployedToken;
-
-  const fromCanonicalStore = normalizeToken(
-    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
-  );
-  if (fromCanonicalStore && fromCanonicalStore !== deployedToken && await acceptedByGitHub(fromCanonicalStore)) {
-    return fromCanonicalStore;
-  }
-
-  if (deployedToken || fromCanonicalStore) {
-    throw new Error('GITHUB_TOKEN_REJECTED: Configured credentials were rejected for Elevate-lms. Reconnect an authorized credential in Dev Studio Secrets.');
+  // One saved runtime source. Never retry a rejected credential through an
+  // expired duplicate or silently change identities after a failed check.
+  const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  const selected = stored ?? normalizeToken(process.env.GITHUB_TOKEN);
+  if (selected && await acceptedByGitHub(selected)) return selected;
+  if (selected) {
+    throw new Error('GITHUB_TOKEN_REJECTED: The configured runtime credential was rejected for Elevate-lms. Update GITHUB_TOKEN in Admin Secrets.');
   }
   return null;
 }
@@ -103,12 +92,6 @@ export function githubApiErrorMessage(status: number): string {
 
 /** Existing credentials for the same repository; never log or persist their values. */
 export async function getGitHubTokenCandidates(): Promise<string[]> {
-  const workflow = currentWorkflowGitHubToken();
-  if (workflow) return [workflow];
-  const app = await getGitHubAppToken();
-  if (app) return [app];
-  const deployed = normalizeToken(process.env.GITHUB_TOKEN);
-  const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
-  return [...new Set([stored, deployed].filter((value): value is string => Boolean(value)))];
+  const selected = await getGitHubToken();
+  return selected ? [selected] : [];
 }
-

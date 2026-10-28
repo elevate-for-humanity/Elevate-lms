@@ -20,10 +20,10 @@ async function resolver({deployed, canonical, statuses = [], storeError, workflo
   return {...api, calls, storeReads: () => storeReads};
 }
 
-test('rejected deployment credential falls back to the authorized stored credential', async () => {
-  const r = await resolver({deployed:'expired-deployment-token', canonicalReads:[null,'accepted-stored-token'], statuses:[401, 200]});
+test('the selected canonical credential is checked without probing an expired duplicate', async () => {
+  const r = await resolver({deployed:'expired-deployment-token', canonical:'accepted-stored-token', statuses:[200]});
   assert.equal(await r.getGitHubToken(), 'accepted-stored-token');
-  assert.deepEqual(r.calls.map(c => c.init.headers.Authorization), ['Bearer expired-deployment-token', 'Bearer accepted-stored-token']);
+  assert.deepEqual(r.calls.map(c => c.init.headers.Authorization), ['Bearer accepted-stored-token']);
 });
 test('accepted deployment credential works when no canonical credential exists', async () => {
   const r = await resolver({deployed:'accepted-deployment-token'});
@@ -38,7 +38,7 @@ test('missing credentials do not contact GitHub', async () => {
 });
 test('duplicate rejected sources are probed once and never exposed in errors', async () => {
   const secret = 'rejected-fixture-credential';
-  const r = await resolver({deployed:secret, canonicalReads:[null,secret], statuses:[401]});
+  const r = await resolver({deployed:secret, canonical:secret, statuses:[401]});
   await assert.rejects(r.getGitHubToken(), error => /GITHUB_TOKEN_REJECTED/.test(error.message) && !error.message.includes(secret));
   assert.equal(r.calls.length, 1);
 });
@@ -62,7 +62,7 @@ test('canonical rotating credential takes precedence without pinning deployment 
   const r = await resolver({deployed:'old-deployment-token', canonical:'current-platform-token'});
   assert.equal(await r.getGitHubToken(), 'current-platform-token');
   assert.equal(r.storeReads(), 1);
-  assert.equal(r.calls.length, 0);
+  assert.equal(r.calls.length, 1);
 });
 test('verified workflow context does not read platform credentials or make a probe', async () => {
   const r = await resolver({workflow:'request-scoped-workflow-token', storeError:new Error('must not read')});
@@ -93,3 +93,5 @@ test('workflow token remains authoritative even when App configuration fails', a
   assert.equal(await r.getGitHubToken(), 'workflow-token-fixture');
   assert.deepEqual(await r.getGitHubTokenCandidates(), ['workflow-token-fixture']);
 });
+
+test('a rejected canonical credential never silently switches to a different stored identity',async()=>{const r=await resolver({canonical:'rejected-canonical-token',deployed:'other-identity-token',statuses:[401]});await assert.rejects(r.getGitHubToken(),/GITHUB_TOKEN_REJECTED/);assert.equal(r.calls.length,1);assert.equal(r.calls[0].init.headers.Authorization,'Bearer rejected-canonical-token');});

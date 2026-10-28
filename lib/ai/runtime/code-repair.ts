@@ -2,6 +2,7 @@ import 'server-only';
 import {isRepairableCourseFailure,courseRepairOutcome} from './course-repair-policy.mjs';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {getGitHubHeaders} from '@/lib/devstudio/github-token';
+import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {publishTaskToMain} from '@/lib/devstudio/main-release.mjs';
 import {readRecentRepairEvents} from './repair-events';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,validationPassed,repairDeploymentState,canRetryRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
@@ -110,6 +111,9 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // Persisted authorization is checked against the current owner role on every tick.
  const {data:owner}=await db.from('profiles').select('role').eq('id',policy.actor_id).maybeSingle();
  if(!['admin','super_admin'].includes(owner?.role??''))throw Error('PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED');
+ // Background runtime polls retain the queue; only the verified Actions request
+ // may advance repairs and dispatch deployments with its scoped job credential.
+ if(!workflowOwnedDispatch||!currentWorkflowGitHubToken())return {enabled:true,dispatched:0,awaitingWorkflow:true};
  const blocked=await db.from('paris_code_repairs').select('*').eq('status','blocked').order('updated_at',{ascending:false}).limit(10);
  if(blocked.error)throw blocked.error;
  for(const repair of blocked.data??[]){

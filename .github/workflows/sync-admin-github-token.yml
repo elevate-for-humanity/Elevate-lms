@@ -24,6 +24,7 @@ jobs:
     concurrency:
       group: google-runtime-us-central1
       cancel-in-progress: false
+      queue: max
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}

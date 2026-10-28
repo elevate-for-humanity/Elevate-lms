@@ -1,7 +1,6 @@
 name: Release approved Google web repairs
-# User authorized clearing the release hold on 2026-10-17 at 10:16 America/New_York.
-# This management workflow must be able to change that setting while it is true.
-# The actual service workflows retain their hold, CI, capacity and health gates.
+# Deploy only after exact-commit CI and an explicitly cleared release hold.
+# Service workflows independently retain their hold, capacity and health gates.
 on:
   push:
     branches: [main]
@@ -12,7 +11,6 @@ on:
 permissions:
   contents: read
   actions: write
-  id-token: write
 concurrency:
   group: google-approved-web-release-controller
   cancel-in-progress: false
@@ -57,17 +55,9 @@ jobs:
           done
           echo "::error::Required CI did not finish within the release window"
           exit 1
-      - uses: google-github-actions/auth@v3
+      - name: Dispatch existing guarded web releases using this workflow identity
         if: steps.ci.outputs.ready == 'true'
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        if: steps.ci.outputs.ready == 'true'
-        with: { skip_install: true }
-      - run: node scripts/gcp/verify-sdk.mjs
-        if: steps.ci.outputs.ready == 'true'
-      - name: Clear authorized hold and dispatch existing guarded web releases
-        if: steps.ci.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GOOGLE_RELEASE_HOLD: ${{ vars.GOOGLE_RELEASE_HOLD }}
         run: node scripts/gcp/release-approved-web.mjs

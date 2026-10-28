@@ -44,7 +44,7 @@ export async function pruneWebReleaseRequests({api, repository, execute=false}) 
       const endpoint=`repos/${repository}/actions/runs/${run.id}`;
       const current=await api(endpoint);
       if(!eligible(current)||current.id!==run.id||current.run_number!==run.run_number||!waiting.has(current.status))continue;
-      const jobs=await api(endpoint+'/jobs?per_page=100');
+      const jobs=await api(endpoint+'/jobs?filter=all&per_page=100');
       if(!Array.isArray(jobs.jobs)||jobs.total_count>100)throw Error('RELEASE_JOB_INVENTORY_UNAVAILABLE');
       // A verified, uploaded image must reach deployment and acceptance even when main advances.
       // Otherwise continuous course commits can repeatedly discard a ready LMS release.

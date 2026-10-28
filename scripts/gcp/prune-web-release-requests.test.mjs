@@ -64,3 +64,18 @@ test('an uploaded image awaiting deployment survives a newer release request',as
  const result=await pruneWebReleaseRequests({...f,repository,execute:true});
  assert.deepEqual(f.writes,[]);assert.deepEqual(result,[]);
 });
+
+
+test('deployment retries retain the verified image from an earlier attempt',async()=>{
+ const f=fixture({rows:[row(1,'in_progress'),row(2)]});let historyRead=false;
+ const api=async(path,method)=>{
+  if(path.includes('/jobs')){
+   historyRead=path.includes('filter=all');
+   const deploy={name:'deploy / deploy (lms)',status:'pending',steps:[]};
+   return {total_count:historyRead?2:1,jobs:historyRead?[{name:'build / image',status:'completed',conclusion:'success'},deploy]:[deploy]};
+  }
+  return f.api(path,method);
+ };
+ await pruneWebReleaseRequests({api,repository,execute:true});
+ assert.equal(historyRead,true);assert.deepEqual(f.writes,[]);
+});

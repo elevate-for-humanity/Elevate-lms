@@ -25,7 +25,7 @@ const PREFIX_ROUTES: Array<[RegExp, UltimateBuildStep]> = [
   [/^MEDIA_TEXT_UNREADABLE/, 'scene_construction'],
   [/^MEDIA_TEACHING_STATE_NOT_VISIBLE/, 'scene_construction'],
   [/^MEDIA_SCENE_NARRATION_MISMATCH/, 'finished_media_qa'],
-  [/^ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED/, 'natural_narration'],
+  [/^(ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED|ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED)/, 'natural_narration'],
   [/^(PACE_OUT_OF_RANGE|ROBOTIC_CADENCE|MONOTONE|CLIPPED_WORDS|UNNATURAL_PAUSES|PRONUNCIATION_FAILURE|REPEATED_AUDIO|NARRATION_MEASUREMENT_INCOMPLETE)/, 'natural_narration'],
   [/^(LOOP_DETECTED|DUPLICATE_VISUAL|EXCESSIVE_VISUAL_DUPLICATION|MEDIA_RELEVANCE_LOW|MEDIA_QUALITY_LOW|MEDIA_TOO_DARK|WATERMARK|SCENES_MISSING|INSUFFICIENT_DISTINCT_SHOTS|ULTIMATE_ENVATO_VISUALS_REQUIRED|ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|ULTIMATE_RENDER_VISUAL_ASSETS_MISSING|ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED|ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED)/, 'visual_assignment'],
   [/^(ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED|ULTIMATE_CONCISE_TEACHING_VISUAL_REQUIRED|ULTIMATE_TEACHING_SEQUENCE_ORDER_REQUIRED|ULTIMATE_SUBSTANTIVE_ASSESSMENT_REQUIRED)/, 'learning_objectives'],
@@ -51,6 +51,7 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
   const targets = new Map<UltimateBuildStep, string[]>();
   for (const f of findings) {
     if (isDurableExternalBlocker(f)) continue;
+    const renderNarrationFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED/.test(f.message);
     const renderInputFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/.test(f.message);
     // The finished-film gate can report two *independent* defects in one
     // finding. Route both; choosing visual_assignment alone for a replay masks
@@ -64,7 +65,7 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
       continue;
     }
     // Cue quotations originate in the storyboard, not the deterministic timeline.
-    const target = renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    const target = renderNarrationFailure ? 'natural_narration' : renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

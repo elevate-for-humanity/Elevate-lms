@@ -75,3 +75,9 @@ test('recovery v2 classifies VTT storage failure as delivery-only, never rerende
 test('per-scene ASR mismatch reinspects existing encoded audio without restarting a deterministic timeline',()=>{
  assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_SCENE_NARRATION_MISMATCH',message:'MEDIA_SCENE_NARRATION_MISMATCH:scene:0.734'}]),[{step:'finished_media_qa',codes:['MEDIA_SCENE_NARRATION_MISMATCH'],rebuildOnlyThisStage:true}]);
 });
+
+test('stale approved speech repairs narration before attempting another render',()=>{
+ for(const code of ['ULTIMATE_VIDEO_RENDER_FAILED','ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED']){
+  assert.deepEqual(routeSelectiveRepairs([{code,message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]),[{step:'natural_narration',codes:[code],rebuildOnlyThisStage:true}]);
+ }
+});

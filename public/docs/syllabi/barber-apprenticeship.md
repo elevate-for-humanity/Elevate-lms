@@ -7,7 +7,7 @@
 **Program Code:** BARBER-APPR  
 **Duration:** 12-18 Months (1,500 Hours)  
 **Delivery Method:** Registered Apprenticeship (Barbershop + Classroom)  
-**Funding:** Registered Apprenticeship • WIOA • WRG
+**Tuition:** Self-pay apprenticeship. Refer to the signed enrollment agreement for payment terms.
 
 ---
 
@@ -31,6 +31,10 @@ Upon successful completion, students will be able to:
 8. Pass Indiana State Board of Barber Examiners licensing exam
 
 ---
+
+## Current lesson-by-lesson outline
+
+Open Host Shop Dashboard → Training Schedule → Lesson-by-lesson syllabus for the assigned course, learning objectives, teaching order and publication status.
 
 ## Course Outline
 

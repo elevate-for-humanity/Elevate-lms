@@ -12,6 +12,10 @@ This syllabus keeps the apprentice, Host Shop supervisor, and Elevate LMS on the
 - Complete the assigned lesson and required knowledge check during each scheduled block.
 - Save work when the stop reminder arrives and continue at the next scheduled block.
 
+## Detailed lesson outline
+
+Host Shop Dashboard → Training Schedule → Lesson-by-lesson syllabus shows the assigned cosmetology course in teaching order, learning objectives, completion and publication status. Apprentices open their assigned theory course to see available lessons and objectives. Lessons awaiting publication do not earn RTI credit.
+
 ## Course sequence
 
 1. Program Orientation and Professional Standards

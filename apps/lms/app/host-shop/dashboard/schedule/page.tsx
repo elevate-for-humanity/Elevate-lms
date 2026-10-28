@@ -59,7 +59,7 @@ export default async function HostShopSchedulePage() {
     db.from('partner_users').select('user_id').eq('partner_id', board.partner.id).eq('status', 'active'),
     shopIds.length
       ? db.from('shop_staff').select('user_id').in('shop_id', shopIds).eq('active', true)
-      : Promise.resolve({ data: [] }),
+      : Promise.resolve({ data: [], error: null }),
   ]);
   const hostUserIds = Array.from(new Set([
     ...(partnerUsers || []).map((row: any) => row.user_id),
@@ -82,11 +82,12 @@ export default async function HostShopSchedulePage() {
         .eq('partner_id', board.partner.id).in('user_id', apprenticeIds).eq('active', true)
     : { data: [], error: null };
   const courseIds = Array.from(new Set((theorySchedules || []).map((item: any) => item.course_id).filter(Boolean))) as string[];
-  const [{ data: courses }, { data: courseLessons }, { data: lessonProgress }] = await Promise.all([
-    courseIds.length ? db.from('courses').select('id,title,status').in('id', courseIds) : Promise.resolve({ data: [] }),
-    courseIds.length ? db.from('course_lessons').select('id,course_id,title,order_index,is_published').in('course_id', courseIds).order('order_index') : Promise.resolve({ data: [] }),
-    courseIds.length && apprenticeIds.length ? db.from('lesson_progress').select('user_id,course_id,lesson_id,completed').in('course_id', courseIds).in('user_id', apprenticeIds).eq('completed', true) : Promise.resolve({ data: [] }),
+  const [{ data: courses, error: coursesError }, { data: courseLessons, error: lessonsError }, { data: lessonProgress, error: progressError }] = await Promise.all([
+    courseIds.length ? db.from('courses').select('id,title,status').in('id', courseIds) : Promise.resolve({ data: [], error: null }),
+    courseIds.length ? db.from('course_lessons').select('id,course_id,title,order_index,is_published,learning_objectives').in('course_id', courseIds).order('order_index') : Promise.resolve({ data: [], error: null }),
+    courseIds.length && apprenticeIds.length ? db.from('lesson_progress').select('user_id,course_id,lesson_id,completed').in('course_id', courseIds).in('user_id', apprenticeIds).eq('completed', true) : Promise.resolve({ data: [], error: null }),
   ]);
+  if (coursesError || lessonsError || progressError) throw new Error('THEORY_COURSE_OUTLINE_LOAD_FAILED');
   const apprenticeById = new Map(board.apprentices.map((apprentice) => [apprentice.student_id, apprentice]));
   const courseById = new Map((courses || []).map((course: any) => [course.id, course]));
   const completedKeys = new Set((lessonProgress || []).map((item: any) => `${item.user_id}:${item.lesson_id}`));
@@ -136,12 +137,23 @@ export default async function HostShopSchedulePage() {
           {(theorySchedules || []).map((schedule: any) => {
             const apprentice = apprenticeById.get(schedule.user_id);
             const syllabus = APPRENTICESHIP_PROGRAM_SYLLABI[schedule.program_slug as keyof typeof APPRENTICESHIP_PROGRAM_SYLLABI];
-            const lessons = (courseLessons || []).filter((lesson: any) => lesson.course_id === schedule.course_id && lesson.is_published !== false);
+            const outline = (courseLessons || []).filter((lesson: any) => lesson.course_id === schedule.course_id);
+            const lessons = outline.filter((lesson: any) => lesson.is_published === true);
             const completed = lessons.filter((lesson: any) => completedKeys.has(`${schedule.user_id}:${lesson.id}`)).length;
             const nextLesson = lessons.find((lesson: any) => !completedKeys.has(`${schedule.user_id}:${lesson.id}`));
             const course = courseById.get(schedule.course_id) as any;
             return <article key={schedule.id} className="rounded-2xl border border-fuchsia-200 bg-white p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h3 className="text-lg font-black text-slate-950">{apprentice?.name || 'Apprentice'}</h3><p className="mt-1 text-sm font-semibold text-slate-700">{course?.title || syllabus?.rtiLabel || 'Assigned theory course'} · {completed}/{lessons.length} lessons complete</p>{formatTheoryStartDate(schedule.starts_on) ? <p className="mt-1 text-sm font-black text-fuchsia-950">Theory/RTI begins {formatTheoryStartDate(schedule.starts_on)}.</p> : null}<p className="mt-1 text-sm text-slate-600">Next: {nextLesson?.title || (lessons.length ? 'Course complete' : 'Course publication pending')}</p></div>{syllabus?.syllabusPath ? <a href={syllabus.syllabusPath} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-fuchsia-300 px-4 py-2 text-sm font-black text-fuchsia-950">Open full syllabus</a> : null}</div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h3 className="text-lg font-black text-slate-950">{apprentice?.name || 'Apprentice'}</h3><p className="mt-1 text-sm font-semibold text-slate-700">{course?.title || syllabus?.rtiLabel || 'Assigned theory course'} · {completed}/{lessons.length} lessons complete</p>{formatTheoryStartDate(schedule.starts_on) ? <p className="mt-1 text-sm font-black text-fuchsia-950">Theory/RTI begins {formatTheoryStartDate(schedule.starts_on)}.</p> : null}<p className="mt-1 text-sm text-slate-600">Next: {nextLesson?.title || (lessons.length && completed === outline.length ? 'Course complete' : 'Further lessons await publication')}</p></div>{syllabus?.syllabusPath ? <a href={syllabus.syllabusPath} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-fuchsia-300 px-4 py-2 text-sm font-black text-fuchsia-950">Open full syllabus</a> : null}</div>
+              <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">Theory follows the recorded calendar start date. This schedule does not specify a minimum number of completed shop hours before theory starts. Follow any individual prerequisite in the approved training plan.</p>
+              <details className="mt-4 rounded-xl border border-slate-200 p-4">
+                <summary className="cursor-pointer text-lg font-black text-slate-950">Lesson-by-lesson syllabus — what the apprentice will learn</summary>
+                <p className="mt-2 text-sm leading-6 text-slate-600">The assigned LMS course determines teaching order. Lessons awaiting publication are planning information and cannot be counted as completed instruction.</p>
+                {!schedule.course_id ? <p className="mt-3 font-bold text-amber-900">A theory course must be linked before its outline can be displayed.</p> : !outline.length ? <p className="mt-3 font-bold text-amber-900">No lesson outline is recorded for the assigned course.</p> : <ol className="mt-4 space-y-4">{outline.map((lesson: { id: string; title: string; is_published: boolean | null; learning_objectives: unknown }, index: number) => {
+                  const objectives = Array.isArray(lesson.learning_objectives) ? lesson.learning_objectives.filter((item): item is string => typeof item === 'string' && item.trim().length > 0) : [];
+                  const done = completedKeys.has(`${schedule.user_id}:${lesson.id}`);
+                  return <li key={lesson.id} className="rounded-xl bg-slate-50 p-4"><h4 className="font-black text-slate-950">{index + 1}. {lesson.title}</h4><p className="mt-1 text-sm font-bold text-fuchsia-900">{lesson.is_published !== true ? 'Awaiting publication' : done ? 'Completed' : 'Assigned course lesson'}</p>{objectives.length ? <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">{objectives.map((objective, objectiveIndex) => <li key={objectiveIndex}>{objective}</li>)}</ul> : null}</li>;
+                })}</ol>}
+              </details>
               <form action={updateTheorySchedule} className="mt-5 grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr_auto] lg:items-end"><input type="hidden" name="scheduleId" value={schedule.id}/><fieldset><legend className="text-xs font-black uppercase tracking-wide text-slate-600">Theory days</legend><div className="mt-2 flex flex-wrap gap-2">{Object.entries(DAY_LABELS).map(([value,label]) => <label key={value} className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-bold"><input type="checkbox" name="days" value={value} defaultChecked={schedule.days_of_week.includes(Number(value))}/>{label}</label>)}</div></fieldset><label className="text-xs font-black uppercase tracking-wide text-slate-600">Start<input name="startTime" type="time" required defaultValue={String(schedule.start_time).slice(0,5)} className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base font-semibold text-slate-950"/></label><label className="text-xs font-black uppercase tracking-wide text-slate-600">Stop<input name="endTime" type="time" required defaultValue={String(schedule.end_time).slice(0,5)} className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base font-semibold text-slate-950"/></label><button className="min-h-11 rounded-xl bg-fuchsia-800 px-4 py-2 font-black text-white">Save schedule</button><label className="text-xs font-black uppercase tracking-wide text-slate-600">Weekly target hours<input name="weeklyTargetHours" type="number" min="0.5" max="40" step="0.25" required defaultValue={schedule.weekly_target_minutes / 60} className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base font-semibold text-slate-950"/></label><label className="text-xs font-black uppercase tracking-wide text-slate-600">Weekly maximum hours<input name="weeklyMaxHours" type="number" min="0.5" max="40" step="0.25" required defaultValue={schedule.weekly_max_minutes / 60} className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base font-semibold text-slate-950"/></label><p className="self-center text-sm font-semibold text-slate-600 lg:col-span-2"><BellRing className="mr-1 inline h-4 w-4"/>Automatic start and stop alerts use {schedule.timezone}. Current block: {formatTime(schedule.start_time)}–{formatTime(schedule.end_time)}.</p></form>
             </article>;
           })}

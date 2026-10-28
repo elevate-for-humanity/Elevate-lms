@@ -29,7 +29,7 @@ export const APPRENTICESHIP_PROGRAM_SYLLABI: Record<ApprenticeshipProgramSlug, P
   'nail-technician-apprenticeship': {
     slug: 'nail-technician-apprenticeship',
     title: 'Nail Technician Apprenticeship',
-    syllabusPath: '/docs/syllabi/professional-esthetician.md',
+    syllabusPath: '/docs/syllabi/nail-technician-apprenticeship.md',
     rtiLabel: 'Elevate LMS Nail Theory',
     hostRequirement:
       'Host nail salons must use the program syllabus so practical coaching matches the apprentice’s current theory module on Elevate LMS.',

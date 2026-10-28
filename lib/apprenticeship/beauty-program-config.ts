@@ -21,7 +21,7 @@ export const BEAUTY_APPRENTICESHIP_CONFIG = {
     label: 'Nail Technician',
     portalLabel: 'Nail Technician Apprentice Portal',
     hostLabel: 'Host Nail Salon',
-    syllabusHref: '/apprentice/rti',
+    syllabusHref: '/docs/syllabi/nail-technician-apprenticeship.md',
   },
 } as const;
 

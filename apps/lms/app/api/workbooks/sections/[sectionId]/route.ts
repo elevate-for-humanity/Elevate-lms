@@ -72,7 +72,7 @@ export async function POST(
     if (error?.code === '42501')
       return reply({ error: 'This workbook section is not available for your account.' }, 403);
     if (error) {
-      logger.error('Workbook save failed', { code: error.code });
+      logger.error('Workbook save failed', error, { code: error.code });
       return reply({ error: 'Answers could not be saved. Please retry.' }, 503);
     }
     const saved = Array.isArray(data) ? data[0] : null;

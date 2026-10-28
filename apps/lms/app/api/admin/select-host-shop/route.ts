@@ -14,6 +14,8 @@ import {
   PORTAL_PREVIEW_SESSION_COOKIE,
 } from '@/lib/admin/portal-preview';
 
+import { clearUserPreviewCookies } from '@/lib/admin/preview-cookie-cleanup';
+
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -118,7 +120,7 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
 
   const destination =
     partner?.approval_status === 'approved' ? '/host-shop/dashboard' : '/host-shop/onboarding';
-  const response = NextResponse.redirect(new URL(destination, APP_ORIGIN));
+  const response = NextResponse.redirect(new URL(destination, APP_ORIGIN), 303);
   response.cookies.set(HOST_SHOP_ADMIN_COOKIE, partnerId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -126,15 +128,20 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
     path: '/',
     maxAge: 60 * 60,
   });
-  if (handoff) {
-    response.cookies.set(HOST_SHOP_PREVIEW_SESSION_COOKIE, handoffToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60,
-    });
+  if (previewActorId) {
+    response.cookies.set(
+      HOST_SHOP_PREVIEW_SESSION_COOKIE,
+      createPortalPreviewHandoff(previewActorId, partnerId, 60 * 60 * 1000),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60,
+      },
+    );
   }
+  clearUserPreviewCookies(response);
   if (previewActorId && previewUserId) {
     response.cookies.set(PORTAL_PREVIEW_COOKIE, previewUserId, {
       httpOnly: true,

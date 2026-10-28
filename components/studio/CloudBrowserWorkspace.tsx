@@ -234,7 +234,7 @@ export default function CloudBrowserWorkspace({
         const ready = response.ok && payload.configured === true && payload.ready === true;
         setRuntimeReady(ready);
         setStatus((current) =>
-          current === 'Studio sign-in required'
+          current === 'Admin session expired'
             ? current
             : ready
               ? 'Ready to start'
@@ -437,7 +437,7 @@ export default function CloudBrowserWorkspace({
         setCdpConnected(false);
         setStatus(
           response.status === 401 || response.status === 403
-            ? 'Studio sign-in required'
+            ? 'Admin session expired'
             : 'Browser controls interrupted',
         );
         setError(body.error || 'Browser action failed');
@@ -780,8 +780,8 @@ export default function CloudBrowserWorkspace({
           if (response?.status === 401 || response?.status === 403) {
             blocked = true;
             setCdpConnected(false);
-            setStatus('Studio sign-in required');
-            setError('Studio could not authorize browser controls. Sign in again to reconnect.');
+            setStatus('Admin session expired');
+            setError('Your Admin session could not authorize browser controls. Reopen Studio from the Admin dashboard.');
             return;
           }
           if (!response?.ok && response?.status !== 410) {
@@ -840,8 +840,8 @@ export default function CloudBrowserWorkspace({
           if (downloadsResponse?.status === 401 || downloadsResponse?.status === 403) {
             blocked = true;
             setCdpConnected(false);
-            setStatus('Studio sign-in required');
-            setError('Studio could not authorize browser controls. Sign in again to reconnect.');
+            setStatus('Admin session expired');
+            setError('Your Admin session could not authorize browser controls. Reopen Studio from the Admin dashboard.');
             return;
           }
           if (downloadsResponse?.ok) {
@@ -1182,9 +1182,9 @@ export default function CloudBrowserWorkspace({
         <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 max-h-[15dvh] shrink-0 overflow-auto px-3 py-2 text-base text-rose-800">
           <AlertTriangle className="h-4 w-4" />
           <span>{error}</span>
-          {status === 'Studio sign-in required' ? (
-            <a href="/login?redirect=%2Fstudio" className="shrink-0 font-bold underline">
-              Sign in to Studio
+          {status === 'Admin session expired' ? (
+            <a href="/login?redirect=%2Fadmin" className="shrink-0 font-bold underline">
+              Return to Admin sign-in
             </a>
           ) : null}
         </div>

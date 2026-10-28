@@ -47,5 +47,5 @@ jobs:
             msg=re.sub(r"https?://\S+","[url]",msg)
             msg=re.sub(r"[\w.+-]+@[\w.-]+","[email]",msg)
             msg=re.sub(r"eyJ[A-Za-z0-9_.-]+","[token]",msg)
-            print(json.dumps({"timestamp":row.get("timestamp"),"service":row.get("resource",{}).get("labels",{}).get("service_name"),"message":str(data.get("message",""))[:160],"errorType":err.get("name"),"error":msg[:600],"reference":data.get("context",{}).get("reference")}))
+            print(json.dumps({"timestamp":row.get("timestamp"),"service":row.get("resource",{}).get("labels",{}).get("service_name"),"message":str(data.get("message",""))[:160],"errorType":err.get("name"),"error":msg[:600],"stackFrames":str(err.get("stack","")).splitlines()[1:5],"reference":data.get("context",{}).get("reference")}))
           '

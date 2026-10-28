@@ -141,6 +141,11 @@ export default function DigitalWorkbook({
           ELEVATE FOR HUMANITY · APPRENTICESHIP PROGRAM
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
+        <aside aria-label="Workbook copyright and licensed access" className="my-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-slate-900">
+          <strong>© 2026 Elevate for Humanity. All rights reserved.</strong>
+          <p>This workbook is licensed only to the authorized learner. Unauthorized copying, recording, resale, scraping, and redistribution are prohibited.</p>
+          <p className="mt-2 break-all text-xs">Licensed account: {accountId}</p>
+        </aside>
         <a className="my-4 inline-flex min-h-12 items-center rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white" href={`/api/workbooks/${workbook.slug}/download`}>Download full illustrated workbook (PDF)</a>
         <p className="my-4 text-lg leading-relaxed">
           Write directly in the boxes below. Your answers save to your LMS account and reopen when

@@ -136,6 +136,7 @@ test('finished course cursor without a checkpoint repair reaches final release',
   let plan;
   const s = scenario({nextCompetencyIndex:40}, true, {
     attach: attachCompletedLessonMedia,
+    nextWork: () => { throw Error('Final release must not plan a missing lesson retry'); },
     runCourse: async value => { plan=value; return {completed:true,findings:[],lessons:[]}; },
   });
   const result=await s.run();

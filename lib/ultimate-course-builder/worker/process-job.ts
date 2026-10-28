@@ -228,7 +228,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       await lessonReleases.publishReadyLessons(build.id, lessonReleaseActor, {jobId: job.id, workerId, generation});
       assertActive();
     }
-    if (!targeted) {
+    if (!targeted && !finalCoursePass) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
         if (result.completed) delete continuation.payload.checkpointRepair;

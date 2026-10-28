@@ -12,6 +12,7 @@ import { courseOverviewPath } from '@/lib/lms/routes';
 export const metadata: Metadata = {
   title: 'Workbook | Apprentice Portal',
   description: 'Complete your apprenticeship training modules and coursework.',
+  robots: { index: false, follow: false, noarchive: true },
 };
 
 export const dynamic = 'force-dynamic';
@@ -53,6 +54,10 @@ export default async function WorkbookPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <p className="border-b border-slate-300 bg-slate-100 px-4 py-2 text-center text-xs text-slate-800">
+        © 2026 Elevate for Humanity. All rights reserved. Licensed learning materials may not be copied, recorded, scraped, resold or redistributed.
+        <span className="ml-2">Authorized learner: {subject.userId}</span>
+      </p>
       {/* Hero Banner */}
       <div className="bg-gradient-to-br from-violet-600 to-violet-800 text-white">
         <div className="max-w-4xl mx-auto px-4 py-12">

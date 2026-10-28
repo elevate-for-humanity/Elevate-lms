@@ -1,3 +1,5 @@
+import { curriculumProgress } from './curriculum-progress';
+import { hasRecruitingAssignment } from './recruiting-access';
 import { loadApprovedSchoolApplicants } from './school-applicants';
 import { after } from 'next/server';
 import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
@@ -156,6 +158,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const applicantContactColumns = contactProjection.applicant;
   const applicantNotesColumns = contactProjection.notes;
   const programWideStudentAccess = holderRes.data?.features?.program_wide_student_access === true;
+  const recruitingEnabled = hasRecruitingAssignment(holderRes.data?.features);
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -276,7 +279,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         'id,program_id,course_id,status,term_name,start_date,end_date,credential_alignment_status,custom_syllabus_path,custom_syllabus_filename,custom_syllabus_uploaded_at',
       )
       .eq('program_holder_id', holderId),
-    programIds.length ? db.from('program_courses').select('id,program_id,course_id').in('program_id', programIds) : Promise.resolve({ data: [] }),
+    programIds.length
+      ? db.from('program_courses').select('id,program_id,course_id').in('program_id', programIds)
+      : Promise.resolve({ data: [] }),
     db
       .from('program_holder_payouts')
       .select(
@@ -337,17 +342,60 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   }
 
   // Holder-specific course rows override the canonical program/course catalog.
-  const canonicalCourseIds = [...new Set((canonicalCourseLinksRes.data ?? []).map((row: any) => row.course_id))];
+  const canonicalCourseIds = [
+    ...new Set(
+      [...(canonicalCourseLinksRes.data ?? []), ...(coursesRes.data ?? [])]
+        .map((row: any) => row.course_id)
+        .filter(Boolean),
+    ),
+  ];
   const [trainingCoursesRes, authoredCoursesRes] = canonicalCourseIds.length
-    ? await Promise.all([db.from('training_courses').select('id,title,status,is_published').in('id', canonicalCourseIds), db.from('courses').select('id,title,status,is_active').in('id', canonicalCourseIds)])
-    : [{ data: [], error: null }, { data: [], error: null }];
-  if (trainingCoursesRes.error || authoredCoursesRes.error) throw new Error('Program Holder course catalog could not load.');
-  const courseMetadata = new Map([...(trainingCoursesRes.data ?? []), ...(authoredCoursesRes.data ?? [])].map((row: any) => [row.id, row]));
-  const deliveryAssignments = [...(coursesRes.data ?? [])];
+    ? await Promise.all([
+        db
+          .from('training_courses')
+          .select('id,title,status,is_published')
+          .in('id', canonicalCourseIds),
+        db
+          .from('courses')
+          .select(
+            'id,title,status,is_active,generation_status,generation_progress,generation_paused,review_status,updated_at',
+          )
+          .in('id', canonicalCourseIds),
+      ])
+    : [
+        { data: [], error: null },
+        { data: [], error: null },
+      ];
+  if (trainingCoursesRes.error || authoredCoursesRes.error)
+    throw new Error('Program Holder course catalog could not load.');
+  const courseMetadata = new Map(
+    [...(trainingCoursesRes.data ?? []), ...(authoredCoursesRes.data ?? [])].map((row: any) => [
+      row.id,
+      row,
+    ]),
+  );
+  const buildMetadata = new Map((authoredCoursesRes.data ?? []).map((row: any) => [row.id, row]));
+  const deliveryAssignments = (coursesRes.data ?? []).map((row: any) => ({
+    ...row,
+    build: curriculumProgress(buildMetadata.get(row.course_id)),
+  }));
   for (const link of canonicalCourseLinksRes.data ?? []) {
     const course: any = courseMetadata.get(link.course_id);
-    if (!course || deliveryAssignments.some(row => row.program_id === link.program_id && row.course_id === link.course_id)) continue;
-    deliveryAssignments.push({ ...link, title: course.title, status: course.status, source: 'canonical_program', published: course.is_published === true || course.status === 'published' });
+    if (
+      !course ||
+      deliveryAssignments.some(
+        (row) => row.program_id === link.program_id && row.course_id === link.course_id,
+      )
+    )
+      continue;
+    deliveryAssignments.push({
+      ...link,
+      title: course.title,
+      status: course.status,
+      source: 'canonical_program',
+      published: course.is_published === true || course.status === 'published',
+      build: curriculumProgress(buildMetadata.get(link.course_id)),
+    });
   }
   const rosterUserIds: string[] = Array.from(
     new Set(
@@ -360,11 +408,21 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
     ),
   );
-  const progressEntriesRes = rosterUserIds.length && programIds.length
-    ? await db.from('progress_entries').select('id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status')
-        .in('apprentice_id', rosterUserIds).in('program_id', programIds).eq('status', 'verified').order('work_date', { ascending: false }).limit(5000)
-    : { data: [], error: null };
-  if (progressEntriesRes.error) throw new Error('Program Holder verified training hours could not load.');
+  const progressEntriesRes =
+    rosterUserIds.length && programIds.length
+      ? await db
+          .from('progress_entries')
+          .select(
+            'id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status',
+          )
+          .in('apprentice_id', rosterUserIds)
+          .in('program_id', programIds)
+          .eq('status', 'verified')
+          .order('work_date', { ascending: false })
+          .limit(5000)
+      : { data: [], error: null };
+  if (progressEntriesRes.error)
+    throw new Error('Program Holder verified training hours could not load.');
   const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
     ? await db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
     : { data: [], error: null };
@@ -372,25 +430,38 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     throw new Error(
       `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
     );
-  const { data: credentialUploads, error: credentialError } = rosterUserIds.length && programIds.length
-    ? await db.from('student_credential_uploads')
-        .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
-        .in('user_id', rosterUserIds).in('program_id', programIds)
-    : { data: [], error: null };
+  const { data: credentialUploads, error: credentialError } =
+    rosterUserIds.length && programIds.length
+      ? await db
+          .from('student_credential_uploads')
+          .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
+          .in('user_id', rosterUserIds)
+          .in('program_id', programIds)
+      : { data: [], error: null };
   if (credentialError) throw new Error('Program Holder certification status could not load.');
-  const emailByUserId = new Map<string, string>((rosterProfiles ?? [])
-    .filter(row => typeof row.email === 'string' && row.email.trim())
-    .map(row => [row.id, String(row.email).trim()]));
-  const phoneByUserId = new Map<string, string>((rosterProfiles ?? [])
-    .filter(row => typeof row.phone === 'string' && row.phone.trim())
-    .map(row => [row.id, String(row.phone).trim()]));
-  const trainingRecord = (row: any) => holderTrainingRecord({
-    ...row, ...(contactAccessGranted ? { email: row.email || emailByUserId.get(row.user_id || row.student_id), phone: row.phone || phoneByUserId.get(row.user_id || row.student_id) } : {}), ...holderCredentialStatus(row, credentialUploads ?? []),
-  });
-  const eligibleRosterUserIds = new Set(
+  const emailByUserId = new Map<string, string>(
     (rosterProfiles ?? [])
-      .filter(isLearnerRosterProfile)
-      .map((row: any) => row.id),
+      .filter((row) => typeof row.email === 'string' && row.email.trim())
+      .map((row) => [row.id, String(row.email).trim()]),
+  );
+  const phoneByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row) => typeof row.phone === 'string' && row.phone.trim())
+      .map((row) => [row.id, String(row.phone).trim()]),
+  );
+  const trainingRecord = (row: any) =>
+    holderTrainingRecord({
+      ...row,
+      ...(contactAccessGranted
+        ? {
+            email: row.email || emailByUserId.get(row.user_id || row.student_id),
+            phone: row.phone || phoneByUserId.get(row.user_id || row.student_id),
+          }
+        : {}),
+      ...holderCredentialStatus(row, credentialUploads ?? []),
+    });
+  const eligibleRosterUserIds = new Set(
+    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
   );
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])
@@ -400,22 +471,23 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const enrolledRoster = (enrollmentsRes.data ?? [])
     .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
     .map((row: any) => {
-      const verified = verifiedTrainingForEnrollment(row, hoursRes.data ?? [], progressEntriesRes.data ?? []);
+      const verified = verifiedTrainingForEnrollment(
+        row,
+        hoursRes.data ?? [],
+        progressEntriesRes.data ?? [],
+      );
       return {
-      ...row,
-      full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
-      total_hours_completed: Math.max(
-        Number(row.total_hours_completed || 0),
-        verified.total,
-      ),
-      training_start_date: row.training_start_date || verified.firstDate || null,
-    };
+        ...row,
+        full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
+        total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verified.total),
+        training_start_date: row.training_start_date || verified.firstDate || null,
+      };
     });
-  const upcomingRoster = (upcomingRes.data ?? []).filter((row: any) =>
-    !row.user_id || eligibleRosterUserIds.has(row.user_id),
+  const upcomingRoster = (upcomingRes.data ?? []).filter(
+    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );
-  const convertedRoster = (convertedStudentsRes.data ?? []).filter((row: any) =>
-    !row.user_id || eligibleRosterUserIds.has(row.user_id),
+  const convertedRoster = (convertedStudentsRes.data ?? []).filter(
+    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );
 
   let phoneLine = phoneLineRes.data ?? null;
@@ -441,7 +513,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     phoneLine = { ...phoneLine, extension };
   }
 
-  const holderApplicantRows = (applicantsRes.data ?? []).filter((row: any) => !hasActiveProgramEnrollment(row, enrolledRoster));
+  const holderApplicantRows = (applicantsRes.data ?? []).filter(
+    (row: any) => !hasActiveProgramEnrollment(row, enrolledRoster),
+  );
   const distanceCheckedRegionalApplicants = isGaryRegionalCoordinator
     ? (
         await Promise.all(
@@ -467,41 +541,82 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ).filter(Boolean)
     : [];
   const regionalOwnership = distanceCheckedRegionalApplicants.length
-    ? await db.from('program_holder_students').select('application_id,program_holder_id,program_holders(status,features)').in('application_id', distanceCheckedRegionalApplicants.map((row: any) => row.id))
+    ? await db
+        .from('program_holder_students')
+        .select('application_id,program_holder_id,program_holders(status,features)')
+        .in(
+          'application_id',
+          distanceCheckedRegionalApplicants.map((row: any) => row.id),
+        )
     : { data: [], error: null };
-  if (regionalOwnership.error) throw new Error('Regional applicant ownership could not be verified.');
-  const locallyControlledApplicationIds = new Set((regionalOwnership.data ?? []).filter((row: any) => {
-    const holder = Array.isArray(row.program_holders) ? row.program_holders[0] : row.program_holders;
-    return row.program_holder_id !== holderId && ['active','approved','approved_pending_mou'].includes(holder?.status) && holder?.features?.regional_assignment?.shared_team_key !== regionalAssignment?.shared_team_key;
-  }).map((row: any) => row.application_id));
+  if (regionalOwnership.error)
+    throw new Error('Regional applicant ownership could not be verified.');
+  const locallyControlledApplicationIds = new Set(
+    (regionalOwnership.data ?? [])
+      .filter((row: any) => {
+        const holder = Array.isArray(row.program_holders)
+          ? row.program_holders[0]
+          : row.program_holders;
+        return (
+          row.program_holder_id !== holderId &&
+          ['active', 'approved', 'approved_pending_mou'].includes(holder?.status) &&
+          holder?.features?.regional_assignment?.shared_team_key !==
+            regionalAssignment?.shared_team_key
+        );
+      })
+      .map((row: any) => row.application_id),
+  );
   const regionalApplicantRows = isGaryRegionalCoordinator
-    ? distanceCheckedRegionalApplicants.filter((row: any) => !locallyControlledApplicationIds.has(row.id)).map((row: any) => ({
-        ...holderApplicantRows.find((assigned: any) => assigned.application_id === row.id),
-        id: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.id || row.id,
-        regional_application_id: row.id,
-        application_id: row.id,
-        user_id: row.user_id,
-        enrollment_id: null,
-        applicant_name:
-          row.full_name || [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Applicant',
-        applicant_email: contactAccessGranted ? row.email : undefined,
-        applicant_phone: contactAccessGranted ? row.phone : undefined,
-        status: 'applied',
-        application_status: row.status,
-        program_id: row.program_id,
-        program_slug: row.program_slug || row.program_interest,
-        created_at: row.created_at,
-        label: `Gary regional applicant · ${row.distanceMiles.toFixed(1)} mi`,
-        call_notes: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.call_notes || null,
-        call_date: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.call_date || null,
-        call_outcome: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.call_outcome || null,
-        next_follow_up: holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.next_follow_up || null,
-        work_start_date: null,
-        work_site: row.city,
-      }))
+    ? distanceCheckedRegionalApplicants
+        .filter((row: any) => !locallyControlledApplicationIds.has(row.id))
+        .map((row: any) => ({
+          ...holderApplicantRows.find((assigned: any) => assigned.application_id === row.id),
+          id:
+            holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)?.id ||
+            row.id,
+          regional_application_id: row.id,
+          application_id: row.id,
+          user_id: row.user_id,
+          enrollment_id: null,
+          applicant_name:
+            row.full_name ||
+            [row.first_name, row.last_name].filter(Boolean).join(' ') ||
+            'Applicant',
+          applicant_email: contactAccessGranted ? row.email : undefined,
+          applicant_phone: contactAccessGranted ? row.phone : undefined,
+          status: 'applied',
+          application_status: row.status,
+          program_id: row.program_id,
+          program_slug: row.program_slug || row.program_interest,
+          created_at: row.created_at,
+          label: `Gary regional applicant · ${row.distanceMiles.toFixed(1)} mi`,
+          call_notes:
+            holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)
+              ?.call_notes || null,
+          call_date:
+            holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)
+              ?.call_date || null,
+          call_outcome:
+            holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)
+              ?.call_outcome || null,
+          next_follow_up:
+            holderApplicantRows.find((assigned: any) => assigned.application_id === row.id)
+              ?.next_follow_up || null,
+          work_start_date: null,
+          work_site: row.city,
+        }))
     : [];
   const applicantRows = isGaryRegionalCoordinator
-    ? [...regionalApplicantRows, ...holderApplicantRows.filter((assigned: any) => !regionalApplicantRows.some((row: any) => row.id === assigned.id || row.application_id === assigned.application_id))]
+    ? [
+        ...regionalApplicantRows,
+        ...holderApplicantRows.filter(
+          (assigned: any) =>
+            !regionalApplicantRows.some(
+              (row: any) =>
+                row.id === assigned.id || row.application_id === assigned.application_id,
+            ),
+        ),
+      ]
     : holderApplicantRows;
   const deduplicatedApplicants =
     allApplicantAccess || isGaryRegionalCoordinator
@@ -532,12 +647,18 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const canonicalEnrollmentKeys = new Set(enrolledRoster.map(learnerProgramKey).filter(Boolean));
   const deduplicatedConvertedStudents = convertedRoster.filter((row: any) => {
     const key = learnerProgramKey(row);
-    return !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
-      !(key && canonicalEnrollmentKeys.has(key));
+    return (
+      !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
+      !(key && canonicalEnrollmentKeys.has(key))
+    );
   });
 
   const schoolApplicants = await loadApprovedSchoolApplicants(
-    db, holderRes.data?.features, programsRes.data || [], contactAccessGranted, true,
+    db,
+    holderRes.data?.features,
+    programsRes.data || [],
+    contactAccessGranted,
+    true,
   );
 
   return {
@@ -548,28 +669,30 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programs: programsRes.data ?? [],
     enrollments: enrolledRoster.map(trainingRecord),
     upcomingEnrollments: upcomingRoster.map(trainingRecord),
-    applicants: deduplicatedApplicants,
-    convertedStudents: deduplicatedConvertedStudents.map((row: any) => trainingRecord({
-      ...row,
-      roster_source: 'holder_student',
-      full_name: row.applicant_name || 'Student',
-      enrollment_state: row.status,
-      program_slug: null,
-      training_start_date: row.work_start_date,
-      training_end_date: null,
-      total_hours_completed: Number(row.hours_taught || 0),
-      progress_percent:
-        Number(row.hours_required || 0) > 0
-          ? Math.min(
-              100,
-              Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100),
-            )
-          : 0,
-      next_required_action:
-        row.work_progress && row.work_progress !== 'Not started'
-          ? row.work_progress
-          : 'Record training progress',
-    })),
+    applicants: recruitingEnabled ? deduplicatedApplicants : [],
+    convertedStudents: deduplicatedConvertedStudents.map((row: any) =>
+      trainingRecord({
+        ...row,
+        roster_source: 'holder_student',
+        full_name: row.applicant_name || 'Student',
+        enrollment_state: row.status,
+        program_slug: null,
+        training_start_date: row.work_start_date,
+        training_end_date: null,
+        total_hours_completed: Number(row.hours_taught || 0),
+        progress_percent:
+          Number(row.hours_required || 0) > 0
+            ? Math.min(
+                100,
+                Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100),
+              )
+            : 0,
+        next_required_action:
+          row.work_progress && row.work_progress !== 'Not started'
+            ? row.work_progress
+            : 'Record training progress',
+      }),
+    ),
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],

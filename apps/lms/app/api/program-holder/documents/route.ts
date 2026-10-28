@@ -56,11 +56,38 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
   }
+  const enrollmentId = String(form.get('enrollmentId') || '');
+  if (documentType === 'testing_evidence' && !enrollmentId)
+    return NextResponse.json(
+      { error: 'Select the student whose evidence you are uploading.' },
+      { status: 400 },
+    );
+  if (enrollmentId) {
+    const { data: student, error } = await ctx.db
+      .from('program_enrollments')
+      .select('id,program_id')
+      .eq('id', enrollmentId)
+      .eq('program_holder_id', ctx.holderId)
+      .is('revoked_at', null)
+      .maybeSingle();
+    if (error)
+      return NextResponse.json({ error: 'Student verification unavailable.' }, { status: 503 });
+    if (!student || !ctx.programIds.includes(student.program_id))
+      return NextResponse.json({ error: 'Student is not assigned to you.' }, { status: 403 });
+  }
   const material = materialUploadPolicy(documentType, file);
   const maxBytes = file.type === 'video/mp4' ? MAX_VIDEO_BYTES : MAX_BYTES;
-  if (material ? !material.allowed : (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes))
+  if (
+    material
+      ? !material.allowed
+      : !MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes
+  )
     return NextResponse.json(
-      { error: material ? 'Upload an XLSX, XLS, or CSV lab tracker up to 10 MB, or a PDF or DOCX textbook up to 50 MB.' : 'Upload a PDF, JPG, or PNG up to 10 MB, or an MP4 video up to 50 MB.' },
+      {
+        error: material
+          ? 'Upload an XLSX, XLS, or CSV lab tracker up to 10 MB, or a PDF or DOCX textbook up to 50 MB.'
+          : 'Upload a PDF, JPG, or PNG up to 10 MB, or an MP4 video up to 50 MB.',
+      },
       { status: 400 },
     );
 
@@ -73,7 +100,10 @@ export async function POST(request: NextRequest) {
   const path = `program-holders/${ctx.holderId}/${documentType}/${randomUUID()}.${extension}`;
   const { error: storageError } = await ctx.db.storage
     .from('documents')
-    .upload(path, await file.arrayBuffer(), { contentType: material?.contentType || file.type, upsert: false });
+    .upload(path, await file.arrayBuffer(), {
+      contentType: material?.contentType || file.type,
+      upsert: false,
+    });
   if (storageError)
     return NextResponse.json(
       { error: 'The protected file could not be uploaded.' },
@@ -91,8 +121,9 @@ export async function POST(request: NextRequest) {
       storage_bucket: 'documents',
       file_size: file.size,
       mime_type: material?.contentType || file.type,
-      description:
-        documentType === 'provider_invoice'
+      description: enrollmentId
+        ? JSON.stringify({ enrollment_id: enrollmentId, kind: 'student_evidence' })
+        : documentType === 'provider_invoice'
           ? 'CDL training invoice submitted to Elevate for payment review'
           : 'Submitted through protected Program Holder onboarding',
       uploaded_by: ctx.user.id,

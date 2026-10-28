@@ -86,3 +86,23 @@ it('keeps the reporting summary and report submission tools in the Reports tab',
   expect(screen.getByRole('heading', { name: 'Submitted reports' })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'To-dos' })).not.toBeInTheDocument();
 });
+it('shows exact submitted exit reports and a review-only second installment', async () => {
+  const workspace = { ...fixture, reports:[{ id:'report',title:'Student exit',status:'submitted',content:'Assessment A: 90 percent\nPractical work verified by instructor', metadata:{report_kind:'testing_readiness',completion_invoice:{status:'draft_pending_completion_review',amount_cents:60000,reason:'Verify individual terms before approval.'}} }] };
+  render(await ProgramHolderWorkspaceView({ section:'ready-to-test',workspace: workspace as any }));
+  expect(screen.getByRole('heading',{name:'Ready to Test'})).toBeInTheDocument();
+  expect(screen.getByText(/Second-payment invoice: draft_pending_completion_review/)).toHaveTextContent('$600.00');
+  expect(screen.getByText(/Assessment A: 90 percent/)).toHaveTextContent('Practical work verified by instructor');
+  expect(screen.queryByRole('button',{name:/transfer|pay now/i})).not.toBeInTheDocument();
+});
+it('shows persisted build progress beside the exact uploaded syllabus and protected download link', async () => {
+  const workspace={...fixture,documents:[{id:'syllabus',document_type:'training_plan',file_name:'Approved syllabus.pdf',file_url:'protected/syllabus.pdf',status:'approved'}],courseAssignments:[{id:'link',course_id:'course',custom_syllabus_path:'protected/syllabus.pdf',title:'Assigned curriculum',build:{status:'generating',percent:45,review:'draft',published:false}}]};
+  render(await ProgramHolderWorkspaceView({section:'documents',workspace:workspace as any}));
+  expect(screen.getByRole('progressbar',{name:'Curriculum build progress'})).toHaveAttribute('value','45');
+  expect(screen.getByRole('link',{name:'View your syllabus'})).toHaveAttribute('href','/api/program-holder/documents/syllabus/download');
+  expect(screen.getByText(/Publication: Not published/)).toBeInTheDocument();
+});
+it('keeps recruiting tools out of the ordinary holder workspace', async () => {
+  render(await ProgramHolderWorkspaceView({section:'recruiting',workspace:fixture as any}));
+  expect(screen.getByText('Recruiting assignment required.')).toBeInTheDocument();
+  expect(screen.queryByText('Call Notes')).not.toBeInTheDocument();
+});

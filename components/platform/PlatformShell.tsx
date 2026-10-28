@@ -38,6 +38,7 @@ interface PlatformShellProps {
   role: UserRole;
   breadcrumbs?: BreadcrumbItem[];
   actions?: ActionItem[];
+  recruitingEnabled?: boolean;
   notifications?: number;
   children: React.ReactNode;
   paris?: Partial<ParisLearnerContext> | false;
@@ -53,24 +54,45 @@ function isActiveHref(href: string, pathname: string): boolean {
   }
 }
 
-export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = true }: PlatformShellProps) {
+export function PlatformShell({
+  user,
+  role,
+  actions = [],
+  children,
+  paris,
+  showLanguageSwitcher = true,
+  recruitingEnabled = false,
+}: PlatformShellProps) {
   const pathname = usePathname();
-  const dashboardHref = role === 'host_shop' ? '/host-shop/dashboard' : role === 'program_holder' || role === 'site_coordinator' ? '/program-holder/dashboard' : role === 'apprentice' ? '/apprentice' : role === 'student' ? '/learner/dashboard' : '/';
-  const installHref = role === 'host_shop'
-    ? '/install/host-shop'
-    : role === 'program_holder' || role === 'site_coordinator'
-      ? '/install/program-holder'
-      : role === 'apprentice'
-        ? '/install/apprentice'
-        : role === 'student'
-          ? '/install/learner'
-          : '/mobile-app';
+  const dashboardHref =
+    role === 'host_shop'
+      ? '/host-shop/dashboard'
+      : role === 'program_holder' || role === 'site_coordinator'
+        ? '/program-holder/dashboard'
+        : role === 'apprentice'
+          ? '/apprentice'
+          : role === 'student'
+            ? '/learner/dashboard'
+            : '/';
+  const installHref =
+    role === 'host_shop'
+      ? '/install/host-shop'
+      : role === 'program_holder' || role === 'site_coordinator'
+        ? '/install/program-holder'
+        : role === 'apprentice'
+          ? '/install/apprentice'
+          : role === 'student'
+            ? '/install/learner'
+            : '/mobile-app';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
 
-  const baseSections = getNavigationForRole(role);
+  const baseSections = getNavigationForRole(role).map((section) => ({
+    ...section,
+    items: section.items.filter((item) => item.id !== 'recruiting' || recruitingEnabled),
+  }));
   // Role navigation owns every tool exactly once. Add install only to the setup group.
   const sections = ['program_holder', 'site_coordinator'].includes(role)
     ? baseSections.map((section, index) =>
@@ -190,8 +212,22 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
           </div>
 
           <div className="hidden items-center gap-1 sm:flex">
-            {pathname !== dashboardHref ? <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100" aria-label="Go back"><ArrowLeft className="h-4 w-4" /> Back</button> : null}
-            <Link href={dashboardHref} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"><Home className="h-4 w-4" /> Dashboard</Link>
+            {pathname !== dashboardHref ? (
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+            ) : null}
+            <Link
+              href={dashboardHref}
+              className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <Home className="h-4 w-4" /> Dashboard
+            </Link>
           </div>
 
           <div className="mx-4 hidden max-w-md flex-1 md:flex">

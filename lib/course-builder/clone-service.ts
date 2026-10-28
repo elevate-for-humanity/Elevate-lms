@@ -1,7 +1,8 @@
-import { z } from 'zod';
-import { requireAdminClient } from '../supabase/admin';
-import { registerProgramCourse } from './program-resolver';
+import { draftLessonHtml } from './workspace-edit.mjs';
+const pick = (row: any, keys: string[]) => Object.fromEntries(keys.filter(key => row[key] !== undefined).map(key => [key, row[key]]));
 
+export async function cloneCanonicalCourse(input: unknown) {
+  const [{ z }, { requireAdminClient }, { registerProgramCourse }] = await Promise.all([import('zod'), import('../supabase/admin'), import('./program-resolver')]);
 const cloneCourseSchema = z.object({
   courseId: z.string().uuid(),
   title: z.string().min(1).optional(),
@@ -10,7 +11,7 @@ const cloneCourseSchema = z.object({
   programSlug: z.string().min(1).optional(),
 });
 
-export async function cloneCanonicalCourse(input: unknown) {
+
   const body = cloneCourseSchema.parse(input);
   const db = await requireAdminClient();
   const { data: source, error: sourceError } = await db
@@ -130,4 +131,51 @@ export async function cloneCanonicalCourse(input: unknown) {
   }
 
   return { course: newCourse, sourceCourseId: body.courseId };
+}
+
+/** Copy a published package into an unpublished AI edit revision. Shared canonical clone authority. */
+export async function cloneEditedCourseRevision({db,sourceCourse,sourceLessons,sourceModules,lessonId,patch,actorId,requestId,uuid}: any) {
+ let courseId=sourceCourse.id,newLessonId=lessonId;
+
+  const existing=await db.from('courses').select('id,metadata').contains('metadata',{course_ai_edit_request_id:requestId}).maybeSingle();
+  if(existing.error)throw existing.error;
+  if(existing.data){
+    if(existing.data.metadata?.course_ai_edit_complete!==true)throw Error('DRAFT_REVISION_INCOMPLETE_REQUIRES_REVIEW');
+    return {courseId:existing.data.id,lessonId:existing.data.metadata.ai_edited_lesson_id??null,reused:true};
+  }
+  courseId=uuid();
+  const courseFields=['program_id','description','short_description','org_id','compliance_profile_key','governing_body','governing_region','governing_standard_version','duration_hours','passing_score'];
+  const created=await db.from('courses').insert({...pick(sourceCourse,courseFields),id:courseId,
+   title:patch.course.title??sourceCourse.title+' — Draft revision',slug:sourceCourse.slug+'-revision-'+courseId.slice(0,8),
+   ...patch.course,status:'draft',is_active:false,created_by:actorId,
+   metadata:{...(sourceCourse.metadata??{}),source_course_id:sourceCourse.id,course_ai_edit_request_id:requestId,course_ai_edit_complete:false}});
+  if(created.error)throw created.error;
+  const moduleIds=new Map(sourceModules.map((row: any)=>[row.id,uuid()]));
+  if(sourceModules.length){
+   const modules=await db.from('course_modules').insert(sourceModules.map((row: any)=>({
+    ...pick(row,['title','slug','order_index','target_hours','domain_key','metadata']),
+    id:moduleIds.get(row.id),course_id:courseId,is_published:false,is_draft:true,created_by:actorId})));
+   if(modules.error)throw modules.error;
+  }
+  if(sourceLessons.length){
+   const fields=['title','slug','order_index','lesson_type','content','content_json','rendered_html','duration_minutes','learning_objectives','quiz_questions','passing_score','competency_checks','instructor_notes','practical_required','activities','is_required','required_artifacts','domain_key','hour_category','evidence_type','delivery_method','requires_instructor_signoff','instructor_requirement','minimum_seat_time_minutes','fieldwork_eligible','video_url','script_text'];
+   const lessons=sourceLessons.map((row: any)=>{
+    const id=uuid();if(row.id===lessonId)newLessonId=id;
+    const copy={...pick(row,fields),id,course_id:courseId,module_id:moduleIds.get(row.module_id)??null,
+      status:'draft',is_published:false,approved:false,media_quality_status:'unverified'};
+    if(row.id===lessonId){
+      Object.assign(copy,patch.lesson);
+      if(patch.lesson.content){copy.video_url=null;copy.script_text=null;copy.rendered_html=draftLessonHtml(patch.lesson.content);
+       const {film,mediaAttachment,...content}=copy.content_json??{};copy.content_json={...content,experience:{...(content.experience??{}),readingGuide:{summary:patch.lesson.content,sections:[]}},revisionInstruction:patch.lesson.content};}
+    }
+    return copy;
+   });
+   const saved=await db.from('course_lessons').insert(lessons);if(saved.error)throw saved.error;
+  }
+  const completed=await db.from('courses').update({metadata:{...(sourceCourse.metadata??{}),
+   source_course_id:sourceCourse.id,course_ai_edit_request_id:requestId,course_ai_edit_complete:true,ai_edited_lesson_id:newLessonId??null}})
+   .eq('id',courseId).eq('status','draft').select('id').single();
+  if(completed.error)throw completed.error;if(!completed.data)throw Error('DRAFT_REVISION_SAVE_NOT_VERIFIED');
+
+ return {courseId,lessonId:newLessonId??null};
 }

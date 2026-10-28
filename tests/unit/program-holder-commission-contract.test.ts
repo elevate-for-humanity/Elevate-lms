@@ -11,7 +11,7 @@ describe('Program Holder student-scoped commission contract', () => {
 
   it('does not make routed applicants commissionable', () => {
     expect(migration).toContain("qualification_source text not null default 'holder_enrollment'");
-    expect(callLog).toContain("outcome === 'enrolled' && agreement?.status === 'active'");
+    expect(callLog).toMatch(/outcome === 'enrolled'\s*&&\s*agreement\?\.status === 'active'/);
     expect(callLog).not.toContain("outcome === 'interested' ? 3000");
   });
 

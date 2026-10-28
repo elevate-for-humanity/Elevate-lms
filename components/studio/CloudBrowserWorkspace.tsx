@@ -233,14 +233,16 @@ export default function CloudBrowserWorkspace({
         if (cancelled) return;
         const ready = response.ok && payload.configured === true && payload.ready === true;
         setRuntimeReady(ready);
-        setStatus(
-          ready
-            ? 'Ready to start'
-            : !response.ok
-              ? `Runtime check failed (HTTP ${response.status})`
-              : payload.configured
-                ? 'Runtime is offline'
-                : 'Runtime is not configured',
+        setStatus((current) =>
+          current === 'Studio sign-in required'
+            ? current
+            : ready
+              ? 'Ready to start'
+              : !response.ok
+                ? `Runtime check failed (HTTP ${response.status})`
+                : payload.configured
+                  ? 'Runtime is offline'
+                  : 'Runtime is not configured',
         );
         if (!ready) {
           setError(

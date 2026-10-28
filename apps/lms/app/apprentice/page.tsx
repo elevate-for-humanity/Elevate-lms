@@ -223,7 +223,7 @@ export default async function ApprenticePortalPage() {
     (db as any)
       .from('apprenticeship_theory_schedules')
       .select(
-        'id,course_id,timezone,days_of_week,start_time,end_time,starts_on,weekly_target_minutes,weekly_max_minutes,active',
+        'id,course_id,timezone,days_of_week,start_time,end_time,starts_on,weekly_target_minutes,weekly_max_minutes,active,learner_confirmed_at',
       )
       .eq('user_id', subject.userId)
       .eq('program_slug', programSlug)
@@ -1129,6 +1129,51 @@ function TheorySchedulePanel({
         </p>
       </section>
     );
+  if (!schedule.learner_confirmed_at)
+    return (
+      <section className="rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm sm:p-8">
+        <p className="text-xs font-black uppercase tracking-[0.15em] text-amber-800">
+          Theory schedule setup required
+        </p>
+        <h2 className="mt-2 text-2xl font-black text-amber-950">
+          Choose your study days and times
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-amber-900">
+          Your online course and workbook are ready, but theory access remains blocked until you
+          save your own recurring study windows outside OJL. The old placement default is not an
+          active learner schedule and will not send start or stop reminders.
+        </p>
+        <div className="mt-4 rounded-xl border border-amber-300 bg-white p-4 text-sm text-slate-800">
+          <p className="font-black">Your weekly allowance</p>
+          <p className="mt-1">
+            Target: {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')} theory hours.
+            Maximum: {(Math.min(schedule.weekly_max_minutes, 600) / 60).toLocaleString('en-US')}{' '}
+            theory hours.
+          </p>
+          <p className="mt-1">
+            Recorded on-the-job learning: {recordedOjlHours.toLocaleString('en-US')} hours. Course
+            progress: {completedLessons} of {totalLessons} published lessons complete.
+          </p>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link
+            href="/apprentice/theory-schedule"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-amber-900 px-5 py-3 font-black text-white"
+          >
+            Choose my theory study times
+          </Link>
+          <a
+            href={syllabusHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-amber-400 bg-white px-5 py-3 font-black text-amber-950"
+          >
+            Open syllabus
+          </a>
+        </div>
+      </section>
+    );
+
   const days = (schedule.days_of_week || [])
     .map((day: number) => THEORY_DAY_LABELS[day])
     .filter(Boolean)

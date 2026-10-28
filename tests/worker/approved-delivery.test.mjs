@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {approvedDeliveryFailures,generatedTeachingPhoto,narrationCoverageSeverity} from '../../lib/ultimate-course-builder/instructional/approved-delivery.mjs';
+import {approvedDeliveryFailures,generatedTeachingPhoto,verifiedTeachingPhotoScene,narrationCoverageSeverity} from '../../lib/ultimate-course-builder/instructional/approved-delivery.mjs';
 const sha='a'.repeat(64);
 function fixture(){
  const text='Inspect the clean tools. Separate the used tools. Keep clean equipment protected until the next client.';
@@ -54,4 +54,17 @@ test('approved audio keeps ASR lexical differences advisory without inventing a 
  for(const coverage of [0,0.5,0.749,NaN,Infinity]) assert.equal(narrationCoverageSeverity(coverage,true),'error');
  const f=fixture(); f.narration.segments[0].parts[0].audioUrl='';
  assert.ok(failures(f).some(code=>code.startsWith('APPROVED_AUDIO_PART_GAP_OR_OVERLAP')));
+});
+
+test('mixed generated and licensed illustrations require evidence on every cue',()=>{
+ const generated={provider:'google-generated',illustration:true,sha256:sha,imageUrl:'https://media.example/generated',storagePath:'approved-teaching-photos/image.png'};
+ const licensed={provider:'envato',illustration:true,sha256:sha,imageUrl:'https://media.example/frame',storagePath:'selected-course-stills/course/'+sha+'-0.35.jpg',selectedSourceSha256:sha,selectedSourceAssetId:'source-asset',sampleFraction:.35,providerItemId:'licensed-item',licenseEvidenceUrl:'https://license.example/certificate.pdf'};
+ const scene={physicalDemonstration:false,resolvedProvider:'google-generated',resolvedModel:'generated-teaching-photograph',pictureCues:[generated,licensed]};
+ assert.equal(verifiedTeachingPhotoScene(scene),true);
+ assert.equal(verifiedTeachingPhotoScene({...scene,resolvedModel:'licensed-teaching-photograph',pictureCues:[licensed,generated]}),true);
+ assert.equal(verifiedTeachingPhotoScene({...scene,physicalDemonstration:true}),false);
+ assert.equal(verifiedTeachingPhotoScene({...scene,resolvedProvider:'untrusted'}),false);
+ for(const patch of [{licenseEvidenceUrl:''},{selectedSourceSha256:'b'.repeat(64)},{selectedSourceAssetId:''},{sampleFraction:NaN},{provider:'untrusted'},{illustration:false},{sha256:'bad'}])
+  assert.equal(verifiedTeachingPhotoScene({...scene,pictureCues:[generated,{...licensed,...patch}]}),false);
+ assert.equal(verifiedTeachingPhotoScene({...scene,pictureCues:[{...generated,provider:'untrusted'},licensed]}),false);
 });

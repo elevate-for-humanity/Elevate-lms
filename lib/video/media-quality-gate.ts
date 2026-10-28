@@ -1,7 +1,7 @@
 import 'server-only';
 import {independentSpeechWindows} from './independent-speech-windows.mjs';
 import {reportCourseProgress} from '../ultimate-course-builder/worker/progress-watch.mjs';
-import { narrationCoverageSeverity, generatedTeachingPhoto } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
+import { narrationCoverageSeverity, verifiedTeachingPhotoScene } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
 import { captionSampleGroups, captionWordCoverage, charcoalPixelsMatch } from '../ultimate-course-builder/instructional/approved-frame-checks.mjs';
 import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
@@ -501,11 +501,11 @@ export async function enforceMediaQuality(input: {
     const sourcedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.resolvedProvider && scene.resolvedModel),
     );
-    const ownedGeneratedPhoto=generatedTeachingPhoto;
+    const verifiedTeachingPictures=verifiedTeachingPhotoScene;
     const licensedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(
         scene.resolvedProvider &&
-        !ownedGeneratedPhoto(scene) && !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
+        !verifiedTeachingPictures(scene) && !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
       ),
     );
     const licensedScenesWithEvidence = licensedScenes.filter((scene) =>
@@ -536,7 +536,7 @@ export async function enforceMediaQuality(input: {
     );
     const verifiedExactScenes = exactScenes.filter((scene) => {
       const provider = scene.resolvedProvider ?? '';
-      if(ownedGeneratedPhoto(scene)) return true;
+      if(verifiedTeachingPictures(scene)) return true;
       if (['wan', 'ltx', 'remotion'].includes(provider)) return true;
       return Boolean(provider && scene.sourceLicenseEvidenceUrl);
     });

@@ -24,7 +24,8 @@ for (const route of ['/', '/programs', '/programs/bookkeeping', '/programs/hvac-
   test(`${route}: readable, responsive, working images`, async ({ page }, testInfo) => {
     // The canonical entry streams a server redirect to the PARIS workspace.
     // Wait for that destination, including its first development compilation.
-    if (route === '/apply/student') test.setTimeout(90000);
+    // The first route can include cold Next.js compilation before hydration enables navigation.
+    test.setTimeout(90000);
     const response = await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90000 });
     expect(response?.status()).toBeLessThan(400);
     const destination = route === '/apply/student' ? '/apply/student/interview' : route;

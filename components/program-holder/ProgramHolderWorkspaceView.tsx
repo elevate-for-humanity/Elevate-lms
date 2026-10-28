@@ -1,3 +1,5 @@
+import { hasRecruitingAssignment } from '@/lib/program-holder/recruiting-access';
+import { TestingReadinessForm } from './TestingReadinessForm';
 import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
@@ -48,22 +50,26 @@ type Section =
   | 'hours'
   | 'compliance'
   | 'documents'
+  | 'ready-to-test'
+  | 'recruiting'
   | 'reports'
   | 'payouts'
   | 'settings';
 
 export async function ProgramHolderWorkspaceView({
   section,
+  workspace,
   payoutPanel,
   studentQuery = '',
   studentStatus = 'all',
 }: {
   section: Section;
+  workspace?: Awaited<ReturnType<typeof getProgramHolderWorkspace>>;
   payoutPanel?: React.ReactNode;
   studentQuery?: string;
   studentStatus?: string;
 }) {
-  const data = await getProgramHolderWorkspace();
+  const data = workspace || await getProgramHolderWorkspace();
   const coordinatorRole =
     data.mode === 'holder'
       ? String(
@@ -298,8 +304,13 @@ export async function ProgramHolderWorkspaceView({
   const completedRequirements = requiredComplianceItems.filter((item) => item.complete).length;
   const missingRequirements = requiredComplianceItems.length - completedRequirements;
   const primaryProgramLabel =
-    data.programs.length === 1 ? (data.programs[0].title || data.programs[0].name || 'Assigned program') : `${data.programs.length} assigned programs`;
-  const callQueue = data.applicants.filter((row) => !row.call_date || !row.call_outcome);
+    data.programs.length === 1
+      ? data.programs[0].title || data.programs[0].name || 'Assigned program'
+      : `${data.programs.length} assigned programs`;
+  const recruitingEnabled = hasRecruitingAssignment(data.holder?.features);
+  const callQueue = (recruitingEnabled ? data.applicants : []).filter(
+    (row) => !row.call_date || !row.call_outcome,
+  );
   const payoutReady = Boolean(
     data.payoutProfile?.payouts_enabled &&
     data.payoutProfile?.transfers_enabled &&
@@ -316,22 +327,90 @@ export async function ProgramHolderWorkspaceView({
           query={studentQuery}
           status={studentStatus}
         />
-        <SchoolApplicantRoster rows={(data.schoolApplicants || []).filter(row => ['accepted', 'enrolled'].includes(row.status))} />
+        <SchoolApplicantRoster
+          rows={(data.schoolApplicants || []).filter((row) =>
+            ['accepted', 'enrolled'].includes(row.status),
+          )}
+        />
       </>
     );
   if (section === 'at-risk')
     return <Students title="At-Risk Students" rows={atRisk} programs={data.programs} />;
-  if (section === 'pending')
-    return (
-      <>
-      <SchoolApplicantRoster pending rows={(data.schoolApplicants || []).filter(row => !['accepted', 'enrolled'].includes(row.status))} />
+  if (section === 'recruiting')
+    return recruitingEnabled ? (
       <Applicants
         rows={data.applicants}
         programs={data.programs}
         contactAccessGranted={data.contactAccessGranted}
         namesOnly={data.requiresEnchantedHeartsTerms}
       />
+    ) : (
+      <p>Recruiting assignment required.</p>
+    );
+  if (section === 'pending')
+    return (
+      <>
+        <SchoolApplicantRoster
+          pending
+          rows={(data.schoolApplicants || []).filter(
+            (row) => !['accepted', 'enrolled'].includes(row.status),
+          )}
+        />
+        {recruitingEnabled ? (
+          <ApplicantsByProgram rows={data.applicants} programs={data.programs} />
+        ) : (
+          <p className="rounded-xl border bg-white p-5">
+            Applicant recruiting tools are available only to assigned recruiters. Use Students for
+            your training roster.
+          </p>
+        )}
       </>
+    );
+  if (section === 'ready-to-test')
+    return (
+      <div className="space-y-6 p-4">
+        <Hero
+          eyebrow="Completion and testing"
+          title="Ready to Test"
+          description="Submit the exact exit report, track Admin review, and start your individual second-payment invoice."
+        />
+        <TestingReadinessForm students={data.enrollments} documents={data.documents} />
+        <section className="rounded-2xl border bg-white p-5">
+          <h2 className="text-xl font-black">Submitted exit reports</h2>
+          {(data.testingReports ?? data.reports)
+            .filter((row) => row.metadata?.report_kind === 'testing_readiness')
+            .map((row) => (
+              <article key={row.id} className="mt-4 min-w-0 rounded-xl border p-4">
+                <h3 className="font-bold">{row.title}</h3>
+                <p className="text-sm">Review: {row.status}</p>
+                <p className="text-sm">
+                  Second-payment invoice:{' '}
+                  {row.metadata?.completion_invoice?.status || 'Requires review'}
+                  {Number.isInteger(row.metadata?.completion_invoice?.amount_cents)
+                    ? ` — ${(row.metadata.completion_invoice.amount_cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`
+                    : ''}
+                </p>
+                {row.metadata?.completion_invoice?.reason && (
+                  <p className="text-sm">{row.metadata.completion_invoice.reason}</p>
+                )}
+                {row.reviewer_notes && (
+                  <p className="mt-2 text-sm">Admin feedback: {row.reviewer_notes}</p>
+                )}
+                <details className="mt-3">
+                  <summary className="min-h-11 cursor-pointer font-bold">
+                    View exact submitted report
+                  </summary>
+                  <pre className="whitespace-pre-wrap break-words font-sans text-sm">
+                    {row.content}
+                  </pre>
+                </details>
+              </article>
+            ))}
+          {!(data.testingReports ?? data.reports).some((row) => row.metadata?.report_kind === 'testing_readiness') && (
+            <p className="mt-3 text-sm">No exit reports submitted yet.</p>
+          )}
+        </section>
+      </div>
     );
   if (section === 'programs') return <Programs data={data} />;
   if (section === 'hours')
@@ -341,7 +420,9 @@ export async function ProgramHolderWorkspaceView({
   if (section === 'documents')
     return (
       <Documents
+        students={data.enrollments}
         rows={data.documents}
+        courseAssignments={data.courseAssignments}
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
         insuranceRequired={holderFeatures.insurance_required !== false}
@@ -390,7 +471,7 @@ export async function ProgramHolderWorkspaceView({
           {
             title: `Contact ${callQueue.length} new applicant${callQueue.length === 1 ? '' : 's'}`,
             detail: 'Record the outcome and next follow-up.',
-            href: '/program-holder/students/pending',
+            href: '/program-holder/recruiting',
           },
         ]
       : []),
@@ -603,7 +684,12 @@ function applicantPipelineStatus(row: any) {
 
 function isCompletionOverdue(row: any): boolean {
   const status = String(row.status || row.enrollment_state || '').toLowerCase();
-  if (['completed', 'graduated', 'withdrawn', 'cancelled'].includes(status) || row.completed_at || row.completion_date) return false;
+  if (
+    ['completed', 'graduated', 'withdrawn', 'cancelled'].includes(status) ||
+    row.completed_at ||
+    row.completion_date
+  )
+    return false;
   const end = String(row.expected_end_date || row.training_end_date || '').slice(0, 10);
   return Boolean(end && end < new Date().toISOString().slice(0, 10));
 }
@@ -617,7 +703,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <article
               key={row.id}
               data-testid="student-card"
-              className={isCompletionOverdue(row) ? "min-w-0 rounded-xl border-2 border-red-600 bg-red-50 p-4" : "min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"}
+              className={
+                isCompletionOverdue(row)
+                  ? 'min-w-0 rounded-xl border-2 border-red-600 bg-red-50 p-4'
+                  : 'min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4'
+              }
             >
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -636,16 +726,41 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
                 <Row label="Completion" value={completionStatus(row)} />
-                {isCompletionOverdue(row) && <p role="alert" className="rounded-lg bg-red-700 p-2 text-xs font-black text-white">Completion overdue — review testing and closeout</p>}
-                <Row label="Actual completion" value={(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'} />
-                <Row label="Certification evidence" value={row.certification_status || 'Upload missing'} />
-                {row.credential_earned_date && <Row label="Credential earned" value={row.credential_earned_date} />}
-                {row.certificate_verified_at && <Row label="Credential verified" value={row.certificate_verified_at.slice(0, 10)} />}
+                {isCompletionOverdue(row) && (
+                  <p
+                    role="alert"
+                    className="rounded-lg bg-red-700 p-2 text-xs font-black text-white"
+                  >
+                    Completion overdue — review testing and closeout
+                  </p>
+                )}
+                <Row
+                  label="Actual completion"
+                  value={
+                    (row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'
+                  }
+                />
+                <Row
+                  label="Certification evidence"
+                  value={row.certification_status || 'Upload missing'}
+                />
+                {row.credential_earned_date && (
+                  <Row label="Credential earned" value={row.credential_earned_date} />
+                )}
+                {row.certificate_verified_at && (
+                  <Row
+                    label="Credential verified"
+                    value={row.certificate_verified_at.slice(0, 10)}
+                  />
+                )}
                 <Row
                   label="Scheduled training"
                   value={`${row.training_start_date || 'Start missing'} — ${row.expected_end_date || row.training_end_date || 'End missing'}`}
                 />
-                <Row label="Next action" value={completionAlert(row) || row.next_required_action || 'Continue training'} />
+                <Row
+                  label="Next action"
+                  value={completionAlert(row) || row.next_required_action || 'Continue training'}
+                />
                 <Row
                   label="WorkOne hours"
                   value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
@@ -658,19 +773,40 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                 >
                   Record progress
                 </Link>
-                {row.phone && <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a>}
-                {row.email && <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a>}
+                {row.phone && (
+                  <a
+                    className="block break-words font-bold text-blue-900 underline"
+                    href={`tel:${row.phone}`}
+                  >
+                    Phone: {row.phone}
+                  </a>
+                )}
+                {row.email && (
+                  <a
+                    className="block break-all font-bold text-blue-900 underline"
+                    href={`mailto:${row.email}`}
+                  >
+                    Email: {row.email}
+                  </a>
+                )}
                 <StudentCommunicationActions
                   enrollmentId={row.id}
                   studentName={row.full_name || 'Student'}
                   hasEmail={Boolean(row.email)}
                   hasPhone={Boolean(row.phone)}
                 />
-                {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
-                  studentId={row.id}
-                  studentName={row.full_name || 'Student'}
-                  source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
-                /> : null}
+                {isEpaTestingProgram(
+                  row.program_slug ||
+                    programs.find((program) => program.id === row.program_id)?.slug,
+                ) ? (
+                  <StudentReadyForTestingButton
+                    studentId={row.id}
+                    studentName={row.full_name || 'Student'}
+                    source={
+                      row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
+                    }
+                  />
+                ) : null}
               </div>
             </article>
           ))
@@ -697,7 +833,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           <tbody className="divide-y divide-slate-100">
             {rows.length ? (
               rows.map((row) => (
-                <tr key={row.id} data-testid="student-row" className={isCompletionOverdue(row) ? "bg-red-50" : undefined}>
+                <tr
+                  key={row.id}
+                  data-testid="student-row"
+                  className={isCompletionOverdue(row) ? 'bg-red-50' : undefined}
+                >
                   <td className="px-3 py-4">
                     <p className="font-bold">{row.full_name || 'Student'}</p>
                     <p className="text-xs text-slate-500">{row.email || ''}</p>
@@ -705,35 +845,96 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4"><p className={isCompletionOverdue(row) ? "font-black text-red-800" : "font-bold"}>{completionStatus(row)}</p>{isCompletionOverdue(row) && <p role="alert" className="text-xs font-black text-red-800">Completion overdue</p>}<p className="text-xs">{row.certification_status || 'Upload missing'}</p>{row.credential_earned_date && <p className="text-xs">Earned: {row.credential_earned_date}</p>}{row.certificate_verified_at && <p className="text-xs">Verified: {row.certificate_verified_at.slice(0, 10)}</p>}</td>
+                  <td className="px-3 py-4">
+                    <p
+                      className={isCompletionOverdue(row) ? 'font-black text-red-800' : 'font-bold'}
+                    >
+                      {completionStatus(row)}
+                    </p>
+                    {isCompletionOverdue(row) && (
+                      <p role="alert" className="text-xs font-black text-red-800">
+                        Completion overdue
+                      </p>
+                    )}
+                    <p className="text-xs">{row.certification_status || 'Upload missing'}</p>
+                    {row.credential_earned_date && (
+                      <p className="text-xs">Earned: {row.credential_earned_date}</p>
+                    )}
+                    {row.certificate_verified_at && (
+                      <p className="text-xs">
+                        Verified: {row.certificate_verified_at.slice(0, 10)}
+                      </p>
+                    )}
+                  </td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
                     {Math.min(48, Number(row.total_hours_completed || 0))} / 48
                   </td>
                   <td className="px-3 py-4 text-xs">
                     <span className="block">Start: {row.training_start_date || 'Missing'}</span>
-                    <span className="block">Scheduled end: {row.expected_end_date || row.training_end_date || 'Missing'}</span><span className="block">Actual completion: {(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'}</span>
+                    <span className="block">
+                      Scheduled end: {row.expected_end_date || row.training_end_date || 'Missing'}
+                    </span>
+                    <span className="block">
+                      Actual completion:{' '}
+                      {(row.completion_date || row.completed_at)?.slice(0, 10) || 'Not documented'}
+                    </span>
                   </td>
-                  <td className="px-3 py-4">{completionAlert(row) || row.next_required_action || 'Continue training'}</td>
+                  <td className="px-3 py-4">
+                    {completionAlert(row) || row.next_required_action || 'Continue training'}
+                  </td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
-                      {row.phone && <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a>}
-                      {row.email && <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a>}
-                      {row.phone && <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a>}
-                {row.email && <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a>}
-                <StudentCommunicationActions
+                      {row.phone && (
+                        <a
+                          className="block break-words font-bold text-blue-900 underline"
+                          href={`tel:${row.phone}`}
+                        >
+                          Phone: {row.phone}
+                        </a>
+                      )}
+                      {row.email && (
+                        <a
+                          className="block break-all font-bold text-blue-900 underline"
+                          href={`mailto:${row.email}`}
+                        >
+                          Email: {row.email}
+                        </a>
+                      )}
+                      {row.phone && (
+                        <a
+                          className="block break-words font-bold text-blue-900 underline"
+                          href={`tel:${row.phone}`}
+                        >
+                          Phone: {row.phone}
+                        </a>
+                      )}
+                      {row.email && (
+                        <a
+                          className="block break-all font-bold text-blue-900 underline"
+                          href={`mailto:${row.email}`}
+                        >
+                          Email: {row.email}
+                        </a>
+                      )}
+                      <StudentCommunicationActions
                         enrollmentId={row.id}
                         studentName={row.full_name || 'Student'}
                         hasEmail={Boolean(row.email)}
                         hasPhone={Boolean(row.phone)}
                       />
-                      {isEpaTestingProgram(row.program_slug || programs.find(program => program.id === row.program_id)?.slug) ? <StudentReadyForTestingButton
-                        studentId={row.id}
-                        studentName={row.full_name || 'Student'}
-                        source={
-                          row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
-                        }
-                      /> : null}
+                      {isEpaTestingProgram(
+                        row.program_slug ||
+                          programs.find((program) => program.id === row.program_id)?.slug,
+                      ) ? (
+                        <StudentReadyForTestingButton
+                          studentId={row.id}
+                          studentName={row.full_name || 'Student'}
+                          source={
+                            row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
+                          }
+                        />
+                      ) : null}
                     </div>
                   </td>
                 </tr>
@@ -997,7 +1198,16 @@ function Programs({ data }: { data: any }) {
         title={label}
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
-      <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
+      <CourseSyllabus
+        syllabus={
+          data.programs.some(
+            (program: any) => program.id === data.holder?.features?.course_syllabus?.program_id,
+          )
+            ? data.holder?.features?.course_syllabus
+            : null
+        }
+      />
+      <SyllabusUploadStatus documents={data.documents} courseAssignments={data.courseAssignments} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>
   );
@@ -1155,7 +1365,32 @@ function ProgramCards({
                     including Affirm when offered. Approval is made by the payment provider, not by
                     the Program Holder.
                   </div>
-                  {courses.length > 0 && <ul className="mt-4 space-y-2 text-sm">{courses.map((course: any) => <li key={`${program.id}-${course.course_id}`} className="rounded-lg border p-3"><strong>{course.title || 'Assigned course'}</strong><span className="block">{course.source === 'canonical_program' ? 'Canonical program course' : 'Holder delivery assignment'} · {course.status || 'Status requires review'}</span>{course.source === 'canonical_program' && !course.published && <span className="block font-bold text-amber-800">Publication has not been verified. This mapping does not unlock learner access.</span>}</li>)}</ul>}
+                  {courses.length > 0 && (
+                    <ul className="mt-4 space-y-2 text-sm">
+                      {courses.map((course: any) => (
+                        <li
+                          key={`${program.id}-${course.course_id}`}
+                          className="rounded-lg border p-3"
+                        >
+                          <strong>{course.title || 'Assigned course'}</strong>
+                          <span className="block">
+                            {course.source === 'canonical_program'
+                              ? 'Canonical program course'
+                              : 'Holder delivery assignment'}{' '}
+                            · {course.status || 'Status requires review'}
+                          </span>
+                          <p>Build: {course.build?.status || 'Build record unavailable'}{typeof course.build?.percent === 'number' ? ` — ${course.build.percent}%` : ''}</p>
+                          <p>Review: {course.build?.review || 'Not recorded'} · Publication: {course.build?.published ? 'Published' : 'Not published'}</p>
+                          {course.source === 'canonical_program' && !course.published && (
+                            <span className="block font-bold text-amber-800">
+                              Publication has not been verified. This mapping does not unlock
+                              learner access.
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
                       This program is assigned, but no delivery course is connected yet.
@@ -1187,7 +1422,11 @@ function Hours({
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
       <HolderHourSubmissionForm enrollments={enrollments} />
-      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} verifiedHours={rows} />
+      <ProgramHolderTrainingLogForm
+        enrollments={enrollments}
+        programs={programs}
+        verifiedHours={rows}
+      />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>
         <p className="mt-1 text-sm text-slate-600">
@@ -1237,20 +1476,24 @@ function Hours({
   );
 }
 function programHolderRequirementLink(label: string): string | null {
-    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
-    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
-    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
-    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
-    if (label === 'Approved required onboarding documents') return '/program-holder/documents';
-    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
-    if (label === 'Signed image release') return '/program-holder/documents';
-    if (label === 'Program-holder approval') return '/program-holder/onboarding';
-    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
-    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
-    if (label === 'QuickBooks payment-record connection') return '/program-holder/payouts';
-    if (label === 'Graduated-student back work and 48-hour sign-offs') return '/program-holder/students';
-    if (label === 'Course delivery assignment' || label === 'HVAC program assignment') return '/program-holder/programs';
-    return null;
+  if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+  if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+  if (label === 'Non-disclosure and confidentiality agreement')
+    return '/program-holder/non-compete';
+  if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+  if (label === 'Approved required onboarding documents') return '/program-holder/documents';
+  if (label === 'Profile picture' || label === 'Company logo upload')
+    return '/program-holder/documents';
+  if (label === 'Signed image release') return '/program-holder/documents';
+  if (label === 'Program-holder approval') return '/program-holder/onboarding';
+  if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+  if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+  if (label === 'QuickBooks payment-record connection') return '/program-holder/payouts';
+  if (label === 'Graduated-student back work and 48-hour sign-offs')
+    return '/program-holder/students';
+  if (label === 'Course delivery assignment' || label === 'HVAC program assignment')
+    return '/program-holder/programs';
+  return null;
 }
 
 function Compliance({
@@ -1267,7 +1510,6 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
-
   return (
     <div className="space-y-6">
       <Hero
@@ -1299,14 +1541,20 @@ function Compliance({
                 </span>
                 <div className="flex shrink-0 items-center gap-3">
                   {programHolderRequirementLink(item.label) ? (
-                    <Link href={programHolderRequirementLink(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                    <Link
+                      href={programHolderRequirementLink(item.label)!}
+                      className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800"
+                    >
                       {item.complete ? 'View form' : 'Open form'}
                     </Link>
                   ) : null}
                   {item.complete ? (
                     <CheckCircle2 aria-label="Completed" className="h-5 w-5 text-emerald-600" />
                   ) : (
-                    <AlertTriangle aria-label="Action required" className="h-5 w-5 text-amber-600" />
+                    <AlertTriangle
+                      aria-label="Action required"
+                      className="h-5 w-5 text-amber-600"
+                    />
                   )}
                 </div>
               </div>
@@ -1317,13 +1565,103 @@ function Compliance({
     </div>
   );
 }
+function SyllabusUploadStatus({
+  documents,
+  courseAssignments,
+}: {
+  documents: any[];
+  courseAssignments: any[];
+}) {
+  const syllabi = documents.filter((row) =>
+    ['training_plan', 'hvac_training_plan', 'syllabus'].includes(row.document_type),
+  );
+  if (!syllabi.length) return null;
+  return (
+    <section
+      className="rounded-2xl border border-blue-200 bg-white p-5 sm:p-6"
+      aria-label="Uploaded syllabus status"
+    >
+      <h2 className="text-xl font-black">Your syllabus and course status</h2>
+      <p className="mt-2 text-sm text-slate-700">
+        A syllabus upload is submitted for review. A course must be created, checked, and published
+        separately before students can use it.
+      </p>
+      <div className="mt-4 space-y-3">
+        {syllabi.map((row) => {
+          const linked = courseAssignments.filter(
+            (course) => course.custom_syllabus_path === row.file_url && course.course_id,
+          );
+          return (
+            <article key={row.id} className="min-w-0 rounded-xl border p-4 text-sm">
+              <h3 className="break-words font-bold">{row.file_name || 'Uploaded syllabus'}</h3>
+              <p className="mt-2">
+                Review:{' '}
+                {row.status === 'approved' || row.approved === true
+                  ? 'Approved'
+                  : row.status === 'rejected'
+                    ? 'Changes requested'
+                    : 'Pending review'}
+              </p>
+              <p>
+                Course from this upload:{' '}
+                {linked.length ? 'Connected' : 'No course is linked to this syllabus yet'}
+              </p>
+              {linked.map((course) => (
+                <div key={course.id} className="mt-2 rounded-lg bg-slate-50 p-3">
+                  <p className="font-bold">{course.title || 'Assigned course'}</p>
+                  <p>
+                    Build: {course.build?.status || 'Build record unavailable'}
+                    {typeof course.build?.percent === 'number' ? ` — ${course.build.percent}%` : ''}
+                  </p>
+                  {typeof course.build?.percent === 'number' && (
+                    <progress
+                      className="w-full"
+                      aria-label="Curriculum build progress"
+                      max={100}
+                      value={course.build.percent}
+                    />
+                  )}
+                  <p>Review: {course.build?.review || 'Not recorded'}</p>
+                  <p>
+                    Publication: {course.build?.published ? 'Published' : 'Not published'}. Student
+                    access is verified separately.
+                  </p>
+                </div>
+              ))}
+              {row.rejection_reason && (
+                <p className="mt-2 text-amber-900">Reviewer feedback: {row.rejection_reason}</p>
+              )}
+              <a
+                className="mt-3 inline-flex min-h-11 items-center font-bold text-blue-800 underline"
+                href={`/api/program-holder/documents/${row.id}/download`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View your syllabus
+              </a>
+            </article>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-sm text-slate-700">
+        An existing program course does not mean your uploaded syllabus was converted. Contact
+        Office Mail for the review or course creation update.
+      </p>
+    </section>
+  );
+}
+
 function Documents({
+  students,
   rows,
+  courseAssignments,
   isHvac,
   requiresEnchantedHeartsTerms,
   insuranceRequired,
 }: {
+  students: any[];
   rows: any[];
+  courseAssignments: any[];
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
   insuranceRequired: boolean;
@@ -1336,25 +1674,41 @@ function Documents({
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
       <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
+      <SyllabusUploadStatus documents={rows} courseAssignments={courseAssignments} />
+      <ProgramHolderDocumentUpload materialsOnly students={students} />
       <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">
           {rows.length ? (
             rows.map((row) => (
-              <div key={row.id} className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border p-4">
+              <div
+                key={row.id}
+                className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border p-4"
+              >
                 <FileText className="h-5 w-5 text-blue-700" />
                 <div className="min-w-0 flex-1">
                   <p className="break-words font-bold">
                     {row.document_type || row.file_name || 'Program document'}
                   </p>
                   <p className="text-xs capitalize text-slate-500">{row.status || 'submitted'}</p>
-                  {row.file_name && row.document_type && <p className="break-all text-xs text-slate-600">{row.file_name}</p>}
+                  {row.file_name && row.document_type && (
+                    <p className="break-all text-xs text-slate-600">{row.file_name}</p>
+                  )}
                 </div>
                 {typeof row.file_url === 'string' && row.file_url.length > 0 ? (
-                  <a href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">View uploaded file</a>
+                  <a
+                    href={`/api/program-holder/documents/${row.id}/download`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800"
+                  >
+                    View uploaded file
+                  </a>
                 ) : (
-                  <span className="text-xs font-semibold text-amber-800">File preview unavailable — contact Office Mail</span>
+                  <span className="text-xs font-semibold text-amber-800">
+                    File preview unavailable — contact Office Mail
+                  </span>
                 )}
               </div>
             ))
@@ -1521,7 +1875,12 @@ function Settings({
         name={profile?.full_name || holder?.organization_name || holder?.name || 'Program Holder'}
       />
       <ProgramHolderNotificationPreferences initial={notificationPreferences} phone={phone} />
-      <details className="rounded-2xl border bg-white p-5"><summary className="min-h-11 cursor-pointer text-lg font-bold">First-time office setup checklist</summary><PortalStartChecklist role="program-holder" /></details>
+      <details className="rounded-2xl border bg-white p-5">
+        <summary className="min-h-11 cursor-pointer text-lg font-bold">
+          First-time office setup checklist
+        </summary>
+        <PortalStartChecklist role="program-holder" />
+      </details>
     </div>
   );
 }
@@ -1552,8 +1911,49 @@ function AdminBoundary() {
   );
 }
 
-
 function SchoolApplicantRoster({ rows, pending = false }: { rows: any[]; pending?: boolean }) {
   if (!rows.length) return null;
-  return <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-black">{pending ? 'New school applications' : 'Accepted school applicants'}</h2><p className="mt-2 text-sm text-slate-700">{pending ? 'Applications waiting for review. Call or email the applicant below.' : 'Accepted applications. Enrollment and course access are tracked separately.'}</p><ul className="mt-5 divide-y">{rows.map(row => <li key={row.id} className="flex flex-wrap items-start justify-between gap-4 py-4"><div><p className="font-bold">{row.full_name}</p><p className="text-sm text-slate-600">{String(row.program_interest).replace(/-/g, ' ')}</p>{row.email ? <a className="block break-all font-bold text-blue-900 underline" href={`mailto:${row.email}`}>Email: {row.email}</a> : null}{row.phone ? <a className="block break-words font-bold text-blue-900 underline" href={`tel:${row.phone}`}>Phone: {row.phone}</a> : null}</div><span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold capitalize">{row.status}</span></li>)}</ul></section>;
+  return (
+    <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+      <h2 className="text-xl font-black">
+        {pending ? 'New school applications' : 'Accepted school applicants'}
+      </h2>
+      <p className="mt-2 text-sm text-slate-700">
+        {pending
+          ? 'Applications waiting for review. Call or email the applicant below.'
+          : 'Accepted applications. Enrollment and course access are tracked separately.'}
+      </p>
+      <ul className="mt-5 divide-y">
+        {rows.map((row) => (
+          <li key={row.id} className="flex flex-wrap items-start justify-between gap-4 py-4">
+            <div>
+              <p className="font-bold">{row.full_name}</p>
+              <p className="text-sm text-slate-600">
+                {String(row.program_interest).replace(/-/g, ' ')}
+              </p>
+              {row.email ? (
+                <a
+                  className="block break-all font-bold text-blue-900 underline"
+                  href={`mailto:${row.email}`}
+                >
+                  Email: {row.email}
+                </a>
+              ) : null}
+              {row.phone ? (
+                <a
+                  className="block break-words font-bold text-blue-900 underline"
+                  href={`tel:${row.phone}`}
+                >
+                  Phone: {row.phone}
+                </a>
+              ) : null}
+            </div>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold capitalize">
+              {row.status}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }

@@ -3,6 +3,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requirePortalAccess } from '@/lib/auth/portal-access';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { resolveProgramHolderPhoto } from '@/lib/program-holder/profile-photo';
 
 interface ProgramHolderProfile {
   id: string;
@@ -103,7 +104,7 @@ export async function requireProgramHolder(options: { allowPendingApproval?: boo
         mode: 'preview',
         isPlatformAdmin: true,
         user: { id: targetProfile.id, email: targetProfile.email || undefined },
-        profile: targetProfile,
+        profile: { ...targetProfile, avatar_url: await resolveProgramHolderPhoto(db, targetProfile, targetProfile.program_holder_id) },
         holderId: targetProfile.program_holder_id,
         tenantId: targetProfile.tenant_id ?? null,
         programIds,
@@ -128,7 +129,7 @@ export async function requireProgramHolder(options: { allowPendingApproval?: boo
           mode: 'preview',
           isPlatformAdmin: true,
           user: { id: targetProfile.id, email: targetProfile.email || undefined },
-          profile: targetProfile,
+          profile: { ...targetProfile, avatar_url: await resolveProgramHolderPhoto(db, targetProfile, targetProfile.program_holder_id) },
           holderId: targetProfile.program_holder_id,
           tenantId: targetProfile.tenant_id ?? null,
           programIds,
@@ -189,6 +190,7 @@ export async function requireProgramHolder(options: { allowPendingApproval?: boo
   // independently; an unsigned MOU must never make student records invisible.
 
   const programIds = await resolveProgramIdsForHolder(db, holderId);
+  profile.avatar_url = await resolveProgramHolderPhoto(db, profile, holderId);
 
   return {
     mode: 'holder',

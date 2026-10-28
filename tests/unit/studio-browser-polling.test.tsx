@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import CloudBrowserWorkspace from '@/components/studio/CloudBrowserWorkspace';
 afterEach(() => {
@@ -8,7 +8,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 async function setup() {
-  let poll: () => Promise<void> = async () => {};
+  let poll: (() => Promise<void>) | undefined;
   let resolveEvents!: (response: Response) => void;
   const events = new Promise<Response>((resolve) => {
     resolveEvents = resolve;
@@ -46,7 +46,9 @@ async function setup() {
   await act(async () => {});
   fireEvent.click(screen.getByRole('button', { name: 'Start Chromium' }));
   await screen.findByRole('button', { name: 'Go', exact: true });
-  return { poll: () => poll(), resolveEvents, fetcher };
+  // A visible session can commit before its polling effect runs under concurrent rendering.
+  await waitFor(() => expect(poll).toBeTypeOf('function'));
+  return { poll: () => poll!(), resolveEvents, fetcher };
 }
 it('does not overlap a slow status request or its download request', async () => {
   const fixture = await setup();

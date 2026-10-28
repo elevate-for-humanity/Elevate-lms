@@ -31,6 +31,10 @@ describe('apprenticeship entry surfaces', () => {
     expect(hero).not.toBeNull();
     expect(promotion).not.toBeNull();
     expect(hero!.index).toBeLessThan(promotion!.index!);
+    const template = readFileSync('components/programs/ProgramDetailPage.tsx', 'utf8');
+    const heroPosition = template.indexOf('{heroOverride ??');
+    expect(heroPosition).toBeGreaterThanOrEqual(0);
+    expect(template.indexOf('{afterHero ?')).toBeGreaterThan(heroPosition);
   });
 
   it('keeps applicant and Host Site choices usable at narrow widths', () => {

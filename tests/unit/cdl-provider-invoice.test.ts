@@ -13,7 +13,7 @@ function request(type = 'application/pdf') {
   const file = new File(['invoice'], 'invoice.pdf', { type });
   Object.defineProperty(file, 'arrayBuffer', { value: async () => new ArrayBuffer(7) });
   return {
-    formData: async () => ({ get: (key: string) => (key === 'file' ? file : 'provider_invoice') }),
+    formData: async () => ({ get: (key: string) => (key === 'file' ? file : key === 'documentType' ? 'provider_invoice' : null) }),
   } as any;
 }
 describe('CDL Academy invoice submission', () => {

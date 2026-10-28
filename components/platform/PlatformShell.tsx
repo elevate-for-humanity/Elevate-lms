@@ -38,6 +38,7 @@ interface PlatformShellProps {
   role: UserRole;
   breadcrumbs?: BreadcrumbItem[];
   actions?: ActionItem[];
+  recruitingEnabled?: boolean;
   notifications?: number;
   children: React.ReactNode;
   paris?: Partial<ParisLearnerContext> | false;
@@ -60,6 +61,7 @@ export function PlatformShell({
   children,
   paris,
   showLanguageSwitcher = true,
+  recruitingEnabled = false,
 }: PlatformShellProps) {
   const pathname = usePathname();
   const dashboardHref =
@@ -87,7 +89,10 @@ export function PlatformShell({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
 
-  const baseSections = getNavigationForRole(role);
+  const baseSections = getNavigationForRole(role).map((section) => ({
+    ...section,
+    items: section.items.filter((item) => item.id !== 'recruiting' || recruitingEnabled),
+  }));
   // Role navigation owns every tool exactly once. Add install only to the setup group.
   const sections = ['program_holder', 'site_coordinator'].includes(role)
     ? baseSections.map((section, index) =>

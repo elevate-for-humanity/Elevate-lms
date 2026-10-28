@@ -447,7 +447,7 @@ export async function executeRegisteredAITool(
       const response = await dispatchToolRequest(tool, url, init);
       const contentType = response.headers.get('content-type') ?? '';
       const payload = contentType.includes('application/json')
-        ? await response.json().catch(() => ({ error: `HTTP ${response.status}` }))
+        ? await response.json().catch(() => { throw new Error('Tool returned invalid JSON.'); })
         : await response.text().catch(() => '');
 
       if (!response.ok) {
@@ -481,7 +481,36 @@ export async function executeRegisteredAITool(
         payload && typeof payload === 'object' && 'status' in payload
           ? String((payload as { status?: unknown }).status ?? '').toLowerCase()
           : '';
-      const accepted = response.status === 202 || payloadStatus === 'queued' || payloadStatus === 'running';
+      // HTTP success is transport evidence, not proof the requested action succeeded.
+      // A status query may legitimately describe a failed job; do not confuse
+      // that read result with failure to execute the query itself.
+      const record = payload && typeof payload === 'object'
+        ? payload as Record<string, unknown> : null;
+      const negativeStatus = tool.classification === 'write' &&
+        ['failed', 'error', 'blocked', 'rejected', 'cancelled', 'canceled', 'approval_required'].includes(payloadStatus);
+      if (record?.ok === false || record?.success === false || negativeStatus) {
+        const status = payloadStatus === 'approval_required' ? 'approval_required'
+          : payloadStatus === 'blocked' ? 'blocked' : 'failed';
+        const message = typeof record?.error === 'string' ? record.error
+          : typeof record?.message === 'string' ? record.message
+          : 'Tool reported an unsuccessful result.';
+        await writeToolRun(tool, context, input, {
+          status, output: payload, error: message, startedAt,
+          completedAt: status === 'approval_required' ? null : new Date().toISOString(),
+        });
+        await emitAuditEvent(tool, context, input, status, {
+          http_status: response.status, error: message, source_event_id: eventId,
+        });
+        return {
+          ok: false, status, httpStatus: response.status, tool: tool.name,
+          risk: tool.risk, classification: tool.classification,
+          approvalRequired: tool.approvalRequired,
+          requiredConfirmation: status === 'approval_required' ? tool.confirmationPhrase : undefined,
+          payload, error: message, traceId: eventId,
+        };
+      }
+      const accepted = response.status === 202 || payloadStatus === 'queued' || payloadStatus === 'running' ||
+        (tool.classification === 'write' && ['accepted', 'pending', 'dispatched', 'processing', 'scheduled'].includes(payloadStatus));
       if (accepted) {
         await writeToolRun(tool, context, input, {
           status: 'accepted',

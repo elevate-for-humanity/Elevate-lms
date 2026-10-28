@@ -1,6 +1,7 @@
 import { taxReturnSourceDigest } from '@/lib/tax-software/security/return-digest';
 import { createHash } from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { taxJson } from '@/lib/tax-software/server/response';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import {
@@ -18,28 +19,24 @@ export async function POST(req: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return taxJson({ error: 'Unauthorized' }, { status: 401 });
   const body = await req.json().catch(() => null);
   const returnId = body?.returnId;
   if (typeof returnId !== 'string' || !returnId.trim())
-    return NextResponse.json({ error: 'returnId is required' }, { status: 400 });
+    return taxJson({ error: 'returnId is required' }, { status: 400 });
   const { data: r, error: returnError } = await supabase
     .from('tax_returns')
-    .select('id,created_by_user_id,filing_status,tax_year,return_json')
+    .select('id,created_by_user_id,filing_status,tax_year,return_json,updated_at')
     .eq('id', returnId)
     .eq('created_by_user_id', user.id)
     .eq('service_type', 'self_file')
     .maybeSingle();
-  if (returnError)
-    return NextResponse.json({ error: 'Unable to load tax return' }, { status: 500 });
-  if (!r) return NextResponse.json({ error: 'Return not found' }, { status: 404 });
+  if (returnError) return taxJson({ error: 'Unable to load tax return' }, { status: 500 });
+  if (!r) return taxJson({ error: 'Return not found' }, { status: 404 });
   if (Number(r.tax_year) !== 2026)
-    return NextResponse.json(
-      { error: 'This calculation engine is for tax year 2026' },
-      { status: 400 },
-    );
+    return taxJson({ error: 'This calculation engine is for tax year 2026' }, { status: 400 });
   if (!Object.prototype.hasOwnProperty.call(STANDARD_DEDUCTION_2026, r.filing_status))
-    return NextResponse.json(
+    return taxJson(
       { error: 'Select a supported filing status before calculating' },
       { status: 400 },
     );
@@ -57,7 +54,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle(),
   ]);
   if (sources.some((source) => source.error))
-    return NextResponse.json({ error: 'Unable to load all calculation inputs' }, { status: 500 });
+    return taxJson({ error: 'Unable to load all calculation inputs' }, { status: 500 });
   const [{ data: w2 }, { data: i1099 }, { data: sc }, { data: itemized }] = sources;
   const validAmount = (value: unknown) =>
     value !== null &&
@@ -73,7 +70,7 @@ export async function POST(req: NextRequest) {
       (row) => !validAmount(row.amount) || !validAmount(row.federal_withholding ?? 0),
     )
   ) {
-    return NextResponse.json(
+    return taxJson(
       { error: 'Confirm valid, nonnegative income and withholding amounts before calculating.' },
       { status: 422 },
     );
@@ -89,7 +86,7 @@ export async function POST(req: NextRequest) {
       itemized: itemized ?? null,
     }).calculation;
   } catch {
-    return NextResponse.json(
+    return taxJson(
       { error: 'Check the saved income, dividend and deduction amounts before calculating.' },
       { status: 422 },
     );
@@ -127,8 +124,7 @@ export async function POST(req: NextRequest) {
     is_refund: result.refundAmount > 0,
     calculation_data: { ...result, returnId, ...estimateMetadata },
   });
-  if (calculationError)
-    return NextResponse.json({ error: 'Unable to save calculation' }, { status: 500 });
+  if (calculationError) return taxJson({ error: 'Unable to save calculation' }, { status: 500 });
   const { data: savedReturn, error: saveError } = await supabase
     .from('tax_returns')
     .update({
@@ -141,11 +137,16 @@ export async function POST(req: NextRequest) {
     .eq('id', returnId)
     .eq('created_by_user_id', user.id)
     .eq('service_type', 'self_file')
+    .eq('updated_at', r.updated_at)
     .select('id')
     .maybeSingle();
-  if (saveError || !savedReturn)
-    return NextResponse.json({ error: 'Unable to save calculated return' }, { status: 500 });
-  return NextResponse.json(
+  if (saveError) return taxJson({ error: 'Unable to save calculated return' }, { status: 500 });
+  if (!savedReturn)
+    return taxJson(
+      { error: 'The return changed while calculating. Reload and calculate again.' },
+      { status: 409 },
+    );
+  return taxJson(
     { success: true, result, ...estimateMetadata },
     { headers: { 'Cache-Control': 'private, no-store' } },
   );

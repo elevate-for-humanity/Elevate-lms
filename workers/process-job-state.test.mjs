@@ -1,3 +1,4 @@
+import {attachCompletedLessonMedia} from '../lib/ultimate-course-builder/worker/attach-lesson-media.mjs';
 import test from 'node:test';
 import {continuousCourseLease,checkpointContinuousLesson} from '../lib/ultimate-course-builder/worker/continuous-course-lease.mjs';
 import {preservedCourseCursor} from '../lib/ultimate-course-builder/worker/preserve-completed.mjs';
@@ -134,6 +135,7 @@ test('publication failure prevents advancing beyond a completed lesson',async()=
 test('finished course cursor without a checkpoint repair reaches final release', async () => {
   let plan;
   const s = scenario({nextCompetencyIndex:40}, true, {
+    attach: attachCompletedLessonMedia,
     runCourse: async value => { plan=value; return {completed:true,findings:[],lessons:[]}; },
   });
   const result=await s.run();

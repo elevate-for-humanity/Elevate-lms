@@ -216,7 +216,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       await queue.complete(job.id,workerId,generation);
       return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
     }
-    await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
+    // A final coordinator pass has no new lesson to attach. The complete
+    // competency audit and fenced release below still verify the saved course.
+    const finalCoursePass = !targeted && result.completed && result.lessons.length === 0 &&
+      Number.isInteger(payload.nextCompetencyIndex) && payload.nextCompetencyIndex >= profile.competencies.length;
+    if (!finalCoursePass) await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,
       validate:assertCompleteLesson,assertActive});
     if (lessonReleases && lessonReleaseActor && result.completed && !result.previewReady) {
       assertActive();

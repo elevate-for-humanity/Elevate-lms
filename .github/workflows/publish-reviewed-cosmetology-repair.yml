@@ -1,0 +1,69 @@
+name: Publish verified cosmetology checkpoint repair
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gcp/reviewed-cosmetology-repair.json'
+      - 'scripts/gcp/promote-reviewed-cosmetology-media.mjs'
+      - 'scripts/gcp/promote-reviewed-cosmetology-media.test.mjs'
+      - '.github/workflows/publish-reviewed-cosmetology-repair.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: publish-verified-cosmetology-checkpoint
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - run: node --test scripts/gcp/promote-reviewed-cosmetology-media.test.mjs
+      - name: Require completed verified LMS deployment for protected text delivery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'JS'
+          import {readFile} from 'node:fs/promises';
+          const review=JSON.parse(await readFile('scripts/gcp/reviewed-cosmetology-repair.json','utf8'));
+          for(let i=0;i<120;i++){
+            const response=await fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/actions/runs/'+review.requiredLmsDeploymentRunId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(20000)});
+            if(!response.ok)throw Error('DEPLOYMENT_READ_HTTP_'+response.status);
+            const run=await response.json();
+            if(run.head_sha!==review.requiredLmsSourceCommit)throw Error('EXACT_LMS_SOURCE_REQUIRED');
+            if(run.status==='completed'){
+              if(run.conclusion!=='success')throw Error('LMS_DEPLOYMENT_NOT_SUCCESSFUL');
+              console.log('Required LMS deployment completed successfully');break;
+            }
+            if(i===119)throw Error('LMS_DEPLOYMENT_STILL_PENDING');
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
+          JS
+      - name: Download exact independently reviewed candidate
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 40689265094
+          name: preserved-cosmetology-media-evidence
+          path: reviewed-repair
+      - name: Recheck actual bytes and publish exact bounded repair with canonical CAS
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUDIT_OUTPUT_DIR: reviewed-repair
+        run: node scripts/gcp/promote-reviewed-cosmetology-media.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cosmetology-checkpoint-repair-publication
+          path: reviewed-repair/promotion-receipt.json
+          retention-days: 30
+          if-no-files-found: warn

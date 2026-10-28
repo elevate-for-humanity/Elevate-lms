@@ -1,0 +1,117 @@
+{
+  "courseId": "a6b0b712-1cf0-475a-ba79-ee2023dea8ec",
+  "lessonId": "0811f5b7-eeff-428e-bad1-bfa78a791998",
+  "reviewMode": "measured-bounded-manual-repair",
+  "reviewedBy": "Codex independent encoded-media scan and visual review",
+  "reviewedAt": "2026-10-28T12:44:52.144Z",
+  "pass": true,
+  "instructionalAcceptanceVerified": true,
+  "learnerPlaybackVerified": false,
+  "sourceUrl": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course_videos/a6b0b712-1cf0-475a-ba79-ee2023dea8ec/1792983253408-lesson-09.mp4",
+  "sourceMediaSha256": "8fb667f92510e276ccc18c2f72d599af620a4178f6bece30f7fe20d4067c679b",
+  "candidateMediaSha256": "a7de8b4e756a2e19df3aaf524705661a4a6bb19dc549b5906d9195930180c78a",
+  "audioSha256": "d0908418316c2fca1e3f5b458780d36f263dbedb5a76ff0f0844b752c631a23d",
+  "canonicalScriptSha256": "11d01e52ddbf0c46487aa50d689843129448fb0fa6d6f58e1ae01c45d571da1e",
+  "assessmentSha256": "482947b0bbfb0723a2016e166742f7f27d97ca4fecef91ef233e89b424ed5f22",
+  "objectivesSha256": "47de6f917f801324d8310f16cd719898027a21e2e5228777c8f7e93c0f3162ed",
+  "workflowRunId": 40689265094,
+  "artifactId": 12815873988,
+  "requiredLmsDeploymentRunId": 40688608629,
+  "requiredLmsSourceCommit": "a3cd362639fe9f11e76b4dda16de70ced40b531b",
+  "independentScan": {
+    "filter": "freezedetect=n=-45dB:d=2",
+    "decodePassed": true,
+    "freezeEvents": 0,
+    "blackEvents": 0,
+    "silenceEvents": 0
+  },
+  "phoneReadability": [
+    {
+      "section": 0,
+      "width": 390,
+      "expected": "A safe service starts before the client sits down",
+      "decoded": "A safe service starts\nbefore the client sits down",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    },
+    {
+      "section": 1,
+      "width": 390,
+      "expected": "Cleaning and disinfection are different jobs",
+      "decoded": "Cleaning and disinfection\nare different jobs",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    },
+    {
+      "section": 2,
+      "width": 390,
+      "expected": "Read the label and protect the clean area",
+      "decoded": "Read the label and\nprotect the clean area",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    },
+    {
+      "section": 3,
+      "width": 390,
+      "expected": "Case practice a used comb on a clean tray",
+      "decoded": "Case practice: a used comb\non a clean tray",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    },
+    {
+      "section": 4,
+      "width": 390,
+      "expected": "Observation and safe service decisions",
+      "decoded": "Observation and\nsafe service decisions",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    },
+    {
+      "section": 5,
+      "width": 390,
+      "expected": "Emergency readiness call for help and stay within training",
+      "decoded": "Emergency readiness: call for help\nand stay within training",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    },
+    {
+      "section": 6,
+      "width": 390,
+      "expected": "Three decisions to carry into the salon",
+      "decoded": "Three decisions to\ncarry into the salon",
+      "wordCoverage": 1,
+      "mode": "actual-phone-frame-title-region-4x"
+    }
+  ],
+  "captionReview": {
+    "measuredCueCount": 134,
+    "ordered": true,
+    "measuredSpeechCheckpointSha256": "1f02fae170c09a6380a71dc37cddb10a5f21a40e45eaacd5c240409784062bc3"
+  },
+  "instructionalReview": {
+    "observedSections": 7,
+    "objectivesCovered": 4,
+    "assessmentIds": [
+      "cosmo-manual-09-q01",
+      "cosmo-manual-09-q02",
+      "cosmo-manual-09-q03",
+      "cosmo-manual-09-q04",
+      "cosmo-manual-09-q05",
+      "cosmo-manual-09-q06",
+      "cosmo-manual-09-q07",
+      "cosmo-manual-09-q08"
+    ],
+    "assessmentAnswersAndRemediationReviewed": true,
+    "contextualFootageOnly": true,
+    "fullPracticalOrEmergencyDemonstrationClaimed": false,
+    "practicalVerificationPreserved": true
+  },
+  "narrationReview": {
+    "unchangedAacBytes": true,
+    "independentTranscriptWordCoverage": 0.9941860465116279,
+    "origin": "preserved owner-supplied PARIS recording",
+    "providerIdentityReattested": false
+  },
+  "scope": "licensed-contextual-motion-and-measured-captions-only",
+  "automatedBuildStagesManufactured": 0
+}

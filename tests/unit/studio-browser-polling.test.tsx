@@ -117,7 +117,7 @@ it('surfaces an unreadable status response without an unhandled polling rejectio
     fixture.resolveEvents(new Response('upstream error', { status: 200 }));
     await fixture.poll();
   });
-  expect(screen.getByText('Browser controls interrupted')).toBeInTheDocument();
+  expect(await screen.findByText('Browser controls interrupted')).toBeInTheDocument();
   expect(fixture.fetcher.mock.calls.some(([url]) => url.includes('resource=downloads'))).toBe(
     false,
   );

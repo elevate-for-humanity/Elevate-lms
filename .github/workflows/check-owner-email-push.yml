@@ -1,0 +1,30 @@
+name: Check owner incoming mail push connection
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/ops/check-owner-email-push.mjs', '.github/workflows/check-owner-email-push.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: owner-mail-push-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated existing push dependency
+        run: |
+          mkdir -p /tmp/elevate-owner-push
+          npm install --prefix /tmp/elevate-owner-push --ignore-scripts --no-audit --no-fund web-push@3.6.7
+          cp scripts/ops/check-owner-email-push.mjs /tmp/elevate-owner-push/check.mjs
+      - name: Check keys and notify only owner registered devices
+        run: node /tmp/elevate-owner-push/check.mjs

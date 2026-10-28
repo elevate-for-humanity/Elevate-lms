@@ -127,11 +127,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
           ? `${beautyProgram.label} Apprenticeship`
           : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship',
         nextLessonTitle:
-          'Complete the required items highlighted in red on your apprentice dashboard',
+          'Review your next step and setup checklist on your apprentice dashboard',
       }}
     >
       {subject.previewing && (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
           <span>
             Admin preview: viewing {profile?.full_name || 'this learner'}&apos;s apprentice
             dashboard.
@@ -143,23 +143,17 @@ export default async function Layout({ children }: { children: React.ReactNode }
       )}
       {!profile?.onboarding_completed && (
         <section
-          className="mb-4 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm"
+          className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
           role="status"
           aria-label="Apprentice start notice"
         >
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
-            Apprentice notice
-          </p>
-          <h2 className="mt-1 text-lg font-black">Complete your apprentice onboarding</h2>
-          <p className="mt-1 text-sm font-semibold leading-6">
-            Review your assigned courses, training schedule, and required documents. Course access
-            follows your actual enrollment and onboarding status.
-          </p>
-          <a
-            href="/apprentice/documents"
-            className="mt-3 inline-flex rounded-xl bg-amber-950 px-4 py-2 text-sm font-black text-white hover:bg-amber-900"
-          >
-            Complete required documents
+          <div>
+            <h2 className="font-semibold text-slate-950">Your enrollment checklist</h2>
+            <p className="mt-1 text-sm text-slate-600">Review your documents and training setup before you begin.</p>
+          </div>
+          <a href="/apprentice/documents"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+            Review checklist →
           </a>
         </section>
       )}

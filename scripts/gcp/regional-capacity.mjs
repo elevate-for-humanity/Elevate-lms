@@ -79,7 +79,16 @@ export async function inspectRegionalCapacity({ region, task, taskCount = 1, run
   if (!['us-central1', 'us-east1'].includes(region)) throw new Error('Unsupported capacity region');
   const read = args => JSON.parse(run([...args, '--project=' + PROJECT, '--region=' + region, '--format=json']));
   const services = read(['run', 'services', 'list']);
-  const revisions = read(['run', 'revisions', 'list']);
+  // Only serving or tagged immutable revisions contribute to this budget.
+  // Avoid an unbounded project-wide history response while retaining every
+  // effective revision and the fail-closed allocation checks below.
+  const revisionNames = [...new Set(services.flatMap(service =>
+    (service.status?.traffic || [])
+      .filter(traffic => Number(traffic.percent || 0) > 0 || traffic.tag)
+      .map(traffic => traffic.revisionName ||
+        (traffic.latestRevision ? service.status?.latestReadyRevisionName : null))
+      .filter(Boolean)))];
+  const revisions = revisionNames.map(name => read(['run', 'revisions', 'describe', name]));
   const jobs = read(['run', 'jobs', 'list']);
   const executions = jobs.flatMap(job => read(['run', 'jobs', 'executions', 'list', '--job=' + job.metadata.name]));
   const required = requiredRegionalAllocation(services, task, revisions, executions, taskCount);

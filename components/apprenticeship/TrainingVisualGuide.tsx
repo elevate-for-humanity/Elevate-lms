@@ -211,7 +211,7 @@ export function TrainingVisualGuide({ courseHref }: { courseHref?: string }) {
               [
                 '1',
                 'Start the theory clock',
-                'Open an available lesson or linked workbook section during your study window. Press Start theory study.',
+                'Open an available lesson or linked workbook section during your study window. Press Start theory timeclock.',
               ],
               [
                 '2',
@@ -226,7 +226,7 @@ export function TrainingVisualGuide({ courseHref }: { courseHref?: string }) {
               [
                 '4',
                 'Save lesson completion',
-                'Use Go to lesson completion below the video. Meet the quiz, activity, time, and any required shop signoff checks, then save completion.',
+                'Use Go to lesson completion below the video. Meet the quiz, activity, time, and any required shop signoff checks, then select Mark lesson complete.',
               ],
             ].map(([number, title, body]) => (
               <li key={number} className="rounded-xl border border-slate-200 p-4">

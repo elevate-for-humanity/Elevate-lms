@@ -13,7 +13,17 @@ export function liveKitReadiness(): LiveKitReadiness {
   const missing = Object.entries(required)
     .filter(([, value]) => !value)
     .map(([name]) => name);
-  return missing.length ? { ready: false, missing } : { ready: true, url: required.LIVEKIT_URL! };
+  if (missing.length) return { ready: false, missing };
+  try {
+    const endpoint = new URL(required.LIVEKIT_URL!);
+    if (!['https:', 'wss:'].includes(endpoint.protocol) || endpoint.username || endpoint.password || endpoint.search || endpoint.hash || !['', '/'].includes(endpoint.pathname)) {
+      return { ready: false, missing: ['LIVEKIT_URL (secure provider root URL required)'] };
+    }
+    endpoint.protocol = 'wss:';
+    return { ready: true, url: endpoint.origin };
+  } catch {
+    return { ready: false, missing: ['LIVEKIT_URL (valid provider URL required)'] };
+  }
 }
 
 function credentials() {
@@ -71,5 +81,5 @@ export async function createMeetingToken(input: {
       ? [TrackSource.CAMERA, TrackSource.MICROPHONE, TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO]
       : [TrackSource.CAMERA, TrackSource.MICROPHONE],
   });
-  return { token: await token.toJwt(), serverUrl: config.url };
+  return { token: await token.toJwt(), serverUrl: config.url, canShare: input.canPublish && input.canShare };
 }

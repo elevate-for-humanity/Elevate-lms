@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
+import { instructionView } from '../core/repair-policy.mjs';
 import { currentEvidence } from '../core/lesson-contract';
 import { ULTIMATE_BUILD_STEPS } from '../core/types';
 import { MIN_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
@@ -50,6 +51,37 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const passed = (steps ?? []).filter((x: any) => x.state === 'passed' && currentEvidence(x.artifacts));
     const artifacts = { ...((lesson?.artifacts ?? {}) as Record<string, unknown>) };
     for (const step of passed) artifacts[String(step.step)] = step.artifacts ?? {};
+    // The safety classifier was repaired after these certified lessons were
+    // authored. An old safety-only directive must retry its failing render
+    // gate rather than force the media role to re-author valid objectives.
+    // This does not certify the render: all preflight, source, licensing and
+    // downstream media checks execute normally on the retained checkpoints.
+    const safetyDirective = (artifacts.__repairState as any)?.directive;
+    const safetySource = artifacts.learning_objectives as any;
+    const safetyBoard = artifacts.storyboard as any;
+    const safetyInspectorRetry = safetyDirective?.failedStep === 'lesson_film_render' &&
+      safetyDirective?.target === 'learning_objectives' &&
+      currentEvidence(safetyDirective.previous) && currentEvidence(safetySource) &&
+      safetyDirective.previous.contractEvidence.outputHash === safetySource.contractEvidence.outputHash &&
+      passed.some((row: any) => row.step === 'learning_objectives') &&
+      currentEvidence(safetyBoard) &&
+      Array.isArray(safetyDirective.requirements) && safetyDirective.requirements.length > 0 &&
+      safetyDirective.requirements.every((finding: any) =>
+        finding.code === 'INSTRUCTIONAL_QUALITY_FAILED' &&
+        finding.message === 'practical beauty instruction must include an explicit safety or sanitation scene') &&
+      instructionView(safetyBoard.storyboard).scenes.some((scene: any) =>
+        scene.sceneType === 'safety_warning' || scene.procedurePhase === 'safety');
+    if (safetyInspectorRetry) {
+      artifacts.__repairState = {
+        ...(artifacts.__repairState as any),
+        directive: {
+          ...safetyDirective,
+          target: 'lesson_film_render',
+          previous: artifacts.lesson_film_render,
+          previousTarget: safetyDirective.target,
+        },
+      };
+    }
     // A legacy ASR finding was routed to a deterministic timeline producer.
     // Recover its exact certified timeline and already encoded film; the new
     // independent decoded-audio QA still has to pass before acceptance.

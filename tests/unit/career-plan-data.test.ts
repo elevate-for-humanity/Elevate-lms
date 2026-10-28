@@ -66,3 +66,15 @@ it('recognizes a verified credential and distinguishes a read failure from no pr
   expect(result.resumeSaved).toBe(true);
   expect(result.jriUnavailable).toBe(true);
 });
+
+it('recognizes staff-verified legacy credential records after graduation', async () => {
+  const db = database({ credential_verification: [{ id: 'verified-legacy-record' }] });
+  const result = await loadCareerPlan(db as any, 'graduated-learner');
+  expect(result.credentialEarned).toBe(true);
+  expect(db.calls).toContainEqual(['credential_verification', 'student_id', 'graduated-learner']);
+  expect(db.calls).toContainEqual([
+    'credential_verification',
+    'verification_status',
+    ['approved', 'verified'],
+  ]);
+});

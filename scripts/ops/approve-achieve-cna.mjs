@@ -30,13 +30,9 @@ const [actor] = await api(`${rest}profiles?id=eq.${actorId}&select=role`);
 if (!['admin','super_admin'].includes(actor?.role)) throw Error('Approving administrator not verified');
 const [program] = await api(`${rest}programs?slug=eq.cna&select=id,slug,title,is_active,status`);
 if (!program || program.is_active === false || ['inactive','archived'].includes(program.status)) throw Error('CNA program unavailable');
-let user;
-for(let page=1;page<=20;page++) {
-  const users = (await api(`/auth/v1/admin/users?page=${page}&per_page=1000`)).users;
-  user = users.find(u=>u.email?.toLowerCase()===email);
-  if(user || users.length<1000) break;
-  if(page===20) throw Error('Auth lookup incomplete');
-}
+// Avoid the global auth-user listing: unrelated legacy records can break it.
+const [existingProfile] = await api(`${rest}profiles?email=eq.${email}&select=id`);
+let user = existingProfile ? await api(`/auth/v1/admin/users/${existingProfile.id}`) : null;
 const name = app.contact_name && app.contact_name.toLowerCase() !== 'email' ? app.contact_name : 'Achieve Training Institute Team';
 if (!user) user = await api('/auth/v1/admin/users','POST',{email,email_confirm:true,user_metadata:{full_name:name,organization_name:app.organization_name}});
 if (!user?.id) throw Error('Account provisioning failed');

@@ -83,19 +83,17 @@ export async function loadMyDigitalWorkbook(slug: string) {
     .order('section_number');
   if (error) throw new Error('Workbook sections could not be loaded. Please try again.');
   let typedSections = (sections ?? []) as WorkbookSection[];
+  // Administrator previews may inspect the assigned workbook, including future sections.
+  // Learner reads use workbook RLS; study-window restrictions belong to video/time credit.
   if (previewing) {
-    const visible = await Promise.all(
-      typedSections.map(async (section) => {
-        if (!section.lesson_id) return section;
-        const access = await db.rpc('can_access_lesson', {
-          p_user_id: user.id,
-          p_lesson_id: section.lesson_id,
-        });
-        if (access.error) throw new Error('Workbook lesson release could not be verified.');
-        return access.data === true ? section : null;
-      }),
-    );
-    typedSections = visible.filter((section): section is WorkbookSection => section !== null);
+    const linked = typedSections.map((section) => section.lesson_id).filter(Boolean) as string[];
+    if (linked.length) {
+      const published = await db.from('course_lessons').select('id')
+        .in('id', linked).eq('is_published', true).eq('status', 'published');
+      if (published.error) throw new Error('Workbook publication could not be verified.');
+      const publishedIds = new Set((published.data || []).map((lesson) => lesson.id));
+      typedSections = typedSections.filter((section) => !section.lesson_id || publishedIds.has(section.lesson_id));
+    }
   }
   const lessonIds = typedSections.map((section) => section.lesson_id).filter(Boolean) as string[];
   if (lessonIds.length) {

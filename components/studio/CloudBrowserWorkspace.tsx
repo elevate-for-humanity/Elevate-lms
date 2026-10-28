@@ -1196,7 +1196,7 @@ export default function CloudBrowserWorkspace({
         <button
           type="button"
           aria-pressed={mobilePane === 'signin'}
-          onClick={() => setMobilePane('signin')}
+          onClick={() => void openSignIn()}
           className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-slate-200"
         >
           Website login

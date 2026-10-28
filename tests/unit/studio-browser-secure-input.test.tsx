@@ -136,9 +136,9 @@ it('switches mobile browser panels without resetting the session, stream or inpu
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   const image = screen.getByRole('img', { name: 'Live isolated Chromium browser' });
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Email / password' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Website login' }));
   expect(
-    screen.getByRole('button', { name: 'Email / password' }).getAttribute('aria-pressed'),
+    screen.getByRole('button', { name: 'Website login' }).getAttribute('aria-pressed'),
   ).toBe('true');
   expect(screen.getByLabelText('Secure browser input')).toBe(input);
   fireEvent.click(screen.getByRole('button', { name: 'Browser', exact: true }));
@@ -146,19 +146,20 @@ it('switches mobile browser panels without resetting the session, stream or inpu
   expect(input.value).toBe('sample@example.com');
 });
 
-it('opens a readable sign-in view on the existing session and keeps the draft', async () => {
+it('opens external website login on the existing session without a separate Studio sign-in button', async () => {
   const { actions } = await start();
   const image = screen.getByAltText('Live isolated Chromium browser');
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
+  expect(screen.queryByRole('button', { name: 'Sign in', exact: true })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Website login' }));
   await waitFor(() =>
     expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780, actor: 'human' }),
   );
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
   expect(
-    screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed'),
+    screen.getByRole('button', { name: 'Website login' }).getAttribute('aria-pressed'),
   ).toBe('true');
   fireEvent.click(screen.getByRole('button', { name: 'Exit sign-in view' }));
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
@@ -239,7 +240,7 @@ it('shrinks below 100 percent to 25 percent and restores without recreating the 
 it('fits the compact frame to available height and places secure input first', async () => {
   await start();
   const image = screen.getByAltText('Live isolated Chromium browser');
-  fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: 'Website login' }));
   Object.defineProperty(image, 'naturalWidth', { value: 390, configurable: true });
   Object.defineProperty(image, 'naturalHeight', { value: 780, configurable: true });
   Object.defineProperty(image.parentElement, 'clientWidth', { value: 1000, configurable: true });

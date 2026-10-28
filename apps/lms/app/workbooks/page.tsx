@@ -20,7 +20,7 @@ export default async function WorkbooksPage() {
         </Link>
         <h1 className="mt-4 text-3xl font-bold">My Workbooks</h1>
         <p className="my-5 max-w-prose text-lg leading-relaxed">
-          Open your assigned apprenticeship workbook. Type your answers and save them to your
+          Open your assigned or purchased apprenticeship workbook. Type your answers and save them to your
           account so you can continue on another device.
         </p>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -55,8 +55,7 @@ export default async function WorkbooksPage() {
         </div>
         {!workbooks.length && (
           <p className="rounded-lg border border-slate-300 p-5 leading-relaxed">
-            No digital workbook is assigned to an active program enrollment yet. Contact your
-            instructor if you expected access.
+            No assigned or purchased workbook is available yet. Contact support if you expected access.
           </p>
         )}
         <Link href="/lms/support" className="mt-8 inline-block py-3 underline">

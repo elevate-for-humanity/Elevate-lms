@@ -18,6 +18,7 @@ export default function StoreHeader() {
         <nav aria-label="Store navigation" className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold text-slate-800 sm:mt-0">
           <Link href="/store" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Catalog</Link>
           <Link href="/store/apps" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Apps</Link>
+          <Link href="/store/workbooks" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Workbooks</Link>
           <Link href="/store/plans" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Plans</Link>
           <Link href="/store/cart" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Cart</Link>
           <Link href="/store/orders" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">My Purchases</Link>

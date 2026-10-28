@@ -1,5 +1,6 @@
 import { INDIVIDUAL_APP_CATALOG, type IndividualAppSlug, type IndividualPlanId } from '@/lib/apps/individual-app-plans';
 import { getProductBySlug, type StoreProduct } from '@/lib/store/products';
+import { workbookProducts } from '@/lib/store/workbook-products';
 
 const PLAN_ALIASES: Record<string, IndividualPlanId> = {
   starter: 'starter',
@@ -34,7 +35,7 @@ export function resolveCartAddParam(param: string): StoreProduct | null {
   const normalized = param.trim().toLowerCase();
   if (!normalized) return null;
 
-  const direct = getProductBySlug(normalized);
+  const direct = workbookProducts.find(book => book.slug === normalized) ?? getProductBySlug(normalized);
   if (direct) return direct;
 
   const appPlanMatch = normalized.match(/^(website-builder|sam-gov|grants)-(.+)$/);

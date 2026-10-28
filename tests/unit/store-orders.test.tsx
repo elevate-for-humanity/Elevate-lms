@@ -34,3 +34,9 @@ it('requires login and preserves the requested order',async()=>{
 it('legacy success URLs redirect to verified account status without granting access',async()=>{
  await expect(Success({searchParams:Promise.resolve({order_id:'order'})})).rejects.toThrow('redirect:/store/orders?order_id=order');
 });
+
+it('links the purchased workbook to the matching LMS account resource',async()=>{
+ state.access=[{id:'e',product_id:'381aff7f-7fdc-58bd-8b65-0d07f4f411ec',name:'Cosmetology Apprenticeship Workbook',status:'active'}];
+ render(await Orders({searchParams:Promise.resolve({})}));
+ expect(screen.getByRole('link',{name:'Open workbook'})).toHaveAttribute('href','https://app.elevateforhumanity.org/workbooks/prestige-elevation-cosmetology');
+});

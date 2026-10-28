@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { workbookAccessHref } from '@/lib/store/workbook-products';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'My Purchases | Elevate Store', robots: { index: false, follow: false } };
@@ -67,6 +68,7 @@ export default async function StoreOrdersPage({ searchParams }: { searchParams: 
             <li key={item.id} className="rounded-xl border border-slate-200 p-5">
               <h3 className="font-bold">{item.name}</h3>
               <p className="mt-2 text-sm text-emerald-800">Active access</p>
+              {workbookAccessHref(item.product_id) && <a className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-slate-900 px-4 font-bold text-white" href={workbookAccessHref(item.product_id)!}>Open workbook</a>}
               <Link className="mt-3 inline-flex min-h-11 items-center font-bold underline" href={`/contact?topic=purchase-access&product=${encodeURIComponent(item.product_id ?? item.id)}`}>Get access support</Link>
             </li>
           ))}</ul>}

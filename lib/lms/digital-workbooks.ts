@@ -66,21 +66,14 @@ export async function loadMyDigitalWorkbook(slug: string) {
     if (result.error) throw new Error('Saved answers could not be loaded. Please try again.');
     responses = (result.data ?? []) as WorkbookResponse[];
   }
-  // An admin can inspect published resources but cannot write on a student's behalf.
-  const enrollment = await db
-    .from('program_enrollments')
-    .select('id')
-    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
-    .eq('program_id', workbook.program_id)
-    .is('revoked_at', null)
-    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
-    .limit(1);
-  if (enrollment.error) throw new Error('Workbook access could not be verified.');
+  // The database checks enrollment or this buyer's paid workbook entitlement.
+  const access = await db.rpc('can_edit_digital_workbook', { p_workbook_id: workbook.id });
+  if (access.error) throw new Error('Workbook access could not be verified.');
   return {
     workbook,
     sections: typedSections,
     responses,
-    readOnly: !enrollment.data?.length,
+    readOnly: access.data !== true,
     accountId: user.id,
   };
 }

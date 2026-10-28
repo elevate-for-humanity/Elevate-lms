@@ -147,7 +147,7 @@ export default function DigitalWorkbook({
         </p>
         {readOnly && (
           <p role="status" className="my-4 rounded-lg border border-amber-400 p-4">
-            Read-only preview. Answers can be saved only from an enrolled learner’s account.
+            Read-only preview. Saving requires an active program enrollment or a verified workbook purchase.
           </p>
         )}
         {sections.length ? (

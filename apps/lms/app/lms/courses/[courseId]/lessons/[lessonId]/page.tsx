@@ -12,6 +12,7 @@ import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/Intera
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
 import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
+import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -250,11 +251,11 @@ export default async function LessonPage({
   const videoCheckpoints = authoredVideoCheckpoints.length
     ? authoredVideoCheckpoints
     : checkpointsFromTimeline(instructionalTimeline, experience);
-  const videoTranscript = Array.isArray(interactiveVideo?.transcript)
+  const videoTranscript = Array.isArray(interactiveVideo?.transcript) && interactiveVideo.transcript.length
     ? interactiveVideo.transcript
-    : Array.isArray(instructionalTimeline?.captions)
+    : Array.isArray(instructionalTimeline?.captions) && instructionalTimeline.captions.length
       ? instructionalTimeline.captions
-      : [];
+      : measuredLessonCues((lesson.content_json as any)?.film);
   const captionsUrl = [interactiveVideo?.captionsUrl, (lesson.content_json as any)?.film?.captionsUrl, (lesson.content_json as any)?.film?.sceneData?.captionUrl, experience?.film?.captionsUrl,
     experience?.film?.sceneData?.captionUrl, experience?.media?.caption_url]
     .find((value): value is string => typeof value === 'string' && /^https:\/\//.test(value));

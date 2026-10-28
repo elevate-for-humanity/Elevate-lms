@@ -8,7 +8,7 @@ export default function WorkbookStorePage() {
     <div className="mx-auto max-w-6xl">
       <p className="font-bold uppercase tracking-widest text-brand-red-700">Elevate for Humanity</p>
       <h1 className="mt-3 text-4xl font-black">Apprenticeship workbooks</h1>
-      <p className="mt-4 max-w-3xl text-lg leading-relaxed">Choose your existing digital workbook. Practice, reflect, and save your answers to your account so you can continue on another device.</p>
+      <p className="mt-4 max-w-3xl text-lg leading-relaxed">Get the full illustrated PDF workbook and online practice sections. Download the original, then practice, reflect, and save your answers to your account so you can continue on another device.</p>
       <p className="mt-3 max-w-3xl leading-relaxed">$90 per workbook, one-time purchase. Access opens after payment is verified. Workbook purchase does not include course enrollment, training hours, instructor sign-off, or a license.</p>
       <Link className="my-6 inline-block min-h-11 py-3 font-bold underline" href="/store/orders">Already purchased? Open My Purchases</Link>
       <div className="grid gap-6 sm:grid-cols-2">{workbookProducts.map(book => <article key={book.id} className="overflow-hidden rounded-2xl border border-slate-300 bg-white">

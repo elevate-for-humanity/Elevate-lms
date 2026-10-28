@@ -141,6 +141,7 @@ export default function DigitalWorkbook({
           ELEVATE FOR HUMANITY · APPRENTICESHIP PROGRAM
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
+        <a className="my-4 inline-flex min-h-12 items-center rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white" href={`/api/workbooks/${workbook.slug}/download`}>Download full illustrated workbook (PDF)</a>
         <p className="my-4 text-lg leading-relaxed">
           Write directly in the boxes below. Your answers save to your LMS account and reopen when
           you return.

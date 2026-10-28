@@ -157,3 +157,13 @@ test('errors crossing worker realms retain their message and external-blocker cl
  assert.equal(ctx.findings.at(-1).message,'MEDIA_LICENSE_REQUIRED: actual entitlement unavailable');
  assert.equal(ctx.artifacts.selective_repair.repair.unresolved,1);
 });
+
+// The authoring pipeline can persist safety_scene; the instructional gate uses safety_warning.
+test('authored safety scene survives stage normalization without rewriting its instruction',()=>{
+ const dialogue='Wash and sanitize hands thoroughly. Defer service for cuts or active infections.';
+ for(const stage of ['activate_prior_knowledge','concept_explanation','demonstration']){
+  const view=instructionView({scenes:[{id:'scene:prior-knowledge',stage,sceneType:'safety_scene',dialogue}]});
+  assert.equal(view.scenes[0].sceneType,'safety_warning');
+  assert.equal(view.scenes[0].dialogue,dialogue);
+ }
+});

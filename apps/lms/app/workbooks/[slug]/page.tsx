@@ -6,7 +6,7 @@ import DigitalWorkbook from '@/components/lms/DigitalWorkbook';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'My Digital Workbook | Elevate for Humanity',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: false, noarchive: true },
 };
 
 export default async function DigitalWorkbookPage({

@@ -9,6 +9,8 @@ on:
       - '.github/workflows/audit-preserved-cosmetology-media.yml'
       - 'scripts/gcp/transcribe-preserved-cosmetology-media.mjs'
       - 'scripts/gcp/transcribe-preserved-cosmetology-media.test.mjs'
+      - 'scripts/gcp/repair-preserved-cosmetology-captions.mjs'
+      - 'scripts/gcp/repair-preserved-cosmetology-captions.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -44,6 +46,10 @@ jobs:
           TRANSFORMERS_OFFLINE: '0'
         run: |
           AUDIT_OUTPUT_DIR="$PWD/preserved-media-audit" ASR_MODULE_PATH="$RUNNER_TEMP/cosmetology-asr/lib/video/local-transcription.mjs" node scripts/gcp/transcribe-preserved-cosmetology-media.mjs
+      - name: Build isolated caption-only candidate using measured speech
+        run: |
+          node --test scripts/gcp/repair-preserved-cosmetology-captions.test.mjs
+          node scripts/gcp/repair-preserved-cosmetology-captions.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -15,9 +15,9 @@ export async function main(){
  if(digest!==evidence.mediaSha256)throw Error('AUDITED_MEDIA_HASH_MISMATCH');
  const expected=await readFile(directory+'/canonical-script.txt','utf8');
  const {transcribeLocalAudio}=await import(pathToFileURL(process.env.ASR_MODULE_PATH||new URL('../../lib/video/local-transcription.mjs',import.meta.url).pathname).href);
- const recognized=await transcribeLocalAudio(file,{wordTimings:false});
+ const recognized=await transcribeLocalAudio(file,{wordTimings:true});
  const coverage=measuredWordCoverage(expected,recognized.text);
- const result={mediaSha256:digest,checkedAt:new Date().toISOString(),provider:recognized.provider,model:recognized.model,actualTranscript:recognized.text,canonicalScriptSha256:createHash('sha256').update(expected).digest('hex'),uniqueWordCoverage:coverage,narrationAcceptanceVerified:false,instructionalAcceptanceVerified:false,learnerPlaybackVerified:false,databaseMutations:0};
+ const result={mediaSha256:digest,checkedAt:new Date().toISOString(),provider:recognized.provider,model:recognized.model,actualTranscript:recognized.text,words:recognized.words,canonicalScriptSha256:createHash('sha256').update(expected).digest('hex'),uniqueWordCoverage:coverage,narrationAcceptanceVerified:false,instructionalAcceptanceVerified:false,learnerPlaybackVerified:false,databaseMutations:0};
  await writeFile(directory+'/narration-evidence.json',JSON.stringify(result,null,2));
  console.log(JSON.stringify(result));
 }

@@ -8,7 +8,7 @@ vi.mock('@/lib/storage/lesson-playback',()=>({signedLessonPlayback:m.sign}));
 vi.mock('@/lib/api/withRateLimit',()=>({applyRateLimit:m.rate}));
 vi.mock('@/lib/lms/access-control',async original=>({...await original<typeof import('@/lib/lms/access-control')>(),assertLessonAccess:m.access}));
 import {GET} from '@/apps/lms/app/api/courses/[courseId]/lessons/[lessonId]/playback/route';
-const run=()=>GET(new Request('https://app.elevateforhumanity.org/api/courses/course/lessons/lesson/playback'),{params:Promise.resolve({courseId:'course',lessonId:'lesson'})});
+const run=(asset='')=>GET(new Request('https://app.elevateforhumanity.org/api/courses/course/lessons/lesson/playback'+(asset?'?asset='+asset:'')),{params:Promise.resolve({courseId:'course',lessonId:'lesson'})});
 beforeEach(()=>{vi.clearAllMocks();m.user={id:'student'};m.preview=false;m.lesson={video_url:'saved-source.mp4',content_json:{}};m.rate.mockResolvedValue(null);m.access.mockResolvedValue(undefined);m.sign.mockResolvedValue('https://storage.example/signed-video');
  const query={select:()=>query,eq:()=>query,maybeSingle:async()=>({data:m.lesson,error:null})};m.admin.mockResolvedValue({from:()=>query});
 });
@@ -18,3 +18,15 @@ it('returns only a private redirect after verifying access to the saved lesson',
 it('does not sign when the lesson does not belong to the requested course',async()=>{m.lesson=null;expect((await run()).status).toBe(404);expect(m.sign).not.toHaveBeenCalled();});
 it('stops rate-limited requests before database reads or signing',async()=>{m.rate.mockResolvedValue(new Response('{}',{status:429}));expect((await run()).status).toBe(429);expect(m.admin).not.toHaveBeenCalled();expect(m.sign).not.toHaveBeenCalled();});
 it('does not leak signing secrets on a provider failure',async()=>{m.sign.mockRejectedValue(new Error('secret token'));const response=await run();expect(response.status).toBe(503);expect(await response.text()).not.toContain('secret token');});
+
+it('protects measured captions and transcript with the same learner access boundary',async()=>{
+ m.lesson={video_url:'saved-source.mp4',content_json:{film:{durationSeconds:10,captionCues:[{start:1.25,end:2.5,text:'Cleaning removes visible debris.'}],measuredTranscript:'Cleaning removes visible debris.'}}};
+ const captions=await run('captions');expect(captions.status).toBe(200);expect(captions.headers.get('content-type')).toContain('text/vtt');expect(await captions.text()).toContain('00:00:01.250 --> 00:00:02.500');
+ const transcript=await run('transcript');expect(await transcript.text()).toBe('Cleaning removes visible debris.');
+ expect(m.access).toHaveBeenCalledTimes(2);expect(m.sign).not.toHaveBeenCalled();
+ m.access.mockRejectedValue(new Error('ACCESS_DENIED'));expect((await run('captions')).status).toBe(403);expect((await run('transcript')).status).toBe(403);
+});
+it('fails closed on malformed measured captions and unknown asset requests',async()=>{
+ m.lesson={video_url:'saved-source.mp4',content_json:{film:{durationSeconds:10,captionCues:[{start:1,end:3,text:'first'},{start:2,end:4,text:'overlap'}]}}};
+ expect((await run('captions')).status).toBe(404);expect((await run('other')).status).toBe(400);expect(m.sign).not.toHaveBeenCalled();
+});

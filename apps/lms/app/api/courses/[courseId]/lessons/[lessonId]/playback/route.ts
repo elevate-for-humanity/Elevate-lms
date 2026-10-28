@@ -5,6 +5,7 @@ import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-contro
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { signedLessonPlayback } from '@/lib/storage/lesson-playback';
 import { renderMediaUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
+import { measuredLessonAsset } from '@/lib/video/measured-lesson-assets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{cour
     const {data:lesson,error} = await query.maybeSingle();
     if (error) throw error;
     if (!lesson) return NextResponse.json({error:'Lesson not found'}, {status:404, headers});
+    const asset = new URL(_request.url).searchParams.get('asset');
+    if (asset && asset !== 'video') {
+      if (!['captions','transcript'].includes(asset)) return NextResponse.json({error:'Unknown lesson asset'}, {status:400, headers});
+      const material = measuredLessonAsset(asset, lesson.content_json?.film);
+      if (!material) return NextResponse.json({error:'Lesson material unavailable'}, {status:404, headers});
+      return new NextResponse(material.body, {headers:{...headers,'Content-Type':material.contentType,'X-Content-Type-Options':'nosniff'}});
+    }
     const source = renderMediaUrl(lesson.content_json?.film) || lesson.video_url;
     if (!source) return NextResponse.json({error:'Video unavailable'}, {status:404, headers});
     const location = await signedLessonPlayback(db, source);

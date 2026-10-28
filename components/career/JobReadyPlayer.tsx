@@ -173,7 +173,7 @@ export function JobReadyPlayer({ slug, title, initialCmi, learnerId, learnerName
     window.addEventListener('pagehide', flush);
     document.addEventListener('visibilitychange', visibility);
     const timeout = setTimeout(() => {
-      if (!disposed)
+      if (!disposed && !initialized)
         setMessage(
           'If the lesson is blank or reports an access error, use Request help below. Progress is saved only after the lesson reports it.',
         );

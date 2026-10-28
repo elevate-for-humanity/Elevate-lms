@@ -22,7 +22,10 @@ export async function streamLessonMedia(request: Request, signedUrl: string, ass
   const headers = new Headers(privateHeaders);
   for (const name of ['content-length', 'content-range', 'accept-ranges']) {
     const value = upstream.headers.get(name);
-    if (value) headers.set(name, value);
+    // A full movie can exceed Cloud Run's 32 MiB non-streamed response limit.
+    // Let the HTTP adapter stream/chunk GET bodies instead of advertising a
+    // fixed full-object length. HEAD metadata and partial range lengths remain.
+    if (value && (name !== 'content-length' || request.method === 'HEAD' || upstream.status === 206)) headers.set(name, value);
   }
   if (upstream.status === 416) {
     await upstream.body?.cancel();

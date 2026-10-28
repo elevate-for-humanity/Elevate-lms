@@ -8,7 +8,7 @@ function database(decision='approve', mediaPass=true) {
  const filters:unknown[]=[];
  const db={from:(table:string)=>{
   const q={select:()=>q,eq:(...args:unknown[])=>{filters.push([table,...args]);return q;},in:()=>q,order:()=>q,limit:()=>q,
-   maybeSingle:async()=>result(),single:async()=>result(),then:(resolve:(v:unknown)=>unknown)=>resolve(result())};
+   maybeSingle:async()=>result(),single:async()=>{const row=result();return table==='ultimate_lesson_builds'?{...row,data:Array.isArray(row.data)?row.data[0]:row.data}:row;},then:(resolve:(v:unknown)=>unknown)=>resolve(result())};
   function result(){return {error:null,data:table==='ultimate_artifacts'?{id:'film'}:table==='ultimate_artifact_versions'?[{id:'new',version:2,content:{render:{videoUrl:'https://media.example/new.mp4'}}},{id:'old',version:1,content:{render:{videoUrl:'https://media.example/old.mp4'}}}]:table==='ultimate_review_decisions'?{action:decision}:table==='ultimate_course_builds'?{id:'build',course_id:'course',status:'built',profile:{publicationPolicy:'owner-review-required',competencies:[{id:'lesson'}]}}:[{id:'lesson-build',lesson_key:'lesson',competency_id:'lesson',status:'built',artifacts:{finished_media_qa:{mediaQA:{pass:mediaPass}},lesson_film_render:{render:{videoUrl:'https://media.example/new.mp4'}}}}]};}
   return q;
  }};return {db,filters};
@@ -34,4 +34,3 @@ describe('immutable video review and publication',()=>{
   await expect(new UltimateReleaseService(database().db as never).derive('build')).resolves.toMatchObject({buildId:'build',lessons:[{sourceLessonBuildId:'lesson-build'}]});
  });
 });
-

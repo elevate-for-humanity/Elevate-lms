@@ -11,6 +11,8 @@ on:
       - 'scripts/gcp/transcribe-preserved-cosmetology-media.test.mjs'
       - 'scripts/gcp/repair-preserved-cosmetology-captions.mjs'
       - 'scripts/gcp/repair-preserved-cosmetology-captions.test.mjs'
+      - 'scripts/gcp/repair-preserved-cosmetology-motion.mjs'
+      - 'scripts/gcp/repair-preserved-cosmetology-motion.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -20,7 +22,7 @@ jobs:
   inspect:
     runs-on: ubuntu-24.04
     environment: production
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,10 +52,18 @@ jobs:
         run: |
           node --test scripts/gcp/repair-preserved-cosmetology-captions.test.mjs
           node scripts/gcp/repair-preserved-cosmetology-captions.mjs
+      - name: Build bounded licensed-motion repair candidate without updating LMS
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node --test scripts/gcp/repair-preserved-cosmetology-motion.test.mjs
+          node scripts/gcp/repair-preserved-cosmetology-motion.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: preserved-cosmetology-media-evidence
-          path: preserved-media-audit/
+          path: |
+            preserved-media-audit/*.*
+            preserved-media-audit/motion/measured-captions.*
           retention-days: 30
           if-no-files-found: error

@@ -78,32 +78,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unable to save the call record.' }, { status: 500 });
   }
 
-  if (outcome === 'enrolled') {
-    const { error: agreementError } = await ctx.db
-      .from('program_holder_commission_agreements')
-      .upsert({
-        program_holder_id: ctx.holderId,
-        program_holder_student_id: studentId,
-        enrollment_id: applicant.enrollment_id || null,
-        student_user_id: applicant.user_id || null,
-        commission_rate_bps: 3000,
-        status: 'active',
-        qualification_source: 'holder_enrollment',
-        qualified_by: ctx.user.id,
-        qualified_at: now,
-        updated_at: now,
-      }, { onConflict: 'program_holder_id,program_holder_student_id' });
-    if (agreementError) {
-      return NextResponse.json(
-        { error: 'Call saved, but commission eligibility requires administrator review.' },
-        { status: 409 },
-      );
-    }
+  // A call outcome must never create, reactivate, or overwrite a negotiated agreement.
+  // Only a separately qualified, student-specific agreement can report eligibility.
+  const { data: agreement, error: agreementError } = await ctx.db
+    .from('program_holder_commission_agreements')
+    .select('status,commission_rate_bps,enrollment_id,qualified_by,qualified_at')
+    .eq('program_holder_id', ctx.holderId)
+    .eq('program_holder_student_id', studentId)
+    .maybeSingle();
+  if (agreementError) {
+    return NextResponse.json(
+      { error: 'Call saved, but commission eligibility could not be verified.' },
+      { status: 503 },
+    );
   }
+  const commissionEligible = outcome === 'enrolled' && agreement?.status === 'active' &&
+    Boolean(applicant.enrollment_id) && agreement.enrollment_id === applicant.enrollment_id &&
+    Boolean(agreement.qualified_by && agreement.qualified_at);
 
   return NextResponse.json({
     ok: true,
-    commissionEligible: outcome === 'enrolled',
-    commissionRatePercent: outcome === 'enrolled' ? 30 : null,
+    commissionEligible,
+    commissionRatePercent: commissionEligible ? agreement.commission_rate_bps / 100 : null,
   });
 }

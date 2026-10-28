@@ -273,7 +273,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holder_courses')
       .select(
-        'id,program_id,course_id,status,term_name,start_date,end_date,credential_alignment_status',
+        'id,program_id,course_id,status,term_name,start_date,end_date,credential_alignment_status,custom_syllabus_path,custom_syllabus_filename,custom_syllabus_uploaded_at',
       )
       .eq('program_holder_id', holderId),
     programIds.length ? db.from('program_courses').select('id,program_id,course_id').in('program_id', programIds) : Promise.resolve({ data: [] }),

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { materialUploadPolicy } from '@/lib/program-holder/material-upload';
 import {
   CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
   HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
@@ -17,6 +18,10 @@ const DOCUMENT_TYPES = new Set([
   ...CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
   ...HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
   'company_logo',
+  'profile_photo',
+  'lab_tracker',
+  'textbook',
+  'testing_evidence',
   'provider_invoice',
 ]);
 
@@ -32,6 +37,8 @@ export async function POST(request: NextRequest) {
   const documentType = String(form.get('documentType') || '');
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
+  if (documentType === 'profile_photo' && !['image/jpeg', 'image/png'].includes(file.type))
+    return NextResponse.json({ error: 'Upload a JPG or PNG profile picture.' }, { status: 400 });
   if (documentType === 'provider_invoice') {
     const holder = await ctx.db
       .from('program_holders')
@@ -49,10 +56,11 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
   }
+  const material = materialUploadPolicy(documentType, file);
   const maxBytes = file.type === 'video/mp4' ? MAX_VIDEO_BYTES : MAX_BYTES;
-  if (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes)
+  if (material ? !material.allowed : (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes))
     return NextResponse.json(
-      { error: 'Upload a PDF, JPG, or PNG up to 10 MB, or an MP4 video up to 50 MB.' },
+      { error: material ? 'Upload an XLSX, XLS, or CSV lab tracker up to 10 MB, or a PDF or DOCX textbook up to 50 MB.' : 'Upload a PDF, JPG, or PNG up to 10 MB, or an MP4 video up to 50 MB.' },
       { status: 400 },
     );
 
@@ -65,7 +73,7 @@ export async function POST(request: NextRequest) {
   const path = `program-holders/${ctx.holderId}/${documentType}/${randomUUID()}.${extension}`;
   const { error: storageError } = await ctx.db.storage
     .from('documents')
-    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false });
+    .upload(path, await file.arrayBuffer(), { contentType: material?.contentType || file.type, upsert: false });
   if (storageError)
     return NextResponse.json(
       { error: 'The protected file could not be uploaded.' },
@@ -82,7 +90,7 @@ export async function POST(request: NextRequest) {
       file_url: path,
       storage_bucket: 'documents',
       file_size: file.size,
-      mime_type: file.type,
+      mime_type: material?.contentType || file.type,
       description:
         documentType === 'provider_invoice'
           ? 'CDL training invoice submitted to Elevate for payment review'

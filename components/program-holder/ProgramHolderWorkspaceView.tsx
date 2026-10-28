@@ -1,3 +1,4 @@
+import { TestingReadinessForm } from './TestingReadinessForm';
 import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
@@ -48,6 +49,7 @@ type Section =
   | 'hours'
   | 'compliance'
   | 'documents'
+  | 'ready-to-test'
   | 'reports'
   | 'payouts'
   | 'settings';
@@ -333,6 +335,22 @@ export async function ProgramHolderWorkspaceView({
       />
       </>
     );
+  if (section === 'ready-to-test') return (
+    <div className="space-y-6 p-4">
+      <Hero eyebrow="Completion and testing" title="Ready to Test" description="Submit the exact exit report, track Admin review, and start your individual second-payment invoice." />
+      <TestingReadinessForm students={data.enrollments} documents={data.documents} />
+      <section className="rounded-2xl border bg-white p-5"><h2 className="text-xl font-black">Submitted exit reports</h2>
+        {data.reports.filter(row => row.metadata?.report_kind === 'testing_readiness').map(row => <article key={row.id} className="mt-4 min-w-0 rounded-xl border p-4">
+          <h3 className="font-bold">{row.title}</h3><p className="text-sm">Review: {row.status}</p>
+          <p className="text-sm">Second-payment invoice: {row.metadata?.completion_invoice?.status || 'Requires review'}{Number.isInteger(row.metadata?.completion_invoice?.amount_cents) ? ` — ${(row.metadata.completion_invoice.amount_cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}` : ''}</p>
+          {row.metadata?.completion_invoice?.reason && <p className="text-sm">{row.metadata.completion_invoice.reason}</p>}
+          {row.reviewer_notes && <p className="mt-2 text-sm">Admin feedback: {row.reviewer_notes}</p>}
+          <details className="mt-3"><summary className="min-h-11 cursor-pointer font-bold">View exact submitted report</summary><pre className="whitespace-pre-wrap break-words font-sans text-sm">{row.content}</pre></details>
+        </article>)}
+        {!data.reports.some(row => row.metadata?.report_kind === 'testing_readiness') && <p className="mt-3 text-sm">No exit reports submitted yet.</p>}
+      </section>
+    </div>
+  );
   if (section === 'programs') return <Programs data={data} />;
   if (section === 'hours')
     return <Hours rows={data.hours} programs={data.programs} enrollments={data.enrollments} />;
@@ -342,6 +360,7 @@ export async function ProgramHolderWorkspaceView({
     return (
       <Documents
         rows={data.documents}
+        courseAssignments={data.courseAssignments}
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
         insuranceRequired={holderFeatures.insurance_required !== false}
@@ -998,6 +1017,7 @@ function Programs({ data }: { data: any }) {
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
       <CourseSyllabus syllabus={data.programs.some((program: any) => program.id === data.holder?.features?.course_syllabus?.program_id) ? data.holder?.features?.course_syllabus : null} />
+      <SyllabusUploadStatus documents={data.documents} courseAssignments={data.courseAssignments} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>
   );
@@ -1317,13 +1337,39 @@ function Compliance({
     </div>
   );
 }
+function SyllabusUploadStatus({ documents, courseAssignments }: { documents: any[]; courseAssignments: any[] }) {
+  const syllabi = documents.filter(row => ['training_plan', 'hvac_training_plan', 'syllabus'].includes(row.document_type));
+  if (!syllabi.length) return null;
+  return (
+    <section className="rounded-2xl border border-blue-200 bg-white p-5 sm:p-6" aria-label="Uploaded syllabus status">
+      <h2 className="text-xl font-black">Your syllabus and course status</h2>
+      <p className="mt-2 text-sm text-slate-700">A syllabus upload is submitted for review. A course must be created, checked, and published separately before students can use it.</p>
+      <div className="mt-4 space-y-3">
+        {syllabi.map(row => {
+          const linked = courseAssignments.filter(course => course.custom_syllabus_path === row.file_url && course.course_id);
+          return <article key={row.id} className="min-w-0 rounded-xl border p-4 text-sm">
+            <h3 className="break-words font-bold">{row.file_name || 'Uploaded syllabus'}</h3>
+            <p className="mt-2">Review: {row.status === 'approved' || row.approved === true ? 'Approved' : row.status === 'rejected' ? 'Changes requested' : 'Pending review'}</p>
+            <p>Course from this upload: {linked.length ? 'Connected — publication and student access require verification' : 'No course is linked to this syllabus yet'}</p>
+            {row.rejection_reason && <p className="mt-2 text-amber-900">Reviewer feedback: {row.rejection_reason}</p>}
+            <a className="mt-3 inline-flex min-h-11 items-center font-bold text-blue-800 underline" href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer">View your syllabus</a>
+          </article>;
+        })}
+      </div>
+      <p className="mt-3 text-sm text-slate-700">An existing program course does not mean your uploaded syllabus was converted. Contact Office Mail for the review or course creation update.</p>
+    </section>
+  );
+}
+
 function Documents({
   rows,
+  courseAssignments,
   isHvac,
   requiresEnchantedHeartsTerms,
   insuranceRequired,
 }: {
   rows: any[];
+  courseAssignments: any[];
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
   insuranceRequired: boolean;
@@ -1336,6 +1382,8 @@ function Documents({
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
       <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
+      <SyllabusUploadStatus documents={rows} courseAssignments={courseAssignments} />
+      <ProgramHolderDocumentUpload materialsOnly />
       <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>

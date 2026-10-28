@@ -500,6 +500,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
           icon: BookOpen,
         },
         { id: 'hours', label: 'Training Hours', href: '/program-holder/hours', icon: Clock },
+        { id: 'ready-to-test', label: 'Ready to Test', href: '/program-holder/ready-to-test', icon: FileText },
         {
           id: 'reports',
           label: 'Progress Reports',

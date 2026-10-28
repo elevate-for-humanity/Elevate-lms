@@ -11,7 +11,7 @@ describe('Program Holder student-scoped commission contract', () => {
 
   it('does not make routed applicants commissionable', () => {
     expect(migration).toContain("qualification_source text not null default 'holder_enrollment'");
-    expect(callLog).toContain("if (outcome === 'enrolled')");
+    expect(callLog).toContain("outcome === 'enrolled' && agreement?.status === 'active'");
     expect(callLog).not.toContain("outcome === 'interested' ? 3000");
   });
 
@@ -28,10 +28,13 @@ describe('Program Holder student-scoped commission contract', () => {
     expect(callList).toContain('href={`sms:${applicant.applicant_phone}`}');
   });
 
-  it('requires documented setup before activating the 30 percent agreement', () => {
+  it('reads qualified individual agreements without creating compensation from a call outcome', () => {
     expect(callLog).toContain("outcome === 'enrolled' && (!notes || !workStartDate)");
-    expect(callLog).toContain('commission_rate_bps: 3000');
-    expect(callLog).toContain("qualification_source: 'holder_enrollment'");
+    expect(callLog).not.toContain('commission_rate_bps: 3000');
+    expect(callLog).not.toContain('.upsert(');
+    expect(callLog).toContain('agreement.enrollment_id === applicant.enrollment_id');
+    expect(callLog).toContain('agreement.qualified_by && agreement.qualified_at');
+    expect(callLog).toContain('agreement.commission_rate_bps / 100');
   });
 
   it('provides idempotent payment and reversal records', () => {

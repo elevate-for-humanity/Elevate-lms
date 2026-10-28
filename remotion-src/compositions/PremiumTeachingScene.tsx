@@ -7,7 +7,7 @@ import { activePictureCue, quoteStartSeconds } from '../../lib/ultimate-course-b
  * stays muted; illustrations never stand in for a practical demonstration. */
 export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideLessonProps}){
  const frame=useCurrentFrame(),{fps}=useVideoConfig(),seconds=frame/fps;
- const fade=(start:number)=>interpolate(seconds,[start,start+.75],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
+ const fade=(start:number,duration=.75)=>interpolate(seconds,[start,start+duration],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
  const steps=scene.teachingVisual?.steps??scene.bullets.map((value,i)=>({label:'Step '+(i+1),value,narrationQuote:value}));
  const speechCues=scene.wordAlignment?.map(w=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??scene.captionCues??[];
  const stepIndex=measuredTeachingStep(steps,speechCues,seconds);
@@ -20,9 +20,15 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const pictureFade=(start:number)=>interpolate(seconds,[start,start+.1],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
  const whole={width:'100%',height:'100%',objectFit:'contain' as const};
  const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
- // Photographs are illustrations, not demonstrations. Keep them still and
- // fully visible; actual action comes only from the inspected video excerpt.
- const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity}}/>;
+ // Keep the whole teaching photograph visible while the camera gently tracks
+ // it. A contained, slightly inset image preserves tools and hands at the edges.
+ // One continuous camera move per picture instead of oscillating sine/cosine
+ // motion. Repeated cycles were visually indistinguishable from timeline replay.
+ const pictureStart=cue?.startSeconds??0;
+ const pictureEnd=cue?.endSeconds??Math.max(1,scene.durationFrames/fps);
+ const pictureProgress=Math.max(0,Math.min(1,(seconds-pictureStart)/Math.max(0.1,pictureEnd-pictureStart)));
+ const photoMotion=`translate(${(-0.8+pictureProgress*1.6).toFixed(3)}%, ${(-0.35+pictureProgress*0.7).toFixed(3)}%) scale(${(0.975+pictureProgress*0.02).toFixed(4)})`;
+ const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity,transform:photoMotion}}/>;
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
   <div style={{position:'absolute',top:30,left:54,color:'#cdb795',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>
@@ -43,7 +49,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
     </>:!demonstration&&scene.imageUrl?photo(scene.imageUrl):null}
    </div>
   </div>
-  <div style={{position:'absolute',left:1220,right:54,top:225,height:640,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(textStart)}}>
+  <div style={{position:'absolute',left:1220,right:54,top:225,height:640,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(textStart,scene.teachingVisual?.transitionSeconds??.75)}}>
    <div style={{fontSize:!recap&&(step?.label?.length??0)>30?40:48,color:'#cdb795',lineHeight:1.25}}>{recap?'Fresh recap':String(stepIndex+1).padStart(2,'0')+'  '+step?.label}</div>
    <div style={{fontSize:recap?56:(step?.value?.length??0)>100?52:64,lineHeight:1.25}}>{recap?scene.recapText:step?.value}</div>
    <div style={{fontSize:22,color:'#cdb795'}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>

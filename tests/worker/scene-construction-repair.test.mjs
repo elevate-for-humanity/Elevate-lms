@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
-import { applySceneTitleReadabilityRepair, orderSceneTeachingStates } from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
+import { applySceneTitleReadabilityRepair, applyTeachingStateVisibilityRepair, orderSceneTeachingStates } from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
 import { measuredTeachingStep } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import { quoteStartSeconds } from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
 
@@ -18,8 +18,8 @@ function loadTypeScript(path, exportName, injectedNames = [], injectedValues = [
 const createProductionHandlers = loadTypeScript(
   '../../lib/ultimate-course-builder/core/production-handlers.ts',
   'createProductionHandlers',
-  ['instructionView', 'applySceneTitleReadabilityRepair', 'orderSceneTeachingStates'],
-  [value => value, applySceneTitleReadabilityRepair, orderSceneTeachingStates],
+  ['instructionView', 'applySceneTitleReadabilityRepair', 'applyTeachingStateVisibilityRepair', 'orderSceneTeachingStates'],
+  [value => value, applySceneTitleReadabilityRepair, applyTeachingStateVisibilityRepair, orderSceneTeachingStates],
 );
 const prepareUltimateStoryboardInput = loadTypeScript(
   '../../lib/ultimate-course-builder/adapters/platform-renderer.ts',
@@ -96,6 +96,35 @@ test('scene construction applies the failure-specific layout directive without c
   assert.equal(repaired.scenes[2].dialogue, board.scenes[2].dialogue);
   assert.equal(board.scenes[2].titleFontSize, undefined);
   assert.equal(result.artifacts.scenes.shots.length, 13);
+});
+
+test('scene construction makes only the failed teaching-state transition fully visible', async () => {
+  const board = storyboard();
+  board.scenes[4].teachingVisual = {kind:'sequence',steps:[
+    {label:'Identify condition',value:'recognize this as an ingrown nail',narrationQuote:'recognize this as an ingrown nail'},
+    {label:'Legal boundary',value:'never dig into the lateral nail groove',narrationQuote:'never dig into the lateral nail groove'},
+  ]};
+  board.scenes[4].dialogue='First, recognize this as an ingrown nail. Then never dig into the lateral nail groove.';
+  const assignments = board.scenes.map((scene, index) => ({sceneId:scene.id,assetId:'asset-'+index}));
+  const result = await createProductionHandlers({}).scene_construction({
+    artifacts:{storyboard:{storyboard:board},visual_assignment:{media:{assignments}}},
+    repairDirective:{target:'scene_construction',requirements:[{
+      code:'MEDIA_TEACHING_STATE_NOT_VISIBLE',
+      message:'MEDIA_TEACHING_STATE_NOT_VISIBLE:'+board.scenes[4].id+':0:390',
+    }]},
+  });
+  const repaired = result.artifacts.scenes.storyboard.storyboard;
+  assert.equal(repaired.scenes[4].teachingVisual.transitionSeconds,0.08);
+  assert.deepEqual(repaired.scenes[4].teachingVisual.visibilityRepair,{stepIndex:0,width:390});
+  assert.deepEqual(repaired.scenes[4].teachingVisual.steps,board.scenes[4].teachingVisual.steps);
+  assert.equal(repaired.scenes[3].teachingVisual,undefined);
+  assert.equal(board.scenes[4].teachingVisual.transitionSeconds,undefined);
+});
+
+test('teaching-state visibility repair rejects an unknown scene or step', () => {
+  const board=storyboard();
+  assert.throws(()=>applyTeachingStateVisibilityRepair(board,{target:'scene_construction',requirements:[{code:'MEDIA_TEACHING_STATE_NOT_VISIBLE',message:'MEDIA_TEACHING_STATE_NOT_VISIBLE:missing:0:390'}]}),/SCENE_OUT_OF_RANGE/);
+  assert.throws(()=>applyTeachingStateVisibilityRepair({...board,scenes:[{...board.scenes[0],teachingVisual:{kind:'sequence',steps:[]}}]},{target:'scene_construction',requirements:[{code:'MEDIA_TEACHING_STATE_NOT_VISIBLE',message:'MEDIA_TEACHING_STATE_NOT_VISIBLE:'+board.scenes[0].id+':1:1280'}]}),/STEP_OUT_OF_RANGE/);
 });
 
 test('the renderer consumes the repaired scene-construction storyboard', () => {

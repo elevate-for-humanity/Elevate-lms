@@ -6,6 +6,9 @@ import { compatibleVisualTask } from './reviewed-scene-evidence';
 export interface TeachingVisual {
   kind: 'sequence' | 'record' | 'choices' | 'comparison' | 'terms';
   steps: Array<{ label: string; value: string; narrationQuote: string }>;
+  /** Presentation-only repair metadata; authored teaching text is unchanged. */
+  transitionSeconds?: number;
+  visibilityRepair?: { stepIndex: number; width: 390 | 1280 };
 }
 /** Fill an omitted visual plan from the exact authored narration. This is a
  * renderer-owned teaching layer, never a claim that stock demonstrates an

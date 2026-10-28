@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {describeWorkerError} from '../lib/ultimate-course-builder/core/worker-error.mjs';
+import {describeWorkerError,optionalStorageCacheMiss} from '../lib/ultimate-course-builder/core/worker-error.mjs';
 test('provider errors retain hidden messages across realms',()=>{
  const error=vm.runInNewContext('new Error("render provider timeout")');
  assert.equal(JSON.stringify(error),'{}');
@@ -25,6 +25,13 @@ test('Supabase storage errors retain the nested HTTP failure behind an empty JSO
 test('the original HTTP Response retains its status text without serializing headers',()=>{
  const detail=describeWorkerError({originalError:new Response('',{status:503,statusText:'Service Unavailable',headers:{Authorization:'private-fixture'}})});
  assert.match(detail,/status=503:statusText=Service Unavailable/);assert.doesNotMatch(detail,/private-fixture|Authorization/);
+});
+test('only optional deterministic photo cache misses accept nested storage 400/404 responses',()=>{
+ assert.equal(optionalStorageCacheMiss({originalError:new Response('',{status:400,statusText:'Bad Request'})}),true);
+ assert.equal(optionalStorageCacheMiss({statusCode:'404',message:'Object not found'}),true);
+ assert.equal(optionalStorageCacheMiss({status:403,message:'Forbidden'}),false);
+ assert.equal(optionalStorageCacheMiss({status:400,message:'JWT signature invalid'}),false);
+ assert.equal(optionalStorageCacheMiss({status:503,message:'Service unavailable'}),false);
 });
 test('photo preparation records the failing scene and cue while retaining licensing error codes',async()=>{
  const source=stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/adapters/teaching-photos.ts',import.meta.url),'utf8'),{mode:'transform'})

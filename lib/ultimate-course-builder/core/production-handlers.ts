@@ -1,4 +1,4 @@
-import {instructionView, applySceneTitleReadabilityRepair, orderSceneTeachingStates} from './repair-policy.mjs';
+import {instructionView, applySceneTitleReadabilityRepair, applyTeachingStateVisibilityRepair, orderSceneTeachingStates} from './repair-policy.mjs';
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
 import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
@@ -189,8 +189,11 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     scene_construction: async (ctx) => {
       const storyboardArtifact: any = ctx.artifacts.storyboard ?? {};
       const sourceStoryboard = storyboardArtifact.storyboard ?? storyboardArtifact;
-      const repairedStoryboard = applySceneTitleReadabilityRepair(
-        orderSceneTeachingStates(sourceStoryboard),
+      const repairedStoryboard = applyTeachingStateVisibilityRepair(
+        applySceneTitleReadabilityRepair(
+          orderSceneTeachingStates(sourceStoryboard),
+          ctx.repairDirective,
+        ),
         ctx.repairDirective,
       );
       const storyboard = storyboardArtifact.storyboard

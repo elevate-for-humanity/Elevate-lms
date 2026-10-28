@@ -6,7 +6,7 @@ import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watc
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
 import { createHash } from 'node:crypto';
-import { describeWorkerError } from '../core/worker-error.mjs';
+import { describeWorkerError, optionalStorageCacheMiss } from '../core/worker-error.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /** Private, reusable photographs tied to exact spoken teaching points.
@@ -107,8 +107,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const indexPath='approved-teaching-photo-index/'+requestHash+'.json';
       const bucket=db.storage.from('course_videos');
       const cached=await bucket.download(indexPath);
-      if(cached.error && String((cached.error as any).statusCode)!=='404' &&
-        !/not found|does not exist/i.test(cached.error.message)) throw cached.error;
+      if(cached.error && !optionalStorageCacheMiss(cached.error)) throw cached.error;
       let saved:any;
       if(cached.data){
         try{saved=JSON.parse(await cached.data.text());}catch{throw new Error('TEACHING_PHOTO_INDEX_INVALID');}
@@ -121,8 +120,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const variants=await Promise.all(['png','jpg','webp'].map(async extension=>{
           const path='approved-teaching-photos/'+legacyRequestHash+'.'+extension;
           const result=await bucket.download(path);
-          if(result.error && String((result.error as any).statusCode)!=='404' &&
-            !/not found|does not exist/i.test(result.error.message)) throw result.error;
+          if(result.error && !optionalStorageCacheMiss(result.error)) throw result.error;
           return {path,data:result.data};
         }));
         const hit=variants.find(variant=>variant.data);

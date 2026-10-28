@@ -11,7 +11,6 @@ on:
       - 'scripts/gcp/transcribe-preserved-cosmetology-media.test.mjs'
 permissions:
   contents: read
-  id-token: write
 concurrency:
   group: audit-preserved-cosmetology-media
   cancel-in-progress: false
@@ -34,22 +33,17 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/gcp/audit-preserved-cosmetology-media.mjs
       - run: node --test scripts/gcp/transcribe-preserved-cosmetology-media.test.mjs
-      - uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
-      - name: Independently transcribe the same audited bytes using the verified offline worker image
+      - name: Prepare isolated pinned speech recognizer without cloud credentials
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-          docker run --rm --cpus=2 --memory=4g --network=none --entrypoint node \
-            -v "$PWD/preserved-media-audit:/audit" \
-            -v "$PWD/scripts/gcp/transcribe-preserved-cosmetology-media.mjs:/audit-driver.mjs:ro" \
-            us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:0a6ad85cd905a8b7363c35b9f46254ff80d8d5c53fc88a17bcc94a3573309c54 \
-            /audit-driver.mjs
+          npm install --prefix "$RUNNER_TEMP/cosmetology-asr" --no-audit --no-fund @huggingface/transformers@4.0.0
+          mkdir -p "$RUNNER_TEMP/cosmetology-asr/lib/video"
+          cp lib/video/local-transcription.mjs lib/video/local-transcription-worker.mjs "$RUNNER_TEMP/cosmetology-asr/lib/video/"
+      - name: Independently transcribe the same audited bytes
+        env:
+          HF_HUB_OFFLINE: '0'
+          TRANSFORMERS_OFFLINE: '0'
+        run: |
+          AUDIT_OUTPUT_DIR="$PWD/preserved-media-audit" ASR_MODULE_PATH="$RUNNER_TEMP/cosmetology-asr/lib/video/local-transcription.mjs" node scripts/gcp/transcribe-preserved-cosmetology-media.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -51,7 +51,7 @@ test('reads approved regional limits and reports insufficient memory without mut
     calls.push(args);
     const command = args.slice(0, 3).join(' ');
     if (command === 'run services list') return JSON.stringify([service]);
-    if (command === 'run revisions list') return JSON.stringify([revision()]);
+    if (command === 'run revisions describe' && args[3] === 'serving') return JSON.stringify(revision());
     if (command === 'run jobs list') return '[]';
     if (args[0] === 'auth') return 'fixture-token';
     throw Error('Unexpected mutation or read');
@@ -62,7 +62,41 @@ test('reads approved regional limits and reports insufficient memory without mut
   const result = await inspectRegionalCapacity({ region: 'us-east1', task, run, request });
   assert.equal(result.fits, false);
   assert.equal(result.required.memory, 40 * 2 ** 30);
-  assert.ok(calls.every(c => c.includes('list') || c[0] === 'auth'));
+  assert.ok(calls.every(c => c.includes('list') || c.includes('describe') || c[0] === 'auth'));
+});
+
+test('describes each effective revision once and never reads historical revision inventory', async () => {
+  const calls = [];
+  const s = structuredClone(service);
+  s.status.latestReadyRevisionName = 'serving';
+  s.status.traffic = [
+    { latestRevision: true, percent: 100 },
+    { revisionName: 'serving', tag: 'live' },
+    { revisionName: 'candidate', tag: 'candidate', percent: 0 },
+    { revisionName: 'historical', percent: 0 },
+  ];
+  const run = args => {
+    calls.push(args);
+    const command = args.slice(0, 3).join(' ');
+    if (command === 'run services list') return JSON.stringify([s]);
+    if (command === 'run revisions describe') return JSON.stringify(revision(args[3]));
+    if (command === 'run jobs list') return '[]';
+    if (args[0] === 'auth') return 'fixture-token';
+    throw Error('Unexpected inventory or mutation');
+  };
+  const request = async () => ({ ok: true, json: async () => ({ dimensionsInfos: [
+    { dimensions: { region: 'us-east1' }, details: { value: '-1' } },
+  ] }) });
+  const result = await inspectRegionalCapacity({ region: 'us-east1', task, run, request });
+  assert.equal(result.fits, true);
+  assert.equal(result.required.memory, 48 * 2 ** 30);
+  assert.deepEqual(calls.filter(c => c[1] === 'revisions').map(c => c.slice(0, 4)), [
+    ['run', 'revisions', 'describe', 'serving'],
+    ['run', 'revisions', 'describe', 'candidate'],
+  ]);
+  await assert.rejects(inspectRegionalCapacity({ region: 'us-east1', task, request,
+    run: args => args[1] === 'revisions' ? (() => { throw Error('readback unavailable'); })() : run(args),
+  }), /readback unavailable/);
 });
 
 test('completed tasks release their slots while pending tasks remain budgeted',()=>{

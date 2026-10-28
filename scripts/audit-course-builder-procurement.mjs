@@ -6,6 +6,9 @@ const root = process.cwd();
 const failures = [];
 const mustExist = [
   'components/admin/course-builder/UnifiedCourseBuilder.tsx',
+  'components/admin/course-builder/CourseWorkspaceContext.tsx',
+  'components/admin/course-builder/UltimateStageInspector.tsx',
+  'components/studio/StudioCommandWorkspace.tsx',
   'components/admin/course-builder/CourseProductionWorkspace.tsx',
   'apps/admin/app/studio/courses/page.tsx',
   'apps/admin/app/api/admin/course-builder/route.ts',
@@ -39,12 +42,18 @@ if (failures.length === 0) {
   const workspace = read('components/admin/course-builder/CourseProductionWorkspace.tsx');
   if (!studioCourses.includes('<CourseProductionWorkspace') || !workspace.includes('<UnifiedCourseBuilder'))
     fail('/studio/courses is not mounted to the canonical UnifiedCourseBuilder workspace');
-  // Both the standalone route and embedded Studio use the shared builder shell.
-  // Follow that composition instead of requiring a duplicate browser in the wrapper.
+  // Work controls and AI stay in the left pane; selected previews have one
+  // owner on the right. Studio retains its independent browser capability.
   const builder = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
-  if (!builder.includes("import('@/components/studio/CloudBrowserWorkspace')") ||
-      !builder.includes('<CloudBrowserWorkspace') || !builder.includes('<ResizableWorkspace'))
-    fail('Canonical Course Builder is missing the resizable live Studio browser');
+  for(const invariant of ['<UnifiedEllieChat','<CourseWorkspaceContext.Provider','<ResizableWorkspace','title="Course previews"'])
+    if(!builder.includes(invariant))fail('Canonical Course Builder is missing the shared AI/control/preview contract: '+invariant);
+  if(builder.includes('<CourseSidePreview') || builder.includes('<CloudBrowserWorkspace'))
+    fail('Course Builder mounts an independent selector or interactive browser in its preview-only pane');
+  const inspector=read('components/admin/course-builder/UltimateStageInspector.tsx');
+  if(!inspector.includes('createPortal(') || !inspector.includes('workspace.previewTarget'))
+    fail('Selected lesson content is not delivered to the shared right preview pane');
+  const studio=read('components/studio/StudioCommandWorkspace.tsx');
+  if(!studio.includes('<CloudBrowserWorkspace'))fail('Studio browser capability was removed instead of keeping it in Studio');
 
   const rootRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
   for (const invariant of [

@@ -691,7 +691,7 @@ export default function UnifiedEllieChat({
           const id=courseResultId(task.tool_output??task.result_json);
           if(id){observedCourseTasks.current.add(task.id);courseResultCallback.current?.(id,courseResultLessonId(task.tool_output??task.result_json)??undefined);}
         }
-      }catch{}finally{pending=false;}
+      }catch{ /* Keep the last verified preview when a receipt read is interrupted. */ }finally{pending=false;}
     };
     void refresh();const timer=window.setInterval(()=>void refresh(),5000);
     return()=>{cancelled=true;controller.abort();window.clearInterval(timer);};

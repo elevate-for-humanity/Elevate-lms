@@ -49,6 +49,7 @@ export default async function JobReadyLesson({ params }: { params: Promise<{ slu
       </p>
       {pkg && !packageError && !progressError ? (
         <JobReadyPlayer
+          key={lesson.slug}
           slug={lesson.slug}
           title={lesson.title}
           initialCmi={enrollment?.cmi_data ?? {}}

@@ -62,7 +62,12 @@ export function JobReadyPlayer({ slug, title, initialCmi, learnerId, learnerName
           });
           if (!response.ok) throw new Error();
           if (revision === version) dirty = false;
-          if (!disposed) setMessage('Progress saved. You can return to this module later.');
+          if (!disposed)
+            setMessage(
+              revision === version
+                ? 'Progress saved. You can return to this module later.'
+                : 'Saving your latest progress…',
+            );
         } catch {
           if (!disposed)
             setMessage('Progress has not saved. Keep this page open and select Retry save.');

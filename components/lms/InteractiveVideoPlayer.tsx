@@ -141,6 +141,40 @@ export default function InteractiveVideoPlayer({
   const [checkpointFeedback, setCheckpointFeedback] = useState('');
   const [completedCheckpointKeys, setCompletedCheckpointKeys] = useState<Set<string>>(new Set());
   const resumePositionRef = useRef(initialPositionSeconds);
+  const playbackSessionRef = useRef<string | null>(null);
+  const lastPlaybackHeartbeatBucketRef = useRef(-1);
+
+  const recordPlaybackEvent = async (
+    eventType: 'play' | 'pause' | 'heartbeat' | 'ended' | 'error',
+    positionSeconds?: number,
+    durationSeconds?: number,
+    errorMessage?: string,
+  ) => {
+    if (readOnly || !lessonRecordId || !courseId) return;
+    if (!playbackSessionRef.current) {
+      playbackSessionRef.current = crypto.randomUUID();
+    }
+    await fetch('/api/video-playback-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courseId,
+        lessonId: lessonRecordId,
+        eventType,
+        currentTime:
+          typeof positionSeconds === 'number' && Number.isFinite(positionSeconds)
+            ? Math.max(0, positionSeconds)
+            : null,
+        duration:
+          typeof durationSeconds === 'number' && Number.isFinite(durationSeconds)
+            ? Math.max(0, durationSeconds)
+            : null,
+        sessionId: playbackSessionRef.current,
+        errorMessage,
+      }),
+      keepalive: eventType === 'pause' || eventType === 'ended',
+    }).catch(() => null);
+  };
 
   const effectiveQuizzes = useMemo(() => {
     const checkpointQuizzes: VideoQuiz[] = checkpoints
@@ -414,6 +448,8 @@ export default function InteractiveVideoPlayer({
   useEffect(() => {
     lastProgressRef.current = -1;
     completeFiredRef.current = false;
+    playbackSessionRef.current = null;
+    lastPlaybackHeartbeatBucketRef.current = -1;
   }, [videoUrl]);
 
   const togglePlay = () => {
@@ -443,6 +479,17 @@ export default function InteractiveVideoPlayer({
     if (!videoRef.current) return;
     const { currentTime: ct, duration: dur } = videoRef.current;
     setCurrentTime(ct);
+
+    if (!readOnly && ct > 0 && Number.isFinite(dur) && dur > 0) {
+      const heartbeatBucket = Math.floor(ct / 30);
+      if (
+        heartbeatBucket > 0 &&
+        heartbeatBucket !== lastPlaybackHeartbeatBucketRef.current
+      ) {
+        lastPlaybackHeartbeatBucketRef.current = heartbeatBucket;
+        void recordPlaybackEvent('heartbeat', ct, dur);
+      }
+    }
 
     if (dur > 0) {
       const pct = Math.round((ct / dur) * 100);
@@ -754,9 +801,40 @@ export default function InteractiveVideoPlayer({
               aria-label={title}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              onError={() => setLoadError(true)}
+              onPlay={() => {
+                setIsPlaying(true);
+                void recordPlaybackEvent(
+                  'play',
+                  videoRef.current?.currentTime,
+                  videoRef.current?.duration,
+                );
+              }}
+              onPause={() => {
+                setIsPlaying(false);
+                if (!videoRef.current?.ended) {
+                  void recordPlaybackEvent(
+                    'pause',
+                    videoRef.current?.currentTime,
+                    videoRef.current?.duration,
+                  );
+                }
+              }}
+              onError={() => {
+                setLoadError(true);
+                void recordPlaybackEvent(
+                  'error',
+                  videoRef.current?.currentTime,
+                  videoRef.current?.duration,
+                  videoRef.current?.error?.message || 'Media element error',
+                );
+              }}
               onEnded={() => {
                 setIsPlaying(false);
+                void recordPlaybackEvent(
+                  'ended',
+                  videoRef.current?.currentTime,
+                  videoRef.current?.duration,
+                );
                 if (!readOnly && allCheckpointsComplete && onComplete) onComplete();
               }}
             />
@@ -777,9 +855,40 @@ export default function InteractiveVideoPlayer({
             playsInline
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
-            onError={() => setLoadError(true)}
+            onPlay={() => {
+              setIsPlaying(true);
+              void recordPlaybackEvent(
+                'play',
+                videoRef.current?.currentTime,
+                videoRef.current?.duration,
+              );
+            }}
+            onPause={() => {
+              setIsPlaying(false);
+              if (!videoRef.current?.ended) {
+                void recordPlaybackEvent(
+                  'pause',
+                  videoRef.current?.currentTime,
+                  videoRef.current?.duration,
+                );
+              }
+            }}
+            onError={() => {
+              setLoadError(true);
+              void recordPlaybackEvent(
+                'error',
+                videoRef.current?.currentTime,
+                videoRef.current?.duration,
+                videoRef.current?.error?.message || 'Media element error',
+              );
+            }}
             onEnded={() => {
               setIsPlaying(false);
+              void recordPlaybackEvent(
+                'ended',
+                videoRef.current?.currentTime,
+                videoRef.current?.duration,
+              );
               if (!readOnly && allCheckpointsComplete && onComplete) onComplete();
             }}
           >

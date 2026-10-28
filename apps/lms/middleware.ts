@@ -6,6 +6,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  * route layouts/pages must still enforce role/tenant authorization.
  */
 const PROTECTED_PREFIXES = [
+  '/workbooks',
   '/lms/dashboard',
   '/lms/courses',
   '/lms/progress',

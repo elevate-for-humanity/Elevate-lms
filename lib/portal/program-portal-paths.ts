@@ -34,8 +34,8 @@ export function apprenticeshipLmsCoursePath(programSlug: string): string | null 
   return courseId ? `/lms/courses/${courseId}` : null;
 }
 
-export function apprenticeshipWorkbookHref(programSlug: string): string {
-  return `/apprentice/${programSlug}/workbook`;
+export function apprenticeshipWorkbookHref(_programSlug: string): string {
+  return '/workbooks';
 }
 
 export function apprenticeshipRtiLabel(programSlug: string, short = false): string | null {

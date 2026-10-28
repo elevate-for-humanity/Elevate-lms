@@ -78,6 +78,10 @@ export default async function WorkbookPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {!subject.previewing && <Link href="/workbooks" className="mb-8 block rounded-xl bg-slate-900 p-6 text-white">
+          <span className="block text-xl font-bold">Open my digital workbooks</span>
+          <span className="mt-2 block leading-relaxed">Write your answers and save them to your LMS account.</span>
+        </Link>}
         {/* Progress Stats */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">

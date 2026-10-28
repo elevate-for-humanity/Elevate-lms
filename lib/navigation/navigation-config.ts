@@ -28,6 +28,7 @@ import {
   Users,
 } from 'lucide-react';
 import { PortalRouter } from '@/lib/routing/portal-router';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 
 export type UserRole =
   | 'student'
@@ -159,6 +160,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         { id: 'agreements', label: 'Agreements', href: p('lms', 'agreements'), icon: Shield },
         { id: 'handbook', label: 'Student Handbook', href: p('lms', 'handbook'), icon: BookOpen },
         { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), icon: BookOpen },
+        { id: 'workbooks', label: 'My Workbooks', href: `${LMS_HOST}/workbooks`, icon: BookOpen },
         { id: 'community', label: 'Student Community', href: p('lms', 'community'), icon: Users },
         { id: 'progress', label: 'Progress', href: p('lms', 'progress'), icon: BarChart3 },
         {

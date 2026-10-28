@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@/lib/supabase';
 
 export type CourseEntryLinks = {
   courseHref: string;
-  /** First published lesson reading tab, or course home when no lessons exist */
+  /** Assigned digital workbook, otherwise the existing lesson reading activity. */
   workbookHref: string;
   /** Next incomplete lesson, or first lesson, or course home */
   continueHref: string;
@@ -13,7 +13,7 @@ export type CourseEntryLinks = {
 
 /**
  * Resolve LMS URLs for apprenticeship dashboards.
- * Workbook opens the first lesson's reading activity (not course-level ?activity=).
+ * Prefer an assigned digital workbook without changing course continuation.
  */
 export async function resolveCourseEntryLinks(
   db: SupabaseClient,
@@ -28,15 +28,31 @@ export async function resolveCourseEntryLinks(
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });
 
-  const published =
-    lessons?.filter((row) => row.id) ?? [];
+  const published = lessons?.filter((row) => row.id) ?? [];
 
   const firstLesson = published[0] ?? null;
   const firstLessonId = firstLesson?.id ?? null;
 
-  const workbookHref = firstLessonId
+  let workbookHref = firstLessonId
     ? `/lms/courses/${courseId}/lessons/${firstLessonId}?activity=reading`
     : courseHref;
+
+  const { data: course, error: courseError } = await db
+    .from('courses')
+    .select('program_id')
+    .eq('id', courseId)
+    .maybeSingle();
+  if (courseError) throw courseError;
+  if (course?.program_id) {
+    const { data: workbook, error: workbookError } = await db
+      .from('digital_workbooks')
+      .select('slug')
+      .eq('program_id', course.program_id)
+      .eq('is_active', true)
+      .maybeSingle();
+    if (workbookError) throw workbookError;
+    if (workbook) workbookHref = `/workbooks/${workbook.slug}`;
+  }
 
   let continueHref = courseHref;
 

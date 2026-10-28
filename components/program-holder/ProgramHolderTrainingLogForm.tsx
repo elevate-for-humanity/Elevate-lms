@@ -2,20 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { trainingMilestones } from '@/lib/program-holder/training-milestones';
 
-const milestones = [
-  'Orientation and workplace safety',
-  'Tools, equipment, and system fundamentals',
-  'Installation and preventive maintenance',
-  'Diagnostics and troubleshooting',
-  'Refrigerant handling and environmental rules',
-  'Employer engagement and job readiness',
-] as const;
-
-export function ProgramHolderTrainingLogForm({ enrollments, verifiedHours = [] }: { enrollments: any[]; programs: any[]; verifiedHours?: any[] }) {
+export function ProgramHolderTrainingLogForm({ enrollments, programs, verifiedHours = [] }: { enrollments: any[]; programs: any[]; verifiedHours?: any[] }) {
   const router = useRouter();
   const [enrollmentId, setEnrollmentId] = useState('');
   const selectedStudent = enrollments.find(row => row.id === enrollmentId);
+  const selectedProgram = programs.find(row => row.id === selectedStudent?.program_id);
+  const milestones = trainingMilestones(selectedStudent?.program_slug || selectedProgram?.slug);
   const availableHours = verifiedHours.filter(row => row.user_id === selectedStudent?.user_id && row.program_slug === selectedStudent?.program_slug && ['approved','verified'].includes(String(row.approval_status || row.status).toLowerCase()));
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
@@ -41,7 +35,7 @@ export function ProgramHolderTrainingLogForm({ enrollments, verifiedHours = [] }
       <p className="mt-1 text-sm text-slate-700">Complete this for each current or graduated student. Record the milestone, hours, work performed, and skills learned.</p>
       <form id="program-holder-training-log" action={submit} className="mt-5 grid gap-4 md:grid-cols-2">
         <label className="text-sm font-bold">Student<select name="enrollment_id" value={enrollmentId} onChange={event => setEnrollmentId(event.target.value)} required className="mt-1 min-h-11 w-full rounded-lg border bg-white px-3 font-normal"><option value="">Select student</option>{enrollments.map((row) => <option key={row.id} value={row.id}>{row.full_name || row.email || 'Student'} — {Number(row.total_hours_completed || 0)} of 48 hours</option>)}</select></label>
-        <label className="text-sm font-bold">Milestone<select name="milestone" required className="mt-1 min-h-11 w-full rounded-lg border bg-white px-3 font-normal"><option value="">Select milestone</option>{milestones.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label className="text-sm font-bold">Milestone<select name="milestone" key={enrollmentId} defaultValue="" disabled={!selectedStudent} required className="mt-1 min-h-11 w-full rounded-lg border bg-white px-3 font-normal"><option value="">Select milestone</option>{milestones.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label className="text-sm font-bold">Training date<input name="work_date" type="date" required className="mt-1 min-h-11 w-full rounded-lg border bg-white px-3 font-normal" /></label>
         <label className="text-sm font-bold">Verified clock record<select name="hour_entry_id" required key={enrollmentId} defaultValue="" className="mt-1 min-h-11 w-full rounded-lg border bg-white px-3 font-normal"><option value="">Choose verified training hours</option>{availableHours.map(row => <option key={row.id} value={row.id}>{row.work_date} — {row.accepted_hours ?? row.hours_claimed ?? row.hours} verified hours</option>)}</select><span className="mt-1 block font-normal">The training date must match this record. Submit hours for Admin verification first if no record is available.</span></label>
         <label className="text-sm font-bold md:col-span-2">Work performed<textarea name="work_completed" minLength={10} maxLength={1500} required rows={3} placeholder="Describe the hands-on work, equipment, and results." className="mt-1 w-full rounded-lg border bg-white px-3 py-2 font-normal" /></label>

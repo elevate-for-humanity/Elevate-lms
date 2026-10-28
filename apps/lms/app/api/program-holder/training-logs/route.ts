@@ -1,6 +1,7 @@
 // pre-auth-registry: exempt - requireProgramHolder verifies the authenticated user and holder relationship.
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { trainingMilestones } from '@/lib/program-holder/training-milestones';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const ELIGIBLE = ['active', 'enrolled', 'in_progress', 'completed', 'graduated'];
@@ -22,6 +23,13 @@ export async function POST(request: Request) {
   if (!milestone || work.length < 10 || skills.length < 10 || body.attested !== 'true') return NextResponse.json({ error: 'Milestone, work performed, skills learned, and attestation are required.' }, { status: 400 });
   const { data: enrollment } = await ctx.db.from('program_enrollments').select('id,user_id,program_id,program_slug,status,progress_percent,total_hours_completed').eq('id', enrollmentId).eq('program_holder_id', ctx.holderId).maybeSingle();
   if (!enrollment || !ELIGIBLE.includes(String(enrollment.status)) || !ctx.programIds.includes(enrollment.program_id)) return NextResponse.json({ error: 'This student is not in your enrolled roster.' }, { status: 403 });
+  let programSlug = enrollment.program_slug;
+  if (!programSlug) {
+    const { data: program, error: programError } = await ctx.db.from('programs').select('slug').eq('id', enrollment.program_id).maybeSingle();
+    if (programError || !program) return NextResponse.json({ error: 'The student program could not be verified.' }, { status: 503 });
+    programSlug = program.slug;
+  }
+  if (!trainingMilestones(programSlug).includes(milestone)) return NextResponse.json({ error: 'Choose a milestone for this student’s program. Reload the form if the program changed.' }, { status: 400 });
   if (progressPercent < Number(enrollment.progress_percent || 0)) return NextResponse.json({ error: 'Progress cannot be lower than the current progress.' }, { status: 400 });
   const { data: verifiedClock } = await ctx.db.from('hour_entries').select('id,user_id,program_holder_id,program_slug,work_date,hours_claimed,accepted_hours,status,approval_status,notes').eq('id', hourEntryId).eq('user_id', enrollment.user_id).eq('program_holder_id', ctx.holderId).maybeSingle();
   if (!verifiedClock || !['approved','verified'].includes(String(verifiedClock.approval_status || verifiedClock.status).toLowerCase())) return NextResponse.json({ error: 'Daily progress can only be recorded after the clock hours are verified.' }, { status: 409 });

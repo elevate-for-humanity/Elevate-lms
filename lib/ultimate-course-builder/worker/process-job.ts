@@ -195,8 +195,8 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           await ensureNotPaused();
           return liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId)(step);
         },
-        repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
-        repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
+        repairRenderRevision: payload.checkpointRepair && payload.checkpointRepair.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
+        repairFromStep: payload.checkpointRepair && payload.checkpointRepair.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
       () => new UltimateBuildRunner(handlers as any),
       runtime.persistence,

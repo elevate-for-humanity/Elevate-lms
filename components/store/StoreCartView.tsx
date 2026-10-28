@@ -33,7 +33,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
   const { cart, removeItem, setQuantity, refresh } = useStoreCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const [message, setMessage] = useState<string | null>(checkoutError ?? null);
-  const checkoutAttempt = useRef<string | null>(null);
+  const checkoutAttempt = useRef<{ cart: string; id: string } | null>(null);
 
   useEffect(() => {
     if (!addParam) return;
@@ -77,13 +77,16 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
         return;
       }
 
-      checkoutAttempt.current ||= crypto.randomUUID();
+      const cartSignature = JSON.stringify(cart.items.map(({ product, quantity }) =>
+        [product.slug, quantity]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
+      if (checkoutAttempt.current?.cart !== cartSignature)
+        checkoutAttempt.current = { cart: cartSignature, id: crypto.randomUUID() };
       const response = await fetch('/api/store/cart-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           items: cart.items.map((item) => ({ slug: item.product.slug, quantity: item.quantity })),
-          checkoutAttemptId: checkoutAttempt.current,
+          checkoutAttemptId: checkoutAttempt.current.id,
         }),
       });
       if (response.status === 401) {

@@ -20,6 +20,7 @@ export default function StoreHeader() {
           <Link href="/store/apps" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Apps</Link>
           <Link href="/store/plans" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Plans</Link>
           <Link href="/store/cart" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">Cart</Link>
+          <Link href="/store/orders" className="inline-flex min-h-11 items-center whitespace-nowrap hover:underline">My Purchases</Link>
         </nav>
       </div>
     </header>

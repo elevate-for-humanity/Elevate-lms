@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { checkoutSnapshotsMatch } from '@/lib/store/checkout-snapshot.mjs';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
 
 export const runtime = 'nodejs';
@@ -66,24 +67,22 @@ export async function POST(request: NextRequest) {
       { error: 'A valid checkout attempt ID is required.' },
       { status: 400 },
     );
-  const requestedItems = Array.isArray(requestBody?.items)
-    ? requestBody.items
-        .filter((item: unknown): item is { slug: string; quantity?: number } =>
-          Boolean(
-            item &&
-            typeof item === 'object' &&
-            typeof (item as { slug?: unknown }).slug === 'string',
-          ),
-        )
-        .map((item: { slug: string; quantity?: number }) => ({
-          slug: item.slug.trim().toLowerCase(),
-          quantity: Number(item.quantity ?? 1),
-        }))
-    : [];
+  const hasBrowserCart = Object.prototype.hasOwnProperty.call(requestBody, 'items');
+  const rawItems = requestBody?.items;
+  if (hasBrowserCart && (!Array.isArray(rawItems) || rawItems.length < 1 || rawItems.length > 25 ||
+    rawItems.some((item: any) => !item || typeof item.slug !== 'string' || !item.slug.trim() ||
+      !Number.isInteger(item.quantity ?? 1) || (item.quantity ?? 1) < 1 || (item.quantity ?? 1) > 10)))
+    return NextResponse.json({ error: 'Cart contains an invalid item or quantity.' }, { status: 400 });
+  const requestedItems: { slug: string; quantity: number }[] = hasBrowserCart
+    ? rawItems.map((item: { slug: string; quantity?: number }) => ({
+        slug: item.slug.trim().toLowerCase(), quantity: item.quantity ?? 1,
+      })) : [];
+  if (new Set(requestedItems.map(item => item.slug)).size !== requestedItems.length)
+    return NextResponse.json({ error: 'Cart contains duplicate products.' }, { status: 400 });
 
   // Server-side product rows are always the source of truth. The browser cart
   // sends only slugs and quantities; names, prices, availability, inventory,
-  // shipping and product IDs are reloaded here before Stripe Checkout.
+  // shipping and product IDs are reloaded here before QuickBooks invoicing.
   const { data: storedCart, error: cartError } = await db
     .from('cart_items')
     .select(
@@ -102,9 +101,9 @@ export async function POST(request: NextRequest) {
   let cart = (storedCart ?? []) as unknown as CartRow[];
 
   // Public product pages use the browser cart so buyers can shop before signing
-  // in. After authentication, resolve that cart against the canonical products
-  // table instead of silently showing or checking out a different empty cart.
-  if (cart.length === 0 && requestedItems.length > 0) {
+  // in. Its explicit contents take precedence over an older saved cart. Resolve
+  // every item against the canonical product rows before creating an invoice.
+  if (hasBrowserCart) {
     if (
       requestedItems.length > 25 ||
       requestedItems.some(
@@ -210,14 +209,15 @@ export async function POST(request: NextRequest) {
 
   const priorOrder = await db
     .from('store_orders')
-    .select('id,user_id,total_cents')
+    .select('id,user_id,total_cents,items')
     .eq('checkout_attempt_id', checkoutAttemptId)
     .maybeSingle();
   if (priorOrder.error)
     return NextResponse.json({ error: 'Unable to verify this checkout attempt.' }, { status: 500 });
   if (
     priorOrder.data &&
-    (priorOrder.data.user_id !== user.id || Number(priorOrder.data.total_cents) !== totalCents)
+    (priorOrder.data.user_id !== user.id || Number(priorOrder.data.total_cents) !== totalCents ||
+      !checkoutSnapshotsMatch(priorOrder.data.items, snapshot))
   )
     return NextResponse.json(
       { error: 'This checkout attempt belongs to a different cart.' },

@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
+import {measuredNarrationRepair} from '../../lib/ultimate-course-builder/instructional/narration-checkpoint-repair.mjs';
 const text=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/persistence/supabase-persistence.ts',import.meta.url),'utf8'),{mode:'transform'})
  .replace(/^import .*;\n/gm,'').replace('export class ','class ');
-const Persistence=new Function('currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES',text+'\nreturn UltimateSupabasePersistence;')(
- ()=>true,['standards_lock','lesson_film_render','finished_media_qa'],1);
+const Persistence=new Function('currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair',text+'\nreturn UltimateSupabasePersistence;')(
+ ()=>true,['standards_lock','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair);
 function db(layoutVersion){return {from:table=>{
  const value=table==='ultimate_lesson_builds'?{artifacts:{lesson_film_render:{render:{layoutVersion}}},findings:[]}:
   ['standards_lock','lesson_film_render','finished_media_qa'].map(step=>({step,state:'passed',artifacts:step==='lesson_film_render'?{render:{layoutVersion}}:{}}));

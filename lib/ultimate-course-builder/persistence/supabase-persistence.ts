@@ -3,6 +3,7 @@ import type { UltimatePersistencePort } from '../core/ports';
 import { currentEvidence } from '../core/lesson-contract';
 import { ULTIMATE_BUILD_STEPS } from '../core/types';
 import { MIN_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
+import { measuredNarrationRepair } from '../instructional/narration-checkpoint-repair.mjs';
 export class UltimateSupabasePersistence implements UltimatePersistencePort {
   constructor(private db: SupabaseClient) {}
   async createBuild(input: any) {
@@ -41,7 +42,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
           .single(),
         this.db
           .from('ultimate_lesson_steps')
-          .select('step,state,artifacts')
+          .select('step,state,artifacts,completed_at')
           .eq('lesson_build_id', input.lessonBuildId),
       ]);
     if (lessonError) throw lessonError;
@@ -133,9 +134,20 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     // A repaired provider or renderer must rebuild downstream media instead of
     // replaying a failed QA result against the same cached audio/video. Keep
     // all earlier instructional work and licensed visual assignments.
-    const narrationQA = (artifacts.narration_qa as any)?.narrationQA;
+    const failedNarration = (steps ?? []).find((row: any) => row.step === 'narration_qa' && row.state === 'failed');
+    const synthesized = (steps ?? []).find((row: any) => row.step === 'natural_narration' && row.state === 'passed');
+    // A newer synthesis must receive fresh QA, rather than inheriting the old
+    // film's pace finding and being regenerated on every role handoff.
+    const failedNarrationIsCurrent = failedNarration?.completed_at &&
+      (!synthesized?.completed_at || Date.parse(failedNarration.completed_at) >= Date.parse(synthesized.completed_at));
+    const narrationQA = (artifacts.narration_qa as any)?.narrationQA ??
+      (failedNarrationIsCurrent ? failedNarration.artifacts?.narrationQA : undefined);
     const narrationNeedsRepair = narrationQA?.failures?.some((failure: string) =>
       ['PACE_OUT_OF_RANGE', 'CLIPPED_WORDS'].includes(failure));
+    const measuredRepair = measuredNarrationRepair(narrationQA, artifacts.natural_narration);
+    if (measuredRepair) artifacts.__repairState = {
+      directive: measuredRepair, status: 'diagnosed',
+    };
     const render = (artifacts.lesson_film_render as any)?.render;
     const oldLayout = render && ![2, 4].includes(render.layoutVersion);
     const storyboard = (artifacts.storyboard as any)?.storyboard ?? artifacts.storyboard;

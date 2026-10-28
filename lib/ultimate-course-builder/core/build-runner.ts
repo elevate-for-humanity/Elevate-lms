@@ -107,7 +107,10 @@ export class UltimateBuildRunner {
       }
       if (ctx.startAtStep && index < ULTIMATE_BUILD_STEPS.indexOf(ctx.startAtStep)) {
         const failure: UltimateInstructionalFinding = {step,severity:'error',code:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED',message:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED:'+step};
-        const directive = repairDirective([failure],step,step,ctx.artifacts[step],1);
+        // Retain measured producer feedback recovered from durable QA. Replacing
+        // it with "checkpoint required" discards the pace correction and loops.
+        const directive = ctx.repairDirective?.target === step
+          ? ctx.repairDirective : repairDirective([failure],step,step,ctx.artifacts[step],1);
         (ctx.artifacts as any).__repairState = {directive,status:'diagnosed',at:new Date().toISOString()};
         ctx.findings.push(failure);
         await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{directive,unresolved:1}}});

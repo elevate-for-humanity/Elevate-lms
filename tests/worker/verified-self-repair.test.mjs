@@ -7,6 +7,14 @@ const {nonblockingManualReview,optionalManualReviewStage}=new Function(reviewSou
 function runner(handlers,validation=()=>[],options={}){
  return new Function('describeWorkerError','repairDirective','artifactPayload','contractHash','currentEvidence','stepInputHash','stepInputHashes','validateStepOutput','practicalVisualFailures','ULTIMATE_LESSON_CONTRACT_VERSION','MAX_TARGETED_REPAIRS','isDurableExternalBlocker','routeSelectiveRepairs','ULTIMATE_BUILD_STEPS','nonblockingManualReview','optionalManualReviewStage',src+'\nreturn UltimateBuildRunner;')(describeWorkerError,repairDirective,x=>{const {contractEvidence,...rest}=x;return rest;},JSON.stringify,options.currentEvidence??(()=>false),()=>'',()=>[''],validation,()=>[],'test',2,f=>/^(MEDIA_LICENSE_REQUIRED|LICENSE_APPROVAL_REQUIRED|PAID_INFERENCE_AUTHORIZATION_REQUIRED)$/.test(f.code),options.route??(findings=>findings[0]?.code==='INSTRUCTIONAL_QUALITY_FAILED'?[{step:'learning_objectives'}]:[]),['learning_objectives','lesson_film_render','finished_media_qa'],nonblockingManualReview,optionalManualReviewStage);
 }
+test('role boundary retains measured upstream repair feedback for its producer',async()=>{
+ const directive={target:'learning_objectives',failedStep:'finished_media_qa',requirements:[{code:'MEASURED_FAILURE',message:'real measured evidence'}],previous:{saved:true}};
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},startAtStep:'finished_media_qa',artifacts:{__repairState:{status:'diagnosed',directive}},findings:[],passedSteps:new Set()};
+ const R=runner();await new R({}).run(ctx);
+ assert.equal(ctx.artifacts.__repairState.directive,directive);
+ assert.equal(ctx.artifacts.__repairState.directive.requirements[0].message,'real measured evidence');
+ assert.equal(ctx.findings[0].code,'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED');
+});
 test('repair carries exact failed requirement, changes producer and validates before new render',async()=>{
  let renders=0,authors=0;const journal=[];const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set(),persistArtifact:async x=>journal.push(x)};
  const R=runner();const r=new R({learning_objectives:async c=>{authors++;return {artifacts:{blueprint:{title:c.repairDirective?'Welcome to Cosmetology Apprenticeship':'wrong'}}};},lesson_film_render:async c=>{

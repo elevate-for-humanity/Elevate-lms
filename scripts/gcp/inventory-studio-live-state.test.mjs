@@ -21,3 +21,16 @@ test('only known browser helpers are classified; arbitrary Node processes remain
  assert.equal(studioProcessClass('chromium'),'browser');assert.equal(studioProcessClass('bash'),'shell');
  for(const name of ['node','python3','private-process-name','chrome_crashpad_unrecognized'])assert.equal(studioProcessClass(name),'unclassified');
 });
+
+test('Admin binding inventory never emits inline credential values or runtime payloads',async()=>{
+ const {adminGitHubBindingMetadata}=await import('./inventory-studio-live-state.mjs');
+ const result=adminGitHubBindingMetadata({spec:{template:{spec:{containers:[{env:[{name:'GITHUB_APP_PRIVATE_KEY',value:'private-key-payload-fixture'},{name:'GITHUB_TOKEN',value:'token-payload-fixture'},{name:'UNRELATED_SECRET',value:'unrelated-payload-fixture'}]}],volumes:[{name:'app-key',secret:{secretName:'existing-github-key'}}]}}}},
+ {runtimeEnvironment:{GITHUB_APP_PRIVATE_KEY:'config-payload-fixture'}},['projects/p/secrets/existing-github-key']);
+ const json=JSON.stringify(result);
+ assert.equal(result.runtimeConfigHasAppPrivateKey,true);
+ assert.equal(result.serviceBindings.length,2);
+ assert.deepEqual(result.secretVolumes,[{name:'app-key',secret:'existing-github-key'}]);
+ assert.deepEqual(result.candidateSecretNames,['projects/p/secrets/existing-github-key']);
+ for(const value of ['private-key-payload-fixture','token-payload-fixture','unrelated-payload-fixture','config-payload-fixture'])assert.ok(!json.includes(value));
+ assert.equal(result.stateChanged,false);
+});

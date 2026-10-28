@@ -1,5 +1,5 @@
 import {pathToFileURL} from 'node:url';
-import {google,PROJECT} from './runtime-config.mjs';
+import {google,PROJECT,loadGoogleConfig} from './runtime-config.mjs';
 // The subprocess reads metadata only. It never reads file contents, command
 // arguments, browser cookies, credentials, terminal input or process memory.
 export function studioProcessClass(name){if(['chromium','chrome','headless_shell'].includes(name))return 'browser';if(['chrome_crashpad','chrome_crashpad_handler'].includes(name))return 'browserHelper';if(['bash','sh','dash'].includes(name))return 'shell';return 'unclassified';}
@@ -16,4 +16,27 @@ export async function inventoryStudioLiveState({run=google,request=fetch}={}){
  const data=JSON.parse(result.stdout);if(data.error||data.fileContentsRead!==false||data.commandsRead!==false)throw Error('STUDIO_STATE_INVENTORY_UNVERIFIED');
  return {readOnly:true,observedAt:new Date().toISOString(),commit:typeof health.commit==='string'?health.commit:null,activeBrowserSessions:Number.isInteger(health.activeSessions)?health.activeSessions:null,workspace:{files:data.files,directories:data.directories,symlinks:data.symlinks,bytes:data.bytes,excludedDependencyCaches:data.excludedDependencyCaches},directChildShells:data.directChildShells,directNonBrowserProcesses:data.directNonBrowserProcesses,directBrowserHelperProcesses:data.directBrowserHelperProcesses,processInventoryReadable:data.processInventoryReadable,traffic:(resource.status?.traffic||[]).map(t=>({revision:t.revisionName,percent:t.percent||0,tag:t.tag||null})),stateChanged:false};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){try{console.log(JSON.stringify(await inventoryStudioLiveState()));}catch{console.error(JSON.stringify({error:'STUDIO_LIVE_STATE_INVENTORY_FAILED',stateChanged:false}));process.exitCode=1;}}
+export function adminGitHubBindingMetadata(resource, config, secretNames=[]) {
+ const spec=resource.spec?.template?.spec||resource.template||{};
+ const env=(spec.containers||[]).flatMap(c=>c.env||[]);
+ const relevant=env.filter(e=>/^GITHUB_APP_|^GITHUB_TOKEN$/.test(e.name||''));
+ const names=secretNames.filter(name=>/github|paris/i.test(name));
+ return {readOnly:true,stateChanged:false,
+  runtimeConfigHasAppPrivateKey:Boolean(config?.runtimeEnvironment?.GITHUB_APP_PRIVATE_KEY),
+  runtimeConfigHasAppPrivateKeyFile:Boolean(config?.runtimeEnvironment?.GITHUB_APP_PRIVATE_KEY_FILE),
+  runtimeConfigHasAppPrivateKeyFileContent:Boolean(config?.runtimeFiles?.[config?.runtimeEnvironment?.GITHUB_APP_PRIVATE_KEY_FILE]),
+  runtimeConfigHasRepositoryToken:Boolean(config?.runtimeEnvironment?.GITHUB_TOKEN),
+  serviceBindings:relevant.map(e=>({name:e.name,hasLiteralValue:Boolean(e.value),secret:e.valueFrom?.secretKeyRef?.name||e.valueSource?.secretKeyRef?.secret||null})),
+  secretVolumes:(spec.volumes||[]).filter(v=>v.secret).map(v=>({name:v.name,secret:v.secret.secretName||v.secret.secret||null})),
+  candidateSecretNames:names,
+  expectedDedicatedSecretPresent:secretNames.some(name=>name.split('/').pop()==='paris-engineer-github-private-key'),
+ };
+}
+export async function inventoryAdminGitHubBindings({run=google}={}) {
+ const resource=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project='+PROJECT,'--region=us-central1','--format=json']));
+ let config=null,configReadable=true,secretNames=[],secretInventoryReadable=true;
+ try {config=loadGoogleConfig('admin',run);}catch {configReadable=false;}
+ try {secretNames=JSON.parse(run(['secrets','list','--project='+PROJECT,'--format=json(name)'])).map(row=>row.name);}catch {secretInventoryReadable=false;}
+ return {...adminGitHubBindingMetadata(resource,config,secretNames),configReadable,secretInventoryReadable};
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){try{console.log(JSON.stringify(await (process.argv.includes('--admin-github-bindings')?inventoryAdminGitHubBindings():inventoryStudioLiveState())));}catch{console.error(JSON.stringify({error:'STUDIO_LIVE_STATE_INVENTORY_FAILED',stateChanged:false}));process.exitCode=1;}}

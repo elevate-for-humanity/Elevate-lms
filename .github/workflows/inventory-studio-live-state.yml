@@ -1,12 +1,26 @@
 name: Inventory Studio state without changing production
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/inventory-studio-live-state.yml'
+      - 'scripts/gcp/inventory-studio-live-state.mjs'
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted read-only inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/inventory-studio-live-state.yml/dispatches" -f ref=main
   inventory:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 5
@@ -23,5 +37,7 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
         with: { skip_install: true }
+      - name: Inspect Admin GitHub binding names and presence flags only
+        run: node scripts/gcp/inventory-studio-live-state.mjs --admin-github-bindings
       - name: Count existing workspace files and active sessions without reading private contents
         run: node scripts/gcp/inventory-studio-live-state.mjs

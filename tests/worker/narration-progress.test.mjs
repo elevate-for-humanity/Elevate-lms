@@ -93,3 +93,16 @@ runpy.run_path(path,run_name='__main__')`;
  const output=execFileSync('python3',['-c',program,fileURLToPath(new URL('../../lib/video/forced-alignment.py',import.meta.url))],{encoding:'utf8'});
  const words=JSON.parse(output);assert.equal(words.length,4);assert.equal(words[2].word,"client's");assert.equal(words[2].start,.4);
 });
+
+test('a grammar word mismatch requires an independent measurement of the same recording',async()=>{
+ const h=harness(false,{alignmentError:new Error('FORCED_ALIGNMENT_SCRIPT_MISMATCH')});
+ const result=await h.provider.generate(input);
+ assert.equal(h.recognitions.length,2);
+ assert.ok(h.recognitions.every(r=>Buffer.isBuffer(r.bytes)&&r.duration===1));
+ assert.deepEqual(result.segments[0].wordAlignment.map(w=>w.start),[0,.2,1,1.2]);
+});
+test('grammar mismatch cannot hide a failed independent speech measurement',async()=>{
+ const h=harness(false,{alignmentError:new Error('FORCED_ALIGNMENT_SCRIPT_MISMATCH'),recognizerError:new Error('ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED')});
+ await assert.rejects(h.provider.generate(input),/RECOGNIZED_WORD_TIMINGS_REQUIRED/);
+ assert.ok(!h.progress.some(p=>p.phase==='narration:stored-segments'));
+});

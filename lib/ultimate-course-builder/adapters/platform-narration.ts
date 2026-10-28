@@ -47,11 +47,13 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
       let words;
       try {words=await alignRecordedNarration(pcm,recording.text);}
       catch(error) {
-       // A finite grammar can have no path through valid recorded speech.
+       // A finite grammar can have no path, or omit a requested word,
+       // even when the recording is valid. Both failures need a separate
+       // measurement; a mismatched forced alignment is never accepted.
        // Independently measure that same PCM with the existing recognizer;
        // never interpolate timestamps or hide a failed measurement.
        const detail=error instanceof Error?error.message+' '+String((error as any).stderr??''):String(error);
-       if(!detail.includes('FORCED_ALIGNMENT_NO_PATH'))throw error;
+       if(!/FORCED_ALIGNMENT_(?:NO_PATH|SCRIPT_MISMATCH)/.test(detail))throw error;
        measured=await recognize();
       }
       if(words) {

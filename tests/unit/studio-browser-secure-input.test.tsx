@@ -50,6 +50,13 @@ async function start(holdFirst = false, cdpCheck?: () => Promise<any>) {
       false,
     ),
   );
+  if (cdpCheck) {
+    // Session controls can commit before the authenticated CDP effect is issued.
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('https://worker.example/sessions/test/cdp', {
+      headers: { Authorization: 'Bearer fixture' },
+      cache: 'no-store',
+    }));
+  }
   return { actions, release: () => release() };
 }
 it('lets a touch user insert @ and replaces the selected field without retaining input', async () => {

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--/* Copyright � 2003-2017 Rustici Software, LLC  All Rights Reserved. */-->
+<html>
+<head>
+    <title>Rustici Software Dispatch</title>
+    <script src="configuration.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        if (window.location.protocol === "https:") {
+            DispatchRoot = DispatchRoot.replace("http:", "https:");
+        }
+        else {
+            DispatchRoot = DispatchRoot.replace("https:", "http:");
+        }
+
+        include_script(DispatchRoot + "scormdriver.js");
+        include_script(DispatchRoot + "dispatch.client.loader.js");
+
+        function DispatchStart () {
+            if (typeof Start !== "undefined" && typeof LoadContent !== "undefined") {
+                strLMSStandard = "SCORM2004";
+
+                if (typeof ShowDebugWindow !== "undefined" && typeof DebugMode !== "undefined" && DebugMode) {
+                    ShowDebugWindow();
+                }
+
+                Start();
+                return;
+            }
+
+            setTimeout("DispatchStart()", 500);
+        }
+
+        function DispatchUnload () {
+            WriteToDebug("In DispatchUnload");
+
+            WriteToDebug("Unloading from DispatchUnload");
+            Unload();
+            WriteToDebug("Unloaded from DispatchUnload");
+        }
+    </script>
+</head>
+
+<frameset id="dispatch_frameset" rows="0,*" frameborder="0" framespacing="0" border="0" onload="DispatchStart()" onunload="DispatchUnload()">
+    <!-- We set the src to blank.html to avoid security warnings in IE6 / IE7 when launching in HTTPS -->
+    <frame id="dispatch_content_frame" name="dispatch_content_frame" src="blank.html">
+    <frame id="dispatch_loading_frame" name="dispatch_loading_frame" src="blank.html">
+</frameset>
+<noframes>
+    Your browser must be able to view frames for this content to display.
+</noframes>
+
+</html>

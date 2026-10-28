@@ -21,14 +21,15 @@ export default async function ScormPage() {
   const { data: packages } = await supabase
     .from('scorm_packages')
     .select('id, title, description, scorm_version, duration_minutes, courses(id, title)')
+    .eq('active', true)
     .order('title')
     .limit(30);
 
   const packageIds = (packages || []).map((pkg: any) => pkg.id);
   const { data: progressData } = packageIds.length
-    ? await supabase.from('scorm_progress').select('scorm_id, status, progress_percentage').eq('user_id', user.id).in('scorm_id', packageIds)
+    ? await supabase.from('scorm_enrollments').select('scorm_package_id, status, progress_percentage').eq('user_id', user.id).in('scorm_package_id', packageIds)
     : { data: [] as any[] };
-  const progressMap = new Map((progressData || []).map((row: any) => [row.scorm_id, row]));
+  const progressMap = new Map((progressData || []).map((row: any) => [row.scorm_package_id, row]));
 
   return (
     <main className="min-h-screen bg-white">

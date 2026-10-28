@@ -2,6 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {resolveOwnerPreviewB2} from './resolve-owner-preview-b2.mjs';
 import {migrate} from './migrate-course-media-to-b2.mjs';
+import {inspectPublishedB2Media} from './inspect-published-b2-media.mjs';
 
 const PROJECT='elegant-racer-299721';
 const SELECTED=/^(NEXT_PUBLIC_SUPABASE_URL|SUPABASE_SERVICE_ROLE_KEY|ELEVATE_MEDIA_[A-Z_]+|S3_[A-Z_]+)$/;
@@ -22,7 +23,7 @@ export function runtimeCourseMediaEnvironment(job,{secret=()=>{throw Error('COUR
  if(env.NEXT_PUBLIC_SUPABASE_URL!=='https://cuxzzpsyufcewtmicszk.supabase.co'||!env.SUPABASE_SERVICE_ROLE_KEY)throw Error('COURSE_MEDIA_SOURCE_CONFIGURATION_UNAVAILABLE');
  return env;
 }
-export async function runRuntimeB2Transfer(job,{mode='audit',limit=1,skip=0,resolve=resolveOwnerPreviewB2,copy=migrate,secret,report=console.log}={}){
+export async function runRuntimeB2Transfer(job,{mode='audit',limit=1,skip=0,resolve=resolveOwnerPreviewB2,copy=migrate,secret,inventory=inspectPublishedB2Media,report=console.log}={}){
  if(!['audit','copy'].includes(mode)||!Number.isInteger(limit)||limit<1||limit>25||!Number.isSafeInteger(skip)||skip<0)throw Error('COURSE_MEDIA_TRANSFER_INPUT_INVALID');
  const env=runtimeCourseMediaEnvironment(job,{secret});
  const connection=await resolve(env);
@@ -30,7 +31,9 @@ export async function runRuntimeB2Transfer(job,{mode='audit',limit=1,skip=0,reso
  if(target.ELEVATE_MEDIA_PROVIDER!=='backblaze-b2'||target.ELEVATE_MEDIA_BUCKET!=='elevate-course-media')throw Error('COURSE_MEDIA_APPROVED_B2_TARGET_REQUIRED');
  const summary={provider:'backblaze-b2',bucket:'elevate-course-media',bucketType:connection.bucketType,private:connection.bucketType==='allPrivate',connectionSource:connection.connectionSource,mode};
  report(JSON.stringify(summary));
- if(mode==='audit')return summary;
+ if(mode==='audit'){
+  const media=await inventory(env,target);report(JSON.stringify({publishedMedia:media}));return {...summary,publishedMedia:media};
+ }
  if(!summary.private)throw Error('COURSE_MEDIA_PRIVATE_B2_BUCKET_REQUIRED');
  const result=await copy({env:{...target,SUPABASE_URL:env.NEXT_PUBLIC_SUPABASE_URL,SUPABASE_SERVICE_ROLE_KEY:env.SUPABASE_SERVICE_ROLE_KEY,MIGRATION_SKIP:String(skip)},limit,
   onResult:line=>{const result=JSON.parse(line);const {key,...safe}=result;report(JSON.stringify(safe));}});

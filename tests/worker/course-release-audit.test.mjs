@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const workflow=readFileSync(new URL('../../.github/workflows/deploy-google-course-worker.yml',import.meta.url),'utf8');
+const job=name=>workflow.split('\n  '+name+':\n')[1]?.split(/\n  [a-z][a-z-]*:\n/)[0];
+test('historical media recovery audit runs beside release without replacing required worker acceptance',()=>{
+ const build=job('build'),deploy=job('deploy'),audit=job('media-recovery-audit');
+ assert.ok(build&&deploy&&audit);
+ assert.match(build,/Verify worker boundaries inside the actual photo-capable image/);
+ assert.match(build,/Upload immutable worker image/);
+ assert.doesNotMatch(build,/COURSE_MEDIA_DEEP_AUDIT/);
+ assert.match(deploy,/needs: build/);
+ assert.doesNotMatch(deploy,/needs:.*media-recovery-audit/);
+ assert.match(deploy,/Deploy three lesson autopilot roles and verify immutable configurations/);
+ assert.match(deploy,/Resume repaired saved lessons after verified image deployment/);
+ assert.match(audit,/needs: build/);
+ assert.match(audit,/COURSE_MEDIA_DEEP_AUDIT=true/);
+ assert.match(audit,/audit-course-storage\.ts/);
+ assert.doesNotMatch(audit,/continue-on-error/);
+});

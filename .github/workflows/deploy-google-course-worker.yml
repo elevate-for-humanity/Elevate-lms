@@ -154,7 +154,7 @@ jobs:
             -v "$PWD/packages:/app/packages:ro" \
             -v "$PWD/Dockerfile.ultimate-worker:/app/Dockerfile.ultimate-worker:ro" \
             -v "$PWD/.dockerignore:/app/.dockerignore:ro" \
-            "elevate-ultimate-worker:$GITHUB_SHA" --test tests/worker/continuous-course-execution.test.mjs lib/ultimate-course-builder/worker/continuous-course-lease.test.mjs tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/photo-cue-repair.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/narration-quality-routing.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/renderer-fallback-source.test.mjs tests/worker/checkpoint-fallback.test.mjs tests/worker/progress-watch.test.mjs tests/worker/fresh-lesson-render-identity.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/worker/citation-repair.test.mjs tests/worker/source-grounding.test.mjs tests/worker/batch-write-deadline.test.mjs tests/worker/photo-format.test.mjs tests/worker/approved-frame-checks.test.mjs tests/worker/approved-repair-routing.test.mjs tests/worker/checkpoint-source-refresh.test.mjs tests/worker/approved-delivery.test.mjs lib/ultimate-course-builder/testing/source-path-precedence.test.mjs lib/ultimate-course-builder/testing/reviewed-photo-selection.test.mjs lib/ultimate-course-builder/instructional/vertex-response.test.mjs tests/worker/approved-motion-excerpt.test.mjs tests/worker/google-teaching-photo.test.mjs tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/worker/attach-lesson-media.test.mjs workers/course-publication-policy.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs tests/worker/lesson-autopilots.test.mjs tests/worker/narration-progress.test.mjs
+            "elevate-ultimate-worker:$GITHUB_SHA" --test tests/worker/continuous-course-execution.test.mjs lib/ultimate-course-builder/worker/continuous-course-lease.test.mjs tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/photo-cue-repair.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/narration-quality-routing.test.mjs tests/worker/course-release-audit.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/renderer-fallback-source.test.mjs tests/worker/checkpoint-fallback.test.mjs tests/worker/progress-watch.test.mjs tests/worker/fresh-lesson-render-identity.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/worker/citation-repair.test.mjs tests/worker/source-grounding.test.mjs tests/worker/batch-write-deadline.test.mjs tests/worker/photo-format.test.mjs tests/worker/approved-frame-checks.test.mjs tests/worker/approved-repair-routing.test.mjs tests/worker/checkpoint-source-refresh.test.mjs tests/worker/approved-delivery.test.mjs lib/ultimate-course-builder/testing/source-path-precedence.test.mjs lib/ultimate-course-builder/testing/reviewed-photo-selection.test.mjs lib/ultimate-course-builder/instructional/vertex-response.test.mjs tests/worker/approved-motion-excerpt.test.mjs tests/worker/google-teaching-photo.test.mjs tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/worker/attach-lesson-media.test.mjs workers/course-publication-policy.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs tests/worker/lesson-autopilots.test.mjs tests/worker/narration-progress.test.mjs
       # Builds can outlive the federated token; refresh only after build acceptance.
       - name: Refresh Google credentials after build
         uses: google-github-actions/auth@v3
@@ -170,13 +170,6 @@ jobs:
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker tag "elevate-ultimate-worker:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
-      - name: Inspect existing target B2 media through the authorized runtime connection
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          docker run --rm --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --test /app/scripts/gcp/inspect-course-media.test.mjs
-          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
   deploy:
     needs: build
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
@@ -237,3 +230,31 @@ jobs:
           node --test scripts/gcp/audit-course-production.test.mjs
           node scripts/gcp/audit-course-production.mjs
 
+  # This read-only recovery inventory is not lesson acceptance. Keep it visible,
+  # but do not delay a tested worker release while downloading historical films.
+  media-recovery-audit:
+    needs: build
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Inspect existing target B2 media through the authorized runtime connection
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:$GITHUB_SHA"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker pull "$IMAGE"
+          docker run --rm --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --test /app/scripts/gcp/inspect-course-media.test.mjs
+          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --import=tsx /app/scripts/gcp/audit-course-storage.ts

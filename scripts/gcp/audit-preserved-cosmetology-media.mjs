@@ -33,6 +33,9 @@ export async function main(){
  const bytes=Buffer.from(await media.arrayBuffer());
  const out=process.env.AUDIT_OUTPUT_DIR||'preserved-media-audit';await mkdir(out,{recursive:true});
  const file=join(out,'preserved-checkpoint.mp4');await writeFile(file,bytes);
+ const sourceScript=lesson.script_text||lesson.script;
+ if(typeof sourceScript!=='string'||!sourceScript.trim())throw Error('CANONICAL_SCRIPT_REQUIRED');
+ await writeFile(join(out,'canonical-script.txt'),sourceScript);
  const probe=JSON.parse((await run('ffprobe',['-v','error','-show_format','-show_streams','-of','json',file],{timeout:60000,maxBuffer:1024*1024})).stdout);
  const duration=Number(probe.format?.duration);if(!Number.isFinite(duration)||duration<=0)throw Error('MEASURED_DURATION_REQUIRED');
  await run('ffmpeg',['-hide_banner','-v','error','-xerror','-i',file,'-map','0:v:0','-map','0:a:0','-f','null','-'],{timeout:120000,maxBuffer:1024*1024});

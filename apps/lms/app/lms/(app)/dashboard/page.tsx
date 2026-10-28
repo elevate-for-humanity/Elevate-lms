@@ -1,3 +1,5 @@
+import { CareerPlan } from '@/components/career/CareerPlan';
+import { loadCareerPlan } from '@/lib/career/plan';
 import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import CourseSyllabus, { type CourseSyllabusRecord } from '@/components/learner/CourseSyllabus';
 import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
@@ -107,7 +109,10 @@ export default async function StudentDashboard() {
   const billingRequirement = showBilling
     ? await loadLearnerBillingRequirement(db, subjectId)
     : null;
-  const careerMatches = await getLearnerCareerMatches(subjectId, 4);
+  const [careerMatches, careerPlan] = await Promise.all([
+    getLearnerCareerMatches(subjectId, 4),
+    loadCareerPlan(supabase, subjectId),
+  ]);
   const { data: holderStudentRows } = await db
     .from('program_holder_students')
     .select('id,program_holder_id,status')
@@ -680,6 +685,7 @@ export default async function StudentDashboard() {
             <OnlineStudyClock />
           ) : null}
         </details>
+        <CareerPlan plan={careerPlan} readOnly={subject.previewing} />
         <details className="rounded-2xl border border-slate-200 bg-white p-4">
           <summary className="min-h-11 cursor-pointer font-bold text-slate-950">
             More: programs, meetings, progress, and career tools

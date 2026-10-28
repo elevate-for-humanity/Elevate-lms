@@ -38,7 +38,7 @@ describe('anonymous portal request boundary', () => {
       });
     }
   }
-  it.each(['/employer/export.json', '/host-shop/export.json', '/parent-portal', '/cosmetology-host-shop/dashboard', '/future/dashboard'])('does not let LMS %s bypass authentication', async (path) => {
+  it.each(['/scorm/job-ready/introduction/dispatch.html', '/scorm/job-ready/mindsets/package.zip', '/lms/career/job-ready', '/lms/scorm', '/employer/export.json', '/host-shop/export.json', '/parent-portal', '/cosmetology-host-shop/dashboard', '/future/dashboard'])('does not let LMS %s bypass authentication', async (path) => {
     const response = await lms(new NextRequest(`https://app.elevateforhumanity.org${path}`));
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toContain('/login');

@@ -96,3 +96,21 @@ it('fails explicitly for inactive packages, malformed data, and save failures', 
   state.writeError = true;
   expect((await POST(request({ cmi: {} }), context)).status).toBe(503);
 });
+
+it('accepts the canonical LMS browser origin behind an internal Cloud Run URL', async () => {
+  vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://app.elevateforhumanity.org');
+  try {
+    const forwarded = new NextRequest(
+      'http://internal-service:8080/api/learner/job-ready/mindsets',
+      {
+        method: 'POST',
+        headers: { origin: 'https://app.elevateforhumanity.org' },
+        body: JSON.stringify({ cmi: { 'cmi.location': 'resume-here' } }),
+      },
+    );
+    expect((await POST(forwarded, context)).status).toBe(200);
+    expect(state.writes[1].cmi_data['cmi.location']).toBe('resume-here');
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});

@@ -10,7 +10,10 @@ import {
 
 export async function POST(request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   const origin = request.headers.get('origin');
-  if (origin && origin !== request.nextUrl.origin)
+  // Cloud Run may receive an internal URL while the browser uses the public LMS.
+  const lmsOrigin = new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org')
+    .origin;
+  if (origin && origin !== request.nextUrl.origin && origin !== lmsOrigin)
     return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403 });
   const db = await createClient();
   const {

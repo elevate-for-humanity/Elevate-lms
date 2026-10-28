@@ -19,3 +19,12 @@ test('program service targets count only verified aggregate rows and cap progres
 test('programs without configured practice targets are not blocked',()=>{
  assert.deepEqual(practicalServiceProgress([],[]),{items:[],requiredCount:0,recordedCount:0,percent:100,complete:true});
 });
+
+test('read-only student progress sums the same service across active enrollments',()=>{
+  const result=practicalServiceProgress(
+    [{id:'hair',service_name:'Haircut',required_count:3,counts_for_completion:true}],
+    [{service_name:'Haircut',recorded_count:1},{service_name:'Haircut',recorded_count:2}],
+  );
+  assert.equal(result.items[0].recordedCount,3);
+  assert.equal(result.complete,true);
+});

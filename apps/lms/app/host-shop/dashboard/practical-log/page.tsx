@@ -23,7 +23,7 @@ export default function PracticalLogPage(){
  const [practice,setPractice]=useState<{items:PracticeItem[];requiredCount:number;recordedCount:number;percent:number;complete:boolean}>({items:[],requiredCount:0,recordedCount:0,percent:100,complete:true});
  useEffect(()=>{fetch('/api/host-shop/competencies').then(r=>r.json()).then(d=>setApprentices(d.apprentices||[])).catch(()=>setMessage('Unable to load assigned apprentices.'));},[]);
  const apprentice=apprentices.find(a=>a.enrollmentId===selected);
- const options=apprentice?listFor(apprentice.standard.occupationTitle):[];
+ const options=apprentice?Array.from(new Set([...listFor(apprentice.standard.occupationTitle),...practice.items.map(item=>item.service_name)])):[];
  useEffect(()=>{if(!selected){setEntries([]);setPractice({items:[],requiredCount:0,recordedCount:0,percent:100,complete:true});return;}fetch('/api/host-shop/practical-services?enrollmentId='+encodeURIComponent(selected)).then(r=>r.json()).then(d=>{if(d.error)throw Error(d.error);setEntries(d.entries||[]);setCanRecord(d.canRecord===true);setPractice(d.practice||{items:[],requiredCount:0,recordedCount:0,percent:100,complete:true});}).catch(e=>setMessage(String(e)));},[selected]);
  async function save(){
   if(!apprentice||!service||!canRecord)return;

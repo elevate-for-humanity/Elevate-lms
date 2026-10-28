@@ -15,6 +15,7 @@ function database(tables: Record<string, any[]>, failPage?: number) {
     const q: any = {
       select: () => q, eq: (key: string, value: any) => { filters.push([table, key, value]); return q; },
       order: () => q,
+      then: (resolve: any, reject: any) => Promise.resolve({ data: tables[table] || [], error: null }).then(resolve, reject),
       range: async (from: number, to: number) => ({
         data: tables[table]?.slice(from, to + 1) || [],
         error: from === failPage ? new Error('later page unavailable') : null,

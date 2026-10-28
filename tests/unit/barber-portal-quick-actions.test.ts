@@ -22,7 +22,7 @@ export const BARBER_PORTAL_QUICK_ACTION_HREFS = {
   stateBoard: '/apprentice/state-board',
   billing: '/apprentice/billing',
   skills: '/apprentice/skills',
-  workbook: '/apprentice/barber-apprenticeship/workbook',
+  workbook: '/workbooks',
   transferHours: '/apprentice/transfer-hours',
   orientation: '/apprentice/orientation?program=barber-apprenticeship',
   mobileApp: BARBER_STUDENT_APP_HOME,

@@ -170,7 +170,7 @@ function findTopLevelKeyword(input: string, start: number, keyword: string): num
 }
 
 function mergeMigrationViews(schema: TableSchema, sql: string): void {
-  const viewRe = /CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?(?:\s*\([^)]*\))?\s+AS\s+SELECT\s+/gi;
+  const viewRe = /CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?(?:\s*\([^)]*\))?(?:\s+WITH\s*\([^)]*\))?\s+AS\s+SELECT\s+/gi;
   let match: RegExpExecArray | null;
 
   while ((match = viewRe.exec(sql)) !== null) {

@@ -49,11 +49,16 @@ describe('approved teaching slide', () => {
     expect(html).toContain('Check the teeth.');
     expect((html.match(/<audio /g) || []).length).toBe(1);
   });
-  it('keeps photographs still rather than simulating demonstration footage', () => {
+  it('keeps the complete photograph identified as an illustration during camera movement', () => {
     const host = document.createElement('div');
     host.innerHTML = renderToStaticMarkup(<PremiumTeachingScene scene={scene} props={props} />);
     const photo = host.querySelector('img');
-    expect(photo?.style.transform).toBe('');
+    const camera = photo?.style.transform.match(/translate\(([-\d.]+)%, ([-\d.]+)%\) scale\(([-\d.]+)\)/);
+    expect(camera).not.toBeNull();
+    expect(Number(camera![3])).toBeLessThanOrEqual(1);
+    expect(Math.abs(Number(camera![1]))).toBeLessThanOrEqual((1 - Number(camera![3])) * 50);
+    expect(Math.abs(Number(camera![2]))).toBeLessThanOrEqual((1 - Number(camera![3])) * 50);
+    expect(host.textContent).toContain('Illustration — practice with your instructor.');
     expect(photo?.style.objectFit).toBe('contain');
     expect(photo?.style.opacity).toBe('1');
     expect(host.querySelector('video')).toBeNull();

@@ -23,7 +23,7 @@ describe('program-portal-paths', () => {
       'Prestige Elevation Barber Curriculum',
     );
     expect(apprenticeshipWorkbookHref('barber-apprenticeship')).toBe(
-      '/apprentice/barber-apprenticeship/workbook',
+      '/workbooks',
     );
   });
 

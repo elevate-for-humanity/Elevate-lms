@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TrainingVisualGuide } from './TrainingVisualGuide';
 
 export function TrainingReadyNotice({ courseHref }: { courseHref: string }) {
   return (
@@ -37,6 +38,7 @@ export function TrainingReadyNotice({ courseHref }: { courseHref: string }) {
         below the video, finish required activities, and save completion. Workbook saves do not
         automatically approve hours.
       </p>
+      <TrainingVisualGuide courseHref={courseHref} />
     </section>
   );
 }

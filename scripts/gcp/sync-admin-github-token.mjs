@@ -34,8 +34,8 @@ export async function syncAdminGitHubToken({run=google,request=fetch,config=()=>
  }
  if(!apply)return {...evidence,stateChanged:false};
  const add=(name,value)=>{
-  const result=readVersion(run(['secrets','versions','add',name,'--project='+PROJECT,'--data-file=-','--format=json(name,state)'],value),name);
-  return result;
+  try{return readVersion(run(['secrets','versions','add',name,'--project='+PROJECT,'--data-file=-','--format=json(name,state)'],value),name);}
+  catch(error){error.phase=name===SECRET?'token-secret-write':'runtime-config-write';throw error;}
  };
  const version=add(SECRET,token.trim());
  if(JSON.stringify(config())!==JSON.stringify(before))failure('ADMIN_GITHUB_CONFIG_CHANGED_CONCURRENTLY');
@@ -43,7 +43,8 @@ export async function syncAdminGitHubToken({run=google,request=fetch,config=()=>
  const configVersion=add(CONFIG,JSON.stringify(next));
  const stable=read(['run','services','describe',SERVICE,'--region=us-central1']);
  if(stable.metadata?.generation!==state.metadata?.generation||stable.spec?.template?.spec?.containers?.[0]?.image!==image)failure('ADMIN_GITHUB_SERVICE_CHANGED_CONCURRENTLY');
- run(['run','services','update',SERVICE,'--project='+PROJECT,'--region=us-central1','--update-secrets=GITHUB_TOKEN='+SECRET+':'+version,'--no-traffic','--quiet','--format=json(status.latestCreatedRevisionName)']);
+ try{run(['run','services','update',SERVICE,'--project='+PROJECT,'--region=us-central1','--remove-env-vars=GITHUB_TOKEN','--update-secrets=GITHUB_TOKEN='+SECRET+':'+version,'--no-traffic','--quiet','--format=json(status.latestCreatedRevisionName)']);}
+ catch(error){error.phase='runtime-secret-binding';throw error;}
  const candidate=read(['run','services','describe',SERVICE,'--region=us-central1']);
  if(candidate.spec?.template?.spec?.containers?.[0]?.image!==image)failure('ADMIN_GITHUB_IMAGE_CHANGED');
  const revision=candidate.status?.latestCreatedRevisionName;
@@ -57,4 +58,4 @@ export async function syncAdminGitHubToken({run=google,request=fetch,config=()=>
 function readVersion(raw,name){let value;try{value=JSON.parse(raw);}catch{failure('ADMIN_GITHUB_SECRET_VERSION_INVALID');}
  const match=value?.name?.match(new RegExp('^projects/[^/]+/secrets/'+name+'/versions/([1-9][0-9]*)$'));
  if(!match||value.state!=='ENABLED')failure('ADMIN_GITHUB_SECRET_VERSION_INVALID');return match[1];}
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){syncAdminGitHubToken({apply:process.argv.includes('--apply')}).then(value=>console.log(JSON.stringify(value))).catch(error=>{console.error(JSON.stringify({error:/^ADMIN_GITHUB_[A-Z_]+$/.test(error.message)?error.message:'ADMIN_GITHUB_SYNC_FAILED',category:['permission_denied','not_found','quota_exceeded'].includes(error.code)?error.code:undefined}));process.exitCode=1;});}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){syncAdminGitHubToken({apply:process.argv.includes('--apply')}).then(value=>console.log(JSON.stringify(value))).catch(error=>{console.error(JSON.stringify({error:/^ADMIN_GITHUB_[A-Z_]+$/.test(error.message)?error.message:'ADMIN_GITHUB_SYNC_FAILED',phase:['token-secret-write','runtime-config-write','runtime-secret-binding'].includes(error.phase)?error.phase:undefined,category:['permission_denied','not_found','quota_exceeded','command_failed','api_disabled','authentication_failed'].includes(error.code)?error.code:undefined}));process.exitCode=1;});}

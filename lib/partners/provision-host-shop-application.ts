@@ -14,13 +14,19 @@ function normalizedPrograms(programs: string[]) { return [...new Set(programs.ma
 
 async function resolveOrCreateUser(db: SupabaseClient, email: string, contactName: string): Promise<{ userId: string | null; isNewUser: boolean }> {
   const normalizedEmail = email.toLowerCase().trim();
-  const { data: profile } = await db.from('profiles').select('id, role').eq('email', normalizedEmail).maybeSingle();
+  const { data: profile, error: profileError } = await db.from('profiles').select('id, role').eq('email', normalizedEmail).maybeSingle();
+  if (profileError) throw profileError;
   if (profile?.id) return { userId: profile.id as string, isNewUser: false };
-  try {
-    const { data: users } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    const existing = ((users?.users ?? []) as AuthUserSummary[]).find((user) => user.email?.toLowerCase() === normalizedEmail);
+  // Existing users can have no profile yet. Search every Auth page before
+  // creating an account; a first-page-only lookup strands later users.
+  for (let page = 1; ; page += 1) {
+    const { data, error } = await db.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw error;
+    const users = (data?.users ?? []) as AuthUserSummary[];
+    const existing = users.find((user) => user.email?.toLowerCase() === normalizedEmail);
     if (existing?.id) return { userId: existing.id, isNewUser: false };
-  } catch (error) { logger.warn('[host-shop/provision] auth user lookup failed', { email: normalizedEmail, error: error instanceof Error ? error.message : String(error) }); }
+    if (users.length < 1000) break;
+  }
   const tempPassword = `${crypto.randomUUID().replace(/-/g, '')}Aa1!`;
   const { data, error } = await db.auth.admin.createUser({ email: normalizedEmail, password: tempPassword, email_confirm: true, user_metadata: { full_name: contactName, role: 'partner', portal: 'host_shop' } });
   if (error || !data.user?.id) { logger.error('[host-shop/provision] auth user creation failed', undefined, { email: normalizedEmail, error: error?.message }); return { userId: null, isNewUser: false }; }
@@ -63,13 +69,10 @@ export async function ensureHostShopOwnerAccess(input: {
       role: 'partner',
     });
     if (error) throw error;
-  } else if (!['admin', 'super_admin', 'org_admin', 'staff'].includes(String(existingProfile.role || ''))) {
-    const { error } = await input.db
-      .from('profiles')
-      .update({ role: 'partner', full_name: input.contactName, phone: input.phone || null })
-      .eq('id', identity.userId);
-    if (error) throw error;
   }
+
+  // Existing users may also be learners or employers. Keep their identity and
+  // primary role; the active partner membership grants only scoped shop access.
 
   const { error: membershipError } = await input.db.from('partner_users').upsert(
     {
@@ -89,6 +92,12 @@ async function createSecureAccessLink(db: SupabaseClient, email: string, isNewUs
   try {
     const { data, error } = await db.auth.admin.generateLink({ type: isNewUser ? 'recovery' : 'magiclink', email: email.toLowerCase().trim(), options: { redirectTo: onboardingUrl } });
     if (error) return null;
+    if (isNewUser && data?.properties?.hashed_token) {
+      const recovery = new URL('/api/auth/recovery-callback', new URL(onboardingUrl).origin);
+      recovery.searchParams.set('token_hash', data.properties.hashed_token);
+      recovery.searchParams.set('next', '/reset-password?portal=host-shop&mode=recovery');
+      return recovery.toString();
+    }
     return data?.properties?.action_link || null;
   } catch { return null; }
 }

@@ -9,7 +9,9 @@ import Link from 'next/link';
 export default function ResetPasswordForm({ portal, mode }: { portal?: string; mode?: string }) {
   const router = useRouter();
   const programHolder = portal === 'program-holder';
-  const destination = programHolder ? '/program-holder/onboarding' : '/lms';
+  const hostShop = portal === 'host-shop';
+  const loginPath = hostShop ? '/host-shop/login' : '/login';
+  const destination = programHolder ? '/program-holder/onboarding' : hostShop ? '/host-shop/onboarding' : '/lms';
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,7 +50,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
-          portal: programHolder ? 'program-holder' : 'learner',
+          portal: programHolder ? 'program-holder' : hostShop ? 'host-shop' : 'learner',
         }),
       });
       if (!response.ok) {
@@ -124,7 +126,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
           </h1>
           <p className="text-slate-600 text-sm mt-1">
             {PLATFORM_DEFAULTS.orgName}{' '}
-            {programHolder ? 'Program Holder Portal' : 'Learning Portal'}
+            {programHolder ? 'Program Holder Portal' : hostShop ? 'Host Shop Portal' : 'Learning Portal'}
           </p>
         </div>
 
@@ -152,7 +154,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
                   If an account exists for that address, a secure password-reset link has been sent.
                 </p>
                 <Link
-                  href="/login"
+                  href={loginPath}
                   className="inline-block text-brand-blue-600 font-semibold hover:underline"
                 >
                   Back to Login
@@ -273,7 +275,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
         </div>
 
         <p className="text-center text-slate-500 text-sm mt-6">
-          <Link href="/login" className="text-brand-blue-600 hover:underline">
+          <Link href={loginPath} className="text-brand-blue-600 hover:underline">
             Back to Login
           </Link>
         </p>

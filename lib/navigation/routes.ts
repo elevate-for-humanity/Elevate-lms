@@ -12,6 +12,8 @@ export const ROUTES = {
   // Home / intake
   home: '/',
   apply: '/apply/student',
+  applicationOptions: '/apply',
+  hostShopApply: '/partners/host-shop/apply',
 
   // Authentication / portals
   login: `${LMS_HOST}/login`,

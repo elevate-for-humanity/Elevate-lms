@@ -96,7 +96,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'How It Works', href: ROUTES.apprenticeshipsHowItWorks, isSectionLink: true },
       { name: 'All Apprenticeships', href: ROUTES.apprenticeships, isSectionLink: true },
       { name: 'All Host Sites', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
-      { name: 'Become a Host Site', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
+      { name: 'Become a Host Site', href: ROUTES.hostShopApply, isSectionLink: true },
       { name: 'Programs', isHeader: true },
       { name: 'Barber', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },

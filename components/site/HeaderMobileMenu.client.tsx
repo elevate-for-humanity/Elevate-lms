@@ -387,7 +387,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
             <div className="shrink-0 border-t border-slate-200 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <div className="mb-3 flex gap-2">
                 <MenuLink
-                  href={ROUTES.apply}
+                  href={ROUTES.applicationOptions}
                   onNavigate={closeMenu}
                   className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg bg-brand-red-600 py-3 text-sm font-semibold text-white hover:bg-brand-red-700"
                 >

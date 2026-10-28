@@ -18,6 +18,7 @@ export function passwordResetHandler(origin: string, store = false) {
   const body = await request.json().catch(() => null);
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
   const programHolder = !store && body?.portal === 'program-holder';
+  const hostShop = !store && body?.portal === 'host-shop';
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
@@ -27,7 +28,7 @@ export function passwordResetHandler(origin: string, store = false) {
     const db = await requireAdminClient();
     const resetPath = programHolder
       ? '/reset-password?portal=program-holder&mode=recovery'
-      : '/reset-password?mode=recovery';
+      : hostShop ? '/reset-password?portal=host-shop&mode=recovery' : '/reset-password?mode=recovery';
     const { data, error } = await db.auth.admin.generateLink({
       type: 'recovery',
       email,
@@ -51,7 +52,7 @@ export function passwordResetHandler(origin: string, store = false) {
     // Keep a reusable portal address in the message; only the credential-bearing reset URL expires.
     const permanentLoginUrl = programHolder
       ? new URL('/login?redirect=/program-holder/onboarding', origin).toString()
-      : new URL('/login', origin).toString();
+      : new URL(hostShop ? '/host-shop/login' : '/login', origin).toString();
 
     const delivery = await sendEmail({
       to: email,
@@ -59,7 +60,7 @@ export function passwordResetHandler(origin: string, store = false) {
       text: `Use this secure link to reset your password: ${recoveryLink}\n\nThis secure reset link expires. Your permanent login page does not expire: ${permanentLoginUrl}\n\nIf you did not request it, ignore this email.`,
       html: `<div style="max-width:600px;margin:0 auto;padding:32px;font-family:Arial,sans-serif;color:#0f172a">
         <h1 style="font-size:24px;margin:0 0 16px">Reset your password</h1>
-        <p style="line-height:1.6">Use the secure button below to choose a new password for your ${programHolder ? 'Program Holder' : 'Elevate'} account.</p>
+        <p style="line-height:1.6">Use the secure button below to choose a new password for your ${programHolder ? 'Program Holder' : hostShop ? 'Host Shop' : 'Elevate'} account.</p>
         <p style="margin:28px 0"><a href="${recoveryLink}" style="display:inline-block;padding:14px 24px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:6px;font-weight:700">Reset Password</a></p>
         <p style="font-size:13px;color:#64748b;line-height:1.6">The secure reset button expires. Your regular portal address never expires:</p>
         <p style="margin:16px 0"><a href="${permanentLoginUrl}" style="color:#1d4ed8;font-weight:700">Permanent Portal Login</a></p>

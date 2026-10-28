@@ -1,0 +1,41 @@
+name: Diagnose managed trial provisioning
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose-managed-trial.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Read sanitized trial failures
+        run: |
+          gcloud logging read 'resource.type="cloud_run_revision" AND (resource.labels.service_name="elevate-store-migration" OR resource.labels.service_name="elevate-marketing-migration") AND ("[trial]" OR "[startWorkspaceTrial]" OR "[provisionWorkspace]")' --project=elegant-racer-299721 --freshness=6h --limit=25 --format=json | python3 -c '
+          import json,sys,re
+          for row in json.load(sys.stdin):
+            data=row.get("jsonPayload") or {}
+            raw=row.get("textPayload","")
+            if raw:
+              try: data=json.loads(raw)
+              except ValueError: data={"message":raw}
+            err=data.get("error") or {}
+            if not isinstance(err,dict): err={}
+            msg=str(err.get("message",""))
+            msg=re.sub(r"https?://\S+","[url]",msg)
+            msg=re.sub(r"[\w.+-]+@[\w.-]+","[email]",msg)
+            msg=re.sub(r"eyJ[A-Za-z0-9_.-]+","[token]",msg)
+            print(json.dumps({"timestamp":row.get("timestamp"),"service":row.get("resource",{}).get("labels",{}).get("service_name"),"message":str(data.get("message",""))[:160],"errorType":err.get("name"),"error":msg[:600],"reference":data.get("context",{}).get("reference")}))
+          '

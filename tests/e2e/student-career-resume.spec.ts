@@ -42,3 +42,45 @@ test('student can access Career Services, save, reopen, preview and download res
   expect(file.suggestedFilename()).toMatch(/-resume\.pdf$/);
   expect((await file.path())).toBeTruthy();
 });
+
+
+test('learner can launch Job Ready and reopen saved SCORM state', async ({ page }) => {
+  test.setTimeout(120000);
+  expect(EMAIL, 'Disposable learner account must be provisioned').toBeTruthy();
+  expect(PASSWORD, 'Disposable learner password must be provisioned').toBeTruthy();
+  await page.goto(BASE + '/login', { waitUntil: 'domcontentloaded' });
+  await page.locator('input[type="email"], input[name="email"]').first().fill(EMAIL);
+  await page.locator('input[type="password"]').first().fill(PASSWORD);
+  await Promise.all([
+    page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 30000 }),
+    page.locator('button[type="submit"]').first().click(),
+  ]);
+  await page.goto(BASE + '/lms/dashboard', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { name: 'Your Career Plan', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Open Job Ready', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Job Ready Indy', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Start module', exact: true })).toHaveCount(7);
+  await expect(page.getByText('Facilitation Resources', { exact: true })).toHaveCount(0);
+  const providerFailures: number[] = [];
+  page.on('response', response => {
+    if (response.request().resourceType() === 'document' && new URL(response.url()).hostname.endsWith('contentcontroller.com') && response.status() >= 400) providerFailures.push(response.status());
+  });
+  await page.getByRole('link', { name: 'Start module', exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'Introduction to Job Ready Indy', exact: true })).toBeVisible();
+  await expect(page.locator('iframe[title="Introduction to Job Ready Indy"]')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as any).API_1484_11?.GetValue('cmi.learner_id') || ''), { timeout: 45000 }).not.toBe('');
+  // The hosted course must actually open, not only the local dispatch shell.
+  await expect.poll(() => page.frames().filter(frame => {
+    try { return new URL(frame.url()).hostname.endsWith('contentcontroller.com'); } catch { return false; }
+  }).length, { timeout: 45000 }).toBeGreaterThan(0);
+  expect(providerFailures, 'Provider document requests must succeed').toEqual([]);
+  const marker = 'Disposable QA state persistence check';
+  expect(await page.evaluate(value => {
+    const api = (window as any).API_1484_11;
+    if (api.SetValue('cmi.comments_from_learner.0.comment', value) !== 'true') return 'false';
+    return api.Commit('');
+  }, marker)).toBe('true');
+  await expect(page.getByText('Progress saved. You can return to this module later.', { exact: true })).toBeVisible({ timeout: 30000 });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect.poll(() => page.evaluate(() => (window as any).API_1484_11?.GetValue('cmi.comments_from_learner.0.comment') || ''), { timeout: 45000 }).toBe(marker);
+});

@@ -48,7 +48,7 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  const admin=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));
  reviewPrivateModelPolicy(read(['run','services','get-iam-policy',CPU_SERVICE]),admin.spec?.template?.spec?.serviceAccountName);
  const budget=await capacity({region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]},run});
- if(!budget.fits)fail('CANDIDATE_CAPACITY_REQUIRED');
+ if(!budget.fits)throw Object.assign(Error('CPU_MEMORY_REPAIR_CANDIDATE_CAPACITY_REQUIRED'),{capacity:{region:budget.region,required:budget.required,granted:budget.granted}});
  if(before.spec?.template?.spec?.containers?.[0]?.image!==original.image)fail('CONCURRENT_CANDIDATE_PRESENT');
  const tag='elevate-owned-cpu-llm-mem';
  run(['run','services','update',CPU_SERVICE,...scope,'--no-traffic','--tag='+tag,
@@ -83,4 +83,4 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  }
  return {repaired:true,previousRevision:previous,revision,modelUrl:before.status.url,memory:'8Gi',cpu:'4',cache:CPU_CACHE_ENV,acceptance,sustained,liveAcceptance:true,permissionsChanged:false};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)repairOwnedCpuMemory().then(report=>console.log(JSON.stringify(report))).catch(error=>{console.error(JSON.stringify({error:error.message?.startsWith('CPU_MEMORY_REPAIR_')||error.message?.startsWith('OWNED_CPU_MODEL_')?error.message:error.code||'CPU_MEMORY_REPAIR_FAILED'}));process.exitCode=1;});
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)repairOwnedCpuMemory().then(report=>console.log(JSON.stringify(report))).catch(error=>{console.error(JSON.stringify({error:error.message?.startsWith('CPU_MEMORY_REPAIR_')||error.message?.startsWith('OWNED_CPU_MODEL_')?error.message:error.code||'CPU_MEMORY_REPAIR_FAILED',...(error.capacity?{capacity:error.capacity}:{})}));process.exitCode=1;});

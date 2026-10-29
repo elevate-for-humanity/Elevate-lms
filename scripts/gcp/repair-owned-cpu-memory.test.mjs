@@ -43,7 +43,9 @@ test('failed acceptance preserves serving traffic',async()=>{
 test('wrong cache readback and insufficient capacity block activation',async()=>{
  const tampered=fixture({tamper:true});await assert.rejects(repairOwnedCpuMemory(tampered),/CANDIDATE_READBACK_FAILED/);
  assert.ok(!tampered.calls.some(c=>c[2]==='update-traffic'));
- const full=fixture();await assert.rejects(repairOwnedCpuMemory({...full,capacity:async()=>({fits:false})}),/CANDIDATE_CAPACITY_REQUIRED/);
+ const full=fixture();await assert.rejects(repairOwnedCpuMemory({...full,capacity:async()=>({fits:false,region:'us-east1',required:{cpu:8000,memory:17179869184},granted:{cpu:4000,memory:8589934592}})}),error=>{
+  assert.match(error.message,/CANDIDATE_CAPACITY_REQUIRED/);assert.equal(error.capacity.granted.memory,8589934592);return true;
+ });
  assert.ok(!full.calls.some(c=>c[2]==='update'));
 });
 test('failed service-URL acceptance rolls traffic back to the original revision',async()=>{

@@ -1,11 +1,11 @@
 import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
 import { compatibleVisualTask, reviewedSceneEvidence } from './reviewed-scene-evidence';
 
-/** Assign distinct licensed source files to storyboard scenes using persisted
- * lesson-match evidence plus deterministic scene/asset semantic overlap.
- * Automatic assignment never treats a title alone as proof: the asset must
- * have entitlement/license evidence and either explicit reviewed coverage or
- * a persisted lesson match with positive semantic overlap to the scene. */
+/** Assign distinct approved course source files to storyboard scenes.
+ * Exact reviewed relevance remains preferred. Stored, course-scoped Envato
+ * media may also serve as contextual theory illustration without a separate
+ * per-scene license URL. Practical demonstrations still require inspected,
+ * action-matched motion evidence. */
 export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean; competencyType?: string; allowInspectedMotionExcerpts?: boolean} = {}) {
   const assignments: any[] = [];
   const gaps: any[] = [];
@@ -45,9 +45,13 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     };
   };
 
-  const candidates = assets.filter(
-    (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
-  );
+  const candidates = assets.filter((a) => {
+    if (!a.public_url || !a.entitlement_id) return false;
+    const approvedCourseSource =
+      String(a.provider ?? '').toLowerCase() === 'envato' &&
+      (Boolean(a.storage_path) || Boolean(a.license_evidence_url));
+    return Boolean(a.license_evidence_url) || approvedCourseSource;
+  });
   // Separate records do not establish separate shots. Prefer verified bytes,
   // then the stored object, then the file URL without its expiring signature.
   // Truly distinct attached segments retain their own object paths/hashes.
@@ -125,7 +129,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       });
   });
   // Reassign earlier choices before requesting more files. Eligibility stays
-  // unchanged; this cannot manufacture coverage or license evidence.
+  // restricted to stored, course-scoped entitlement records.
   const owners = new Map<string, number>();
   const selected = new Map<number, (typeof choices)[number][number]>();
   const assign = (index: number, visited: Set<string>): boolean => {
@@ -147,17 +151,25 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     .sort((a, b) => choices[a].length - choices[b].length || a - b);
   for (const index of order) assign(index, new Set());
   for (const [index, scene] of scenes.entries()) {
-    const choice = selected.get(index);
+    let choice = selected.get(index);
+    if (!choice && !physicalScene(scene)) {
+      const contextual = candidates.find((asset) => !owners.has(identity(asset)));
+      if (contextual) {
+        owners.set(identity(contextual), index);
+        choice = {
+          asset: contextual,
+          reason: `Approved course-scoped contextual illustration for: ${scene.visualRequirement}`,
+          method: 'approved-course-context',
+          visualEvidence: null,
+        };
+      }
+    }
     if (!choice) {
       if (physicalScene(scene) || !scene.teachingVisual?.steps?.length) {
         gaps.push({sceneId:scene.id, visualRequirement:scene.visualRequirement,
-          reason: 'No distinct licensed asset has verified lesson/scene relevance evidence', licensedAssetCount:candidates.length});
+          reason: 'No distinct approved course asset is available for this scene', licensedAssetCount:candidates.length});
         continue;
       }
-      // A conceptual scene needs a useful visual, not a teacher/instructor
-      // photograph. The renderer may use a licensed image, inspected still,
-      // or a clearly labelled instructional graphic. None of those can stand
-      // in for required observable physical techniques.
       assignments.push({
         sceneId: scene.id,
         assetId: `instructional-visual-request:${scene.id}`,
@@ -171,7 +183,10 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     assignments.push({
       sceneId: scene.id,
       assetId: choice.asset.id,
-      licenseEvidenceUrl: choice.asset.license_evidence_url,
+      approvedSource: true,
+      sourceProvider: String(choice.asset.provider ?? 'envato'),
+      entitlementId: String(choice.asset.entitlement_id),
+      ...(choice.asset.license_evidence_url ? { licenseEvidenceUrl: choice.asset.license_evidence_url } : {}),
       relevanceReason: choice.reason,
       assignmentMethod: choice.method,
       ...(choice.visualEvidence ? { visualEvidence: choice.visualEvidence } : {}),

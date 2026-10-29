@@ -180,3 +180,16 @@ describe('authored content compiler', () => {
     ).toThrow(/generic baseline content is prohibited/i);
   });
 });
+
+
+it('preserves indexed answers in imported HVAC practice assessments', () => {
+  const result = compileAuthoredLessonExperience({
+    courseTitle: 'HVAC Technician', moduleTitle: 'Safety',
+    lessonTitle: 'Cleaning and Disinfecting Implements', lessonSlug: 'source-schema-check',
+    domainKey: 'safety', html,
+    learningObjectives: ['Explain cleaning procedures.', 'Apply label directions.', 'Separate used and clean equipment.'],
+    quizQuestions: questions.map(({ correctAnswer, ...question }) => ({ ...question, correct_index: correctAnswer })),
+  });
+  expect(result.questions).toHaveLength(3);
+  expect(result.questions.map(question => question.correctAnswer)).toEqual([0, 0, 0]);
+});

@@ -15,6 +15,37 @@ function database(){
 }
 beforeEach(()=>{state.rows={};state.fail.clear();state.ranges=[];state.rpcCalls=[];state.invoiceSnapshot={all_time_cents:'0',this_month_cents:'0',paid_count:0,all_time_available:true,month_available:true};state.authorize.mockReset().mockResolvedValue({});state.admin.mockReset().mockResolvedValue(database());});
 describe('executed admin dashboard data loader',()=>{
+ it('uses the publication flag and excludes archived programs from the unpublished queue',async()=>{
+  state.rows.programs=[
+   {id:'live',title:'HVAC',status:'active',published:true,is_active:true},
+   {id:'draft',title:'Business',status:'active',published:false,is_active:true},
+   {id:'inactive-draft',title:'Accounting',status:'draft',published:false,is_active:false},
+   {id:'archived',title:'Archived',status:'archived',published:false},
+   {id:'archived-date',title:'Retired',status:'active',published:false,archived_at:'2026-10-01T00:00:00Z'},
+  ];
+  const data=await getAdminDashboardData();
+  expect(data.blockedPrograms.map(row=>row.id)).toEqual(['draft','inactive-draft']);
+ });
+ it('excludes QA enrollments from operational counts, program totals and recent activity',async()=>{
+  const today=new Date().toISOString();
+  state.rows.program_enrollments=[
+   {id:'real',user_id:'learner',full_name:'Real Learner',email:'learner@school.org',program_id:'program',status:'active',created_at:today},
+   {id:'qa',user_id:'qa-user',full_name:'[QA E2E] Barber Apprentice',email:'barber@qa.invalid',program_id:'program',status:'active',created_at:today},
+  ];
+  state.rows.programs=[{id:'program',title:'Barber',published:true,status:'active'}];
+  const data=await getAdminDashboardData();
+  expect(data.counts.activeEnrollments).toBe(1);
+  expect(data.operational.newEnrollmentsToday).toBe(1);
+  expect(data.topPrograms[0].learners).toBe(1);
+  expect(data.recentStudents.map(row=>row.id)).toEqual(['learner']);
+  expect(JSON.stringify(data.recentActivity)).not.toContain('[QA E2E]');
+ });
+ it('resolves the program title for completed enrollment outcome alerts',async()=>{
+  state.rows.program_enrollments=[{id:'completed',user_id:'learner',program_id:'program',status:'completed'}];
+  state.rows.programs=[{id:'program',slug:'hvac-technician',title:'HVAC Certification',published:true,status:'active'}];
+  const data=await getAdminDashboardData();
+  expect(data.noOutcomeEnrollments[0]).toMatchObject({program_title:'HVAC Certification'});
+ });
  it('counts completions and inactive states beyond the first thousand enrollments',async()=>{
   state.rows.program_enrollments=Array.from({length:1001},(_,i)=>({id:String(i),program_id:'program',status:i===1000?'completed':i===999?'inactive':'active',created_at:'2026-10-01T00:00:00Z'}));
   state.rows.programs=[{id:'program',title:'Training'}];

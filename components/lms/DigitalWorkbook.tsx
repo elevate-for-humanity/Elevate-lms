@@ -31,7 +31,7 @@ function SectionEditor({
     readOnly,
     accountId,
   );
-  const slides = workbookSlides(section);
+  const slides = workbookSlides(section, visual?.caption);
   const [step, setStep] = useState(0);
   const [moving, setMoving] = useState(false);
   const slide = slides[step];
@@ -122,15 +122,7 @@ function SectionEditor({
           <p className="mt-4 max-w-prose text-xl leading-relaxed">{slide.text}</p>
         </div>
         <div className="p-5 sm:p-8">
-          {!hidden && (
-            <WorkbookNarration
-              text={
-                step === 0 && visual
-                  ? `${slide.narration} Look at the lesson picture. ${visual.caption}`
-                  : slide.narration
-              }
-            />
-          )}
+          {!hidden && <WorkbookNarration text={slide.narration} />}
           {slide.field && (
             <div className="my-5">
               <label

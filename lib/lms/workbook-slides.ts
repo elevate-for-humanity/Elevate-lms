@@ -10,12 +10,12 @@ export type WorkbookSlide = {
 };
 
 /** Use the assigned workbook's actual prompts, never invented lesson content. */
-export function workbookSlides(section: WorkbookSection): WorkbookSlide[] {
+export function workbookSlides(section: WorkbookSection, visualCaption?: string): WorkbookSlide[] {
   return [
     {
       title: 'Study and notice',
       text: `Study ${section.title}. Record key ideas, words to define, and questions for your instructor.`,
-      narration: `Welcome. I'm PARIS, your workbook guide. This section is ${section.title}. ${section.unit}. Record key ideas, words to define, and questions for your instructor. Pause here to write. Your answers save to your account. Choose Next when you are ready.`,
+      narration: `Welcome. I'm PARIS, your workbook guide. This section is ${section.title}. ${section.unit}. ${visualCaption ? `Look at the lesson picture. ${visualCaption} ` : ''}Record key ideas, words to define, and questions for your instructor. Pause here to write. Your answers save to your account. Choose Next when you are ready.`,
       field: 'notes',
     },
     ...section.prompts.slice(0, 3).map(

@@ -11,6 +11,8 @@ function fixture({tamper=false}={}) {
   containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'4',memory:'8Gi'}},env:[{name:'LLM_WORKER_SECRET',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}]}]};
  const run=args=>{
   calls.push(args);
+  if(args[0]==='projects')return JSON.stringify({bindings:[{role:'roles/owner',members:['user:owner@example.test']}]});
+  if(args[0]==='auth')return 'fixture-access-token';
   if(args[0]==='secrets')return JSON.stringify({version:1,component:'admin',runtimeEnvironment:{ELEVATE_LLM_SECRET:'secret-'.repeat(8)},volumes:[],runtimeFiles:{}});
   if(args.includes('elevate-admin-migration'))return JSON.stringify({spec:{template:{spec:{serviceAccountName:'elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com'}}}});
   if(args.includes('get-iam-policy'))return JSON.stringify({bindings:[]});
@@ -53,6 +55,25 @@ test('failed service-URL acceptance rolls traffic back to the original revision'
  await assert.rejects(repairOwnedCpuMemory({...f,accept:async()=>({passed:++n===1})}),/LIVE_ACCEPTANCE_REQUIRED/);
  const changes=f.calls.filter(c=>c[2]==='update-traffic');assert.equal(changes.length,2);
  assert.ok(changes[1].includes('--to-revisions='+f.old+'=100'));
+});
+test('accepted quota request never substitutes for granted regional capacity',async()=>{
+ const f=fixture();let inspections=0,requests=0,waits=0;
+ await assert.rejects(repairOwnedCpuMemory({...f,requestStagingHeadroom:true,
+  capacity:async()=>{inspections++;return {fits:false,region:'us-east1',required:{cpu:24000},granted:{cpu:20000}};},
+  requestQuota:async(token,contact,_request,options)=>{requests++;assert.equal(token,'fixture-access-token');assert.equal(contact,'owner@example.test');assert.deepEqual(options,{region:'us-east1'});return [{accepted:true,grantedValue:'20000'}];},
+  pause:async ms=>{waits++;assert.equal(ms,15000);}}),error=>{
+  assert.match(error.message,/CANDIDATE_CAPACITY_REQUIRED/);assert.equal(error.quotaRequests[0].accepted,true);return true;
+ });
+ assert.equal(requests,1);assert.equal(inspections,5);assert.equal(waits,4);
+ assert.ok(!f.calls.some(c=>['update','update-traffic'].includes(c[2])));
+});
+test('staging resumes only after quota readback proves adequate capacity',async()=>{
+ const f=fixture();let inspections=0,requested=false;
+ const result=await repairOwnedCpuMemory({...f,requestStagingHeadroom:true,
+  capacity:async()=>({fits:++inspections>1}),
+  requestQuota:async()=>{requested=true;assert.ok(!f.calls.some(c=>c[2]==='update'));return [{accepted:true}];},pause:async()=>{}});
+ assert.ok(requested);assert.equal(inspections,2);assert.equal(result.repaired,true);
+ assert.ok(!f.calls.some(c=>c.includes('add-iam-policy-binding')||c.includes('set-iam-policy')));
 });
 test('sustained proof performs eight different bounded requests and rejects wrong answers',async()=>{
  const prompts=[];const f=fixture();

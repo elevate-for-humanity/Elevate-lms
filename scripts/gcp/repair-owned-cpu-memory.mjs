@@ -4,6 +4,7 @@ import {modelCredential} from './deploy-owned-llm.mjs';
 import {CPU_SERVICE,CPU_REGION,CPU_CACHE_ENV,reviewPrivateModelPolicy} from './deploy-owned-cpu-model.mjs';
 import {inspectRegionalCapacity} from './regional-capacity.mjs';
 import {acceptOwnedCpuModel} from './accept-owned-cpu-model.mjs';
+import {quotaContact,requestHeadroom} from './request-run-headroom.mjs';
 
 const fail=code=>{throw Error('CPU_MEMORY_REPAIR_'+code);};
 const scope=['--project',PROJECT,'--region',CPU_REGION];
@@ -36,7 +37,7 @@ export async function repeatCpuInference({base,token,invokerToken,request=fetch}
 }
 
 /** Stage the same immutable image with bounded caches; accept it before traffic moves. */
-export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalCapacity,accept=acceptOwnedCpuModel,repeat=repeatCpuInference,invokerToken=process.env.MODEL_INVOKER_TOKEN}={}) {
+export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalCapacity,accept=acceptOwnedCpuModel,repeat=repeatCpuInference,invokerToken=process.env.MODEL_INVOKER_TOKEN,requestStagingHeadroom=false,requestQuota=requestHeadroom,pause=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}) {
  if(!invokerToken)fail('INVOCATION_IDENTITY_REQUIRED');
  const read=args=>JSON.parse(run([...args,...scope,'--format=json']));
  const before=read(['run','services','describe',CPU_SERVICE]);
@@ -47,8 +48,17 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  const token=modelCredential(adminConfig);
  const admin=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));
  reviewPrivateModelPolicy(read(['run','services','get-iam-policy',CPU_SERVICE]),admin.spec?.template?.spec?.serviceAccountName);
- const budget=await capacity({region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]},run});
- if(!budget.fits)throw Object.assign(Error('CPU_MEMORY_REPAIR_CANDIDATE_CAPACITY_REQUIRED'),{capacity:{region:budget.region,required:budget.required,granted:budget.granted}});
+ const capacityInput={region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]},run};
+ let budget=await capacity(capacityInput);
+ let quotaRequests;
+ if(!budget.fits&&requestStagingHeadroom) {
+  const contact=quotaContact(JSON.parse(run(['projects','get-iam-policy',PROJECT,'--format=json'])));
+  quotaRequests=await requestQuota(run(['auth','print-access-token']),contact,fetch,{region:CPU_REGION});
+  if(!quotaRequests.some(result=>result.accepted===false)) {
+   for(let attempt=0;attempt<4&&!budget.fits;attempt++) {await pause(15000);budget=await capacity(capacityInput);}
+  }
+ }
+ if(!budget.fits)throw Object.assign(Error('CPU_MEMORY_REPAIR_CANDIDATE_CAPACITY_REQUIRED'),{capacity:{region:budget.region,required:budget.required,granted:budget.granted},quotaRequests});
  if(before.spec?.template?.spec?.containers?.[0]?.image!==original.image)fail('CONCURRENT_CANDIDATE_PRESENT');
  const tag='elevate-owned-cpu-llm-mem';
  run(['run','services','update',CPU_SERVICE,...scope,'--no-traffic','--tag='+tag,
@@ -83,4 +93,4 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  }
  return {repaired:true,previousRevision:previous,revision,modelUrl:before.status.url,memory:'8Gi',cpu:'4',cache:CPU_CACHE_ENV,acceptance,sustained,liveAcceptance:true,permissionsChanged:false};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)repairOwnedCpuMemory().then(report=>console.log(JSON.stringify(report))).catch(error=>{console.error(JSON.stringify({error:error.message?.startsWith('CPU_MEMORY_REPAIR_')||error.message?.startsWith('OWNED_CPU_MODEL_')?error.message:error.code||'CPU_MEMORY_REPAIR_FAILED',...(error.capacity?{capacity:error.capacity}:{})}));process.exitCode=1;});
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)repairOwnedCpuMemory({requestStagingHeadroom:process.env.REQUEST_PARIS_STAGING_HEADROOM==='true'}).then(report=>console.info(JSON.stringify(report))).catch(error=>{console.error(JSON.stringify({error:error.message?.startsWith('CPU_MEMORY_REPAIR_')||error.message?.startsWith('OWNED_CPU_MODEL_')?error.message:error.code||'CPU_MEMORY_REPAIR_FAILED',...(error.capacity?{capacity:error.capacity}:{}),...(error.quotaRequests?{quotaRequests:error.quotaRequests}:{})}));process.exitCode=1;});

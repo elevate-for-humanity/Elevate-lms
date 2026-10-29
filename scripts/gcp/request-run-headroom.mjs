@@ -7,6 +7,10 @@ export const targets = [
   {quotaId: 'CpuAllocPerProjectRegion', preferredValue: '32000', id: 'elevate-run-cpu-us-central1'},
   {quotaId: 'MemAllocPerProjectRegion', preferredValue: '103079215104', id: 'elevate-run-memory-us-central1'},
 ];
+export const parisStagingTargets = [
+  {quotaId: 'CpuAllocPerProjectRegion', preferredValue: '24000', id: 'elevate-run-cpu-us-east1'},
+  {quotaId: 'MemAllocPerProjectRegion', preferredValue: '51539607552', id: 'elevate-run-memory-us-east1'},
+];
 export function quotaContact(policy) {
   const owners = [...new Set((policy.bindings || []).filter(b => b.role === 'roles/owner' && !b.condition)
     .flatMap(b => b.members || []).filter(m => m.startsWith('user:')).map(m => m.slice(5)))];
@@ -34,8 +38,11 @@ function providerState(body, secrets) {
     stateDetail: sanitizeText(body.quotaConfig?.stateDetail, secrets),
     traceId: sanitizeText(body.quotaConfig?.traceId, secrets)};
 }
-export async function requestHeadroom(token, contactEmail, request = fetch, {requestMaximum = false} = {}) {
+export async function requestHeadroom(token, contactEmail, request = fetch, {requestMaximum = false, region = 'us-central1'} = {}) {
   if (typeof requestMaximum !== 'boolean') throw Error('requestMaximum must be an explicit boolean');
+  if (!['us-central1', 'us-east1'].includes(region) || (region === 'us-east1' && requestMaximum))
+    throw Error('PARIS staging supports only the bounded us-east1 quota request');
+  const scopedTargets = region === 'us-east1' ? parisStagingTargets : targets;
   const results = [];
   const headers = {authorization: 'Bearer ' + token, 'content-type': 'application/json'};
   const secrets = [token, contactEmail];
@@ -44,11 +51,11 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
       {headers, signal: AbortSignal.timeout(30000)});
     if (!response.ok) throw Error('Unable to read current quota; adjustment stopped for ' + target.quotaId);
     const info = await response.json();
-    const value = (info.dimensionsInfos || []).find(x => x.dimensions?.region === 'us-central1')?.details?.value;
+    const value = (info.dimensionsInfos || []).find(x => x.dimensions?.region === region)?.details?.value;
     if (!validValue(value)) throw Error('Regional quota value unavailable; adjustment stopped');
     return value;
   };
-  for (const target of targets) {
+  for (const target of scopedTargets) {
     const desired = requestMaximum ? '-1' : target.preferredValue;
     const value = await readQuota(target);
     const name = 'projects/484736877039/locations/global/quotaPreferences/' + target.id;
@@ -60,7 +67,7 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
       existing = await existingResponse.json();
       const names = [name, name.replace('/484736877039/', '/elegant-racer-299721/')];
       if (!names.includes(existing.name) || existing.service !== 'run.googleapis.com' || existing.quotaId !== target.quotaId ||
-          Object.keys(existing.dimensions || {}).length !== 1 || existing.dimensions?.region !== 'us-central1' ||
+          Object.keys(existing.dimensions || {}).length !== 1 || existing.dimensions?.region !== region ||
           !validValue(existing.quotaConfig?.preferredValue) ||
           (existing.quotaConfig?.grantedValue !== undefined && !validValue(existing.quotaConfig.grantedValue)))
         throw Error('Owned quota preference identity, scope or value mismatch; adjustment stopped');
@@ -81,8 +88,10 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
     // -1 requests unlimited quota under Google's normal review; it does not
     // promise a grant. Never bypass safety checks or replace another preference.
     const payload = {service: 'run.googleapis.com', quotaId: target.quotaId,
-      dimensions: {region: 'us-central1'}, quotaConfig: {preferredValue: desired}, contactEmail,
-      justification: requestMaximum
+      dimensions: {region}, quotaConfig: {preferredValue: desired}, contactEmail,
+      justification: region === 'us-east1'
+        ? 'Request 24 vCPU and 48 GiB in us-east1 for existing bounded workloads plus one temporary 4 vCPU / 8 GiB PARIS model validation revision. Current allocations consume the approved 20 vCPU / 40 GiB envelope. The candidate fixes observed model memory exhaustion and must pass real inference before traffic moves. No container sizes, replica limits, permissions or autoscaling settings are increased.'
+        : requestMaximum
         ? 'The project owner requests the largest Cloud Run CPU and memory quota Google will approve in us-central1, using the documented unlimited preference. Current web services and rendering jobs exhaust 20 vCPU and 40 GiB and block rolling deployments. Google determines the approved limit; no container sizes or autoscaling settings are changed.'
         : 'Request 32 vCPU and 96 GiB in us-central1 for bounded existing workloads: service envelopes total 16 vCPU and 36 GiB, one course worker uses 4 vCPU and 8 GiB, one finite renderer uses 8 vCPU and 32 GiB, and one rolling web revision needs up to 4 vCPU and 8 GiB. Google determines the granted limits; no container sizes, replica counts or autoscaling settings are changed.'};
     const url = new URL(existing ? endpoint : parent + '/quotaPreferences');
@@ -120,6 +129,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (!['true', 'false'].includes(flag)) throw Error('REQUEST_MAXIMUM must be true or false');
   const requestMaximum = flag === 'true';
   const results = await requestHeadroom(token, contact, fetch, {requestMaximum});
-  console.log(JSON.stringify({observedAt: new Date().toISOString(), project, region: 'us-central1', requestMaximum, results}));
+  console.info(JSON.stringify({observedAt: new Date().toISOString(), project, region: 'us-central1', requestMaximum, results}));
   if (results.some(r => r.accepted === false || r.effectiveReadFailed)) process.exitCode = 1;
 }

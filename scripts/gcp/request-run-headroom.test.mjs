@@ -9,7 +9,7 @@ function preference(target, overrides = {}) {
     dimensions: {region: 'us-central1'}, etag: 'version-1',
     quotaConfig: {preferredValue: target.preferredValue, grantedValue: '20000'}, ...overrides};
 }
-function provider({preferences = {}, effective = '20000', mutate} = {}) {
+function provider({preferences = {}, effective = '20000', mutate, region = 'us-central1'} = {}) {
   const writes = [];
   const reads = [];
   const request = async (input, options) => {
@@ -17,7 +17,7 @@ function provider({preferences = {}, effective = '20000', mutate} = {}) {
     if (!options.method) {
       reads.push(url.pathname);
       if (url.pathname.includes('/quotaInfos/')) return response({dimensionsInfos: [
-        {dimensions: {region: 'us-central1'}, details: {value: effective}},
+        {dimensions: {region}, details: {value: effective}},
       ]});
       const id = url.pathname.split('/').at(-1);
       return Object.hasOwn(preferences, id) ? response(preferences[id]) : response({error: {status: 'NOT_FOUND'}}, 404);
@@ -44,6 +44,16 @@ test('default creates only the bounded preferences and preserves provider checks
   assert(api.writes.every(x => x.options.method === 'POST' && x.body.dimensions.region === 'us-central1'));
   assert(api.reads.includes('/v1/' + resource('elevate-run-memory-us-central1')));
   assert(results.every(x => x.accepted === false));
+});
+
+test('PARIS staging requests only one additional model envelope in the existing secondary region', async () => {
+  const api=provider({region:'us-east1'});
+  const result=await requestHeadroom('token','owner@example.test',api.request,{region:'us-east1'});
+  assert.deepEqual(api.writes.map(x=>x.body.quotaConfig.preferredValue),['24000','51539607552']);
+  assert.ok(api.writes.every(x=>x.body.dimensions.region==='us-east1'&&x.url.searchParams.get('quotaPreferenceId').endsWith('us-east1')));
+  assert.ok(result.every(x=>x.accepted===false));
+  await assert.rejects(requestHeadroom('token','owner@example.test',api.request,{region:'us-east1',requestMaximum:true}),/bounded/);
+  await assert.rejects(requestHeadroom('token','owner@example.test',api.request,{region:'unapproved-region'}),/bounded/);
 });
 
 test('explicit maximum patches exact owned preferences using their etags and a narrow mask', async () => {

@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify bounded memory repair and rollback contracts
-        run: node --test scripts/gcp/repair-owned-cpu-memory.test.mjs scripts/gcp/deploy-owned-cpu-model.test.mjs scripts/gcp/accept-owned-cpu-model.test.mjs
+        run: node --test scripts/gcp/repair-owned-cpu-memory.test.mjs scripts/gcp/deploy-owned-cpu-model.test.mjs scripts/gcp/accept-owned-cpu-model.test.mjs scripts/gcp/request-run-headroom.test.mjs
       - uses: google-github-actions/auth@v3
         id: invocation
         with:
@@ -47,4 +47,5 @@ jobs:
       - name: Stage bounded caches, test real inference repeatedly, and activate only on acceptance
         env:
           MODEL_INVOKER_TOKEN: ${{ steps.invocation.outputs.id_token }}
+          REQUEST_PARIS_STAGING_HEADROOM: 'true'
         run: node scripts/gcp/repair-owned-cpu-memory.mjs

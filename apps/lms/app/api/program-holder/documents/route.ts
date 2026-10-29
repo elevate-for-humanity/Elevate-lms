@@ -50,16 +50,6 @@ export async function POST(request: NextRequest) {
   if (documentType === 'profile_photo' && !['image/jpeg', 'image/png'].includes(file.type))
     return NextResponse.json({ error: 'Upload a JPG or PNG profile picture.' }, { status: 400 });
   if (documentType === 'provider_invoice') {
-    const holder = await ctx.db
-      .from('program_holders')
-      .select('organization_name')
-      .eq('id', ctx.holderId)
-      .maybeSingle();
-    if (holder.error || holder.data?.organization_name !== 'The CDL Academy')
-      return NextResponse.json(
-        { error: 'Training invoice submission is unavailable for this account.' },
-        { status: 403 },
-      );
     if (file.type === 'video/mp4')
       return NextResponse.json(
         { error: 'Submit the invoice as a PDF, JPG, or PNG.' },
@@ -137,7 +127,7 @@ export async function POST(request: NextRequest) {
       description: enrollmentId
         ? JSON.stringify({ enrollment_id: enrollmentId, kind: 'student_evidence' })
         : documentType === 'provider_invoice'
-          ? 'CDL training invoice submitted to Elevate for payment review'
+          ? 'Training invoice submitted to Elevate for payment review'
           : 'Submitted through protected Program Holder onboarding',
       uploaded_by: ctx.user.id,
       uploaded_at: now,

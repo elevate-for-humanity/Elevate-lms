@@ -60,3 +60,13 @@ test('only the furthest historical cursor is recovered and an admission race is 
  }});
  assert.equal(writes.length,1);assert.match(writes[0],/id=eq.job/);assert.deepEqual(result.jobIds,[]);
 });
+
+
+test('business saved-render repair resumes once after a verified image without reopening superseded HVAC', async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED"}]';
+ const business={...base,last_error:error,build:{...base.build,course_id:'e9a2547c-ae03-418e-97fc-51377d438f8c'}};
+ assert.equal((await run(business)).writes.length,1);
+ assert.equal((await run({...business,monitor:{...business.monitor,lastRepairDeployment:{imageSha}}})).writes.length,0);
+ for(const course_id of ['0ba9a61c-1f1b-4019-be6f-90e92eba2bc0','511aefe6-15fe-47b2-8eca-d55da4f31c51'])
+  assert.equal((await run({...business,build:{...business.build,course_id}})).writes.length,0);
+});

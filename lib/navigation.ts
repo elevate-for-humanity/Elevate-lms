@@ -84,8 +84,19 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Microcourses & Certifications', isHeader: true, href: '/microclasses' },
       { name: 'All Microcourses', href: '/microclasses', isSectionLink: true },
       { name: 'Job Ready Indy', href: ROUTES.fundingJobReadyIndy, isSectionLink: true },
+    ],
+  },
+  {
+    id: 'testing',
+    name: 'Testing',
+    href: ROUTES.testing,
+    subItems: [
+      { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },
+      { name: 'Book an Exam', href: '/testing/book', isSectionLink: true },
       { name: 'Certification Testing', href: '/testing/nha', isSectionLink: true },
       { name: 'Testing Products', href: '/store/testing', isSectionLink: true },
+      { name: 'Employer / Group Testing', href: '/testing/for-employers', isSectionLink: true },
+      { name: 'Testing Policies', href: '/testing/policies', isSectionLink: true },
     ],
   },
   {

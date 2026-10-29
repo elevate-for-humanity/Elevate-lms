@@ -104,3 +104,6 @@ docs/ultimate-course-builder/lessons/*
 !tests/worker
 tests/worker/*
 !tests/worker/narration-storage-reference.test.mjs
+
+# Native narration must keep heartbeat scheduling live before worker release.
+!tests/worker/kokoro-liveness-smoke.mjs

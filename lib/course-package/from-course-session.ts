@@ -172,7 +172,10 @@ export function coursePackageFromSession(
                       })
                     : [],
                   captions: Array.isArray(effectiveTimeline.captions)
-                    ? effectiveTimeline.captions
+                    ? effectiveTimeline.captions.map((caption, index) => ({
+                        ...(record(caption) ?? {}),
+                        id: String(record(caption)?.id ?? `${lesson.slug}-caption-${index + 1}`),
+                      }))
                     : [],
                   interactions: [],
                   checkpoints: [],

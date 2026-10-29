@@ -45,3 +45,30 @@ describe('coursePackageFromSession', () => {
     expect(result.modules[0].lessons[0].completion.requiredWatchPercent).toBe(95);
   });
 });
+
+it.each(['experience', 'scene_data'])('normalizes missing caption IDs in %s timelines without changing timing or text', (origin) => {
+  const input = session();
+  const captions = [
+    { start: 0, end: 2, text: 'Recover refrigerant.' },
+    { id: 'persisted-caption', start: 2, end: 4, text: 'Never vent it.' },
+  ];
+  const scenes = [{ startTime: 0, endTime: 4, duration_seconds: 4, narration: 'Recover refrigerant. Never vent it.', action: 'Recovery equipment', visualDirection: 'Recovery equipment' }];
+  if (origin === 'experience') {
+    input.lessons[0].content_json = { experience: { instructionalTimeline: { durationSeconds: 4, scenes, captions } } };
+  } else {
+    input.lessons[0].scene_data = { scenes, captions };
+  }
+  const result = coursePackageFromSession(input).modules[0].lessons[0].timeline!;
+  expect(result.captions).toEqual([
+    { id: 'clean-air-act-caption-1', ...captions[0] },
+    captions[1],
+  ]);
+});
+
+it('still rejects invalid caption timing after normalizing its identity', () => {
+  const input = session();
+  input.lessons[0].content_json = { experience: { instructionalTimeline: {
+    durationSeconds: 4, scenes: [], captions: [{ start: 2, end: 1, text: 'Invalid timing' }],
+  } } };
+  expect(() => coursePackageFromSession(input)).toThrow();
+});

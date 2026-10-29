@@ -5,7 +5,7 @@ import { verifyRegisteredProfile } from '../credential/verify-registered-profile
 import type { StepHandler } from './build-runner';
 import type { UltimateRuntime } from './runtime';
 import { evaluateNarration } from '../quality/narration-quality';
-import { analyzeNarrationAudio } from '../quality/narration-audio-analysis';
+import { analyzeNarrationAudio, resolveStoredNarrationUrl } from '../quality/narration-audio-analysis';
 import { routeSelectiveRepairs } from './repair-router';
 import { evaluateLearnerRunthrough } from '../quality/learner-runthrough';
 import { auditTraceability, type TraceabilityRow } from '../release/traceability';
@@ -64,11 +64,17 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
       reuse.set(String(assignment.assetId), (reuse.get(String(assignment.assetId)) ?? 0) + 1);
       continue;
     }
-    if (!assignment?.licenseEvidenceUrl)
-      throw new Error('ULTIMATE_VISUAL_LICENSE_RELEVANCE_REQUIRED');
     const asset = assetById.get(String(assignment.assetId)) as any;
     if (!asset?.entitlement_id || !asset?.public_url)
       throw new Error(`ULTIMATE_VISUAL_ASSET_NOT_READY:${assignment.assetId}`);
+    // A stored, course-scoped entitlement is the durable approval record.
+    // Keep legacy per-scene evidence compatible, but never require another
+    // license URL for an assignment that carries matching approved provenance.
+    const approvedSource = assignment.approvedSource === true &&
+      Boolean(String(assignment.sourceProvider ?? '').trim()) &&
+      String(assignment.entitlementId ?? '') === String(asset.entitlement_id);
+    if (!assignment.licenseEvidenceUrl && !approvedSource)
+      throw new Error('ULTIMATE_VISUAL_APPROVED_SOURCE_REQUIRED');
     const identity = String(asset.id ?? assignment.assetId);
     reuse.set(identity, (reuse.get(identity) ?? 0) + 1);
   }
@@ -377,9 +383,14 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           })),
           artifacts: { mediaQA: { pass: false, failures: quality.failures } },
         };
+      const storedMediaUrl = renderMediaUrl(render);
+      if (!storedMediaUrl) throw new Error('ULTIMATE_RENDER_MEDIA_URL_REQUIRED');
+      // Saved checkpoints outlive private B2 query signatures. Renew access to
+      // the same configured object before decoding it; never regenerate media.
+      const currentMediaUrl = await resolveStoredNarrationUrl(storedMediaUrl);
       const inspection = await enforceMediaQuality({
         lessonPresentation: ctx.profile.lessonPresentation,
-        videoUrl: renderMediaUrl(render),
+        videoUrl: currentMediaUrl.toString(),
         expectedDurationSeconds: render.duration,
         expectedSceneCount: render.sceneData.scenes.length,
         sceneData: render.sceneData,

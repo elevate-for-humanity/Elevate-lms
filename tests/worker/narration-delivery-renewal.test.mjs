@@ -30,3 +30,9 @@ test('renderer fetches and delivers the renewed URL while keeping approved timin
  assert.match(renderer,/audioSrc = approvedAudioUrl;/);
  assert.match(renderer,/ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED/);
 });
+
+test('finished-media QA renews the saved private MP4 before inspection',()=>{
+ const handlers=readFileSync(new URL('../../lib/ultimate-course-builder/core/production-handlers.ts',import.meta.url),'utf8');
+ assert.match(handlers,/const currentMediaUrl = await resolveStoredNarrationUrl\(storedMediaUrl\)/);
+ assert.match(handlers,/videoUrl: currentMediaUrl\.toString\(\)/);
+});

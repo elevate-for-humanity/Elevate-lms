@@ -114,7 +114,8 @@ async function domOperation({ steps, operation, argument, source }) {
         elements = elements.filter(
           (el) =>
             (!step.hasText || matches(el.textContent, step.hasText)) &&
-            (!step.has || query(step.has, el).length > 0),
+            (!step.has || query(step.has, el).length > 0) &&
+            (step.visible === null || visible(el) === step.visible),
         );
         continue;
       }
@@ -238,13 +239,16 @@ export class CdpLocator {
       includeHidden: !!options.includeHidden,
     });
   }
-  filter({ has, hasText } = {}) {
+  filter({ has, hasText, visible } = {}) {
     if (has && has.frame !== this.frame)
       throw new Error('has locator must belong to the same frame');
+    if (visible !== undefined && typeof visible !== 'boolean')
+      throw new Error('visible filter must be a boolean');
     return this.append({
       kind: 'filter',
       has: has?.steps,
       hasText: hasText === undefined ? null : matcher(hasText),
+      visible: visible === undefined ? null : visible,
     });
   }
   first() {

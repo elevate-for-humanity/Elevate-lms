@@ -47,10 +47,11 @@ test('queries compose relative filters and preserve regex and exact options', as
     return 2;
   });
   await locator(target, 'section')
-    .filter({ has: getByText(target, 'Prompt', { exact: true }) })
+    .filter({ has: getByText(target, 'Prompt', { exact: true }), visible: true })
     .getByRole('button', { name: /submit/i })
     .count();
   assert.equal(request.steps[1].has[0].exact, true);
+  assert.equal(request.steps[1].visible, true);
   assert.deepEqual(request.steps[2].name, { regex: 'submit', flags: 'i' });
   assert.throws(
     () =>
@@ -62,6 +63,7 @@ test('queries compose relative filters and preserve regex and exact options', as
       }),
     /same frame/,
   );
+  assert.throws(() => locator(target, 'section').filter({ visible: 'yes' }), /must be a boolean/);
 });
 test('waits for attachment and visibility independently', async () => {
   let calls = 0;

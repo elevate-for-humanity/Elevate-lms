@@ -35,7 +35,9 @@ test(
     }
     if (req.url === '/learner-controls') {
       res.setHeader('Content-Type', 'text/html');
-      res.end(`<!doctype html><h1>Local learner adapter fixture</h1><main data-testid="staged-lesson">
+      res.end(`<!doctype html><h1>Local learner adapter fixture</h1>
+        <main data-testid="staged-lesson" hidden><button>Complete lesson</button></main>
+        <main data-testid="staged-lesson">
         <p role="status">Saved position: 5</p>
         <section data-testid="guided_practice"><p>First prompt</p><textarea aria-label="First prompt"></textarea><button>Submit practice</button></section>
         <section data-testid="guided_practice"><p>Second prompt</p><textarea aria-label="Second prompt"></textarea><button>Submit practice</button></section>
@@ -302,7 +304,9 @@ test(
     const learner = await context.newPage();
     try {
       await learner.goto(origin + '/learner-controls');
-      await learner.getByTestId('staged-lesson').waitFor();
+      const staged = learner.getByTestId('staged-lesson');
+      assert.equal(await staged.count(), 2);
+      await staged.filter({ visible: true }).first().waitFor();
       for (const prompt of ['First prompt', 'Second prompt']) {
         const section = learner.getByTestId('guided_practice').filter({ has: learner.getByText(prompt, { exact: true }) });
         await section.locator('textarea').fill('Response: ' + prompt);

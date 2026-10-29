@@ -6,6 +6,11 @@ on:
   pull_request:
     paths: ['scripts/gcp/repair-quickbooks-production*', '.github/workflows/repair-quickbooks-production.yml']
   workflow_dispatch:
+    inputs:
+      apply:
+        description: Apply recovered existing QuickBooks configuration after reviewing the audit
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: write
@@ -48,7 +53,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
       - run: node scripts/gcp/verify-sdk.mjs
-      - name: Recover existing verifier and bind production configuration
+      - name: Audit or recover existing QuickBooks production configuration
         env:
-          QB_PRODUCTION_REPAIR: 'true'
+          QB_PRODUCTION_REPAIR: ${{ inputs.apply && 'true' || 'false' }}
         run: node scripts/gcp/repair-quickbooks-production.mjs

@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import WorkbookNarration from './WorkbookNarration';
+import WorkbookLessonPicture from './WorkbookLessonPicture';
+import { workbookVisualAssignments, type WorkbookVisual } from '@/lib/lms/workbook-visuals';
 import { workbookSlides } from '@/lib/lms/workbook-slides';
 import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
@@ -14,12 +16,14 @@ function SectionEditor({
   hidden,
   readOnly,
   accountId,
+  visual,
 }: {
   section: WorkbookSection;
   initial?: WorkbookResponse;
   hidden: boolean;
   readOnly: boolean;
   accountId: string;
+  visual?: WorkbookVisual;
 }) {
   const { draft, edit, save, status, error } = useWorkbookSave(
     section.id,
@@ -110,10 +114,23 @@ function SectionEditor({
             className="my-3 h-2 w-full accent-amber-300"
           />
           <h3 className="text-2xl font-bold leading-relaxed sm:text-3xl">{slide.title}</h3>
+          {step === 0 && visual && (
+            <div className="mt-5">
+              <WorkbookLessonPicture key={visual.src} visual={visual} />
+            </div>
+          )}
           <p className="mt-4 max-w-prose text-xl leading-relaxed">{slide.text}</p>
         </div>
         <div className="p-5 sm:p-8">
-          {!hidden && <WorkbookNarration text={slide.narration} />}
+          {!hidden && (
+            <WorkbookNarration
+              text={
+                step === 0 && visual
+                  ? `${slide.narration} Look at the lesson picture. ${visual.caption}`
+                  : slide.narration
+              }
+            />
+          )}
           {slide.field && (
             <div className="my-5">
               <label
@@ -238,6 +255,7 @@ export default function DigitalWorkbook({
   accountId: string;
 }) {
   const [active, setActive] = useState(sections[0]?.id ?? '');
+  const visuals = workbookVisualAssignments(workbook.slug, sections);
   return (
     <main className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
       <div className="mx-auto max-w-5xl">
@@ -301,6 +319,7 @@ export default function DigitalWorkbook({
               <SectionEditor
                 key={section.id}
                 section={section}
+                visual={visuals[section.id]}
                 initial={responses.find((row) => row.section_id === section.id)}
                 hidden={section.id !== active}
                 readOnly={readOnly}

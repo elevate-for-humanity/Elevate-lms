@@ -1,3 +1,4 @@
+import { PaymentServices } from '@/components/admin/PaymentServices';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -48,14 +49,15 @@ function fmtUsd(n: number) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(n);
 }
 
 export default async function PayoutQueuePage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; holder?: string }>;
 }) {
   // Auth guard
   const supabase = await createClient();
@@ -109,6 +111,8 @@ export default async function PayoutQueuePage({
     query = query.eq('payout_status', filterStatus);
   }
 
+  if (params.holder) query = query.eq('program_holder_id', params.holder);
+
   const { data: rawRows } = await query;
 
   // Hydrate profiles (user_id → profiles)
@@ -125,13 +129,28 @@ export default async function PayoutQueuePage({
   const { data: holderRows } = holderIds.length
     ? await db
         .from('program_holders')
-        .select('id, name, contact_name, contact_email')
+        .select('id, user_id, name, organization_name, contact_name, contact_email')
         .in('id', holderIds)
     : { data: [] };
   const holderMap = Object.fromEntries((holderRows ?? []).map((h: any) => [h.id, h]));
 
+  const enrollmentIds = (rawRows ?? []).map((row: any) => row.id);
+  const { data: schedules } = enrollmentIds.length
+    ? await db.from('payout_schedules')
+        .select('enrollment_id,increment_1_cents,increment_1_status')
+        .in('enrollment_id', enrollmentIds)
+    : { data: [] };
+  const scheduleMap = new Map((schedules ?? []).map((row: any) => [row.enrollment_id, row]));
+  const holderUserIds = (holderRows ?? []).map((holder: any) => holder.user_id).filter(Boolean);
+  const { data: payoutAccounts } = holderUserIds.length
+    ? await db.from('program_holder_payouts').select('user_id,payout_provider').in('user_id', holderUserIds)
+    : { data: [] };
+  const providerMap = new Map((payoutAccounts ?? []).map((row: any) => [row.user_id, row.payout_provider]));
+
   const rows = (rawRows ?? []).map((r: any) => ({
     ...r,
+    payment_schedule: scheduleMap.get(r.id) as any,
+    payout_provider: providerMap.get(holderMap[r.program_holder_id]?.user_id) as string | undefined,
     profiles: payoutProfileMap[r.user_id] ?? null,
     program_holders: holderMap[r.program_holder_id] ?? null,
   }));
@@ -171,6 +190,7 @@ export default async function PayoutQueuePage({
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
+        <PaymentServices />
         {/* QuickBooks connection banner */}
         {!qbConnected && (
           <div className="mb-4 flex items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm">
@@ -209,6 +229,7 @@ export default async function PayoutQueuePage({
           </div>
         </div>
 
+        <Link href="/program-holder-invoices" className="mb-5 inline-flex min-h-11 items-center font-bold text-blue-800 underline">Review submitted partner invoices</Link>
         {/* Summary cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           {counts.overdue > 0 && (
@@ -218,7 +239,7 @@ export default async function PayoutQueuePage({
                 <span className="text-xs font-medium text-red-700">Overdue</span>
               </div>
               <p className="text-2xl font-bold text-red-800">{counts.overdue}</p>
-              <p className="text-xs text-red-600">{fmtUsd(counts.overdue * 2500)} owed</p>
+              <p className="text-xs text-red-600">{fmtUsd(queue.filter(r => r.payout_status === 'overdue').reduce((sum, r) => sum + Number(r.payment_schedule?.increment_1_cents || 0) / 100, 0))} owed</p>
             </div>
           )}
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
@@ -227,7 +248,7 @@ export default async function PayoutQueuePage({
               <span className="text-xs font-medium text-amber-700">Pending</span>
             </div>
             <p className="text-2xl font-bold text-amber-800">{counts.pending}</p>
-            <p className="text-xs text-amber-600">{fmtUsd(counts.pending * 2500)} queued</p>
+            <p className="text-xs text-amber-600">{fmtUsd(queue.filter(r => r.payout_status === 'pending').reduce((sum, r) => sum + Number(r.payment_schedule?.increment_1_cents || 0) / 100, 0))} queued</p>
           </div>
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -235,7 +256,7 @@ export default async function PayoutQueuePage({
               <span className="text-xs font-medium text-emerald-700">Paid</span>
             </div>
             <p className="text-2xl font-bold text-emerald-800">{counts.paid}</p>
-            <p className="text-xs text-emerald-600">{fmtUsd(counts.paid * 2500)} disbursed</p>
+            <p className="text-xs text-emerald-600">{fmtUsd(queue.filter(r => r.payout_status === 'paid').reduce((sum, r) => sum + Number(r.payout_amount || 0), 0))} disbursed</p>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -252,7 +273,7 @@ export default async function PayoutQueuePage({
           {FILTERS.map((f) => (
             <Link
               key={f.key}
-              href={'/payout-queue?status=' + encodeURIComponent(f.key)}
+              href={'/payout-queue?status=' + encodeURIComponent(f.key) + (params.holder ? '&holder=' + encodeURIComponent(params.holder) : '')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 filterStatus === f.key
                   ? 'bg-slate-900 text-white'
@@ -321,7 +342,7 @@ export default async function PayoutQueuePage({
                           <p className="text-xs text-slate-400">{profile?.email ?? '—'}</p>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="font-medium text-slate-800">{partner?.name ?? '—'}</p>
+                          <p className="font-medium text-slate-800">{partner?.organization_name || partner?.name || '—'}</p>
                           <p className="text-xs text-slate-400">{partner?.contact_email ?? '—'}</p>
                         </td>
                         <td className="px-4 py-3">
@@ -357,21 +378,15 @@ export default async function PayoutQueuePage({
                             {STATUS_LABELS[row.payout_status] ?? row.payout_status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 font-semibold text-slate-900">$2,500</td>
+                        <td className="px-4 py-3 font-semibold text-slate-900">{row.payment_schedule?.increment_1_cents ? fmtUsd(row.payment_schedule.increment_1_cents / 100) : 'Schedule required'}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             {row.payout_status !== 'paid' ? (
                               <ApprovePayButton
                                 enrollmentId={row.id}
-                                amount={row.payout_amount ?? 0}
-                                holderName={
-                                  (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)
-                                    ?.full_name
-                                }
-                                holderEmail={
-                                  (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)
-                                    ?.email
-                                }
+                                amount={Number(row.payment_schedule?.increment_1_cents || 0) / 100}
+                                provider={row.payout_provider}
+                                holderName={partner?.organization_name || partner?.name}
                                 qbConnected={qbConnected}
                               />
                             ) : (

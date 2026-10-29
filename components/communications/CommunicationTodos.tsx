@@ -11,13 +11,14 @@ export function CommunicationTodos({
   embedded?: boolean;
 }) {
   const pathname = usePathname();
+  const authPage = /\/(login|signup|reset-password|auth)(\/|$)/.test(pathname);
   const holderPage = /^\/program-holder(\/|$)/.test(pathname);
   const learnerPage = /^\/(lms|learner|student)(\/|$)/.test(pathname);
   const [signedIn, setSignedIn] = useState(false);
   const [activeUserId, setActiveUserId] = useState('');
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
-    if (holderPage && !embedded) return;
+    if (authPage || (holderPage && !embedded)) return;
     let active = true;
     const db = createClient();
     let channel: any;
@@ -75,7 +76,8 @@ export function CommunicationTodos({
       if (authTimer) clearTimeout(authTimer);
       if (channel) void db.removeChannel(channel);
     };
-  }, [holderPage, embedded]);
+  }, [authPage, holderPage, embedded]);
+  if (authPage) return null;
   const content = (
     <>
       {!embedded && (

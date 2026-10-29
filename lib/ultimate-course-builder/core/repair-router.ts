@@ -15,6 +15,7 @@ export function requiresIndependentMediaDelivery(finding: Pick<UltimateInstructi
 
 const PREFIX_ROUTES: Array<[RegExp, UltimateBuildStep]> = [
   [/^(ENCODED_MP4_INSPECTION_REQUIRED|MEDIA_INSPECTION_|TRANSCRIPTION_)/, 'finished_media_qa'],
+  [/^APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED/, 'finished_media_qa'],
   [/^(MEDIA_FREEZE_DETECTED|MEDIA_BLACK_FRAMES|MEDIA_VISUAL_CHANGES_REQUIRED)/, 'lesson_film_render'],
   [/^ULTIMATE_VIDEO_RENDER_FAILED/, 'lesson_film_render'],
   [/^BLUEPRINT_/, 'learning_objectives'],

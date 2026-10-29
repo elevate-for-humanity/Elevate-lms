@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}));
 
 import {
   cloudflareTranscriptionChunkSeconds,
+  countEncodedAdjacentChanges,
   MEDIA_QUALITY_GATE_VERSION,
   mediaQualityFailures,
   parseFreezeIntervals,
@@ -65,6 +66,11 @@ const validEvidence: MediaQualityEvidence = {
 };
 
 describe('canonical media completion quality gate', () => {
+  it('counts decoded crossfade boundaries from actual adjacent scene samples', () => {
+    const frame = (value: number) => Buffer.alloc(32 * 18, value);
+    expect(countEncodedAdjacentChanges([frame(10), frame(10), frame(30), frame(50)])).toBe(2);
+    expect(countEncodedAdjacentChanges([frame(10), frame(12), frame(14)])).toBe(0);
+  });
   it('uses Cloudflare Whisper when Cloudflare is the canonical provider', () => {
     expect(
       resolveCloudflareTranscriptionModel({

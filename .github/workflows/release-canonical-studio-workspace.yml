@@ -13,10 +13,45 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
+      - name: Retire only the observed superseded pending Studio checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # These candidate-only requests predate the canonical-prefix fix.
+          # Their changes are already included in the queued production run.
+          # Never cancel a running job, an unknown run or the production run.
+          while read -r run_id expected_sha; do
+            run="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id")"
+            test "$(jq -r .head_sha <<<"$run")" = "$expected_sha"
+            test "$(jq -r .head_branch <<<"$run")" = main
+            test "$(jq -r .event <<<"$run")" = workflow_dispatch
+            test "$(jq -r .path <<<"$run")" = .github/workflows/repair-google-studio-browser.yml
+            if test "$(jq -r .status <<<"$run")" = completed; then continue; fi
+            comparison="$(gh api "repos/$GITHUB_REPOSITORY/compare/$expected_sha...69998eb9cc5ea90b30eaa8fd57129132f38546cb")"
+            test "$(jq -r .merge_base_commit.sha <<<"$comparison")" = "$expected_sha"
+            jobs="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100")"
+            if jq -e '[.jobs[] | select(.name == "repair")] | length == 1 and (.[0] | (.status == "pending" or .status == "queued") and ((.runner_id // 0) == 0) and ((.steps // []) | length == 0))' <<<"$jobs" >/dev/null; then
+              gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel"
+              echo "Requested cancellation of superseded pending Studio check $run_id"
+            else
+              echo "Preserved Studio check $run_id because it has started or its state is uncertain"
+            fi
+          done <<'RUNS'
+          40969198053 0c15ef5717d177dfb88cfb5270425f266cf3a2cd
+          40969636775 c4a16bff502321118b763c6213f79640d2070353
+          40969931352 16a41f06cd21715529e6cbe6428653913541b2f7
+          RUNS
       - name: Request production recovery through the existing gated Studio workflow
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh api --method POST
-          "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches"
-          -f ref=main -f 'inputs[candidate_only]=false'
+        run: |
+          set -euo pipefail
+          existing="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/40970392039")"
+          test "$(jq -r .head_sha <<<"$existing")" = 69998eb9cc5ea90b30eaa8fd57129132f38546cb
+          if test "$(jq -r .status <<<"$existing")" != completed || test "$(jq -r .conclusion <<<"$existing")" = success; then
+            echo 'Preserved the existing canonical-workspace production release 40970392039'
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches" \
+            -f ref=main -f 'inputs[candidate_only]=false'

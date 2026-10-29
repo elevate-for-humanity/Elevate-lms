@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildSceneAssignments } from '@/lib/ultimate-course-builder/instructional/scene-assignments';
+import { validateStepOutput } from '@/lib/ultimate-course-builder/core/lesson-contract';
 const scenes = [{ id: 'scene:consultation', visualRequirement: 'A client consultation' }];
 const asset = {
   id: 'clip',
@@ -11,16 +12,31 @@ const asset = {
   visual_requirements: ['A client consultation'],
 };
 describe('automatic licensed scene assignment', () => {
-  it('requests photographs for theory but preserves physical demonstration gaps', () => {
+  it('makes the visual-neutral request part of the shared lesson contract', () => {
+    const assignment={sceneId:'theory',assetId:'instructional-visual-request:theory',
+      relevanceReason:'Instructional visual supporting the narrated concept',
+      assignmentMethod:'instructional-visual-request',requestedInstructionalVisual:true};
+    expect(validateStepOutput('visual_assignment',{media:{assignments:[assignment]}})).toEqual([]);
+    expect(validateStepOutput('visual_assignment',{media:{assignments:[{
+      ...assignment,assetId:'teaching-photo-request:theory',
+    }]}})).toContain('VISUAL_SCENE_COVERAGE_REQUIRED');
+  });
+  it('requests visual-neutral instruction for theory but preserves physical demonstration gaps', () => {
     const scene = {id:'demo', stage:'demonstration', visualRequirement:'Demonstrate a safe shave',
       teachingVisual:{kind:'sequence',steps:[{label:'Prepare',value:'Check the tool'}]}};
     expect(buildSceneAssignments([scene], [], [], {requiresPracticalEvidence:true}).gaps).toHaveLength(1);
     const theory = buildSceneAssignments([scene], [], [], {requiresPracticalEvidence:false});
     expect(theory.gaps).toEqual([]);
-    expect(theory.assignments[0].requestedTeachingPhotograph).toBe(true);
+    expect(theory.assignments[0]).toMatchObject({
+      requestedInstructionalVisual: true,
+      assignmentMethod: 'instructional-visual-request',
+    });
     const recordTeaching=buildSceneAssignments([scene],[],[],{requiresPracticalEvidence:true,competencyType:'knowledge'});
     expect(recordTeaching.gaps).toEqual([]);
-    expect(recordTeaching.assignments[0].requestedTeachingPhotograph).toBe(true);
+    expect(recordTeaching.assignments[0]).toMatchObject({
+      requestedInstructionalVisual: true,
+      assignmentMethod: 'instructional-visual-request',
+    });
   });
   it('uses inspected visible actions instead of a misleading title for semantic assignment', () => {
     const inspected = {

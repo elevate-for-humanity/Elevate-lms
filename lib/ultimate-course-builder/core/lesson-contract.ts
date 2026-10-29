@@ -143,9 +143,12 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             nonempty(s.sceneId) &&
             nonempty(s.assetId) &&
             nonempty(s.relevanceReason) &&
-            (s.requestedTeachingPhotograph === true
-              ? s.assignmentMethod === 'teaching-photograph-request' &&
-                String(s.assetId).startsWith('teaching-photo-request:')
+            (s.requestedInstructionalVisual === true
+              ? s.assignmentMethod === 'instructional-visual-request' &&
+                String(s.assetId).startsWith('instructional-visual-request:')
+              : s.requestedTeachingPhotograph === true
+                ? s.assignmentMethod === 'teaching-photograph-request' &&
+                  String(s.assetId).startsWith('teaching-photo-request:')
               : nonempty(s.licenseEvidenceUrl)),
         ), 'VISUAL_SCENE_COVERAGE_REQUIRED');
       // Licensed media can be reused for a distinct teaching purpose.
@@ -302,7 +305,7 @@ export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildS
   return physical.some((scene: any) => {
     const assignment = media.assignments?.find((a: any) => a.sceneId === scene.id);
     const asset = media.readyAssets?.find((a: any) => a.id === assignment?.assetId);
-    return !assignment || assignment.requestedTeachingPhotograph || assignment.generatedInstructionalVisual || ['instructional-render','teaching-photograph-request'].includes(assignment.assignmentMethod) ||
+    return !assignment || assignment.requestedInstructionalVisual || assignment.requestedTeachingPhotograph || assignment.generatedInstructionalVisual || ['instructional-render','instructional-visual-request','teaching-photograph-request'].includes(assignment.assignmentMethod) ||
       !asset?.entitlement_id || !assignment.licenseEvidenceUrl ||
       !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
   }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];

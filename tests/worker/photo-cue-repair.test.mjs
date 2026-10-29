@@ -17,13 +17,13 @@ test('failed provider uses selected replacement without arbitrary regenerated re
  assert.equal(calls,1);assert.equal(result.repair.sourceAssetId,'source');
 });
 test('missing selected replacement stops at exact cue',async()=>{
- await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED:scene:cue-1/);
+ await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');}}),/INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED:scene:cue-1/);
 });
 test('successful provider preserves successful cue',async()=>{
  const result=await recoverTeachingPhoto({...request,generate:async()=>({bytes:Buffer.from('saved')})});assert.equal(result.bytes.toString(),'saved');
 });
 test('explicit provider safety block is retained',async()=>{
- await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
+ await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED/);
 });
 
 test('conceptual cards cannot pass as replacement photographs',async()=>{
@@ -32,7 +32,7 @@ test('conceptual cards cannot pass as replacement photographs',async()=>{
  const card=await conceptualTeachingCard({scene,step:{narrationQuote:'Complete the required licensing steps.'},courseTitle:'Cosmetology',index:0});
  assert.equal(card.mimeType,'image/png');assert.ok(card.bytes.length>100);
  for(const replacement of [card,{...card,selectedSourceAssetId:'generated-training-diagram:scene:0'}]){
-  await assert.rejects(recoverTeachingPhoto({...request,scene,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},selectedReplacement:async()=>replacement}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
+  await assert.rejects(recoverTeachingPhoto({...request,scene,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},selectedReplacement:async()=>replacement}),/INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED/);
  }
 });
 
@@ -59,6 +59,6 @@ test('missing exact photo can recover with one course-related photograph',async(
  assert.equal(result.repair.method,'course-related-photo-v1');
 });
 test('provider safety block never invokes course-related generation',async()=>{
- let calls=0;await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
+ let calls=0;await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED/);
  assert.equal(calls,1);
 });

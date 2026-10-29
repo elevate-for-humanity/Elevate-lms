@@ -11,6 +11,7 @@ import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { refreshSecrets } from '@/lib/secrets';
 import { saveGoogleRuntimeConfiguration, validateRuntimeEntries, GoogleConfigurationError } from '@/lib/google/runtime-configuration';
+import { isGoogleCalendarRuntimeKey, validateGoogleCalendarUpdates } from '@/lib/google/calendar-settings';
 import googlePolicy from '@/config/google-runtime-policy.json';
 import { isElevateMediaRuntimeKey, validateElevateMediaUpdates } from '@/lib/google/elevate-media-settings';
 
@@ -115,12 +116,13 @@ export async function POST(req: NextRequest) {
   );
   try {
     validateElevateMediaUpdates(mediaUpdates);
+    validateGoogleCalendarUpdates(entries);
   } catch (error) {
     return safeError(error instanceof Error ? error.message : 'Invalid Elevate Media settings', 400);
   }
   const runtimeEntries = entries.filter(entry => googlePolicy.components.admin.keys.includes(entry.key));
   const lmsEntries = runtimeEntries.filter(entry =>
-    (isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_') || entry.key.startsWith('PBX_')) &&
+    (isGoogleCalendarRuntimeKey(entry.key) || isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_') || entry.key.startsWith('PBX_')) &&
     googlePolicy.components.lms.keys.includes(entry.key));
   try {
     if (runtimeEntries.length) validateRuntimeEntries('admin', runtimeEntries);

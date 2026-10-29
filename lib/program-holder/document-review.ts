@@ -1,3 +1,5 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+
 export type DocumentReview = {
   document_type?: string | null;
   status?: string | null;
@@ -21,15 +23,9 @@ export function uploadedW9Status(documents: DocumentReview[]): UploadedW9Status 
 }
 
 /** Returns review metadata only, never the tax form, tax ID, or storage URL. */
-export async function getUploadedW9Status(db: {
-  from: (table: string) => {
-    select: (columns: string) => {
-      eq: (column: string, value: string) => PromiseLike<{
-        data: DocumentReview[] | null; error: unknown;
-      }>;
-    };
-  };
-}, userId: string): Promise<UploadedW9Status> {
+export async function getUploadedW9Status(
+  db: Pick<SupabaseClient, 'from'>, userId: string,
+): Promise<UploadedW9Status> {
   const { data, error } = await db.from('program_holder_documents')
     .select('document_type,status,approved').eq('user_id', userId);
   if (error) throw new Error('Uploaded W-9 review could not be verified.');

@@ -165,8 +165,8 @@ test('verified payout destinations cannot be replaced by a new PayPal email',asy
 });
 
 test('compliance lookup errors block release but leave banking setup accessible',async()=>{
- const api=load('apps/lms/app/api/program-holder/payouts/route.ts',{'next/server':next,'@/lib/auth/require-program-holder':{requireProgramHolder:async()=>({mode:'holder',holderId:'h',db:{}})},'@/lib/program-holder/payout-account':{getProgramHolderPayoutAccount:async()=>({provider:'quickbooks'})},'@/lib/program-holder/onboarding-readiness':{getProgramHolderPaymentReadiness:async()=>{throw Error('offline')}}});
- const result=await api.GET();assert.equal(result.status,200);assert.equal(result.body.provider,'quickbooks');assert.equal(result.body.onboardingReady,false);assert.ok(result.body.missingRequirements.length);
+ const api=load('apps/lms/app/api/program-holder/payouts/route.ts',{'next/server':next,'@/lib/auth/require-program-holder':{requireProgramHolder:async()=>({mode:'holder',holderId:'h',user:{id:'owner'},db:{}})},'@/lib/program-holder/payout-account':{getProgramHolderPayoutAccount:async()=>({provider:'quickbooks'})},'@/lib/program-holder/document-review':{getUploadedW9Status:async(_db,userId)=>{assert.equal(userId,'owner');return 'missing'}},'@/lib/program-holder/onboarding-readiness':{getProgramHolderPaymentReadiness:async()=>{throw Error('offline')}}});
+ const result=await api.GET();assert.equal(result.status,200);assert.equal(result.body.provider,'quickbooks');assert.equal(result.body.uploadedW9,'missing');assert.equal(result.body.onboardingReady,false);assert.ok(result.body.missingRequirements.length);
 });
 
 test('QuickBooks requests do not report an invitation delivered when notification writes fail',async()=>{

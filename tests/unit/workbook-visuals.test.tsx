@@ -34,3 +34,21 @@ it('preserves the full frame, describes generated imagery, and never substitutes
   expect(screen.queryByRole('img')).toBeNull();
   expect(screen.getByRole('status')).toHaveTextContent('could not load');
 });
+
+it('gives each workbook a distinct opening picture instead of opening as a text-only page', () => {
+  const openings = [
+    ['prestige-elevation-barbering', 'Introduction to Barbering'],
+    ['prestige-elevation-cosmetology', 'Welcome to Cosmetology Apprenticeship'],
+    ['prestige-elevation-esthetics', 'Welcome to Esthetician Apprenticeship'],
+    ['prestige-elevation-nail-technology', 'Welcome to Nail Technician Apprenticeship'],
+  ];
+  const sources = openings.map(([slug, title]) => {
+    const visual = workbookVisualAssignments(slug, [
+      { id: 'opening', title, section_number: 1 },
+    ]).opening;
+    expect(visual.generated).toBe(true);
+    expect(visual.src).toContain('/intro-');
+    return visual.src;
+  });
+  expect(new Set(sources).size).toBe(4);
+});

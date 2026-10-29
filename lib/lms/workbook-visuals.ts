@@ -10,6 +10,11 @@ const fresh = '/images/workbooks/2026-10/';
 const examples: Record<string, readonly Picture[]> = {
   'prestige-elevation-barbering': [
     [
+      'Introduction to Barbering',
+      'intro-barber.webp',
+      'Observe the instructor, apprentice, mannequin, and prepared tools. Discuss how supervised practice and feedback support your learning.',
+    ],
+    [
       'Tools & Equipment',
       'barber-tools.webp',
       'Identify the clipper, trimmer, shears, comb, guards, and folded cape. Explain the purpose of each item.',
@@ -41,22 +46,22 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'The Fade - Low, Mid & High',
-      '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp',
+      'barber-fade.webp',
       'Follow the transition from the shorter area into the longer hair. Describe the blend you can see.',
     ],
     [
       'Lineup & Edging',
-      '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
+      'barber-lineup.webp',
       'Examine the visible hairline and side profile. Discuss the client’s natural hairline before planning an edge.',
     ],
     [
       'Flat Top & Classic Cuts',
-      '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp',
+      'barber-classic.webp',
       'Compare the longer top with the shorter sides in this finished haircut example. Describe its overall silhouette.',
     ],
     [
       'Beard Design & Shaping',
-      '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard-enhanced-2026.webp',
+      'barber-beard.webp',
       'Observe the relationship between the beard outline and haircut. Discuss the client’s desired shape before working.',
     ],
     [
@@ -66,16 +71,21 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'Building Your Clientele',
-      '/images/partners/j-noelle/official-salon-2026.webp',
+      'salon-interior.webp',
       'Look at the client-facing environment. Describe how presentation and communication contribute to the service experience.',
     ],
     [
       'Styling Products & Finishing',
-      '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop-enhanced-2026.webp',
+      'barber-texture.webp',
       'Observe the texture and direction in the finished top. Discuss how the chosen finish supports the haircut.',
     ],
   ],
   'prestige-elevation-cosmetology': [
+    [
+      'Welcome to Cosmetology Apprenticeship',
+      'intro-cosmetology.webp',
+      'Observe the instructor coaching an apprentice at a mannequin station. Identify the role of instruction, practice, and feedback.',
+    ],
     [
       'Infection Control Fundamentals',
       'barber-disinfection.webp',
@@ -93,7 +103,7 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'Haircutting Techniques',
-      '/images/partners/generations-hair/cutting.webp',
+      'cosmetology-cutting.webp',
       'Observe the hair and working position in this cutting example. Identify what you would discuss with your trainer before practicing.',
     ],
     [
@@ -108,7 +118,7 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'Updos and Special Occasion Styling',
-      '/images/partners/generations-hair/special-event-styling.webp',
+      'cosmetology-updo.webp',
       'Observe the finished arrangement and balance. Discuss the client’s occasion, preferences, and planned style.',
     ],
     [
@@ -118,22 +128,22 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'Single-Process Color',
-      '/images/partners/generations-hair/brunettes.webp',
+      'cosmetology-brunette.webp',
       'Describe the visible tone and finish in this color-result example. A photograph alone does not determine a color formula.',
     ],
     [
       'Highlights and Lowlights',
-      '/images/partners/generations-hair/blondes.webp',
+      'cosmetology-highlights.webp',
       'Observe lighter and darker areas in the finished hair. Describe the placement and contrast you can see.',
     ],
     [
       'Color Correction Techniques',
-      '/images/partners/generations-hair/color-transformation.webp',
-      'Compare the visible color result. Discuss consultation and strand assessment with your instructor before planning a correction.',
+      'cosmetology-correction.webp',
+      'Compare the visible hair swatches. Discuss consultation and strand assessment with your instructor before planning a correction.',
     ],
     [
       'Hair Coloring - Hands-On Practice',
-      '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
+      'cosmetology-dimension.webp',
       'Observe the dimension in the finished color. Document the supervised practice and feedback assigned by your trainer.',
     ],
     [
@@ -173,11 +183,16 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'Salon Business Practices',
-      '/images/partners/generations-hair/salon-service.webp',
-      'Observe the service environment. Explain how appointments, communication, and station readiness support salon operations.',
+      'salon-operations.webp',
+      'Observe the receptionist and stylist reviewing an appointment planner. Explain how communication and scheduling support salon operations.',
     ],
   ],
   'prestige-elevation-esthetics': [
+    [
+      'Welcome to Esthetician Apprenticeship',
+      'intro-esthetics.webp',
+      'Observe the treatment bed, fresh supplies, and instructor-led preparation. Discuss the professional habits you will practice.',
+    ],
     [
       'Professional Skin Analysis',
       'esthetic-analysis.webp',
@@ -201,6 +216,11 @@ const examples: Record<string, readonly Picture[]> = {
   ],
   'prestige-elevation-nail-technology': [
     [
+      'Welcome to Nail Technician Apprenticeship',
+      'intro-nails.webp',
+      'Observe the instructor, apprentice, practice hand, and organized supplies. Discuss how you will prepare for supervised nail-service practice.',
+    ],
+    [
       'Basic Manicure Procedure',
       'nail-manicure.webp',
       'Identify the fresh towel, supported hands, and single-use file. Explain your preparation before beginning a service.',
@@ -222,17 +242,17 @@ const examples: Record<string, readonly Picture[]> = {
     ],
     [
       'Sculptured Nails',
-      '/images/programs/cosmetology/nail-art-gold.webp',
+      'nail-gold.webp',
       'Observe the finished nail shapes in this design example. Discuss the underlying structure and finishing steps with your trainer.',
     ],
     [
       'Gel and Acrylic Application',
-      '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
-      'Observe this finished nail-design example. The photograph does not identify its product chemistry or replace a supervised application demonstration.',
+      'nail-enhancement.webp',
+      'Observe the trainer positioning an artificial tip on a practice hand. The picture does not replace your supervised application demonstration or product directions.',
     ],
     [
       'Nail Enhancements - Hands-On Practice',
-      '/images/programs/cosmetology/nail-art-gemstone.webp',
+      'nail-gemstone.webp',
       'Examine the finished shape and decorative placement. Record your assigned supervised practice and instructor feedback.',
     ],
   ],

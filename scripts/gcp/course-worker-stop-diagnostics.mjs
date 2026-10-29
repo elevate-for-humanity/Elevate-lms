@@ -1,5 +1,12 @@
 import {execFileSync} from 'node:child_process';
-const read=args=>JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+const read=args=>{
+ try{return JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:16*1024*1024,timeout:60000}));}
+ catch(error){
+  // Native errors include captured stdout, which can contain raw configuration.
+  // Keep that evidence private and emit only the bounded operation failure code.
+  throw new Error('COURSE_DIAGNOSTIC_READ_FAILED:'+String(error.code??'INVALID_RESPONSE'));
+ }
+};
 for(const [job,region] of [['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1']]){
  const config=read(['run','jobs','describe',job,'--region='+region,'--project=elegant-racer-299721','--format=json']);
  const task=config.spec?.template?.spec?.template?.spec;
@@ -7,7 +14,7 @@ for(const [job,region] of [['elevate-course-builder','us-central1'],['elevate-co
  const runs=read(['run','jobs','executions','list','--job='+job,'--region='+region,'--project=elegant-racer-299721','--limit=6','--format=json']);
  console.log(JSON.stringify({job,region,executions:runs.map(r=>({name:r.metadata?.name,start:r.status?.startTime,end:r.status?.completionTime,running:r.status?.runningCount,failed:r.status?.failedCount,conditions:r.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason}))}))}));
 }
-const logs=read(['logging','read','resource.type="cloud_run_job" AND (resource.labels.job_name="elevate-course-builder" OR resource.labels.job_name="elevate-course-builder-parallel")','--project=elegant-racer-299721','--freshness=2h','--limit=1000','--format=json']);
+const logs=read(['logging','read','resource.type="cloud_run_job" AND (resource.labels.job_name="elevate-course-builder" OR resource.labels.job_name="elevate-course-builder-parallel") AND NOT logName:"cloudaudit.googleapis.com"','--project=elegant-racer-299721','--freshness=2h','--limit=1000','--format=json']);
 const patterns=[[/memory|OOM|SIGKILL/i,'memory_or_kill'],[/timeout|timed out/i,'timeout'],[/heartbeat.*failed|fetch failed|ECONNRESET|ETIMEDOUT|TLS/i,'connection_failure'],[/lease.*lost|LEASE_LOST/i,'lease_lost'],[/terminated|exit|killed|signal/i,'process_exit'],[/GOOGLE_TEACHING_PHOTO|RESOURCE_EXHAUSTED|429/i,'photo_provider_failure'],[/progress stalled|PROGRESS_STALLED/i,'progress_stall']];
 for(const e of logs){const s=JSON.stringify(e.textPayload??e.jsonPayload??'');const categories=patterns.filter(([p])=>p.test(s)).map(([,c])=>c);if(categories.length)console.log(JSON.stringify({at:e.timestamp,job:e.resource?.labels?.job_name,execution:e.labels?.['run.googleapis.com/execution_name'],categories,events:['heartbeat failed','progress stalled','poll error','fatal','segment complete','segment started','job claimed','processed'].filter(event=>s.includes(event)),codes:[...new Set(s.match(/ULTIMATE_[A-Z_]+|GOOGLE_TEACHING_[A-Z_]+|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|UND_ERR_[A-Z_]+|AbortError|TimeoutError|SIGKILL/g)??[])]}));}
 

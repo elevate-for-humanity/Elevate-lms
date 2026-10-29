@@ -2,8 +2,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { ArrowLeft, Send, User } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import ConversationComposer from '@/components/lms/ConversationComposer';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Conversation | Elevate LMS', robots: { index: false, follow: false } };
@@ -14,17 +15,22 @@ async function sendMessage(formData: FormData) {
   'use server';
   const recipientId = String(formData.get('recipient_id') ?? '');
   const content = String(formData.get('content') ?? '').trim();
-  if (!UUID_RE.test(recipientId) || !content || content.length > 5000) return;
+  if (!UUID_RE.test(recipientId)) return { error: 'Choose a valid message recipient.' };
+  if (!content || content.length > 5000) return { error: 'Enter a message between 1 and 5,000 characters.' };
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/lms/messages/${recipientId}`);
-  if (recipientId === user.id) return;
+  if (recipientId === user.id) return { error: 'Choose another member to message.' };
 
   // The database INSERT policy calls can_start_community_message(), so a forged
   // client request cannot bypass visibility/contact rules.
-  const { error } = await supabase.from('messages').insert({ sender_id: user.id, recipient_id: recipientId, content });
-  if (error) return;
+  try {
+    const { error } = await supabase.from('messages').insert({ sender_id: user.id, recipient_id: recipientId, content });
+    if (error) return { error: error.code === '42501' ? 'You cannot send a message to this member.' : 'Your message could not be sent. Please try again.' };
+  } catch {
+    return { error: 'We could not confirm whether your message was sent. Review the conversation before trying again.' };
+  }
 
   revalidatePath(`/lms/messages/${recipientId}`);
   revalidatePath('/lms/messages');
@@ -88,11 +94,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
         })}
       </section>
 
-      <form action={sendMessage} className="sticky bottom-0 flex gap-2 border-t border-slate-200 bg-white py-4">
-        <input type="hidden" name="recipient_id" value={id} />
-        <textarea name="content" required maxLength={5000} rows={2} placeholder="Write a message…" className="min-w-0 flex-1 resize-none rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-brand-blue-500" />
-        <button type="submit" className="inline-flex items-center gap-2 self-end rounded-xl bg-brand-blue-600 px-5 py-3 font-bold text-white hover:bg-brand-blue-700"><Send className="h-4 w-4" />Send</button>
-      </form>
+      <ConversationComposer recipientId={id} action={sendMessage} />
     </main>
   );
 }

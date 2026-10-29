@@ -69,6 +69,17 @@ const testedRollouts = {
   'deploy-google-store-runtime.yml': 'Store',
   'deploy-google-marketing-trigger.yml': 'Marketing',
 };
+// GitHub gives an unstarted dependent job a synthetic started_at when its run
+// is cancelled. Require the complete no-runner, no-step, zero-duration receipt;
+// missing metadata or a cancellation after any execution still blocks rollback.
+function cancelledBeforeExecution(job) {
+  return job.status === 'completed' && job.conclusion === 'cancelled' &&
+    Array.isArray(job.steps) && job.steps.length === 0 &&
+    (job.runner_id === null || job.runner_id === 0) &&
+    (job.runner_name === null || job.runner_name === '') &&
+    typeof job.started_at === 'string' && Number.isFinite(Date.parse(job.started_at)) &&
+    job.started_at === job.completed_at;
+}
 export async function assertTestedWebRollout({ api, repository, workflow, runId, commitSha }) {
   if (repository !== 'elevate-for-humanity/Elevate-lms' || !Object.hasOwn(testedRollouts, workflow))
     throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
@@ -110,6 +121,7 @@ export async function assertTestedWebRollout({ api, repository, workflow, runId,
       newerJobs.some(
         (j) =>
           j.name === `Deploy and verify ${label} on Google` &&
+          !cancelledBeforeExecution(j) &&
           (j.status === 'in_progress' ||
             (j.status === 'completed' && j.conclusion !== 'skipped') ||
             j.steps?.some((step) => step.status === 'in_progress' || step.status === 'completed')),

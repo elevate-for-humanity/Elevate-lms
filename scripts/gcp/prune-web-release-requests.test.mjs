@@ -271,6 +271,29 @@ test('Admin rollout never overwrites a newer started or completed rollout', asyn
   }
 });
 
+test('a cancelled job that never acquired a runner cannot block an already tested image', async () => {
+  const { assertTestedAdminRollout } = await import('./prune-web-release-requests.mjs');
+  const sha = 'a'.repeat(40);
+  // Actual GitHub receipt from cancelled run 40961423017: the dependent
+  // deployment was created and cancelled at the same instant with no runner.
+  const unstarted = { status: 'completed', conclusion: 'cancelled', steps: [],
+    runner_id: null, runner_name: null,
+    started_at: '2026-10-29T22:03:23Z', completed_at: '2026-10-29T22:03:23Z' };
+  const check = (newer) => assertTestedAdminRollout({ repository, runId: 1, commitSha: sha,
+    api: async (path) => path.includes('/workflows/')
+      ? { workflow_runs: [row(1, 'in_progress', { head_sha: sha }), row(2, 'completed')] }
+      : { total_count: 1, jobs: path.includes('/runs/1/')
+          ? [{ name: 'Build and upload Admin image', status: 'completed', conclusion: 'success' }]
+          : [{ name: 'Deploy and verify Admin on Google', ...newer }] } });
+  for (const runner_id of [null, 0])
+    assert.equal((await check({...unstarted, runner_id})).status, 'tested_admin_image_allowed');
+  // Cancellation alone is never permission to reverse a potentially started rollout.
+  for (const change of [{runner_id: 42}, {runner_name: 'runner'}, {runner_id: undefined},
+    {steps: undefined}, {steps: [{status: 'completed'}]}, {started_at: null},
+    {started_at: '2026-10-29T22:03:22Z'}, {conclusion: 'failure'}])
+    await assert.rejects(check({...unstarted, ...change}), /NEWER_ADMIN_ROLLOUT_STARTED/);
+});
+
 for (const [workflow, label] of [
   ['deploy-google-store-runtime.yml', 'Store'],
   ['deploy-google-marketing-trigger.yml', 'Marketing'],

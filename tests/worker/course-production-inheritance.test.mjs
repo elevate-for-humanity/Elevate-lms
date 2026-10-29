@@ -10,7 +10,7 @@ for (const id of ['hvac','barber','bookkeeping','new-program']) {
   const before=structuredClone(original),p=inheritCourseProductionPolicy(original);
   assert.deepEqual(original,before);
   assert.equal(p.productionPolicyVersion,COURSE_PRODUCTION_POLICY_VERSION);
-  assert.equal(p.instructionalAuthoring.provider,'google');assert.equal(p.parallelAutopilot,'three-role-v1');assert.equal(p.publishCompletedLessons,true);
+  assert.equal(p.instructionalAuthoring.provider,'google');assert.equal(p.parallelAutopilot,'three-role-v1');assert.equal(p.activeLessonWorkers,'runnable-stage-required-v1');assert.equal(p.publishCompletedLessons,true);
   assert.equal(p.ownerPaused,true);assert.deepEqual(p.competencies,original.competencies);
   assert.deepEqual(p.instructionalSources,original.instructionalSources);
   assert.deepEqual(p.presentationContract.approvedReferenceVideo.permittedUses,['presentation-reference']);

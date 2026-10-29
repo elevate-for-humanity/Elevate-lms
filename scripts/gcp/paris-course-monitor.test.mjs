@@ -169,3 +169,16 @@ test('owner pause closes an outstanding recovery intent without dispatching or r
  request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
  assert.equal(body.monitor.recoveryRequest,null);assert.equal(body.status,undefined);
 });
+
+test('an exhausted expired lease retains a real stop reason without resetting or replaying work',async()=>{
+ for(const last_error of [null,'ULTIMATE_INTERNAL_REPAIR_REQUIRED:saved-scene']){
+  const row=job({status:'running',attempts:5,last_error,lease_owner:'expired-worker',heartbeat_at:'2026-10-14T17:40:00Z',lease_expires_at:'2026-10-14T17:45:00Z'});
+  let body,url;
+  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+   request:async(value,options)=>{if(options.method){body=JSON.parse(options.body);url=String(value);}return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+  assert.equal(body.status,'failed');assert.equal(body.execution_generation,3);
+  assert.equal(body.last_error,last_error??'ULTIMATE_WORKER_LEASE_EXPIRED:retry_limit_reached');
+  assert.equal(body.attempts,undefined);assert.equal(body.payload,undefined);
+  assert.match(url,/lease_expires_at=lt\./);assert.match(url,/execution_generation=eq.2/);
+ }
+});

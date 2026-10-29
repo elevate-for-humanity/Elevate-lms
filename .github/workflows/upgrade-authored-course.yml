@@ -79,6 +79,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          transient_failures=0
           while true; do
             status=$(curl -sS --connect-timeout 30 --max-time 1800 \
               -o /tmp/video-worker.json -w '%{http_code}' \
@@ -88,7 +89,16 @@ jobs:
               --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":4}")
             cat /tmp/video-worker.json
             case "$status" in
-              200|202) ;;
+              200|202) transient_failures=0 ;;
+              502|503|504)
+                transient_failures=$((transient_failures + 1))
+                if [ "$transient_failures" -gt 5 ]; then
+                  echo "::error::Renderer unavailable after five bounded recovery attempts (HTTP $status)"
+                  exit 1
+                fi
+                echo "::warning::Renderer HTTP $status; retaining durable jobs and retrying in 30 seconds ($transient_failures/5)"
+                sleep 30
+                continue ;;
               *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
             esac
             outcome=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.reason || (p.started ? 'started' : 'queue-empty')))")

@@ -52,7 +52,7 @@ it.each(['experience', 'scene_data', 'video_config'])('normalizes missing captio
     { start: 0, end: 2, text: 'Recover refrigerant.' },
     { id: 'persisted-caption', start: 2, end: 4, text: 'Never vent it.' },
   ];
-  const scenes = [{ startTime: 0, endTime: 4, duration_seconds: 4, narration: 'Recover refrigerant. Never vent it.', action: 'Recovery equipment', visualDirection: 'Recovery equipment' }];
+  const scenes = [{ startTime: 0, endTime: 4, duration_seconds: 4, narration: 'Recover refrigerant. Never vent it.', action: 'Recovery equipment', visualDirection: 'Recovery equipment', purpose: 'Show how recovery equipment prevents refrigerant venting.' }];
   if (origin === 'experience') {
     input.lessons[0].content_json = { experience: { instructionalTimeline: { durationSeconds: 4, scenes, captions } } };
   } else if (origin === 'scene_data') {

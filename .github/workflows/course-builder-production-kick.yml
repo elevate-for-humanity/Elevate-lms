@@ -1,4 +1,4 @@
-# Canonical production continuation: Barber + Cosmetology media checkpoints
+# Canonical production continuation for all owner-authorized courses
 name: Course Builder Production Kick
 
 on:
@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   kick-canonical-runs:
-    name: Keep Barber and Cosmetology canonical media workers active
+    name: Keep authorized canonical course workers active
     runs-on: ubuntu-latest
     timeout-minutes: 75
     env:
@@ -53,6 +53,11 @@ jobs:
           BARBER_ID="$(node scripts/course-factory/resolve-course-id.mjs barber-apprenticeship)"
           COSMETOLOGY_ID="$(node scripts/course-factory/resolve-course-id.mjs cosmetology-apprenticeship)"
 
+          HVAC_ID="$(node scripts/course-factory/resolve-course-id.mjs hvac-technician)"
+          BUSINESS_ID="$(node scripts/course-factory/resolve-course-id.mjs business-administration)"
+          course_ids=("$BARBER_ID" "$COSMETOLOGY_ID" "$HVAC_ID" "$BUSINESS_ID")
+          course_names=(Barber Cosmetology HVAC Business)
+
           kick_course() {
             local label="$1"
             local course_id="$2"
@@ -68,17 +73,11 @@ jobs:
 
           for pass in $(seq 1 12); do
             echo "=== media continuation pass $pass/12 ==="
-            # The Admin renderer intentionally allows one local Chromium job at a
-            # time. Always calling Barber first starved Cosmetology whenever
-            # Barber still had backlog. Alternate the first claim so both canonical
-            # courses get a fair chance at the next available local render slot.
-            if [ $((pass % 2)) -eq 1 ]; then
-              kick_course "Cosmetology" "$COSMETOLOGY_ID" "cosmetology-worker-request-failed"
-              kick_course "Barber" "$BARBER_ID" "barber-worker-request-failed"
-            else
-              kick_course "Barber" "$BARBER_ID" "barber-worker-request-failed"
-              kick_course "Cosmetology" "$COSMETOLOGY_ID" "cosmetology-worker-request-failed"
-            fi
+            # Rotate first claim across all four courses so no backlog is starved.
+            for offset in 0 1 2 3; do
+              index=$(( (pass - 1 + offset) % 4 ))
+              kick_course "${course_names[$index]}" "${course_ids[$index]}" "canonical-worker-request-failed"
+            done
             if [ "$pass" -lt 12 ]; then
               sleep 300
             fi

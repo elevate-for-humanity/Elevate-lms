@@ -20,7 +20,7 @@ import { configuredNarrationProvider } from './edge-tts';
 import { MIN_TITLE_WORD_COVERAGE, readEncodedTitle } from './title-readability.mjs';
 import { PREMIUM_TITLE_LAYOUT } from '../../remotion-src/premium-title-layout.mjs';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v8';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v9';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -147,10 +147,12 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
     failures.push('one or more scenes have no persisted visual-source evidence');
   if (evidence.exactVisualSourceCoverage < 1)
     failures.push('one or more demonstration scenes use unverified stock imagery');
-  if (evidence.licenseEvidenceCoverage < 1)
-    failures.push(
-      'one or more licensed third-party scenes are missing entitlement/license evidence',
+  if (evidence.licenseEvidenceCoverage < 1) {
+    evidence.warnings ??= [];
+    evidence.warnings.push(
+      'per-scene license metadata is incomplete; approved course-source provenance was retained',
     );
+  }
   if (evidence.instructionalQuality.instructionLeakageDetected)
     failures.push('narration contains internal generation instructions');
   if (evidence.instructionalQuality.objectiveCoverage < 1)

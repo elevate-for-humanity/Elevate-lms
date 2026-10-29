@@ -101,6 +101,28 @@ describe('automatic licensed scene assignment', () => {
     });
     expect(asset).not.toHaveProperty('scene_id');
   });
+
+  it('accepts stored course-scoped Envato provenance without a per-scene license URL', () => {
+    const stored = {
+      ...asset,
+      provider: 'envato',
+      storage_path: 'licensed-library/envato/item/clip.mp4',
+      license_evidence_url: '',
+    };
+    const result = buildSceneAssignments(scenes, [stored]);
+    expect(result.gaps).toEqual([]);
+    expect(result.assignments[0]).toMatchObject({
+      sceneId: 'scene:consultation',
+      assetId: 'clip',
+      approvedSource: true,
+      sourceProvider: 'envato',
+      entitlementId: 'license',
+      assignmentMethod: 'verified-coverage',
+    });
+    expect(result.assignments[0]).not.toHaveProperty('licenseEvidenceUrl');
+    expect(validateStepOutput('visual_assignment', { media: { assignments: result.assignments } })).toEqual([]);
+  });
+
   it('does not treat a title or an unverified description as visual proof', () => {
     expect(
       buildSceneAssignments(scenes, [

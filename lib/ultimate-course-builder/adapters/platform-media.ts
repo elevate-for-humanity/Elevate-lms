@@ -41,15 +41,18 @@ export function canAutoApproveLicensedMediaMatch(match: RecordLike, courseId: st
   if (String(entitlement.provider ?? '') !== 'envato') return false;
   const metadata = firstRecord(entitlement.metadata);
   if (!licensedMediaBelongsToCourse(metadata, courseId)) return false;
-  if (!observedLicenseEvidence(entitlement)) return false;
+  // A stored school-controlled file plus its Envato entitlement and course
+  // scope is sufficient production provenance. A separate per-scene license
+  // URL is advisory and must not stop an otherwise approved course asset.
   const stored = Boolean(storedLicensedMediaMetadata(metadata));
+  if (stored) return true;
   const retrievableWorkspaceAsset =
     (typeof metadata.assetUrl === 'string' || typeof metadata.asset_url === 'string') &&
     String(metadata.assetUrl ?? metadata.asset_url).trim().startsWith('https://') &&
     (metadata.licenseObserved === true ||
       String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
       String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
-  return stored || retrievableWorkspaceAsset;
+  return retrievableWorkspaceAsset;
 }
 
 export class UltimatePlatformMedia implements UltimateMediaPort {

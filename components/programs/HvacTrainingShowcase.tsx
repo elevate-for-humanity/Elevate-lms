@@ -51,7 +51,7 @@ const scenes = [
 
 export function HvacLabHero() {
   return (
-    <figure className="border-b-4 border-orange-500 bg-[#071b3a] text-white">
+    <figure className="border-b-4 border-orange-500 bg-blue-950 text-white">
       <div className="mx-auto max-w-7xl px-4 pb-5 pt-6 sm:px-6">
         <p className="mb-4 text-sm font-bold tracking-wide text-orange-300">
           Sponsored by Elevate for Humanity
@@ -81,7 +81,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
     <section
       aria-labelledby={headingId}
       data-hvac-training-showcase="20261029"
-      className="border-y-4 border-orange-500 bg-[#071b3a] px-4 py-14 text-white sm:px-6 sm:py-20"
+      className="border-y-4 border-orange-500 bg-blue-950 px-4 py-14 text-white sm:px-6 sm:py-20"
     >
       <div className="mx-auto max-w-7xl">
         <p className="text-sm font-bold uppercase tracking-widest text-orange-300">
@@ -135,7 +135,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
           ))}
         </div>
         {!compact && (
-          <div className="mt-10 grid gap-7 rounded-2xl border border-blue-800 bg-[#0d294e] p-6 text-white sm:p-8 lg:grid-cols-2">
+          <div className="mt-10 grid gap-7 rounded-2xl border border-blue-800 bg-blue-900 p-6 text-white sm:p-8 lg:grid-cols-2">
             <div>
               <h3 className="text-2xl font-bold">Know the credential you are preparing for.</h3>
               <ul className="mt-4 space-y-3 leading-7 text-slate-200">

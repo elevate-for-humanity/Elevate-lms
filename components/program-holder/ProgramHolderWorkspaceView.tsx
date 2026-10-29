@@ -452,6 +452,23 @@ export async function ProgramHolderWorkspaceView({
           administrators.
         </p>
         {payoutPanel}
+        <section className="rounded-2xl border bg-white p-5">
+          <h2 className="text-xl font-black">Submitted invoices</h2>
+          <p className="mt-1 text-sm text-slate-600">Track your invoice review here. Document approval does not confirm payment.</p>
+          <div className="mt-4 space-y-3">
+            {data.documents.filter((row) => row.document_type === 'provider_invoice').length ? (
+              data.documents.filter((row) => row.document_type === 'provider_invoice').map((row) => (
+                <article key={row.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+                  <div className="min-w-0">
+                    <p className="break-all font-bold">{row.file_name}</p>
+                    <p className="text-sm capitalize">Review: {row.status || 'pending'}</p>
+                  </div>
+                  <a href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-bold text-blue-800 underline">View invoice</a>
+                </article>
+              ))
+            ) : <p className="text-sm text-slate-600">You have not submitted any invoices yet.</p>}
+          </div>
+        </section>
       </section>
     );
   if (section === 'settings')

@@ -1,11 +1,18 @@
 name: Release unused Studio verification tag
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-studio-candidate-tag.yml']
   workflow_dispatch:
     inputs:
       revision:
         description: Exact non-serving Studio candidate revision whose temporary alias may be removed
         type: string
         required: true
+      tag:
+        description: Exact unused verification tag; serving and Admin-bound tags are protected
+        type: string
+        default: studio-verify
 permissions:
   contents: read
   id-token: write
@@ -16,7 +23,9 @@ jobs:
     environment: production
     timeout-minutes: 5
     concurrency:
-      group: google-runtime-us-central1
+      # Releasing an unused alias allocates no CPU/memory and must not wait
+      # behind deployments that are blocked by the capacity it is retaining.
+      group: google-studio-browser-runtime-operations
       cancel-in-progress: false
       queue: max
     steps:
@@ -32,5 +41,8 @@ jobs:
         with: {skip_install: true}
       - name: Remove only the exact unused verification alias and verify preserved production traffic
         env:
-          STUDIO_CANDIDATE_REVISION: ${{ inputs.revision }}
+          # One bounded recovery of the observed failed 2aba candidate. A push
+          # changes no other alias; repeated execution is a read-only no-op.
+          STUDIO_CANDIDATE_REVISION: ${{ github.event_name == 'push' && 'elevate-studio-browser-00063-buj' || inputs.revision }}
+          STUDIO_CANDIDATE_TAG: ${{ github.event_name == 'push' && 'sc-2aba3de5-c8976733' || inputs.tag }}
         run: node scripts/gcp/release-studio-candidate-tag.mjs

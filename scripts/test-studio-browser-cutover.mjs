@@ -90,6 +90,15 @@ test('unready persistent storage preserves Admin and collects exact revision dia
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
  const logs=f.diagnostics.find(a=>a[0]==='logging');assert.ok(logs);assert.match(logs[2],/revision_name="browser-failed-revision"/);
 });
+
+test('a failed production candidate releases only its unused tag and keeps the revision and serving traffic',async()=>{
+ const f=await execute({foundation:{passed:false,commit:sha,checks:[]}});
+ assert.match(f.error.message,/foundation evidence invalid/);
+ const tag=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag=')).slice(6);
+ assert.ok(f.commands.some(a=>a.includes('--remove-tags='+tag)));
+ assert.equal(f.commands.some(a=>a.includes('delete')||a.some(v=>v.startsWith('--to-revisions='))),false);
+ assert.equal(switched(f),false);
+});
 test('anonymous workspace authorization regression prevents Admin cutover',async()=>{
  const f=await execute({anonymous:200});assert.match(f.error.message,/authorization boundary/);assert.equal(switched(f),false);
 });
@@ -136,7 +145,7 @@ test('failed public cutover restores previous traffic and leaves Admin unchanged
 test('unready candidates never change serving traffic',async()=>{
  const f=await execute({state:{commit:sha,ready:false,providerAuthStorage:{persistent:true}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
- assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
+ assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);
 });
 
 test('browser candidate runs as the dedicated Studio identity rather than Admin',async()=>{
@@ -174,7 +183,7 @@ test('candidate acceptance leaves serving traffic and Admin untouched',async()=>
 test('live browser foundation failure preserves old traffic even when HTTP health passes',async()=>{
  const f=await execute({foundation:{passed:false,commit:sha,checks:[{name:'restore',passed:false}]}});
  assert.match(f.error.message,/foundation evidence invalid/);
- assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);assert.equal(switched(f),false);
+ assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);assert.equal(switched(f),false);
 });
 
 test('routine candidate release never provisions identities, secrets or storage grants',async()=>{

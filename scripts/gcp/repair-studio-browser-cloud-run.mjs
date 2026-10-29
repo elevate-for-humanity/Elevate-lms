@@ -134,10 +134,12 @@ state=await verifyHealth(url,'Public browser did not serve the verified candidat
 } finally {
   // A verification tag keeps min=1 warm. Release only this exact candidate's
   // tag after acceptance/failure, retaining its revision and the old traffic.
-  if(process.env.STUDIO_CANDIDATE_ONLY==='true'&&candidateRevision){
+  if((process.env.STUDIO_CANDIDATE_ONLY==='true'||!trafficActivated)&&candidateRevision){
     try {
       const current=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
-      if(current.status?.traffic?.some(t=>t.tag===candidateTag&&t.revisionName===candidateRevision))
+      if(current.status?.traffic?.some(t=>t.tag===candidateTag&&t.revisionName===candidateRevision)&&
+        !current.status?.traffic?.some(t=>t.revisionName===candidateRevision&&t.percent>0)&&
+        !current.spec?.traffic?.some(t=>t.percent>0&&(t.revisionName===candidateRevision||t.latestRevision)))
         command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--remove-tags='+candidateTag,'--quiet']);
       console.log(JSON.stringify({candidateRevision,candidateTagReleased:true,revisionRetained:true,servingTrafficChanged:false}));
     } catch {throw Error('STUDIO_CANDIDATE_TAG_CLEANUP_UNVERIFIED');}

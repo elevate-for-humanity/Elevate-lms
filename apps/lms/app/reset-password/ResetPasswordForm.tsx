@@ -6,12 +6,13 @@ import { createClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import Link from 'next/link';
 
-export default function ResetPasswordForm({ portal, mode }: { portal?: string; mode?: string }) {
+export default function ResetPasswordForm({ portal, mode, recoveryError }: { portal?: string; mode?: string; recoveryError?: string }) {
   const router = useRouter();
   const programHolder = portal === 'program-holder';
+  const employer = portal === 'employer';
   const hostShop = portal === 'host-shop';
   const loginPath = hostShop ? '/host-shop/login' : '/login';
-  const destination = programHolder ? '/program-holder/onboarding' : hostShop ? '/host-shop/onboarding' : '/lms';
+  const destination = employer ? '/employer/dashboard' : programHolder ? '/program-holder/onboarding' : hostShop ? '/host-shop/onboarding' : '/lms';
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,12 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
   const [recoverySent, setRecoverySent] = useState(false);
 
   useEffect(() => {
+    if (recoveryError) {
+      setError('This password link is missing, expired, or already used. Request a fresh secure link below.');
+      setRequestMode(true);
+      setSessionReady(true);
+      return;
+    }
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
       const recoveryMode = mode === 'recovery';
@@ -38,7 +45,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
         setSessionReady(true);
       }
     });
-  }, [mode, router]);
+  }, [mode, recoveryError, router]);
 
   const handleRecoveryRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +57,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
-          portal: programHolder ? 'program-holder' : hostShop ? 'host-shop' : 'learner',
+          portal: employer ? 'employer' : programHolder ? 'program-holder' : hostShop ? 'host-shop' : 'learner',
         }),
       });
       if (!response.ok) {
@@ -126,7 +133,7 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
           </h1>
           <p className="text-slate-600 text-sm mt-1">
             {PLATFORM_DEFAULTS.orgName}{' '}
-            {programHolder ? 'Program Holder Portal' : hostShop ? 'Host Shop Portal' : 'Learning Portal'}
+            {employer ? 'Employer Portal' : programHolder ? 'Program Holder Portal' : hostShop ? 'Host Shop Portal' : 'Learning Portal'}
           </p>
         </div>
 

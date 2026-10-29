@@ -80,6 +80,9 @@ jobs:
       - name: Course dispatch PostgREST projection (read-only)
         if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request'
         run: node scripts/gcp/probe-course-dispatch-queue.mjs
+      - name: Learner inbox PostgREST projection (read-only)
+        if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request'
+        run: node scripts/qa/probe-learner-inbox.mjs
       - name: Google Studio runtime topology regression tests
         run: node --test scripts/gcp/verify-ai-runtime.test.mjs
       - name: Google Calendar credential and OAuth regressions

@@ -6,17 +6,25 @@ on:
       course_slug:
         type: choice
         default: barber-apprenticeship
-        options: [barber-apprenticeship, cosmetology-apprenticeship]
+        options: [barber-apprenticeship, cosmetology-apprenticeship, hvac-technician, business-administration]
+  issues:
+    types: [opened]
 
 permissions:
   contents: read
 
 concurrency:
-  group: authored-course-media-launch
+  group: authored-course-media-launch-${{ inputs.course_slug || github.event.issue.title }}
   cancel-in-progress: false
 
 jobs:
   upgrade:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+        contains(fromJSON('["FINISH AUTHORED COURSE: barber-apprenticeship","FINISH AUTHORED COURSE: hvac-technician","FINISH AUTHORED COURSE: business-administration"]'), github.event.issue.title)
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 360
     env:
@@ -26,7 +34,11 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       ADMIN_URL: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app'
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      COURSE_SLUG: ${{ inputs.course_slug || 'barber-apprenticeship' }}
+      COURSE_SLUG: >-
+        ${{ inputs.course_slug ||
+          (github.event.issue.title == 'FINISH AUTHORED COURSE: barber-apprenticeship' && 'barber-apprenticeship') ||
+          (github.event.issue.title == 'FINISH AUTHORED COURSE: hvac-technician' && 'hvac-technician') ||
+          (github.event.issue.title == 'FINISH AUTHORED COURSE: business-administration' && 'business-administration') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,7 +69,7 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --ignore-scripts --frozen-lockfile --strict-peer-dependencies=false --prod=false
 
-      - name: Prove the complete Barber blueprint compiles
+      - name: Prove the authored lesson compiler contract
         run: pnpm vitest run tests/unit/course-factory/authored-content-compiler.test.ts
 
       - name: Upgrade the exact authored course and enqueue missing media

@@ -86,3 +86,21 @@ test('saved cosmetology recap resolves an exact ASR-split compound without fuzzy
  assert.throws(()=>quoteStartSeconds('disinfect tools for 10 minutes',[{text:'disinfect tools for 20 minutes',startSeconds:0}]),/NOT_ALIGNED/);
  assert.throws(()=>quoteStartSeconds('do not disinfect tools',[{text:'do disinfect tools',startSeconds:0}]),/NOT_ALIGNED/);
 });
+
+test('barber consultation teaching pictures use primary speech rather than a closer recap phrase',()=>{
+ const recorded=[
+  {text:'Conduct a 5-10-minute consultation before service.',startSeconds:0.52,endSeconds:3.8},
+  {text:'Greet warmly inspect scalp and hair, confirm agreement and document findings.',startSeconds:4.2,endSeconds:9},
+  {text:'Complete a five to ten minute consultation by greeting evaluating hair and scalp securing consent and logging notes.',startSeconds:9.908,endSeconds:17.148},
+ ];
+ const pictures=[
+  {imageUrl:'primary-a',sha256:'a',narrationQuote:'Conduct a 5 to 10 minute consultation before service.'},
+  {imageUrl:'primary-b',sha256:'b',narrationQuote:'Greet warmly inspect scalp and hair'},
+  {imageUrl:'recap',sha256:'c',isRecap:true,narrationQuote:'Complete a five-to-ten minute consultation'},
+ ];
+ const timeline=pictureTimeline(pictures,recorded,17.976,9.648);
+ assert.deepEqual(timeline.map(p=>p.startSeconds),[0,4.2,9.648]);
+ assert.equal(activePictureCue(timeline,10).imageUrl,'recap');
+ const unsupported=pictures.map((p,i)=>i===0?{...p,narrationQuote:'securing consent and logging notes'}:p);
+ assert.throws(()=>pictureTimeline(unsupported,recorded,17.976,9.648),/NOT_ALIGNED/);
+});

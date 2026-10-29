@@ -3,6 +3,26 @@ import { observeDocumentStability } from './helpers/document-stability';
 
 const website = 'https://www.elevateforhumanity.org/';
 
+test('legacy portal URLs redirect before streaming a dashboard document', async ({ request }, testInfo) => {
+  const origin = 'https://app.elevateforhumanity.org';
+  const evidence = [];
+  for (const [source, destination] of [
+    ['/program-holder/portal/students', '/program-holder/students'],
+    ['/program-holder/portal/reports', '/program-holder/reports'],
+    ['/program-holder/portal/page', '/program-holder/dashboard'],
+    ['/apprentice/attendance', '/apprentice/hours'],
+  ]) {
+    const response = await request.get(origin + source + '?view=acceptance', { maxRedirects: 0 });
+    expect(response.status(), source + ' must redirect before rendering').toBe(307);
+    const location = new URL(response.headers().location, origin);
+    expect(location.origin).toBe(origin);
+    expect(location.pathname).toBe(destination);
+    expect(location.searchParams.get('view')).toBe('acceptance');
+    evidence.push({ source, destination: location.pathname, status: response.status(), queryPreserved: true });
+  }
+  await testInfo.attach('legacy-portal-http-redirects', { body: JSON.stringify(evidence), contentType: 'application/json' });
+});
+
 test('public startup stays visible without reloads, client exceptions or competing narration', async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   const errors: string[] = [];

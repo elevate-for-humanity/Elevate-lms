@@ -12,9 +12,17 @@ test('unrecognized provider payloads are never copied into diagnostics',()=>{
  const [result]=summarizeParisLogs([{textPayload:JSON.stringify({message:'[devstudio/chat] owned stream failed',error:{message:'secret credentials'}})}]);
  assert.equal(result.failure,'unclassified_provider_failure');assert.ok(!JSON.stringify(result).includes('secret'));
 });
-test('diagnostics use one bounded read-only query and propagate access failures',()=>{
- const calls=[];const report=diagnoseParisRuntime({run:args=>{calls.push(args);return '[]';}});
- assert.equal(report.readOnly,true);assert.equal(calls.length,1);assert.deepEqual(calls[0].slice(0,2),['logging','read']);
+test('diagnostics use bounded read-only operations and propagate access failures',()=>{
+ const calls=[];const report=diagnoseParisRuntime({run:args=>{calls.push(args);return args[0]==='logging'?'[]':JSON.stringify({spec:{template:{spec:{containerConcurrency:1,timeoutSeconds:300,containers:[{env:[{name:'SECRET',value:'private-secret'}],resources:{limits:{cpu:'4',memory:'8Gi'}}}]}}}});}});
+ assert.equal(report.readOnly,true);assert.equal(calls.length,2);assert.deepEqual(calls[0].slice(0,2),['logging','read']);
+ assert.deepEqual(calls[1].slice(0,3),['run','services','describe']);
+ assert.equal(report.runtime.concurrency,1);assert.equal(report.runtime.resources.memory,'8Gi');
+ assert.ok(!JSON.stringify(report).includes('private-secret'));
  assert.ok(calls[0].includes('--limit=50'));assert.ok(calls[0].includes('--freshness=4h'));
  assert.throws(()=>diagnoseParisRuntime({run:()=>{throw Error('permission_denied');}}),/permission_denied/);
+});
+
+test('system logs identify memory exhaustion without copying arbitrary log content',()=>{
+ const [result]=summarizeParisLogs([{textPayload:'Memory limit of 8192 MiB exceeded. private diagnostic content'}]);
+ assert.equal(result.runtimeFailure,'memory_limit_exceeded');assert.ok(!JSON.stringify(result).includes('private'));
 });

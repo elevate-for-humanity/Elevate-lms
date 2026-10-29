@@ -1,3 +1,4 @@
+import { getUploadedW9Status } from '@/lib/program-holder/document-review';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
@@ -15,10 +16,11 @@ export async function GET() {
   if (!ctx) return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403, headers: privateHeaders });
   try {
     const account = await getProgramHolderPayoutAccount(ctx);
+    const uploadedW9 = await getUploadedW9Status(ctx.db, ctx.user.id);
     // Banking setup remains accessible while compliance is being completed.
     // A failed readiness lookup must still block payment release.
     const onboarding = await getProgramHolderPaymentReadiness(ctx.db, ctx.holderId).catch(() => ({ ready: false, missing: ['Payment requirements could not be verified. Retry before requesting a payment.'] }));
-    return NextResponse.json({ ...account, onboardingReady: onboarding.ready, missingRequirements: onboarding.missing }, { headers: privateHeaders });
+    return NextResponse.json({ ...account, uploadedW9, onboardingReady: onboarding.ready, missingRequirements: onboarding.missing }, { headers: privateHeaders });
   } catch {
     return NextResponse.json({ error: 'Payout setup could not load. Please retry.' }, { status: 503, headers: privateHeaders });
   }

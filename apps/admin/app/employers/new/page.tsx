@@ -1,31 +1,11 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
+import { createEmployer } from './actions';
 import Link from 'next/link';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'New Employer | Admin' };
-
-async function createEmployer(formData: FormData) {
-  'use server';
-  await requireRole(['admin', 'staff']);
-  const name = String(formData.get('name') || '').trim();
-  if (!name) throw new Error('EMPLOYER_NAME_REQUIRED');
-  const db = await requireAdminClient();
-  const { error } = await db.from('employers').insert({
-    name,
-    industry: (formData.get('industry') as string) || null,
-    city: (formData.get('city') as string) || null,
-    state: (formData.get('state') as string) || null,
-    phone: (formData.get('phone') as string) || null,
-    email: (formData.get('email') as string) || null,
-    status: 'active',
-  });
-  if (error) throw new Error('EMPLOYER_CREATE_FAILED');
-  redirect('/employers');
-}
 
 export default async function NewEmployerPage() {
   await requireRole(['admin', 'staff']);

@@ -1,55 +1,49 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
-export async function createJob(formData: FormData) {
-  const supabase = await createClient();
+async function saveJob(form: FormData, id?: string) {
+  const { user } = await requireRole(['admin']);
   const db = await requireAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
-  if (!supabase) throw new Error('Database unavailable');
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
-  const { data: _profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!_profile || !['admin'].includes(_profile.role)) throw new Error('Forbidden');
-
-  const { error } = await db.from('jobs').insert({
-    title: formData.get('title') as string,
-    company: formData.get('company') as string,
-    location: formData.get('location') as string,
-    type: formData.get('type') as string,
-    salary_min: formData.get('salary_min')
-      ? parseFloat(formData.get('salary_min') as string)
-      : null,
-    salary_max: formData.get('salary_max')
-      ? parseFloat(formData.get('salary_max') as string)
-      : null,
-    description: formData.get('description') as string,
-    requirements: formData.get('requirements') as string,
-    status: 'active',
-    created_by: user.id,
-  });
-
-  if (error) throw new Error('Failed to process job action.');
-
+  const value = (key: string) => String(form.get(key) ?? '').trim();
+  const title = value('title');
+  const description = value('description');
+  const location = value('location');
+  const employerId = value('employer_id');
+  const employmentType = value('employment_type');
+  const status = value('status') || 'pending';
+  if (title.length < 3 || title.length > 160 || description.length < 20 || !location) {
+    throw new Error('Enter a title, location, and description of at least 20 characters.');
+  }
+  if (!['Full-time', 'Part-time', 'Apprenticeship', 'Internship', 'Contract'].includes(employmentType)) throw new Error('Invalid employment type.');
+  if (!['pending', 'active', 'paused', 'closed'].includes(status)) throw new Error('Invalid posting status.');
+  const { data: employer, error: employerError } = await db.from('employers')
+    .select('id,approved').eq('id', employerId).maybeSingle();
+  if (employerError || !employer) throw new Error('Select an existing employer.');
+  if (status === 'active' && !employer.approved) throw new Error('Approve the employer before publishing its job.');
+  const payload = {
+    employer_id: employer.id, title, job_title: title, description, job_description: description,
+    location, employment_type: employmentType, job_type: employmentType,
+    requirements: value('requirements') || null, salary_range: value('salary_range') || null,
+    status, approved_at: status === 'active' ? new Date().toISOString() : null,
+    approved_by: status === 'active' ? user.id : null,
+  };
+  const result = id
+    ? await db.from('job_postings').update(payload).eq('id', id).select('id').maybeSingle()
+    : await db.from('job_postings').insert({ ...payload, posted_by: user.id }).select('id').single();
+  if (result.error || !result.data) throw new Error('Unable to save this job posting.');
   await logAdminAudit({
-    action: AdminAction.JOB_CREATED,
-    actorId: user.id,
-    entityType: 'jobs',
-    entityId: BULK_ENTITY_ID,
-    metadata: { title: formData.get('title') as string },
+    action: id ? AdminAction.JOB_UPDATED : AdminAction.JOB_CREATED,
+    actorId: user.id, entityType: 'job_postings', entityId: result.data.id,
+    metadata: { title, status, employer_id: employer.id },
   });
-
-  revalidatePath('/jobs');
-  redirect('/jobs');
+  for (const path of ['/jobs', `/jobs/${result.data.id}`]) revalidatePath(path);
+  redirect(`/jobs/${result.data.id}`);
 }
+
+export async function createJob(form: FormData) { return saveJob(form); }
+export async function updateJob(id: string, form: FormData) { return saveJob(form, id); }

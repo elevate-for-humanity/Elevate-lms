@@ -80,6 +80,7 @@ const INTEGRATIONS: Integration[] = [
   {
     name: 'Google Calendar',
     slug: 'google-calendar',
+    configUrl: '/integrations/env-manager',
     description:
       'Sync course schedules and appointments to student and staff Google Calendars via OAuth.',
     icon: Calendar,

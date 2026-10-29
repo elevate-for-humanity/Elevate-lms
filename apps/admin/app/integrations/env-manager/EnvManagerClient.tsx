@@ -129,6 +129,10 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
+    label: 'Google Calendar',
+    keys: ['GOOGLE_CALENDAR_CLIENT_ID', 'GOOGLE_CALENDAR_CLIENT_SECRET'],
+  },
+  {
     label: 'Google',
     keys: [
       'GOOGLE_CLIENT_ID',

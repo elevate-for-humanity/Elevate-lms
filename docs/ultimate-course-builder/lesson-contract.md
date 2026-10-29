@@ -1,6 +1,6 @@
 # Ultimate Course Builder lesson contract
 
-Version: `ultimate-lesson-2026-10-01.1`.
+Version: `ultimate-lesson-2026-10-29.1`.
 
 The executable contract is `lib/ultimate-course-builder/core/lesson-contract.ts`. Each stage records its contract version, a SHA-256 of all prior stage payloads and locked profile inputs, its output SHA-256, validation outcome, and time. Changing any input invalidates that stage and every dependent stage. Old unversioned passes cannot be restored or published.
 
@@ -12,7 +12,7 @@ The executable contract is `lib/ultimate-course-builder/core/lesson-contract.ts`
 | 4. Teaching sequence | Thirteen ordered stages with instruction and objective mappings, not stage labels alone. |
 | 5. Instructor script | Complete spoken segments with objective/source mappings, examples, corrections, practice, and recap. Every teaching stage must be represented in speech. |
 | 6. Storyboard | Each script segment becomes a scene without shortening its dialogue. Each scene has an instructional visual purpose. |
-| 7. Visual assignment | Explicit scene-to-asset assignments with license evidence and relevance reasons. Item landing pages and arbitrary indexed stock assets do not prove a license or relevance. |
+| 7. Visual assignment | Explicit scene-to-asset assignments with relevance reasons and approved source provenance. A stored, course-scoped Envato entitlement is sufficient; a separate per-scene license URL is advisory. Unknown media remains ineligible, and practical demonstrations still require inspected, action-matched footage. |
 | 8. Scene construction | Shot plan uses assigned assets and forbids loops. Short source videos fail duration checks instead of repeating. |
 | 9. Narration | Generate approved segments once, measure their durations, obtain recognized word timings, and retain durable audio assets. |
 | 10. Synchronization | Scene timing follows measured audio; captions use recognized word times. The 30fps intro is three seconds and the outro is two seconds. |
@@ -20,11 +20,11 @@ The executable contract is `lib/ultimate-course-builder/core/lesson-contract.ts`
 | 12. Mistakes/corrections | Specific wrong actions, correct actions, and explanations mapped to objectives. |
 | 13. Assessment | Real objective IDs, scored questions, explanations, targeted remediation, a distinct reassessment bank, and practical rubric when required. |
 | 14. Render | Approved segment audio is reused in the compositor; strict rendering rejects changed text or audio duration. No 180-second narration truncation. Versioned MP4, VTT, and transcript assets. |
-| 15. Finished media QA | Decode the actual MP4, transcribe its actual audio, detect scene changes/replay/black/frozen frames, inspect source/license evidence, and OCR encoded titles at desktop and phone widths. |
+| 15. Finished media QA | Decode the actual MP4, transcribe its actual audio, detect scene changes/replay/black/frozen frames, inspect approved source provenance, and OCR encoded titles at desktop and phone widths. Missing per-scene license metadata is recorded as an advisory rather than blocking publication. |
 | 16. Instructional QA | Compare delivered transcription with approved objectives and script. Reviewer excerpts must actually occur in the delivered transcript. Labels cannot count as teaching. |
 | 17. Narration QA | Analyze audio from the delivered MP4, bound to its media hash. Separate narration files cannot certify the film. |
 | 18. Learner runthrough | Authenticated browser observations for desktop/mobile/PWA, complete playback, captions, activities, scoring, remediation/reassessment, saved progress, resume, completion, and accessibility. Evidence is signed and bound to the staged artifact hash and video hash. |
-| 19. Repair | Execute at most two targeted repairs/retries per lesson, invalidate dependent artifacts, and record attempts/unresolved failures. Durable missing sources, licenses, and browser configuration remain blockers. |
+| 19. Repair | Execute bounded targeted repairs per lesson, invalidate dependent artifacts, and record attempts/unresolved failures. Unknown media sources and browser configuration remain blockers; missing per-scene license URLs do not. |
 | 20. Release | All twenty current certificates, actual traceability IDs, accessibility results, complete competency coverage, canonical lesson identity, and publication readback. Rollback and the alternate publisher cannot bypass the contract. |
 
 ## Supplying authorized content

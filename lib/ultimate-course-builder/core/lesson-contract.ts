@@ -6,7 +6,7 @@ import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs'
 import { isExternalCourseVideoReference } from '../../storage/course-video-policy.mjs';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
-export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
+export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-29.1';
 export const MAX_TARGETED_REPAIRS = 8;
 // Only the manually approved Cosmetology build; never the automated build.
 const MANUAL_COSMETOLOGY_COURSE_ID = 'a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
@@ -59,7 +59,7 @@ export function stepInputHash(
     ...(step === 'learning_objectives' ? { instructionalProducer: 'approved-moment-photos-and-fresh-recaps-v4' } : {}),
     ...(step === 'natural_narration' ? { narrationProducer: 'warm-native-pace-24khz-delivery-word-alignment-v3' } : {}),
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
-    ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'canonical-entitlement-source-paths-v3' } : {}),
+    ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'approved-course-provenance-v4' } : {}),
     ...(step === 'finished_media_qa' ? { approvedDeliveryValidator: 'approved-delivery-v1' } : {}),
     ...(step === 'lesson_film_render' ? { renderProducer: STORYBOARD_RENDER_PRODUCER } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
@@ -149,10 +149,13 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
               : s.requestedTeachingPhotograph === true
                 ? s.assignmentMethod === 'teaching-photograph-request' &&
                   String(s.assetId).startsWith('teaching-photo-request:')
-              : nonempty(s.licenseEvidenceUrl)),
+              : nonempty(s.licenseEvidenceUrl) ||
+                (s.approvedSource === true &&
+                  nonempty(s.sourceProvider) &&
+                  nonempty(s.entitlementId))),
         ), 'VISUAL_SCENE_COVERAGE_REQUIRED');
       // Licensed media can be reused for a distinct teaching purpose.
-      // Reject unreasoned duplication; retain per-scene license and relevance evidence.
+      // Reject unreasoned duplication; retain source provenance and relevance evidence.
       const seen = new Map<string, string>();
       for (const assignment of assignments) {
         const id = String(assignment.assetId ?? '');

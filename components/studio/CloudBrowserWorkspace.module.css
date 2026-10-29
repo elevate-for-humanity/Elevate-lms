@@ -50,6 +50,10 @@
   -webkit-text-fill-color: #0f172a;
   color-scheme: light;
 }
+/* Reading view must not shrink the credential field below its accessible size. */
+.root .secureInput {
+  font-size: max(1.25rem, 20px);
+}
 .secureInput::placeholder {
   color: #475569;
   -webkit-text-fill-color: #475569;

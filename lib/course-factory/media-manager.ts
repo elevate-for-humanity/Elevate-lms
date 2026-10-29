@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { signedLessonPlayback } from '@/lib/storage/lesson-playback';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { classifyVideoFailure, type VideoAssetKind, type VideoJob } from '@/lib/video/job-queue';
 import { MEDIA_QUALITY_GATE_VERSION, mediaQualityFailures, type MediaQualityEvidence } from '@/lib/video/media-quality-gate';
@@ -249,13 +250,29 @@ async function checkPlayable(url: string): Promise<{ ok: boolean; reason?: strin
   }
 }
 
-async function verifyPlayableRows(rows: VideoJob[]) {
+export async function verifyPlayableRows(rows: Pick<VideoJob, 'id' | 'video_url'>[]) {
+  const db = await requireAdminClient();
   const unreachable: Array<{ jobId: string; url: string; reason: string }> = [];
   let playable = 0;
   const concurrency = 8;
   for (let index = 0; index < rows.length; index += concurrency) {
     const batch = rows.slice(index, index + concurrency);
-    const results = await Promise.all(batch.map(async (row) => ({ row, result: await checkPlayable(String(row.video_url)) })));
+    const results = await Promise.all(batch.map(async (row) => {
+      try {
+        // Probe the same renewed private reference used by learner delivery.
+        // A legacy /public/ URL does not make its storage bucket public.
+        const source = String(row.video_url);
+        let delivery: string;
+        try { delivery = await signedLessonPlayback(db, source); }
+        catch (error) {
+          if (!(error instanceof Error) || error.message !== 'LESSON_MEDIA_STORAGE_REFERENCE_REQUIRED') throw error;
+          delivery = source;
+        }
+        return { row, result: await checkPlayable(delivery) };
+      } catch (error) {
+        return { row, result: { ok: false, reason: error instanceof Error ? error.message : 'media signing failed' } };
+      }
+    }));
     for (const { row, result } of results) {
       if (result.ok) playable += 1;
       else unreachable.push({ jobId: row.id, url: String(row.video_url), reason: result.reason ?? 'unreachable' });
@@ -386,8 +403,11 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   let unreachable: Array<{ jobId: string; url: string; reason: string }> = [];
 
   if (options.verifyUrls) {
-    const verified = await verifyPlayableRows(completeRows);
-    playable = verified.playable + approvedExternalLessons;
+    const uploadedRows = (lessons ?? [])
+      .filter((lesson) => approvedExternalLessonIds.has(lesson.id))
+      .map((lesson) => ({ id: `uploaded:${lesson.id}`, video_url: lesson.video_url }));
+    const verified = await verifyPlayableRows([...completeRows, ...uploadedRows]);
+    playable = verified.playable;
     unreachable = verified.unreachable;
   }
 

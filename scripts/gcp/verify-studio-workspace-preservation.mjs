@@ -52,7 +52,8 @@ export const WORKSPACE_PRESERVATION_PROBE = `
 (async()=>{
  const {WorkspaceCheckpoint}=await import('/app/workspace-checkpoint.mjs');
  const {GcsWorkspaceObjects}=await import('/app/gcs-workspace-objects.mjs');
- const objects=new GcsWorkspaceObjects();
+ const prefix=process.env.STUDIO_WORKSPACE_OBJECT_PREFIX||'workspaces/admin-repository-v1';
+ const objects=new GcsWorkspaceObjects({prefix});
  const store=new WorkspaceCheckpoint({root:process.cwd(),objects,secret:process.env.STUDIO_BROWSER_SECRET});
  const before=await objects.readManifest();
  if(!before)throw Error('checkpoint_missing');
@@ -60,7 +61,7 @@ export const WORKSPACE_PRESERVATION_PROBE = `
  const proof=await (${workspaceContentProof.toString()})(process.cwd());
  const after=await objects.readManifest();
  if(!after||after.generation!==before.generation||!after.data.equals(before.data))throw Error('checkpoint_changed');
- console.log(JSON.stringify({...proof,generation:String(before.generation),archiveDigest:manifest.digest,authenticatedManifest:true}));
+ console.log(JSON.stringify({...proof,generation:String(before.generation),archiveDigest:manifest.digest,authenticatedManifest:true,canonicalWorkspace:prefix==='workspaces/admin-repository-v1'}));
 })().catch(()=>{console.error('STUDIO_WORKSPACE_PRESERVATION_PROBE_FAILED');process.exitCode=1;});`;
 
 export async function verifyStudioWorkspacePreservation({sourceUrl, candidateUrl, secret, expectedFiles, request = fetch}) {
@@ -91,7 +92,7 @@ export async function verifyStudioWorkspacePreservation({sourceUrl, candidateUrl
     if (proof.files !== expectedFiles || !Number.isSafeInteger(proof.directories) || proof.directories < 0 ||
         !Number.isSafeInteger(proof.bytes) || proof.bytes < 0 || !/^[a-f0-9]{64}$/.test(proof.digest || '') ||
         !/^[a-f0-9]{64}$/.test(proof.archiveDigest || '') || proof.generation !== String(saved.generation) ||
-        proof.authenticatedManifest !== true || proof.excludedDependencyCaches !== true)
+        proof.authenticatedManifest !== true || proof.excludedDependencyCaches !== true || proof.canonicalWorkspace !== true)
       throw Error('STUDIO_WORKSPACE_PRESERVATION_UNVERIFIED');
     return proof;
   };

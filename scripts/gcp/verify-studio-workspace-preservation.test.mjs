@@ -40,7 +40,7 @@ test('dependency caches are excluded, but user symlinks are never silently dropp
 function fixture(overrides = {}) {
   const calls = [], proof = {files: 13943, directories: 4166, bytes: 385383807,
     digest: 'a'.repeat(64), archiveDigest: 'b'.repeat(64), generation: '1234',
-    authenticatedManifest: true, excludedDependencyCaches: true};
+    authenticatedManifest: true, excludedDependencyCaches: true, canonicalWorkspace: true};
   let sourceReads = 0;
   const options = {sourceUrl: 'https://live.run.app', candidateUrl: 'https://candidate.run.app',
     secret: 'existing-secret-not-production', expectedFiles: 13943,
@@ -67,7 +67,8 @@ test('nonempty live work is accepted only with authenticated identical candidate
 
 test('missing files, changed bytes, unauthenticated archives, and concurrent generations stop cutover', async () => {
   for (const candidate of [{files: 13942}, {digest: 'c'.repeat(64)}, {authenticatedManifest: false},
-    {generation: '1235'}, {archiveDigest: 'd'.repeat(64)}, {excludedDependencyCaches: false}]) {
+    {generation: '1235'}, {archiveDigest: 'd'.repeat(64)}, {excludedDependencyCaches: false},
+    {canonicalWorkspace: false}]) {
     const f = fixture({candidate});
     await assert.rejects(verifyStudioWorkspacePreservation(f.options), /STUDIO_WORKSPACE_PRESERVATION_/);
   }
@@ -82,6 +83,16 @@ test('failed durable checkpoint or inaccessible runtime never falls back to an e
     await assert.rejects(verifyStudioWorkspacePreservation(f.options), /STUDIO_WORKSPACE_/);
     assert.equal(f.calls.length, 1);
   }
+});
+
+test('even matching files cannot authorize promotion from an isolated acceptance workspace', async () => {
+  const f = fixture();
+  const request = async (url, options) => {
+    const response = await f.options.request(url, options), result = await response.json();
+    if (result.stdout) result.stdout = JSON.stringify({...JSON.parse(result.stdout), canonicalWorkspace: false});
+    return Response.json(result);
+  };
+  await assert.rejects(verifyStudioWorkspacePreservation({...f.options, request}), /PRESERVATION_UNVERIFIED/);
 });
 
 test('unverified destinations and empty or missing inventories make no authenticated requests', async () => {

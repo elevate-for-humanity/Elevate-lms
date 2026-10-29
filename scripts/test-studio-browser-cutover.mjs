@@ -76,6 +76,15 @@ test('new image deployments replace a stale runtime commit override with the exa
  assert.ok(!deploy.some(a=>a.startsWith('--set-env-vars=')));
 });
 
+test('production restoration overrides an inherited isolated acceptance workspace prefix',async()=>{
+ const f=await execute({browserSpec:{containers:[{env:[{name:'STUDIO_WORKSPACE_OBJECT_PREFIX',value:'workspaces/acceptance-11111111-1111-1111-1111-111111111111'}]}]}});
+ assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ const env=deploy.find(a=>a.startsWith('--update-env-vars='));
+ assert.ok(env.slice('--update-env-vars='.length).split(',').includes('STUDIO_WORKSPACE_OBJECT_PREFIX=workspaces/admin-repository-v1'));
+ assert.equal(f.commands.some(a=>a.includes('delete')),false);
+});
+
 test('unready persistent storage preserves Admin and collects exact revision diagnostics',async()=>{
  const f=await execute({state:{commit:sha,ready:true,providerAuthStorage:{persistent:false}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);

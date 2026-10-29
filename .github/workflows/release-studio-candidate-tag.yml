@@ -15,11 +15,32 @@ on:
         default: studio-verify
 permissions:
   contents: read
-  id-token: write
 jobs:
-  cleanup:
-    if: github.ref == 'refs/heads/main'
+  dispatch-cleanup:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GOOGLE_RELEASE_HOLD != 'true'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
+    timeout-minutes: 5
+    steps:
+      - name: Request the bounded cleanup through the trusted dispatch identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Google trusts workflow_dispatch for this production identity. The push
+        # job only dispatches; it never requests a Google token or changes IAM.
+        run: >-
+          gh api --method POST
+          "repos/$GITHUB_REPOSITORY/actions/workflows/release-studio-candidate-tag.yml/dispatches"
+          -f ref=main
+          -f 'inputs[revision]=elevate-studio-browser-00063-buj'
+          -f 'inputs[tag]=sc-2aba3de5-c8976733'
+  cleanup:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
     environment: production
     timeout-minutes: 5
     concurrency:
@@ -41,8 +62,6 @@ jobs:
         with: {skip_install: true}
       - name: Remove only the exact unused verification alias and verify preserved production traffic
         env:
-          # One bounded recovery of the observed failed 2aba candidate. A push
-          # changes no other alias; repeated execution is a read-only no-op.
-          STUDIO_CANDIDATE_REVISION: ${{ github.event_name == 'push' && 'elevate-studio-browser-00063-buj' || inputs.revision }}
-          STUDIO_CANDIDATE_TAG: ${{ github.event_name == 'push' && 'sc-2aba3de5-c8976733' || inputs.tag }}
+          STUDIO_CANDIDATE_REVISION: ${{ inputs.revision }}
+          STUDIO_CANDIDATE_TAG: ${{ inputs.tag }}
         run: node scripts/gcp/release-studio-candidate-tag.mjs

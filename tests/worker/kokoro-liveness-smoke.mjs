@@ -14,4 +14,7 @@ try {
  assert.ok(ticks>2,'NATIVE_NARRATION_HEARTBEAT_TIMER_REQUIRED');
  assert.ok(maxLagMs<2000,'NATIVE_NARRATION_BLOCKED_HEARTBEAT:'+Math.round(maxLagMs));
  console.log(JSON.stringify({nativeNarration:true,heartbeatTicks:ticks,maxEventLoopGapMs:Math.round(maxLagMs),audioBytes:audio.length}));
+} catch(error) {
+ console.error('COURSE_NATIVE_NARRATION_LIVENESS_FAILED: '+(error instanceof Error?error.message:String(error)));
+ process.exitCode=1;
 } finally {clearInterval(timer);}

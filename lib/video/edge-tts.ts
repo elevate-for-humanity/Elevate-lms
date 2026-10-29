@@ -169,7 +169,6 @@ async function pcm16MonoToMp3(pcm: Buffer, speed = 1, volume = 1): Promise<Buffe
   });
 }
 
-const KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 
 interface KokoroAudio {
   audio?: Float32Array;
@@ -227,22 +226,12 @@ function kokoroNarrationChunks(text: string, maxCharacters = 420): string[] {
 
 async function getKokoroModel(): Promise<KokoroModel> {
   if (!kokoroModelPromise) {
-    kokoroModelPromise = import('kokoro-js').then(async ({ KokoroTTS }) => {
-      const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
-        dtype: 'q8',
-        device: 'cpu',
-        // The image preloads Kokoro at build time. Never download model files
-        // while rendering lessons: remote 429s must not fail production jobs.
-        // Offline availability is enforced by the preloaded model image and
-        // runtime network policy, not by an unsupported KokoroJS option.
+    kokoroModelPromise = import('./kokoro-narration-worker.mjs')
+      .then(({ createIsolatedKokoroModel }) => createIsolatedKokoroModel())
+      .catch((error) => {
+        kokoroModelPromise = undefined;
+        throw error;
       });
-      return model as unknown as KokoroModel;
-    }).catch((error) => {
-      // Do not permanently cache a rejected model initialization promise.
-      // An operator can restore the model cache before the next bounded attempt.
-      kokoroModelPromise = undefined;
-      throw error;
-    });
   }
   return kokoroModelPromise;
 }

@@ -50,13 +50,20 @@ jobs:
         run: |
           set -euo pipefail
 
-          BARBER_ID="$(node scripts/course-factory/resolve-course-id.mjs barber-apprenticeship)"
-          COSMETOLOGY_ID="$(node scripts/course-factory/resolve-course-id.mjs cosmetology-apprenticeship)"
-
-          HVAC_ID="$(node scripts/course-factory/resolve-course-id.mjs hvac-technician)"
-          BUSINESS_ID="$(node scripts/course-factory/resolve-course-id.mjs business-administration)"
-          course_ids=("$BARBER_ID" "$COSMETOLOGY_ID" "$HVAC_ID" "$BUSINESS_ID")
-          course_names=(Barber Cosmetology HVAC Business)
+          course_ids=()
+          course_names=()
+          lookup_failed=0
+          for slug in barber-apprenticeship cosmetology-apprenticeship hvac-technician business-administration; do
+            if course_id="$(node scripts/course-factory/resolve-course-id.mjs "$slug")"; then
+              course_ids+=("$course_id")
+              course_names+=("$slug")
+            else
+              echo "::error::Canonical lookup failed for $slug; continuing other authorized courses without selecting a substitute"
+              lookup_failed=1
+            fi
+          done
+          course_count=${#course_ids[@]}
+          test "$course_count" -gt 0 || { echo '::error::No canonical courses resolved'; exit 1; }
 
           kick_course() {
             local label="$1"
@@ -74,11 +81,12 @@ jobs:
           for pass in $(seq 1 12); do
             echo "=== media continuation pass $pass/12 ==="
             # Rotate first claim across all four courses so no backlog is starved.
-            for offset in 0 1 2 3; do
-              index=$(( (pass - 1 + offset) % 4 ))
+            for ((offset=0; offset<course_count; offset++)); do
+              index=$(( (pass - 1 + offset) % course_count ))
               kick_course "${course_names[$index]}" "${course_ids[$index]}" "canonical-worker-request-failed"
             done
             if [ "$pass" -lt 12 ]; then
               sleep 300
             fi
           done
+          exit "$lookup_failed"

@@ -16,6 +16,22 @@ test('inventory uses exact Google endpoint and authorized metadata probe; return
  const r=await inventoryStudioLiveState({run,request});assert.equal(r.activeBrowserSessions,2);assert.equal(r.stateChanged,false);assert.equal(r.directChildShells,1);assert.ok(!JSON.stringify(r).includes('test-secret'));assert.deepEqual(JSON.parse(calls[1].opts.body).args,['-e',METADATA_PROBE]);
 });
 
+test('inventory uses the durable checkpoint boundary for interrupted Git transfers',async t=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'studio-inventory-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ await fs.mkdir(path.join(root,'.git/objects/pack'),{recursive:true});
+ for(const [name,value] of [['tmp_pack_partial','unfinished'],['tmp_idx_partial','index'],['pack-valid.pack','committed']])
+  await fs.writeFile(path.join(root,'.git/objects/pack',name),value);
+ // Similar names outside Git's internal transfer directory are user work.
+ await fs.writeFile(path.join(root,'tmp_pack_user-work'),'preserved');
+ const {stdout}=await promisify(execFile)(process.execPath,['-e',METADATA_PROBE],{cwd:root});const data=JSON.parse(stdout);
+ assert.equal(data.files,2);assert.equal(data.bytes,18);
+ assert.equal(data.excludedGitTransferFiles,2);assert.equal(data.excludedGitTransferBytes,15);
+ assert.equal((await fs.readFile(path.join(root,'.git/objects/pack/tmp_pack_partial'),'utf8')),'unfinished');
+ const {workspaceContentProof}=await import('./verify-studio-workspace-preservation.mjs');
+ const proof=await workspaceContentProof(root);assert.equal(proof.files,data.files);assert.equal(proof.bytes,data.bytes);
+ assert.ok(!stdout.includes('user-work'));assert.equal(data.fileContentsRead,false);
+});
+
 test('only known browser helpers are classified; arbitrary Node processes remain unknown',()=>{
  assert.equal(studioProcessClass('chrome_crashpad'),'browserHelper');assert.equal(studioProcessClass('chrome_crashpad_handler'),'browserHelper');
  assert.equal(studioProcessClass('chromium'),'browser');assert.equal(studioProcessClass('bash'),'shell');

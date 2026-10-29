@@ -73,6 +73,7 @@ export async function cleanupUnusedCandidateTags({
 export async function activateTestedRevision({
   service, revision, commit, read = gcloud, fetcher = fetch, attempts = 12,
   pause = () => new Promise(resolve => setTimeout(resolve, 2000)),
+  report = entry => console.error(JSON.stringify(entry)),
 }) {
   const services = {
     'elevate-marketing-migration': 'marketing',
@@ -114,12 +115,25 @@ export async function activateTestedRevision({
       throw Error('Google candidate URL unavailable; public traffic unchanged');
     }
     let passed = false;
+    let lastProbe;
     for (let attempt = 0; attempt < attempts; attempt++) {
+      lastProbe = { attempt: attempt + 1, responseParsed: false };
       try {
         const response = await fetcher(candidate.url + '/api/health', {
           cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10000),
         });
+        lastProbe.httpStatus = Number.isInteger(response.status) ? response.status : null;
+        lastProbe.responseOk = response.ok === true;
         const state = await response.json();
+        lastProbe = {
+          ...lastProbe, responseParsed: true,
+          correctCommit: (state?.commitSha || state?.commit || state?.sha) === commit,
+          correctRevision: state?.revision === revision,
+          correctService: state?.service === services[service],
+          healthy: state?.healthy === true, ready: state?.ready === true,
+          configurationReady: state?.configuration?.ok === true,
+          supabaseReady: state?.dependencies?.supabase?.ok === true,
+        };
         if (response.ok && state && typeof state === 'object') {
           const actual = state.commitSha || state.commit || state.sha;
           if (actual !== commit) throw Error('Candidate served wrong immutable commit');
@@ -130,11 +144,18 @@ export async function activateTestedRevision({
           }
         }
       } catch (error) {
+        lastProbe.error = ['AbortError', 'TimeoutError'].includes(error?.name) ? 'request_timeout'
+          : error?.name === 'SyntaxError' ? 'invalid_json' : 'request_failed';
         if (error.message === 'Candidate served wrong immutable commit') throw error;
       }
       if (attempt + 1 < attempts) await pause();
     }
-    if (!passed) throw Error('Exact candidate failed runtime health; public traffic unchanged');
+    if (!passed) {
+      // Emit only fixed flags and request status. Never log response bodies,
+      // candidate URLs, provider errors or credentials.
+      report({ event: 'candidate_health_failed', service, revision, commit, lastProbe });
+      throw Error('Exact candidate failed runtime health; public traffic unchanged');
+    }
     const current = describe();
     assertTrafficUnchanged(before, current);
     if (current.status?.latestCreatedRevisionName !== before.status?.latestCreatedRevisionName) {

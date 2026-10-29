@@ -76,7 +76,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   // Platform and Resources are public discovery surfaces, not hidden utilities.
   // Authenticated portals remain discoverable while authorization still gates data/actions.
   const primaryItems = items.filter((item) =>
-    ['students', 'programs', 'apprenticeships', 'funding', 'resources'].includes(item.id ?? ''),
+    ['students', 'programs', 'testing', 'apprenticeships', 'funding', 'resources'].includes(item.id ?? ''),
   );
   const secondaryItems = items.filter((item) => !primaryItems.includes(item));
 

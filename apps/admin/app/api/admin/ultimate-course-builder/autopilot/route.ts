@@ -1,3 +1,5 @@
+import {requestLessonAutopilots} from '@/lib/ultimate-course-builder/worker/request-lesson-autopilots.mjs';
+import {UltimateJobQueue} from '@/lib/ultimate-course-builder/worker/job-queue';
 import {NextRequest,NextResponse} from 'next/server';
 import {apiRequireAdmin} from '@/lib/admin/guards';
 import {requireAdminClient} from '@/lib/supabase/admin';
@@ -14,10 +16,10 @@ export async function POST(req:NextRequest){
  try{
   const db=await requireAdminClient();
   if(input.enabled && input.mode==='three-role-v1'){
-   const planned=await db.rpc('request_ultimate_autopilot_pool',{p_build:input.buildId,p_actor:auth.id});
-   if(planned.error)throw planned.error;
+   const queue=new UltimateJobQueue(db);
+   const planned=await requestLessonAutopilots(db,{buildId:input.buildId,actorId:auth.id,enqueue:(id:string,payload:unknown)=>queue.enqueue(id,payload)});
    const launch=await requestCourseWorker();
-   return NextResponse.json({ok:true,pool:planned.data,launch,message:'Three jobs per lesson requested: instruction, media, and independent quality/publication. The current lesson will keep its saved work and hand off at its checkpoint. '+launch?.message});
+   return NextResponse.json({ok:true,pool:planned,launch,message:'Three jobs per lesson requested: instruction, media, and independent quality/publication. The current lesson will keep its saved work and hand off at its checkpoint. '+launch?.message});
   }
   const {data:job,error}=await db.from('ultimate_build_jobs').select('id,monitor,execution_generation')
    .eq('build_id',input.buildId).eq('job_type','course_build').order('created_at',{ascending:false}).limit(1).maybeSingle();

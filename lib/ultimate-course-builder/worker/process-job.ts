@@ -233,7 +233,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
         if (result.completed) delete continuation.payload.checkpointRepair;
-        if (continuousCourseLease(build.course_id, payload, Date.now() - executionStarted)) {
+        if (continuousCourseLease(build.course_id, payload, Date.now() - executionStarted, profile)) {
           // Drain writes from the previous lesson before committing its cursor.
           // Subsequent progress must use the new payload under the same fence.
           await progressWatch.flush();

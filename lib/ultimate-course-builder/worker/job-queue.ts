@@ -1,3 +1,4 @@
+import {defaultCourseMonitor} from './default-course-monitor.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {claimExactOwnerPreview} from './owner-preview-claim.mjs';
 import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
@@ -51,7 +52,7 @@ export class UltimateJobQueue {
     const nextPayload = previous?.status === 'failed' && payload &&
       typeof payload === 'object' && !Array.isArray(payload) ? {...checkpointPayload,...payload} : payload;
     const { data: queued, error } = await this.db.rpc('enqueue_ultimate_build_job', {
-      p_build: buildId, p_payload: nextPayload, p_monitor: previous?.monitor ?? null,
+      p_build: buildId, p_payload: nextPayload, p_monitor: defaultCourseMonitor(previous?.monitor),
     });
     const data = queued?.[0] ?? null;
     if (error?.code === '23505') {

@@ -1,4 +1,4 @@
-import { isCosmetologyRti, RTI_TEACHING_REQUIREMENTS, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
+import { subjectTeachingRequirements, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
 import {reportCourseProgress} from '../worker/progress-watch.mjs';
 import { generateVertexLessonJson } from './google-lesson-author';
 import { repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
@@ -13,7 +13,7 @@ export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:a
  try {
  const result=await generate(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
   'Return JSON {recaps:[{segmentId,text}]}. Write one fresh concise 1-2 sentence recap of at most twenty-four words and 140 characters for EVERY supplied teaching moment. Ground it only in that moment and the authorized sources. Paraphrase the lesson conclusion; do not repeat any original sentence. Preserve safety negations, guard manufacturer and lengths, and all standards. Never invent facts, measurements or approvals.',
-  {segments:blueprint.segments,sources,...(isCosmetologyRti(profile)?{rtiRequirements:RTI_TEACHING_REQUIREMENTS}:{}),...(lastFailure?{repair:lastFailure}: {})},profile.instructionalAuthoring?.location??'us');
+  {segments:blueprint.segments,sources,...(subjectTeachingRequirements(profile)?{rtiRequirements:subjectTeachingRequirements(profile)}:{}),...(lastFailure?{repair:lastFailure}: {})},profile.instructionalAuthoring?.location??'us');
  reportCourseProgress('authoring:'+blueprint.competencyId+':recaps',attempt+1);
  if(!Array.isArray(result.recaps)||result.recaps.length!==blueprint.segments.length)throw Error('EVERY_TEACHING_MOMENT_RECAP_REQUIRED');
  const segments=blueprint.segments.map((s:any)=>{

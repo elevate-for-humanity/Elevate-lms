@@ -1,3 +1,4 @@
+import { inheritCourseProductionPolicy } from '@/lib/ultimate-course-builder/core/production-policy.mjs';
 import {loadCheckpointPage} from '@/lib/ultimate-course-builder/queries/checkpoint-page.mjs';
 import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
 import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
@@ -161,7 +162,7 @@ export async function POST(req: NextRequest) {
       .from('ultimate_course_builds')
       .insert({
         course_id: body.courseId,
-        profile: { ...body.profile, mediaAcquisitionOwnerId: auth.id },
+        profile: inheritCourseProductionPolicy({ ...body.profile, mediaAcquisitionOwnerId: auth.id }),
         status: 'initializing',
         current_step: 'standards_lock',
         findings: [],

@@ -1,3 +1,4 @@
+import { inheritCourseProductionPolicy } from '../core/production-policy.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
 import { instructionView } from '../core/repair-policy.mjs';
@@ -10,7 +11,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
   async createBuild(input: any) {
     const { data, error } = await this.db
       .from('ultimate_course_builds')
-      .insert(input)
+      .insert({...input, profile: inheritCourseProductionPolicy(input.profile)})
       .select('id')
       .single();
     if (error) throw error;

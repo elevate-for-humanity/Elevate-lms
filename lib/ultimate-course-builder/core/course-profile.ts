@@ -1,3 +1,4 @@
+import { inheritCourseProductionPolicy } from './production-policy.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateAppendixAStandardsSource } from '../credential/appendix-a-source';
 import { registeredInstructionalSources } from '../credential/registered-instructional-sources';
@@ -90,7 +91,7 @@ export async function hydrateUltimateProfileSources(
   };
 }
 
-export async function buildUltimateProfile(
+async function buildCourseProfile(
   db: SupabaseClient,
   input: {
     courseId: string;
@@ -139,6 +140,7 @@ export async function buildUltimateProfile(
       .from('course_lessons')
       .select('id,title,learning_objectives')
       .eq('course_id', input.courseId)
+      .or('content_json->>sourceOnly.is.null,content_json->>sourceOnly.neq.true')
       .order('order_index');
     if (lessonError) throw lessonError;
     competencyRows = (lessons ?? []).map((lesson, index) => ({
@@ -195,4 +197,9 @@ export async function buildUltimateProfile(
         Boolean(standard && /clean|sanit|disinfect|protective|safety/i.test(`${row.category ?? ''} ${row.description ?? ''}`)),
     })),
   });
+}
+
+/** New builds inherit shared production fixes; hydration never edits a locked saved contract. */
+export async function buildUltimateProfile(db: SupabaseClient, input: Parameters<typeof buildCourseProfile>[1]) {
+  return inheritCourseProductionPolicy(await buildCourseProfile(db, input)) as UltimateCredentialProfile;
 }

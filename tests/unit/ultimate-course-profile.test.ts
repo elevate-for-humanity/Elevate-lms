@@ -5,7 +5,7 @@ vi.mock('@/lib/ultimate-course-builder/credential/appendix-a-source',()=>({Ultim
 }}));
 import {buildUltimateProfile, hydrateUltimateProfileSources} from '@/lib/ultimate-course-builder/core/course-profile';
 function dbWithLesson(failure=false, content:any={html:'Pause the service and consult the supervisor.',scenario:{correctAction:'consult'}}) {
- return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content}],error:null});}};return q;}};
+ return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},or(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content}],error:null});}};return q;}};
 }
 describe('shared Ultimate profile used by Studio and builder',()=>{
  it('preserves an explicitly approved reference and presentation during resume',async()=>{

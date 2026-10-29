@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
-const source = stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'), { mode: 'transform' }).replace("'./owner-preview-claim.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/owner-preview-claim.mjs', import.meta.url).href)).replace("'./dispatch-on-enqueue.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/dispatch-on-enqueue.mjs', import.meta.url).href));
+const source = stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'), { mode: 'transform' }).replace("'./default-course-monitor.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/default-course-monitor.mjs', import.meta.url).href)).replace("'./owner-preview-claim.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/owner-preview-claim.mjs', import.meta.url).href)).replace("'./dispatch-on-enqueue.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/dispatch-on-enqueue.mjs', import.meta.url).href));
 const { UltimateJobQueue } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
 function database(rows = [{ id: 'job' }]) {

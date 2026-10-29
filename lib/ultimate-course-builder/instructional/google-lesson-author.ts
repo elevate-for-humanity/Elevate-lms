@@ -1,4 +1,4 @@
-import { isCosmetologyRti, RTI_TEACHING_REQUIREMENTS, optionalCosmetologyRtiEnhancement, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
+import { subjectTeachingRequirements, optionalCosmetologyRtiEnhancement, assertRtiSubjectTeaching } from './rti-teaching-policy.mjs';
 import {reportCourseProgress, courseProgressSignal} from '../worker/progress-watch.mjs';
 import { assertGeneratedLessonAssessment } from './generated-lesson-assessment.mjs';
 import { parseVertexLessonResponse, vertexLessonGenerationConfig } from './vertex-response.mjs';
@@ -68,7 +68,7 @@ Output only a complete JSON object with double-quoted property names and strings
   const presentationRequirements = input.profile.lessonPresentation === 'approved-premium-v1'
     ? 'Use focused PowerPoint-style teaching moments. Explain the required tools and exact numbered guard lengths when supported by the source. Within each teaching moment include a fresh brief recap or practice question, never repeat its spoken passage. Change the visual for the next technique. Whole pictures stay visible beside concise demonstration instructions, with word-aligned bottom captions. Use unique task-relevant images; do not reuse a photo or loop as filler. Do not invent technical measurements or substitute illustrative photos for an actual required physical demonstration.'
     : undefined;
-  const rtiRequirements = isCosmetologyRti(input.profile) ? RTI_TEACHING_REQUIREMENTS + '\n' + optionalCosmetologyRtiEnhancement(input.profile) : undefined;
+  const rtiRequirements = [subjectTeachingRequirements(input.profile), optionalCosmetologyRtiEnhancement(input.profile)].filter(Boolean).join('\n');
   const authorSystem = rtiRequirements ? system + '\n' + rtiRequirements : system;
   const authorRequest = { ...(rtiRequirements ? {rtiRequirements} : {}), ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
   let result = bindBlueprintRequirements(await generate(authorSystem, authorRequest), input.competency);

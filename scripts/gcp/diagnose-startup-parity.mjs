@@ -1,12 +1,21 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 const project='elegant-racer-299721';
 const read=args=>JSON.parse(execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',timeout:30000,maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
 const hash=value=>createHash('sha256').update(JSON.stringify(value ?? null)).digest('hex');
-for(const component of ['admin','marketing']) {
+export function startupRevisionPair(service, serviceName) {
+ const serving=(service.status?.traffic||[]).filter(row=>row.percent>0);
+ if(serving.length!==1||serving[0].percent!==100)throw Error('One fully serving revision is required for startup comparison');
+ const revisions={serving:serving[0].revisionName,created:service.status?.latestCreatedRevisionName};
+ if(Object.values(revisions).some(name=>!new RegExp('^'+serviceName+'-[a-z0-9-]+$').test(name||'')))throw Error('Exact existing service revisions are required');
+ return revisions;
+}
+export function diagnoseStartupParity() {
+for(const component of ['admin','marketing','store']) {
  const serviceName='elevate-'+component+'-migration';
  const service=read(['run','services','describe',serviceName,'--region=us-central1']);
- const revisions={ready:service.status.latestReadyRevisionName,created:service.status.latestCreatedRevisionName};
+ const revisions=startupRevisionPair(service,serviceName);
  const snapshots={};
  for(const [kind,name] of Object.entries(revisions)) {
   const r=read(['run','revisions','describe',name,'--region=us-central1']);
@@ -16,6 +25,7 @@ for(const component of ['admin','marketing']) {
   console.log(JSON.stringify({component,kind,revision:name,image:c.image,
    commandCount:c.command?.length||0,argumentCount:c.args?.length||0,
    commandMatchesImage:!c.command?.length&&!c.args?.length,
+   heapArguments:(c.args||[]).filter(arg=>/^--max-old-space-size=\d+$/.test(arg)),
    resources:c.resources,ports:c.ports,startupProbe:c.startupProbe,
    executionEnvironment:r.metadata.annotations?.['run.googleapis.com/execution-environment'],
    cpuThrottling:r.metadata.annotations?.['run.googleapis.com/cpu-throttling'],
@@ -31,11 +41,17 @@ for(const component of ['admin','marketing']) {
   try {const image=read(['artifacts','docker','images','describe',c.image]);console.log(JSON.stringify({component,kind,imageMetadata:image.image_summary}));}
   catch {console.log(JSON.stringify({component,kind,imageMetadataUnavailable:true}));}
  }
- const before=new Map(snapshots.ready.env.map(e=>[e.name,e.hash]));
+ const before=new Map(snapshots.serving.env.map(e=>[e.name,e.hash]));
  const after=new Map(snapshots.created.env.map(e=>[e.name,e.hash]));
  console.log(JSON.stringify({component,changedEnvNames:[...new Set([...before.keys(),...after.keys()])].filter(k=>before.get(k)!==after.get(k)),
-  specChangedKeys:[...new Set([...Object.keys(snapshots.ready.spec),...Object.keys(snapshots.created.spec)])].filter(k=>hash(snapshots.ready.spec[k])!==hash(snapshots.created.spec[k])),
-  annotationChangedKeys:[...new Set([...Object.keys(snapshots.ready.annotations||{}),...Object.keys(snapshots.created.annotations||{})])].filter(k=>hash(snapshots.ready.annotations?.[k])!==hash(snapshots.created.annotations?.[k]))}));
+  specChangedKeys:[...new Set([...Object.keys(snapshots.serving.spec),...Object.keys(snapshots.created.spec)])].filter(k=>hash(snapshots.serving.spec[k])!==hash(snapshots.created.spec[k])),
+  annotationChangedKeys:[...new Set([...Object.keys(snapshots.serving.annotations||{}),...Object.keys(snapshots.created.annotations||{})])].filter(k=>hash(snapshots.serving.annotations?.[k])!==hash(snapshots.created.annotations?.[k]))}));
  const rows=read(['logging','read',`resource.type="cloud_run_revision" AND resource.labels.service_name="${serviceName}" AND resource.labels.revision_name="${revisions.created}"`,'--freshness=8h','--limit=200']);
- console.log(JSON.stringify({component,revision:revisions.created,logCount:rows.length,logNames:[...new Set(rows.map(r=>r.logName))]}));
+ console.log(JSON.stringify({component,revision:revisions.created,logCount:rows.length,logNames:[...new Set(rows.map(r=>r.logName))],
+  probeRequests:rows.flatMap(row=>{
+   let path;try{path=new URL(row.httpRequest?.requestUrl).pathname;}catch{return [];}
+   return ['/api/ping','/api/ready','/api/health'].includes(path)?[{timestamp:row.timestamp,path,status:row.httpRequest.status,latency:row.httpRequest.latency}]:[];
+  })}));
 }
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)diagnoseStartupParity();

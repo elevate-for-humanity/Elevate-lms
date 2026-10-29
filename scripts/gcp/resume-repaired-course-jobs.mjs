@@ -36,8 +36,13 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const error=String(job.last_error??'');
   // New tested code can recover internal defects. Missing evidence, permissions,
   // storage quota and intentional pauses still need their real remedy.
-  if(!error.startsWith('ULTIMATE_INTERNAL_REPAIR_REQUIRED:')||
-   /OWNER_|AUTHORIZ|LICENSE|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error))continue;
+  const durableExternalBlocker =
+   /OWNER_|AUTHORIZ|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) ||
+   /\b(?:LICENSE_APPROVAL_REQUIRED|MEDIA_LICENSE_REQUIRED|MEDIA_SOURCE_APPROVAL_REQUIRED)\b/i.test(error);
+  // Per-scene license metadata and saved-assignment findings are internal
+  // contract defects after an approved-source deployment, so the verified new
+  // image must be allowed to resume those saved checkpoints.
+  if(!error.startsWith('ULTIMATE_INTERNAL_REPAIR_REQUIRED:')||durableExternalBlocker)continue;
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');
   target.searchParams.set('execution_generation','eq.'+job.execution_generation);

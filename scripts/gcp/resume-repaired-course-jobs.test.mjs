@@ -19,13 +19,22 @@ test('same image cannot continuously retry the same unresolved defect',async()=>
 test('pause, live lease, publication, unrelated course and external blockers never restart',async()=>{
  for(const job of [{...base,status:'running'},{...base,lease_expires_at:'2999-01-01'},
  {...base,build:{...base.build,profile:{ownerPaused:true}}},{...base,build:{...base.build,status:'published'}},
- {...base,build:{...base.build,course_id:'other'}},{...base,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:LICENSE_REQUIRED'},
+ {...base,build:{...base.build,course_id:'other'}},{...base,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:MEDIA_LICENSE_REQUIRED'},
  {...base,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED'},
  {...base,monitor:{enabled:false}}])assert.equal((await run(job)).writes.length,0);
 });
 test('concurrent claim or monitor change produces no false restart proof',async()=>{
  assert.deepEqual((await run(base,true)).result.jobIds,[]);
 });
+
+test('approved-source contract deployment resumes old per-scene metadata and saved-render findings',async()=>{
+ for(const last_error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"message":"licensed third-party scenes are missing entitlement/license evidence"}]',
+ ]) assert.equal((await run({...base,last_error})).writes.length,1);
+});
+
 
 test('an active continuation prevents a historical failed attempt being reopened',async()=>{
  let writes=0;

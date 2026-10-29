@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { DEFAULT_NAV } from '@/lib/admin/nav-config';
+import { STUDIO_WORKSPACES } from '@/lib/devstudio/workspace-registry';
 
 const ADMIN_APP_DIR = path.join(process.cwd(), 'apps/admin/app');
 
@@ -33,6 +34,13 @@ function walkAdminRoutes(dir: string, segments: string[] = []): string[] {
 }
 
 describe('admin DEFAULT_NAV coverage', () => {
+  it('exposes every canonical Studio capability under the Dev Studio section', () => {
+    const studio = DEFAULT_NAV.find(section => section.label === 'Dev Studio');
+    expect(studio).toBeDefined();
+    const routes = new Set(studio?.items.map(item => item.href));
+    expect(STUDIO_WORKSPACES.filter(workspace => !routes.has(workspace.route)).map(workspace => workspace.id)).toEqual([]);
+    expect(routes.has('/studio')).toBe(true);
+  });
   it('points every default navigation entry at a real Admin page', () => {
     const staticRoutes = new Set(walkAdminRoutes(ADMIN_APP_DIR));
     const navHrefs = new Set<string>();

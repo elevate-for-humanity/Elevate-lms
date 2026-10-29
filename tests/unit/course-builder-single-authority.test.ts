@@ -116,7 +116,6 @@ describe('single Course Builder authority', () => {
       'esb-video-recovery-test.yml',
       'purge-esb-course-media.yml',
       'regenerate-barber-cosmetology.yml',
-      'upgrade-authored-course.yml',
     ];
     for (const workflow of workflows) {
       const triggerBlock = read(`.github/workflows/${workflow}`).split(/^permissions:/m)[0];
@@ -125,6 +124,17 @@ describe('single Course Builder authority', () => {
       expect(triggerBlock, workflow).not.toMatch(/\bissues:/);
       expect(triggerBlock, workflow).not.toMatch(/\bpush:/);
     }
+  });
+
+  it('limits authored-course issue launches to trusted actors and exact canonical titles', () => {
+    const workflow = read('.github/workflows/upgrade-authored-course.yml');
+    const triggerBlock = workflow.split(/^permissions:/m)[0];
+    expect(triggerBlock).toContain('workflow_dispatch:');
+    expect(triggerBlock).toContain('issues:\n    types: [opened]');
+    expect(triggerBlock).not.toMatch(/\bschedule:|\bpush:/);
+    expect(workflow).toContain('contains(fromJSON(\'["OWNER","MEMBER","COLLABORATOR"]\'), github.event.issue.author_association) &&');
+    expect(workflow).toContain('contains(fromJSON(\'["FINISH AUTHORED COURSE: barber-apprenticeship","FINISH AUTHORED COURSE: hvac-technician","FINISH AUTHORED COURSE: business-administration"]\'), github.event.issue.title)');
+    expect(workflow).toContain('scripts/course-factory/resolve-course-id.mjs "$COURSE_SLUG"');
   });
 
   it('allows only explicitly allowlisted courses while the global pause remains closed', () => {

@@ -4,7 +4,7 @@ import {pathToFileURL} from 'node:url';
 /** Execute the actual migration functions against session-private table copies.
  * No course, QA, publication or approval fixture enters a production table. */
 export function lessonAutopilotPostgresTest(){
- const migration=['20261027182305_parallel_lesson_autopilots.sql','20261027183355_lesson_autopilot_runtime.sql','20261027195409_prioritize_lesson_autopilot_repairs.sql']
+ const migration=['20261027182305_parallel_lesson_autopilots.sql','20261027183355_lesson_autopilot_runtime.sql','20261027195409_prioritize_lesson_autopilot_repairs.sql','20261028074705_refresh_autopilot_successor_retry_budget.sql','20261029192819_align_ultimate_database_contract_version.sql']
   .map(name=>readFileSync(new URL('../../supabase/migrations/'+name,import.meta.url),'utf8')).join('\n')
   .replaceAll('public.','pg_temp.').replaceAll('pg_temp.course_status','public.course_status')
   .replace('CREATE TABLE pg_temp.ultimate_autopilot_pools','CREATE TEMP TABLE pg_temp.ultimate_autopilot_pools')

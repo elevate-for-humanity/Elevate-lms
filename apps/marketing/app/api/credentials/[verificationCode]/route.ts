@@ -24,7 +24,7 @@ export async function GET(
     .select(
       `id, verification_code, status, expires_at, revoked_at, open_badge_credential,
        open_badge_credential_url, open_badge_status, badge_url,
-       credentials!inner(id, name, description)`,
+       credentials:credential_registry!inner(id, name, description)`,
     )
     .eq('verification_code', verificationCode)
     .maybeSingle();

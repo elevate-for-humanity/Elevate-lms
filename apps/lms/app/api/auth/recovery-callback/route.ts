@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createRecoveryClient } from '@/lib/supabase/recovery';
 import { getServerPublicSupabaseConfig } from '@/lib/supabase/public-config';
 import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
-import { createBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
-import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { siteUrls } from '@/lib/utils/site-urls';
 
 export const runtime = 'nodejs';
@@ -61,12 +59,9 @@ export async function POST(request: NextRequest) {
   const config = getServerPublicSupabaseConfig();
   if (!config) return failed(next, 'recovery_unavailable');
   const cookies: Array<{ name: string; value: string; options: any }> = [];
-  const supabase = createServerClient(config.url, config.anonKey, {
-    global: { fetch: createBrowserAuthFetch(config.url, { fetchImpl: timedFetch }) },
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (values) => { cookies.push(...values); },
-    },
+  const supabase = createRecoveryClient(config, {
+    getAll: () => request.cookies.getAll(),
+    setAll: (values) => { cookies.push(...values); },
   });
   const result = token
     ? await supabase.auth.verifyOtp({ type: 'recovery', token_hash: token })

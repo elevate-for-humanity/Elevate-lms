@@ -56,6 +56,7 @@ export function HvacLabHero() {
         <p className="mb-4 text-sm font-bold tracking-wide text-orange-300">
           Sponsored by Elevate for Humanity
         </p>
+        <div className="relative overflow-hidden rounded-2xl bg-blue-950">
         <Image
           src={`${imageRoot}/lab-overview.webp`}
           alt="Wide view of the HVAC training-lab concept"
@@ -67,10 +68,19 @@ export function HvacLabHero() {
           sizes="(max-width: 1280px) 100vw, 1280px"
           className="h-auto w-full rounded-2xl object-contain"
         />
-        <figcaption className="mt-3 text-sm leading-6 text-slate-300">
-          AI-generated training-lab concept. Explore the program details and confirmed training
-          arrangements below.
-        </figcaption>
+        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-slate-950 shadow-lg sm:left-5 sm:top-5 sm:gap-3 sm:px-4 sm:py-3">
+          <Image
+            src="/images/logo.png"
+            alt="Elevate for Humanity logo"
+            width={64}
+            height={64}
+            className="h-10 w-10 object-contain sm:h-16 sm:w-16"
+          />
+          <div className="text-xs font-black uppercase leading-tight sm:text-lg">
+            Elevate<br />for Humanity
+          </div>
+        </div>
+        </div>
       </div>
     </figure>
   );

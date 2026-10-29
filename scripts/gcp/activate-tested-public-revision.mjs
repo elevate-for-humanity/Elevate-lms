@@ -34,6 +34,10 @@ function servingTraffic(state) {
   return [...totals].sort(([a], [b]) => a.localeCompare(b));
 }
 
+function probeHttpStatus(value) {
+  return Number.isInteger(value) && value >= 100 && value <= 599 ? value : null;
+}
+
 function assertTrafficUnchanged(before, after) {
   if (JSON.stringify(servingTraffic(before)) !== JSON.stringify(servingTraffic(after))) {
     throw Error('Serving traffic changed concurrently; activation stopped');
@@ -122,7 +126,7 @@ export async function activateTestedRevision({
         const response = await fetcher(candidate.url + '/api/health', {
           cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10000),
         });
-        lastProbe.httpStatus = Number.isInteger(response.status) ? response.status : null;
+        lastProbe.httpStatus = probeHttpStatus(response.status);
         lastProbe.responseOk = response.ok === true;
         const state = await response.json();
         lastProbe = {
@@ -133,6 +137,13 @@ export async function activateTestedRevision({
           healthy: state?.healthy === true, ready: state?.ready === true,
           configurationReady: state?.configuration?.ok === true,
           supabaseReady: state?.dependencies?.supabase?.ok === true,
+          supabaseStatus: probeHttpStatus(state?.dependencies?.supabase?.status),
+          authReady: state?.dependencies?.supabase?.checks?.auth?.ok === true,
+          authStatus: probeHttpStatus(state?.dependencies?.supabase?.checks?.auth?.status),
+          databaseReady: state?.dependencies?.supabase?.checks?.database?.ok === true,
+          databaseStatus: probeHttpStatus(state?.dependencies?.supabase?.checks?.database?.status),
+          missingConfiguration: ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'BUILD_COMMIT']
+            .filter(name => Array.isArray(state?.configuration?.missing) && state.configuration.missing.includes(name)),
         };
         if (response.ok && state && typeof state === 'object') {
           const actual = state.commitSha || state.commit || state.sha;

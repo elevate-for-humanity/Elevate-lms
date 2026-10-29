@@ -228,7 +228,8 @@ test('Store deployment creates a zero-traffic revision before verified activatio
 test('failed Store readiness emits only safe probe flags and preserves the serving revision', async () => {
   const f = fixture({ ...healthy, revision: 'elevate-store-migration-candidate-a', service: 'store',
     ready: false, configuration: { ok: false, secret: 'private-configuration' },
-    dependencies: { supabase: { ok: false, error: 'private-provider-body' } },
+    dependencies: { supabase: { ok: false, status: 403, error: 'private-provider-body',
+      checks: { auth: { ok: true, status: 200 }, database: { ok: false, status: 403, error: 'private-database-error' } } } },
     token: 'private-token' }, 503, 'store');
   const reports = []; f.options.report = value => reports.push(value);
   await assert.rejects(activateTestedRevision(f.options), /failed runtime health/);
@@ -236,8 +237,10 @@ test('failed Store readiness emits only safe probe flags and preserves the servi
   assert.deepEqual(f.traffic, [{ revisionName: 'elevate-store-migration-old', percent: 100 }]);
   assert.deepEqual(reports[0].lastProbe, { attempt: 1, responseParsed: true, httpStatus: 503,
     responseOk: false, correctCommit: true, correctRevision: true, correctService: true,
-    healthy: true, ready: false, configurationReady: false, supabaseReady: false });
-  for (const secret of ['private-configuration', 'private-provider-body', 'private-token', 'candidate.example'])
+    healthy: true, ready: false, configurationReady: false, supabaseReady: false,
+    supabaseStatus: 403, authReady: true, authStatus: 200, databaseReady: false,
+    databaseStatus: 403, missingConfiguration: [] });
+  for (const secret of ['private-configuration', 'private-provider-body', 'private-database-error', 'private-token', 'candidate.example'])
     assert.ok(!JSON.stringify(reports).includes(secret));
 });
 

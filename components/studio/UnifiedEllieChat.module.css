@@ -1,0 +1,4 @@
+/* Reading view must preserve the Studio composer's larger accessible text. */
+.root .composer {
+  font-size: max(1.25rem, 20px);
+}

@@ -309,13 +309,21 @@ async function certify(
   manifestPath: string,
 ) {
   await login(page, loginBase, credentials[0], credentials[1]);
-  for (const path of paths)
-    await test.step(`${testInfo.project.name}: ${path}`, async () =>
-      assertResponsivePage(page, path));
-  await expect(
-    page.locator('link[rel="manifest"]'),
-    `${role} loaded the wrong PWA manifest`,
-  ).toHaveAttribute('href', manifestPath, { timeout: 15_000 });
+  for (const path of paths) {
+    await test.step(`${testInfo.project.name}: ${path}`, async () => {
+      await assertResponsivePage(page, path);
+      // Studio owns a distinct installable app. Verify each destination's
+      // manifest, including Admin before navigating into the Studio workspace.
+      const destination = new URL(path, BASE);
+      const expectedManifest = destination.origin === ADMIN_BASE && destination.pathname === '/studio'
+        ? '/manifest-dev-studio.json'
+        : manifestPath;
+      await expect(
+        page.locator('link[rel="manifest"]'),
+        `${role} loaded the wrong PWA manifest at ${destination.pathname}`,
+      ).toHaveAttribute('href', expectedManifest, { timeout: 15_000 });
+    });
+  }
   await page.screenshot({
     path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`),
     fullPage: false,

@@ -9,6 +9,17 @@ function record(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
+function normalizeTimelineCaptions(value: Record<string, unknown> | null, lessonSlug: string) {
+  if (!value || !Array.isArray(value.captions)) return value;
+  return {
+    ...value,
+    captions: value.captions.map((caption, index) => ({
+      ...(record(caption) ?? {}),
+      id: String(record(caption)?.id ?? `${lessonSlug}-caption-${index + 1}`),
+    })),
+  };
+}
+
 function lessonHtml(lesson: StudioLesson): string {
   if (lesson.rendered_html?.trim()) return lesson.rendered_html;
   if (typeof lesson.content === 'string') return lesson.content;
@@ -138,7 +149,7 @@ export function coursePackageFromSession(
                 }
               : null;
           const effectiveTimeline = experienceTimeline ?? sceneTimeline;
-          const timeline = record(videoConfig?.timeline) ?? (
+          const timeline = normalizeTimelineCaptions(record(videoConfig?.timeline) ?? (
             effectiveTimeline
               ? {
                   durationSeconds: effectiveTimeline.durationSeconds,
@@ -178,7 +189,7 @@ export function coursePackageFromSession(
                   checkpoints: [],
                 }
               : null
-          );
+          ), lesson.slug);
           const persistedCompetencies = Array.isArray(lesson.competency_checks)
             ? lesson.competency_checks.flatMap((value, index) => {
                 const check = record(value);

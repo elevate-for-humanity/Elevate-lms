@@ -6,6 +6,7 @@ test('CPU release is immutable, bounded, scale-to-zero and never enables public 
  const args=privateCpuDeploymentArguments('sha256:'+'a'.repeat(64));
  for(const pair of [['--region','us-east1'],['--cpu','4'],['--memory','8Gi'],['--concurrency','1'],['--max-instances','1'],['--min-instances','0']])assert.equal(args[args.indexOf(pair[0])+1],pair[1]);
  assert.ok(!args.some(arg=>/allow-unauthenticated|invoker-iam|--gpu|allUsers/.test(arg)));
+ assert.ok(args.includes('--update-env-vars=LLAMA_ARG_CACHE_RAM=0,LLAMA_ARG_CTX_CHECKPOINTS=0'));
  assert.throws(()=>privateCpuDeploymentArguments('latest'),/IMMUTABLE_IMAGE/);
 });
 test('reports explicit service bindings without confusing them with effective IAM access',()=>{

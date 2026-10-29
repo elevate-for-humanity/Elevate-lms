@@ -256,6 +256,9 @@ async function generateKokoroNarration(
   const segments: Float32Array[] = [];
   let totalSamples = 0;
   for (const chunk of kokoroNarrationChunks(text)) {
+    // Native inference can resolve through a continuous microtask chain. Give
+    // lease timers and queued network I/O a turn between approved text chunks.
+    await new Promise<void>((resolve) => setImmediate(resolve));
     const audio = await model.generate(chunk, {
       voice: kokoroVoice(instructorVoice),
       speed: kokoroSpeed(rate),

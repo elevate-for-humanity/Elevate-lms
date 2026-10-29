@@ -451,7 +451,16 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       });
       const results: any = (learnerRuntimeEvidence.evidence as any).results ?? {};
       const learnerQA = { ...evaluateLearnerRunthrough(results), results };
-      return { passed: learnerQA.pass, artifacts: { learnerQA, learnerRuntimeEvidence } };
+      return {
+        passed: learnerQA.pass,
+        findings: learnerQA.failed.map((check: string) => ({
+          step: 'learner_runthrough' as const,
+          severity: 'error' as const,
+          code: 'LEARNER_RUNTHROUGH_CHECK_FAILED',
+          message: `Authenticated learner check failed: ${check}`,
+        })),
+        artifacts: { learnerQA, learnerRuntimeEvidence },
+      };
     },
     selective_repair: async (ctx) => {
       const routes = routeSelectiveRepairs(ctx.findings);

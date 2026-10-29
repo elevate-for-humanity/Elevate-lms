@@ -13,7 +13,7 @@ function database(initialLessons: any[] = []) {
       upsert: (row: any) => {
         inserted = rows[table].find(x => x.course_id === row.course_id && x.slug === row.slug);
         if (!inserted) {
-          inserted = { id: `${table}-${rows[table].length}`, ...row }; rows[table].push(inserted);
+          inserted = { id: `${table}-${rows[table].length}`, ...JSON.parse(JSON.stringify(row)) }; rows[table].push(inserted);
         }
         return query;
       },
@@ -27,6 +27,21 @@ function database(initialLessons: any[] = []) {
 }
 
 describe('canonical source-backed draft materialization', () => {
+  it('reserves parallel lesson drafts before authoring, without inventing teaching or approval', async () => {
+    const loaded = await new UltimateAppendixAStandardsSource().load({ programSlug: 'barber-apprenticeship' });
+    const profile = {...loaded, instructionalSources: [], lessonBlueprints: {}};
+    const {db,rows}=database();
+    const seeded=await materializeUltimateDraft(db,'course',profile,undefined,{deferInstruction:true});
+    expect(Object.keys(seeded.canonicalLessonIds!)).toHaveLength(profile.competencies.length);
+    expect(Object.values(seeded.canonicalLessonIds!).every(Boolean)).toBe(true);
+    for(const row of rows.course_lessons){
+      expect(row).toMatchObject({status:'draft',is_published:false,approved:false,generation_status:'queued',content:'',learning_objectives:[]});
+      expect(row.content_json).toMatchObject({instructionPending:true,releasePending:true});
+      expect(row.content_json.blueprint).toBeUndefined();
+    }
+    expect(await materializeUltimateDraft(db,'course',seeded,undefined,{deferInstruction:true})).toEqual(seeded);
+    expect(rows.course_lessons).toHaveLength(profile.competencies.length);
+  });
   it('gives every Appendix A competency a substantive unpublished lesson, and resumes without duplicates', async () => {
     const profile = await new UltimateAppendixAStandardsSource().load({ programSlug: 'barber-apprenticeship' });
     const { db, rows } = database();

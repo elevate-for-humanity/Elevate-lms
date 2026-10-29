@@ -8,8 +8,11 @@ export default async function StagedLesson({ params }: { params: Promise<{ runId
   const { runId } = await params;
   const access = await loadOwnedLearnerTest(runId);
   if (!access) notFound();
+  const media = `/api/learner-testing/runs/${encodeURIComponent(runId)}/media`;
   return <main className="mx-auto max-w-4xl px-4 py-6"><p className="text-sm">Private lesson test · Test progress only</p>
     <h1 className="my-4 text-2xl font-bold">{access.run.snapshot.title}</h1>
-    <StagedLessonExperience runId={runId} snapshot={{ ...access.run.snapshot, blueprint: publicBlueprint(access.run.snapshot.blueprint) }} initialProgress={access.run.progress} />
+    <StagedLessonExperience runId={runId} snapshot={{ ...access.run.snapshot,
+      render: { playbackUrl: `${media}?asset=video`, captionsUrl: `${media}?asset=captions` },
+      blueprint: publicBlueprint(access.run.snapshot.blueprint) }} initialProgress={access.run.progress} />
   </main>;
 }

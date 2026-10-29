@@ -14,6 +14,21 @@ import {isDurableExternalBlocker} from '../core/repair-router';
 import {reportCourseProgress} from './progress-watch.mjs';
 import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
 
+/** A role may delegate only the directive produced for its current blocking
+ * finding. Saved producer feedback from an earlier stage is recovery history,
+ * not permission to restart instruction after a later learner/browser fault. */
+export function currentRepairDirective(result:any) {
+  const directive = result.lessons?.[0]?.result?.artifacts?.__repairState?.directive;
+  const findings = (result.findings ?? []).filter((finding:any) => finding?.severity === 'error');
+  const requirements = directive?.requirements;
+  if (!directive || !Array.isArray(requirements) || !requirements.length || !findings.length)
+    return undefined;
+  const matching = findings.filter((finding:any) => finding.step === directive.failedStep);
+  if (!matching.length || !requirements.every((requirement:any) => matching.some((finding:any) =>
+    finding.code === requirement.code && finding.message === requirement.message))) return undefined;
+  return directive;
+}
+
 /** Called only by the course coordinator after its prior lesson was published
  * and its old lease yielded. One immutable profile feeds every role. */
 export async function coordinateLessonAutopilots({db,job,workerId,generation,build,assertActive}:any) {
@@ -23,7 +38,7 @@ export async function coordinateLessonAutopilots({db,job,workerId,generation,bui
   if (existing.data?.state === 'finalizing') return null;
   if (existing.data) throw Error('ULTIMATE_AUTOPILOT_COORDINATOR_NOT_READY');
   const hydrated = await hydrateUltimateProfileSources(db,build.course_id,build.profile);
-  const profile:any = await materializeUltimateDraft(db,build.course_id,hydrated,hydrated.competencies.map((c:any)=>c.id));
+  const profile:any = await materializeUltimateDraft(db,build.course_id,hydrated,hydrated.competencies.map((c:any)=>c.id),{deferInstruction:true});
   const canonical = await db.from('course_lessons').select('id,status,is_published,video_status,video_url').eq('course_id',build.course_id);
   if (canonical.error) throw canonical.error;
   const ids = new Set(Object.values(profile.canonicalLessonIds ?? {}));
@@ -81,7 +96,7 @@ export async function processLessonAutopilot({db,job,workerId,generation,build,q
   },()=>new UltimateBuildRunner(handlers as any),runtime.persistence,runtime.artifacts,assertActive);
   await ensureActive();
   if (!(task.role === 'quality' ? result.completed : result.stageReady)) {
-    const directive = (result.lessons[0]?.result.artifacts as any)?.__repairState?.directive;
+    const directive = currentRepairDirective(result);
     if (directive && !result.findings.some(isDurableExternalBlocker)) {
       const delegated = await db.rpc('delegate_ultimate_autopilot_repair',{
         p_job:job.id,p_worker:workerId,p_generation:generation,p_directive:directive,

@@ -1,0 +1,110 @@
+name: Audit Google OAuth credential locations
+on:
+  pull_request:
+    paths: ['scripts/gcp/audit-google-oauth-locations*', '.github/workflows/audit-google-oauth-locations.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/audit-google-oauth-locations*', '.github/workflows/audit-google-oauth-locations.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --check scripts/gcp/audit-google-oauth-locations.mjs
+      - run: node --test scripts/gcp/audit-google-oauth-locations.test.mjs
+  dispatch:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-oauth-locations.yml/dispatches -f ref=main
+  audit:
+    needs: test
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Audit active bindings, saved archives, aliases and enabled versions without exposing credentials
+        env:
+          AUDIT_OAUTH_GOOGLE_CALENDAR_CLIENT_ID: ${{ secrets.GOOGLE_CALENDAR_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_CALENDAR_CLIENT_SECRET: ${{ secrets.GOOGLE_CALENDAR_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOOGLE_AUTH_CLIENT_ID: ${{ secrets.GOOGLE_AUTH_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_AUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_AUTH_CLIENT_SECRET }}
+          AUDIT_OAUTH_AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
+          AUDIT_OAUTH_AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
+          AUDIT_OAUTH_GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          AUDIT_OAUTH_GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          AUDIT_OAUTH_SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: ${{ secrets.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET: ${{ secrets.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${{ secrets.GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_GOTRUE_EXTERNAL_GOOGLE_SECRET: ${{ secrets.GOTRUE_EXTERNAL_GOOGLE_SECRET }}
+          AUDIT_OAUTH_GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          AUDIT_OAUTH_GCAL_CLIENT_ID: ${{ secrets.GCAL_CLIENT_ID }}
+          AUDIT_OAUTH_GCAL_CLIENT_SECRET: ${{ secrets.GCAL_CLIENT_SECRET }}
+          AUDIT_OAUTH_NEXTAUTH_GOOGLE_ID: ${{ secrets.NEXTAUTH_GOOGLE_ID }}
+          AUDIT_OAUTH_NEXTAUTH_GOOGLE_SECRET: ${{ secrets.NEXTAUTH_GOOGLE_SECRET }}
+          AUDIT_OAUTH_VARS_GOOGLE_CALENDAR_CLIENT_ID: ${{ vars.GOOGLE_CALENDAR_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_GOOGLE_CALENDAR_CLIENT_SECRET: ${{ vars.GOOGLE_CALENDAR_CLIENT_SECRET }}
+          AUDIT_OAUTH_VARS_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_GOOGLE_CLIENT_SECRET: ${{ vars.GOOGLE_CLIENT_SECRET }}
+          AUDIT_OAUTH_VARS_GOOGLE_OAUTH_CLIENT_ID: ${{ vars.GOOGLE_OAUTH_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_GOOGLE_OAUTH_CLIENT_SECRET: ${{ vars.GOOGLE_OAUTH_CLIENT_SECRET }}
+          AUDIT_OAUTH_VARS_GOOGLE_AUTH_CLIENT_ID: ${{ vars.GOOGLE_AUTH_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_GOOGLE_AUTH_CLIENT_SECRET: ${{ vars.GOOGLE_AUTH_CLIENT_SECRET }}
+          AUDIT_OAUTH_VARS_AUTH_GOOGLE_ID: ${{ vars.AUTH_GOOGLE_ID }}
+          AUDIT_OAUTH_VARS_AUTH_GOOGLE_SECRET: ${{ vars.AUTH_GOOGLE_SECRET }}
+          AUDIT_OAUTH_VARS_GOOGLE_CREDENTIALS: ${{ vars.GOOGLE_CREDENTIALS }}
+          AUDIT_OAUTH_VARS_GOOGLE_APPLICATION_CREDENTIALS: ${{ vars.GOOGLE_APPLICATION_CREDENTIALS }}
+          AUDIT_OAUTH_VARS_SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: ${{ vars.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET: ${{ vars.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET }}
+          AUDIT_OAUTH_VARS_GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${{ vars.GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_GOTRUE_EXTERNAL_GOOGLE_SECRET: ${{ vars.GOTRUE_EXTERNAL_GOOGLE_SECRET }}
+          AUDIT_OAUTH_VARS_GOOGLE_SECRET: ${{ vars.GOOGLE_SECRET }}
+          AUDIT_OAUTH_VARS_GCAL_CLIENT_ID: ${{ vars.GCAL_CLIENT_ID }}
+          AUDIT_OAUTH_VARS_GCAL_CLIENT_SECRET: ${{ vars.GCAL_CLIENT_SECRET }}
+          AUDIT_OAUTH_VARS_NEXTAUTH_GOOGLE_ID: ${{ vars.NEXTAUTH_GOOGLE_ID }}
+          AUDIT_OAUTH_VARS_NEXTAUTH_GOOGLE_SECRET: ${{ vars.NEXTAUTH_GOOGLE_SECRET }}
+        run: node scripts/gcp/audit-google-oauth-locations.mjs
+      - name: Check managed Supabase Google provider configuration without exposing values
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_TOKEN: ${{ secrets.SUPABASE_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const token=process.env.SUPABASE_ACCESS_TOKEN||process.env.SUPABASE_TOKEN;
+          if(!token){console.log(JSON.stringify({source:'supabase-managed-auth',readError:'management_token_unavailable'}));}
+          else {
+            try {
+              const response=await fetch('https://api.supabase.com/v1/projects/cuxzzpsyufcewtmicszk/config/auth',{headers:{Authorization:'Bearer '+token},redirect:'error',signal:AbortSignal.timeout(15000)});
+              if(!response.ok)console.log(JSON.stringify({source:'supabase-managed-auth',httpStatus:response.status,readError:'management_read_rejected'}));
+              else {
+                const body=await response.json(),id=body.external_google_client_id,secret=body.external_google_secret;
+                console.log(JSON.stringify({source:'supabase-managed-auth',enabled:body.external_google_enabled===true,clientIdPresent:typeof id==='string'&&Boolean(id.trim()),clientSecretPresent:typeof secret==='string'&&Boolean(secret.trim()),clientSecretMasked:typeof secret==='string'&&/^[*•]+$/.test(secret.trim()),valuesExposed:false}));
+              }
+            }catch{console.log(JSON.stringify({source:'supabase-managed-auth',readError:'management_read_unavailable'}));}
+          }
+          NODE

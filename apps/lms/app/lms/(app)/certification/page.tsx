@@ -59,7 +59,7 @@ export default async function CertificationPage() {
     supabase
       .from('credential_attempts')
       .select(
-        'id, credential_id, program_id, attempt_number, attempted_at, passed, credentials(name, abbreviation, issuing_authority)',
+        'id, credential_id, program_id, attempt_number, attempted_at, passed, credentials:credential_registry(name, abbreviation, issuing_authority)',
       )
       .eq('learner_id', user.id)
       .order('attempted_at', { ascending: false }),

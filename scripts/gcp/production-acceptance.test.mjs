@@ -37,6 +37,28 @@ test('missing or untrusted identity never makes an API call and permission failu
  await assert.rejects(dispatchAcceptance({...env,GITHUB_REPOSITORY:'other/repo'},f.request),/IDENTITY_REQUIRED/);assert.equal(f.calls.length,0);
  await assert.rejects(dispatchAcceptance(env,f.request),/GITHUB_HTTP_403/);assert.equal(f.calls.length,2);
 });
+test('transient health transport failures recover before a single acceptance dispatch',async()=>{
+ const f=fixture();let attempts=0;
+ const result=await dispatchAcceptance(env,async(url,options)=>{
+  if(url.includes('/api/health') && attempts++<2)throw new DOMException('sensitive URL detail','TimeoutError');
+  return f.request(url,options);
+ });
+ assert.equal(attempts,3);assert.equal(result.acceptanceDispatched,true);
+ assert.equal(f.calls.filter(c=>c.options.method==='POST').length,2);
+});
+test('exhausted health failures have sanitized stage evidence and never dispatch',async()=>{
+ let attempts=0;
+ await assert.rejects(dispatchAcceptance(env,async()=>{attempts++;throw new TypeError('private-token');}),/^Error: ACCEPTANCE_HEALTH_TRANSPORT_FAILED$/);
+ assert.equal(attempts,3);
+});
+test('ambiguous dispatch failures are never retried',async()=>{
+ const f=fixture();let posts=0;
+ await assert.rejects(dispatchAcceptance(env,async(url,options)=>{
+  if(options.method==='POST'){posts++;throw new DOMException('private-token','TimeoutError');}
+  return f.request(url,options);
+ }),/^Error: ACCEPTANCE_DISPATCH_TRANSPORT_FAILED$/);
+ assert.equal(posts,1);
+});
 test('all four real deployment jobs explicitly hand off acceptance, never their push dispatchers',()=>{
  for(const [file,dependency,component] of [['deploy-admin.yml','deploy-admin','admin'],['deploy-google-lms-trigger.yml','deploy','lms'],['deploy-google-marketing-trigger.yml','deploy','marketing'],['deploy-google-store-runtime.yml','deploy','store']]) {
   const source=readFileSync(new URL('../../.github/workflows/'+file,import.meta.url),'utf8');

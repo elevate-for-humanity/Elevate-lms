@@ -46,6 +46,7 @@ import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
 import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
+import { loadEarnedCredentials, loadRecentQuizAttempts } from '@/lib/learner/dashboard-evidence';
 
 export const metadata: Metadata = generateInternalMetadata({
   title: 'Student Dashboard',
@@ -193,12 +194,7 @@ export default async function StudentDashboard() {
       .select('id, course_title, issued_at, verification_code')
       .eq('user_id', subjectId)
       .order('issued_at', { ascending: false }),
-    supabase
-      .from('learner_credentials')
-      .select('id, issued_at, verification_code, credentials(name)')
-      .eq('learner_id', subjectId)
-      .eq('status', 'active')
-      .order('issued_at', { ascending: false }),
+    loadEarnedCredentials(supabase, subjectId),
     supabase
       .from('credential_verification')
       .select('id, credential_name, issue_date, verification_status')
@@ -212,13 +208,7 @@ export default async function StudentDashboard() {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from('quiz_attempts')
-      .select('id, score, passed, completed_at, quiz_id, quizzes(title)')
-      .eq('user_uuid', subjectId)
-      .not('completed_at', 'is', null)
-      .order('completed_at', { ascending: false })
-      .limit(5),
+    loadRecentQuizAttempts(supabase, subjectId),
     showBilling
       ? supabase
           .from('payment_logs')

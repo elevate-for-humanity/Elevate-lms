@@ -115,6 +115,7 @@ export type DegradedSection =
   | 'unpublished_programs'
   | 'recent_students'
   | 'enrollments_by_program'
+  | 'paid_invoices'
   | 'dashboard_data';
 
 export interface PendingSubmission {
@@ -206,3 +207,4 @@ export interface AdminDashboardData {
   systemHealth: SystemHealth;
   isSuperAdmin?: boolean;
 }
+

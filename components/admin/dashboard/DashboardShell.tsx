@@ -5,6 +5,7 @@ import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
 import LogoImage from '@/components/site/LogoImage';
 import Image from 'next/image';
 import type { DashboardHeroAsset } from '@/lib/admin/dashboard/get-hero-assets';
+import { dashboardDataNotice } from '@/lib/admin/dashboard/data-availability.mjs';
 import {
   Activity,
   AlertTriangle,
@@ -43,24 +44,25 @@ function dashboardFirstName(profile: AdminDashboardData['profile']): string {
 }
 
 function DegradedBanner({ data }: { data: AdminDashboardData }) {
-  const degraded = data.degradedSections ?? [];
-  if (!degraded.length) return null;
-  const dashboardUnavailable = degraded.includes('dashboard_data');
+  const notice = dashboardDataNotice(data.degradedSections);
+  if (!notice) return null;
 
   return (
     <div
-      className={`mb-6 flex items-start gap-3 rounded-xl border px-5 py-4 text-sm ${dashboardUnavailable ? 'border-rose-200 bg-rose-50 text-rose-900' : 'border-amber-200 bg-amber-50 text-amber-900'}`}
+      role="status"
+      className={`mb-6 flex items-start gap-3 rounded-xl border px-5 py-4 text-sm ${notice.critical ? 'border-rose-200 bg-rose-50 text-rose-900' : 'border-amber-200 bg-amber-50 text-amber-900'}`}
     >
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
       <div>
         <p className="font-semibold">
-          {dashboardUnavailable
-            ? 'Live dashboard data could not be fully loaded.'
-            : 'Some dashboard sections are temporarily unavailable.'}
+          {notice.title}
         </p>
         <p className="mt-1 text-xs opacity-80">
-          Open System Health for the current dependency status before acting on missing data.
+          {notice.detail}
         </p>
+        <Link href={notice.href} className="mt-2 inline-flex min-h-11 items-center font-bold underline">
+          {notice.action}
+        </Link>
       </div>
     </div>
   );
@@ -484,3 +486,4 @@ export function AdminDashboardContent({
     </div>
   );
 }
+

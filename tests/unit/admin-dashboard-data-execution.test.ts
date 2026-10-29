@@ -15,6 +15,22 @@ function database(){
 }
 beforeEach(()=>{state.rows={};state.fail.clear();state.ranges=[];state.rpcCalls=[];state.invoiceSnapshot={all_time_cents:'0',this_month_cents:'0',paid_count:0,all_time_available:true,month_available:true};state.authorize.mockReset().mockResolvedValue({});state.admin.mockReset().mockResolvedValue(database());});
 describe('executed admin dashboard data loader',()=>{
+ it('isolates a missing paid-invoice date from otherwise available dashboard sources',async()=>{
+  state.invoiceSnapshot={all_time_cents:'35000',this_month_cents:'0',paid_count:5,all_time_available:true,month_available:false};
+  const data=await getAdminDashboardData();
+  expect(data.degradedSections).toContain('paid_invoices');
+  expect(data.degradedSections).not.toContain('dashboard_data');
+  expect(data.revenueAllTimeCents).toBe(35000);
+  expect(data.kpis.find(k=>k.label==='Paid Invoices This Month')?.unavailable).toBe(true);
+ });
+ it('keeps genuine source failures visible alongside invoice reconciliation',async()=>{
+  state.invoiceSnapshot.month_available=false;
+  state.fail.add('applications');
+  const data=await getAdminDashboardData();
+  expect(data.degradedSections).toContain('paid_invoices');
+  expect(data.degradedSections).toContain('dashboard_data');
+  expect(data.kpis.find(k=>k.label==='Pending Applications')?.unavailable).toBe(true);
+ });
  it('uses the publication flag and excludes archived programs from the unpublished queue',async()=>{
   state.rows.programs=[
    {id:'live',title:'HVAC',status:'active',published:true,is_active:true},
@@ -110,3 +126,4 @@ describe('executed admin dashboard data loader',()=>{
   expect(state.admin).not.toHaveBeenCalled();
  });
 });
+

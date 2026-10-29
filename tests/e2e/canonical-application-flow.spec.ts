@@ -17,13 +17,32 @@ test.describe('Canonical application flow', () => {
     expect(await page.locator('main a[href*="/programs/"]:visible').count()).toBeGreaterThan(0);
   });
 
-  test('apply page exposes the canonical PARIS intake and standard-form fallback', async ({ page }) => {
+  test('application chooser exposes Host Shop and the canonical student intake', async ({ page }) => {
     await page.goto('/apply');
+    await expect(page.getByRole('heading', { name: 'Choose your application' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /^Host Shop/ })).toHaveAttribute('href', '/partners/host-shop/apply');
+    await page.getByRole('link', { name: /^Student or apprentice/ }).click();
     await expect(page).toHaveURL(/\/apply\/student\/interview/);
     await expect(page.getByRole('heading', { name: /Talk with PARIS/i })).toBeVisible();
     await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole('button', { name: /Speak answer|Escuchar/i })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Use standard form instead' })).toBeVisible();
+  });
+
+  test('Host Shop application provides resume access and stays usable after incomplete submit', async ({ page }) => {
+    await page.goto('/apply');
+    await page.getByRole('link', { name: /^Host Shop/ }).click();
+    await expect(page).toHaveURL(/\/partners\/host-shop\/apply/);
+    await expect(page.getByRole('heading', { name: 'Become an approved apprenticeship Host Site' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${siteUrls.app}/host-shop/login`);
+    await expect(page.getByRole('checkbox', { name: 'Cosmetology Apprenticeship', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save application and finish later' })).toBeEnabled();
+    const submit = page.getByRole('button', { name: 'Submit Host Site Application', exact: true });
+    await submit.click();
+    const legalName = page.getByRole('textbox', { name: 'Legal business name *', exact: true });
+    expect(await legalName.evaluate((element) => (element as HTMLInputElement).validity.valueMissing)).toBe(true);
+    await expect(submit).toBeEnabled();
+    await expect(page).toHaveURL(/\/partners\/host-shop\/apply/);
   });
 
   test('canonical applications API validates missing fields', async ({ request }) => {

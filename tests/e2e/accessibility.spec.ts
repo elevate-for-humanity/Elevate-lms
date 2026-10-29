@@ -13,13 +13,15 @@ const PUBLIC_ROUTES = [
   '/funding',
   '/check-eligibility',
   '/apply',
+  '/apply/student',
+  '/partners/host-shop/apply',
   '/contact',
 ] as const;
 
 async function scan(page: Page, route: string) {
   const response = await page.goto(route);
   expect(response?.status()).toBeLessThan(400);
-  if (route === '/apply') {
+  if (route === '/apply/student') {
     await expect(page).toHaveURL(/\/apply\/student\/interview(?:[?#].*)?$/, { timeout: 90000 });
     await page.waitForLoadState('domcontentloaded');
   }
@@ -133,8 +135,8 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
   });
 
   test('apply form controls have programmatic labels', async ({ page }) => {
-    await page.goto('/apply');
-    // /apply redirects through the canonical student entry after streaming.
+    await page.goto('/apply/student');
+    // The explicit student entry redirects to the PARIS interview after streaming.
     // Inspect the actual intake once its controls have mounted.
     await expect(page).toHaveURL(/\/apply\/student\/interview/);
     await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible({ timeout: 20_000 });

@@ -78,6 +78,8 @@ jobs:
         run: node scripts/gcp/probe-course-dispatch-queue.mjs
       - name: Google Studio runtime topology regression tests
         run: node --test scripts/gcp/verify-ai-runtime.test.mjs
+      - name: Google Calendar credential and OAuth regressions
+        run: pnpm exec vitest run tests/unit/google-calendar-runtime-settings.test.ts tests/unit/google-calendar-env-sync.test.ts tests/unit/google-calendar-oauth.test.ts tests/unit/google-calendar-busy.test.ts --environment node
       - name: Google runtime settings regression tests
         run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
       - name: Resizable Studio and Course Builder panels

@@ -27,3 +27,22 @@ OAuth state is bound to the authenticated account, uses a ten-minute HttpOnly se
 - The nine-step video guide appears on Admin and Program Holder meeting pages and inside the shared room used by all portals.
 
 Video deployment, Google OAuth configuration, individual Google consent, and actual two-device camera/audio/screen-sharing acceptance are separate verification steps.
+
+## Diagnosing activation gaps
+
+- A Calendar-specific client ID or secret takes precedence as a pair. If either
+  Calendar-specific value is present, both are required. A generic Google client
+  must never supply the other half of a Calendar-specific client.
+- `configured: true` means a complete local credential pair exists; it does not
+  prove the client exists in Google, its secret is current, or its consent and
+  redirect configuration are correct. Verify an actual account authorization.
+- A successful push dispatcher is not proof that runtime preparation succeeded.
+  Inspect the dispatched **Prepare Google runtime settings ownership** job.
+  A `permission_denied` failure at `run services add-iam-policy-binding` requires
+  the Google project administrator to review the deployment identity's permission
+  to set the intended service policy. Do not hide the failure, skip policy
+  verification, or grant project-wide secret access to work around it. The LMS
+  preparation step may not have run after an Admin preparation failure.
+- GitHub's Google workload identity authorizes its workflow API calls. It does
+  not sign a browser into Google Cloud Console or establish browser reachability.
+  A console network error and an OAuth client error are separate failures.

@@ -14,7 +14,7 @@ function database(previous:unknown) {
 it('Resume preserves the failed job lesson cursor and targeted repair while refreshing the requesting actor',async()=>{
  const {db,insert}=database({status:'failed',monitor:{enabled:true},payload:{nextCompetencyIndex:7,checkpointRepair:{fromStep:'lesson_film_render'},requestedBy:'previous-admin',progress:{phase:'old-phase'}}});
  await new UltimateJobQueue(db as never).enqueue('build',{requestedBy:'current-admin'});
- expect(insert).toHaveBeenCalledWith(expect.objectContaining({payload:{nextCompetencyIndex:7,checkpointRepair:{fromStep:'lesson_film_render'},requestedBy:'current-admin'},monitor:{enabled:true}}));
+ expect(insert).toHaveBeenCalledWith(expect.objectContaining({payload:{nextCompetencyIndex:7,checkpointRepair:{fromStep:'lesson_film_render'},requestedBy:'current-admin'},monitor:expect.objectContaining({enabled:true,coordinator:'PARIS',agents:expect.objectContaining({PARIS:expect.any(String),ELLIE:expect.any(String),LIZZY:expect.any(String),ZORA:expect.any(String)})})}));
 });
 it('a finished one-lesson preview does not trap a full-course Resume in preview-only mode',async()=>{
  const {db,insert}=database({status:'completed',payload:{ownerPreview:true,lessonBuildId:'preview-only'},monitor:{enabled:true}});

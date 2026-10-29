@@ -96,6 +96,19 @@ describe('canonical media completion quality gate', () => {
     expect(mediaQualityFailures(validEvidence)).toEqual([]);
   });
 
+  it('treats missing per-scene license metadata as advisory for approved course media', () => {
+    const evidence: MediaQualityEvidence = {
+      ...validEvidence,
+      licenseEvidenceCoverage: 0,
+      warnings: [],
+    };
+    expect(mediaQualityFailures(evidence)).toEqual([]);
+    expect(evidence.warnings).toContain(
+      'per-scene license metadata is incomplete; approved course-source provenance was retained',
+    );
+  });
+
+
   it('treats ASR as presence evidence while still rejecting materially incomplete narration', () => {
     expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.907 })).toEqual([]);
     expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.899 })).toEqual(

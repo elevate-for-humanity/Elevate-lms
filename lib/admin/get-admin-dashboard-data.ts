@@ -1,5 +1,6 @@
 import 'server-only';
 import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
+import { hasUnavailableInvoiceTotals } from './dashboard/data-availability.mjs';
 import { APPLICATION_REVIEW_STATUSES } from './application-filters';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -593,8 +594,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const invoiceTotals = paidInvoicesRes.error
     ? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false}
     : paidInvoicesRes.data ?? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false};
-  if (!invoiceTotals.allTimeAvailable || !invoiceTotals.monthAvailable ||
-      [stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
+  if (hasUnavailableInvoiceTotals(invoiceTotals)) degradedSections.push('paid_invoices');
+  if ([stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
   // Paid invoices have an explicit cents contract and one canonical identity.
@@ -899,3 +900,4 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     isSuperAdmin,
   };
 }
+

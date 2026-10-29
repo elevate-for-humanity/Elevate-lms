@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Building2, Users, ArrowRight } from 'lucide-react';
+import { getAdminClient } from '@/lib/supabase/admin';
 import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
@@ -8,7 +9,16 @@ export const metadata: Metadata = {
   description: 'Explore employer, host-site, and workforce connections by occupation and view current employment resources.',
 };
 
-export default function EmployerDirectoryPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function EmployerDirectoryPage() {
+  const db = await getAdminClient();
+  const result = db ? await db.from('employers')
+    .select('id,business_name,company_name,industry,city,state,description')
+    .eq('approved', true).eq('listed_in_directory', true).not('verified_at', 'is', null)
+    .order('business_name').limit(100) : { data: [], error: null };
+  const employers = result.data || [];
+
   const employerCategories = [
     { title: 'Healthcare Employers', description: 'Healthcare organizations, clinics, pharmacies, home-care providers, and related employers.', href: '/workforce-board/employment?industry=healthcare' },
     { title: 'Skilled Trades Employers', description: 'HVAC, construction, maintenance, electrical, plumbing, and related trade employers.', href: '/workforce-board/employment?industry=skilled-trades' },
@@ -23,7 +33,7 @@ export default function EmployerDirectoryPage() {
         alt="Employers and workforce partners connecting with trained candidates"
         eyebrow="Employer Connections"
         title="Employer Directory"
-        description="Use the directory to reach current employment resources and employer/host-site pathways. Employer availability changes, so this page no longer publishes hard-coded company records."
+        description="Browse verified businesses that have chosen to join the public employer directory, explore openings, or apply to join the employer network."
         actions={(
           <>
             <Link href="/workforce-board/employment" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">View Employment Resources</Link>
@@ -31,6 +41,17 @@ export default function EmployerDirectoryPage() {
           </>
         )}
       />
+
+      <section className="mx-auto max-w-5xl space-y-6 px-4 py-12">
+        <h2 className="text-2xl font-bold">Participating Employers</h2>
+        {result.error ? <p>Employer listings could not be loaded. Please try again shortly.</p> : employers.length === 0 ? <p>No verified businesses have opted into the public directory yet. Businesses can apply to join and submit jobs after approval.</p> : <div className="grid gap-6 md:grid-cols-2">{employers.map((employer: any) => <article key={employer.id} className="rounded-xl border p-6">
+          <h3 className="text-xl font-bold">{employer.company_name || employer.business_name}</h3>
+          <p className="mt-2 text-slate-600">{[employer.industry, employer.city, employer.state].filter(Boolean).join(' · ')}</p>
+          {employer.description && <p className="mt-3">{employer.description}</p>}
+          <Link className="mt-4 inline-block font-bold text-brand-blue-700" href={`/workforce-board/employment?employer=${employer.id}`}>View Current Openings →</Link>
+        </article>)}</div>}
+        <Link href="/employers/post-job" className="inline-flex rounded-lg bg-brand-blue-700 px-6 py-3 font-bold text-white">Post a Job</Link>
+      </section>
 
       <section className="bg-slate-50 py-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">

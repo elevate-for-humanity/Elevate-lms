@@ -19,6 +19,7 @@ type JobRow = {
   company: string | null;
   location: string | null;
   type: string | null;
+  salary_range: string | null;
   salary_min: number | null;
   salary_max: number | null;
   description: string | null;
@@ -32,21 +33,32 @@ function moneyRange(min: number | null, max: number | null) {
   return min != null ? `From ${fmt(min)}` : `Up to ${fmt(max as number)}`;
 }
 
-export default async function WorkforceEmploymentPage() {
+export default async function WorkforceEmploymentPage({ searchParams }: { searchParams: Promise<{ employer?: string; industry?: string }> }) {
+  const filters = await searchParams;
   let jobs: JobRow[] = [];
+  let loadFailed = false;
   try {
     const db = await getAdminClient();
+    if (!db) throw new Error('Job database unavailable');
     if (db) {
-      const { data } = await db
-        .from('jobs')
-        .select('id,title,name,company,location,type,salary_min,salary_max,description,created_at')
-        .in('status', ['active', 'open', 'published'])
+      let query = db
+        .from('job_postings')
+        .select('id,title,location,employment_type,salary_range,salary_min,salary_max,description,created_at,employer:employers!inner(company_name,business_name,approved,industry)')
+        .eq('status', 'active')
+        .eq('employer.approved', true)
+        .or('expires_at.is.null,expires_at.gt.' + new Date().toISOString())
         .order('created_at', { ascending: false })
         .limit(50);
-      jobs = (data ?? []) as JobRow[];
+      const industries: Record<string, string> = { healthcare: '%health%', 'skilled-trades': '%construction%', transportation: '%transport%' };
+      if (filters.industry && industries[filters.industry]) query = query.ilike('employer.industry', industries[filters.industry]);
+      if (filters.employer) query = query.eq('employer_id', filters.employer);
+      const { data, error } = await query;
+      if (error) throw new Error('Unable to load published jobs.');
+      jobs = (data ?? []).map((row: any) => ({ ...row, name: row.title, type: row.employment_type, company: row.employer?.company_name || row.employer?.business_name }));
     }
   } catch {
     jobs = [];
+    loadFailed = true;
   }
 
   return (
@@ -75,14 +87,14 @@ export default async function WorkforceEmploymentPage() {
           {jobs.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center sm:p-12">
               <Briefcase className="mx-auto h-10 w-10 text-slate-500" />
-              <h3 className="mt-4 text-xl font-black text-slate-950">No jobs are published right now</h3>
-              <p className="mx-auto mt-3 max-w-xl text-slate-700">This page no longer displays fabricated sample jobs. Contact career services for current employer referrals or check again when new listings are published.</p>
+              <h3 className="mt-4 text-xl font-black text-slate-950">{loadFailed ? 'Job listings could not be loaded' : 'No jobs are published right now'}</h3>
+              <p className="mx-auto mt-3 max-w-xl text-slate-700">{loadFailed ? 'Please try again shortly or contact career services for help.' : 'Contact career services for current employer referrals or check again when new listings are published.'}</p>
               <Link href="/career-services/contact" className="mt-6 inline-flex items-center rounded-lg bg-brand-blue-700 px-6 py-3 font-bold text-white hover:bg-brand-blue-800">Contact Career Services <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </div>
           ) : (
             <div className="space-y-4">
               {jobs.map((job) => {
-                const salary = moneyRange(job.salary_min, job.salary_max);
+                const salary = job.salary_range || moneyRange(job.salary_min, job.salary_max);
                 return (
                   <article key={job.id} className="rounded-xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-blue-200 hover:shadow-md">
                     <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">

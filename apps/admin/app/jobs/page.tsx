@@ -13,14 +13,18 @@ export const metadata: Metadata = {
   description: 'Manage job postings and employer partnerships',
 };
 
-async function getJobsData() {
+async function getJobsData(filters: { employer?: string; status?: string; type?: string; q?: string }) {
   const supabase = await requireAdminClient();
 
-  const { data: jobPostings, count: jobCount } = await supabase
-    .from('job_postings')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(10);
+  let query = supabase.from('job_postings')
+    .select('*, employer:employers(company_name,business_name)', { count: 'exact' });
+  if (filters.employer) query = query.eq('employer_id', filters.employer);
+  if (filters.status) query = query.eq('status', filters.status);
+  if (filters.type) query = query.eq('employment_type', filters.type);
+  if (filters.q) query = query.ilike('title', `%${filters.q.slice(0, 160)}%`);
+  const { data: jobPostings, count: jobCount, error } = await query.order('created_at', { ascending: false }).limit(100);
+  if (error) throw new Error('Unable to load job postings.');
+  const { count: activeCount } = await supabase.from('job_postings').select('id', { count: 'exact', head: true }).eq('status', 'active');
 
   const { count: employerCount } = await supabase
     .from('employers')
@@ -34,7 +38,7 @@ async function getJobsData() {
     .from('job_placements')
     .select('*', { count: 'exact', head: true });
 
-  const activeJobs = jobPostings?.filter((j) => j.status === 'active').length || 0;
+  const activeJobs = activeCount || 0;
 
   return {
     jobs: jobPostings || [],
@@ -48,9 +52,10 @@ async function getJobsData() {
   };
 }
 
-export default async function JobsPage() {
-  await requireRole(['admin', 'staff']);
-  const { jobs: dbJobs, stats: dbStats } = await getJobsData();
+export default async function JobsPage({ searchParams }: { searchParams: Promise<{ employer?: string; status?: string; type?: string; q?: string }> }) {
+  await requireRole(['admin']);
+  const filters = await searchParams;
+  const { jobs: dbJobs, stats: dbStats } = await getJobsData(filters);
 
   const stats = [
     { label: 'Active Jobs', value: String(dbStats.activeJobs), icon: Briefcase },
@@ -64,7 +69,7 @@ export default async function JobsPage() {
       ? dbJobs.map((j: any) => ({
           id: j.id,
           title: j.title || 'Untitled Position',
-          company: j.company_name || 'Unknown Company',
+          company: j.employer?.company_name || j.employer?.business_name || 'Employer not linked',
           location: j.location || 'Indianapolis, IN',
           type: j.employment_type || 'Full-time',
           applications: j.application_count || 0,
@@ -128,28 +133,30 @@ export default async function JobsPage() {
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
+          <form action="/jobs" className="flex flex-col md:flex-row gap-4">
+            {filters.employer && <input type="hidden" name="employer" value={filters.employer} />}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
               <input
                 type="text"
-                placeholder="Search jobs..."
+                name="q" defaultValue={filters.q} placeholder="Search jobs..."
                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
               />
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
+            <select name="status" defaultValue={filters.status || ""} className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
               <option value="">All Statuses</option>
-              <option value="active">Active</option>
+              <option value="pending">Pending review</option><option value="active">Active</option>
               <option value="paused">Paused</option>
               <option value="closed">Closed</option>
             </select>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
+            <select name="type" defaultValue={filters.type || ""} className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
               <option value="">All Types</option>
-              <option value="full-time">Full-time</option>
-              <option value="part-time">Part-time</option>
-              <option value="contract">Contract</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
             </select>
-          </div>
+            <button type="submit" className="rounded-lg bg-brand-blue-700 px-5 py-3 text-white">Search</button>
+          </form>
         </div>
 
         {/* Jobs Table */}
@@ -204,27 +211,13 @@ export default async function JobsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <Link
+                      {job.status !== 'none' && <Link
                         href={`/jobs/${job.id}`}
                         className="p-2 hover:bg-slate-100 rounded-lg"
                         title="View"
                       >
                         <Eye className="w-4 h-4 text-slate-700" />
-                      </Link>
-                      <Link
-                        href={`/jobs/${job.id}/edit`}
-                        className="p-2 hover:bg-slate-100 rounded-lg"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-slate-700" />
-                      </Link>
-                      <Link
-                        href={`/jobs/${job.id}/delete`}
-                        className="p-2 hover:bg-brand-red-50 rounded-lg"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-brand-red-500" />
-                      </Link>
+                      </Link>}
                     </div>
                   </td>
                 </tr>

@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     .from('employers')
     .insert({
       company_name: body.company_name,
+      business_name: body.company_name,
       contact_name: body.contact_name || null,
       contact_email: body.contact_email,
       contact_phone: body.contact_phone || null,

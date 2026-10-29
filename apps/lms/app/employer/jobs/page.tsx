@@ -18,13 +18,8 @@ export default async function EmployerJobsPage() {
   const { user } = await requireRole(['employer', 'sponsor', 'admin']);
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id, full_name, role, verified')
-    .eq('id', user.id)
-    .maybeSingle();
   const employer = await getEmployerRecord(supabase, user.id);
-  const isVerified = Boolean(employer?.approved || profile?.verified);
+  const isVerified = Boolean(employer?.approved);
 
   const { data: jobs } = employer
     ? await supabase
@@ -35,6 +30,9 @@ export default async function EmployerJobsPage() {
     : { data: [] };
 
   const activeJobs = jobs?.filter((job: any) => job.status === 'active') || [];
+  const pendingJobs = jobs?.filter((job: any) => job.status === 'pending') || [];
+  const pausedJobs = jobs?.filter((job: any) => job.status === 'paused') || [];
+  const archivedJobs = jobs?.filter((job: any) => job.status === 'archived') || [];
   const draftJobs = jobs?.filter((job: any) => job.status === 'draft') || [];
   const closedJobs = jobs?.filter((job: any) => job.status === 'closed') || [];
 
@@ -89,6 +87,9 @@ export default async function EmployerJobsPage() {
           </div>
         )}
 
+        {pendingJobs.length > 0 && <JobSection title="Pending Review" jobs={pendingJobs} />}
+        {pausedJobs.length > 0 && <JobSection title="Paused Jobs" jobs={pausedJobs} />}
+        {archivedJobs.length > 0 && <JobSection title="Archived Jobs" jobs={archivedJobs} isClosed />}
         {activeJobs.length > 0 && <JobSection title="Active Jobs" jobs={activeJobs} />}
         {draftJobs.length > 0 && <JobSection title="Drafts" jobs={draftJobs} isDraft />}
         {closedJobs.length > 0 && <JobSection title="Closed Jobs" jobs={closedJobs} isClosed />}
@@ -146,7 +147,7 @@ function JobCard({ job, isDraft, isClosed }: { job: any; isDraft?: boolean; isCl
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold text-slate-900">{job.title}</h3>
+            <h3 className="text-lg font-semibold text-slate-900">{job.title}</h3><span className="text-sm text-slate-600">{job.status}</span>
             {isDraft && <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">Draft</span>}
             {isClosed && <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Closed</span>}
           </div>

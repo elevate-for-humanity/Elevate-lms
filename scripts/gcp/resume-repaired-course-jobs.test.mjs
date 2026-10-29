@@ -23,6 +23,14 @@ test('pause, live lease, publication, unrelated course and external blockers nev
  {...base,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED'},
  {...base,monitor:{enabled:false}}])assert.equal((await run(job)).writes.length,0);
 });
+test('verified private-media renewal resumes an expired finished-media QA URL only',async()=>{
+ const renewable='ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"step":"finished_media_qa","code":"MP4 returned HTTP 401"}]';
+ assert.equal((await run({...base,last_error:renewable})).writes.length,1);
+ for(const last_error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"step":"media","code":"HTTP 401"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"step":"finished_media_qa","code":"MP4 returned HTTP 403"}]',
+ ]) assert.equal((await run({...base,last_error})).writes.length,0);
+});
 test('concurrent claim or monitor change produces no false restart proof',async()=>{
  assert.deepEqual((await run(base,true)).result.jobIds,[]);
 });

@@ -36,8 +36,14 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const error=String(job.last_error??'');
   // New tested code can recover internal defects. Missing evidence, permissions,
   // storage quota and intentional pauses still need their real remedy.
+  // A finished-media MP4 401 from a private configured object is an expired
+  // checkpoint signature. The deployed worker renews that exact object before
+  // QA, so it is safe to resume. Other authorization failures remain external.
+  const renewableStoredMediaRead =
+   /FINDINGS=.*finished_media_qa.*MP4 returned HTTP 401/i.test(error);
   const durableExternalBlocker =
-   /OWNER_|AUTHORIZ|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) ||
+   (/OWNER_|AUTHORIZ|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
+    !renewableStoredMediaRead) ||
    /\b(?:LICENSE_APPROVAL_REQUIRED|MEDIA_LICENSE_REQUIRED|MEDIA_SOURCE_APPROVAL_REQUIRED)\b/i.test(error);
   // Per-scene license metadata and saved-assignment findings are internal
   // contract defects after an approved-source deployment, so the verified new

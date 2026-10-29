@@ -42,6 +42,54 @@ jobs:
           40969636775 c4a16bff502321118b763c6213f79640d2070353
           40969931352 16a41f06cd21715529e6cbe6428653913541b2f7
           RUNS
+      - name: Retire observed older web images only when their replacement image is ready
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # The newer immutable images have completed their build and upload.
+          # Preserve active deployments and every release outside this allowlist.
+          while IFS='|' read -r old_run new_run old_sha new_sha workflow build_job deploy_job; do
+            old="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$old_run")"
+            replacement="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$new_run")"
+            test "$(jq -r .head_sha <<<"$old")" = "$old_sha"
+            test "$(jq -r .head_sha <<<"$replacement")" = "$new_sha"
+            for receipt in "$old" "$replacement"; do
+              jq -e --arg path ".github/workflows/$workflow" '.head_branch == "main" and .event == "workflow_dispatch" and .path == $path' <<<"$receipt" >/dev/null
+            done
+            if test "$(jq -r .status <<<"$old")" = completed; then continue; fi
+            comparison="$(gh api "repos/$GITHUB_REPOSITORY/compare/$old_sha...$new_sha")"
+            test "$(jq -r .merge_base_commit.sha <<<"$comparison")" = "$old_sha"
+            replacement_jobs="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$new_run/jobs?per_page=100")"
+            if ! jq -e --arg build "$build_job" --arg deploy "$deploy_job" '
+              .total_count <= 100 and
+              any(.jobs[]; .name == $build and .status == "completed" and .conclusion == "success") and
+              any(.jobs[]; .name == $deploy and (.status == "pending" or .status == "queued"))
+            ' <<<"$replacement_jobs" >/dev/null; then
+              echo "Preserved $old_run because its replacement is not awaiting rollout with a verified image"
+              continue
+            fi
+            old_jobs="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$old_run/jobs?per_page=100")"
+            if jq -e --arg build "$build_job" --arg deploy "$deploy_job" '
+              .total_count <= 100 and
+              all(.jobs[];
+                if .name == $deploy then
+                  (.status == "pending" or .status == "queued") and (.runner_id == 0 or .runner_id == null) and ((.steps // []) | length == 0)
+                else
+                  (.name == $build or .name == "validate" or .name == "dispatch") and .status == "completed" and (.conclusion == "success" or .conclusion == "skipped")
+                end) and
+              ([.jobs[] | select(.name == $deploy)] | length == 1)
+            ' <<<"$old_jobs" >/dev/null; then
+              gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$old_run/cancel"
+              echo "Retired unstarted web rollout $old_run; descendant image $new_run is verified and queued"
+            else
+              echo "Preserved $old_run because a deployment started or its state is uncertain"
+            fi
+          done <<'RUNS'
+          40967031379|40970551719|d1a43b58b9a8476be5fa602255c91132e105a981|9d635a1510706f4d85ffc8e2c1bff4e64fce9416|deploy-admin.yml|Build and upload Admin image|Deploy and verify Admin on Google
+          40967028468|40970618783|d1a43b58b9a8476be5fa602255c91132e105a981|3859ec6e174491637ec208523d59eb02940580dd|deploy-google-store-runtime.yml|Build and upload Store image|Deploy and verify Store on Google
+          40968176266|40968739373|cb1408085c20035d24b73b88918f96ed9704609c|3ca90c0c9de3dfa4f0cabdbe7b18c3e73535fc00|deploy-google-lms-trigger.yml|build / image|deploy / deploy (lms)
+          RUNS
       - name: Request production recovery through the existing gated Studio workflow
         env:
           GH_TOKEN: ${{ github.token }}

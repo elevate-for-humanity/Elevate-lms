@@ -9,6 +9,9 @@ export function summarizeParisLogs(entries) {
   if(!payload)try{payload=JSON.parse(entry.textPayload||'');}catch{}
   const error=payload?.error?.message;
   const known=typeof error==='string'&&(/^(?:Elevate LLM worker streaming request failed: HTTP \d{3}|Elevate LLM worker did not return an event stream|Elevate LLM stream event exceeds the size limit|Elevate LLM worker reported a stream error|Elevate LLM stream ended before completion|Elevate LLM worker returned no text content|Elevate LLM prompt is too large for the configured \d+-token context window|ELEVATE_GOOGLE_MODEL_IDENTITY_UNAVAILABLE|fetch failed|The operation was aborted due to timeout)$/.test(error));
+  const browserRejected=payload?.message==='[studio-browser] Session creation rejected';
+  const browserCode=payload?.context?.upstreamError;
+  const knownBrowserCode=typeof browserCode==='string'&&/^(?:session_capacity_reached|session_restore_failed|browser_unavailable|browser_recycling|navigation_timeout|worker_failure|unauthorized)$/.test(browserCode);
   const diagnostic=String(entry.textPayload||payload?.message||'');
   const runtimeFailure=/memory limit|out of memory|OOMKilled/i.test(diagnostic)?'memory_limit_exceeded'
    :/segmentation fault|signal 11|SIGSEGV/i.test(diagnostic)?'process_crash'
@@ -19,6 +22,7 @@ export function summarizeParisLogs(entries) {
    service:entry.resource?.labels?.service_name,
    revision:entry.resource?.labels?.revision_name,
    ...(payload?.message==='[devstudio/chat] owned stream failed'?{failure:known?error:'unclassified_provider_failure'}:{}),
+   ...(browserRejected?{browserFailure:knownBrowserCode?browserCode:'unclassified_browser_failure',...(Number.isInteger(payload?.context?.status)?{upstreamStatus:payload.context.status}:{})}:{}),
    ...(runtimeFailure?{runtimeFailure}:{}),
    ...(Number.isInteger(entry.httpRequest?.status)?{httpStatus:entry.httpRequest.status}:{}),
    ...(/^\d+(?:\.\d+)?s$/.test(entry.httpRequest?.latency||'')?{latency:entry.httpRequest.latency}:{}),
@@ -27,7 +31,7 @@ export function summarizeParisLogs(entries) {
 }
 
 export function diagnoseParisRuntime({run=google}={}) {
- const filter='resource.type="cloud_run_revision" AND ((resource.labels.service_name="elevate-admin-migration" AND jsonPayload.message="[devstudio/chat] owned stream failed") OR (resource.labels.service_name="elevate-owned-cpu-llm" AND (httpRequest.requestMethod="POST" OR severity>=WARNING OR textPayload:"memory limit" OR textPayload:"segmentation fault")))';
+ const filter='resource.type="cloud_run_revision" AND ((resource.labels.service_name="elevate-admin-migration" AND (jsonPayload.message="[devstudio/chat] owned stream failed" OR jsonPayload.message="[studio-browser] Session creation rejected")) OR (resource.labels.service_name="elevate-owned-cpu-llm" AND (httpRequest.requestMethod="POST" OR severity>=WARNING OR textPayload:"memory limit" OR textPayload:"segmentation fault")))';
  const entries=JSON.parse(run(['logging','read',filter,'--project',PROJECT,'--freshness=4h','--limit=50','--format=json']));
  if(!Array.isArray(entries))throw Error('PARIS_DIAGNOSTIC_INVALID_RESPONSE');
  const service=JSON.parse(run(['run','services','describe','elevate-owned-cpu-llm','--project',PROJECT,'--region','us-east1','--format=json']));

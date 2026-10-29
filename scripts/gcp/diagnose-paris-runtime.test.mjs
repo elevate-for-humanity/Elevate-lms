@@ -26,3 +26,17 @@ test('system logs identify memory exhaustion without copying arbitrary log conte
  const [result]=summarizeParisLogs([{textPayload:'Memory limit of 8192 MiB exceeded. private diagnostic content'}]);
  assert.equal(result.runtimeFailure,'memory_limit_exceeded');assert.ok(!JSON.stringify(result).includes('private'));
 });
+
+test('Studio session diagnostics retain allowlisted upstream failures without exposing credentials',()=>{
+ const events=summarizeParisLogs(['session_restore_failed','browser_unavailable','secret-token'].map(upstreamError=>({
+  jsonPayload:{message:'[studio-browser] Session creation rejected',context:{status:503,upstreamError,ownerId:'private-owner',token:'private-token'}},
+ })));
+ assert.equal(events[0].browserFailure,'session_restore_failed');
+ assert.equal(events[1].browserFailure,'browser_unavailable');
+ assert.equal(events[2].browserFailure,'unclassified_browser_failure');
+ assert.equal(events[0].upstreamStatus,503);
+ assert.ok(!JSON.stringify(events).includes('private'));
+ assert.ok(!JSON.stringify(events).includes('secret-token'));
+ const calls=[];diagnoseParisRuntime({run:args=>{calls.push(args);return args[0]==='logging'?'[]':'{}';}});
+ assert.match(calls[0][2],/\[studio-browser\] Session creation rejected/);
+});

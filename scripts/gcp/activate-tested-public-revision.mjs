@@ -34,6 +34,10 @@ function servingTraffic(state) {
   return [...totals].sort(([a], [b]) => a.localeCompare(b));
 }
 
+function probeHttpStatus(value) {
+  return Number.isInteger(value) && value >= 100 && value <= 599 ? value : null;
+}
+
 function assertTrafficUnchanged(before, after) {
   if (JSON.stringify(servingTraffic(before)) !== JSON.stringify(servingTraffic(after))) {
     throw Error('Serving traffic changed concurrently; activation stopped');
@@ -73,6 +77,7 @@ export async function cleanupUnusedCandidateTags({
 export async function activateTestedRevision({
   service, revision, commit, read = gcloud, fetcher = fetch, attempts = 12,
   pause = () => new Promise(resolve => setTimeout(resolve, 2000)),
+  report = entry => console.error(JSON.stringify(entry)),
 }) {
   const services = {
     'elevate-marketing-migration': 'marketing',
@@ -114,12 +119,32 @@ export async function activateTestedRevision({
       throw Error('Google candidate URL unavailable; public traffic unchanged');
     }
     let passed = false;
+    let lastProbe;
     for (let attempt = 0; attempt < attempts; attempt++) {
+      lastProbe = { attempt: attempt + 1, responseParsed: false };
       try {
         const response = await fetcher(candidate.url + '/api/health', {
           cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10000),
         });
+        lastProbe.httpStatus = probeHttpStatus(response.status);
+        lastProbe.responseOk = response.ok === true;
         const state = await response.json();
+        lastProbe = {
+          ...lastProbe, responseParsed: true,
+          correctCommit: (state?.commitSha || state?.commit || state?.sha) === commit,
+          correctRevision: state?.revision === revision,
+          correctService: state?.service === services[service],
+          healthy: state?.healthy === true, ready: state?.ready === true,
+          configurationReady: state?.configuration?.ok === true,
+          supabaseReady: state?.dependencies?.supabase?.ok === true,
+          supabaseStatus: probeHttpStatus(state?.dependencies?.supabase?.status),
+          authReady: state?.dependencies?.supabase?.checks?.auth?.ok === true,
+          authStatus: probeHttpStatus(state?.dependencies?.supabase?.checks?.auth?.status),
+          databaseReady: state?.dependencies?.supabase?.checks?.database?.ok === true,
+          databaseStatus: probeHttpStatus(state?.dependencies?.supabase?.checks?.database?.status),
+          missingConfiguration: ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'BUILD_COMMIT']
+            .filter(name => Array.isArray(state?.configuration?.missing) && state.configuration.missing.includes(name)),
+        };
         if (response.ok && state && typeof state === 'object') {
           const actual = state.commitSha || state.commit || state.sha;
           if (actual !== commit) throw Error('Candidate served wrong immutable commit');
@@ -130,11 +155,18 @@ export async function activateTestedRevision({
           }
         }
       } catch (error) {
+        lastProbe.error = ['AbortError', 'TimeoutError'].includes(error?.name) ? 'request_timeout'
+          : error?.name === 'SyntaxError' ? 'invalid_json' : 'request_failed';
         if (error.message === 'Candidate served wrong immutable commit') throw error;
       }
       if (attempt + 1 < attempts) await pause();
     }
-    if (!passed) throw Error('Exact candidate failed runtime health; public traffic unchanged');
+    if (!passed) {
+      // Emit only fixed flags and request status. Never log response bodies,
+      // candidate URLs, provider errors or credentials.
+      report({ event: 'candidate_health_failed', service, revision, commit, lastProbe });
+      throw Error('Exact candidate failed runtime health; public traffic unchanged');
+    }
     const current = describe();
     assertTrafficUnchanged(before, current);
     if (current.status?.latestCreatedRevisionName !== before.status?.latestCreatedRevisionName) {

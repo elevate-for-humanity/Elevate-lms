@@ -27,8 +27,8 @@ function fixture(state = healthy, status = 200, component = 'marketing') {
     }
     return { spec: f.spec, status: { latestReadyRevisionName: service + '-old', latestCreatedRevisionName: f.latest, traffic: structuredClone(f.traffic) } };
   };
-  f.fetcher = async () => ({ ok: status === 200, async json() { return state; } });
-  f.options = { service, revision, commit, read: f.read, fetcher: f.fetcher, attempts: 1 };
+  f.fetcher = async () => ({ status, ok: status === 200, async json() { return state; } });
+  f.options = { service, revision, commit, read: f.read, fetcher: f.fetcher, attempts: 1, report: () => {} };
   f.promoted = () => calls.some(a => a.some(x => x.startsWith('--to-revisions=')));
   return f;
 }
@@ -223,4 +223,55 @@ test('Store deployment creates a zero-traffic revision before verified activatio
   const update = workflow.slice(workflow.indexOf('gcloud run services update elevate-store-migration'), workflow.indexOf('- name: Collect exact failed Store revision logs'));
   assert.match(update, /--no-traffic/);
   assert.ok(workflow.indexOf('Verify and activate the exact Store candidate') > workflow.indexOf('gcloud run services update elevate-store-migration'));
+});
+
+test('failed Store readiness emits only safe probe flags and preserves the serving revision', async () => {
+  const f = fixture({ ...healthy, revision: 'elevate-store-migration-candidate-a', service: 'store',
+    ready: false, configuration: { ok: false, secret: 'private-configuration' },
+    dependencies: { supabase: { ok: false, status: 403, error: 'private-provider-body',
+      checks: { auth: { ok: true, status: 200 }, database: { ok: false, status: 403, error: 'private-database-error' } } } },
+    token: 'private-token' }, 503, 'store');
+  const reports = []; f.options.report = value => reports.push(value);
+  await assert.rejects(activateTestedRevision(f.options), /failed runtime health/);
+  assert.equal(f.promoted(), false);
+  assert.deepEqual(f.traffic, [{ revisionName: 'elevate-store-migration-old', percent: 100 }]);
+  assert.deepEqual(reports[0].lastProbe, { attempt: 1, responseParsed: true, httpStatus: 503,
+    responseOk: false, correctCommit: true, correctRevision: true, correctService: true,
+    healthy: true, ready: false, configurationReady: false, supabaseReady: false,
+    supabaseStatus: 403, authReady: true, authStatus: 200, databaseReady: false,
+    databaseStatus: 403, missingConfiguration: [] });
+  for (const secret of ['private-configuration', 'private-provider-body', 'private-database-error', 'private-token', 'candidate.example'])
+    assert.ok(!JSON.stringify(reports).includes(secret));
+});
+
+for (const [name, errorName, expected] of [
+  ['deadline', 'TimeoutError', 'request_timeout'],
+  ['network failure', 'TypeError', 'request_failed'],
+  ['invalid JSON', 'SyntaxError', 'invalid_json'],
+]) {
+  test(name + ' is classified without exposing its message or promoting the candidate', async () => {
+    const f = fixture(); const reports = [];
+    f.options.report = value => reports.push(value);
+    f.options.fetcher = async () => {
+      const error = new Error('private-url?token=private-credential'); error.name = errorName;
+      if (errorName === 'SyntaxError') return { status: 200, ok: true, json: async () => { throw error; } };
+      throw error;
+    };
+    await assert.rejects(activateTestedRevision(f.options), /failed runtime health/);
+    assert.equal(reports[0].lastProbe.error, expected);
+    assert.equal(reports[0].lastProbe.responseParsed, false);
+    assert.equal(f.promoted(), false);
+    assert.equal(JSON.stringify(reports).includes('private-'), false);
+  });
+}
+
+test('Store diagnostics also cover post-startup health and public verification failures', async () => {
+  const { readFileSync } = await import('node:fs');
+  const workflow = readFileSync('.github/workflows/deploy-google-store-runtime.yml', 'utf8');
+  const collect = workflow.indexOf('- name: Collect exact failed Store revision logs');
+  assert.ok(collect > workflow.indexOf('- name: Verify and activate the exact Store candidate'));
+  assert.ok(collect > workflow.indexOf('- name: Verify Store identity, dependencies, storefront and traffic'));
+  const diagnosticSteps = workflow.slice(collect, workflow.indexOf('\n  acceptance:', collect));
+  assert.match(diagnosticSteps, /failure\(\) && steps\.deploy\.outputs\.revision != ''/);
+  assert.doesNotMatch(diagnosticSteps, /steps\.deploy\.outcome == 'failure'/);
 });

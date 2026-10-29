@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({ rpc: vi.fn(), token: vi.fn(), credentials: { a
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ rpc: mocks.rpc }) }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: async () => {} }));
 vi.mock('googleapis/build/src/apis/calendar/index.js', () => ({ auth: { OAuth2: class { credentials = mocks.credentials; setCredentials() {} getAccessToken() { return mocks.token(); } } } }));
-import { assertGoogleCalendarAvailable, googleBusyEvents } from '@/lib/calendar/google-calendar';
+import { assertGoogleCalendarAvailable, calendarConfigured, calendarOAuth, googleBusyEvents } from '@/lib/calendar/google-calendar';
 beforeEach(() => { vi.stubEnv('GOOGLE_CLIENT_ID', 'client'); vi.stubEnv('GOOGLE_CLIENT_SECRET', 'secret'); mocks.rpc.mockReset().mockResolvedValue({ data: mocks.credentials, error: null }); mocks.token.mockReset().mockResolvedValue({ token: 'private-access' }); });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 function provider(busy: any, errors?: unknown[]) {
@@ -36,4 +36,15 @@ it('distinguishes an unconnected account from a failed credential lookup', async
   await expect(googleBusyEvents('owner', '2026-10-28T14:00:00Z', '2026-10-28T15:00:00Z')).resolves.toEqual({ connected: false, events: [] });
   mocks.rpc.mockResolvedValueOnce({ data: null, error: { message: 'unavailable' } });
   await expect(googleBusyEvents('owner', '2026-10-28T14:00:00Z', '2026-10-28T15:00:00Z')).rejects.toThrow('could not be loaded');
+});
+
+it('does not report mixed OAuth clients configured or start authorization', async () => {
+  vi.stubEnv('GOOGLE_CALENDAR_CLIENT_ID', 'different-client');
+  vi.stubEnv('GOOGLE_CALENDAR_CLIENT_SECRET', '');
+  expect(await calendarConfigured()).toBe(false);
+  await expect(calendarOAuth('https://app.elevateforhumanity.org')).rejects.toThrow('administrator setup');
+});
+it.each(['https://app.elevateforhumanity.org', 'https://admin.elevateforhumanity.org'])('allows a complete OAuth pair on the approved host %s', async origin => {
+  expect(await calendarConfigured()).toBe(true);
+  await expect(calendarOAuth(origin)).resolves.toBeDefined();
 });

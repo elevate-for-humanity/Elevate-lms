@@ -2,6 +2,7 @@ import 'server-only';
 import { auth as googleAuth } from 'googleapis/build/src/apis/calendar/index.js';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { googleCalendarCredentials } from '@/lib/google/calendar-settings';
 
 export const GOOGLE_CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
 export class CalendarConflictError extends Error {}
@@ -9,15 +10,14 @@ export class CalendarConflictError extends Error {}
 export async function calendarOAuth(origin: string) {
   await hydrateProcessEnv();
   if (!['https://app.elevateforhumanity.org', 'https://admin.elevateforhumanity.org'].includes(origin)) throw new Error('Calendar connection is unavailable on this host.');
-  const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
-  const secret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
-  if (!clientId || !secret) throw new Error('Google Calendar connection needs administrator setup.');
-  return new googleAuth.OAuth2(clientId, secret, `${origin}/api/calendar/google/callback`);
+  const credentials = googleCalendarCredentials(process.env);
+  if (!credentials) throw new Error('Google Calendar connection needs administrator setup.');
+  return new googleAuth.OAuth2(credentials.clientId, credentials.clientSecret, `${origin}/api/calendar/google/callback`);
 }
 
 export async function calendarConfigured() {
   await hydrateProcessEnv();
-  return Boolean((process.env.GOOGLE_CALENDAR_CLIENT_ID || process.env.GOOGLE_CLIENT_ID) && (process.env.GOOGLE_CALENDAR_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET));
+  return Boolean(googleCalendarCredentials(process.env));
 }
 
 export async function storeCalendarTokens(userId: string, tokens: Record<string, unknown>) {

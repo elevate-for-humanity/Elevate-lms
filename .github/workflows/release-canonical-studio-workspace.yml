@@ -89,6 +89,12 @@ jobs:
           40967031379|40970551719|d1a43b58b9a8476be5fa602255c91132e105a981|9d635a1510706f4d85ffc8e2c1bff4e64fce9416|deploy-admin.yml|Build and upload Admin image|Deploy and verify Admin on Google
           40967028468|40970618783|d1a43b58b9a8476be5fa602255c91132e105a981|3859ec6e174491637ec208523d59eb02940580dd|deploy-google-store-runtime.yml|Build and upload Store image|Deploy and verify Store on Google
           40968176266|40968739373|cb1408085c20035d24b73b88918f96ed9704609c|3ca90c0c9de3dfa4f0cabdbe7b18c3e73535fc00|deploy-google-lms-trigger.yml|build / image|deploy / deploy (lms)
+          40970551719|40973834700|9d635a1510706f4d85ffc8e2c1bff4e64fce9416|5e8cab6102b6d48f5756ba1dcfa103446b9819ed|deploy-admin.yml|Build and upload Admin image|Deploy and verify Admin on Google
+          40970549803|40973835648|9d635a1510706f4d85ffc8e2c1bff4e64fce9416|5e8cab6102b6d48f5756ba1dcfa103446b9819ed|deploy-google-marketing-trigger.yml|Build and upload Marketing image|Deploy and verify Marketing on Google
+          40970618783|40973867581|3859ec6e174491637ec208523d59eb02940580dd|5e8cab6102b6d48f5756ba1dcfa103446b9819ed|deploy-google-store-runtime.yml|Build and upload Store image|Deploy and verify Store on Google
+          40968739373|40974968984|3ca90c0c9de3dfa4f0cabdbe7b18c3e73535fc00|aca5b6911d476873fa690081768bbdde9e399e91|deploy-google-lms-trigger.yml|build / image|deploy / deploy (lms)
+          40971166209|40974968984|388af75d031dfd15580746538cc98f9c291c7814|aca5b6911d476873fa690081768bbdde9e399e91|deploy-google-lms-trigger.yml|build / image|deploy / deploy (lms)
+          40973861433|40974968984|5e8cab6102b6d48f5756ba1dcfa103446b9819ed|aca5b6911d476873fa690081768bbdde9e399e91|deploy-google-lms-trigger.yml|build / image|deploy / deploy (lms)
           RUNS
       - name: Request production recovery through the existing gated Studio workflow
         env:

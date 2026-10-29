@@ -1,6 +1,7 @@
 import {randomUUID} from 'node:crypto';
 import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';
 import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';
+import {verifyStudioWorkspacePreservation} from './verify-studio-workspace-preservation.mjs';
 import {execFileSync, execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {mkdir, writeFile} from 'node:fs/promises';
@@ -111,7 +112,14 @@ if(process.env.STUDIO_CANDIDATE_ONLY==='true'){
   // Keep the known-good serving revision and all its sessions untouched.
 } else {
 const live=await inventoryStudioLiveState({run:command});
-if(live.activeBrowserSessions!==0||live.workspace.files!==0||live.workspace.symlinks!==0||live.directChildShells!==0||live.directNonBrowserProcesses!==0||live.processInventoryReadable!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+if(live.activeBrowserSessions!==0||live.workspace.symlinks!==0||live.directChildShells!==0||live.directNonBrowserProcesses!==0||live.processInventoryReadable!==true||!Number.isSafeInteger(live.workspace.files)||live.workspace.files<0)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+if(live.workspace.files>0){
+  const preservation=await verifyStudioWorkspacePreservation({sourceUrl:url,candidateUrl:candidate.url,secret,expectedFiles:live.workspace.files});
+  if(preservation?.passed!==true||preservation.files!==live.workspace.files)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+  const current=await inventoryStudioLiveState({run:command});
+  if(current.commit!==live.commit||current.activeBrowserSessions!==0||current.workspace.files!==live.workspace.files||current.workspace.symlinks!==0||current.directChildShells!==0||current.directNonBrowserProcesses!==0||current.processInventoryReadable!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+  console.log(JSON.stringify({candidateRevision,workspacePreservation:preservation}));
+}
 command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+candidateRevision+'=100','--quiet']);
 trafficActivated=true;
 state=await verifyHealth(url,'Public browser did not serve the verified candidate');

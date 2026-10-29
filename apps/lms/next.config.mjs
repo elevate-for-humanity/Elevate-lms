@@ -53,12 +53,24 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
           { key: 'Referrer-Policy', value: 'no-referrer' },
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
         ],
       },
+      {
+        // Keep legacy same-origin framing outside the signed course-preview
+        // handoff and lesson surfaces. Their CSP admits only the owning Admin.
+        source: '/:path((?!api/admin/course-preview$|lms/courses(?:/|$)).*)',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
+      },
+      ...['/api/admin/course-preview', '/lms/courses/:path*'].map(source => ({
+        source,
+        headers: [{
+          key: 'Content-Security-Policy',
+          value: "frame-ancestors 'self' https://admin.elevateforhumanity.org; object-src 'none'; base-uri 'self'",
+        }],
+      })),
       {
         source: '/workbooks/:path*',
         headers: [

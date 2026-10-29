@@ -16,13 +16,12 @@ export async function getMarketplaceBillingReadiness(db: any) {
     if (
       !config.clientId ||
       !config.clientSecret ||
-      !config.accessToken ||
       !config.refreshToken ||
       !config.realmId
     ) {
       return { ...base, provider, ready: false, status: 'not_configured' };
     }
-    if (!process.env.QB_WEBHOOK_VERIFIER_TOKEN)
+    if (!(process.env.QB_WEBHOOK_VERIFIER_TOKEN?.trim() || process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN?.trim()))
       return { ...base, provider, ready: false, status: 'webhook_not_configured' };
     await quickBooksRequest(db, config, `companyinfo/${config.realmId}`);
     return { ...base, provider, ready: true, status: 'connected' };

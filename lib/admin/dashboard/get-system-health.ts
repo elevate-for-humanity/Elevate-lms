@@ -45,7 +45,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
     Promise.all([loadQuickBooksConfig(db), loadBillingProviderConfig(db)])
       .then(async ([config, provider]) => {
         if (provider.primary !== 'quickbooks' || !config.clientId || !config.clientSecret ||
-            !config.accessToken || !config.refreshToken || !config.realmId) return false;
+            !config.refreshToken || !config.realmId) return false;
         const company = await quickBooksRequest<{ CompanyInfo?: { CompanyName?: string } }>(
           db, config, `companyinfo/${config.realmId}`, { signal: AbortSignal.timeout(4_000) },
         );
@@ -77,7 +77,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
   ]);
 
   const quickBooksBillingOk = billingConfig;
-  const quickBooksWebhookOk = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN);
+  const quickBooksWebhookOk = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN?.trim() || process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN?.trim());
   if (!quickBooksBillingOk)
     alerts.push({
       code: 'quickbooks_billing_not_ready',

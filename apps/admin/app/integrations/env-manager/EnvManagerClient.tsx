@@ -337,6 +337,7 @@ const SERVICE_GROUPS: ServiceGroup[] = [
   {
     label: 'QuickBooks Online',
     keys: [
+      'QB_ENVIRONMENT',
       'QB_CLIENT_ID',
       'QB_CLIENT_SECRET',
       'QB_REDIRECT_URI',
@@ -344,6 +345,7 @@ const SERVICE_GROUPS: ServiceGroup[] = [
       'QB_REFRESH_TOKEN',
       'QB_REALM_ID',
       'QB_TOKEN_EXPIRES',
+      'QB_WEBHOOK_VERIFIER_TOKEN',
       'QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN',
     ],
   },

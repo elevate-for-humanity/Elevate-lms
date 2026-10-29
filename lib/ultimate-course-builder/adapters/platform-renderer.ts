@@ -104,9 +104,17 @@ function visualCandidates(input: any): VisualCandidate[] {
       /^[a-f0-9]{64}$/i.test(row.content_sha256 ?? '') &&
       assignment.assignments?.some((a:any) => a.assetId === row.id &&
         a.sceneId === row.instructional_scene_id && a.assignmentMethod === 'teaching-photograph');
-    if (!url || !kind || (!row.entitlement_id && !ownedPhoto)) continue;
+    const ownedGraphic = row.owned_instructional_visual === true &&
+      row.provider === 'elevate-instructional' &&
+      /^[a-f0-9]{64}$/i.test(row.content_sha256 ?? '') &&
+      typeof row.storage_path === 'string' && Boolean(row.storage_path.trim()) &&
+      typeof row.narration_quote === 'string' && Boolean(row.narration_quote.trim()) &&
+      assignment.assignments?.some((a:any) => a.assetId === row.id &&
+        a.sceneId === row.instructional_scene_id &&
+        a.assignmentMethod === 'instructional-visual' && a.generatedInstructionalVisual === true);
+    if (!url || !kind || (!row.entitlement_id && !ownedPhoto && !ownedGraphic)) continue;
     candidates.push({
-      ownedInstructional: ownedPhoto,
+      ownedInstructional: ownedPhoto || ownedGraphic,
       assetId: String(row.id ?? ''),
       url,
       kind,

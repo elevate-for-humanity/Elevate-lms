@@ -1,0 +1,22 @@
+name: Release canonical Studio workspace recovery
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-canonical-studio-workspace.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main' && vars.GOOGLE_RELEASE_HOLD != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Request production recovery through the existing gated Studio workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh api --method POST
+          "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches"
+          -f ref=main -f 'inputs[candidate_only]=false'

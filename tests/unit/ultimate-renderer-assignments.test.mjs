@@ -70,3 +70,21 @@ test('checkpointed graphics cannot replace required practical demonstrations', (
   }};
   assert.throws(()=>prepareUltimateStoryboardInput(input), /ULTIMATE_(PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED|RENDER_SAVED_ASSIGNMENT_REQUIRED)/);
 });
+
+test('verified saved conceptual graphics remain resolvable by their scene assignments', () => {
+  const scenes=Array.from({length:minimum},(_,i)=>({id:`concept-${i}`,stage:'core_concept',dialogue:`Explain concept ${i}`}));
+  const input={requiresPracticalEvidence:false,artifacts:{
+    storyboard:{storyboard:{scenes}},visual_assignment:{media:{
+      assignments:scenes.map(s=>({sceneId:s.id,assetId:`graphic:${s.id}`,assignmentMethod:'instructional-visual',generatedInstructionalVisual:true})),
+      readyAssets:scenes.map(s=>({id:`graphic:${s.id}`,instructional_scene_id:s.id,public_url:`https://media.example/${s.id}.png`,mime_type:'image/png',owned_instructional_visual:true,provider:'elevate-instructional',content_sha256:'a'.repeat(64),storage_path:`saved/${s.id}.png`,narration_quote:s.dialogue})),
+    }},
+  }};
+  const prepared=prepareUltimateStoryboardInput(input);
+  assert.equal(prepared.sceneData.scenes.length,minimum);
+  prepared.sceneData.scenes.forEach((scene,i)=>assert.equal(scene.reference_image_url,`https://media.example/concept-${i}.png`));
+  const practical=structuredClone(input);practical.requiresPracticalEvidence=true;
+  practical.artifacts.storyboard.storyboard.scenes[0].stage='demonstration';
+  assert.throws(()=>prepareUltimateStoryboardInput(practical),/ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED/);
+  const unbound=structuredClone(input);unbound.artifacts.visual_assignment.media.readyAssets[0].instructional_scene_id='other';
+  assert.throws(()=>prepareUltimateStoryboardInput(unbound),/ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED/);
+});

@@ -28,6 +28,8 @@ export const DEFAULT_NAV: NavSection[] = [
     href: '/dashboard',
     items: [
       { label: 'Dashboard', href: '/dashboard' },
+      { label: 'Portal Management', href: '/portals' },
+      { label: 'Infrastructure Costs', href: '/operations/infrastructure-costs' },
       { label: 'At-Risk Learners', href: '/at-risk' },
       { label: 'Analytics', href: '/analytics' },
       { label: 'Website Traffic', href: '/analytics/traffic' },

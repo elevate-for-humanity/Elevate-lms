@@ -34,6 +34,10 @@ function walkAdminRoutes(dir: string, segments: string[] = []): string[] {
 }
 
 describe('admin DEFAULT_NAV coverage', () => {
+  it('includes portal management and infrastructure cost dashboard cards in navigation', () => {
+    const routes = new Set(DEFAULT_NAV.flatMap(section => section.items.map(item => item.href)));
+    expect(['/portals', '/operations/infrastructure-costs'].filter(route => !routes.has(route))).toEqual([]);
+  });
   it('exposes every canonical Studio capability under the Dev Studio section', () => {
     const studio = DEFAULT_NAV.find(section => section.label === 'Dev Studio');
     expect(studio).toBeDefined();

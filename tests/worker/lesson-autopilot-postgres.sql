@@ -70,6 +70,12 @@ BEGIN
   PERFORM pg_temp.ultimate_fenced_write(reclaimed.id,'replacement',reclaimed.execution_generation,'record_step',first_lesson,
    jsonb_build_object('step',step_name,'state','passed','artifacts',jsonb_build_object('contractEvidence',jsonb_build_object('passed',true,'version','ultimate-lesson-2026-10-05.1'))));
  END LOOP;
+ rejected:=false;
+ BEGIN PERFORM pg_temp.complete_ultimate_lesson_autopilot(reclaimed.id,'replacement',reclaimed.execution_generation);
+ EXCEPTION WHEN OTHERS THEN IF SQLERRM LIKE '%AUTOPILOT_STAGE_NOT_COMPLETE:standards_lock%' THEN rejected:=true;ELSE RAISE;END IF;END;
+ IF NOT rejected THEN RAISE EXCEPTION 'TEST: obsolete evidence contract accepted'; END IF;
+ UPDATE pg_temp.ultimate_lesson_steps SET artifacts=jsonb_set(artifacts,'{contractEvidence,version}','"ultimate-lesson-2026-10-29.1"')
+ WHERE lesson_build_id=first_lesson;
  PERFORM pg_temp.complete_ultimate_lesson_autopilot(reclaimed.id,'replacement',reclaimed.execution_generation);
  SELECT * INTO media_job FROM pg_temp.claim_ultimate_lesson_autopilot('media-a',300,'media');
  IF media_job.id IS NULL OR media_job.payload#>>'{autopilot,competencyId}' IS DISTINCT FROM reclaimed.payload#>>'{autopilot,competencyId}'
@@ -99,6 +105,9 @@ BEGIN
  UPDATE pg_temp.ultimate_build_jobs SET available_at=now() WHERE id=coordinator;
  IF EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_build_job('legacy-overlap',300))
  THEN RAISE EXCEPTION 'TEST: legacy coordinator overlapped a pool'; END IF;
- RAISE NOTICE 'PASS: 15 runtime, role, dependency, recovery, fencing, priority and preservation assertions';
+ IF position('ultimate-lesson-2026-10-29.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))=0 OR
+    position('ultimate-lesson-2026-10-05.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))>0
+ THEN RAISE EXCEPTION 'TEST: publication contract version drift'; END IF;
+ RAISE NOTICE 'PASS: 17 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
 END $$;
-SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',15) AS autopilot_database_test;
+SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',17) AS autopilot_database_test;

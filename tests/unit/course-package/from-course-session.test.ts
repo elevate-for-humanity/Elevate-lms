@@ -46,7 +46,7 @@ describe('coursePackageFromSession', () => {
   });
 });
 
-it.each(['experience', 'scene_data'])('normalizes missing caption IDs in %s timelines without changing timing or text', (origin) => {
+it.each(['experience', 'scene_data', 'video_config'])('normalizes missing caption IDs in %s timelines without changing timing or text', (origin) => {
   const input = session();
   const captions = [
     { start: 0, end: 2, text: 'Recover refrigerant.' },
@@ -55,8 +55,10 @@ it.each(['experience', 'scene_data'])('normalizes missing caption IDs in %s time
   const scenes = [{ startTime: 0, endTime: 4, duration_seconds: 4, narration: 'Recover refrigerant. Never vent it.', action: 'Recovery equipment', visualDirection: 'Recovery equipment' }];
   if (origin === 'experience') {
     input.lessons[0].content_json = { experience: { instructionalTimeline: { durationSeconds: 4, scenes, captions } } };
-  } else {
+  } else if (origin === 'scene_data') {
     input.lessons[0].scene_data = { scenes, captions };
+  } else {
+    input.lessons[0].video_config = { timeline: { durationSeconds: 4, audio: [], visuals: [], captions, interactions: [], checkpoints: [] } };
   }
   const result = coursePackageFromSession(input).modules[0].lessons[0].timeline!;
   expect(result.captions).toEqual([

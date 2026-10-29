@@ -1,3 +1,4 @@
+import { PaymentServices } from '@/components/admin/PaymentServices';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -69,6 +70,8 @@ export default async function PaymentSettingsPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment Settings</h1>
         <p className="text-slate-500">Admin payment plans with PayPal automatic collection and QuickBooks invoicing.</p>
       </div>
+
+      <PaymentServices />
 
       <SettingsFormClient
         fields={FIELDS}

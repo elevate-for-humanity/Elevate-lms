@@ -14,7 +14,11 @@ export function resolveVerifier(environments, standalone = []) {
 }
 
 /** Recover existing configuration only. Never generate a replacement Intuit verifier. */
-export function repairQuickBooksProduction({ run = google, apply = false } = {}) {
+export function repairQuickBooksProduction({ run: executor = google, apply = false } = {}) {
+  const run = (args) => {
+    try { return executor(args); }
+    catch (error) { error.operation = args.slice(0, 3).join(' '); throw error; }
+  };
   const listed = JSON.parse(run(['secrets', 'list', '--project', PROJECT, '--format=json']));
   const names = listed.map(item => item.name.split('/').at(-1));
   const configs = [];
@@ -81,5 +85,5 @@ export function repairQuickBooksProduction({ run = google, apply = false } = {})
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try { console.log(JSON.stringify(repairQuickBooksProduction({ apply: process.env.QB_PRODUCTION_REPAIR === 'true' }))); }
-  catch (error) { console.error(JSON.stringify({ error: /^QB_[A-Z_]+$/.test(error.message) ? error.message : error.code || 'QB_PRODUCTION_REPAIR_FAILED' })); process.exitCode = 1; }
+  catch (error) { console.error(JSON.stringify({ error: /^QB_[A-Z_]+$/.test(error.message) ? error.message : error.code || 'QB_PRODUCTION_REPAIR_FAILED', operation: error.operation })); process.exitCode = 1; }
 }

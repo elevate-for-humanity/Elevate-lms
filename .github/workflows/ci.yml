@@ -61,6 +61,8 @@ jobs:
         run: |
           pnpm exec vitest run tests/unit/admin-dashboard-data-execution.test.ts tests/unit/admin-header-degradation.test.tsx tests/unit/dashboard-system-health.test.ts tests/unit/normalize-dashboard-data.test.ts tests/unit/dashboard-unavailable-kpi.test.tsx tests/unit/course-production-review.test.ts tests/unit/course-production-resume-cursor.test.ts tests/unit/legacy-lms-publication.test.ts tests/unit/platform-settings-permissions.test.ts tests/unit/course-worker-direct-launch.test.ts tests/unit/ultimate-build-list-pagination.test.ts tests/unit/dashboard-role-routing.test.tsx
           node --test scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/dispatch-course-job.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/paid-invoice-totals.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-release-media.test.mjs workers/process-job-state.test.mjs workers/ultimate-teaching-cache.test.mjs workers/ultimate-resume-route.test.mjs
+      - name: Admin navigation and QuickBooks recovery regressions
+        run: pnpm exec vitest run tests/unit/admin-nav-coverage.test.ts tests/unit/admin-nav-config-execution.test.ts tests/unit/quickbooks-admin-recovery.test.ts tests/unit/quickbooks-client.test.ts tests/unit/quickbooks-environment-routes.test.ts
       - name: Authored cosmetology sample production adapter regression
         run: pnpm exec vitest run tests/unit/ultimate-authored-sample.test.ts
       - name: Course photographs and saved preview regression tests

@@ -4,6 +4,16 @@ on:
     branches: [main]
     paths: ['.github/workflows/verify-marketing-revision-diagnostics.yml']
   workflow_dispatch:
+    inputs:
+      service:
+        description: Existing public service whose revision will be inspected
+        type: choice
+        options: [elevate-marketing-migration, elevate-store-migration]
+        default: elevate-marketing-migration
+      revision:
+        description: Exact existing revision (leave empty to inspect a recent failure)
+        type: string
+        required: false
 permissions:
   contents: read
   actions: write
@@ -22,6 +32,9 @@ jobs:
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 5
+    env:
+      FAILED_SERVICE: ${{ inputs.service || 'elevate-marketing-migration' }}
+      REQUESTED_REVISION: ${{ inputs.revision }}
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v3
@@ -32,23 +45,28 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
-      - name: Select an existing Marketing revision for collector verification
+      - name: Select an existing public revision for collector verification
         id: revision
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
           import { appendFileSync } from 'node:fs';
-          const args=['run','revisions','list','--service=elevate-marketing-migration','--project=elegant-racer-299721','--region=us-central1','--sort-by=~metadata.creationTimestamp','--limit=20','--format=json'];
+          const service=process.env.FAILED_SERVICE;
+          if(!['elevate-marketing-migration','elevate-store-migration'].includes(service))throw Error('Unsupported public service');
+          const requested=process.env.REQUESTED_REVISION;
+          const pattern=new RegExp('^'+service+'-[a-z0-9-]+$');
+          if(requested&&!pattern.test(requested))throw Error('Unexpected revision name');
+          const args=['run','revisions','list','--service='+service,'--project=elegant-racer-299721','--region=us-central1','--sort-by=~metadata.creationTimestamp','--limit=20','--format=json'];
           const revisions=JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}));
           const failed=revisions.find(r=>(r.status?.conditions||[]).some(c=>c.type==='Ready'&&c.status==='False'));
           // Prefer failure evidence; a live revision still verifies actual log
           // access when Google no longer lists a failed revision.
-          const selected=failed||revisions[0];
-          if(!selected) throw new Error('No Marketing revision available for diagnostic verification');
+          const selected=requested?revisions.find(r=>r.metadata?.name===requested):(failed||revisions[0]);
+          if(!selected) throw new Error('Requested or recent public revision is unavailable for diagnostic verification');
           const revision=selected.metadata.name;
-          if(!/^elevate-marketing-migration-[a-z0-9-]+$/.test(revision)) throw new Error('Unexpected revision name');
+          if(!pattern.test(revision)) throw new Error('Unexpected revision name');
           appendFileSync(process.env.GITHUB_OUTPUT,'name='+revision+'\n');
-          console.log('Verifying revision: '+revision+'; failed='+Boolean(failed));
+          console.log('Verifying revision: '+revision+'; ready='+JSON.stringify(selected.status?.conditions?.find(c=>c.type==='Ready')?.status));
           NODE
       - name: Verify actual revision metadata and log collection
         timeout-minutes: 3

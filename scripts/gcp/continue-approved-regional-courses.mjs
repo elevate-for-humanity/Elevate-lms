@@ -24,7 +24,7 @@ export async function dispatchApprovedRegionalCourses({env=process.env}={}) {
  }
  let state;
  try { state=await dispatchQueuedCourseJob({
-  env:{...env,COURSE_WORKER_PARALLELISM:env.COURSE_WORKER_PARALLELISM ?? '1'},
+  env:{...env,COURSE_WORKER_PARALLELISM:env.COURSE_WORKER_PARALLELISM ?? '2'},
   run:(_command,args)=>google(regionalArguments(args)),
   capacityCheck:input=>inspectRegionalCapacity({...input,region:'us-east1'}),
   request:(url,options)=>fetch(scopedCourseQueueUrl(url),options),

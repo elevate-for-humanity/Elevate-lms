@@ -50,7 +50,7 @@ jobs:
         run: node scripts/gcp/verify-sdk.mjs
       - name: Dispatch queued or expired work without overlapping executions
         env:
-          COURSE_WORKER_PARALLELISM: '1'
+          COURSE_WORKER_PARALLELISM: '2'
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GH_TOKEN: ${{ github.token }}
         shell: bash

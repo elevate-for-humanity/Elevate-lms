@@ -9,12 +9,26 @@ on:
       - scripts/gcp/diagnose-paris-runtime.test.mjs
 permissions:
   contents: read
-  id-token: write
 concurrency:
   group: paris-runtime-diagnostics
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Dispatch diagnostics through the existing trusted main workflow entrypoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-paris-runtime.yml/dispatches" -f ref=main
   diagnose:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     environment: production

@@ -89,3 +89,32 @@ test('public narration survives blocked browser storage and remains controllable
   await expect(stop).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('password recovery confirmation preserves its origin and reports an invalid link safely', async ({ page }, testInfo) => {
+  const origin = 'https://app.elevateforhumanity.org';
+  const callback = origin + '/api/auth/recovery-callback';
+  const next = '/reset-password?portal=employer&mode=recovery';
+  const landing = await page.goto(
+    callback + '?token_hash=deployment-acceptance-invalid-token&next=' + encodeURIComponent(next),
+    { waitUntil: 'domcontentloaded' },
+  );
+  expect(landing?.status()).toBe(200);
+  const confirmationPromise = page.waitForResponse(
+    response => response.url() === callback && response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: 'Continue to Password Setup', exact: true }).click();
+  const confirmation = await confirmationPromise;
+  const headers = await confirmation.request().allHeaders();
+  expect(headers.origin).toBe(origin);
+  expect(confirmation.status()).toBe(303);
+  await expect(page).toHaveURL(/\/reset-password\?/);
+  const destination = new URL(page.url());
+  expect(destination.origin).toBe(origin);
+  expect(destination.searchParams.get('portal')).toBe('employer');
+  expect(destination.searchParams.get('error')).toBe('recovery_failed');
+  await expect(page.getByText('This password link is missing, expired, or already used. Request a fresh secure link below.', { exact: true })).toBeVisible();
+  await testInfo.attach('recovery-origin-evidence', {
+    body: JSON.stringify({ origin: headers.origin, status: confirmation.status(), error: destination.searchParams.get('error') }),
+    contentType: 'application/json',
+  });
+});

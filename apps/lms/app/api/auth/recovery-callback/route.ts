@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
   return new NextResponse(body, { headers: {
     'Content-Type': 'text/html; charset=utf-8',
     'Cache-Control': 'private, no-store',
-    'Referrer-Policy': 'no-referrer',
+    // Preserve Origin on the same-origin form POST; suppress referrers elsewhere.
+    'Referrer-Policy': 'same-origin',
     'X-Robots-Tag': 'noindex, nofollow',
     'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
   } });

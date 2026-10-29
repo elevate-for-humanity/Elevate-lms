@@ -152,7 +152,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   for (const index of order) assign(index, new Set());
   for (const [index, scene] of scenes.entries()) {
     let choice = selected.get(index);
-    if (!choice && !physicalScene(scene)) {
+    if (!choice && !physicalScene(scene) && scene.teachingVisual?.steps?.length) {
       const contextual = candidates.find((asset) => !owners.has(identity(asset)));
       if (contextual) {
         owners.set(identity(contextual), index);

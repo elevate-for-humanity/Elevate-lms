@@ -1,4 +1,11 @@
 import { describeWorkerError } from '../../lib/ultimate-course-builder/core/worker-error.mjs';
+test('refrigerant hazard warnings retain safety classification without salon vocabulary',()=>{
+ const dialogue='SAFETY WARNING: Pressurized refrigerants create cylinder rupture, frostbite, and chemical exposure hazards. Never assume a recovery container can accept an unidentified mixture. Before a recovery task, identify the appliance and refrigerant.';
+ const scene=instructionView({scenes:[{id:'concept',stage:'concept_explanation',sceneType:'mental_model',dialogue}]}).scenes[0];
+ assert.equal(scene.sceneType,'safety_warning');assert.equal(scene.dialogue,dialogue);
+ for(const text of ['SAFETY WARNING: Learn about refrigerant pressure.','Cylinder rupture and frostbite are hazards.','SAFETY WARNING: Refrigerant cylinder rupture is dangerous.'])
+  assert.notEqual(instructionView({scenes:[{id:'concept',stage:'concept_explanation',dialogue:text}]}).scenes[0].sceneType,'safety_warning');
+});
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {stripTypeScriptTypes} from 'node:module';import {repairDirective,instructionView} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
 const src=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/build-runner.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');

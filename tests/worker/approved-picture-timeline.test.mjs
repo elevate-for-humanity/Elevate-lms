@@ -3,6 +3,13 @@ import assert from 'node:assert/strict';
 import {pictureTimeline,activePictureCue,pictureSceneTiming,quoteStartSeconds} from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
 const cues=[{text:'Inspect the clean cape.',startSeconds:0,endSeconds:4},{text:'Check the neck strip.',startSeconds:4,endSeconds:8},{text:'Recap: prepare the station safely.',startSeconds:8,endSeconds:12}];
 const photos=[{imageUrl:'a',sha256:'a',narrationQuote:'Inspect the clean cape'},{imageUrl:'b',sha256:'b',narrationQuote:'Check the neck strip'},{imageUrl:'c',sha256:'c',narrationQuote:'Recap prepare the station safely'}];
+test('spoken recovery percentage resolves the identical ASR numeral and percent sign',()=>{
+ const spoken=[{text:'80 % when it does not',startSeconds:17}];
+ assert.equal(quoteStartSeconds('eighty percent when it does not',spoken),17);
+ assert.equal(quoteStartSeconds('recover eighty percent now',[{text:'recover 80 % now',startSeconds:9}]),9);
+ assert.throws(()=>quoteStartSeconds('recover eighty percent now',[{text:'recover 90 % now',startSeconds:9}]),/NOT_ALIGNED/);
+ assert.throws(()=>quoteStartSeconds('do not vent refrigerant',[{text:'do vent refrigerant',startSeconds:9}]),/NOT_ALIGNED/);
+});
 test('single frame quantization prevents the extra frame that exhausted the picture timeline',()=>{
  const timing=pictureSceneTiming(31/30-Number.EPSILON,30);
  assert.equal(Math.ceil(timing.durationSeconds*30),32); // Reproduce the previous double-rounding defect.

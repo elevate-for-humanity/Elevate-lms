@@ -48,3 +48,5 @@ jobs:
         with: {skip_install: true}
       - name: Read bounded production inference failure evidence
         run: node scripts/gcp/diagnose-paris-runtime.mjs
+      - name: Identify regional allocations blocking isolated model validation
+        run: node scripts/gcp/audit-runtime-capacity.mjs

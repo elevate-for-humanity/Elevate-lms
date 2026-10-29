@@ -65,7 +65,7 @@ function normalizeQuestion(
   const options = Array.isArray(question.options)
     ? question.options.map(clean).filter(Boolean)
     : [];
-  const correct = Number(question.correctAnswer ?? question.correct);
+  const correct = Number(question.correctAnswer ?? question.correct ?? question.correct_index);
   if (
     !clean(question.question) ||
     options.length !== 4 ||

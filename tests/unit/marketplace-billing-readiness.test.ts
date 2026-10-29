@@ -18,6 +18,7 @@ beforeEach(() => {
   });
   mocks.request.mockResolvedValue({});
   vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', 'configured');
+  vi.stubEnv('QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN', '');
 });
 afterEach(() => vi.unstubAllEnvs());
 describe('marketplace billing readiness', () => {
@@ -34,6 +35,11 @@ describe('marketplace billing readiness', () => {
     const result = await getMarketplaceBillingReadiness({});
     expect(result.ready).toBe(false);
     expect(JSON.stringify(result)).not.toContain('private upstream');
+  });
+  it('accepts the existing long verifier alias', async () => {
+    vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', '');
+    vi.stubEnv('QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN', 'private-existing-verifier');
+    expect(await getMarketplaceBillingReadiness({})).toMatchObject({ ready: true });
   });
   it('blocks activation without payment reconciliation', async () => {
     vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', '');

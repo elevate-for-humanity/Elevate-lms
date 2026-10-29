@@ -165,6 +165,9 @@ export default function QuickBooksClient() {
           </button>
         </div>
 
+        {status.message && !status.connected && !status.error && (
+          <p role="status" className="mb-4 text-sm text-amber-800">{status.message}</p>
+        )}
         {status.error && (
           <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
             <AlertTriangle className="w-4 h-4 shrink-0" />

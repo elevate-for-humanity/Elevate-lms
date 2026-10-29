@@ -1,5 +1,6 @@
 import {pathToFileURL} from 'node:url';
 import {google,PROJECT,loadGoogleConfig} from './runtime-config.mjs';
+import {WORKSPACE_PRESERVATION_PROBE} from './verify-studio-workspace-preservation.mjs';
 // The subprocess reads metadata only. It never reads file contents, command
 // arguments, browser cookies, credentials, terminal input or process memory.
 export function studioProcessClass(name){if(['chromium','chrome','headless_shell'].includes(name))return 'browser';if(['chrome_crashpad','chrome_crashpad_handler'].includes(name))return 'browserHelper';if(['bash','sh','dash'].includes(name))return 'shell';return 'unclassified';}
@@ -39,4 +40,25 @@ export async function inventoryAdminGitHubBindings({run=google}={}) {
  try {secretNames=JSON.parse(run(['secrets','list','--project='+PROJECT,'--format=json(name)'])).map(row=>row.name);}catch {secretInventoryReadable=false;}
  return {...adminGitHubBindingMetadata(resource,config,secretNames),configReadable,secretInventoryReadable};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){try{console.log(JSON.stringify(await (process.argv.includes('--admin-github-bindings')?inventoryAdminGitHubBindings():inventoryStudioLiveState())));}catch{console.error(JSON.stringify({error:'STUDIO_LIVE_STATE_INVENTORY_FAILED',stateChanged:false}));process.exitCode=1;}}
+export async function inspectStudioPreservation({run=google,request=fetch}={}) {
+ const resource=JSON.parse(run(['run','services','describe','elevate-studio-browser','--project='+PROJECT,'--region=us-central1','--format=json']));
+ const candidate=resource.status?.traffic?.find(t=>t.revisionName===resource.status.latestCreatedRevisionName&&/^sc-[a-f0-9]{8}-[a-f0-9]{8}$/.test(t.tag||'')&&!t.percent);
+ if(!candidate?.url)return {readOnly:true,stateChanged:false,candidateAvailable:false};
+ const endpoints=[resource.status.url,candidate.url];
+ for(const value of endpoints){const url=new URL(value);if(url.protocol!=='https:'||!url.hostname.endsWith('.run.app')||url.username||url.password||url.pathname!=='/'||url.search||url.hash)throw Error('STUDIO_ENDPOINT_UNVERIFIED');}
+ const secret=run(['secrets','versions','access','latest','--secret=studio-browser-shared-secret','--project='+PROJECT]);
+ const proofs=[];
+ for(const base of endpoints){
+  const response=await request(new URL('/workspace/exec',base),{method:'POST',headers:{'content-type':'application/json','x-studio-browser-secret':secret},body:JSON.stringify({command:'node',args:['-e',WORKSPACE_PRESERVATION_PROBE],timeoutMs:120000}),redirect:'error',signal:AbortSignal.timeout(150000)});
+  if(!response.ok)throw Error('STUDIO_PRESERVATION_INSPECTION_HTTP_'+response.status);
+  const result=await response.json();if(result.exitCode!==0||typeof result.stdout!=='string'||result.stdout.length>2048)throw Error('STUDIO_PRESERVATION_INSPECTION_FAILED');
+  const data=JSON.parse(result.stdout),proof={};
+  for(const key of ['files','directories','bytes'])proof[key]=Number.isSafeInteger(data[key])&&data[key]>=0?data[key]:null;
+  for(const key of ['digest','archiveDigest'])proof[key]=/^[a-f0-9]{64}$/.test(data[key]||'')?data[key]:null;
+  proof.generation=/^[1-9]\d*$/.test(data.generation||'')?String(data.generation):null;
+  proof.authenticatedManifest=data.authenticatedManifest===true;proof.excludedDependencyCaches=data.excludedDependencyCaches===true;
+  proofs.push(proof);
+ }
+ return {readOnly:true,stateChanged:false,candidateAvailable:true,candidateRevision:candidate.revisionName,source:proofs[0],candidate:proofs[1],equal:JSON.stringify(proofs[0])===JSON.stringify(proofs[1])};
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){try{console.log(JSON.stringify(await (process.argv.includes('--admin-github-bindings')?inventoryAdminGitHubBindings():process.argv.includes('--preservation')?inspectStudioPreservation():inventoryStudioLiveState())));}catch{console.error(JSON.stringify({error:'STUDIO_LIVE_STATE_INVENTORY_FAILED',stateChanged:false}));process.exitCode=1;}}

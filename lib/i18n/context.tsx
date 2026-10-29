@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useSyncExternalStore } from 'react';
 import en from './messages/en.json';
 import es from './messages/es.json';
 import fr from './messages/fr.json';
@@ -29,7 +29,27 @@ interface I18nContextValue {
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-const I18nContext = createContext<I18nContextValue | null>(null);
+function createLocaleStore() {
+  let locale: Locale = 'en';
+  const listeners = new Set<() => void>();
+  return {
+    getSnapshot: () => locale,
+    // Every streamed consumer hydrates against the same English snapshot as
+    // its server HTML, even if another consumer already restored the cookie.
+    getServerSnapshot: (): Locale => 'en',
+    subscribe: (listener: () => void) => {
+      listeners.add(listener);
+      return () => { listeners.delete(listener); };
+    },
+    restore: (next: Locale) => {
+      if (locale === next) return;
+      locale = next;
+      listeners.forEach((listener) => listener());
+    },
+  };
+}
+
+const I18nContext = createContext<ReturnType<typeof createLocaleStore> | null>(null);
 
 function getValue(obj: unknown, path: string): string {
   const keys = path.split('.');
@@ -52,28 +72,37 @@ function interpolate(text: string, params?: Record<string, string | number>): st
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [store] = useState(createLocaleStore);
 
   useEffect(() => {
+    let savedLocale: Locale = 'en';
     try {
       const saved = document.cookie
         .split('; ')
         .find((c) => c.startsWith('NEXT_LOCALE='))
         ?.split('=')[1] as Locale | undefined;
 
-      if (saved && LOCALES.includes(saved)) setLocaleState(saved);
+      if (saved && LOCALES.includes(saved)) savedLocale = saved;
     } catch {
       // Ignore cookie errors.
     }
-    setIsHydrated(true);
-  }, []);
+    store.restore(savedLocale);
+  }, [store]);
+
+  return <I18nContext.Provider value={store}>{children}</I18nContext.Provider>;
+}
+
+export function useI18n(): I18nContextValue {
+  const store = useContext(I18nContext);
+  if (!store) throw new Error('useI18n must be used within I18nProvider');
+  const locale = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
 
   const setLocale = useCallback((newLocale: Locale) => {
     if (!LOCALES.includes(newLocale)) return;
-    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000;SameSite=Lax`;
-    setLocaleState(newLocale);
-  }, []);
+    try { document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000;SameSite=Lax`; }
+    catch { /* The current view still works when preference storage is unavailable. */ }
+    store.restore(newLocale);
+  }, [store]);
 
   const t = useCallback(
     (key: string, params?: Record<string, string | number>): string => {
@@ -83,17 +112,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     [locale],
   );
 
-  const contextValue: I18nContextValue = {
-    locale: isHydrated ? locale : 'en',
+  return {
+    locale,
     setLocale,
-    t: isHydrated ? t : (key) => getValue(MESSAGES.en, key),
+    t,
   };
-
-  return <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>;
-}
-
-export function useI18n() {
-  const context = useContext(I18nContext);
-  if (!context) throw new Error('useI18n must be used within I18nProvider');
-  return context;
 }

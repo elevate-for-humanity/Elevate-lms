@@ -27,7 +27,7 @@ it('does not consume recovery tokens during email previews', async () => {
   expect(response.status).toBe(200);
   expect(await response.text()).toContain('Continue to Password Setup');
   expect(mocks.verify).not.toHaveBeenCalled();
-  expect(response.headers.get('referrer-policy')).toBe('no-referrer');
+  expect(response.headers.get('referrer-policy')).toBe('same-origin');
 });
 it('persists the verified recovery session on the password-form redirect', async () => {
   const response = await POST(submit());
@@ -59,5 +59,11 @@ it('rejects cross-origin recovery submissions without verifying a token', async 
 it('reports missing tokens without using any existing signed-in session', async () => {
   const response = await GET(new NextRequest('https://app.elevateforhumanity.org/api/auth/recovery-callback'));
   expect(response.headers.get('location')).toContain('error=missing_recovery_token');
+  expect(mocks.verify).not.toHaveBeenCalled();
+});
+
+it.each(['null', ''])('rejects opaque or missing origins (%s) without consuming recovery tokens', async (origin) => {
+  const response = await POST(submit(undefined, origin));
+  expect(response.status).toBe(403);
   expect(mocks.verify).not.toHaveBeenCalled();
 });

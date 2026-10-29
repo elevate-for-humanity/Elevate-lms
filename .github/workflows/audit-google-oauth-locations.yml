@@ -1,0 +1,61 @@
+name: Audit Google OAuth credential locations
+on:
+  pull_request:
+    paths: ['scripts/gcp/audit-google-oauth-locations*', '.github/workflows/audit-google-oauth-locations.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/audit-google-oauth-locations*', '.github/workflows/audit-google-oauth-locations.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --check scripts/gcp/audit-google-oauth-locations.mjs
+      - run: node --test scripts/gcp/audit-google-oauth-locations.test.mjs
+  dispatch:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-oauth-locations.yml/dispatches -f ref=main
+  audit:
+    needs: test
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Audit active bindings, saved archives, aliases and enabled versions without exposing credentials
+        env:
+          AUDIT_OAUTH_GOOGLE_CALENDAR_CLIENT_ID: ${{ secrets.GOOGLE_CALENDAR_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_CALENDAR_CLIENT_SECRET: ${{ secrets.GOOGLE_CALENDAR_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          AUDIT_OAUTH_GOOGLE_AUTH_CLIENT_ID: ${{ secrets.GOOGLE_AUTH_CLIENT_ID }}
+          AUDIT_OAUTH_GOOGLE_AUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_AUTH_CLIENT_SECRET }}
+          AUDIT_OAUTH_AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
+          AUDIT_OAUTH_AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
+          AUDIT_OAUTH_GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          AUDIT_OAUTH_GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        run: node scripts/gcp/audit-google-oauth-locations.mjs

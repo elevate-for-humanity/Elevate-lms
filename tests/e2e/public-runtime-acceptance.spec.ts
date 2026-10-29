@@ -99,6 +99,8 @@ test('password recovery confirmation preserves its origin and reports an invalid
     { waitUntil: 'domcontentloaded' },
   );
   expect(landing?.status()).toBe(200);
+  expect(landing?.headers()['referrer-policy']).toBe('same-origin');
+  expect(landing?.headers()['content-security-policy']).toContain("form-action 'self'");
   const confirmationPromise = page.waitForResponse(
     response => response.url() === callback && response.request().method() === 'POST',
   );

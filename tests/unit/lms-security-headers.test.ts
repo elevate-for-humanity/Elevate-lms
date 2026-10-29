@@ -34,3 +34,16 @@ it('allows only the trusted Admin frame for signed course handoffs and their LMS
     expect(headers['Strict-Transport-Security']).toContain('includeSubDomains');
   }
 });
+
+it('leaves recovery confirmation and redirect policies to the recovery route', async () => {
+  for (const path of ['/api/auth/recovery-callback', '/api/auth/recovery-callback/']) {
+    const headers = await headersFor(path);
+    expect(headers['Referrer-Policy'], path).toBeUndefined();
+    expect(headers['Content-Security-Policy'], path).toBeUndefined();
+    expect(headers['X-Content-Type-Options']).toBe('nosniff');
+    expect(headers['Strict-Transport-Security']).toContain('includeSubDomains');
+  }
+  const other = await headersFor('/api/auth/recovery-callback-other');
+  expect(other['Referrer-Policy']).toBe('no-referrer');
+  expect(other['Content-Security-Policy']).toContain("frame-ancestors 'self'");
+});

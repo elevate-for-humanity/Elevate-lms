@@ -53,9 +53,17 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+        ],
+      },
+      {
+        // Next's configured headers replace the route's response headers.
+        // Recovery owns distinct GET/POST policies: its confirmation form must
+        // retain a same-origin POST, while redirects suppress all referrers.
+        source: '/:path((?!api/auth/recovery-callback(?:/)?$).*)',
+        headers: [
           { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
           { key: 'Referrer-Policy', value: 'no-referrer' },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
         ],
       },
       {

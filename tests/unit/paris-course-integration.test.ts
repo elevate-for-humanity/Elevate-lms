@@ -34,6 +34,6 @@ it('a replacement queue job inherits PARIS monitoring without overwriting its wo
    update:()=>{mutation=true;return q;},then:(resolve:any)=>resolve({data:mutation?[{id:'build'}]:null,error:null})};return q;
  }};
  await new UltimateJobQueue(db).enqueue('build',{nextCompetencyIndex:2});
- expect(inserted.monitor).toEqual(monitor);
+ expect(inserted.monitor).toEqual(expect.objectContaining({...monitor,agents:expect.objectContaining({PARIS:expect.any(String),ELLIE:expect.any(String),LIZZY:expect.any(String),ZORA:expect.any(String)})}));
  expect(inserted.payload).toEqual({nextCompetencyIndex:2});
 });

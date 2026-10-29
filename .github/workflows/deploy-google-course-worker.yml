@@ -103,7 +103,8 @@ jobs:
   build:
     concurrency:
       group: google-course-worker-image
-      cancel-in-progress: true
+      # Finish the active tested image/upload; GitHub retains only the newest pending build.
+      cancel-in-progress: false
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 120

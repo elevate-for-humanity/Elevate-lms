@@ -13,11 +13,18 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 /** Private, reusable photographs tied to exact spoken teaching points.
  * These are illustrations, never evidence of a performed practical skill. */
 export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
-  if (input.lessonPresentation !== 'approved-premium-v1') return input;
+  const premium = input.lessonPresentation === 'approved-premium-v1';
+  const requestedScenes = new Set<string>((input.artifacts?.visual_assignment?.media?.assignments ?? [])
+    .filter((assignment: {requestedInstructionalVisual?: boolean; assignmentMethod?: string}) =>
+      assignment.requestedInstructionalVisual === true && assignment.assignmentMethod === 'instructional-visual-request')
+    .map((assignment: {sceneId: string}) => assignment.sceneId));
+  // Shared conceptual scene requests need real persisted image bytes too.
+  // Existing licensed assignments and physical-skill acceptance stay unchanged.
+  if (!premium && requestedScenes.size === 0) return input;
   const scenes = input.artifacts?.storyboard?.storyboard?.scenes;
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
-  const approvedReference=await approvedReferencePhotoPicker(input,db);
+  const approvedReference=premium ? await approvedReferencePhotoPicker(input,db) : null;
   let placedPhotos: any[] | undefined;
   const usedPhotoHashes=new Set<string>();
   const usedSelections=new Set<string>();
@@ -29,21 +36,23 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   };
 
   for (const scene of scenes) {
+    if (!premium && !requestedScenes.has(scene.id)) continue;
     const steps = scene.teachingVisual?.steps;
     if (!steps?.length) throw new Error('TEACHING_PHOTO_SCRIPT_CUES_REQUIRED');
     const requests = steps.length === 1 ? [
       {...steps[0], view:'full workstation view'}, {...steps[0], view:'close detail view with complete hands and tools'},
     ] : steps.map((step: any) => ({...step,view:'complete action view'}));
-    if(!scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
-    requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
+    if(premium && !scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
+    const recapIndex = scene.recapText?.trim() ? requests.length : -1;
+    if (recapIndex !== -1) requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
     for (const [index, step] of requests.entries()) {
      try {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
         try {
-          const photo=await approvedReference(scene,index,step,index===requests.length-1);
-          if(!assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))throw new Error('COURSE_PHOTO_ALREADY_USED');
+          const photo=await approvedReference(scene,index,step,index===recapIndex);
+          if(!assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex}))throw new Error('COURSE_PHOTO_ALREADY_USED');
           reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
           continue;
         } catch(error) {
@@ -68,13 +77,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'}))throw new Error('COURSE_PHOTO_ALREADY_USED');
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,provider:'openai'}))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
       const selected=await courseSelectedStill(input,db,scene,index,step,{allowRelatedCoursePhoto:true,usedSelections});
       if(selected){
-        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1}))throw new Error('COURSE_PHOTO_ALREADY_USED');
+        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex}))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -86,7 +95,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==licensed.content_sha256) throw new Error('LICENSED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url}))continue;
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url}))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -169,7 +178,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const signed=await bucket.createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
-        stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,
+        stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,
         provider:saved.provider??(saved.repair?.method==='lesson-conceptual-card-v1'?'elevate-instructional':'google-generated'),repair:saved.repair}))
         throw new Error('COURSE_PHOTO_ALREADY_USED');
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);

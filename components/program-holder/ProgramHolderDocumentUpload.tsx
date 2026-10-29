@@ -33,7 +33,7 @@ export function ProgramHolderDocumentUpload({
   ] as const;
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState(invoiceOnly ? 'provider_invoice' : '');
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -84,7 +84,7 @@ export function ProgramHolderDocumentUpload({
             ? 'PDF, JPG, or PNG up to 10 MB. Include the student, training dates, amount, and invoice number. Submission does not mark the invoice paid.'
             : 'PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected storage.'}
       </p>
-      {!materialsOnly && (
+      {!materialsOnly && !invoiceOnly && (
         <div className="mt-4 rounded-xl border border-blue-200 bg-white p-4 text-sm leading-6 text-slate-700">
           <p className="font-black text-slate-950">What should I upload?</p>
           <p className="mt-1">
@@ -128,7 +128,13 @@ export function ProgramHolderDocumentUpload({
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <select
           name="documentType"
-          aria-label={materialsOnly ? 'Course material type' : 'Onboarding document type'}
+          aria-label={
+            invoiceOnly
+              ? 'Invoice document type'
+              : materialsOnly
+                ? 'Course material type'
+                : 'Onboarding document type'
+          }
           required
           value={selectedType}
           onChange={(event) => setSelectedType(event.target.value)}
@@ -179,7 +185,7 @@ export function ProgramHolderDocumentUpload({
           disabled={busy}
           className="min-h-11 rounded-xl bg-blue-700 px-5 font-bold text-white disabled:opacity-50"
         >
-          {busy ? 'Uploading…' : 'Upload'}
+          {busy ? 'Submitting…' : invoiceOnly ? 'Submit invoice' : 'Upload'}
         </button>
       </div>
       {selectedType ? (
@@ -187,6 +193,7 @@ export function ProgramHolderDocumentUpload({
           Selected:{' '}
           {
             [
+              ['provider_invoice', 'Training invoice'],
               ...materialOptions,
               ...commonOptions.filter(([value]) => insuranceRequired || value !== 'insurance'),
               ...(isHvac

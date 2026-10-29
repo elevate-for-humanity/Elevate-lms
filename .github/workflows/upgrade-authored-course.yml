@@ -7,24 +7,17 @@ on:
         type: choice
         default: barber-apprenticeship
         options: [barber-apprenticeship, cosmetology-apprenticeship, hvac-technician, business-administration]
-  issues:
-    types: [opened]
 
 permissions:
   contents: read
 
 concurrency:
-  group: authored-course-media-launch-${{ inputs.course_slug || github.event.issue.title }}
+  group: authored-course-media-launch-${{ inputs.course_slug }}
   cancel-in-progress: false
 
 jobs:
   upgrade:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (
-        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
-        contains(fromJSON('["FINISH AUTHORED COURSE: barber-apprenticeship","FINISH AUTHORED COURSE: hvac-technician","FINISH AUTHORED COURSE: business-administration"]'), github.event.issue.title)
-      )
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     env:
@@ -34,11 +27,7 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       ADMIN_URL: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app'
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      COURSE_SLUG: >-
-        ${{ inputs.course_slug ||
-          (github.event.issue.title == 'FINISH AUTHORED COURSE: barber-apprenticeship' && 'barber-apprenticeship') ||
-          (github.event.issue.title == 'FINISH AUTHORED COURSE: hvac-technician' && 'hvac-technician') ||
-          (github.event.issue.title == 'FINISH AUTHORED COURSE: business-administration' && 'business-administration') }}
+      COURSE_SLUG: ${{ inputs.course_slug }}
     steps:
       - uses: actions/checkout@v4
         with:

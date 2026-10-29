@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import styles from './UnifiedEllieChat.module.css';
 import {courseResultId,courseResultLessonId} from '@/lib/course-builder/workspace-receipt.mjs';
 import {
   Activity,
@@ -1203,7 +1204,7 @@ export default function UnifiedEllieChat({
     : 'border-gray-700 bg-gray-950 text-white placeholder:text-gray-500 focus:border-blue-500';
 
   return (
-    <div className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden ${shellClass}`}>
+    <div className={`${styles.root} flex h-full min-h-0 min-w-0 flex-col overflow-hidden ${shellClass}`}>
       {!embedded && (
         <div
           className={`flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 ${headerClass}`}
@@ -1564,7 +1565,7 @@ export default function UnifiedEllieChat({
               }}
               rows={1}
               placeholder="Tell Paris what you need done..."
-              className={`order-first min-h-[60px] max-h-[20dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
+              className={`${styles.composer} order-first min-h-[60px] max-h-[20dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
             />
             <button
               type="button"

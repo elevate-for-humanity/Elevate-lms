@@ -3,14 +3,16 @@ import {inspectRegionalCapacity,isTerminalExecution,allocation} from './regional
 import {LESSON_ROLE_JOBS,LESSON_ROLE_REGION} from './deploy-lesson-autopilots.mjs';
 import {randomUUID} from 'node:crypto';
 
-// Default to one execution per runnable lesson, rather than a small role pool.
-// An explicit operational limit can still reduce demand during an incident.
+// One execution is required for every runnable lesson stage. A configured
+// ceiling may raise that bound, but it cannot turn the active-worker contract
+// back into queued placeholders.
 function concurrency(role,env,demand){
  const value=env['COURSE_AUTOPILOT_'+role.toUpperCase()+'_CONCURRENCY'];
  if(value===undefined || value==='')return demand;
  const count=Number(value);
  if(!Number.isSafeInteger(count)||count<1)throw Error('ULTIMATE_AUTOPILOT_CONCURRENCY_INVALID:'+role);
- return count;
+ if(count<demand)throw Error('ULTIMATE_ACTIVE_WORKER_CONTRACT_VIOLATION:'+role+':required='+demand+':configured='+count);
+ return demand;
 }
 
 // Cloud inventory can lag a just-acknowledged asynchronous launch. Retain its
@@ -143,9 +145,23 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  }
  // A slow claim is pending work, not a failed lesson or dispatcher crash.
  // The coordinator rechecks cloud inventory before admitting another execution.
+ const leasedRows=rows.filter(j=>j.status==='running'&&Date.parse(j.lease_expires_at)>now.getTime());
+ const freshLeases=leasedRows.filter(j=>{
+  const heartbeat=Date.parse(j.heartbeat_at??'');
+  return Number.isFinite(heartbeat)&&now.getTime()-heartbeat>=0&&now.getTime()-heartbeat<90000;
+ }).length;
+ const runnableJobs=leasedRows.length+ready.length;
+ const coveredJobs=freshLeases+assigned.length;
+ const uncoveredJobs=Math.max(0,runnableJobs-coveredJobs);
+ const coverage={contract:'runnable-stage-required-v1',runnableJobs,coveredJobs,uncoveredJobs};
  if(pending.size)return {status:'busy',reason:'awaiting_worker_assignment',
-  activeExecutions:activeCount,unconfirmedExecutions:pending.size,assignments:assigned};
- if(assigned.length)return {status:'assigned',activeExecutions:activeCount,assignments:assigned};
+  activeExecutions:activeCount,unconfirmedExecutions:pending.size,assignments:assigned,...coverage};
+ // Partial admission is not success. Keep the trusted coordinator alive while
+ // admitted workers finish and free quota, then immediately cover the rest.
+ if(uncoveredJobs)return capacityWait&&activeCount===0
+  ? {status:'capacity_wait',reason:'approved_regional_capacity_unavailable',activeExecutions:0,assignments:assigned,...coverage}
+  : {status:'busy',reason:'active_worker_coverage_pending',activeExecutions:activeCount,assignments:assigned,...coverage};
+ if(assigned.length)return {status:'assigned',activeExecutions:activeCount,assignments:assigned,...coverage};
  if(activeCount)return {status:'busy',activeExecutions:activeCount};
  if(eligible.some(j=>Date.parse(j.available_at)>now.getTime()))return {status:'retry_wait',activeExecutions:0};
  return capacityWait?{status:'capacity_wait',reason:'approved_regional_capacity_unavailable',activeExecutions:0}:{status:'empty',activeExecutions:0};

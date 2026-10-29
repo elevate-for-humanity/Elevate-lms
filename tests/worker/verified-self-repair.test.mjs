@@ -95,6 +95,16 @@ test('unchanged repaired output is independently rejected without a redundant pr
  assert.equal(ctx.artifacts.learning_objectives.blueprint.title,'same');
  assert.equal(ctx.artifacts.learning_objectives.contractEvidence.passed,true);
 });
+test('an unrelated later gate clears obsolete producer routing without deleting checkpoints',async()=>{
+ const source={blueprint:'saved'},film={video:'saved.mp4'};
+ const stale={failedStep:'lesson_film_render',target:'learning_objectives',requirements:[{code:'INSTRUCTIONAL_QUALITY_FAILED',message:'old failure'}]};
+ const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:source,lesson_film_render:film,__repairState:{status:'producer-validated',directive:stale}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render'])};
+ const R=runner({},()=>[],{currentEvidence:()=>true,route:()=>[]});
+ await new R({finished_media_qa:async()=>({passed:false,findings:[{step:'finished_media_qa',severity:'error',code:'LEARNER_RUNTHROUGH_CHECK_FAILED',message:'new learner failure'}]})}).run(ctx);
+ assert.equal(ctx.artifacts.__repairState,undefined);
+ assert.deepEqual(ctx.artifacts.learning_objectives,source);assert.deepEqual(ctx.artifacts.lesson_film_render,film);
+ assert.equal(ctx.artifacts.selective_repair.repair.blockedAt,'finished_media_qa');
+});
 test('content failure does not invent missing encoded inspection evidence',async()=>{
  let checked=0;const R=runner({},()=>{checked++;return []});const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set()};
  await new R({learning_objectives:async()=>({passed:false,findings:[{code:'REPAIR_PRODUCER_UNCHANGED',severity:'error',message:'unchanged'}]})}).run(ctx);assert.equal(checked,0);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { signedLessonPlayback } from '@/lib/storage/lesson-playback';
+import { streamLessonMedia } from '@/lib/storage/lesson-stream';
 import { renderMediaUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
 export const runtime = 'nodejs';
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
       const lesson=await db.from('course_lessons').select('id,video_url').eq('id',canonicalLessonId).eq('course_id',build.data.course_id).maybeSingle();
       if(lesson.error)throw lesson.error;
       if(!lesson.data?.video_url)return NextResponse.json({error:'No saved video yet'},{status:404,headers});
-      return new NextResponse(null,{status:307,headers:{...headers,Location:await signedLessonPlayback(db,lesson.data.video_url)}});
+      return await streamLessonMedia(req, await signedLessonPlayback(db, lesson.data.video_url));
     }catch{return NextResponse.json({error:'Saved video access could not be renewed'},{status:503,headers});}
   }
   if (![buildId, lessonBuildId].every(value => /^[a-f0-9-]{36}$/i.test(value ?? '')))
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
       const approved=await ownerApprovedPreview(db,build.data,lesson.data);
       if(!approved)return NextResponse.json({error:'No matching owner-approved published video.'},{status:404,headers});
       const location=await signedLessonPlayback(db,approved.videoUrl);
-      return new NextResponse(null,{status:307,headers:{...headers,Location:location}});
+      return await streamLessonMedia(req, location);
     }
     const artifactVersionId = req.nextUrl.searchParams.get('artifactVersionId');
     if (artifactVersionId) {
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
       if (version.error) throw version.error;
       const video = renderMediaUrl(version.data?.content?.render);
       if (!video) return NextResponse.json({error:'Saved video version not found.'},{status:404,headers});
-      return new NextResponse(null,{status:307,headers:{...headers,Location:await signedLessonPlayback(db,video)}});
+      return await streamLessonMedia(req, await signedLessonPlayback(db, video));
     }
     let source = renderMediaUrl(lesson.data.artifacts?.lesson_film_render?.render);
     if (!source) {
@@ -69,8 +70,10 @@ export async function GET(req: NextRequest) {
     }
     if (!source) return NextResponse.json({error:'No saved video yet'}, {status:404, headers});
     const location = await signedLessonPlayback(db, source);
-    return new NextResponse(null, {status:307, headers:{...headers, Location:location}});
+    return await streamLessonMedia(req, location);
   } catch {
     return NextResponse.json({error:'Saved video access could not be renewed'}, {status:503, headers});
   }
 }
+
+export const HEAD = GET;

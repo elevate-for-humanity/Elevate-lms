@@ -50,6 +50,14 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   for (const assignment of assignments) {
     if (!assignment?.assetId || !assignment?.relevanceReason)
       throw new Error('ULTIMATE_VISUAL_RELEVANCE_REQUIRED');
+    if (assignment.requestedInstructionalVisual === true && assignment.assignmentMethod === 'instructional-visual-request') {
+      if (!String(assignment.assetId).startsWith('instructional-visual-request:'))
+        throw new Error(`ULTIMATE_INSTRUCTIONAL_VISUAL_ID_INVALID:${assignment.assetId}`);
+      reuse.set(String(assignment.assetId), (reuse.get(String(assignment.assetId)) ?? 0) + 1);
+      continue;
+    }
+    // Saved checkpoints from the former photo-specific contract remain
+    // resumable. New authoring never creates this legacy request type.
     if (assignment.requestedTeachingPhotograph === true && assignment.assignmentMethod === 'teaching-photograph-request') {
       if (!String(assignment.assetId).startsWith('teaching-photo-request:'))
         throw new Error(`ULTIMATE_INSTRUCTIONAL_VISUAL_ID_INVALID:${assignment.assetId}`);
@@ -451,7 +459,16 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       });
       const results: any = (learnerRuntimeEvidence.evidence as any).results ?? {};
       const learnerQA = { ...evaluateLearnerRunthrough(results), results };
-      return { passed: learnerQA.pass, artifacts: { learnerQA, learnerRuntimeEvidence } };
+      return {
+        passed: learnerQA.pass,
+        findings: learnerQA.failed.map((check: string) => ({
+          step: 'learner_runthrough' as const,
+          severity: 'error' as const,
+          code: 'LEARNER_RUNTHROUGH_CHECK_FAILED',
+          message: `Authenticated learner check failed: ${check}`,
+        })),
+        artifacts: { learnerQA, learnerRuntimeEvidence },
+      };
     },
     selective_repair: async (ctx) => {
       const routes = routeSelectiveRepairs(ctx.findings);

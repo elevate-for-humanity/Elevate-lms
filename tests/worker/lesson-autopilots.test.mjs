@@ -4,6 +4,15 @@ import {describeWorkerError} from '../../lib/ultimate-course-builder/core/worker
 import {repairDirective} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
 import {lessonAutopilotIdentity,lessonAutopilotType} from '../../lib/ultimate-course-builder/worker/lesson-autopilot-policy.mjs';
 const strip=path=>stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
+test('coordinator reserves canonical rows and creates the pool before instruction authoring',async()=>{
+ const profile={parallelAutopilot:'three-role-v1',competencies:[{id:'first'},{id:'later'}]},events=[];
+ const db={from(table){const q={select(){return q},eq(){return q},async maybeSingle(){return {data:null,error:null}},then(resolve){resolve({data:[],error:null})}};return q},async rpc(name,args){events.push(name);assert.equal(args.p_profile,profile);return {data:{poolId:'pool',taskCount:6},error:null}}};
+ const coordinate=new Function('hydrateUltimateProfileSources','materializeUltimateDraft','contractHash','LESSON_AUTOPILOT_VERSION','notifyCourseDispatcher',strip('../../lib/ultimate-course-builder/worker/lesson-autopilot.ts')+';return coordinateLessonAutopilots;')(
+  async()=>profile,async(_db,_course,p,ids,options)=>{assert.deepEqual(ids,['first','later']);assert.deepEqual(options,{deferInstruction:true});events.push('reserve-drafts');return p},JSON.stringify,'three-role-v1',async()=>{events.push('dispatch')});
+ const result=await coordinate({db,job:{id:'job'},workerId:'worker',generation:1,build:{id:'build',course_id:'course',profile},assertActive(){}});
+ assert.deepEqual(events,['reserve-drafts','seed_ultimate_lesson_autopilots','dispatch']);
+ assert.equal(result.taskCount,6);assert.equal(result.completed,false);
+});
 const steps=new Function(strip('../../lib/ultimate-course-builder/core/types.ts')+';return ULTIMATE_BUILD_STEPS;')();
 const payload=value=>Object.fromEntries(Object.entries(value).filter(([key])=>key!=='contractEvidence'));
 const Runner=new Function('describeWorkerError','repairDirective','artifactPayload','contractHash','currentEvidence','stepInputHash','stepInputHashes','validateStepOutput','practicalVisualFailures','ULTIMATE_LESSON_CONTRACT_VERSION','MAX_TARGETED_REPAIRS','isDurableExternalBlocker','routeSelectiveRepairs','ULTIMATE_BUILD_STEPS','nonblockingManualReview','optionalManualReviewStage',
@@ -45,4 +54,13 @@ test('quality cannot silently author a missing upstream checkpoint',async()=>{
 });
 test('forged lesson or role identity is rejected before work starts',()=>{
  assert.throws(()=>lessonAutopilotIdentity({job_type:lessonAutopilotType('another','media'),payload:{autopilot:{version:'three-role-v1',poolId:'pool',competencyId:'c',role:'media'}}}),/IDENTITY_MISMATCH/);
+});
+test('a later learner failure cannot redelegate an obsolete picture-cue repair',()=>{
+ const currentRepairDirective=new Function(strip('../../lib/ultimate-course-builder/worker/lesson-autopilot.ts')+';return currentRepairDirective;')();
+ const stale={failedStep:'lesson_film_render',requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'}]};
+ const result={findings:[{step:'learner_runthrough',severity:'error',code:'LEARNER_RUNTHROUGH_CHECK_FAILED',message:'Authenticated learner check failed: captions'}],lessons:[{result:{artifacts:{__repairState:{directive:stale}}}}]};
+ assert.equal(currentRepairDirective(result),undefined);
+ const active={failedStep:'learner_runthrough',requirements:[{code:'LEARNER_RUNTHROUGH_CHECK_FAILED',message:'Authenticated learner check failed: captions'}]};
+ result.lessons[0].result.artifacts.__repairState.directive=active;
+ assert.equal(currentRepairDirective(result),active);
 });

@@ -278,6 +278,15 @@ export class UltimateBuildRunner {
         }
         continue;
       }
+      // A completed producer repair belongs only to the failure that requested
+      // it. Once a later independent gate fails without a routed producer, do
+      // not leave that older directive available for the role coordinator to
+      // delegate again. The certified producer checkpoints remain intact; only
+      // the obsolete routing instruction is removed.
+      if (!target) {
+        delete (ctx.artifacts as any).__repairState;
+        ctx.repairDirective = undefined;
+      }
       ctx.findings.push(...failures);
       ctx.artifacts.selective_repair = {
         repair: { attempts, unresolved: failures.length, blockedAt: step },

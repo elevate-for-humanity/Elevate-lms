@@ -31,7 +31,7 @@ function input() {
   };
 }
 
-describe('photographic lesson assets without text-card generation', () => {
+describe('shared instructional visual assets', () => {
   it('binds actual prepared photographs to saved scene requests', () => {
     const original:any=input();
     original.teachingPhotos=Object.fromEntries(original.artifacts.storyboard.storyboard.scenes.map((scene:any,i:number)=>[scene.id,[{
@@ -50,8 +50,28 @@ describe('photographic lesson assets without text-card generation', () => {
     expect(actual.artifacts.visual_assignment.media.readyAssets).toEqual([]);
     expect(()=>prepareUltimateStoryboardInput(actual)).toThrow('ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED');
   });
-  it('rejects missing photograph identity instead of fabricating a card',()=>{
+  it('binds the shared visual-neutral request to a clearly identified instructional graphic',()=>{
+    const original:any=input();
+    original.artifacts.visual_assignment.media.assignments[0]={
+      sceneId:'s0',assetId:'instructional-visual-request:s0',
+      assignmentMethod:'instructional-visual-request',requestedInstructionalVisual:true,
+      relevanceReason:'Instructional visual supporting the narration',
+    };
+    original.teachingPhotos={s0:[{
+      imageUrl:'https://media.example.org/card.png',storagePath:'approved-teaching-photos/card.png',
+      sha256:'a'.repeat(64),narrationQuote:original.artifacts.storyboard.storyboard.scenes[0].dialogue,
+      provider:'elevate-instructional',repair:{method:'lesson-conceptual-card-v1'},
+    }]};
+    const actual=bindTeachingPhotoAssignments(original);
+    expect(actual.artifacts.visual_assignment.media.assignments[0]).toMatchObject({
+      assignmentMethod:'instructional-visual',generatedInstructionalVisual:true,
+    });
+    expect(actual.artifacts.visual_assignment.media.readyAssets[0]).toMatchObject({
+      owned_instructional_visual:true,teaching_photo:false,
+    });
+  });
+  it('rejects missing visual identity instead of fabricating evidence',()=>{
     const original:any=input();original.teachingPhotos={s0:[{imageUrl:'https://media.example.org/image.png'}]};
-    expect(()=>bindTeachingPhotoAssignments(original)).toThrow('TEACHING_PHOTO_EVIDENCE_REQUIRED');
+    expect(()=>bindTeachingPhotoAssignments(original)).toThrow('INSTRUCTIONAL_VISUAL_EVIDENCE_REQUIRED');
   });
 });

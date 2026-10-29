@@ -1,3 +1,5 @@
+import { isApprovedDocument } from './document-review';
+
 export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'government_id', label: 'Government-issued photo ID' },
   { type: 'business_registration', label: 'Business registration for the contracting entity' },
@@ -118,7 +120,7 @@ export async function getProgramHolderPaymentReadiness(
   const [{ data: acknowledgements }, { data: documents }, { data: graduated }, { data: assignments }, { data: imageRelease }, { data: payoutProfile }] = evidence;
   const approvedTypes = new Set(
     (documents || [])
-      .filter((document: any) => document.status === 'approved' || document.approved === true)
+      .filter(isApprovedDocument)
       .map((document: any) => String(document.document_type)),
   );
   const acknowledgedTypes = new Set(

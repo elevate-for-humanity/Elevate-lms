@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { UploadedW9Review } from './UploadedW9Review';
+import type { UploadedW9Status } from '@/lib/program-holder/document-review';
 
 type Status = {
+  uploadedW9: UploadedW9Status;
   provider: 'paypal' | 'quickbooks' | 'branch' | null;
   destination: string | null;
   recipientEmail: string | null;
@@ -61,12 +64,13 @@ export function PayoutAccessPanel() {
       {error && <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-900"><p>{error}</p><button type="button" disabled={busy} onClick={() => void load()} className="mt-2 min-h-11 font-bold underline">Retry setup status</button></div>}
       {message && <p role="status" className="rounded-xl bg-blue-50 p-4 text-sm">{message}</p>}
       {preview ? <p className="rounded-xl bg-blue-50 p-4">Administrator preview is read only. The Program Holder completes their own banking setup.</p> : status ? <>
+        <UploadedW9Review status={status.uploadedW9} />
         <p className="text-sm">Current method: <strong>{status.provider === 'paypal' ? 'PayPal' : status.provider === 'quickbooks' ? 'QuickBooks' : 'Choose QuickBooks or PayPal'}</strong>. {verified ? 'Elevate has confirmed this payout setup.' : status.verificationStatus === 'pending' ? 'Destination saved; Elevate review is pending.' : 'Banking setup is incomplete.'}</p>
         {status.destination && <p className="text-sm">Saved destination: {status.destination}</p>}
         <div className="grid gap-4 lg:grid-cols-2">
           <section className="space-y-3 rounded-xl border border-blue-200 p-4">
             <h3 className="text-lg font-black">QuickBooks direct deposit</h3>
-            <p className="text-sm">Use your personal Intuit contractor invitation to add your W-9 and banking information. Elevate must issue the invitation from its QuickBooks contractor account.</p>
+            <p className="text-sm">Use your personal Intuit contractor invitation to complete QuickBooks tax and banking setup. Review the uploaded W-9 status above first. Elevate must issue the invitation from its QuickBooks contractor account.</p>
             <button type="button" disabled={busy || Boolean(lockedProvider && lockedProvider !== 'quickbooks')} onClick={() => void act({ provider: 'quickbooks', action: status.quickbooksInvitationAvailable ? 'onboard' : 'request_quickbooks' })} className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white disabled:opacity-50">{status.quickbooksInvitationAvailable ? 'Open my QuickBooks invitation' : 'Request QuickBooks bank setup'}</button>
           </section>
           <section className="space-y-3 rounded-xl border border-blue-200 p-4">

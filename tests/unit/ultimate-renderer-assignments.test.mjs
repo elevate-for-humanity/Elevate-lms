@@ -52,12 +52,12 @@ test('missing scene mapping cannot substitute an arbitrary licensed clip', () =>
     visual_assignment:{media:{assignments:[],readyAssets:[{id:'unrelated',public_url:'https://media.example/stock.mp4',mime_type:'video/mp4',entitlement_id:'license'}]}},
   }}), /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED/);
 });
-test('copies of one stored file request photographs for remaining scenes', () => {
+test('copies of one stored file request visual-neutral instruction for remaining scenes', () => {
   const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, visualRequirement: 'A client consultation', teachingVisual:{kind:'sequence',steps:[{label:'Clarify',value:'Clarify the client request'}]} }));
   const assets = scenes.map((_, i) => ({ id: `copy-${i}`, public_url: `https://media.example/file.mp4?token=${i}`, entitlement_id: 'license', license_evidence_url: 'https://media.example/license', visual_coverage_verified: true, visual_requirements: ['A client consultation'] }));
   const result = buildSceneAssignments(scenes, assets);
-  assert.equal(result.assignments.filter(a => a.assignmentMethod !== 'teaching-photograph-request').length, 1);
-  assert.equal(result.assignments.filter(a => a.assignmentMethod === 'teaching-photograph-request').length, minimum - 1);
+  assert.equal(result.assignments.filter(a => a.assignmentMethod !== 'instructional-visual-request').length, 1);
+  assert.equal(result.assignments.filter(a => a.assignmentMethod === 'instructional-visual-request').length, minimum - 1);
   assert.deepEqual(result.gaps, []);
 });
 test('checkpointed graphics cannot replace required practical demonstrations', () => {

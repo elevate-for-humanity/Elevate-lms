@@ -45,6 +45,7 @@ describe('dashboard billing health', () => {
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'private-db');
     vi.stubEnv('SENDGRID_API_KEY', 'private-email');
     vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', 'private-webhook');
+    vi.stubEnv('QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN', '');
     vi.mocked(loadQuickBooksConfig).mockResolvedValue(credentials);
     vi.mocked(quickBooksRequest).mockReset().mockResolvedValue({CompanyInfo:{CompanyName:'Authorized company'}});
     vi.mocked(loadBillingProviderConfig).mockResolvedValue({ primary: 'quickbooks' });
@@ -55,6 +56,19 @@ describe('dashboard billing health', () => {
     expect(health.quickBooksWebhookOk).toBe(true);
     expect(tables).not.toContain('billing_provider_config');
     expect(JSON.stringify(health)).not.toContain('private-');
+  });
+  it('accepts the verifier name saved by Environment Manager and used by the webhook handler', async () => {
+    vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', '');
+    vi.stubEnv('QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN', 'private-existing-verifier');
+    const health = await getSystemHealth(db as never);
+    expect(health.quickBooksWebhookOk).toBe(true);
+    expect(health.alerts.some(a => a.code === 'quickbooks_webhook_config_missing')).toBe(false);
+    expect(JSON.stringify(health)).not.toContain('private-existing-verifier');
+  });
+  it('allows the shared client to recover a missing access token with a saved refresh token', async () => {
+    vi.mocked(loadQuickBooksConfig).mockResolvedValue({ ...credentials, accessToken: '' });
+    expect((await getSystemHealth(db as never)).quickBooksBillingOk).toBe(true);
+    expect(quickBooksRequest).toHaveBeenCalled();
   });
   it('checks SendGrid without requiring retired Resend', async () => {
     vi.stubEnv('RESEND_API_KEY', '');
@@ -74,7 +88,7 @@ describe('dashboard billing health', () => {
     expect(JSON.stringify(health)).not.toContain('private-database-error');
   });
   it('reports incomplete or unreadable configuration as degraded', async () => {
-    vi.mocked(loadQuickBooksConfig).mockResolvedValue({ ...credentials, accessToken: '' });
+    vi.mocked(loadQuickBooksConfig).mockResolvedValue({ ...credentials, refreshToken: '' });
     expect((await getSystemHealth(db as never)).quickBooksBillingOk).toBe(false);
     vi.mocked(loadQuickBooksConfig).mockRejectedValue(new Error('private-provider-error'));
     const health = await getSystemHealth(db as never);

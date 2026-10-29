@@ -130,6 +130,8 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         authored = await author({
           ...(e.repairDirective ?? {}),
           reason: 'NARRATION_DUPLICATION',
+          previousBlueprint: authored,
+          duplicateSentenceCount: repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')),
           instruction: 'Rewrite duplicated teaching segments with unique, source-grounded instructional content. Keep the required objectives, stages, standards and assessments; do not repeat sentences or invent facts.',
           attempt: repair + 1,
         });

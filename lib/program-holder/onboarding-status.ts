@@ -1,3 +1,4 @@
+import { isApprovedDocument } from './document-review';
 /**
  * PROGRAM HOLDER ONBOARDING STATUS
  *
@@ -251,10 +252,10 @@ export async function getProgramHolderOnboardingStatus(
   // Check required documents
   const { data: documents } = await supabase
     .from('program_holder_documents')
-    .select('document_type, approved')
+    .select('document_type, status, approved')
     .eq('user_id', currentUserId);
 
-  const approvedDocs = documents?.filter((d) => d.approved) || [];
+  const approvedDocs = documents?.filter(isApprovedDocument) || [];
   const mouType = programHolder?.mou_type ?? 'barber';
 
   let requiredDocsComplete: boolean;

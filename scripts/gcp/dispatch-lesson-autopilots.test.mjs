@@ -90,7 +90,9 @@ test('stale cloud inventory cannot spend acknowledged launch capacity twice',asy
  const s=fixture(Array.from({length:5},(_,i)=>waiting('media','media-'+i)));
  s.options.capacityCheck=async()=>({fits:true,required:{cpu:4000,memory:8*Gi},granted:{cpu:8000,memory:16*Gi}});
  const result=await dispatchLessonAutopilots(s.options);
- assert.equal(result.assignments.length,2);assert.equal(launches(s).length,2);
+ assert.equal(result.status,'busy');assert.equal(result.reason,'active_worker_coverage_pending');
+ assert.equal(result.assignments.length,2);assert.equal(result.runnableJobs,5);assert.equal(result.coveredJobs,2);assert.equal(result.uncoveredJobs,3);
+ assert.equal(launches(s).length,2);
 });
 
 test('the capacity reservation includes launches from different role pools',async()=>{
@@ -150,10 +152,12 @@ test('a failed claimed lesson does not prevent launching and verifying other les
  assert.equal(result.assignments.length,3);assert.equal(result.assignments.filter(a=>a.state==='running').length,2);
 });
 
-test('explicit concurrency configuration replaces the former one-per-role ceiling',async()=>{
+test('explicit concurrency configuration cannot reduce active lesson coverage',async()=>{
  const s=fixture(Array.from({length:7},(_,i)=>waiting('instruction','lesson-'+i)));
  s.options.env.COURSE_AUTOPILOT_INSTRUCTION_CONCURRENCY='6';
- assert.equal((await dispatchLessonAutopilots(s.options)).assignments.length,6);
+ await assert.rejects(dispatchLessonAutopilots(s.options),/ACTIVE_WORKER_CONTRACT_VIOLATION/);
+ s.options.env.COURSE_AUTOPILOT_INSTRUCTION_CONCURRENCY='8';
+ assert.equal((await dispatchLessonAutopilots(s.options)).assignments.length,7);
  const invalid=fixture([waiting('media')]);invalid.options.env.COURSE_AUTOPILOT_MEDIA_CONCURRENCY='-1';
  await assert.rejects(dispatchLessonAutopilots(invalid.options),/CONCURRENCY_INVALID/);
 });

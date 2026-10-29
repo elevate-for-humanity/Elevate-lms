@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     return safeError('Only admins can mark payouts as paid', 403);
   }
 
-  const { enrollment_id, release_date } = await request.json();
+  const { enrollment_id, release_date, expected_amount_cents } = await request.json();
   if (!enrollment_id) return safeError('enrollment_id required', 400);
 
   const { data: paymentEnrollment } = await db
@@ -58,6 +58,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (expected_amount_cents !== undefined) {
+    const { data: currentSchedule, error: currentError } = await db.from('payout_schedules')
+      .select('increment_1_cents').eq('enrollment_id', enrollment_id).maybeSingle();
+    if (currentError || !currentSchedule || !Number.isInteger(expected_amount_cents) || expected_amount_cents <= 0 ||
+        Number(currentSchedule.increment_1_cents) !== expected_amount_cents)
+      return safeError('The payout amount changed. Refresh and review the current schedule.', 409);
+  }
+
   const today = new Date().toISOString().slice(0, 10);
   const approvedReleaseDate =
     typeof release_date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(release_date)
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     })
     .eq('enrollment_id', enrollment_id)
-    .neq('increment_1_status', 'paid')
+    .in('increment_1_status', ['pending', 'approved'])
     .select('id')
     .maybeSingle();
   if (scheduleError) return safeInternalError(scheduleError, 'Failed to approve payout schedule');
@@ -107,7 +115,7 @@ export async function POST(request: NextRequest) {
     changed_by: auth.id,
     field_name: 'payout_status',
     old_value: 'pending',
-    new_value: 'paid',
+    new_value: release.alreadyReleased ? 'paid' : 'released',
     note: release.quickBooksSynced
       ? `Provider payout completed and recorded in QuickBooks (payment ID: ${release.quickBooksPaymentId})`
       : 'Provider payout released; QuickBooks recording is pending provider confirmation.',

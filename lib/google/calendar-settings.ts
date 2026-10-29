@@ -11,3 +11,16 @@ export function validateGoogleCalendarUpdates(entries: Array<{ key: string; valu
     }
   }
 }
+
+/** Select one complete OAuth client; never mix credentials from two clients. */
+export function googleCalendarCredentials(env: Record<string, string | undefined>) {
+  const preferredId = env.GOOGLE_CALENDAR_CLIENT_ID;
+  const preferredSecret = env.GOOGLE_CALENDAR_CLIENT_SECRET;
+  if (preferredId || preferredSecret) {
+    return preferredId?.trim() && preferredSecret?.trim()
+      ? { clientId: preferredId, clientSecret: preferredSecret } : null;
+  }
+  const clientId = env.GOOGLE_CLIENT_ID;
+  const clientSecret = env.GOOGLE_CLIENT_SECRET;
+  return clientId?.trim() && clientSecret?.trim() ? { clientId, clientSecret } : null;
+}

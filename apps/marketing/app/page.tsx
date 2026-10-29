@@ -1,3 +1,4 @@
+import HvacTrainingShowcase from '@/components/programs/HvacTrainingShowcase';
 import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 // Keep the homepage focused on training, the featured shops, and enrollment.
 // Detailed platform operations remain on the dedicated platform pages.
@@ -64,6 +65,7 @@ export default function HomePage() {
         <PlatformHubHero />
         <HomeFeaturedHostShop />
         <HomeCareerPathways />
+        <HvacTrainingShowcase compact />
         <HomeHowItWorks />
         <section className="bg-slate-50 px-5 py-12" aria-labelledby="tax-home-cta">
           <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-8">
@@ -112,7 +114,9 @@ export default function HomePage() {
         <HomeInstitutionalGateway />
         <HomeWebsiteBuilderSales />
         <HomePlatformOverview />
-        <div className="mx-auto max-w-6xl px-5"><ProgramGuideResources /></div>
+        <div className="mx-auto max-w-6xl px-5">
+          <ProgramGuideResources />
+        </div>
         <section
           className="border-y border-slate-200 bg-white px-5 py-12 sm:py-16"
           aria-labelledby="workforce-platform-heading"

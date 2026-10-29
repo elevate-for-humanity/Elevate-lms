@@ -1,3 +1,4 @@
+import { getUploadedW9Status } from '@/lib/program-holder/document-review';
 import { NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,8 +20,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!holder?.user_id) return NextResponse.json({ error: 'A linked Program Holder login is required.' }, { status: 409 });
   const { data: payout, error: payoutError } = await auth.db!.from('program_holder_payouts').select('payout_provider,provider_recipient_id,paypal_recipient_email,verification_status,verified_at,notes').eq('user_id', holder.user_id).maybeSingle();
   if (payoutError) return NextResponse.json({ error: 'Banking review could not load.' }, { status: 503 });
+  let uploadedW9;
+  try { uploadedW9 = await getUploadedW9Status(auth.db!, holder.user_id); }
+  catch { return NextResponse.json({ error: 'Uploaded W-9 review could not be verified.' }, { status: 503 }); }
   const { notes, ...summary } = payout || {};
-  return NextResponse.json({ payout: payout ? summary : null, invitationUrl: quickBooksInvitationUrl(payoutSetupNotes(notes).quickbooks_invitation_url) || '' }, { headers: { 'Cache-Control': 'private, no-store' } });
+  return NextResponse.json({ uploadedW9, payout: payout ? summary : null, invitationUrl: quickBooksInvitationUrl(payoutSetupNotes(notes).quickbooks_invitation_url) || '' }, { headers: { 'Cache-Control': 'private, no-store' } });
 }
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const limited = await applyRateLimit(request, 'payment'); if (limited) return limited;

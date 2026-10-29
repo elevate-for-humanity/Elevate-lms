@@ -154,14 +154,16 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           reason: 'No distinct licensed asset has verified lesson/scene relevance evidence', licensedAssetCount:candidates.length});
         continue;
       }
-      // Photographic requests support conceptual teaching. They cannot stand
+      // A conceptual scene needs a useful visual, not a teacher/instructor
+      // photograph. The renderer may use a licensed image, inspected still,
+      // or a clearly labelled instructional graphic. None of those can stand
       // in for required observable physical techniques.
       assignments.push({
         sceneId: scene.id,
-        assetId: `teaching-photo-request:${scene.id}`,
-        relevanceReason: `Photograph illustrating: ${scene.visualRequirement}`,
-        assignmentMethod: 'teaching-photograph-request',
-        requestedTeachingPhotograph: true,
+        assetId: `instructional-visual-request:${scene.id}`,
+        relevanceReason: `Instructional visual supporting: ${scene.visualRequirement}`,
+        assignmentMethod: 'instructional-visual-request',
+        requestedInstructionalVisual: true,
         visualRequirement: scene.visualRequirement,
       });
       continue;

@@ -5,6 +5,7 @@ import {generateTeachingPhoto} from './google-teaching-photo.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
+import { conceptualTeachingCard } from './conceptual-teaching-card.mjs';
 import { createHash } from 'node:crypto';
 import { describeWorkerError, optionalStorageCacheMiss } from '../core/worker-error.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -128,7 +129,12 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
           .update(Buffer.from(await hit.data.arrayBuffer())).digest('hex')};
       }
       if(!saved){
-        const generated=await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,
+        // A missing photograph is not a course blocker. Conceptual scenes use
+        // a deterministic, clearly labelled instructional visual. Licensed
+        // photographs and inspected course stills above remain preferred, and
+        // practical scenes still require real observable footage separately.
+        const generated=await conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index,supplemental:true}) ??
+          await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,
           persistFailure:async(detail:any)=>{
             const result=await bucket.upload('approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',
               Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
@@ -140,7 +146,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const mimeType=generated.mimeType;
         if(!['image/png','image/jpeg','image/webp'].includes(mimeType))throw new Error('TEACHING_PHOTO_MIME_INVALID');
         const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
-        saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256,repair:generated.repair};
+        saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256,repair:generated.repair,
+          provider:generated.repair?.method==='lesson-conceptual-card-v1'?'elevate-instructional':generated.provider};
         const uploaded=await bucket.upload(saved.storagePath,generated.bytes,{contentType:mimeType,upsert:false});
         if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
       }
@@ -162,7 +169,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const signed=await bucket.createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
-        stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'google-generated'}))
+        stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,
+        provider:saved.provider??(saved.repair?.method==='lesson-conceptual-card-v1'?'elevate-instructional':'google-generated'),repair:saved.repair}))
         throw new Error('COURSE_PHOTO_ALREADY_USED');
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
      } catch (error) {

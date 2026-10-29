@@ -12,9 +12,9 @@ test('workspace diagnosis returns bounded aggregate differences without private 
  const run=args=>args[0]==='run'?JSON.stringify({status:{url:'https://serving.run.app',latestCreatedRevisionName:'candidate',traffic}}):'test-secret';
  const calls=[];const request=async(url,options)=>{calls.push({url,options});return Response.json({exitCode:0,stdout:JSON.stringify({files:url.hostname==='candidate.run.app'?2:3,directories:1,bytes:10,digest:'a'.repeat(64),archiveDigest:'b'.repeat(64),generation:'1234',authenticatedManifest:true,excludedDependencyCaches:true,private:'never-return-this'})});};
  const result=await inspectStudioPreservation({run,request});assert.equal(result.equal,false);assert.equal(result.source.files,3);assert.equal(result.candidate.files,2);
- assert.equal(result.stateChanged,false);assert.equal(calls.length,2);assert.ok(calls.every(c=>c.url.pathname==='/workspace/exec'));
+ assert.equal(result.stateChanged,false);assert.equal(calls.length,4);assert.ok(calls.every(c=>c.url.pathname==='/workspace/exec'));
  assert.ok(!JSON.stringify(result).includes('never-return-this'));assert.ok(!JSON.stringify(result).includes('test-secret'));
- traffic[0].percent=100;assert.equal((await inspectStudioPreservation({run,request})).candidateAvailable,false);assert.equal(calls.length,2);
+ traffic[0].percent=100;assert.equal((await inspectStudioPreservation({run,request})).candidateAvailable,false);assert.equal(calls.length,4);
 });
 test('real metadata probe counts files and links without returning contents or names',async t=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'studio-inventory-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));await fs.writeFile(path.join(root,'private-name'),'private-content');await fs.mkdir(path.join(root,'node_modules'));await fs.writeFile(path.join(root,'node_modules','ignored'),'cache');await fs.symlink('/etc',path.join(root,'external-link'));

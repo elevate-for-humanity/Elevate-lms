@@ -47,8 +47,15 @@ export async function inspectStudioPreservation({run=google,request=fetch}={}) {
  const endpoints=[resource.status.url,candidate.url];
  for(const value of endpoints){const url=new URL(value);if(url.protocol!=='https:'||!url.hostname.endsWith('.run.app')||url.username||url.password||url.pathname!=='/'||url.search||url.hash)throw Error('STUDIO_ENDPOINT_UNVERIFIED');}
  const secret=run(['secrets','versions','access','latest','--secret=studio-browser-shared-secret','--project='+PROJECT]);
- const proofs=[];
+ const proofs=[],runtimes=[];
  for(const base of endpoints){
+  const metadataProgram="const fs=require('node:fs'),crypto=require('node:crypto');console.log(JSON.stringify({kind:'workspace_module_metadata',revision:process.env.K_REVISION,rootIsDefault:process.cwd()==='/workspace/project',prefixIsDefault:!process.env.STUDIO_WORKSPACE_OBJECT_PREFIX||process.env.STUDIO_WORKSPACE_OBJECT_PREFIX==='workspaces/admin-repository-v1',moduleHashes:Object.fromEntries(['server.mjs','workspace-checkpoint.mjs','gcs-workspace-objects.mjs'].map(name=>[name,crypto.createHash('sha256').update(fs.readFileSync('/app/'+name)).digest('hex')]))}));";
+  const metadataResponse=await request(new URL('/workspace/exec',base),{method:'POST',headers:{'content-type':'application/json','x-studio-browser-secret':secret},body:JSON.stringify({command:'node',args:['-e',metadataProgram],timeoutMs:30000}),redirect:'error',signal:AbortSignal.timeout(40000)});
+  if(!metadataResponse.ok)throw Error('STUDIO_RUNTIME_METADATA_UNVERIFIED');
+  const metadataResult=await metadataResponse.json();if(metadataResult.exitCode!==0||typeof metadataResult.stdout!=='string'||metadataResult.stdout.length>2048)throw Error('STUDIO_RUNTIME_METADATA_UNVERIFIED');
+  const raw=JSON.parse(metadataResult.stdout),metadata={revision:/^elevate-studio-browser-[a-z0-9-]+$/.test(raw.revision||'')?raw.revision:null,rootIsDefault:raw.rootIsDefault===true,prefixIsDefault:raw.prefixIsDefault===true,moduleHashes:{}};
+  for(const name of ['server.mjs','workspace-checkpoint.mjs','gcs-workspace-objects.mjs'])metadata.moduleHashes[name]=/^[a-f0-9]{64}$/.test(raw.moduleHashes?.[name]||'')?raw.moduleHashes[name]:null;
+  runtimes.push(metadata);
   const response=await request(new URL('/workspace/exec',base),{method:'POST',headers:{'content-type':'application/json','x-studio-browser-secret':secret},body:JSON.stringify({command:'node',args:['-e',WORKSPACE_PRESERVATION_PROBE],timeoutMs:120000}),redirect:'error',signal:AbortSignal.timeout(150000)});
   if(!response.ok)throw Error('STUDIO_PRESERVATION_INSPECTION_HTTP_'+response.status);
   const result=await response.json();if(result.exitCode!==0||typeof result.stdout!=='string'||result.stdout.length>2048)throw Error('STUDIO_PRESERVATION_INSPECTION_FAILED');
@@ -59,6 +66,6 @@ export async function inspectStudioPreservation({run=google,request=fetch}={}) {
   proof.authenticatedManifest=data.authenticatedManifest===true;proof.excludedDependencyCaches=data.excludedDependencyCaches===true;
   proofs.push(proof);
  }
- return {readOnly:true,stateChanged:false,candidateAvailable:true,candidateRevision:candidate.revisionName,source:proofs[0],candidate:proofs[1],equal:JSON.stringify(proofs[0])===JSON.stringify(proofs[1])};
+ return {readOnly:true,stateChanged:false,candidateAvailable:true,candidateRevision:candidate.revisionName,sourceRuntime:runtimes[0],candidateRuntime:runtimes[1],source:proofs[0],candidate:proofs[1],equal:JSON.stringify(proofs[0])===JSON.stringify(proofs[1])};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){try{console.log(JSON.stringify(await (process.argv.includes('--admin-github-bindings')?inventoryAdminGitHubBindings():process.argv.includes('--preservation')?inspectStudioPreservation():inventoryStudioLiveState())));}catch{console.error(JSON.stringify({error:'STUDIO_LIVE_STATE_INVENTORY_FAILED',stateChanged:false}));process.exitCode=1;}}

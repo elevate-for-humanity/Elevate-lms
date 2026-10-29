@@ -91,7 +91,7 @@ jobs:
         run: node scripts/gcp/audit-google-oauth-locations.mjs
       - name: Check managed Supabase Google provider configuration without exposing values
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN || secrets.SUPABASE_MANAGEMENT_API_KEY }}
           SUPABASE_TOKEN: ${{ secrets.SUPABASE_TOKEN }}
         run: |
           node --input-type=module <<'NODE'

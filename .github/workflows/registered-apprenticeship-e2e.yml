@@ -133,16 +133,24 @@ jobs:
         run: node scripts/check-registered-apprenticeship-architecture.mjs
       - name: Verify public hydration, startup stability and audible-media exclusivity
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/studio
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/responsive
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Require the attested release to remain live through acceptance
         if: ${{ !cancelled() && inputs.deployment_run_id != '' }}
         env:

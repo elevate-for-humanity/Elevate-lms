@@ -42,8 +42,8 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const renewableStoredMediaRead =
    /FINDINGS=.*finished_media_qa.*MP4 returned HTTP 401/i.test(error);
   const durableExternalBlocker =
-   /OWNER_|AUTHORIZ|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
-    !renewableStoredMediaRead ||
+   (/OWNER_|AUTHORIZ|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
+    !renewableStoredMediaRead) ||
    /\b(?:LICENSE_APPROVAL_REQUIRED|MEDIA_LICENSE_REQUIRED|MEDIA_SOURCE_APPROVAL_REQUIRED)\b/i.test(error);
   // Per-scene license metadata and saved-assignment findings are internal
   // contract defects after an approved-source deployment, so the verified new

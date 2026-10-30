@@ -21,6 +21,9 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/consolidation-docker-northflank.yml'
+      - '.github/workflows/deploy-google-lms-trigger.yml'
+      - '.github/workflows/deploy-google-repaired.yml'
+      - 'scripts/gcp/smoke-lms-container*'
 
 permissions:
   contents: read
@@ -111,3 +114,8 @@ jobs:
           echo "${{ matrix.service }} failed canonical health on PORT=${RUNTIME_PORT}"
           docker logs "$name"
           exit 1
+      - name: Prove the LMS candidate under its production CPU and memory limits
+        if: matrix.service == 'lms'
+        run: |
+          node --test scripts/gcp/smoke-lms-container.test.mjs
+          node scripts/gcp/smoke-lms-container.mjs

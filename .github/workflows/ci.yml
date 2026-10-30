@@ -49,6 +49,8 @@ jobs:
         run: node --test scripts/test-devstudio-github-token.mjs scripts/test-github-app-token.mjs scripts/gcp/paris-github-app-binding.test.mjs scripts/gcp/github-runtime-binding.test.mjs scripts/test-github-authorization-contract.mjs scripts/test-paris-app-diagnostic.mjs scripts/test-paris-completion-audit.mjs scripts/test-studio-health-app-access.mjs scripts/test-paris-tool-outcomes.mjs tests/worker/course-workspace-controls.test.mjs
       - name: Studio terminal, repository and PARIS voice regression tests
         run: node --test services/studio-browser/terminal-sessions.test.mjs services/studio-browser/repository-sync.test.mjs infra/pbx/paris/*.test.mjs infra/pbx/provisioner/*.test.mjs
+      - name: External course execution and RunPod inference contracts
+        run: node --test tests/compute/*.test.mjs infra/pbx/runtime-secrets.test.mjs lib/ai/providers/google-runtime-auth.test.mjs tests/worker/video-encoder-process.test.mjs tests/worker/remotion-concat-output.test.mjs
       - name: Automatic container build-memory policy
         run: |
           node scripts/check-build-memory-policy.mjs

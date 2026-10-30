@@ -3,9 +3,12 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 
-const source = stripTypeScriptTypes(await readFile(new URL('../../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'), {mode: 'transform'})
-  .replace("'./owner-preview-claim.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/owner-preview-claim.mjs', import.meta.url).href))
-  .replace("'./dispatch-on-enqueue.mjs'", JSON.stringify(new URL('../../lib/ultimate-course-builder/worker/dispatch-on-enqueue.mjs', import.meta.url).href));
+const queueUrl = new URL('../../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url);
+// A data URL has no directory. Resolve every static relative import against
+// the real module so newly added queue dependencies are tested without stubs.
+const source = stripTypeScriptTypes(await readFile(queueUrl, 'utf8'), {mode: 'transform'})
+  .replace(/\bfrom\s+(['"])(\.{1,2}\/[^'"]+)\1/g,
+    (_match, _quote, specifier) => `from ${JSON.stringify(new URL(specifier, queueUrl).href)}`);
 const {UltimateJobQueue} = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 function scope(t, attempt, preview) {
   const saved = {...process.env};

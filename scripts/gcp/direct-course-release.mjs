@@ -11,9 +11,9 @@ export function directJobTemplate(source,{imageSha,imageDigest}) {
  if(!Array.isArray(container.env)||!container.env.some(value=>value.name==='SUPABASE_SERVICE_ROLE_KEY'))throw Error('DIRECT_SOURCE_DATABASE_CONNECTION_REQUIRED');
  container.image=`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@${imageDigest}`;
  container.command=['node'];container.args=['--import=tsx','workers/direct-course-release.ts'];
- container.env=container.env.filter(value=>!['DIRECT_RELEASE_SOURCE_SHA','ULTIMATE_PHOTO_REGION','ULTIMATE_PHOTO_MODEL'].includes(value.name));
+ container.env=container.env.filter(value=>!['DIRECT_RELEASE_SOURCE_SHA','ULTIMATE_PHOTO_REGION','ULTIMATE_PHOTO_MODEL','REMOTION_RENDER_CONCURRENCY'].includes(value.name));
  const legacy=['3ae82989396abe436d503a694c02f54396d80bb4','79dc886bd59385d2f42069fe22c216211d8f00b9','80eb6455d0bfff9178306fcaedc9b88c84390e73'].includes(imageSha);
- container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha},{name:'ULTIMATE_PHOTO_REGION',value:'global'},{name:'ULTIMATE_PHOTO_MODEL',value:legacy?'gemini-3.1-flash-image':'gemini-3.1-flash-lite-image'});
+ container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha},{name:'ULTIMATE_PHOTO_REGION',value:'global'},{name:'ULTIMATE_PHOTO_MODEL',value:legacy?'gemini-3.1-flash-image':'gemini-3.1-flash-lite-image'},{name:'REMOTION_RENDER_CONCURRENCY',value:'4'});
  // One task processes course groups sequentially. HVAC's two preserved
  // snapshots stay together before another course starts. The task is finite and
  // cannot be retried by Cloud Run. Original job configuration stays intact.

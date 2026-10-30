@@ -1,7 +1,5 @@
 import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
-import {recoverTeachingPhoto} from './photo-repair.mjs';
-import {generateTeachingPhoto} from './google-teaching-photo.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
@@ -142,13 +140,11 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         // a deterministic, clearly labelled instructional visual. Licensed
         // photographs and inspected course stills above remain preferred, and
         // practical scenes still require real observable footage separately.
-        const generated=await conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index,supplemental:true}) ??
-          await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,
-          persistFailure:async(detail:any)=>{
-            const result=await bucket.upload('approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',
-              Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
-            if(result.error)throw new Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);
-          }});
+        const generated=await conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index,supplemental:true});
+        // Google teaching-photo generation is retired. Preserve saved images,
+        // selected course stills and licensed photographs above; never call a
+        // remote image generator when an asset is missing.
+        if(!generated) throw new Error('COURSE_VISUAL_ASSET_REQUIRED:'+scene.id+':cue='+index);
         if(!generated?.bytes || !Buffer.isBuffer(generated.bytes) || !generated.bytes.length)throw new Error('TEACHING_PHOTO_BYTES_REQUIRED');
         const sha256=createHash('sha256').update(generated.bytes).digest('hex');
         if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');

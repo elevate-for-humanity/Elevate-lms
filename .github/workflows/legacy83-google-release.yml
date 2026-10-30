@@ -54,3 +54,17 @@ jobs:
             gcloud builds connections list --project=elegant-racer-299721 --region="$region" --format='json(name,githubConfig.installationState)' || true
           done
           gcloud storage buckets list --project=elegant-racer-299721 --format='value(name)'
+      - name: Prepare encrypted private-source handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          key_file="$(mktemp)"
+          trap 'rm -f "$key_file"' EXIT
+          if ! gcloud secrets describe legacy83-source-decryption-key --project=elegant-racer-299721 >/dev/null 2>&1; then
+            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out "$key_file" 2>/dev/null
+            gcloud secrets create legacy83-source-decryption-key --project=elegant-racer-299721 --replication-policy=automatic --data-file="$key_file" --labels=customer=legacy83,purpose=source-delivery
+          else
+            gcloud secrets versions access latest --secret=legacy83-source-decryption-key --project=elegant-racer-299721 > "$key_file"
+          fi
+          openssl pkey -in "$key_file" -pubout

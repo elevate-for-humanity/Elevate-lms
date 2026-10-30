@@ -8,7 +8,7 @@ const read=args=>{
   throw new Error('COURSE_DIAGNOSTIC_READ_FAILED:'+String(error.code??'INVALID_RESPONSE'));
  }
 };
-const jobs=[['elevate-direct-course-release','us-central1'],['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1'],['elevate-course-instruction','us-east1'],['elevate-course-media','us-east1'],['elevate-course-quality','us-east1']];
+const jobs=[['elevate-direct-course-release','us-central1'],['elevate-direct-course-release','us-east1'],['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1'],['elevate-course-instruction','us-east1'],['elevate-course-media','us-east1'],['elevate-course-quality','us-east1']];
 for(const [job,region] of jobs){
  const config=read(['run','jobs','describe',job,'--region='+region,'--project=elegant-racer-299721','--format=json']);
  const task=config.spec?.template?.spec?.template?.spec;
@@ -69,7 +69,7 @@ for(const entry of denied){
 const billing=read(['billing','projects','describe','elegant-racer-299721','--format=json']);
 console.log(JSON.stringify({project:'elegant-racer-299721',billingEnabled:billing.billingEnabled===true}));
 
-const directRuns=read(['run','jobs','executions','list','--job=elevate-direct-course-release','--project=elegant-racer-299721','--region=us-central1','--limit=10','--format=json']);
+const directRuns=['us-central1','us-east1'].flatMap(region=>read(['run','jobs','executions','list','--job=elevate-direct-course-release','--project=elegant-racer-299721','--region='+region,'--limit=10','--format=json']));
 const probeDecision=authoringProbeDecision(directRuns);
 if(probeDecision==='probe'){
  const probeCode="const marker='DIRECT_AUTHORING_DIAGNOSTIC_V1';const token=await(await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',{headers:{'Metadata-Flavor':'Google'},signal:AbortSignal.timeout(10000)})).json();const r=await fetch('https://aiplatform.us.rep.googleapis.com/v1/projects/elegant-racer-299721/locations/us/publishers/google/models/gemini-3.8-flash:generateContent',{method:'POST',headers:{Authorization:'Bearer '+token.access_token,'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Reply OK.'}]}],generationConfig:{maxOutputTokens:16}}),signal:AbortSignal.timeout(25000)});const body=await r.json();console.log(JSON.stringify({marker,providerDiagnostic:{http:r.status,status:body.error?.status,message:String(body.error?.message??'').replace(/https?:\\/\\/[^\\s]+/g,'[url]').slice(0,1500),reasons:body.error?.details?.map(d=>({reason:d.reason,domain:d.domain}))}}));";

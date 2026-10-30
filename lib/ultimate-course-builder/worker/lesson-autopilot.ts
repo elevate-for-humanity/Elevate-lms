@@ -18,11 +18,25 @@ import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
  * finding. Saved producer feedback from an earlier stage is recovery history,
  * not permission to restart instruction after a later learner/browser fault. */
 export function currentRepairDirective(result:any) {
-  const directive = result.lessons?.[0]?.result?.artifacts?.__repairState?.directive;
+  const repairState = result.lessons?.[0]?.result?.artifacts?.__repairState;
+  const directive = repairState?.directive;
   const findings = (result.findings ?? []).filter((finding:any) => finding?.severity === 'error');
   const requirements = directive?.requirements;
   if (!directive || !Array.isArray(requirements) || !requirements.length || !findings.length)
     return undefined;
+  // A resumed quality role stops at an upstream producer that its saved QA
+  // directive already invalidated. Keep the measured requirements rather than
+  // rejecting the handoff because this attempt reports the role boundary.
+  // A validated repair or an unrelated later failure cannot use this path.
+  const upstream = findings.every((finding:any) =>
+    finding.code === 'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED' &&
+    finding.step === directive.target &&
+    finding.message === 'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED:' + directive.target);
+  if (repairState.status === 'diagnosed' && upstream &&
+      requirements.every((requirement:any) =>
+        typeof requirement.code === 'string' && Boolean(requirement.code.trim()) &&
+        typeof requirement.message === 'string' && Boolean(requirement.message.trim())))
+    return directive;
   const matching = findings.filter((finding:any) => finding.step === directive.failedStep);
   if (!matching.length || !requirements.every((requirement:any) => matching.some((finding:any) =>
     finding.code === requirement.code && finding.message === requirement.message))) return undefined;
@@ -112,8 +126,12 @@ export async function processLessonAutopilot({db,job,workerId,generation,build,q
       await queue.waitForDependency(job.id,workerId,message,generation);
       return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
     }
-    await queue.fail(job.id,workerId,message,generation,true);
-    return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
+    // An unchanged producer or unresolved role handoff needs a new repair or
+    // deployed code, not another identical claim that consumes the retry budget.
+    const retry = !result.findings.some((finding:any) =>
+      ['AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED','REPAIR_PRODUCER_UNCHANGED'].includes(finding.code));
+    await queue.fail(job.id,workerId,message,generation,retry);
+    return {claimed:true,completed:false,repairQueued:retry,jobId:job.id,result};
   }
   if (task.role === 'quality') {
     await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,validate:assertCompleteLesson,assertActive});

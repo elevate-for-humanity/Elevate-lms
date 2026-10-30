@@ -20,10 +20,10 @@ on:
         required: true
         options: [marketing, admin, lms, store, all]
       candidate_size:
-        description: Admin candidate allocation; preserve keeps existing service resources
+        description: Tested candidate allocation; preserve keeps existing service resources
         type: choice
         default: preserve
-        options: [preserve, admin-2cpu-4gi]
+        options: [preserve, admin-2cpu-4gi, lms-2cpu-4gi]
       image_sha:
         description: Full commit SHA of the successfully uploaded image
         type: string
@@ -62,6 +62,8 @@ jobs:
           COMPONENT: ${{ matrix.component }}
           IMAGE_SHA: ${{ inputs.image_sha }}
           CANDIDATE_SIZE: ${{ inputs.candidate_size || 'preserve' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         shell: bash
         run: |
           set -euo pipefail
@@ -73,7 +75,7 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          # The bounded Admin candidate fits verified rollout headroom; existing traffic stays healthy until acceptance.
+          # Bounded candidates must fit verified headroom; traffic stays pinned until acceptance.
           resource_args=()
           case "$CANDIDATE_SIZE" in
             preserve) ;;
@@ -81,6 +83,16 @@ jobs:
               test "$COMPONENT" = admin
               export CANDIDATE_CPU=2 CANDIDATE_MEMORY=4Gi
               resource_args=(--cpu=2 --memory=4Gi --no-cpu-throttling --update-env-vars=AI_NARRATION_PROVIDER=kokoro)
+              ;;
+            lms-2cpu-4gi)
+              test "$COMPONENT" = lms
+              export CANDIDATE_CPU=2 CANDIDATE_MEMORY=4Gi
+              resource_args=(--cpu=2 --memory=4Gi)
+              # Test the same immutable image and allocation, including manual releases.
+              gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+              docker pull "$IMAGE@$DIGEST"
+              node --test scripts/gcp/smoke-lms-container.test.mjs
+              SMOKE_IMAGE="$IMAGE@$DIGEST" node scripts/gcp/smoke-lms-container.mjs
               ;;
             *) echo 'Unsupported candidate allocation'; exit 1 ;;
           esac

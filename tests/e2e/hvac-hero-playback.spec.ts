@@ -77,10 +77,15 @@ test('HVAC hero plays the complete 96-second film and loops without cropping', a
 });
 
 test('optional assistance and installation do not cover the HVAC film or controls', async ({ page }, testInfo) => {
+  const hydrationErrors: string[] = [];
+  page.on('pageerror', error => {
+    if (/hydration|Minified React error #418/i.test(error.message)) hydrationErrors.push(error.message);
+  });
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   await expect(page.locator(selector)).toBeVisible();
   // Cover the delayed iOS install promotion as well as the initial page load.
   await page.waitForTimeout(12_000);
+  expect(hydrationErrors, 'The streamed HVAC hero must hydrate without replacing its portal container').toEqual([]);
   await expect(page.locator('[data-pwa-install-banner]')).toHaveCount(0);
   await expect(page.locator('[data-public-video-overlay]')).toHaveCount(0);
   const controlsClear = await page.locator(selector).evaluate((element: HTMLVideoElement) => {

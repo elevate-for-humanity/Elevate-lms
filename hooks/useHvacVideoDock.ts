@@ -13,30 +13,41 @@ export function useHvacVideoDock(enabled = true) {
     if (!enabled || pathname !== '/programs/hvac-technician') return;
     let active = true;
     let observer: IntersectionObserver | undefined;
-    let waiting: MutationObserver | undefined;
+    let video: Element | null = null;
+    let target: HTMLElement | null = null;
     const attach = () => {
-      if (!active || observer) return true;
-      const video = document.querySelector('main video[data-hvac-hero-video]');
-      const target = document.querySelector<HTMLElement>('[data-hvac-video-assistance]');
-      if (!video || !target) return false;
+      if (!active) return;
+      const nextVideo = document.querySelector('main video[data-hvac-hero-video]');
+      const nextTarget = document.querySelector<HTMLElement>('[data-hvac-video-assistance="ready"]');
+      if (nextVideo === video && nextTarget === target) return;
+      observer?.disconnect();
+      video = nextVideo;
+      target = nextTarget;
+      setDock(null);
+      if (!video || !target) return;
+      const observedVideo = video;
+      const observedTarget = target;
       observer = new IntersectionObserver(entries => {
-        if (!active) return;
+        if (!active || video !== observedVideo || target !== observedTarget ||
+          !observedVideo.isConnected || !observedTarget.isConnected) return;
         for (const entry of entries) {
-          if (entry.target === video) setDock(entry.isIntersecting ? target : null);
+          if (entry.target === observedVideo) setDock(entry.isIntersecting ? observedTarget : null);
         }
       });
-      observer.observe(video);
-      return true;
+      observer.observe(observedVideo);
     };
-    // App Router can stream the page after the shared layout has mounted.
-    if (!attach()) {
-      waiting = new MutationObserver(() => { if (attach()) waiting?.disconnect(); });
-      waiting.observe(document.body, { childList: true, subtree: true });
-    }
+    // Streaming and hydration recovery can replace an already discovered hero.
+    // Observe only on this route, and rebind only when the actual nodes change.
+    const changes = new MutationObserver(attach);
+    changes.observe(document.body, {
+      childList: true, subtree: true, attributes: true,
+      attributeFilter: ['data-hvac-video-assistance'],
+    });
+    attach();
     return () => {
       active = false;
       observer?.disconnect();
-      waiting?.disconnect();
+      changes.disconnect();
     };
   }, [enabled, pathname]);
 

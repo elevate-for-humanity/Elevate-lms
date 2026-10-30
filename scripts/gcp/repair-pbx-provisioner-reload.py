@@ -60,6 +60,8 @@ def repair(source, revision):
         if path.is_symlink() or not path.is_file() or (path == TARGET and (path.stat().st_uid != EXPECTED_UID or path.stat().st_mode & 0o022)):
             raise ValueError('provisioner_file_ownership_unverified')
     if digest(source) != NEW or digest(TARGET) not in [OLD, PREVIOUS, NATIVE, REVIEWED_PREVIOUS, EMPTY_BOOTSTRAP_PREVIOUS, NEW]:
+        print(json.dumps({'provisionerSourceReview': {'candidateSha256': digest(source),
+              'currentSha256': digest(TARGET), 'expectedCandidateSha256': NEW}}), flush=True)
         raise ValueError('provisioner_source_requires_review')
     run(['/usr/bin/node', '--check', str(source)])
     records_path = ROOT / 'current' / 'state.json'

@@ -44,18 +44,18 @@ beforeEach(async () => {
   images.forEach(bytes => vi.mocked(generateTeachingPhoto).mockResolvedValueOnce({ bytes, mimeType: 'image/png', provider: 'google' }));
 });
 
-test('new lessons use reusable instructional visuals without requiring a teacher photograph', async () => {
+test('new lessons generate relevant photographs without requiring a teacher portrait', async () => {
   const { db, files } = storage();
   const original = structuredClone(input);
   const result = await prepareTeachingPhotos(input, db);
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(3);
   expect(result.teachingPhotos.concept).toHaveLength(3);
   expect(new Set(result.teachingPhotos.concept.map((p: any) => p.sha256)).size).toBe(3);
   expect(input).toEqual(original);
   expect([...files.keys()].filter(path => path.startsWith('approved-teaching-photos/'))).toHaveLength(3);
   expect([...files.keys()].filter(path => path.startsWith('approved-teaching-photo-index/'))).toHaveLength(3);
   const resumed = await prepareTeachingPhotos(input, db);
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(3);
   expect(resumed.teachingPhotos).toEqual(result.teachingPhotos);
 });
 
@@ -84,18 +84,16 @@ test('unverified legacy card cache entries cannot satisfy new visual requests', 
   ].map(hash => 'approved-teaching-photos/' + hash + '.png');
   legacyKeys.forEach(path => files.set(path, Buffer.from('legacy text card')));
   const result = await prepareTeachingPhotos(input, db);
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(3);
   expect(result.teachingPhotos.concept.every((p: any) => !legacyKeys.includes(p.storagePath))).toBe(true);
   expect(legacyKeys.every(path => files.has(path))).toBe(true);
 });
 
-test('a blocked photograph provider is not required for a conceptual lesson visual', async () => {
+test('a provider safety block is retained without a text-card replacement', async () => {
   vi.mocked(generateTeachingPhoto).mockReset().mockRejectedValue(Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'), { details: { blocked: true } }));
   const { db } = storage();
-  const result=await prepareTeachingPhotos(input, db);
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
-  expect(result.teachingPhotos.concept.every((visual: any) =>
-    visual.repair?.method === 'lesson-conceptual-card-v1')).toBe(true);
+  await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED');
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(1);
 });
 
 test('resume rejects changed stored image bytes without requesting replacement inference', async () => {
@@ -103,22 +101,19 @@ test('resume rejects changed stored image bytes without requesting replacement i
   const result = await prepareTeachingPhotos(input, db);
   files.set(result.teachingPhotos.concept[0].storagePath, Buffer.from('changed-after-indexing'));
   await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('TEACHING_PHOTO_HASH_MISMATCH');
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(3);
 });
 
-test('instructional cue visuals stay distinct without photograph generation', async () => {
+test('duplicate generated images cannot become distinct teaching cues', async () => {
   const bytes = await sharp({ create: { width: 32, height: 18, channels: 3, background: 'red' } }).png().toBuffer();
   vi.mocked(generateTeachingPhoto).mockReset().mockResolvedValue({ bytes, mimeType: 'image/png', provider: 'google' });
   const { db } = storage();
-  const result=await prepareTeachingPhotos(input, db);
-  expect(new Set(result.teachingPhotos.concept.map((visual:any)=>visual.sha256)).size).toBe(3);
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
+  await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('COURSE_PHOTO_ALREADY_USED');
 });
 
-test('provider output is not requested when the shared contract can render the lesson', async () => {
+test('empty provider output is rejected before storing a visual', async () => {
   vi.mocked(generateTeachingPhoto).mockReset().mockResolvedValue({ bytes: Buffer.alloc(0), mimeType: 'image/png', provider: 'google' } as never);
   const { db, files } = storage();
-  await expect(prepareTeachingPhotos(input, db)).resolves.toBeTruthy();
-  expect(generateTeachingPhoto).not.toHaveBeenCalled();
-  expect(files.size).toBeGreaterThan(0);
+  await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('TEACHING_PHOTO_BYTES_REQUIRED');
+  expect(files.size).toBe(0);
 });

@@ -1,6 +1,6 @@
 import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contract.mjs';
 import { createHash } from 'node:crypto';
-import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
+import { approvedDeliveryFailures, hasTextCardPhotographs } from '../instructional/approved-delivery.mjs';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 import { isExternalCourseVideoReference } from '../../storage/course-video-policy.mjs';
@@ -220,6 +220,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
       break;
     case 'lesson_film_render':
+      require(!hasTextCardPhotographs(a.render), 'PHOTOGRAPHIC_PRESENTATION_REQUIRES_REFRESH');
       require(isExternalCourseVideoReference(renderMediaUrl(a.render)), 'VIDEO_EXTERNAL_STORAGE_REQUIRED');
       require(renderPlaybackUrl(a.render) && renderMediaUrl(a.render) &&
         a.render.duration > 0 &&

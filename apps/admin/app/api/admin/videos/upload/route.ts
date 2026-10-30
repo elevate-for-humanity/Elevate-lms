@@ -1,52 +1,63 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
-import { withAuth } from '@/lib/with-auth';
-import { toErrorMessage } from '@/lib/safe';
-import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
-import { attachLicensedMediaUpload } from '@/lib/course-builder/licensed-media';
+import { NextRequest, NextResponse } from "next/server";
+import { logAdminAudit, AdminAction } from "@/lib/admin/audit-log";
+import { withAuth } from "@/lib/with-auth";
+import { toErrorMessage } from "@/lib/safe";
+import { withApiAudit } from "@/lib/audit/withApiAudit";
+import { applyRateLimit } from "@/lib/api/withRateLimit";
+import { requireAdminClient } from "@/lib/supabase/admin";
+import { queueCourseMedia } from "@/lib/course-builder/orchestrator";
+import { attachLicensedMediaUpload } from "@/lib/course-builder/licensed-media";
+import {
+  storeManualLessonFilm,
+  MAX_MANUAL_LESSON_BYTES,
+} from "@/lib/video/manual-lesson-upload.mjs";
+import {
+  uploadToElevateMedia,
+  getSignedElevateMediaUrl,
+  getElevateMediaStorageConfig,
+} from "@/lib/storage/elevate-media-storage";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // Paid Supabase projects support much larger objects. Keep this aligned with
 // the private course_videos bucket limit so 4K licensed masters are accepted.
 const MAX_BYTES = 1024 * 1024 * 1024;
 const LICENSED_MEDIA_TYPES = new Set([
-  'video/mp4',
-  'video/webm',
-  'video/quicktime',
-  'image/jpeg',
-  'image/png',
-  'image/webp',
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
 ]);
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const COURSE_VIDEO_ROLES = new Set([
-  'source_broll',
-  'course_preroll',
-  'lesson_preroll',
-  'lesson_outro',
-  'reference',
+  "source_broll",
+  "course_preroll",
+  "lesson_preroll",
+  "lesson_outro",
+  "reference",
 ]);
 
 function cleanName(name: string) {
-  return name.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/-+/g, '-');
+  return name.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/-+/g, "-");
 }
 
 function directStorageUploadEndpoint() {
-  const configuredUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  if (!configuredUrl) throw new Error('Supabase project URL is not configured');
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  if (!configuredUrl) throw new Error("Supabase project URL is not configured");
   const projectUrl = new URL(configuredUrl);
-  const projectRef = projectUrl.hostname.split('.')[0];
-  if (!projectRef) throw new Error('Supabase project URL is invalid');
+  const projectRef = projectUrl.hostname.split(".")[0];
+  if (!projectRef) throw new Error("Supabase project URL is invalid");
   return `https://${projectRef}.storage.supabase.co/storage/v1/upload/resumable`;
 }
 
 type CourseUploadControl = {
-  action?: 'prepare' | 'finalize' | 'prepare-library' | 'finalize-library';
+  action?: "prepare" | "finalize" | "prepare-library" | "finalize-library";
   title?: string;
   description?: string;
   fileName?: string;
@@ -56,9 +67,14 @@ type CourseUploadControl = {
   lessonId?: string;
   storagePath?: string;
   licensedMatchId?: string;
-  assetRole?: 'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference';
+  assetRole?:
+    | "source_broll"
+    | "course_preroll"
+    | "lesson_preroll"
+    | "lesson_outro"
+    | "reference";
   providerItemId?: string;
-  provider?: 'envato';
+  provider?: "envato";
   sourceUrl?: string;
   resolution?: string;
   durationSeconds?: number;
@@ -69,27 +85,32 @@ type CourseUploadControl = {
 function cleanTags(values: unknown) {
   if (!Array.isArray(values)) return [];
   return [
-    ...new Set(values.map((value) => String(value).trim().toLowerCase()).filter(Boolean)),
+    ...new Set(
+      values.map((value) => String(value).trim().toLowerCase()).filter(Boolean),
+    ),
   ].slice(0, 40);
 }
 
 async function queueLicensedLessonRender(courseId: string, lessonId: string) {
   const db = await requireAdminClient();
   const { data: lesson, error: lessonError } = await db
-    .from('course_lessons')
-    .select('video_config')
-    .eq('id', lessonId)
-    .eq('course_id', courseId)
+    .from("course_lessons")
+    .select("video_config")
+    .eq("id", lessonId)
+    .eq("course_id", courseId)
     .maybeSingle();
   if (lessonError || !lesson) {
-    throw lessonError ?? new Error('Lesson not found while preparing its render policy');
+    throw (
+      lessonError ??
+      new Error("Lesson not found while preparing its render policy")
+    );
   }
   const videoConfig =
-    lesson.video_config && typeof lesson.video_config === 'object'
+    lesson.video_config && typeof lesson.video_config === "object"
       ? (lesson.video_config as Record<string, unknown>)
       : {};
   const { error: policyError } = await db
-    .from('course_lessons')
+    .from("course_lessons")
     .update({
       video_config: {
         ...videoConfig,
@@ -98,8 +119,8 @@ async function queueLicensedLessonRender(courseId: string, lessonId: string) {
       },
       updated_at: new Date().toISOString(),
     })
-    .eq('id', lessonId)
-    .eq('course_id', courseId);
+    .eq("id", lessonId)
+    .eq("course_id", courseId);
   if (policyError) throw policyError;
 
   // Always pass through Course Factory. It refreshes the canonical job's
@@ -111,8 +132,12 @@ async function queueLicensedLessonRender(courseId: string, lessonId: string) {
     onlyMissing: false,
     force: true,
   });
-  if (queued.queued < 1 && queued.alreadyActive < 1 && queued.lessonVideosReady < 1) {
-    throw new Error('Canonical lesson video job was not queued');
+  if (
+    queued.queued < 1 &&
+    queued.alreadyActive < 1 &&
+    queued.lessonVideosReady < 1
+  ) {
+    throw new Error("Canonical lesson video job was not queued");
   }
   return queued;
 }
@@ -122,205 +147,250 @@ async function controlCourseUpload(
   userId: string,
   request: NextRequest,
 ) {
-  const title = String(input.title ?? '').trim();
-  const courseId = String(input.courseId ?? '').trim();
-  const lessonId = String(input.lessonId ?? '').trim();
-  const fileName = cleanName(String(input.fileName ?? '').trim());
-  const fileType = String(input.fileType ?? '').trim();
+  const title = String(input.title ?? "").trim();
+  const courseId = String(input.courseId ?? "").trim();
+  const lessonId = String(input.lessonId ?? "").trim();
+  const fileName = cleanName(String(input.fileName ?? "").trim());
+  const fileType = String(input.fileType ?? "").trim();
   const fileSize = Number(input.fileSize ?? 0);
-  const assetRole = input.licensedMatchId ? 'source_broll' : (input.assetRole ?? 'source_broll');
-  const libraryAction = input.action === 'prepare-library' || input.action === 'finalize-library';
-  const providerItemId = cleanName(String(input.providerItemId ?? '').trim());
+  const assetRole = input.licensedMatchId
+    ? "source_broll"
+    : (input.assetRole ?? "source_broll");
+  const libraryAction =
+    input.action === "prepare-library" || input.action === "finalize-library";
+  const providerItemId = cleanName(String(input.providerItemId ?? "").trim());
   if (libraryAction) {
-    if (!title || !providerItemId || input.provider !== 'envato') {
+    if (!title || !providerItemId || input.provider !== "envato") {
       return NextResponse.json(
-        { error: 'A title, Envato item ID, and provider are required for the licensed library' },
+        {
+          error:
+            "A title, Envato item ID, and provider are required for the licensed library",
+        },
         { status: 400 },
       );
     }
-    if (!fileName || !LICENSED_MEDIA_TYPES.has(fileType) || fileSize <= 0 || fileSize > MAX_BYTES) {
+    if (
+      !fileName ||
+      !LICENSED_MEDIA_TYPES.has(fileType) ||
+      fileSize <= 0 ||
+      fileSize > MAX_BYTES
+    ) {
       return NextResponse.json(
-        { error: 'A valid licensed photo or video file of 1 GB or less is required' },
+        {
+          error:
+            "A valid licensed photo or video file of 1 GB or less is required",
+        },
         { status: 400 },
       );
     }
     const db = await requireAdminClient();
-    if (input.action === 'prepare-library') {
+    if (input.action === "prepare-library") {
       const storagePath = `licensed-library/envato/${providerItemId}/${Date.now()}-${fileName}`;
       const { data, error } = await db.storage
-        .from('course_videos')
+        .from("course_videos")
         .createSignedUploadUrl(storagePath);
       if (error || !data?.token) {
         return NextResponse.json(
-          { error: 'Could not prepare the secure licensed-media upload' },
+          { error: "Could not prepare the secure licensed-media upload" },
           { status: 500 },
         );
       }
       return NextResponse.json({
         success: true,
-        bucket: 'course_videos',
+        bucket: "course_videos",
         storagePath,
         token: data.token,
         uploadEndpoint: directStorageUploadEndpoint(),
       });
     }
-    const storagePath = String(input.storagePath ?? '');
+    const storagePath = String(input.storagePath ?? "");
     if (!storagePath.startsWith(`licensed-library/envato/${providerItemId}/`)) {
-      return NextResponse.json({ error: 'Invalid licensed-media storage path' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid licensed-media storage path" },
+        { status: 400 },
+      );
     }
-    const folder = storagePath.slice(0, storagePath.lastIndexOf('/'));
-    const storedName = storagePath.slice(storagePath.lastIndexOf('/') + 1);
+    const folder = storagePath.slice(0, storagePath.lastIndexOf("/"));
+    const storedName = storagePath.slice(storagePath.lastIndexOf("/") + 1);
     const { data: storedFiles, error: verifyError } = await db.storage
-      .from('course_videos')
+      .from("course_videos")
       .list(folder, { search: storedName, limit: 2 });
     const storedFile = storedFiles?.find((file) => file.name === storedName);
     if (verifyError || !storedFile) {
       return NextResponse.json(
-        { error: 'Uploaded licensed media could not be verified' },
+        { error: "Uploaded licensed media could not be verified" },
         { status: 400 },
       );
     }
     const { data: existing, error: existingError } = await db
-      .from('licensed_media_entitlements')
-      .select('id,metadata')
-      .eq('provider', 'envato')
-      .eq('provider_item_id', providerItemId)
+      .from("licensed_media_entitlements")
+      .select("id,metadata")
+      .eq("provider", "envato")
+      .eq("provider_item_id", providerItemId)
       .maybeSingle();
     if (existingError) throw existingError;
     const existingMetadata =
-      existing?.metadata && typeof existing.metadata === 'object'
+      existing?.metadata && typeof existing.metadata === "object"
         ? (existing.metadata as Record<string, unknown>)
         : {};
     const metadata = {
       ...existingMetadata,
-      storage_bucket: 'course_videos',
+      storage_bucket: "course_videos",
       storage_path: storagePath,
       file_name: fileName,
       mime_type: fileType,
       file_size: fileSize,
-      resolution: String(input.resolution ?? '').trim() || null,
+      resolution: String(input.resolution ?? "").trim() || null,
       duration_seconds:
-        Number.isFinite(Number(input.durationSeconds)) && Number(input.durationSeconds) > 0
+        Number.isFinite(Number(input.durationSeconds)) &&
+        Number(input.durationSeconds) > 0
           ? Number(input.durationSeconds)
           : null,
       program_tags: cleanTags(input.programTags),
       lesson_tags: cleanTags(input.lessonTags),
-      source_url: String(input.sourceUrl ?? '').trim() || null,
+      source_url: String(input.sourceUrl ?? "").trim() || null,
       storage_verified_at: new Date().toISOString(),
     };
     const row = {
-      provider: 'envato',
+      provider: "envato",
       provider_item_id: providerItemId,
       title,
-      item_url: String(input.sourceUrl ?? '').trim() || null,
-      license_type: 'Envato lifetime commercial license',
+      item_url: String(input.sourceUrl ?? "").trim() || null,
+      license_type: "Envato lifetime commercial license",
       metadata,
       created_by: userId,
     };
     const { data: entitlement, error: entitlementError } = existing
       ? await db
-          .from('licensed_media_entitlements')
+          .from("licensed_media_entitlements")
           .update(row)
-          .eq('id', existing.id)
-          .select('id,title,provider_item_id,license_type,metadata')
+          .eq("id", existing.id)
+          .select("id,title,provider_item_id,license_type,metadata")
           .single()
       : await db
-          .from('licensed_media_entitlements')
+          .from("licensed_media_entitlements")
           .insert(row)
-          .select('id,title,provider_item_id,license_type,metadata')
+          .select("id,title,provider_item_id,license_type,metadata")
           .single();
     if (entitlementError) {
-      await db.storage.from('course_videos').remove([storagePath]);
+      await db.storage.from("course_videos").remove([storagePath]);
       throw entitlementError;
     }
     await logAdminAudit({
       action: AdminAction.VIDEO_UPLOADED,
       actorId: userId,
-      entityType: 'licensed_media_entitlements',
+      entityType: "licensed_media_entitlements",
       entityId: entitlement.id,
-      metadata: { provider: 'envato', provider_item_id: providerItemId, storage_path: storagePath },
+      metadata: {
+        provider: "envato",
+        provider_item_id: providerItemId,
+        storage_path: storagePath,
+      },
       req: request,
     });
     return NextResponse.json({ success: true, entitlement });
   }
-  if (!title || !courseId || !lessonId || !UUID.test(courseId) || !UUID.test(lessonId)) {
+  if (
+    !title ||
+    !courseId ||
+    !lessonId ||
+    !UUID.test(courseId) ||
+    !UUID.test(lessonId)
+  ) {
     return NextResponse.json(
-      { error: 'A valid title, courseId, and lessonId are required' },
+      { error: "A valid title, courseId, and lessonId are required" },
       { status: 400 },
     );
   }
   if (!COURSE_VIDEO_ROLES.has(assetRole)) {
-    return NextResponse.json({ error: 'Unsupported course video placement role' }, { status: 400 });
-  }
-
-  const db = await requireAdminClient();
-  const { data: lesson, error: lessonLookupError } = await db
-    .from('course_lessons')
-    .select('id')
-    .eq('id', lessonId)
-    .eq('course_id', courseId)
-    .maybeSingle();
-  if (lessonLookupError || !lesson) {
     return NextResponse.json(
-      { error: 'Lesson does not belong to the selected course' },
+      { error: "Unsupported course video placement role" },
       { status: 400 },
     );
   }
 
-  if (input.action === 'prepare') {
-    if (!fileName || !fileType.startsWith('video/') || fileSize <= 0 || fileSize > MAX_BYTES) {
+  const db = await requireAdminClient();
+  const { data: lesson, error: lessonLookupError } = await db
+    .from("course_lessons")
+    .select("id")
+    .eq("id", lessonId)
+    .eq("course_id", courseId)
+    .maybeSingle();
+  if (lessonLookupError || !lesson) {
+    return NextResponse.json(
+      { error: "Lesson does not belong to the selected course" },
+      { status: 400 },
+    );
+  }
+
+  if (input.action === "prepare") {
+    if (
+      !fileName ||
+      !fileType.startsWith("video/") ||
+      fileSize <= 0 ||
+      fileSize > MAX_BYTES
+    ) {
       return NextResponse.json(
-        { error: 'A valid video file of 500 MB or less is required' },
+        { error: "A valid video file of 500 MB or less is required" },
         { status: 400 },
       );
     }
     const storagePath = `${courseId}/${Date.now()}-${fileName}`;
     const { data, error } = await db.storage
-      .from('course_videos')
+      .from("course_videos")
       .createSignedUploadUrl(storagePath);
     if (error || !data?.token) {
       return NextResponse.json(
-        { error: 'Could not prepare the private video upload' },
+        { error: "Could not prepare the private video upload" },
         { status: 500 },
       );
     }
     return NextResponse.json({
       success: true,
-      bucket: 'course_videos',
+      bucket: "course_videos",
       storagePath,
       token: data.token,
     });
   }
 
-  if (input.action !== 'finalize' || !input.storagePath?.startsWith(`${courseId}/`)) {
-    return NextResponse.json({ error: 'Invalid upload finalization request' }, { status: 400 });
+  if (
+    input.action !== "finalize" ||
+    !input.storagePath?.startsWith(`${courseId}/`)
+  ) {
+    return NextResponse.json(
+      { error: "Invalid upload finalization request" },
+      { status: 400 },
+    );
   }
 
   const storagePath = input.storagePath;
   const { data: signed, error: signedError } = await db.storage
-    .from('course_videos')
+    .from("course_videos")
     .createSignedUrl(storagePath, 60 * 60);
   if (signedError || !signed?.signedUrl) {
-    return NextResponse.json({ error: 'Uploaded video could not be verified' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Uploaded video could not be verified" },
+      { status: 400 },
+    );
   }
   const { data: videoData, error: videoError } = await db
-    .from('course_videos')
+    .from("course_videos")
     .insert({
       title,
       course_id: courseId,
       lesson_id: lessonId,
       storage_path: storagePath,
-      generated_by: 'manual',
+      generated_by: "manual",
       asset_role: assetRole,
-      status: 'ready',
+      status: "ready",
       created_by: userId,
     })
-    .select('id,title,course_id,lesson_id,storage_path,status,created_at')
+    .select("id,title,course_id,lesson_id,storage_path,status,created_at")
     .single();
   if (videoError) {
-    await db.storage.from('course_videos').remove([storagePath]);
+    await db.storage.from("course_videos").remove([storagePath]);
     return NextResponse.json(
-      { error: 'Uploaded video metadata could not be saved' },
+      { error: "Uploaded video metadata could not be saved" },
       { status: 500 },
     );
   }
@@ -335,32 +405,35 @@ async function controlCourseUpload(
         actorId: userId,
       });
     } catch (matchError) {
-      await db.from('course_videos').delete().eq('id', videoData.id);
-      await db.storage.from('course_videos').remove([storagePath]);
-      return NextResponse.json({ error: toErrorMessage(matchError) }, { status: 400 });
+      await db.from("course_videos").delete().eq("id", videoData.id);
+      await db.storage.from("course_videos").remove([storagePath]);
+      return NextResponse.json(
+        { error: toErrorMessage(matchError) },
+        { status: 400 },
+      );
     }
   }
-  const shouldRenderLesson = assetRole === 'source_broll';
+  const shouldRenderLesson = assetRole === "source_broll";
   const { error: lessonError } = await db
-    .from('course_lessons')
+    .from("course_lessons")
     .update({
       ...(shouldRenderLesson
         ? {
-            media_origin: 'uploaded',
-            media_quality_status: 'pending',
-            video_status: 'queued',
+            media_origin: "uploaded",
+            media_quality_status: "pending",
+            video_status: "queued",
             video_error: null,
           }
         : {}),
       updated_at: new Date().toISOString(),
     })
-    .eq('id', lessonId)
-    .eq('course_id', courseId);
+    .eq("id", lessonId)
+    .eq("course_id", courseId);
   if (lessonError) {
-    await db.from('course_videos').delete().eq('id', videoData.id);
-    await db.storage.from('course_videos').remove([storagePath]);
+    await db.from("course_videos").delete().eq("id", videoData.id);
+    await db.storage.from("course_videos").remove([storagePath]);
     return NextResponse.json(
-      { error: 'Uploaded video could not be linked to its lesson' },
+      { error: "Uploaded video could not be linked to its lesson" },
       { status: 500 },
     );
   }
@@ -368,23 +441,23 @@ async function controlCourseUpload(
     if (shouldRenderLesson) await queueLicensedLessonRender(courseId, lessonId);
   } catch (queueError) {
     await db
-      .from('course_lessons')
+      .from("course_lessons")
       .update({
-        video_status: 'failed',
+        video_status: "failed",
         video_error: `Licensed footage saved, but render queue failed: ${toErrorMessage(queueError)}`,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', lessonId)
-      .eq('course_id', courseId);
+      .eq("id", lessonId)
+      .eq("course_id", courseId);
     return NextResponse.json(
-      { error: 'Video was saved, but its lesson render could not be queued' },
+      { error: "Video was saved, but its lesson render could not be queued" },
       { status: 500 },
     );
   }
   await logAdminAudit({
     action: AdminAction.VIDEO_UPLOADED,
     actorId: userId,
-    entityType: 'course_videos',
+    entityType: "course_videos",
     entityId: videoData.id,
     metadata: {
       file_name: fileName,
@@ -395,52 +468,128 @@ async function controlCourseUpload(
     },
     req: request,
   });
-  return NextResponse.json({ success: true, url: signed.signedUrl, video: videoData });
+  return NextResponse.json({
+    success: true,
+    url: signed.signedUrl,
+    video: videoData,
+  });
 }
 
 const _POST = withAuth(
   async (request: NextRequest, user) => {
-    const rateLimited = await applyRateLimit(request, 'strict');
+    const rateLimited = await applyRateLimit(request, "strict");
     if (rateLimited) return rateLimited;
 
     try {
-      if (request.headers.get('content-type')?.includes('application/json')) {
-        return controlCourseUpload((await request.json()) as CourseUploadControl, user.id, request);
+      if (request.headers.get("content-type")?.includes("application/json")) {
+        return controlCourseUpload(
+          (await request.json()) as CourseUploadControl,
+          user.id,
+          request,
+        );
       }
       const formData = await request.formData();
-      const file = formData.get('file');
-      const title = String(formData.get('title') ?? '').trim();
-      const description = String(formData.get('description') ?? '').trim();
-      const category = String(formData.get('category') ?? 'Training').trim() || 'Training';
-      const courseId = String(formData.get('courseId') ?? '').trim();
-      const lessonId = String(formData.get('lessonId') ?? '').trim();
+      const file = formData.get("file");
+      const title = String(formData.get("title") ?? "").trim();
+      const description = String(formData.get("description") ?? "").trim();
+      const category =
+        String(formData.get("category") ?? "Training").trim() || "Training";
+      const courseId = String(formData.get("courseId") ?? "").trim();
+      const lessonId = String(formData.get("lessonId") ?? "").trim();
 
       if (!(file instanceof File)) {
-        return NextResponse.json({ error: 'No video file provided' }, { status: 400 });
+        return NextResponse.json(
+          { error: "No video file provided" },
+          { status: 400 },
+        );
       }
       if (!title) {
-        return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+        return NextResponse.json(
+          { error: "Title is required" },
+          { status: 400 },
+        );
       }
-      if (!file.type.startsWith('video/')) {
-        return NextResponse.json({ error: 'Only video files are accepted' }, { status: 400 });
+      if (!file.type.startsWith("video/")) {
+        return NextResponse.json(
+          { error: "Only video files are accepted" },
+          { status: 400 },
+        );
       }
       if (file.size <= 0 || file.size > MAX_BYTES) {
         return NextResponse.json(
-          { error: `Video must be between 1 byte and ${Math.round(MAX_BYTES / (1024 * 1024))} MB` },
+          {
+            error: `Video must be between 1 byte and ${Math.round(MAX_BYTES / (1024 * 1024))} MB`,
+          },
           { status: 413 },
         );
       }
       if (courseId && !UUID.test(courseId)) {
-        return NextResponse.json({ error: 'courseId must be a UUID' }, { status: 400 });
+        return NextResponse.json(
+          { error: "courseId must be a UUID" },
+          { status: 400 },
+        );
       }
       if (lessonId && !UUID.test(lessonId)) {
-        return NextResponse.json({ error: 'lessonId must be a UUID' }, { status: 400 });
+        return NextResponse.json(
+          { error: "lessonId must be a UUID" },
+          { status: 400 },
+        );
       }
 
       const db = await requireAdminClient();
+      if (formData.get("completedLesson") === "true") {
+        if (!courseId || !lessonId) {
+          return NextResponse.json(
+            {
+              error: "A completed lesson film requires its course and lesson.",
+            },
+            { status: 400 },
+          );
+        }
+        if (file.size > MAX_MANUAL_LESSON_BYTES) {
+          return NextResponse.json(
+            { error: "Completed lesson files must be 25 MB or smaller." },
+            { status: 413 },
+          );
+        }
+        const config = getElevateMediaStorageConfig();
+        if (
+          config.provider === "supabase-s3" ||
+          /supabase\.(?:co|com)/i.test(config.endpoint || "")
+        ) {
+          throw new Error("COURSE_VIDEO_EXTERNAL_STORAGE_REQUIRED");
+        }
+        const stored = await storeManualLessonFilm({
+          db,
+          courseId,
+          lessonId,
+          title,
+          actorId: user.id,
+          bytes: Buffer.from(await file.arrayBuffer()),
+          contentType: file.type,
+          upload: uploadToElevateMedia,
+          sign: getSignedElevateMediaUrl,
+        });
+        await logAdminAudit({
+          action: AdminAction.VIDEO_UPLOADED,
+          actorId: user.id,
+          entityType: "course_videos",
+          entityId: stored.video.id,
+          metadata: {
+            mode: "completed-lesson-review",
+            course_id: courseId,
+            lesson_id: lessonId,
+            sha256: stored.sha256,
+            bytes: stored.bytes,
+            storage_path: stored.video.storage_path,
+          },
+          req: request,
+        });
+        return NextResponse.json(stored);
+      }
       const isCourseVideo = Boolean(courseId || lessonId);
-      const bucket = isCourseVideo ? 'course_videos' : 'course-videos';
-      const folder = isCourseVideo ? courseId || 'unassigned' : 'public';
+      const bucket = isCourseVideo ? "course_videos" : "course-videos";
+      const folder = isCourseVideo ? courseId || "unassigned" : "public";
       const storagePath = `${folder}/${Date.now()}-${cleanName(file.name)}`;
 
       // Supabase's Node storage client expects bytes/Blob data. Passing the
@@ -449,33 +598,41 @@ const _POST = withAuth(
       // object was ever created.
       const fileBytes = Buffer.from(await file.arrayBuffer());
 
-      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, fileBytes, {
-        contentType: file.type,
-        upsert: false,
-      });
+      const { error: uploadError } = await db.storage
+        .from(bucket)
+        .upload(storagePath, fileBytes, {
+          contentType: file.type,
+          upsert: false,
+        });
       if (uploadError) {
-        return NextResponse.json({ error: 'Video storage upload failed' }, { status: 500 });
+        return NextResponse.json(
+          { error: "Video storage upload failed" },
+          { status: 500 },
+        );
       }
 
       if (isCourseVideo) {
         const { data: videoData, error: dbError } = await db
-          .from('course_videos')
+          .from("course_videos")
           .insert({
             title,
             course_id: courseId || null,
             lesson_id: lessonId || null,
             storage_path: storagePath,
             duration_seconds: null,
-            generated_by: 'manual',
-            status: 'ready',
+            generated_by: "manual",
+            status: "ready",
             created_by: user.id,
           })
-          .select('id,title,course_id,lesson_id,storage_path,status,created_at')
+          .select("id,title,course_id,lesson_id,storage_path,status,created_at")
           .single();
 
         if (dbError) {
           await db.storage.from(bucket).remove([storagePath]);
-          return NextResponse.json({ error: 'Course video metadata save failed' }, { status: 500 });
+          return NextResponse.json(
+            { error: "Course video metadata save failed" },
+            { status: 500 },
+          );
         }
 
         const { data: signed, error: signedError } = await db.storage
@@ -483,7 +640,9 @@ const _POST = withAuth(
           .createSignedUrl(storagePath, 60 * 60);
         if (signedError || !signed?.signedUrl) {
           return NextResponse.json(
-            { error: 'Course video saved but playback URL could not be created' },
+            {
+              error: "Course video saved but playback URL could not be created",
+            },
             { status: 500 },
           );
         }
@@ -493,21 +652,21 @@ const _POST = withAuth(
         // footage never depends on an expired URL stored in scene_data.
         if (lessonId) {
           const { error: lessonError } = await db
-            .from('course_lessons')
+            .from("course_lessons")
             .update({
-              media_origin: 'uploaded',
-              media_quality_status: 'pending',
-              video_status: 'queued',
+              media_origin: "uploaded",
+              media_quality_status: "pending",
+              video_status: "queued",
               video_error: null,
               updated_at: new Date().toISOString(),
             })
-            .eq('id', lessonId)
-            .eq('course_id', courseId);
+            .eq("id", lessonId)
+            .eq("course_id", courseId);
           if (lessonError) {
-            await db.from('course_videos').delete().eq('id', videoData.id);
+            await db.from("course_videos").delete().eq("id", videoData.id);
             await db.storage.from(bucket).remove([storagePath]);
             return NextResponse.json(
-              { error: 'Video uploaded but lesson linking failed' },
+              { error: "Video uploaded but lesson linking failed" },
               { status: 500 },
             );
           }
@@ -515,16 +674,19 @@ const _POST = withAuth(
             await queueLicensedLessonRender(courseId, lessonId);
           } catch (queueError) {
             await db
-              .from('course_lessons')
+              .from("course_lessons")
               .update({
-                video_status: 'failed',
+                video_status: "failed",
                 video_error: `Licensed footage saved, but render queue failed: ${toErrorMessage(queueError)}`,
                 updated_at: new Date().toISOString(),
               })
-              .eq('id', lessonId)
-              .eq('course_id', courseId);
+              .eq("id", lessonId)
+              .eq("course_id", courseId);
             return NextResponse.json(
-              { error: 'Video was saved, but its lesson render could not be queued' },
+              {
+                error:
+                  "Video was saved, but its lesson render could not be queued",
+              },
               { status: 500 },
             );
           }
@@ -533,7 +695,7 @@ const _POST = withAuth(
         await logAdminAudit({
           action: AdminAction.VIDEO_UPLOADED,
           actorId: user.id,
-          entityType: 'course_videos',
+          entityType: "course_videos",
           entityId: videoData.id,
           metadata: {
             file_name: file.name,
@@ -543,7 +705,11 @@ const _POST = withAuth(
           req: request,
         });
 
-        return NextResponse.json({ success: true, url: signed.signedUrl, video: videoData });
+        return NextResponse.json({
+          success: true,
+          url: signed.signedUrl,
+          video: videoData,
+        });
       }
 
       const {
@@ -551,7 +717,7 @@ const _POST = withAuth(
       } = db.storage.from(bucket).getPublicUrl(storagePath);
 
       const { data: videoData, error: dbError } = await db
-        .from('videos')
+        .from("videos")
         .insert({
           title,
           description: description || null,
@@ -560,29 +726,41 @@ const _POST = withAuth(
           published: true,
           category,
         })
-        .select('id,title,description,url,video_url,published,category,created_at')
+        .select(
+          "id,title,description,url,video_url,published,category,created_at",
+        )
         .single();
 
       if (dbError) {
         await db.storage.from(bucket).remove([storagePath]);
-        return NextResponse.json({ error: 'Video metadata save failed' }, { status: 500 });
+        return NextResponse.json(
+          { error: "Video metadata save failed" },
+          { status: 500 },
+        );
       }
 
       await logAdminAudit({
         action: AdminAction.VIDEO_UPLOADED,
         actorId: user.id,
-        entityType: 'videos',
+        entityType: "videos",
         entityId: videoData.id,
         metadata: { file_name: file.name, category },
         req: request,
       });
 
-      return NextResponse.json({ success: true, url: publicUrl, video: videoData });
+      return NextResponse.json({
+        success: true,
+        url: publicUrl,
+        video: videoData,
+      });
     } catch (error) {
-      return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
+      return NextResponse.json(
+        { error: toErrorMessage(error) },
+        { status: 500 },
+      );
     }
   },
-  { roles: ['admin'] },
+  { roles: ["admin"] },
 );
 
-export const POST = withApiAudit('/api/admin/videos/upload', _POST);
+export const POST = withApiAudit("/api/admin/videos/upload", _POST);

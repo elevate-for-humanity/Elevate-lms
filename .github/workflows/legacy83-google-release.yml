@@ -1,8 +1,8 @@
-name: Legacy 83 Google deployment inspection
+name: Legacy 83 Google release candidate
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/legacy83-google-release.yml']
+    paths: ['.github/workflows/legacy83-google-release.yml', '.deploy/legacy83-source/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,55 +16,105 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
-      - name: Use the established main-branch Google identity event
-        env:
+      - env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/legacy83-google-release.yml/dispatches" -f ref=main
-  inspect:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && vars.GOOGLE_RELEASE_HOLD != 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: 5ff6b33a1bbbcba8cc232a96d62a53befabf40cf
+      NEXT_PUBLIC_SUPABASE_URL: https://vhulnzcfmlnsmoxixjco.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_lb8-f5trWyOLdTY-ElpX9A_ImDp8eGe
+      PROJECT: elegant-racer-299721
+      REGION: us-central1
+      SERVICE: legacy83-candidate
     steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
-      - name: Inspect Legacy 83 deployment resources without exposing secret values
-        shell: bash
-        run: |
-          set -euo pipefail
-          for region in us-central1 us-east1; do
-            gcloud run services list --project=elegant-racer-299721 --region="$region" --format='json(metadata.name,status.url,status.latestReadyRevisionName)' > "/tmp/services-$region.json"
-          done
-          python3 - <<'PY'
-          import json
-          for region in ['us-central1','us-east1']:
-            rows=json.load(open('/tmp/services-'+region+'.json'))
-            for row in rows:
-              if 'legacy' in row.get('metadata',{}).get('name','').lower():
-                print(json.dumps({'region':region,'service':row}))
-          PY
-          gcloud secrets list --project=elegant-racer-299721 --format='value(name)' | grep -Ei 'legacy|github|icy' || true
-      - name: Inspect connected source build paths
-        run: |
-          gcloud builds triggers list --project=elegant-racer-299721 --region=global --format='json(name,github,repositoryEventConfig)' || true
-          for region in us-central1 us-east1; do
-            gcloud builds connections list --project=elegant-racer-299721 --region="$region" --format='json(name,githubConfig.installationState)' || true
-          done
-          gcloud storage buckets list --project=elegant-racer-299721 --format='value(name)'
-      - name: Prepare encrypted private-source handoff
+      - name: Authenticate and unpack the private customer source
         shell: bash
         run: |
           set -euo pipefail
           umask 077
-          key_file="$(mktemp)"
-          trap 'rm -f "$key_file"' EXIT
-          if ! gcloud secrets describe legacy83-source-decryption-key --project=elegant-racer-299721 >/dev/null 2>&1; then
-            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out "$key_file" 2>/dev/null
-            gcloud secrets create legacy83-source-decryption-key --project=elegant-racer-299721 --replication-policy=automatic --data-file="$key_file" --labels=customer=legacy83,purpose=source-delivery
-          else
-            gcloud secrets versions access latest --secret=legacy83-source-decryption-key --project=elegant-racer-299721 > "$key_file"
+          export DECRYPTION_KEY_FILE="$RUNNER_TEMP/legacy83-source-key.pem"
+          export SOURCE_ARCHIVE="$RUNNER_TEMP/legacy83-source.tar.gz"
+          trap 'rm -f "$DECRYPTION_KEY_FILE" "$SOURCE_ARCHIVE"' EXIT
+          gcloud secrets versions access latest --secret=legacy83-source-decryption-key --project="$PROJECT" > "$DECRYPTION_KEY_FILE"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {createHash,privateDecrypt,createDecipheriv,constants} from 'node:crypto';
+          const manifest=JSON.parse(readFileSync('.deploy/legacy83-source/manifest.json','utf8'));
+          const expected="5ff6b33a1bbbcba8cc232a96d62a53befabf40cf";
+          if(manifest.sourceSha!==expected || manifest.sha256!=="7cd3f3445246ba7d3bf7a97238dcd9bbc1e5507c80bc2fe2488b6e819f1890cd")throw Error('Unexpected source revision');
+          const envelopeText=manifest.chunks.map(name=>{
+           if(!/^part-[0-9]{3}[.]txt$/.test(name))throw Error('Invalid encrypted chunk path');
+           return readFileSync('.deploy/legacy83-source/'+name,'utf8');
+          }).join('');
+          if(createHash('sha256').update(envelopeText).digest('hex')!==manifest.sha256)throw Error('Encrypted delivery hash mismatch');
+          const envelope=JSON.parse(envelopeText);
+          if(envelope.version!==1||envelope.sourceSha!==expected)throw Error('Invalid source envelope');
+          const key=privateDecrypt({key:readFileSync(process.env.DECRYPTION_KEY_FILE),padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},Buffer.from(envelope.encryptedKey,'base64'));
+          const decipher=createDecipheriv('aes-256-gcm',key,Buffer.from(envelope.iv,'base64'));
+          decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));
+          writeFileSync(process.env.SOURCE_ARCHIVE,Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext,'base64')),decipher.final()]),{mode:0o600});
+          console.log('Authenticated source revision: '+expected);
+          
+          NODE
+          mkdir "$RUNNER_TEMP/legacy83-source"
+          tar -xzf "$SOURCE_ARCHIVE" -C "$RUNNER_TEMP/legacy83-source"
+          test -f "$RUNNER_TEMP/legacy83-source/Dockerfile"
+      - name: Check the exact source before building
+        working-directory: ${{ runner.temp }}/legacy83-source
+        run: |
+          npm ci --no-audit --no-fund
+          node --test tests/*.test.mjs
+          SUPABASE_SERVICE_ROLE_KEY=build-only-no-live-access npx tsc --noEmit
+      - name: Build and upload the isolated customer image
+        working-directory: ${{ runner.temp }}/legacy83-source
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
+          docker build --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" .
+          docker push "$IMAGE"
+      - name: Create a runtime identity with no project permissions
+        run: |
+          set -euo pipefail
+          SA="legacy83-runtime@$PROJECT.iam.gserviceaccount.com"
+          if ! gcloud iam service-accounts describe "$SA" --project="$PROJECT" >/dev/null 2>&1; then
+            gcloud iam service-accounts create legacy83-runtime --project="$PROJECT" --display-name="Legacy 83 website runtime"
           fi
-          openssl pkey -in "$key_file" -pubout
+      - name: Deploy the candidate without changing the customer domain
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
+          gcloud run deploy "$SERVICE" --project="$PROJECT" --region="$REGION" --image="$IMAGE" \
+            --service-account="legacy83-runtime@$PROJECT.iam.gserviceaccount.com" \
+            --port=8080 --cpu=1 --memory=1Gi --concurrency=20 --min=0 --max=2 --timeout=60 --no-cpu-boost \
+            --set-env-vars="NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY,LEGACY83_REVISION=$SOURCE_SHA" \
+            --allow-unauthenticated --labels=customer=legacy83,managed-by=elevate --quiet
+          URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
+          echo "LEGACY83_CANDIDATE_URL=$URL" >> "$GITHUB_ENV"
+          echo "Legacy 83 candidate: $URL" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify revision and public page responses
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.LEGACY83_CANDIDATE_URL;
+          const health=await fetch(base+'/api/health').then(r=>r.json());
+          if(health.service!=='legacy83'||health.revision!==process.env.SOURCE_SHA)throw Error('Candidate revision mismatch');
+          for(const path of ['/','/about','/services','/academy','/resources','/contact','/growth-iq','/journal','/events','/schedule-a-call']){
+            const response=await fetch(base+path,{redirect:'manual',signal:AbortSignal.timeout(30000)});
+            console.log(JSON.stringify({path,status:response.status}));
+            if(response.status!==200)throw Error('Public page failed: '+path);
+          }
+          NODE

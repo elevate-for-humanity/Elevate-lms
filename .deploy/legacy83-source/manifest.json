@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "sourceSha": "5ff6b33a1bbbcba8cc232a96d62a53befabf40cf",
+  "sha256": "7cd3f3445246ba7d3bf7a97238dcd9bbc1e5507c80bc2fe2488b6e819f1890cd",
+  "chunks": [
+    "part-000.txt",
+    "part-001.txt",
+    "part-002.txt",
+    "part-003.txt",
+    "part-004.txt",
+    "part-005.txt",
+    "part-006.txt",
+    "part-007.txt",
+    "part-008.txt",
+    "part-009.txt",
+    "part-010.txt",
+    "part-011.txt",
+    "part-012.txt",
+    "part-013.txt",
+    "part-014.txt",
+    "part-015.txt",
+    "part-016.txt",
+    "part-017.txt",
+    "part-018.txt",
+    "part-019.txt"
+  ]
+}

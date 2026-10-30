@@ -151,3 +151,24 @@ describe('instructional quality gate', () => {
     }).failures).toEqual([]);
   });
 });
+
+describe('objective subject coverage', () => {
+  const objective = 'Differentiate mechanical and electrical components of an HVAC system and describe their specific operating functions.';
+  it('counts the taught subject rather than demanding narration repeat objective command verbs', () => {
+    const result = instructionalQualityFailures({
+      courseTitle: 'EPA 608', lessonTitle: 'HVAC components', instructor,
+      learningObjectives: [objective], storyboard: storyboard(),
+      script: 'HVAC systems integrate mechanical and electrical components to condition air. The compressor pumps refrigerant, the condenser dissipates heat, and thermostats control current. In equipment design, a central system uses ductwork throughout a structure, whereas a ductless system uses individual zone units.'
+    });
+    expect(result.evidence.objectiveCoverage).toBe(1);
+  });
+  it('still rejects objective command words without the actual subject', () => {
+    const result = instructionalQualityFailures({
+      courseTitle: 'EPA 608', lessonTitle: 'HVAC components', instructor,
+      learningObjectives: [objective], storyboard: storyboard(),
+      script: 'Differentiate and describe their specific operating functions.'
+    });
+    expect(result.evidence.objectiveCoverage).toBe(0);
+    expect(result.failures.some(failure => failure.includes('stated learning objectives'))).toBe(true);
+  });
+});

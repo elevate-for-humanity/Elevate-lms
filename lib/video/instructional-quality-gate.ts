@@ -95,10 +95,12 @@ function keywordCoverage(title: string, script: string): number {
   return expected.filter((word) => delivered.has(word)).length / expected.length;
 }
 
+// Objective command verbs describe the learner task, not its taught subject.
+// Keep the same coverage threshold and all technical subject terms.
 function objectivesCoverage(objectives: string[], script: string): number {
   if (!objectives.length) return 1;
   return (
-    objectives.filter((objective) => keywordCoverage(objective, script) >= 0.5).length /
+    objectives.filter((objective) => keywordCoverage(objective.replace(/\b(?:explain|identify|differentiate|describe|apply)\b/gi, ''), script) >= 0.5).length /
     objectives.length
   );
 }

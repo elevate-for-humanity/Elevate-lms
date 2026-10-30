@@ -99,9 +99,10 @@ body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
     padding-inline: 0.75rem;
   }
 
-  :where(main) input:not([type='checkbox']):not([type='radio']),
-  :where(main) select,
-  :where(main) textarea {
+  /* Visually hidden controls keep their screen-reader-only geometry. */
+  :where(main) input:not([type='checkbox']):not([type='radio']):not(:where(.sr-only)),
+  :where(main) select:not(:where(.sr-only)),
+  :where(main) textarea:not(:where(.sr-only)) {
     width: 100%;
     min-height: 44px;
     font-size: 1rem;

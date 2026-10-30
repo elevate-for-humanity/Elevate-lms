@@ -920,7 +920,7 @@ export function attachBrowserTabs(session, attachPage, saveState = async () => {
 export async function restoreBrowserWorkspaceTabs(session,checkpoint){
   for(const target of checkpoint.tabs.slice(1)){
     const tab=await session.context.newPage();
-    await tab.goto(target,{waitUntil:'domcontentloaded',timeout:30000});
+    await tab.goto(target,{waitUntil:'commit',timeout:30000});
   }
   const selected=[...session.pages.entries()][checkpoint.activeTabIndex];
   if(selected){session.activeTabId=selected[0];session.page=selected[1];await session.page.bringToFront();}
@@ -1008,7 +1008,9 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
       )
         await context.addCookies(safeAuthCookies);
       page = await context.newPage();
-      await page.goto(initialTarget, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      // A usable live browser needs a committed document, not completion of a
+      // third-party login page's scripts. Stream the real page while it loads.
+      await page.goto(initialTarget, { waitUntil: 'commit', timeout: 30_000 });
       const id = crypto.randomUUID();
       const token = crypto.randomBytes(32).toString('base64url');
       const downloadDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'studio-browser-'));

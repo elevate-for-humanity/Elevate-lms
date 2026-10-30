@@ -27,7 +27,17 @@ test(
   async (t) => {
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'cdp-integration-'));
     let origin, crossOrigin;
+    let releaseBlockingScript;
     const server = http.createServer((req, res) => {
+      if (req.url === '/committed-loading') {
+        res.setHeader('Content-Type', 'text/html');
+        res.end('<!doctype html><h1>Committed document</h1><script src="/blocking-script"></script>');
+        return;
+      }
+      if (req.url === '/blocking-script') {
+        releaseBlockingScript = () => { res.setHeader('Content-Type', 'text/javascript'); res.end('window.finishedLoading=true'); };
+        return;
+      }
       if (req.url === '/api/session') {
       if (req.method === 'POST') res.setHeader('Set-Cookie', 'api-session=fixture-http-only; HttpOnly; Path=/; SameSite=Lax');
       res.setHeader('Content-Type', 'application/json');
@@ -118,7 +128,25 @@ test(
       assert.deepEqual(events, ['domcontentloaded', 'load', 'domcontentloaded', 'load']);
     } finally { await lifecyclePage.close(); }
   });
-  await t.test('navigation waits for the new delayed document', async () => {
+    await t.test('committed browser sessions can render before external scripts finish', async () => {
+      const loading = await context.newPage();
+      try {
+        await loading.goto(origin + '/committed-loading', { waitUntil: 'commit', timeout: 5000 });
+        const loader = loading.frameMap.get(loading.mainFrameId).loaderId;
+        assert.equal(loading.lifecycle.has(`${loader}:DOMContentLoaded`), false);
+        // The browser is connected to the real requested document, not a placeholder.
+        assert.equal(loading.url(), origin + '/committed-loading');
+        for (let attempt = 0; !releaseBlockingScript && attempt < 500; attempt++)
+          await new Promise(resolve => setTimeout(resolve, 10));
+        assert.equal(typeof releaseBlockingScript, 'function');
+        const release = releaseBlockingScript;
+        releaseBlockingScript = undefined;
+        release();
+        await loading.waitForLoadState('domcontentloaded', { timeout: 5000 });
+        assert.equal(await loading.evaluate(() => window.finishedLoading), true);
+      } finally { releaseBlockingScript?.(); releaseBlockingScript = undefined; await loading.close(); }
+    });
+    await t.test('navigation waits for the new delayed document', async () => {
       await page.goto(origin + '/slow');
       assert.equal(
         await page.evaluate(() => document.querySelector('h1').textContent),

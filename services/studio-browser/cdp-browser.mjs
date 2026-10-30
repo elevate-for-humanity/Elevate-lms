@@ -528,7 +528,7 @@ class CdpFrame {
   }
 }
 
-class CdpPage extends EventEmitter {
+export class CdpPage extends EventEmitter {
   constructor(context, target, sessionId) {
     super();
     this.context = context;
@@ -830,11 +830,26 @@ class CdpPage extends EventEmitter {
       this.once(name, handler);
     });
   }
-  async goto(url, { timeout = 30000 } = {}) {
-    const navigation = await this.send('Page.navigate', { url }, timeout);
+  async goto(url, { timeout = 30000, waitUntil = 'domcontentloaded' } = {}) {
+    const deadline = Date.now() + timeout;
+    const remaining = () => {
+      const budget = deadline - Date.now();
+      if (budget <= 0) throw timeoutError('navigation');
+      return budget;
+    };
+    const navigation = await this.send('Page.navigate', { url }, remaining());
     if (navigation.errorText) throw new Error(navigation.errorText);
-    if (navigation.loaderId) await this.waitForLoader(navigation.loaderId, timeout);
-    else await this.waitForLoadState('domcontentloaded', { timeout });
+    if (waitUntil === 'commit') {
+      if (!navigation.loaderId) return;
+      while (Date.now() < deadline) {
+        if (this.closed) throw new Error('Target closed');
+        if (this.frameMap.get(this.mainFrameId)?.loaderId === navigation.loaderId) return;
+        await delay(Math.min(10, remaining()));
+      }
+      throw timeoutError('navigation commit');
+    }
+    if (navigation.loaderId) await this.waitForLoader(navigation.loaderId, remaining());
+    else await this.waitForLoadState('domcontentloaded', { timeout: remaining() });
   }
   async reload({ timeout = 30000 } = {}) {
     const previous = this.frameMap.get(this.mainFrameId)?.loaderId;

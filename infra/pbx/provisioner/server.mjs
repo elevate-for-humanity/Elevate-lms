@@ -486,10 +486,14 @@ async function main() {
   });
   await service.initialize();
   service.server.listen(8090, '127.0.0.1');
-  const timer = setInterval(() => service.reconcile().catch(() => {
-    process.stderr.write('PBX ownership/runtime reconciliation failed; investigate before accepting new devices.\n');
+  // Preserve the running service's failure-stage diagnostics without reflecting
+  // provider exceptions or credentials. ProvisioningError codes are local constants.
+  const failureCode = error => error instanceof ProvisioningError ? error.code : 'unknown';
+  const timer = setInterval(() => service.reconcile().catch(error => {
+    process.stderr.write('PBX ownership/runtime reconciliation failed: ' + failureCode(error) + '\n');
   }), 60000);
-  const expiryTimer = setInterval(() => service.pruneExpired().catch(() => {
+  const expiryTimer = setInterval(() => service.pruneExpired().catch(error => {
+    process.stderr.write('PBX expired-credential revocation stage: ' + failureCode(error) + '\n');
     process.stderr.write('PBX expired-credential revocation failed; investigate immediately.\n');
   }), 5000);
   for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => {

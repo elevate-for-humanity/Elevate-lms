@@ -105,6 +105,11 @@ test('a provider safety block is retained without a text-card replacement', asyn
     });
   }
   expect(diagnostics.map(([, bytes]) => JSON.parse(bytes.toString()).cueIndex).sort()).toEqual([0, 1]);
+  const prompts = vi.mocked(generateTeachingPhoto).mock.calls.map(([prompt]) => String(prompt));
+  expect(new Set(prompts).size).toBe(2);
+  expect(prompts.some(prompt => prompt.includes('general course-related photograph'))).toBe(false);
+  expect([...files.keys()].some(path => path.startsWith('approved-teaching-photos/'))).toBe(false);
+
 });
 
 test('resume rejects changed stored image bytes without requesting replacement inference', async () => {

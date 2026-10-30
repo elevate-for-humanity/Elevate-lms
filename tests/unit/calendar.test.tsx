@@ -22,8 +22,14 @@ describe('Learner calendar page', () => {
 
   it('uses canonical course enrollment and one calendar UI', () => {
     const src = fs.readFileSync(pagePath, 'utf-8');
-    expect(src).toContain("from('course_enrollments')");
-    expect(src).toContain(".eq('student_id', user.id)");
+    expect(src).toContain("from '@/lib/lms/learner-course-ids'");
+    expect(src).toContain('loadLearnerCourseIds(db, user.id, true)');
+    const scope = fs.readFileSync(path.resolve('lib/lms/learner-course-ids.ts'), 'utf-8');
+    expect(scope).toContain("from('course_enrollments')");
+    expect(scope).toContain(".eq('student_id', userId)");
+    expect(scope).toContain("from('program_enrollments')");
+    expect(scope).toContain('user_id.eq.${userId},student_id.eq.${userId}');
+    expect(scope).toContain(".is('revoked_at', null)");
     expect(src.match(/<CalendarWidget\b/g)).toHaveLength(1);
     expect(src).toContain('userId={user.id}');
     expect(src).toContain('additionalEvents={meetingEvents}');

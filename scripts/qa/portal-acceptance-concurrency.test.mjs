@@ -52,3 +52,22 @@ test('only the admitted test job owns concurrency and runs this regression befor
   const check = job.indexOf('node --test scripts/qa/portal-acceptance-concurrency.test.mjs');
   assert.ok(check >= 0 && check < job.indexOf('Provision disposable Host Shop'));
 });
+
+const mediaJob = workflow.slice(workflow.indexOf('\n  hvac-public-playback:'), workflow.indexOf('\n  production-authenticated-e2e:'));
+const mediaCondition = mediaJob.match(/^    if: (.+)$/m)?.[1];
+
+test('unchanged full-film acceptance runs for PRs and real Marketing releases', () => {
+  assert.equal(evaluate(mediaCondition, event('pull_request')), true);
+  assert.equal(evaluate(mediaCondition, event('workflow_dispatch', {}, { component: 'marketing' })), true);
+  assert.equal(evaluate(mediaCondition, event('workflow_run', {
+    name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'main',
+  })), true);
+  for (const upstream of [
+    { name: 'Deploy Admin', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'main' },
+    { name: 'Deploy Google Marketing on trigger', conclusion: 'failure', event: 'workflow_dispatch', head_branch: 'main' },
+    { name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'push', head_branch: 'main' },
+    { name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'feature' },
+  ]) assert.equal(evaluate(mediaCondition, event('workflow_run', upstream)), false);
+  assert.equal(evaluate(mediaCondition, event('push')), false);
+  assert.equal(evaluate(mediaCondition, event('workflow_dispatch')), false);
+});

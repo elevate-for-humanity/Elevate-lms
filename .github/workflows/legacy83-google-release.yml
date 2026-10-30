@@ -85,15 +85,15 @@ jobs:
           set -euo pipefail
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
-          docker build --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" .
-          docker push "$IMAGE"
-      - name: Create a runtime identity with no project permissions
-        run: |
-          set -euo pipefail
-          SA="legacy83-runtime@$PROJECT.iam.gserviceaccount.com"
-          if ! gcloud iam service-accounts describe "$SA" --project="$PROJECT" >/dev/null 2>&1; then
-            gcloud iam service-accounts create legacy83-runtime --project="$PROJECT" --display-name="Legacy 83 website runtime"
+          if ! gcloud artifacts docker images describe "$IMAGE" --project="$PROJECT" >/dev/null 2>&1; then
+            docker build --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" .
+            docker push "$IMAGE"
           fi
+      - name: Inspect available runtime identities and project role bindings
+        run: |
+          gcloud iam service-accounts list --project="$PROJECT" --format='json(email,displayName,disabled)' || true
+          gcloud projects get-iam-policy "$PROJECT" --format=json || true
+          exit 1
       - name: Deploy the candidate without changing the customer domain
         run: |
           set -euo pipefail

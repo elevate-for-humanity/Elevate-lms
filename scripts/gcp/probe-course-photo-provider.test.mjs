@@ -8,7 +8,7 @@ import {photoProbeCode,probeCoursePhotoProvider} from './probe-course-photo-prov
 
 test('probe executes the real provider module and decodes the returned image',async()=>{
  const image=(await sharp({create:{width:1280,height:720,channels:3,background:'blue'}}).png().toBuffer()).toString('base64');
- const setup=`globalThis.fetch=async(url)=>({ok:true,json:async()=>String(url).includes('metadata.google.internal')?{access_token:'test-token'}:{candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:'${image}'}}]}}]}});`;
+ const setup=`globalThis.fetch=async(url)=>{if(!String(url).includes('metadata.google.internal')&&!String(url).includes('/locations/global/publishers/google/models/gemini-3.1-flash-lite-image:generateContent'))throw Error('WRONG_PROBE_ENDPOINT');return {ok:true,json:async()=>String(url).includes('metadata.google.internal')?{access_token:'test-token'}:{candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:'${image}'}}]}}]}}};`;
  const result=spawnSync(process.execPath,['--input-type=module','-e',setup+photoProbeCode],{
   cwd:fileURLToPath(new URL('../../',import.meta.url)),encoding:'utf8',timeout:10000,
   env:{...process.env,GOOGLE_CLOUD_PROJECT:'test-project',ULTIMATE_PHOTO_MODEL:'gemini-3.1-flash-image',ULTIMATE_PHOTO_REGION:'us'},
@@ -17,6 +17,8 @@ test('probe executes the real provider module and decodes the returned image',as
  const evidence=JSON.parse(result.stdout.trim());
  assert.equal(evidence.photoProviderVerified,true);
  assert.equal(evidence.provider,'google');
+ assert.equal(evidence.model,'gemini-3.1-flash-lite-image');
+ assert.equal(evidence.region,'global');
  assert.ok(evidence.bytes>0);
  assert.equal(evidence.width,1280);assert.equal(evidence.height,720);
  assert.match(evidence.sha256,/^[a-f0-9]{64}$/);

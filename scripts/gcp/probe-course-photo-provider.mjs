@@ -10,11 +10,18 @@ export const photoProbeCode = `
 import {createHash} from 'node:crypto';
 import sharp from 'sharp';
 import {generateTeachingPhoto} from './lib/ultimate-course-builder/adapters/google-teaching-photo.mjs';
-const image=await generateTeachingPhoto('Photorealistic instructional illustration of a clean barber workstation with combs, cape and clipper guards neatly separated. No people, no text, no invented guard measurements.',{maxAttempts:1,timeoutMs:120000});
+// Exercise the supported alternate endpoint before changing the delivery image.
+// Keep the deployed decoder, authentication path, identity and request contract.
+const testedModel='gemini-3.1-flash-lite-image';
+const image=await generateTeachingPhoto('Photorealistic instructional illustration of an HVAC training workstation with disconnected service gauges, a recovery machine and protective goggles neatly arranged. No people, no text, no invented readings.',{
+ maxAttempts:1,timeoutMs:120000,
+ env:{...process.env,ULTIMATE_PHOTO_REGION:'global',ULTIMATE_PHOTO_MODEL:'gemini-3.1-flash-image'},
+ request:(url,options)=>fetch(String(url).replace('/models/gemini-3.1-flash-image:','/models/'+testedModel+':'),options),
+});
 if(!['image/png','image/jpeg','image/webp'].includes(image.mimeType)||!image.bytes?.length)throw Error('IMAGE_FORMAT_INVALID');
 const decoded=await sharp(image.bytes).raw().toBuffer({resolveWithObject:true});
 if(decoded.info.width<512||decoded.info.height<288)throw Error('IMAGE_DIMENSIONS_INVALID');
-console.log(JSON.stringify({photoProviderVerified:true,provider:image.provider,model:image.model,bytes:image.bytes.length,width:decoded.info.width,height:decoded.info.height,sha256:createHash('sha256').update(image.bytes).digest('hex')}));
+console.log(JSON.stringify({photoProviderVerified:true,provider:image.provider,model:testedModel,region:'global',bytes:image.bytes.length,width:decoded.info.width,height:decoded.info.height,sha256:createHash('sha256').update(image.bytes).digest('hex')}));
 `;
 
 export async function probeCoursePhotoProvider({run=google,capacityCheck=inspectRegionalCapacity}={}){

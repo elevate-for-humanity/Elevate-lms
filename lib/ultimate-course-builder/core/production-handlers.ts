@@ -1,4 +1,4 @@
-import {instructionView, applySceneTitleReadabilityRepair, applyTeachingStateVisibilityRepair, orderSceneTeachingStates} from './repair-policy.mjs';
+import {instructionView, renderInstructionArtifacts, applySceneTitleReadabilityRepair, applyTeachingStateVisibilityRepair, orderSceneTeachingStates} from './repair-policy.mjs';
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
 import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
@@ -340,7 +340,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             presentationContract: ctx.profile.presentationContract,
             renderRevision: [(ctx.artifacts as any).__renderRevision,(ctx.artifacts as any).__repairState?.at].filter(Boolean).join(':') || undefined,
             requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
-            artifacts: ctx.artifacts,
+            artifacts: renderInstructionArtifacts(ctx.artifacts),
           }),
         },
       };

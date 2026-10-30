@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","compilerOptions":{"incremental":false},"include":["workers/direct-course-release.ts","workers/direct-course-policy.mjs"],"exclude":["node_modules"]}

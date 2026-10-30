@@ -1,0 +1,43 @@
+name: Direct LMS course completion and publication
+on:
+  workflow_run:
+    workflows: ['Deploy Google Course Builder on source changes']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tested_image_sha:
+        description: Full SHA of the successfully deployed tested image containing the direct release entrypoint
+        required: true
+        type: string
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: direct-course-release-launch
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify direct release preserves completed media and has no rewind or retry
+        run: node --test workers/direct-course-policy.test.mjs scripts/gcp/direct-course-release.test.mjs tests/worker/hvac-saved-safety-role.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Run finite direct completion outside builder queues
+        env:
+          DIRECT_RELEASE_SOURCE_SHA: ${{ inputs.tested_image_sha || github.event.workflow_run.head_sha }}
+        run: node scripts/gcp/direct-course-release.mjs

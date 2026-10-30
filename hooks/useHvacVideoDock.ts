@@ -16,12 +16,11 @@ export function useHvacVideoDock(enabled = true) {
     let video: Element | null = null;
     let target: HTMLElement | null = null;
     const attach = () => {
-      if (!active || (observer && video?.isConnected && target?.isConnected)) return;
+      if (!active) return;
       const nextVideo = document.querySelector('main video[data-hvac-hero-video]');
-      const nextTarget = document.querySelector<HTMLElement>('[data-hvac-video-assistance]');
+      const nextTarget = document.querySelector<HTMLElement>('[data-hvac-video-assistance="ready"]');
       if (nextVideo === video && nextTarget === target) return;
       observer?.disconnect();
-      observer = undefined;
       video = nextVideo;
       target = nextTarget;
       setDock(null);
@@ -29,21 +28,26 @@ export function useHvacVideoDock(enabled = true) {
       const observedVideo = video;
       const observedTarget = target;
       observer = new IntersectionObserver(entries => {
-        if (!active || !observedVideo.isConnected || !observedTarget.isConnected) return;
+        if (!active || video !== observedVideo || target !== observedTarget ||
+          !observedVideo.isConnected || !observedTarget.isConnected) return;
         for (const entry of entries) {
           if (entry.target === observedVideo) setDock(entry.isIntersecting ? observedTarget : null);
         }
       });
-      observer.observe(video);
+      observer.observe(observedVideo);
     };
-    // Discover streamed markup and reattach after a page subtree is replaced.
-    const waiting = new MutationObserver(attach);
-    waiting.observe(document.body, { childList: true, subtree: true });
+    // Streaming and hydration recovery can replace an already discovered hero.
+    // Observe only on this route, and rebind only when the actual nodes change.
+    const changes = new MutationObserver(attach);
+    changes.observe(document.body, {
+      childList: true, subtree: true, attributes: true,
+      attributeFilter: ['data-hvac-video-assistance'],
+    });
     attach();
     return () => {
       active = false;
       observer?.disconnect();
-      waiting.disconnect();
+      changes.disconnect();
     };
   }, [enabled, pathname]);
 

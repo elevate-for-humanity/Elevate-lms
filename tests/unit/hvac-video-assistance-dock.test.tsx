@@ -41,7 +41,7 @@ async function showFilm(isIntersecting: boolean) {
 
 function filmPage() {
   const main = document.createElement('main');
-  main.innerHTML = '<video data-hvac-hero-video="20261029"></video><div data-hvac-video-assistance></div><section data-scroll-narration data-narration="HVAC course information"></section>';
+  main.innerHTML = '<video data-hvac-hero-video="20261029"></video><div data-hvac-video-assistance="ready"></div><section data-scroll-narration data-narration="HVAC course information"></section>';
   document.body.append(main);
   return main.querySelector('[data-hvac-video-assistance]')!;
 }

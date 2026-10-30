@@ -97,7 +97,7 @@ export default async function ApprenticeHomePanel({
               On your phone, tap the menu button to find the same tools.
             </p>
           </div>
-          <div className="relative min-h-56">
+          <div className="relative min-h-56 bg-neutral-200">
             <Image
               src={getProgramHeroImage(programSlug)}
               alt="Your apprenticeship training"

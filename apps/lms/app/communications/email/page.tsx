@@ -5,6 +5,7 @@ import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
+import { ROLE_DISPLAY_NAMES, type UserRole } from '@/lib/navigation/navigation-config';
 export const dynamic = 'force-dynamic';
 export default async function InterofficeEmail({
   searchParams,
@@ -29,7 +30,9 @@ export default async function InterofficeEmail({
     .eq('id', subject.userId)
     .maybeSingle();
   if (error || !profile) throw new Error('Email account profile could not be loaded.');
-  const role = normalizeRole(profile.role);
+  const role =
+    normalizeRole(profile.role) ||
+    (Object.hasOwn(ROLE_DISPLAY_NAMES, profile.role) ? (profile.role as UserRole) : null);
   if (!role) throw new Error('Email account role could not be resolved.');
   return (
     <PlatformShell

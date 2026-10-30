@@ -1,4 +1,3 @@
-import {authoringProbeDecision} from './authoring-probe-policy.mjs';
 import {execFileSync} from 'node:child_process';
 const read=args=>{
  try{return JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:16*1024*1024,timeout:60000}));}
@@ -59,8 +58,8 @@ for(const entry of [...logs].reverse()) {
  console.log(JSON.stringify({at:entry.timestamp,job:'elevate-direct-course-release',execution:clean(entry.labels?.['run.googleapis.com/execution_name']),state:clean(event.state),courseId:clean(event.courseId),lessonId:clean(event.lessonId),step:clean(event.step),code:clean(event.code),complete:typeof event.complete==='boolean'?event.complete:undefined,publishedLessonCount:Number.isSafeInteger(event.publishedLessonCount)?event.publishedLessonCount:undefined,learnerLessonCount:Number.isSafeInteger(event.learnerLessonCount)?event.learnerLessonCount:undefined}));
 }
 
-// Read provider denial evidence; API rejection must not be guessed from HTTP 403.
-const denied=read(['logging','read','protoPayload.serviceName="aiplatform.googleapis.com" AND protoPayload.status.code=7','--project=elegant-racer-299721','--freshness=3h','--limit=30','--format=json']);
+// Read actual permission and quota rejection evidence without new inference.
+const denied=read(['logging','read','protoPayload.serviceName="aiplatform.googleapis.com" AND (protoPayload.status.code=7 OR protoPayload.status.code=8)','--project=elegant-racer-299721','--freshness=3h','--limit=30','--format=json']);
 for(const entry of denied){
  const status=entry.protoPayload?.status;
  const message=String(status?.message??'').replace(/https?:\/\/[^\s]+/gi,'[url]').slice(0,1200);
@@ -69,16 +68,11 @@ for(const entry of denied){
 const billing=read(['billing','projects','describe','elegant-racer-299721','--format=json']);
 console.log(JSON.stringify({project:'elegant-racer-299721',billingEnabled:billing.billingEnabled===true}));
 
-const directRuns=['us-central1','us-east1'].flatMap(region=>read(['run','jobs','executions','list','--job=elevate-direct-course-release','--project=elegant-racer-299721','--region='+region,'--limit=10','--format=json']));
-const probeDecision=authoringProbeDecision(directRuns);
-if(probeDecision==='probe'){
- const probeCode="const marker='DIRECT_AUTHORING_DIAGNOSTIC_V1';const token=await(await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',{headers:{'Metadata-Flavor':'Google'},signal:AbortSignal.timeout(10000)})).json();const r=await fetch('https://aiplatform.us.rep.googleapis.com/v1/projects/elegant-racer-299721/locations/us/publishers/google/models/gemini-3.8-flash:generateContent',{method:'POST',headers:{Authorization:'Bearer '+token.access_token,'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Reply OK.'}]}],generationConfig:{maxOutputTokens:16}}),signal:AbortSignal.timeout(25000)});const body=await r.json();console.log(JSON.stringify({marker,providerDiagnostic:{http:r.status,status:body.error?.status,message:String(body.error?.message??'').replace(/https?:\\/\\/[^\\s]+/g,'[url]').slice(0,1500),reasons:body.error?.details?.map(d=>({reason:d.reason,domain:d.domain}))}}));";
- const started=read(['run','jobs','execute','elevate-direct-course-release','--project=elegant-racer-299721','--region=us-central1','--args=^~^--input-type=module~-e~'+probeCode,'--async','--quiet','--format=json']);
- console.log(JSON.stringify({diagnosticExecution:started.metadata?.name}));
- await new Promise(resolve=>setTimeout(resolve,20000));
- const evidence=read(['logging','read','resource.type="cloud_run_job" AND resource.labels.job_name="elevate-direct-course-release" AND textPayload:"DIRECT_AUTHORING_DIAGNOSTIC_V1"','--project=elegant-racer-299721','--freshness=5m','--limit=3','--format=json']);
- for(const entry of evidence){try{const value=JSON.parse(entry.textPayload);console.log(JSON.stringify({at:entry.timestamp,providerDiagnostic:value.providerDiagnostic}));}catch{}}
-}else console.log(JSON.stringify({diagnosticProbe:probeDecision}));
+// Diagnostics must not launch an authoring probe or reserve course capacity.
+// Retain previously recorded probe evidence below; current failures are read
+// from production logs rather than reproduced with another paid request.
+console.log(JSON.stringify({diagnosticReadOnly:true}));
 const recorded=read(['logging','read','resource.type="cloud_run_job" AND resource.labels.job_name="elevate-direct-course-release" AND (textPayload:"DIRECT_AUTHORING_DIAGNOSTIC_V1" OR jsonPayload.marker="DIRECT_AUTHORING_DIAGNOSTIC_V1")','--project=elegant-racer-299721','--freshness=20m','--limit=3','--format=json']);
 for(const entry of recorded){try{const value=entry.jsonPayload??JSON.parse(entry.textPayload);console.log(JSON.stringify({at:entry.timestamp,providerDiagnostic:value.providerDiagnostic}));}catch{}}
+
 

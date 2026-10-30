@@ -1,37 +1,21 @@
-// PUBLIC ROUTE: auth enforced by the delegate target — /api/lessons/[lessonId]/complete requires session
-/**
- * Legacy lesson completion endpoint.
- * Delegates to the gated /api/lessons/[lessonId]/complete which enforces
- * enrollment, quiz pass, and minimum seat time requirements.
- */
-import { NextRequest, NextResponse } from 'next/server';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
+import type { NextRequest } from 'next/server';
+import { POST as completeLesson } from '../../../../../lessons/[lessonId]/complete/route';
 
 export const runtime = 'nodejs';
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
+/**
+ * Preserve the legacy course-scoped URL while invoking the canonical,
+ * authenticated completion handler in the same request context.
+ * A server-to-server fetch to request.url can target an internal Cloud Run
+ * origin and loses request context. The canonical handler owns all gates,
+ * rate limiting, and audit logging.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string; lessonId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
   const { lessonId } = await params;
-
-  // Forward to the gated endpoint with all original headers (auth cookies)
-  const gatewayUrl = new URL(`/api/lessons/${lessonId}/complete`, request.url);
-  const body = await request.text().catch(() => '{}');
-
-  const response = await fetch(gatewayUrl.toString(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      cookie: request.headers.get('cookie') || '',
-      authorization: request.headers.get('authorization') || '',
-    },
-    body,
-  });
-
-  const data = await response.json().catch(() => ({}));
-  return NextResponse.json(data, { status: response.status });
+  return completeLesson(request, { params: Promise.resolve({ lessonId }) });
 }

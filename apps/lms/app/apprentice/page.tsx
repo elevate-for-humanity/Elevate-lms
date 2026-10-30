@@ -1,7 +1,5 @@
 import ApprenticeHomePanel from '@/components/apprenticeship/ApprenticeHomePanel';
-import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
-import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import type { Metadata } from 'next';
@@ -517,8 +515,6 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
         {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
           <TrainingReadyNotice courseHref={courseHref} />
         ) : null}
-        <ProgramGuideResources />
-        <VisualDashboardOrientation audience="apprentice" compact />
 
         <TimeclockAttendanceNotice />
 
@@ -664,8 +660,6 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
       {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
         <TrainingReadyNotice courseHref={courseHref} />
       ) : null}
-      <ProgramGuideResources />
-      <VisualDashboardOrientation audience="apprentice" compact />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">

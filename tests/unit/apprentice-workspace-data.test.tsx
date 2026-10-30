@@ -39,6 +39,7 @@ vi.mock('@/components/lms/LmsHeroBanner', () => ({
 vi.mock('@/components/AssignmentSubmission', () => ({ default: () => null }));
 vi.mock('@/components/LearningAnalyticsDashboard', () => ({ default: () => null }));
 vi.mock('@/components/StudentEngagementAnalytics', () => ({ default: () => null }));
+vi.mock('@/lib/admin/portal-preview', () => ({ resolvePortalPreviewSubject: async (_db: unknown, userId: string) => ({ userId, previewing: false }) }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn() } }));
 import QuizzesPage from '@/apps/lms/app/lms/(app)/quizzes/page';
 import GradesPage from '@/apps/lms/app/lms/(app)/grades/page';

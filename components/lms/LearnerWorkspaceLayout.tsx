@@ -14,25 +14,27 @@ export default async function LearnerWorkspaceLayout({
   children: React.ReactNode;
   showLearnerNotices?: boolean;
 }) {
-  const { user, profile } = await requireRole([
-    'student',
-    'learner',
-    'apprentice',
-    'barber_apprentice',
-    'cosmetology_apprentice',
-    'admin',
-    'staff',
-  ]);
   const supabase = await createClient();
-  const { data: photoProfile } = await supabase
-    .from('profiles')
-    .select('avatar_url')
-    .eq('id', user.id)
-    .maybeSingle();
-
+  const {
+    data: { user: authenticatedUser },
+  } = await supabase.auth.getUser();
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
-  const isAdmin = ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
+  const subject = await resolvePortalPreviewSubject(db, authenticatedUser?.id);
+  // Only the verified, administrator-signed handoff can render without a learner session.
+  // Ordinary requests still pass the full role and membership authorization below.
+  const authorized = subject.previewing
+    ? null
+    : await requireRole([
+        'student',
+        'learner',
+        'apprentice',
+        'barber_apprentice',
+        'cosmetology_apprentice',
+        'admin',
+        'staff',
+      ]);
+  const user = authorized?.user || { id: subject.userId, email: undefined };
+  const profile = authorized?.profile;
   const subjectProfile = subject.previewing
     ? (
         await db
@@ -42,7 +44,11 @@ export default async function LearnerWorkspaceLayout({
           .maybeSingle()
       ).data
     : profile;
-  const subjectRole = subjectProfile?.role;
+  if (!subjectProfile) throw new Error('Learner workspace profile could not be loaded.');
+  const photoProfile = { avatar_url: subjectProfile.avatar_url };
+  const isAdmin =
+    subject.previewing || ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
+  const subjectRole = subjectProfile.role;
   const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole);
   const showBilling =
     (!isAdmin || subject.previewing) &&

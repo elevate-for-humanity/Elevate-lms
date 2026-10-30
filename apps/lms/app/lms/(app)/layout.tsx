@@ -19,13 +19,14 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
   } = await userDb.auth.getUser();
   const pathname = (await headers()).get('x-pathname') || '/lms/dashboard';
 
-  if (user) {
+  {
     const db = await requireAdminClient();
-    const [{ data: actor }, subject] = await Promise.all([
-      db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
-      resolvePortalPreviewSubject(db, user.id),
-    ]);
-    const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
+    const subject = await resolvePortalPreviewSubject(db, user?.id);
+    const actor = user
+      ? (await db.from('profiles').select('role').eq('id', user.id).maybeSingle()).data
+      : null;
+    const isAdmin =
+      subject.previewing || ['admin', 'super_admin'].includes(String(actor?.role || ''));
     const isDashboard = pathname === '/lms' || pathname === '/lms/dashboard';
     const hasReadOnlyModule =
       subject.previewing &&

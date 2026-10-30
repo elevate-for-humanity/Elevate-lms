@@ -1,3 +1,7 @@
+import {
+  APPRENTICE_POLICY_KEYS,
+  APPRENTICE_POLICY_VERSION,
+} from '@/lib/apprenticeship/apprentice-policy';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -36,8 +40,7 @@ export default async function ApprenticeHomePanel({
     db
       .from('documents')
       .select('document_type,status,verification_status,verified,metadata')
-      .eq('user_id', userId)
-      .eq('document_type', 'photo_id'),
+      .eq('user_id', userId),
     db
       .from('id_verifications')
       .select('id')
@@ -45,11 +48,21 @@ export default async function ApprenticeHomePanel({
       .in('status', ['approved', 'verified'])
       .limit(1)
       .maybeSingle(),
+    db
+      .from('apprentice_document_types')
+      .select('document_type')
+      .eq('program_slug', programSlug)
+      .eq('is_required', true),
+    db
+      .from('agreement_acceptances')
+      .select('agreement_key,agreement_version')
+      .eq('subject_type', 'apprentice')
+      .eq('subject_id', userId)
+      .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
   const failed = results.some((result) => result.error);
-  const [profile, notifications, apprentice, documents, verification] = results.map(
-    (result) => result.data,
-  );
+  const [profile, notifications, apprentice, documents, verification, requirements, policies] =
+    results.map((result) => result.data);
   const name =
     (profile as any)?.first_name || (profile as any)?.full_name?.split(' ')[0] || 'Apprentice';
   const identity = evaluateIdentityClockEligibility(
@@ -58,6 +71,42 @@ export default async function ApprenticeHomePanel({
     Boolean(verification),
   );
   const actions: Array<{ title: string; text: string; href: string }> = [];
+  const approved = new Set(
+    ((documents || []) as any[])
+      .filter((doc) =>
+        ['approved', 'verified', 'accepted'].includes(
+          String(doc.verification_status || doc.status || '').toLowerCase(),
+        ),
+      )
+      .map((doc) => doc.document_type),
+  );
+  const missing = ((requirements || []) as any[]).filter(
+    (item) => !approved.has(item.document_type),
+  ).length;
+  if (!failed && missing)
+    actions.push({
+      title: `${missing} required document${missing === 1 ? '' : 's'} need attention`,
+      text: 'Open Documents to see exactly what is missing or needs correction.',
+      href: '/apprentice/documents',
+    });
+  const acceptedPolicies = new Set(
+    ((policies || []) as any[])
+      .filter((policy) => policy.agreement_version === APPRENTICE_POLICY_VERSION)
+      .map((policy) => policy.agreement_key),
+  );
+  if (!failed && !acceptedPolicies.has(APPRENTICE_POLICY_KEYS.timeclock))
+    actions.push({
+      title: 'Review and sign your clock rules',
+      text: 'Read the clock and location rules before recording shop work.',
+      href: '/apprentice/policies/timeclock',
+    });
+  if (!failed && !acceptedPolicies.has(APPRENTICE_POLICY_KEYS.payment))
+    actions.push({
+      title: 'Review and sign your payment rules',
+      text: 'Read the payment and communication policy. Once signed, it stays in your menu.',
+      href: '/apprentice/policies/payments',
+    });
+
   if (!failed && !identity.eligible)
     actions.push({
       title: 'Identity verification required for clock-in',

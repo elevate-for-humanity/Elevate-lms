@@ -119,3 +119,12 @@ test('site lookup failures fail closed; read-only previews never provision sites
   assert.match(route, /apprenticeSiteScopeId && !subject.previewing/);
   assert.match(route, /await provisionMissingTimeclockSite\(db, apprenticeSiteScopeId\)/);
 });
+
+test('workbook sits immediately beneath theory for every apprentice alias', () => {
+  for (const role of ['apprentice', 'barber_apprentice', 'cosmetology_apprentice']) {
+    const items = nav.getNavigationForRole(role).flatMap(section => section.items);
+    const index = items.findIndex(item => item.id === 'theory');
+    assert.ok(index >= 0);
+    assert.equal(items[index + 1]?.id, 'workbook');
+  }
+});

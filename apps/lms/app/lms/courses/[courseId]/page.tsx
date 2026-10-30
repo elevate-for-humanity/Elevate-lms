@@ -201,7 +201,7 @@ export default async function CourseLandingPage({
           ) : heroVisual?.media_type === 'image' ? (
             <figure className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-xl">
               <img
-                className="aspect-[8/3] w-full object-cover"
+                className="h-40 w-full object-contain sm:h-48"
                 src={heroVisual.asset_url}
                 alt={heroVisual.alt_text || course.title}
               />

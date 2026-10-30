@@ -85,7 +85,7 @@ export default async function ApprenticeHomePanel({
   ).length;
   if (!failed && missing)
     actions.push({
-      title: `${missing} required document${missing === 1 ? '' : 's'} need attention`,
+      title: `${missing} required document${missing === 1 ? ' needs' : 's need'} attention`,
       text: 'Open Documents to see exactly what is missing or needs correction.',
       href: '/apprentice/documents',
     });

@@ -9,6 +9,10 @@ const web = app => ({ family: 'next-web', app,
 // the shared Next preset and bounded entry point; native/GPU workers retain
 // their separate, capacity-checked runtime contracts.
 export const containerBuildPolicy = Object.freeze({
+  'legacy83-candidate': { dockerfile: 'Dockerfile.legacy83-candidate', family: 'next-web', app: 'legacy83',
+    memoryControl: 'scripts/build-memory-policy.mjs',
+    savingControl: '.deploy/legacy83-source/manifest.json',
+    recoveryControl: '.github/workflows/legacy83-google-release.yml' },
   marketing: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
   store: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
   admin: { dockerfile: 'Dockerfile.admin', ...web('admin') },

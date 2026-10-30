@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
+      - 'scripts/gcp/smoke-lms-container*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
@@ -92,6 +93,7 @@ jobs:
     with:
       component: lms
       image_sha: ${{ github.sha }}
+      candidate_size: lms-2cpu-4gi
     secrets: inherit
   acceptance:
     needs: deploy

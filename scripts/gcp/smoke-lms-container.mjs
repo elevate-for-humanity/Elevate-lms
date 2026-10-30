@@ -2,6 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 const memory=4*2**30;
+export const LMS_SMOKE_NODE_OPTIONS='--max-old-space-size=2560';
 const fail=code=>{throw Error('LMS_SMOKE_'+code);};
 export async function smokeLmsContainer({sha,image=`elevate-lms:${sha}`,name=`lms-bounded-${process.pid}`,env=process.env,
  docker=args=>execFileSync('docker',args,{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']}).trim(),
@@ -14,10 +15,14 @@ export async function smokeLmsContainer({sha,image=`elevate-lms:${sha}`,name=`lm
  try {
   const publicEnv=['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY'].filter(key=>typeof env[key]==='string'&&env[key].trim()).flatMap(key=>['--env',key]);
   docker(['run','-d','--name',name,'--cpus=2','--memory=4g','--memory-swap=4g','-p','127.0.0.1::3000',
-   '--env','PORT=3000','--env','HOSTNAME=0.0.0.0','--env','K_SERVICE=elevate-lms-migration',...publicEnv,image]);
+   '--env','PORT=3000','--env','HOSTNAME=0.0.0.0','--env',`NODE_OPTIONS=${LMS_SMOKE_NODE_OPTIONS}`,'--env','K_SERVICE=elevate-lms-migration',...publicEnv,image]);
   started=true;
   const config=alive().HostConfig;
   if(config?.Memory!==memory||config.MemorySwap!==memory||config.NanoCpus!==2e9)fail('RESOURCE_LIMIT_NOT_ENFORCED');
+  const imageCommand=alive().Config?.Cmd;
+  if(!Array.isArray(imageCommand)||!imageCommand.length||imageCommand.some(arg=>/max[-_]old[-_]space[-_]size/.test(arg)))fail('HEAP_COMMAND_UNVERIFIED');
+  const heap=JSON.parse(docker(['exec',name,'node','-e',"console.log(JSON.stringify({limit:require('node:v8').getHeapStatistics().heap_size_limit,options:process.env.NODE_OPTIONS}))"]));
+  if(heap.options!==LMS_SMOKE_NODE_OPTIONS||!Number.isSafeInteger(heap.limit)||heap.limit<2**30||heap.limit>3*2**30)fail('HEAP_BUDGET_UNVERIFIED');
   const port=docker(['port',name,'3000/tcp']).split(':').at(-1);
   if(!/^\d+$/.test(port??''))fail('LOCAL_PORT_REQUIRED');
   const base=`http://127.0.0.1:${port}`;
@@ -59,7 +64,7 @@ export async function smokeLmsContainer({sha,image=`elevate-lms:${sha}`,name=`lm
    if(path==='/api/health'&&(body.healthy!==true||body.ready!==true||body.configuration?.ok!==true||body.dependencies?.supabase?.ok!==true))fail('DEPENDENCY_HEALTH_UNVERIFIED');
   }
   alive();
-  return {verified:true,commit:sha,cpu:2,memoryBytes:memory,renderedRequests:12,guestAccessDenied:true,exactHealthVerified:true,oomKilled:false};
+  return {verified:true,commit:sha,cpu:2,memoryBytes:memory,heapLimitBytes:heap.limit,renderedRequests:12,guestAccessDenied:true,exactHealthVerified:true,oomKilled:false};
  } finally {
   if(started)docker(['rm','-f',name]);
  }

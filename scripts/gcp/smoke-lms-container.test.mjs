@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {smokeLmsContainer} from './smoke-lms-container.mjs';
+import {smokeLmsContainer,LMS_SMOKE_NODE_OPTIONS} from './smoke-lms-container.mjs';
 const sha='a'.repeat(40);
-function fixture({memory=4*2**30,swap=4*2**30,cpu=2e9,restarts=0,wrongSha=false,wrongService=false,dependency=true,guestAllowed=false,oom=false}={}) {
+function fixture({memory=4*2**30,swap=4*2**30,cpu=2e9,restarts=0,heap=2.5*2**30,options=LMS_SMOKE_NODE_OPTIONS,command=['node','server.js'],wrongSha=false,wrongService=false,dependency=true,guestAllowed=false,oom=false}={}) {
  const calls=[];let requests=0;
  return {calls,get requests(){return requests;},input:{sha,name:'lms-bounded-fixture',env:{NEXT_PUBLIC_SUPABASE_URL:'public',NEXT_PUBLIC_SUPABASE_ANON_KEY:'public',PRIVATE_KEY:'must-not-forward'},delay:async()=>{},
-  docker:args=>{calls.push(args);if(args[0]==='inspect')return JSON.stringify({State:{Running:true,OOMKilled:oom&&requests>4},RestartCount:restarts,HostConfig:{Memory:memory,MemorySwap:swap,NanoCpus:cpu}});if(args[0]==='port')return '127.0.0.1:3001';return 'started';},
+  docker:args=>{calls.push(args);if(args[0]==='inspect')return JSON.stringify({State:{Running:true,OOMKilled:oom&&requests>4},RestartCount:restarts,HostConfig:{Memory:memory,MemorySwap:swap,NanoCpus:cpu},Config:{Cmd:command}});if(args[0]==='exec')return JSON.stringify({limit:heap,options});if(args[0]==='port')return '127.0.0.1:3001';return 'started';},
   request:async url=>{
    requests++;const path=new URL(url).pathname;
    if(path==='/login')return new Response('<html>'+('x'.repeat(1200))+'</html>',{headers:{'content-type':'text/html'}});
@@ -21,7 +21,7 @@ test('native acceptance enforces 2 CPU/4 GiB with no swap, bounded SSR and exact
  assert.equal(JSON.stringify(f.calls).includes('PRIVATE_KEY'),false);
  assert.deepEqual(f.calls.at(-1),['rm','-f','lms-bounded-fixture']);
 });
-for(const [name,options] of [['unbounded memory',{memory:8*2**30}],['extra swap',{swap:8*2**30}],['different CPU limit',{cpu:4e9}],['restarted process',{restarts:1}],['wrong immutable commit',{wrongSha:true}],['another service',{wrongService:true}],['failed dependency',{dependency:false}],['guest access to LMS',{guestAllowed:true}],['OOM after page traffic',{oom:true}]]) {
+for(const [name,options] of [['unbounded memory',{memory:8*2**30}],['extra swap',{swap:8*2**30}],['different CPU limit',{cpu:4e9}],['restarted process',{restarts:1}],['heap larger than the container budget',{heap:6*2**30}],['unapplied heap setting',{options:'--max-old-space-size=6144'}],['command-line heap override',{command:['node','--max-old-space-size=6144','server.js']}],['wrong immutable commit',{wrongSha:true}],['another service',{wrongService:true}],['failed dependency',{dependency:false}],['guest access to LMS',{guestAllowed:true}],['OOM after page traffic',{oom:true}]]) {
  test('rejects '+name+' and cleans its own container',async()=>{
   const f=fixture(options);await assert.rejects(smokeLmsContainer(f.input),/LMS_SMOKE_/);
   assert.deepEqual(f.calls.at(-1),['rm','-f','lms-bounded-fixture']);
@@ -53,6 +53,7 @@ test('LMS profile is scoped, capacity-checked and smoke-tested before any Google
  assert.ok(trigger.includes('candidate_size: lms-2cpu-4gi'));
  const profile=deploy.slice(deploy.indexOf('            lms-2cpu-4gi)'),deploy.indexOf("            *) echo"));
  assert.ok(profile.includes('test "$COMPONENT" = lms'));assert.ok(profile.includes('CANDIDATE_CPU=2 CANDIDATE_MEMORY=4Gi'));
+ assert.ok(profile.includes(`--update-env-vars=NODE_OPTIONS=${LMS_SMOKE_NODE_OPTIONS}`));
  assert.ok(profile.includes('smoke-lms-container.mjs'));assert.ok(profile.includes('SMOKE_IMAGE="$IMAGE@$DIGEST"'));
  assert.ok(deploy.indexOf('preflight-web-rollout.mjs')<deploy.indexOf('gcloud run services update "$SERVICE"'));
  assert.ok(gate.includes("if: matrix.service == 'lms'"));assert.ok(gate.includes('node scripts/gcp/smoke-lms-container.mjs'));

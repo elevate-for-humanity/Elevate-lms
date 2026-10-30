@@ -87,7 +87,7 @@ jobs:
             lms-2cpu-4gi)
               test "$COMPONENT" = lms
               export CANDIDATE_CPU=2 CANDIDATE_MEMORY=4Gi
-              resource_args=(--cpu=2 --memory=4Gi)
+              resource_args=(--cpu=2 --memory=4Gi --update-env-vars=NODE_OPTIONS=--max-old-space-size=2560)
               # Test the same immutable image and allocation, including manual releases.
               gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
               docker pull "$IMAGE@$DIGEST"

@@ -10,4 +10,7 @@ class SelectionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'SIZE_INVALID'):r.selected_lessons('saved-request',{'mode':'encode-review-candidate','lessonIds':[]})
     def test_invalid_identifier_rejected(self):
         with self.assertRaises(ValueError):r.selected_lessons('unexpected-input',{})
+    def test_review_request_is_explicitly_scoped(self):self.assertEqual(r.selected_lessons('review-request',{'mode':'refresh-review-previews','lessonIds':[ID]}),[ID])
+    def test_review_cannot_request_encoding(self):
+        with self.assertRaisesRegex(ValueError,'MODE_INVALID'):r.selected_lessons('review-request',{'mode':'encode-review-candidate','lessonIds':[ID]})
 if __name__=='__main__':unittest.main()

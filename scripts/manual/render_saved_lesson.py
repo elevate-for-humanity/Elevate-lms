@@ -8,8 +8,8 @@ BUCKET='elevate-course-media'
 
 def digest(data): return hashlib.sha256(data).hexdigest()
 
-def request(url, data=None, headers=None):
-    req=urllib.request.Request(url,data=None if data is None else json.dumps(data).encode(),headers=headers or {})
+def request(url, data=None, headers=None, method=None):
+    req=urllib.request.Request(url,data=None if data is None else json.dumps(data).encode(),headers=headers or {},method=method)
     try:
         with urllib.request.urlopen(req,timeout=90) as response: return json.load(response)
     except urllib.error.HTTPError as error:
@@ -36,7 +36,7 @@ def main():
     lesson=str(uuid.UUID(os.environ['LESSON_ID']))
     service=os.environ['SUPABASE_SERVICE_ROLE_KEY']
     headers={'apikey':service,'Authorization':'Bearer '+service,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates,return=representation'}
-    def db(path,data=None): return request(PROJECT+'/rest/v1/'+path,data,headers)
+    def db(path,data=None,method=None): return request(PROJECT+'/rest/v1/'+path,data,headers,method)
     rows=db('course_lessons?select=id,course_id,title,content_json&id=eq.'+lesson+'&course_id=eq.'+COURSE)
     if len(rows)!=1: raise RuntimeError('MANUAL_LESSON_NOT_FOUND')
     row=rows[0]; sections,groups,text=canonical_source(row)
@@ -67,11 +67,27 @@ def main():
             raise RuntimeError('MANUAL_PRIVATE_READ_FAILED') from None
     def put(key,data,mime):
         s3.put_object(Bucket=BUCKET,Key=key,Body=data,ContentType=mime,CacheControl='private, max-age=0')
+    def retain_review(manifest):
+        from urllib.parse import quote
+        sheet=get(prefix+'/film-review-sheet.jpg')
+        if not sheet or len(sheet)>2*1024*1024: raise RuntimeError('MANUAL_REVIEW_SHEET_INVALID')
+        # Private admin thumbnail; actual saved review frames remain available
+        # without an expiring bearer URL or a public repository artifact.
+        db('course_videos?id=eq.'+manifest['candidateVideoId'],{'thumbnail_url':'data:image/jpeg;base64,'+base64.b64encode(sheet).decode()},'PATCH')
+        latest=db('course_lessons?select=content_json,updated_at&id=eq.'+lesson+'&course_id=eq.'+COURSE)[0]
+        canonical_source(latest)
+        if latest['content_json']['manualMediaDraft']['sourceTranscriptSha256']!=source_hash: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_REVIEW')
+        content=latest['content_json'];content['manualMediaDraft']['encodedReview']=manifest
+        changed=db('course_lessons?id=eq.'+lesson+'&course_id=eq.'+COURSE+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content},'PATCH')
+        if len(changed)!=1: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_REVIEW_SAVE')
     old=get(manifest_key)
     if old:
         manifest=json.loads(old)
         if manifest.get('sourceTranscriptSha256')!=source_hash or manifest.get('reviewRequired') is not True: raise RuntimeError('MANUAL_CANDIDATE_CONFLICT')
+        retain_review(manifest)
         print(json.dumps({'lessonId':lesson,'state':'existing-review-candidate','manifestKey':manifest_key})); return
+    if os.environ.get('MANUAL_REVIEW_ONLY')=='true':
+        print(json.dumps({'lessonId':lesson,'state':'not-yet-encoded'}));return
     import google.auth
     from google.auth.transport.requests import Request as GoogleRequest
     speech_credentials,_=google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
@@ -122,13 +138,14 @@ def main():
             image=Image.open(frame).convert('RGB');image.thumbnail((480,270));sheet.paste(image,((i%2)*480,(i//2)*290));ImageDraw.Draw(sheet).text(((i%2)*480+8,(i//2)*290+271),str(i+1)+' — '+shot['title'][:60],fill='white');cursor+=shot['duration']
         review=out/'film-review-sheet.jpg';sheet.save(review,quality=88);put(prefix+'/film-review-sheet.jpg',review.read_bytes(),'image/jpeg')
         for name,mime in [('captions.vtt','text/vtt'),('transcript.txt','text/plain')]: put(prefix+'/'+name,(out/name).read_bytes(),mime)
-        # Candidate only. This tool never writes course_lessons, video_jobs or approvals.
+        # Candidate only; never change instruction, quizzes, publication, jobs or approvals.
         url=s3.generate_presigned_url('get_object',Params={'Bucket':BUCKET,'Key':film_key,'ResponseContentType':'video/mp4'},ExpiresIn=3600)
         video_id=str(uuid.uuid5(uuid.NAMESPACE_URL,film_key))
         thumbnail=s3.generate_presigned_url('get_object',Params={'Bucket':BUCKET,'Key':prefix+'/film-review-sheet.jpg'},ExpiresIn=3600)
         db('course_videos?on_conflict=id',{'id':video_id,'lesson_id':lesson,'course_id':COURSE,'title':row['title']+' — manually reviewed source; encoded film awaiting visual review','video_url':url,'thumbnail_url':thumbnail,'storage_path':film_key,'duration_seconds':round(manifest['durationSeconds']),'transcript':text,'generated_by':'manual','asset_role':'reference','status':'ready'})
         manifest['candidateVideoId']=video_id
         put(manifest_key,json.dumps(manifest).encode(),'application/json')
+        retain_review(manifest)
         print(json.dumps({'lessonId':lesson,'candidateVideoId':video_id,'state':'encoded-review-required','sha256':manifest['sha256'],'durationSeconds':manifest['durationSeconds'],'manifestKey':manifest_key}))
 
 if __name__=='__main__': main()

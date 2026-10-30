@@ -2,7 +2,7 @@ name: Legacy 83 Google release candidate
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/legacy83-google-release.yml', '.deploy/legacy83-source/**']
+    paths: ['.github/workflows/legacy83-google-release.yml', '.deploy/legacy83-source/**', 'scripts/gcp/deploy-legacy83-website.mjs', 'scripts/gcp/legacy83-startup.sh']
   workflow_dispatch:
 permissions:
   contents: read

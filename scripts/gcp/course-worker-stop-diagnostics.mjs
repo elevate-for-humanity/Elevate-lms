@@ -7,7 +7,7 @@ const read=args=>{
   throw new Error('COURSE_DIAGNOSTIC_READ_FAILED:'+String(error.code??'INVALID_RESPONSE'));
  }
 };
-const jobs=[['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1'],['elevate-course-instruction','us-east1'],['elevate-course-media','us-east1'],['elevate-course-quality','us-east1']];
+const jobs=[['elevate-direct-course-release','us-central1'],['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1'],['elevate-course-instruction','us-east1'],['elevate-course-media','us-east1'],['elevate-course-quality','us-east1']];
 for(const [job,region] of jobs){
  const config=read(['run','jobs','describe',job,'--region='+region,'--project=elegant-racer-299721','--format=json']);
  const task=config.spec?.template?.spec?.template?.spec;
@@ -41,4 +41,19 @@ console.log(JSON.stringify({service:'elevate-admin-migration',latestCreated:admi
 if(admin.status?.latestCreatedRevisionName){
  const revision=read(['run','revisions','describe',admin.status.latestCreatedRevisionName,'--project=elegant-racer-299721','--region=us-central1','--format=json']);
  console.log(JSON.stringify({revision:revision.metadata?.name,created:revision.metadata?.creationTimestamp,image:revision.spec?.containers?.[0]?.image,conditions:revision.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason}))}));
+}
+
+// Direct release writes bounded JSON events. Read only identifiers, gate names
+// and failure codes; never emit raw messages, configuration or media URLs.
+for(const entry of [...logs].reverse()) {
+ if(entry.resource?.labels?.job_name!=='elevate-direct-course-release')continue;
+ let event=entry.jsonPayload;
+ if(!event&&typeof entry.textPayload==='string'){
+  try{event=JSON.parse(entry.textPayload);}catch{continue;}
+ }
+ if(!event||typeof event!=='object')continue;
+ const states=new Set(['executing-once','blocked','published-and-verified','direct-release-stopped']);
+ if(!states.has(event.state)&&typeof event.complete!=='boolean')continue;
+ const clean=value=>typeof value==='string'&&/^[a-zA-Z0-9_:-]{1,100}$/.test(value)?value:undefined;
+ console.log(JSON.stringify({at:entry.timestamp,job:'elevate-direct-course-release',execution:clean(entry.labels?.['run.googleapis.com/execution_name']),state:clean(event.state),courseId:clean(event.courseId),lessonId:clean(event.lessonId),step:clean(event.step),code:clean(event.code),complete:typeof event.complete==='boolean'?event.complete:undefined,publishedLessonCount:Number.isSafeInteger(event.publishedLessonCount)?event.publishedLessonCount:undefined,learnerLessonCount:Number.isSafeInteger(event.learnerLessonCount)?event.learnerLessonCount:undefined}));
 }

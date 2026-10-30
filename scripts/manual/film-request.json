@@ -1,20 +1,22 @@
 {
   "mode": "encode-review-candidate",
-  "courseGroup": "barber",
+  "courseGroup": "hvac",
   "lessonIds": [
-    "1daf5923-8ac2-4622-853d-e15fa6f661d8",
-    "f3bb1248-548e-4cd7-977d-d36079c47b9b",
-    "f3ed80af-705d-4482-ba25-9cfad9864203",
-    "78c754a3-6e48-45fb-8fdf-9397f8d1816f",
-    "0bd41361-f32b-4acf-98d3-30c81363c6c9",
-    "d5f746e6-5bd6-4dd8-b0c4-e3173c264fb1",
-    "c5ba80fa-6145-4827-b1f7-f75ec02333ba",
-    "2a590513-ee20-4473-8aa6-46950befbc0f",
-    "4c5f16ab-1a2b-4949-8616-ead431dce494",
-    "e370ade7-5566-4747-b6c3-087ddb5d26a1",
-    "cbf330b1-ddfe-438e-b583-f1035f045ff7",
-    "46d1c315-68d5-4855-85ea-b4f061ec7cd6",
-    "310eb276-19e4-4588-8a51-e065d918a8a2",
-    "972050a9-d51b-4e3d-86a1-16c03a631aed"
+    "f1d32b7f-7cd4-44c4-9858-6b756ef21b89",
+    "a80053bb-03c2-4533-a3b8-60c3b92ceaeb",
+    "5d54f2f0-08f3-4fd8-bdce-a222c76fa44a",
+    "ec20b538-40f3-4779-bb2c-bc4777f5e406",
+    "9fc1e9bc-707e-4b3f-95a1-d3f727d1fce1",
+    "e82b52ba-45a0-4ed4-ac58-335284ddb695",
+    "8ac047d1-e197-42da-859b-d62183a1fed0",
+    "71f4a5cb-677e-49b2-bec1-a690ab9f20c6",
+    "42564382-7bf8-424e-8560-68b5b0a7897a",
+    "72104275-969b-4973-b237-8808adbae2a8",
+    "8be12981-5829-487b-8769-90a8a479d1b0",
+    "f0e124f0-b7b7-4caf-aed0-5d99ae00c40b",
+    "a605aae6-9e8f-48aa-bd47-d686059f2a9f",
+    "ce2dcadf-0647-4364-a39d-6cdefafb5b96",
+    "c80f470b-8250-4c0c-b866-7c2035813aed",
+    "a21cd441-9809-4b22-889e-880948e902b6"
   ]
 }

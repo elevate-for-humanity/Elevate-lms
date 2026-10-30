@@ -91,9 +91,20 @@ test('unverified legacy card cache entries cannot satisfy new visual requests', 
 
 test('a provider safety block is retained without a text-card replacement', async () => {
   vi.mocked(generateTeachingPhoto).mockReset().mockRejectedValue(Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'), { details: { blocked: true } }));
-  const { db } = storage();
+  const { db, files } = storage();
   await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED');
-  expect(generateTeachingPhoto).toHaveBeenCalledTimes(1);
+  // Both independently queued cues settle before the bounded pair fails.
+  // A safety rejection must never launch a rewritten fallback or a third cue.
+  expect(generateTeachingPhoto).toHaveBeenCalledTimes(2);
+  const diagnostics = [...files.entries()];
+  expect(diagnostics).toHaveLength(2);
+  for (const [path, bytes] of diagnostics) {
+    expect(path).toMatch(/^approved-teaching-photo-diagnostics\//);
+    expect(JSON.parse(bytes.toString())).toMatchObject({
+      code: 'GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED', provider: { blocked: true },
+    });
+  }
+  expect(diagnostics.map(([, bytes]) => JSON.parse(bytes.toString()).cueIndex).sort()).toEqual([0, 1]);
 });
 
 test('resume rejects changed stored image bytes without requesting replacement inference', async () => {

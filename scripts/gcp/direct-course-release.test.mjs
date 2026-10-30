@@ -32,6 +32,7 @@ test('direct job uses existing identity and connections with no automatic task r
  assert.equal(task.maxRetries,0);assert.equal(task.serviceAccountName,'existing-service');
  assert.deepEqual(task.containers[0].env[0],source.spec.template.spec.template.spec.containers[0].env[0]);
  assert.deepEqual(task.containers[0].resources,{limits:{memory:'16Gi',cpu:'4'}});
+ assert.deepEqual(task.containers[0].env.filter(e=>e.name==='REMOTION_RENDER_CONCURRENCY'),[{name:'REMOTION_RENDER_CONCURRENCY',value:'4'}]);
  assert.deepEqual(task.containers[0].args,['--import=tsx','workers/direct-course-release.ts']);
  assert.equal(source.spec.template.spec.template.spec.containers[0].image,'old');assert.equal(result.spec.template.spec.taskCount,1);assert.equal(result.spec.template.spec.parallelism,1);
 });

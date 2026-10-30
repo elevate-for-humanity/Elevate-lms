@@ -166,6 +166,12 @@ export function useTheoryTimeclock(courseId: string, lessonId: string) {
     async finalize() {
       clockRequested.current = false;
       await stopTheorySession(true);
+      if (theoryStatus !== 'untracked') {
+        setTheoryStatus('paused');
+        setTheoryMessage(
+          'Theory timeclock stopped. If the lesson needs more study, start the clock again before continuing.',
+        );
+      }
     },
   };
 }

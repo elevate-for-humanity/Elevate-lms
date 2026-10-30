@@ -1,3 +1,5 @@
+import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { Metadata } from 'next';
@@ -37,34 +39,36 @@ export default async function AssignmentsPage() {
     redirect('/login');
   }
 
+  // Assignment tables are server-only. Every read below is scoped to this
+  // authenticated learner or their enrolled course IDs; do not grant public reads.
+  const recordsDb = await requireAdminClient();
+
   let assignments: any[] = [];
   let submissions: any[] = [];
   const stats = { pending: 0, submitted: 0, graded: 0, overdue: 0 };
 
   try {
-    const { data: enrollments } = await supabase
-      .from('program_enrollments')
-      .select('course_id')
-      .eq('user_id', user.id)
-      .eq('status', 'active');
-
-    const courseIds = enrollments?.map((e) => e.course_id) || [];
+    const courseIds = await loadLearnerCourseIds(recordsDb, user.id);
 
     if (courseIds.length > 0) {
-      const { data: assignmentData } = await supabase
+      const { data: assignmentData, error: assignmentError } = await recordsDb
         .from('assignments')
         .select('id, title, description, due_date, course_id, max_points, submission_type')
         .in('course_id', courseIds)
         .order('due_date', { ascending: true });
 
+      if (assignmentError) throw assignmentError;
+
       if (assignmentData) {
         assignments = assignmentData;
       }
 
-      const { data: submissionData } = await supabase
+      const { data: submissionData, error: submissionError } = await recordsDb
         .from('assignment_submissions')
         .select('*')
-        .eq('student_id', user.id);
+        .or(`user_id.eq.${user.id},student_id.eq.${user.id}`);
+
+      if (submissionError) throw submissionError;
 
       if (submissionData) {
         submissions = submissionData;
@@ -82,14 +86,19 @@ export default async function AssignmentsPage() {
         } else {
           stats.submitted++;
         }
-      } else if (dueDate < now) {
+      } else if (assignment.due_date && dueDate < now) {
         stats.overdue++;
       } else {
         stats.pending++;
       }
     });
   } catch (error) {
-    logger.error('Error', normalizeError(error, 'Failed to load assignments'), getErrorContext(error));
+    logger.error(
+      'Error',
+      normalizeError(error, 'Failed to load assignments'),
+      getErrorContext(error),
+    );
+    throw new Error('Your assignments could not be loaded. Please try again.', { cause: error });
   }
 
   const getSubmissionStatus = (assignment: any) => {
@@ -113,7 +122,7 @@ export default async function AssignmentsPage() {
         icon: CheckCircle,
       };
     }
-    if (dueDate < now) {
+    if (assignment.due_date && dueDate < now) {
       return {
         status: 'overdue',
         label: 'Overdue',
@@ -155,7 +164,9 @@ export default async function AssignmentsPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Assignments' }]} />
+        <Breadcrumbs
+          items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Assignments' }]}
+        />
       </div>
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -257,12 +268,18 @@ export default async function AssignmentsPage() {
                           <div className="flex flex-wrap items-center gap-4 text-sm">
                             <div className="flex items-center gap-1 text-slate-500">
                               <Calendar className="w-4 h-4" />
-                              <span>Due: {formatDate(assignment.due_date)}</span>
+                              <span>
+                                {assignment.due_date
+                                  ? `Due: ${formatDate(assignment.due_date)}`
+                                  : 'No due date'}
+                              </span>
                             </div>
                             <div
                               className={`font-medium ${statusInfo.status === 'overdue' ? 'text-brand-red-600' : statusInfo.status === 'pending' ? 'text-brand-orange-600' : 'text-brand-green-600'}`}
                             >
-                              {getDaysUntilDue(assignment.due_date)}
+                              {assignment.due_date
+                                ? getDaysUntilDue(assignment.due_date)
+                                : 'No deadline assigned'}
                             </div>
                             {assignment.max_points && (
                               <div className="text-slate-500">{assignment.max_points} points</div>
@@ -302,7 +319,6 @@ export default async function AssignmentsPage() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

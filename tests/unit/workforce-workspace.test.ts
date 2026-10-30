@@ -5,6 +5,7 @@ import {
   filterEnrollments,
   isPlatformOversight,
   learnerId,
+  enrollmentNeedsReview,
 } from '@/lib/workforce/records';
 
 const mocks = vi.hoisted(() => ({ auth: vi.fn(), db: { from: vi.fn() } }));
@@ -48,6 +49,7 @@ describe('Workforce records', () => {
       participants: 2,
       enrollments: 3,
       active: 2,
+      activeParticipants: 2,
       completed: 1,
       atRisk: 1,
     });
@@ -64,6 +66,27 @@ describe('Workforce records', () => {
   it('quotes CSV delimiters, quotes and line breaks', () => {
     expect(csvCell('A,"B"\nC')).toBe('"A,""B""\nC"');
     expect(csvCell(null)).toBe('""');
+  });
+  it('separates test, staff and unlinked records without changing their statuses', () => {
+    const profile = {
+      id: 'learner',
+      role: 'student',
+      email: 'learner@school.edu',
+      full_name: 'Learner',
+    };
+    expect(enrollmentNeedsReview({ profile })).toBe(false);
+    expect(enrollmentNeedsReview({ profile, source: 'qa_e2e' })).toBe(true);
+    expect(enrollmentNeedsReview({ profile: { ...profile, role: 'staff' } })).toBe(true);
+    expect(enrollmentNeedsReview({ profile: { ...profile, email: 'learner@qa.invalid' } })).toBe(
+      true,
+    );
+    expect(enrollmentNeedsReview({})).toBe(true);
+    expect(
+      enrollmentSummary([
+        { user_id: 'same', enrollment_state: 'enrolled' },
+        { user_id: 'same', enrollment_state: 'active' },
+      ]).activeParticipants,
+    ).toBe(1);
   });
   it('limits platform oversight to platform administrators', () => {
     expect(isPlatformOversight(['super_admin'])).toBe(true);

@@ -44,7 +44,9 @@ export default async function StateBoardExamPage() {
   // Canonical enrollment source
   const { data: programEnrollment, error: enrollmentError } = await db
     .from('program_enrollments')
-    .select('program_slug, enrolled_at, status, required_hours, transfer_hours, transfer_hours_verified, lms_completed, practical_skills_verified')
+    .select(
+      'program_slug, enrolled_at, status, required_hours, transfer_hours, transfer_hours_verified, lms_completed, practical_skills_verified',
+    )
     .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .in('program_slug', Object.keys(APPRENTICESHIP_REQUIRED_HOURS))
     .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
@@ -62,18 +64,26 @@ export default async function StateBoardExamPage() {
     redirect('/programs');
   }
 
-  const requiredHours = programEnrollment?.required_hours ?? configuredRequiredHours;
+  // This is the same program training target shown in Work Hours, not an agency eligibility decision.
+  const requiredHours = configuredRequiredHours;
 
-  const approvedRows = await readHoursPages<any>((from, to) => db
-    .from('hour_entries')
-    .select('id,accepted_hours,hours_claimed,source_type,category')
-    .eq('user_id', subject.userId)
-    .eq('program_slug', programSlug)
-    .in('status', ['approved', 'locked'])
-    .order('id').range(from, to));
-  const pwaHours = approvedRows.filter(isOjlEntry).reduce((sum, row) => sum + recordedHours(row), 0);
-  const transferHours = programEnrollment?.transfer_hours_verified === true
-    ? Math.max(0, Number(programEnrollment.transfer_hours) || 0) : 0;
+  const approvedRows = await readHoursPages<any>((from, to) =>
+    db
+      .from('hour_entries')
+      .select('id,accepted_hours,hours_claimed,source_type,category')
+      .eq('user_id', subject.userId)
+      .eq('program_slug', programSlug)
+      .in('status', ['approved', 'locked'])
+      .order('id')
+      .range(from, to),
+  );
+  const pwaHours = approvedRows
+    .filter(isOjlEntry)
+    .reduce((sum, row) => sum + recordedHours(row), 0);
+  const transferHours =
+    programEnrollment?.transfer_hours_verified === true
+      ? Math.max(0, Number(programEnrollment.transfer_hours) || 0)
+      : 0;
   const totalHours = pwaHours + transferHours;
 
   const hoursComplete = totalHours >= requiredHours;
@@ -119,12 +129,16 @@ export default async function StateBoardExamPage() {
         {isReady ? (
           <div className="bg-emerald-600 rounded-2xl p-6 text-white flex items-center gap-5">
             <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="w-8 h-8 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />
+              <span
+                className="w-8 h-8 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+                aria-hidden="true"
+              />
             </div>
             <div>
               <h2 className="text-xl font-bold">Recorded training checklist complete</h2>
               <p className="text-emerald-100 text-sm mt-0.5">
-                Your recorded hours, coursework, and practical skills are complete. Confirm final examination eligibility with your program administrator and licensing agency.
+                Your recorded hours, coursework, and practical skills are complete. Confirm final
+                examination eligibility with your program administrator and licensing agency.
               </p>
             </div>
           </div>
@@ -134,9 +148,10 @@ export default async function StateBoardExamPage() {
               <Lock className="w-7 h-7 text-amber-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-amber-900">Not yet eligible</h2>
+              <h2 className="text-lg font-bold text-amber-900">Training checklist incomplete</h2>
               <p className="text-amber-700 text-sm mt-0.5">
-                Complete the requirements below to unlock exam scheduling.
+                Review your recorded training requirements below. Admin and the licensing agency
+                confirm examination eligibility.
               </p>
             </div>
           </div>
@@ -153,7 +168,10 @@ export default async function StateBoardExamPage() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
                 {hoursComplete ? (
-                  <span className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                  <span
+                    className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0 mt-0.5 flex-shrink-0"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <Clock className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
                 )}
@@ -190,7 +208,10 @@ export default async function StateBoardExamPage() {
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 {lmsComplete ? (
-                  <span className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0" aria-hidden="true" />
+                  <span
+                    className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <Clock className="w-5 h-5 text-amber-500 flex-shrink-0" />
                 )}
@@ -219,13 +240,18 @@ export default async function StateBoardExamPage() {
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 {skillsVerified ? (
-                  <span className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0" aria-hidden="true" />
+                  <span
+                    className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <Clock className="w-5 h-5 text-slate-300 flex-shrink-0" />
                 )}
                 <div>
                   <p className="font-medium text-slate-900">Practical skills verified</p>
-                  <p className="text-sm text-slate-500">Instructor sign-off on hands-on competencies</p>
+                  <p className="text-sm text-slate-500">
+                    Instructor sign-off on hands-on competencies
+                  </p>
                 </div>
               </div>
               <Link
@@ -241,14 +267,19 @@ export default async function StateBoardExamPage() {
           <div className="px-5 py-4 bg-emerald-50">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <span className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0" aria-hidden="true" />
+                <span
+                  className="w-5 h-5 rounded-full bg-emerald-500 inline-block flex-shrink-0"
+                  aria-hidden="true"
+                />
                 <div>
                   <p className="font-medium text-slate-900">State board exam fee — ${examFee}</p>
-                  <p className="text-sm text-slate-500">Included in your program tuition</p>
+                  <p className="text-sm text-slate-500">
+                    Confirm payment and any tuition inclusion with Admin
+                  </p>
                 </div>
               </div>
               <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-full">
-                Paid
+                Verify with Admin
               </span>
             </div>
           </div>
@@ -341,7 +372,7 @@ export default async function StateBoardExamPage() {
             <Lock className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <h3 className="font-semibold text-slate-700 mb-1">Exam scheduling locked</h3>
             <p className="text-sm text-slate-500 mb-4">
-              Complete all requirements above to unlock.
+              Complete the recorded training checklist, then confirm eligibility with Admin.
             </p>
             <Link
               href={APPRENTICE_TIMECLOCK_URL}
@@ -364,7 +395,10 @@ export default async function StateBoardExamPage() {
                   • Bring your own tools/kit for the practical exam — check IPLA requirements for
                   the approved list.
                 </li>
-                <li>• Your exam fee (${examFee}) is included in your tuition and has been paid.</li>
+                <li>
+                  • Confirm your exam fee (${examFee}) and provider payment with Admin before
+                  scheduling.
+                </li>
                 <li>• Retake fees apply if you do not pass — contact us for assistance.</li>
                 <li>• After passing both sections, apply for your license at MyLicense.IN.gov.</li>
               </ul>
@@ -378,7 +412,7 @@ export default async function StateBoardExamPage() {
           <p className="text-sm text-slate-500 mb-4">We&apos;re here to help you get licensed.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
               className="text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 px-4 py-2 rounded-lg hover:bg-purple-100 transition-colors"
             >
               Call {PLATFORM_DEFAULTS.supportPhone}

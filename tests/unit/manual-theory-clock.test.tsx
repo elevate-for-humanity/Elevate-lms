@@ -49,3 +49,37 @@ describe('separate manual theory timeclock', () => {
     expect(fetchMock.mock.calls.some((call) => String(call[0]).endsWith('/complete'))).toBe(false);
   });
 });
+
+it('allows restarting theory tracking after a completion attempt is rejected', async () => {
+  const fetchMock = vi.fn().mockImplementation(async (url: string) => ({
+    ok: !url.endsWith('/complete'),
+    json: async () =>
+      url.endsWith('/complete')
+        ? { error: 'Minimum time requirement not met', required: 90, actual: 30 }
+        : { tracked: true, sessionId: 'session', weeklyActiveSeconds: 30 },
+  }));
+  vi.stubGlobal('fetch', fetchMock);
+  render(
+    <LessonProgressClient
+      courseId="course"
+      lessonId="lesson"
+      lessonType="lesson"
+      moduleOrder={1}
+      passingScore={80}
+      questions={[]}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Start theory timeclock' }));
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'Stop theory timeclock' })).not.toBeDisabled(),
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Mark lesson complete' }));
+  await waitFor(() => expect(screen.getByText('Minimum time requirement not met')).toBeTruthy());
+  expect(screen.getByRole('button', { name: 'Start theory timeclock' })).not.toBeDisabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Start theory timeclock' }));
+  await waitFor(() =>
+    expect(
+      fetchMock.mock.calls.filter((call) => JSON.parse(call[1].body).action === 'start'),
+    ).toHaveLength(2),
+  );
+});

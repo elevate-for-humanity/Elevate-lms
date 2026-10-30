@@ -1,3 +1,7 @@
+import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { loadLessonAssessmentResults } from '@/lib/lms/lesson-assessment-results';
+import { LessonAssessmentResults } from '@/components/lms/LessonAssessmentResults';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
@@ -35,35 +39,29 @@ export default async function GradesPage() {
     redirect('/login');
   }
 
+  // Assignment tables are server-only. Every read below is scoped to this
+  // authenticated learner or their enrolled course IDs; do not grant public reads.
+  const recordsDb = await requireAdminClient();
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
-  // Fetch enrollments then hydrate course details separately (no FK on course_id)
-  const { data: rawGradeEnrollments } = await supabase
-    .from('program_enrollments')
-    .select('id, status, course_id, progress_percent, created_at, updated_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-  const gradeCourseIds = [
-    ...new Set((rawGradeEnrollments || []).map((e: any) => e.course_id).filter(Boolean)),
-  ];
-  const { data: gradeCourses } = gradeCourseIds.length
+  // Hydrate course titles from the same metadata grants as other learner tabs.
+  const gradeCourseIds = await loadLearnerCourseIds(recordsDb, user.id, true);
+  const lessonAssessments = await loadLessonAssessmentResults(recordsDb, user.id, gradeCourseIds);
+  const { data: gradeCourses, error: courseError } = gradeCourseIds.length
     ? await supabase
         .from('courses')
         .select('id, title, description, thumbnail_url')
         .in('id', gradeCourseIds)
-    : { data: [] };
+    : { data: [], error: null };
+  if (courseError) throw courseError;
   const gradeCourseMap = Object.fromEntries((gradeCourses || []).map((c: any) => [c.id, c]));
-  const enrollments = (rawGradeEnrollments || []).map((e: any) => ({
-    ...e,
-    courses: gradeCourseMap[e.course_id] ?? null,
-  }));
-
   // Fetch assignment submissions with grades
-  const { data: assignmentSubmissions } = await supabase
+  const { data: assignmentSubmissions, error: assignmentError } = await recordsDb
     .from('assignment_submissions')
     .select(
       `
@@ -76,12 +74,14 @@ export default async function GradesPage() {
       )
     `,
     )
-    .eq('student_id', user.id)
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
     .not('grade', 'is', null)
     .order('graded_at', { ascending: false });
 
+  if (assignmentError) throw assignmentError;
+
   // Fetch quiz attempts with scores
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts, error: quizError } = await supabase
     .from('quiz_attempts')
     .select(
       `
@@ -93,14 +93,18 @@ export default async function GradesPage() {
       )
     `,
     )
-    .eq('user_id', user.id)
+    .eq('user_uuid', user.id)
     .eq('status', 'completed')
     .order('completed_at', { ascending: false });
+
+  if (quizError) throw quizError;
+
+  const checkpointResults = lessonAssessments.filter((result) => result.bestScore !== null);
 
   // Calculate overall statistics
   const stats = {
     totalAssignments: assignmentSubmissions?.length || 0,
-    totalQuizzes: quizAttempts?.length || 0,
+    totalQuizzes: (quizAttempts?.length || 0) + checkpointResults.length,
     avgAssignmentGrade: 0,
     avgQuizScore: 0,
     coursesWithGrades: new Set<string>(),
@@ -123,11 +127,21 @@ export default async function GradesPage() {
     const totalScore = quizAttempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0);
     stats.avgQuizScore = Math.round(totalScore / quizAttempts.length);
     quizAttempts.forEach((attempt) => {
-      if (attempt.quizzes?.course_id) {
-        stats.coursesWithGrades.add(attempt.quizzes.course_id);
+      if (attempt.course_id) {
+        stats.coursesWithGrades.add(attempt.course_id);
       }
     });
   }
+
+  const quizScores = [
+    ...(quizAttempts || []).map((attempt) => Number(attempt.score) || 0),
+    ...checkpointResults.map((result) => result.bestScore!),
+  ];
+  if (quizScores.length)
+    stats.avgQuizScore = Math.round(
+      quizScores.reduce((sum, score) => sum + score, 0) / quizScores.length,
+    );
+  checkpointResults.forEach((result) => stats.coursesWithGrades.add(result.course_id));
 
   // Calculate course grades
   const courseGrades: Record<
@@ -143,7 +157,7 @@ export default async function GradesPage() {
 
   assignmentSubmissions?.forEach((sub) => {
     const courseId = sub.assignments?.course_id;
-    const courseTitle = sub.assignments?.courses?.title || 'Unknown Course';
+    const courseTitle = gradeCourseMap[courseId]?.title || 'Course';
     if (courseId) {
       if (!courseGrades[courseId]) {
         courseGrades[courseId] = {
@@ -164,8 +178,8 @@ export default async function GradesPage() {
   });
 
   quizAttempts?.forEach((attempt) => {
-    const courseId = attempt.quizzes?.course_id;
-    const courseTitle = attempt.quizzes?.courses?.title || 'Unknown Course';
+    const courseId = attempt.course_id;
+    const courseTitle = gradeCourseMap[courseId]?.title || 'Course';
     if (courseId) {
       if (!courseGrades[courseId]) {
         courseGrades[courseId] = {
@@ -182,6 +196,23 @@ export default async function GradesPage() {
         date: attempt.completed_at,
       });
     }
+  });
+
+  checkpointResults.forEach((result) => {
+    const courseId = result.course_id;
+    if (!courseGrades[courseId])
+      courseGrades[courseId] = {
+        courseId,
+        courseTitle: gradeCourseMap[courseId]?.title || 'Course',
+        assignments: [],
+        quizzes: [],
+        overallGrade: 0,
+      };
+    courseGrades[courseId].quizzes.push({
+      title: result.title,
+      score: result.bestScore!,
+      date: result.lastAttemptAt || '',
+    });
   });
 
   // Calculate overall grade for each course
@@ -234,12 +265,24 @@ export default async function GradesPage() {
     });
   };
 
+  const averageGrade = [
+    ...(assignmentSubmissions || []).map(
+      (sub) => (Number(sub.grade) / (Number(sub.assignments?.max_points) || 100)) * 100,
+    ),
+    ...(quizAttempts || []).map((attempt) => Number(attempt.score) || 0),
+    ...checkpointResults.map((result) => result.bestScore!),
+  ];
+  const overallAverage = averageGrade.length
+    ? Math.round(averageGrade.reduce((sum, grade) => sum + grade, 0) / averageGrade.length)
+    : 0;
   const hasGrades = stats.totalAssignments > 0 || stats.totalQuizzes > 0;
 
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Grades' }]} />
+        <Breadcrumbs
+          items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Grades' }]}
+        />
       </div>
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
@@ -296,15 +339,14 @@ export default async function GradesPage() {
                 <TrendingUp className="w-5 h-5 text-brand-orange-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-slate-900">
-                  {hasGrades ? Math.round((stats.avgAssignmentGrade + stats.avgQuizScore) / 2) : 0}%
-                </div>
+                <div className="text-2xl font-bold text-slate-900">{overallAverage}%</div>
                 <div className="text-xs text-slate-600">Average</div>
               </div>
             </div>
           </div>
         </div>
 
+        <LessonAssessmentResults results={lessonAssessments} />
         {hasGrades ? (
           <div className="space-y-6">
             {/* Course Grades */}

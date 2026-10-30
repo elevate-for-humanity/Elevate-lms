@@ -10,7 +10,7 @@ const read = (relativePath: string) => readFileSync(resolve(root, relativePath),
 const guardedPortals: Array<{ path: string; required: string[]; shellPath?: string }> = [
   {
     path: 'components/lms/LearnerWorkspaceLayout.tsx',
-    required: ["requireRole([", "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
+    required: ['requireRole([', "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
   },
   {
     path: 'apps/lms/app/employer/layout.tsx',
@@ -18,7 +18,7 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
   },
   {
     path: 'apps/lms/app/workforce/layout.tsx',
-    required: ['await requireRole(WORKFORCE_ACCESS_ROLES)', "from '@/lib/workforce/records'"],
+    required: ['requireRole(WORKFORCE_ACCESS_ROLES)', "from '@/lib/workforce/records'"],
   },
   {
     path: 'apps/lms/app/apprentice/layout.tsx',
@@ -69,7 +69,12 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
 ];
 
 describe('portal authorization boundaries', () => {
-  it('preserves canonical workforce and case-manager access without admitting learner or employer roles', () => {
+  it('keeps Workforce authorization on the shared explicit operational role allowlist', () => {
+    expect([...WORKFORCE_ACCESS_ROLES].sort()).toEqual(
+      ['admin', 'super_admin', 'staff', 'org_admin', 'case_manager', 'workforce_partner'].sort(),
+    );
+  });
+  it('preserves normalized Workforce access and rejects unrelated roles', () => {
     for (const role of ['workforce', 'workforce_partner', 'case_manager', 'admin', 'staff']) {
       expect(hasAnyRole(normalizeRoles([role]), WORKFORCE_ACCESS_ROLES), role).toBe(true);
     }

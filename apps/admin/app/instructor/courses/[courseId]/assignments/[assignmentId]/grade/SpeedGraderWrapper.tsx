@@ -31,11 +31,21 @@ interface Props {
 }
 
 export default function SpeedGraderWrapper({ courseId, assignment, submissions }: Props) {
-  // SpeedGrader writes to the grades table directly via Supabase client.
-  // This callback runs after the DB write for any additional side effects.
-  const handleGrade = async (_submissionId: string, _grade: any) => {
-    // Grade already saved by SpeedGrader component.
-    // Could trigger notifications or audit log here in the future.
+  const handleGrade = async (
+    submissionId: string,
+    grade: { points?: number; feedback?: string },
+  ) => {
+    const response = await fetch('/api/grade/upsert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assignmentSubmissionId: submissionId,
+        points: grade.points,
+        feedback: grade.feedback,
+      }),
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || 'Unable to save grade.');
   };
 
   if (submissions.length === 0) {

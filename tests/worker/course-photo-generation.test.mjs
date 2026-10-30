@@ -4,9 +4,10 @@ import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { createHash } from 'node:crypto';
 import { recoverTeachingPhoto } from '../../lib/ultimate-course-builder/adapters/photo-repair.mjs';
+import { TeachingPhotoBatch } from '../../lib/ultimate-course-builder/adapters/teaching-photo-batch.mjs';
 
 const source = readFileSync(new URL('../../lib/ultimate-course-builder/adapters/teaching-photos.ts', import.meta.url), 'utf8');
-function prepare(generate) {
+function prepare(generate,overrides={}) {
   assert.doesNotMatch(source, /conceptualTeachingCard/);
   const code = stripTypeScriptTypes(source.replace(/^import .*;\n/gm, '').replace('export async function', 'async function'));
   const dependencies = {
@@ -18,9 +19,11 @@ function prepare(generate) {
     compatibleVisualTask: () => false,
     generateTeachingPhoto: generate,
     recoverTeachingPhoto,
+    TeachingPhotoBatch,
     createHash,
     describeWorkerError: error => error.message,
     optionalStorageCacheMiss: error => error.status === 404,
+    ...overrides,
   };
   return Function(...Object.keys(dependencies), code + '\nreturn prepareTeachingPhotos;')(...Object.values(dependencies));
 }
@@ -53,6 +56,16 @@ test('missing saved images generate photographs and persist distinct cue assets'
   assert.equal(result.teachingPhotos.core.length, 3);
   assert.ok(result.teachingPhotos.core.every(photo => photo.provider === 'google' && photo.storagePath.endsWith('.jpg')));
 });
+test('mixed licensed and generated pictures stay in their spoken cue slots',async()=>{
+ let sequence=0;
+ const run=prepare(async()=>{
+  const id=sequence++;await new Promise(resolve=>setTimeout(resolve,id===0?15:1));
+  return {bytes:Buffer.from('generated-'+id),mimeType:'image/jpeg',provider:'google'};
+ },{courseSelectedStill:async(_input,_db,_scene,index,step)=>index===1?{sha256:'a'.repeat(64),imageUrl:'https://licensed.example/picture.jpg',storagePath:'licensed/picture.jpg',provider:'envato',narrationQuote:step.narrationQuote}:null});
+ const result=await run(input,database());
+ assert.deepEqual(result.teachingPhotos.core.map(p=>p.provider),['google','envato','google']);
+ assert.equal(result.teachingPhotos.core[2].isRecap,true);assert.equal(sequence,2);
+});
 test('resume reuses verified photographs without repeating paid generation', async () => {
   let calls = 0;
   const run = prepare(async () => ({ bytes: Buffer.from('photo-' + calls++), mimeType: 'image/png', provider: 'google' }));
@@ -67,27 +80,28 @@ test('an exact cue is optional when a relevant course photograph can be generate
   const prompts = [];
   const run = prepare(async prompt => {
     prompts.push(prompt);
-    if (calls++ % 2 === 0) throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');
+    calls++;
+    if (!prompt.startsWith('Create a realistic, professional, general course-related photograph')) throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');
     return { bytes: Buffer.from('related-' + calls), mimeType: 'image/png', provider: 'google' };
   });
   const result = await run(input, database());
   assert.equal(calls, 6);
   assert.equal(result.teachingPhotos.core.length, 3);
   assert.ok(result.teachingPhotos.core.every(photo => photo.repair.method === 'course-related-photo-v1'));
-  assert.match(prompts[1], /EPA 608/);
-  assert.doesNotMatch(prompts[1], /salon/);
+  assert.ok(prompts.some(prompt=>prompt.startsWith('Create a realistic, professional, general course-related photograph')&&prompt.includes('EPA 608')));
+  assert.ok(prompts.every(prompt=>!/salon/.test(prompt)));
 });
 test('provider failures are retained without silently creating text cards', async () => {
   let calls = 0;
   const run = prepare(async () => { calls++; throw Error('GOOGLE_TEACHING_PHOTO_HTTP_403:billing'); });
   await assert.rejects(run(input, database()), /GOOGLE_TEACHING_PHOTO_HTTP_403.*core.*cue/);
-  assert.equal(calls, 1);
+  assert.equal(calls, 2); // Only the current pair starts; neither cue retries a 403.
 });
 test('a safety-blocked request never retries with a rewritten prompt', async () => {
   let calls = 0;
   const run = prepare(async () => { calls++; throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'), { details: { blocked: true } }); });
   await assert.rejects(run(input, database()), /INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED/);
-  assert.equal(calls, 1);
+  assert.equal(calls, 2); // Two distinct primary cues; no rewritten blocked request.
 });
 
 test('text-card cache from the retired v3 path cannot satisfy a photographic request', async () => {

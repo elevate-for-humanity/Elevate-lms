@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { createClient } from '@/lib/supabase/client';
+
 import { DEFAULT_GRADE_SCALE } from '@/lib/gradebook/types';
 import { Users, FileText, ClipboardList, Download } from 'lucide-react';
 
@@ -10,61 +10,6 @@ const SpeedGrader = dynamic(() => import('@/components/gradebook/SpeedGrader'), 
   ssr: false,
   loading: () => <div className="p-8 text-center text-slate-700">Loading grader...</div>,
 });
-
-/** Inline editable progress cell — calls /api/student/progress to override enrollment progress_percent. */
-function ProgressCell({ enrollmentId, initialProgress }: { enrollmentId: string; initialProgress: number }) {
-  const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(String(initialProgress));
-  const [saved, setSaved] = useState(initialProgress);
-  const [saving, setSaving] = useState(false);
-
-  async function save() {
-    const pct = Math.min(100, Math.max(0, parseInt(value, 10) || 0));
-    setSaving(true);
-    try {
-      await fetch('/api/student/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enrollmentId, progress: pct }),
-      });
-      setSaved(pct);
-      setValue(String(pct));
-    } finally {
-      setSaving(false);
-      setEditing(false);
-    }
-  }
-
-  if (editing) {
-    return (
-      <div className="flex items-center gap-1">
-        <input
-          type="number"
-          min={0}
-          max={100}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
-          className="w-16 border border-slate-300 rounded px-1.5 py-0.5 text-sm"
-          autoFocus
-        />
-        <button onClick={save} disabled={saving} className="text-xs text-brand-blue-600 font-medium disabled:opacity-50">
-          {saving ? '…' : 'Save'}
-        </button>
-        <button onClick={() => setEditing(false)} className="text-xs text-slate-400">✕</button>
-      </div>
-    );
-  }
-
-  return (
-    <button onClick={() => setEditing(true)} className="flex items-center gap-2 group" title="Click to override progress">
-      <div className="w-20 bg-slate-200 rounded-full h-1.5">
-        <div className="bg-brand-blue-600 h-1.5 rounded-full" style={{ width: `${saved}%` }} />
-      </div>
-      <span className="text-sm text-slate-700 group-hover:underline">{saved}%</span>
-    </button>
-  );
-}
 
 interface Enrollment {
   id: string;
@@ -84,6 +29,9 @@ interface Submission {
   status: string;
   submitted_at: string;
   content?: string;
+  attachments?: string[];
+  max_points: number;
+  assignment_title: string;
 }
 
 interface QuizAttempt {
@@ -131,9 +79,11 @@ export function GradebookClient({
     const studentSubs = submissions.filter((s) => s.user_id === enrollment.user_id);
     const studentQuizzes = quizAttempts.filter((q) => q.user_id === enrollment.user_id);
 
+    const gradedSubs = studentSubs.filter((s) => s.grade != null);
     const avgAssignment =
-      studentSubs.length > 0
-        ? studentSubs.reduce((sum, s) => sum + (s.grade || s.score || 0), 0) / studentSubs.length
+      gradedSubs.length > 0
+        ? gradedSubs.reduce((sum, s) => sum + ((s.grade ?? 0) / (s.max_points || 100)) * 100, 0) /
+          gradedSubs.length
         : null;
 
     const avgQuiz =
@@ -144,10 +94,14 @@ export function GradebookClient({
           ) / studentQuizzes.length
         : null;
 
-    const overall =
-      avgAssignment !== null && avgQuiz !== null
-        ? (avgAssignment + avgQuiz) / 2
-        : (avgAssignment ?? avgQuiz ?? 0);
+    // Match the learner gradebook: each recorded assignment/assessment is one result.
+    const recordedGrades = [
+      ...gradedSubs.map((s) => ((s.grade ?? 0) / (s.max_points || 100)) * 100),
+      ...studentQuizzes.map((q) => (q.max_score > 0 ? (q.score / q.max_score) * 100 : 0)),
+    ];
+    const overall = recordedGrades.length
+      ? recordedGrades.reduce((sum, grade) => sum + grade, 0) / recordedGrades.length
+      : 0;
 
     return {
       ...enrollment,
@@ -283,7 +237,7 @@ export function GradebookClient({
                       <p className="text-sm text-slate-700">{s.profile.email}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <ProgressCell enrollmentId={s.id} initialProgress={s.progress || 0} />
+                      <span>{s.progress || 0}%</span>
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {s.assignmentAvg !== null ? `${s.assignmentAvg.toFixed(1)}%` : '-'}
@@ -340,7 +294,8 @@ export function GradebookClient({
                   <option value="">Choose an assignment...</option>
                   {assignmentIds.map((id) => (
                     <option key={id} value={id}>
-                      Assignment {id.slice(0, 8)}...
+                      {submissions.find((s) => s.assignment_id === id)?.assignment_title ||
+                        'Assignment'}
                     </option>
                   ))}
                 </select>
@@ -355,26 +310,34 @@ export function GradebookClient({
                       studentId: s.user_id,
                       submittedAt: new Date(s.submitted_at),
                       content: s.content || '',
+                      attachments: s.attachments,
                       status:
                         (s.status as 'submitted' | 'graded' | 'returned' | 'late') || 'submitted',
                       isLate: false,
                     }))}
                   assignment={{
                     id: selectedAssignment,
-                    title: `Assignment ${selectedAssignment.slice(0, 8)}`,
-                    points: 100,
+                    title:
+                      submissions.find((s) => s.assignment_id === selectedAssignment)
+                        ?.assignment_title || 'Assignment',
+                    points:
+                      submissions.find((s) => s.assignment_id === selectedAssignment)?.max_points ||
+                      100,
                   }}
                   onGrade={async (submissionId, grade) => {
                     // Route through /api/grade/upsert so FERPA audit log fires
-                    await fetch('/api/grade/upsert', {
+                    const response = await fetch('/api/grade/upsert', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        gradeItemId: submissionId,
-                        enrollmentId: submissionId,
-                        points: grade.percentage,
+                        assignmentSubmissionId: submissionId,
+                        points: grade.points,
+                        feedback: grade.feedback,
                       }),
                     });
+                    const result = await response.json();
+                    if (!response.ok || !result.ok)
+                      throw new Error(result.error || 'Unable to save grade.');
                   }}
                 />
               )}

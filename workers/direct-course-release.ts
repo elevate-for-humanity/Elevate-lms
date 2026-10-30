@@ -6,6 +6,8 @@ import {artifactPayload,contractHash,currentEvidence,stepInputHash,stepInputHash
 import {ULTIMATE_BUILD_STEPS,type UltimateBuildStep,type UltimateCredentialProfile} from '../lib/ultimate-course-builder/core/types';
 import type {UltimateRunContext} from '../lib/ultimate-course-builder/core/build-runner';
 import {UltimateReleaseService} from '../lib/ultimate-course-builder/release/release-service';
+import {createCourseProgressWatch} from '../lib/ultimate-course-builder/worker/progress-watch.mjs';
+import {createDirectDatabaseFetch} from './direct-database-fetch.mjs';
 import {resolveReleaseActor} from '../lib/ultimate-course-builder/worker/release-actor';
 import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication} from './direct-course-policy.mjs';
 
@@ -19,7 +21,7 @@ const TARGET_GROUPS=[
 ];
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('DIRECT_RELEASE_DATABASE_AUTH_REQUIRED');
-const db=createClient('https://cuxzzpsyufcewtmicszk.supabase.co',key,{auth:{persistSession:false,autoRefreshToken:false}});
+const db=createClient('https://cuxzzpsyufcewtmicszk.supabase.co',key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:createDirectDatabaseFetch()}});
 const producer=process.env.DIRECT_RELEASE_SOURCE_SHA;
 if(!/^[a-f0-9]{40}$/.test(producer??''))throw Error('DIRECT_RELEASE_TESTED_SOURCE_REQUIRED');
 const runId=randomUUID();
@@ -97,7 +99,7 @@ async function main(buildId:string){
    artifacts[step]=value!;context.passedSteps!.add(step);return true;
   };
   const result=await runDirectLessonPass({steps:ULTIMATE_BUILD_STEPS,reusable,
-   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='lesson_film_render'?{photoGenerationRevision:'photographic-course-cues-v5-capacity-alternate'}:{}),...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
+   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='lesson_film_render'?{photoGenerationRevision:'photographic-course-cues-v6-bounded-pairs'}:{}),...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
    attempted:async(step:UltimateBuildStep,fingerprint:string)=>{
     const logicalKey=`direct-failure:${lesson.id}:${step}:${fingerprint}`;attempts.set(step,logicalKey);
     const prior=await db.from('ultimate_artifacts').select('id').eq('build_id',build.id).eq('logical_key',logicalKey).maybeSingle();
@@ -107,7 +109,8 @@ async function main(buildId:string){
     await assertSource();console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'executing-once'}));
     // No failure is routed backwards. A failed component is diagnosed for an
     // explicit source correction; saved narration and films remain untouched.
-    return handlers[step](context);
+    const watch=createCourseProgressWatch({onProgress:async(progress:any)=>{console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'progress',...progress}));}});
+    try{const result=await watch.race(watch.run(()=>handlers[step](context)));await watch.flush();return result;}finally{watch.dispose();}
    },
    validate:async(step:UltimateBuildStep,result:Awaited<ReturnType<(typeof handlers)[string]>>)=>{
     if(result.passed===false||result.findings?.some(finding=>finding.severity==='error'))throw Error(result.findings?.find(finding=>finding.severity==='error')?.code??'DIRECT_COMPONENT_QUALITY_FAILED');

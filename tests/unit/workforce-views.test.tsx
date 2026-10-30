@@ -25,7 +25,7 @@ describe('Workforce user-facing regressions', () => {
     );
     mocks.workspace.mockResolvedValue({ enrollments: rows });
     const html = renderToStaticMarkup(await WorkforceRoster({ params: { q: 'person154' } }));
-    expect(html).toContain('1 participants');
+    expect(html).toContain('1 learners');
     expect(html).toContain('person154@example.test');
     expect(html).not.toContain('person153@example.test');
   });
@@ -38,8 +38,8 @@ describe('Workforce user-facing regressions', () => {
       ],
     });
     const html = renderToStaticMarkup(await WorkforceRoster({ params: { filter: 'completed' } }));
-    expect(html).toContain('1 participants');
-    expect(html).toContain('2 enrollments');
+    expect(html).toContain('1 learners');
+    expect(html).toContain('2 program records');
     expect(html).toContain('two@example.test');
     expect(html).not.toContain('one@example.test');
     expect(html).toContain('name="filter"');
@@ -57,9 +57,9 @@ describe('Workforce user-facing regressions', () => {
     });
     mocks.records.mockResolvedValue([]);
     const html = renderToStaticMarkup(await WorkforceOverview({ admin: true }));
-    expect(html).toContain('3 enrollments');
+    expect(html).toContain('1 currently enrolled learner accounts');
     expect(html).toContain('https://app.elevateforhumanity.org/workforce/participants');
-    expect(html).toMatch(/>2<\/p><p>Total Participants/);
+    expect(html).toMatch(/>2<\/p><p>Learners With Records/);
   });
   it('exports scoped rows with private cache headers and no inferred cross-program placement', async () => {
     mocks.workspace.mockResolvedValue({

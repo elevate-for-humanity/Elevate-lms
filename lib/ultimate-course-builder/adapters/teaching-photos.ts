@@ -5,6 +5,7 @@ import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
 import { generateTeachingPhoto } from './google-teaching-photo.mjs';
 import { recoverTeachingPhoto } from './photo-repair.mjs';
+import { TeachingPhotoBatch } from './teaching-photo-batch.mjs';
 import { createHash } from 'node:crypto';
 import { describeWorkerError, optionalStorageCacheMiss } from '../core/worker-error.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -27,10 +28,10 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   let placedPhotos: any[] | undefined;
   const usedPhotoHashes=new Set<string>();
   const usedSelections=new Set<string>();
-  const assignPhoto=(sceneId:string,photo:any)=>{
+  const assignPhoto=(sceneId:string,photo:any,cueIndex:number)=>{
     if(!photo.sha256||usedPhotoHashes.has(photo.sha256))return false;
     usedPhotoHashes.add(photo.sha256);
-    photos[sceneId].push(photo);
+    photos[sceneId][cueIndex]=photo;
     return true;
   };
 
@@ -45,13 +46,14 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     const recapIndex = scene.recapText?.trim() ? requests.length : -1;
     if (recapIndex !== -1) requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
+    const batch=new TeachingPhotoBatch();
     for (const [index, step] of requests.entries()) {
      try {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
         try {
           const photo=await approvedReference(scene,index,step,index===recapIndex);
-          if(!assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex}))throw new Error('COURSE_PHOTO_ALREADY_USED');
+          if(!assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index))throw new Error('COURSE_PHOTO_ALREADY_USED');
           reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
           continue;
         } catch(error) {
@@ -76,13 +78,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,provider:'openai'}))throw new Error('COURSE_PHOTO_ALREADY_USED');
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,provider:'openai'},index))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
       const selected=await courseSelectedStill(input,db,scene,index,step,{allowRelatedCoursePhoto:true,usedSelections});
       if(selected){
-        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex}))throw new Error('COURSE_PHOTO_ALREADY_USED');
+        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index))throw new Error('COURSE_PHOTO_ALREADY_USED');
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -94,10 +96,12 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==licensed.content_sha256) throw new Error('LICENSED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url}))continue;
+        if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url},index))continue;
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
+      await batch.add(async()=>{
+       try {
       const prompt = [
         'Generate a camera-realistic professional training photograph with natural skin texture, lifelike materials and photographic lighting. No cartoons, anime, drawings, vector art, clip art or 3D-rendered characters.',
         'This synthetic photograph is an educational illustration, not evidence of a performed practical procedure.',
@@ -180,15 +184,23 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
         stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,
-        provider:saved.provider??'google-generated',model:saved.model,repair:saved.repair}))
+        provider:saved.provider??'google-generated',model:saved.model,repair:saved.repair},index))
         throw new Error('COURSE_PHOTO_ALREADY_USED');
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+       } catch(error) {
+        const detail=describeWorkerError(error);
+        const code=detail.match(/^[A-Z][A-Z0-9_]+(?=:|$)/)?.[0]??'TEACHING_PHOTO_PREPARATION_FAILED';
+        throw new Error(code+':scene='+scene.id+':cue='+index+':'+detail,{cause:error});
+       }
+      });
      } catch (error) {
+       if(error instanceof Error&&error.message.includes(':scene='+scene.id+':cue='))throw error;
        const detail = describeWorkerError(error);
        const code = detail.match(/^[A-Z][A-Z0-9_]+(?=:|$)/)?.[0] ?? 'TEACHING_PHOTO_PREPARATION_FAILED';
        throw new Error(code+':scene='+scene.id+':cue='+index+':'+detail, {cause:error});
      }
     }
+    await batch.flush();
     if(new Set(photos[scene.id].map(p=>p.sha256)).size<2) throw new Error('TEACHING_PHOTOS_MUST_BE_DISTINCT');
   }
   return {...input,teachingPhotos:photos};

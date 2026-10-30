@@ -1,7 +1,5 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
-
 import React from 'react';
 
 import { useState } from 'react';
@@ -24,11 +22,13 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
   const [feedback, setFeedback] = useState('');
   const [rubricScores, setRubricScores] = useState<RubricScore[]>([]);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saved, setSaved] = useState(false);
 
   const currentSubmission = submissions[currentIndex];
 
   const handleNext = async () => {
-    await saveGrade();
+    if (!(await saveGrade())) return;
     if (currentIndex < submissions.length - 1) {
       setCurrentIndex(currentIndex + 1);
       resetForm();
@@ -43,36 +43,28 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
   };
 
   const resetForm = () => {
+    setSaveError('');
+    setSaved(false);
     setPoints(assignment.points);
     setFeedback('');
     setRubricScores([]);
   };
 
   const saveGrade = async () => {
-    if (!currentSubmission) return;
+    if (!currentSubmission) return false;
 
     setSaving(true);
+    setSaved(false);
+    setSaveError('');
     try {
+      if (
+        !Number.isFinite(points) ||
+        points < 0 ||
+        points > assignment.points ||
+        assignment.points <= 0
+      )
+        throw new Error('Enter points within the assignment maximum.');
       const percentage = (points / assignment.points) * 100;
-
-      // Save to database directly
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      await supabase.from('grades').upsert({
-        submission_id: currentSubmission.id,
-        assignment_id: assignment.id,
-        student_id: currentSubmission.studentId,
-        grader_id: user?.id,
-        points,
-        max_points: assignment.points,
-        percentage,
-        feedback,
-        rubric_scores: rubricScores,
-        graded_at: new Date().toISOString(),
-      });
 
       await onGrade(currentSubmission.id, {
         points,
@@ -82,6 +74,11 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
         rubricScores: rubricScores.length > 0 ? rubricScores : undefined,
         gradedAt: new Date(),
       });
+      setSaved(true);
+      return true;
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Unable to save grade.');
+      return false;
     } finally {
       setSaving(false);
     }
@@ -122,14 +119,14 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
           <div className="flex items-center gap-3">
             <button
               onClick={handlePrevious}
-              disabled={currentIndex === 0}
+              disabled={saving || currentIndex === 0}
               className="px-4 py-2 text-sm font-medium text-black bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ← Previous
             </button>
             <button
               onClick={handleNext}
-              disabled={currentIndex === submissions.length - 1}
+              disabled={saving}
               className="px-4 py-2 text-sm font-medium text-white bg-brand-orange-600 rounded hover:bg-brand-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {currentIndex === submissions.length - 1 ? 'Finish' : 'Next →'}
@@ -274,6 +271,16 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
               </div>
             </div>
 
+            {saveError && (
+              <p role="alert" className="text-red-700">
+                {saveError}
+              </p>
+            )}
+            {saved && (
+              <p role="status" className="text-green-700">
+                Grade saved.
+              </p>
+            )}
             {/* Save Button */}
             <button
               onClick={saveGrade}

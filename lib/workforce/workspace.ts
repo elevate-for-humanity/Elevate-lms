@@ -1,7 +1,12 @@
 import 'server-only';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { WORKFORCE_ACCESS_ROLES, isPlatformOversight, learnerId } from './records';
+import {
+  WORKFORCE_ACCESS_ROLES,
+  isPlatformOversight,
+  learnerId,
+  enrollmentNeedsReview,
+} from './records';
 
 export async function allRows(makeQuery: () => any): Promise<any[]> {
   const rows: any[] = [];
@@ -78,7 +83,7 @@ export type WorkforceContext = Awaited<ReturnType<typeof getWorkforceContext>>;
 
 export async function getWorkforceEnrollments(ctx: WorkforceContext) {
   const fields =
-    'id,user_id,student_id,program_id,enrollment_state,enrolled_at,started_at,completed_at,at_risk,tenant_id,funding_source,eligibility_status,training_start_date,training_end_date';
+    'id,user_id,student_id,program_id,enrollment_state,enrolled_at,started_at,completed_at,at_risk,tenant_id,funding_source,eligibility_status,training_start_date,training_end_date,source,status';
   if (ctx.ids !== null && !ctx.ids.length) return [];
   const base = () => {
     let query = ctx.db.from('program_enrollments').select(fields);
@@ -97,7 +102,7 @@ export async function getWorkforceEnrollments(ctx: WorkforceContext) {
   const profileIds = [...new Set(rows.map(learnerId).filter(Boolean))] as string[];
   const programIds = [...new Set(rows.map((row) => row.program_id).filter(Boolean))] as string[];
   const [profiles, programs] = await Promise.all([
-    relatedRows(ctx.db, 'profiles', 'id,full_name,email', 'id', profileIds),
+    relatedRows(ctx.db, 'profiles', 'id,full_name,email,role', 'id', profileIds),
     relatedRows(ctx.db, 'programs', 'id,title,status', 'id', programIds),
   ]);
   const profileMap = new Map(profiles.map((row) => [row.id, row]));
@@ -117,9 +122,11 @@ export async function getWorkforceEnrollments(ctx: WorkforceContext) {
 
 export async function getWorkforceWorkspace() {
   const ctx = await getWorkforceContext();
-  const enrollments = await getWorkforceEnrollments(ctx);
+  const records = await getWorkforceEnrollments(ctx);
+  const enrollments = records.filter((row) => !enrollmentNeedsReview(row));
+  const reviewEnrollments = records.filter(enrollmentNeedsReview);
   const userIds = [...new Set(enrollments.map(learnerId).filter(Boolean))] as string[];
-  return { ctx, enrollments, userIds };
+  return { ctx, enrollments, reviewEnrollments, userIds };
 }
 
 export async function workforceRecords(

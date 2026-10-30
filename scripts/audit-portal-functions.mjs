@@ -2,6 +2,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { hasGetRouteHandler } from './portal-route-contract.mjs';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const APPS = { marketing: 'apps/marketing/app', lms: 'apps/lms/app', admin: 'apps/admin/app' };
@@ -57,6 +58,7 @@ for (const [app, relRoot] of Object.entries(APPS)) {
   const apis = walk(appRoot).filter((f) => /\/route\.(tsx?|jsx?|js)$/.test(f));
   routeIndex[app] = pages.map((file) => ({ file, route: routeFromFile(appRoot, file, 'page') }));
   apiIndex[app] = apis.map((file) => ({ file, route: routeFromFile(appRoot, file, 'route') }));
+  routeIndex[app].push(...apiIndex[app].filter(entry => hasGetRouteHandler(readFileSync(entry.file, 'utf8'))));
 }
 
 function normalizeDynamicTarget(target) {
@@ -71,14 +73,7 @@ function existsRoute(app, target, api = false) {
 }
 
 function existsPortalAction(app, target) {
-  if (existsRoute(app, target)) return true;
-  const pathname = normalizeDynamicTarget(target.split(/[?#]/)[0] || '/');
-  // Download links can terminate at a Next route handler instead of a page.
-  // Require an actual GET export: a POST-only endpoint cannot serve a link.
-  return apiIndex[app].some(entry =>
-    pattern(entry.route).test(pathname) &&
-    /\bexport\s+(?:(?:async\s+)?function\s+GET\s*\(|const\s+GET\s*=)/.test(readFileSync(entry.file, 'utf8')),
-  );
+  return existsRoute(app, target);
 }
 
 function hasBalancedInterpolation(ref) {

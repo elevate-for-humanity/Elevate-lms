@@ -5,13 +5,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import vm from 'node:vm';
+import { hasGetRouteHandler } from './portal-route-contract.mjs';
 
 const source = readFileSync(new URL('./audit-portal-functions.mjs', import.meta.url), 'utf8');
 const routePattern = source.slice(source.indexOf('function pattern('), source.indexOf('const routeIndex'));
 const resolvers = source.slice(source.indexOf('function normalizeDynamicTarget('), source.indexOf('function hasBalancedInterpolation('));
 const files = { get: 'export async function GET() {}', post: 'export async function POST() {}', constant: 'export const GET = handler;' };
 const exists = vm.runInNewContext(routePattern + resolvers + '\nexistsPortalAction', {
-  routeIndex: { lms: [{ route: '/workforce/dashboard' }] },
+  routeIndex: { lms: [{ route: '/workforce/dashboard' }, ...[
+    { route: '/workforce/wioa-export/download', file: 'get' },
+    { route: '/workforce/post-only', file: 'post' },
+    { route: '/workforce/constant', file: 'constant' },
+  ].filter(entry => hasGetRouteHandler(files[entry.file]))] },
   apiIndex: { lms: [
     { route: '/workforce/wioa-export/download', file: 'get' },
     { route: '/workforce/post-only', file: 'post' },

@@ -30,6 +30,7 @@ export async function resolveCourseEnrollment(
     .from('program_enrollments')
     .select('id,status,program_id,funding_program_id,course_id,user_id,student_id,updated_at')
     .or(`user_id.eq.${userId},student_id.eq.${userId}`)
+    .is('revoked_at', null)
     .eq('course_id', courseId)
     .order('updated_at', { ascending: false })
     .limit(1);
@@ -55,6 +56,7 @@ export async function resolveCourseEnrollment(
     .from('program_enrollments')
     .select('id,status,program_id,funding_program_id,course_id,user_id,student_id,updated_at')
     .or(`user_id.eq.${userId},student_id.eq.${userId}`)
+    .is('revoked_at', null)
     .in('program_id', programIds)
     .order('updated_at', { ascending: false })
     .limit(1);

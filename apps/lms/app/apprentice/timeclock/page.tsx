@@ -507,7 +507,7 @@ export default function TimeclockPage() {
               Hours
             </Link>
             <Link
-              href="/apprentice/competencies/log"
+              href="/apprentice/competencies"
               className="px-3 py-1.5 bg-brand-blue-50 hover:bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium transition"
             >
               + Competency

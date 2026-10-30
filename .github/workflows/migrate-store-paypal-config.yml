@@ -17,6 +17,10 @@ on:
         description: 'Exact successfully deployed Store commit; defaults to current main'
         type: string
         required: false
+      deployment_run_id:
+        description: 'Exact Store deployment handoff; wait for this run to complete successfully'
+        type: string
+        required: false
 permissions:
   contents: read
   actions: read
@@ -49,6 +53,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           STORE_PAYPAL_EXPECTED_SHA: ${{ inputs.store_sha || github.sha }}
+          STORE_PAYPAL_DEPLOYMENT_RUN_ID: ${{ inputs.deployment_run_id }}
         run: node scripts/gcp/verify-store-release-provenance.mjs
       - uses: google-github-actions/auth@v3
         with:

@@ -48,10 +48,10 @@ jobs:
           node --input-type=module <<'NODE'
           import {preflightWebRollout} from './scripts/gcp/preflight-web-rollout.mjs';
           try {
-            console.log(JSON.stringify(await preflightWebRollout({service:'elevate-lms-migration'})));
+            console.log(JSON.stringify(await preflightWebRollout({service:'elevate-lms-migration',cpu:'2',memory:'4Gi'})));
           } catch (error) {
             if (error.code !== 'WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE') throw error;
-            console.log(JSON.stringify({rolloutAllowed:false,error:error.code,...error.diagnostic}));
+            console.log(JSON.stringify({checkedAt:new Date().toISOString(),rolloutAllowed:false,error:error.code,...error.diagnostic}));
           }
           NODE
       - name: Inventory project resources without provisioning or deleting anything

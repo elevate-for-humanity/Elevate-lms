@@ -71,7 +71,7 @@ jobs:
   direct-release:
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && inputs.direct_release == true
     concurrency:
-      group: google-runtime-us-central1
+      group: google-runtime-us-east1
       cancel-in-progress: false
       queue: max
     runs-on: ubuntu-24.04
@@ -82,6 +82,10 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+      - name: Retire only older waiting direct launch requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/gcp/retire-pending-direct-launches.mjs
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tested_image_sha }}
@@ -106,6 +110,7 @@ jobs:
       - name: Run finite direct completion outside builder queues
         env:
           DIRECT_RELEASE_SOURCE_SHA: ${{ inputs.tested_image_sha }}
+          DIRECT_RELEASE_REGION: us-east1
         run: node scripts/gcp/direct-course-release.mjs
 
   authoring-access:

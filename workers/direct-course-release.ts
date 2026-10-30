@@ -7,7 +7,7 @@ import {ULTIMATE_BUILD_STEPS,type UltimateBuildStep,type UltimateCredentialProfi
 import type {UltimateRunContext} from '../lib/ultimate-course-builder/core/build-runner';
 import {UltimateReleaseService} from '../lib/ultimate-course-builder/release/release-service';
 import {resolveReleaseActor} from '../lib/ultimate-course-builder/worker/release-actor';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication} from './direct-course-policy.mjs';
 
 // Reuse media tools and release validators, but never invoke the build runner,
 // role dispatcher, automatic repair router, or any queue operation.
@@ -144,9 +144,12 @@ async function main(buildId:string){
   const packageForLesson=await release.derive(build.id,lesson.id);
   packageForLesson.lessons[0].orderIndex=order.data.order_index;
   await release.applyPackage(packageForLesson,actor);
-  const verified=await db.from('course_lessons').select('id,status,is_published,video_status,media_quality_status').eq('id',canonicalId).single();
+  const measuredDuration=Math.ceil(artifacts.lesson_film_render!.render.duration);
+  const duration=await db.from('course_lessons').update({duration_seconds:measuredDuration,duration_minutes:Math.ceil(measuredDuration/60)}).eq('id',canonicalId).eq('course_id',build.course_id).eq('video_url',packageForLesson.lessons[0].videoUrl);
+  if(duration.error)throw duration.error;
+  const verified=await db.from('course_lessons').select('id,status,is_published,video_status,media_quality_status,duration_seconds').eq('id',canonicalId).single();
   if(verified.error)throw verified.error;
-  if(verified.data.status!=='published'||verified.data.is_published!==true||verified.data.video_status!=='complete'||verified.data.media_quality_status!=='approved')throw Error('DIRECT_LESSON_PUBLICATION_READBACK_FAILED');
+  if(verified.data.status!=='published'||verified.data.is_published!==true||verified.data.video_status!=='complete'||verified.data.media_quality_status!=='approved'||verified.data.duration_seconds!==measuredDuration)throw Error('DIRECT_LESSON_PUBLICATION_READBACK_FAILED');
   accepted.push(canonicalId);
   console.log(JSON.stringify({courseId:build.course_id,lessonId:canonicalId,state:'published-and-verified'}));
   } catch(error) {
@@ -178,19 +181,22 @@ async function main(buildId:string){
  const complete=directCourseComplete({learnerLessonIds,acceptedLessonIds:allAccepted,manifestLessonIds:learnerLessonIds});
  if(complete){
   await assertSource();
-  const course=await db.from('courses').select('id,status,updated_at').eq('id',build.course_id).single();
+  const course=await db.from('courses').select('id,status,is_active,generation_status,generation_progress,total_lessons,metadata,updated_at').eq('id',build.course_id).single();
   if(course.error)throw course.error;
-  if(course.data.status!=='published'){
+  // An incrementally published shell is not a full seventeen-lesson release.
+  // This branch is reached only after every canonical lesson passes above.
+  if(directCourseNeedsFinalPublication(course.data,learnerLessonIds.length)){
    const previous=await db.from('course_versions').select('version_number').eq('course_id',build.course_id).order('version_number',{ascending:false}).limit(1).maybeSingle();
    if(previous.error)throw previous.error;
    const number=(previous.data?.version_number??0)+1;
-   const version=await db.from('course_versions').insert({course_id:build.course_id,version_number:number,label:'Direct validated LMS release',is_published:false,created_by:actor}).select('id').single();
+   const version=await db.from('course_versions').insert({course_id:build.course_id,version_number:number,version:number,label:'Direct validated LMS release',is_published:false,created_by:actor,snapshot:{mode:'direct-lms-release',lessonIds:learnerLessonIds,sourceSha:producer,runId}}).select('id').single();
    if(version.error)throw version.error;
    const moduleIds=[...new Set(learnerRows.map(row=>row.module_id).filter(Boolean))];
    if(moduleIds.length){const modules=await db.from('course_version_modules').insert(moduleIds.map(id=>({version_id:version.data.id,module_id:id})));if(modules.error)throw modules.error;}
    const lessons=await db.from('course_version_lessons').insert(learnerLessonIds.map(id=>({version_id:version.data.id,lesson_id:id})));if(lessons.error)throw lessons.error;
    const now=new Date().toISOString();
-   const published=await db.from('courses').update({status:'published',is_active:true,published_at:now,published_by:actor,review_status:'approved',generation_status:'published',generation_progress:100,total_lessons:learnerLessonIds.length,version:number,updated_at:now}).eq('id',build.course_id).eq('updated_at',course.data.updated_at).select('id,status,is_active');
+   const metadata={...(course.data.metadata??{}),manualCompletionAudit:{...(course.data.metadata?.manualCompletionAudit??{}),checked_at:now,published_lessons:allAccepted.length,verified_photographic_lessons:allAccepted.length,full_release_ready:true,current_blocker:null,first_aid_release_hold:null,completedSourceSha:producer,completedRunId:runId}};
+   const published=await db.from('courses').update({status:'published',is_active:true,published_at:now,published_by:actor,review_status:'approved',generation_status:'published',generation_progress:100,total_lessons:learnerLessonIds.length,version:number,metadata,updated_at:now}).eq('id',build.course_id).eq('updated_at',course.data.updated_at).select('id,status,is_active');
    if(published.error||published.data?.length!==1)throw published.error??Error('DIRECT_COURSE_CHANGED_BEFORE_PUBLICATION');
    const publishedVersion=await db.from('course_versions').update({is_published:true,published_at:now}).eq('id',version.data.id).select('id');
    if(publishedVersion.error||publishedVersion.data?.length!==1)throw publishedVersion.error??Error('DIRECT_COURSE_SNAPSHOT_PUBLICATION_FAILED');

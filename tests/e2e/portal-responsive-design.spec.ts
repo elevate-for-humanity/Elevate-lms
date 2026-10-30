@@ -451,7 +451,7 @@ test.describe('Authenticated portal responsive design certification', () => {
     'Admin',
     'admin',
     ADMIN_BASE,
-    [`${ADMIN_BASE}/dashboard`, `${ADMIN_BASE}/studio`],
+    [`${ADMIN_BASE}/dashboard`, `${ADMIN_BASE}/phone`, `${ADMIN_BASE}/studio`],
     '/manifest-admin.json',
   );
 });

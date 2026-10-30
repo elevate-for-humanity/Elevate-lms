@@ -45,7 +45,6 @@ on:
 permissions:
   contents: read
   actions: read
-  issues: write
 
 jobs:
   production-authenticated-e2e:
@@ -180,15 +179,16 @@ jobs:
             playwright-report/
           retention-days: 14
           if-no-files-found: ignore
-      - name: Publish production QA evidence
+      - name: Preserve production QA result in this run
         if: always()
         env:
-          GH_TOKEN: ${{ github.token }}
           QA_STATUS: ${{ job.status }}
           QA_SHA: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
-          QA_EVENT: ${{ github.event_name }}
-          QA_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        shell: bash
         run: |
-          set -euo pipefail
-          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Full portal production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Fixtures: isolated disposable Host Shop, Apprentice, Learner, Program Holder, Employer, Instructor, Staff, Case Manager and Admin identities.\n- Responsive scope: all nine roles on desktop 1440x900, laptop 1280x720, iPad-class tablet, iPhone WebKit and Pixel-class Android Chromium.\n- Assertions: no 5xx, login/authorization regression, horizontal overflow, clipped critical controls, zero-size primary content or undersized mobile controls.\n- Evidence: Playwright traces/screenshots/report artifact retained for 14 days."
+          python3 - <<'PYTHON'
+          import os
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as report:
+              report.write('Production portal acceptance: ' + os.environ['QA_STATUS'] + '\n\n')
+              report.write('Test source commit: `' + os.environ['QA_SHA'] + '`\n\n')
+              report.write('Inspect the test steps and attached Playwright evidence for individual results. A queued run is not acceptance.\n')
+          PYTHON

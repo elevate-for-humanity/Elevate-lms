@@ -8,7 +8,7 @@ const read = (path) => readFileSync(new URL('../' + path, import.meta.url), 'utf
 function evaluate(path, bindings, names) {
   let source = stripTypeScriptTypes(read(path));
   source = source.replace(/import[\s\S]*?from\s*['"][^'"]+['"];?/g, '');
-  source = source.replace(/export\s+(?=(const|function|class)\b)/g, '');
+  source = source.replace(/export\s+(?=(?:async\s+)?(const|function|class)\b)/g, '');
   return vm.runInNewContext('(function(){' + source + ';return {' + names.join(',') + '};})()', bindings);
 }
 const matrix = evaluate('lib/rbac/role-matrix.ts', {}, [
@@ -71,4 +71,51 @@ test('shared shell has no independent home-role switch or root fallback', () => 
   const shell = read('components/platform/PlatformShell.tsx');
   assert.match(shell, /const dashboardHref = getDashboardHref\(role\)/);
   assert.doesNotMatch(shell, /const dashboardHref = isWorkforce/);
+});
+
+const { provisionMissingTimeclockSite } = evaluate('lib/timeclock/provision-site.ts', {}, ['provisionMissingTimeclockSite']);
+function siteDb(existing, shop, error = null) {
+  const writes = [];
+  return { writes, from(table) {
+    return {
+      select() { return this; }, eq() { return this; },
+      async limit() { return { data: existing, error }; },
+      async maybeSingle() { return { data: shop, error }; },
+      async upsert(row, options) { writes.push({ table, row, options }); return { error }; },
+    };
+  } };
+}
+const approvedShop = { id: 'shop-1', name: 'Existing shop', active: true, partner_id: 'partner-1', latitude: '39.1', longitude: '-87.4' };
+test('missing timeclock site uses the assigned shop and existing database defaults', async () => {
+  const db = siteDb([], approvedShop);
+  await provisionMissingTimeclockSite(db, 'shop-1');
+  assert.equal(db.writes.length, 1);
+  const { row, options } = db.writes[0];
+  assert.equal(row.id, approvedShop.id);
+  assert.equal(row.shop_id, approvedShop.id);
+  assert.equal(row.partner_id, approvedShop.partner_id);
+  assert.equal(row.latitude, 39.1);
+  assert.equal(row.longitude, -87.4);
+  assert.equal(options.ignoreDuplicates, true);
+  assert.equal(options.onConflict, 'id');
+  assert.equal('radius_meters' in row, false);
+  assert.equal('is_active' in row, false);
+});
+test('existing, disabled, or invalid sites are never silently re-enabled or replaced', async () => {
+  const existing = siteDb([{ id: 'disabled-site' }], approvedShop);
+  await provisionMissingTimeclockSite(existing, 'shop-1');
+  assert.equal(existing.writes.length, 0);
+  for (const shop of [null, { ...approvedShop, partner_id: null }, { ...approvedShop, latitude: null }, { ...approvedShop, latitude: 100 }, { ...approvedShop, latitude: 0, longitude: 0 }]) {
+    const db = siteDb([], shop);
+    await provisionMissingTimeclockSite(db, 'shop-1');
+    assert.equal(db.writes.length, 0);
+  }
+});
+test('site lookup failures fail closed; read-only previews never provision sites', async () => {
+  const db = siteDb([], approvedShop, new Error('database unavailable'));
+  await assert.rejects(provisionMissingTimeclockSite(db, 'shop-1'), /database unavailable/);
+  assert.equal(db.writes.length, 0);
+  const route = read('apps/lms/app/api/timeclock/context/route.ts');
+  assert.match(route, /apprenticeSiteScopeId && !subject.previewing/);
+  assert.match(route, /await provisionMissingTimeclockSite\(db, apprenticeSiteScopeId\)/);
 });

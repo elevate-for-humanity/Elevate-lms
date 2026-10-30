@@ -10,6 +10,7 @@ import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship'
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 import { getTimeclockWorkDate, getTimeclockWeekEnding } from '@/lib/timeclock/work-date';
 import { APPRENTICE_TIME_POLICY } from '@/lib/timeclock/policy';
+import { provisionMissingTimeclockSite } from '@/lib/timeclock/provision-site';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -58,6 +59,13 @@ async function _GET(request: NextRequest) {
   // The action endpoint validates apprentice_sites.id, so the context must
   // return that same canonical site identity. Returning shops.id here makes the
   // UI look configured but every clock action fail with "Site not found".
+  if (apprenticeSiteScopeId && !subject.previewing) {
+    try {
+      await provisionMissingTimeclockSite(db, apprenticeSiteScopeId);
+    } catch {
+      return NextResponse.json({ error: 'Approved site configuration unavailable' }, { status: 503 });
+    }
+  }
   const { data: sites, error: sitesError } = apprenticeSiteScopeId
     ? await db
         .from('apprentice_sites')

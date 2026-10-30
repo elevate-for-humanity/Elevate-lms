@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {authoringProbeDecision} from './authoring-probe-policy.mjs';
+const now=Date.parse('2026-10-30T10:00:00Z');
+const probe=minutes=>({spec:{template:{spec:{containers:[{args:['DIRECT_AUTHORING_DIAGNOSTIC_V1']}]}}},status:{completionTime:new Date(now-minutes*60000).toISOString()}});
+test('old billing denial does not permanently block a post-payment test',()=>assert.equal(authoringProbeDecision([probe(60)],now),'probe'));
+test('a recent probe prevents duplicate paid requests',()=>assert.equal(authoringProbeDecision([probe(2)],now),'recent-probe-preserved'));
+test('active course execution is preserved even when the previous probe is old',()=>assert.equal(authoringProbeDecision([probe(60),{status:{conditions:[{type:'Completed',status:'Unknown'}]}}],now),'active-execution-preserved'));
+test('a terminal execution without a completion timestamp does not block forever',()=>assert.equal(authoringProbeDecision([{status:{conditions:[{type:'Completed',status:'False'}]}}],now),'probe'));
+test('malformed state fails before starting a paid request',()=>assert.throws(()=>authoringProbeDecision(null,now),/STATE_REQUIRED/));

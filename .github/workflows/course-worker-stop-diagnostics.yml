@@ -23,6 +23,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
     timeout-minutes: 5
     permissions:
       contents: read
@@ -39,4 +43,5 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - run: node --test scripts/gcp/authoring-probe-policy.test.mjs
       - run: node scripts/gcp/course-worker-stop-diagnostics.mjs

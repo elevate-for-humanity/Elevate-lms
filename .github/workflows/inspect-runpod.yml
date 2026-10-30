@@ -1,0 +1,38 @@
+name: Inspect RunPod migration capacity
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/compute/inspect-runpod.mjs'
+      - 'tests/compute/runpod-inspection.test.mjs'
+      - '.github/workflows/inspect-runpod.yml'
+permissions:
+  contents: read
+concurrency:
+  group: inspect-runpod-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test tests/compute/runpod-inspection.test.mjs
+  inventory:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify authenticated account inventory and current capacity without provisioning
+        env:
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+        run: node scripts/compute/inspect-runpod.mjs

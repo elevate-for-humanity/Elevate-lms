@@ -415,7 +415,7 @@ function collectDuplicateMediaFindings(sitemapHrefs) {
 }
 
 function isStaticAssetHref(href) {
-  return /\.(?:pdf|png|jpe?g|webp|svg|gif|zip|docx?|xlsx?|csv)(?:[?#].*)?$/i.test(href);
+  return /\.(?:pdf|png|jpe?g|webp|avif|svg|gif|ico|mp4|webm|mov|m4v|mp3|m4a|wav|ogg|aac|zip|docx?|xlsx?|csv)(?:[?#].*)?$/i.test(href);
 }
 
 function collectActionFindings(files, routeConstants) {

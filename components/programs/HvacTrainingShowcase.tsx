@@ -57,29 +57,27 @@ export function HvacLabHero() {
           Sponsored by Elevate for Humanity
         </p>
         <div className="relative overflow-hidden rounded-2xl bg-blue-950">
-        <Image
-          src={`${imageRoot}/lab-overview.webp`}
-          alt="Wide view of the HVAC training-lab concept"
-          width={1600}
-          height={900}
-          priority
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAOABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCtHNJbQ4t5V3EZMbZx6Y9j3qL+1b0xgrGCoyR8hrX0/SbWNWzGHOM5bmnS6VA98sxXDs4wc9MYpxdlqrjkrvQx3nNzgvKPLCl3XJGcfSitm90+2mGQgV+RuFFONRxVglFSdz//2Q=="
-          sizes="(max-width: 1280px) 100vw, 1280px"
-          className="h-auto w-full rounded-2xl object-contain"
-        />
-        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-slate-950 shadow-lg sm:left-5 sm:top-5 sm:gap-3 sm:px-4 sm:py-3">
-          <Image
-            src="/images/logo.png"
-            alt="Elevate for Humanity logo"
-            width={64}
-            height={64}
-            className="h-10 w-10 object-contain sm:h-16 sm:w-16"
-          />
-          <div className="text-xs font-black uppercase leading-tight sm:text-lg">
-            Elevate<br />for Humanity
-          </div>
-        </div>
+          <video
+            aria-label="Elevate for Humanity HVAC training program introduction"
+            data-hvac-hero-video="20261029"
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls
+            preload="metadata"
+            poster={`${imageRoot}/lab-overview.webp`}
+            width={1080}
+            height={1350}
+            className="mx-auto block max-h-[75svh] w-full object-contain"
+          >
+            <source src="/videos/hvac-recruitment-20261029.mp4" type="video/mp4" />
+            Your browser does not support embedded video.{' '}
+            <a href="/videos/hvac-recruitment-20261029.mp4">Watch the HVAC program video</a>.
+          </video>
+          <p className="px-4 py-3 text-center text-sm text-slate-200">
+            Watch our HVAC program introduction. Use the video controls to turn on sound or pause.
+          </p>
         </div>
       </div>
     </figure>

@@ -1,19 +1,13 @@
 name: Direct LMS course completion and publication
+# Manual completion of the saved courses must not restart authoring on deployments.
+# Retain explicit dispatch for an independently authorized future pipeline run.
 on:
-  workflow_run:
-    workflows: ['Deploy Google Course Builder on source changes']
-    types: [completed]
   workflow_dispatch:
     inputs:
       tested_image_sha:
         description: Full SHA of the successfully deployed tested image containing the direct release entrypoint
         required: true
         type: string
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/direct-course-release.yml'
-      - 'scripts/gcp/direct-course-release.mjs'
 permissions:
   contents: read
   actions: write
@@ -21,24 +15,8 @@ concurrency:
   group: direct-course-release-launch
   cancel-in-progress: false
 jobs:
-  dispatch:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - name: Hand exact tested image to an identity-approved release event
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TESTED_IMAGE_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          set -euo pipefail
-          [[ "$TESTED_IMAGE_SHA" =~ ^[a-f0-9]{40}$ ]]
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/direct-course-release.yml/dispatches" \
-            -f ref=main \
-            -f "inputs[tested_image_sha]=$TESTED_IMAGE_SHA"
-
   release:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

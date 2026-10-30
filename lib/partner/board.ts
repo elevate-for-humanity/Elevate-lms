@@ -1,3 +1,7 @@
+import {
+  hostShopStateAliases,
+  resolveHostShopDocuments,
+} from '@/lib/partners/host-shop-document-status';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -7,7 +11,6 @@ import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-pr
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 import {
   getHostShopOnboardingPaths,
-  mergeHostShopDocumentRequirements,
   resolveHostShopProgram,
 } from '@/lib/partners/host-shop-onboarding';
 
@@ -164,22 +167,6 @@ function isPending(row: HourRow) {
     .toLowerCase();
   const pending = new Set(['pending', 'submitted', 'awaiting_review']);
   return pending.has(approval) || pending.has(status);
-}
-
-const ACCEPTED_DOCUMENT_STATUSES = new Set([
-  'accepted',
-  'approved',
-  'verified',
-  'complete',
-  'completed',
-]);
-
-function isAcceptedDocumentStatus(value: unknown) {
-  return ACCEPTED_DOCUMENT_STATUSES.has(
-    String(value || '')
-      .trim()
-      .toLowerCase(),
-  );
 }
 
 async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
@@ -358,7 +345,12 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
       if (placement.programSlug && row.program_slug && row.program_slug !== placement.programSlug)
         continue;
       if (isPending(row)) pendingHoursCount += 1;
-      if (!isApproved(row) || !['ojl', 'timeclock', 'manual', 'host_shop'].includes(row.source_type || '') || placement.tradeInfo.progressModel === 'unconfigured') continue;
+      if (
+        !isApproved(row) ||
+        !['ojl', 'timeclock', 'manual', 'host_shop'].includes(row.source_type || '') ||
+        placement.tradeInfo.progressModel === 'unconfigured'
+      )
+        continue;
       workProgress[row.user_id].completed += numericHours(
         row.accepted_hours ?? row.hours ?? row.hours_claimed,
       );
@@ -427,15 +419,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         .filter((v): v is string => Boolean(v)),
     ]),
   );
-  const stateAliases = Array.from(
-    new Set(
-      [
-        partner.state || 'Indiana',
-        String(partner.state || '').toUpperCase() === 'IN' ? 'Indiana' : null,
-        'ALL',
-      ].filter((value): value is string => Boolean(value)),
-    ),
-  );
+  const stateAliases = hostShopStateAliases(partner.state);
   const { data: dbRequirements, error: requirementsError } = await db
     .from('partner_document_requirements')
     .select('*')
@@ -446,10 +430,6 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
       partnerId: partner.id,
       error: requirementsError.message,
     });
-  const requirements = mergeHostShopDocumentRequirements(
-    requirementsError ? null : dbRequirements,
-    programType,
-  );
   const { data: uploadedDocs, error: uploadedDocsError } = await db
     .from('partner_documents')
     .select(
@@ -463,20 +443,14 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
       error: uploadedDocsError.message,
     });
 
-  const latestDocs = new Map<string, any>();
-  for (const doc of uploadedDocsError ? [] : uploadedDocs || [])
-    if (!latestDocs.has(doc.document_type)) latestDocs.set(doc.document_type, doc);
-  const documentStatuses = requirements.map((requirement: any) => {
-    const document = latestDocs.get(requirement.document_type);
-    const rawStatus = String(document?.status || 'missing')
-      .trim()
-      .toLowerCase();
-    const status = isAcceptedDocumentStatus(rawStatus) ? 'accepted' : rawStatus;
-    return { ...requirement, uploaded: Boolean(document), document: document || null, status };
-  });
+  const documentStatuses = resolveHostShopDocuments(
+    programType,
+    partner.state,
+    requirementsError ? [] : dbRequirements || [],
+    uploadedDocsError ? [] : uploadedDocs || [],
+  );
   const missingDocuments = documentStatuses.filter(
-    (d: any) =>
-      d.is_required && (!d.uploaded || ['missing', 'rejected', 'expired'].includes(d.status)),
+    (d: any) => d.is_required && d.status !== 'accepted' && d.status !== 'pending',
   );
   const pendingDocuments = documentStatuses.filter(
     (d: any) => d.is_required && d.status === 'pending',
@@ -488,34 +462,16 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
   const documentsComplete =
     requiredDocumentCount > 0 && acceptedDocumentCount === requiredDocumentCount;
 
-  const registeredPrograms = Array.from(
-    new Map(
-      apprentices
-        .filter((apprentice) => apprentice.tradeInfo.registered)
-        .map((apprentice) => [apprentice.tradeInfo.rapidsCode, apprentice.tradeInfo]),
-    ).values(),
-  );
-  const timeBasedPrograms = Array.from(
-    new Map(
-      apprentices
-        .filter((apprentice) => apprentice.tradeInfo.progressModel === 'time_based')
-        .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
-    ).values(),
-  );
-  const hybridPrograms = Array.from(
-    new Map(
-      apprentices
-        .filter((apprentice) => apprentice.tradeInfo.progressModel === 'hybrid')
-        .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
-    ).values(),
-  );
-  const unconfiguredPrograms = Array.from(
-    new Map(
-      apprentices
-        .filter((apprentice) => apprentice.tradeInfo.progressModel === 'unconfigured')
-        .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
-    ).values(),
-  );
+  // Program readiness must exist before the first apprentice is placed too.
+  const assignedTargets = [tradeInfo, ...apprentices.map(apprentice => apprentice.tradeInfo)];
+  const uniqueTargets = (model?: TradeTarget['progressModel']) => Array.from(new Map(
+    assignedTargets.filter(target => model ? target.progressModel === model : target.registered)
+      .map(target => [target.programSlug || 'unknown', target]),
+  ).values());
+  const registeredPrograms = uniqueTargets();
+  const timeBasedPrograms = uniqueTargets('time_based');
+  const hybridPrograms = uniqueTargets('hybrid');
+  const unconfiguredPrograms = uniqueTargets('unconfigured');
 
   return {
     partner,

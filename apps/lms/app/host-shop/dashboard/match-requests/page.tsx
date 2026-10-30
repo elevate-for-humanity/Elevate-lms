@@ -66,14 +66,16 @@ export default function HostShopMatchRequestsPage() {
   const [showApprovalModal, setShowApprovalModal] = useState<MatchRequest | null>(null);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [page, setPage] = useState(1);
+  const [loadError, setLoadError] = useState('');
 
   const fetchRequests = useCallback(async (pageNum: number = 1) => {
     setLoading(true);
+    setLoadError('');
     try {
       const params = new URLSearchParams();
       params.set('page', pageNum.toString());
       params.set('limit', '10');
-      if (filter) params.set('status', filter);
+      if (filter && filter !== 'all') params.set('status', filter);
 
       const res = await fetch(`/api/host-shop/match-requests?${params.toString()}`);
       
@@ -83,12 +85,14 @@ export default function HostShopMatchRequestsPage() {
       }
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unable to load match requests');
       if (data.requests) {
         setRequests(data.requests);
         setPagination(data.pagination);
       }
     } catch (error) {
-      console.error('Failed to fetch requests:', error);
+      setRequests([]);
+      setLoadError(error instanceof Error ? error.message : 'Unable to load match requests');
     } finally {
       setLoading(false);
     }
@@ -154,6 +158,7 @@ export default function HostShopMatchRequestsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {loadError && <p role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-900">{loadError}</p>}
       {/* Header */}
       <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-pink-700 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">

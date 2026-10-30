@@ -293,6 +293,26 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'hours', label: 'Work Hours', href: `${p('hostshop')}/hours`, icon: Clock },
         {
+          id: 'practical-log',
+          label: 'Practical Service Log',
+          href: `${p('hostshop')}/practical-log`,
+          icon: ClipboardList,
+        },
+        {
+          id: 'match-requests',
+          label: 'Match Requests',
+          href: `${p('hostshop')}/match-requests`,
+          icon: Users,
+        },
+        { id: 'email', label: 'Email', href: '/host-shop/email', icon: Mail },
+        { id: 'orientation', label: 'Orientation', href: '/host-shop/orientation', icon: BookOpen },
+        {
+          id: 'community',
+          label: 'Community & Networks',
+          href: `${p('hostshop')}/community`,
+          icon: Users,
+        },
+        {
           id: 'competencies',
           label: 'Competencies',
           href: `${p('hostshop')}/competencies`,

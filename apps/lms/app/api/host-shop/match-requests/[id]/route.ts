@@ -30,10 +30,20 @@ async function getContext() {
     .eq('id', user.id)
     .maybeSingle();
 
+  // Existing employers may also own Host Shops. Honor the same active
+  // partner membership used by the shared portal role guard.
+  let role = String(profile?.role || '').trim().toLowerCase();
+  if (!PLATFORM_ADMIN_ROLES.has(role) && !HOST_ROLES.has(role)) {
+    const { data: memberships, error: membershipError } = await db.from('partner_users')
+      .select('role,status').eq('user_id', user.id).eq('status', 'active');
+    if (membershipError) throw new Error('HOST_SHOP_MEMBERSHIP_LOOKUP_FAILED');
+    if ((memberships || []).some((row: any) => ['owner','partner_admin','admin','supervisor','mentor','manager'].includes(row.role))) role = 'host_shop';
+  }
+
   return {
     user,
     db,
-    role: String(profile?.role || '').trim().toLowerCase(),
+    role,
   };
 }
 
@@ -64,7 +74,7 @@ async function authorizedShopIds(db: any, userId: string, role: string) {
     .neq('partners.is_active', false);
 
   if (partnerId) query = query.eq('partner_id', partnerId);
-  else if (!PLATFORM_ADMIN_ROLES.has(role)) return [];
+  else return [];
 
   const { data } = await query;
   return (data || []).map((shop: any) => shop.id).filter(Boolean);

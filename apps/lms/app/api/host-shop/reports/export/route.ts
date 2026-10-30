@@ -28,7 +28,10 @@ export async function GET(request: NextRequest) {
       ? await db.from('program_enrollments').select('id,user_id,student_id,program_slug,status,enrollment_state,transfer_hours,transfer_hours_verified').or(`user_id.in.(${studentIds.join(',')}),student_id.in.(${studentIds.join(',')})`)
       : { data: [], error: null };
     if (enrollmentError) return NextResponse.json({ error: 'Progress export unavailable' }, { status: 500 });
-    const enrollmentIds = (enrollments || []).map((row) => row.id).filter(Boolean);
+    const scopedEnrollments = (enrollments || []).filter(row => board.apprentices.some(
+      apprentice => apprentice.student_id === (row.user_id || row.student_id) && apprentice.program_slug === row.program_slug,
+    ));
+    const enrollmentIds = scopedEnrollments.map((row) => row.id).filter(Boolean);
     const { data: rtiEntries, error: rtiError } = enrollmentIds.length
       ? await db.from('apprenticeship_rti_entries').select('enrollment_id,status,minutes_verified').in('enrollment_id', enrollmentIds)
       : { data: [], error: null };
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
     const rtiHours = new Map<string, number>();
     for (const row of rtiEntries || []) if (['verified','approved'].includes(String(row.status))) rtiHours.set(row.enrollment_id, (rtiHours.get(row.enrollment_id) || 0) + Number(row.minutes_verified || 0) / 60);
     const apprenticeByStudent = new Map(board.apprentices.map((item) => [item.student_id,item]));
-    output = csv(['apprentice','program','enrollment_status','approved_ojl_hours','verified_transfer_hours','verified_rti_hours','competencies_complete','competencies_required'], (enrollments || []).map((row) => { const apprentice = apprenticeByStudent.get(row.user_id || row.student_id); return [apprentice?.name || 'Assigned apprentice',row.program_slug,row.enrollment_state || row.status,apprentice?.ojt.completed || 0,row.transfer_hours_verified ? Number(row.transfer_hours || 0) : 0,Math.round((rtiHours.get(row.id) || 0) * 100) / 100,apprentice?.competency?.completed || 0,apprentice?.competency?.required || 0]; }));
+    output = csv(['apprentice','program','enrollment_status','approved_ojl_hours','verified_transfer_hours','verified_rti_hours','competencies_complete','competencies_required'], scopedEnrollments.map((row) => { const apprentice = apprenticeByStudent.get(row.user_id || row.student_id); return [apprentice?.name || 'Assigned apprentice',row.program_slug,row.enrollment_state || row.status,apprentice?.ojt.completed || 0,row.transfer_hours_verified ? Number(row.transfer_hours || 0) : 0,Math.round((rtiHours.get(row.id) || 0) * 100) / 100,apprentice?.competency?.completed || 0,apprentice?.competency?.required || 0]; }));
   } else if (type === 'hours') {
     const { data, error } = studentIds.length ? await db.from('hour_entries').select('user_id,host_shop_id,program_slug,work_date,entered_at,hours,hours_claimed,accepted_hours,status,approval_status,notes').in('user_id', studentIds).in('host_shop_id', shopIds).order('work_date', { ascending: false }) : { data: [], error: null };
     if (error) return NextResponse.json({ error: 'Hours export unavailable' }, { status: 500 });

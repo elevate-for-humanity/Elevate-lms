@@ -1,20 +1,8 @@
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 
 export const dynamic = 'force-dynamic';
 
-const HOST_SHOP_ADMIN_COOKIE = '__efh_host_shop_partner';
-const ALLOWED_ROLES = new Set([
-  'host_shop',
-  'host_shop_admin',
-  'partner',
-  'admin',
-  'super_admin',
-  'org_admin',
-]);
-const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'org_admin']);
 const ATTENDANCE_STATUSES = new Set(['present', 'absent', 'excused', 'late']);
 
 type AttendanceInput = {
@@ -25,66 +13,15 @@ type AttendanceInput = {
 };
 
 async function resolveContext() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-
-  const db = await requireAdminClient();
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  const role = String(profile?.role || '').trim().toLowerCase();
-  if (!ALLOWED_ROLES.has(role)) {
-    return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+  let context;
+  try {
+    context = await requireCurrentHostShopPartner();
+  } catch (error) {
+    const status = error instanceof Error && error.message === 'HOST_SHOP_UNAUTHENTICATED' ? 401 : 403;
+    return { error: NextResponse.json({ error: status === 401 ? 'Unauthorized' : 'An active approved Host Shop account is required.' }, { status }) };
   }
-
-  let partnerId: string | null = null;
-  if (PLATFORM_ADMIN_ROLES.has(role)) {
-    const cookieStore = await cookies();
-    partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || null;
-    if (!partnerId) {
-      return {
-        error: NextResponse.json(
-          { error: 'Select a Host Shop from the Host Shop board before recording attendance.' },
-          { status: 400 },
-        ),
-      };
-    }
-  } else {
-    const { data: partnerUser } = await db
-      .from('partner_users')
-      .select('partner_id, status')
-      .eq('user_id', user.id)
-      .eq('status', 'active')
-      .maybeSingle();
-    partnerId = partnerUser?.partner_id || null;
-  }
-
-  if (!partnerId) {
-    return { error: NextResponse.json({ error: 'No active Host Shop account found.' }, { status: 403 }) };
-  }
-
-  const { data: partner } = await db
-    .from('partners')
-    .select('id, status, approval_status, is_active')
-    .eq('id', partnerId)
-    .maybeSingle();
-
-  if (
-    !partner ||
-    partner.status !== 'active' ||
-    partner.approval_status !== 'approved' ||
-    partner.is_active === false
-  ) {
-    return {
-      error: NextResponse.json({ error: 'This Host Shop is not active and approved.' }, { status: 403 }),
-    };
-  }
+  const { user, db, partner } = context;
+  const partnerId = partner.id;
 
   const { data: shops, error: shopsError } = await db
     .from('shops')

@@ -31,11 +31,21 @@ async function getSessionContext() {
     .eq('id', user.id)
     .maybeSingle();
 
+  // Existing employers may also own Host Shops. Honor the same active
+  // partner membership used by the shared portal role guard.
+  let role = String(profile?.role || '').trim().toLowerCase();
+  if (!PLATFORM_ADMIN_ROLES.has(role) && !HOST_ROLES.has(role)) {
+    const { data: memberships, error: membershipError } = await db.from('partner_users')
+      .select('role,status').eq('user_id', user.id).eq('status', 'active');
+    if (membershipError) throw new Error('HOST_SHOP_MEMBERSHIP_LOOKUP_FAILED');
+    if ((memberships || []).some((row: any) => ['owner','partner_admin','admin','supervisor','mentor','manager'].includes(row.role))) role = 'host_shop';
+  }
+
   return {
     user,
     db,
     profile,
-    role: String(profile?.role || '').trim().toLowerCase(),
+    role,
   };
 }
 
@@ -57,7 +67,7 @@ async function getAuthorizedHostShopIds(db: any, userId: string, role: string) {
   if (PLATFORM_ADMIN_ROLES.has(role)) {
     const cookieStore = await cookies();
     const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || null;
-    return activeApprovedShopIds(db, selectedPartnerId);
+    return selectedPartnerId ? activeApprovedShopIds(db, selectedPartnerId) : [];
   }
 
   if (!HOST_ROLES.has(role)) return [];
@@ -100,7 +110,12 @@ export async function GET(req: NextRequest) {
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (subject.previewing) {
+  const selectedHostShop = PLATFORM_ADMIN_ROLES.has(role)
+    ? (await cookies()).get(HOST_SHOP_ADMIN_COOKIE)?.value
+    : null;
+  // A shop preview also sets a communication-account preview; that account is
+  // the shop owner, not an apprentice requesting a placement.
+  if (subject.previewing && !selectedHostShop) {
     query = query.eq('apprentice_id', subject.userId);
   } else if (PLATFORM_ADMIN_ROLES.has(role) || HOST_ROLES.has(role)) {
     const shopIds = await getAuthorizedHostShopIds(db, user.id, role);
@@ -114,7 +129,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  if (status) query = query.eq('status', status);
+  if (status && status !== 'all') query = query.eq('status', status);
   const { data, error, count } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

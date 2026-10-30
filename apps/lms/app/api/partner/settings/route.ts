@@ -1,7 +1,22 @@
+import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
+
+const settingsSchema = z.object({
+  orgId: z.string().optional().nullable(),
+  name: z.string().trim().min(1).max(255),
+  address: z.string().trim().max(255),
+  city: z.string().trim().max(100),
+  state: z.string().trim().regex(/^[a-zA-Z]{2}$/).transform(value => value.toUpperCase()),
+  contact_name: z.string().trim().max(255),
+  contact_email: z.string().trim().email().max(255),
+  contact_phone: z.string().trim().max(50),
+  notification_preferences: z.object({
+    email: z.boolean(), weekly_digest: z.boolean(), outcome_alerts: z.boolean(), referral_confirmations: z.boolean(),
+  }).strict(),
+}).strict();
 
 export async function PATCH(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -24,6 +39,9 @@ export async function PATCH(request: NextRequest) {
     return safeError('Invalid request body', 400);
   }
 
+  const parsed = settingsSchema.safeParse(body);
+  if (!parsed.success) return safeError('Provide a valid shop name, contact email, two-letter state and notification preferences.', 400);
+
   const {
     name,
     address,
@@ -33,12 +51,12 @@ export async function PATCH(request: NextRequest) {
     contact_email,
     contact_phone,
     notification_preferences,
-  } = body;
+  } = parsed.data;
 
   const orgId = partner.id;
 
   try {
-    const { error } = await db
+    const { data: updated, error } = await db
       .from('partners')
       .update({
         name,
@@ -51,9 +69,11 @@ export async function PATCH(request: NextRequest) {
         notification_preferences,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', orgId);
+      .eq('id', orgId)
+      .select('id')
+      .maybeSingle();
 
-    if (error) return safeError('Failed to update settings', 500);
+    if (error || !updated) return safeError('Failed to update settings', 500);
 
     return NextResponse.json({ success: true });
   } catch (err) {

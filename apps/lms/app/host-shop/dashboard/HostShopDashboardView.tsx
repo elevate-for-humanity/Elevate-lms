@@ -595,7 +595,7 @@ export default async function HostShopDashboardView() {
             {
               label: 'Verify Appendix A skills and services',
               detail: board.registeredPrograms.length
-                ? 'Open the apprentice competency record and sign only skills/services personally observed with required evidence.'
+                ? 'Review apprentice competency progress and record personally observed services in the Practical Service Log. Formal approvals belong to Elevate sponsor administration.'
                 : 'A registered standard must be configured before regulated competency progress can be credited.',
               done: board.registeredPrograms.length > 0 && board.unconfiguredPrograms.length === 0,
               href: '/host-shop/dashboard/competencies',

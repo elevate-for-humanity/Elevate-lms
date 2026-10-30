@@ -16,24 +16,20 @@ export default async function PartnerSettingsPage() {
   // workspace. This preserves owner access through partner_users and lets a
   // platform administrator inspect the explicitly selected shop without an
   // unrelated partner membership capturing the request.
-  const { user, db, partner } = await requireCurrentHostShopPartner();
+  const { db, partner } = await requireCurrentHostShopPartner();
   const orgId = partner.id;
 
-  const { data: org } = orgId
-      ? await db
+  const { data: org, error: settingsError } = orgId
+    ? await db
         .from('partners')
         .select(
           'name, city, state, address_line1, owner_name, supervisor_name, contact_name, contact_email, contact_phone, phone, notification_preferences',
         )
         .eq('id', orgId)
         .maybeSingle()
-    : { data: null };
+    : { data: null, error: null };
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('full_name, email')
-    .eq('id', user.id)
-    .maybeSingle();
+  if (settingsError || !org) throw new Error('HOST_SHOP_SETTINGS_LOAD_FAILED');
 
   const initialData = {
     orgId,
@@ -41,8 +37,8 @@ export default async function PartnerSettingsPage() {
     address: org?.address_line1 ?? '',
     city: org?.city ?? '',
     state: org?.state ?? '',
-    contactName: org?.contact_name ?? org?.owner_name ?? org?.supervisor_name ?? profile?.full_name ?? '',
-    contactEmail: org?.contact_email ?? profile?.email ?? user.email ?? '',
+    contactName: org?.contact_name ?? org?.owner_name ?? org?.supervisor_name ?? '',
+    contactEmail: org?.contact_email ?? '',
     contactPhone: org?.contact_phone ?? org?.phone ?? '',
     emailNotifications: org?.notification_preferences?.email ?? true,
     weeklyDigest: org?.notification_preferences?.weekly_digest ?? true,

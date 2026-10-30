@@ -1,3 +1,4 @@
+import { resolveHostShopDocuments } from '@/lib/partners/host-shop-document-status';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Manage training provider partnerships and Host Shop readiness.',
 };
 
-const ACCEPTED_DOCUMENT_STATUSES = new Set(['accepted', 'approved', 'verified', 'complete', 'completed']);
+
 
 function isProductionRecord(item: any) {
   const identity = `${item.name || ''} ${item.contact_email || ''}`.toLowerCase();
@@ -38,7 +39,7 @@ export default async function PartnersPage() {
   const hostShopIds = hostShopPartners.map((partner: any) => partner.id);
   const [{ data: hostDocuments }, { data: hostUsers }, { data: canonicalShops }, { data: requirementRows }] = hostShopIds.length
     ? await Promise.all([
-        supabase.from('partner_documents').select('partner_id,document_type,status,uploaded_at').in('partner_id', hostShopIds),
+        supabase.from('partner_documents').select('partner_id,document_type,status,uploaded_at,expiration_date').in('partner_id', hostShopIds),
         supabase.from('partner_users').select('partner_id,user_id,status').in('partner_id', hostShopIds).eq('status', 'active'),
         supabase.from('shops').select('id,partner_id,name,active').in('partner_id', hostShopIds).neq('active', false),
         supabase.from('partner_document_requirements').select('*'),
@@ -47,19 +48,10 @@ export default async function PartnersPage() {
 
   const hostReadiness = hostShopPartners.map((partner: any) => {
     const program = resolveHostShopProgram(partner);
-    const requirements = (requirementRows || []).filter(
-      (row: any) =>
-        ['ALL', program].includes(row.program_id) &&
-        ['ALL', partner.state || 'Indiana'].includes(row.state) &&
-        row.is_required,
-    );
-    const latestByType = new Map<string, any>();
-    const documents = (hostDocuments || []).filter((row: any) => row.partner_id === partner.id).sort((a: any, b: any) => String(b.uploaded_at || '').localeCompare(String(a.uploaded_at || '')));
-    for (const document of documents) if (!latestByType.has(document.document_type)) latestByType.set(document.document_type, document);
-    const missing = requirements.filter((requirement: any) => {
-      const document = latestByType.get(requirement.document_type);
-      return !document || !ACCEPTED_DOCUMENT_STATUSES.has(String(document.status || '').toLowerCase());
-    });
+    const documentStatuses = resolveHostShopDocuments(program, partner.state, requirementRows || [],
+      (hostDocuments || []).filter((row: any) => row.partner_id === partner.id));
+    const requirements = documentStatuses.filter((row: any) => row.is_required);
+    const missing = requirements.filter((row: any) => row.status !== 'accepted');
     const linkedUsers = (hostUsers || []).filter((row: any) => row.partner_id === partner.id).length;
     const linkedShops = (canonicalShops || []).filter((row: any) => row.partner_id === partner.id).length;
     const previewUserId = (hostUsers || []).find((row: any) => row.partner_id === partner.id)?.user_id ?? null;

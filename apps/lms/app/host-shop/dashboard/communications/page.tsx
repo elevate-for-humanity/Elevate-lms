@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export default function HostShopCommunicationsPage() {
   const tools = [
     { href: '/host-shop/email', title: 'Host Shop email', detail: 'Read, reply, compose, and manage official shop email.', icon: Mail },
-    { href: '/host-shop/dashboard/apprentices', title: 'Apprentice messages', detail: 'Open assigned apprentices and use their communication actions without leaving the Host Shop scope.', icon: MessageSquareText },
+    { href: '/host-shop/dashboard/messages', title: 'Apprentice messages', detail: 'Review messages associated with this Host Shop and its active accounts.', icon: MessageSquareText },
     { href: '/host-shop/dashboard/phone', title: 'Elevate phone', detail: 'Open the assigned Host Shop extension, answer calls in the PWA, and review PARIS callback intake.', icon: Phone },
     { href: '/host-shop/dashboard/schedule', title: 'Training schedule', detail: 'Open the Host Shop schedule for supervised training sessions and apprentice follow-up.', icon: Video },
   ];

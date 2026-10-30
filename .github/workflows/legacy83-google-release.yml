@@ -47,7 +47,10 @@ jobs:
                 print(json.dumps({'region':region,'service':row}))
           PY
           gcloud secrets list --project=elegant-racer-299721 --format='value(name)' | grep -Ei 'legacy|github|icy' || true
-      - name: Inspect standalone deployment identity requirements
+      - name: Inspect connected source build paths
         run: |
-          gcloud iam workload-identity-pools providers describe github-main --workload-identity-pool=elevate-github --location=global --project=elegant-racer-299721 --format='json(attributeCondition,attributeMapping)'
-          gcloud iam service-accounts get-iam-policy elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com --project=elegant-racer-299721 --format=json
+          gcloud builds triggers list --project=elegant-racer-299721 --region=global --format='json(name,github,repositoryEventConfig)' || true
+          for region in us-central1 us-east1; do
+            gcloud builds connections list --project=elegant-racer-299721 --region="$region" --format='json(name,githubConfig.installationState)' || true
+          done
+          gcloud storage buckets list --project=elegant-racer-299721 --format='value(name)'

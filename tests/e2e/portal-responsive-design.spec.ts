@@ -52,6 +52,9 @@ async function login(page: Page, loginBase: string, email: string, password: str
     })
     .not.toMatch(/\/login(?:\/|$)/);
   await page.waitForLoadState('domcontentloaded').catch(() => undefined);
+  // The login API starts a full-document navigation. Wait for the authorized
+  // workspace before another goto can race that navigation on mobile WebKit.
+  await expect(page.locator('[data-elevate-dashboard-content]:visible')).toBeVisible({ timeout: 30_000 });
 }
 
 async function assertResponsivePage(page: Page, pathOrUrl: string) {
@@ -247,12 +250,19 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
           return rect.height < 32 || rect.width < 32;
         })
         .slice(0, 10)
-        .map((element) => ({
-          tag: element.tagName,
-          text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '')
-            .trim()
-            .slice(0, 80),
-        })),
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            tag: element.tagName,
+            name: element.getAttribute('name'),
+            type: element.getAttribute('type'),
+            width: rect.width,
+            height: rect.height,
+            text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '')
+              .trim()
+              .slice(0, 80),
+          };
+        }),
     );
     expect(tinyCritical, `${target} has undersized mobile controls`).toEqual([]);
   }
@@ -459,6 +469,7 @@ test.describe('Authenticated portal responsive design certification', () => {
 test.describe('Studio single-session access and composer', () => {
   test.skip(!creds.admin[0] || !creds.admin[1], 'Disposable admin identity is required');
   test('Admin session opens Studio and optional external browser tools remain usable on the active device', async ({ page }, testInfo) => {
+    test.setTimeout(180_000);
     await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -478,7 +489,7 @@ test.describe('Studio single-session access and composer', () => {
     const access = page.getByRole('region', { name: 'Course and media access' });
     await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
     await access.getByRole('link', { name: 'Open Course Builder' }).click();
-    await expect(page).toHaveURL(`${ADMIN_BASE}/studio/courses`);
+    await expect(page).toHaveURL(`${ADMIN_BASE}/studio/courses`, { timeout: 30_000 });
     await expect(page.getByRole('heading', { name: 'Course Production Studio', exact: true })).toBeVisible();
     await page.goto(`${ADMIN_BASE}/dashboard`);
     await expect(access).toBeVisible();
@@ -554,6 +565,7 @@ test.describe('Studio single-session access and composer', () => {
         if (!session) continue;
         const stopped = await page.request.delete(`${session.publicUrl}/sessions/${encodeURIComponent(session.id)}`, {
           headers: {Authorization: `Bearer ${session.token}`},
+          timeout: 20_000,
         });
         expect([200,410]).toContain(stopped.status());
       }

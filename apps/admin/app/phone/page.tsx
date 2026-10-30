@@ -367,7 +367,7 @@ export default async function PhonePage() {
                       name="profileId"
                       defaultValue={item.assigned_profile_id ?? ''}
                       aria-label={`Assign ${item.label}`}
-                      className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs"
+                      className="min-h-11 min-w-11 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs"
                     >
                       <option value="">Unassigned</option>
                       {programHolders.map((profile: any) => (
@@ -383,16 +383,16 @@ export default async function PhonePage() {
                       defaultValue={item.extension ?? ''}
                       placeholder="Ext."
                       aria-label={`Extension for ${item.label}`}
-                      className="rounded-lg border border-slate-300 px-2 py-1.5 text-xs"
+                      className="min-h-11 min-w-11 rounded-lg border border-slate-300 px-2 py-1.5 text-xs"
                     />
-                    <button className="rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-bold text-white">
+                    <button className="min-h-11 min-w-11 rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-bold text-white">
                       Assign
                     </button>
                   </form>
                   {item.source === 'external_forwarding' && !item.is_primary ? (
                     <form action={removeExternalNumber}>
                       <input type="hidden" name="phoneNumberId" value={item.id} />
-                      <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                      <button className="min-h-11 min-w-11 rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
                         Remove
                       </button>
                     </form>
@@ -466,7 +466,7 @@ export default async function PhonePage() {
                 ) : null}
                 <form action={removeMenuOption} className="mt-3">
                   <input type="hidden" name="menuOptionId" value={item.id} />
-                  <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                  <button className="min-h-11 min-w-11 rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
                     Remove route
                   </button>
                 </form>
@@ -490,7 +490,7 @@ export default async function PhonePage() {
           <select
             name="profileId"
             required
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+            className="min-h-11 min-w-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
           >
             <option value="">Choose Program Holder</option>
             {programHolders.map((profile: any) => (
@@ -505,14 +505,14 @@ export default async function PhonePage() {
             inputMode="numeric"
             pattern="[0-9]{2,6}"
             placeholder="Extension"
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="min-h-11 min-w-11 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
           <input
             name="department"
             placeholder="Program or department"
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="min-h-11 min-w-11 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          <button className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-black text-white">
+          <button className="min-h-11 min-w-11 rounded-lg bg-indigo-700 px-4 py-2 text-sm font-black text-white">
             Save extension
           </button>
         </form>
@@ -545,7 +545,7 @@ export default async function PhonePage() {
                           <input type="hidden" name="extensionId" value={entry.id} />
                           <input type="hidden" name="enabled" value={String(!entry.enabled)} />
                           <span>{entry.enabled ? 'Active' : 'Paused'}</span>
-                          <button className="rounded border px-2 py-1 text-xs font-bold">
+                          <button className="min-h-11 min-w-11 rounded border px-2 py-1 text-xs font-bold">
                             {entry.enabled ? 'Pause' : 'Enable'}
                           </button>
                         </form>

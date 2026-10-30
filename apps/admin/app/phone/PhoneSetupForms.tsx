@@ -20,9 +20,9 @@ import {
 
 const initial: PhoneActionState = { ok: false, message: '' };
 const field =
-  'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950';
+  'mt-1 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950';
 const button =
-  'mt-4 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50';
+  'mt-4 min-h-11 min-w-11 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50';
 
 function Result({ state }: { state: PhoneActionState }) {
   return state.message ? (
@@ -45,12 +45,12 @@ function Toggle({
   defaultChecked?: boolean;
 }) {
   return (
-    <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+    <label className="flex min-h-11 items-center gap-3 text-sm font-semibold text-slate-700">
       <input
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
-        className="h-4 w-4 rounded border-slate-300"
+        className="h-11 w-11 shrink-0 rounded border-slate-300"
       />
       {label}
     </label>
@@ -114,7 +114,7 @@ export function NewSystemNotice({
           </div>
         </div>
         <form action={dismissAction}>
-          <button className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm font-bold text-indigo-800 sm:w-auto sm:py-1.5 sm:text-xs">
+          <button className="min-h-11 min-w-11 w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm font-bold text-indigo-800 sm:w-auto sm:py-1.5 sm:text-xs">
             Dismiss
           </button>
         </form>

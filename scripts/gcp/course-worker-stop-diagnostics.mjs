@@ -67,3 +67,15 @@ for(const entry of denied){
 }
 const billing=read(['billing','projects','describe','elegant-racer-299721','--format=json']);
 console.log(JSON.stringify({project:'elegant-racer-299721',billingEnabled:billing.billingEnabled===true}));
+
+const directRuns=read(['run','jobs','executions','list','--job=elevate-direct-course-release','--project=elegant-racer-299721','--region=us-central1','--limit=10','--format=json']);
+const active=directRuns.some(r=>!r.status?.completionTime);
+const priorProbe=directRuns.some(r=>JSON.stringify(r.spec?.template?.spec?.containers?.[0]?.args??[]).includes('DIRECT_AUTHORING_DIAGNOSTIC_V1'));
+if(!active&&!priorProbe){
+ const probeCode="const marker='DIRECT_AUTHORING_DIAGNOSTIC_V1';const token=await(await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',{headers:{'Metadata-Flavor':'Google'},signal:AbortSignal.timeout(10000)})).json();const r=await fetch('https://aiplatform.us.rep.googleapis.com/v1/projects/elegant-racer-299721/locations/us/publishers/google/models/gemini-3.8-flash:generateContent',{method:'POST',headers:{Authorization:'Bearer '+token.access_token,'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Reply OK.'}]}],generationConfig:{maxOutputTokens:16}}),signal:AbortSignal.timeout(25000)});const body=await r.json();console.log(JSON.stringify({marker,providerDiagnostic:{http:r.status,status:body.error?.status,message:String(body.error?.message??'').replace(/https?:\\/\\/[^\\s]+/g,'[url]').slice(0,1500),reasons:body.error?.details?.map(d=>({reason:d.reason,domain:d.domain}))}}));";
+ const started=read(['run','jobs','execute','elevate-direct-course-release','--project=elegant-racer-299721','--region=us-central1','--args=^~^--input-type=module~-e~'+probeCode,'--async','--quiet','--format=json']);
+ console.log(JSON.stringify({diagnosticExecution:started.metadata?.name}));
+ await new Promise(resolve=>setTimeout(resolve,20000));
+ const evidence=read(['logging','read','resource.type="cloud_run_job" AND resource.labels.job_name="elevate-direct-course-release" AND textPayload:"DIRECT_AUTHORING_DIAGNOSTIC_V1"','--project=elegant-racer-299721','--freshness=5m','--limit=3','--format=json']);
+ for(const entry of evidence){try{const value=JSON.parse(entry.textPayload);console.log(JSON.stringify({at:entry.timestamp,providerDiagnostic:value.providerDiagnostic}));}catch{}}
+}else console.log(JSON.stringify({diagnosticProbe:active?'active-execution-preserved':'existing-probe-preserved'}));

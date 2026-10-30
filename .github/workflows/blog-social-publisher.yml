@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Generate and publish queued blog content
         env:
-          ADMIN_URL: ${{ secrets.ADMIN_URL }}
+          ADMIN_URL: ${{ secrets.ADMIN_URL || vars.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           if [ -z "$ADMIN_URL" ] || [ -z "$CRON_SECRET" ]; then

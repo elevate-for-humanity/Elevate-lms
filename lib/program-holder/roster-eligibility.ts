@@ -6,9 +6,10 @@ const TEST_EMAIL_DOMAINS = new Set([
   'example.com',
 ]);
 
-export function isLearnerRosterProfile(profile: {
+export function isProductionRosterProfile(profile: {
   id?: unknown;
   role?: unknown;
+  full_name?: unknown;
   email?: unknown;
 }): boolean {
   const domain =
@@ -20,10 +21,12 @@ export function isLearnerRosterProfile(profile: {
   return (
     typeof profile.id === 'string' &&
     profile.id.length > 0 &&
-    ['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(
-      String(profile.role || '').toLowerCase(),
-    ) &&
+    !/^\[QA E2E\]/i.test(String(profile.full_name || '').trim()) &&
     !TEST_EMAIL_DOMAINS.has(domain) &&
     !domain.endsWith('.test')
   );
+}
+
+export function isLearnerRosterProfile(profile: Parameters<typeof isProductionRosterProfile>[0]): boolean {
+  return isProductionRosterProfile(profile) && ['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(String(profile.role || '').toLowerCase());
 }

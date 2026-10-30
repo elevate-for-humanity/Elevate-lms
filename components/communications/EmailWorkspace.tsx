@@ -124,12 +124,14 @@ export function EmailWorkspace({
   roleLabel = 'Program Holder',
   initialRecipient,
   initialSubject = '',
+  communicationLinks,
 }: {
   apiPath?: string;
   initialMailboxId?: string;
   roleLabel?: string;
   initialRecipient?: string;
   initialSubject?: string;
+  communicationLinks?: { phone: string; chat: string; calendar: string };
 }) {
   const [data, setData] = useState<WorkspaceData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -488,16 +490,16 @@ export function EmailWorkspace({
         >
           <a
             className="shrink-0 rounded-lg border px-3 py-2"
-            href={data.isAdmin ? '/phone/inbox' : '/communications/phone'}
+            href={communicationLinks?.phone ?? (data.isAdmin ? '/phone/inbox' : '/communications/phone')}
           >
             Phone inbox
           </a>
           <a
             className="shrink-0 rounded-lg border px-3 py-2"
             href={
-              data.isAdmin
+              communicationLinks?.chat ?? (data.isAdmin
                 ? '/staff-portal/messages'
-                : 'https://app.elevateforhumanity.org/lms/messages'
+                : 'https://app.elevateforhumanity.org/lms/messages')
             }
           >
             Chat
@@ -505,7 +507,7 @@ export function EmailWorkspace({
           <a
             className="shrink-0 rounded-lg border px-3 py-2"
             href={
-              data.isAdmin ? '/phone/meetings' : 'https://app.elevateforhumanity.org/lms/calendar'
+              communicationLinks?.calendar ?? (data.isAdmin ? '/phone/meetings' : 'https://app.elevateforhumanity.org/lms/calendar')
             }
           >
             Calendar

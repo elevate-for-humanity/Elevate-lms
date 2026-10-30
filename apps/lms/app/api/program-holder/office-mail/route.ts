@@ -1,3 +1,4 @@
+import { isProductionRosterProfile } from '@/lib/program-holder/roster-eligibility';
 // pre-auth-registry: exempt - requireProgramHolder plus sender/recipient filters authorize access.
 import { loadHolderOfficeStudents } from '@/lib/program-holder/office-students';
 import { NextResponse } from 'next/server';
@@ -18,7 +19,7 @@ export async function GET() {
         .limit(100),
       ctx.db
         .from('profiles')
-        .select('id,full_name,role')
+        .select('id,full_name,role,email')
         .in('role', ['admin', 'super_admin', 'staff'])
         .order('full_name'),
       loadHolderOfficeStudents(ctx),
@@ -28,7 +29,7 @@ export async function GET() {
       readOnly: ctx.mode === 'preview',
       messages: messages.data ?? [],
       recipients: [
-        ...(recipients.data ?? []),
+        ...(recipients.data ?? []).filter(isProductionRosterProfile).map(({ id, full_name, role }: any) => ({ id, full_name, role })),
         ...students
           .filter((student) => student.user_id)
           .map((student) => ({
@@ -65,12 +66,14 @@ export async function POST(request: Request) {
     );
   const { data: recipient, error: recipientError } = await ctx.db
     .from('profiles')
-    .select('id,role')
+    .select('id,role,full_name,email')
     .eq('id', recipientId)
     .in('role', ['admin', 'super_admin', 'staff'])
     .maybeSingle();
   if (recipientError)
     return NextResponse.json({ error: 'Office recipient could not be verified.' }, { status: 503 });
+  if (recipient && !isProductionRosterProfile(recipient))
+    return NextResponse.json({ error: 'Choose an active office recipient.' }, { status: 403 });
   if (!recipient) {
     try {
       const students = await loadHolderOfficeStudents(ctx);

@@ -119,7 +119,9 @@ function formatDate(value: string) {
 export function ProgramHolderPhone({
   apiBase = '/api/program-holder/phone',
   roleLabel = 'Program Holder',
-}: { apiBase?: string; roleLabel?: string } = {}) {
+  calendarHref = '/lms/calendar',
+  emailHref = '/communications/email',
+}: { apiBase?: string; roleLabel?: string; calendarHref?: string; emailHref?: string } = {}) {
   const [data, setData] = useState<PhoneData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -723,13 +725,13 @@ export function ProgramHolderPhone({
           Text messages
         </a>
         <a
-          href="/communications/email"
+          href={emailHref}
           className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
         >
           Interoffice email
         </a>
         <a
-          href="/lms/calendar"
+          href={calendarHref}
           className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
         >
           Calendar

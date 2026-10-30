@@ -6,6 +6,17 @@ export const metadata = {
   description: 'Review enrolled students who need immediate follow-up.',
 };
 
-export default function Page() {
-  return <ProgramHolderWorkspaceView section="at-risk" />;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
+  const params = await searchParams;
+  return (
+    <ProgramHolderWorkspaceView
+      section="at-risk"
+      studentQuery={typeof params.q === 'string' ? params.q : ''}
+      studentStatus={typeof params.status === 'string' ? params.status : 'all'}
+    />
+  );
 }

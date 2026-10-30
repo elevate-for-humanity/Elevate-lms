@@ -1,3 +1,4 @@
+import { payoutSetupLabel } from '@/lib/program-holder/payout-summary';
 import { ProgramHolderOnlineStudy } from './ProgramHolderOnlineStudy';
 import { hasRecruitingAssignment } from '@/lib/program-holder/recruiting-access';
 import { TestingReadinessForm } from './TestingReadinessForm';
@@ -336,7 +337,21 @@ export async function ProgramHolderWorkspaceView({
       </>
     );
   if (section === 'at-risk')
-    return <Students title="At-Risk Students" rows={atRisk} programs={data.programs} />;
+    return (
+      <Students
+        title="At-Risk Students"
+        rows={filterHolderStudents(atRisk, studentQuery, studentStatus)}
+        programs={data.programs}
+        query={studentQuery}
+        status={studentStatus}
+        rosterPath="/program-holder/students/at-risk"
+        emptyMessage={
+          studentQuery || studentStatus !== 'all'
+            ? 'No flagged students match these filters.'
+            : 'No enrolled students are currently flagged for follow-up.'
+        }
+      />
+    );
   if (section === 'recruiting')
     return recruitingEnabled ? (
       <Applicants
@@ -499,6 +514,7 @@ export async function ProgramHolderWorkspaceView({
     return (
       <Settings
         holder={data.holder}
+        payoutProfile={data.payoutProfile}
         profile={data.profile}
         notificationPreferences={data.notificationPreferences}
         phone={data.profile?.phone || data.holder?.contact_phone || ''}
@@ -735,7 +751,15 @@ function isCompletionOverdue(row: any): boolean {
   return Boolean(end && end < new Date().toISOString().slice(0, 10));
 }
 
-function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
+function EnrollmentTable({
+  rows,
+  programs,
+  emptyMessage = 'No confirmed student enrollments are linked.',
+}: {
+  rows: any[];
+  programs: any[];
+  emptyMessage?: string;
+}) {
   return (
     <div className="mt-5 min-w-0">
       <div className="grid gap-3 md:hidden">
@@ -853,7 +877,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           ))
         ) : (
           <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-500">
-            No confirmed student enrollments are linked.
+            {emptyMessage}
           </div>
         )}
       </div>
@@ -967,7 +991,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             ) : (
               <tr>
                 <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
-                  No confirmed student enrollments are linked.
+                  {emptyMessage}
                 </td>
               </tr>
             )}
@@ -984,12 +1008,16 @@ function Students({
   programs,
   query = '',
   status = 'all',
+  rosterPath = '/program-holder/students',
+  emptyMessage,
 }: {
   title: string;
   rows: any[];
   programs: any[];
   query?: string;
   status?: string;
+  rosterPath?: string;
+  emptyMessage?: string;
 }) {
   const today = new Date().toISOString().slice(0, 10);
   const sevenDays = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
@@ -1014,7 +1042,7 @@ function Students({
           </p>
         </section>
       )}
-      <form method="get" action="/program-holder/students" className="flex flex-wrap gap-3">
+      <form method="get" action={rosterPath} className="flex flex-wrap gap-3">
         <input
           name="q"
           aria-label="Search students"
@@ -1039,7 +1067,7 @@ function Students({
           Apply filters
         </button>
         <Link
-          href="/program-holder/students"
+          href={rosterPath}
           className="inline-flex min-h-11 items-center px-3 font-bold underline"
         >
           Clear filters
@@ -1059,7 +1087,14 @@ function Students({
         }
       />
       <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-6">
-        <EnrollmentTable rows={rows} programs={programs} />
+        <EnrollmentTable
+          rows={rows}
+          programs={programs}
+          emptyMessage={
+            emptyMessage ||
+            (query || status !== 'all' ? 'No enrolled students match these filters.' : undefined)
+          }
+        />
       </section>
       <ProgramHolderStudentCloseoutForm enrollments={rows} />
     </div>
@@ -1863,11 +1898,13 @@ function Payouts({ schedules, panel }: { schedules: any[]; panel?: React.ReactNo
 }
 function Settings({
   holder,
+  payoutProfile,
   profile,
   notificationPreferences,
   phone,
 }: {
   holder: any;
+  payoutProfile: any;
   profile: any;
   notificationPreferences: any;
   phone: string;
@@ -1892,7 +1929,7 @@ function Settings({
               label="Internal LMS"
               value={holder?.is_using_internal_lms ? 'Connected' : 'Not connected'}
             />
-            <Row label="Payout setup" value={holder?.payout_status || 'Not started'} />
+            <Row label="Payout setup" value={payoutSetupLabel(payoutProfile)} />
           </dl>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

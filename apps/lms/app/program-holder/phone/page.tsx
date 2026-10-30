@@ -10,5 +10,5 @@ export const metadata: Metadata = {
 
 export default async function ProgramHolderPhonePage() {
   await requireProgramHolder();
-  return <ProgramHolderPhone />;
+  return <ProgramHolderPhone calendarHref="/program-holder/meetings" emailHref="/program-holder/email" />;
 }

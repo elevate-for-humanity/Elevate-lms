@@ -56,3 +56,10 @@ describe('Program Holder learner roster boundary', () => {
     expect(isLearnerRosterProfile({ id: 'learner-id', role: 'learner' })).toBe(true);
   });
 });
+
+it('excludes named QA fixture accounts from production directories', async () => {
+  const { isProductionRosterProfile } = await import('@/lib/program-holder/roster-eligibility');
+  expect(isProductionRosterProfile({ id: 'qa', role: 'staff', full_name: '[QA E2E] Staff', email: 'staff@elevateforhumanity.org' })).toBe(false);
+  expect(isProductionRosterProfile({ id: 'staff', role: 'staff', full_name: 'Office Staff', email: 'staff@elevateforhumanity.org' })).toBe(true);
+  expect(isProductionRosterProfile({ id: 'qa', role: 'admin', email: 'admin@qa.invalid' })).toBe(false);
+});

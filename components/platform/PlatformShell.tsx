@@ -64,8 +64,10 @@ export function PlatformShell({
   recruitingEnabled = false,
 }: PlatformShellProps) {
   const pathname = usePathname();
-  const dashboardHref =
-    role === 'host_shop'
+  const isWorkforce = role === 'workforce' || role === 'workforce_partner';
+  const dashboardHref = isWorkforce
+    ? '/workforce/dashboard'
+    : role === 'host_shop'
       ? '/host-shop/dashboard'
       : role === 'program_holder' || role === 'site_coordinator'
         ? '/program-holder/dashboard'
@@ -196,7 +198,7 @@ export function PlatformShell({
             >
               <Menu className="h-6 w-6" />
             </button>
-            <Link href="/" className="flex min-w-0 items-center gap-2">
+            <Link href={dashboardHref} className="flex min-w-0 items-center gap-2">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-red-600 shadow-sm">
                 <span className="text-sm font-black text-white">E</span>
               </div>
@@ -231,14 +233,20 @@ export function PlatformShell({
           </div>
 
           <div className="mx-4 hidden max-w-md flex-1 md:flex">
-            <div className="relative w-full">
+            <form
+              action={isWorkforce ? '/workforce/participants' : undefined}
+              onSubmit={isWorkforce ? undefined : (event) => event.preventDefault()}
+              className="relative w-full"
+            >
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="search"
+                name="q"
+                aria-label={isWorkforce ? 'Search workforce participants' : 'Search your portal'}
                 placeholder="Search your portal..."
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm font-medium text-slate-950 transition-all placeholder:text-slate-500 focus:bg-white focus:ring-2 focus:ring-brand-blue-500"
               />
-            </div>
+            </form>
           </div>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">

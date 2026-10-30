@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { WorkforceRoster } from '@/components/workforce/WorkforceRoster';
 import { requireRole } from '@/lib/auth/require-role';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getWorkforceContext } from '@/lib/workforce/workspace';
 import Link from 'next/link';
 import { Users, Plus, ChevronRight } from 'lucide-react';
 
@@ -9,26 +10,38 @@ export const metadata: Metadata = {
   title: 'Participants | Workforce | Admin | Elevate For Humanity',
 };
 
-export default async function ParticipantsPage() {
+export default async function ParticipantsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; filter?: string; page?: string }>;
+}) {
   await requireRole(['admin', 'super_admin', 'staff']);
-  const db = await requireAdminClient();
+  const ctx = await getWorkforceContext();
+  const db = ctx.db;
 
-  const { data: participants } = await db
+  let intakeQuery = db
     .from('participants')
-    .select('id,name,email,program_id,status,enrollment_date,created_at')
+    .select('id,name,email,program_id,status,enrollment_date,created_at');
+  if (!ctx.global) intakeQuery = intakeQuery.eq('case_worker_id', ctx.user.id);
+  const { data: participants, error: intakeError } = await intakeQuery
     .order('created_at', { ascending: false })
     .limit(100);
-  const programIds = [...new Set((participants || []).map((participant) => participant.program_id).filter(Boolean))];
+  if (intakeError) throw new Error('WORKFORCE_INTAKE_UNAVAILABLE');
+  const programIds = [
+    ...new Set((participants || []).map((participant) => participant.program_id).filter(Boolean)),
+  ];
   const { data: programs } = programIds.length
     ? await db.from('programs').select('id,title').in('id', programIds)
     : { data: [] };
   const programNames = new Map((programs || []).map((program) => [program.id, program.title]));
 
   return (
-    <div className="p-6">
+    <div className="space-y-8 p-6">
+      <WorkforceRoster params={await searchParams} admin />
+      <h2 className="text-xl font-bold">Separate intake records</h2>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Workforce Participants</h1>
+          <h1 className="text-3xl font-bold">Workforce Intake Records</h1>
           <p className="text-gray-600 mt-1">Manage workforce development program participants</p>
         </div>
         <Link
@@ -49,19 +62,19 @@ export default async function ParticipantsPage() {
         <div className="bg-white rounded-lg border p-4">
           <div className="text-sm text-gray-500">Active</div>
           <div className="text-2xl font-bold text-green-600">
-            {participants?.filter(p => p.status === 'active').length || 0}
+            {participants?.filter((p) => p.status === 'active').length || 0}
           </div>
         </div>
         <div className="bg-white rounded-lg border p-4">
           <div className="text-sm text-gray-500">Completed</div>
           <div className="text-2xl font-bold text-blue-600">
-            {participants?.filter(p => p.status === 'completed').length || 0}
+            {participants?.filter((p) => p.status === 'completed').length || 0}
           </div>
         </div>
         <div className="bg-white rounded-lg border p-4">
           <div className="text-sm text-gray-500">In Training</div>
           <div className="text-2xl font-bold text-purple-600">
-            {participants?.filter(p => p.status === 'training').length || 0}
+            {participants?.filter((p) => p.status === 'training').length || 0}
           </div>
         </div>
       </div>
@@ -96,16 +109,22 @@ export default async function ParticipantsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      participant.status === 'active' ? 'bg-green-100 text-green-700' :
-                      participant.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        participant.status === 'active'
+                          ? 'bg-green-100 text-green-700'
+                          : participant.status === 'completed'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
                       {participant.status || 'Unspecified'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {participant.enrollment_date ? new Date(participant.enrollment_date).toLocaleDateString() : 'N/A'}
+                    {participant.enrollment_date
+                      ? new Date(participant.enrollment_date).toLocaleDateString()
+                      : 'N/A'}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">Not tracked on this record</td>
                   <td className="px-4 py-3 text-right">

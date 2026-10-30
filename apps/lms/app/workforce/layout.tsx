@@ -1,16 +1,11 @@
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
+import { WORKFORCE_ACCESS_ROLES } from '@/lib/workforce/records';
 
 export const dynamic = 'force-dynamic';
 
 export default async function WorkforcePortalLayout({ children }: { children: React.ReactNode }) {
-  const { user, profile } = await requireRole([
-    'workforce',
-    'workforce_partner',
-    'case_manager',
-    'admin',
-    'staff',
-  ]);
+  const { user, profile } = await requireRole(WORKFORCE_ACCESS_ROLES);
 
   return (
     <PlatformShell

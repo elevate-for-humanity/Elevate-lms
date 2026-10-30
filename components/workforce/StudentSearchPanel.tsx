@@ -5,6 +5,7 @@ interface StudentSearchPanelProps {
   defaultValue?: string;
   label?: string;
   placeholder?: string;
+  filter?: string;
 }
 
 export function StudentSearchPanel({
@@ -12,10 +13,15 @@ export function StudentSearchPanel({
   defaultValue = '',
   label = 'Search participants',
   placeholder = 'Search by name or email…',
+  filter,
 }: StudentSearchPanelProps) {
   return (
     <form action={action} method="GET" className="w-full">
-      <label htmlFor="participant-search" className="mb-2 block text-sm font-semibold text-slate-900">
+      {filter && <input type="hidden" name="filter" value={filter} />}
+      <label
+        htmlFor="participant-search"
+        className="mb-2 block text-sm font-semibold text-slate-900"
+      >
         {label}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">

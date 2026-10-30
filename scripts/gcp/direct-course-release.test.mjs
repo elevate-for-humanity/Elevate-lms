@@ -112,3 +112,20 @@ test('pending cancellation preserves no-overlap without replacing or launching',
  assert.equal(result.state,'obsolete-source-cancelling');
  assert.equal(calls.some(a=>a.includes('replace')||a.includes('execute')),false);
 });
+
+test('direct image requests use supported global capacity while preserving other runtime settings',()=>{
+ const original=structuredClone(source);
+ original.spec.template.spec.template.spec.containers[0].env.push({name:'ULTIMATE_PHOTO_REGION',value:'us'});
+ const result=directJobTemplate(original,{imageSha,imageDigest});
+ const env=result.spec.template.spec.template.spec.containers[0].env;
+ assert.deepEqual(env.filter(e=>e.name==='ULTIMATE_PHOTO_REGION'),[{name:'ULTIMATE_PHOTO_REGION',value:'global'}]);
+ assert.equal(original.spec.template.spec.template.spec.containers[0].env.find(e=>e.name==='ULTIMATE_PHOTO_REGION').value,'us');
+});
+test('only the identified superseded photo image can be replaced with the audited newer image',()=>{
+ const x=structuredClone(obsolete);x.metadata.name='elevate-direct-course-release-saved';
+ x.spec.template.spec.containers[0].image='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:b131064b00050f336357b40ffaab88362d9d90932c8ebadb18cd75461a830bb8';
+ x.spec.template.spec.containers[0].env[0].value='79dc886bd59385d2f42069fe22c216211d8f00b9';
+ assert.equal(knownObsoletePhotoExecution(x),true);
+ x.spec.template.spec.containers[0].env[0].value='80eb6455d0bfff9178306fcaedc9b88c84390e73';
+ assert.equal(knownObsoletePhotoExecution(x),false);
+});

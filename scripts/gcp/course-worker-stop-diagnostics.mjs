@@ -57,3 +57,13 @@ for(const entry of [...logs].reverse()) {
  const clean=value=>typeof value==='string'&&/^[a-zA-Z0-9_:-]{1,100}$/.test(value)?value:undefined;
  console.log(JSON.stringify({at:entry.timestamp,job:'elevate-direct-course-release',execution:clean(entry.labels?.['run.googleapis.com/execution_name']),state:clean(event.state),courseId:clean(event.courseId),lessonId:clean(event.lessonId),step:clean(event.step),code:clean(event.code),complete:typeof event.complete==='boolean'?event.complete:undefined,publishedLessonCount:Number.isSafeInteger(event.publishedLessonCount)?event.publishedLessonCount:undefined,learnerLessonCount:Number.isSafeInteger(event.learnerLessonCount)?event.learnerLessonCount:undefined}));
 }
+
+// Read provider denial evidence; API rejection must not be guessed from HTTP 403.
+const denied=read(['logging','read','protoPayload.serviceName="aiplatform.googleapis.com" AND protoPayload.status.code=7','--project=elegant-racer-299721','--freshness=3h','--limit=30','--format=json']);
+for(const entry of denied){
+ const status=entry.protoPayload?.status;
+ const message=String(status?.message??'').replace(/https?:\/\/[^\s]+/gi,'[url]').slice(0,1200);
+ console.log(JSON.stringify({at:entry.timestamp,providerDenial:{service:entry.protoPayload?.serviceName,method:entry.protoPayload?.methodName,code:status?.code,message,reasons:status?.details?.map(detail=>({reason:detail.reason,domain:detail.domain}))}}));
+}
+const billing=read(['billing','projects','describe','elegant-racer-299721','--format=json']);
+console.log(JSON.stringify({project:'elegant-racer-299721',billingEnabled:billing.billingEnabled===true}));

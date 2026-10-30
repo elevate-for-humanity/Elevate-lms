@@ -1,6 +1,13 @@
 name: Registered Apprenticeship E2E
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/registered-apprenticeship-e2e.yml'
+      - 'components/programs/HvacTrainingShowcase.tsx'
+      - 'components/pwa/PwaInstallBanner.tsx'
+      - 'public/videos/hvac-recruitment-20261029.mp4'
+      - 'tests/e2e/hvac-hero-playback.spec.ts'
   workflow_dispatch:
     inputs:
       deployed_sha:
@@ -21,6 +28,7 @@ on:
       - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
       - 'tests/e2e/portal-responsive-design.spec.ts'
       - 'tests/e2e/public-runtime-acceptance.spec.ts'
+      - 'tests/e2e/hvac-hero-playback.spec.ts'
       - 'scripts/gcp/production-acceptance.*'
       - 'scripts/qa/require-portal-e2e-identities.*'
       - 'scripts/qa/portal-acceptance-concurrency.test.mjs'
@@ -47,6 +55,38 @@ permissions:
   actions: read
 
 jobs:
+  hvac-public-playback:
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [desktop-chrome, tablet-chrome, iphone-webkit, android-chrome]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      PLAYWRIGHT_BASE_URL: https://www.elevateforhumanity.org
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: pnpm }
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
+      - run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Verify public HVAC film on desktop, tablet, iPhone and Android
+        run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --reporter=line,html --output=test-results/hvac-hero --project=${{ matrix.device }}
+      - name: Preserve playback samples, screenshots and browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hvac-hero-playback-${{ github.run_id }}-${{ matrix.device }}
+          path: |
+            test-results/hvac-hero/
+            playwright-report/
+          retention-days: 14
   production-authenticated-e2e:
     # Dispatch-only success proves the deployment ran, not just that it was queued.
     if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
@@ -136,7 +176,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
         if: ${{ !cancelled() }}
         env:

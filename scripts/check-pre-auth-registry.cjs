@@ -53,6 +53,7 @@ const AUTH_PATTERNS = [
   /getCurrentUser\s*\(/,
   /createServerSupabaseClient\s*\(/,
   /requireProgramHolder\s*\(/,
+  /requireCurrentHostShopPartner\s*\(/,
   /requireApiRole\s*\(/,
   /requireRoleAPI\s*\(/,
   /apiAuthGuard\s*\(/,

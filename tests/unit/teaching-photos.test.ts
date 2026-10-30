@@ -93,13 +93,23 @@ test('a provider safety block is retained without a text-card replacement', asyn
   vi.mocked(generateTeachingPhoto).mockReset().mockRejectedValue(Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'), { details: { blocked: true } }));
   const { db, files } = storage();
   await expect(prepareTeachingPhotos(input, db)).rejects.toThrow('INSTRUCTIONAL_VISUAL_REPLACEMENT_REQUIRED');
-  // Both already-started cues settle before the bounded batch surfaces its failure.
+  // Both independently queued cues settle before the bounded pair fails.
+  // A safety rejection must never launch a rewritten fallback or a third cue.
   expect(generateTeachingPhoto).toHaveBeenCalledTimes(2);
+  const diagnostics = [...files.entries()];
+  expect(diagnostics).toHaveLength(2);
+  for (const [path, bytes] of diagnostics) {
+    expect(path).toMatch(/^approved-teaching-photo-diagnostics\//);
+    expect(JSON.parse(bytes.toString())).toMatchObject({
+      code: 'GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED', provider: { blocked: true },
+    });
+  }
+  expect(diagnostics.map(([, bytes]) => JSON.parse(bytes.toString()).cueIndex).sort()).toEqual([0, 1]);
   const prompts = vi.mocked(generateTeachingPhoto).mock.calls.map(([prompt]) => String(prompt));
   expect(new Set(prompts).size).toBe(2);
   expect(prompts.some(prompt => prompt.includes('general course-related photograph'))).toBe(false);
   expect([...files.keys()].some(path => path.startsWith('approved-teaching-photos/'))).toBe(false);
-  expect([...files.keys()].filter(path => path.startsWith('approved-teaching-photo-diagnostics/'))).toHaveLength(2);
+
 });
 
 test('resume rejects changed stored image bytes without requesting replacement inference', async () => {

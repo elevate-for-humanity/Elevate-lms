@@ -142,7 +142,7 @@ jobs:
         run: node scripts/platform-doctor-static.mjs
       - name: Canonical portal contracts
         run: |
-          node --test scripts/portal-route-contract.test.mjs
+          node --test scripts/portal-route-contract.test.mjs scripts/portal-audit-detections.test.mjs
           node scripts/audit-portal-contracts.mjs
       - name: Portal/database schema drift — live production contract
         if: github.event_name != 'pull_request'

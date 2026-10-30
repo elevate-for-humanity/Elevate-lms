@@ -72,6 +72,10 @@ function existsRoute(app, target, api = false) {
   return (api ? apiIndex[app] : routeIndex[app]).some((entry) => pattern(entry.route).test(pathname));
 }
 
+function existsPortalAction(app, target) {
+  return existsRoute(app, target);
+}
+
 function hasBalancedInterpolation(ref) {
   let depth = 0;
   for (let i = 0; i < ref.length; i++) {
@@ -112,7 +116,7 @@ for (const [app, name, prefix] of PORTALS) {
         continue;
       }
       if (target === prefix || target.startsWith(prefix + '/')) {
-        if (!existsRoute(app, target, false)) fail(`${relative(ROOT,file)} → missing portal route ${target} on ${app}`);
+        if (!existsPortalAction(app, target)) fail(`${relative(ROOT,file)} → missing portal route ${target} on ${app}`);
         checked++;
       }
     }

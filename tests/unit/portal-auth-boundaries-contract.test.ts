@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { WORKFORCE_ACCESS_ROLES } from '@/lib/workforce/records';
+import { hasAnyRole, normalizeRoles } from '@/lib/rbac/role-matrix';
 
 const root = process.cwd();
 const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
@@ -72,6 +73,14 @@ describe('portal authorization boundaries', () => {
     expect([...WORKFORCE_ACCESS_ROLES].sort()).toEqual(
       ['admin', 'super_admin', 'staff', 'org_admin', 'case_manager', 'workforce_partner'].sort(),
     );
+  });
+  it('preserves normalized Workforce access and rejects unrelated roles', () => {
+    for (const role of ['workforce', 'workforce_partner', 'case_manager', 'admin', 'staff']) {
+      expect(hasAnyRole(normalizeRoles([role]), WORKFORCE_ACCESS_ROLES), role).toBe(true);
+    }
+    for (const role of ['student', 'learner', 'employer', 'host_shop']) {
+      expect(hasAnyRole(normalizeRoles([role]), WORKFORCE_ACCESS_ROLES), role).toBe(false);
+    }
   });
   for (const portal of guardedPortals) {
     it(`${portal.path} enforces a server-side authorization boundary`, () => {

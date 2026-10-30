@@ -9,6 +9,7 @@
  * - Auto-hides when already installed.
  */
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface PwaInstallBannerProps {
@@ -26,6 +27,23 @@ export function PwaInstallBanner({
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [pageSettled, setPageSettled] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const videos = document.querySelectorAll('main video');
+    const visible = new Set<Element>();
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target);
+        else visible.delete(entry.target);
+      }
+      setVideoVisible(visible.size > 0);
+    });
+    setVideoVisible(false);
+    videos.forEach(video => observer.observe(video));
+    return () => observer.disconnect();
+  }, [pathname]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setPageSettled(true), 8000);
@@ -37,7 +55,8 @@ export function PwaInstallBanner({
     catch { setBannerDismissed(false); }
   }, [storageKey]);
 
-  if (!pageSettled || isInstalled || bannerDismissed) return null;
+  // Installation is optional; never cover an on-screen film or its controls.
+  if (!pageSettled || isInstalled || bannerDismissed || videoVisible) return null;
 
   const isIos = platform === 'ios';
   if (!canInstall && !isIos) return null;

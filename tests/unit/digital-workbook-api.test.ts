@@ -49,20 +49,44 @@ describe('Workbook API', () => {
       (await POST(forwarded, { params: Promise.resolve({ sectionId: section }) })).status,
     ).toBe(200);
   });
-  it('requires authentication and rejects cross-site saves', async () => {
-    mocks.getUser.mockResolvedValue({ data: { user: null } });
-    expect(
-      (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
-    ).toBe(401);
-    expect(
-      (
-        await POST(request(save, 'https://other.example'), {
-          params: Promise.resolve({ sectionId: section }),
-        })
-      ).status,
-    ).toBe(403);
-    expect(mocks.rpc).not.toHaveBeenCalled();
+  it('accepts the live LMS hostname when the configured app origin uses the legacy alias', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://app.elevateforhumanity.org');
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    try {
+      const forwarded = new NextRequest('http://localhost:8080/api/workbooks/sections/' + section, {
+        method: 'POST',
+        headers: {
+          origin: 'https://lms.elevateforhumanity.org',
+          'Content-Type': 'application/json',
+          'x-workbook-owner': 'current-user',
+        },
+        body: JSON.stringify(save),
+      });
+      expect(
+        (await POST(forwarded, { params: Promise.resolve({ sectionId: section }) })).status,
+      ).toBe(200);
+      expect(mocks.rpc).toHaveBeenCalledOnce();
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
+  it.each(['https://other.example', 'https://lms.elevateforhumanity.org.attacker.example', 'null'])(
+    'requires authentication and rejects cross-site saves from %s',
+    async (origin) => {
+      mocks.getUser.mockResolvedValue({ data: { user: null } });
+      expect(
+        (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
+      ).toBe(401);
+      expect(
+        (
+          await POST(request(save, origin), {
+            params: Promise.resolve({ sectionId: section }),
+          })
+        ).status,
+      ).toBe(403);
+      expect(mocks.rpc).not.toHaveBeenCalled();
+    },
+  );
   it('passes no client user ID to the session-scoped RPC', async () => {
     mocks.rpc.mockResolvedValue({
       data: [{ section_id: section, version: 1, updated_at: 'now' }],

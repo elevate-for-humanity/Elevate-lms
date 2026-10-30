@@ -17,10 +17,16 @@ export async function POST(
 ) {
   const origin = request.headers.get('origin');
   // Google can forward the request on an internal service URL while the
-  // browser retains the canonical LMS origin.
+  // browser retains the public LMS origin. Keep that deployed hostname valid
+  // even when NEXT_PUBLIC_APP_URL still points to the legacy app alias.
   const lmsOrigin = new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org')
     .origin;
-  if (origin && origin !== request.nextUrl.origin && origin !== lmsOrigin)
+  if (
+    origin &&
+    origin !== request.nextUrl.origin &&
+    origin !== lmsOrigin &&
+    origin !== 'https://lms.elevateforhumanity.org'
+  )
     return reply({ error: 'Invalid request origin.' }, 403);
   const { sectionId } = await params;
   if (!UUID.test(sectionId)) return reply({ error: 'Invalid section.' }, 400);

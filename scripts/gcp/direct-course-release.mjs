@@ -12,12 +12,11 @@ export function directJobTemplate(source,{imageSha,imageDigest}) {
  container.command=['node'];container.args=['--import=tsx','workers/direct-course-release.ts'];
  container.env=container.env.filter(value=>value.name!=='DIRECT_RELEASE_SOURCE_SHA');
  container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha});
- // One task per preserved source snapshot. HVAC has a Core/Type I snapshot
- // and a supplementary snapshot for its remaining 14 canonical lessons.
- // Each task is finite and
+ // One task processes course groups sequentially. HVAC's two preserved
+ // snapshots stay together before another course starts. The task is finite and
  // cannot be retried by Cloud Run. Original job configuration stays intact.
  task.maxRetries=0;task.timeoutSeconds='21600';
- spec.template.spec.taskCount=4;spec.template.spec.parallelism=2;
+ spec.template.spec.taskCount=1;spec.template.spec.parallelism=1;
  return {apiVersion:'run.googleapis.com/v1',kind:'Job',metadata:{name:NAME,namespace:source.metadata?.namespace??PROJECT},spec};
 }
 export function launchDirectRelease({imageSha,run=google}){
@@ -34,7 +33,7 @@ export function launchDirectRelease({imageSha,run=google}){
  const saved=JSON.parse(run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
  const savedTask=saved.spec?.template?.spec?.template?.spec;
  if(savedTask?.containers?.[0]?.image!==job.spec.template.spec.template.spec.containers[0].image||
-  Number(savedTask.maxRetries??0)!==0||Number(saved.spec?.template?.spec?.taskCount)!==4||Number(saved.spec.template.spec.parallelism)!==2||
+  Number(savedTask.maxRetries??0)!==0||Number(saved.spec?.template?.spec?.taskCount)!==1||Number(saved.spec.template.spec.parallelism)!==1||
   JSON.stringify(savedTask.containers[0].args)!==JSON.stringify(job.spec.template.spec.template.spec.containers[0].args))throw Error('DIRECT_JOB_READBACK_FAILED');
  run(['run','jobs','execute',NAME,'--project='+PROJECT,'--region='+REGION,'--async','--quiet']);
  return {state:'started',job:NAME,imageDigest:digest,retries:0};

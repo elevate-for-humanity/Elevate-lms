@@ -8,7 +8,7 @@ test('direct job uses existing identity and connections with no automatic task r
  assert.deepEqual(task.containers[0].env[0],source.spec.template.spec.template.spec.containers[0].env[0]);
  assert.deepEqual(task.containers[0].resources,{limits:{memory:'16Gi',cpu:'4'}});
  assert.deepEqual(task.containers[0].args,['--import=tsx','workers/direct-course-release.ts']);
- assert.equal(source.spec.template.spec.template.spec.containers[0].image,'old');assert.equal(result.spec.template.spec.taskCount,4);assert.equal(result.spec.template.spec.parallelism,2);
+ assert.equal(source.spec.template.spec.template.spec.containers[0].image,'old');assert.equal(result.spec.template.spec.taskCount,1);assert.equal(result.spec.template.spec.parallelism,1);
 });
 test('an active direct execution cannot be duplicated or have its configuration replaced',()=>{
  const calls=[];const result=launchDirectRelease({imageSha,run:args=>{
@@ -19,4 +19,11 @@ test('an active direct execution cannot be duplicated or have its configuration 
 });
 test('a mutable image tag cannot replace tested immutable image evidence',()=>{
  assert.throws(()=>directJobTemplate(source,{imageSha:'main',imageDigest}),/TESTED_IMAGE/);
+});
+
+import {googleFailureCode} from './runtime-config.mjs';
+test('Cloud Run missing-job wording is distinguished from permissions and unknown errors',()=>{
+ assert.equal(googleFailureCode('ERROR: (gcloud.run.jobs.describe) Cannot find job [elevate-direct-course-release].'),'not_found');
+ assert.equal(googleFailureCode('PERMISSION_DENIED: Cannot find job [private].'),'permission_denied');
+ assert.equal(googleFailureCode('Cannot find credential file'),'command_failed');
 });

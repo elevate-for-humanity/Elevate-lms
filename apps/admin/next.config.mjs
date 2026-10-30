@@ -34,6 +34,10 @@ const adminConfig = {
   // Serve packaged assets directly, as the other standalone applications do.
   images: { unoptimized: true },
 
+  // Preserve completed lesson multipart bodies through authenticated middleware.
+  // The route enforces 25 MiB; this includes room for multipart overhead.
+  experimental: { middlewareClientMaxBodySize: '26mb' },
+
   transpilePackages: ['edge-tts'],
 
   webpack(config, { dev, isServer, nextRuntime }) {

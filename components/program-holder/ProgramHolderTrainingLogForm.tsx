@@ -10,7 +10,7 @@ export function ProgramHolderTrainingLogForm({ enrollments, programs, verifiedHo
   const selectedStudent = enrollments.find(row => row.id === enrollmentId);
   const selectedProgram = programs.find(row => row.id === selectedStudent?.program_id);
   const milestones = trainingMilestones(selectedStudent?.program_slug || selectedProgram?.slug);
-  const availableHours = verifiedHours.filter(row => row.user_id === selectedStudent?.user_id && row.program_slug === selectedStudent?.program_slug && ['approved','verified'].includes(String(row.approval_status || row.status).toLowerCase()));
+  const availableHours = verifiedHours.filter(row => row.user_id === selectedStudent?.user_id && row.program_slug === (selectedStudent?.program_slug || selectedProgram?.slug) && ['approved','verified'].includes(String(row.approval_status || row.status).toLowerCase()));
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
   async function submit(formData: FormData) {

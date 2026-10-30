@@ -33,9 +33,13 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
         return;
       }
       if (!response.ok) throw new Error(result.error || 'Unable to load the workspace.');
-      setPreview(false);
+      setPreview(result.readOnly === true);
       setData(result);
-      setStatus('');
+      setStatus(
+        result.readOnly
+          ? 'Administrator preview is read only. Sign in as this Program Holder to submit changes.'
+          : '',
+      );
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Unable to load the workspace.');
     } finally {
@@ -49,33 +53,37 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (preview) {
+      setStatus('Administrator preview is read only.');
+      return;
+    }
     setStatus('Saving…');
     const form = new FormData(event.currentTarget);
     const formElement = event.currentTarget;
     try {
-    const body =
-      mode === 'meetings'
-        ? {
-            programHolderStudentId: form.get('student'),
-            title: form.get('title'),
-            startsAt: (() => {
-              const value = String(form.get('startsAt') || '');
-              const date = new Date(value);
-              if (!value || Number.isNaN(date.getTime())) {
-                throw new Error('Enter a valid meeting date and time.');
-              }
-              return date.toISOString();
-            })(),
-            meetingMethod: form.get('method'),
-            durationMinutes: Number(form.get('duration') || 30),
-            location: form.get('location'),
-            agenda: form.get('agenda'),
-          }
-        : {
-            recipientId: form.get('recipient'),
-            subject: form.get('subject'),
-            message: form.get('message'),
-          };
+      const body =
+        mode === 'meetings'
+          ? {
+              programHolderStudentId: form.get('student'),
+              title: form.get('title'),
+              startsAt: (() => {
+                const value = String(form.get('startsAt') || '');
+                const date = new Date(value);
+                if (!value || Number.isNaN(date.getTime())) {
+                  throw new Error('Enter a valid meeting date and time.');
+                }
+                return date.toISOString();
+              })(),
+              meetingMethod: form.get('method'),
+              durationMinutes: Number(form.get('duration') || 30),
+              location: form.get('location'),
+              agenda: form.get('agenda'),
+            }
+          : {
+              recipientId: form.get('recipient'),
+              subject: form.get('subject'),
+              message: form.get('message'),
+            };
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -105,7 +113,12 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
   if (mode === 'meetings') {
     return (
       <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
-        <header><h1 className="text-2xl font-black text-slate-950">Calendar and meetings</h1><p className="mt-2 text-sm text-slate-600">Schedule, confirm and join your appointments here.</p></header>
+        <header>
+          <h1 className="text-2xl font-black text-slate-950">Calendar and meetings</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Schedule, confirm and join your appointments here.
+          </p>
+        </header>
         <VideoCallingGuide />
         <MeetingDeviceCheck />
 
@@ -127,18 +140,25 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
         {loaded ? (
           <section aria-label="Meeting calendar">
             <h2 className="mb-3 text-xl font-black">Your calendar</h2>
-            {data.userId && !preview ? <CalendarWidget
-              userId={data.userId}
-              additionalEvents={(data.meetings || [])
-                .filter((meeting: any) => meeting.status === 'scheduled')
-                .map((meeting: any) => ({
-                  id: meeting.id,
-                  title: meeting.title,
-                  date: meeting.starts_at.slice(0, 10),
-                  startsAt: meeting.starts_at,
-                  type: 'event' as const,
-                }))}
-            /> : <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">Sign in as the assigned Program Holder to load your private calendar. Your meeting dates are not displayed in administrator preview.</div>}
+            {data.userId && !preview ? (
+              <CalendarWidget
+                userId={data.userId}
+                additionalEvents={(data.meetings || [])
+                  .filter((meeting: any) => meeting.status === 'scheduled')
+                  .map((meeting: any) => ({
+                    id: meeting.id,
+                    title: meeting.title,
+                    date: meeting.starts_at.slice(0, 10),
+                    startsAt: meeting.starts_at,
+                    type: 'event' as const,
+                  }))}
+              />
+            ) : (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+                Sign in as the assigned Program Holder to load your private calendar. Your meeting
+                dates are not displayed in administrator preview.
+              </div>
+            )}
           </section>
         ) : null}
         {data.contactAccessGranted === false ? (

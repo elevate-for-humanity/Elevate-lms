@@ -1,6 +1,10 @@
 // pre-auth-registry: exempt - requireProgramHolder and holder filters authorize every operation.
-import { assertGoogleCalendarAvailable, CalendarConflictError } from '@/lib/calendar/google-calendar';
+import {
+  assertGoogleCalendarAvailable,
+  CalendarConflictError,
+} from '@/lib/calendar/google-calendar';
 import { studentContactHolderIds } from '@/lib/email/assigned-student-directory';
+import { loadHolderOfficeStudents } from '@/lib/program-holder/office-students';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
@@ -48,38 +52,38 @@ async function holderWorkspace(ctx: Awaited<ReturnType<typeof requireProgramHold
 
 export async function GET() {
   const ctx = await requireProgramHolder();
-  if (ctx.mode !== 'holder') {
+  if (ctx.mode === 'admin')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
-  }
   await hydrateProcessEnv();
-  const [{ data, error }, { data: applicants, error: applicantError }, contactHolderIds] =
-    await Promise.all([
+  try {
+    const [meetings, applicants, contactHolderIds] = await Promise.all([
       ctx.db
         .from('program_holder_meetings')
         .select('*')
         .eq('program_holder_id', ctx.holderId)
         .order('starts_at'),
-      ctx.db
-        .from('program_holder_students')
-        .select('id,applicant_name,user_id,applicant_email,applicant_phone')
-        .eq('program_holder_id', ctx.holderId)
-        .in('status', ['applied', 'pending', 'enrolled'])
-        .order('applicant_name'),
+      loadHolderOfficeStudents(ctx),
       studentContactHolderIds(ctx.db, ctx.user.id),
     ]);
-  return error || applicantError
-    ? NextResponse.json({ error: 'Unable to load meetings.' }, { status: 500 })
-    : NextResponse.json({
-        userId: ctx.user.id,
-        meetings: data ?? [],
-        contactAccessGranted: contactHolderIds.includes(ctx.holderId),
-        applicants: (applicants ?? []).map((student: any) =>
-          contactHolderIds.includes(ctx.holderId)
-            ? student
-            : { id: student.id, applicant_name: student.applicant_name, user_id: student.user_id },
-        ),
-        videoReady: liveKitReadiness().ready,
-      });
+    if (meetings.error) throw new Error('Meetings unavailable.');
+    return NextResponse.json({
+      readOnly: ctx.mode === 'preview',
+      userId: ctx.user.id,
+      meetings: meetings.data ?? [],
+      contactAccessGranted: contactHolderIds.includes(ctx.holderId),
+      applicants: applicants.map((student) =>
+        contactHolderIds.includes(ctx.holderId)
+          ? student
+          : { id: student.id, applicant_name: student.applicant_name, user_id: student.user_id },
+      ),
+      videoReady: liveKitReadiness().ready,
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Unable to load meetings and assigned students.' },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -106,31 +110,48 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const { data: student } = await ctx.db
-    .from('program_holder_students')
-    .select('id,applicant_name,user_id,applicant_email,applicant_phone')
-    .eq('id', studentId)
-    .eq('program_holder_id', ctx.holderId)
-    .maybeSingle();
-  if (!student) {
+  let student: any;
+  try {
+    student = (await loadHolderOfficeStudents(ctx)).find((item) => item.id === studentId);
+  } catch {
+    return NextResponse.json({ error: 'Assigned student could not be verified.' }, { status: 503 });
+  }
+  if (!student)
     return NextResponse.json(
-      { error: 'Applicant is not assigned to this Program Holder.' },
+      { error: 'Student is not assigned to this Program Holder.' },
       { status: 404 },
     );
-  }
 
   const endsAt = new Date(Date.parse(startsAt) + duration * 60000).toISOString();
   try {
     await assertGoogleCalendarAvailable(ctx.user.id, new Date(startsAt).toISOString(), endsAt);
-    const { data: scheduled, error: scheduleError } = await ctx.db.from('program_holder_meetings')
-      .select('starts_at,duration_minutes').eq('program_holder_id', ctx.holderId).eq('status', 'scheduled')
-      .lt('starts_at', endsAt).gte('starts_at', new Date(Date.parse(startsAt) - 240 * 60000).toISOString());
-    if (scheduleError) throw new Error('Existing appointments could not be checked. Try again before booking.');
-    if ((scheduled || []).some((meeting: any) => Date.parse(meeting.starts_at) + meeting.duration_minutes * 60000 > Date.parse(startsAt))) {
-      throw new CalendarConflictError('This time overlaps an existing dashboard meeting. Choose another time.');
+    const { data: scheduled, error: scheduleError } = await ctx.db
+      .from('program_holder_meetings')
+      .select('starts_at,duration_minutes')
+      .eq('program_holder_id', ctx.holderId)
+      .eq('status', 'scheduled')
+      .lt('starts_at', endsAt)
+      .gte('starts_at', new Date(Date.parse(startsAt) - 240 * 60000).toISOString());
+    if (scheduleError)
+      throw new Error('Existing appointments could not be checked. Try again before booking.');
+    if (
+      (scheduled || []).some(
+        (meeting: any) =>
+          Date.parse(meeting.starts_at) + meeting.duration_minutes * 60000 > Date.parse(startsAt),
+      )
+    ) {
+      throw new CalendarConflictError(
+        'This time overlaps an existing dashboard meeting. Choose another time.',
+      );
     }
   } catch (cause) {
-    return NextResponse.json({ error: cause instanceof Error ? cause.message : 'Calendar availability could not be checked.' }, { status: cause instanceof CalendarConflictError ? 409 : 503 });
+    return NextResponse.json(
+      {
+        error:
+          cause instanceof Error ? cause.message : 'Calendar availability could not be checked.',
+      },
+      { status: cause instanceof CalendarConflictError ? 409 : 503 },
+    );
   }
 
   const title = String(
@@ -234,7 +255,8 @@ export async function POST(request: Request) {
     .from('program_holder_meetings')
     .insert({
       program_holder_id: ctx.holderId,
-      program_holder_student_id: student.id,
+      program_holder_student_id: student.enrollment_id ? null : student.id,
+      enrollment_id: student.enrollment_id || null,
       title,
       starts_at: new Date(startsAt).toISOString(),
       duration_minutes: duration,

@@ -1,3 +1,4 @@
+import { loadHolderOnlineStudy } from './online-study';
 import { loadHolderExitReports } from './exit-reports';
 import { curriculumProgress } from './curriculum-progress';
 import { hasRecruitingAssignment } from './recruiting-access';
@@ -24,6 +25,7 @@ export type ProgramHolderWorkspace = {
   applicants: any[];
   convertedStudents: any[];
   hours: any[];
+  onlineStudySessions?: any[];
   documents: any[];
   reports: any[];
   testingReports?: any[];
@@ -352,35 +354,48 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .filter(Boolean),
     ),
   ];
-  const [trainingCoursesRes, authoredCoursesRes] = canonicalCourseIds.length
-    ? await Promise.all([
-        db
-          .from('training_courses')
-          .select('id,title,status,is_published')
-          .in('id', canonicalCourseIds),
-        db
-          .from('courses')
-          .select(
-            'id,title,status,is_active,generation_status,generation_progress,generation_paused,review_status,updated_at',
-          )
-          .in('id', canonicalCourseIds),
-      ])
-    : [
-        { data: [], error: null },
-        { data: [], error: null },
-      ];
+  const trainingCoursesRes = canonicalCourseIds.length
+    ? await db
+        .from('training_courses')
+        .select('id,title,status,is_published,is_active,canonical_course_id,review_status')
+        .in('id', canonicalCourseIds)
+    : { data: [], error: null };
+  if (trainingCoursesRes.error) throw new Error('Program Holder delivery catalog could not load.');
+  const authoredIds = [
+    ...new Set([
+      ...canonicalCourseIds,
+      ...(trainingCoursesRes.data ?? []).map((row: any) => row.canonical_course_id).filter(Boolean),
+    ]),
+  ];
+  const authoredCoursesRes = authoredIds.length
+    ? await db
+        .from('courses')
+        .select(
+          'id,title,status,is_active,generation_status,generation_progress,generation_paused,review_status,updated_at',
+        )
+        .in('id', authoredIds)
+    : { data: [], error: null };
   if (trainingCoursesRes.error || authoredCoursesRes.error)
     throw new Error('Program Holder course catalog could not load.');
   const courseMetadata = new Map(
-    [...(trainingCoursesRes.data ?? []), ...(authoredCoursesRes.data ?? [])].map((row: any) => [
+    [...(authoredCoursesRes.data ?? []), ...(trainingCoursesRes.data ?? [])].map((row: any) => [
       row.id,
       row,
     ]),
   );
   const buildMetadata = new Map((authoredCoursesRes.data ?? []).map((row: any) => [row.id, row]));
+  const deliveryMetadata = new Map(
+    (trainingCoursesRes.data ?? []).map((row: any) => [row.id, row]),
+  );
+  const progressFor = (id: string) => {
+    const delivery: any = deliveryMetadata.get(id);
+    return curriculumProgress(buildMetadata.get(delivery?.canonical_course_id || id), delivery);
+  };
   const deliveryAssignments = (coursesRes.data ?? []).map((row: any) => ({
     ...row,
-    build: curriculumProgress(buildMetadata.get(row.course_id)),
+    title: (courseMetadata.get(row.course_id) as any)?.title,
+    published: progressFor(row.course_id).published,
+    build: progressFor(row.course_id),
   }));
   for (const link of canonicalCourseLinksRes.data ?? []) {
     const course: any = courseMetadata.get(link.course_id);
@@ -396,8 +411,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       title: course.title,
       status: course.status,
       source: 'canonical_program',
-      published: course.is_published === true || course.status === 'published',
-      build: curriculumProgress(buildMetadata.get(link.course_id)),
+      published: progressFor(link.course_id).published,
+      build: progressFor(link.course_id),
     });
   }
   const rosterUserIds: string[] = Array.from(
@@ -486,6 +501,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         training_start_date: row.training_start_date || verified.firstDate || null,
       };
     });
+  const onlineStudySessions = await loadHolderOnlineStudy(db, enrolledRoster);
   const upcomingRoster = (upcomingRes.data ?? []).filter(
     (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );
@@ -697,6 +713,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       }),
     ),
     hours: hoursRes.data ?? [],
+    onlineStudySessions,
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
     testingReports: await loadHolderExitReports(db, holderId),

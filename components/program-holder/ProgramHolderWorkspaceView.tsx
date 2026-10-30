@@ -1,3 +1,4 @@
+import { ProgramHolderOnlineStudy } from './ProgramHolderOnlineStudy';
 import { hasRecruitingAssignment } from '@/lib/program-holder/recruiting-access';
 import { TestingReadinessForm } from './TestingReadinessForm';
 import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
@@ -69,7 +70,7 @@ export async function ProgramHolderWorkspaceView({
   studentQuery?: string;
   studentStatus?: string;
 }) {
-  const data = workspace || await getProgramHolderWorkspace();
+  const data = workspace || (await getProgramHolderWorkspace());
   const coordinatorRole =
     data.mode === 'holder'
       ? String(
@@ -406,15 +407,22 @@ export async function ProgramHolderWorkspaceView({
                 </details>
               </article>
             ))}
-          {!(data.testingReports ?? data.reports).some((row) => row.metadata?.report_kind === 'testing_readiness') && (
-            <p className="mt-3 text-sm">No exit reports submitted yet.</p>
-          )}
+          {!(data.testingReports ?? data.reports).some(
+            (row) => row.metadata?.report_kind === 'testing_readiness',
+          ) && <p className="mt-3 text-sm">No exit reports submitted yet.</p>}
         </section>
       </div>
     );
   if (section === 'programs') return <Programs data={data} />;
   if (section === 'hours')
-    return <Hours rows={data.hours} programs={data.programs} enrollments={data.enrollments} />;
+    return (
+      <Hours
+        rows={data.hours}
+        programs={data.programs}
+        enrollments={data.enrollments}
+        onlineSessions={data.onlineStudySessions || []}
+      />
+    );
   if (section === 'compliance')
     return <Compliance score={complianceScore} items={complianceItems} atRisk={atRisk.length} />;
   if (section === 'documents')
@@ -454,19 +462,35 @@ export async function ProgramHolderWorkspaceView({
         {payoutPanel}
         <section className="rounded-2xl border bg-white p-5">
           <h2 className="text-xl font-black">Submitted invoices</h2>
-          <p className="mt-1 text-sm text-slate-600">Track your invoice review here. Document approval does not confirm payment.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Track your invoice review here. Document approval does not confirm payment.
+          </p>
           <div className="mt-4 space-y-3">
             {data.documents.filter((row) => row.document_type === 'provider_invoice').length ? (
-              data.documents.filter((row) => row.document_type === 'provider_invoice').map((row) => (
-                <article key={row.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
-                  <div className="min-w-0">
-                    <p className="break-all font-bold">{row.file_name}</p>
-                    <p className="text-sm capitalize">Review: {row.status || 'pending'}</p>
-                  </div>
-                  <a href={`/api/program-holder/documents/${row.id}/download`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-bold text-blue-800 underline">View invoice</a>
-                </article>
-              ))
-            ) : <p className="text-sm text-slate-600">You have not submitted any invoices yet.</p>}
+              data.documents
+                .filter((row) => row.document_type === 'provider_invoice')
+                .map((row) => (
+                  <article
+                    key={row.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
+                  >
+                    <div className="min-w-0">
+                      <p className="break-all font-bold">{row.file_name}</p>
+                      <p className="text-sm capitalize">Review: {row.status || 'pending'}</p>
+                    </div>
+                    <a
+                      href={`/api/program-holder/documents/${row.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 items-center font-bold text-blue-800 underline"
+                    >
+                      View invoice
+                    </a>
+                  </article>
+                ))
+            ) : (
+              <p className="text-sm text-slate-600">You have not submitted any invoices yet.</p>
+            )}
           </div>
         </section>
       </section>
@@ -902,22 +926,6 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   </td>
                   <td className="px-3 py-4">
                     <div className="flex flex-col items-start gap-2">
-                      {row.phone && (
-                        <a
-                          className="block break-words font-bold text-blue-900 underline"
-                          href={`tel:${row.phone}`}
-                        >
-                          Phone: {row.phone}
-                        </a>
-                      )}
-                      {row.email && (
-                        <a
-                          className="block break-all font-bold text-blue-900 underline"
-                          href={`mailto:${row.email}`}
-                        >
-                          Email: {row.email}
-                        </a>
-                      )}
                       {row.phone && (
                         <a
                           className="block break-words font-bold text-blue-900 underline"
@@ -1396,8 +1404,16 @@ function ProgramCards({
                               : 'Holder delivery assignment'}{' '}
                             · {course.status || 'Status requires review'}
                           </span>
-                          <p>Build: {course.build?.status || 'Build record unavailable'}{typeof course.build?.percent === 'number' ? ` — ${course.build.percent}%` : ''}</p>
-                          <p>Review: {course.build?.review || 'Not recorded'} · Publication: {course.build?.published ? 'Published' : 'Not published'}</p>
+                          <p>
+                            Build: {course.build?.status || 'Build record unavailable'}
+                            {typeof course.build?.percent === 'number'
+                              ? ` — ${course.build.percent}%`
+                              : ''}
+                          </p>
+                          <p>
+                            Review: {course.build?.review || 'Not recorded'} · Publication:{' '}
+                            {course.build?.published ? 'Published' : 'Not published'}
+                          </p>
                           {course.source === 'canonical_program' && !course.published && (
                             <span className="block font-bold text-amber-800">
                               Publication has not been verified. This mapping does not unlock
@@ -1426,10 +1442,12 @@ function Hours({
   rows,
   programs,
   enrollments,
+  onlineSessions = [],
 }: {
   rows: any[];
   programs: any[];
   enrollments: any[];
+  onlineSessions?: any[];
 }) {
   return (
     <div className="space-y-6">
@@ -1438,6 +1456,7 @@ function Hours({
         title="Training Hours"
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
+      <ProgramHolderOnlineStudy sessions={onlineSessions} enrollments={enrollments} />
       <HolderHourSubmissionForm enrollments={enrollments} />
       <ProgramHolderTrainingLogForm
         enrollments={enrollments}

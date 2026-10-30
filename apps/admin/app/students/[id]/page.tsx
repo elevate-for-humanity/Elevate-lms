@@ -1,3 +1,5 @@
+import { loadHolderOnlineStudy } from '@/lib/program-holder/online-study';
+import { ProgramHolderOnlineStudy } from '@/components/program-holder/ProgramHolderOnlineStudy';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -84,7 +86,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     db
       .from('program_enrollments')
       .select(
-        'id,status,enrolled_at,payment_status,amount_paid_cents,program_id,program_slug,program_holder_id,student_start_date,voucher_issued_date,voucher_paid_date,payout_due_date,payout_status,payout_paid_date,payout_notes',
+        'id,user_id,status,enrolled_at,payment_status,amount_paid_cents,program_id,program_slug,program_holder_id,student_start_date,voucher_issued_date,voucher_paid_date,payout_due_date,payout_status,payout_paid_date,payout_notes',
       )
       .eq('user_id', id)
       .order('enrolled_at', { ascending: false }),
@@ -116,6 +118,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     logger.error('[student-detail] applications query failed', applicationsRes.error);
 
   const enrollments = enrollmentsRes.data ?? [];
+  const onlineStudySessions = await loadHolderOnlineStudy(db, enrollments);
   const applications = applicationsRes.data ?? [];
   const billingInvoices = (billingRes.data ?? []).filter(isIssuedStudentInvoice);
   const programIds = [
@@ -236,6 +239,11 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           )}
         </div>
       </section>
+
+      <ProgramHolderOnlineStudy
+        sessions={onlineStudySessions}
+        enrollments={enrollments.map((row) => ({ ...row, full_name: name }))}
+      />
 
       <div className="grid gap-6 lg:grid-cols-[.75fr_1.25fr]">
         <aside className="min-w-0 space-y-4">

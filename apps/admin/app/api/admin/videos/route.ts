@@ -12,6 +12,8 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getSignedElevateMediaUrl } from '@/lib/storage/elevate-media-storage';
+import { resolveCourseVideoPlayback } from '@/lib/video/course-video-playback.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,13 +44,15 @@ async function _GET(req: NextRequest) {
 
       const videos = await Promise.all(
         (data ?? []).map(async (video) => {
-          let playbackUrl = video.video_url ?? '';
-          if (!playbackUrl && video.storage_path) {
-            const { data: signed } = await db.storage
-              .from('course_videos')
-              .createSignedUrl(video.storage_path, 60 * 60);
-            playbackUrl = signed?.signedUrl ?? '';
-          }
+          const playbackUrl = await resolveCourseVideoPlayback(video, {
+            signExternal: (key: string) => getSignedElevateMediaUrl(key, 60 * 60),
+            signLegacy: async (key: string) => {
+              const { data: signed } = await db.storage
+                .from('course_videos')
+                .createSignedUrl(key, 60 * 60);
+              return signed?.signedUrl ?? '';
+            },
+          });
           return {
             id: video.id,
             title: video.title ?? 'Course video',
@@ -92,3 +96,4 @@ async function _GET(req: NextRequest) {
 }
 
 export const GET = withApiAudit('/api/admin/videos', _GET);
+

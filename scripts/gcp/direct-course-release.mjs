@@ -11,8 +11,9 @@ export function directJobTemplate(source,{imageSha,imageDigest}) {
  if(!Array.isArray(container.env)||!container.env.some(value=>value.name==='SUPABASE_SERVICE_ROLE_KEY'))throw Error('DIRECT_SOURCE_DATABASE_CONNECTION_REQUIRED');
  container.image=`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@${imageDigest}`;
  container.command=['node'];container.args=['--import=tsx','workers/direct-course-release.ts'];
- container.env=container.env.filter(value=>!['DIRECT_RELEASE_SOURCE_SHA','ULTIMATE_PHOTO_REGION'].includes(value.name));
- container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha},{name:'ULTIMATE_PHOTO_REGION',value:'global'});
+ container.env=container.env.filter(value=>!['DIRECT_RELEASE_SOURCE_SHA','ULTIMATE_PHOTO_REGION','ULTIMATE_PHOTO_MODEL'].includes(value.name));
+ const legacy=['3ae82989396abe436d503a694c02f54396d80bb4','79dc886bd59385d2f42069fe22c216211d8f00b9','80eb6455d0bfff9178306fcaedc9b88c84390e73'].includes(imageSha);
+ container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha},{name:'ULTIMATE_PHOTO_REGION',value:'global'},{name:'ULTIMATE_PHOTO_MODEL',value:legacy?'gemini-3.1-flash-image':'gemini-3.1-flash-lite-image'});
  // One task processes course groups sequentially. HVAC's two preserved
  // snapshots stay together before another course starts. The task is finite and
  // cannot be retried by Cloud Run. Original job configuration stays intact.
@@ -35,6 +36,7 @@ export function knownObsoletePhotoExecution(execution) {
   '79dc886bd59385d2f42069fe22c216211d8f00b9':'b131064b00050f336357b40ffaab88362d9d90932c8ebadb18cd75461a830bb8',
   '80eb6455d0bfff9178306fcaedc9b88c84390e73':'85ac9b7f7b4bdd4760e8032fc03dc5922c26dc6449d4671582a8987c36873ca3',
   'ade51ae703e75722186b5dd8a62098547bde6e60':'4d2de36dcebcdee37808fa425a65698087265de586cc0f4d7f43c3d64a395603',
+  '517cf6da93652de3102e4c0822be6b82bab261ef':'a0396ba6ff5ddcff17359e3af36e4c9dbbfd10cd3b55e39761b598c65f02cd89',
  };
  const superseded=Boolean(obsoleteDigests[source]) &&
   container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@sha256:${obsoleteDigests[source]}` &&

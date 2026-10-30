@@ -1,4 +1,4 @@
-name: Diagnose finite Google Course Builder execution
+name: Diagnose finite course execution (read-only)
 on:
   push:
     branches: [main]
@@ -6,11 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: Existing Course Builder job to inspect without mutation
+        description: Existing course execution to inspect without mutation
         required: true
-        default: elevate-course-builder
+        default: elevate-direct-course-release
         type: choice
-        options: [elevate-course-builder, elevate-course-builder-parallel, elevate-course-builder-overflow, elevate-course-builder-repair]
+        options: [elevate-direct-course-release, elevate-course-builder, elevate-course-builder-parallel, elevate-course-builder-overflow, elevate-course-builder-repair]
+      region:
+        description: Region of the direct completion job
+        required: false
+        default: us-east1
+        type: choice
+        options: [us-central1, us-east1]
       execution:
         description: Existing course execution name to inspect
         required: false
@@ -74,13 +80,15 @@ jobs:
         env:
           COURSE_EXECUTION: ${{ inputs.execution }}
           COURSE_JOB: ${{ inputs.job }}
+          COURSE_REGION: ${{ inputs.region }}
         run: |
           node --input-type=module <<'NODE'
           import {google} from './scripts/gcp/runtime-config.mjs';
           let execution=process.env.COURSE_EXECUTION || 'latest';
-          const job=process.env.COURSE_JOB || 'elevate-course-builder';
+          const job=process.env.COURSE_JOB || 'elevate-direct-course-release';
           const regions={'elevate-course-builder':'us-central1','elevate-course-builder-parallel':'us-east1','elevate-course-builder-overflow':'us-east1','elevate-course-builder-repair':'us-east1'};
-          const region=regions[job];
+          const region=job==='elevate-direct-course-release'?(process.env.COURSE_REGION||'us-east1'):regions[job];
+          if(!['us-central1','us-east1'].includes(region))throw Error('COURSE_REGION_NOT_AUTHORIZED');
           if(!region)throw Error('COURSE_JOB_NOT_AUTHORIZED');
           const call=args=>JSON.parse(google(args));
           if(execution === 'latest') {
@@ -98,7 +106,8 @@ jobs:
           const logs=call(['logging','read',filter,'--project=elegant-racer-299721','--freshness=2h','--limit=200','--format=json']);
           console.log(JSON.stringify({logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]}));
           for(const item of logs) {
-            const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
+            const structured=Object.fromEntries(['courseId','lessonId','step','state','code','phase','completed','total','at'].filter(key=>item.jsonPayload?.[key]!==undefined).map(key=>[key,item.jsonPayload[key]]));
+            const message=String(item.textPayload ?? item.jsonPayload?.message ?? (Object.keys(structured).length?JSON.stringify(structured):''));
             if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4|TeachingPhoto|blockReason|finishReasons|candidateCount|partTypes|blocked|BLUEPRINT|grounding|author|model|timeout|attempt|reason|code|message|step|phase|stalled|quota/i.test(message)) continue;
             let safe=message;
             for(const entry of container.env||[])if(/KEY|TOKEN|SECRET|PASSWORD|URL/i.test(entry.name)&&entry.value?.length>5)safe=safe.split(entry.value).join('[redacted]');

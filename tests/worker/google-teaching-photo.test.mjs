@@ -1,6 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {generateTeachingPhoto} from '../../lib/ultimate-course-builder/adapters/google-teaching-photo.mjs';
+test('a global image timeout changes capacity route without expanding the request budget',async()=>{
+ const calls=[];
+ const result=await generateTeachingPhoto('same photo',{env:{GOOGLE_CLOUD_PROJECT:'timeout-route-test',ULTIMATE_PHOTO_REGION:'global'},delay:async()=>{},request:async url=>{
+  calls.push(url);if(calls.length===1)return {ok:true,json:async()=>({access_token:'token'})};
+  if(calls.length===2)throw new DOMException('timed out','TimeoutError');
+  return {ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:Buffer.from('photo').toString('base64')}}]}}]})};
+ }});
+ assert.equal(calls.length,3);assert.match(calls[2],/gemini-3\.1-flash-lite-image:generateContent$/);assert.equal(result.model,'gemini-3.1-flash-lite-image');
+});
+test('the verified lite primary can use the other global pool after a capacity rejection',async()=>{
+ const calls=[];
+ const result=await generateTeachingPhoto('same photo',{env:{GOOGLE_CLOUD_PROJECT:'lite-primary-test',ULTIMATE_PHOTO_REGION:'global',ULTIMATE_PHOTO_MODEL:'gemini-3.1-flash-lite-image'},delay:async()=>{},request:async url=>{
+  calls.push(url);if(calls.length===1)return {ok:true,json:async()=>({access_token:'token'})};
+  if(calls.length===2)return {ok:false,status:429,headers:{get:()=>null}};
+  return {ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:Buffer.from('photo').toString('base64')}}]}}]})};
+ }});
+ assert.equal(calls.length,3);assert.match(calls[2],/gemini-3\.1-flash-image:generateContent$/);assert.equal(result.model,'gemini-3.1-flash-image');
+});
 test('global capacity rejection uses an alternate model inside the existing request budget',async()=>{
  const calls=[];
  const result=await generateTeachingPhoto('same photographic instruction',{env:{ULTIMATE_PHOTO_REGION:'global'},delay:async()=>{},request:async(url,options)=>{

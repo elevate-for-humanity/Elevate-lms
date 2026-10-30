@@ -47,7 +47,7 @@ export async function smokeLmsContainer({sha,image=`elevate-lms:${sha}`,name=`lm
    }));
    alive();
   }
-  const protectedPage=await get('/lms');
+  const protectedPage=await get('/lms/dashboard');
   const login=new URL(protectedPage.headers.get('location')??'',base);
   if(![302,303,307,308].includes(protectedPage.status)||login.pathname!=='/login'||login.username||login.password||
    ![base,'https://app.elevateforhumanity.org','http://app.elevateforhumanity.org'].includes(login.origin))fail('GUEST_ACCESS_GATE_FAILED');

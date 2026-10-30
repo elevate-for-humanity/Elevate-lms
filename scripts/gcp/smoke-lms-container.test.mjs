@@ -10,7 +10,7 @@ function fixture({memory=4*2**30,swap=4*2**30,cpu=2e9,restarts=0,wrongSha=false,
   request:async url=>{
    requests++;const path=new URL(url).pathname;
    if(path==='/login')return new Response('<html>'+('x'.repeat(1200))+'</html>',{headers:{'content-type':'text/html'}});
-   if(path==='/lms')return guestAllowed?new Response('private page'):new Response(null,{status:307,headers:{location:'/login?redirect=%2Flms'}});
+   if(path==='/lms/dashboard')return guestAllowed?new Response('private page'):new Response(null,{status:307,headers:{location:'/login?redirect=%2Flms%2Fdashboard'}});
    return Response.json({service:wrongService?'marketing':'lms',commit:wrongSha?'b'.repeat(40):sha,ok:true,ready:true,healthy:true,configuration:{ok:true},dependencies:{supabase:{ok:dependency}}});
   }}};
 }

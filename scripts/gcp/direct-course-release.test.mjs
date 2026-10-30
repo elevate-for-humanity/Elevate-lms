@@ -2,6 +2,31 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {directJobTemplate,launchDirectRelease,knownObsoletePhotoExecution} from './direct-course-release.mjs';
 const source={spec:{template:{spec:{taskCount:1,parallelism:1,template:{spec:{serviceAccountName:'existing-service',maxRetries:3,containers:[{image:'old',env:[{name:'SUPABASE_SERVICE_ROLE_KEY',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}],resources:{limits:{memory:'16Gi',cpu:'4'}},volumeMounts:[{name:'existing'}]}],volumes:[{name:'existing'}]}}}}}};
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64);
+test('a direct execution in another region prevents overlapping course production',async()=>{
+ const calls=[];
+ const result=await launchDirectRelease({imageSha,region:'us-east1',executionRegions:['us-central1','us-east1'],inspect:()=>{throw Error('no capacity write permitted');},run:args=>{
+  calls.push(args);
+  if(args[0]==='artifacts')return imageDigest;
+  if(args.includes('elevate-course-builder'))return JSON.stringify(source);
+  if(args.includes('executions'))return args.includes('--region=us-central1')?JSON.stringify([{metadata:{name:'elevate-direct-course-release-existing'},status:{}}]):'[]';
+  return 'existing';
+ }});
+ assert.equal(result.state,'already-running');assert.equal(calls.some(a=>a.includes('replace')||a.includes('execute')),false);
+});
+test('secondary-region launch retains the source identity and checks that regions exact capacity',async()=>{
+ const calls=[];let saved;
+ const result=await launchDirectRelease({imageSha,region:'us-east1',executionRegions:['us-central1','us-east1'],inspect:async({region,task})=>{assert.equal(region,'us-east1');assert.deepEqual(task.resources,undefined);assert.equal(task.serviceAccountName,'existing-service');return {fits:true};},run:(args,body)=>{
+  calls.push(args);
+  if(args[0]==='artifacts')return imageDigest;
+  if(args.includes('elevate-course-builder')){assert.ok(args.includes('--region=us-central1'));return JSON.stringify(source);}
+  if(args.includes('replace')){saved=JSON.parse(body);return '';}
+  if(args.includes('describe')){if(saved&&args.includes('--format=json'))return JSON.stringify(saved);const e=Error('missing');e.code='not_found';throw e;}
+  if(args.includes('execute'))return '';
+  throw Error('unexpected command');
+ }});
+ assert.equal(result.region,'us-east1');assert.equal(calls.filter(a=>a.includes('execute')).length,1);
+ assert.ok(calls.find(a=>a.includes('execute')).includes('--region=us-east1'));
+});
 test('direct job uses existing identity and connections with no automatic task retries',()=>{
  const result=directJobTemplate(source,{imageSha,imageDigest});const task=result.spec.template.spec.template.spec;
  assert.equal(task.maxRetries,0);assert.equal(task.serviceAccountName,'existing-service');

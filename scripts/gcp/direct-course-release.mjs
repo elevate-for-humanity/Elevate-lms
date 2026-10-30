@@ -44,40 +44,44 @@ export function knownObsoletePhotoExecution(execution) {
   container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@${OBSOLETE_PHOTO_DIGEST}` &&
   container?.env?.some(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA'&&entry.value===OBSOLETE_PHOTO_SOURCE)===true;
 }
-export async function launchDirectRelease({imageSha,run=google,inspect=inspectRegionalCapacity,retireKnownTextCardExecution=false}){
+export async function launchDirectRelease({imageSha,run=google,inspect=inspectRegionalCapacity,retireKnownTextCardExecution=false,region=REGION,executionRegions=[region]}){
+ if(!['us-central1','us-east1'].includes(region)||!executionRegions.includes(region)||executionRegions.some(value=>!['us-central1','us-east1'].includes(value)))throw Error('DIRECT_RELEASE_REGION_INVALID');
  const source=JSON.parse(run(['run','jobs','describe','elevate-course-builder','--project='+PROJECT,'--region='+REGION,'--format=json']));
  const digest=run(['artifacts','docker','images','describe',`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker:${imageSha}`,'--project='+PROJECT,'--format=value(image_summary.digest)']).trim();
  const job=directJobTemplate(source,{imageSha,imageDigest:digest});
- let exists=false;
- try{run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+REGION,'--format=value(metadata.name)']);exists=true;}catch(error){if(error.code!=='not_found')throw error;}
- if(exists){
-  const executions=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
-  const active=executions.filter(activeExecution);
+ const inventory=()=>{
+  const active=[];
+  for(const executionRegion of [...new Set(executionRegions)]){
+   try{run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+executionRegion,'--format=value(metadata.name)']);}catch(error){if(error.code==='not_found')continue;throw error;}
+   const executions=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+executionRegion,'--format=json']));
+   active.push(...executions.filter(activeExecution).map(execution=>({execution,region:executionRegion})));
+  }
+  return active;
+ };
+ const active=inventory();
   if(active.length){
-   if(!retireKnownTextCardExecution||active.length!==1||!new RegExp('^'+NAME+'-[a-z0-9]+$').test(active[0].metadata?.name??'')||imageSha===OBSOLETE_PHOTO_SOURCE)return {state:'already-running'};
-   const executionName=active[0].metadata.name;
-   const execution=JSON.parse(run(['run','jobs','executions','describe',executionName,'--project='+PROJECT,'--region='+REGION,'--format=json']));
+   if(!retireKnownTextCardExecution||active.length!==1||!new RegExp('^'+NAME+'-[a-z0-9]+$').test(active[0].execution.metadata?.name??'')||imageSha===OBSOLETE_PHOTO_SOURCE)return {state:'already-running'};
+   const executionName=active[0].execution.metadata.name,executionRegion=active[0].region;
+   const execution=JSON.parse(run(['run','jobs','executions','describe',executionName,'--project='+PROJECT,'--region='+executionRegion,'--format=json']));
    if(!knownObsoletePhotoExecution(execution)||execution.spec?.template?.spec?.containers?.[0]?.env?.some(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA'&&entry.value===imageSha))return {state:'already-running'};
    // Cancellation retains database checkpoints and all saved media. Never
    // replace configuration until readback proves the old task is terminal.
-   run(['run','jobs','executions','cancel',executionName,'--project='+PROJECT,'--region='+REGION,'--quiet']);
-   const after=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
-   if(after.some(activeExecution))return {state:'obsolete-source-cancelling'};
+   run(['run','jobs','executions','cancel',executionName,'--project='+PROJECT,'--region='+executionRegion,'--quiet']);
+   if(inventory().length)return {state:'obsolete-source-cancelling'};
   }
- }
- const capacity=await inspect({region:REGION,run,task:job.spec.template.spec.template.spec,taskCount:1});
+ const capacity=await inspect({region,run,task:job.spec.template.spec.template.spec,taskCount:1});
  if(capacity.fits!==true)throw Error('DIRECT_RELEASE_REGIONAL_CAPACITY_UNAVAILABLE');
- run(['run','jobs','replace','-','--project='+PROJECT,'--region='+REGION,'--quiet'],JSON.stringify(job));
- const saved=JSON.parse(run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
+ run(['run','jobs','replace','-','--project='+PROJECT,'--region='+region,'--quiet'],JSON.stringify(job));
+ const saved=JSON.parse(run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+region,'--format=json']));
  const savedTask=saved.spec?.template?.spec?.template?.spec;
  if(savedTask?.containers?.[0]?.image!==job.spec.template.spec.template.spec.containers[0].image||
   Number(savedTask.maxRetries??0)!==0||Number(saved.spec?.template?.spec?.taskCount)!==1||Number(saved.spec.template.spec.parallelism)!==1||
   JSON.stringify(savedTask.containers[0].args)!==JSON.stringify(job.spec.template.spec.template.spec.containers[0].args))throw Error('DIRECT_JOB_READBACK_FAILED');
- run(['run','jobs','execute',NAME,'--project='+PROJECT,'--region='+REGION,'--async','--quiet']);
- return {state:'started',job:NAME,imageDigest:digest,retries:0};
+ run(['run','jobs','execute',NAME,'--project='+PROJECT,'--region='+region,'--async','--quiet']);
+ return {state:'started',job:NAME,region,imageDigest:digest,retries:0};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- launchDirectRelease({imageSha:process.env.DIRECT_RELEASE_SOURCE_SHA,retireKnownTextCardExecution:true})
+ launchDirectRelease({imageSha:process.env.DIRECT_RELEASE_SOURCE_SHA,retireKnownTextCardExecution:true,region:process.env.DIRECT_RELEASE_REGION??REGION,executionRegions:['us-central1','us-east1']})
   .then(result=>console.log(JSON.stringify(result)))
   .catch(error=>{console.error(JSON.stringify({state:'blocked',code:error.code??error.message?.match(/^[A-Z][A-Z0-9_]+/)?.[0]??'DIRECT_RELEASE_FAILED'}));process.exitCode=1;});
 }

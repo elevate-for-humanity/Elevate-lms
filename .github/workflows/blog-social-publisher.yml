@@ -1,6 +1,9 @@
 name: Blog Social Publisher
 
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/blog-social-publisher.yml']
   workflow_dispatch:
   schedule:
     - cron: '*/5 * * * *'

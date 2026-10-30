@@ -100,7 +100,7 @@ export default async function ApprenticeOrientationPage({
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
-      <VisualDashboardOrientation audience={programSlug === 'cosmetology-apprenticeship' ? 'cosmetology-apprentice' : programSlug === 'barber-apprenticeship' ? 'barber-apprentice' : 'apprentice'} />
+      <VisualDashboardOrientation audience={programSlug === 'cosmetology-apprenticeship' ? 'cosmetology-apprentice' : programSlug === 'barber-apprenticeship' ? 'barber-apprentice' : programSlug === 'esthetician-apprenticeship' ? 'esthetician-apprentice' : programSlug === 'nail-technician-apprenticeship' ? 'nail-technician-apprentice' : 'apprentice'} />
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 text-white shadow-sm">
         <div className="grid">
           <div className="p-6 sm:p-8">

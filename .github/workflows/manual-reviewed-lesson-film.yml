@@ -1,0 +1,66 @@
+name: Encode a manually reviewed saved lesson film
+
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/manual/film-request.json']
+  workflow_dispatch:
+    inputs:
+      lesson_id:
+        description: Exact authorized lesson UUID, or saved-request for the explicitly selected request file
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+
+concurrency:
+  group: manual-reviewed-film-${{ inputs.lesson_id || 'request' }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch-request:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Dispatch the explicitly selected saved lesson
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          lesson=$(node -e "const fs=require('fs');const r=JSON.parse(fs.readFileSync('scripts/manual/film-request.json','utf8'));if(!['encode-review-candidate','refresh-review-previews','verify-uploaded-films','prepare-source-frames'].includes(r.mode))throw Error('MANUAL_REQUEST_INVALID');if(r.mode==='prepare-source-frames'&&Array.isArray(r.sourceVideoIds)&&r.sourceVideoIds.length>0&&r.sourceVideoIds.length<=20&&r.sourceVideoIds.every(id=>/^[0-9a-f-]{36}$/.test(id)))process.stdout.write('sources-request');else if(Array.isArray(r.lessonIds)&&r.lessonIds.length>0&&r.lessonIds.length<=35&&r.lessonIds.every(id=>/^[0-9a-f-]{36}$/.test(id)))process.stdout.write(r.mode==='refresh-review-previews'?'review-request':r.mode==='verify-uploaded-films'?'verify-request':r.courseGroup==='barber'?'barber-request':r.courseGroup==='hvac'?'hvac-request':'saved-request');else if(/^[0-9a-f-]{36}$/.test(r.lessonId))process.stdout.write(r.lessonId);else throw Error('MANUAL_SELECTION_INVALID')")
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/manual-reviewed-lesson-film.yml/dispatches" -f ref=main -f "inputs[lesson_id]=$lesson"
+  encode-review-candidate:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - name: Install film encoding tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install boto3==1.40.61 Pillow==12.0.0 'google-auth[requests]==2.43.0'
+      - name: Validate manual encoder contracts
+        run: python -m unittest discover -s tests/manual -p 'test_*.py'
+      - name: Encode saved instruction and photographs for review
+        env:
+          LESSON_ID: ${{ inputs.lesson_id }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/manual/render_requested_films.py

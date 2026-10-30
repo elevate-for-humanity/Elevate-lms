@@ -13,4 +13,7 @@ class SelectionTests(unittest.TestCase):
     def test_review_request_is_explicitly_scoped(self):self.assertEqual(r.selected_lessons('review-request',{'mode':'refresh-review-previews','lessonIds':[ID]}),[ID])
     def test_review_cannot_request_encoding(self):
         with self.assertRaisesRegex(ValueError,'MODE_INVALID'):r.selected_lessons('review-request',{'mode':'encode-review-candidate','lessonIds':[ID]})
+    def test_verify_cannot_request_encoding(self):
+        with self.assertRaisesRegex(ValueError,'MODE_INVALID'):r.selected_lessons('verify-request',{'mode':'encode-review-candidate','lessonIds':[ID]})
+    def test_verify_selection(self):self.assertEqual(r.selected_lessons('verify-request',{'mode':'verify-uploaded-films','lessonIds':[ID]}),[ID])
 if __name__=='__main__':unittest.main()

@@ -67,6 +67,26 @@ def main():
             raise RuntimeError('MANUAL_PRIVATE_READ_FAILED') from None
     def put(key,data,mime):
         s3.put_object(Bucket=BUCKET,Key=key,Body=data,ContentType=mime,CacheControl='private, max-age=0')
+    if os.environ.get('MANUAL_VERIFY_UPLOADED')=='true':
+        from urllib.parse import quote
+        candidates=db('course_videos?select=id,storage_path&lesson_id=eq.'+lesson+'&course_id=eq.'+COURSE+'&generated_by=eq.manual&status=eq.ready&storage_path=like.course-videos/manual-lessons/*&order=created_at.desc')
+        audits=db('admin_audit_events?select=metadata&metadata->>mode=eq.completed-lesson-review&metadata->>lesson_id=eq.'+lesson+'&order=created_at.desc&limit=20')
+        for candidate in candidates:
+            matches=[a['metadata'] for a in audits if a['metadata'].get('storage_path')==candidate['storage_path']]
+            if not matches: continue
+            audit=matches[0];data=get(candidate['storage_path'])
+            if not data or len(data)!=audit['bytes'] or digest(data)!=audit['sha256']: raise RuntimeError('MANUAL_UPLOADED_STORED_BYTES_MISMATCH')
+            with tempfile.TemporaryDirectory(prefix='manual-verify-') as directory:
+                film=Path(directory)/'film.mp4';film.write_bytes(data)
+                probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(film)]))
+                subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(film),'-f','null','-'],check=True)
+            evidence={'candidateVideoId':candidate['id'],'mediaSha256':digest(data),'bytes':len(data),'durationSeconds':float(probe['format']['duration']),'storedBytesHashMatchesUploadInput':True,'fullDecode':True,'method':'Actual authenticated Backblaze readback, SHA-256 comparison with the authenticated upload audit and full-file ffmpeg decode','nativeLmsReview':'pending'}
+            latest=db('course_lessons?select=content_json,updated_at&id=eq.'+lesson+'&course_id=eq.'+COURSE)[0];canonical_source(latest)
+            content=latest['content_json'];content['manualMediaDraft']['storedFileVerification']=evidence
+            changed=db('course_lessons?id=eq.'+lesson+'&course_id=eq.'+COURSE+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content},'PATCH')
+            if len(changed)!=1: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_VERIFY_SAVE')
+            print(json.dumps({'lessonId':lesson,'state':'stored-upload-verified',**evidence}));return
+        raise RuntimeError('MANUAL_UPLOADED_CANDIDATE_NOT_FOUND')
     def retain_review(manifest):
         from urllib.parse import quote
         sheet=get(prefix+'/film-review-sheet.jpg')

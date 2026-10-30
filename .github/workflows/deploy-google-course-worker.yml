@@ -70,6 +70,10 @@ permissions:
 jobs:
   direct-release:
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && inputs.direct_release == true
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15

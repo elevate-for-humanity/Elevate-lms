@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
 import { boundedBuildEnvironment, buildMemoryLimitBytes, withBuildMemoryDefaults, childExitStatus } from './build-memory-policy.mjs';
@@ -191,4 +192,7 @@ test('missing worker regression fixture blocks release admission', async () => {
     await rm(join(root, 'tests/worker/narration-storage-reference.test.mjs'));
     await assert.rejects(checkBuildMemoryPolicy(root), /Worker image regression fixture missing/);
   });
+});
+test('reviewed workload controls remain available when Docker omits CI workflow metadata', () => {
+  validateContainerProfiles(containerBuildPolicy, path => !path.startsWith('.github/') && existsSync(path));
 });

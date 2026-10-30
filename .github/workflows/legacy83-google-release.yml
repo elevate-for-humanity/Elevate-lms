@@ -35,6 +35,8 @@ jobs:
         with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -68,7 +70,7 @@ jobs:
           decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));
           writeFileSync(process.env.SOURCE_ARCHIVE,Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext,'base64')),decipher.final()]),{mode:0o600});
           console.log('Authenticated source revision: '+expected);
-          
+
           NODE
           mkdir "$RUNNER_TEMP/legacy83-source"
           tar -xzf "$SOURCE_ARCHIVE" -C "$RUNNER_TEMP/legacy83-source"
@@ -80,13 +82,17 @@ jobs:
           node --test tests/*.test.mjs
           SUPABASE_SERVICE_ROLE_KEY=build-only-no-live-access npx tsc --noEmit
       - name: Build and upload the isolated customer image
-        working-directory: ${{ runner.temp }}/legacy83-source
         run: |
           set -euo pipefail
+          SOURCE_DIR="$RUNNER_TEMP/legacy83-source"
+          DOCKERFILE="$(node scripts/container-build-policy.mjs legacy83-candidate)"
+          mkdir -p "$SOURCE_DIR/.elevate-build"
+          cp scripts/build-memory-policy.mjs scripts/run-bounded-build.mjs scripts/gcp/prepare-legacy83-config.mjs "$SOURCE_DIR/.elevate-build/"
+          printf '\n!.elevate-build\n!.elevate-build/**\n' >> "$SOURCE_DIR/.dockerignore"
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
           if ! gcloud artifacts docker images describe "$IMAGE" --project="$PROJECT" >/dev/null 2>&1; then
-            docker build --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" .
+            docker build -f "$DOCKERFILE" --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" "$SOURCE_DIR"
             docker push "$IMAGE"
           fi
       - name: Deploy and verify the isolated Google website host

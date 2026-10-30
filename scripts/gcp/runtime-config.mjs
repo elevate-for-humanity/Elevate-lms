@@ -9,7 +9,7 @@ export function configSecret(component) {
 export function googleFailureCode(stderr = '') {
   if (/SERVICE_DISABLED|API .*not enabled|has not been used.*before|is disabled/i.test(stderr)) return 'api_disabled';
   if (/PERMISSION_DENIED|permission denied|does not have permission|Permission .* denied/i.test(stderr)) return 'permission_denied';
-  if (/NOT_FOUND|was not found|does not exist|cannot find (?:job|service|execution)\\b/i.test(stderr)) return 'not_found';
+  if (/NOT_FOUND|was not found|does not exist|cannot find (?:job|service|execution)\b/i.test(stderr)) return 'not_found';
   if (/UNAUTHENTICATED|invalid_grant|authentication failed/i.test(stderr)) return 'authentication_failed';
   if (/RESOURCE_EXHAUSTED|quota exceeded/i.test(stderr)) return 'quota_exceeded';
   return 'command_failed';

@@ -27,6 +27,13 @@ test('phone-size unreadable text routes to the scene producer', () => {
   );
 });
 
+test('encoded caption OCR retries QA on the durable film instead of rerendering it', () => {
+  assert.deepEqual(
+    routeSelectiveRepairs([{code:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED',message:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED:scene:seg-check:390'}]),
+    [{step:'finished_media_qa',codes:['APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED'],rebuildOnlyThisStage:true}],
+  );
+});
+
 
 test('picture mismatch from render routes to its storyboard cue producer', () => {
  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'}];

@@ -27,3 +27,19 @@ test('real Chromium replacement restores owner browser cookies, local storage an
  const recovered={context:recoveredContext,page:recoveredPage,viewport:checkpoint.viewport,events:[]};attachBrowserTabs(recovered,()=>{});await restoreBrowserWorkspaceTabs(recovered,checkpoint);
  assert.equal(recovered.pages.size,2);assert.equal(recovered.page.url(),origin+'/first');assert.equal(await recovered.page.evaluate(()=>localStorage.getItem('draft')),'restored lesson draft');assert.ok((await recovered.page.evaluate(()=>document.cookie)).includes('workspace=authorized'));assert.equal(recovered.page.viewportSize().width,390);
 });
+
+test('storage origin restoration preserves state without issuing a network request',{
+ skip:!process.env.STUDIO_BROWSER_EXECUTABLE_PATH,timeout:30000,
+},async t=>{
+ let requests=0,browser;
+ const fixture=http.createServer((req,res)=>{requests++;res.end('<!doctype html><title>Origin fixture</title>');});
+ await new Promise(r=>fixture.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+fixture.address().port;
+ t.after(async()=>{await browser?.close();fixture.closeAllConnections();await new Promise(r=>fixture.close(r));});
+ browser=await launchBrowser({executablePath:process.env.STUDIO_BROWSER_EXECUTABLE_PATH,args:['--no-sandbox']});
+ const context=await browser.newContext({storageState:{cookies:[],origins:[{origin,localStorage:[{name:'saved-preference',value:'preserved'}]}]}});
+ assert.equal(requests,0,'restoring embedded origin state must not contact its server');
+ assert.equal(context.pages().length,0,'synthetic restoration documents stay out of operator tabs');
+ const page=await context.newPage();await page.goto(origin);
+ assert.ok(requests>0,'normal explicit navigation still contacts the fixture');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('saved-preference')),'preserved');
+});

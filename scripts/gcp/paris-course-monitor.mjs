@@ -87,6 +87,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(expiredExhausted){
       target.searchParams.set('lease_expires_at','lt.'+now.toISOString());
       Object.assign(body,{status:'failed',lease_owner:null,lease_expires_at:null,
+        last_error:job.last_error??'ULTIMATE_WORKER_LEASE_EXPIRED:retry_limit_reached',
         execution_generation:job.execution_generation+1,updated_at:now.toISOString()});
     }
     if(observation.action==='requeue'){

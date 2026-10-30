@@ -17,6 +17,41 @@ test('requires all owning runtime configurations before any mutation', () => {
   assert.equal(calls[0][1],'list');
 });
 
+for (const enabled of [true, false]) {
+  test(`audits a ${enabled ? 'populated' : 'prepared empty'} standalone verifier using the supported Google CLI arguments`, () => {
+    const components = ['admin', 'marketing', 'lms', 'store'];
+    const standalone = 'elevate-quickbooks-webhook-verifier';
+    const calls = [];
+    const run = args => {
+      calls.push(args);
+      if (args[0] === 'secrets' && args[1] === 'list') {
+        return JSON.stringify([...components.map(c => `elevate-${c}-runtime-config`), standalone].map(name => ({ name })));
+      }
+      if (args[0] === 'secrets' && args[2] === 'list') {
+        assert.equal(args[3], standalone, 'secrets versions list requires positional SECRET');
+        assert.equal(args.includes('--secret'), false, 'list does not support the access command secret flag');
+        return JSON.stringify(enabled ? [{ name: `${standalone}/versions/1`, state: 'ENABLED' }] : []);
+      }
+      if (args[0] === 'secrets' && args[2] === 'access') {
+        const secret = args[args.indexOf('--secret') + 1];
+        if (secret === standalone) return 'private-existing-verifier';
+        const component = secret.replace('elevate-', '').replace('-runtime-config', '');
+        return JSON.stringify({ version: 1, component, volumes: [], runtimeFiles: {}, runtimeEnvironment: {} });
+      }
+      if (args[1] === 'services' && args[2] === 'describe') return JSON.stringify({ status: { traffic: [{ percent: 100, revisionName: args[3] }] } });
+      if (args[1] === 'revisions' && args[2] === 'describe') return JSON.stringify({ spec: { containers: [{ env: [] }] } });
+      throw Error('Unexpected or mutating operation during audit');
+    };
+    const report = repairQuickBooksProduction({ run });
+    assert.equal(report.mode, 'audit');
+    assert.equal(report.existingVerifierFound, enabled);
+    assert.equal(report.companyAuthorizationVerified, false);
+    assert.equal(report.webhookDeliveryVerified, false);
+    assert.equal(JSON.stringify(report).includes('private-existing-verifier'), false);
+    assert.equal(calls.some(args => args.includes('add') || args.includes('update')), false);
+  });
+}
+
 test('applies production and recovered verifier while preserving unrelated settings and verifying serving revisions', async () => {
   const {readFileSync}=await import('node:fs');
   const components=['admin','marketing','lms','store'];

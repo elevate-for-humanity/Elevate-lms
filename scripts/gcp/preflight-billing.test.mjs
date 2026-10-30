@@ -41,7 +41,10 @@ test('Google uploads require billing and identity while independent builds stay 
     assert.ok(refresh > source.indexOf(build) && refresh < source.indexOf(uploadName), file);
   }
   assert.match(readFileSync(new URL('../../.dockerignore', import.meta.url), 'utf8'), /^\*\*\/gha-creds-\*\.json$/m);
-  assert.match(readFileSync(new URL('../../.github/workflows/build-google-migration-images.yml', import.meta.url), 'utf8'), /cancel-in-progress: true/);
+  const imageWorkflow=readFileSync(new URL('../../.github/workflows/build-google-migration-images.yml', import.meta.url), 'utf8');
+  const imageConcurrency=imageWorkflow.slice(imageWorkflow.indexOf('concurrency:'),imageWorkflow.indexOf('jobs:'));
+  assert.match(imageConcurrency, /group: google-image-/);
+  assert.match(imageConcurrency, /cancel-in-progress: false/, 'new source must not cancel a built image during authenticated upload');
 });
 test('retired provider deletion jobs cannot run when changes reach main', () => {
   for (const file of ['purge-all-gpu-resources.yml', 'delete-stuck-gpu-volume.yml', 'delete-legacy-gpu-build-service.yml']) {

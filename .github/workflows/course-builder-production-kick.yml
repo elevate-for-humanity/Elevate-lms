@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: course-builder-production-kick
@@ -28,65 +29,14 @@ jobs:
   kick-canonical-runs:
     name: Keep authorized canonical course workers active
     runs-on: ubuntu-latest
-    timeout-minutes: 75
-    env:
-      ADMIN_URL: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app'
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - name: Require production worker credentials
+      # The canonical Google coordinator owns build selection, pool profiles,
+      # generation fences and leases. Never restart legacy video_jobs by slug.
+      - name: Continue approved checkpointed Google course work
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$CRON_SECRET"
-          test -n "$ADMIN_URL"
-
-      - name: Continue canonical media workers for one hour
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          course_ids=()
-          course_names=()
-          lookup_failed=0
-          for slug in barber-apprenticeship cosmetology-apprenticeship hvac-technician business-administration; do
-            if course_id="$(node scripts/course-factory/resolve-course-id.mjs "$slug")"; then
-              course_ids+=("$course_id")
-              course_names+=("$slug")
-            else
-              echo "::error::Canonical lookup failed for $slug; continuing other authorized courses without selecting a substitute"
-              lookup_failed=1
-            fi
-          done
-          course_count=${#course_ids[@]}
-          test "$course_count" -gt 0 || { echo '::error::No canonical courses resolved'; exit 1; }
-
-          kick_course() {
-            local label="$1"
-            local course_id="$2"
-            local failure_reason="$3"
-            echo "$label:"
-            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-              -H "Authorization: Bearer $CRON_SECRET" \
-              -H "Content-Type: application/json" \
-              --data "{\"courseId\":\"${course_id}\",\"maxJobs\":1}" \
-              --max-time 60 || echo "{\"ok\":false,\"reason\":\"${failure_reason}\"}"
-            echo
-          }
-
-          for pass in $(seq 1 12); do
-            echo "=== media continuation pass $pass/12 ==="
-            # Rotate first claim across all four courses so no backlog is starved.
-            for ((offset=0; offset<course_count; offset++)); do
-              index=$(( (pass - 1 + offset) % course_count ))
-              kick_course "${course_names[$index]}" "${course_ids[$index]}" "canonical-worker-request-failed"
-            done
-            if [ "$pass" -lt 12 ]; then
-              sleep 300
-            fi
-          done
-          exit "$lookup_failed"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main

@@ -1,6 +1,7 @@
 import {randomUUID} from 'node:crypto';
 import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';
 import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';
+import {verifyStudioWorkspacePreservation} from './verify-studio-workspace-preservation.mjs';
 import {execFileSync, execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {mkdir, writeFile} from 'node:fs/promises';
@@ -55,7 +56,7 @@ if(candidateTag.length+name.length>46)throw Error('STUDIO_CANDIDATE_TAG_TOO_LONG
 if((existingService.status?.traffic||[]).some(t=>t.tag===candidateTag))throw Error('STUDIO_CANDIDATE_TAG_COLLISION');
 let url,state,candidateRevision,trafficActivated=false;
 try {
-command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--no-traffic','--tag='+candidateTag,'--update-env-vars=STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org,GIT_SHA='+sha,'--update-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest',...mountArguments,'--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--liveness-probe=httpGet.path=/live,httpGet.port=3100,periodSeconds=30,timeoutSeconds=5,failureThreshold=3','--quiet']);
+command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--no-traffic','--tag='+candidateTag,'--update-env-vars=STUDIO_WORKSPACE_OBJECT_PREFIX=workspaces/admin-repository-v1,STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org,GIT_SHA='+sha,'--update-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest',...mountArguments,'--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--liveness-probe=httpGet.path=/live,httpGet.port=3100,periodSeconds=30,timeoutSeconds=5,failureThreshold=3','--quiet']);
 const service=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
 url=service.status.url;
 candidateRevision=service.status.latestCreatedRevisionName;
@@ -111,7 +112,14 @@ if(process.env.STUDIO_CANDIDATE_ONLY==='true'){
   // Keep the known-good serving revision and all its sessions untouched.
 } else {
 const live=await inventoryStudioLiveState({run:command});
-if(live.activeBrowserSessions!==0||live.workspace.files!==0||live.workspace.symlinks!==0||live.directChildShells!==0||live.directNonBrowserProcesses!==0||live.processInventoryReadable!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+if(live.activeBrowserSessions!==0||live.workspace.symlinks!==0||live.directChildShells!==0||live.directNonBrowserProcesses!==0||live.processInventoryReadable!==true||!Number.isSafeInteger(live.workspace.files)||live.workspace.files<0)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+if(live.workspace.files>0){
+  const preservation=await verifyStudioWorkspacePreservation({sourceUrl:url,candidateUrl:candidate.url,secret,expectedFiles:live.workspace.files});
+  if(preservation?.passed!==true||preservation.files!==live.workspace.files)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+  const current=await inventoryStudioLiveState({run:command});
+  if(current.commit!==live.commit||current.activeBrowserSessions!==0||current.workspace.files!==live.workspace.files||current.workspace.symlinks!==0||current.directChildShells!==0||current.directNonBrowserProcesses!==0||current.processInventoryReadable!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+  console.log(JSON.stringify({candidateRevision,workspacePreservation:preservation}));
+}
 command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+candidateRevision+'=100','--quiet']);
 trafficActivated=true;
 state=await verifyHealth(url,'Public browser did not serve the verified candidate');
@@ -126,10 +134,12 @@ state=await verifyHealth(url,'Public browser did not serve the verified candidat
 } finally {
   // A verification tag keeps min=1 warm. Release only this exact candidate's
   // tag after acceptance/failure, retaining its revision and the old traffic.
-  if(process.env.STUDIO_CANDIDATE_ONLY==='true'&&candidateRevision){
+  if((process.env.STUDIO_CANDIDATE_ONLY==='true'||!trafficActivated)&&candidateRevision){
     try {
       const current=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
-      if(current.status?.traffic?.some(t=>t.tag===candidateTag&&t.revisionName===candidateRevision))
+      if(current.status?.traffic?.some(t=>t.tag===candidateTag&&t.revisionName===candidateRevision)&&
+        !current.status?.traffic?.some(t=>t.revisionName===candidateRevision&&t.percent>0)&&
+        !current.spec?.traffic?.some(t=>t.percent>0&&(t.revisionName===candidateRevision||t.latestRevision)))
         command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--remove-tags='+candidateTag,'--quiet']);
       console.log(JSON.stringify({candidateRevision,candidateTagReleased:true,revisionRetained:true,servingTrafficChanged:false}));
     } catch {throw Error('STUDIO_CANDIDATE_TAG_CLEANUP_UNVERIFIED');}

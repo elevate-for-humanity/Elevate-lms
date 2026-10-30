@@ -431,7 +431,7 @@ export function isPrivateAddress(address) {
   );
 }
 
-async function validateTarget(input) {
+function browserTarget(input) {
   let url;
   try {
     url = new URL(input);
@@ -443,6 +443,17 @@ async function validateTarget(input) {
   if (url.username || url.password) throw new BrowserServiceError('invalid_target', 400);
   if (url.port && !['80', '443'].includes(url.port))
     throw new BrowserServiceError('invalid_target', 400);
+  return url;
+}
+
+async function validatePublicTarget(url,lookup) {
+  const records = await lookup(url.hostname.toLowerCase(), { all: true });
+  if (!records.length || records.some((record) => isPrivateAddress(record.address)))
+    throw new BrowserServiceError('invalid_target', 400);
+}
+
+async function validateTarget(input, {lookup=dns.lookup}={}) {
+  const url=browserTarget(input);
   const host = url.hostname.toLowerCase();
   if (
     allowedDomains.length &&
@@ -450,10 +461,22 @@ async function validateTarget(input) {
   ) {
     throw new BrowserServiceError('invalid_target', 400);
   }
-  const records = await dns.lookup(host, { all: true });
-  if (!records.length || records.some((record) => isPrivateAddress(record.address)))
-    throw new BrowserServiceError('invalid_target', 400);
+  await validatePublicTarget(url,lookup);
   return url.toString();
+}
+
+export async function validateRestoredBrowserWorkspace(checkpoint, {lookup=dns.lookup}={}) {
+  for(const url of checkpoint.tabs)if(url!=='about:blank')await validateTarget(url,{lookup});
+  // Embedded frames have their own origins. CDP restores their storage in
+  // isolated synthetic documents with every request intercepted locally; it
+  // does not navigate the operator to these origins. Applying the top-level
+  // domain allowlist here made a valid saved Envato session impossible to reopen.
+  // Keep exact-origin syntax and private-network rejection for persisted state.
+  for(const entry of checkpoint.storageState.origins){
+    const url=browserTarget(entry.origin);
+    if(url.origin!==entry.origin)throw new BrowserServiceError('invalid_target',400);
+    await validatePublicTarget(url,lookup);
+  }
 }
 
 function authorized(req, session, requestUrl) {
@@ -938,8 +961,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
     restored=await browserWorkspaces.load(persistentOwner);
     if(restored){
       viewport={...restored.viewport};
-      for(const url of restored.tabs)if(url!=='about:blank')await validateTarget(url);
-      for(const origin of restored.storageState.origins)await validateTarget(origin.origin);
+      await validateRestoredBrowserWorkspace(restored);
     }
   }catch{throw new BrowserServiceError('session_restore_failed',503);}
   const initialTarget=restored?.tabs[0]||target;

@@ -1,0 +1,51 @@
+name: Repair PARIS model memory budget
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/repair-owned-cpu-memory.yml
+      - scripts/gcp/repair-owned-cpu-memory.mjs
+      - scripts/gcp/repair-owned-cpu-memory.test.mjs
+permissions:
+  contents: read
+concurrency:
+  group: google-private-cpu-model-release
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    permissions: {contents: read, actions: write}
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-owned-cpu-memory.yml/dispatches" -f ref=main
+  repair:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: production
+    permissions: {contents: read, id-token: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify bounded memory repair and rollback contracts
+        run: node --test scripts/gcp/repair-owned-cpu-memory.test.mjs scripts/gcp/deploy-owned-cpu-model.test.mjs scripts/gcp/accept-owned-cpu-model.test.mjs scripts/gcp/request-run-headroom.test.mjs
+      - uses: google-github-actions/auth@v3
+        id: invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Stage bounded caches, test real inference repeatedly, and activate only on acceptance
+        env:
+          MODEL_INVOKER_TOKEN: ${{ steps.invocation.outputs.id_token }}
+          REQUEST_PARIS_STAGING_HEADROOM: 'true'
+        run: node scripts/gcp/repair-owned-cpu-memory.mjs

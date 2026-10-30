@@ -23,6 +23,7 @@ on:
       - 'tests/e2e/public-runtime-acceptance.spec.ts'
       - 'scripts/gcp/production-acceptance.*'
       - 'scripts/qa/require-portal-e2e-identities.*'
+      - 'scripts/qa/portal-acceptance-concurrency.test.mjs'
       - 'components/home/ScrollNarrator.tsx'
       - 'components/voice/useNaturalVoice.ts'
       - 'components/marketing/HeroVideo.tsx'
@@ -46,17 +47,16 @@ permissions:
   actions: read
   issues: write
 
-# Keep source-regression QA and exact deployed-SHA certification independent.
-# Newer runs may supersede older runs of the same authority class, but a
-# test-only push must never cancel the workflow_run that certifies production.
-concurrency:
-  group: registered-apprenticeship-e2e-${{ (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
-  cancel-in-progress: true
-
 jobs:
   production-authenticated-e2e:
     # Dispatch-only success proves the deployment ran, not just that it was queued.
     if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
+    # Acquire concurrency only after this job is admitted. Workflow-level locks
+    # let skipped push-dispatch notifications cancel real production acceptance.
+    # Keep source regression and exact deployed-SHA certification independent.
+    concurrency:
+      group: registered-apprenticeship-e2e-${{ (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
+      cancel-in-progress: true
     name: Full portal authenticated persistence and responsive design
     runs-on: ubuntu-24.04
     environment: production
@@ -72,6 +72,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify skipped notifications cannot cancel production acceptance
+        run: node --test scripts/qa/portal-acceptance-concurrency.test.mjs
       - name: Verify explicit deployment handoff before checking out its tested commit
         if: inputs.deployment_run_id != '' || inputs.deployed_sha != '' || inputs.component != ''
         env:
@@ -133,16 +135,24 @@ jobs:
         run: node scripts/check-registered-apprenticeship-architecture.mjs
       - name: Verify public hydration, startup stability and audible-media exclusivity
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/studio
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
         if: ${{ !cancelled() }}
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/responsive
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Require the attested release to remain live through acceptance
         if: ${{ !cancelled() && inputs.deployment_run_id != '' }}
         env:

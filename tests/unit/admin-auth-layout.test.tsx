@@ -50,6 +50,8 @@ describe('Admin authentication layout', () => {
       <AdminApplicationChrome navSections={[]}>Studio content</AdminApplicationChrome>,
     );
     expect(html).toContain('data-elevate-dashboard-shell="studio"');
+    // Reading settings precede this chrome; document flow would push Send below the viewport.
+    expect(html).toContain('fixed inset-0');
     expect(html).not.toContain('Dashboard navigation');
     expect(html).not.toContain('Dashboard dock');
   });

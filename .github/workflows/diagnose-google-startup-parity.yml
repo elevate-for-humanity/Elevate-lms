@@ -32,4 +32,5 @@ jobs:
         with:
           skip_install: true
       - run: node scripts/gcp/verify-sdk.mjs
+      - run: node --test scripts/gcp/diagnose-startup-parity.test.mjs
       - run: node scripts/gcp/diagnose-startup-parity.mjs

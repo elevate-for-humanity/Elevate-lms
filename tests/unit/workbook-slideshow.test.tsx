@@ -72,9 +72,11 @@ it('narrates each screen after opt-in and never reads the learner answer', async
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
   await waitFor(() => expect(screen.getByRole('heading', { name: 'Practice 1' })).toBeVisible());
   expect(screen.getAllByRole('textbox')).toHaveLength(1);
-  expect(voice.play).toHaveBeenLastCalledWith(
-    expect.stringContaining('Describe cleaning.'),
-    expect.any(Object),
+  await waitFor(() =>
+    expect(voice.play).toHaveBeenLastCalledWith(
+      expect.stringContaining('Describe cleaning.'),
+      expect.any(Object),
+    ),
   );
   expect(JSON.stringify(voice.play.mock.calls)).not.toContain('Private learner response');
   fireEvent.click(screen.getByRole('button', { name: 'Back' }));

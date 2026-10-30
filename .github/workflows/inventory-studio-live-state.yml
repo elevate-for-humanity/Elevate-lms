@@ -41,3 +41,5 @@ jobs:
         run: node scripts/gcp/inventory-studio-live-state.mjs --admin-github-bindings
       - name: Count existing workspace files and active sessions without reading private contents
         run: node scripts/gcp/inventory-studio-live-state.mjs
+      - name: Compare aggregate workspace proofs without changing files or traffic
+        run: node scripts/gcp/inventory-studio-live-state.mjs --preservation

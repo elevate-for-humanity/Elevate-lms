@@ -44,7 +44,8 @@ COPY --from=build /output/elevate/ /models/elevate/
 COPY services/llm-cpu-worker/entrypoint.sh /entrypoint.sh
 RUN chmod 555 /entrypoint.sh /opt/llama/llama-server && chmod -R a+rX /models/elevate
 ENV LD_LIBRARY_PATH=/opt/llama HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
-    OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1
+    OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 \
+    LLAMA_ARG_CACHE_RAM=0 LLAMA_ARG_CTX_CHECKPOINTS=0
 USER 10001
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint.sh"]

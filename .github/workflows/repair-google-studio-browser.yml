@@ -6,6 +6,7 @@ on:
       - '.dockerignore'
       - '.github/workflows/repair-google-studio-browser.yml'
       - 'scripts/gcp/repair-studio-browser-cloud-run.mjs'
+      - 'scripts/gcp/verify-studio-workspace-preservation*.mjs'
       - 'services/studio-browser/**'
       - 'Dockerfile.studio-browser'
       - 'scripts/gcp/preflight-studio-browser-permissions.mjs'
@@ -69,7 +70,7 @@ jobs:
         with:
           skip_install: true
       - name: Verify cutover, encryption-key preservation and exact revision diagnostics
-        run: node --test scripts/test-studio-browser-cutover.mjs scripts/gcp/verify-studio-runtime-replacement.test.mjs
+        run: node --test scripts/test-studio-browser-cutover.mjs scripts/gcp/verify-studio-runtime-replacement.test.mjs scripts/gcp/verify-studio-workspace-preservation.test.mjs
       - name: Verify the existing Studio target and prepared boundary before building
         run: node scripts/gcp/preflight-studio-browser-permissions.mjs
       - name: Verify the owner-prepared dedicated Studio runtime identity

@@ -35,7 +35,9 @@ test(
     }
     if (req.url === '/learner-controls') {
       res.setHeader('Content-Type', 'text/html');
-      res.end(`<!doctype html><h1>Local learner adapter fixture</h1><main data-testid="staged-lesson">
+      res.end(`<!doctype html><h1>Local learner adapter fixture</h1>
+        <main data-testid="staged-lesson" hidden><button>Complete lesson</button></main>
+        <main data-testid="staged-lesson">
         <p role="status">Saved position: 5</p>
         <section data-testid="guided_practice"><p>First prompt</p><textarea aria-label="First prompt"></textarea><button>Submit practice</button></section>
         <section data-testid="guided_practice"><p>Second prompt</p><textarea aria-label="Second prompt"></textarea><button>Submit practice</button></section>
@@ -47,7 +49,7 @@ test(
         document.querySelectorAll('[data-testid="guided_practice"] button').forEach(button=>button.onclick=()=>{const status=document.createElement('p');status.setAttribute('role','status');status.textContent='Practice saved.';button.parentElement.append(status);});
         document.querySelectorAll('[data-testid="scenario"] button').forEach((button,index)=>button.onclick=()=>{button.parentElement.querySelector('[role="status"]').textContent=index?'Correct decision.':'Review this decision.';});
         document.querySelector('#assessment button').onclick=()=>{const passed=document.querySelector('input:checked')?.value==='1';document.querySelector('#assessment [role="status"]').textContent=passed?'Score: 100. Passed.':'Score: 0. Review required.';if(!passed){document.querySelector('#remediation').innerHTML='<section data-testid="remediation"><button>I have reviewed the missed objectives</button></section>';document.querySelector('#remediation button').onclick=()=>{document.querySelector('#assessment').setAttribute('data-testid','reassessment');};}};
-        document.querySelector('#complete').onclick=()=>{sessionStorage.setItem('completed','true');const done=document.createElement('p');done.dataset.testid='lesson-completed';done.setAttribute('role','status');done.textContent='Lesson completed';document.querySelector('main').append(done);};
+        document.querySelector('#complete').onclick=()=>{sessionStorage.setItem('completed','true');const done=document.createElement('p');done.dataset.testid='lesson-completed';done.setAttribute('role','status');done.textContent='Lesson completed';document.querySelector('#complete').closest('main').append(done);};
         if(sessionStorage.getItem('completed'))document.querySelector('#complete').click();
         </script>`); return;
     }
@@ -302,7 +304,9 @@ test(
     const learner = await context.newPage();
     try {
       await learner.goto(origin + '/learner-controls');
-      await learner.getByTestId('staged-lesson').waitFor();
+      const staged = learner.getByTestId('staged-lesson');
+      assert.equal(await staged.count(), 2);
+      await staged.filter({ visible: true }).first().waitFor();
       for (const prompt of ['First prompt', 'Second prompt']) {
         const section = learner.getByTestId('guided_practice').filter({ has: learner.getByText(prompt, { exact: true }) });
         await section.locator('textarea').fill('Response: ' + prompt);

@@ -20,6 +20,7 @@ async function execute(overrides={}){
  globalThis.__studioCutoverFixture={
   async verifyStudioRuntimeReplacement(options){f.replacementOptions=options;f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
   async inventoryStudioLiveState(){return f.live||{activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true};},
+  async verifyStudioWorkspacePreservation(options){f.preservationOptions=options;f.events.push({workspacePreservation:true});if(!f.preservation)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');return f.preservation;},
   execFileSync(_program,args){return output(args);},
   execFile(_program,args,_options,callback){f.diagnostics.push(args);callback(null,{stdout:args.includes('--format=value(status.latestCreatedRevisionName)')?'browser-failed-revision':args[0]==='run'?JSON.stringify({metadata:{name:'failed'},spec:{containers:[{env:[{name:'PRIVATE_TOKEN',value:'private-runtime-value'}]}]}}):JSON.stringify([{textPayload:'private-log-value',severity:'ERROR',timestamp:'2026-10-17T00:00:00Z'}])});},
   async mkdir(){},async writeFile(name,body){f.files.push({name,body});},
@@ -37,6 +38,7 @@ async function execute(overrides={}){
  const source=raw
   .replace("import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';","const verifyStudioRuntimeReplacement=globalThis.__studioCutoverFixture.verifyStudioRuntimeReplacement;")
   .replace("import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';","const inventoryStudioLiveState=globalThis.__studioCutoverFixture.inventoryStudioLiveState;")
+  .replace("import {verifyStudioWorkspacePreservation} from './verify-studio-workspace-preservation.mjs';","const verifyStudioWorkspacePreservation=globalThis.__studioCutoverFixture.verifyStudioWorkspacePreservation;")
   .replace("import {execFileSync, execFile} from 'node:child_process';","const {execFileSync,execFile,fetch,process,console,mkdir,writeFile,setTimeout}=globalThis.__studioCutoverFixture;")
   .replace("import {mkdir, writeFile} from 'node:fs/promises';","");
  try{await import('data:text/javascript;base64,'+Buffer.from(source+'\n// invocation '+serial++).toString('base64'));}catch(error){f.error=error;}
@@ -74,10 +76,28 @@ test('new image deployments replace a stale runtime commit override with the exa
  assert.ok(!deploy.some(a=>a.startsWith('--set-env-vars=')));
 });
 
+test('production restoration overrides an inherited isolated acceptance workspace prefix',async()=>{
+ const f=await execute({browserSpec:{containers:[{env:[{name:'STUDIO_WORKSPACE_OBJECT_PREFIX',value:'workspaces/acceptance-11111111-1111-1111-1111-111111111111'}]}]}});
+ assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ const env=deploy.find(a=>a.startsWith('--update-env-vars='));
+ assert.ok(env.slice('--update-env-vars='.length).split(',').includes('STUDIO_WORKSPACE_OBJECT_PREFIX=workspaces/admin-repository-v1'));
+ assert.equal(f.commands.some(a=>a.includes('delete')),false);
+});
+
 test('unready persistent storage preserves Admin and collects exact revision diagnostics',async()=>{
  const f=await execute({state:{commit:sha,ready:true,providerAuthStorage:{persistent:false}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
  const logs=f.diagnostics.find(a=>a[0]==='logging');assert.ok(logs);assert.match(logs[2],/revision_name="browser-failed-revision"/);
+});
+
+test('a failed production candidate releases only its unused tag and keeps the revision and serving traffic',async()=>{
+ const f=await execute({foundation:{passed:false,commit:sha,checks:[]}});
+ assert.match(f.error.message,/foundation evidence invalid/);
+ const tag=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy').find(a=>a.startsWith('--tag=')).slice(6);
+ assert.ok(f.commands.some(a=>a.includes('--remove-tags='+tag)));
+ assert.equal(f.commands.some(a=>a.includes('delete')||a.some(v=>v.startsWith('--to-revisions='))),false);
+ assert.equal(switched(f),false);
 });
 test('anonymous workspace authorization regression prevents Admin cutover',async()=>{
  const f=await execute({anonymous:200});assert.match(f.error.message,/authorization boundary/);assert.equal(switched(f),false);
@@ -125,7 +145,7 @@ test('failed public cutover restores previous traffic and leaves Admin unchanged
 test('unready candidates never change serving traffic',async()=>{
  const f=await execute({state:{commit:sha,ready:false,providerAuthStorage:{persistent:true}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
- assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
+ assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);
 });
 
 test('browser candidate runs as the dedicated Studio identity rather than Admin',async()=>{
@@ -163,7 +183,7 @@ test('candidate acceptance leaves serving traffic and Admin untouched',async()=>
 test('live browser foundation failure preserves old traffic even when HTTP health passes',async()=>{
  const f=await execute({foundation:{passed:false,commit:sha,checks:[{name:'restore',passed:false}]}});
  assert.match(f.error.message,/foundation evidence invalid/);
- assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);assert.equal(switched(f),false);
+ assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);assert.equal(switched(f),false);
 });
 
 test('routine candidate release never provisions identities, secrets or storage grants',async()=>{
@@ -179,6 +199,16 @@ test('HTTP health and browser foundation cannot replace full runtime recovery ac
 });
 test('a passing replacement proof never discards existing serving workspace files',async()=>{
  const f=await execute({live:{activeBrowserSessions:0,workspace:{files:1,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true}});assert.match(f.error.message,/STUDIO_LIVE_STATE_REQUIRES_PRESERVATION/);assert.equal(switched(f),false);assert.ok(!f.commands.some(a=>a.includes('--to-revisions=browser-candidate=100')));
+});
+
+test('nonempty workspaces can switch only after exact durable file preservation is verified',async()=>{
+ const f=await execute({live:{activeBrowserSessions:0,workspace:{files:13943,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true},preservation:{passed:true,files:13943}});
+ assert.equal(f.error,undefined);assert.equal(switched(f),true);
+ const proof=f.events.findIndex(e=>e.workspacePreservation);
+ const activation=f.events.findIndex(e=>e.command?.includes('--to-revisions=browser-candidate=100'));
+ assert.ok(proof>=0&&proof<activation);
+ assert.equal(f.preservationOptions.sourceUrl,'https://browser.example.run.app');
+ assert.equal(f.preservationOptions.candidateUrl,'https://candidate.example.test');
 });
 
 test('repeated verification of the same image uses a fresh tag and never reuses the active browser alias',async()=>{

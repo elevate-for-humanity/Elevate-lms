@@ -30,7 +30,7 @@ const MAX_BLACK_SECONDS = 0.75;
 // oracle. Technical acronyms and product names routinely vary in ASR output.
 
 export interface MediaQualityEvidence {
-  approvedPresentationInspection?: {pass: boolean; backgrounds: Array<{sceneId:string;passed:boolean}>; captions: Array<{sceneId:string;width:number;time:number;expected:string;decoded:string;wordCoverage:number}>};
+  approvedPresentationInspection?: {pass: boolean; backgrounds: Array<{sceneId:string;passed:boolean}>; captions: Array<{sceneId:string;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'direct'|'upscaled'}>};
   mediaSha256?: string;
   actualTranscript?: string;
   readability?: Array<{ scene: number; width: number; wordCoverage: number; ocrMode?: 'full-frame' | 'title-region' }>;
@@ -48,6 +48,7 @@ export interface MediaQualityEvidence {
   height: number;
   openingStillUrl?: string;
   sceneChanges: number;
+  encodedBoundarySceneChanges?: number;
   longestFreezeSeconds: number;
   longestBlackSeconds: number;
   expectedSceneCount: number;
@@ -218,6 +219,47 @@ function frameDifference(a: Buffer, b: Buffer): number {
   let total = 0;
   for (let index = 0; index < length; index += 1) total += Math.abs(a[index] - b[index]);
   return total / length;
+}
+
+export function countEncodedAdjacentChanges(samples: Buffer[], threshold = 3.5): number {
+  let changes = 0;
+  for (let index = 1; index < samples.length; index += 1) {
+    if (frameDifference(samples[index - 1], samples[index]) >= threshold) changes += 1;
+  }
+  return changes;
+}
+
+async function inspectEncodedSceneBoundaries(
+  videoPath: string,
+  workDir: string,
+  sceneData: MediaStoryboard,
+  premium: boolean,
+): Promise<number> {
+  const width = 32;
+  const height = 18;
+  const fps = 2;
+  const frameSize = width * height;
+  const samplePath = join(workDir, 'scene-boundary-audit-gray.raw');
+  await execFileAsync(
+    'ffmpeg',
+    ['-hide_banner','-loglevel','error','-y','-i',videoPath,'-vf',`fps=${fps},scale=${width}:${height}:flags=area,format=gray`,'-an','-f','rawvideo',samplePath],
+    { timeout: 180_000, maxBuffer: 2_000_000 },
+  );
+  const raw = await readFile(samplePath);
+  const frames: Buffer[] = [];
+  for (let offset = 0; offset + frameSize <= raw.length; offset += frameSize)
+    frames.push(raw.subarray(offset, offset + frameSize));
+  if (!frames.length) return 0;
+
+  let cursor = Number((sceneData as any).preRollDurationSeconds ?? 0) + (premium ? 0 : 3);
+  const samples = sceneData.scenes.map(scene => {
+    const duration = Number(scene.durationSeconds);
+    const midpoint = cursor + Math.max(0, duration / 2);
+    cursor += duration;
+    const frameIndex = Math.min(frames.length - 1, Math.max(0, Math.round(midpoint * fps)));
+    return frames[frameIndex];
+  });
+  return countEncodedAdjacentChanges(samples);
 }
 
 async function detectBackwardTimelineReplay(
@@ -566,6 +608,16 @@ export async function enforceMediaQuality(input: {
       ],
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
+    // The approved presentation intentionally crossfades whole pictures. FFmpeg's
+    // hard-cut detector can miss those gradual transitions, so independently
+    // compare decoded midpoint frames from every authored scene. This measures
+    // the encoded movie; it never trusts storyboard hashes as delivery proof.
+    const encodedBoundarySceneChanges = await inspectEncodedSceneBoundaries(
+      videoPath,
+      workDir,
+      input.sceneData,
+      input.lessonPresentation === 'approved-premium-v1',
+    );
     const { stderr: freezeOutput } = await execFileAsync(
       'ffmpeg',
       [
@@ -652,9 +704,20 @@ export async function enforceMediaQuality(input: {
           const captionTime=sceneStart+(sample.startSeconds+sample.endSeconds)/2;
           const frame=join(workDir,`caption-${index}-${sampleIndex}-${width}.png`);
           await execFileAsync('ffmpeg',['-y','-ss',String(captionTime),'-i',videoPath,'-frames:v','1','-vf',`scale=${width}:-1,crop=iw:ih/6:0:ih*5/6`,frame],{timeout:30000,maxBuffer:1000000});
-          const decoded=await execFileAsync('tesseract',[frame,'stdout','--psm','6'],{timeout:30000,maxBuffer:1000000});
-          const wordCoverage=captionWordCoverage(sample.text,decoded.stdout);
-          approvedPresentationInspection.captions.push({sceneId:scene.id,width,time:captionTime,expected:sample.text,decoded:decoded.stdout,wordCoverage});
+          let decoded=await execFileAsync('tesseract',[frame,'stdout','--psm','6'],{timeout:30000,maxBuffer:1000000});
+          let wordCoverage=captionWordCoverage(sample.text,decoded.stdout);
+          let ocrMode: 'direct'|'upscaled' = 'direct';
+          // Phone-sized captions are deliberately inspected after downscaling.
+          // If OCR misses small glyphs, re-read only those same encoded pixels at
+          // a larger sampling scale. The required 85% coverage is unchanged.
+          if(wordCoverage<0.85) {
+            const enlarged=join(workDir,`caption-${index}-${sampleIndex}-${width}-ocr.png`);
+            await execFileAsync('ffmpeg',['-v','error','-y','-i',frame,'-vf','scale=iw*4:ih*4:flags=lanczos',enlarged],{timeout:30000,maxBuffer:1000000});
+            const retry=await execFileAsync('tesseract',[enlarged,'stdout','--psm','6'],{timeout:30000,maxBuffer:1000000});
+            const retryCoverage=captionWordCoverage(sample.text,retry.stdout);
+            if(retryCoverage>wordCoverage){decoded=retry;wordCoverage=retryCoverage;ocrMode='upscaled';}
+          }
+          approvedPresentationInspection.captions.push({sceneId:scene.id,width,time:captionTime,expected:sample.text,decoded:decoded.stdout,wordCoverage,ocrMode});
           if(wordCoverage<0.85)throw new Error(`APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED:${scene.id}:${width}`);
         }
       }
@@ -766,7 +829,11 @@ export async function enforceMediaQuality(input: {
       width: Number(videoStream?.width ?? 0),
       height: Number(videoStream?.height ?? 0),
       openingStillUrl: input.sceneData.scenes[0]?.referenceImageUrl,
-      sceneChanges: (String(sceneOutput).match(/pts_time:/g) ?? []).length,
+      sceneChanges: Math.max(
+        (String(sceneOutput).match(/pts_time:/g) ?? []).length,
+        encodedBoundarySceneChanges,
+      ),
+      encodedBoundarySceneChanges,
       longestFreezeSeconds: freezeIntervals.length
         ? Math.max(0, ...unexplainedFreezes.map(interval => interval.end - interval.start))
         : longestMetric(String(freezeOutput), 'freeze_duration'),

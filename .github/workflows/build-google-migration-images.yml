@@ -17,7 +17,9 @@ permissions:
   id-token: write
 concurrency:
   group: google-image-${{ inputs.component }}
-  cancel-in-progress: true
+  # Finish the active immutable image and its upload. Keep the newest pending
+  # request; cancelling in-flight uploads starves production during active work.
+  cancel-in-progress: false
 jobs:
   image:
     if: github.ref == 'refs/heads/main'

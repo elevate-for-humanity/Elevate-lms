@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getOpenBadgeStatus } from '@/lib/credentials/open-badges';
+import { PUBLIC_AWARD_DEFINITION, awardBadgeImage } from '@/lib/credentials/award-definition';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export default async function CredentialVerificationPage({
       `verification_code, status, issued_at, expires_at, revoked_at, revoked_reason,
        badge_url, certificate_url, open_badge_status, open_badge_credential_url,
        open_badge_proof_type,
-       credentials!inner(name, description, issuing_authority, partner_id, badge_image_url)`
+       ${PUBLIC_AWARD_DEFINITION}`
     )
     .eq('verification_code', verificationCode)
     .maybeSingle();
@@ -34,26 +35,16 @@ export default async function CredentialVerificationPage({
   const definition = Array.isArray(data.credentials) ? data.credentials[0] : data.credentials;
   if (!definition) notFound();
 
-  let partner: { name: string; type: string } | null = null;
-  if (definition.partner_id) {
-    const { data: partnerData } = await db
-      .from('credentialing_partners')
-      .select('name, type')
-      .eq('id', definition.partner_id)
-      .maybeSingle();
-    partner = partnerData;
-  }
-
   const status = getOpenBadgeStatus({
     status: data.status,
     expiresAt: data.expires_at,
     revokedAt: data.revoked_at,
   });
 
-  const badgeImage = data.badge_url || definition.badge_image_url;
+  const badgeImage = data.badge_url || awardBadgeImage(definition);
   const verified = status === 'active';
-  const internalIssuer = partner?.type === 'internal';
-  const issuerName = definition.issuing_authority || partner?.name || 'Credential issuer';
+  const internalIssuer = definition.issuer_type === 'elevate_issued';
+  const issuerName = definition.issuing_authority || 'Credential issuer';
 
   return (
     <main className="min-h-screen bg-slate-50 py-12">

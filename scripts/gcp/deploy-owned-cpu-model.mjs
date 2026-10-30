@@ -6,6 +6,9 @@ import {modelCredential} from './deploy-owned-llm.mjs';
 
 export const CPU_SERVICE='elevate-owned-cpu-llm';
 export const CPU_REGION='us-east1';
+// The engine defaults to an additional 8 GiB prompt cache. That cannot fit
+// alongside model weights and the active context in an 8 GiB container.
+export const CPU_CACHE_ENV={LLAMA_ARG_CACHE_RAM:'0',LLAMA_ARG_CTX_CHECKPOINTS:'0'};
 const MODEL_IDENTITY=`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`;
 const DEPLOY_IDENTITY=`elevate-github-deploy@${PROJECT}.iam.gserviceaccount.com`;
 const SECRET='elevate-owned-llm-token';
@@ -17,6 +20,7 @@ export function privateCpuDeploymentArguments(digest) {
     '--image',`us-central1-docker.pkg.dev/${PROJECT}/elevate/owned-cpu-llm@${digest}`,
     '--service-account',MODEL_IDENTITY,'--port','8080','--cpu','4','--memory','8Gi',
     '--min-instances','0','--max-instances','1','--concurrency','1','--timeout','300s','--no-cpu-boost',
+    '--update-env-vars='+Object.entries(CPU_CACHE_ENV).map(([key,value])=>key+'='+value).join(','),
     '--startup-probe','httpGet.path=/health,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=24',
     '--set-secrets',`LLM_WORKER_SECRET=${SECRET}:latest`,'--quiet'];
 }

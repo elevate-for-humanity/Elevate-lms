@@ -47,6 +47,16 @@ test('generated illustrations preserve OpenAI provenance without pretending to b
  assert.equal(generatedTeachingPhoto({...scene,resolvedProvider:'untrusted'}),false);
 });
 
+test('saved Elevate instructional graphics retain the same strict owned-picture contract',()=>{
+ const scene={physicalDemonstration:false,resolvedProvider:'elevate-instructional',resolvedModel:'generated-teaching-photograph',
+  pictureCues:[1,2].map(index=>({provider:'elevate-instructional',illustration:true,imageUrl:'https://media.example/'+index,
+   sha256:String(index).repeat(64),storagePath:'approved-teaching-photos/'+index+'.png'}))};
+ assert.equal(generatedTeachingPhoto(scene),true);
+ assert.equal(verifiedTeachingPhotoScene(scene),true);
+ assert.equal(verifiedTeachingPhotoScene({...scene,physicalDemonstration:true}),false);
+ assert.equal(verifiedTeachingPhotoScene({...scene,pictureCues:[scene.pictureCues[0],{...scene.pictureCues[1],storagePath:'unapproved/file.png'}]}),false);
+});
+
 test('approved audio keeps ASR lexical differences advisory without inventing a passing score',()=>{
  assert.equal(narrationCoverageSeverity(0.895,true),'warning');
  assert.equal(narrationCoverageSeverity(0.895,false),'error');

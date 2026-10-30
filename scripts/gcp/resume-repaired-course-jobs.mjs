@@ -1,5 +1,7 @@
 import {pathToFileURL} from 'node:url';
-const COURSE='a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
+const COURSES=new Set(['a6b0b712-1cf0-475a-ba79-ee2023dea8ec',
+ '580f7eeb-aa36-4b2a-8526-bbfa6899bb14','d48c61c4-8880-4d9d-9ab5-fab4dd51b201',
+ 'e9a2547c-ae03-418e-97fc-51377d438f8c']);
 const ROOT='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
 export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process.env,request=fetch,now=new Date()}={}) {
  if(!/^[a-f0-9]{40}$/.test(imageSha??'')||!/^sha256:[a-f0-9]{64}$/.test(imageDigest??''))throw Error('VERIFIED_REPAIR_IMAGE_REQUIRED');
@@ -28,7 +30,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const key=job.build_id+':'+job.payload?.autopilot?.competencyId;
   if(!job.build_id||(pool?seenLessons.has(key):seenBuilds.has(job.build_id)))continue;
   if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
-  if(job.status!=='failed'||(!pool&&job.build?.course_id!==COURSE)||job.build?.profile?.ownerPaused===true||
+  if(job.status!=='failed'||(!pool&&!COURSES.has(job.build?.course_id))||job.build?.profile?.ownerPaused===true||
    ['published','archived','cancelled'].includes(job.build?.status)||job.monitor?.enabled!==true||
    job.monitor?.lastRepairDeployment?.imageSha===imageSha||
    (job.lease_expires_at && !(Date.parse(job.lease_expires_at)<=now.getTime()))||

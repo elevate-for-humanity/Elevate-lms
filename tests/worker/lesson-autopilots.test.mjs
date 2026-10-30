@@ -64,3 +64,30 @@ test('a later learner failure cannot redelegate an obsolete picture-cue repair',
  result.lessons[0].result.artifacts.__repairState.directive=active;
  assert.equal(currentRepairDirective(result),active);
 });
+
+test('resumed quality hands the measured visual repair back to its producer',()=>{
+ const currentRepairDirective=new Function(strip('../../lib/ultimate-course-builder/worker/lesson-autopilot.ts')+';return currentRepairDirective;')();
+ const directive={target:'visual_assignment',failedStep:'finished_media_qa',requirements:[{
+  code:'Media quality gate failed',message:'Media quality gate failed: insufficient visual changes: detected 12, expected at least 13',
+ }]};
+ const state={status:'diagnosed',directive};
+ const result={findings:[{step:'visual_assignment',severity:'error',code:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED',message:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED:visual_assignment'}],lessons:[{result:{artifacts:{__repairState:state}}}]};
+ assert.equal(currentRepairDirective(result),directive);
+ state.status='producer-validated';
+ assert.equal(currentRepairDirective(result),undefined);
+ state.status='diagnosed';
+ result.findings[0].step='storyboard';
+ result.findings[0].message='AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED:storyboard';
+ assert.equal(currentRepairDirective(result),undefined);
+});
+
+test('an undelegated deterministic role failure stops without burning identical attempts',async()=>{
+ const profile={competencies:[{id:'c'}]},failures=[],dispatches=[];
+ const findings=[{step:'visual_assignment',severity:'error',code:'REPAIR_PRODUCER_UNCHANGED',message:'REPAIR_PRODUCER_UNCHANGED:visual_assignment'}];
+ const process=new Function('lessonAutopilotIdentity','contractHash','createUltimateRuntime','createProductionHandlers','runUltimateCourse','isDurableExternalBlocker','notifyCourseDispatcher',strip('../../lib/ultimate-course-builder/worker/lesson-autopilot.ts')+';return processLessonAutopilot;')(
+  ()=>({poolId:'pool',competencyId:'c',role:'quality'}),JSON.stringify,async()=>({}),()=>({}),async()=>({completed:false,findings,lessons:[]}),()=>false,async()=>dispatches.push('dispatch'));
+ const db={from(table){const query={select(){return query},eq(){return query},async single(){return {data:table==='ultimate_autopilot_pools'?{id:'pool',state:'active',profile}:{profile},error:null}}};return query;}};
+ const result=await process({db,job:{id:'job'},workerId:'worker',generation:2,build:{id:'build',course_id:'course'},queue:{fail:async(...args)=>failures.push(args)},assertActive(){}});
+ assert.equal(failures.length,1);assert.equal(failures[0][4],false);
+ assert.equal(result.repairQueued,false);assert.deepEqual(dispatches,[]);
+});

@@ -53,9 +53,17 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+        ],
+      },
+      {
+        // Next's configured headers replace the route's response headers.
+        // Recovery owns distinct GET/POST policies: its confirmation form must
+        // retain a same-origin POST, while redirects suppress all referrers.
+        source: '/:path((?!api/auth/recovery-callback(?:/)?$).*)',
+        headers: [
           { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
           { key: 'Referrer-Policy', value: 'no-referrer' },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
         ],
       },
       {
@@ -118,6 +126,12 @@ const nextConfig = {
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
       { source: '/partners/dashboard', destination: '/host-shop/dashboard', permanent: true },
       { source: '/partner/dashboard', destination: '/host-shop/dashboard', permanent: false },
+      // Resolve aliases before a streamed parent layout can mount and then
+      // replace the document. Canonical destinations retain their auth gates.
+      { source: '/program-holder/portal/students', destination: '/program-holder/students', permanent: false },
+      { source: '/program-holder/portal/reports', destination: '/program-holder/reports', permanent: false },
+      { source: '/program-holder/portal/page', destination: '/program-holder/dashboard', permanent: false },
+      { source: '/apprentice/attendance', destination: '/apprentice/hours', permanent: false },
       { source: '/partners/workforce', destination: '/workforce', permanent: true },
       { source: '/host-shop/dashboard/apprentices/new', destination: '/host-shop/dashboard/match-requests', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },

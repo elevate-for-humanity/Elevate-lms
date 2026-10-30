@@ -40,6 +40,22 @@ it('persists the verified recovery session on the password-form redirect', async
   expect(response.headers.get('set-cookie')).toContain('Domain=.elevateforhumanity.org');
   expect(response.headers.get('set-cookie')).toContain('Max-Age=0');
 });
+it('persists recovery cookies when exchanging a PKCE code', async () => {
+  mocks.exchange.mockImplementation(async () => {
+    mocks.cookies.setAll([{ name: 'sb-fixture-auth-token', value: 'fixture-code-session', options: { path: '/', secure: true, sameSite: 'lax' } }]);
+    return { data: { session: { user: { id: 'fixture-user' } } }, error: null };
+  });
+  const response = await POST(new NextRequest('https://app.elevateforhumanity.org/api/auth/recovery-callback', {
+    method: 'POST',
+    headers: { origin: 'https://app.elevateforhumanity.org' },
+    body: new URLSearchParams({ code: 'fixture-pkce-code' }),
+  }));
+  expect(mocks.exchange).toHaveBeenCalledWith('fixture-pkce-code');
+  expect(mocks.verify).not.toHaveBeenCalled();
+  expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/reset-password?mode=recovery');
+  expect(response.headers.get('set-cookie')).toContain('fixture-code-session');
+  expect(response.headers.get('set-cookie')).toContain('Domain=.elevateforhumanity.org');
+});
 it.each(['https://admin.elevateforhumanity.org/dashboard', '/login', '//evil.example'])('keeps recovery on the password form even for next=%s', async (next) => {
   const response = await POST(submit(next));
   expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/reset-password?mode=recovery');

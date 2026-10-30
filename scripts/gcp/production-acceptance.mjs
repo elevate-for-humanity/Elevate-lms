@@ -6,13 +6,25 @@ function identity(env) {
   if(env.GITHUB_REPOSITORY!==repository || !targets[component] || !/^[a-f0-9]{40}$/.test(sha||'') || !/^[1-9]\d*$/.test(runId||'') || !token?.trim())throw Error('ACCEPTANCE_IDENTITY_REQUIRED');
   return {component,sha,runId,token};
 }
+async function boundedRequest(url,options,request,stage) {
+  // GETs are safe to repeat after transport failures. Never retry a dispatch:
+  // a lost response may mean GitHub already accepted that POST.
+  const attempts=options.method==='POST'?1:3;
+  for(let attempt=0;attempt<attempts;attempt++) {
+    try {return await request(url,{...options,signal:AbortSignal.timeout(20000)});}
+    catch(error) {
+      const transient=['TimeoutError','AbortError','TypeError'].includes(error?.name);
+      if(!transient || attempt===attempts-1)throw Error(`ACCEPTANCE_${stage}_${transient?'TRANSPORT_FAILED':'REQUEST_FAILED'}`);
+    }
+  }
+}
 async function api(path,token,request,body) {
-  const response=await request(`https://api.github.com/repos/${repository}/${path}`,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),redirect:'error',signal:AbortSignal.timeout(15000)});
+  const response=await boundedRequest(`https://api.github.com/repos/${repository}/${path}`,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),redirect:'error'},request,body?'DISPATCH':'SOURCE');
   if(!response.ok)throw Error('ACCEPTANCE_GITHUB_HTTP_'+response.status);
   return response.status===204?null:response.json();
 }
 async function live(component,sha,request) {
-  const response=await request(targets[component][0]+'/api/health',{redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
+  const response=await boundedRequest(targets[component][0]+'/api/health',{redirect:'error',cache:'no-store'},request,'HEALTH');
   const health=await response.json();
   if(!response.ok || health.service!==component || health.commit!==sha || health.ready!==true || health.healthy!==true || health.dependencies?.supabase?.ok!==true)throw Error('ACCEPTANCE_LIVE_REVISION_MISMATCH');
   return {component,commit:health.commit,revision:health.revision};

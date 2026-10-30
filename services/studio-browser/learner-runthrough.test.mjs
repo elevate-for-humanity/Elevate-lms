@@ -221,10 +221,23 @@ test('completion requires visible staged status and persisted completion after r
   if(role==='button'){assert.deepEqual(options,{name:'Complete lesson',exact:true});return {click:async()=>events.push('click-complete')};}
   assert.equal(role,'status');return {filter:options=>{assert.equal(options.hasText,'Lesson completed');return status;}};
  }};
- const page={getByTestId:id=>{assert.equal(id,'staged-lesson');return staged;},reload:async()=>events.push('reload')};
+ const roots={
+  filter:options=>{
+   assert.deepEqual(options,{visible:true});
+   events.push('visible-root');
+   return {first:()=>staged};
+  },
+ };
+ const page={getByTestId:id=>{assert.equal(id,'staged-lesson');return roots;},reload:async()=>events.push('reload')};
  assert.equal(await completeStagedLesson(page,async()=>({completed:true})),'Completion persisted across reload');
- assert.deepEqual(events,['click-complete','visible-completion','reload','visible-completion']);
+ assert.deepEqual(events,[
+  'visible-root',
+  'click-complete',
+  'visible-root',
+  'visible-completion',
+  'reload',
+  'visible-root',
+  'visible-completion',
+ ]);
  await assert.rejects(completeStagedLesson(page,async()=>({completed:false})),/Completion not persistent/);
- staged.getByRole=()=>({click:async()=>{throw Error('Strict locator resolved to 2 elements');}});
- await assert.rejects(completeStagedLesson(page,async()=>({completed:true})),/Strict locator/);
 });

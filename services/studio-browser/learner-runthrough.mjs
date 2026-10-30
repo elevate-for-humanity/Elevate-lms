@@ -44,13 +44,19 @@ export function credentialMatches(actual, expected) {
     b = Buffer.from(expected);
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
+export function visibleStagedLesson(page) {
+  return page.getByTestId('staged-lesson').filter({ visible: true }).first();
+}
 export function stagedCompletionStatus(page) {
-  return page.getByTestId('staged-lesson').getByRole('status').filter({hasText:'Lesson completed'});
+  return visibleStagedLesson(page).getByRole('status').filter({ hasText: 'Lesson completed' });
 }
 export async function completeStagedLesson(page, state) {
-  // Role queries exclude hidden streamed/cached copies; retain strict matching
-  // if more than one visible completion control or status is present.
-  await page.getByTestId('staged-lesson').getByRole('button', {name:'Complete lesson',exact:true}).click();
+  // Streamed/hydrated copies can remain mounted but hidden. Scope learner
+  // actions to the first visible staged root while retaining strict matching
+  // inside that root.
+  await visibleStagedLesson(page)
+    .getByRole('button', { name: 'Complete lesson', exact: true })
+    .click();
   await stagedCompletionStatus(page).waitFor();
   await page.reload();
   await stagedCompletionStatus(page).waitFor();
@@ -158,7 +164,7 @@ export async function runLearnerTest(
     page = await context.newPage();
     page.on('pageerror', (e) => errors.push(e.message.slice(0, 300)));
     await page.goto(`${base.origin}${setup.path}`, { waitUntil: 'domcontentloaded' });
-    await page.getByTestId('staged-lesson').waitFor({ timeout: 30000 });
+    await visibleStagedLesson(page).waitFor({ timeout: 30000 });
     const premature = await page.request.post(
       `${base.origin}/api/learner-testing/runs/${setup.runId}`,
       { data: { action: 'complete' } },
@@ -201,7 +207,7 @@ export async function runLearnerTest(
           return !!r.active;
         });
         await page.reload();
-        await page.getByTestId('staged-lesson').filter({ visible: true }).first().waitFor();
+        await visibleStagedLesson(page).waitFor();
         const sw = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL ?? '');
         assert(
           new URL(sw).pathname === '/sw-lms.js',
@@ -214,16 +220,14 @@ export async function runLearnerTest(
       'captions',
       'Load real caption track, enable it, and inspect parsed cues',
       async () => {
-        const video = page.locator('video:visible').first();
+        const video = page.locator('video').filter({ visible: true }).first();
         await video.waitFor();
         // Exercise the learner control, rather than forcing a track mode that
         // React can legitimately restore after a re-render.
         const toggle = page.getByRole('button', { name: 'Show lesson captions', exact: true }).filter({ visible: true }).first();
         await toggle.waitFor();
         await toggle.click();
-        const c = await page.evaluate(async () => {
-          const v = document.querySelector('video');
-          if (!v) throw new Error('Lesson video not present');
+        const c = await video.evaluate(async (v) => {
           const trackElement = v.querySelector('track[kind="captions"]');
           if (!trackElement) throw new Error('Lesson caption track is missing');
           const track = trackElement.track;
@@ -252,15 +256,28 @@ export async function runLearnerTest(
       'film_playback',
       'Play the entire delivered film without seeking and observe progress and completion',
       async () => {
-        const v = page.locator('video:visible').first();
+        const v = page.locator('video').filter({ visible: true }).first();
         await v.evaluate(async (video) => {
           video.muted = true;
           video.playbackRate = 1;
           await video.play();
         });
-        await page.waitForFunction(() => document.querySelector('video')?.currentTime > 5, null, {
-          timeout: 30000,
-        });
+        await page.waitForFunction(
+          () =>
+            [...document.querySelectorAll('video')].some((video) => {
+              const style = getComputedStyle(video);
+              const box = video.getBoundingClientRect();
+              return (
+                style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                box.width > 0 &&
+                box.height > 0 &&
+                video.currentTime > 5
+              );
+            }),
+          null,
+          { timeout: 30000 },
+        );
         await check(
           'progress_save',
           'Read server-saved learner position after playback',
@@ -277,11 +294,21 @@ export async function runLearnerTest(
           async () => {
             const p = await state();
             await page.reload();
-            await page.getByTestId('staged-lesson').filter({ visible: true }).first().waitFor();
+            await visibleStagedLesson(page).waitFor();
             await page.waitForFunction(
               (saved) => {
-                const v = document.querySelector('video');
-                return !!v && v.readyState >= 1 && Math.abs(v.currentTime - saved) < 2;
+                return [...document.querySelectorAll('video')].some((video) => {
+                  const style = getComputedStyle(video);
+                  const box = video.getBoundingClientRect();
+                  return (
+                    style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    box.width > 0 &&
+                    box.height > 0 &&
+                    video.readyState >= 1 &&
+                    Math.abs(video.currentTime - saved) < 2
+                  );
+                });
               },
               p.position,
               { timeout: 30000 },
@@ -289,18 +316,35 @@ export async function runLearnerTest(
             return `Resumed at ${p.position} seconds`;
           },
         );
-        await page.locator('video:visible').first().evaluate(async (video) => {
+        await page.locator('video').filter({ visible: true }).first().evaluate(async (video) => {
           video.muted = true;
           await video.play();
         });
-        const duration = await page.locator('video:visible').first().evaluate((v) => v.duration);
+        const duration = await page
+          .locator('video')
+          .filter({ visible: true })
+          .first()
+          .evaluate((video) => video.duration);
         assert(
           Number.isFinite(duration) && duration > 0 && duration < 3300,
           'Film duration outside runner budget',
         );
-        await page.waitForFunction(() => document.querySelector('video')?.ended, null, {
-          timeout: Math.min(3450000, duration * 1000 + 120000),
-        });
+        await page.waitForFunction(
+          () =>
+            [...document.querySelectorAll('video')].some((video) => {
+              const style = getComputedStyle(video);
+              const box = video.getBoundingClientRect();
+              return (
+                style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                box.width > 0 &&
+                box.height > 0 &&
+                video.ended
+              );
+            }),
+          null,
+          { timeout: Math.min(3450000, duration * 1000 + 120000) },
+        );
         await page.waitForTimeout(4000);
         const p = await state();
         assert(p.watchedSeconds >= duration * 0.95, 'Full watched time was not saved');

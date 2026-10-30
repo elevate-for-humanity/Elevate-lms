@@ -44,7 +44,7 @@ export function repairQuickBooksProduction({ run: executor = google, apply = fal
   const standalone = [];
   for (const name of names.filter(name => /(?:quickbooks|(?:^|-)qb)(?:-|_).*?(?:webhook|verifier)/i.test(name))) {
     // Prepared, empty secrets have no enabled versions. Do not confuse them with lost credentials.
-    const versions = JSON.parse(run(['secrets', 'versions', 'list', '--secret', name, '--project', PROJECT, '--filter=state:ENABLED', '--format=json']));
+    const versions = JSON.parse(run(['secrets', 'versions', 'list', name, '--project', PROJECT, '--filter=state:ENABLED', '--format=json']));
     if (versions.length) standalone.push(run(['secrets', 'versions', 'access', 'latest', '--secret', name, '--project', PROJECT]));
   }
   const verifier = resolveVerifier([...configs.map(item => item.config.runtimeEnvironment), ...serving], standalone);

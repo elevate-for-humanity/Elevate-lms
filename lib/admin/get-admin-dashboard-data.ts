@@ -1,5 +1,6 @@
 import 'server-only';
 import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
+import { hasUnavailableInvoiceTotals } from './dashboard/data-availability.mjs';
 import { APPLICATION_REVIEW_STATUSES } from './application-filters';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -101,7 +102,7 @@ async function loadDashboardPrograms(db: Awaited<ReturnType<typeof requireAdminC
   const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await db.from('programs')
-      .select('id,title,slug,status,is_active,updated_at')
+      .select('id,title,slug,status,published,is_active,archived_at,updated_at')
       .order('title', { ascending: true })
       .order('id', { ascending: true })
       .range(offset, offset + pageSize - 1)
@@ -417,8 +418,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const applications = safeRows(applicationsRes, degradedSections, 'dashboard_data').filter(
     (row: any) => !isTestRecord(row.full_name, row.first_name, row.last_name, row.email),
   );
-  const enrollments = safeRows(enrollmentsRes, degradedSections, 'dashboard_data');
-  const recentEnrollmentRows = safeRows(recentEnrollmentsRes, degradedSections, 'recent_students');
+  const enrollments = safeRows(enrollmentsRes, degradedSections, 'dashboard_data')
+    .filter((row: any) => !isTestRecord(row.full_name, row.email));
+  const recentEnrollmentRows = safeRows(recentEnrollmentsRes, degradedSections, 'recent_students')
+    .filter((row: any) => !isTestRecord(row.full_name, row.email));
   const programRows = safeRows(programsRes, degradedSections, 'unpublished_programs');
   const complianceRows = safeRows(complianceRes, degradedSections, 'dashboard_data');
   const leadRows = safeRows(leadsRes, degradedSections, 'dashboard_data');
@@ -591,8 +594,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const invoiceTotals = paidInvoicesRes.error
     ? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false}
     : paidInvoicesRes.data ?? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false};
-  if (!invoiceTotals.allTimeAvailable || !invoiceTotals.monthAvailable ||
-      [stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
+  if (hasUnavailableInvoiceTotals(invoiceTotals)) degradedSections.push('paid_invoices');
+  if ([stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
   }
   // Paid invoices have an explicit cents contract and one canonical identity.
@@ -653,8 +656,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     }));
 
   const blockedPrograms = programRows
-    .filter((row: any) => row.status !== 'archived' && !isTestRecord(row.title, row.slug))
-    .filter((row: any) => row.status !== 'published' || row.is_active === false)
+    .filter((row: any) => row.status !== 'archived' && !row.archived_at && !isTestRecord(row.title, row.slug))
+    .filter((row: any) => row.published !== true)
     .map((row: any) => ({
       id: row.id,
       title: row.title ?? 'Untitled',
@@ -869,7 +872,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     stalledApplications: pendingApplications.filter(
       (row) => row.age_days >= 7,
     ) as unknown as Record<string, unknown>[],
-    noOutcomeEnrollments: noOutcomeEnrollments as Record<string, unknown>[],
+    noOutcomeEnrollments: noOutcomeEnrollments.map((row: any) => ({
+      ...row,
+      program_title: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
+    })),
     missingFundingEnrollments: enrollments.filter(
       (row: any) => !row.funding_source && n(row.amount_paid_cents) === 0,
     ) as Record<string, unknown>[],
@@ -894,3 +900,4 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     isSuperAdmin,
   };
 }
+

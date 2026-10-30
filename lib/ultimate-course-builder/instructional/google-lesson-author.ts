@@ -35,6 +35,39 @@ export function validateGoogleAuthoringEvidence(blueprint: LessonBlueprint, sour
     throw new Error('ULTIMATE_CURRENT_AUTHORING_EVIDENCE_REQUIRED');
 }
 
+function isHvacProfile(profile: UltimateCredentialProfile): boolean {
+  return /\b(?:hvac|epa\s*608|refriger)/i.test(`${profile.id} ${profile.title} ${profile.authority}`);
+}
+
+/**
+ * Stop a safety-sensitive HVAC blueprint before it is persisted when the
+ * authored lesson has no concrete, source-mapped warning. The finished-media
+ * gate still performs its independent scene check; this earlier assertion
+ * gives the bounded authoring repair loop an actionable failure instead of
+ * allowing the same incomplete blueprint to fail much later during render.
+ */
+export function assertHvacSafetyBlueprint(
+  blueprint: LessonBlueprint,
+  profile: UltimateCredentialProfile,
+  competency: UltimateCompetency,
+) {
+  if (!isHvacProfile(profile)) return;
+  const segments = Array.isArray(blueprint?.segments) ? blueprint.segments : [];
+  const lessonText = `${competency.title} ${competency.description ?? ''} ${segments.map(segment => segment.text).join(' ')}`;
+  if (!/recover|refrigerant|electrical|voltage|pressure|cylinder|service|procedure/i.test(lessonText)) return;
+  const warning = segments.some(segment => {
+    const text = String(segment.text ?? '');
+    const explicitWarning = ['safety_warning', 'safety_scene'].includes(String(segment.sceneType ?? '')) ||
+      /\bsafety warning\b/i.test(text);
+    const concreteHazard = /\b(?:refrigerant|cylinder|pressure|electrical|voltage|ignition)\b/i.test(text) &&
+      /\b(?:rupture|frostbite|exposure|overpressure|shock|electrocution|fire|explosion|injury)\b/i.test(text);
+    const protectiveAction = /\b(?:never|do not|must not|stop (?:if|for|when)|before[^.!?]{0,120}(?:identify|inspect|verify|isolate|connect|service|recover)|wear[^.!?]{0,80}(?:gloves|goggles|protection)|use[^.!?]{0,80}(?:ppe|protective equipment))\b/i.test(text);
+    const sourceMapped = Array.isArray(segment.sourceRequirementIds) && segment.sourceRequirementIds.length > 0;
+    return explicitWarning && concreteHazard && protectiveAction && sourceMapped;
+  });
+  if (!warning) throw new Error('BLUEPRINT_HVAC_SAFETY_WARNING_REQUIRED');
+}
+
 /** One reviewed artifact supplies narration, visuals, practice and assessment.
  * Schema, assessment and visual validation are deterministic.
  * Neither author nor reviewer is permitted to certify rendered media.
@@ -69,7 +102,10 @@ Output only a complete JSON object with double-quoted property names and strings
     ? 'Use focused PowerPoint-style teaching moments. Explain the required tools and exact numbered guard lengths when supported by the source. Within each teaching moment include a fresh brief recap or practice question, never repeat its spoken passage. Change the visual for the next technique. Whole pictures stay visible beside concise demonstration instructions, with word-aligned bottom captions. Use unique task-relevant images; do not reuse a photo or loop as filler. Do not invent technical measurements or substitute illustrative photos for an actual required physical demonstration.'
     : undefined;
   const rtiRequirements = [subjectTeachingRequirements(input.profile), optionalCosmetologyRtiEnhancement(input.profile)].filter(Boolean).join('\n');
-  const authorSystem = rtiRequirements ? system + '\n' + rtiRequirements : system;
+  const hvacSafetyRequirements = isHvacProfile(input.profile)
+    ? 'For a safety-sensitive HVAC lesson, include a source-grounded segment with sceneType safety_warning. Its spoken text must name the concrete refrigerant, pressure, cylinder, electrical, voltage or ignition hazard, the resulting injury or equipment danger, and the required protective action. Do not invent a safety fact that is absent from the authorized sources.'
+    : '';
+  const authorSystem = [system, rtiRequirements, hvacSafetyRequirements].filter(Boolean).join('\n');
   const authorRequest = { ...(rtiRequirements ? {rtiRequirements} : {}), ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
   let result = bindBlueprintRequirements(await generate(authorSystem, authorRequest), input.competency);
   reportCourseProgress('authoring:' + input.competency.id + ':draft', 1);
@@ -78,6 +114,7 @@ Output only a complete JSON object with double-quoted property names and strings
     try {
       assertGeneratedLessonAssessment(result?.blueprint?.assessment);
       validateLessonBlueprint(result?.blueprint, input.competency);
+      assertHvacSafetyBlueprint(result?.blueprint, input.profile, input.competency);
       assertRtiSubjectTeaching(result?.blueprint, input.profile);
       break;
     }
@@ -87,10 +124,13 @@ Output only a complete JSON object with double-quoted property names and strings
         try { if (segment.teachingVisual) validateTeachingVisual(segment.teachingVisual, segment.text); return []; }
         catch { return [{segmentId: segment.id, narration: segment.text, teachingVisual: segment.teachingVisual}]; }
       });
+      const hvacSafetyRepair = error.message.startsWith('BLUEPRINT_HVAC_SAFETY_WARNING_REQUIRED')
+        ? 'Add one source-grounded safety_warning segment. Its spoken narration must identify the concrete HVAC hazard, the resulting injury or equipment danger, and the required protective action. Use only an authorized-source safety fact; do not invent one.'
+        : '';
       result = bindBlueprintRequirements(await generate(authorSystem, {...authorRequest, repair: {
         code: error.message, previousResult: result, invalidVisuals,
-        ...(rtiRequirements ? {rtiRequirements, contentRepair: 'Replace navigation and test-taking filler with the substantive supplied module content. Preserve actual subject questions, safety facts and all teaching stages.'} : {}),
-        instructions: 'Repair the reported blueprint validation failure using blueprintSchema. Return all required 13-16 segments with nonempty text and visualRequirement, unique segment IDs, objectiveIds that match actual blueprint objectives and omit sourceRequirementIds because the builder supplies them. Preserve all thirteen stages in order and all required activity and assessment fields. Repair invalid teaching visuals. Return the full {blueprint}. Preserve spoken narration, objectives and valid assessment items. Supply at least two recap questions and at least two distinct reassessment questions. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.',
+        ...(rtiRequirements ? {rtiRequirements, contentRepair: ['Replace navigation and test-taking filler with the substantive supplied module content. Preserve actual subject questions, safety facts and all teaching stages.', hvacSafetyRepair].filter(Boolean).join(' ')} : hvacSafetyRepair ? {contentRepair: hvacSafetyRepair} : {}),
+        instructions: ['Repair the reported blueprint validation failure using blueprintSchema. Return all required 13-16 segments with nonempty text and visualRequirement, unique segment IDs, objectiveIds that match actual blueprint objectives and omit sourceRequirementIds because the builder supplies them. Preserve all thirteen stages in order and all required activity and assessment fields. Repair invalid teaching visuals. Return the full {blueprint}. Preserve spoken narration, objectives and valid assessment items. Supply at least two recap questions and at least two distinct reassessment questions. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.', hvacSafetyRepair].filter(Boolean).join(' '),
       }}), input.competency);
       reportCourseProgress('authoring:' + input.competency.id + ':repair', attempt + 1);
     }
@@ -98,6 +138,7 @@ Output only a complete JSON object with double-quoted property names and strings
   if (result?.blocked) throw new Error('ULTIMATE_AUTHORING_SOURCE_GAP:' + String(result.reason).slice(0, 300));
   const blueprint = result?.blueprint as LessonBlueprint;
   validateLessonBlueprint(blueprint, input.competency);
+  assertHvacSafetyBlueprint(blueprint, input.profile, input.competency);
   let previousStage = -1;
   for (const segment of blueprint.segments) {
     const stage = ULTIMATE_TEACHING_SEQUENCE.indexOf(segment.stage as any);

@@ -18,3 +18,28 @@ test('historical media recovery audit runs beside release without replacing requ
  assert.match(audit,/audit-course-storage\.ts/);
  assert.doesNotMatch(audit,/continue-on-error/);
 });
+
+import { stripTypeScriptTypes } from 'node:module';
+const accessibilitySource = stripTypeScriptTypes(
+  readFileSync(new URL('../../lib/ultimate-course-builder/accessibility/accessibility-contract.ts', import.meta.url), 'utf8'),
+  { mode: 'transform' },
+).replaceAll('export ', '');
+const { evaluateAccessibility } = new Function(accessibilitySource + '\nreturn { evaluateAccessibility };')();
+const observed = { semanticHeadings: true, colorContrast: true, nonColorMeaning: true,
+  screenReaderLabels: true, reducedMotion: true };
+test('signed browser version metadata does not fail measured accessibility checks', () => {
+  assert.deepEqual(evaluateAccessibility({ contractVersion: 'ultimate-lesson-2026-10-29.1', ...observed }),
+    { pass: true, critical: false, failures: [] });
+});
+test('a failed measured check remains a publication blocker with version metadata', () => {
+  assert.deepEqual(evaluateAccessibility({ ...observed, contractVersion: 'ultimate-lesson-2026-10-29.1', reducedMotion: false }),
+    { pass: false, critical: true, failures: ['ACCESSIBILITY_REDUCEDMOTION_FAILED'] });
+});
+test('metadata alone and empty evidence cannot authorize release', () => {
+  for (const evidence of [{}, { contractVersion: 'ultimate-lesson-2026-10-29.1' }])
+    assert.equal(evaluateAccessibility(evidence).pass, false);
+});
+test('other supplied accessibility checks still fail closed', () => {
+  for (const value of [false, undefined, null, 'true', 1])
+    assert.equal(evaluateAccessibility({ ...observed, keyboardOperation: value }).pass, false);
+});

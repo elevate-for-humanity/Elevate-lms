@@ -76,7 +76,12 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
   expect(response?.status() ?? 200, `${target} returned server error`).toBeLessThan(500);
   expect(page.url(), `${target} unexpectedly returned to login`).not.toMatch(/\/login(?:\?|$)/);
   expect(page.url(), `${target} redirected to unauthorized`).not.toContain('/unauthorized');
-  await page.waitForTimeout(500);
+  // Legacy redirects and streamed layouts can briefly have no dashboard frame.
+  // Await the same single-shell contract before measuring its geometry.
+  await expect(
+    page.locator('[data-elevate-dashboard-shell]:visible'),
+    `${target} must settle to one canonical dashboard shell`,
+  ).toHaveCount(1, { timeout: 15_000 });
 
   const geometry = await page.evaluate(() => {
     const doc = document.documentElement;
@@ -304,11 +309,21 @@ async function certify(
   manifestPath: string,
 ) {
   await login(page, loginBase, credentials[0], credentials[1]);
-  for (const path of paths)
-    await test.step(`${testInfo.project.name}: ${path}`, async () =>
-      assertResponsivePage(page, path));
-  const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
-  expect(manifestHref, `${role} loaded the wrong PWA manifest`).toBe(manifestPath);
+  for (const path of paths) {
+    await test.step(`${testInfo.project.name}: ${path}`, async () => {
+      await assertResponsivePage(page, path);
+      // Studio owns a distinct installable app. Verify each destination's
+      // manifest, including Admin before navigating into the Studio workspace.
+      const destination = new URL(path, BASE);
+      const expectedManifest = destination.origin === ADMIN_BASE && destination.pathname === '/studio'
+        ? '/manifest-dev-studio.json'
+        : manifestPath;
+      await expect(
+        page.locator('link[rel="manifest"]'),
+        `${role} loaded the wrong PWA manifest at ${destination.pathname}`,
+      ).toHaveAttribute('href', expectedManifest, { timeout: 15_000 });
+    });
+  }
   await page.screenshot({
     path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`),
     fullPage: false,

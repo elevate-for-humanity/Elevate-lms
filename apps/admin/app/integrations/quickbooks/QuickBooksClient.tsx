@@ -180,7 +180,9 @@ export default function QuickBooksClient() {
             <p className="text-sm text-slate-600">
               {status.credentials_configured
                 ? 'The Intuit application is configured. Authorize the Elevate for Humanity company to finish connecting accounting data.'
-                : 'Add the Intuit application credentials before authorizing a company.'}{' '}
+                : status.credentials_configured === false
+                  ? 'Add the Intuit application credentials before authorizing a company.'
+                  : 'Checking Intuit application credentials. Retry the connection check if it cannot complete.'}{' '}
               Payroll-run sync requires separate Intuit Payroll API access.
             </p>
             {!authUrl ? (
@@ -203,7 +205,9 @@ export default function QuickBooksClient() {
             <p className="text-xs text-slate-400">
               {status.credentials_configured
                 ? 'Application credentials detected. Company authorization is still required.'
-                : 'Requires QB_CLIENT_ID and QB_CLIENT_SECRET in your environment.'}
+                : status.credentials_configured === false
+                  ? 'Requires QB_CLIENT_ID and QB_CLIENT_SECRET in your environment.'
+                  : 'Application credential status has not been verified.'}
             </p>
           </div>
         )}

@@ -2,14 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {releaseStudioCandidateTag} from './release-studio-candidate-tag.mjs';
 const revision='elevate-studio-browser-00045-wer',old='elevate-studio-browser-00039-yuv';
-function fixture({target=revision,percent=0,absent=false,drift=false,courseQa=false,concurrentQa=false}={}) {
+function fixture({target=revision,tag='studio-verify',percent=0,absent=false,drift=false,courseQa=false,concurrentQa=false,adminUrl='https://studio.run.app',pendingTraffic=false}={}) {
   let removed=false;const calls=[];
   const run=args=>{
     calls.push(args);
     if(args[2]==='update-traffic'){removed=true;return '';}
-    return JSON.stringify({spec:{template:{storage:'preserved',identity:'unchanged'}},status:{latestCreatedRevisionName:revision,traffic:[
+    if(args[3]==='elevate-admin-migration')return JSON.stringify({spec:{template:{spec:{containers:[{env:[{name:'STUDIO_BROWSER_URL',value:adminUrl}]}]}}}});
+    return JSON.stringify({spec:{template:{storage:'preserved',identity:'unchanged'},traffic:pendingTraffic?[{revisionName:revision,percent:100}]:[]},status:{latestCreatedRevisionName:revision,traffic:[
       {revisionName:old,percent:removed&&drift?90:100},
-      ...(!removed&&!absent?[{revisionName:target,tag:'studio-verify',percent}]:[]),
+      ...(!removed&&!absent?[{revisionName:target,tag,percent}]:[]),
       ...(courseQa||(removed&&concurrentQa)?[{revisionName:revision,tag:'course-qa-approved',percent:0}]:[]),
     ]}});
   };
@@ -20,6 +21,16 @@ test('releases only the exact unused verification alias without deployment or st
   const writes=f.calls.filter(c=>c[2]==='update-traffic');assert.equal(writes.length,1);
   assert.ok(writes[0].includes('--remove-tags=studio-verify'));
   assert.equal(f.calls.some(c=>c.includes('delete')||c.includes('deploy')||c.includes('secrets')||c.some(a=>a.startsWith('--to-revisions='))),false);
+});
+test('generated failed-candidate tags release capacity only when no Admin binding or pending traffic references them',()=>{
+ const tag='sc-2aba3de5-c8976733';
+ const readConfig=()=>({runtimeEnvironment:{STUDIO_BROWSER_URL:'https://studio.run.app'}});
+ const f=fixture({tag});assert.equal(releaseStudioCandidateTag({revision,tag,run:f.run,readConfig}).removedTag,tag);
+ for(const options of [{adminUrl:'https://'+tag+'---studio.run.app'},{pendingTraffic:true},{courseQa:true}]){
+  const blocked=fixture({tag,...options});assert.throws(()=>releaseStudioCandidateTag({revision,tag,run:blocked.run,readConfig}));assert.equal(blocked.calls.some(c=>c[2]==='update-traffic'),false);
+ }
+ const pinned=fixture({tag});assert.throws(()=>releaseStudioCandidateTag({revision,tag,run:pinned.run,readConfig:()=>({runtimeEnvironment:{STUDIO_BROWSER_PUBLIC_URL:'https://'+tag+'---studio.run.app'}})}),/STILL_REFERENCED/);
+ assert.throws(()=>releaseStudioCandidateTag({revision,tag:'course-qa-approved',run:f.run}),/TAG_REQUIRED/);
 });
 test('a repeated cleanup is read-only when the alias is already absent',()=>{
   const f=fixture({absent:true});assert.equal(releaseStudioCandidateTag({revision,run:f.run}).changed,false);assert.equal(f.calls.length,1);

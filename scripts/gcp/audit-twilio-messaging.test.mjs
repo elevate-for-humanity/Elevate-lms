@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {auditMessaging} from './audit-twilio-messaging.mjs';
+import {auditMessaging, voiceRouting} from './audit-twilio-messaging.mjs';
 const account='AC'+'a'.repeat(32),phone='PN'+'b'.repeat(32),service='MG'+'c'.repeat(32);
 const bindings={TWILIO_ACCOUNT_SID:account,TWILIO_AUTH_TOKEN:'private-token',TWILIO_PHONE_NUMBER:'+13175550100'};
 function fixture({campaigns=['VERIFIED'],next=null}={}) {
@@ -34,4 +34,17 @@ test('untrusted pagination cannot receive account credentials',async()=>{
 test('network and permission failures never expose provider response or credentials',async()=>{
  await assert.rejects(auditMessaging(bindings,async()=>{throw Error('private-token');}),/NETWORK_FAILED/);
  await assert.rejects(auditMessaging(bindings,async()=>new Response('private-token',{status:403})),/HTTP_403/);
+});
+test('voice routing reports the actual owned webhook but never its credentials or query',()=>{
+ const evidence=voiceRouting({voice_url:'https://admin.elevateforhumanity.org/api/webhooks/twilio/voice?token=private-token',voice_method:'POST'});
+ assert.equal(evidence.ownedWebhookPath,'/api/webhooks/twilio/voice');
+ assert.equal(evidence.ownedHttpsWebhook,true);
+ assert.equal(evidence.liveCallAcceptance,'NOT_TESTED');
+ assert.doesNotMatch(JSON.stringify(evidence),/private-token|\?token/);
+ for(const voice_url of ['https://attacker.example/private-token','https://user:private-token@admin.elevateforhumanity.org/voice']) {
+  const result=voiceRouting({voice_url});
+  assert.equal(result.ownedHttpsWebhook,false);
+  assert.equal(result.ownedWebhookOrigin,null);
+  assert.doesNotMatch(JSON.stringify(result),/private-token|attacker/);
+ }
 });

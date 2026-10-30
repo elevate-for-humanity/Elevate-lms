@@ -2,6 +2,24 @@ import {pathToFileURL} from 'node:url';
 import {loadGoogleConfig} from './runtime-config.mjs';
 import {verifiedTwilioBindings} from './bind-twilio-runtime.mjs';
 
+export function voiceRouting(number) {
+  let url;
+  try { url = new URL(number.voice_url); } catch { /* A trunk/application may own routing. */ }
+  const owned = url?.protocol === 'https:' && !url.username && !url.password &&
+    ['admin.elevateforhumanity.org', 'app.elevateforhumanity.org', 'www.elevateforhumanity.org', 'elevateforhumanity.org', 'phone.elevateforhumanity.org'].includes(url.hostname);
+  return {
+    trunkConfigured: /^TK[a-f0-9]{32}$/i.test(number.trunk_sid || ''),
+    applicationConfigured: /^AP[a-f0-9]{32}$/i.test(number.voice_application_sid || ''),
+    webhookConfigured: Boolean(url),
+    ownedHttpsWebhook: Boolean(owned),
+    // Query strings and arbitrary third-party destinations can contain secrets.
+    ownedWebhookOrigin: owned ? url.origin : null,
+    ownedWebhookPath: owned && /^\/[a-zA-Z0-9_/-]*$/.test(url.pathname) ? url.pathname : null,
+    method: ['POST', 'GET'].includes(number.voice_method) ? number.voice_method : 'UNVERIFIED',
+    liveCallAcceptance: 'NOT_TESTED',
+  };
+}
+
 // Read existing account resources only. Never submit registrations, change
 // sender capabilities, send messages, or print credentials/contact content.
 export async function auditMessaging(bindings, request=fetch) {
@@ -32,6 +50,12 @@ export async function auditMessaging(bindings, request=fetch) {
   const number=await get(`https://api.twilio.com/2010-04-01/Accounts/${account}/IncomingPhoneNumbers.json?PhoneNumber=${encodeURIComponent(bindings.TWILIO_PHONE_NUMBER)}&PageSize=50`);
   const owned=number.incoming_phone_numbers?.find(n=>n.account_sid===account && n.phone_number===bindings.TWILIO_PHONE_NUMBER);
   if(!owned || !/^PN[a-f0-9]{32}$/i.test(owned.sid||''))throw Error('TWILIO_AUDIT_NUMBER_NOT_VERIFIED');
+  const voice = voiceRouting(owned);
+  if (voice.applicationConfigured) {
+    const application = await get(`https://api.twilio.com/2010-04-01/Accounts/${account}/Applications/${owned.voice_application_sid}.json`);
+    if (application.account_sid !== account || application.sid !== owned.voice_application_sid) throw Error('TWILIO_AUDIT_APPLICATION_NOT_VERIFIED');
+    voice.applicationRouting = voiceRouting(application);
+  }
   const services=await list('https://messaging.twilio.com/v1/Services?PageSize=50','services');
   const matches=[];
   for(const service of services) {
@@ -44,7 +68,7 @@ export async function auditMessaging(bindings, request=fetch) {
     matches.push({numberAssigned:true,campaignStatuses:statuses});
   }
   return {numberOwnershipVerified:true,providerCapabilities:{sms:owned.capabilities?.sms===true,mms:owned.capabilities?.mms===true,voice:owned.capabilities?.voice===true},
-    assignedMessagingServices:matches,verifiedCampaign:matches.some(s=>s.campaignStatuses.includes('VERIFIED')),messagesSent:0,configurationChanged:false};
+    voiceRouting:voice,assignedMessagingServices:matches,verifiedCampaign:matches.some(s=>s.campaignStatuses.includes('VERIFIED')),messagesSent:0,configurationChanged:false};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   Promise.resolve().then(()=>verifiedTwilioBindings(loadGoogleConfig('admin')))

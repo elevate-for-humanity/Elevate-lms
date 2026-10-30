@@ -53,13 +53,51 @@ on:
       - 'workers/admin-speech-cache.mjs'
       # Workflow-only orchestration edits do not require rebuilding the worker image.
   workflow_dispatch:
+    inputs:
+      direct_release:
+        description: Launch only the finite direct LMS release against an already tested image
+        required: false
+        default: false
+        type: boolean
+      tested_image_sha:
+        description: Exact successfully deployed worker image source for direct release
+        required: false
+        type: string
 permissions:
   contents: read
   actions: write
   id-token: write
 jobs:
+  direct-release:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && inputs.direct_release == true
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tested_image_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify direct release preserves completed media and has no rewind or retry
+        run: node --test workers/direct-course-policy.test.mjs scripts/gcp/direct-course-release.test.mjs tests/worker/hvac-saved-safety-role.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Run finite direct completion outside builder queues
+        env:
+          DIRECT_RELEASE_SOURCE_SHA: ${{ inputs.tested_image_sha }}
+        run: node scripts/gcp/direct-course-release.mjs
+
   authoring-access:
-    if: vars.GOOGLE_RELEASE_HOLD != 'true'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && inputs.direct_release != true
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -105,7 +143,7 @@ jobs:
       group: google-course-worker-image
       # Finish the active tested image/upload; GitHub retains only the newest pending build.
       cancel-in-progress: false
-    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && inputs.direct_release != true && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:

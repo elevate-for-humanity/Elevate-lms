@@ -16,7 +16,6 @@ on:
 permissions:
   contents: read
   actions: write
-  id-token: write
 concurrency:
   group: direct-course-release-launch
   cancel-in-progress: false
@@ -40,8 +39,7 @@ jobs:
   release:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-24.04
-    environment: production
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - name: Resolve the exact successfully deployed image source
         id: tested
@@ -56,22 +54,13 @@ jobs:
           fi
           [[ "$SHA" =~ ^[a-f0-9]{40}$ ]]
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.tested.outputs.sha }}
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - name: Verify direct release preserves completed media and has no rewind or retry
-        run: node --test workers/direct-course-policy.test.mjs scripts/gcp/direct-course-release.test.mjs tests/worker/hvac-saved-safety-role.test.mjs
-      - uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with: {skip_install: true}
-      - name: Run finite direct completion outside builder queues
+      - name: Request direct-only execution through the approved production identity
         env:
-          DIRECT_RELEASE_SOURCE_SHA: ${{ steps.tested.outputs.sha }}
-        run: node scripts/gcp/direct-course-release.mjs
+          GH_TOKEN: ${{ github.token }}
+          TESTED_IMAGE_SHA: ${{ steps.tested.outputs.sha }}
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-course-worker.yml/dispatches" \
+            -f ref=main \
+            -f "inputs[direct_release]=true" \
+            -f "inputs[tested_image_sha]=$TESTED_IMAGE_SHA"

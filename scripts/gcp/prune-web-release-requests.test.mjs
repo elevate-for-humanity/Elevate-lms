@@ -347,3 +347,24 @@ for (const [workflow, label] of [
     },
   );
 }
+
+test('GitHub synthetic cancellation clock ordering does not invent a newer rollout', async () => {
+ const {assertTestedWebRollout}=await import('./prune-web-release-requests.mjs');
+ const sha='a'.repeat(40);
+ for (const [workflow,label] of [['deploy-admin.yml','Admin'],['deploy-google-store-runtime.yml','Store']]) {
+  // Actual cancelled runs 40976561649 and 40976564692 had no runner or
+  // steps, with synthetic started_at one second AFTER completed_at.
+  const unstarted={name:`Deploy and verify ${label} on Google`,status:'completed',conclusion:'cancelled',
+   runner_id:null,runner_name:null,steps:[],started_at:'2026-10-30T00:08:44Z',completed_at:'2026-10-30T00:08:43Z'};
+  const check=job=>assertTestedWebRollout({repository,workflow,runId:1,commitSha:sha,
+   api:async path=>path.includes('/workflows/')
+    ? {workflow_runs:[row(1,'in_progress',{head_sha:sha}),row(2,'completed')]}
+    : {total_count:1,jobs:path.includes('/runs/1/')
+      ? [{name:`Build and upload ${label} image`,status:'completed',conclusion:'success'}] : [job]}});
+  assert.equal((await check(unstarted)).status,`tested_${label.toLowerCase()}_image_allowed`);
+  for(const change of [{runner_id:7},{steps:[{status:'completed'}]},
+   {completed_at:null},{completed_at:'invalid'},{completed_at:'2026-10-30T00:08:42Z'},
+   {completed_at:'2026-10-30T00:08:45Z'}])
+   await assert.rejects(check({...unstarted,...change}),/ROLLOUT_STARTED/);
+ }
+});

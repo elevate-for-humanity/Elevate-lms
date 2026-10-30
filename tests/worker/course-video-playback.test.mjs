@@ -38,9 +38,9 @@ test('legacy public URLs and private Supabase records retain their existing beha
 
 const source = stripTypeScriptTypes(readFileSync(new URL('../../apps/admin/app/api/admin/videos/route.ts', import.meta.url), 'utf8'), { mode: 'transform' })
   .replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm, '').replace(/^export /gm, '');
-function route({ authorized = true } = {}) {
+function route({ authorized = true, storedVideo = video } = {}) {
   const calls = [];
-  const query = { select() { return this; }, eq() { return this; }, order() { return this; }, async limit() { return { data: [video], error: null }; } };
+  const query = { select() { return this; }, eq() { return this; }, order() { return this; }, async limit() { return { data: [storedVideo], error: null }; } };
   const values = {
     NextResponse: Response,
     apiRequireAdmin: async () => { calls.push('auth'); return authorized ? { id: 'admin' } : { error: new Response(null, { status: 403 }) }; },
@@ -49,7 +49,7 @@ function route({ authorized = true } = {}) {
     safeError: (error, status) => Response.json({ error }, { status }),
     safeInternalError: () => Response.json({ error: 'failed' }, { status: 500 }),
     withApiAudit: (_path, handler) => handler,
-    getSignedElevateMediaUrl: async (actual, expiry) => { calls.push('sign'); assert.equal(actual, key); assert.equal(expiry, 3600); return 'https://media.example/fresh'; },
+    getSignedElevateMediaUrl: async (actual, expiry) => { calls.push('sign'); assert.equal(actual, storedVideo.storage_path); assert.equal(expiry, 3600); return 'https://media.example/fresh'; },
     resolveCourseVideoPlayback,
   };
   return { handler: new Function(...Object.keys(values), source + ';return GET;')(...Object.values(values)), calls };
@@ -66,4 +66,21 @@ test('the actual route rejects unauthorized requests before signing media', asyn
   const response = await f.handler({ nextUrl: new URL(`https://admin.example/api/admin/videos?courseId=${courseId}`) });
   assert.equal(response.status, 403);
   assert.deepEqual(f.calls, ['auth']);
+});
+
+const reviewedKey = `course-videos/manual-lessons/${courseId}/${lessonId}/reviewed-${'a'.repeat(64)}/completed-lesson-manual.mp4`;
+test('the authenticated route renews an exact source-hashed reviewed film folder', async () => {
+  const f = route({ storedVideo: { ...video, storage_path: reviewedKey } });
+  const response = await f.handler({ nextUrl: new URL(`https://admin.example/api/admin/videos?courseId=${courseId}`) });
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).data[0].url, 'https://media.example/fresh');
+  assert.deepEqual(f.calls, ['auth', 'sign']);
+});
+test('review folders reject malformed hashes, unrelated files, extra nesting and cross-lesson keys', async () => {
+  for (const invalid of [reviewedKey.replace('a'.repeat(64),'short'),reviewedKey.replace('completed-lesson-manual.mp4','source.mp4'),reviewedKey.replace('/completed-lesson-manual.mp4','/extra/completed-lesson-manual.mp4'),reviewedKey.replace(lessonId,'00000000-0000-4000-8000-000000000000')]) {
+    await assert.rejects(resolveCourseVideoPlayback({ ...video, storage_path: invalid }, {
+      signExternal: () => assert.fail('invalid identity must not be signed'),
+      signLegacy: () => assert.fail('no fallback'),
+    }), /IDENTITY_MISMATCH/);
+  }
 });

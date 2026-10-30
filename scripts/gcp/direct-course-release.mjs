@@ -1,5 +1,6 @@
 import {pathToFileURL} from 'node:url';
 import {google,PROJECT} from './runtime-config.mjs';
+import {inspectRegionalCapacity} from './regional-capacity.mjs';
 const REGION='us-central1',NAME='elevate-direct-course-release';
 export function directJobTemplate(source,{imageSha,imageDigest}) {
  if(!/^[a-f0-9]{40}$/.test(imageSha??'')||!/^sha256:[a-f0-9]{64}$/.test(imageDigest??''))throw Error('DIRECT_TESTED_IMAGE_REQUIRED');
@@ -19,7 +20,7 @@ export function directJobTemplate(source,{imageSha,imageDigest}) {
  spec.template.spec.taskCount=1;spec.template.spec.parallelism=1;
  return {apiVersion:'run.googleapis.com/v1',kind:'Job',metadata:{name:NAME,namespace:source.metadata?.namespace??PROJECT},spec};
 }
-export function launchDirectRelease({imageSha,run=google}){
+export async function launchDirectRelease({imageSha,run=google,inspect=inspectRegionalCapacity}){
  const source=JSON.parse(run(['run','jobs','describe','elevate-course-builder','--project='+PROJECT,'--region='+REGION,'--format=json']));
  const digest=run(['artifacts','docker','images','describe',`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker:${imageSha}`,'--project='+PROJECT,'--format=value(image_summary.digest)']).trim();
  const job=directJobTemplate(source,{imageSha,imageDigest:digest});
@@ -29,6 +30,8 @@ export function launchDirectRelease({imageSha,run=google}){
   const executions=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
   if(executions.some(execution=>!execution.status?.completionTime&&!execution.status?.conditions?.some(condition=>condition.type==='Completed'&&['True','False'].includes(condition.status))))return {state:'already-running'};
  }
+ const capacity=await inspect({region:REGION,run,task:job.spec.template.spec.template.spec,taskCount:1});
+ if(capacity.fits!==true)throw Error('DIRECT_RELEASE_REGIONAL_CAPACITY_UNAVAILABLE');
  run(['run','jobs','replace','-','--project='+PROJECT,'--region='+REGION,'--quiet'],JSON.stringify(job));
  const saved=JSON.parse(run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
  const savedTask=saved.spec?.template?.spec?.template?.spec;
@@ -39,5 +42,7 @@ export function launchDirectRelease({imageSha,run=google}){
  return {state:'started',job:NAME,imageDigest:digest,retries:0};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- console.log(JSON.stringify(launchDirectRelease({imageSha:process.env.DIRECT_RELEASE_SOURCE_SHA})));
+ launchDirectRelease({imageSha:process.env.DIRECT_RELEASE_SOURCE_SHA})
+  .then(result=>console.log(JSON.stringify(result)))
+  .catch(error=>{console.error(JSON.stringify({state:'blocked',code:error.code??error.message?.match(/^[A-Z][A-Z0-9_]+/)?.[0]??'DIRECT_RELEASE_FAILED'}));process.exitCode=1;});
 }

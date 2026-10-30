@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      SOURCE_SHA: c531d6b206277cdbd766ebccdfdbd07962d4db89
+      SOURCE_SHA: 9762e8f649fb8a4bc55d5aff1d368f5197d60455
       NEXT_PUBLIC_SUPABASE_URL: https://vhulnzcfmlnsmoxixjco.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_lb8-f5trWyOLdTY-ElpX9A_ImDp8eGe
       PROJECT: elegant-racer-299721
@@ -56,8 +56,8 @@ jobs:
           import {readFileSync,writeFileSync} from 'node:fs';
           import {createHash,privateDecrypt,createDecipheriv,constants} from 'node:crypto';
           const manifest=JSON.parse(readFileSync('.deploy/legacy83-source/manifest.json','utf8'));
-          const expected="c531d6b206277cdbd766ebccdfdbd07962d4db89";
-          if(manifest.sourceSha!==expected || manifest.sha256!=="802bbed33947a3755f2eb9ecab2ab12da359d85c206edff71f0da8b454e71a3a")throw Error('Unexpected source revision');
+          const expected="9762e8f649fb8a4bc55d5aff1d368f5197d60455";
+          if(manifest.sourceSha!==expected || manifest.sha256!=="1c7918f7c8d229ab1d7b167602d481bb980584395c1116b52cb87ec29535d798")throw Error('Unexpected source revision');
           const envelopeText=manifest.chunks.map(name=>{
            if(!/^part-[0-9]{3}[.]txt$/.test(name))throw Error('Invalid encrypted chunk path');
            return readFileSync('.deploy/legacy83-source/'+name,'utf8');
@@ -99,3 +99,6 @@ jobs:
       - name: Deploy and verify the isolated Google website host
         timeout-minutes: 18
         run: node scripts/gcp/deploy-legacy83-website.mjs
+      - name: Run read-only beta acceptance checks
+        timeout-minutes: 10
+        run: node "$RUNNER_TEMP/legacy83-source/scripts/beta-preview.mjs"

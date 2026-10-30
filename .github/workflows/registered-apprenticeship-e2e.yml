@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/registered-apprenticeship-e2e.yml'
       - 'components/programs/HvacTrainingShowcase.tsx'
+      - 'components/pwa/PwaInstallBanner.tsx'
       - 'public/videos/hvac-recruitment-20261029.mp4'
       - 'tests/e2e/hvac-hero-playback.spec.ts'
   workflow_dispatch:

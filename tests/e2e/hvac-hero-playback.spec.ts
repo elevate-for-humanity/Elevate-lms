@@ -47,6 +47,7 @@ test('HVAC hero plays the complete 96-second film and loops without cropping', a
       samples.push({ ...sample, elapsedMs: Date.now() - started });
       expect(sample.error, JSON.stringify(sample)).toBe(0);
       expect(sample.paused, JSON.stringify(sample)).toBe(false);
+      expect(sample.installBannerVisible, 'Install prompts must not cover the film or its controls').toBe(false);
       if (sample.time >= 95) reachedEnd = true;
       if (reachedEnd && sample.time < 3) { looped = true; break; }
       await page.waitForTimeout(250);

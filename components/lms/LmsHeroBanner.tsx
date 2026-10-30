@@ -7,6 +7,7 @@ interface LmsHeroBannerProps {
   title: string;
   subtitle: string;
   image: string;
+  compact?: boolean;
   /** Primary CTA button */
   cta?: { label: string; href: string };
   /** Secondary CTA button */
@@ -22,22 +23,23 @@ export function LmsHeroBanner({
   cta,
   secondaryCta,
   eyebrow,
+  compact = false,
 }: LmsHeroBannerProps) {
   return (
     <section className="relative rounded-2xl overflow-hidden mb-8 shadow-lg">
-      <div className="relative aspect-video">
+      <div className={compact ? "relative h-40 bg-slate-100 sm:h-48" : "relative aspect-video"}>
         <Image
           placeholder="blur"
           blurDataURL={IMAGE_LOADING_BLUR}
           src={image}
           alt={title}
           fill
-          className="object-cover object-top"
+          className={compact ? "object-contain" : "object-cover object-top"}
           priority
           sizes="100vw"
         />
       </div>
-      <div className="bg-slate-950 py-6 sm:py-8">
+      <div className={compact ? "bg-slate-950 py-4" : "bg-slate-950 py-6 sm:py-8"}>
         <div className="max-w-3xl px-8 md:px-12">
           {eyebrow && (
             <span className="inline-block text-xs font-bold uppercase tracking-wider text-brand-blue-300 mb-2">

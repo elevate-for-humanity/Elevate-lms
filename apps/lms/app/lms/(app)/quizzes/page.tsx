@@ -1,3 +1,4 @@
+import { getPrestigeCourseCover } from '@/lib/lms/prestige-course-covers';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import Link from 'next/link';
@@ -46,9 +47,10 @@ export default async function QuizzesPage() {
         </p>
       ) : null}
       <LmsHeroBanner
+        compact
         title="Quizzes & Assessments"
         subtitle={`${results.length} assigned assessments · ${passed} passed`}
-        image="/images/pages/training-classroom.webp"
+        image={getPrestigeCourseCover(courseIds[0] || '') || '/images/pages/training-classroom.webp'}
         eyebrow="Test Your Knowledge"
       />
       <section aria-label="Assessment summary" className="grid grid-cols-2 gap-4 md:grid-cols-4">

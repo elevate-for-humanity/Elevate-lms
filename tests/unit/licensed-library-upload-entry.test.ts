@@ -21,10 +21,10 @@ describe('licensed course-media upload entry', () => {
       'utf8',
     );
 
-    expect(client).toContain("'image/jpeg'");
-    expect(client).toContain("'image/png'");
-    expect(client).toContain("'image/webp'");
-    expect(route).toContain("'image/jpeg'");
+    expect(client).toMatch(/['"]image\/jpeg['"]/);
+    expect(client).toMatch(/['"]image\/png['"]/);
+    expect(client).toMatch(/['"]image\/webp['"]/);
+    expect(route).toMatch(/['"]image\/jpeg['"]/);
     expect(route).toContain('LICENSED_MEDIA_TYPES.has(fileType)');
   });
 });

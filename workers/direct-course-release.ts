@@ -7,18 +7,16 @@ import {ULTIMATE_BUILD_STEPS,type UltimateBuildStep,type UltimateCredentialProfi
 import type {UltimateRunContext} from '../lib/ultimate-course-builder/core/build-runner';
 import {UltimateReleaseService} from '../lib/ultimate-course-builder/release/release-service';
 import {resolveReleaseActor} from '../lib/ultimate-course-builder/worker/release-actor';
-import {runDirectLessonPass,directCourseComplete} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence} from './direct-course-policy.mjs';
 
 // Reuse media tools and release validators, but never invoke the build runner,
 // role dispatcher, automatic repair router, or any queue operation.
-const TARGETS=[
- 'b400834e-15e3-4ef0-ae20-33cd9f82e950',
- 'adc2ae08-f739-41e1-ac86-b79802e46f19',
- '42688955-1d2c-4988-a2c8-9e46cd9b3499',
- '60861eb2-2d25-44b8-8193-3721aae716c9',
+// Finish EPA/HVAC first for current learners, then Barber, then Business.
+const TARGET_GROUPS=[
+ ['adc2ae08-f739-41e1-ac86-b79802e46f19','60861eb2-2d25-44b8-8193-3721aae716c9'],
+ ['b400834e-15e3-4ef0-ae20-33cd9f82e950'],
+ ['42688955-1d2c-4988-a2c8-9e46cd9b3499'],
 ];
-const index=Number(process.env.CLOUD_RUN_TASK_INDEX??0);
-if(!Number.isInteger(index)||index<0||index>=TARGETS.length)throw Error('DIRECT_RELEASE_TARGET_REQUIRED');
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('DIRECT_RELEASE_DATABASE_AUTH_REQUIRED');
 const db=createClient('https://cuxzzpsyufcewtmicszk.supabase.co',key,{auth:{persistSession:false,autoRefreshToken:false}});
@@ -27,11 +25,11 @@ if(!/^[a-f0-9]{40}$/.test(producer??''))throw Error('DIRECT_RELEASE_TESTED_SOURC
 const runId=randomUUID();
 // Only a relevant direct-engine repair may retry an unchanged rejected input;
 // unrelated repository commits and worker deployments are not new evidence.
-const engineRevision='direct-single-pass-2026-10-30.1';
+const engineRevision='direct-single-pass-no-google-2026-10-30.2';
 const safeCode=(error:unknown)=>error instanceof Error?(error.message.match(/^[A-Z][A-Z0-9_]+/)?.[0]??'DIRECT_COMPONENT_FAILED'):'DIRECT_COMPONENT_FAILED';
 
-async function main(){
- const loaded=await db.from('ultimate_course_builds').select('id,course_id,profile,status').eq('id',TARGETS[index]).single();
+async function main(buildId:string){
+ const loaded=await db.from('ultimate_course_builds').select('id,course_id,profile,status').eq('id',buildId).single();
  if(loaded.error||!loaded.data)throw loaded.error??Error('DIRECT_RELEASE_SOURCE_NOT_FOUND');
  const build=loaded.data;
  const profile=build.profile as UltimateCredentialProfile&{ownerPaused?:boolean};
@@ -192,5 +190,6 @@ async function main(){
   }
  }
  console.log(JSON.stringify({courseId:build.course_id,runId,complete,publishedLessonCount:allAccepted.length,newlyVerifiedInThisPass:accepted.length,learnerLessonCount:learnerLessonIds.length,blocked}));
+ return {courseId:build.course_id,complete};
 }
-main().catch(error=>{console.error(JSON.stringify({state:'direct-release-stopped',code:safeCode(error)}));process.exitCode=1;});
+runDirectCourseSequence({groups:TARGET_GROUPS,execute:main}).catch(error=>{console.error(JSON.stringify({state:'direct-release-stopped',code:safeCode(error)}));process.exitCode=1;});

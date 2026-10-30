@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runDirectLessonPass,directCourseComplete} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence} from './direct-course-policy.mjs';
 function harness(overrides={}) {
  const calls=[],saved=new Map([['script','original-script'],['narration','original-audio']]);
  return {calls,saved,input:{steps:['script','narration','render','qa','publish'],
@@ -30,4 +30,23 @@ test('a three-lesson production manifest cannot certify a seventeen-lesson cours
  assert.equal(directCourseComplete({learnerLessonIds,acceptedLessonIds:learnerLessonIds,manifestLessonIds:learnerLessonIds.slice(0,3)}),false);
  assert.equal(directCourseComplete({learnerLessonIds,acceptedLessonIds:learnerLessonIds,manifestLessonIds:learnerLessonIds}),true);
  assert.equal(directCourseComplete({learnerLessonIds,acceptedLessonIds:learnerLessonIds.slice(0,16),manifestLessonIds:learnerLessonIds}),false);
+});
+
+test('course snapshots execute sequentially with both HVAC snapshots before Barber',async()=>{
+ const calls=[];let active=0;
+ const results=await runDirectCourseSequence({groups:[['core','supplement'],['barber'],['business']],execute:async id=>{
+  assert.equal(active++,0);calls.push(id);await Promise.resolve();active--;
+  return {courseId:['core','supplement'].includes(id)?'hvac':id,complete:id!=='core'};
+ }});
+ assert.deepEqual(calls,['core','supplement','barber','business']);assert.equal(results.length,4);
+});
+test('an incomplete course stops before another course starts',async()=>{
+ const calls=[];
+ await assert.rejects(runDirectCourseSequence({groups:[['core','supplement'],['barber']],execute:async id=>{
+  calls.push(id);return {courseId:'hvac',complete:false};
+ }}),/DIRECT_COURSE_INCOMPLETE:hvac/);
+ assert.deepEqual(calls,['core','supplement']);
+});
+test('unrelated courses cannot be silently grouped as one completed course',async()=>{
+ await assert.rejects(runDirectCourseSequence({groups:[['core','barber']],execute:async id=>({courseId:id,complete:true})}),/DIRECT_COURSE_GROUP_MISMATCH/);
 });

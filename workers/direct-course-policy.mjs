@@ -23,3 +23,21 @@ export function directCourseComplete({learnerLessonIds, acceptedLessonIds, manif
   return learners.size>0 && learners.size===learnerLessonIds.length && manifest.size===learners.size &&
     [...learners].every(id=>manifest.has(id)&&accepted.has(id));
 }
+
+/** Run every snapshot of one course before the next course. An incomplete
+ * course stops this pass so failures are repaired before unrelated work starts. */
+export async function runDirectCourseSequence({groups,execute}) {
+ const results=[];
+ for(const group of groups) {
+  if(!Array.isArray(group)||!group.length)throw Error('DIRECT_COURSE_GROUP_REQUIRED');
+  let last;
+  for(const buildId of group) {
+   const result=await execute(buildId);
+   if(!result||typeof result.complete!=='boolean'||!result.courseId)throw Error('DIRECT_COURSE_RESULT_REQUIRED');
+   if(last&&result.courseId!==last.courseId)throw Error('DIRECT_COURSE_GROUP_MISMATCH');
+   results.push(result);last=result;
+  }
+  if(!last.complete)throw Error('DIRECT_COURSE_INCOMPLETE:'+last.courseId);
+ }
+ return results;
+}

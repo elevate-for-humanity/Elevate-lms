@@ -1,0 +1,126 @@
+"""Explicit encoder of owner-reviewed saved instruction/photos. No authoring or publication."""
+import base64, hashlib, json, os, re, subprocess, sys, tempfile, urllib.request, urllib.error, uuid
+from pathlib import Path
+
+PROJECT='https://cuxzzpsyufcewtmicszk.supabase.co'
+COURSE='e9a2547c-ae03-418e-97fc-51377d438f8c'
+BUCKET='elevate-course-media'
+
+def digest(data): return hashlib.sha256(data).hexdigest()
+
+def request(url, data=None, headers=None):
+    req=urllib.request.Request(url,data=None if data is None else json.dumps(data).encode(),headers=headers or {})
+    try:
+        with urllib.request.urlopen(req,timeout=90) as response: return json.load(response)
+    except urllib.error.HTTPError as error:
+        raise RuntimeError('MANUAL_REMOTE_HTTP_'+str(error.code)) from None
+
+def canonical_source(row):
+    sections=row['content_json']['experience']['readingGuide']['sections']
+    draft=row['content_json']['manualMediaDraft']
+    text='\n\n'.join(s['heading']+'. '+s['body'] for s in sections)
+    if draft.get('mode')!='manually-reviewed-source-and-photo-selections' or draft.get('noAutomaticPublication') is not True or draft.get('reviewRequiredAfterEncoding') is not True:
+        raise RuntimeError('MANUAL_SOURCE_REVIEW_REQUIRED')
+    if draft['sourceTranscriptSha256']!=digest(text.encode()): raise RuntimeError('MANUAL_SOURCE_CHANGED')
+    groups=draft['photoGroups']
+    if len(groups)!=len(sections) or not all(len(g)==2 for g in groups): raise RuntimeError('MANUAL_PHOTO_PLAN_INVALID')
+    return sections,groups,text
+
+def main():
+    import boto3
+    from botocore.exceptions import ClientError
+    lesson=str(uuid.UUID(os.environ['LESSON_ID']))
+    service=os.environ['SUPABASE_SERVICE_ROLE_KEY']
+    headers={'apikey':service,'Authorization':'Bearer '+service,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates,return=representation'}
+    def db(path,data=None): return request(PROJECT+'/rest/v1/'+path,data,headers)
+    rows=db('course_lessons?select=id,course_id,title,content_json&id=eq.'+lesson+'&course_id=eq.'+COURSE)
+    if len(rows)!=1: raise RuntimeError('MANUAL_LESSON_NOT_FOUND')
+    row=rows[0]; sections,groups,text=canonical_source(row)
+    photos=db('course_visual_assets?select=id,asset_url,alt_text,metadata&course_id=eq.'+COURSE+'&metadata->>manualCatalogue=eq.true')
+    lookup={p['id']:p for p in photos}; images=[]
+    for photo_id in sorted({i for g in groups for i in g}):
+        p=lookup[photo_id]; m=p['metadata']; url=p['asset_url']
+        if m.get('license_observed') is not True or not m.get('entitlement_id') or not m.get('manualReviewedDerivative',{}).get('sha256'):
+            raise RuntimeError('MANUAL_PHOTO_REVIEW_REQUIRED')
+        if not url.startswith('https://elements-resized.envatousercontent.com/'):
+            raise RuntimeError('MANUAL_PHOTO_ORIGIN_INVALID')
+        images.append({'id':p['id'],'title':p['id'],'sourceTitle':p['alt_text'],'url':url,'sha256':m['manualReviewedDerivative']['sha256'],'entitlementId':m['entitlement_id']})
+    # Read only the existing authorized runtime key family; never print credentials.
+    def secret(key):
+        value=db('rpc/get_platform_secret',{'p_key':key})
+        if not isinstance(value,str) or not value.strip(): raise RuntimeError('MANUAL_CREDENTIAL_UNAVAILABLE')
+        return value.strip()
+    access=secret('ELEVATE_MEDIA_ACCESS_KEY_ID'); private=secret('ELEVATE_MEDIA_SECRET_ACCESS_KEY')
+    s3=boto3.client('s3',endpoint_url='https://s3.us-east-005.backblazeb2.com',region_name='us-east-005',aws_access_key_id=access,aws_secret_access_key=private)
+    source_hash=digest(text.encode())
+    plan_hash=digest(json.dumps({'source':source_hash,'photos':images,'groups':groups,'voice':'en-US-Neural2-F','renderer':'manual-ffmpeg-v1'},sort_keys=True).encode())
+    prefix=f'course-videos/manual-lessons/{COURSE}/{lesson}/reviewed-{plan_hash}'
+    manifest_key=prefix+'/render-manifest.json'; film_key=prefix+'/completed-lesson-manual.mp4'
+    def get(key):
+        try: return s3.get_object(Bucket=BUCKET,Key=key)['Body'].read()
+        except ClientError as error:
+            if error.response['Error']['Code'] in ('NoSuchKey','404'): return None
+            raise RuntimeError('MANUAL_PRIVATE_READ_FAILED') from None
+    def put(key,data,mime):
+        s3.put_object(Bucket=BUCKET,Key=key,Body=data,ContentType=mime,CacheControl='private, max-age=0')
+    old=get(manifest_key)
+    if old:
+        manifest=json.loads(old)
+        if manifest.get('sourceTranscriptSha256')!=source_hash or manifest.get('reviewRequired') is not True: raise RuntimeError('MANUAL_CANDIDATE_CONFLICT')
+        print(json.dumps({'lessonId':lesson,'state':'existing-review-candidate','manifestKey':manifest_key})); return
+    tts=secret('GOOGLE_CLOUD_API_KEY')
+    with tempfile.TemporaryDirectory(prefix='manual-lesson-') as directory:
+        root=Path(directory); out=root/'film'; out.mkdir(); speech=out/'speech'; speech.mkdir()
+        # Content-addressed private narration cache avoids repeated paid synthesis.
+        chunks=[]
+        for section in sections:
+            for sentence in re.split(r'(?<=[.!?])\s+',section['heading']+'. '+section['body']):
+                part=[]
+                for word in sentence.split():
+                    if len(' '.join(part+[word]))>130 and part: chunks.append(' '.join(part)); part=[]
+                    part.append(word)
+                if part: chunks.append(' '.join(part))
+        for chunk in chunks:
+            h=digest(chunk.encode()); cached=get('course-videos/manual-narration/en-US-Neural2-F/'+h+'.mp3')
+            if not cached:
+                result=request('https://texttospeech.googleapis.com/v1/text:synthesize',{'input':{'text':chunk},'voice':{'languageCode':'en-US','name':'en-US-Neural2-F'},'audioConfig':{'audioEncoding':'MP3'}},{'Content-Type':'application/json','X-Goog-Api-Key':tts})
+                cached=base64.b64decode(result['audioContent'],validate=True)
+                if len(cached)<1000: raise RuntimeError('MANUAL_NARRATION_EMPTY')
+                put('course-videos/manual-narration/en-US-Neural2-F/'+h+'.mp3',cached,'audio/mpeg')
+            (speech/(h+'.mp3')).write_bytes(cached)
+        plan={'lessonId':lesson,'courseId':COURSE,'title':row['title'],'sections':sections,'images':images,'photoGroups':groups,'outputDirectory':'film'}
+        path=root/'plan.json'; path.write_text(json.dumps(plan))
+        env={**os.environ,'MANUAL_RENDER_ROOT':str(root),'MANUAL_GOOGLE_TTS_KEY':tts}
+        subprocess.run([sys.executable,str(Path(__file__).with_name('encode_reviewed_lesson.py')),str(path)],check=True,env=env)
+        film=out/'completed-lesson-manual.mp4'; manifest=json.loads((out/'render-manifest.json').read_text())
+        if digest(film.read_bytes())!=manifest['sha256']: raise RuntimeError('MANUAL_FILM_HASH_MISMATCH')
+        if ' '.join(c['text'] for c in manifest['captionCues']).split()!=text.split(): raise RuntimeError('MANUAL_CAPTION_COVERAGE_FAILED')
+        subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(film),'-f','null','-'],check=True)
+        check=subprocess.run(['ffmpeg','-v','info','-i',str(film),'-vf','blackdetect=d=0.4:pix_th=0.05','-af','silencedetect=n=-45dB:d=1','-f','null','-'],capture_output=True,text=True,check=True)
+        if 'black_start:' in check.stderr or 'silence_start:' in check.stderr: raise RuntimeError('MANUAL_BLACK_OR_SILENCE_REVIEW_REQUIRED')
+        # Recheck canonical instruction after encoding; no stale film promotion.
+        latest=db('course_lessons?select=content_json&id=eq.'+lesson+'&course_id=eq.'+COURSE)[0]
+        canonical_source(latest)
+        if latest['content_json']['manualMediaDraft']['sourceTranscriptSha256']!=source_hash: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_ENCODE')
+        for audio in speech.glob('*.mp3'): put('course-videos/manual-narration/en-US-Neural2-F/'+audio.name,audio.read_bytes(),'audio/mpeg')
+        put(film_key,film.read_bytes(),'video/mp4')
+        if digest(get(film_key))!=manifest['sha256']: raise RuntimeError('MANUAL_STORED_BYTES_MISMATCH')
+        manifest.update({'sourceTranscriptSha256':source_hash,'planSha256':plan_hash,'storagePath':film_key,'technicalChecks':{'fullDecode':True,'blackAtLeastPoint4Seconds':False,'silenceAtLeast1SecondAtMinus45dB':False,'storedBytesHashMatches':True},'visualReview':'pending','nativeLmsReview':'pending'})
+        from PIL import Image,ImageDraw
+        shots=manifest['visualShots']; sheet=Image.new('RGB',(960,290*((len(shots)+1)//2)),(24,24,27)); cursor=0
+        for i,shot in enumerate(shots):
+            frame=out/(str(i)+'.review.jpg')
+            subprocess.run(['ffmpeg','-v','error','-y','-ss',str(min(cursor+shot['duration']/2,manifest['durationSeconds']-.1)),'-i',str(film),'-frames:v','1',str(frame)],check=True)
+            image=Image.open(frame).convert('RGB');image.thumbnail((480,270));sheet.paste(image,((i%2)*480,(i//2)*290));ImageDraw.Draw(sheet).text(((i%2)*480+8,(i//2)*290+271),str(i+1)+' — '+shot['title'][:60],fill='white');cursor+=shot['duration']
+        review=out/'film-review-sheet.jpg';sheet.save(review,quality=88);put(prefix+'/film-review-sheet.jpg',review.read_bytes(),'image/jpeg')
+        for name,mime in [('captions.vtt','text/vtt'),('transcript.txt','text/plain')]: put(prefix+'/'+name,(out/name).read_bytes(),mime)
+        # Candidate only. This tool never writes course_lessons, video_jobs or approvals.
+        url=s3.generate_presigned_url('get_object',Params={'Bucket':BUCKET,'Key':film_key,'ResponseContentType':'video/mp4'},ExpiresIn=3600)
+        video_id=str(uuid.uuid5(uuid.NAMESPACE_URL,film_key))
+        thumbnail=s3.generate_presigned_url('get_object',Params={'Bucket':BUCKET,'Key':prefix+'/film-review-sheet.jpg'},ExpiresIn=3600)
+        db('course_videos?on_conflict=id',{'id':video_id,'lesson_id':lesson,'course_id':COURSE,'title':row['title']+' — manually reviewed source; encoded film awaiting visual review','video_url':url,'thumbnail_url':thumbnail,'storage_path':film_key,'duration_seconds':round(manifest['durationSeconds']),'transcript':text,'generated_by':'manual','asset_role':'reference','status':'ready'})
+        manifest['candidateVideoId']=video_id
+        put(manifest_key,json.dumps(manifest).encode(),'application/json')
+        print(json.dumps({'lessonId':lesson,'candidateVideoId':video_id,'state':'encoded-review-required','sha256':manifest['sha256'],'durationSeconds':manifest['durationSeconds'],'manifestKey':manifest_key}))
+
+if __name__=='__main__': main()

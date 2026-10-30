@@ -1,0 +1,42 @@
+name: Encode a manually reviewed saved lesson film
+
+on:
+  workflow_dispatch:
+    inputs:
+      lesson_id:
+        description: Exact Business lesson UUID with saved owner-reviewed instruction and photo selections
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-reviewed-film-${{ inputs.lesson_id }}
+  cancel-in-progress: false
+
+jobs:
+  encode-review-candidate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install film encoding tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install boto3==1.40.61 Pillow==12.0.0
+      - name: Validate manual encoder contracts
+        run: python -m unittest discover -s tests/manual -p 'test_*.py'
+      - name: Encode saved instruction and photographs for review
+        env:
+          LESSON_ID: ${{ inputs.lesson_id }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/manual/render_saved_lesson.py

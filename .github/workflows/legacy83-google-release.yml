@@ -35,12 +35,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for region in us-central1 us-east1 us-east2; do
+          for region in us-central1 us-east1; do
             gcloud run services list --project=elegant-racer-299721 --region="$region" --format='json(metadata.name,status.url,status.latestReadyRevisionName)' > "/tmp/services-$region.json"
           done
           python3 - <<'PY'
           import json
-          for region in ['us-central1','us-east1','us-east2']:
+          for region in ['us-central1','us-east1']:
             rows=json.load(open('/tmp/services-'+region+'.json'))
             for row in rows:
               if 'legacy' in row.get('metadata',{}).get('name','').lower():

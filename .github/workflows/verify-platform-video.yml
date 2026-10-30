@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/verify-platform-video.yml'
       - 'scripts/gcp/verify-platform-video.mjs'
+      - 'scripts/gcp/verify-stripe-provider*'
       - 'lib/communications/livekit.ts'
       - 'components/communications/PlatformVideoRoom.tsx'
 permissions:
@@ -30,6 +31,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify read-only payment checks and redaction
+        run: node --test scripts/gcp/verify-stripe-provider.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721

@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication,directStepIdleDeadline} from './direct-course-policy.mjs';
+test('full learner playback keeps its existing one-hour deadline without extending stalled rendering',()=>{
+ assert.equal(directStepIdleDeadline('learner_runthrough'),3600000);
+ assert.equal(directStepIdleDeadline('lesson_film_render'),600000);
+});
 test('an incrementally published shell still requires final course publication',()=>{
  const full={status:'published',is_active:true,generation_status:'published',generation_progress:100,total_lessons:17};
  assert.equal(directCourseNeedsFinalPublication({...full,generation_status:'draft',generation_progress:0},17),true);

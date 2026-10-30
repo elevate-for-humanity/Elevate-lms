@@ -9,7 +9,7 @@ import {UltimateReleaseService} from '../lib/ultimate-course-builder/release/rel
 import {createCourseProgressWatch} from '../lib/ultimate-course-builder/worker/progress-watch.mjs';
 import {createDirectDatabaseFetch} from './direct-database-fetch.mjs';
 import {resolveReleaseActor} from '../lib/ultimate-course-builder/worker/release-actor';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication,directStepIdleDeadline} from './direct-course-policy.mjs';
 
 // Reuse media tools and release validators, but never invoke the build runner,
 // role dispatcher, automatic repair router, or any queue operation.
@@ -99,7 +99,7 @@ async function main(buildId:string){
    artifacts[step]=value!;context.passedSteps!.add(step);return true;
   };
   const result=await runDirectLessonPass({steps:ULTIMATE_BUILD_STEPS,reusable,
-   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='lesson_film_render'?{photoGenerationRevision:'photographic-course-cues-v6-bounded-pairs'}:{}),...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
+   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='learner_runthrough'?{learnerDeadlineRevision:'full-playback-one-hour-v1'}:{}),...(step==='lesson_film_render'?{photoGenerationRevision:'photographic-course-cues-v6-bounded-pairs'}:{}),...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
    attempted:async(step:UltimateBuildStep,fingerprint:string)=>{
     const logicalKey=`direct-failure:${lesson.id}:${step}:${fingerprint}`;attempts.set(step,logicalKey);
     const prior=await db.from('ultimate_artifacts').select('id').eq('build_id',build.id).eq('logical_key',logicalKey).maybeSingle();
@@ -109,7 +109,7 @@ async function main(buildId:string){
     await assertSource();console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'executing-once'}));
     // No failure is routed backwards. A failed component is diagnosed for an
     // explicit source correction; saved narration and films remain untouched.
-    const watch=createCourseProgressWatch({onProgress:async(progress:any)=>{console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'progress',...progress}));}});
+    const watch=createCourseProgressWatch({idleMs:directStepIdleDeadline(step),onProgress:async(progress:any)=>{console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'progress',...progress}));}});
     try{const result=await watch.race(watch.run(()=>handlers[step](context)));await watch.flush();return result;}finally{watch.dispose();}
    },
    validate:async(step:UltimateBuildStep,result:Awaited<ReturnType<(typeof handlers)[string]>>)=>{

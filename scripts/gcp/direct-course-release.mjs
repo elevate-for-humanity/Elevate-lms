@@ -37,6 +37,7 @@ export function knownObsoletePhotoExecution(execution) {
   '80eb6455d0bfff9178306fcaedc9b88c84390e73':'85ac9b7f7b4bdd4760e8032fc03dc5922c26dc6449d4671582a8987c36873ca3',
   'ade51ae703e75722186b5dd8a62098547bde6e60':'4d2de36dcebcdee37808fa425a65698087265de586cc0f4d7f43c3d64a395603',
   '517cf6da93652de3102e4c0822be6b82bab261ef':'a0396ba6ff5ddcff17359e3af36e4c9dbbfd10cd3b55e39761b598c65f02cd89',
+  '1dd350514ff1683efdaca642f45dd753b111db15':'e90f32f0a8bb1370b15f131eeb71d558be42983d965bfbffc6dab80aea3bd11f',
  };
  const superseded=Boolean(obsoleteDigests[source]) &&
   container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@sha256:${obsoleteDigests[source]}` &&

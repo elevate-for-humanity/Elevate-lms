@@ -2,6 +2,7 @@
 export function directLessonEditorialHold(contentJson) {
   return contentJson?.savedFilmSourceNeedsRevision===true;
 }
+export function directStepIdleDeadline(step){return step==='learner_runthrough'?3600000:600000;}
 
 export function directCourseNeedsFinalPublication(course,lessonCount) {
   if(!Number.isInteger(lessonCount)||lessonCount<1)throw Error('DIRECT_COURSE_LESSON_COUNT_REQUIRED');

@@ -3,6 +3,9 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
+import { HvacLabHero } from '@/components/programs/HvacTrainingShowcase';
+import { renderToString } from 'react-dom/server';
+import { hydrateRoot } from 'react-dom/client';
 
 const voice = vi.hoisted(() => ({ play: vi.fn(), prepare: vi.fn(), stop: vi.fn() }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/programs/hvac-technician' }));
@@ -115,5 +118,53 @@ describe('public assistance around the HVAC film', () => {
     await act(async () => { dock = filmPage(); });
     await showFilm(true);
     expect(dock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
+  });
+
+  it('does not mutate server-rendered hero HTML before hydration or replace the native player', async () => {
+    vi.useRealTimers();
+    const host = document.createElement('main');
+    host.innerHTML = renderToString(<HvacLabHero />);
+    document.body.append(host);
+    const originalVideo = host.querySelector('video');
+    if (!originalVideo) throw new Error('The server-rendered hero must contain its native player');
+    // jsdom does not initialize the live muted property from the SSR attribute.
+    originalVideo.muted = originalVideo.defaultMuted;
+    expect(host.querySelector('[data-hvac-video-assistance]')).toBeNull();
+    render(<ParisFloatingButton />);
+    await showFilm(true);
+    expect(host.querySelector('[data-hvac-video-assistance]')).toBeNull();
+    const recoverableError = vi.fn();
+    const hydrationWarning = vi.spyOn(console, 'error');
+    let unmount = () => {};
+    try {
+      await act(async () => {
+        const root = hydrateRoot(host, <HvacLabHero />, { onRecoverableError: recoverableError });
+        unmount = () => root.unmount();
+      });
+      await showFilm(true);
+      const dock = host.querySelector('[data-hvac-video-assistance]');
+      expect(dock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
+      expect(host.querySelector('video')).toBe(originalVideo);
+      expect(recoverableError).not.toHaveBeenCalled();
+      expect(hydrationWarning).not.toHaveBeenCalled();
+    } finally {
+      await act(async () => unmount());
+      hydrationWarning.mockRestore();
+    }
+  });
+
+  it('reattaches to a replacement page subtree instead of retaining detached elements', async () => {
+    const oldDock = filmPage();
+    render(<ParisFloatingButton />);
+    await showFilm(true);
+    expect(oldDock.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
+    let newDock: Element | undefined;
+    await act(async () => {
+      document.querySelector('main')!.remove();
+      newDock = filmPage();
+    });
+    await showFilm(true);
+    expect(newDock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
+    expect(oldDock.children).toHaveLength(0);
   });
 });

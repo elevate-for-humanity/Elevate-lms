@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const website = 'https://www.elevateforhumanity.org/programs/hvac-technician';
 const selector = 'video[data-hvac-hero-video="20261029"]';
@@ -8,8 +8,15 @@ type PlaybackEvidence = {
 };
 type ObservedWindow = typeof window & { __hvacPlaybackEvidence: PlaybackEvidence };
 
+function trackPageErrors(page: Page) {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  return errors;
+}
+
 test('HVAC hero plays the complete 96-second film and loops without cropping', async ({ page }, testInfo) => {
   test.setTimeout(155_000);
+  const pageErrors = trackPageErrors(page);
   // Observe native autoplay from document creation. In particular, do not
   // introduce an asynchronous seek/rewind into WebKit's streaming decoder.
   await page.addInitScript(target => {
@@ -69,14 +76,16 @@ test('HVAC hero plays the complete 96-second film and loops without cropping', a
     expect(evidence.maxTime).toBeGreaterThanOrEqual(95);
     expect(evidence.samples.at(-1)!.elapsedMs).toBeGreaterThanOrEqual(94_000);
     expect(evidence.samples.every(sample => sample.error === 0 && !sample.paused)).toBe(true);
+    expect(pageErrors, 'The live page must hydrate without replacing the player').toEqual([]);
   } finally {
     const evidence = await page.evaluate(() => (window as ObservedWindow).__hvacPlaybackEvidence);
-    await testInfo.attach('hvac-full-playback', { body: JSON.stringify({ url: page.url(), project: testInfo.project.name, initial, ...evidence }), contentType: 'application/json' });
+    await testInfo.attach('hvac-full-playback', { body: JSON.stringify({ url: page.url(), project: testInfo.project.name, initial, pageErrors, ...evidence }), contentType: 'application/json' });
   }
   await testInfo.attach('hvac-hero-playing', { body: await page.screenshot(), contentType: 'image/png' });
 });
 
 test('optional assistance and installation do not cover the HVAC film or controls', async ({ page }, testInfo) => {
+  const pageErrors = trackPageErrors(page);
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   await expect(page.locator(selector)).toBeVisible();
   // Cover the delayed iOS install promotion as well as the initial page load.
@@ -92,10 +101,12 @@ test('optional assistance and installation do not cover the HVAC film or control
     });
   });
   expect(controlsClear, 'Both ends of the native control bar must receive pointer input').toBe(true);
+  expect(pageErrors).toEqual([]);
   await testInfo.attach('hvac-unobstructed-controls', { body: await page.screenshot(), contentType: 'image/png' });
 });
 
 test('HVAC native media supports sound, pause, and resume', async ({ page }, testInfo) => {
+  const pageErrors = trackPageErrors(page);
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   const video = page.locator(selector);
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState)).toBeGreaterThanOrEqual(2);
@@ -113,10 +124,12 @@ test('HVAC native media supports sound, pause, and resume', async ({ page }, tes
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBeGreaterThan(before + 0.5);
   const sound = await video.evaluate((element: HTMLVideoElement) => ({ muted: element.muted, volume: element.volume, paused: element.paused, error: element.error?.code ?? 0 }));
   expect(sound).toEqual({ muted: false, volume: 1, paused: false, error: 0 });
+  expect(pageErrors).toEqual([]);
   await testInfo.attach('hvac-native-sound', { body: JSON.stringify(sound), contentType: 'application/json' });
 });
 
 test('HVAC poster remains available when the video request fails', async ({ page, request }, testInfo) => {
+  const pageErrors = trackPageErrors(page);
   await page.route('**/videos/hvac-recruitment-20261029.mp4', route => route.abort('failed'));
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   const video = page.locator(selector);
@@ -128,5 +141,6 @@ test('HVAC poster remains available when the video request fails', async ({ page
   expect(image.headers()['content-type']).toMatch(/^image\//);
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.networkState)).toBe(3);
   expect(await video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBe(0);
+  expect(pageErrors).toEqual([]);
   await testInfo.attach('hvac-video-unavailable-poster', { body: await page.screenshot(), contentType: 'image/png' });
 });

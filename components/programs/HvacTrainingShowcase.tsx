@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { HvacVideoAssistanceDock } from './HvacVideoAssistanceDock';
 
 const imageRoot = '/images/programs/hvac/elevate-20261029';
 const applyHref = '/apply/student?program=hvac-technician';
@@ -78,10 +79,7 @@ export function HvacLabHero() {
           <p className="px-4 py-3 text-center text-sm text-slate-200">
             Watch our HVAC program introduction. Use the video controls to turn on sound or pause.
           </p>
-          <div
-            data-hvac-video-assistance
-            className="flex flex-wrap items-center justify-center gap-3 px-4 pb-4 empty:hidden"
-          />
+          <HvacVideoAssistanceDock />
         </div>
       </div>
     </figure>

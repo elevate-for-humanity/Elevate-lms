@@ -66,6 +66,10 @@ try {
   NEXT_PUBLIC_SUPABASE_ANON_KEY:process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   LEGACY83_REVISION:sha,PORT:'8080',HOSTNAME:'0.0.0.0'
  };
+ for(const suffix of ['API_KEY','AUTH_DOMAIN','PROJECT_ID','STORAGE_BUCKET','MESSAGING_SENDER_ID','APP_ID','MEASUREMENT_ID']){
+  const name='NEXT_PUBLIC_FIREBASE_'+suffix;
+  if(typeof process.env[name]==='string')env[name]=process.env[name];
+ }
  if(!env.NEXT_PUBLIC_SUPABASE_ANON_KEY||Object.values(env).some(x=>/[\r\n\0]/.test(x)))throw Error('Invalid customer runtime configuration');
  ssh('sudo install -m 600 /dev/stdin /etc/legacy83/runtime.env',Object.entries(env).map(([k,v])=>k+'='+v).join('\n')+'\n');
  const priorPort=ssh('sudo cat /etc/legacy83/active-port 2>/dev/null || true').trim();

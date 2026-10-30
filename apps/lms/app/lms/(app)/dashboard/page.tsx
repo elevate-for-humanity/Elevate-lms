@@ -9,6 +9,9 @@ import HvacStartHere from '@/components/learner/HvacStartHere';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { isApprenticeWorkspaceRole } from '@/lib/navigation/navigation-config';
+import { PortalRouter } from '@/lib/routing/portal-router';
 import {
   ArrowRight,
   Award,
@@ -113,6 +116,9 @@ export default async function StudentDashboard() {
   const { data: subjectProfile } = subject.previewing
     ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
     : { data: profile };
+  // Old bookmarks and installed Student app shortcuts must not create a second
+  // home for apprentices. Shared course routes remain available with apprentice chrome.
+  if (isApprenticeWorkspaceRole(subjectProfile?.role)) redirect(PortalRouter.get('apprentice'));
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling

@@ -22,7 +22,7 @@ import type {
   BreadcrumbItem,
   ActionItem,
 } from '@/lib/navigation/navigation-config';
-import { getNavigationForRole, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
+import { getNavigationForRole, getDashboardHref, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
 import { ProfileImage } from '@/components/profile/ProfileImage';
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
 
@@ -64,18 +64,7 @@ export function PlatformShell({
   recruitingEnabled = false,
 }: PlatformShellProps) {
   const pathname = usePathname();
-  const isWorkforce = role === 'workforce' || role === 'workforce_partner';
-  const dashboardHref = isWorkforce
-    ? '/workforce/dashboard'
-    : role === 'host_shop'
-      ? '/host-shop/dashboard'
-      : role === 'program_holder' || role === 'site_coordinator'
-        ? '/program-holder/dashboard'
-        : role === 'apprentice'
-          ? '/apprentice'
-          : role === 'student'
-            ? '/learner/dashboard'
-            : '/';
+  const dashboardHref = getDashboardHref(role);
   const installHref =
     role === 'host_shop'
       ? '/install/host-shop'
@@ -214,7 +203,7 @@ export function PlatformShell({
           </div>
 
           <div className="hidden items-center gap-1 sm:flex">
-            {pathname !== dashboardHref ? (
+            {pathname !== new URL(dashboardHref, 'https://local.invalid').pathname ? (
               <button
                 type="button"
                 onClick={() => window.history.back()}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 
-export function OpenLearnerPortalButton({ studentId }: { studentId: string }) {
+export function OpenLearnerPortalButton({ studentId, label = 'Open learner portal' }: { studentId: string; label?: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   async function openPortal() {
@@ -35,5 +35,5 @@ export function OpenLearnerPortalButton({ studentId }: { studentId: string }) {
       setBusy(false);
     }
   }
-  return <div className="flex flex-col items-end gap-1"><button type="button" onClick={openPortal} disabled={busy} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-blue-800 disabled:opacity-60"><ExternalLink className="h-4 w-4" />{busy ? 'Opening…' : 'Open learner portal'}</button>{error ? <p className="max-w-64 text-right text-xs font-semibold text-rose-700">{error}</p> : null}</div>;
+  return <div className="flex flex-col items-end gap-1"><button type="button" onClick={openPortal} disabled={busy} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-blue-800 disabled:opacity-60"><ExternalLink className="h-4 w-4" />{busy ? 'Opening…' : label}</button>{error ? <p className="max-w-64 text-right text-xs font-semibold text-rose-700">{error}</p> : null}</div>;
 }

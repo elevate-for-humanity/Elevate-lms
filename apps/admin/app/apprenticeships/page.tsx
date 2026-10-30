@@ -1,3 +1,4 @@
+import { OpenLearnerPortalButton } from '@/components/admin/students/OpenLearnerPortalButton';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -137,7 +138,7 @@ export default async function ApprenticeshipsPage() {
             <table className="w-full min-w-[720px] text-sm hours-review-table">
               <thead className="bg-slate-50">
                 <tr>
-                  {['Apprentice', 'Program', 'Hours', 'Status', 'Start Date'].map((h) => (
+                  {['Apprentice', 'Program', 'Hours', 'Status', 'Start Date', 'Dashboard'].map((h) => (
                     <th
                       key={h}
                       className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
@@ -200,6 +201,9 @@ export default async function ApprenticeshipsPage() {
                       </td>
                       <td data-label="Start date" className="px-4 py-3 text-xs text-slate-500">
                         {formatHoursDate(e.start_date)}
+                      </td>
+                      <td data-label="Dashboard" className="px-4 py-3">
+                        {e.user_id ? <OpenLearnerPortalButton studentId={e.user_id} label="Open apprentice portal" /> : <span>Account link required</span>}
                       </td>
                     </tr>
                   );

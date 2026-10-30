@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { isApprenticeWorkspaceRole } from '@/lib/navigation/navigation-config';
 import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
 
 export default async function LearnerWorkspaceLayout({
@@ -35,6 +36,7 @@ export default async function LearnerWorkspaceLayout({
   const subjectRole = subject.previewing
     ? (await db.from('profiles').select('role').eq('id', subject.userId).maybeSingle()).data?.role
     : profile?.role;
+  const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole);
   const showBilling =
     (!isAdmin || subject.previewing) &&
     (await learnerCanSeeBilling(db, subject.userId, subjectRole));
@@ -49,10 +51,10 @@ export default async function LearnerWorkspaceLayout({
         last_name: profile?.last_name || undefined,
         avatar_url: photoProfile?.avatar_url || undefined,
       }}
-      role="student"
+      role={apprenticeWorkspace ? 'apprentice' : 'student'}
       paris={{ autoOpenOnDashboard: false }}
     >
-      {showLearnerNotices && !isAdmin && !photoProfile?.avatar_url ? (
+      {showLearnerNotices && !apprenticeWorkspace && !isAdmin && !photoProfile?.avatar_url ? (
         <div className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6">
           <details className="rounded-xl border border-slate-200 bg-white p-3">
             <summary className="cursor-pointer text-sm font-bold text-slate-700">
@@ -81,7 +83,7 @@ export default async function LearnerWorkspaceLayout({
           </details>
         </div>
       ) : null}
-      {showLearnerNotices && showBilling ? (
+      {showLearnerNotices && !apprenticeWorkspace && showBilling ? (
         <section
           className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6"
           aria-label="Your payment plan"

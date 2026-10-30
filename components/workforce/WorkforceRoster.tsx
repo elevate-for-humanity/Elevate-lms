@@ -10,7 +10,7 @@ export async function WorkforceRoster({
   params: { q?: string; filter?: string; page?: string };
   admin?: boolean;
 }) {
-  const { enrollments } = await getWorkforceWorkspace();
+  const { enrollments, reviewEnrollments = [] } = await getWorkforceWorkspace();
   const q = (params.q ?? '').trim().slice(0, 200).toLowerCase();
   const filtered = filterEnrollments(enrollments, params.filter).filter(
     (row) =>
@@ -33,10 +33,28 @@ export async function WorkforceRoster({
       <div>
         <h1 className="text-2xl font-bold">Workforce Participants</h1>
         <p>
-          {grouped.length} participants · {filtered.length} enrollments
+          {grouped.length} learners · {filtered.length} program records
           {params.filter ? ` · ${params.filter}` : ''}
         </p>
       </div>
+      {reviewEnrollments.length > 0 && (
+        <details className="rounded-xl border bg-white p-4">
+          <summary>{reviewEnrollments.length} excluded records requiring review</summary>
+          <p>
+            Test records, staff/owner accounts and records without a linked learner profile are kept
+            separate from learner counts. Original enrollment statuses are preserved.
+          </p>
+          <ul>
+            {reviewEnrollments.map((row) => (
+              <li key={row.id}>
+                {row.profile?.full_name ?? 'Unlinked identity'} ·{' '}
+                {row.program?.title ?? 'Program not recorded'} ·{' '}
+                {row.enrollment_state ?? 'Status not recorded'}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
       <StudentSearchPanel action={base} defaultValue={params.q ?? ''} filter={params.filter} />
       <nav className="flex flex-wrap gap-4" aria-label="Participant filters">
         {['all', 'active', 'completed', 'at-risk'].map((filter) => (

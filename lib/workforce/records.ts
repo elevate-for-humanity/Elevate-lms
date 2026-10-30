@@ -1,3 +1,5 @@
+import { isLearnerRosterProfile } from '@/lib/program-holder/roster-eligibility';
+
 export const WORKFORCE_ACCESS_ROLES = [
   'admin',
   'super_admin',
@@ -20,8 +22,9 @@ export function filterEnrollments<T extends { enrollment_state?: string; at_risk
   filter?: string,
 ) {
   if (filter === 'at-risk') return rows.filter((row) => row.at_risk === true);
-  if (filter === 'active' || filter === 'completed')
-    return rows.filter((row) => row.enrollment_state === filter);
+  if (filter === 'active')
+    return rows.filter((row) => ['active', 'enrolled'].includes(row.enrollment_state ?? ''));
+  if (filter === 'completed') return rows.filter((row) => row.enrollment_state === filter);
   return rows;
 }
 
@@ -37,9 +40,27 @@ export function enrollmentSummary(
     participants: new Set(rows.map(learnerId).filter(Boolean)).size,
     enrollments: rows.length,
     active: filterEnrollments(rows, 'active').length,
+    activeParticipants: new Set(filterEnrollments(rows, 'active').map(learnerId).filter(Boolean))
+      .size,
     completed: filterEnrollments(rows, 'completed').length,
     atRisk: filterEnrollments(rows, 'at-risk').length,
   };
+}
+
+export function enrollmentNeedsReview(row: {
+  source?: string | null;
+  profile?: { id?: unknown; role?: unknown; email?: unknown; full_name?: unknown };
+}) {
+  const name = String(row.profile?.full_name ?? '')
+    .trim()
+    .toLowerCase();
+  return (
+    ['qa_e2e', 'test', 'demo', 'seed_test'].includes(String(row.source ?? '').toLowerCase()) ||
+    name.startsWith('[qa') ||
+    name === 'test barber student' ||
+    !row.profile ||
+    !isLearnerRosterProfile(row.profile)
+  );
 }
 
 // Quote all cells and neutralize spreadsheet formulas in user-entered fields.

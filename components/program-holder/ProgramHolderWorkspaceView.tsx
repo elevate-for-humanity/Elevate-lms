@@ -1,3 +1,5 @@
+import ProgramSyllabusReader from '@/components/learner/ProgramSyllabusReader';
+import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 import { payoutSetupLabel } from '@/lib/program-holder/payout-summary';
 import { ProgramHolderOnlineStudy } from './ProgramHolderOnlineStudy';
 import { hasRecruitingAssignment } from '@/lib/program-holder/recruiting-access';
@@ -1267,6 +1269,10 @@ function Programs({ data }: { data: any }) {
             : null
         }
       />
+      {data.programs.map((program: any) => {
+        const syllabus = getBeautyApprenticeshipConfig(program.slug);
+        return syllabus ? <ProgramSyllabusReader key={program.id} title={`${syllabus.label} apprenticeship syllabus`} path={syllabus.syllabusHref} /> : null;
+      })}
       <SyllabusUploadStatus documents={data.documents} courseAssignments={data.courseAssignments} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
     </div>

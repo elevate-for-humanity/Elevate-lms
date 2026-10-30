@@ -33,9 +33,16 @@ export default async function LearnerWorkspaceLayout({
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user.id);
   const isAdmin = ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
-  const subjectRole = subject.previewing
-    ? (await db.from('profiles').select('role').eq('id', subject.userId).maybeSingle()).data?.role
-    : profile?.role;
+  const subjectProfile = subject.previewing
+    ? (
+        await db
+          .from('profiles')
+          .select('role,email,full_name,first_name,last_name,avatar_url')
+          .eq('id', subject.userId)
+          .maybeSingle()
+      ).data
+    : profile;
+  const subjectRole = subjectProfile?.role;
   const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole);
   const showBilling =
     (!isAdmin || subject.previewing) &&
@@ -44,12 +51,14 @@ export default async function LearnerWorkspaceLayout({
   return (
     <PlatformShell
       user={{
-        id: user.id,
-        email: user.email || '',
-        full_name: profile?.full_name || undefined,
-        first_name: profile?.first_name || undefined,
-        last_name: profile?.last_name || undefined,
-        avatar_url: photoProfile?.avatar_url || undefined,
+        id: subject.userId,
+        email: subjectProfile?.email || user.email || '',
+        full_name: subjectProfile?.full_name || undefined,
+        first_name: subjectProfile?.first_name || undefined,
+        last_name: subjectProfile?.last_name || undefined,
+        avatar_url: subject.previewing
+          ? subjectProfile?.avatar_url || undefined
+          : photoProfile?.avatar_url || undefined,
       }}
       role={apprenticeWorkspace ? 'apprentice' : 'student'}
       paris={{ autoOpenOnDashboard: false }}

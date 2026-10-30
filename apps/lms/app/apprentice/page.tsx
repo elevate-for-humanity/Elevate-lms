@@ -576,7 +576,7 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
           <Metric
             label="Required documents"
             value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`}
-            detail={`${missingDocumentCount} incomplete`}
+            detail={missingDocumentCount ? `${missingDocumentCount} still needed` : 'All required documents verified'}
             icon={FileText}
           />
           <Metric

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import TheoryScheduleEditor from '@/components/apprenticeship/TheoryScheduleEditor';
-import { TrainingVisualGuide } from '@/components/apprenticeship/TrainingVisualGuide';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'My Theory Study Schedule',
@@ -13,7 +12,6 @@ export default function TheorySchedulePage() {
         Back to my dashboard
       </Link>
       <TheoryScheduleEditor />
-      <TrainingVisualGuide />
     </main>
   );
 }

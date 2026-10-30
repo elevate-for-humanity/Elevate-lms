@@ -35,7 +35,7 @@ export default function VisualDashboardOrientation({
     >
       {!compact && (
         <div className="overflow-hidden rounded-3xl bg-neutral-950 text-white">
-          <div className="relative aspect-video">
+          <div className="relative h-40 sm:h-48">
             <Image src={guide.hero} alt="" fill sizes="100vw" className="object-cover object-top" />
           </div>
 
@@ -219,7 +219,7 @@ export default function VisualDashboardOrientation({
               <summary className="min-h-11 cursor-pointer font-bold text-amber-100">
                 Read the detailed instructions for this topic
               </summary>
-              <p className="mt-3 max-w-4xl whitespace-pre-line text-base leading-8 text-stone-200">
+              <p tabIndex={0} role="region" aria-label="Orientation transcript" className="mt-3 max-h-64 max-w-4xl overflow-y-auto whitespace-pre-line text-base leading-8 text-stone-200">
                 {slide.narration}
               </p>
             </details>

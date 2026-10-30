@@ -1,7 +1,8 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-
 
 function monthBounds(year: number, month: number) {
   const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
@@ -15,10 +16,14 @@ export async function getCalendarEvents(request: NextRequest) {
 
   const supabase = await createClient();
   const {
-    data: { user },
+    data: { user: authenticatedUser },
   } = await supabase.auth.getUser();
 
-  if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const admin = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(admin, authenticatedUser?.id);
+  if (!subject.userId)
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const user = { id: subject.userId };
 
   const params = request.nextUrl.searchParams;
   const now = new Date();
@@ -26,7 +31,14 @@ export async function getCalendarEvents(request: NextRequest) {
   const month = Number(params.get('month') ?? now.getUTCMonth() + 1);
   const requestedUserId = params.get('userId');
 
-  if (!Number.isInteger(year) || year < 2000 || year > 2100 || !Number.isInteger(month) || month < 1 || month > 12) {
+  if (
+    !Number.isInteger(year) ||
+    year < 2000 ||
+    year > 2100 ||
+    !Number.isInteger(month) ||
+    month < 1 ||
+    month > 12
+  ) {
     return NextResponse.json({ error: 'Invalid calendar month' }, { status: 400 });
   }
   if (requestedUserId && requestedUserId !== user.id) {
@@ -36,7 +48,7 @@ export async function getCalendarEvents(request: NextRequest) {
   const { start, end } = monthBounds(year, month);
   const startDate = start.slice(0, 10);
   const endDate = end.slice(0, 10);
-  const { data, error } = await supabase
+  const { data, error } = await (subject.previewing ? admin : supabase)
     .from('calendar_events')
     .select('id, title, date, time, event_type, description')
     .eq('user_id', user.id)
@@ -54,17 +66,37 @@ export async function getCalendarEvents(request: NextRequest) {
     const time = event.time ? String(event.time).slice(0, 5) : '00:00';
     const startTime = new Date(`${date}T${time}:00Z`);
     const rawType = String(event.event_type ?? 'event').toLowerCase();
-    const type = ['assignment', 'quiz', 'deadline', 'class', 'event'].includes(rawType) ? rawType : 'event';
+    const type = ['assignment', 'quiz', 'deadline', 'class', 'event'].includes(rawType)
+      ? rawType
+      : 'event';
 
     return {
       id: String(event.id),
       title: String(event.title ?? 'Scheduled event'),
       date: startTime.toISOString().slice(0, 10),
-      time: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }),
+      time: startTime.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'UTC',
+      }),
       type,
       course: undefined,
     };
   });
 
-  return NextResponse.json({ events });
+  const { data: theorySchedule, error: scheduleError } = await admin
+    .from('apprenticeship_theory_schedules')
+    .select('days_of_week,start_time,end_time,timezone,starts_on,learner_confirmed_at')
+    .eq('user_id', user.id)
+    .eq('active', true)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (scheduleError)
+    return NextResponse.json({ error: 'Unable to load theory schedule' }, { status: 503 });
+  return NextResponse.json(
+    { events, theorySchedule, readOnly: subject.previewing },
+    { headers: { 'Cache-Control': 'private, no-store' } },
+  );
 }

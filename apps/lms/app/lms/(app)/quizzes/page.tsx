@@ -1,3 +1,4 @@
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -14,9 +15,14 @@ export const metadata = {
 export default async function QuizzesPage() {
   const auth = await createClient();
   const {
-    data: { user },
+    data: { user: authenticatedUser },
   } = await auth.auth.getUser();
-  if (!user) redirect('/login');
+  const previewDb = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(previewDb, authenticatedUser?.id);
+  if (!subject.userId) redirect('/login');
+  // The signed preview subject, or the authenticated learner, owns every read.
+  const user = { id: subject.userId };
+
   const db = await requireAdminClient();
   const courseIds = await loadLearnerCourseIds(db, user.id);
   // Current courses and course_lessons have UUID identities. The legacy quizzes
@@ -30,6 +36,15 @@ export default async function QuizzesPage() {
     : 0;
   return (
     <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+      {subject.previewing ? (
+        <p
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"
+        >
+          Administrator preview: viewing this learner’s saved records. Changes and submissions are
+          disabled.
+        </p>
+      ) : null}
       <LmsHeroBanner
         title="Quizzes & Assessments"
         subtitle={`${results.length} assigned assessments · ${passed} passed`}

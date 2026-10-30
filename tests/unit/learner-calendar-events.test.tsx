@@ -53,3 +53,14 @@ it('shows a Google all-day busy block on each occupied local day but excludes it
   fireEvent.click(screen.getByRole('button', { name: end.toLocaleDateString('en-US', { dateStyle: 'full' }) }));
   expect(screen.queryByText('Google Calendar · Busy')).toBeNull();
 });
+it('shows saved theory times in the calendar without connecting the admin Google account in preview', async () => {
+  const today = new Date();
+  const target = new Date(today.getFullYear(), today.getMonth(), 15);
+  const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ events: [], theorySchedule: { days_of_week: [target.getDay() || 7], start_time: '12:00:00', end_time: '14:30:00', timezone: 'America/Indiana/Indianapolis', starts_on: '2020-01-01', learner_confirmed_at: '2026-01-01' } }) });
+  vi.stubGlobal('fetch', fetcher);
+  render(<CalendarWidget userId="selected-learner" readOnly />);
+  await vi.waitFor(() => expect(fetcher).toHaveBeenCalledTimes(1));
+  fireEvent.click(screen.getByRole('button', { name: target.toLocaleDateString('en-US', { dateStyle: 'full' }) }));
+  expect(await screen.findByText('My theory study time')).toBeInTheDocument();
+  expect(fetcher.mock.calls.every(call => String(call[0]).startsWith('/api/calendar/events?'))).toBe(true);
+});

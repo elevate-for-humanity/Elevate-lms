@@ -16,6 +16,7 @@ import {
   Square,
 } from 'lucide-react';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
+import { startStudioBrowserSession } from '@/lib/devstudio/studio-browser-session-start';
 
 type Session = {
   id: string;
@@ -130,6 +131,11 @@ export default function CloudBrowserWorkspace({
   const navigationRevisionRef = useRef(0);
   const navigatingRef = useRef(false);
   const autoStartedRef = useRef(false);
+  useEffect(() => () => {
+    // A superseded conversation or unmounted view cannot restart admission.
+    lifecycleRef.current += 1;
+    autoStartedRef.current = false;
+  }, [conversationId, unifiedTask?.taskId]);
   const autoRunCommandRef = useRef('');
 
   useEffect(() => {
@@ -299,18 +305,18 @@ export default function CloudBrowserWorkspace({
     setError('');
     setStatus('Starting isolated Chromium…');
     setCdpConnected(false);
-    const response = await fetch('/api/admin/dev-studio/browser/session', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
+    const result = await startStudioBrowserSession<Session & { error?: string }>({
+      isCurrent: () => lifecycle === lifecycleRef.current,
+      body: {
         url: startingTarget,
         width: compact ? 390 : Math.min(1440, Math.max(390, window.innerWidth)),
         height: compact || window.innerWidth < 1024 ? 780 : 900,
         conversationId: conversationId || undefined,
         taskId: unifiedTask?.taskId || undefined,
-      }),
+      },
     });
-    const payload = await response.json();
+    if (!result) return;
+    const { response, payload } = result;
     if (lifecycle !== lifecycleRef.current) return;
     if (!response.ok) {
       setError(payload.error || 'Could not start browser');

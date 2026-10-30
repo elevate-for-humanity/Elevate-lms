@@ -41,3 +41,14 @@ export async function runDirectCourseSequence({groups,execute}) {
  }
  return results;
 }
+
+/** Preserve known validation diagnostics without serializing request/config data. */
+export function directFailureEvidence(error) {
+ const message=typeof error?.message==='string'?error.message:'';
+ const typed=message.match(/^([A-Z][A-Z0-9_]+)(?=[:\s]|$)/)?.[1];
+ const result={code:typed??'DIRECT_COMPONENT_FAILED'};
+ if(/^Media quality gate failed:/.test(message))result.code='MEDIA_QUALITY_GATE_FAILED';
+ const diagnostic=/^(?:Media quality gate failed:|MP4 returned HTTP|Caption alignment returned HTTP|Rendered-audio transcription is empty|Cloudflare rendered-audio transcription credentials are not configured)/.test(message);
+ if(diagnostic)result.detail=message.replace(/https?:\/\/[^\s]+/gi,'[private-url]').replace(/(?:Bearer\s+|(?:token|key|secret|signature|authorization)\s*[=:]\s*)[^\s;,]+/gi,'[redacted]').slice(0,1200);
+ return result;
+}

@@ -7,7 +7,7 @@ import {ULTIMATE_BUILD_STEPS,type UltimateBuildStep,type UltimateCredentialProfi
 import type {UltimateRunContext} from '../lib/ultimate-course-builder/core/build-runner';
 import {UltimateReleaseService} from '../lib/ultimate-course-builder/release/release-service';
 import {resolveReleaseActor} from '../lib/ultimate-course-builder/worker/release-actor';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence} from './direct-course-policy.mjs';
 
 // Reuse media tools and release validators, but never invoke the build runner,
 // role dispatcher, automatic repair router, or any queue operation.
@@ -118,9 +118,9 @@ async function main(buildId:string){
     await runtime.persistence.recordStep({lessonBuildId:lesson.id,step,state:'passed',artifacts:certified,findings:[]});
    },
    reject:async(step:UltimateBuildStep,fingerprint:string,error:unknown)=>{
-    await assertSource();const code=safeCode(error);
-    await runtime.artifacts.createVersion({buildId:build.id,lessonBuildId:lesson.id,stage:step,artifactType:'direct-release-failure',logicalKey:attempts.get(step)??`direct-failure:${lesson.id}:${step}:${fingerprint}`,content:{step,code,inputFingerprint:fingerprint,producer,runId},generatedBy:'direct-lms-release',changeReason:'One failed component retained; unchanged inputs may not automatically repeat.'});
-    console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'blocked',code}));
+    await assertSource();const failure=directFailureEvidence(error);const {code}=failure;
+    await runtime.artifacts.createVersion({buildId:build.id,lessonBuildId:lesson.id,stage:step,artifactType:'direct-release-failure',logicalKey:attempts.get(step)??`direct-failure:${lesson.id}:${step}:${fingerprint}`,content:{step,...failure,inputFingerprint:fingerprint,producer,runId},generatedBy:'direct-lms-release',changeReason:'One failed component retained; unchanged inputs may not automatically repeat.'});
+    console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,step,state:'blocked',...failure}));
    },
   });
   if(!result.complete){blocked.push({lesson:lesson.competency_id,step:result.blockedAt,reason:result.reason});continue;}

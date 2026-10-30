@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence} from './direct-course-policy.mjs';
 function harness(overrides={}) {
  const calls=[],saved=new Map([['script','original-script'],['narration','original-audio']]);
  return {calls,saved,input:{steps:['script','narration','render','qa','publish'],
@@ -49,4 +49,16 @@ test('an incomplete course stops before another course starts',async()=>{
 });
 test('unrelated courses cannot be silently grouped as one completed course',async()=>{
  await assert.rejects(runDirectCourseSequence({groups:[['core','barber']],execute:async id=>({courseId:id,complete:true})}),/DIRECT_COURSE_GROUP_MISMATCH/);
+});
+
+test('direct failures retain measured media rejection without a generic stop reason',()=>{
+ const result=directFailureEvidence(Error('Media quality gate failed: insufficient visual changes: detected 12, expected at least 13'));
+ assert.equal(result.code,'MEDIA_QUALITY_GATE_FAILED');assert.match(result.detail,/detected 12, expected at least 13/);
+ assert.equal(directFailureEvidence(Error('MEDIA_TEXT_UNREADABLE:4:390')).code,'MEDIA_TEXT_UNREADABLE');
+});
+test('direct diagnostics redact URLs and secrets and never serialize unknown request errors',()=>{
+ const result=directFailureEvidence(Error('Media quality gate failed: https://private.example/?signature=secret token=private-value'));
+ assert.equal(result.detail.includes('secret'),false);assert.equal(result.detail.includes('private-value'),false);
+ assert.deepEqual(directFailureEvidence({message:'request failed',config:{key:'credential'}}),{code:'DIRECT_COMPONENT_FAILED'});
+ assert.equal(directFailureEvidence(Error('Media quality gate failed: '+'x'.repeat(5000))).detail.length,1200);
 });

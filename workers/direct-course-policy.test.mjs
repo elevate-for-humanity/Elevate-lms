@@ -79,3 +79,22 @@ test('direct diagnostics redact URLs and secrets and never serialize unknown req
  assert.deepEqual(directFailureEvidence({message:'request failed',config:{key:'credential'}}),{code:'DIRECT_COMPONENT_FAILED'});
  assert.equal(directFailureEvidence(Error('Media quality gate failed: '+'x'.repeat(5000))).detail.length,1200);
 });
+
+test('authoring rejection retains the exact objective and practice type without changing the gate',()=>{
+ assert.deepEqual(directFailureEvidence(Error('BLUEPRINT_OBJECTIVE_PRACTICE_REQUIRED:obj-cycle:independent_practice')),
+  {code:'BLUEPRINT_OBJECTIVE_PRACTICE_REQUIRED',detail:'BLUEPRINT_OBJECTIVE_PRACTICE_REQUIRED:obj-cycle:independent_practice'});
+ assert.match(directFailureEvidence(Error('NARRATION_DUPLICATION:scene-3 repeats scene-2')).detail,/scene-3 repeats scene-2/);
+});
+test('photo rejection retains scene and cue with redacted provider cause and no request object',()=>{
+ const provider=Error('GOOGLE_TEACHING_PHOTO_HTTP_429:quota exhausted https://private.example/?signature=secret Bearer private-token');
+ const wrapped=Error('GOOGLE_TEACHING_PHOTO_HTTP_429:scene=tools:cue=2',{cause:provider});
+ wrapped.config={key:'never-serialize'};
+ const result=directFailureEvidence(wrapped);
+ assert.equal(result.code,'GOOGLE_TEACHING_PHOTO_HTTP_429');
+ assert.match(result.detail,/scene=tools:cue=2/);assert.match(result.detail,/quota exhausted/);
+ assert.doesNotMatch(result.detail,/secret|private-token|never-serialize/);
+ const unknown=Error('request failed',{cause:Error('arbitrary request config')});
+ assert.deepEqual(directFailureEvidence(unknown),{code:'DIRECT_COMPONENT_FAILED'});
+ provider.cause=wrapped;assert.ok(directFailureEvidence(wrapped).detail.length<=1200);
+});
+

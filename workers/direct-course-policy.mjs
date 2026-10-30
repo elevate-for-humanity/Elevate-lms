@@ -59,7 +59,16 @@ export function directFailureEvidence(error) {
  const typed=message.match(/^([A-Z][A-Z0-9_]+)(?=[:\s]|$)/)?.[1];
  const result={code:typed??'DIRECT_COMPONENT_FAILED'};
  if(/^Media quality gate failed:/.test(message))result.code='MEDIA_QUALITY_GATE_FAILED';
- const diagnostic=/^(?:Media quality gate failed:|MP4 returned HTTP|Caption alignment returned HTTP|Rendered-audio transcription is empty|Cloudflare rendered-audio transcription credentials are not configured)/.test(message);
- if(diagnostic)result.detail=message.replace(/https?:\/\/[^\s]+/gi,'[private-url]').replace(/(?:Bearer\s+|(?:token|key|secret|signature|authorization)\s*[=:]\s*)[^\s;,]+/gi,'[redacted]').slice(0,1200);
+ // These validators include the failed objective/activity or scene/cue in
+ // their error text. Keep it, while rejecting arbitrary request/config data.
+ const diagnostic=/^(?:Media quality gate failed:|MP4 returned HTTP|Caption alignment returned HTTP|Rendered-audio transcription is empty|Cloudflare rendered-audio transcription credentials are not configured|BLUEPRINT_[A-Z_]+:|NARRATION_DUPLICATION:|ULTIMATE_TEACHING_SEQUENCE_ORDER_REQUIRED:|INSTRUCTIONAL_QUALITY_FAILED:|GOOGLE_TEACHING_PHOTO_HTTP_\d{3}:)/;
+ const messages=[];let current=error;
+ // Photo preparation wraps the provider error in scene/cue context. Its
+ // bounded cause chain supplies the actual provider rejection, not just 429.
+ for(let depth=0;depth<4&&current;depth++,current=current.cause){
+  if(typeof current.message==='string'&&diagnostic.test(current.message)&&!messages.includes(current.message))messages.push(current.message);
+ }
+ if(messages.length)result.detail=messages.join(' | ').replace(/https?:\/\/[^\s]+/gi,'[private-url]').replace(/(?:Bearer\s+|(?:token|key|secret|signature|authorization)\s*[=:]\s*)[^\s;,]+/gi,'[redacted]').slice(0,1200);
  return result;
 }
+
